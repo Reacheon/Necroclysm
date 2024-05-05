@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{63385295-0bec-4a32-8fa4-2aea0bc09d86}</ProjectGuid>
+    <RootNamespace>Chemiclysm</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Chemiclysm</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <BuildStlModules>true</BuildStlModules>
+      <AdditionalIncludeDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\include;$(ProjectDir)\sdl\SDL2_image-2.0.5\include;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\include;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableModules>true</EnableModules>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\lib\x64;$(ProjectDir)\sdl\SDL2_image-2.0.5\lib\x64;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <BuildStlModules>true</BuildStlModules>
+      <AdditionalIncludeDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\include;$(ProjectDir)\sdl\SDL2_image-2.0.5\include;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\include;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableModules>true</EnableModules>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\lib\x64;$(ProjectDir)\sdl\SDL2_image-2.0.5\lib\x64;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <BuildStlModules>true</BuildStlModules>
+      <AdditionalIncludeDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\include;$(ProjectDir)\sdl\SDL2_image-2.0.5\include;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\include;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableModules>true</EnableModules>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\lib\x64;$(ProjectDir)\sdl\SDL2_image-2.0.5\lib\x64;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <BuildStlModules>true</BuildStlModules>
+      <AdditionalIncludeDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\include;$(ProjectDir)\sdl\SDL2_image-2.0.5\include;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\include;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <EnableModules>true</EnableModules>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)\sdl\SDL2-2.0.14\lib\x64;$(ProjectDir)\sdl\SDL2_image-2.0.5\lib\x64;$(ProjectDir)\sdl\SDL2_ttf-2.0.15\lib\x64;$(ProjectDir)\sdl\SDL2_mixer-2.0.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="code\actFuncSet.ixx" />
+    <ClCompile Include="code\Aim.ixx" />
+    <ClCompile Include="code\Alchemy.ixx" />
+    <ClCompile Include="code\AlchemyData.ixx" />
+    <ClCompile Include="code\Ani.ixx" />
+    <ClCompile Include="code\aStar.ixx" />
+    <ClCompile Include="code\Bionic.ixx" />
+    <ClCompile Include="code\calc.ixx" />
+    <ClCompile Include="code\camera.ixx" />
+    <ClCompile Include="code\constVar.ixx" />
+    <ClCompile Include="code\CoordSelectCraft.ixx" />
+    <ClCompile Include="code\Craft.ixx" />
+    <ClCompile Include="code\debugConsole.ixx" />
+    <ClCompile Include="code\Drawable.ixx" />
+    <ClCompile Include="code\drawRect.ixx" />
+    <ClCompile Include="code\God.ixx" />
+    <ClCompile Include="code\HUD.ixx" />
+    <ClCompile Include="code\initCoordTransform.ixx" />
+    <ClCompile Include="code\checkCursor.ixx" />
+    <ClCompile Include="code\Chunk.ixx" />
+    <ClCompile Include="code\clickDown.ixx" />
+    <ClCompile Include="code\clickMotion.ixx" />
+    <ClCompile Include="code\clickUp.ixx" />
+    <ClCompile Include="code\col2Str.ixx" />
+    <ClCompile Include="code\const2Str.ixx" />
+    <ClCompile Include="code\Coord.ixx" />
+    <ClCompile Include="code\CoordSelect.ixx" />
+    <ClCompile Include="code\Corouter.ixx" />
+    <ClCompile Include="code\Corpse.ixx" />
+    <ClCompile Include="code\Damage.ixx" />
+    <ClCompile Include="code\dataLoader.ixx" />
+    <ClCompile Include="code\decimalCutter.ixx" />
+    <ClCompile Include="code\dir16.ixx" />
+    <ClCompile Include="code\dirToXY.ixx" />
+    <ClCompile Include="code\displayLoader.ixx" />
+    <ClCompile Include="code\drawItemList.ixx" />
+    <ClCompile Include="code\drawItemSlot.ixx" />
+    <ClCompile Include="code\drawItemTooltip.ixx" />
+    <ClCompile Include="code\drawSprite.ixx" />
+    <ClCompile Include="code\drawStadium.ixx" />
+    <ClCompile Include="code\drawText.ixx" />
+    <ClCompile Include="code\drawWindow.ixx" />
+    <ClCompile Include="code\drawWindowArrow.ixx" />
+    <ClCompile Include="code\EntityData.ixx" />
+    <ClCompile Include="code\Equip.ixx" />
+    <ClCompile Include="code\errorBox.ixx" />
+    <ClCompile Include="code\extremum.ixx" />
+    <ClCompile Include="code\floodFill.ixx" />
+    <ClCompile Include="code\fontLoader.ixx" />
+    <ClCompile Include="code\getDegree.ixx" />
+    <ClCompile Include="code\AI.ixx" />
+    <ClCompile Include="code\Entity.ixx" />
+    <ClCompile Include="code\Install.ixx" />
+    <ClCompile Include="code\lineMaker.ixx" />
+    <ClCompile Include="code\Loot.ixx" />
+    <ClCompile Include="code\Map.ixx" />
+    <ClCompile Include="code\Mapmaker.ixx" />
+    <ClCompile Include="code\Module.ixx" />
+    <ClCompile Include="code\Msg.ixx" />
+    <ClCompile Include="code\readSkillDex.ixx" />
+    <ClCompile Include="code\renderFPS.ixx" />
+    <ClCompile Include="code\renderSticker.ixx" />
+    <ClCompile Include="code\renderWeather.ixx" />
+    <ClCompile Include="code\SkillData.ixx" />
+    <ClCompile Include="code\Sticker.ixx" />
+    <ClCompile Include="code\updateBarAct.ixx" />
+    <ClCompile Include="code\Vec3.ixx" />
+    <ClCompile Include="code\Player.ixx" />
+    <ClCompile Include="code\Monster.ixx" />
+    <ClCompile Include="code\nanoTimer.ixx" />
+    <ClCompile Include="code\globalTime.ixx" />
+    <ClCompile Include="code\globalVar.ixx" />
+    <ClCompile Include="code\GUI.ixx" />
+    <ClCompile Include="code\hasher.ixx" />
+    <ClCompile Include="code\HSVConverter.ixx" />
+    <ClCompile Include="code\isCircle.ixx" />
+    <ClCompile Include="code\ItemData.ixx" />
+    <ClCompile Include="code\ItemPocket.ixx" />
+    <ClCompile Include="code\ItemStack.ixx" />
+    <ClCompile Include="code\Light.ixx" />
+    <ClCompile Include="code\log.ixx" />
+    <ClCompile Include="code\Lst.ixx" />
+    <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\Mutation.ixx" />
+    <ClCompile Include="code\Point.ixx" />
+    <ClCompile Include="code\prt.ixx" />
+    <ClCompile Include="code\randomRange.ixx" />
+    <ClCompile Include="code\readAlchemyDex.ixx" />
+    <ClCompile Include="code\readCSV.ixx" />
+    <ClCompile Include="code\readEntityDex.ixx" />
+    <ClCompile Include="code\readItemDex.ixx" />
+    <ClCompile Include="code\renderLogue.ixx" />
+    <ClCompile Include="code\renderTile.ixx" />
+    <ClCompile Include="code\renderUI.ixx" />
+    <ClCompile Include="code\replaceStr.ixx" />
+    <ClCompile Include="code\sgn.ixx" />
+    <ClCompile Include="code\Talent.ixx" />
+    <ClCompile Include="code\Sprite.ixx" />
+    <ClCompile Include="code\startSetting.ixx" />
+    <ClCompile Include="code\Status.ixx" />
+    <ClCompile Include="code\stepEvent.ixx" />
+    <ClCompile Include="code\textureLoader.ixx" />
+    <ClCompile Include="code\textureVar.ixx" />
+    <ClCompile Include="code\TileData.ixx" />
+    <ClCompile Include="code\turnCycleLoop.ixx" />
+    <ClCompile Include="code\turnWait.ixx" />
+    <ClCompile Include="code\utf8Decoder.ixx" />
+    <ClCompile Include="code\util.ixx" />
+    <ClCompile Include="code\Vehicle.ixx" />
+    <ClCompile Include="code\connectGroupExtraIndex.ixx" />
+    <ClCompile Include="code\World.ixx" />
+    <ClCompile Include="code\wstring2Number.ixx" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
