@@ -1,0 +1,88 @@
+﻿export module TileData;
+
+import ItemData;
+import globalVar;
+import constVar;
+//__int8 : -128~127
+//__int16 : -32768 ~32767
+//__int32 : –2,147,483,648 ~2,147,483,647
+
+export struct TileData //총용량 29바이트
+{
+    unsigned __int16 floor = 1;
+    unsigned __int16 wall = 0;
+    unsigned __int16 ceil = 0;
+
+    __int16 temperature = 25;//섭씨온도
+    unsigned __int8 moisture = 30; //수분(0~100)
+    unsigned __int8 fertility = 30; //비옥도(0~100)
+    unsigned __int16 plantCounter = 0; // 0 ~  65535 비옥도나 성장환경에 따라 가산되는 카운터(얼마나 잘 성장하는 중인지)
+    unsigned __int16 plantDay = 0; //심은지 지난 날짜 0~65535
+
+    //시야 관련
+    bool blocker = false;
+    fovFlag fov = fovFlag::black;
+
+    //이동 관련
+    bool walkable = true;
+
+    //광원 관련
+    unsigned __int8 light = 0; //이 타일에 영향을 주는 광원의 단순 갯수 
+    unsigned __int16 redLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
+    unsigned __int16 greenLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
+    unsigned __int16 blueLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
+    //식물의 광원으로 계산할 땐 각각이 최댓값 255에 3값의 평균으로 광량 설정
+
+    void* EntityPtr = nullptr;
+    void* ItemStackPtr = nullptr;
+    void* VehiclePtr = nullptr;
+    void* InstallPtr = nullptr;
+
+
+    void update()
+    {
+        if (wall != 0)
+        {
+            walkable = false;
+            //벽 투명 설정
+            if (itemDex[wall].checkFlag(itemFlag::TRANSPARENT_WALL)) blocker = false;
+            else blocker = true;
+        }
+        else
+        {
+            walkable = true;
+            blocker = false;
+        }
+    }
+
+    void setWall(int inputIndex)
+    {
+        wall = inputIndex;
+        update();
+    }
+
+    void destoryWall()
+    {
+        wall = 0;
+        update();
+    }
+
+    void setFloor(int inputIndex)
+    {
+        floor = inputIndex;
+        update();
+    }
+
+    void setCeil(int inputIndex)
+    {
+        ceil = inputIndex;
+        update();
+    }
+};
+
+//식물 성장
+//1. 비료 2. 수분 3. 온도
+//addMap이나 setMap addTileBlueLight나 세분 함수로 전부 분류할 것
+//레이드아머는 설치물로 하는게 좋지않아? 그러게
+//설치물로 하면 레이드아머의 주소를 가리키는건 어떻게 하게?
+//그건 다른 설치물들이 생기면 그 설치물의 정보를 나타내는 그런게 생길텐데 거기서 고려해야되지않음? 흠 맞는말이군
