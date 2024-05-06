@@ -34,7 +34,6 @@ public:
 		prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
 		while (1)
 		{
-
 			prt(lowCol::red, L"[ID : %p]의 timeResource는 %f입니다.\n", this, getTimeResource());
 			if (getTimeResource() >= 2.0) 
 			{

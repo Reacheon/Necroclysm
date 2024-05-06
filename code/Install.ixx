@@ -30,7 +30,7 @@ public:
     {
         leadItem = itemDex[leadItemCode];
         setAniPriority(3);
-        prt(lowCol::orange, L"[Install:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
+        prt(L"[Install:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
         setGrid(inputX, inputY, inputZ);
 
         errorBox(World::ins()->getTile(inputX, inputY, inputZ).InstallPtr != nullptr, L"생성위치에 이미 설치물이 존재한다!");
@@ -61,7 +61,7 @@ public:
     ~Install()
     {
         delete myLight;
-        prt(lowCol::orange, L"[Install:destructor] 소멸자가 호출되었다. \n");
+        prt(L"[Install:destructor] 소멸자가 호출되었다. \n");
 
         //주변 타일을 분석해 extraIndex 설정
         int dx = 0;
@@ -230,11 +230,11 @@ public:
 
     bool runAI()
     {
-        //prt(lowCol::orange,L"[Install:AI] ID : %p의 AI를 실행시켰다.\n", this);
+        //prt(L"[Install:AI] ID : %p의 AI를 실행시켰다.\n", this);
         while (1)
         {
 
-            //prt(lowCol::orange, L"[Install:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
+            //prt(L"[Install:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
             if (getTimeResource() >= 2.0)
             {
                 clearTimeResource();
@@ -245,7 +245,7 @@ public:
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //위의 모든 패턴 조건을 만족하지않을시 return true
-            //prt(lowCol::orange, L"[Install:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
+            //prt(L"[Install:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
             return true;
         }
     }

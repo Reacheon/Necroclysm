@@ -457,7 +457,7 @@ public:
 			//상대좌표를 절대좌표로 변환
 			clickTile.x = Player::ins()->getGridX() + revGridX;
 			clickTile.y = Player::ins()->getGridY() + revGridY;
-			prt(L"절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
+			prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
 			tileTouch(clickTile.x, clickTile.y);
 		}
 	}

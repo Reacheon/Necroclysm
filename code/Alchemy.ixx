@@ -801,7 +801,7 @@ public:
 		{
 			if (alchemyDex[alchemyCounter].qualityNeed != targetToolQuality)
 			{
-				prt(col::red, L"인덱스 %d 연금술 조합 공구기술 부족으로 취소됨\n", alchemyCounter);
+				prt(L"인덱스 %d 연금술 조합 공구기술 부족으로 취소됨\n", alchemyCounter);
 				continue;
 			}
 
@@ -823,22 +823,22 @@ public:
 				{
 					
 					int index = std::distance(itemCodeVec.begin(), codeIt); //반복자를 인덱스로 변환
-					prt(col::red, L"필요한 아이템 %d이 현재 반응물에 존재함\n", itemCodeVec[index]);
+					prt(L"필요한 아이템 %d이 현재 반응물에 존재함\n", itemCodeVec[index]);
 					if (numberVec[index] < alchemyDex[alchemyCounter].reactant[recipeCounter].second)
 					{
-						prt(col::red, L"아이템 %d 숫자 부족(현재 %d)으로 break;\n", itemCodeVec[index],numberVec[index]);
+						prt(L"아이템 %d 숫자 부족(현재 %d)으로 break;\n", itemCodeVec[index],numberVec[index]);
 						break;//숫자가 충분한지 확인
 					}
 				}
 				else
 				{
-					prt(col::red, L"아이템 %d가 반응물에 없어서 break\n", alchemyDex[alchemyCounter].reactant[recipeCounter].first);
+					prt(L"아이템 %d가 반응물에 없어서 break\n", alchemyDex[alchemyCounter].reactant[recipeCounter].first);
 					break;
 				}
 
 				if (recipeCounter == alchemyDex[alchemyCounter].reactant.size() - 1)//마지막에 문제없이 도달했을 경우
 				{
-					prt(col::red, L"연금술 마지막 도달\n");
+					prt(L"연금술 마지막 도달\n");
 
 					int reactPtrVecSize = 0;
 					for (int i = 0; i < reactPtrVec.size(); i++)
@@ -848,7 +848,7 @@ public:
 
 					if (itemCodeVec.size() == reactPtrVecSize)
 					{
-						prt(col::red, L"연금술 성공\n");
+						prt(L"연금술 성공\n");
 						//std::wprintf(L"성공\n");
 						targetProductIndex = alchemyCounter;
 						return;
@@ -900,7 +900,7 @@ public:
 
 			if (negateMonster == false)
 			{
-				prt(col::yellow, L"적을 무시할까?\n");
+				prt(L"적을 무시할까?\n");
 				for (int x = Player::ins()->getGridX() - 1; x <= Player::ins()->getGridX() + 1; x++)
 				{
 					for (int y = Player::ins()->getGridY() - 1; y <= Player::ins()->getGridY() + 1; y++)

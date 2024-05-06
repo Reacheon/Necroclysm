@@ -1553,7 +1553,7 @@ public:
 					if (coAnswer == L"네")
 					{
 						loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
-						prt(col::yellow, L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation[0], buildLocation[1], buildLocation[2]);
+						prt(L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation[0], buildLocation[1], buildLocation[2]);
 					}
 					else
 					{
@@ -1769,7 +1769,7 @@ public:
 		ongoingTargetCodeStructure = code;
 		ongoingElapsedTimeStructure = time;
 		buildLocation = coord;
-		prt(col::yellow, L"저장이 이루어졌다. 코드는 %d 시간은 %d이다. 좌표는 %d,%d,%d이다.\n", ongoingTargetCode, ongoingElapsedTime, buildLocation[0], buildLocation[1], buildLocation[2]);
+		prt(L"저장이 이루어졌다. 코드는 %d 시간은 %d이다. 좌표는 %d,%d,%d이다.\n", ongoingTargetCode, ongoingElapsedTime, buildLocation[0], buildLocation[1], buildLocation[2]);
 	}
 
 	void loadCraftDataStructure(int& code, int& time, std::array<int, 3> coord)

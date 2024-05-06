@@ -150,7 +150,7 @@ public:
 				std::wstring yStr = std::to_wstring(throwingY);
 				std::wstring zStr = std::to_wstring(throwingZ);
 
-				prt(L"절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
+				prt(L"[CoordSelect] 절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
 
 
 				if (selectableCoord.size() > 0)
@@ -160,14 +160,14 @@ public:
 						if (selectableCoord[i][axis::x] == throwingX && selectableCoord[i][axis::y] == throwingY)
 						{
 							coAnswer = xStr + L"," + yStr + L"," + zStr;
-							prt(L"coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+							prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
 							delete this;
 							break;
 						}
 
 						if (i == selectableCoord.size() - 1)
 						{
-							prt(L"해당 좌표는 선택할 수 없다.\n");
+							prt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
 						}
 					}
 				}
@@ -177,12 +177,12 @@ public:
 					if (World::ins()->getTile(throwingX, throwingY, throwingZ).fov == fovFlag::white)
 					{
 						coAnswer = xStr + L"," + yStr + L"," + zStr;
-						prt(L"coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+						prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
 						delete this;
 					}
 					else
 					{
-						prt(L"해당 좌표는 시야에 보이지 않는다.\n");
+						prt(L"[CoordSelect] 해당 좌표는 시야에 보이지 않는다.\n");
 					}
 				}
 			}

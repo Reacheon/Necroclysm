@@ -83,7 +83,7 @@ public:
 	EntityData entityInfo;
 	Entity(int gridX, int gridY, int gridZ)//생성자
 	{
-		prt(col::orange, L"Entity : 생성자가 호출되었습니다!\n");
+		prt(L"Entity : 생성자가 호출되었습니다!\n");
 		setAniPriority(1);
 		setGrid(gridX, gridY, gridZ);
 		World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
@@ -98,7 +98,7 @@ public:
 	~Entity()//소멸자
 	{
 		World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
-		prt(col::orange, L"Entity : 소멸자가 호출되었습니다..\n");
+		prt(L"Entity : 소멸자가 호출되었습니다..\n");
 		//delete sprite;
 		delete spriteFlash;
 		delete equipment;
@@ -245,7 +245,7 @@ public:
 
 				entityInfo.parts[i][partsFlag::hp] -= inputDmg;
 				entityInfo.HP -= inputDmg;
-				prt(col::orange, L"[공격] %d의 데미지를 부위 %d에 가하였다. 해당 부위의 남은 HP는 %d이며 전체 HP는 %d이다.\n", inputDmg, inputPartIndex, entityInfo.parts[i][partsFlag::hp], entityInfo.HP);
+				prt(L"[공격] %d의 데미지를 부위 %d에 가하였다. 해당 부위의 남은 HP는 %d이며 전체 HP는 %d이다.\n", inputDmg, inputPartIndex, entityInfo.parts[i][partsFlag::hp], entityInfo.HP);
 
 				if (entityInfo.HP <= 0)//HP 0, 사망
 				{
@@ -485,7 +485,7 @@ public:
 		Entity* victimEntity = (Entity*)World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr;
 		if (victimEntity == nullptr)
 		{
-			prt(col::orange, L"[디버그] 공격이 빗나갔다.\n");
+			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 		else
 		{
@@ -501,7 +501,7 @@ public:
 			else
 			{
 				new Damage(L"dodged", victimEntity->getX(), victimEntity->getY() - 8, col::yellow, 9);
-				prt(col::orange, L"[디버그] 공격이 빗나갔다.\n");
+				prt(L"[디버그] 공격이 빗나갔다.\n");
 			}
 		}
 	}

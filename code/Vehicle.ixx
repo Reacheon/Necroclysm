@@ -69,7 +69,7 @@ public:
         trainWheelCenter = { inputX, inputY };
 
         setAniPriority(3);
-        prt(lowCol::orange, L"[Vehicle:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
+        prt(L"[Vehicle:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
         setGrid(inputX, inputY, inputZ);
 
         errorBox(World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr != nullptr, L"생성위치에 이미 프롭이 존재한다!");
@@ -86,7 +86,7 @@ public:
     ~Vehicle()
     {
         for (auto it = partInfo.begin(); it != partInfo.end(); it++) delete it->second;
-        prt(lowCol::orange, L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
+        prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
     }
 
     void updateTile(int inputX, int inputY)
@@ -160,7 +160,7 @@ public:
         //열차바퀴 중심 설정
         if (inputPart.checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
 
-        prt(lowCol::orange, L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
+        prt(L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
         updateSpr();
     }
     void addPart(int inputX, int inputY, int dexIndex) { addPart(inputX, inputY, itemDex[dexIndex]); }
@@ -195,7 +195,7 @@ public:
         partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
         World::ins()->getTile(inputX, inputY, getGridZ()).VehiclePtr = this;
 
-        prt(lowCol::orange, L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공헀다.\n", inputX, inputY, inputItemCode);
+        prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공헀다.\n", inputX, inputY, inputItemCode);
         updateSpr();
     }
 
@@ -530,17 +530,14 @@ public:
 
     bool runAI()
     {
-        if (isAIFirstRun)
-        {
-            isAIFirstRun = false;
-        }
+        if (isAIFirstRun) isAIFirstRun = false;
 
-        //prt(lowCol::orange,L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
+        //prt(L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
         while (1)
         {
 
-            //prt(lowCol::orange, L"[Vehicle:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
-            if (getTimeResource() >= 2.0)
+            //prt(L"[Vehicle:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
+            if (getTimeResource() > 2.0)
             {
                 clearTimeResource();
                 addTimeResource(2.0);
@@ -675,194 +672,195 @@ public:
                 }
 
 
-
                 if (getTimeResource() >= 1.0)
                 {
                     useTimeResource(1.0);
-
-                    if (vehType == vehFlag::car || vehType == vehFlag::heli)
+                    if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0)|| (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
                     {
-                        if (spdVec.compZ != 0)
+                        if (vehType == vehFlag::car || vehType == vehFlag::heli)
                         {
-                            zShift(spdVec.compZ);
-                        }
+                            if (spdVec.compZ != 0) zShift(spdVec.compZ);
 
-                        if (bodyDir != wheelDir)
-                        {
-                            Vec3 wheelDirSpd = getDefaultVec(dir16toInt16(wheelDir));
-                            int sgn = 1;
-                            if (gearState == gearFlag::reverse) sgn = -1;
-
-
-                            if (wheelDir == ACW2(bodyDir))
-                            {
-                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                                //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
-                            }
-                            else if (wheelDir == ACW(bodyDir))
-                            {
-                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                                //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
-                            }
-                            else if (wheelDir == CW(bodyDir))
-                            {
-                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                                //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
-                            }
-                            else if (wheelDir == CW2(bodyDir))
-                            {
-                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                                //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
-                            }
-                        }
-
-                        //가속도에 의한 속도 가감
-                        spdVec.addVec(accVec);
-                        accVec = getZeroVec();
-                        //마찰에 의한 손실
-                        if (spdVec.getLength() != 0)
-                        {
-                            int beforeXSpdSgn = sgn(spdVec.compX);
-                            int beforeYSpdSgn = sgn(spdVec.compY);
-                            float massCoeff = 1.5;
-                            float frictionCoeff = 1.0;
-                            float delSpd = frictionCoeff / massCoeff;
-                            Vec3 brakeDirVec = scalarMultiple(spdVec, -1.0);
-                            Vec3 brakeDirNormVec = brakeDirVec.getNormDirVec();
-                            Vec3 brakeVec = scalarMultiple(brakeDirNormVec, delSpd);
-
-                            if (spdVec.getLength() < brakeVec.getLength())
-                            {
-                                spdVec = getZeroVec();
-                                continue;
-                            }
-                            else spdVec.addVec(brakeVec);
-                        }
-                        xAcc += spdVec.compX;
-                        yAcc += spdVec.compY;
-
-                        int dstX = std::floor(xAcc);
-                        int dstY = std::floor(yAcc);
-                        // (0,0)에서 (dstX,dstY)까지 직선을 그어야 함
-                        std::vector<std::array<int, 2>> path;
-                        makeLine(path, dstX, dstY);
-
-                        int dxFinal = 0;
-                        int dyFinal = 0;
-                        for (int i = 1; i < path.size(); i++)
-                        {
-                            if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
-                            {
-                                dxFinal = path[i - 1][0];
-                                dyFinal = path[i - 1][1];
-                                break;
-                            }
-
-                            if (i == path.size() - 1)
-                            {
-                                dxFinal = dstX;
-                                dyFinal = dstY;
-                            }
-                        }
-
-                        if (dxFinal != 0 || dyFinal != 0)
-                        {
-                            rush(dxFinal, dyFinal);
                             if (bodyDir != wheelDir)
                             {
-                                rotateAcc += std::abs(dxFinal) + std::abs(dyFinal);
-                                if (wheelDir == ACW2(bodyDir) && rotateAcc > 7)  rotate(ACW2(bodyDir));
-                                else if (wheelDir == ACW(bodyDir) && rotateAcc > 11)  rotate(ACW(bodyDir));
-                                else if (wheelDir == CW(bodyDir) && rotateAcc > 11) rotate(CW(bodyDir));
-                                else if (wheelDir == CW2(bodyDir) && rotateAcc > 7) rotate(CW2(bodyDir));
+                                Vec3 wheelDirSpd = getDefaultVec(dir16toInt16(wheelDir));
+                                int sgn = 1;
+                                if (gearState == gearFlag::reverse) sgn = -1;
+
+                                if (wheelDir == ACW2(bodyDir))
+                                {
+                                    spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                    //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
+                                }
+                                else if (wheelDir == ACW(bodyDir))
+                                {
+                                    spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                    //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
+                                }
+                                else if (wheelDir == CW(bodyDir))
+                                {
+                                    spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                    //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
+                                }
+                                else if (wheelDir == CW2(bodyDir))
+                                {
+                                    spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                    //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
+                                }
                             }
-                            xAcc -= std::floor(xAcc);
-                            yAcc -= std::floor(yAcc);
-                        }
-                        updateSpr();
-                        return false;
-                    }
-                    else if (vehType == vehFlag::train)
-                    {
-                        if (rpmState >= 1)//열차 rpm state에 따른 가속도 추가
-                        {
-                            trainSpdVal = 10;
-                            int vx = getGridX();
-                            int vy = getGridY();
-                            int vz = getGridZ();
-                            Install* tgtInstall = (Install*)World::ins()->getTile(vx, vy, vz).InstallPtr;
-                            if (tgtInstall != nullptr)
+
+                            //가속도에 의한 속도 가감
+                            spdVec.addVec(accVec);
+                            accVec = getZeroVec();
+                            //마찰에 의한 손실
+                            if (spdVec.getLength() != 0)
                             {
-                                if (gearState == gearFlag::drive)//주행기어
+                                int beforeXSpdSgn = sgn(spdVec.compX);
+                                int beforeYSpdSgn = sgn(spdVec.compY);
+                                float massCoeff = 1.5;
+                                float frictionCoeff = 1.0;
+                                float delSpd = frictionCoeff / massCoeff;
+                                Vec3 brakeDirVec = scalarMultiple(spdVec, -1.0);
+                                Vec3 brakeDirNormVec = brakeDirVec.getNormDirVec();
+                                Vec3 brakeVec = scalarMultiple(brakeDirNormVec, delSpd);
+
+                                if (spdVec.getLength() < brakeVec.getLength())
                                 {
-                                    if (bodyDir == dir16::dir0)//동쪽 방향 열차
+                                    spdVec = getZeroVec();
+                                    continue;
+                                }
+                                else spdVec.addVec(brakeVec);
+                            }
+                            xAcc += spdVec.compX;
+                            yAcc += spdVec.compY;
+
+                            int dstX = std::floor(xAcc);
+                            int dstY = std::floor(yAcc);
+
+                            if (dstX != 0 || dstY != 0)
+                            {
+                                // (0,0)에서 (dstX,dstY)까지 직선을 그어야 함
+                                std::vector<std::array<int, 2>> path;
+                                makeLine(path, dstX, dstY);
+
+                                int dxFinal = 0;
+                                int dyFinal = 0;
+                                for (int i = 1; i < path.size(); i++)
+                                {
+                                    if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
                                     {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        dxFinal = path[i - 1][0];
+                                        dyFinal = path[i - 1][1];
+                                        break;
                                     }
-                                    else if (bodyDir == dir16::dir2)//북쪽 방향 열차
+
+                                    if (i == path.size() - 1)
                                     {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
-                                    }
-                                    else if (bodyDir == dir16::dir4)//서쪽 방향 열차
-                                    {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
-                                    }
-                                    else if (bodyDir == dir16::dir6)//남쪽 방향 열차
-                                    {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        dxFinal = dstX;
+                                        dyFinal = dstY;
                                     }
                                 }
-                                else if (gearState == gearFlag::reverse)//후진기어
+
+                                if (dxFinal != 0 || dyFinal != 0)
                                 {
-                                    if (bodyDir == dir16::dir0)//동쪽 방향 열차
+                                    rush(dxFinal, dyFinal);
+                                    if (bodyDir != wheelDir)
                                     {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        rotateAcc += std::abs(dxFinal) + std::abs(dyFinal);
+                                        if (wheelDir == ACW2(bodyDir) && rotateAcc > 7)  rotate(ACW2(bodyDir));
+                                        else if (wheelDir == ACW(bodyDir) && rotateAcc > 11)  rotate(ACW(bodyDir));
+                                        else if (wheelDir == CW(bodyDir) && rotateAcc > 11) rotate(CW(bodyDir));
+                                        else if (wheelDir == CW2(bodyDir) && rotateAcc > 7) rotate(CW2(bodyDir));
                                     }
-                                    else if (bodyDir == dir16::dir2)//북쪽 방향 열차
+                                    xAcc -= std::floor(xAcc);
+                                    yAcc -= std::floor(yAcc);
+                                }
+                                updateSpr();
+                                return false;
+                            }
+                        }
+                        else if (vehType == vehFlag::train)
+                        {
+                            if (rpmState >= 1)//열차 rpm state에 따른 가속도 추가
+                            {
+                                trainSpdVal = 10;
+                                int vx = getGridX();
+                                int vy = getGridY();
+                                int vz = getGridZ();
+                                Install* tgtInstall = (Install*)World::ins()->getTile(vx, vy, vz).InstallPtr;
+                                if (tgtInstall != nullptr)
+                                {
+                                    if (gearState == gearFlag::drive)//주행기어
                                     {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        if (bodyDir == dir16::dir0)//동쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        }
+                                        else if (bodyDir == dir16::dir2)//북쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        }
+                                        else if (bodyDir == dir16::dir4)//서쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        }
+                                        else if (bodyDir == dir16::dir6)//남쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        }
                                     }
-                                    else if (bodyDir == dir16::dir4)//서쪽 방향 열차
+                                    else if (gearState == gearFlag::reverse)//후진기어
                                     {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
-                                    }
-                                    else if (bodyDir == dir16::dir6)//남쪽 방향 열차
-                                    {
-                                        if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
-                                        else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        if (bodyDir == dir16::dir0)//동쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        }
+                                        else if (bodyDir == dir16::dir2)//북쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        }
+                                        else if (bodyDir == dir16::dir4)//서쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
+                                        }
+                                        else if (bodyDir == dir16::dir6)//남쪽 방향 열차
+                                        {
+                                            if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
+                                            else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
+                                        }
                                     }
                                 }
                             }
+
+                            //마찰에 의한 손실
+                            if (trainSpdVal != 0)
+                            {
+                                float massCoeff = 1.5;
+                                float frictionCoeff = 1.0;
+                                float delSpd = frictionCoeff / massCoeff;
+
+                                if (delSpd > trainSpdVal) trainSpdVal = 0;
+                                else trainSpdVal - delSpd;
+                            }
+
+                            trainMoveCounter = trainSpdVal;
+                            return false;
                         }
-
-                        //마찰에 의한 손실
-                        if (trainSpdVal != 0)
-                        {
-                            float massCoeff = 1.5;
-                            float frictionCoeff = 1.0;
-                            float delSpd = frictionCoeff / massCoeff;
-
-                            if (delSpd > trainSpdVal) trainSpdVal = 0;
-                            else trainSpdVal - delSpd;
-                        }
-
-                        trainMoveCounter = trainSpdVal;
-                        return false;
                     }
                 }
             }
@@ -871,7 +869,7 @@ public:
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //위의 모든 패턴 조건을 만족하지않을시 return true
-            //prt(lowCol::orange, L"[Vehicle:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
+            //prt(L"[Vehicle:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
             isAIFirstRun = true;
             return true;
         }

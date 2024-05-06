@@ -198,39 +198,9 @@ public:
 				int number = 2971 + sectorX + 108 * sectorY;
 				if (number < 100) filePath += "0";
 				filePath += std::to_string(number);
-				//std::string filePath = "map/images/";
-				//if (sectorX >= 0 && sectorY >= 0)//botRight
-				//{
-				//	filePath += "botRight_";
-				//	int fileNumber = 54 * sectorY + sectorX + 1;
-				//	if (fileNumber <= 9) filePath += "0";
-				//	filePath += std::to_string(fileNumber);
-				//}
-				//else if (sectorX >= 0 && sectorY < 0)//topRight
-				//{
-				//	filePath += "topRight_";
-				//	int fileNumber = 54 * (sectorY + 27) + sectorX + 1;
-				//	if (fileNumber <= 9) filePath += "0";
-				//	filePath += std::to_string(fileNumber);
-				//}
-				//else if (sectorX < 0 && sectorY >= 0)//botLeft
-				//{
-				//	filePath += "botLeft_";
-				//	int fileNumber = 54 * sectorY + (sectorX + 54) + 1;
-				//	if (fileNumber <= 9) filePath += "0";
-				//	filePath += std::to_string(fileNumber);
-				//}
-				//else//topLeft
-				//{
-				//	//topLeft_1458
-				//	filePath += "topLeft_";
-				//	int fileNumber = 54 * (sectorY + 27) + (sectorX + 54) + 1;
-				//	if (fileNumber <= 9) filePath += "0";
-				//	filePath += std::to_string(fileNumber);
-				//}
 				filePath += ".png";
-				std::printf(filePath.c_str());
-				std::printf("\n");
+				std::wstring wPath(filePath.begin(), filePath.end());
+				std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
 				SDL_Surface* refSector = IMG_Load(filePath.c_str());
 				errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
 				Uint32* pixels = (Uint32*)refSector->pixels;
