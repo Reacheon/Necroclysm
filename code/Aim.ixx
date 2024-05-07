@@ -7,7 +7,7 @@ import util;
 import GUI;
 import errorBox;
 import globalVar;
-import drawStadium;
+import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;

@@ -6,7 +6,7 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import drawStadium;
+import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;

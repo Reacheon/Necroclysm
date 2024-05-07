@@ -12,7 +12,7 @@ import constVar;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawStadium;
+import drawPrimitive;
 import checkCursor;
 import Loot;
 import Sprite;

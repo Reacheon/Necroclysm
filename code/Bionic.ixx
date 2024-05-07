@@ -7,12 +7,13 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawStadium;
+import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
-import drawRect;
+import drawPrimitive;
 import util;
+
 
 export class Bionic : public GUI
 {

@@ -7,7 +7,7 @@ export module Equip;
 import std;
 import util;
 import Player;
-import drawStadium;
+import drawPrimitive;
 import drawText;
 import globalVar;
 import textureVar;

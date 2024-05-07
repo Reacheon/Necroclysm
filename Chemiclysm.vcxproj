@@ -170,7 +170,7 @@
     <ClCompile Include="code\Craft.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
-    <ClCompile Include="code\drawRect.ixx" />
+    <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\God.ixx" />
     <ClCompile Include="code\HUD.ixx" />
     <ClCompile Include="code\initCoordTransform.ixx" />
@@ -195,7 +195,6 @@
     <ClCompile Include="code\drawItemSlot.ixx" />
     <ClCompile Include="code\drawItemTooltip.ixx" />
     <ClCompile Include="code\drawSprite.ixx" />
-    <ClCompile Include="code\drawStadium.ixx" />
     <ClCompile Include="code\drawText.ixx" />
     <ClCompile Include="code\drawWindow.ixx" />
     <ClCompile Include="code\drawWindowArrow.ixx" />

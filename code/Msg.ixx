@@ -8,7 +8,7 @@ import globalVar;
 import constVar;
 import errorBox;
 import textureVar;
-import drawStadium;
+import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;

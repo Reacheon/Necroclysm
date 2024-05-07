@@ -8,11 +8,11 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawStadium;
+import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
-import drawRect;
+import drawPrimitive;
 
 export class Mutation : public GUI
 {
@@ -21,6 +21,7 @@ private:
 	SDL_Rect mutationBase;
 	std::array<SDL_Rect, 12> bionicRect;
 	int bionicCursor = -1;
+	int bionicScroll = 0;
 public:
 	Mutation() : GUI(false)
 	{
@@ -96,6 +97,8 @@ public:
 				SDL_Rect pivotRect = bionicRect[i];
 
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
+				
+				
 				if (checkCursor(&pivotRect))
 				{
 					if (click == false) { btnColor = lowCol::blue; }
@@ -104,10 +107,31 @@ public:
 				else if(bionicCursor == i)
 				{
 					btnColor = lowCol::blue;
+
+
 				}
-				
+
 				drawFillRect(pivotRect.x, pivotRect.y, pivotRect.w, pivotRect.h, btnColor);
 				drawRect(pivotRect.x + 4, pivotRect.y + 2, 18, 18, col::white); //아이콘 테두리
+
+				if (bionicCursor == i)
+				{
+					int cursorIndex = 0;
+					{
+						if (timer::timer600 % 30 < 5) { cursorIndex = 0; }
+						else if (timer::timer600 % 30 < 10) { cursorIndex = 1; }
+						else if (timer::timer600 % 30 < 15) { cursorIndex = 2; }
+						else if (timer::timer600 % 30 < 20) { cursorIndex = 1; }
+						else { cursorIndex = 0; }
+					}
+
+					drawCross2(pivotRect.x - 1 - cursorIndex, pivotRect.y - 1 - cursorIndex, 0, 8, 0, 8);
+					drawCross2(pivotRect.x - 1 - cursorIndex, pivotRect.y + pivotRect.h - 1 + cursorIndex, 8, 0, 0, 8);
+					drawCross2(pivotRect.x + pivotRect.w - 1 + cursorIndex, pivotRect.y - 1 - cursorIndex, 0, 8, 8, 0);
+					drawCross2(pivotRect.x + pivotRect.w - 1 + cursorIndex, pivotRect.y + pivotRect.h - 1 + cursorIndex, 8, 0, 8, 0);
+				}
+				
+
 				drawSprite(spr::mutationIcon, 17, pivotRect.x + 5, pivotRect.y + 3);
 				setFontSize(10);
 				drawText(col2Str(lowCol::red) + L"[유당불내증] 당신은 유제품을 소화할 수 없습니다.", pivotRect.x + 29, pivotRect.y + 4);
@@ -154,11 +178,16 @@ public:
 			{
 				if (checkCursor(&bionicRect[i]))
 				{
-					bionicCursor = i;
+					bionicCursor = bionicScroll + i;
+					barAct = actSet::mutationActive;
 					break;
 				}
 
-				if (i == bionicRect.size() - 1) bionicCursor = -1;
+				if (i == bionicRect.size() - 1)
+				{
+					bionicCursor = -1;
+					barAct = actSet::null;
+				}
 			}
 		}
 	}

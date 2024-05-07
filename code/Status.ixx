@@ -7,7 +7,7 @@ import util;
 import GUI;
 import globalVar;
 import checkCursor;
-import drawStadium;
+import drawPrimitive;
 
 export class Status : public GUI
 {

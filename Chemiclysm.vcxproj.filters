@@ -384,9 +384,6 @@
     <ClCompile Include="code\drawSprite.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
-    <ClCompile Include="code\drawStadium.ixx">
-      <Filter>소스 파일\03_renderer\draw</Filter>
-    </ClCompile>
     <ClCompile Include="code\drawText.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
@@ -408,14 +405,14 @@
     <ClCompile Include="code\Drawable.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
-    <ClCompile Include="code\drawRect.ixx">
-      <Filter>소스 파일\03_renderer\draw</Filter>
-    </ClCompile>
     <ClCompile Include="code\SkillData.ixx">
       <Filter>소스 파일\02_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\readSkillDex.ixx">
       <Filter>소스 파일\02_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\drawPrimitive.ixx">
+      <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

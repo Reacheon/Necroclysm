@@ -12,7 +12,7 @@ import ItemPocket;
 import drawItemList;
 import checkCursor;
 import drawSprite;
-import drawStadium;
+import drawPrimitive;
 import drawText;
 import Player;
 import World;
