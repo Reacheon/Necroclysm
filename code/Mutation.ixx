@@ -20,8 +20,8 @@ private:
 	inline static Mutation* ptr = nullptr;
 	SDL_Rect mutationBase;
 	std::array<SDL_Rect, 12> bionicRect;
-	int bionicCursor = -1;
-	int bionicScroll = 0;
+	int mutationCursor = -1;
+	int mutationScroll = 0;
 public:
 	Mutation() : GUI(false)
 	{
@@ -104,17 +104,12 @@ public:
 					if (click == false) { btnColor = lowCol::blue; }
 					else { btnColor = lowCol::deepBlue; }
 				}
-				else if(bionicCursor == i)
-				{
-					btnColor = lowCol::blue;
-
-
-				}
+				else if(mutationCursor == i) btnColor = lowCol::blue;
 
 				drawFillRect(pivotRect.x, pivotRect.y, pivotRect.w, pivotRect.h, btnColor);
 				drawRect(pivotRect.x + 4, pivotRect.y + 2, 18, 18, col::white); //아이콘 테두리
 
-				if (bionicCursor == i)
+				if (mutationCursor == i)
 				{
 					int cursorIndex = 0;
 					{
@@ -178,14 +173,14 @@ public:
 			{
 				if (checkCursor(&bionicRect[i]))
 				{
-					bionicCursor = bionicScroll + i;
+					mutationCursor = mutationScroll + i;
 					barAct = actSet::mutationActive;
 					break;
 				}
 
 				if (i == bionicRect.size() - 1)
 				{
-					bionicCursor = -1;
+					mutationCursor = -1;
 					barAct = actSet::null;
 				}
 			}

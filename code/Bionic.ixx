@@ -21,6 +21,8 @@ private:
 	inline static Bionic* ptr = nullptr;
 	SDL_Rect bionicBase;
 	SDL_Rect bionicDataRect;
+
+	int bionicCursor = -1;
 public:
 	Bionic() : GUI(false)
 	{
@@ -38,6 +40,8 @@ public:
 		setAniType(aniFlag::winUnfoldOpen);
 		aniUSet.insert(this);
 		turnCycle = turn::playerAnime;
+
+		int bionicCursor = -1, bionicScroll = 0;
 	}
 	~Bionic()
 	{
@@ -172,6 +176,7 @@ public:
 					if (click == false) { btnColor = lowCol::blue; }
 					else { btnColor = lowCol::deepBlue; }
 				}
+				else if (bionicCursor == i) btnColor = lowCol::blue;
 				//else if (bionicCursor == i)
 				//{
 				//	btnColor = lowCol::blue;
@@ -206,10 +211,7 @@ public:
 					if (click == false) { btnColor = lowCol::blue; }
 					else { btnColor = lowCol::deepBlue; }
 				}
-				//else if (bionicCursor == i)
-				//{
-				//	btnColor = lowCol::blue;
-				//}
+				else if (bionicCursor == 1) btnColor = lowCol::blue;
 
 				drawFillRect(pivotRect.x, pivotRect.y, pivotRect.w, pivotRect.h, btnColor);
 				drawRect(pivotRect.x + 4, pivotRect.y + 2, 18, 18, col::white); //아이콘 테두리
@@ -219,7 +221,6 @@ public:
 				setFontSize(8);
 				drawText(L"#FFFF00TOGGLE#FFFFFF : 360 kcal/act", pivotRect.x + pivotRect.w - 90, pivotRect.y + 11);
 			}
-
 
 
 			//drawStadium(whiteRectPassive.x + 6, whiteRectPassive.y + 25, whiteRectPassive.w - 12, 16, col::black, 200, 5);

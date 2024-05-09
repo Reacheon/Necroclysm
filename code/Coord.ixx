@@ -34,6 +34,8 @@ public:
 	int getDstGridY() { return dstGridY; }
 	int getFakeX() { return fakeX; }
 	int getFakeY() { return fakeY; }
+	void addFakeX(int val) { fakeX += val; }
+	void addFakeY(int val) { fakeY += val; }
 
 	void setGridZ(int val) { gridZ = val; }
 	void setFakeX(int val) { fakeX = val; }

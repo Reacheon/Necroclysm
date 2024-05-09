@@ -16,6 +16,7 @@ export void dir2Coord(int dir, int& dx, int& dy)
 	}
 }
 
+
 export int coord2Dir(int dx, int dy)
 {
 	if (dx == 1 && dy == 0) { return 0; }

@@ -615,6 +615,7 @@ export enum class aniFlag
     shotAuto,
     shotArrow,
     propRush,
+    trainRush,
 };
 
 export enum class input
