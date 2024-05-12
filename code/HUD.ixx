@@ -40,6 +40,7 @@ import globalTime;
 import debugConsole;
 import updateBarAct;
 import CoordSelect;
+import SkillData;
 
 namespace segmentIndex
 {
@@ -70,7 +71,9 @@ private:
 	bool executedHold = false;
 	bool isAdvancedMode = false;
 	Point2 advancedModeGrid;
+	std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::none , -1), };
 public:
+	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
 	{
 		prt(L"HUD instance was generated.\n");
@@ -1287,6 +1290,36 @@ public:
 			else if (barAct[i] == act::tailRotorPedalL) setBtnLayout(sysStr[154], 0);
 			else if (barAct[i] == act::tailRotorPedalR) setBtnLayout(sysStr[155], 0);
 			else if (barAct[i] == act::closeDoor) setBtnLayout(sysStr[156], 91);
+			else if (barAct[i] == act::skillActive)
+			{
+				errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
+				setBtnLayout(sysStr[157], 140);
+
+			}
+			else if (barAct[i] == act::skillToggle)
+			{
+				errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
+				if (targetSkill->toggle == false)
+				{
+					setBtnLayout(sysStr[158], 141);
+				}
+				else
+				{
+					setBtnLayout(sysStr[159], 142);
+				}
+			}
+			else if (barAct[i] == act::quickSlot)
+			{
+				errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
+				if (targetSkill->isQuickSlot == false)
+				{
+					setBtnLayout(sysStr[160], 146);
+				}
+				else
+				{
+					setBtnLayout(sysStr[161], 147);
+				}
+			}
 			else setBtnLayout(L" ", 0);
 
 			//48*48 심볼 아이콘 그리기

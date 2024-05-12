@@ -24,6 +24,7 @@ import util;
 import turnWait;
 import Drawable;
 import drawSprite;
+import SkillData;
 
 export class Entity : public Ani, public Coord, public Drawable//엔티티는 시야 기능과 개인 FOV, 현재 좌표, 그리고 화면에 표시되는 기능과 고유 텍스쳐를 가진다.
 {
@@ -79,6 +80,12 @@ private:
 	humanCustom::scar scar = humanCustom::scar::null;
 	humanCustom::beard beard = humanCustom::beard::null;
 	humanCustom::hair hair = humanCustom::hair::null;
+
+	std::vector<SkillData> bionicList;
+	std::vector<SkillData> mutationList;
+	std::vector<SkillData> martialArtList;
+	std::vector<SkillData> divinePowerList;
+	std::vector<SkillData> magicList;
 public:
 	EntityData entityInfo;
 	Entity(int gridX, int gridY, int gridZ)//생성자

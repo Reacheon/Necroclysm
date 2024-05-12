@@ -25,8 +25,11 @@ export namespace actSet
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
     std::vector<act> train = { act::rpmLever, act::wait, act::brake, act::startEngine, act::shiftGear, act::blank,act::blank };
 
-    std::vector<act> bionicActive= { act::bionicActive, act::bionicToggle, act::bionicQuickSlot, act::bionicInfo };
-    std::vector<act> mutationActive = { act::mutationActive, act::mutationToggle, act::mutationQuickSlot, act::mutationInfo };
+    std::vector<act> bionicActive= {act::skillActive, act::quickSlot};
+    std::vector<act> bionicToggle = { act::skillToggle, act::quickSlot };
+
+    std::vector<act> mutationActive = { act::skillActive, act::quickSlot };
+    std::vector<act> mutationToggle = { act::skillToggle, act::quickSlot };
 };
 export namespace option
 {

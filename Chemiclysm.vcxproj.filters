@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="소스 파일\02_var">
-      <UniqueIdentifier>{5b0409cc-011d-4af5-be1f-689b3989bd07}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01_system">
       <UniqueIdentifier>{04c58ed2-d70f-43f6-bfe9-0cc1039ecf28}</UniqueIdentifier>
     </Filter>
@@ -55,9 +52,6 @@
     <Filter Include="소스 파일\01_system\04_GUI\CoroutineGUI">
       <UniqueIdentifier>{c6939b84-4b2e-48f0-aafb-0f63036b7fef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\02_var\Alchemy">
-      <UniqueIdentifier>{4cffd73c-02c1-4857-9de8-924576165909}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\05_Class\05_Etc">
       <UniqueIdentifier>{f75a6716-ad3a-4980-9d34-b43cae387679}</UniqueIdentifier>
     </Filter>
@@ -76,19 +70,25 @@
     <Filter Include="소스 파일\01_system\04_GUI\act">
       <UniqueIdentifier>{c8bc05cc-ad20-49cd-b2a2-7d26a971aff6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\02_var\Skill">
+    <Filter Include="소스 파일\00_var">
+      <UniqueIdentifier>{5b0409cc-011d-4af5-be1f-689b3989bd07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00_var\Alchemy">
+      <UniqueIdentifier>{4cffd73c-02c1-4857-9de8-924576165909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00_var\Skill">
       <UniqueIdentifier>{5f5a64ad-856a-41c1-88c7-ce014c9be36c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
-      <Filter>소스 파일\02_var</Filter>
+      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\globalVar.ixx">
-      <Filter>소스 파일\02_var</Filter>
+      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\textureVar.ixx">
-      <Filter>소스 파일\02_var</Filter>
+      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\util.ixx">
       <Filter>소스 파일\04_util</Filter>
@@ -259,10 +259,10 @@
       <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
     <ClCompile Include="code\readAlchemyDex.ixx">
-      <Filter>소스 파일\02_var\Alchemy</Filter>
+      <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
     <ClCompile Include="code\AlchemyData.ixx">
-      <Filter>소스 파일\02_var\Alchemy</Filter>
+      <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
     <ClCompile Include="code\startSetting.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
@@ -394,7 +394,7 @@
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
     <ClCompile Include="code\constVar.ixx">
-      <Filter>소스 파일\02_var</Filter>
+      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\actFuncSet.ixx">
       <Filter>소스 파일\01_system\04_GUI\act</Filter>
@@ -406,10 +406,10 @@
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
     <ClCompile Include="code\SkillData.ixx">
-      <Filter>소스 파일\02_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\readSkillDex.ixx">
-      <Filter>소스 파일\02_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\drawPrimitive.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>

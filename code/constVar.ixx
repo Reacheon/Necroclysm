@@ -164,17 +164,11 @@ export enum class act
     rotate,//회전
     cancel,//취소
 
-    //바이오닉 GUI
-    bionicInfo,
-    bionicActive,
-    bionicToggle,
-    bionicQuickSlot,
+    quickSlot,
+    skillActive,
+    skillToggle,
 
-    //돌연변이 GUI
-    mutationInfo,
-    mutationActive,
-    mutationToggle,
-    mutationQuickSlot,
+    //skillInfo,
 };
 
 export namespace humanCustom
@@ -1121,4 +1115,11 @@ export enum class skillType
     ACTIVE,
     PASSIVE,
     TOGGLE,
+};
+
+export enum class quickSlotFlag
+{
+    none,
+    skill,
+    item,
 };

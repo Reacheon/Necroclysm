@@ -19,9 +19,10 @@ namespace csvSkill
     constexpr int abstract = 4;
     constexpr int src = 5;
     constexpr int type = 6;
-    constexpr int energyPerAct = 7;
-    constexpr int energyPerTurn = 8;
-    constexpr int energyPerDay = 9;
+    constexpr int flag = 7;
+    constexpr int energyPerAct = 8;
+    constexpr int energyPerTurn = 9;
+    constexpr int energyPerDay = 10;
 };
 
 export int readSkillDex(const wchar_t* file)
