@@ -179,3 +179,5 @@ export int godPiety = 0;
 
 export std::vector<void*> extraRenderVehList;
 export std::vector<void*> extraRenderEntityList;
+
+export std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , -1), };

@@ -58,6 +58,8 @@ namespace segmentIndex
 	int colon = 11;
 	int pm = 12;
 	int am = 13;
+	float popUpDist = 360;
+
 };
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
@@ -71,7 +73,12 @@ private:
 	bool executedHold = false;
 	bool isAdvancedMode = false;
 	Point2 advancedModeGrid;
-	std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::none , -1), };
+
+	SDL_Rect quickSlotRegion;
+	SDL_Rect quickSlotPopBtn;
+	bool isQuickSlotPop = false;
+	float popUpDist = 360;
+	int quickSlotDist = 0;
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -115,6 +122,11 @@ public:
 		letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
 		//탭 버튼은 changeXY의 영향을 받지 않음
 		tab = { 20, 20, 120, 120 };
+
+
+		quickSlotRegion =  { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, } ;
+		quickSlotPopBtn = { quickSlotRegion.x, quickSlotRegion.y, 43, 38 };
+
 		x = 0;
 		y = inputY;
 	}
@@ -350,6 +362,7 @@ public:
 					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_Enter, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 				}
 			}
+
 		}
 		else
 		{
@@ -358,7 +371,7 @@ public:
 
 		drawBarAct();
 		drawTab();
-		//drawQuickSlot();
+		drawQuickSlot();
 
 		//디버깅용 좌측상단 하늘색 점
 		SDL_SetRenderDrawColor(renderer, 35, 246, 204, 255);
@@ -419,6 +432,25 @@ public:
 					turnWait(1.0);
 					break;
 				}
+			}
+		}
+		else if (checkCursor(&quickSlotPopBtn))
+		{
+			if (isQuickSlotPop)
+			{
+				isQuickSlotPop = false;
+				setAniType(aniFlag::quickSlotPopRight);
+				deactInput();
+				aniUSet.insert(this);
+				turnCycle = turn::playerAnime;
+			}
+			else
+			{
+				isQuickSlotPop = true;
+				setAniType(aniFlag::quickSlotPopLeft);
+				deactInput();
+				aniUSet.insert(this);
+				turnCycle = turn::playerAnime;
 			}
 		}
 		else if(checkCursor(&letterbox))
@@ -523,7 +555,7 @@ public:
 	void executePopUp()
 	{
 		isPopUp = true;
-		setPopUpDist(((barAct.size()-1)/7)*89);
+		popUpDist = ((barAct.size() - 1) / 7) * 89;
 		setAniType(aniFlag::popUpLetterbox);
 		deactInput();
 		aniUSet.insert(this);
@@ -1062,33 +1094,126 @@ public:
 	
 	void drawQuickSlot()
 	{
-		//퀵 슬롯
-		SDL_Rect quickSlot = { 207, 16, 48, 48 };
-		SDL_Rect inQuickSlot = { quickSlot.x + 2, quickSlot.y + 2, 44, 44 };
+		int pivotX = quickSlotRegion.x;
+		int pivotY = quickSlotRegion.y;
+		
+		//drawRect({ pivotX,pivotY,180,358, }, lowCol::skyBlue);
 
-		//왼쪽
-		drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-		SDL_RenderDrawRect(renderer, &inQuickSlot);
-		quickSlot.x += 50;
-		inQuickSlot.x += 50;
-
-		//오른쪽
-		drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-		SDL_RenderDrawRect(renderer, &inQuickSlot);
-		quickSlot.x += 84;
-		inQuickSlot.x += 84;
-
-		//숫자 퀵슬롯
-		for (int i = 0; i < 7; i++)
+		int sprIndex = 0;
+		if (isQuickSlotPop)
 		{
-			drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-			SDL_RenderDrawRect(renderer, &inQuickSlot);
-			quickSlot.x += 50;
-			inQuickSlot.x += 50;
+			if (checkCursor(&quickSlotPopBtn))
+			{
+				if (click == false) sprIndex = 1;
+				else sprIndex = 2;
+			}
+			else sprIndex = 0;
 		}
+		else
+		{
+			if (checkCursor(&quickSlotPopBtn))
+			{
+				if (click == false) sprIndex = 4;
+				else sprIndex = 5;
+			}
+			else sprIndex = 3;
+		}
+
+		drawSprite(spr::topQuickSlotBtn, sprIndex, pivotX, pivotY);
+		drawFillRect({ pivotX + 43,pivotY,137,38 }, col::black, 200);
+
+		for (int i = 0; i < 8; i++)
+		{
+			int singlePivotX = pivotX;
+			int singlePivotY = pivotY + 40 * (i + 1);
+			drawSprite(spr::singleQuickSlot, 0, singlePivotX, singlePivotY);
+
+
+
+			if (quickSlot[i].first == quickSlotFlag::NONE)
+			{
+				drawCross2(singlePivotX + 6, singlePivotY + 2, 0, 5, 0, 5);
+				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2, 0, 5, 5, 0);
+				drawCross2(singlePivotX + 6, singlePivotY + 2 + 32, 5, 0, 0, 5);
+				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2 + 32, 5, 0, 5, 0);
+				drawFillRect({ singlePivotX + 6, singlePivotY + 2 ,34,34 }, col::black, 180);
+			}
+			else
+			{
+				setZoom(2.0);
+				std::wstring skillName = L"";
+				if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
+				{
+					int index = Player::ins()->searchBionicCode(quickSlot[i].second);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getBionicList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					skillName = Player::ins()->getBionicList()[index].name;
+				}
+				else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
+				{
+					int index = Player::ins()->searchMutationCode(quickSlot[i].second);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMutationList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					skillName = Player::ins()->getMutationList()[index].name;
+				}
+				else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
+				{
+					int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMartialArtList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					skillName = Player::ins()->getMartialArtList()[index].name;
+				}
+				else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
+				{
+					int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getDivinePowerList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					skillName = Player::ins()->getDivinePowerList()[index].name;
+				}
+				else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
+				{
+					int index = Player::ins()->searchMagicCode(quickSlot[i].second);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMagicList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					skillName = Player::ins()->getMagicList()[index].name;
+				}
+				setZoom(1.0);
+
+				setFontSize(14);
+				drawText(L"#FFFFFF" + skillName, singlePivotX + 43, singlePivotY + 5);
+				
+				//setFontSize(10);
+				//drawText(L"#FFFF00-32 MP" + skillName, singlePivotX + 120, singlePivotY + 24);
+
+				drawCross2(singlePivotX + 6, singlePivotY + 2, 0, 5, 0, 5);
+				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2, 0, 5, 5, 0);
+				drawCross2(singlePivotX + 6, singlePivotY + 2 + 32, 5, 0, 0, 5);
+				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2 + 32, 5, 0, 5, 0);
+			}
+		}
+
+		////퀵 슬롯
+		//SDL_Rect quickSlot = { 207, 16, 48, 48 };
+		//SDL_Rect inQuickSlot = { quickSlot.x + 2, quickSlot.y + 2, 44, 44 };
+
+		////왼쪽
+		//drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
+		//SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
+		//SDL_RenderDrawRect(renderer, &inQuickSlot);
+		//quickSlot.x += 50;
+		//inQuickSlot.x += 50;
+
+		////오른쪽
+		//drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
+		//SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
+		//SDL_RenderDrawRect(renderer, &inQuickSlot);
+		//quickSlot.x += 84;
+		//inQuickSlot.x += 84;
+
+		////숫자 퀵슬롯
+		//for (int i = 0; i < 7; i++)
+		//{
+		//	drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
+		//	SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
+		//	SDL_RenderDrawRect(renderer, &inQuickSlot);
+		//	quickSlot.x += 50;
+		//	inQuickSlot.x += 50;
+		//}
 	}
 
 	void drawBarAct()
@@ -1425,4 +1550,200 @@ public:
 		}
 	};
 
+	bool runAnimation(bool shutdown) override
+	{
+		const int acc = 20;
+		const int initSpeed = 4;
+		if (getAniType() == aniFlag::popUpLetterbox)
+		{
+			//initDist가 정해져있어야 한다.
+			//역으로 initDist에서 가속을 구할 수 있어야 함
+			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
+			static float initDist = 0;
+			float dstDist = popUpDist;
+			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
+
+			addTimer();
+			switch (getTimer())
+			{
+			case 1:
+				initDist = 0;
+				for (int i = 9; i >= 0; i--)
+				{
+					spd[9 - i] = acc * i + initSpeed;
+					initDist += spd[9 - i];
+				}
+				//정규화
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] *= (dstDist / initDist);
+				}
+				break;
+			default:
+				changeXY(0, y - floor(spd[getTimer() - 2]), false);
+				break;
+			case 12:
+				if (inputType == input::keyboard) { changeXY(0, -dstDist + noActHeightHUD, false); }
+				else { changeXY(0, -dstDist, false); }
+				resetTimer();
+				actInput();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
+		else if (getAniType() == aniFlag::popDownLetterbox)
+		{
+			//initDist가 정해져있어야 한다.
+			//역으로 initDist에서 가속을 구할 수 있어야 함
+			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
+			static float initDist = 0;
+			float dstDist = popUpDist;
+			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
+
+			if (inputType == input::keyboard) { dstDist = -y + noActHeightHUD; }
+			else { dstDist = -y; }
+
+			addTimer();
+			switch (getTimer())
+			{
+			case 1:
+				initDist = 0;
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] = acc * i + initSpeed;
+					initDist += spd[i];
+				}
+				//정규화
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] *= (dstDist / initDist);
+				}
+				break;
+			default:
+				changeXY(0, y + floor(spd[getTimer() - 2]), false);
+				break;
+			case 12:
+				if (inputType == input::keyboard) { changeXY(0, noActHeightHUD, false); }
+				else { changeXY(0, 0, false); }
+				resetTimer();
+				actInput();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
+		else if (getAniType() == aniFlag::popUpSingleLetterbox)//키보드에서만 발생하는 1칸 팝업
+		{
+			//initDist가 정해져있어야 한다.
+			//역으로 initDist에서 가속을 구할 수 있어야 함
+			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
+			static float initDist = 0;
+			float dstDist = noActHeightHUD;
+
+			addTimer();
+			switch (getTimer())
+			{
+			case 1:
+				initDist = 0;
+				for (int i = 9; i >= 0; i--)
+				{
+					spd[9 - i] = acc * i + initSpeed;
+					initDist += spd[9 - i];
+				}
+				//정규화
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] *= (dstDist / initDist);
+				}
+				break;
+			default:
+				changeXY(0, y - floor(spd[getTimer() - 2]), false);
+				break;
+			case 12:
+				changeXY(0, 0, false);
+				resetTimer();
+				actInput();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
+		else if (getAniType() == aniFlag::quickSlotPopLeft)
+		{
+			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
+			static float initDist = 0;
+			float dstDist = 137;
+
+			addTimer();
+			switch (getTimer())
+			{
+			case 1:
+				quickSlotDist = 0;
+				initDist = 0;
+				for (int i = 9; i >= 0; i--)
+				{
+					spd[9 - i] = acc * i + initSpeed;
+					initDist += spd[9 - i];
+				}
+				//정규화
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] *= (dstDist / initDist);
+				}
+				break;
+			default:
+				quickSlotDist += floor(spd[getTimer() - 2]);
+				changeXY(x, y, false);
+				break;
+			case 12:
+				quickSlotDist = dstDist;
+				changeXY(x, y, false);
+				resetTimer();
+				actInput();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
+		else if (getAniType() == aniFlag::quickSlotPopRight)
+		{
+			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
+			static float initDist = 0;
+			float dstDist = 137;
+
+			addTimer();
+			switch (getTimer())
+			{
+			case 1:
+				quickSlotDist = dstDist;
+				initDist = 0;
+				for (int i = 9; i >= 0; i--)
+				{
+					spd[9 - i] = acc * i + initSpeed;
+					initDist += spd[9 - i];
+				}
+				//정규화
+				for (int i = 0; i <= 9; i++)
+				{
+					spd[i] *= (dstDist / initDist);
+				}
+				break;
+			default:
+				quickSlotDist -= floor(spd[getTimer() - 2]);
+				changeXY(x, y, false);
+				break;
+			case 12:
+				quickSlotDist = 0;
+				changeXY(x, y, false);
+				resetTimer();
+				actInput();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
+
+		return false;
+	}
 };

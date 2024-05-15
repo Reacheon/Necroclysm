@@ -610,6 +610,8 @@ export enum class aniFlag
     shotArrow,
     propRush,
     trainRush,
+    quickSlotPopLeft,
+    quickSlotPopRight,
 };
 
 export enum class input
@@ -1107,6 +1109,7 @@ export enum class skillSrc
     BIONIC,
     MUTATION,
     MARTIAL_ART,
+    DIVINE_POWER,
     MAGIC,
 };
 
@@ -1119,7 +1122,7 @@ export enum class skillType
 
 export enum class quickSlotFlag
 {
-    none,
-    skill,
-    item,
+    NONE,
+    SKILL,
+    ITEM,
 };

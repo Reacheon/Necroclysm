@@ -52,6 +52,23 @@ public:
 		getEquipPtr()->itemInfo.push_back(itemDex[107]);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
+		addSkill(27);
+		quickSlot[0] = { quickSlotFlag::SKILL, 27 };
+
+		addSkill(19);
+		quickSlot[1] = { quickSlotFlag::SKILL, 19 };
+
+		addSkill(30);
+		quickSlot[2] = { quickSlotFlag::SKILL, 30 };
+
+		addSkill(14);
+		quickSlot[3] = { quickSlotFlag::SKILL, 14 };
+
+		addSkill(10);
+		quickSlot[4] = { quickSlotFlag::SKILL, 10 };
+		
+		addSkill(1);
+		quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 		//getEquipPtr()->addItemFromDex(88, 1);
 		//getEquipPtr()->addItemFromDex(88, 1);
 		//getEquipPtr()->addItemFromDex(88, 1);

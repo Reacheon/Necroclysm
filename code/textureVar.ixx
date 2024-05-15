@@ -135,4 +135,8 @@ export namespace spr
 	Sprite* mainRotor = nullptr;
 
 	std::unordered_map<std::wstring, Sprite*> equipMapper;
+
+	Sprite* singleQuickSlot = nullptr;
+	Sprite* topQuickSlotBtn = nullptr;
+	Sprite* skillSet = nullptr;
 }

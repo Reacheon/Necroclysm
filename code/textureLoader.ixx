@@ -132,4 +132,9 @@ export void textureLoader()
 	{
 		spr::equipMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
 	}
+
+	spr::singleQuickSlot = new Sprite(renderer, "image/UI/GUI/HUD/singleQuickSlot.png", 180, 38);
+	spr::topQuickSlotBtn = new Sprite(renderer, "image/UI/GUI/HUD/topQuickSlotBtn.png", 43, 38);
+
+	spr::skillSet = new Sprite(renderer, "image/UI/skillSet.png", 16, 16);
 }

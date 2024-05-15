@@ -111,6 +111,199 @@ public:
 		delete equipment;
 	}
 #pragma region getset method
+	
+	std::vector<SkillData>& getBionicList() { return bionicList; }
+	std::vector<SkillData>& getMutationList() { return mutationList; }
+	std::vector<SkillData>& getMartialArtList() { return martialArtList; }
+	std::vector<SkillData>& getDivinePowerList() { return divinePowerList; }
+	std::vector<SkillData>& getMagicList() { return magicList; }
+
+	void addSkill(int index)
+	{
+		prt(L"돌연변이 %ls를 추가했다.\n", skillDex[index].name.c_str());
+		if (skillDex[index].src == skillSrc::BIONIC) bionicList.push_back(skillDex[index]);
+		else if (skillDex[index].src == skillSrc::MUTATION) mutationList.push_back(skillDex[index]);
+		else if (skillDex[index].src == skillSrc::MARTIAL_ART) martialArtList.push_back(skillDex[index]);
+		else if (skillDex[index].src == skillSrc::DIVINE_POWER) divinePowerList.push_back(skillDex[index]);
+		else if (skillDex[index].src == skillSrc::MAGIC) magicList.push_back(skillDex[index]);
+	}
+
+	//void addBionic(int index)
+	//{
+	//	errorBox(skillDex[index].src != skillSrc::BIONIC, L"바이오닉이 아닌 스킬이 addBionic으로 추가되었다.");
+	//	bionicList.push_back(skillDex[index]);
+	//}
+
+
+	//void addMutation(int index)
+	//{
+	//	errorBox(skillDex[index].src != skillSrc::MUTATION, L"돌연변이가 아닌 스킬이 addMutation으로 추가되었다.");
+	//	prt(L"돌연변이 %ls를 추가했다.\n", skillDex[index].name.c_str());
+	//	mutationList.push_back(skillDex[index]);
+	//}
+
+	//void addMartialArt(int index)
+	//{
+	//	errorBox(skillDex[index].src != skillSrc::MARTIAL_ART, L"무술이 아닌 스킬이 addMartialArt로 추가되었다.");
+	//	martialArtList.push_back(skillDex[index]);
+	//}
+
+	//void addDivinePower(int index)
+	//{
+	//	errorBox(skillDex[index].src != skillSrc::DIVINE_POWER, L"권능이 아닌 스킬이 addDivinePower로 추가되었다.");
+	//	divinePowerList.push_back(skillDex[index]);
+	//}
+
+	//void addMagic(int index)
+	//{
+	//	errorBox(skillDex[index].src != skillSrc::MAGIC, L"마법이 아닌 스킬이 addMagic으로 추가되었다.");
+	//	magicList.push_back(skillDex[index]);
+	//}
+
+	int searchBionicCode(int inputCode)
+	{
+		for (int i = 0; i < bionicList.size(); i++)
+		{
+			if (bionicList[i].code == inputCode) return i;
+		}
+		return -1;
+	}
+
+	bool eraseBionicCode(int inputCode)
+	{
+		for (int i = 0; i < bionicList.size(); i++) if (bionicList[i].code == inputCode)
+		{
+			bionicList.erase(bionicList.begin() + i);
+			return true;
+		}
+		return false;
+	}
+
+	bool eraseBionicIndex(int inputIndex)
+	{
+		if (inputIndex >= 0 && inputIndex < bionicList.size())
+		{
+			bionicList.erase(bionicList.begin() + inputIndex);
+			return true;
+		}
+		return false;
+	}
+
+	int searchMutationCode(int inputCode)
+	{
+		for (int i = 0; i < mutationList.size(); i++)
+		{
+			if (mutationList[i].code == inputCode) return i;
+		}
+		return -1;
+	}
+
+	bool eraseMutationCode(int inputCode)
+	{
+		for (int i = 0; i < mutationList.size(); i++) if (mutationList[i].code == inputCode)
+		{
+			mutationList.erase(mutationList.begin() + i);
+			return true;
+		}
+		return false;
+	}
+
+	bool eraseMutationIndex(int inputIndex)
+	{
+		if (inputIndex >= 0 && inputIndex < mutationList.size())
+		{
+			mutationList.erase(mutationList.begin() + inputIndex);
+			return true;
+		}
+		return false;
+	}
+
+	int searchMartialArtCode(int inputCode)
+	{
+		for (int i = 0; i < martialArtList.size(); i++)
+		{
+			if (martialArtList[i].code == inputCode) return i;
+		}
+		return -1;
+	}
+
+	bool eraseMartialArtCode(int inputCode)
+	{
+		for (int i = 0; i < martialArtList.size(); i++) if (martialArtList[i].code == inputCode)
+		{
+			martialArtList.erase(martialArtList.begin() + i);
+			return true;
+		}
+		return false;
+	}
+
+	bool eraseMartialArtIndex(int inputIndex)
+	{
+		if (inputIndex >= 0 && inputIndex < martialArtList.size())
+		{
+			martialArtList.erase(martialArtList.begin() + inputIndex);
+			return true;
+		}
+		return false;
+	}
+
+	int searchDivinePowerCode(int inputCode)
+	{
+		for (int i = 0; i < divinePowerList.size(); i++)
+		{
+			if (divinePowerList[i].code == inputCode) return i;
+		}
+		return -1;
+	}
+
+	bool eraseDivinePowerCode(int inputCode)
+	{
+		for (int i = 0; i < divinePowerList.size(); i++) if (divinePowerList[i].code == inputCode)
+		{
+			divinePowerList.erase(divinePowerList.begin() + i);
+			return true;
+		}
+		return false;
+	}
+
+	bool eraseDivinePowerIndex(int inputIndex)
+	{
+		if (inputIndex >= 0 && inputIndex < divinePowerList.size())
+		{
+			divinePowerList.erase(divinePowerList.begin() + inputIndex);
+			return true;
+		}
+		return false;
+	}
+
+	int searchMagicCode(int inputCode)
+	{
+		for (int i = 0; i < magicList.size(); i++)
+		{
+			if (magicList[i].code == inputCode) return i;
+		}
+		return -1;
+	}
+
+	bool eraseMagicCode(int inputCode)
+	{
+		for (int i = 0; i < magicList.size(); i++) if (magicList[i].code == inputCode)
+		{
+			magicList.erase(magicList.begin() + i);
+			return true;
+		}
+		return false;
+	}
+
+	bool eraseMagicIndex(int inputIndex)
+	{
+		if (inputIndex >= 0 && inputIndex < magicList.size())
+		{
+			magicList.erase(magicList.begin() + inputIndex);
+			return true;
+		}
+		return false;
+	}
 
 	humanCustom::skin getSkin() { return skin;  }
 	void setSkin(humanCustom::skin input) { skin = input; }

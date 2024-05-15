@@ -18,7 +18,9 @@ private:
 	int slipDir = 6;
 	float foldRatio = 1.0;
 	bool isCorouter = false;
-	float popUpDist = 360;
+
+	int distCounter = 100;
+	float distSpd = 1.0;
 public:
 	int x, y;
 	GUI(bool corouterInput) : isCorouter(corouterInput)
@@ -34,9 +36,9 @@ public:
 		if (isCorouter) (*coFunc).run();
 	};
 	static std::vector<GUI*> getActiveGUIList() { return activeGUIList; }
-	void setPopUpDist(float inputVal)
+	void setDistCounter(float val)
 	{
-		popUpDist = inputVal;
+		distCounter = val;
 	}
 	float getFoldRatio() { return foldRatio; }
     void setAniSlipDir(int inputDir) { slipDir = inputDir; }
@@ -77,7 +79,7 @@ public:
 	virtual void clickMotionGUI(int dx, int dy) = 0;
 	virtual void clickDownGUI() = 0;
 	virtual void step() = 0;
-    bool runAnimation(bool shutdown)
+    virtual bool runAnimation(bool shutdown)
 	{
 		const int acc = 20;
 		const int initSpeed = 4;
@@ -202,121 +204,8 @@ public:
 				}
 			}
 		}
-		else if (getAniType() == aniFlag::popUpLetterbox)
-		{
-			//initDist가 정해져있어야 한다.
-			//역으로 initDist에서 가속을 구할 수 있어야 함
-			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
-			static float initDist = 0;
-			float dstDist = popUpDist;
-			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
 
-			addTimer();
-			switch (getTimer())
-			{
-				case 1:
-					initDist = 0;
-					for (int i = 9; i >= 0; i--)
-					{
-						spd[9 - i] = acc * i + initSpeed;
-						initDist += spd[9 - i];
-					}
-					//정규화
-					for (int i = 0; i <= 9; i++)
-					{
-						spd[i] *= (dstDist/initDist);
-					}
-					break;
-				default:
-					changeXY(0, y - floor(spd[getTimer() - 2]), false);
-					break;
-				case 12:
-					if (inputType == input::keyboard) { changeXY(0, -dstDist + noActHeightHUD, false); }
-					else { changeXY(0, -dstDist, false); }
-					resetTimer();
-					actInput();
-					setAniType(aniFlag::null);
-					return true;
-					break;
-			}
-		}
-		else if (getAniType() == aniFlag::popDownLetterbox)
-		{
-			//initDist가 정해져있어야 한다.
-			//역으로 initDist에서 가속을 구할 수 있어야 함
-			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
-			static float initDist = 0;
-			float dstDist = popUpDist;
-			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
 
-			if (inputType == input::keyboard) { dstDist = - y + noActHeightHUD; }
-			else { dstDist = -y; }
-
-			addTimer();
-			switch (getTimer())
-			{
-				case 1:
-					initDist = 0;
-					for (int i = 0; i <= 9; i++)
-					{
-						spd[i] = acc * i + initSpeed;
-						initDist += spd[i];
-					}
-					//정규화
-					for (int i = 0; i <= 9; i++)
-					{
-						spd[i] *= (dstDist / initDist);
-					}
-					break;
-				default:
-					changeXY(0, y + floor(spd[getTimer() - 2]), false);
-					break;
-				case 12:
-					if (inputType == input::keyboard) { changeXY(0, noActHeightHUD, false); }
-					else { changeXY(0, 0, false); }
-					resetTimer();
-					actInput();
-					setAniType(aniFlag::null);
-					return true;
-					break;
-			}
-		}
-		else if (getAniType() == aniFlag::popUpSingleLetterbox)//키보드에서만 발생하는 1칸 팝업
-		{
-			//initDist가 정해져있어야 한다.
-			//역으로 initDist에서 가속을 구할 수 있어야 함
-			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
-			static float initDist = 0;
-			float dstDist = noActHeightHUD;
-
-			addTimer();
-			switch (getTimer())
-			{
-				case 1:
-					initDist = 0;
-					for (int i = 9; i >= 0; i--)
-					{
-						spd[9 - i] = acc * i + initSpeed;
-						initDist += spd[9 - i];
-					}
-					//정규화
-					for (int i = 0; i <= 9; i++)
-					{
-						spd[i] *= (dstDist / initDist);
-					}
-					break;
-				default:
-					changeXY(0, y - floor(spd[getTimer() - 2]), false);
-					break;
-				case 12:
-					changeXY(0, 0, false);
-					resetTimer();
-					actInput();
-					setAniType(aniFlag::null);
-					return true;
-					break;
-			}
-		}
 		return false;
 	}
 };

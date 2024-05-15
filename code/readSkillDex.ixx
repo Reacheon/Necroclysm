@@ -23,6 +23,14 @@ namespace csvSkill
     constexpr int energyPerAct = 8;
     constexpr int energyPerTurn = 9;
     constexpr int energyPerDay = 10;
+
+    constexpr int pietyPerAct = 11;
+    constexpr int pietyPerTurn = 12;
+    constexpr int pietyPerDay = 13;
+
+    constexpr int mentalPerAct = 14;
+    constexpr int mentalPerTurn = 15;
+    constexpr int mentalPerDay = 16;
 };
 
 export int readSkillDex(const wchar_t* file)
@@ -144,6 +152,7 @@ export int readSkillDex(const wchar_t* file)
                         else if (strFragment == L"BIONIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::BIONIC;
                         else if (strFragment == L"MUTATION") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MUTATION;
                         else if (strFragment == L"MARTIAL_ART") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MARTIAL_ART;
+                        else if (strFragment == L"DIVINE_POWER") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::DIVINE_POWER;
                         else if (strFragment == L"MAGIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MAGIC;
                         else errorBox(L"잘못된 스킬 소스 %ls를 발견했다.",strFragment.c_str());
                         break;
@@ -161,6 +170,20 @@ export int readSkillDex(const wchar_t* file)
                         break;
                     case csvSkill::energyPerDay:
                         skillDex[arrayCounter / (csvWidth)-1].energyPerDay = wtof(strFragment);
+                        break;
+                    case csvSkill::flag:
+                        break;
+                    case csvSkill::pietyPerAct:
+                        break;
+                    case csvSkill::pietyPerTurn:
+                        break;
+                    case csvSkill::pietyPerDay:
+                        break;
+                    case csvSkill::mentalPerAct:
+                        break;
+                    case csvSkill::mentalPerTurn:
+                        break;
+                    case csvSkill::mentalPerDay:
                         break;
                     default:
                         prt(L"readSkillDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

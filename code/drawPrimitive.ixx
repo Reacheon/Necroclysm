@@ -76,14 +76,14 @@ export void drawCross2(int x, int y, int north, int south, int west, int east)
     SDL_RenderDrawLine(renderer, x, y, x, y - north);
     SDL_RenderDrawLine(renderer, x+1, y, x+1, y - north);
 
-    SDL_RenderDrawLine(renderer, x, y, x, y + south);
-    SDL_RenderDrawLine(renderer, x+1, y, x+1, y + south);
+    SDL_RenderDrawLine(renderer, x, y, x, y + south + 1);
+    SDL_RenderDrawLine(renderer, x+1, y, x+1, y + south + 1);
 
     SDL_RenderDrawLine(renderer, x, y, x - west, y);
     SDL_RenderDrawLine(renderer, x, y+1, x - west, y+1);
 
-    SDL_RenderDrawLine(renderer, x, y, x + east, y);
-    SDL_RenderDrawLine(renderer, x, y+1, x + east, y+1);
+    SDL_RenderDrawLine(renderer, x, y, x + east + 1, y);
+    SDL_RenderDrawLine(renderer, x, y+1, x + east + 1, y+1);
 }
 
 
