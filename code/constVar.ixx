@@ -420,10 +420,10 @@ export enum class itemFlag
     VPART, //차량부품
     TRANSPARENT_WALL, //투명벽
 
-    PROP_WALL_CONNECT,//차벽같이 주변에 연결되는 16타일
-    PROP_DIR_DEPEND,//방향에 의존하여 16방향이 존재하는 프롭
-    PROP_DOOR_OPEN,
-    PROP_DOOR_CLOSE,
+    VPART_WALL_CONNECT,//차벽같이 주변에 연결되는 16타일
+    VPART_DIR_DEPEND,//방향에 의존하여 16방향이 존재하는 프롭
+    VPART_DOOR_OPEN,
+    VPART_DOOR_CLOSE,
 
     VEH_ROOF,
 
@@ -433,11 +433,11 @@ export enum class itemFlag
     TIRE_NORMAL,
     TIRE_STEER,
 
-    INSTALL, //설치 가능한 아이템
-    INSTALL_BIG,//48px가 아니라 80px*80px의 giantVehicleset 참조함
-    INSTALL_WALKABLE,//이동가능 프롭
-    INSTALL_BLOCKER,//시야방해 프롭
-    INSTALL_DEPTH_LOWER,//기존 설치물(&엔티티)들과 겹쳐지지 않고 바닥에 깔리는 설치물
+    PROP, //설치 가능한 아이템
+    PROP_BIG,//48px가 아니라 80px*80px의 giantVehicleset 참조함
+    PROP_WALKABLE,//이동가능 프롭
+    PROP_BLOCKER,//시야방해 프롭
+    PROP_DEPTH_LOWER,//기존 설치물(&엔티티)들과 겹쳐지지 않고 바닥에 깔리는 설치물
 
 
     PIPE_CNCT_RIGHT,
@@ -814,7 +814,7 @@ export enum class itemSubcategory
     structure_wall,
     structure_floor,
     structure_ceil,
-    structure_install,
+    structure_prop,
     structure_electric,
     structure_pneumatic,
 

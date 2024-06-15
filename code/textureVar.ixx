@@ -139,4 +139,6 @@ export namespace spr
 	Sprite* singleQuickSlot = nullptr;
 	Sprite* topQuickSlotBtn = nullptr;
 	Sprite* skillSet = nullptr;
+
+	Sprite* fireStorm = nullptr;
 }

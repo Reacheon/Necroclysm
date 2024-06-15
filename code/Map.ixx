@@ -35,9 +35,7 @@ public:
 		mapTexture = IMG_LoadTexture(renderer, "image/map/map1.png");
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winUnfoldOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 	}
 	~Map()
 	{

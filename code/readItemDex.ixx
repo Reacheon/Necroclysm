@@ -323,7 +323,7 @@ export int readItemDex(const wchar_t* file)
                                 if (strFragment == L"WALL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_wall; }
                                 else if (strFragment == L"FLOOR") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_floor; }
                                 else if (strFragment == L"CEIL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_ceil; }
-                                else if (strFragment == L"INSTALL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_install; }
+                                else if (strFragment == L"PROP") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_prop; }
                                 else if (strFragment == L"ELECTRIC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_electric; }
                                 else if (strFragment == L"PNEUMATIC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_pneumatic; }
                                 else { errorBox("error in readItemDex.ixx, csvItem::subcategory(structure)"); }
@@ -361,17 +361,17 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"VAPOR") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VAPOR);
                                     else if (strFragment.substr(0, j) == L"VPART") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART);
                                     else if (strFragment.substr(0, j) == L"TRANSPARENT_WALL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TRANSPARENT_WALL);
-                                    else if (strFragment.substr(0, j) == L"INSTALL_BIG") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL_BIG);
+                                    else if (strFragment.substr(0, j) == L"PROP_BIG") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_BIG);
                                     else if (strFragment.substr(0, j) == L"VEH_ROOF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VEH_ROOF);
-                                    else if (strFragment.substr(0, j) == L"INSTALL_WALKABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL_WALKABLE);
-                                    else if (strFragment.substr(0, j) == L"INSTALL_BLOCKER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL_BLOCKER);
-                                    else if (strFragment.substr(0, j) == L"INSTALL_DEPTH_LOWER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL_DEPTH_LOWER);
+                                    else if (strFragment.substr(0, j) == L"PROP_WALKABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_WALKABLE);
+                                    else if (strFragment.substr(0, j) == L"PROP_BLOCKER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_BLOCKER);
+                                    else if (strFragment.substr(0, j) == L"PROP_DEPTH_LOWER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_DEPTH_LOWER);
                                     else if (strFragment.substr(0, j) == L"LIGHT_ON") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::LIGHT_ON);
                                     else if (strFragment.substr(0, j) == L"LIGHT_OFF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::LIGHT_OFF);
-                                    else if (strFragment.substr(0, j) == L"PROP_WALL_CONNECT") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_WALL_CONNECT);
-                                    else if (strFragment.substr(0, j) == L"PROP_DIR_DEPEND") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_DIR_DEPEND);
-                                    else if (strFragment.substr(0, j) == L"PROP_DOOR_OPEN") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_DOOR_OPEN);
-                                    else if (strFragment.substr(0, j) == L"PROP_DOOR_CLOSE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_DOOR_CLOSE);
+                                    else if (strFragment.substr(0, j) == L"VPART_WALL_CONNECT") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART_WALL_CONNECT);
+                                    else if (strFragment.substr(0, j) == L"VPART_DIR_DEPEND") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART_DIR_DEPEND);
+                                    else if (strFragment.substr(0, j) == L"VPART_DOOR_OPEN") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART_DOOR_OPEN);
+                                    else if (strFragment.substr(0, j) == L"VPART_DOOR_CLOSE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART_DOOR_CLOSE);
 
                                     else if (strFragment.substr(0, j) == L"PIPE_CNCT_RIGHT") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PIPE_CNCT_RIGHT);
                                     else if (strFragment.substr(0, j) == L"PIPE_CNCT_TOP") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PIPE_CNCT_TOP);
@@ -391,7 +391,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"TIRE_NORMAL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TIRE_NORMAL);
                                     else if (strFragment.substr(0, j) == L"TIRE_STEER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TIRE_STEER);
 
-                                    else if (strFragment.substr(0, j) == L"INSTALL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL);
+                                    else if (strFragment.substr(0, j) == L"PROP") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP);
 
                                     else if (strFragment.substr(0, j) == L"WIRE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WIRE);
                                     else if (strFragment.substr(0, j) == L"PIPE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PIPE);
@@ -422,7 +422,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"FLOOR") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::FLOOR);
                                     else if (strFragment.substr(0, j) == L"WALL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WALL);
                                     else if (strFragment.substr(0, j) == L"CEIL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CEIL);
-                                    else if (strFragment.substr(0, j) == L"INSTALL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::INSTALL);
+                                    else if (strFragment.substr(0, j) == L"PROP") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP);
                                     else if (strFragment.substr(0, j) == L"WATER_SHALLOW") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WATER_SHALLOW);
                                     else if (strFragment.substr(0, j) == L"WATER_DEEP") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WATER_DEEP);
                                     else if (strFragment.substr(0, j) == L"FRESHWATER") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::FRESHWATER);

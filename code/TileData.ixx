@@ -36,7 +36,7 @@ export struct TileData //총용량 29바이트
     void* EntityPtr = nullptr;
     void* ItemStackPtr = nullptr;
     void* VehiclePtr = nullptr;
-    void* InstallPtr = nullptr;
+    void* PropPtr = nullptr;
 
 
     void update()

@@ -20,8 +20,8 @@ export void renderFPS(__int64 loopTime)
 	static std::vector<float> turnCycleArr, stepEventArr, renderTileArr, renderStickerArr, renderUIArr, renderLogArr;
 	static __int64 turnCycleAvg, stepEventAvg, renderTileAvg, renderStickerAvg, renderUIAvg, renderLogAvg;
 
-	static std::vector<float> tileArr, corpseArr, itemArr, entityArr, damageArr, fogArr, markerArr;
-	static __int64 tileAvg, corpseAvg, itemAvg, entityAvg, damageAvg, fogAvg, markerAvg;
+	static std::vector<float> analysisArr,tileArr, corpseArr, itemArr, entityArr, damageArr, fogArr, markerArr;
+	static __int64 analysisAvg,tileAvg, corpseAvg, itemAvg, entityAvg, damageAvg, fogAvg, markerAvg;
 
 	if (currentTime - lastUpdateTime > samplingTime)
 	{
@@ -44,6 +44,7 @@ export void renderFPS(__int64 loopTime)
 		renderUIAvg = getAvg(renderUIArr, dur::renderUI);
 		renderLogAvg = getAvg(renderLogArr, dur::renderLog);
 
+		analysisAvg = getAvg(analysisArr, dur::analysis);
 		tileAvg = getAvg(tileArr, dur::tile);
 		corpseAvg = getAvg(corpseArr, dur::corpse);
 		itemAvg = getAvg(itemArr, dur::item);
@@ -83,11 +84,12 @@ export void renderFPS(__int64 loopTime)
 	drawTextShadow(col2Str(col::white) + L"renderLog : " + decimalCutter(renderLogAvg / 1000000.0, 5) + L" ns", 20, 180 + 12 * 4);
 	drawTextShadow(col2Str(col::white) + L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 5) + L" ns", 20, 180 + 12 * 5);
 
-	drawTextShadow(col2Str(col::white) + L">tile : " + decimalCutter(tileAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 6);
-	drawTextShadow(col2Str(col::white) + L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 7);
-	drawTextShadow(col2Str(col::white) + L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 8);
-	drawTextShadow(col2Str(col::white) + L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 9);
-	drawTextShadow(col2Str(col::white) + L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 10);
-	drawTextShadow(col2Str(col::white) + L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 11);
-	drawTextShadow(col2Str(col::white) + L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 12);
+	drawTextShadow(col2Str(col::white) + L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 6);
+	drawTextShadow(col2Str(col::white) + L">tile : " + decimalCutter(tileAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 7);
+	drawTextShadow(col2Str(col::white) + L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 8);
+	drawTextShadow(col2Str(col::white) + L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 9);
+	drawTextShadow(col2Str(col::white) + L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 10);
+	drawTextShadow(col2Str(col::white) + L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 11);
+	drawTextShadow(col2Str(col::white) + L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 12);
+	drawTextShadow(col2Str(col::white) + L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 5) + L" ns", 30, 180 + 12 * 13);
 }

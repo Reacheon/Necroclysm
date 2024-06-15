@@ -1,6 +1,6 @@
 #include <SDL.h>
 
-export module Install;
+export module Prop;
 
 import std;
 import globalVar;
@@ -19,22 +19,22 @@ import Drawable;
 import drawSprite;
 import globalTime;
 
-export class Install : public Ani, public AI, public Coord, public Drawable
+export class Prop : public Ani, public AI, public Coord, public Drawable
 {
 public:
     ItemData leadItem;
     float timeResource = 0;
     Light* myLight = nullptr;
 
-    Install(int inputX, int inputY, int inputZ, int leadItemCode)
+    Prop(int inputX, int inputY, int inputZ, int leadItemCode)
     {
         leadItem = itemDex[leadItemCode];
         setAniPriority(3);
-        prt(L"[Install:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
+        prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
         setGrid(inputX, inputY, inputZ);
 
-        errorBox(World::ins()->getTile(inputX, inputY, inputZ).InstallPtr != nullptr, L"생성위치에 이미 설치물이 존재한다!");
-        World::ins()->getTile(inputX, inputY, inputZ).InstallPtr = this;
+        errorBox(World::ins()->getTile(inputX, inputY, inputZ).PropPtr != nullptr, L"생성위치에 이미 설치물이 존재한다!");
+        World::ins()->getTile(inputX, inputY, inputZ).PropPtr = this;
         updateTile();
 
         if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
@@ -52,16 +52,16 @@ public:
         for (int i = 0; i < 8; i++)
         {
             dir2Coord(i, dx, dy);
-            Install* targetInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-            if (targetInstall != nullptr) targetInstall->updateSprIndex();
+            Prop* targetProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+            if (targetProp != nullptr) targetProp->updateSprIndex();
         }
         updateSprIndex();
     }
 
-    ~Install()
+    ~Prop()
     {
         delete myLight;
-        prt(L"[Install:destructor] 소멸자가 호출되었다. \n");
+        prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 
         //주변 타일을 분석해 extraIndex 설정
         int dx = 0;
@@ -69,8 +69,8 @@ public:
         for (int i = 0; i < 8; i++)
         {
             dir2Coord(i, dx, dy);
-            Install* targetInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-            if (targetInstall != nullptr) targetInstall->updateSprIndex();
+            Prop* targetProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+            if (targetProp != nullptr) targetProp->updateSprIndex();
         }
         updateSprIndex();
     }
@@ -88,19 +88,19 @@ public:
         {
             auto wireCheck = [=](int dx, int dy) -> bool
                 {
-                    Install* tgtInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-                    if (tgtInstall != nullptr)
+                    Prop* tgtProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+                    if (tgtProp != nullptr)
                     {
-                        if (tgtInstall->leadItem.checkFlag(itemFlag::WIRE))//같은 전선일 경우
+                        if (tgtProp->leadItem.checkFlag(itemFlag::WIRE))//같은 전선일 경우
                         {
                             return true;
                         }
                         else
                         {
-                            if ((dx == 0 && dy == -1) && tgtInstall->leadItem.checkFlag(itemFlag::WIRE_CNCT_BOT)) return true;
-                            else if ((dx == 0 && dy == 1) && tgtInstall->leadItem.checkFlag(itemFlag::WIRE_CNCT_TOP)) return true;
-                            else if ((dx == 1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::WIRE_CNCT_LEFT)) return true;
-                            else if ((dx == -1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::WIRE_CNCT_RIGHT)) return true;
+                            if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_BOT)) return true;
+                            else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_TOP)) return true;
+                            else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_LEFT)) return true;
+                            else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_RIGHT)) return true;
                             else return false;
                         }
                     }
@@ -117,19 +117,19 @@ public:
         {
             auto pipeCheck = [=](int dx, int dy) -> bool
                 {
-                    Install* tgtInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-                    if (tgtInstall != nullptr)
+                    Prop* tgtProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+                    if (tgtProp != nullptr)
                     {
-                        if (tgtInstall->leadItem.checkFlag(itemFlag::PIPE))//같은 전선일 경우
+                        if (tgtProp->leadItem.checkFlag(itemFlag::PIPE))//같은 전선일 경우
                         {
                             return true;
                         }
                         else
                         {
-                            if ((dx == 0 && dy == -1) && tgtInstall->leadItem.checkFlag(itemFlag::PIPE_CNCT_BOT)) return true;
-                            else if ((dx == 0 && dy == 1) && tgtInstall->leadItem.checkFlag(itemFlag::PIPE_CNCT_TOP)) return true;
-                            else if ((dx == 1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT)) return true;
-                            else if ((dx == -1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)) return true;
+                            if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_BOT)) return true;
+                            else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_TOP)) return true;
+                            else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT)) return true;
+                            else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)) return true;
                             else return false;
                         }
                     }
@@ -146,19 +146,19 @@ public:
         {
             auto conveyorCheck = [=](int dx, int dy) -> bool
                 {
-                    Install* tgtInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-                    if (tgtInstall != nullptr)
+                    Prop* tgtProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+                    if (tgtProp != nullptr)
                     {
-                        if (tgtInstall->leadItem.checkFlag(itemFlag::CONVEYOR))//같은 전선일 경우
+                        if (tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR))//같은 전선일 경우
                         {
                             return true;
                         }
                         else
                         {
-                            if ((dx == 0 && dy == -1) && tgtInstall->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_BOT)) return true;
-                            else if ((dx == 0 && dy == 1) && tgtInstall->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_TOP)) return true;
-                            else if ((dx == 1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_LEFT)) return true;
-                            else if ((dx == -1 && dy == 0) && tgtInstall->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_RIGHT)) return true;
+                            if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_BOT)) return true;
+                            else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_TOP)) return true;
+                            else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_LEFT)) return true;
+                            else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_RIGHT)) return true;
                             else return false;
                         }
                     }
@@ -175,12 +175,12 @@ public:
         {
             auto sameCheck = [=](int dx, int dy) -> bool
                 {
-                    Install* tgtInstall = (Install*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).InstallPtr;
-                    if (tgtInstall != nullptr)
+                    Prop* tgtProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
+                    if (tgtProp != nullptr)
                     {
-                        if (tgtInstall->leadItem.tileConnectGroup != 0)
+                        if (tgtProp->leadItem.tileConnectGroup != 0)
                         {
-                            if (tgtInstall->leadItem.tileConnectGroup == leadItem.tileConnectGroup)
+                            if (tgtProp->leadItem.tileConnectGroup == leadItem.tileConnectGroup)
                             {
                                 return true;
                             }
@@ -188,7 +188,7 @@ public:
                         }
                         else
                         {
-                            if (tgtInstall->leadItem.itemCode == leadItem.itemCode)
+                            if (tgtProp->leadItem.itemCode == leadItem.itemCode)
                             {
                                 return true;
                             }
@@ -212,7 +212,7 @@ public:
         //walkable 체크
         if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable == true)
         {
-            if (leadItem.checkFlag(itemFlag::INSTALL_WALKABLE) == false)
+            if (leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
             {
                 World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable = false;
             }
@@ -221,7 +221,7 @@ public:
         //blocker 체크
         if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).blocker == false)
         {
-            if (leadItem.checkFlag(itemFlag::INSTALL_BLOCKER) == true)
+            if (leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true)
             {
                 World::ins()->getTile(getGridX(), getGridY(), getGridZ()).blocker = true;
             }
@@ -230,11 +230,11 @@ public:
 
     bool runAI()
     {
-        //prt(L"[Install:AI] ID : %p의 AI를 실행시켰다.\n", this);
+        //prt(L"[Prop:AI] ID : %p의 AI를 실행시켰다.\n", this);
         while (1)
         {
 
-            //prt(L"[Install:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
+            //prt(L"[Prop:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
             if (getTimeResource() >= 2.0)
             {
                 clearTimeResource();
@@ -245,7 +245,7 @@ public:
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //위의 모든 패턴 조건을 만족하지않을시 return true
-            //prt(L"[Install:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
+            //prt(L"[Prop:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
             return true;
         }
     }
@@ -262,7 +262,7 @@ public:
     void drawSelf() override
     {
         int tileSize = 16 * zoomScale;
-        int bigShift = 16 * (leadItem.checkFlag(itemFlag::INSTALL_BIG));
+        int bigShift = 16 * (leadItem.checkFlag(itemFlag::PROP_BIG));
         SDL_Rect dst;
         dst.x = cameraW / 2 + zoomScale * ((16 * getGridX() + 8) - cameraX) - ((16 * zoomScale) / 2);
         dst.y = cameraH / 2 + zoomScale * ((16 * getGridY() + 8 - bigShift) - cameraY) - ((16 * zoomScale) / 2);

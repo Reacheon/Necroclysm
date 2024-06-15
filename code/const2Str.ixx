@@ -67,7 +67,7 @@ export std::wstring itemSubcategory2String(itemSubcategory input)
 	else if (input == itemSubcategory::structure_wall) return L"벽";
 	else if (input == itemSubcategory::structure_floor) return L"바닥";
 	else if (input == itemSubcategory::structure_ceil) return L"천장";
-	else if (input == itemSubcategory::structure_install) return L"설치물";
+	else if (input == itemSubcategory::structure_prop) return L"설치물";
 	else if (input == itemSubcategory::structure_electric) return L"전기";
 	else if (input == itemSubcategory::structure_pneumatic) return L"유압";
 

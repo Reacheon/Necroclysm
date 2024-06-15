@@ -48,13 +48,8 @@ export namespace timer
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
 
-auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
 
-    if (a->getAniPriority() == b->getAniPriority()) return a < b;
-    else if (a->getAniPriority() > b->getAniPriority()) return true;
-    else return false;
-    };
-export std::set<Ani*, decltype(aniUSetComp)> aniUSet;//애니메이션 저장 해시셋, 해당 애니메이션의 우선도 순서대로 정렬됨
+
 //export std::unordered_map<std::wstring, SDL_Texture*> textCache;// drawText들의 문자열 저장 캐시
 //export std::unordered_map<std::wstring, SDL_Texture*> textOutlineCache;// drawText들의 문자열 저장 캐시
 export turn turnCycle = turn::playerInput;//0:플레이어 입력_1:플레이어 애니메이션 재생_2:모든 엔티티 AI 작동(하나라도 false 반환시 3으로, 없으면 0으로)_3:엔티티 애니메이션 재생
@@ -155,6 +150,7 @@ export namespace dur
 	__int64 renderUI = 0;
 	__int64 renderLog = 0;
 
+    __int64 analysis = 0;
     __int64 tile = 0;
     __int64 corpse = 0;
     __int64 item = 0;
@@ -181,3 +177,34 @@ export std::vector<void*> extraRenderVehList;
 export std::vector<void*> extraRenderEntityList;
 
 export std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , -1), };
+
+export SDL_Rect quickSlotRegion;
+
+
+auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
+
+    if (a->getAniPriority() == b->getAniPriority()) return a < b;
+    else if (a->getAniPriority() > b->getAniPriority()) return true;
+    else return false;
+    };
+export std::set<Ani*, decltype(aniUSetComp)> aniUSet;//애니메이션 저장 해시셋, 해당 애니메이션의 우선도 순서대로 정렬됨
+//AniUSet에 애니메이션을 추가한다. 단 턴을 넘기지는 않는다. 몬스터의 경우 모든 AI에서 실행 후 자동으로 턴이 넘어가므로...
+export std::function<void(Ani*, aniFlag)> addAniUSet = [](Ani* tgtPtr, aniFlag inputType)
+    {
+        aniUSet.insert(tgtPtr);
+        tgtPtr->setAniType(inputType);
+    };
+
+//AniUSet에 애니메이션을 추가한다. 플레이어의 입력턴을 강제로 종료하고 플레이어 애니메이션으로 넘어간다.
+export std::function<void(Ani*, aniFlag)> addAniUSetPlayer = [](Ani* tgtPtr, aniFlag inputType)
+    {
+        addAniUSet(tgtPtr, inputType);
+        turnCycle = turn::playerAnime;
+    };
+
+//AniUSet에 애니메이션을 추가한다. 몬스터의 연산턴을 강제로 종료하고 플레이어 애니메이션으로 넘어간다.
+export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, aniFlag inputType)
+    {
+        addAniUSet(tgtPtr, inputType);
+        turnCycle = turn::monsterAnime;
+    };

@@ -32,9 +32,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winSlipOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::winSlipOpen);
 	}
 	~Status()
 	{

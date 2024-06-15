@@ -86,9 +86,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winSlipOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::winSlipOpen);
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 

@@ -89,9 +89,8 @@ public:
 
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winUnfoldOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this,aniFlag::winUnfoldOpen);
+		
 		rootPathPocket = new ItemPocket(storageType::null);
 		prodPocket = new ItemPocket(storageType::null);
 		currentPathPocket.push_back(rootPathPocket);

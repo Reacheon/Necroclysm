@@ -26,7 +26,7 @@ import CoordSelectCraft;
 import log;
 import Msg;
 import Vehicle;
-import Install;
+import Prop;
 import turnWait;
 
 export class Craft : public GUI
@@ -90,11 +90,9 @@ public:
 		tabType = tabFlag::closeWin;
 
 		deactInput();
-
 		deactDraw();
-		setAniType(aniFlag::winUnfoldOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this,aniFlag::winUnfoldOpen);
+
 
 		exInputText = L"";
 		recipePtr = ((ItemPocket*)availableRecipe);
@@ -590,7 +588,7 @@ public:
 					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_install), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_prop), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_electric), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 					drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_pneumatic), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 					break;
@@ -1148,7 +1146,7 @@ public:
 								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::structure_wall; }
 								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::structure_floor; }
 								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::structure_ceil; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_install; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_prop; }
 								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::structure_electric; }
 								else if (selectSubcategory == 5) { targetSubcategory = itemSubcategory::structure_pneumatic; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
@@ -1490,7 +1488,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).InstallPtr == nullptr) selectableTile.push_back({ Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy });
+						if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).PropPtr == nullptr) selectableTile.push_back({ Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy });
 					}
 
 					if (selectableTile.size() > 0)
@@ -1721,10 +1719,10 @@ public:
 				errorBox(!targetVehicle->hasFrame(buildLocation[0], buildLocation[1]), "first part doesn't have VFRAME flag");
 				targetVehicle->addPart(buildLocation[0], buildLocation[1], targetItemCode);
 			}
-			else if (itemDex[targetItemCode].checkFlag(itemFlag::INSTALL))
+			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))
 			{
-				errorBox(World::ins()->getTile(buildLocation[0], buildLocation[1], buildLocation[2]).InstallPtr != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
-				new Install(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
+				errorBox(World::ins()->getTile(buildLocation[0], buildLocation[1], buildLocation[2]).PropPtr != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
+				new Prop(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
 			}
 		}
 

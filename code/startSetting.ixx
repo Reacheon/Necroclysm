@@ -6,7 +6,7 @@ import Player;
 import ItemData;
 import World;
 import Vehicle;
-import Install;
+import Prop;
 
 export void startSetting()
 {
@@ -109,7 +109,7 @@ export void startSetting()
 	//Áý ÇÏ´Ü 5Å¸ÀÏ
 	World::ins()->getTile(pX - 1, pY - 2, pZ).setWall(110);
 	World::ins()->getTile(pX - 2, pY - 2, pZ).setWall(110);
-	new Install(pX - 3, pY - 2, pZ, 291);//³ª¹«¹® ¼³Ä¡
+	new Prop(pX - 3, pY - 2, pZ, 291);//³ª¹«¹® ¼³Ä¡
 	World::ins()->getTile(pX - 4, pY - 2, pZ).setWall(110);
 	World::ins()->getTile(pX - 5, pY - 2, pZ).setWall(110);
 
@@ -130,10 +130,10 @@ export void startSetting()
 	World::ins()->getTile(pX - 3, pY - 6, pZ).setWall(110);
 	World::ins()->getTile(pX - 4, pY - 6, pZ).setWall(110);
 
-	new Install(pX - 4, pY - 5, pZ, 295);//Ã¥Àå
-	new Install(pX - 2, pY - 5, pZ, 294);//Ä§´ë
+	new Prop(pX - 4, pY - 5, pZ, 295);//Ã¥Àå
+	new Prop(pX - 2, pY - 5, pZ, 294);//Ä§´ë
 
-	new Install(pX - 4, pY - 3, pZ, 298);//»ó½Â°è´Ü
+	new Prop(pX - 4, pY - 3, pZ, 298);//»ó½Â°è´Ü
 	for (int dx = -1; dx <= 1; dx++)
 	{
 		for (int dy = -1; dy <= 1; dy++)
@@ -142,7 +142,7 @@ export void startSetting()
 		}
 	}
 
-	new Install(pX - 2, pY - 3, pZ, 299);//ÇÏ°­°è´Ü
+	new Prop(pX - 2, pY - 3, pZ, 299);//ÇÏ°­°è´Ü
 
 
 
@@ -157,16 +157,16 @@ export void startSetting()
 			}
 		}
 
-		new Install(pX - 2, pY - 5, pZ - 1, 211);//ÀüÅëµî
+		new Prop(pX - 2, pY - 5, pZ - 1, 211);//ÀüÅëµî
 		{
 			int cx = pX - 2 + 1;
 			int cy = pY - 3 + 2;
 
 			for (int i = 1; i < 9; i++) World::ins()->getTile(cx, cy + i, pZ - 1).destoryWall();
-			new Install(cx, cy + 1, pZ - 1, 291);//³ª¹«¹® ¼³Ä¡
+			new Prop(cx, cy + 1, pZ - 1, 291);//³ª¹«¹® ¼³Ä¡
 
 			for (int i = 1; i < 9; i++) World::ins()->getTile(cx + i, cy, pZ - 1).destoryWall();
-			Install* door2 = new Install(cx + 1, cy, pZ - 1, 291);//³ª¹«¹® ¼³Ä¡
+			Prop* door2 = new Prop(cx + 1, cy, pZ - 1, 291);//³ª¹«¹® ¼³Ä¡
 			door2->leadItem.extraSprIndexSingle = 2;
 
 			int aisleEndX = cx + 8;
@@ -215,26 +215,26 @@ export void startSetting()
 
 			for (int i = 0; i <= 25; i++)
 			{
-				new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railTB);
+				new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railTB);
 				cursorY--;
 			}
 
-			new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railBR);
+			new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railBR);
 			cursorX++;
 
 			for (int i = 0; i < 11; i++)
 			{
-				new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railRL);
+				new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railRL);
 				cursorX++;
 			}
 
-			new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railSwitchWS);//ÀüÈ¯±â
+			new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railSwitchWS);//ÀüÈ¯±â
 
 			int secondCursorX = cursorX+1;
 			int secondCursorY = cursorY;
 			for (int i = 0; i < 22; i++)
 			{
-				new Install(secondCursorX, secondCursorY, pZ - 1, itemVIPCode::railRL);//³ª¹«¹® ¼³Ä¡
+				new Prop(secondCursorX, secondCursorY, pZ - 1, itemVIPCode::railRL);//³ª¹«¹® ¼³Ä¡
 				secondCursorX++;
 			}
 
@@ -242,19 +242,19 @@ export void startSetting()
 
 			for (int i = 0; i < 26; i++)
 			{
-				new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railTB);//³ª¹«¹® ¼³Ä¡
+				new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railTB);//³ª¹«¹® ¼³Ä¡
 				cursorY++;
 			}
 
-			new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railTL);//³ª¹«¹® ¼³Ä¡
+			new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railTL);//³ª¹«¹® ¼³Ä¡
 			cursorX--;
 
 			for (int i = 0; i < 11; i++)
 			{
-				new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railRL);//³ª¹«¹® ¼³Ä¡
+				new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railRL);//³ª¹«¹® ¼³Ä¡
 				cursorX--;
 			}
-			new Install(cursorX, cursorY, pZ - 1, itemVIPCode::railTR);//³ª¹«¹® ¼³Ä¡
+			new Prop(cursorX, cursorY, pZ - 1, itemVIPCode::railTR);//³ª¹«¹® ¼³Ä¡
 
 
 			//ÁöÇÏÃ¶ ¼³Ä¡
@@ -415,19 +415,19 @@ export void startSetting()
 
 			//for (int targetY = endY; targetY >= endY - 19; targetY--)
 			//{
-			//	new Install(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
 			//}
 
-			//new Install(endX + 3, endY - 20, pZ - 1, 317);//³ª¹«¹® ¼³Ä¡
+			//new Prop(endX + 3, endY - 20, pZ - 1, 317);//³ª¹«¹® ¼³Ä¡
 
 			//for (int targetY = endY - 21; targetY >= endY - 50; targetY--)
 			//{
-			//	new Install(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
 			//}
 
 			//for (int targetX = endX + 1; targetX >= endX - 30; targetX--)
 			//{
-			//	new Install(targetX, endY - 20, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(targetX, endY - 20, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
 			//}
 
 		}
@@ -442,7 +442,7 @@ export void startSetting()
 		}
 	}
 
-	new Install(pX + 2, pY - 1, pZ, 297);//Ç¥ÁöÆÇ
+	new Prop(pX + 2, pY - 1, pZ, 297);//Ç¥ÁöÆÇ
 
 
 	//À¯¸®º® ¼³Ä¡
@@ -463,26 +463,26 @@ export void startSetting()
 	/////////////////////////////////////////////////¡å¼³Ä¡¹° Ãß°¡////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	new Install(pX + 1, pY - 2, pZ, 237);//³ª¹« ¼³Ä¡
-	new Install(pX + 1 - 1, pY - 2, pZ, 235);//º¢²É³«¿± ¼³Ä¡
-	new Install(pX + 1, pY - 2 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 1, pY - 2, pZ, 237);//³ª¹« ¼³Ä¡
+	new Prop(pX + 1 - 1, pY - 2, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 1, pY - 2 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 
-	new Install(pX + 3, pY - 2, pZ, 239);//³ª¹« ¼³Ä¡
+	new Prop(pX + 3, pY - 2, pZ, 239);//³ª¹« ¼³Ä¡
 
-	new Install(pX + 5, pY - 1, pZ, 248);//³ª¹« ¼³Ä¡
-	new Install(pX + 5, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
-	new Install(pX + 5 - 1, pY - 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
-	new Install(pX + 5 - 1, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
-	new Install(pX + 5 - 1, pY - 1 + 2, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 5, pY - 1, pZ, 248);//³ª¹« ¼³Ä¡
+	new Prop(pX + 5, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 5 - 1, pY - 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 5 - 1, pY - 1 + 2, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 
-	new Install(pX + 7, pY + 1, pZ, 237);//³ª¹« ¼³Ä¡
-	new Install(pX + 7 - 1, pY + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 7, pY + 1, pZ, 237);//³ª¹« ¼³Ä¡
+	new Prop(pX + 7 - 1, pY + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 
-	new Install(pX + 4, pY - 5, pZ, 248);//³ª¹« ¼³Ä¡
+	new Prop(pX + 4, pY - 5, pZ, 248);//³ª¹« ¼³Ä¡
 
 
 
-	new Install(pX, pY - 20, pZ, 237);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX, pY - 20, pZ, 237);//º¢²É³«¿± ¼³Ä¡
 
 
 	//ÀÜµð
@@ -496,63 +496,63 @@ export void startSetting()
 	World::ins()->getTile(pX + 0, pY + 4, pZ).floor = 220;
 	World::ins()->getTile(pX + 1, pY + 4, pZ).floor = 220;
 
-	new Install(pX + -2, pY + 3, pZ, 270);//²É ¼³Ä¡
-	new Install(pX + -1, pY + 3, pZ, 265);//²É ¼³Ä¡
-	new Install(pX + 0, pY + 3, pZ, 266);//²É ¼³Ä¡
-	new Install(pX + 1, pY + 3, pZ, 267);//²É ¼³Ä¡
+	new Prop(pX + -2, pY + 3, pZ, 270);//²É ¼³Ä¡
+	new Prop(pX + -1, pY + 3, pZ, 265);//²É ¼³Ä¡
+	new Prop(pX + 0, pY + 3, pZ, 266);//²É ¼³Ä¡
+	new Prop(pX + 1, pY + 3, pZ, 267);//²É ¼³Ä¡
 
-	new Install(pX + -2, pY + 4, pZ, 271);//²É ¼³Ä¡
-	new Install(pX + -1, pY + 4, pZ, 268);//²É ¼³Ä¡
-	new Install(pX + 0, pY + 4, pZ, 269);//²É ¼³Ä¡
-	new Install(pX + 1, pY + 4, pZ, 270);//²É ¼³Ä¡
+	new Prop(pX + -2, pY + 4, pZ, 271);//²É ¼³Ä¡
+	new Prop(pX + -1, pY + 4, pZ, 268);//²É ¼³Ä¡
+	new Prop(pX + 0, pY + 4, pZ, 269);//²É ¼³Ä¡
+	new Prop(pX + 1, pY + 4, pZ, 270);//²É ¼³Ä¡
 
-	new Install(pX, pY - 1, pZ, 118);//º¼¶óµå µî ¼³Ä¡
+	new Prop(pX, pY - 1, pZ, 118);//º¼¶óµå µî ¼³Ä¡
 
 	//¿ïÅ¸¸® ¼³Ä¡
-	new Install(pX - 3, pY + 2, pZ, 206);
-	new Install(pX - 2, pY + 2, pZ, 206);
-	new Install(pX - 1, pY + 2, pZ, 206);
-	new Install(pX, pY + 2, pZ, 206);
-	new Install(pX + 1, pY + 2, pZ, 206);
-	new Install(pX + 2, pY + 2, pZ, 206);
-	new Install(pX + 3, pY + 2, pZ, 206);
+	new Prop(pX - 3, pY + 2, pZ, 206);
+	new Prop(pX - 2, pY + 2, pZ, 206);
+	new Prop(pX - 1, pY + 2, pZ, 206);
+	new Prop(pX, pY + 2, pZ, 206);
+	new Prop(pX + 1, pY + 2, pZ, 206);
+	new Prop(pX + 2, pY + 2, pZ, 206);
+	new Prop(pX + 3, pY + 2, pZ, 206);
 
-	new Install(pX - 3, pY + 3, pZ, 206);
-	new Install(pX - 3, pY + 4, pZ, 206);
+	new Prop(pX - 3, pY + 3, pZ, 206);
+	new Prop(pX - 3, pY + 4, pZ, 206);
 
-	new Install(pX + 2, pY + 3, pZ, 206);
-	new Install(pX + 2, pY + 4, pZ, 206);
+	new Prop(pX + 2, pY + 3, pZ, 206);
+	new Prop(pX + 2, pY + 4, pZ, 206);
 
-	new Install(pX - 3, pY + 5, pZ, 206);
-	new Install(pX - 2, pY + 5, pZ, 206);
-	new Install(pX - 1, pY + 5, pZ, 206);
-	new Install(pX, pY + 5, pZ, 206);
-	new Install(pX + 1, pY + 5, pZ, 206);
-	new Install(pX + 2, pY + 5, pZ, 206);
+	new Prop(pX - 3, pY + 5, pZ, 206);
+	new Prop(pX - 2, pY + 5, pZ, 206);
+	new Prop(pX - 1, pY + 5, pZ, 206);
+	new Prop(pX, pY + 5, pZ, 206);
+	new Prop(pX + 1, pY + 5, pZ, 206);
+	new Prop(pX + 2, pY + 5, pZ, 206);
 
 	//Àü¼± ¼³Ä¡
-	new Install(pX + 7, pY + 2, pZ, 143);
-	new Install(pX + 8, pY + 2, pZ, 143);
-	new Install(pX + 9, pY + 2, pZ, 143);
-	new Install(pX + 8, pY + 1, pZ, 143);
-	new Install(pX + 8, pY + 0, pZ, 143);
-	new Install(pX + 9, pY + 0, pZ, 143);
+	new Prop(pX + 7, pY + 2, pZ, 143);
+	new Prop(pX + 8, pY + 2, pZ, 143);
+	new Prop(pX + 9, pY + 2, pZ, 143);
+	new Prop(pX + 8, pY + 1, pZ, 143);
+	new Prop(pX + 8, pY + 0, pZ, 143);
+	new Prop(pX + 9, pY + 0, pZ, 143);
 
 	//¹è°ü ¼³Ä¡
-	new Install(pX + 3, pY + 6, pZ, 144);
-	new Install(pX + 4, pY + 6, pZ, 144);
-	new Install(pX + 5, pY + 6, pZ, 144);
-	new Install(pX + 6, pY + 6, pZ, 144);
-	new Install(pX + 5, pY + 7, pZ, 144);
+	new Prop(pX + 3, pY + 6, pZ, 144);
+	new Prop(pX + 4, pY + 6, pZ, 144);
+	new Prop(pX + 5, pY + 6, pZ, 144);
+	new Prop(pX + 6, pY + 6, pZ, 144);
+	new Prop(pX + 5, pY + 7, pZ, 144);
 
 	//Á¾±³
 
-	new Install(pX - 3, pY - 7, pZ, 213);
-	new Install(pX - 1, pY - 7, pZ, 214);
-	new Install(pX + 1, pY - 7, pZ, 216);
-	new Install(pX + 3, pY - 7, pZ, 217);
-	new Install(pX + 5, pY - 7, pZ, 218);
-	new Install(pX + 7, pY - 7, pZ, 219);
+	new Prop(pX - 3, pY - 7, pZ, 213);
+	new Prop(pX - 1, pY - 7, pZ, 214);
+	new Prop(pX + 1, pY - 7, pZ, 216);
+	new Prop(pX + 3, pY - 7, pZ, 217);
+	new Prop(pX + 5, pY - 7, pZ, 218);
+	new Prop(pX + 7, pY - 7, pZ, 219);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 

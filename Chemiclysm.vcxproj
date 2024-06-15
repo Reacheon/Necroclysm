@@ -207,7 +207,7 @@
     <ClCompile Include="code\getDegree.ixx" />
     <ClCompile Include="code\AI.ixx" />
     <ClCompile Include="code\Entity.ixx" />
-    <ClCompile Include="code\Install.ixx" />
+    <ClCompile Include="code\Prop.ixx" />
     <ClCompile Include="code\lineMaker.ixx" />
     <ClCompile Include="code\Loot.ixx" />
     <ClCompile Include="code\Map.ixx" />

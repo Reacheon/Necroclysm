@@ -37,9 +37,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winUnfoldOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
 		int bionicCursor = -1, bionicScroll = 0;
 	}

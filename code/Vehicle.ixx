@@ -17,7 +17,7 @@ import AI;
 import Light;
 import Coord;
 import log;
-import Install;
+import Prop;
 import Drawable;
 import drawSprite;
 
@@ -103,7 +103,7 @@ public:
                 {
                     for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
                     {
-                        if (!partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::INSTALL_WALKABLE))
+                        if (!partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::PROP_WALKABLE))
                         {
                             World::ins()->getTile(inputX, inputY, getGridZ()).walkable = false;
                             break;
@@ -116,7 +116,7 @@ public:
                 {
                     for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
                     {
-                        if (partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::INSTALL_BLOCKER))
+                        if (partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::PROP_BLOCKER))
                         {
                             World::ins()->getTile(inputX, inputY, getGridZ()).blocker = true;
                             break;
@@ -355,7 +355,7 @@ public:
             ItemPocket* tgtPocket = it->second;
             for (int layer = 0; layer < tgtPocket->itemInfo.size(); layer++)
             {
-                if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::PROP_WALL_CONNECT))
+                if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::VPART_WALL_CONNECT))
                 {
                     auto checkWallGroup = [=](int dx, int dy)->bool
                         {
@@ -398,7 +398,7 @@ public:
                     int extraIndex = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
                     tgtPocket->itemInfo[layer].extraSprIndexSingle = extraIndex;
                 }
-                else if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::PROP_DIR_DEPEND))
+                else if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::VPART_DIR_DEPEND))
                 {
                     tgtPocket->itemInfo[layer].extraSprIndexSingle = dir16toInt16(bodyDir);
                 }
@@ -519,11 +519,9 @@ public:
     {
         if (dx == 0 && dy == 0) return;
         //iAmDictator();
-        aniUSet.insert(this);
-        setAniType(aniFlag::propRush);
         setDelGrid(dx, dy);
         shift(getDelGridX(), getDelGridY());
-        turnCycle = turn::monsterAnime;
+        addAniUSetMonster(this, aniFlag::propRush);
     }
 
     void centerShift(int dx, int dy, int dz)
@@ -564,7 +562,7 @@ public:
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         //1. 열차의 현재 위치에 따라 속도의 방향 수정////////////////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        Install* currentRail = (Install*)World::ins()->getTile(trainCursorX, trainCursorY, trainCursorZ).InstallPtr;
+                        Prop* currentRail = (Prop*)World::ins()->getTile(trainCursorX, trainCursorY, trainCursorZ).PropPtr;
                         dir16 prevSpdDir = trainSpdDir;
                         if (currentRail != nullptr)
                         {
@@ -824,9 +822,7 @@ public:
                         //prt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFloatFakeX(), getFloatFakeY());
                         
                         //iAmDictator();
-                        aniUSet.insert(this);
-                        setAniType(aniFlag::trainRush);
-                        turnCycle = turn::monsterAnime;
+                        addAniUSetMonster(this, aniFlag::trainRush);
 
                         extraRenderVehList.push_back(this);
                         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
@@ -961,7 +957,7 @@ public:
                             int vx = getGridX();
                             int vy = getGridY();
                             int vz = getGridZ();
-                            prt(L"[Vehicle:train] 열차 AI 최초 실행, 열차 중심 위치 (%d,%d,%d)\n", vx, vy, vz);
+                            //prt(L"[Vehicle:train] 열차 AI 최초 실행, 열차 중심 위치 (%d,%d,%d)\n", vx, vy, vz);
 
                             if (rpmState >= 1)//열차 rpm state에 따른 가속도 추가
                             {
@@ -978,7 +974,7 @@ public:
                                 }
 
                                 //2. 현재 차량의 위치에 있는 레일에 따라 시작하는 속도의 방향(trainSpdDir)을 정한다.
-                                Install* currentRail = (Install*)World::ins()->getTile(vx, vy, vz).InstallPtr;
+                                Prop* currentRail = (Prop*)World::ins()->getTile(vx, vy, vz).PropPtr;
                                 if (currentRail != nullptr)
                                 {
                                     if (gearState == gearFlag::drive)//주행기어
@@ -1165,7 +1161,11 @@ public:
                     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                     {
                         void* iPtr = World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr;
-                        if(iPtr!=nullptr) extraRenderEntityList.erase(std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr));
+                        if (iPtr != nullptr)
+                        {
+                            auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
+                            if(eraseIt != extraRenderEntityList.end()) extraRenderEntityList.erase(eraseIt);
+                        }
                     }
                     return true;
                 }

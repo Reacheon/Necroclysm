@@ -137,4 +137,6 @@ export void textureLoader()
 	spr::topQuickSlotBtn = new Sprite(renderer, "image/UI/GUI/HUD/topQuickSlotBtn.png", 43, 38);
 
 	spr::skillSet = new Sprite(renderer, "image/UI/skillSet.png", 16, 16);
+
+	spr::fireStorm = new Sprite(renderer, "image/effect/skill/fireStorm.png", 80, 96);
 }

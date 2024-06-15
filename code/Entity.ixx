@@ -120,7 +120,7 @@ public:
 
 	void addSkill(int index)
 	{
-		prt(L"돌연변이 %ls를 추가했다.\n", skillDex[index].name.c_str());
+		prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
 		if (skillDex[index].src == skillSrc::BIONIC) bionicList.push_back(skillDex[index]);
 		else if (skillDex[index].src == skillSrc::MUTATION) mutationList.push_back(skillDex[index]);
 		else if (skillDex[index].src == skillSrc::MARTIAL_ART) martialArtList.push_back(skillDex[index]);
@@ -164,14 +164,14 @@ public:
 	{
 		for (int i = 0; i < bionicList.size(); i++)
 		{
-			if (bionicList[i].code == inputCode) return i;
+			if (bionicList[i].skillCode == inputCode) return i;
 		}
 		return -1;
 	}
 
 	bool eraseBionicCode(int inputCode)
 	{
-		for (int i = 0; i < bionicList.size(); i++) if (bionicList[i].code == inputCode)
+		for (int i = 0; i < bionicList.size(); i++) if (bionicList[i].skillCode == inputCode)
 		{
 			bionicList.erase(bionicList.begin() + i);
 			return true;
@@ -193,14 +193,14 @@ public:
 	{
 		for (int i = 0; i < mutationList.size(); i++)
 		{
-			if (mutationList[i].code == inputCode) return i;
+			if (mutationList[i].skillCode == inputCode) return i;
 		}
 		return -1;
 	}
 
 	bool eraseMutationCode(int inputCode)
 	{
-		for (int i = 0; i < mutationList.size(); i++) if (mutationList[i].code == inputCode)
+		for (int i = 0; i < mutationList.size(); i++) if (mutationList[i].skillCode == inputCode)
 		{
 			mutationList.erase(mutationList.begin() + i);
 			return true;
@@ -222,14 +222,14 @@ public:
 	{
 		for (int i = 0; i < martialArtList.size(); i++)
 		{
-			if (martialArtList[i].code == inputCode) return i;
+			if (martialArtList[i].skillCode == inputCode) return i;
 		}
 		return -1;
 	}
 
 	bool eraseMartialArtCode(int inputCode)
 	{
-		for (int i = 0; i < martialArtList.size(); i++) if (martialArtList[i].code == inputCode)
+		for (int i = 0; i < martialArtList.size(); i++) if (martialArtList[i].skillCode == inputCode)
 		{
 			martialArtList.erase(martialArtList.begin() + i);
 			return true;
@@ -251,14 +251,14 @@ public:
 	{
 		for (int i = 0; i < divinePowerList.size(); i++)
 		{
-			if (divinePowerList[i].code == inputCode) return i;
+			if (divinePowerList[i].skillCode == inputCode) return i;
 		}
 		return -1;
 	}
 
 	bool eraseDivinePowerCode(int inputCode)
 	{
-		for (int i = 0; i < divinePowerList.size(); i++) if (divinePowerList[i].code == inputCode)
+		for (int i = 0; i < divinePowerList.size(); i++) if (divinePowerList[i].skillCode == inputCode)
 		{
 			divinePowerList.erase(divinePowerList.begin() + i);
 			return true;
@@ -280,14 +280,14 @@ public:
 	{
 		for (int i = 0; i < magicList.size(); i++)
 		{
-			if (magicList[i].code == inputCode) return i;
+			if (magicList[i].skillCode == inputCode) return i;
 		}
 		return -1;
 	}
 
 	bool eraseMagicCode(int inputCode)
 	{
-		for (int i = 0; i < magicList.size(); i++) if (magicList[i].code == inputCode)
+		for (int i = 0; i < magicList.size(); i++) if (magicList[i].skillCode == inputCode)
 		{
 			magicList.erase(magicList.begin() + i);
 			return true;
@@ -396,25 +396,12 @@ public:
 	int getDirection() { return direction; }
 	bool getCanMove() { return canMove; }
 
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
+	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
 	{
 		setDirection(getIntDegree(getGridX(), getGridY(), inputGridX, inputGridY));
 		setAtkTarget(inputGridX, inputGridY, inputGridZ, inputTarget);
-		aniUSet.insert(this);
-		setAniType(inputAniType);
 	}
 
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget)
-	{
-		setDirection(getIntDegree(getGridX(), getGridY(), inputGridX, inputGridY));
-		setAtkTarget(inputGridX, inputGridY, inputGridZ, inputTarget);
-		aniUSet.insert(this);
-		setAniType(aniFlag::atk);
-	}
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ)
-	{
-		startAtk(inputGridX, inputGridY, inputGridZ, -1);
-	}
 	float endAtk()
 	{
 		setAniType(aniFlag::null);
@@ -670,8 +657,7 @@ public:
 
 		if (jump == false)
 		{
-			setAniType(aniFlag::move);
-			aniUSet.insert(this);
+			addAniUSet(this, aniFlag::move);
 			setDstGrid(dstGridX, dstGridY);
 		}
 		else
@@ -946,10 +932,8 @@ public:
 			}
 			delete txPtr; //잊지않고 기존의 매개변수 drop을 제거해준다.
 		}
-		aniUSet.insert(targetStack);
-		turnCycle = turn::playerAnime;
 
-		targetStack->setAniType(aniFlag::drop);
+		addAniUSetPlayer(targetStack, aniFlag::drop);
 	}
 	void throwing(ItemPocket* txPtr, int gridX, int gridY)
 	{
@@ -976,10 +960,8 @@ public:
 			}
 			delete txPtr; //잊지않고 기존의 매개변수 drop을 제거해준다.
 		}
-		aniUSet.insert(targetStack);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(targetStack, aniFlag::throwing);
 
-		targetStack->setAniType(aniFlag::throwing);
 		targetStack->setFakeX(getX() - targetStack->getX());
 		targetStack->setFakeY(getY() - targetStack->getY());
 	}
@@ -1433,7 +1415,6 @@ public:
 			}
 		}
 
-
 		return false;
 	}
 
@@ -1688,4 +1669,19 @@ public:
 		setZoom(1.0);
 		setFlip(SDL_FLIP_NONE);
 	};
+
+	void useSkill(SkillData dat)
+	{
+		prt(L"[Entity:useSkill] 엔티티 %p가 스킬 %ls을(를) 실행하였다.\n",this, dat.name.c_str());
+		switch (dat.skillCode)
+		{
+		default:
+			prt(L"[Entity:useSkill] 엔티티 %p가 알 수 없는 스킬을 시전하였다.\n", this);
+			break;
+		case 0:
+			break;
+		case 1:
+			break;
+		}
+	}
 };

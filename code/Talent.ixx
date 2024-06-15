@@ -39,9 +39,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		setAniType(aniFlag::winUnfoldOpen);
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 	}
 	~Talent()
 	{

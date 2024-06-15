@@ -29,6 +29,17 @@ public:
 	{
 		prt(lowCol::red, L"Monster : 소멸자가 호출되었습니다..\n");
 	}
+
+	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType) override
+	{
+		Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, inputAniType);
+		addAniUSet(this, inputAniType);
+	}
+
+	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget) { startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, aniFlag::atk); }
+
+	void startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, -1); }
+
 	bool runAI()
 	{
 		prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
@@ -174,4 +185,6 @@ public:
 		drop(dropItem);
 		delete this;
 	}
+
+
 };

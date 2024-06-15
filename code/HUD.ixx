@@ -34,7 +34,7 @@ import Alchemy;
 import turnWait;
 import Vehicle;
 import God;
-import Install;
+import Prop;
 import Map;
 import globalTime;
 import debugConsole;
@@ -74,9 +74,9 @@ private:
 	bool isAdvancedMode = false;
 	Point2 advancedModeGrid;
 
-	SDL_Rect quickSlotRegion;
 	SDL_Rect quickSlotPopBtn;
-	bool isQuickSlotPop = false;
+	SDL_Rect quickSlotBtn[8];
+	bool isQuickSlotPop = false; //화면우측의 퀵슬롯이 오른쪽으로 팝업되었는지를 나타내는 bool 변수
 	float popUpDist = 360;
 	int quickSlotDist = 0;
 public:
@@ -126,6 +126,11 @@ public:
 
 		quickSlotRegion =  { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, } ;
 		quickSlotPopBtn = { quickSlotRegion.x, quickSlotRegion.y, 43, 38 };
+		for (int i = 0; i < 8; i++)
+		{
+			quickSlotBtn[i] = { quickSlotRegion.x, quickSlotRegion.y + 40 * (i + 1), 180,38 };
+		}
+
 
 		x = 0;
 		y = inputY;
@@ -439,21 +444,17 @@ public:
 			if (isQuickSlotPop)
 			{
 				isQuickSlotPop = false;
-				setAniType(aniFlag::quickSlotPopRight);
 				deactInput();
-				aniUSet.insert(this);
-				turnCycle = turn::playerAnime;
+				addAniUSetPlayer(this, aniFlag::quickSlotPopRight);
 			}
 			else
 			{
 				isQuickSlotPop = true;
-				setAniType(aniFlag::quickSlotPopLeft);
 				deactInput();
-				aniUSet.insert(this);
-				turnCycle = turn::playerAnime;
+				addAniUSetPlayer(this, aniFlag::quickSlotPopLeft);
 			}
 		}
-		else if(checkCursor(&letterbox))
+		else if (checkCursor(&letterbox))
 		{
 			for (int i = 0; i < barAct.size(); i++) // 하단 UI 터치 이벤트
 			{
@@ -463,10 +464,44 @@ public:
 
 					if (y != 0)
 					{
-						setAniType(aniFlag::popDownLetterbox);
 						deactInput();
-						aniUSet.insert(this);
-						turnCycle = turn::playerAnime;
+						addAniUSetPlayer(this, aniFlag::popDownLetterbox);
+					}
+				}
+			}
+		}
+		else if (checkCursor(&quickSlotRegion))//퀵슬롯 이벤트 터치
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				if (checkCursor(&quickSlotBtn[i]))
+				{
+					prt(L"%d번 스킬 슬롯을 눌렀다!\n", i + 1);
+
+					if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
+					{
+						int index = Player::ins()->searchBionicCode(quickSlot[i].second);
+						Player::ins()->useSkill(Player::ins()->getBionicList()[index]);
+					}
+					else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
+					{
+						int index = Player::ins()->searchMutationCode(quickSlot[i].second);
+						Player::ins()->useSkill(Player::ins()->getMutationList()[index]);
+					}
+					else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
+					{
+						int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
+						Player::ins()->useSkill(Player::ins()->getMartialArtList()[index]);
+					}
+					else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
+					{
+						int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
+						Player::ins()->useSkill(Player::ins()->getDivinePowerList()[index]);
+					}
+					else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
+					{
+						int index = Player::ins()->searchMagicCode(quickSlot[i].second);
+						Player::ins()->useSkill(Player::ins()->getMagicList()[index]);
 					}
 				}
 			}
@@ -556,26 +591,20 @@ public:
 	{
 		isPopUp = true;
 		popUpDist = ((barAct.size() - 1) / 7) * 89;
-		setAniType(aniFlag::popUpLetterbox);
 		deactInput();
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::popUpLetterbox);
 	}
 	void executePopDown()
 	{
 		isPopUp = false;
-		setAniType(aniFlag::popDownLetterbox);
 		deactInput();
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::popDownLetterbox);
 	}
 	void executePopUpSingle()
 	{
 		isPopUp = true;
-		setAniType(aniFlag::popUpSingleLetterbox);
 		deactInput();
-		aniUSet.insert(this);
-		turnCycle = turn::playerAnime;
+		addAniUSetPlayer(this, aniFlag::popUpSingleLetterbox);
 	}
 
 	void clickLetterboxBtn(act inputAct)
@@ -744,61 +773,61 @@ public:
 				int vx = myCar->getGridX();
 				int vy = myCar->getGridY();
 				int vz = myCar->getGridZ();
-				Install* tgtInstall = (Install*)World::ins()->getTile(vx, vy, vz).InstallPtr;
-				if (tgtInstall != nullptr)
+				Prop* tgtProp = (Prop*)World::ins()->getTile(vx, vy, vz).PropPtr;
+				if (tgtProp != nullptr)
 				{
 					if (myCar->gearState == gearFlag::drive)//주행기어
 					{
 						if (myCar->bodyDir == dir16::dir0)//동쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir2)//북쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir4)//서쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir6)//남쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
 						}
 					}
 					else if (myCar->gearState == gearFlag::reverse)
 					{
 						if (myCar->bodyDir == dir16::dir0)//동쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir2)//북쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir4)//서쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir6)//남쪽 방향 열차
 						{
-							if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtInstall->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
 						}
 					}
 				}
@@ -830,6 +859,7 @@ public:
 
 	void tileTouch(int touchX, int touchY) //일반 타일 터치
 	{
+
 		if (ctrlVeh == nullptr)//차량 조종 중이 아닐 경우
 		{
 			//화면에 있는 아이템 터치
@@ -897,11 +927,11 @@ public:
 				}
 				else
 				{
-					if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr != nullptr)
+					if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr != nullptr)
 					{
-						Install* tgtInstall = ((Install*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr));
-						int tgtItemCode = tgtInstall->leadItem.itemCode;
-						if (tgtInstall->leadItem.checkFlag(itemFlag::UPSTAIR))
+						Prop* tgtProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+						int tgtItemCode = tgtProp->leadItem.itemCode;
+						if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
 						{
 							if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).floor == 0)
 							{
@@ -914,14 +944,14 @@ public:
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
 
-								Install* upInstall = ((Install*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr));
-								if (upInstall == nullptr)
+								Prop* upProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+								if (upProp == nullptr)
 								{
-									new Install(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 299);//하강계단
+									new Prop(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 299);//하강계단
 								}
 							}
 						}
-						else if (tgtInstall->leadItem.checkFlag(itemFlag::DOWNSTAIR))
+						else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
 						{
 							if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).wall != 0)
 							{
@@ -934,10 +964,10 @@ public:
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() - 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
 
-								Install* downInstall = ((Install*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr));
-								if (downInstall == nullptr)
+								Prop* downProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+								if (downProp == nullptr)
 								{
-									new Install(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 298);//상승계단
+									new Prop(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 298);//상승계단
 								}
 							}
 						}
@@ -946,26 +976,26 @@ public:
 			}
 			else if ((std::abs(touchX - Player::ins()->getGridX()) <= 1 && std::abs(touchY - Player::ins()->getGridY()) <= 1) && World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).walkable == false)//1칸 이내
 			{
-				if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr != nullptr)
+				if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr != nullptr)
 				{
-					Install* tgtInstall = ((Install*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).InstallPtr));
-					int tgtItemCode = tgtInstall->leadItem.itemCode;
-					if (tgtInstall->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
+					Prop* tgtProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+					int tgtItemCode = tgtProp->leadItem.itemCode;
+					if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
 					{
-						if (tgtInstall->leadItem.checkFlag(itemFlag::INSTALL_WALKABLE) == false)
+						if (tgtProp->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
 						{
-							tgtInstall->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
-							tgtInstall->leadItem.addFlag(itemFlag::DOOR_OPEN);
+							tgtProp->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
+							tgtProp->leadItem.addFlag(itemFlag::DOOR_OPEN);
 
-							tgtInstall->leadItem.addFlag(itemFlag::INSTALL_WALKABLE);
-							tgtInstall->leadItem.eraseFlag(itemFlag::INSTALL_BLOCKER);
-							tgtInstall->leadItem.extraSprIndexSingle++;
-							tgtInstall->updateTile();
+							tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
+							tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+							tgtProp->leadItem.extraSprIndexSingle++;
+							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->getEyeSight());
 							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(),Player::ins()->getGridZ());
 						}
 					}
-					else if (tgtInstall->leadItem.checkFlag(itemFlag::UPSTAIR))
+					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
 					{
 						if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).floor == 0)
 						{
@@ -977,7 +1007,7 @@ public:
 							Player::ins()->addGridZ(1);
 						}
 					}
-					else if (tgtInstall->leadItem.checkFlag(itemFlag::DOWNSTAIR))
+					else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
 					{
 					}
 					else if (tgtItemCode == 213 || tgtItemCode == 218)//불교 제단
@@ -1001,6 +1031,7 @@ public:
 						new God(godFlag::ra);
 					}
 				}
+				else Player::ins()->setAStarDst(touchX, touchY);
 			}
 			else
 			{
@@ -1122,21 +1153,23 @@ public:
 		drawSprite(spr::topQuickSlotBtn, sprIndex, pivotX, pivotY);
 		drawFillRect({ pivotX + 43,pivotY,137,38 }, col::black, 200);
 
+		//개별 스킬창 그리기 1번부터 8번까지
 		for (int i = 0; i < 8; i++)
 		{
-			int singlePivotX = pivotX;
-			int singlePivotY = pivotY + 40 * (i + 1);
-			drawSprite(spr::singleQuickSlot, 0, singlePivotX, singlePivotY);
-
-
+			if(isQuickSlotPop == true && checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE)
+			{
+				if (click) drawSprite(spr::singleQuickSlot, 2, quickSlotBtn[i].x, quickSlotBtn[i].y);
+				else drawSprite(spr::singleQuickSlot, 1, quickSlotBtn[i].x, quickSlotBtn[i].y);
+			}
+			else drawSprite(spr::singleQuickSlot, 0, quickSlotBtn[i].x, quickSlotBtn[i].y);
 
 			if (quickSlot[i].first == quickSlotFlag::NONE)
 			{
-				drawCross2(singlePivotX + 6, singlePivotY + 2, 0, 5, 0, 5);
-				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2, 0, 5, 5, 0);
-				drawCross2(singlePivotX + 6, singlePivotY + 2 + 32, 5, 0, 0, 5);
-				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2 + 32, 5, 0, 5, 0);
-				drawFillRect({ singlePivotX + 6, singlePivotY + 2 ,34,34 }, col::black, 180);
+				drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2, 0, 5, 0, 5);
+				drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2, 0, 5, 5, 0);
+				drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 + 32, 5, 0, 0, 5);
+				drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2 + 32, 5, 0, 5, 0);
+				drawFillRect({ quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 ,34,34 }, col::black, 180);
 			}
 			else
 			{
@@ -1145,45 +1178,45 @@ public:
 				if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
 				{
 					int index = Player::ins()->searchBionicCode(quickSlot[i].second);
-					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getBionicList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getBionicList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
 					skillName = Player::ins()->getBionicList()[index].name;
 				}
 				else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
 				{
 					int index = Player::ins()->searchMutationCode(quickSlot[i].second);
-					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMutationList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMutationList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
 					skillName = Player::ins()->getMutationList()[index].name;
 				}
 				else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
 				{
 					int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
-					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMartialArtList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMartialArtList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
 					skillName = Player::ins()->getMartialArtList()[index].name;
 				}
 				else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
 				{
 					int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
-					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getDivinePowerList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getDivinePowerList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
 					skillName = Player::ins()->getDivinePowerList()[index].name;
 				}
 				else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
 				{
 					int index = Player::ins()->searchMagicCode(quickSlot[i].second);
-					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMagicList()[index].iconIndex, singlePivotX + 7, singlePivotY + 3);
+					if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMagicList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
 					skillName = Player::ins()->getMagicList()[index].name;
 				}
 				setZoom(1.0);
 
 				setFontSize(14);
-				drawText(L"#FFFFFF" + skillName, singlePivotX + 43, singlePivotY + 5);
+				drawText(L"#FFFFFF" + skillName, quickSlotBtn[i].x + 43, quickSlotBtn[i].y + 5);
 				
 				//setFontSize(10);
-				//drawText(L"#FFFF00-32 MP" + skillName, singlePivotX + 120, singlePivotY + 24);
+				//drawText(L"#FFFF00-32 MP" + skillName, quickSlotBtn[i].x + 120, quickSlotBtn[i].y + 24);
 
-				drawCross2(singlePivotX + 6, singlePivotY + 2, 0, 5, 0, 5);
-				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2, 0, 5, 5, 0);
-				drawCross2(singlePivotX + 6, singlePivotY + 2 + 32, 5, 0, 0, 5);
-				drawCross2(singlePivotX + 6 + 32, singlePivotY + 2 + 32, 5, 0, 5, 0);
+				drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2, 0, 5, 0, 5);
+				drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2, 0, 5, 5, 0);
+				drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 + 32, 5, 0, 0, 5);
+				drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2 + 32, 5, 0, 5, 0);
 			}
 		}
 
@@ -1496,9 +1529,9 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(dir, dx, dy);
-			if (World::ins()->getTile(cx + dx, cy + dy, cz).InstallPtr != nullptr)
+			if (World::ins()->getTile(cx + dx, cy + dy, cz).PropPtr != nullptr)
 			{
-				Install* instlPtr = (Install*)World::ins()->getTile(cx + dx, cy + dy, cz).InstallPtr;
+				Prop* instlPtr = (Prop*)World::ins()->getTile(cx + dx, cy + dy, cz).PropPtr;
 				if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
 				{
 					doorNumber++;
@@ -1509,14 +1542,14 @@ public:
 
 		auto closeDoorCoord = [=](int inputX, int inputY, int inputZ)
 			{
-				Install* tgtInstall = (Install*)World::ins()->getTile(inputX, inputY, inputZ).InstallPtr;
-				tgtInstall->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
-				tgtInstall->leadItem.addFlag(itemFlag::DOOR_CLOSE);
+				Prop* tgtProp = (Prop*)World::ins()->getTile(inputX, inputY, inputZ).PropPtr;
+				tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
+				tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
 
-				tgtInstall->leadItem.eraseFlag(itemFlag::INSTALL_WALKABLE);
-				tgtInstall->leadItem.addFlag(itemFlag::INSTALL_BLOCKER);
-				tgtInstall->leadItem.extraSprIndexSingle--;
-				tgtInstall->updateTile();
+				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
+				tgtProp->leadItem.extraSprIndexSingle--;
+				tgtProp->updateTile();
 				Player::ins()->updateVision(Player::ins()->getEyeSight());
 				updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 			};
@@ -1537,14 +1570,14 @@ public:
 			targetStr.erase(0, targetStr.find(L",") + 1);
 
 
-			Install* tgtInstall = (Install*)World::ins()->getTile(targetX, targetY, cz).InstallPtr;
-			tgtInstall->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
-			tgtInstall->leadItem.addFlag(itemFlag::DOOR_CLOSE);
+			Prop* tgtProp = (Prop*)World::ins()->getTile(targetX, targetY, cz).PropPtr;
+			tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
+			tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
 
-			tgtInstall->leadItem.eraseFlag(itemFlag::INSTALL_WALKABLE);
-			tgtInstall->leadItem.addFlag(itemFlag::INSTALL_BLOCKER);
-			tgtInstall->leadItem.extraSprIndexSingle--;
-			tgtInstall->updateTile();
+			tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
+			tgtProp->leadItem.extraSprIndexSingle--;
+			tgtProp->updateTile();
 			Player::ins()->updateVision(Player::ins()->getEyeSight());
 			updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 		}
@@ -1746,4 +1779,5 @@ public:
 
 		return false;
 	}
+
 };

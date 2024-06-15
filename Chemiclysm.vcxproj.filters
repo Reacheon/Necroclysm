@@ -315,7 +315,7 @@
     <ClCompile Include="code\camera.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
-    <ClCompile Include="code\Install.ixx">
+    <ClCompile Include="code\Prop.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\CoordSelectCraft.ixx">

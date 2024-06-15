@@ -19,12 +19,15 @@ import Corpse;
 import Craft;
 import Vehicle;
 import GUI;
-import Install;
+import Prop;
 import globalTime;
+import Drawable;
+import TileData;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, playerZ, markerIndex;
 
+__int64 analyseRender();
 __int64 drawTiles();
 __int64 drawCorpses();
 __int64 drawItems();
@@ -32,6 +35,68 @@ __int64 drawEntities();
 __int64 drawDamages();
 __int64 drawFogs();
 __int64 drawMarkers();
+
+template <typename T>
+class uniqueVector
+{
+private:
+	std::vector<T> vec;
+	std::unordered_set<T> set;
+
+public:
+	bool insert(const T& value)
+	{
+		if (set.find(value) == set.end())
+		{
+			vec.push_back(value);
+			set.insert(value);
+			return true;
+		}
+		return false;
+	}
+
+	bool erase(const T& value)
+	{
+		auto it = set.find(value);
+		if (it != set.end())
+		{
+			set.erase(it);
+			vec.erase(std::remove(vec.begin(), vec.end(), value), vec.end());
+			return true;
+		}
+		return false;
+	}
+
+	void reserve(int size)
+	{
+		vec.reserve(size);
+	}
+
+	void clear()
+	{
+		vec.clear();
+		set.clear();
+	}
+
+	size_t size() const { return vec.size(); }
+	bool empty() const { return vec.empty(); }
+	const T& operator[](size_t index) const { return vec[index]; }
+	typename std::vector<T>::iterator begin() { return vec.begin(); }
+	typename std::vector<T>::iterator end() { return vec.end(); }
+	typename std::vector<T>::const_iterator begin() const { return vec.begin(); }
+	typename std::vector<T>::const_iterator end() const { return vec.end(); }
+};
+
+
+std::unordered_map<std::array<int, 2>, TileData*, decltype(arrayHasher2)> tileCache;
+std::vector<Point2> tileList;
+std::vector<Point2> itemList;
+std::vector<Point2> floorPropList;
+uniqueVector<Drawable*> renderVehList;
+uniqueVector<Drawable*> renderEntityList;
+std::vector<Point2> blackFogList;
+std::vector<Point2> grayFogList;
+std::vector<Point2> lightFogList;
 
 export __int64 renderTile()
 {
@@ -52,6 +117,26 @@ export __int64 renderTile()
 	else if (timer::timer600 % 30 < 25) markerIndex = 4;
 	else markerIndex = 0;
 
+	tileList.clear();
+	itemList.clear();
+	floorPropList.clear();
+	renderVehList.clear();
+	renderEntityList.clear();
+	blackFogList.clear();
+	grayFogList.clear();
+	lightFogList.clear();
+	tileCache.clear();
+
+	//tileList.reserve(10000);
+	//itemList.reserve(10000);
+	//floorPropList.reserve(10000);
+	//renderVehList.reserve(10000);
+	//renderEntityList.reserve(10000);
+	//blackFogList.reserve(10000);
+	//grayFogList.reserve(10000);
+	//lightFogList.reserve(10000);
+
+	dur::analysis = analyseRender();
 	dur::tile = drawTiles();
 	dur::corpse = drawCorpses();
 	dur::item = drawItems();
@@ -66,7 +151,60 @@ export __int64 renderTile()
 	SDL_SetRenderDrawColor(renderer, mainLightColor.r, mainLightColor.g, mainLightColor.b, mainLightBright);
 	SDL_RenderFillRect(renderer, &screenRect);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
 	return (getNanoTimer() - timeStampStart);
+}
+__int64 analyseRender()
+{
+	__int64 timeStampStart = getNanoTimer();
+
+	//루프 분석
+	for (int tgtY = renderRegion.y - 1; tgtY < renderRegion.y + renderRegion.h + 1; tgtY++)
+	{
+		for (int tgtX = renderRegion.x - 1; tgtX < renderRegion.x + renderRegion.w + 1; tgtX++)
+		{
+			TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, playerZ);
+			tileCache[{tgtX, tgtY}] = thisTile;
+
+			//바깥쪽이면 타일캐시만 추가하고 거기에 있는 내용은 렌더링하지 않음
+			if (tgtX < renderRegion.x || tgtX >= renderRegion.x + renderRegion.w) continue;
+			if (tgtY < renderRegion.y || tgtY >= renderRegion.y + renderRegion.h) continue;
+
+			//바닥과 벽
+			if (thisTile->fov != fovFlag::black) tileList.push_back({ tgtX,tgtY });
+
+			//아이템
+			if (thisTile->fov == fovFlag::white)
+			{
+				if ((World::ins())->getItemPos(tgtX, tgtY, playerZ) != nullptr) itemList.push_back({ tgtX,tgtY });
+			}
+			//바닥프롭
+			Prop* fpPtr = (Prop*)thisTile->PropPtr;
+			if (fpPtr != nullptr && fpPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) floorPropList.push_back({ tgtX,tgtY });
+
+			//차량
+			Drawable* vPtr = (Drawable*)((Vehicle*)(thisTile->VehiclePtr));
+			if (vPtr != nullptr) renderVehList.insert(vPtr);
+			for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.insert((Drawable*)(Vehicle*)(*it));
+
+			//플레이어와 겹치는 일반설치물
+			Prop* pPtr = (Prop*)(thisTile->PropPtr);
+			if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false) renderEntityList.insert((Drawable*)pPtr);
+
+			//일반 객체
+			Drawable* ePtr = (Drawable*)((Entity*)(thisTile->EntityPtr));
+			if (ePtr != nullptr) renderEntityList.insert(ePtr);
+			//추가로 렌더링되는 객체(화면밖)
+			for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.insert((Drawable*)(Entity*)(*it));
+
+			//안개
+			if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
+			else if (thisTile->fov == fovFlag::gray) grayFogList.push_back({ tgtX, tgtY });
+			else  lightFogList.push_back({ tgtX, tgtY });
+		}
+	}
+
+	return getNanoTimer() - timeStampStart;
 }
 
 
@@ -75,189 +213,187 @@ __int64 drawTiles()
 	__int64 timeStampStart = getNanoTimer();
 
 	bool targetMarker = false;
-
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < tileList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
+		int tgtX = tileList[i].x;
+		int tgtY = tileList[i].y;
+		const TileData* thisTile = tileCache[{tgtX, tgtY}];
+		const TileData* topTile = tileCache[{tgtX, tgtY - 1}];
+		const TileData* botTile = tileCache[{tgtX, tgtY + 1}];
+		const TileData* leftTile = tileCache[{tgtX - 1, tgtY}];
+		const TileData* rightTile = tileCache[{tgtX + 1, tgtY}];
+
+		switch (thisTile->floor)//바닥 타일 그리기 
 		{
-			if (World::ins()->getTile(tgtX, tgtY, playerZ).fov != fovFlag::black)
+		default:
+			setZoom(zoomScale);
+
+			int dirCorrection = 0;
+
+			if (itemDex[thisTile->floor].tileConnectGroup != -1)
 			{
-				switch (World::ins()->getTile(tgtX, tgtY, playerZ).floor)//바닥 타일 그리기 
+				bool topCheck, botCheck, leftCheck, rightCheck;
+				if (itemDex[thisTile->floor].tileConnectGroup == 0)
 				{
-				default:
-					setZoom(zoomScale);
+					int currentTileFloor = thisTile->floor;
+					int	topTileFloor = topTile->floor;
+					int	botTileFloor = botTile->floor;
+					int	leftTileFloor = leftTile->floor;
+					int	rightTileFloor = rightTile->floor;
 
-					int dirCorrection = 0;
+					topCheck = currentTileFloor == topTileFloor;
+					botCheck = currentTileFloor == botTileFloor;
+					leftCheck = currentTileFloor == leftTileFloor;
+					rightCheck = currentTileFloor == rightTileFloor;
+				}
+				else
+				{
+					int currentTileGroup = itemDex[thisTile->floor].tileConnectGroup;
+					int	topTileGroup = itemDex[topTile->floor].tileConnectGroup;
+					int	botTileGroup = itemDex[botTile->floor].tileConnectGroup;
+					int	leftTileGroup = itemDex[leftTile->floor].tileConnectGroup;
+					int	rightTileGroup = itemDex[rightTile->floor].tileConnectGroup;
 
-					if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].tileConnectGroup != -1)
-					{
-						bool topCheck, botCheck, leftCheck, rightCheck;
-						if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].tileConnectGroup == 0)
-						{
-							int currentTile = World::ins()->getTile(tgtX, tgtY, playerZ).floor;
-							int	topTile = World::ins()->getTile(tgtX, tgtY - 1, playerZ).floor;
-							int	botTile = World::ins()->getTile(tgtX, tgtY + 1, playerZ).floor;
-							int	leftTile = World::ins()->getTile(tgtX - 1, tgtY, playerZ).floor;
-							int	rightTile = World::ins()->getTile(tgtX + 1, tgtY, playerZ).floor;
-
-							topCheck = currentTile == topTile;
-							botCheck = currentTile == botTile;
-							leftCheck = currentTile == leftTile;
-							rightCheck = currentTile == rightTile;
-						}
-						else
-						{
-							int currentTile = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].tileConnectGroup;
-							int	topTile = itemDex[World::ins()->getTile(tgtX, tgtY - 1, playerZ).floor].tileConnectGroup;
-							int	botTile = itemDex[World::ins()->getTile(tgtX, tgtY + 1, playerZ).floor].tileConnectGroup;
-							int	leftTile = itemDex[World::ins()->getTile(tgtX - 1, tgtY, playerZ).floor].tileConnectGroup;
-							int	rightTile = itemDex[World::ins()->getTile(tgtX + 1, tgtY, playerZ).floor].tileConnectGroup;
-
-							topCheck = currentTile == topTile;
-							botCheck = currentTile == botTile;
-							leftCheck = currentTile == leftTile;
-							rightCheck = currentTile == rightTile;
-						}
-
-						dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
-
-						if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeSize > 1)
-						{
-							int animeFPS = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeFPS;
-							int animeSize = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeSize;
-
-							if (timer::timer600 % animeFPS == 0)
-							{
-								itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndex16++;
-								if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndex16 >= animeSize)
-								{
-									itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndex16 = 0;
-								}
-							}
-						}
-					}
-					else
-					{
-						if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeSize > 1)
-						{
-							int animeFPS = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeFPS;
-							int animeSize = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].animeSize;
-
-							if (timer::timer600 % animeFPS == 0)
-							{
-								itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndexSingle++;
-								if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndexSingle >= animeSize)
-								{
-									itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndexSingle = 0;
-								}
-							}
-						}
-					}
-
-					int sprIndex = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].tileSprIndex + itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndexSingle + 16 * itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).floor].extraSprIndex16;
-					if (World::ins()->getTile(tgtX, tgtY, playerZ).floor == 0) sprIndex = 506;
-
-					drawSpriteCenter
-					(
-						spr::tileset,
-						sprIndex + dirCorrection,
-						cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-						cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-					);
-
-					setZoom(1.0);
-
-					//마우스가 가리키는 타일에 마커 그리기
-					if (targetMarker == false && GUI::getActiveGUIList().size() == 1)
-					{
-						SDL_Rect tileRect = { cameraW / 2 + zoomScale * ((16 * tgtX) - cameraX), cameraH / 2 + zoomScale * ((16 * tgtY) - cameraY), 16 * zoomScale, 16 * zoomScale };
-						if (UIType == act::null)
-						{
-							SDL_Rect bottomBox = { 0,0,630, 140 };
-							bottomBox.x = (cameraW - bottomBox.w) / 2;
-							bottomBox.y = cameraH - bottomBox.h + 6;
-							SDL_Rect tabBox = { cameraW - 120 - 20, 20, 120, 120 };
-
-							if (checkCursor(&tileRect) == true)
-							{
-								if (checkCursor(&bottomBox) == false)
-								{
-									if (checkCursor(&tabBox) == false)
-									{
-										setZoom(zoomScale);
-										drawSpriteCenter
-										(
-											spr::blueMarker,
-											markerIndex,
-											cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-											cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-										);
-										setZoom(1.0);
-										targetMarker = true;
-									}
-								}
-							}
-						}
-					}
-					break;
+					topCheck = currentTileGroup == topTileGroup;
+					botCheck = currentTileGroup == botTileGroup;
+					leftCheck = currentTileGroup == leftTileGroup;
+					rightCheck = currentTileGroup == rightTileGroup;
 				}
 
-				switch (World::ins()->getTile(tgtX, tgtY, playerZ).wall)//벽 그리기
+				dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+
+				if (itemDex[thisTile->floor].animeSize > 1)
 				{
-				case 0:
-					break;
-				default:
-					setZoom(zoomScale);
-					int dirCorrection = 0;
-					if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).wall].tileConnectGroup != -1)
+					int animeFPS = itemDex[thisTile->floor].animeFPS;
+					int animeSize = itemDex[thisTile->floor].animeSize;
+
+					if (timer::timer600 % animeFPS == 0)
 					{
-						bool topCheck, botCheck, leftCheck, rightCheck;
-						if (itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).wall].tileConnectGroup == 0)
+						itemDex[thisTile->floor].extraSprIndex16++;
+						if (itemDex[thisTile->floor].extraSprIndex16 >= animeSize)
 						{
-							int currentTile = World::ins()->getTile(tgtX, tgtY, playerZ).wall;
-							int	topTile = World::ins()->getTile(tgtX, tgtY - 1, playerZ).wall;
-							int	botTile = World::ins()->getTile(tgtX, tgtY + 1, playerZ).wall;
-							int	leftTile = World::ins()->getTile(tgtX - 1, tgtY, playerZ).wall;
-							int	rightTile = World::ins()->getTile(tgtX + 1, tgtY, playerZ).wall;
-
-							topCheck = currentTile == topTile;
-							botCheck = currentTile == botTile;
-							leftCheck = currentTile == leftTile;
-							rightCheck = currentTile == rightTile;
+							itemDex[thisTile->floor].extraSprIndex16 = 0;
 						}
-						else
-						{
-							int currentTile = itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).wall].tileConnectGroup;
-							int	topTile = itemDex[World::ins()->getTile(tgtX, tgtY - 1, playerZ).wall].tileConnectGroup;
-							int	botTile = itemDex[World::ins()->getTile(tgtX, tgtY + 1, playerZ).wall].tileConnectGroup;
-							int	leftTile = itemDex[World::ins()->getTile(tgtX - 1, tgtY, playerZ).wall].tileConnectGroup;
-							int	rightTile = itemDex[World::ins()->getTile(tgtX + 1, tgtY, playerZ).wall].tileConnectGroup;
-
-							topCheck = currentTile == topTile;
-							botCheck = currentTile == botTile;
-							leftCheck = currentTile == leftTile;
-							rightCheck = currentTile == rightTile;
-						}
-
-						dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
 					}
-
-
-					drawSpriteCenter
-					(
-						spr::tileset,
-						itemDex[World::ins()->getTile(tgtX, tgtY, playerZ).wall].tileSprIndex + dirCorrection,
-						cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-						cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-					);
-					setZoom(1.0);
 				}
 			}
+			else
+			{
+				if (itemDex[thisTile->floor].animeSize > 1)
+				{
+					int animeFPS = itemDex[thisTile->floor].animeFPS;
+					int animeSize = itemDex[thisTile->floor].animeSize;
+
+					if (timer::timer600 % animeFPS == 0)
+					{
+						itemDex[thisTile->floor].extraSprIndexSingle++;
+						if (itemDex[thisTile->floor].extraSprIndexSingle >= animeSize)
+						{
+							itemDex[thisTile->floor].extraSprIndexSingle = 0;
+						}
+					}
+				}
+			}
+
+			int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
+			if (thisTile->floor == 0) sprIndex = 506;
+
+			drawSpriteCenter
+			(
+				spr::tileset,
+				sprIndex + dirCorrection,
+				cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
+				cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
+			);
+
+			setZoom(1.0);
+
+			//마우스가 가리키는 타일에 마커 그리기
+			if (targetMarker == false && GUI::getActiveGUIList().size() == 1)
+			{
+				SDL_Rect tileRect = { cameraW / 2 + zoomScale * ((16 * tgtX) - cameraX), cameraH / 2 + zoomScale * ((16 * tgtY) - cameraY), 16 * zoomScale, 16 * zoomScale };
+				if (UIType == act::null)
+				{
+					SDL_Rect bottomBox = { 0,0,630, 140 };
+					bottomBox.x = (cameraW - bottomBox.w) / 2;
+					bottomBox.y = cameraH - bottomBox.h + 6;
+					SDL_Rect tabBox = { cameraW - 120 - 20, 20, 120, 120 };
+
+					if (checkCursor(&tileRect) == true)
+					{
+						if (checkCursor(&bottomBox) == false && checkCursor(&tabBox) == false && checkCursor(&quickSlotRegion) == false)
+						{
+							setZoom(zoomScale);
+							drawSpriteCenter
+							(
+								spr::blueMarker,
+								markerIndex,
+								cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
+								cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
+							);
+							setZoom(1.0);
+							targetMarker = true;
+						}
+					}
+				}
+			}
+			break;
+		}
+
+		switch (thisTile->wall)//벽 그리기
+		{
+		case 0:
+			break;
+		default:
+			setZoom(zoomScale);
+			int dirCorrection = 0;
+			if (itemDex[thisTile->wall].tileConnectGroup != -1)
+			{
+				bool topCheck, botCheck, leftCheck, rightCheck;
+				if (itemDex[thisTile->wall].tileConnectGroup == 0)
+				{
+					int currentTileWall = thisTile->wall;
+					int	topTileWall = topTile->wall;
+					int	botTileWall = botTile->wall;
+					int	leftTileWall = leftTile->wall;
+					int	rightTileWall = rightTile->wall;
+
+					topCheck = currentTileWall == topTileWall;
+					botCheck = currentTileWall == botTileWall;
+					leftCheck = currentTileWall == leftTileWall;
+					rightCheck = currentTileWall == rightTileWall;
+				}
+				else
+				{
+					int currentTileGroup = itemDex[thisTile->wall].tileConnectGroup;
+					int	topTileGroup = itemDex[topTile->wall].tileConnectGroup;
+					int	botTileGroup = itemDex[botTile->wall].tileConnectGroup;
+					int	leftTileGroup = itemDex[leftTile->wall].tileConnectGroup;
+					int	rightTileGroup = itemDex[rightTile->wall].tileConnectGroup;
+
+					topCheck = currentTileGroup == topTileGroup;
+					botCheck = currentTileGroup == botTileGroup;
+					leftCheck = currentTileGroup == leftTileGroup;
+					rightCheck = currentTileGroup == rightTileGroup;
+				}
+
+				dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+			}
+
+
+			drawSpriteCenter
+			(
+				spr::tileset,
+				itemDex[thisTile->wall].tileSprIndex + dirCorrection,
+				cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
+				cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
+			);
+			setZoom(1.0);
 		}
 	}
-
 	return getNanoTimer() - timeStampStart;
 }
+
 
 __int64 drawCorpses()
 {
@@ -281,43 +417,33 @@ __int64 drawItems()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < itemList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
+		int tgtX = itemList[i].x;
+		int tgtY = itemList[i].y;
+		ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, playerZ);
+		if (address->getAniType() == aniFlag::throwing)
 		{
-			if (World::ins()->getTile(tgtX, tgtY, playerZ).fov == fovFlag::white)
-			{
-				if ((World::ins())->getItemPos(tgtX, tgtY, playerZ) != nullptr)
-				{
-					ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, playerZ);
-
-
-					if (address->getAniType() == aniFlag::throwing)
-					{
-						setZoom(zoomScale);
-						drawSpriteCenter
-						(
-							address->getSprite(),
-							address->getTargetSprIndex(),
-							(cameraW / 2) + zoomScale * (address->getX() - cameraX),
-							(cameraH / 2) + zoomScale * (address->getY() - cameraY)
-						);
-						setZoom(1.0);
-					}
-
-					setZoom(zoomScale);
-					drawSpriteCenter
-					(
-						address->getSprite(),
-						address->getSprIndex(),
-						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getFakeX()),
-						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getFakeY())
-					);
-					setZoom(1.0);
-
-				}
-			}
+			setZoom(zoomScale);
+			drawSpriteCenter
+			(
+				address->getSprite(),
+				address->getTargetSprIndex(),
+				(cameraW / 2) + zoomScale * (address->getX() - cameraX),
+				(cameraH / 2) + zoomScale * (address->getY() - cameraY)
+			);
+			setZoom(1.0);
 		}
+
+		setZoom(zoomScale);
+		drawSpriteCenter
+		(
+			address->getSprite(),
+			address->getSprIndex(),
+			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getFakeX()),
+			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getFakeY())
+		);
+		setZoom(1.0);
 	}
 
 	return getNanoTimer() - timeStampStart;
@@ -327,163 +453,52 @@ __int64 drawEntities()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-	auto drawVehicleComponent = [=](Vehicle* vPtr, int tgtX, int tgtY, int layer, int alpha)
-		{
-			SDL_Rect dst;
-			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-			dst.w = tileSize;
-			dst.h = tileSize;
-
-			setZoom(zoomScale);
-			SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
-			drawSpriteCenter
-			(
-				spr::propset,
-				sprIndex,
-				dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-				dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
-			);
-			SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
-			setZoom(1.0);
-		};
-
-
 	//바닥 설치물 그리기
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < floorPropList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-		{
-			Install* iPtr = (Install*)World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).InstallPtr;
-			if (iPtr != nullptr)
-			{
-				if (iPtr->leadItem.checkFlag(itemFlag::INSTALL_DEPTH_LOWER))
-				{
-					int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::INSTALL_BIG));
-					SDL_Rect dst;
-					dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-					dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8 - bigShift) - cameraY) - ((16 * zoomScale) / 2);
-					dst.w = tileSize;
-					dst.h = tileSize;
+		int tgtX = floorPropList[i].x;
+		int tgtY = floorPropList[i].y;
+		Prop* iPtr = (Prop*)tileCache[{tgtX, tgtY}]->PropPtr;
+		int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::PROP_BIG));
+		SDL_Rect dst;
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8 - bigShift) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
 
-					setZoom(zoomScale);
-					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
-					SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-					int sprIndex = iPtr->leadItem.propSprIndex + iPtr->leadItem.extraSprIndexSingle + 16 * iPtr->leadItem.extraSprIndex16;
-					if (iPtr->leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
-					{
-						if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
-						else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
-						else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
-					}
-					drawSpriteCenter
-					(
-						spr::propset,
-						sprIndex,
-						dst.x + dst.w / 2 + zoomScale * iPtr->getFakeX(),
-						dst.y + dst.h / 2 + zoomScale * iPtr->getFakeY()
-					);
-					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
-					setZoom(1.0);
-				}
-			}
+		setZoom(zoomScale);
+		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+		SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+		int sprIndex = iPtr->leadItem.propSprIndex + iPtr->leadItem.extraSprIndexSingle + 16 * iPtr->leadItem.extraSprIndex16;
+		if (iPtr->leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
+		{
+			if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
+			else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
+			else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
 		}
+		drawSpriteCenter
+		(
+			spr::propset,
+			sprIndex,
+			dst.x + dst.w / 2 + zoomScale * iPtr->getFakeX(),
+			dst.y + dst.h / 2 + zoomScale * iPtr->getFakeY()
+		);
+		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+		setZoom(1.0);
 	}
 
 	std::vector<std::array<int, 2>> rotorList;
-	
-	//차량 그리기
-	{
-		//화면에 그려질 renderVehList 작성
-		std::vector<Drawable*> renderVehList;
-		for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
-		{
-			for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-			{
-				Drawable* vPtr = (Drawable*)((Vehicle*)(World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).VehiclePtr));
-				if (vPtr != nullptr)
-				{
-					if (std::find(renderVehList.begin(), renderVehList.end(), vPtr) == renderVehList.end()) //만약 이 차량 포인터가 존재하지 않으면
-					{
-						renderVehList.push_back(vPtr);
-					}
-				}
-			}
-		}
-
-		for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++)
-		{
-			if (std::find(renderVehList.begin(), renderVehList.end(), (*it)) == renderVehList.end()) //만약 이 차량 포인터가 존재하지 않으면
-			{
-				renderVehList.push_back((Drawable*)(Vehicle*)(*it));
-			}
-		}
-		
-		for (int i = 0; i < renderVehList.size(); i++) renderVehList[i]->drawSelf();
-	}
-
-
-	///////////////////////////////////▼엔티티 그리기//////////////////////////////////////////////////////////////////
+	for (int i = 0; i < renderVehList.size(); i++) renderVehList[i]->drawSelf();
 
 	//엔티티&일반설치물 그리기
-	{
-		//화면에 그려질 renderVehList 작성
-		std::vector<Drawable*> renderEntityList;
-		for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
-		{
-			for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-			{
-				//플레이어와 겹치는 설치물
-				Install* iPtr = (Install*)(World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).InstallPtr);
-				if (iPtr != nullptr)
-				{
-					if (iPtr->leadItem.checkFlag(itemFlag::INSTALL_DEPTH_LOWER) == false)
-					{
-						if (std::find(renderEntityList.begin(), renderEntityList.end(), iPtr) == renderEntityList.end()) //만약 이 설치물 포인터가 존재하지 않으면
-						{
-							renderEntityList.push_back((Drawable*)iPtr);
-						}
-					}
-				}
-
-				//일반 객체
-				Drawable* ePtr = (Drawable*)((Entity*)(World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).EntityPtr));
-				if (ePtr != nullptr)
-				{
-					if (std::find(renderEntityList.begin(), renderEntityList.end(), ePtr) == renderEntityList.end()) //만약 이 차량 포인터가 존재하지 않으면
-					{
-						renderEntityList.push_back(ePtr);
-					}
-				}
-
-
-			}
-		}
-
-		for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) //추가로 렌더링되는 객체(화면밖)
-		{
-			if (std::find(renderEntityList.begin(), renderEntityList.end(), (*it)) == renderEntityList.end()) //만약 이 차량 포인터가 존재하지 않으면
-			{
-				renderEntityList.push_back((Drawable*)(Entity*)(*it));
-			}
-		}
-
-		for (int i = 0; i < renderEntityList.size(); i++)
-		{
-			renderEntityList[i]->drawSelf();
-		}
-	}
-
+	for (int i = 0; i < renderEntityList.size(); i++) renderEntityList[i]->drawSelf();
 
 	//헬기 로터 그리기
 	for (int i = 0; i < rotorList.size(); i++)
 	{
 		int tgtX = rotorList[i][0];
 		int tgtY = rotorList[i][1];
-		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).VehiclePtr;
-
+		Vehicle* vPtr = (Vehicle*)tileCache[{tgtX, tgtY}]->VehiclePtr;
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -492,7 +507,7 @@ __int64 drawEntities()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).VehiclePtr == vPtr)
+		if (tileCache[{Player::ins()->getGridX(), Player::ins()->getGridY()}]->VehiclePtr == vPtr)
 		{
 			SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 50); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
@@ -552,10 +567,7 @@ __int64 drawEntities()
 					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255); //텍스쳐 투명도 설정
 					setZoom(1.0);
 				}
-
-
 			}
-
 
 			//플레이어 속도 표현
 			if (tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY())
@@ -610,7 +622,6 @@ __int64 drawDamages()
 		setZoom(1.0);
 	}
 
-
 	return getNanoTimer() - timeStampStart;
 }
 
@@ -618,66 +629,57 @@ __int64 drawFogs()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < blackFogList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-		{
-			if (World::ins()->getTile(tgtX, tgtY, playerZ).fov == fovFlag::black)
-			{
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
-				SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 255);
-				SDL_RenderFillRect(renderer, &dst);
-			}
-		}
+		int tgtX = blackFogList[i].x;
+		int tgtY = blackFogList[i].y;
+
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 255);
+		SDL_RenderFillRect(renderer, &dst);
 	}
 
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < grayFogList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-		{
-			if (World::ins()->getTile(tgtX, tgtY, playerZ).fov == fovFlag::gray)
-			{
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
+		int tgtX = grayFogList[i].x;
+		int tgtY = grayFogList[i].y;
 
-				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-				SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 185);
-				SDL_RenderFillRect(renderer, &dst);
-			}
-		}
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 185);
+		SDL_RenderFillRect(renderer, &dst);
 	}
 
-	for (int tgtY = renderRegion.y; tgtY <= renderRegion.y + renderRegion.h; tgtY++)
+	for (int i = 0; i < lightFogList.size(); i++)
 	{
-		for (int tgtX = renderRegion.x; tgtX <= renderRegion.x + renderRegion.w; tgtX++)
-		{
-			if (World::ins()->getTile(tgtX, tgtY, playerZ).fov == fovFlag::white)
-			{
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
+		int tgtX = lightFogList[i].x;
+		int tgtY = lightFogList[i].y;
+		TileData* thisTile = tileCache[{tgtX, tgtY}];
 
-				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-				SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 90);
-				SDL_RenderFillRect(renderer, &dst);
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
 
-				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
-				Uint8 targetR = myMin(255, World::ins()->getTile(tgtX, tgtY, playerZ).redLight);
-				Uint8 targetG = myMin(255, World::ins()->getTile(tgtX, tgtY, playerZ).greenLight);
-				Uint8 targetB = myMin(255, World::ins()->getTile(tgtX, tgtY, playerZ).blueLight);
-				SDL_SetRenderDrawColor(renderer, targetR, targetG, targetB, 200);
-				SDL_RenderFillRect(renderer, &dst);
-				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			}
-		}
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 90);
+		SDL_RenderFillRect(renderer, &dst);
+
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+		Uint8 targetR = myMin(255, thisTile->redLight);
+		Uint8 targetG = myMin(255, thisTile->greenLight);
+		Uint8 targetB = myMin(255, thisTile->blueLight);
+		SDL_SetRenderDrawColor(renderer, targetR, targetG, targetB, 200);
+		SDL_RenderFillRect(renderer, &dst);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	}
-
 
 	return getNanoTimer() - timeStampStart;
 }

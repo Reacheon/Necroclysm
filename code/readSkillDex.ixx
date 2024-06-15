@@ -136,7 +136,7 @@ export int readSkillDex(const wchar_t* file)
                         skillDex[arrayCounter / (csvWidth)-1].name = strFragment;
                         break;
                     case csvSkill::code:
-                        skillDex[arrayCounter / (csvWidth)-1].code = wtoi(strFragment);
+                        skillDex[arrayCounter / (csvWidth)-1].skillCode = wtoi(strFragment);
                         break;
                     case csvSkill::iconIndex:
                         skillDex[arrayCounter / (csvWidth)-1].iconIndex = wtoi(strFragment);

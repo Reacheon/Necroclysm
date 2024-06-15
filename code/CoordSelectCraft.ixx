@@ -114,7 +114,7 @@ public:
 				revY += sgn(revY) * (8 * zoomScale);
 				revGridY = revY / (16 * zoomScale);
 
-				if (itemDex[rotatedItemCode].checkFlag(itemFlag::INSTALL_BIG)) revGridY -= 1;
+				if (itemDex[rotatedItemCode].checkFlag(itemFlag::PROP_BIG)) revGridY -= 1;
 
 				setZoom(zoomScale);
 				SDL_SetTextureColorMod(spr::propset->getTexture(), 0, 255, 0);
@@ -143,7 +143,7 @@ public:
 				spr::propset,
 				itemDex[rotatedItemCode].propSprIndex,
 				(cameraW / 2),
-				(cameraH / 2) + itemDex[rotatedItemCode].checkFlag(itemFlag::INSTALL_BIG)*zoomScale * (-16 * 1 + 8)
+				(cameraH / 2) + itemDex[rotatedItemCode].checkFlag(itemFlag::PROP_BIG)*zoomScale * (-16 * 1 + 8)
 			);
 			SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
 			SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);

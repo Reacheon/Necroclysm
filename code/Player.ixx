@@ -86,6 +86,17 @@ public:
 		ptr->setIsPlayer(true);
 		return ptr;
 	}
+
+	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType) override
+	{
+		Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, inputAniType);
+		addAniUSetPlayer(this, inputAniType);
+	}
+
+	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget) { startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, aniFlag::atk); }
+
+	void startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, -1); }
+
 	void startMove(int inputDir)
 	{
 		if (Player::ins()->getAniType() == aniFlag::null)
@@ -153,7 +164,7 @@ public:
 						}
 
 						//prop
-						if (tgtTile.InstallPtr != nullptr)
+						if (tgtTile.PropPtr != nullptr)
 						{
 							SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 255);
 						}

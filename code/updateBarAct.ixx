@@ -4,7 +4,7 @@ import util;
 import constVar;
 import globalVar;
 import World;
-import Install;
+import Prop;
 
 export void updateNearbyBarAct(int px, int py, int pz)
 {
@@ -13,7 +13,7 @@ export void updateNearbyBarAct(int px, int py, int pz)
 		barAct = actSet::null;
 		
 		//플레이어 타일
-		if (World::ins()->getTile(px, py, pz).InstallPtr != nullptr)
+		if (World::ins()->getTile(px, py, pz).PropPtr != nullptr)
 		{
 
 		}
@@ -24,9 +24,9 @@ export void updateNearbyBarAct(int px, int py, int pz)
 			int dx, dy;
 			dir2Coord(dir, dx, dy);
 
-			if (World::ins()->getTile(px + dx, py + dy, pz).InstallPtr != nullptr)
+			if (World::ins()->getTile(px + dx, py + dy, pz).PropPtr != nullptr)
 			{
-				Install* instlPtr = (Install*)World::ins()->getTile(px + dx, py + dy, pz).InstallPtr;
+				Prop* instlPtr = (Prop*)World::ins()->getTile(px + dx, py + dy, pz).PropPtr;
 				if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
 				{
 					if (std::find(barAct.begin(),barAct.end(),act::closeDoor) == barAct.end())

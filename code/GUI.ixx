@@ -53,16 +53,12 @@ public:
 		if (aniType == aniFlag::winUnfoldClose)
 		{
 			deactInput();
-			setAniType(aniFlag::winUnfoldClose);
-			aniUSet.insert(this);
-			turnCycle = turn::playerAnime;
+			addAniUSetPlayer(this, aniFlag::winUnfoldClose);
 		}
 		else if (aniType == aniFlag::winSlipClose)
 		{
 			deactInput();
-			setAniType(aniFlag::winSlipClose);
-			aniUSet.insert(this);
-			turnCycle = turn::playerAnime;
+			addAniUSetPlayer(this, aniFlag::winSlipClose);
 		}
 		else if (aniType == aniFlag::null)
 		{
