@@ -1645,7 +1645,7 @@ public:
 			dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 			if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			if (1/*address == Player::ins()*/)
+			if (isPlayer)
 			{
 				SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 255);
 			}
