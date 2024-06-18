@@ -1682,6 +1682,9 @@ public:
 			break;
 		case 1:
 			break;
+		case 30:
+			addAniUSetPlayer(this, aniFlag::fireStorm);
+			break;
 		}
 	}
 };

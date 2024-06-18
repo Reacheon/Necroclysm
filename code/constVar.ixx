@@ -612,6 +612,7 @@ export enum class aniFlag
     trainRush,
     quickSlotPopLeft,
     quickSlotPopRight,
+    fireStorm,
 };
 
 export enum class input
