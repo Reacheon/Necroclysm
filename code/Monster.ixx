@@ -40,6 +40,10 @@ public:
 
 	void startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, -1); }
 
+	void endMove()
+	{
+	}
+
 	bool runAI()
 	{
 		prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);

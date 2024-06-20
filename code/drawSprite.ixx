@@ -41,13 +41,42 @@ export void drawSprite(Sprite* spr, int index, int x, int y)
 	SDL_Rect dst = { x,y,src.w * s_zoomScale, src.h * s_zoomScale };
 	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }
+
 export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
 {
 	int textureW, textureH;
 	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	int srcX = (spr->getW() * index) % textureW;
+	int srcY = (spr->getH() * (spr->getW() * index / textureW));
+	SDL_Rect src = { srcX, srcY, spr->getW(), spr->getH() };
+
+	int dstW = static_cast<int>(std::floor(src.w * s_zoomScale));
+	int dstH = static_cast<int>(std::floor(src.h * s_zoomScale));
+	SDL_Rect dst = { x - dstW / 2, y - dstH / 2, dstW, dstH };
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+}
+
+//export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
+//{
+//	int textureW, textureH;
+//	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+//	SDL_Rect src = { spr->getW() * index % textureW, spr->getH() * (spr->getW() * index / textureW), spr->getW(), spr->getH() };
+//	SDL_Rect dst = { x,y,src.w * s_zoomScale, src.h * s_zoomScale };
+//	dst.x = x - (dst.w / 2);
+//	dst.y = y - (dst.h / 2);
+//	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+//}
+
+
+export void drawSpriteCenterF(Sprite* spr, int index, double x, double y)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
 	SDL_Rect src = { spr->getW() * index % textureW, spr->getH() * (spr->getW() * index / textureW), spr->getW(), spr->getH() };
-	SDL_Rect dst = { x,y,src.w * s_zoomScale, src.h * s_zoomScale };
+	SDL_FRect dst = { x,y,src.w * s_zoomScale, src.h * s_zoomScale };
 	dst.x = x - (dst.w / 2);
 	dst.y = y - (dst.h / 2);
-	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+	SDL_RenderCopyExF(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }

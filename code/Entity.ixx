@@ -25,6 +25,7 @@ import turnWait;
 import Drawable;
 import drawSprite;
 import SkillData;
+//import CoordSelect;
 
 export class Entity : public Ani, public Coord, public Drawable//엔티티는 시야 기능과 개인 FOV, 현재 좌표, 그리고 화면에 표시되는 기능과 고유 텍스쳐를 가진다.
 {
@@ -86,6 +87,8 @@ private:
 	std::vector<SkillData> martialArtList;
 	std::vector<SkillData> divinePowerList;
 	std::vector<SkillData> magicList;
+
+	Point3 skillTarget;
 public:
 	EntityData entityInfo;
 	Entity(int gridX, int gridY, int gridZ)//생성자
@@ -111,12 +114,21 @@ public:
 		delete equipment;
 	}
 #pragma region getset method
-	
+
 	std::vector<SkillData>& getBionicList() { return bionicList; }
 	std::vector<SkillData>& getMutationList() { return mutationList; }
 	std::vector<SkillData>& getMartialArtList() { return martialArtList; }
 	std::vector<SkillData>& getDivinePowerList() { return divinePowerList; }
 	std::vector<SkillData>& getMagicList() { return magicList; }
+
+	void setSkillTarget(int gridX, int gridY, int gridZ)
+	{
+		skillTarget.x = gridX;
+		skillTarget.y = gridY;
+		skillTarget.z = gridZ;
+	}
+
+	Point3 getSkillTarget() { return skillTarget; }
 
 	void addSkill(int index)
 	{
@@ -305,7 +317,7 @@ public:
 		return false;
 	}
 
-	humanCustom::skin getSkin() { return skin;  }
+	humanCustom::skin getSkin() { return skin; }
 	void setSkin(humanCustom::skin input) { skin = input; }
 
 	humanCustom::eyes getEyes() { return eyes; }
@@ -702,6 +714,7 @@ public:
 	void updateWalkable(int gridX, int gridY)//만약 다를 경우 개체에서 오버라이드해서 쓰시오
 	{
 		//만약 걸을 수 있다해도 해당 위치에 엔티티가 존재하면 걷기불가로 만듬
+
 		if (World::ins()->getTile(gridX, gridY, getGridZ()).walkable == true)
 		{
 			if (World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr != nullptr)
@@ -1019,6 +1032,8 @@ public:
 	void setTalentExp(int index, int val) { talentExp[index] = val; }
 	void setTalentFocus(int index, int val) { talentFocus[index] = val; }
 
+	virtual void endMove() = 0; //aStar로 인해 이동이 일어났을시에 발생, 플레이어와 몬스터가 다름
+
 	bool runAnimation(bool shutdown)
 	{
 		if (getAniType() == aniFlag::move)//만약 플레이어 인스턴스의 좌표와 목적좌표가 다를 경우
@@ -1052,6 +1067,7 @@ public:
 				setAniType(aniFlag::null);
 				setGrid(getDstGridX(), getDstGridY(), getGridZ());
 				turnWait(1.0);
+				endMove();
 				return true;
 				break;
 
@@ -1414,6 +1430,46 @@ public:
 				}
 			}
 		}
+		else if (getAniType() == aniFlag::fireStorm)
+		{
+			addTimer();
+
+			std::wstring stickerID = L"FIRESTORM";
+
+			switch (getTimer())
+			{
+			case 1:
+				new Sticker(false, getX() + (16 * (getSkillTarget().x - getGridX())), getY() + (16 * (getSkillTarget().y - getGridY())), spr::fireStorm, 0, stickerID, true);
+				break;
+			case 5:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
+				break;
+			case 9:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
+				break;
+			case 13:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(3);
+				break;
+			case 17:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(4);
+				break;
+			case 21:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(5);
+				break;
+			case 25:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(6);
+				break;
+			case 29:
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(7);
+				break;
+			case 33:
+				delete(((Sticker*)(StickerList.find(stickerID))->second));
+				resetTimer();
+				setAniType(aniFlag::null);
+				return true;
+				break;
+			}
+		}
 
 		return false;
 	}
@@ -1670,21 +1726,5 @@ public:
 		setFlip(SDL_FLIP_NONE);
 	};
 
-	void useSkill(SkillData dat)
-	{
-		prt(L"[Entity:useSkill] 엔티티 %p가 스킬 %ls을(를) 실행하였다.\n",this, dat.name.c_str());
-		switch (dat.skillCode)
-		{
-		default:
-			prt(L"[Entity:useSkill] 엔티티 %p가 알 수 없는 스킬을 시전하였다.\n", this);
-			break;
-		case 0:
-			break;
-		case 1:
-			break;
-		case 30:
-			addAniUSetPlayer(this, aniFlag::fireStorm);
-			break;
-		}
-	}
+
 };

@@ -69,12 +69,6 @@ public:
 		
 		addSkill(1);
 		quickSlot[5] = { quickSlotFlag::SKILL, 1 };
-		//getEquipPtr()->addItemFromDex(88, 1);
-		//getEquipPtr()->addItemFromDex(88, 1);
-		//getEquipPtr()->addItemFromDex(88, 1);
-		//(item->getPocket())->addItemFromDex(89, 1000);//에탄올
-		//(item->getPocket())->addItemFromDex(91, 1000);//벤젠
-		//(item->getPocket())->addItemFromDex(82, 1);//증류기
 	}
 	~Player()
 	{
@@ -140,11 +134,11 @@ public:
 			{
 				if (isCircle(minimapDiameter / 2, dx, dy))
 				{
-					TileData& tgtTile = World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
-					if (tgtTile.fov == fovFlag::white || tgtTile.fov == fovFlag::gray)
+					TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
+					if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 					{
 						//floor
-						switch (tgtTile.floor)
+						switch (tgtTile->floor)
 						{
 						case 0:
 							break;
@@ -154,7 +148,7 @@ public:
 						}
 
 						//wall
-						switch (tgtTile.wall)
+						switch (tgtTile->wall)
 						{
 						case 0:
 							break;
@@ -164,20 +158,20 @@ public:
 						}
 
 						//prop
-						if (tgtTile.PropPtr != nullptr)
+						if (tgtTile->PropPtr != nullptr)
 						{
 							SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 255);
 						}
 
 						//vehicle
-						if (tgtTile.VehiclePtr != nullptr)
+						if (tgtTile->VehiclePtr != nullptr)
 						{
 							SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 255);
 						}
 
 						SDL_RenderDrawPoint(renderer, dx + (minimapDiameter / 2), dy + (minimapDiameter / 2));
 
-						if (tgtTile.fov == fovFlag::gray)
+						if (tgtTile->fov == fovFlag::gray)
 						{
 							SDL_SetRenderDrawColor(renderer, col::black.r, col::black.g, col::black.b, 100);
 							SDL_RenderDrawPoint(renderer, dx + (minimapDiameter / 2), dy + (minimapDiameter / 2));
@@ -201,6 +195,7 @@ public:
 	{
 		//updateVison은 렉을 유발하지 않는다. 시야가 7에서 8이어도 순간적인 0.5ns의 딜레이만 유발한다
 		//__int64 timeStampStart = getNanoTimer();
+		prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
 
 		int correctionRange = range;
 		if (getHour() >= 6 && getHour() < 18) correctionRange = range;
@@ -210,10 +205,8 @@ public:
 		{
 			for (int j = cy - userVisionHalfH; j <= cy + userVisionHalfH; j++)
 			{
-				if (World::ins()->getTile(i, j, getGridZ()).fov == fovFlag::white)
-				{
-					World::ins()->getTile(i, j, getGridZ()).fov = fovFlag::gray;
-				}
+				TileData& tgtTile = World::ins()->getTile(i, j, getGridZ());
+				if (tgtTile.fov == fovFlag::white) tgtTile.fov = fovFlag::gray;
 			}
 		}
 
@@ -289,7 +282,6 @@ public:
 	{
 		Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 
-
 		std::array<int, 2> sectorXY = World::ins()->changeToSectorCoord(getGridX(), getGridY());
 		for (int dir = -1; dir <= 7; dir++)
 		{
@@ -298,10 +290,13 @@ public:
 			if (World::ins()->isEmptySector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ()) == true) World::ins()->createSector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ());
 		}
 		updateNearbyChunk(chunkLoadingRange);
-		
+		updateNearbyBarAct(inputGridX, inputGridY, inputGridZ);
+	}
+
+	void endMove() override //aStar로 인해 이동이 끝났을 경우
+	{
 		updateVision(getEyeSight());
 		updateMinimap();
-		updateNearbyBarAct(inputGridX, inputGridY, inputGridZ);
 	}
 
 	void death()

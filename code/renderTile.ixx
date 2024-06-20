@@ -105,8 +105,8 @@ export __int64 renderTile()
 	tileSize = 16 * zoomScale;
 	cameraGridX = (cameraX - 8) / (16);
 	cameraGridY = (cameraY - 8) / (16);
-	renderRangeW = 2 + (cameraW + extraCameraLength) / tileSize;
-	renderRangeH = 2 + (cameraH + extraCameraLength) / tileSize;
+	renderRangeW = 3 + (cameraW + extraCameraLength) / tileSize;
+	renderRangeH = 3 + (cameraH + extraCameraLength) / tileSize;
 	playerZ = Player::ins()->getGridZ();
 	renderRegion = { cameraGridX - (renderRangeW / 2), cameraGridY - (renderRangeH / 2), renderRangeW, renderRangeH };
 
@@ -302,8 +302,8 @@ __int64 drawTiles()
 			(
 				spr::tileset,
 				sprIndex + dirCorrection,
-				cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-				cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
+				cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+				cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
 			);
 
 			setZoom(1.0);
@@ -326,7 +326,7 @@ __int64 drawTiles()
 							setZoom(zoomScale);
 							drawSpriteCenter
 							(
-								spr::blueMarker,
+								spr::cursorMarker,
 								markerIndex,
 								cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
 								cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)

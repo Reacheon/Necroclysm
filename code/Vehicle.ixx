@@ -522,6 +522,18 @@ public:
         setDelGrid(dx, dy);
         shift(getDelGridX(), getDelGridY());
         addAniUSetMonster(this, aniFlag::propRush);
+
+        cameraFix = false;
+        setFakeX(-getDelX());
+        setFakeY(-getDelY());
+        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        {
+            if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
+            {
+                ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeX(getFloatFakeX());
+                ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeY(getFloatFakeY());
+            }
+        }
     }
 
     void centerShift(int dx, int dy, int dz)
@@ -1075,12 +1087,11 @@ public:
                         void* iPtr = World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr;
                         if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                     }
-
-                    cameraFix = false;
-
                     totalDist = std::sqrt(std::pow(getDelX(), 2) + std::pow(getDelY(), 2));
                     totalMove = 0;
                     lineCheck = 0;
+
+                    cameraFix = false;
                     setFakeX(-getDelX());
                     setFakeY(-getDelY());
                 }
@@ -1135,7 +1146,7 @@ public:
 
                 if (getFloatFakeX() == 0 && getFloatFakeY() == 0)//도착
                 {
-                    //prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFloatFakeX(), getFloatFakeY());
+                    prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFloatFakeX(), getFloatFakeY());
                     
                     extraRenderSet.clear();
                     extraRenderEntityList.clear();
@@ -1220,6 +1231,8 @@ public:
                 extraRenderSet.clear();
                 extraRenderVehList.clear();
                 extraRenderEntityList.clear();
+                Player::ins()->updateVision(Player::ins()->getEyeSight());
+                Player::ins()->updateMinimap();
                 cameraFix = true;
                 resetTimer();
                 return true;

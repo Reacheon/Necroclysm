@@ -79,6 +79,8 @@ private:
 	bool isQuickSlotPop = false; //화면우측의 퀵슬롯이 오른쪽으로 팝업되었는지를 나타내는 bool 변수
 	float popUpDist = 360;
 	int quickSlotDist = 0;
+
+	bool disableClickUp4Motion = false;
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -139,12 +141,15 @@ public:
 	{
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 		Sprite* targetBtnSpr = nullptr;
+		
+		//SDL_SetRenderDrawColor(renderer, 0x87, 0xCE, 0xEB, 200);
+		//SDL_RenderDrawPoint(renderer, cameraW / 2, cameraH / 2);
 
 		drawStadium(letterbox.x, letterbox.y, letterbox.w, letterbox.h + 10, { 0,0,0 }, 150, 5);
 		if (ctrlVeh != nullptr) drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		
 		if (isAdvancedMode == false)
 		{
 			SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
@@ -382,8 +387,33 @@ public:
 		SDL_SetRenderDrawColor(renderer, 35, 246, 204, 255);
 		SDL_RenderDrawPoint(renderer, 0, 0);
 	}
+
+	void clickDownGUI()
+	{
+		executedHold = false;
+	}
+	void clickMotionGUI(int dx, int dy)
+	{
+		if (click && dtClickStack > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
+		{
+			const int maxDist = 160;
+			int prevCameraX = cameraX, prevCameraY = cameraY;
+			cameraFix = false;
+			cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
+			cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
+			disableClickUp4Motion = true;
+
+			if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+			if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+		}
+	}
 	void clickUpGUI()
 	{
+		if (disableClickUp4Motion)
+		{
+			disableClickUp4Motion = false;
+			return;
+		}
 		if (executedHold) return;
 
 		if (checkCursor(&letterboxPopUpButton) == true)//팝업 기능
@@ -481,34 +511,44 @@ public:
 					if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
 					{
 						int index = Player::ins()->searchBionicCode(quickSlot[i].second);
-						Player::ins()->useSkill(Player::ins()->getBionicList()[index]);
+						CORO(useSkill(Player::ins()->getBionicList()[index]));
 					}
 					else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
 					{
 						int index = Player::ins()->searchMutationCode(quickSlot[i].second);
-						Player::ins()->useSkill(Player::ins()->getMutationList()[index]);
+						CORO(useSkill(Player::ins()->getMutationList()[index]));
 					}
 					else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
 					{
 						int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
-						Player::ins()->useSkill(Player::ins()->getMartialArtList()[index]);
+						CORO(useSkill(Player::ins()->getMartialArtList()[index]));
 					}
 					else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
 					{
 						int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
-						Player::ins()->useSkill(Player::ins()->getDivinePowerList()[index]);
+						CORO(useSkill(Player::ins()->getDivinePowerList()[index]));
 					}
 					else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
 					{
 						int index = Player::ins()->searchMagicCode(quickSlot[i].second);
-						Player::ins()->useSkill(Player::ins()->getMagicList()[index]);
+						CORO(useSkill(Player::ins()->getMagicList()[index]));
 					}
 				}
 			}
 		}
-		else
+		else//타일터치
 		{
+			cameraFix = true;
 			//터치한 좌표를 얻어내는 부분
+			int cameraGridX, cameraGridY;
+			if (cameraX >= 0) cameraGridX = cameraX / 16;
+			else cameraGridX = -1 + cameraX / 16;
+			if (cameraY >= 0) cameraGridY = cameraY / 16;
+			else cameraGridY = -1 + cameraY / 16;
+
+			int camDelX = cameraX - (16 * cameraGridX + 8);
+			int camDelY = cameraY - (16 * cameraGridY + 8);
+
 			int revX, revY, revGridX, revGridY;
 			if (inputType == input::touch)
 			{
@@ -520,23 +560,17 @@ public:
 				revX = event.motion.x - (cameraW / 2);
 				revY = event.motion.y - (cameraH / 2);
 			}
-			revX += sgn(revX) * (8 * zoomScale);
+			revX += sgn(revX) * (8 * zoomScale) + camDelX;
 			revGridX = revX / (16 * zoomScale);
-			revY += sgn(revY) * (8 * zoomScale);
+			revY += sgn(revY) * (8 * zoomScale) + camDelY;
 			revGridY = revY / (16 * zoomScale);
+
 			//상대좌표를 절대좌표로 변환
-			clickTile.x = Player::ins()->getGridX() + revGridX;
-			clickTile.y = Player::ins()->getGridY() + revGridY;
+			clickTile.x = cameraGridX + revGridX;
+			clickTile.y = cameraGridY + revGridY;
 			prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
 			tileTouch(clickTile.x, clickTile.y);
 		}
-	}
-	void clickMotionGUI(int dx, int dy)
-	{
-	}
-	void clickDownGUI()
-	{
-		executedHold = false;
 	}
 	void step()
 	{
@@ -561,17 +595,18 @@ public:
 			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&tabSmallBox) == false)
 			{
 				//터치한 좌표를 얻어내는 부분
+
+				prt(L"1초 이상 눌렀다.\n");
 				int revX, revY, revGridX, revGridY;
 				revX = clickDownPoint.x - (cameraW / 2);
-				revY = clickDownPoint.y - (cameraH / 2);
-				revX += sgn(revX) * (8 * zoomScale);
-				revGridX = revX / (16 * zoomScale);
-				revY += sgn(revY) * (8 * zoomScale);
-				revGridY = revY / (16 * zoomScale);
-				prt(L"1초 이상 눌렀다.\n");
-				dtClickStack = -1;
-				executedHold = true;
-				//advancedTileTouch(Player::ins()->getGridX() + revGridX, Player::ins()->getGridY() + revGridY);
+				//revY = clickDownPoint.y - (cameraH / 2);
+				//revX += sgn(revX) * (8 * zoomScale);
+				//revGridX = revX / (16 * zoomScale);
+				//revY += sgn(revY) * (8 * zoomScale);
+				//revGridY = revY / (16 * zoomScale);
+				//dtClickStack = -1;
+				//executedHold = true;
+				////advancedTileTouch(Player::ins()->getGridX() + revGridX, Player::ins()->getGridY() + revGridY);
 			}
 		}
 
@@ -943,6 +978,8 @@ public:
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
+								Player::ins()->updateVision(Player::ins()->getEyeSight());
+								Player::ins()->updateMinimap();
 
 								Prop* upProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
 								if (upProp == nullptr)
@@ -963,6 +1000,8 @@ public:
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() - 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
+								Player::ins()->updateVision(Player::ins()->getEyeSight());
+								Player::ins()->updateMinimap();
 
 								Prop* downProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
 								if (downProp == nullptr)
@@ -1219,34 +1258,6 @@ public:
 				drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2 + 32, 5, 0, 5, 0);
 			}
 		}
-
-		////퀵 슬롯
-		//SDL_Rect quickSlot = { 207, 16, 48, 48 };
-		//SDL_Rect inQuickSlot = { quickSlot.x + 2, quickSlot.y + 2, 44, 44 };
-
-		////왼쪽
-		//drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-		//SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-		//SDL_RenderDrawRect(renderer, &inQuickSlot);
-		//quickSlot.x += 50;
-		//inQuickSlot.x += 50;
-
-		////오른쪽
-		//drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-		//SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-		//SDL_RenderDrawRect(renderer, &inQuickSlot);
-		//quickSlot.x += 84;
-		//inQuickSlot.x += 84;
-
-		////숫자 퀵슬롯
-		//for (int i = 0; i < 7; i++)
-		//{
-		//	drawStadium(quickSlot.x, quickSlot.y, quickSlot.w, quickSlot.h, col::black, 170, 2);
-		//	SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-		//	SDL_RenderDrawRect(renderer, &inQuickSlot);
-		//	quickSlot.x += 50;
-		//	inQuickSlot.x += 50;
-		//}
 	}
 
 	void drawBarAct()
@@ -1780,4 +1791,46 @@ public:
 		return false;
 	}
 
+
+	Corouter useSkill(SkillData dat)
+	{
+		const int SKILL_MAX_RANGE = 30;
+		switch (dat.skillCode)
+		{
+		default:
+			prt(L"[Entity:useSkill] 플레이어가 알 수 없는 스킬을 시전하였다.\n", this);
+			break;
+		case 0:
+			break;
+		case 1:
+			break;
+		case 30://화염폭풍
+		{
+			std::vector<std::array<int, 2>> coordList;
+			for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
+			{
+				for (int tgtX = -SKILL_MAX_RANGE; tgtX <= SKILL_MAX_RANGE; tgtX++)
+				{
+					if (World::ins()->getTile(Player::ins()->getGridX() + tgtX, Player::ins()->getGridY() + tgtY, Player::ins()->getGridZ()).fov == fovFlag::white)
+					{
+						coordList.push_back({ tgtX,tgtY });
+
+					}
+				}
+			}
+			new CoordSelect(CoordSelectFlag::FIRESTORM, L"화염폭풍을 시전할 위치를 입력해주세요.", coordList);
+			co_await std::suspend_always();
+			std::wstring targetStr = coAnswer;
+			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+			targetStr.erase(0, targetStr.find(L",") + 1);
+			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+			targetStr.erase(0, targetStr.find(L",") + 1);
+			int targetZ = wtoi(targetStr.c_str());
+
+			Player::ins()->setSkillTarget(targetX, targetY, targetZ);
+			addAniUSetPlayer(Player::ins(), aniFlag::fireStorm);
+			break;
+		}
+		}
+	}
 };

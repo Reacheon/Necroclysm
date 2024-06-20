@@ -1127,3 +1127,10 @@ export enum class quickSlotFlag
     SKILL,
     ITEM,
 };
+
+export enum class CoordSelectFlag
+{
+    NONE,
+    SINGLE_TARGET_SKILL,
+    FIRESTORM,
+};

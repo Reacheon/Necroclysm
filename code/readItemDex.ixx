@@ -791,8 +791,8 @@ export int readItemDex(const wchar_t* file)
                             break;
                     }
 
-                    prt(L"[문자열] %ws ", strFragment.c_str());
-                    prt(L"를 (%d,%d)에 입력했다.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
+                    //prt(L"[문자열] %ws ", strFragment.c_str());
+                    //prt(L"를 (%d,%d)에 입력했다.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
                 }
 
                 arrayCounter++;

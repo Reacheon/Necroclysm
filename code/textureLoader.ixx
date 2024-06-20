@@ -35,7 +35,7 @@ export void textureLoader()
 	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 72, 35);
 	spr::itemset = new Sprite(renderer, "image/item/itemset.png", 48, 48);
 	spr::windowArrow = new Sprite(renderer, "image/UI/windowArrow.png", 16, 16);
-	spr::blueMarker = new Sprite(renderer, "image/UI/blueMarker.png", 16, 16);
+	spr::cursorMarker = new Sprite(renderer, "image/UI/blueMarker.png", 16, 16);
 	spr::yellowMarker = new Sprite(renderer, "image/UI/yellowMarker.png", 16, 16);
 	spr::itemCursorLong = new Sprite(renderer, "image/UI/itemCursorLong.png", 304, 64);
 	spr::itemCursorShort = new Sprite(renderer, "image/UI/itemCursorShort.png", 304, 64);

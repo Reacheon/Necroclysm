@@ -35,7 +35,7 @@ export namespace spr
 	Sprite* weatherCloud = nullptr;
 	Sprite* itemset = nullptr;
 	Sprite* windowArrow = nullptr;
-	Sprite* blueMarker = nullptr;
+	Sprite* cursorMarker = nullptr;
 	Sprite* yellowMarker = nullptr;
 	Sprite* equipRoll = nullptr;
 	Sprite* lootRoll = nullptr;

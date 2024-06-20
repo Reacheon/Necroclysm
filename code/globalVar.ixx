@@ -48,15 +48,10 @@ export namespace timer
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
 
-
-
-//export std::unordered_map<std::wstring, SDL_Texture*> textCache;// drawText들의 문자열 저장 캐시
-//export std::unordered_map<std::wstring, SDL_Texture*> textOutlineCache;// drawText들의 문자열 저장 캐시
 export turn turnCycle = turn::playerInput;//0:플레이어 입력_1:플레이어 애니메이션 재생_2:모든 엔티티 AI 작동(하나라도 false 반환시 3으로, 없으면 0으로)_3:엔티티 애니메이션 재생
 export bool quit = false;// true일 경우 게임을 종료시킴
 export bool stopLog = false; // 로그를 멈춘다. 시간이 지나도 사라지지 않음
 export float timeGift = 0; // 유저의 행동에 의해 엔티티들에게 주어지는 시간
-
 
 export std::vector<EntityData> entityDex; // Entity DB
 export std::vector<ItemData> itemDex;// 아이템 DB
@@ -179,6 +174,8 @@ export std::vector<void*> extraRenderEntityList;
 export std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , -1), };
 
 export SDL_Rect quickSlotRegion;
+
+export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해 원래 마우스 클릭좌표, 기존 클릭좌표랑은 조금 다르니 유의할 것, 카메라 이동에 사용됨
 
 
 auto aniUSetComp = [](Ani* a, Ani* b) -> bool {

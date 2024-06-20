@@ -15,6 +15,7 @@ import textureVar;
 import drawText;
 import log;
 import ItemPocket;
+import drawPrimitive;
 
 //반환형 : wstring L"x좌표,y좌표,z좌표", ex) 3,5,1
 export class CoordSelect : public GUI
@@ -28,22 +29,31 @@ private:
 	
 	bool advance = false; //좌표를 선택하고 확인 버튼을 한번 더 눌러야 진행되는 옵션
 	int advanceIconIndex = -1;
-	
-public:
-	CoordSelect(std::wstring inputTelepathyStr) : GUI(true)
-	{
-		telepathyStr = inputTelepathyStr;
-		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
-		ptr = this;
-	}
 
-	CoordSelect(std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
+	CoordSelectFlag type = CoordSelectFlag::NONE;
+
+public:
+	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr) : GUI(true)
 	{
-		selectableCoord = inputSelectableCoord;
+		type = inputType;
 		telepathyStr = inputTelepathyStr;
 		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
 		ptr = this;
 	}
+	CoordSelect(std::wstring inputTelepathyStr) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr) { }
+
+
+	//셀렉터블 코드는 상대좌표 기준
+	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
+	{
+		type = inputType;
+		telepathyStr = inputTelepathyStr;
+		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
+		ptr = this;
+
+		selectableCoord = inputSelectableCoord;
+	}
+	CoordSelect(std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr, inputSelectableCoord) { }
 
 	~CoordSelect()
 	{
@@ -53,10 +63,22 @@ public:
 		UIType = act::null;
 
 	}
+
 	static CoordSelect* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center) {}
 	void drawGUI()
 	{
+		bool displaySelectableCursor = true;
+		bool yellowFullRectCursor = false;
+
+
+		if (type == CoordSelectFlag::FIRESTORM)
+		{
+			displaySelectableCursor = false;
+			yellowFullRectCursor = true;
+		}
+
+
 		int markerIndex = 0;
 		if (timer::timer600 % 30 < 5) { markerIndex = 0; }
 		else if (timer::timer600 % 30 < 10) { markerIndex = 1; }
@@ -64,24 +86,28 @@ public:
 		else if (timer::timer600 % 30 < 20) { markerIndex = 3; }
 		else if (timer::timer600 % 30 < 25) { markerIndex = 4; }
 
-		//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 표시
-		for (int i = 0; i < selectableCoord.size(); i++)
+		if (displaySelectableCursor)
 		{
-			int revX = Player::ins()->getGridX() - selectableCoord[i][axis::x];
-			int revY = Player::ins()->getGridY() - selectableCoord[i][axis::y];
+			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 옐로커서로 표시
+			for (int i = 0; i < selectableCoord.size(); i++)
+			{
+				int revX = Player::ins()->getGridX() - selectableCoord[i][axis::x];
+				int revY = Player::ins()->getGridY() - selectableCoord[i][axis::y];
 
-			setZoom(zoomScale);
-			drawSpriteCenter
-			(
-				spr::yellowMarker,
-				markerIndex,
-				cameraW / 2 + zoomScale * ((16 * revX + 8) - cameraX),
-				cameraH / 2 + zoomScale * ((16 * revY + 8) - cameraY)
-			);
-			setZoom(1.0);
+				setZoom(zoomScale);
+				drawSpriteCenter
+				(
+					spr::yellowMarker,
+					markerIndex,
+					cameraW / 2 + zoomScale * ((16 * revX + 8) - cameraX),
+					cameraH / 2 + zoomScale * ((16 * revY + 8) - cameraY)
+				);
+				setZoom(1.0);
+			}
 		}
 
-		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false)
+
+		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&quickSlotRegion) == false)
 		{
 			int revX, revY, revGridX, revGridY;
 			if (inputType == input::touch)
@@ -100,13 +126,41 @@ public:
 			revGridY = revY / (16 * zoomScale);
 
 			setZoom(zoomScale);
-			drawSpriteCenter
-			(
-				spr::blueMarker,
-				markerIndex,
-				(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
-				(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
-			);
+
+			auto drawGridRect = [](int inputRevX, int inputRevY, SDL_Color inputCol, Uint8 inputAlpha)
+				{
+					double tileSize = 16 * zoomScale;
+					SDL_Rect dst;
+					dst.x = cameraW / 2 + zoomScale * ((16 * inputRevX)) - ((16 * zoomScale) / 2);
+					dst.y = cameraH / 2 + zoomScale * ((16 * inputRevY)) - ((16 * zoomScale) / 2);
+					dst.w = tileSize;
+					dst.h = tileSize;
+					drawFillRect(dst, inputCol, inputAlpha);
+				};
+
+			if (yellowFullRectCursor)
+			{
+				for (int dx = -2; dx <= 2; dx++)
+				{
+					for (int dy = -2; dy <= 2; dy++)
+					{
+						if (std::abs(dx) <= 1 && std::abs(dy) <= 1) drawGridRect(revGridX + dx, revGridY + dy, col::yellow, 120);
+						else drawGridRect(revGridX + dx, revGridY + dy, col::yellow, 60);
+					}
+				}
+			}
+			else
+			{
+				drawSpriteCenter
+				(
+					spr::cursorMarker,
+					markerIndex,
+					(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
+					(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
+				);
+			}
+
+
 			setZoom(1.0);
 		}
 
@@ -124,8 +178,18 @@ public:
 		}
 		else
 		{
-			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false)
+			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&quickSlotRegion) == false)
 			{
+				//터치한 좌표를 얻어내는 부분
+				int cameraGridX, cameraGridY;
+				if (cameraX >= 0) cameraGridX = cameraX / 16;
+				else cameraGridX = -1 + cameraX / 16;
+				if (cameraY >= 0) cameraGridY = cameraY / 16;
+				else cameraGridY = -1 + cameraY / 16;
+
+				int camDelX = cameraX - (16 * cameraGridX + 8);
+				int camDelY = cameraY - (16 * cameraGridY + 8);
+
 				int revX, revY, revGridX, revGridY;
 				if (inputType == input::touch)
 				{
@@ -137,14 +201,18 @@ public:
 					revX = event.motion.x - (cameraW / 2);
 					revY = event.motion.y - (cameraH / 2);
 				}
-				revX += sgn(revX) * (8 * zoomScale);
+				revX += sgn(revX) * (8 * zoomScale) + camDelX;
 				revGridX = revX / (16 * zoomScale);
-				revY += sgn(revY) * (8 * zoomScale);
+				revY += sgn(revY) * (8 * zoomScale) + camDelY;
 				revGridY = revY / (16 * zoomScale);
 
 				//상대좌표를 절대좌표로 변환
-				int throwingX = Player::ins()->getGridX() + revGridX;
-				int throwingY = Player::ins()->getGridY() + revGridY;
+				clickTile.x = cameraGridX + revGridX;
+				clickTile.y = cameraGridY + revGridY;
+
+				//상대좌표를 절대좌표로 변환
+				int throwingX = clickTile.x;
+				int throwingY = clickTile.y;
 				int throwingZ = Player::ins()->getGridZ();
 				std::wstring xStr = std::to_wstring(throwingX);
 				std::wstring yStr = std::to_wstring(throwingY);

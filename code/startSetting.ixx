@@ -702,5 +702,6 @@ export void startSetting()
 
 	World::ins()->createSector(0, 0, 0);
 
-	playerPtr->updateVision(playerPtr->getEyeSight());
+	Player::ins()->updateVision(Player::ins()->getEyeSight());
+	Player::ins()->updateMinimap();
 };

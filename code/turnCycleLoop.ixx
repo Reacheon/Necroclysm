@@ -21,6 +21,7 @@ import turnWait;
 import dirToXY;
 import globalTime;
 
+
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
 __int64 playerInputTurn(), animationTurn(), entityAITurn();
@@ -177,6 +178,18 @@ __int64 playerInputTurn()
 				break;
 			case SDL_FINGERUP:
 				if (inputType == input::touch) { clickUp(); }
+				break;
+			case SDL_MOUSEWHEEL:
+				if (event.wheel.y > 0) 
+				{
+					zoomScale += 1;
+					if (zoomScale > 5.0) zoomScale = 5;
+				}
+				else if (event.wheel.y < 0) 
+				{
+					zoomScale -= 1;
+					if (zoomScale < 1.0) zoomScale = 1;
+				}
 				break;
 			case SDL_KEYDOWN:
 				if (exInput == true && event.key.keysym.sym == UNI::BACKSPACE)

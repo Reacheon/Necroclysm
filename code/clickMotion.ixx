@@ -41,4 +41,10 @@ export void clickMotion()
 	}
 
 	GUI::getActiveGUIList()[GUI::getActiveGUIList().size() - 1]->clickMotionGUI(dx,dy);
+
+	if (click)
+	{
+		prevMouseX4Motion = event.motion.x;
+		prevMouseY4Motion = event.motion.y;
+	}
 }
