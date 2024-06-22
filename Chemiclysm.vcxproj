@@ -172,6 +172,7 @@
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Flame.ixx" />
+    <ClCompile Include="code\Gas.ixx" />
     <ClCompile Include="code\God.ixx" />
     <ClCompile Include="code\HUD.ixx" />
     <ClCompile Include="code\initCoordTransform.ixx" />

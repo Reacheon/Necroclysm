@@ -1142,3 +1142,11 @@ export enum class flameFlag
     NORMAL,
     BIG,
 };
+
+export enum class gasFlag
+{
+    NONE,
+    SMALL,
+    NORMAL,
+    BIG,
+};

@@ -417,5 +417,8 @@
     <ClCompile Include="code\Flame.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="code\Gas.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
