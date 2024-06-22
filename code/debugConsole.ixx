@@ -11,6 +11,7 @@ import Monster;
 import Vehicle;
 import Sticker;
 import Light;
+import Flame;
 
 export void debugConsole()
 {
@@ -22,7 +23,7 @@ export void debugConsole()
 	prt(L"2.적 생성\n");
 	prt(L"3.테스트 로그 갱신\n");
 	prt(L"4.아이템 생성\n");
-	prt(L"5.맵핵\n");
+	prt(L"5.불 생성\n");
 	prt(L"6.EntityPtr 콘솔 출력\n");
 	prt(L"7.벽 생성\n");
 	prt(L"8.로그 타이머 비활성화/활성화\n");
@@ -109,9 +110,34 @@ export void debugConsole()
 	}
 	case 5: //맵핵
 	{
-		updateLog(L"#FFFFFF디버그 : 맵을 밝혔다.");
-		(Player::ins())->updateMinimap();
-		prt(L"[디버그]미니맵을 밝혔다!\n");
+		int xp = Player::ins()->getGridX();
+		int yp = Player::ins()->getGridY();
+		int zp = Player::ins()->getGridZ();
+		int inputX;
+		int inputY;
+		int fireSize;
+		prt(L"[상대 좌표]\n");
+		prt(L"생성할 불의 크기를 입력해주세요.(1~3)\n");
+		std::cin >> fireSize;
+		prt(L"생성할 화염의 x 좌표를 입력하세요.\n");
+		std::cin >> inputX;
+		prt(L"생성할 화염의 y 좌표를 입력하세요.\n");
+		std::cin >> inputY;
+
+		switch (fireSize)
+		{
+		case 1:
+			new Flame(xp + inputX, yp + inputY, zp, flameFlag::SMALL);
+			break;
+		case 2:
+			new Flame(xp + inputX, yp + inputY, zp, flameFlag::NORMAL);
+			break;
+		case 3:
+			new Flame(xp + inputX, yp + inputY, zp, flameFlag::BIG);
+			break;
+		}
+		updateLog(L"#FFFFFF화염을 생성했다.");
+		prt(L"[디버그]화염을 생성했다.\n");
 		break;
 	}
 	case 6: //entityPtr 출력

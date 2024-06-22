@@ -19,6 +19,8 @@ export struct TileData //총용량 29바이트
     unsigned __int16 plantCounter = 0; // 0 ~  65535 비옥도나 성장환경에 따라 가산되는 카운터(얼마나 잘 성장하는 중인지)
     unsigned __int16 plantDay = 0; //심은지 지난 날짜 0~65535
 
+    void* flamePtr = nullptr;
+    
     //시야 관련
     bool blocker = false;
     fovFlag fov = fovFlag::black;
@@ -38,6 +40,7 @@ export struct TileData //총용량 29바이트
     void* VehiclePtr = nullptr;
     void* PropPtr = nullptr;
 
+    unsigned __int16 randomVal = 0;
 
     void update()
     {

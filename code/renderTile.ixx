@@ -23,6 +23,7 @@ import Prop;
 import globalTime;
 import Drawable;
 import TileData;
+import Flame;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, playerZ, markerIndex;
@@ -92,6 +93,7 @@ std::unordered_map<std::array<int, 2>, TileData*, decltype(arrayHasher2)> tileCa
 std::vector<Point2> tileList;
 std::vector<Point2> itemList;
 std::vector<Point2> floorPropList;
+std::vector<Flame*> flameList;
 uniqueVector<Drawable*> renderVehList;
 uniqueVector<Drawable*> renderEntityList;
 std::vector<Point2> blackFogList;
@@ -126,6 +128,7 @@ export __int64 renderTile()
 	grayFogList.clear();
 	lightFogList.clear();
 	tileCache.clear();
+	flameList.clear();
 
 	//tileList.reserve(10000);
 	//itemList.reserve(10000);
@@ -182,6 +185,10 @@ __int64 analyseRender()
 			Prop* fpPtr = (Prop*)thisTile->PropPtr;
 			if (fpPtr != nullptr && fpPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) floorPropList.push_back({ tgtX,tgtY });
 
+			//화염
+			Flame* flamePtr = (Flame*)thisTile->flamePtr;
+			if (flamePtr != nullptr ) flameList.push_back(flamePtr);
+			
 			//차량
 			Drawable* vPtr = (Drawable*)((Vehicle*)(thisTile->VehiclePtr));
 			if (vPtr != nullptr) renderVehList.insert(vPtr);
@@ -196,6 +203,8 @@ __int64 analyseRender()
 			if (ePtr != nullptr) renderEntityList.insert(ePtr);
 			//추가로 렌더링되는 객체(화면밖)
 			for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.insert((Drawable*)(Entity*)(*it));
+
+
 
 			//안개
 			if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
@@ -486,6 +495,44 @@ __int64 drawEntities()
 		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
 		setZoom(1.0);
 	}
+
+	//화염 그리기
+	for (int i = 0; i < flameList.size(); i++)
+	{
+		Flame* tgtFlame = flameList[i];
+		int tgtX = tgtFlame->gridX;
+		int tgtY = tgtFlame->gridY;
+
+		SDL_Rect dst;
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+
+		setZoom(zoomScale);
+		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+		SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+		int sprIndex = 0;
+		int animeVal = timer::timer600 % 30;
+		if (animeVal < 6) sprIndex += 0;
+		else if (animeVal < 12) sprIndex += 1;
+		else if (animeVal < 18) sprIndex += 2;
+		else if (animeVal < 24) sprIndex += 3;
+		else sprIndex += 4;
+		sprIndex += tgtFlame->sprRandomStart;
+		sprIndex = sprIndex % 5;
+
+		drawSpriteCenter
+		(
+			spr::flameSet,
+			tgtFlame->sprInfimum + sprIndex,
+			dst.x + dst.w / 2 + zoomScale,
+			dst.y + dst.h / 2 + zoomScale
+		);
+		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+		setZoom(1.0);
+	}
+
 
 	std::vector<std::array<int, 2>> rotorList;
 	for (int i = 0; i < renderVehList.size(); i++) renderVehList[i]->drawSelf();

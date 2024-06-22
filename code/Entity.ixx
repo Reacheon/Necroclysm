@@ -26,6 +26,7 @@ import Drawable;
 import drawSprite;
 import SkillData;
 //import CoordSelect;
+import Flame;
 
 export class Entity : public Ani, public Coord, public Drawable//엔티티는 시야 기능과 개인 FOV, 현재 좌표, 그리고 화면에 표시되는 기능과 고유 텍스쳐를 가진다.
 {
@@ -1440,12 +1441,31 @@ public:
 			{
 			case 1:
 				new Sticker(false, getX() + (16 * (getSkillTarget().x - getGridX())), getY() + (16 * (getSkillTarget().y - getGridY())), spr::fireStorm, 0, stickerID, true);
+				new Flame(getSkillTarget().x, getSkillTarget().y, getGridZ(), flameFlag::BIG);
+
+
 				break;
 			case 5:
 				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
+
+				new Flame(getSkillTarget().x + 1, getSkillTarget().y, getGridZ(), flameFlag::NORMAL);
+				new Flame(getSkillTarget().x - 1, getSkillTarget().y, getGridZ(), flameFlag::NORMAL);
+				new Flame(getSkillTarget().x, getSkillTarget().y + 1, getGridZ(), flameFlag::NORMAL);
+				new Flame(getSkillTarget().x, getSkillTarget().y - 1, getGridZ(), flameFlag::NORMAL);
+
+
 				break;
 			case 9:
 				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
+
+				new Flame(getSkillTarget().x, getSkillTarget().y - 2, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x - 1, getSkillTarget().y - 1, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x - 2, getSkillTarget().y, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x - 1, getSkillTarget().y + 1, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x, getSkillTarget().y + 2, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x + 1, getSkillTarget().y + 1, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x + 2, getSkillTarget().y, getGridZ(), flameFlag::SMALL);
+				new Flame(getSkillTarget().x + 1, getSkillTarget().y - 1, getGridZ(), flameFlag::SMALL);
 				break;
 			case 13:
 				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(3);

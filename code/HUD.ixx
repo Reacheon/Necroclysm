@@ -666,6 +666,7 @@ public:
 			else if (Player::ins()->getSpriteInfimum() == sprInf::run) Player::ins()->setSpriteInfimum(sprInf::sit);
 			else if (Player::ins()->getSpriteInfimum() == sprInf::sit) Player::ins()->setSpriteInfimum(sprInf::crawl);
 			else if (Player::ins()->getSpriteInfimum() == sprInf::crawl)Player::ins()->setSpriteInfimum(sprInf::walk);
+			Player::ins()->setSpriteIndex(Player::ins()->getSpriteInfimum());
 			break;
 		case act::craft:
 			updateLog(L"#FFFFFF조합 창을 열었다.");

@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 		if (delayTime >= constDelay) delayTime = constDelay; // 만약 루프 시간이 음수(오류)가 나왔을 경우
 		else if (delayTime < 0) delayTime = 0;
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
-		renderFPS(getNanoTimer() - loopStart);
+		//renderFPS(getNanoTimer() - loopStart);
 		SDL_RenderPresent(renderer);
 	}
 

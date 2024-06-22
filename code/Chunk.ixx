@@ -19,6 +19,14 @@ public:
 	{
 		//prt(lowCol::green, L"Chunk : 생성자가 호출되었습니다..\n");
 		
+		for (int x = 0; x < chunkSizeX; x++)
+		{
+			for (int y = 0; y < chunkSizeY; y++)
+			{
+				singleTile[x][y].randomVal = randomRange(0, 65535);
+			}
+		}
+
 		if (input == chunkFlag::seawater)
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");

@@ -569,7 +569,7 @@ public:
                     //[반복문] 계산된 방향과 속도값으로 trainMoveVec을 순서대로 채워넣음
                     for (int i = 0; i < trainSpdVal; i++)
                     {
-                        prt(L"[Vehicle:train %p] (%d,%d,%d) 커서에서 열차 이동 루프가 실행됨\n", this, trainCursorX, trainCursorY, trainCursorZ);
+                        //prt(L"[Vehicle:train %p] (%d,%d,%d) 커서에서 열차 이동 루프가 실행됨\n", this, trainCursorX, trainCursorY, trainCursorZ);
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         //1. 열차의 현재 위치에 따라 속도의 방향 수정////////////////////////////////////////////////////////////////////
@@ -747,7 +747,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dx, trainCursorY - getGridY() + dy) == true)
                             {
-                                prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                                //prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;
@@ -763,7 +763,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dxLeft, trainCursorY - getGridY() + dyLeft) == true)
                             {
-                                prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                                //prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;
@@ -779,7 +779,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dxRight, trainCursorY - getGridY() + dyRight) == true)
                             {
-                                prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                                //prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;

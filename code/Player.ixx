@@ -195,7 +195,7 @@ public:
 	{
 		//updateVison은 렉을 유발하지 않는다. 시야가 7에서 8이어도 순간적인 0.5ns의 딜레이만 유발한다
 		//__int64 timeStampStart = getNanoTimer();
-		prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
+		//prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
 
 		int correctionRange = range;
 		if (getHour() >= 6 && getHour() < 18) correctionRange = range;
@@ -205,8 +205,8 @@ public:
 		{
 			for (int j = cy - userVisionHalfH; j <= cy + userVisionHalfH; j++)
 			{
-				TileData& tgtTile = World::ins()->getTile(i, j, getGridZ());
-				if (tgtTile.fov == fovFlag::white) tgtTile.fov = fovFlag::gray;
+				TileData* tgtTile = &World::ins()->getTile(i, j, getGridZ());
+				if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;
 			}
 		}
 

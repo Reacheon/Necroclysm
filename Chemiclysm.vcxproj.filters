@@ -414,5 +414,8 @@
     <ClCompile Include="code\drawPrimitive.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
+    <ClCompile Include="code\Flame.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

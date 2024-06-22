@@ -1134,3 +1134,11 @@ export enum class CoordSelectFlag
     SINGLE_TARGET_SKILL,
     FIRESTORM,
 };
+
+export enum class flameFlag
+{
+    NONE,
+    SMALL,
+    NORMAL,
+    BIG,
+};

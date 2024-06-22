@@ -141,4 +141,5 @@ export namespace spr
 	Sprite* skillSet = nullptr;
 
 	Sprite* fireStorm = nullptr;
+	Sprite* flameSet = nullptr;
 }
