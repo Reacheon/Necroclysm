@@ -1814,7 +1814,7 @@ public:
 				{
 					if (World::ins()->getTile(Player::ins()->getGridX() + tgtX, Player::ins()->getGridY() + tgtY, Player::ins()->getGridZ()).fov == fovFlag::white)
 					{
-						coordList.push_back({ tgtX,tgtY });
+						coordList.push_back({ Player::ins()->getGridX() + tgtX, Player::ins()->getGridY() + tgtY });
 
 					}
 				}

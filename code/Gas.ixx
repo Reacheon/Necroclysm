@@ -6,7 +6,6 @@ import TileData;
 import constVar;
 import globalVar;
 import World;
-import Light;
 
 export struct Gas
 {
@@ -35,15 +34,12 @@ export struct Gas
             {
             default:
             case gasFlag::SMALL:
-                lightPtr = new Light(inputGridX, inputGridY, inputGridZ, 1, 30, lowCol::orange);
                 sprInfimum = 15;
                 break;
             case gasFlag::NORMAL:
-                lightPtr = new Light(inputGridX, inputGridY, inputGridZ, 2, 50, lowCol::orange);
                 sprInfimum = 10;
                 break;
             case gasFlag::BIG:
-                lightPtr = new Light(inputGridX, inputGridY, inputGridZ, 3, 70, lowCol::orange);
                 sprInfimum = 5;
                 break;
             }

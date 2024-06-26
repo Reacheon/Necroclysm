@@ -27,7 +27,7 @@ import initCoordTransform;
 
 int main(int argc, char** argv)
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	std::locale::global(std::locale("korean"));
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();

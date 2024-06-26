@@ -122,8 +122,17 @@ namespace csvItem
 
     constexpr int animeSize = 87;
     constexpr int animeFPS = 88;
-    constexpr int randomSprSize = 89;
+    constexpr int randomPropSprSize = 89;
     constexpr int growthThreshold = 90;
+
+    constexpr int molecularWeight = 91;
+    constexpr int liqColorR = 92;
+    constexpr int liqColorG = 93;
+    constexpr int liqColorB = 94;
+    constexpr int gasColorR = 95;
+    constexpr int gasColorG = 96;
+    constexpr int gasColorB = 97;
+    constexpr int gasAlphaMax = 98;
 
 };
 
@@ -781,10 +790,34 @@ export int readItemDex(const wchar_t* file)
                         case csvItem::animeFPS:
                             itemDex[arrayCounter / (csvWidth)-1].animeFPS = wtoi(strFragment.c_str());
                             break;
-                        case csvItem::randomSprSize:
-                            itemDex[arrayCounter / (csvWidth)-1].randomSprSize = wtoi(strFragment.c_str());
+                        case csvItem::randomPropSprSize:
+                            itemDex[arrayCounter / (csvWidth)-1].randomPropSprSize = wtoi(strFragment.c_str());
                             break;
                         case csvItem::growthThreshold:
+                            break;
+                        case csvItem::molecularWeight:
+                            itemDex[arrayCounter / (csvWidth)-1].molecularWeight = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::liqColorR:
+                            itemDex[arrayCounter / (csvWidth)-1].liqColorR = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::liqColorG:
+                            itemDex[arrayCounter / (csvWidth)-1].liqColorG = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::liqColorB:
+                            itemDex[arrayCounter / (csvWidth)-1].liqColorB = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::gasColorR:
+                            itemDex[arrayCounter / (csvWidth)-1].gasColorR = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::gasColorG:
+                            itemDex[arrayCounter / (csvWidth)-1].gasColorG = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::gasColorB:
+                            itemDex[arrayCounter / (csvWidth)-1].gasColorB = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::gasAlphaMax:
+                            itemDex[arrayCounter / (csvWidth)-1].gasAlphaMax = wtoi(strFragment.c_str());
                             break;
                         default:
                             prt(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

@@ -126,7 +126,18 @@ export struct ItemData
 
     __int8 animeSize = 1;
     __int8 animeFPS = 0;
-    __int8 randomSprSize = 1;
+    __int8 randomPropSprSize = 1;
+
+    //liqColorR	liqColorG	liqColorB	gasColorR	gasColorG	gasColorB	gasAlphaMax	vaporP
+
+    unsigned __int16 molecularWeight = 0;
+    unsigned __int8 liqColorR = 255;
+    unsigned __int8 liqColorG = 255;
+    unsigned __int8 liqColorB = 255;
+    unsigned __int8 gasColorR = 255;
+    unsigned __int8 gasColorG = 255;
+    unsigned __int8 gasColorB = 255;
+    unsigned __int8 gasAlphaMax = 0; //가스연기의 짙은 정도, 만약 무색의 기체의 경우 값은 0
 
     ///////////////////비데이터베이스 변수////////////////////
 

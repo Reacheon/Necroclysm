@@ -44,6 +44,7 @@ public:
             //Player::ins()->updateVision(Player::ins()->getEyeSight());
         }
 
+
         deactivateAI();//차량을 제외하고 기본적으로 비활성화
 
         //주변 타일을 분석해 extraIndex 설정
@@ -55,6 +56,12 @@ public:
             Prop* targetProp = (Prop*)World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).PropPtr;
             if (targetProp != nullptr) targetProp->updateSprIndex();
         }
+
+        if (leadItem.randomPropSprSize != 1)
+        {
+            leadItem.propSprIndex += randomRange(0, leadItem.randomPropSprSize - 1);
+        }
+
         updateSprIndex();
     }
 

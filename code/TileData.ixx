@@ -1,5 +1,6 @@
 ﻿export module TileData;
 
+import std;
 import ItemData;
 import globalVar;
 import constVar;
@@ -7,8 +8,35 @@ import constVar;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
+struct gasData
+{
+    int gasCode = 0;
+    int gasVol = 0;
+
+    bool operator==(const gasData& other) const 
+    {
+        return gasCode == other.gasCode && gasVol == other.gasVol;
+    }
+};
+
+namespace std
+{
+    template<>
+    struct hash<gasData>
+    {
+        std::size_t operator()(const gasData& g) const
+        {
+            return std::hash<int>()(g.gasCode);
+        }
+    };
+}
+
+
 export struct TileData //총용량 29바이트
 {
+private:
+    std::unordered_set<gasData> gasSet;
+public:
     unsigned __int16 floor = 1;
     unsigned __int16 wall = 0;
     unsigned __int16 ceil = 0;
@@ -19,8 +47,7 @@ export struct TileData //총용량 29바이트
     unsigned __int16 plantCounter = 0; // 0 ~  65535 비옥도나 성장환경에 따라 가산되는 카운터(얼마나 잘 성장하는 중인지)
     unsigned __int16 plantDay = 0; //심은지 지난 날짜 0~65535
 
-    void* flamePtr = nullptr;
-    
+
     //시야 관련
     bool blocker = false;
     fovFlag fov = fovFlag::black;
@@ -39,8 +66,11 @@ export struct TileData //총용량 29바이트
     void* ItemStackPtr = nullptr;
     void* VehiclePtr = nullptr;
     void* PropPtr = nullptr;
+    void* flamePtr = nullptr;
+    void* gasPtr = nullptr;
 
     unsigned __int16 randomVal = 0;
+
 
     void update()
     {
@@ -81,6 +111,68 @@ export struct TileData //총용량 29바이트
         ceil = inputIndex;
         update();
     }
+
+    bool checkGas(int inputCode)
+    {
+        gasData temp;
+        temp.gasCode = inputCode;
+        return gasSet.find(temp) != gasSet.end();
+    }
+
+    int getGasVol(int inputCode)
+    {
+        gasData temp;
+        temp.gasCode = inputCode;
+        auto it = gasSet.find(temp);
+        return it->gasVol;
+    }
+
+    void setGasVol(int inputCode, int inputVal)
+    {
+        if (inputVal < 0) return;
+
+        gasData temp;
+        temp.gasCode = inputCode;
+        auto it = gasSet.find(temp);
+        if (it != gasSet.end())
+        {
+            gasData updatedGas = *it;
+            gasSet.erase(it);
+            updatedGas.gasVol = inputVal;
+            gasSet.insert(updatedGas);
+        }
+        else gasSet.insert({ inputCode, inputVal });
+    };
+
+    void addGasVol(int inputCode, int inputVal)
+    {
+        gasData temp;
+        temp.gasCode = inputCode;
+        auto it = gasSet.find(temp);
+        if (it != gasSet.end()) 
+        {
+            gasData updatedGas = *it;
+            gasSet.erase(it);
+            updatedGas.gasVol += inputVal;
+            gasSet.insert(updatedGas);
+        }
+        else gasSet.insert({ inputCode, inputVal });
+    };
+
+    void subGasVol(int inputCode, int inputVal)
+    {
+        gasData temp;
+        temp.gasCode = inputCode;
+        auto it = gasSet.find(temp);
+        if (it != gasSet.end())
+        {
+            gasData updatedGas = *it;
+            gasSet.erase(it);
+            updatedGas.gasVol -= inputVal;
+            if (updatedGas.gasVol > 0) gasSet.insert(updatedGas);
+        }
+    };
+
 };
 
 //식물 성장

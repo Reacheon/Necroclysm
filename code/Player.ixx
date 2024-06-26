@@ -40,6 +40,9 @@ public:
 
 		int i = 0;
 
+		getEquipPtr()->itemInfo.push_back(itemDex[2]);
+		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+
 		getEquipPtr()->itemInfo.push_back(itemDex[290]);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 

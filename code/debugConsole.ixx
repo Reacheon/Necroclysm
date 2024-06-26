@@ -15,6 +15,10 @@ import Flame;
 
 export void debugConsole()
 {
+	int xp = Player::ins()->getGridX();
+	int yp = Player::ins()->getGridY();
+	int zp = Player::ins()->getGridZ();
+
 	updateLog(L"#FFFFFF디버그 테스트 기능을 실행했다.");
 	prt(L"////////////////////////////////////////\n");
 	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
@@ -29,7 +33,7 @@ export void debugConsole()
 	prt(L"8.로그 타이머 비활성화/활성화\n");
 	prt(L"9.로그 클리어\n");
 	prt(L"10.고정 텍스쳐 생성\n");
-	prt(L"11.????\n");
+	prt(L"11.가스 생성\n");
 	prt(L"12. 이큅 1번 제자리 드롭\n");
 	prt(L"13. 달리기 토글\n");
 	prt(L"14. 경험치 획득\n");
@@ -110,9 +114,6 @@ export void debugConsole()
 	}
 	case 5: //맵핵
 	{
-		int xp = Player::ins()->getGridX();
-		int yp = Player::ins()->getGridY();
-		int zp = Player::ins()->getGridZ();
 		int inputX;
 		int inputY;
 		int fireSize;
@@ -160,9 +161,6 @@ export void debugConsole()
 	}
 	case 7: //create wall
 	{
-		int xp = Player::ins()->getGridX();
-		int yp = Player::ins()->getGridY();
-		int zp = Player::ins()->getGridZ();
 		int wallX;
 		int wallY;
 		int wallZ;
@@ -204,8 +202,18 @@ export void debugConsole()
 		//new Sticker(false, Player::ins()->getX(), Player::ins()->y - 16, spr::defaultStranger, 0, L"123DEPTHTEST", true);
 		break;
 	}
-	case 11: // ??
+	case 11: // 가스 생성
 	{
+		int gasCode, gasVol;
+		prt(L"[상대 좌표]\n");
+		prt(L"생성할 가스의 아이템 코드를 입력해주세요.\n");
+		std::cin >> gasCode;
+		prt(L"생성할 가스의 부피를 입력해주세요.\n");
+		std::cin >> gasVol;
+		if (World::ins()->getTile(xp, yp, zp).checkGas(gasCode) == false)
+		{
+			World::ins()->getTile(xp, yp, zp).setGasVol(gasCode, gasVol);
+		}
 		break;
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
@@ -221,22 +229,10 @@ export void debugConsole()
 	}
 	case 13:
 	{
-		if (Player::ins()->getSpriteInfimum() == sprInf::walk)
-		{
-			Player::ins()->setSpriteInfimum(sprInf::run);
-		}
-		else if (Player::ins()->getSpriteInfimum() == sprInf::run)
-		{
-			Player::ins()->setSpriteInfimum(sprInf::sit);
-		}
-		else if (Player::ins()->getSpriteInfimum() == sprInf::sit)
-		{
-			Player::ins()->setSpriteInfimum(sprInf::crawl);
-		}
-		else if (Player::ins()->getSpriteInfimum() == sprInf::crawl)
-		{
-			Player::ins()->setSpriteInfimum(sprInf::walk);
-		}
+		if (Player::ins()->getSpriteInfimum() == sprInf::walk) Player::ins()->setSpriteInfimum(sprInf::run);
+		else if (Player::ins()->getSpriteInfimum() == sprInf::run) Player::ins()->setSpriteInfimum(sprInf::sit);
+		else if (Player::ins()->getSpriteInfimum() == sprInf::sit) Player::ins()->setSpriteInfimum(sprInf::crawl);
+		else if (Player::ins()->getSpriteInfimum() == sprInf::crawl) Player::ins()->setSpriteInfimum(sprInf::walk);
 		break;
 	}
 	case 14:
@@ -277,9 +273,6 @@ export void debugConsole()
 	}
 	case 18: //fov 출력
 	{
-		int xp = Player::ins()->getGridX();
-		int yp = Player::ins()->getGridY();
-		int zp = Player::ins()->getGridZ();
 		for (int y = yp - 8; y <= yp + 8; y++)
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
@@ -316,7 +309,6 @@ export void debugConsole()
 	case 21: //날씨 변경
 	{
 		int cx, cy;
-		int pz = Player::ins()->getGridZ();
 		World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
 
 		int tgtWeather;
@@ -327,11 +319,11 @@ export void debugConsole()
 		prt(L" 4. 천둥\n");
 		prt(L" 5. 눈\n");
 		std::cin >> tgtWeather;
-		if (tgtWeather == 1) World::ins()->setChunkWeather(cx, cy, pz, weatherFlag::sunny);
-		else if (tgtWeather == 2) World::ins()->setChunkWeather(cx, cy, pz, weatherFlag::cloudy);
-		else if (tgtWeather == 3) World::ins()->setChunkWeather(cx, cy, pz, weatherFlag::rain);
-		else if (tgtWeather == 4) World::ins()->setChunkWeather(cx, cy, pz, weatherFlag::storm);
-		else if (tgtWeather == 5) World::ins()->setChunkWeather(cx, cy, pz, weatherFlag::snow);
+		if (tgtWeather == 1) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::sunny);
+		else if (tgtWeather == 2) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::cloudy);
+		else if (tgtWeather == 3) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::rain);
+		else if (tgtWeather == 4) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::storm);
+		else if (tgtWeather == 5) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::snow);
 		prt(L" 날씨를 성공적으로 변경했다! \n");
 		break;
 	}

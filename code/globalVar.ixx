@@ -205,3 +205,9 @@ export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, an
         addAniUSet(tgtPtr, inputType);
         turnCycle = turn::monsterAnime;
     };
+
+export enum flag gasType
+{
+
+};
+

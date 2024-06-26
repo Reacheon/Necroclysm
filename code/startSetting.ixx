@@ -485,6 +485,13 @@ export void startSetting()
 	new Prop(pX, pY - 20, pZ, 237);//º¢²É³«¿± ¼³Ä¡
 
 
+	new Prop(pX + 3, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 3 + 1, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 3 + 2, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 3 + 1, pY + 3 + 1, pZ, 338);//°íÃ¶ ¼³Ä¡
+
+
+
 	//ÀÜµð
 	World::ins()->getTile(pX + -2, pY + 3, pZ).floor = 220;
 	World::ins()->getTile(pX + -1, pY + 3, pZ).floor = 220;
