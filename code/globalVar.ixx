@@ -206,8 +206,30 @@ export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, an
         turnCycle = turn::monsterAnime;
     };
 
-export enum flag gasType
+export struct gasData
 {
+    int gasCode = 0;
+    int gasVol = 0;
 
+    bool operator==(const gasData& other) const
+    {
+        return gasCode == other.gasCode && gasVol == other.gasVol;
+    }
 };
 
+//▼ 해시함수 모음
+namespace std
+{
+    template<>
+    struct hash<gasData>
+    {
+        std::size_t operator()(const gasData& g) const
+        {
+            return std::hash<int>()(g.gasCode);
+        }
+    };
+}
+
+//전방선언
+
+export void turnWait(float waitTime);

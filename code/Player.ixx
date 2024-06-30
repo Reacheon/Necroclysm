@@ -10,7 +10,6 @@ import globalVar;
 import textureVar;
 import constVar;
 import log;
-import turnWait;
 import ItemData;
 import nanoTimer;
 import globalTime;
@@ -53,6 +52,9 @@ public:
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
 		getEquipPtr()->itemInfo.push_back(itemDex[107]);
+		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+
+		getEquipPtr()->itemInfo.push_back(itemDex[374]);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
 		addSkill(27);
@@ -204,6 +206,7 @@ public:
 		if (getHour() >= 6 && getHour() < 18) correctionRange = range;
 		else correctionRange = range / 2;
 
+		//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
 		for (int i = cx - userVisionHalfW; i <= cx + userVisionHalfW; i++)
 		{
 			for (int j = cy - userVisionHalfH; j <= cy + userVisionHalfH; j++)

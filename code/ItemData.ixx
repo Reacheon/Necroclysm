@@ -130,7 +130,7 @@ export struct ItemData
 
     //liqColorR	liqColorG	liqColorB	gasColorR	gasColorG	gasColorB	gasAlphaMax	vaporP
 
-    unsigned __int16 molecularWeight = 0;
+    unsigned __int16 molecularWeight = 1;
     unsigned __int8 liqColorR = 255;
     unsigned __int8 liqColorG = 255;
     unsigned __int8 liqColorB = 255;

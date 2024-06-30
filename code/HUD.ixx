@@ -1030,6 +1030,13 @@ public:
 							tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
 							tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
 							tgtProp->leadItem.extraSprIndexSingle++;
+
+							if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+							{
+								tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+								tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+							}
+
 							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->getEyeSight());
 							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(),Player::ins()->getGridZ());
@@ -1557,6 +1564,12 @@ public:
 				Prop* tgtProp = (Prop*)World::ins()->getTile(inputX, inputY, inputZ).PropPtr;
 				tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
 				tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
+
+				if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_OFF))
+				{
+					tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+					tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+				}
 
 				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);

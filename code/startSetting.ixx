@@ -86,11 +86,12 @@ export void startSetting()
 		}
 	}
 
-	for (int dx = -6; dx >= -10; dx--)
+	for (int dx = -6; dx >= -14; dx--)
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			World::ins()->getTile(pX + dx, pY + dy, pZ).floor = 296;
+			if (dx == -10 && ((dy + 30) % 6 < 3)) World::ins()->getTile(pX + dx, pY + dy, pZ).floor = 377;//³ë¶û¾Æ½ºÆÈÆ®
+			else World::ins()->getTile(pX + dx, pY + dy, pZ).floor = 296;//°ËÁ¤¾Æ½ºÆÈÆ®
 		}
 	}
 
@@ -104,31 +105,34 @@ export void startSetting()
 	World::ins()->getTile(pX + 2, pY, pZ).floor = 293;
 	World::ins()->getTile(pX + 2, pY + 1, pZ).floor = 293;
 	World::ins()->getTile(pX + 3, pY + 1, pZ).floor = 293;
+	World::ins()->getTile(pX + 4, pY + 1, pZ).floor = 293;
+	World::ins()->getTile(pX + 4, pY + 2, pZ).floor = 293;
+	for(int i=0; i<9; i++) World::ins()->getTile(pX + 5 + i, pY + 2, pZ).floor = 293;
 
 	//³ª¹«º® ¼³Ä¡
 	//Áý ÇÏ´Ü 5Å¸ÀÏ
-	World::ins()->getTile(pX - 1, pY - 2, pZ).setWall(110);
-	World::ins()->getTile(pX - 2, pY - 2, pZ).setWall(110);
+	World::ins()->getTile(pX - 1, pY - 2, pZ).setWall(375);
+	World::ins()->getTile(pX - 2, pY - 2, pZ).setWall(375);
 	new Prop(pX - 3, pY - 2, pZ, 291);//³ª¹«¹® ¼³Ä¡
-	World::ins()->getTile(pX - 4, pY - 2, pZ).setWall(110);
-	World::ins()->getTile(pX - 5, pY - 2, pZ).setWall(110);
+	World::ins()->getTile(pX - 4, pY - 2, pZ).setWall(375);
+	World::ins()->getTile(pX - 5, pY - 2, pZ).setWall(375);
 
 	//Áý ¿ìÃø 4Å¸ÀÏ
-	World::ins()->getTile(pX - 1, pY - 3, pZ).setWall(110);
+	World::ins()->getTile(pX - 1, pY - 3, pZ).setWall(375);
 	World::ins()->getTile(pX - 1, pY - 4, pZ).setWall(114);
-	World::ins()->getTile(pX - 1, pY - 5, pZ).setWall(110);
-	World::ins()->getTile(pX - 1, pY - 6, pZ).setWall(110);
+	World::ins()->getTile(pX - 1, pY - 5, pZ).setWall(375);
+	World::ins()->getTile(pX - 1, pY - 6, pZ).setWall(375);
 
 	//Áý ÁÂÃø 4Å¸ÀÏ
-	World::ins()->getTile(pX - 5, pY - 3, pZ).setWall(110);
+	World::ins()->getTile(pX - 5, pY - 3, pZ).setWall(375);
 	World::ins()->getTile(pX - 5, pY - 4, pZ).setWall(114);
-	World::ins()->getTile(pX - 5, pY - 5, pZ).setWall(110);
-	World::ins()->getTile(pX - 5, pY - 6, pZ).setWall(110);
+	World::ins()->getTile(pX - 5, pY - 5, pZ).setWall(375);
+	World::ins()->getTile(pX - 5, pY - 6, pZ).setWall(375);
 
 	//Àâ »ó´Ü Áß¾Ó 3Å¸ÀÏ
-	World::ins()->getTile(pX - 2, pY - 6, pZ).setWall(110);
-	World::ins()->getTile(pX - 3, pY - 6, pZ).setWall(110);
-	World::ins()->getTile(pX - 4, pY - 6, pZ).setWall(110);
+	World::ins()->getTile(pX - 2, pY - 6, pZ).setWall(375);
+	World::ins()->getTile(pX - 3, pY - 6, pZ).setWall(375);
+	World::ins()->getTile(pX - 4, pY - 6, pZ).setWall(375);
 
 	new Prop(pX - 4, pY - 5, pZ, 295);//Ã¥Àå
 	new Prop(pX - 2, pY - 5, pZ, 294);//Ä§´ë
@@ -144,6 +148,29 @@ export void startSetting()
 
 	new Prop(pX - 2, pY - 3, pZ, 299);//ÇÏ°­°è´Ü
 
+
+	//Ã¶Á¶¸Á
+	for (int i = 0; i < 17; i++)//»ó´Ü
+	{
+		World::ins()->getTile(pX - 5 + i, pY - 9, pZ).setWall(376);
+	}
+
+	for (int i = 0; i < 20; i++)//¿ìÃø
+	{
+		if (pY - 8 + i != 1 && pY - 8 + i != 2 && pY - 8 + i != 3)
+		{
+			World::ins()->getTile(pX + 11, pY - 8 + i, pZ).setWall(376);
+		}
+	}
+
+	for (int i = 0; i < 17; i++)//»ó´Ü
+	{
+		World::ins()->getTile(pX + 11 - i, pY + 12, pZ).setWall(376);
+	}
+
+	//Ã¶Á¶¸Á ¿ìÃø ÀÔ±¸ ÀüÅëµî 2°³
+	new Prop(pX + 12, pY + 0, pZ + 0, 211);//ÀüÅëµî
+	new Prop(pX + 12, pY + 4, pZ + 0, 211);//ÀüÅëµî
 
 
 	//ÁöÇÏ
@@ -452,12 +479,27 @@ export void startSetting()
 	World::ins()->getTile(pX + 4, pY - 4, pZ).setWall(114);
 	World::ins()->getTile(pX + 4, pY - 3, pZ).setWall(114);
 
-
+	//¾èÀº ¹° Å¸ÀÏ(¿¬¸ø)
 	World::ins()->getTile(pX - 3, pY + 0, pZ).floor = 225;
 	World::ins()->getTile(pX - 4, pY + 0, pZ).floor = 225;
 	World::ins()->getTile(pX - 3, pY + 1, pZ).floor = 225;
 	World::ins()->getTile(pX - 4, pY + 1, pZ).floor = 225;
 	World::ins()->getTile(pX - 4, pY + 2, pZ).floor = 225;
+
+	//ÇÏ´Ü¿¬¸ø
+	World::ins()->getTile(pX + 5, pY + 8, pZ).floor = 225;
+	World::ins()->getTile(pX + 5, pY + 9, pZ).floor = 225;
+
+	for (int dx = -3; dx <= 2; dx++)
+	{
+		World::ins()->getTile(pX + 5 + dx, pY + 10, pZ).floor = 225;
+		World::ins()->getTile(pX + 5 + dx, pY + 11, pZ).floor = 225;
+	}
+	
+	for(int dy = 0; dy <= 10; dy++) World::ins()->getTile(pX + 3, pY + 12 + dy, pZ).floor = 225;
+
+	
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////¡å¼³Ä¡¹° Ãß°¡////////////////////////////////////////////////////////////////////////////
@@ -473,12 +515,13 @@ export void startSetting()
 	new Prop(pX + 5, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 	new Prop(pX + 5 - 1, pY - 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 	new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 5 - 1, pY - 1 + 2, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 
 	new Prop(pX + 7, pY + 1, pZ, 237);//³ª¹« ¼³Ä¡
 	new Prop(pX + 7 - 1, pY + 1, pZ, 235);//º¢²É³«¿± ¼³Ä¡
 
 	new Prop(pX + 4, pY - 5, pZ, 248);//³ª¹« ¼³Ä¡
+
+	new Prop(pX + 9, pY - 4, pZ, 237);//³ª¹« ¼³Ä¡
 
 
 
@@ -489,6 +532,13 @@ export void startSetting()
 	new Prop(pX + 3 + 1, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
 	new Prop(pX + 3 + 2, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
 	new Prop(pX + 3 + 1, pY + 3 + 1, pZ, 338);//°íÃ¶ ¼³Ä¡
+
+	new Prop(pX + 10, pY + 11, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 10, pY + 11 - 1, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 10, pY + 11 - 2, pZ, 338);//°íÃ¶ ¼³Ä¡
+
+	new Prop(pX + 10 - 1, pY + 11, pZ, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 10 - 1, pY + 11 - 1, pZ, 338);//°íÃ¶ ¼³Ä¡
 
 
 
@@ -538,11 +588,10 @@ export void startSetting()
 	new Prop(pX + 2, pY + 5, pZ, 206);
 
 	//Àü¼± ¼³Ä¡
-	new Prop(pX + 7, pY + 2, pZ, 143);
-	new Prop(pX + 8, pY + 2, pZ, 143);
-	new Prop(pX + 9, pY + 2, pZ, 143);
 	new Prop(pX + 8, pY + 1, pZ, 143);
 	new Prop(pX + 8, pY + 0, pZ, 143);
+	new Prop(pX + 8, pY - 1, pZ, 143);
+	new Prop(pX + 8, pY - 2, pZ, 143);
 	new Prop(pX + 9, pY + 0, pZ, 143);
 
 	//¹è°ü ¼³Ä¡

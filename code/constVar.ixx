@@ -8,8 +8,10 @@ export constexpr int mapGridW = 120;
 export constexpr int mapGridH = 100;
 export constexpr int userVisionW = 19;
 export constexpr int userVisionH = 17;
-export constexpr int userVisionHalfW = 10; //어둠시야
-export constexpr int userVisionHalfH = 9; //어둠시야
+//export constexpr int userVisionHalfW = 10; //어둠시야
+//export constexpr int userVisionHalfH = 9; //어둠시야
+export constexpr int userVisionHalfW = 23; //어둠시야
+export constexpr int userVisionHalfH = 23; //어둠시야
 
 export constexpr int maxEntityNumber = 128;
 export constexpr int entityDexWidth = 150;
@@ -416,7 +418,7 @@ export enum class itemFlag
     ALCHEMYTOOL,//연금술에서 사용 가능한 도구
     ALCHEMYMATERIAL, //연금술에 사용 가능한 재료
     LIQUID, //액체 상
-    VAPOR, // 기체 상
+    GAS, // 기체 상
     VPART, //차량부품
     TRANSPARENT_WALL, //투명벽
 
@@ -500,6 +502,10 @@ export enum class itemFlag
     DOOR_OPEN,
 
     TRAIN_WHEEL, //열차바퀴
+
+    PROP_GAS_OBSTACLE_ON,
+    PROP_GAS_OBSTACLE_OFF,
+    WALL_GAS_PERMEABLE,
 };
 
 export namespace toolQuality

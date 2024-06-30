@@ -210,10 +210,11 @@ export void debugConsole()
 		std::cin >> gasCode;
 		prt(L"생성할 가스의 부피를 입력해주세요.\n");
 		std::cin >> gasVol;
-		if (World::ins()->getTile(xp, yp, zp).checkGas(gasCode) == false)
+		if (World::ins()->getTile(xp, yp, zp).checkGas(gasCode) == -1)
 		{
-			World::ins()->getTile(xp, yp, zp).setGasVol(gasCode, gasVol);
+			World::ins()->getTile(xp, yp, zp).gasVec.push_back({ gasCode, gasVol });
 		}
+		prt(col::white,L"%ls를 %d의 부피만큼 좌표 (%d,%d,%d)에 생성하였다!\n",itemDex[gasCode].name.c_str(),gasVol,xp,yp,zp);
 		break;
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭

@@ -96,6 +96,7 @@ std::vector<Point2> floorPropList;
 std::vector<Flame*> flameList;
 uniqueVector<Drawable*> renderVehList;
 uniqueVector<Drawable*> renderEntityList;
+std::vector<Point2> gasList;
 std::vector<Point2> blackFogList;
 std::vector<Point2> grayFogList;
 std::vector<Point2> lightFogList;
@@ -124,6 +125,7 @@ export __int64 renderTile()
 	floorPropList.clear();
 	renderVehList.clear();
 	renderEntityList.clear();
+	gasList.clear();
 	blackFogList.clear();
 	grayFogList.clear();
 	lightFogList.clear();
@@ -204,7 +206,11 @@ __int64 analyseRender()
 			//추가로 렌더링되는 객체(화면밖)
 			for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.insert((Drawable*)(Entity*)(*it));
 
-
+			//가스
+			if (thisTile->gasVec.size() > 0)
+			{
+				gasList.push_back({ tgtX,tgtY });
+			}
 
 			//안개
 			if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
@@ -675,6 +681,49 @@ __int64 drawDamages()
 __int64 drawFogs()
 {
 	__int64 timeStampStart = getNanoTimer();
+
+
+	for (int i = 0; i < gasList.size(); i++)
+	{
+		int tgtX = gasList[i].x;
+		int tgtY = gasList[i].y;
+		SDL_Rect dst;
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+
+		setZoom(zoomScale);
+		TileData* thisTile = tileCache[{tgtX, tgtY}];
+		
+		for (int j = 0; j < thisTile->gasVec.size(); j++)
+		{
+			int alpha = 255 * (1 - std::exp(-0.03 * thisTile->gasVec[j].gasVol));
+			SDL_SetTextureAlphaMod(spr::steamEffect1->getTexture(), std::min(255, alpha)); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(spr::steamEffect1->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+
+			SDL_SetTextureColorMod(spr::steamEffect1->getTexture(), itemDex[thisTile->gasVec[j].gasCode].gasColorR, itemDex[thisTile->gasVec[j].gasCode].gasColorG, itemDex[thisTile->gasVec[j].gasCode].gasColorB);
+			int sprIndex = 0;//1초에 5번해야됨, 600 10
+			sprIndex += thisTile->randomVal;
+			if (timer::timer600 % 60 < 10) sprIndex += 0;
+			else if (timer::timer600 % 60 < 20) sprIndex += 1;
+			else if (timer::timer600 % 60 < 30) sprIndex += 2;
+			else if (timer::timer600 % 60 < 40) sprIndex += 3;
+			else if (timer::timer600 % 60 < 50) sprIndex += 4;
+			else sprIndex += 5;
+			sprIndex += 2*j;
+			sprIndex = sprIndex % 6;
+			drawSpriteCenter
+			(
+				spr::steamEffect1,
+				sprIndex,
+				dst.x + dst.w / 2,
+				dst.y + dst.h / 2
+			);
+		}
+		SDL_SetTextureAlphaMod(spr::steamEffect1->getTexture(), 255); //텍스쳐 투명도 설정
+		setZoom(1.0);
+	}
 
 	for (int i = 0; i < blackFogList.size(); i++)
 	{

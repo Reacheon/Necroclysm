@@ -142,4 +142,7 @@ export namespace spr
 
 	Sprite* fireStorm = nullptr;
 	Sprite* flameSet = nullptr;
+
+	Sprite* gasEffect1 = nullptr;
+	Sprite* steamEffect1 = nullptr;
 }

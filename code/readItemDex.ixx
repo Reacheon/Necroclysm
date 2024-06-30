@@ -367,7 +367,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"ALCHEMYTOOL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::ALCHEMYTOOL);
                                     else if (strFragment.substr(0, j) == L"ALCHEMYMATERIAL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::ALCHEMYMATERIAL);
                                     else if (strFragment.substr(0, j) == L"LIQUID") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::LIQUID);
-                                    else if (strFragment.substr(0, j) == L"VAPOR") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VAPOR);
+                                    else if (strFragment.substr(0, j) == L"GAS") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::GAS);
                                     else if (strFragment.substr(0, j) == L"VPART") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART);
                                     else if (strFragment.substr(0, j) == L"TRANSPARENT_WALL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TRANSPARENT_WALL);
                                     else if (strFragment.substr(0, j) == L"PROP_BIG") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_BIG);
@@ -445,6 +445,11 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"DOOR_CLOSE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::DOOR_CLOSE);
                                     else if (strFragment.substr(0, j) == L"DOOR_OEPN") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::DOOR_OPEN);
                                     else if (strFragment.substr(0, j) == L"TRAIN_WHEEL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TRAIN_WHEEL);
+
+                                    else if (strFragment.substr(0, j) == L"PROP_GAS_OBSTACLE_ON") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_GAS_OBSTACLE_ON);
+                                    else if (strFragment.substr(0, j) == L"PROP_GAS_OBSTACLE_OFF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_GAS_OBSTACLE_OFF);
+                                    else if (strFragment.substr(0, j) == L"WALL_GAS_PERMEABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WALL_GAS_PERMEABLE);
+
 
 
                                     else

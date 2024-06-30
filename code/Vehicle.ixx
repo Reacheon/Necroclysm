@@ -162,7 +162,7 @@ public:
         //열차바퀴 중심 설정
         if (inputPart.checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
 
-        prt(L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
+        //prt(L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
         updateSpr();
     }
     void addPart(int inputX, int inputY, int dexIndex) { addPart(inputX, inputY, itemDex[dexIndex]); }
@@ -197,7 +197,7 @@ public:
         partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
         World::ins()->getTile(inputX, inputY, getGridZ()).VehiclePtr = this;
 
-        prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공헀다.\n", inputX, inputY, inputItemCode);
+        //prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공헀다.\n", inputX, inputY, inputItemCode);
         updateSpr();
     }
 
@@ -1267,6 +1267,7 @@ public:
 
     void drawSelf() override
     {
+        std::vector<Point2> rotorList;
         int tileSize = 16 * zoomScale;
         auto drawVehicleComponent = [=](Vehicle* vPtr, int tgtX, int tgtY, int layer, int alpha)
             {
@@ -1314,11 +1315,39 @@ public:
                 {
                     if ((it->second)->itemInfo[layer].itemCode == 314)
                     {
-                        //rotorList.push_back({ it->first[0],it->first[1] });
+                        rotorList.push_back({ it->first[0],it->first[1] });
                     }
                     else drawVehicleComponent(this, it->first[0], it->first[1], layer, propCeilAlpha);
                 }
             }
+        }
+
+        for (int i = 0; i < rotorList.size(); i++)
+        {
+            int propCeilAlpha = 255;
+            if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).VehiclePtr == this) propCeilAlpha = 50;
+
+            int tgtX = rotorList[i].x;
+            int tgtY = rotorList[i].y;
+            SDL_Rect dst;
+            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+            dst.w = tileSize;
+            dst.h = tileSize;
+
+            setZoom(zoomScale);
+            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), propCeilAlpha); //텍스쳐 투명도 설정
+            SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+            //int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
+            drawSpriteCenter
+            (
+                spr::mainRotor,
+                0,
+                dst.x + dst.w / 2 + zoomScale * getFakeX(),
+                dst.y + dst.h / 2 + zoomScale * getFakeY()
+            );
+            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 255); //텍스쳐 투명도 설정
+            setZoom(1.0);
         }
     };
 };

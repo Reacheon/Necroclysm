@@ -21,7 +21,6 @@ import EntityData;
 import ItemData;
 import Damage;
 import util;
-import turnWait;
 import Drawable;
 import drawSprite;
 import SkillData;

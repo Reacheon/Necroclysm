@@ -141,4 +141,8 @@ export void textureLoader()
 	spr::fireStorm = new Sprite(renderer, "image/effect/skill/fireStorm.png", 80, 96);
 
 	spr::flameSet = new Sprite(renderer, "image/tileset/flameSet.png", 48, 48);
+
+	spr::gasEffect1 = new Sprite(renderer, "image/gas/gasEffect1.png", 48, 48);
+	spr::steamEffect1 = new Sprite(renderer, "image/gas/steamEffect1.png", 48, 48);
+
 }
