@@ -196,10 +196,12 @@ public:
 
 		SDL_SetRenderTarget(renderer, nullptr);
 	}
+
+
 	void updateVision(int range, int cx, int cy)
 	{
 		//updateVison은 렉을 유발하지 않는다. 시야가 7에서 8이어도 순간적인 0.5ns의 딜레이만 유발한다
-		//__int64 timeStampStart = getNanoTimer();
+		__int64 timeStampStart = getNanoTimer();
 		//prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
 
 		int correctionRange = range;
@@ -215,27 +217,58 @@ public:
 				if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;
 			}
 		}
+		
 
-		for (int i = cx - userVisionHalfW; i <= cx + userVisionHalfW; i++)
+		
+		std::vector<Point2> taskVec;
+		for (int tgtX = cx - userVisionHalfW; tgtX <= cx + userVisionHalfW; tgtX++)
 		{
-			for (int j = cy - userVisionHalfH; j <= cy + userVisionHalfH; j++)
+			for (int tgtY = cy - userVisionHalfH; tgtY <= cy + userVisionHalfH; tgtY++)
 			{
-				if (isCircle(correctionRange, i - cx, j - cy) == true)
-				{
-					rayCasting(cx, cy, i, j);
-				}
-				else
-				{
-					rayCastingDark(cx, cy, i, j);
-				}
+				taskVec.push_back({ tgtX,tgtY });
 			}
 		}
-		//prt(L"updateVision 실행에 %f ns만큼의 시간이 걸렸다.\n", (float)(getNanoTimer() - timeStampStart) / 10000000.0);
+
+		auto rayCastingWorker = [=](int cx, int cy, const std::vector<Point2>& points, int correctionRange)
+			{
+				for (const auto& point : points)
+				{
+					if (isCircle(correctionRange, point.x - cx, point.y - cy)) rayCasting(cx, cy, point.x, point.y);
+					else rayCastingDark(cx, cy, point.x, point.y);
+				}
+			};
+
+		int numThreads = std::thread::hardware_concurrency();
+		//prt(L"사용한 스레드의 수는 %d개이다.\n", numThreads);
+		if (numThreads == 0) numThreads = 4;
+		std::vector<std::thread> threads;
+		int chunkSize = taskVec.size() / numThreads;
+		for (int i = 0; i < numThreads; i++) 
+		{
+			std::vector<Point2>::iterator startPoint = taskVec.begin() + i * chunkSize;
+
+			std::vector<Point2>::iterator endPoint;
+			if (i == numThreads - 1) endPoint = taskVec.end(); //만약 마지막 스레드일 경우 벡터의 끝을 강제로 설정
+			else endPoint = startPoint + chunkSize;
+
+			std::vector<Point2> chunk(startPoint, endPoint);
+
+			threads.emplace_back(rayCastingWorker, cx, cy, chunk, correctionRange);
+		}
+
+		for (auto& thread : threads) //스레드가 전부 실행될 때까지 대기
+		{
+			if (thread.joinable()) thread.join();
+		}
+
+		prt(L"updateVision 실행에 %f ns만큼의 시간이 걸렸다.\n", (float)(getNanoTimer() - timeStampStart) / 10000000.0);
 	}
 
 	void updateVision(int range) {
 		updateVision(range, getGridX(), getGridY());
 	}
+
+
 	void updateNearbyChunk(int range)
 	{
 		int chunkX, chunkY;

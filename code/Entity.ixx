@@ -731,7 +731,8 @@ public:
 		int dely = abs(y2 - y1);
 		int i = 0;
 		World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-		if (fabs(1.0 * dely / delx) < 1)
+		double slope = fabs(1.0 * dely / delx);
+		if (slope < 1)
 		{
 			int p = 2 * dely - delx;
 			while (i < delx)
@@ -760,7 +761,7 @@ public:
 			}
 			return;
 		}
-		else if (fabs(1.0 * dely / delx) > 1)
+		else if (slope > 1)
 		{
 			int p = (2 * delx) - dely;
 			while (i < dely)
@@ -810,7 +811,8 @@ public:
 		int dely = abs(y2 - y1);
 		int i = 0;
 		World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-		if (fabs(1.0 * dely / delx) < 1)
+		double slope = fabs(1.0 * dely / delx);
+		if (slope < 1)
 		{
 			int p = 2 * dely - delx;
 			while (i < delx)
@@ -845,7 +847,7 @@ public:
 			}
 			return;
 		}
-		else if (fabs(1.0 * dely / delx) > 1)
+		else if (slope > 1)
 		{
 			int p = (2 * delx) - dely;
 			while (i < dely)

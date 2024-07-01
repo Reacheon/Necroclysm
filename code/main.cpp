@@ -33,6 +33,7 @@ int main(int argc, char** argv)
 	TTF_Init();
 	IMG_Init(IMG_INIT_PNG);
 	Mix_OpenAudio(22050, AUDIO_S16, 2, 4096);
+	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
 	textureLoader(); //프로그램에 사용될 텍스쳐들을 image 폴더에서 로드
 	fontLoader(); //프로그램에 사용될 폰트들을 언어에 맞게 로드

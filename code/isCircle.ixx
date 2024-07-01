@@ -2,7 +2,8 @@
 
 import std;
 
-namespace std {
+namespace std 
+{
 	template<>
 	struct hash<std::array<int, 2>> {
 		std::size_t operator()(const std::array<int, 2>& arr) const noexcept {
@@ -15,6 +16,7 @@ namespace std {
 
 static bool firstExecute = true;
 static std::vector<std::unordered_set<std::array<int, 2>>> circleVec;//원의 모양이 저장된 템플릿
+
 
 std::unordered_set<std::array<int, 2>>  makeCircle(int r, bool outline)
 {
@@ -134,22 +136,15 @@ std::unordered_set<std::array<int, 2>>  makeCircle(int r, bool outline)
 	return circle;
 }
 
+export void initCircle()
+{
+	std::unordered_set<std::array<int, 2>> blank;
+	circleVec.push_back(blank);
+	for (int i = 1; i < 70; i++) circleVec.push_back(makeCircle(i, false));
+}
+
 export bool isCircle(int range, int revX, int revY)
 {
-	//if (firstExecute == true)//최초 실행 make Circle Template
-	//{
-	//	circleVec.push_back({ 0,0 });
-	//	const int maxRange = 15;
-	//	for (int i = 1; i < maxRange; i++) circleVec.push_back(makeCircle(i, false));
-	//	firstExecute = false;
-	//}
-
-	if (range >= circleVec.size()) //범위를 넘을 경우 동적 할당
-	{
-		for(int i = circleVec.size(); i <= range; i++) circleVec.push_back(makeCircle(i, false));
-	}
-
-	
 	if (circleVec[range].find({ revX,revY }) != circleVec[range].end()) return true;
 	else return false;
 }
