@@ -8,10 +8,10 @@ export constexpr int mapGridW = 120;
 export constexpr int mapGridH = 100;
 export constexpr int userVisionW = 19;
 export constexpr int userVisionH = 17;
-//export constexpr int userVisionHalfW = 10; //¾îµÒ½Ã¾ß
-//export constexpr int userVisionHalfH = 9; //¾îµÒ½Ã¾ß
-export constexpr int userVisionHalfW = 23; //¾îµÒ½Ã¾ß
-export constexpr int userVisionHalfH = 23; //¾îµÒ½Ã¾ß
+export constexpr int userVisionHalfW = 10; //¾îµÒ½Ã¾ß
+export constexpr int userVisionHalfH = 9; //¾îµÒ½Ã¾ß
+//export constexpr int userVisionHalfW = 23; //¾îµÒ½Ã¾ß
+//export constexpr int userVisionHalfH = 23; //¾îµÒ½Ã¾ß
 
 export constexpr int maxEntityNumber = 128;
 export constexpr int entityDexWidth = 150;

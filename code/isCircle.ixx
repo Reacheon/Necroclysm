@@ -2,14 +2,16 @@
 
 import std;
 
-namespace std 
+namespace std
 {
 	template<>
-	struct hash<std::array<int, 2>> {
-		std::size_t operator()(const std::array<int, 2>& arr) const noexcept {
-			std::size_t h1 = std::hash<int>{}(arr[0]);
-			std::size_t h2 = std::hash<int>{}(arr[1]);
-			return h1 ^ (h2 << 1);
+	struct hash<std::array<int, 2>> 
+	{
+		std::size_t operator()(const std::array<int, 2>& arr) const noexcept 
+		{
+			std::size_t seed = 0;
+			for (const auto& elem : arr) seed ^= std::hash<int>{}(elem)+0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
 		}
 	};
 }

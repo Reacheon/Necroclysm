@@ -71,7 +71,7 @@ public:
 
 		addSkill(10);
 		quickSlot[4] = { quickSlotFlag::SKILL, 10 };
-		
+
 		addSkill(1);
 		quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 	}
@@ -200,7 +200,8 @@ public:
 
 	void updateVision(int range, int cx, int cy)
 	{
-		//updateVison은 렉을 유발하지 않는다. 시야가 7에서 8이어도 순간적인 0.5ns의 딜레이만 유발한다
+		static std::vector<float> timeDurations;
+		static const int maxDurations = 10;
 		__int64 timeStampStart = getNanoTimer();
 		//prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
 
@@ -217,15 +218,15 @@ public:
 				if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;
 			}
 		}
-		
 
-		
-		std::vector<Point2> taskVec;
+
+		std::vector<Point2> tasksVec;
+		tasksVec.reserve((2 * userVisionHalfW + 1) * (2 * userVisionHalfH + 1));
 		for (int tgtX = cx - userVisionHalfW; tgtX <= cx + userVisionHalfW; tgtX++)
 		{
 			for (int tgtY = cy - userVisionHalfH; tgtY <= cy + userVisionHalfH; tgtY++)
 			{
-				taskVec.push_back({ tgtX,tgtY });
+				tasksVec.push_back({ tgtX,tgtY });
 			}
 		}
 
@@ -238,31 +239,33 @@ public:
 				}
 			};
 
-		int numThreads = std::thread::hardware_concurrency();
-		//prt(L"사용한 스레드의 수는 %d개이다.\n", numThreads);
-		if (numThreads == 0) numThreads = 4;
-		std::vector<std::thread> threads;
-		int chunkSize = taskVec.size() / numThreads;
-		for (int i = 0; i < numThreads; i++) 
-		{
-			std::vector<Point2>::iterator startPoint = taskVec.begin() + i * chunkSize;
+		int numThreads = threadPoolPtr->getAvailableThreads();
+		int chunkSize = tasksVec.size() / numThreads;
+		for (int i = 0; i < numThreads; i++) {
+			std::vector<Point2>::iterator startPoint = tasksVec.begin() + i * chunkSize;
 
 			std::vector<Point2>::iterator endPoint;
-			if (i == numThreads - 1) endPoint = taskVec.end(); //만약 마지막 스레드일 경우 벡터의 끝을 강제로 설정
+			if (i == numThreads - 1) endPoint = tasksVec.end(); //만약 마지막 스레드일 경우 벡터의 끝을 강제로 설정
 			else endPoint = startPoint + chunkSize;
-
 			std::vector<Point2> chunk(startPoint, endPoint);
 
-			threads.emplace_back(rayCastingWorker, cx, cy, chunk, correctionRange);
+			threadPoolPtr->addTask([=]() {
+				rayCastingWorker(cx, cy, chunk, correctionRange);
+				});
 		}
 
-		for (auto& thread : threads) //스레드가 전부 실행될 때까지 대기
-		{
-			if (thread.joinable()) thread.join();
-		}
+		threadPoolPtr->waitForThreads();
 
-		prt(L"updateVision 실행에 %f ns만큼의 시간이 걸렸다.\n", (float)(getNanoTimer() - timeStampStart) / 10000000.0);
+		float duration = (float)(getNanoTimer() - timeStampStart) / 1000000.0;
+		timeDurations.push_back(duration);
+		if (timeDurations.size() > maxDurations) {
+			timeDurations.erase(timeDurations.begin());
+		}
+		float averageDuration = std::accumulate(timeDurations.begin(), timeDurations.end(), 0.0) / timeDurations.size();
+		prt(L"updateVision 실행에 %f ms만큼의 시간이 걸렸다.\n", duration);
+		prt(L"최근 10회의 평균 실행 시간: %f ms\n", averageDuration);
 	}
+
 
 	void updateVision(int range) {
 		updateVision(range, getGridX(), getGridY());

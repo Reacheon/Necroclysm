@@ -420,5 +420,8 @@
     <ClCompile Include="code\Gas.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="code\ThreadPool.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

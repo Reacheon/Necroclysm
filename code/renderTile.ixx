@@ -89,17 +89,11 @@ public:
 };
 
 
+//차량과 엔티니는 중복을 허용하면 안됨
 std::unordered_map<std::array<int, 2>, TileData*, decltype(arrayHasher2)> tileCache;
-std::vector<Point2> tileList;
-std::vector<Point2> itemList;
-std::vector<Point2> floorPropList;
-std::vector<Flame*> flameList;
+std::vector<Point2> tileList, itemList, floorPropList, flameList, gasList, blackFogList, grayFogList, lightFogList;
 uniqueVector<Drawable*> renderVehList;
 uniqueVector<Drawable*> renderEntityList;
-std::vector<Point2> gasList;
-std::vector<Point2> blackFogList;
-std::vector<Point2> grayFogList;
-std::vector<Point2> lightFogList;
 
 export __int64 renderTile()
 {
@@ -207,10 +201,7 @@ __int64 analyseRender()
 			for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.insert((Drawable*)(Entity*)(*it));
 
 			//가스
-			if (thisTile->gasVec.size() > 0)
-			{
-				gasList.push_back({ tgtX,tgtY });
-			}
+			if (thisTile->gasVec.size() > 0) gasList.push_back({ tgtX,tgtY });
 
 			//안개
 			if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });

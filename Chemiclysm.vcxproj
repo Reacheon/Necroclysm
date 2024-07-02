@@ -226,6 +226,7 @@
     <ClCompile Include="code\renderWeather.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
+    <ClCompile Include="code\ThreadPool.ixx" />
     <ClCompile Include="code\updateBarAct.ixx" />
     <ClCompile Include="code\Vec3.ixx" />
     <ClCompile Include="code\Player.ixx" />

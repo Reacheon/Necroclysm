@@ -188,6 +188,7 @@ public:
 		else return false;
 	}
 
+
 	void createSector(int sectorX, int sectorY, int sectorZ)
 	{
 		if (sectorZ == 0)
@@ -204,6 +205,7 @@ public:
 				SDL_Surface* refSector = IMG_Load(filePath.c_str());
 				errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
 				Uint32* pixels = (Uint32*)refSector->pixels;
+
 
 				for (int x = 0; x < 400; x++)
 				{
@@ -235,6 +237,85 @@ public:
 
 		isSectorCreated.insert({ sectorX,sectorY,sectorZ });
 	}
+
+	//void createSector(int sectorX, int sectorY, int sectorZ)
+	//{
+	//	if (sectorZ == 0)
+	//	{
+	//		if ((sectorY <= 26 && sectorY >= -27) && (sectorX <= 53 && sectorX >= -54))
+	//		{
+	//			std::string filePath = "map/worldSector-";
+	//			int number = 2971 + sectorX + 108 * sectorY;
+	//			if (number < 100) filePath += "0";
+	//			filePath += std::to_string(number);
+	//			filePath += ".png";
+	//			std::wstring wPath(filePath.begin(), filePath.end());
+	//			std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
+	//			SDL_Surface* refSector = IMG_Load(filePath.c_str());
+	//			errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
+	//			Uint32* pixels = (Uint32*)refSector->pixels;
+
+	//			const int sectorPixelW = 400;
+	//			const int sectorPixelH = 400;
+
+	//			std::vector<Point2> tasksVec;
+	//			tasksVec.reserve((sectorPixelW + 1) * (sectorPixelH + 1));
+	//			for (int tgtX = 0; tgtX < sectorPixelW; tgtX++)
+	//			{
+	//				for (int tgtY = 0; tgtY < sectorPixelH; tgtY++)
+	//				{
+	//					tasksVec.push_back({ tgtX,tgtY });
+	//				}
+	//			}
+
+	//			auto sectorPixelCalcWorker = [=](const std::vector<Point2>& points)
+	//				{
+	//					for (const auto& point : points)
+	//					{
+	//						chunkFlag targetFlag = chunkFlag::none;
+
+	//						Uint32 pixel = pixels[(point.y * refSector->w) + point.x];
+	//						SDL_Color pixelCol;
+	//						SDL_GetRGB(pixel, refSector->format, &pixelCol.r, &pixelCol.g, &pixelCol.b);
+
+	//						if (pixelCol.r == chunkCol::seawater.r && pixelCol.g == chunkCol::seawater.g && pixelCol.b == chunkCol::seawater.b)
+	//						{
+	//							targetFlag = chunkFlag::seawater;
+	//						}
+
+	//						//섹터 좌표로 청크 좌표 구하기
+	//						int chunkOriginX, chunkOriginY;
+	//						chunkOriginX = 400 * sectorX;
+	//						chunkOriginY = 400 * sectorY;
+
+	//						Mapmaker::ins()->addProphecy(chunkOriginX + point.x, chunkOriginY + point.y, sectorZ, targetFlag);
+	//					}
+	//				};
+
+
+	//			int numThreads = threadPoolPtr->getAvailableThreads();
+	//			int chunkSize = tasksVec.size() / numThreads;
+	//			for (int i = 0; i < numThreads; i++) {
+	//				std::vector<Point2>::iterator startPoint = tasksVec.begin() + i * chunkSize;
+
+	//				std::vector<Point2>::iterator endPoint;
+	//				if (i == numThreads - 1) endPoint = tasksVec.end(); //만약 마지막 스레드일 경우 벡터의 끝을 강제로 설정
+	//				else endPoint = startPoint + chunkSize;
+	//				std::vector<Point2> chunk(startPoint, endPoint);
+
+	//				threadPoolPtr->addTask([=]() {
+	//					sectorPixelCalcWorker(chunk);
+	//					});
+	//			}
+
+	//			threadPoolPtr->waitForThreads();
+
+	//			SDL_FreeSurface(refSector);
+	//		}
+	//	}
+
+	//	isSectorCreated.insert({ sectorX,sectorY,sectorZ });
+	//}
 
 	weatherFlag getChunkWeather(int chunkX, int chunkY, int chunkZ)
 	{

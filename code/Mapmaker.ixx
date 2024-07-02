@@ -9,6 +9,8 @@ import constVar;
 // 플레이어 주변에 없는 계시는 따로 파일로 저장함
 // 저장 기능이 존재
 
+
+// 완전히 array 기반으로 바꿀 것(병렬화로 맵생성 가능하도록!!!)
 export class Mapmaker
 {
 private:

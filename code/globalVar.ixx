@@ -177,6 +177,7 @@ export SDL_Rect quickSlotRegion;
 
 export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해 원래 마우스 클릭좌표, 기존 클릭좌표랑은 조금 다르니 유의할 것, 카메라 이동에 사용됨
 
+export ThreadPool* threadPoolPtr;
 
 auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
 

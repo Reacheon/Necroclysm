@@ -33,6 +33,12 @@ int main(int argc, char** argv)
 	TTF_Init();
 	IMG_Init(IMG_INIT_PNG);
 	Mix_OpenAudio(22050, AUDIO_S16, 2, 4096);
+
+	int numThreads = std::thread::hardware_concurrency();
+	if (numThreads == 0) numThreads = 4;
+	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
+	threadPoolPtr = new ThreadPool(numThreads);
+	
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
 	textureLoader(); //프로그램에 사용될 텍스쳐들을 image 폴더에서 로드
@@ -88,6 +94,7 @@ int main(int argc, char** argv)
 	}
 
 
+	delete threadPoolPtr;
 	Mix_CloseAudio();
 	IMG_Quit();
 	TTF_Quit();
