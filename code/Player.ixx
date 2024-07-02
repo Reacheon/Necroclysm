@@ -256,14 +256,17 @@ public:
 
 		threadPoolPtr->waitForThreads();
 
-		float duration = (float)(getNanoTimer() - timeStampStart) / 1000000.0;
-		timeDurations.push_back(duration);
-		if (timeDurations.size() > maxDurations) {
-			timeDurations.erase(timeDurations.begin());
-		}
-		float averageDuration = std::accumulate(timeDurations.begin(), timeDurations.end(), 0.0) / timeDurations.size();
-		prt(L"updateVision 실행에 %f ms만큼의 시간이 걸렸다.\n", duration);
-		prt(L"최근 10회의 평균 실행 시간: %f ms\n", averageDuration);
+
+
+
+		//float duration = (float)(getNanoTimer() - timeStampStart) / 1000000.0;
+		//timeDurations.push_back(duration);
+		//if (timeDurations.size() > maxDurations) {
+		//	timeDurations.erase(timeDurations.begin());
+		//}
+		//float averageDuration = std::accumulate(timeDurations.begin(), timeDurations.end(), 0.0) / timeDurations.size();
+		//prt(L"updateVision 실행에 %f ms만큼의 시간이 걸렸다.\n", duration);
+		//prt(L"최근 10회의 평균 실행 시간: %f ms\n", averageDuration);
 	}
 
 
