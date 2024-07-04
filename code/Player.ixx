@@ -210,9 +210,9 @@ public:
 		else correctionRange = range / 2;
 
 		//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
-		for (int i = cx - userVisionHalfW; i <= cx + userVisionHalfW; i++)
+		for (int i = cx - userVisionHalfGrayW; i <= cx + userVisionHalfGrayW; i++)
 		{
-			for (int j = cy - userVisionHalfH; j <= cy + userVisionHalfH; j++)
+			for (int j = cy - userVisionHalfGrayH; j <= cy + userVisionHalfGrayH; j++)
 			{
 				TileData* tgtTile = &World::ins()->getTile(i, j, getGridZ());
 				if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;

@@ -6,12 +6,12 @@ import std;
 
 export constexpr int mapGridW = 120;
 export constexpr int mapGridH = 100;
-export constexpr int userVisionW = 19;
-export constexpr int userVisionH = 17;
+
 export constexpr int userVisionHalfW = 10; //어둠시야
 export constexpr int userVisionHalfH = 9; //어둠시야
-//export constexpr int userVisionHalfW = 23; //어둠시야
-//export constexpr int userVisionHalfH = 23; //어둠시야
+
+export constexpr int userVisionHalfGrayW = 23; //주변 FOV 회색으로 바꾸는 최대 W
+export constexpr int userVisionHalfGrayH = 23; //주변 FOV 회색으로 바꾸는 최대 H
 
 export constexpr int maxEntityNumber = 128;
 export constexpr int entityDexWidth = 150;

@@ -1,4 +1,5 @@
-﻿#include <SDL.h>
+﻿//타일캐시 없는 버전
+#include <SDL.h>
 
 export module renderTile;
 
@@ -26,7 +27,7 @@ import TileData;
 import Flame;
 
 SDL_Rect dst, renderRegion;
-int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, playerZ;
+int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
 
 __int64 analyseRender();
 __int64 drawTiles();
@@ -38,8 +39,6 @@ __int64 drawFogs();
 __int64 drawMarkers();
 
 //차량과 엔티티는 중복을 허용하면 안됨
-std::unordered_map<std::array<int, 2>, TileData*, decltype(arrayHasher2)> tileCache;
-
 std::list<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList;
 std::list<Drawable*> renderVehList, renderEntityList;
 
@@ -52,7 +51,7 @@ export __int64 renderTile()
 	cameraGridY = (cameraY - 8) / (16);
 	renderRangeW = 3 + (cameraW + extraCameraLength) / tileSize;
 	renderRangeH = 3 + (cameraH + extraCameraLength) / tileSize;
-	playerZ = Player::ins()->getGridZ();
+	pZ = Player::ins()->getGridZ();
 	renderRegion = { cameraGridX - (renderRangeW / 2), cameraGridY - (renderRangeH / 2), renderRangeW, renderRangeH };
 
 	tileList.clear();
@@ -64,7 +63,6 @@ export __int64 renderTile()
 	blackFogList.clear();
 	grayFogList.clear();
 	lightFogList.clear();
-	tileCache.clear();
 	flameList.clear();
 
 	dur::analysis = analyseRender();
@@ -89,76 +87,12 @@ __int64 analyseRender()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-
-	std::vector<Point2> tasksVec;
-	tasksVec.reserve((renderRegion.h + 3) * (renderRegion.x + 3));
-	for (int tgtY = renderRegion.y - 1; tgtY < renderRegion.y + renderRegion.h + 1; tgtY++)
-	{
-		for (int tgtX = renderRegion.x - 1; tgtX < renderRegion.x + renderRegion.w + 1; tgtX++)
-		{
-			tasksVec.push_back({ tgtX,tgtY });
-		}
-	}
-
-	auto singleTileAnalysis = [=](const std::vector<Point2>& points)
-		{
-			for (const auto& point : points)
-			{
-				TileData* thisTile = &World::ins()->getTile(point.x, point.y, playerZ);
-				tileCache[{point.x, point.y}] = thisTile;
-
-				//바깥쪽이면 타일캐시만 추가하고 거기에 있는 내용은 렌더링하지 않음
-				if (tgtX < renderRegion.x || point.x >= renderRegion.x + renderRegion.w) continue;
-				if (tgtY < renderRegion.y || point.y >= renderRegion.y + renderRegion.h) continue;
-
-				//바닥과 벽
-				if (thisTile->fov != fovFlag::black) tileList.push_back({ tgtX,tgtY });
-
-				//아이템
-				if (thisTile->fov == fovFlag::white)
-				{
-					if ((World::ins())->getItemPos(tgtX, tgtY, playerZ) != nullptr) itemList.push_back({ tgtX,tgtY });
-				}
-				//바닥프롭
-				Prop* fpPtr = (Prop*)thisTile->PropPtr;
-				if (fpPtr != nullptr && fpPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) floorPropList.push_back({ tgtX,tgtY });
-
-				//화염
-				Flame* flamePtr = (Flame*)thisTile->flamePtr;
-				if (flamePtr != nullptr) flameList.push_back({ tgtX,tgtY });
-
-				//차량
-				Drawable* vPtr = (Drawable*)((Vehicle*)(thisTile->VehiclePtr));
-				if (vPtr != nullptr) renderVehList.push_back(vPtr);
-				for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.push_back((Drawable*)(Vehicle*)(*it));
-
-				//플레이어와 겹치는 일반설치물
-				Prop* pPtr = (Prop*)(thisTile->PropPtr);
-				if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false) renderEntityList.push_back((Drawable*)pPtr);
-
-				//일반 객체
-				Drawable* ePtr = (Drawable*)((Entity*)(thisTile->EntityPtr));
-				if (ePtr != nullptr) renderEntityList.push_back(ePtr);
-				//추가로 렌더링되는 객체(화면밖)
-				for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)(Entity*)(*it));
-
-				//가스
-				if (thisTile->gasVec.size() > 0) gasList.push_back({ tgtX,tgtY });
-
-				//안개
-				if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
-				else if (thisTile->fov == fovFlag::gray) grayFogList.push_back({ tgtX, tgtY });
-				else  lightFogList.push_back({ tgtX, tgtY });
-			}
-		};
-
 	//루프 분석
 	for (int tgtY = renderRegion.y - 1; tgtY < renderRegion.y + renderRegion.h + 1; tgtY++)
 	{
 		for (int tgtX = renderRegion.x - 1; tgtX < renderRegion.x + renderRegion.w + 1; tgtX++)
 		{
-			TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, playerZ);
-			tileCache[{tgtX, tgtY}] = thisTile;
+			TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, pZ);
 
 			//바깥쪽이면 타일캐시만 추가하고 거기에 있는 내용은 렌더링하지 않음
 			if (tgtX < renderRegion.x || tgtX >= renderRegion.x + renderRegion.w) continue;
@@ -170,7 +104,7 @@ __int64 analyseRender()
 			//아이템
 			if (thisTile->fov == fovFlag::white)
 			{
-				if ((World::ins())->getItemPos(tgtX, tgtY, playerZ) != nullptr) itemList.push_back({ tgtX,tgtY });
+				if ((World::ins())->getItemPos(tgtX, tgtY, pZ) != nullptr) itemList.push_back({ tgtX,tgtY });
 			}
 			//바닥프롭
 			Prop* fpPtr = (Prop*)thisTile->PropPtr;
@@ -178,12 +112,11 @@ __int64 analyseRender()
 
 			//화염
 			Flame* flamePtr = (Flame*)thisTile->flamePtr;
-			if (flamePtr != nullptr) flameList.push_back({tgtX,tgtY});
-			
+			if (flamePtr != nullptr) flameList.push_back({ tgtX,tgtY });
+
 			//차량
 			Drawable* vPtr = (Drawable*)((Vehicle*)(thisTile->VehiclePtr));
 			if (vPtr != nullptr) renderVehList.push_back(vPtr);
-			for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.push_back((Drawable*)(Vehicle*)(*it));
 
 			//플레이어와 겹치는 일반설치물
 			Prop* pPtr = (Prop*)(thisTile->PropPtr);
@@ -192,8 +125,6 @@ __int64 analyseRender()
 			//일반 객체
 			Drawable* ePtr = (Drawable*)((Entity*)(thisTile->EntityPtr));
 			if (ePtr != nullptr) renderEntityList.push_back(ePtr);
-			//추가로 렌더링되는 객체(화면밖)
-			for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)(Entity*)(*it));
 
 			//가스
 			if (thisTile->gasVec.size() > 0) gasList.push_back({ tgtX,tgtY });
@@ -204,6 +135,9 @@ __int64 analyseRender()
 			else  lightFogList.push_back({ tgtX, tgtY });
 		}
 	}
+
+	for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.push_back((Drawable*)(Vehicle*)(*it));
+	for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)(Entity*)(*it));
 
 	return getNanoTimer() - timeStampStart;
 }
@@ -218,11 +152,11 @@ __int64 drawTiles()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		const TileData* thisTile = tileCache[{tgtX, tgtY}];
-		const TileData* topTile = tileCache[{tgtX, tgtY - 1}];
-		const TileData* botTile = tileCache[{tgtX, tgtY + 1}];
-		const TileData* leftTile = tileCache[{tgtX - 1, tgtY}];
-		const TileData* rightTile = tileCache[{tgtX + 1, tgtY}];
+		const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
+		const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, Player::ins()->getGridZ());
+		const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, Player::ins()->getGridZ());
+		const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, Player::ins()->getGridZ());
+		const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, Player::ins()->getGridZ());
 
 		switch (thisTile->floor)//바닥 타일 그리기 
 		{
@@ -412,7 +346,7 @@ __int64 drawCorpses()
 	for (const auto& elem : Corpse::list)
 	{
 		Corpse* adr = elem;
-		if (playerZ == adr->getZ())//플레이어의 z축과 시체의 z축이 같을 경우
+		if (pZ == adr->getZ())//플레이어의 z축과 시체의 z축이 같을 경우
 		{
 			setZoom(zoomScale);
 			drawSpriteCenter(adr->getSprite(), adr->getSprIndex(), (cameraW / 2) + zoomScale * (adr->getX() - cameraX), (cameraH / 2) + zoomScale * (adr->getY() - cameraY));
@@ -431,7 +365,7 @@ __int64 drawItems()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, playerZ);
+		ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, pZ);
 		if (address->getAniType() == aniFlag::throwing)
 		{
 			setZoom(zoomScale);
@@ -468,7 +402,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Prop* iPtr = (Prop*)tileCache[{tgtX, tgtY}]->PropPtr;
+		Prop* iPtr = (Prop*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->PropPtr;
 		int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::PROP_BIG));
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -502,7 +436,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Flame* tgtFlame = (Flame*)tileCache[{tgtX, tgtY}]->flamePtr;
+		Flame* tgtFlame = (Flame*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->flamePtr;
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -538,8 +472,8 @@ __int64 drawEntities()
 	std::vector<std::array<int, 2>> rotorList;
 	//차량그리기
 	std::unordered_set<Drawable*> vehCache;
-	for (const auto& elem : renderVehList) 
-	{ 
+	for (const auto& elem : renderVehList)
+	{
 		if (vehCache.find(elem) == vehCache.end())
 		{
 			elem->drawSelf();
@@ -562,7 +496,7 @@ __int64 drawEntities()
 	{
 		int tgtX = rotorList[i][0];
 		int tgtY = rotorList[i][1];
-		Vehicle* vPtr = (Vehicle*)tileCache[{tgtX, tgtY}]->VehiclePtr;
+		Vehicle* vPtr = (Vehicle*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->VehiclePtr;
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -571,7 +505,7 @@ __int64 drawEntities()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		if (tileCache[{Player::ins()->getGridX(), Player::ins()->getGridY()}]->VehiclePtr == vPtr)
+		if ((&World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()))->VehiclePtr == vPtr)
 		{
 			SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 50); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
@@ -705,8 +639,8 @@ __int64 drawFogs()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		TileData* thisTile = tileCache[{tgtX, tgtY}];
-		
+		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
+
 		for (int j = 0; j < thisTile->gasVec.size(); j++)
 		{
 			int alpha = 255 * (1 - std::exp(-0.03 * thisTile->gasVec[j].gasVol));
@@ -722,7 +656,7 @@ __int64 drawFogs()
 			else if (timer::timer600 % 60 < 40) sprIndex += 3;
 			else if (timer::timer600 % 60 < 50) sprIndex += 4;
 			else sprIndex += 5;
-			sprIndex += 2*j;
+			sprIndex += 2 * j;
 			sprIndex = sprIndex % 6;
 			drawSpriteCenter
 			(
@@ -768,7 +702,7 @@ __int64 drawFogs()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		TileData* thisTile = tileCache[{tgtX, tgtY}];
+		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
 
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
 		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
@@ -812,7 +746,7 @@ __int64 drawMarkers()
 	if (Craft::ins() != nullptr && Craft::ins()->getIsNowBuilding())
 	{
 		std::array<int, 3> nowBuildLocation = Craft::ins()->getBuildLocation();
-		if (playerZ == nowBuildLocation[2])
+		if (pZ == nowBuildLocation[2])
 		{
 			SDL_Point pt = { nowBuildLocation[0], nowBuildLocation[1] };
 			if (SDL_PointInRect(&pt, &renderRegion))
@@ -851,7 +785,7 @@ __int64 drawMarkers()
 	}
 	else if (Craft::ins() == nullptr && Craft::ins()->existCraftDataStructure())
 	{
-		if (playerZ == Craft::getBuildLocation()[2])
+		if (pZ == Craft::getBuildLocation()[2])
 		{
 			SDL_Point pt = { Craft::getBuildLocation()[0], Craft::getBuildLocation()[1] };
 			if (SDL_PointInRect(&pt, &renderRegion))

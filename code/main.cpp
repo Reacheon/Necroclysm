@@ -38,7 +38,35 @@ int main(int argc, char** argv)
 	if (numThreads == 0) numThreads = 4;
 	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
 	threadPoolPtr = new ThreadPool(numThreads);
-	
+
+	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+	int numJoysticks = SDL_NumJoysticks();
+	prt(L"연결된 조이스틱의 수 : %d\n", numJoysticks);
+	for (int i = 0; i < numJoysticks; ++i) 
+	{
+		if (SDL_IsGameController(i))
+		{
+			SDL_GameController* controller = SDL_GameControllerOpen(i);
+			if (controller) 
+			{
+				SDL_Joystick* joystick = SDL_GameControllerGetJoystick(controller);
+				prt(L"%d번 게임패드 :\n", i);
+				std::printf(" ▶ Name: %s\n", SDL_GameControllerName(controller));
+				std::printf(" ▶ Vendor Code: %d\n", SDL_JoystickGetVendor(joystick));
+				std::printf(" ▶ Product Code: %d\n", SDL_JoystickGetProduct(joystick));
+				SDL_GameControllerClose(controller);
+			}
+			else 
+			{
+				prt(L"%d번 게임패드를 여는데 실패하였다.\n", i);
+			}
+		}
+		else {
+			std::printf("조이스틱 %d는 게임패드가 아니다.\n", i);
+		}
+	}
+
+
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
 	textureLoader(); //프로그램에 사용될 텍스쳐들을 image 폴더에서 로드
