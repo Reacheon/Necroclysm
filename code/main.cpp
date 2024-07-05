@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 {
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	std::locale::global(std::locale("korean"));
-	SDL_Init(SDL_INIT_EVERYTHING);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
 	TTF_Init();
 	IMG_Init(IMG_INIT_PNG);
 	Mix_OpenAudio(22050, AUDIO_S16, 2, 4096);
@@ -40,32 +40,24 @@ int main(int argc, char** argv)
 	threadPoolPtr = new ThreadPool(numThreads);
 
 	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
-	int numJoysticks = SDL_NumJoysticks();
-	prt(L"연결된 조이스틱의 수 : %d\n", numJoysticks);
-	for (int i = 0; i < numJoysticks; ++i) 
+	if (SDL_NumJoysticks() > 0) 
 	{
-		if (SDL_IsGameController(i))
+		for (int i = 0; i < SDL_NumJoysticks(); ++i) 
 		{
-			SDL_GameController* controller = SDL_GameControllerOpen(i);
-			if (controller) 
+			if (SDL_IsGameController(i)) 
 			{
-				SDL_Joystick* joystick = SDL_GameControllerGetJoystick(controller);
-				prt(L"%d번 게임패드 :\n", i);
-				std::printf(" ▶ Name: %s\n", SDL_GameControllerName(controller));
-				std::printf(" ▶ Vendor Code: %d\n", SDL_JoystickGetVendor(joystick));
-				std::printf(" ▶ Product Code: %d\n", SDL_JoystickGetProduct(joystick));
-				SDL_GameControllerClose(controller);
+				controller = SDL_GameControllerOpen(i);
+				if (controller) 
+				{
+					prt(L"다음 게임패드가 감지되었다. : ");
+					std::printf(SDL_GameControllerName(controller));
+					prt(L"\n");
+					break;
+				}
+				else errorBox(L"게임패드를 열 수가 없다.");
 			}
-			else 
-			{
-				prt(L"%d번 게임패드를 여는데 실패하였다.\n", i);
-			}
-		}
-		else {
-			std::printf("조이스틱 %d는 게임패드가 아니다.\n", i);
 		}
 	}
-
 
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
@@ -112,7 +104,7 @@ int main(int argc, char** argv)
 		dur::renderLog = renderLog(renderer);
 		__int64 loopEnd = getNanoTimer();
 
-		const int constDelay = 16000000;
+		const int constDelay = 17000000;
 		__int64 delayTime = constDelay - (loopEnd - loopStart);
 		if (delayTime >= constDelay) delayTime = constDelay; // 만약 루프 시간이 음수(오류)가 나왔을 경우
 		else if (delayTime < 0) delayTime = 0;

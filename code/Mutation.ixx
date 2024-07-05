@@ -8,11 +8,9 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
-import drawPrimitive;
 
 export class Mutation : public GUI
 {
@@ -135,8 +133,7 @@ public:
 			// 액티브 바이오닉 스크롤 그리기
 			{
 				SDL_Rect activeScrollBox = { mutationBase.x + mutationBase.w - 20,mutationBase.y + 36 + 24, 2, 282 };
-				SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-				SDL_RenderFillRect(renderer, &activeScrollBox);
+				drawFillRect(activeScrollBox, { 120,120,120 });
 			}
 		}
 		else
@@ -186,5 +183,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

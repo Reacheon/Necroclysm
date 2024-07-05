@@ -162,11 +162,8 @@ public:
 						outlineColor = { 0xa6, 0xa6, 0xa6 };
 					}
 
-					SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 255);
-					SDL_RenderFillRect(renderer, &targetBtn);
-
-					SDL_SetRenderDrawColor(renderer, outlineColor.r, outlineColor.g, outlineColor.b, 255);
-					SDL_RenderDrawRect(renderer, &targetBtn);
+					drawFillRect(targetBtn, btnColor);
+					drawRect(targetBtn, outlineColor);
 
 					drawSpriteCenter(spr::icon16, iconIndex, targetBtn.x + targetBtn.w / 2, targetBtn.y + targetBtn.h / 2);
 				};
@@ -182,16 +179,11 @@ public:
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 				SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
 
-				SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 255);
-				SDL_RenderFillRect(renderer, &rotateBtn);
-
-				SDL_SetRenderDrawColor(renderer, outlineColor.r, outlineColor.g, outlineColor.b, 255);
-				SDL_RenderDrawRect(renderer, &rotateBtn);
+				drawFillRect(rotateBtn, btnColor);
+				drawRect(rotateBtn, outlineColor);
 
 				drawSpriteCenter(spr::icon16, 42, rotateBtn.x + rotateBtn.w / 2, rotateBtn.y + rotateBtn.h / 2);
-
-				SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 150);
-				SDL_RenderFillRect(renderer, &rotateBtn);
+				drawFillRect(rotateBtn, btnColor, 150);
 			}
 
 			drawBtn(43, cancelBtn);
@@ -306,5 +298,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

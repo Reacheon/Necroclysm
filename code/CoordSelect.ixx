@@ -15,7 +15,6 @@ import textureVar;
 import drawText;
 import log;
 import ItemPocket;
-import drawPrimitive;
 
 //반환형 : wstring L"x좌표,y좌표,z좌표", ex) 3,5,1
 export class CoordSelect : public GUI
@@ -258,5 +257,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

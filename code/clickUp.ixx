@@ -6,7 +6,6 @@ import globalVar;
 import textureVar;
 import Player;
 import World;
-import drawPrimitive;
 import log;
 import GUI;
 

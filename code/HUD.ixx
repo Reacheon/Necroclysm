@@ -12,7 +12,6 @@ import constVar;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import checkCursor;
 import Loot;
 import Sprite;
@@ -81,6 +80,14 @@ private:
 	int quickSlotDist = 0;
 
 	bool disableClickUp4Motion = false;
+
+	bool dpadUpPressed = false;
+	bool dpadDownPressed = false;
+	bool dpadLeftPressed = false;
+	bool dpadRightPressed = false;
+	int dpadDelay = 0;
+	int barActCursorMoveDelay = 0;
+	int rStickPressDelay = 0;
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -142,9 +149,6 @@ public:
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 		Sprite* targetBtnSpr = nullptr;
 		
-		//SDL_SetRenderDrawColor(renderer, 0x87, 0xCE, 0xEB, 200);
-		//SDL_RenderDrawPoint(renderer, cameraW / 2, cameraH / 2);
-
 		drawStadium(letterbox.x, letterbox.y, letterbox.w, letterbox.h + 10, { 0,0,0 }, 150, 5);
 		if (ctrlVeh != nullptr) drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73);
 
@@ -383,9 +387,6 @@ public:
 		drawTab();
 		drawQuickSlot();
 
-		//디버깅용 좌측상단 하늘색 점
-		SDL_SetRenderDrawColor(renderer, 35, 246, 204, 255);
-		SDL_RenderDrawPoint(renderer, 0, 0);
 	}
 
 	void clickDownGUI()
@@ -572,8 +573,161 @@ public:
 			tileTouch(clickTile.x, clickTile.y);
 		}
 	}
+	void gamepadBtnDown() 
+	{ 
+		switch (event.cbutton.button)
+		{
+		case SDL_CONTROLLER_BUTTON_DPAD_UP:
+			dpadUpPressed = true;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+			dpadDownPressed = true;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+			dpadLeftPressed = true;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+			dpadRightPressed = true;
+			break;
+		case SDL_CONTROLLER_BUTTON_Y:
+			if (y == 0) 
+			{ 
+				executePopUp(); 
+				barActCursor = 0;
+			}
+			else 
+			{ 
+				executePopDown(); 
+				barActCursor = -1;
+			}
+			break;
+		case SDL_CONTROLLER_BUTTON_LEFTSTICK:
+			zoomScale += 1;
+			if (zoomScale > 5.0) zoomScale = 1.0;
+			break;
+		}
+
+
+	}
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() 
+	{
+		switch (event.cbutton.button)
+		{
+		case SDL_CONTROLLER_BUTTON_DPAD_UP:
+			std::printf("Button DPad Up released\n");
+			dpadUpPressed = false;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+			std::printf("Button DPad Down released\n");
+			dpadDownPressed = false;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+			std::printf("Button DPad Left released\n");
+			dpadLeftPressed = false;
+			break;
+		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+			std::printf("Button DPad Right released\n");
+			dpadRightPressed = false;
+			break;
+		}
+	}
 	void step()
 	{
+		if (SDL_NumJoysticks() > 0)
+		{
+			if (dpadDelay <= 0)
+			{
+				int dir = -1;
+				if (dpadUpPressed && dpadLeftPressed) dir = 3;
+				else if (dpadUpPressed && dpadRightPressed) dir = 1;
+				else if (dpadDownPressed && dpadLeftPressed) dir = 5;
+				else if (dpadDownPressed && dpadRightPressed) dir = 7;
+				else if (dpadUpPressed) dir = 2;
+				else if (dpadDownPressed) dir = 6;
+				else if (dpadLeftPressed) dir = 4;
+				else if (dpadRightPressed) dir = 0;
+
+				if (barActCursor == -1)
+				{
+					if (dir != -1)
+					{
+						int dx, dy;
+						dir2Coord(dir, dx, dy);
+						if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).walkable == true)//1칸 이내
+						{
+							cameraFix = true;
+							Player::ins()->startMove(dir);
+							dpadDelay = 6;
+						}
+					}
+				}
+			}
+			else dpadDelay--;
+
+			if (barActCursorMoveDelay <= 0 && barActCursor != -1)
+			{
+				barActCursorMoveDelay = 5;
+				if (dpadUpPressed)
+				{
+					if (barActCursor >= 7) barActCursor -= 7;
+				}
+				else if (dpadDownPressed)
+				{
+					if (barAct.size() - 1 >= barActCursor + 7) barActCursor += 7;
+				}
+				else if (dpadLeftPressed)
+				{
+					if (barActCursor % 7 == 0)
+					{
+						barActCursor += 6;
+						if (barActCursor >= barAct.size() - 1) barActCursor = barAct.size() - 1;
+					}
+					else barActCursor--;
+				}
+				else if (dpadRightPressed)
+				{
+					if (barActCursor % 7 == 6) barActCursor -= 6;
+					else
+					{
+						barActCursor++;
+						if (barActCursor >= barAct.size() - 1) barActCursor = barAct.size() - 1;
+					}
+				}
+				else barActCursorMoveDelay = 0;
+			}
+			else barActCursorMoveDelay--;
+
+			__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX); // -32768 ~ 32767
+			__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY); // -32768 ~ 32767
+			const int maxDist = 160;
+			int prevCameraX = cameraX, prevCameraY = cameraY;
+			if (leftY < -8000)
+			{
+				cameraFix = false;
+				cameraY -= 2;
+			}
+			else if (leftY > 8000)
+			{
+				cameraFix = false;
+				cameraY += 2;
+			}
+
+			if (leftX < -8000)
+			{
+				cameraFix = false;
+				cameraX -= 2;
+			}
+			else if (leftX > 8000)
+			{
+				cameraFix = false;
+				cameraX += 2;
+			}
+
+			if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+			if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+		}
+
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
 		if (Talent::ins() == nullptr)
 		{
@@ -895,7 +1049,6 @@ public:
 
 	void tileTouch(int touchX, int touchY) //일반 타일 터치
 	{
-
 		if (ctrlVeh == nullptr)//차량 조종 중이 아닐 경우
 		{
 			//화면에 있는 아이템 터치
@@ -1078,7 +1231,10 @@ public:
 						new God(godFlag::ra);
 					}
 				}
-				else Player::ins()->setAStarDst(touchX, touchY);
+				else
+				{
+					Player::ins()->startMove(coord2Dir(touchX - Player::ins()->getGridX(), touchY) - Player::ins()->getGridY());
+				}
 			}
 			else
 			{
@@ -1389,8 +1545,7 @@ public:
 
 				drawStadium(barButton[i].x, barButton[i].y, 72, 72, btnColor, 200, 5);
 				SDL_Rect letterboxInButton = { barButton[i].x + 3,  barButton[i].y + 3, 72 - 6, 72 - 6 };
-				SDL_SetRenderDrawColor(renderer, outlineColor.r, outlineColor.g, outlineColor.b, 255);
-				SDL_RenderDrawRect(renderer, &letterboxInButton);
+				drawRect(letterboxInButton, outlineColor);
 			}
 			else if (i <= 2)//왼쪽부터 3개의 버튼의 경우(좌회전, 1턴대기, 우회전)
 			{

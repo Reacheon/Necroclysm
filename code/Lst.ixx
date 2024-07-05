@@ -6,7 +6,6 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;
@@ -134,11 +133,10 @@ public:
 		{
 			drawWindow(&lstBase, lstTitleText, 0);
 
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 180);
 			SDL_Rect topWindow = { lstBase.x + 1, lstBase.y + 30, 278, 44 };
 			SDL_Rect botWindow = { lstBase.x + 1, lstBase.y + lstBase.h - 17, 278, 16 };
-			SDL_RenderFillRect(renderer, &topWindow);
-			SDL_RenderFillRect(renderer, &botWindow);
+			drawFillRect(topWindow, col::black, 180);
+			drawFillRect(botWindow, col::black, 180);
 
 			setFontSize(10);
 			drawTextCenter(L"#FFFFFF172/282", lstWindow.x + lstWindow.w - 30, lstWindow.y + lstWindow.h - 9);
@@ -163,8 +161,7 @@ public:
 			}
 
 			// 아이템 스크롤 그리기
-			SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-			SDL_RenderFillRect(renderer, &lstScrollBox);
+			drawFillRect(lstScrollBox, { 120,120,120 });
 		}
 		else
 		{
@@ -222,6 +219,9 @@ public:
 		}
 	}
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };
 

@@ -7,11 +7,9 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
-import drawPrimitive;
 import util;
 
 
@@ -87,13 +85,13 @@ public:
 			SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 0xff);
 
 			SDL_Rect whiteRectData = { bionicBase.x, bionicBase.y + 30 - 1 , 220 , bionicBase.h - 30 + 1 };
-			SDL_RenderDrawRect(renderer, &whiteRectData);
+			drawRect(whiteRectData, col::gray);
 
 			SDL_Rect whiteRectActive = { whiteRectData.x + whiteRectData.w - 1, bionicBase.y + 30 - 1,241,bionicBase.h - 30 + 1 };
-			SDL_RenderDrawRect(renderer, &whiteRectActive);
+			drawRect(whiteRectActive, col::gray);
 
 			SDL_Rect whiteRectPassive = { whiteRectActive.x + whiteRectActive.w - 1, bionicBase.y + 30 - 1,191,bionicBase.h - 30 + 1 };
-			SDL_RenderDrawRect(renderer, &whiteRectPassive);
+			drawRect(whiteRectPassive, col::gray);
 
 			setFontSize(10);
 			drawText(L"#FFFFFF바이오닉 인터페이스 : (INTERFACE_NAME)", bionicBase.x + 20, bionicBase.y + 36 + 14);
@@ -192,8 +190,7 @@ public:
 			// 액티브 바이오닉 스크롤 그리기
 			{
 				SDL_Rect activeScrollBox = { whiteRectActive.x + whiteRectActive.w - 5,whiteRectActive.y + 25 + 19 * 1, 2, 270 };
-				SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-				SDL_RenderFillRect(renderer, &activeScrollBox);
+				drawFillRect(activeScrollBox, { 120,120,120 });
 			}
 
 			setFontSize(10);
@@ -236,15 +233,15 @@ public:
 			drawTextCenter(L"#4A823E100%", bionicBase.x + 70, bionicBase.y + 36 + 94 - 12);
 			setFontSize(10);
 			drawTextCenter(L"#FFFFFF9800.5 KJ", bionicBase.x + 70, bionicBase.y + 36 + 94 + 6);
-			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			SDL_RenderDrawLine(renderer, bionicBase.x + 70 - 24, bionicBase.y + 36 + 94 + 13, bionicBase.x + 70 + 24, bionicBase.y + 36 + 94 + 13);
+			
+			drawLine(bionicBase.x + 70 - 24, bionicBase.y + 36 + 94 + 13, bionicBase.x + 70 + 24, bionicBase.y + 36 + 94 + 13, col::white);
+			
 			drawTextCenter(L"#FFFFFF9800.5 KJ", bionicBase.x + 70, bionicBase.y + 36 + 94 + 20);
 
 			// 패시브 바이오닉 스크롤 그리기
 			{
 				SDL_Rect passiveScrollBox = { whiteRectPassive.x + whiteRectPassive.w - 5,whiteRectPassive.y + 25 + 19 * 1, 2, 270 };
-				SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-				SDL_RenderFillRect(renderer, &passiveScrollBox);
+				drawFillRect(passiveScrollBox, { 120,120,120 });
 			}
 
 		}
@@ -277,5 +274,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

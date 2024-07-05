@@ -9,7 +9,6 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
@@ -95,13 +94,13 @@ public:
 			drawTextCenter(L"마킹", mapBase.x + 397, mapBase.y + 388);
 
 			SDL_Rect markingBtnRed = { mapBase.x + 345, mapBase.y + 396, 32, 32 };
-			SDL_RenderDrawRect(renderer, &markingBtnRed);
+			drawRect(markingBtnRed,col::white);
 			drawSpriteCenter(spr::icon16, 49, markingBtnRed.x + 16, markingBtnRed.y + 16);
 			SDL_Rect markingBtnYellow = { mapBase.x + 345 + 38, mapBase.y + 396, 32, 32 };
-			SDL_RenderDrawRect(renderer, &markingBtnYellow);
+			drawRect(markingBtnYellow, col::white);
 			drawSpriteCenter(spr::icon16, 50, markingBtnYellow.x + 16, markingBtnYellow.y + 16);
 			SDL_Rect markingBtnBlue = { mapBase.x + 345 + 76, mapBase.y + 396, 32, 32 };
-			SDL_RenderDrawRect(renderer, &markingBtnBlue);
+			drawRect(markingBtnBlue, col::white);
 			drawSpriteCenter(spr::icon16, 51, markingBtnBlue.x + 16, markingBtnBlue.y + 16);
 
 
@@ -109,23 +108,21 @@ public:
 			drawTextCenter(L"배율", mapBase.x + 585, mapBase.y + 388);
 
 			SDL_Rect reduceBtn = { mapBase.x + 487, mapBase.y + 396, 32, 32 };
-			SDL_RenderDrawRect(renderer, &reduceBtn);
+			drawRect(reduceBtn, col::white);
 			drawSpriteCenter(spr::icon16, 46, reduceBtn.x + 16, reduceBtn.y + 16);
 
 			SDL_Rect magnifyBtn = { mapBase.x + 487 + 172, mapBase.y + 396, 32, 32 };
-			SDL_RenderDrawRect(renderer, &magnifyBtn);
+			drawRect(magnifyBtn, col::white);
 			drawSpriteCenter(spr::icon16, 47, magnifyBtn.x + 16, magnifyBtn.y + 16);
 
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			SDL_RenderDrawLine(renderer, mapBase.x + 525, mapBase.y + 411, mapBase.x + 525 + 127, mapBase.y + 411);
-			SDL_RenderDrawLine(renderer, mapBase.x + 525, mapBase.y + 411 + 1, mapBase.x + 525 + 127, mapBase.y + 411 + 1);
+			drawLine(mapBase.x + 525, mapBase.y + 411, mapBase.x + 525 + 127, mapBase.y + 411,col::white);
+			drawLine(mapBase.x + 525, mapBase.y + 411 + 1, mapBase.x + 525 + 127, mapBase.y + 411 + 1,col::white);
 
-			SDL_RenderDrawLine(renderer, mapBase.x + 525, mapBase.y + 411 - 2, mapBase.x + 525, mapBase.y + 411 + 2);
-			SDL_RenderDrawLine(renderer, mapBase.x + 525 + 1, mapBase.y + 411 - 2, mapBase.x + 525 + 1, mapBase.y + 411 + 2);
+			drawLine(mapBase.x + 525, mapBase.y + 411 - 2, mapBase.x + 525, mapBase.y + 411 + 2,col::white);
+			drawLine(mapBase.x + 525 + 1, mapBase.y + 411 - 2, mapBase.x + 525 + 1, mapBase.y + 411 + 2,col::white);
 
-			SDL_RenderDrawLine(renderer, mapBase.x + 525 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 127, mapBase.y + 411 + 2);
-			SDL_RenderDrawLine(renderer, mapBase.x + 525 + 1 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 1 + 127, mapBase.y + 411 + 2);
-
+			drawLine(mapBase.x + 525 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 127, mapBase.y + 411 + 2,col::white);
+			drawLine(mapBase.x + 525 + 1 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 1 + 127, mapBase.y + 411 + 2,col::white);
 
 			drawSprite(spr::mapHereMarker, 0, mapBase.x+339, mapBase.y + 193);
 		}
@@ -158,5 +155,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

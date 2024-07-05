@@ -6,7 +6,6 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;
@@ -242,15 +241,13 @@ public:
 					if (Player::ins()->getTalentLevel(i) >= 18) rankColor = col::yellow;
 					drawText(col2Str(rankColor) + levelStr, targetX + 120, targetY + 4);
 
-					SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 					SDL_Rect gauge = { targetX + 118, targetY + 18, 36, 3 };
-					SDL_RenderDrawRect(renderer, &gauge);
+					drawRect(gauge, col::white);
 					if (Player::ins()->getTalentLevel(i) < 18)
 					{
-						SDL_SetRenderDrawColor(renderer, col::yellowGreen.r, col::yellowGreen.g, col::yellowGreen.b, 0xff);
 						float levelPercent = (Player::ins()->getTalentLevel(i) - (int)Player::ins()->getTalentLevel(i));
 						int gaugeLength = floor(34.0 * levelPercent);
-						if(gaugeLength>0) SDL_RenderDrawLine(renderer, targetX + 118 + 1, targetY + 18 + 1, targetX + 118 + gaugeLength, targetY + 18 + 1);
+						if(gaugeLength>0) drawLine(targetX + 118 + 1, targetY + 18 + 1, targetX + 118 + gaugeLength, targetY + 18 + 1,col::yellowGreen);
 						int q = ((int)(levelPercent*100.0)) / 10;
 						int r = ((int)(levelPercent * 100.0)) % 10;
 						int qIndex = q + 27;
@@ -264,8 +261,7 @@ public:
 					}
 					else
 					{
-						SDL_SetRenderDrawColor(renderer, col::yellow.r, col::yellow.g, col::yellow.b, 0xff);
-						SDL_RenderDrawLine(renderer, targetX + 118 + 1, targetY + 18 + 1, targetX + 118 + 34, targetY + 18 + 1);
+						drawLine(targetX + 118 + 1, targetY + 18 + 1, targetX + 118 + 34, targetY + 18 + 1, col::yellow);
 						setZoom(1.0);
 						drawSprite(spr::epsilonFont, 13, targetX + 118 + 37, targetY + 18 - 1);
 						drawSprite(spr::epsilonFont, 1, targetX + 118 + 37 + 4, targetY + 18 - 1);
@@ -289,8 +285,7 @@ public:
 					if (Player::ins()->getTalentFocus(i) == 0)
 					{
 						SDL_Rect rect = { targetX,targetY,24,24 };
-						SDL_SetRenderDrawColor(renderer, col::black.r, col::black.g, col::black.b, 150);
-						SDL_RenderFillRect(renderer, &rect);
+						drawFillRect(rect, col::black, 150);
 					}
 				}
 				else { drawSprite(spr::talentIconGold, i, targetX, targetY); }
@@ -374,6 +369,9 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 
 	void setWarningIndex(int inputVal) { warningIndex = inputVal; }

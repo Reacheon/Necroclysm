@@ -27,3 +27,4 @@ export import dir16;
 export import connectGroupExtraIndex;
 export import lineMaker;
 export import ThreadPool;
+export import drawPrimitive;

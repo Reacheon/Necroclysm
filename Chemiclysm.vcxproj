@@ -176,6 +176,9 @@
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Flame.ixx" />
+    <ClCompile Include="code\gamepadBtnDown.ixx" />
+    <ClCompile Include="code\gamepadBtnMotion.ixx" />
+    <ClCompile Include="code\gamepadBtnUp.ixx" />
     <ClCompile Include="code\Gas.ixx" />
     <ClCompile Include="code\God.ixx" />
     <ClCompile Include="code\HUD.ixx" />
@@ -218,7 +221,6 @@
     <ClCompile Include="code\Loot.ixx" />
     <ClCompile Include="code\Map.ixx" />
     <ClCompile Include="code\Mapmaker.ixx" />
-    <ClCompile Include="code\Module.ixx" />
     <ClCompile Include="code\Msg.ixx" />
     <ClCompile Include="code\readSkillDex.ixx" />
     <ClCompile Include="code\renderFPS.ixx" />

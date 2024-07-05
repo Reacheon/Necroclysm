@@ -8,7 +8,6 @@ import globalVar;
 import constVar;
 import errorBox;
 import textureVar;
-import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;
@@ -223,9 +222,7 @@ public:
 
 
 			//버튼 흰색 뚜껑
-			SDL_SetRenderDrawColor(renderer, 0x63, 0x63, 0x63, 0xff);
-			SDL_RenderDrawLine(renderer, msgBase.x + 1, msgBase.y + msgBase.h - 63, msgBase.x + msgBase.w - 1, msgBase.y + msgBase.h - 63);
-
+			drawLine(msgBase.x + 1, msgBase.y + msgBase.h - 63, msgBase.x + msgBase.w - 1, msgBase.y + msgBase.h - 63, { 0x63,0x63,0x63 });
 
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
@@ -253,8 +250,7 @@ public:
 				//메시지 입력 박스
 				SDL_Rect fMsgInputBox = msgInputBox; // 아이템 존재로 최종보정된 사각형
 				fMsgInputBox.x = msgInputBox.x + 30 * lootItemExist;
-				SDL_RenderDrawRect(renderer, &fMsgInputBox);
-
+				drawRect(fMsgInputBox, col::white);
 
 				const unsigned __int16 maxTextWidth = 170;
 				SDL_Point inputTextPoint = { fMsgInputBox.x + 10, msgInputBox.y + 9 };
@@ -267,12 +263,11 @@ public:
 				}
 				drawText(col2Str(col::white) + exInputTextCut, inputTextPoint.x, inputTextPoint.y);
 				std::wstring cursorText = exInputTextCut.substr(0, exInputCursor + exInputEditing);
-				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 				if (timer::timer600 % 30 <= 15 && exInput == true)
 				{
 					int textWidth = queryTextWidth(cursorText, false);
 					int textHeight = queryTextHeight(cursorText, false);
-					SDL_RenderDrawLine(renderer, inputTextPoint.x + textWidth - 1, inputTextPoint.y, inputTextPoint.x + textWidth - 1, inputTextPoint.y + textHeight);
+					drawLine(inputTextPoint.x + textWidth - 1, inputTextPoint.y, inputTextPoint.x + textWidth - 1, inputTextPoint.y + textHeight, col::white);
 				}
 
 			}
@@ -319,6 +314,9 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };
 

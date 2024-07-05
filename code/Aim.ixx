@@ -7,7 +7,6 @@ import util;
 import GUI;
 import errorBox;
 import globalVar;
-import drawPrimitive;
 import drawText;
 import checkCursor;
 import drawSprite;
@@ -289,8 +288,7 @@ public:
 				if (playerEquipInfo.size() == 0) { behindStr += L"맨손"; }
 				SDL_Rect inEquipSlotBehind = { aimWindow.x + 12 + 2, aimWindow.y + 12 + 2, 48 - 4, 48 - 4 };
 				drawStadium(equipSlotBehind.x, equipSlotBehind.y, equipSlotBehind.w, equipSlotBehind.h, slotColor, 200, 5);
-				SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-				SDL_RenderDrawRect(renderer, &inEquipSlotBehind);
+				drawRect(inEquipSlotBehind, lowCol::white);
 				setZoom(2.0);
 				drawSpriteCenter(spr::itemset, behindSprIndex, equipSlotBehind.x + equipSlotBehind.w / 2, equipSlotBehind.y + equipSlotBehind.h / 2);
 				setZoom(1.0);
@@ -385,8 +383,7 @@ public:
 
 				SDL_Rect inEquipSlotFront = { aimWindow.x + 18 + 2, aimWindow.y + 18 + 2, 48 - 4, 48 - 4 };
 				drawStadium(equipSlotFront.x, equipSlotFront.y, equipSlotFront.w, equipSlotFront.h, slotColor, 200, 5);
-				SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 170);
-				SDL_RenderDrawRect(renderer, &inEquipSlotFront);
+				drawRect(inEquipSlotFront, col::white, 170);
 				setZoom(2.0);
 				drawSpriteCenter(spr::itemset, frontSprIndex, equipSlotFront.x + equipSlotFront.w / 2, equipSlotFront.y + equipSlotFront.h / 2);
 				setZoom(1.0);
@@ -761,8 +758,7 @@ public:
 
 
 		//템플릿 피벗
-		SDL_SetRenderDrawColor(renderer, lowCol::red.r, lowCol::red.g, lowCol::red.b, 255);
-		SDL_RenderDrawPoint(renderer, tmpPivotX, tmpPivotY);
+		drawPoint(tmpPivotX, tmpPivotY, lowCol::red);
 
 		if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)))
 		{
@@ -823,8 +819,8 @@ public:
 
 			SDL_Rect inAtkBtn = { atkBtn.x + 3, atkBtn.y + 3, atkBtn.w - 6, atkBtn.h - 6 };
 			drawStadium(atkBtn.x, atkBtn.y, atkBtn.w, atkBtn.h, btnColor, 200, 5);
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 130);
-			SDL_RenderDrawRect(renderer, &inAtkBtn);
+			drawRect(inAtkBtn, col::white, 130);
+
 			setFontSize(10);
 			drawText(col2Str(col::white) + L"몸통 사격 (" + std::to_wstring((int)(mainAimAcc * 100)) + L"%," + std::to_wstring(Player::ins()->getAimStack()) + L"차지)", atkBtn.x + 31, atkBtn.y + 11);
 			setFontSize(7);
@@ -868,8 +864,7 @@ public:
 
 			SDL_Rect inAimBtn = { aimBtn.x + 3, aimBtn.y + 3, aimBtn.w - 6, aimBtn.h - 6 };
 			drawStadium(aimBtn.x, aimBtn.y, aimBtn.w, aimBtn.h, btnColor, 200, 5);
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 130);
-			SDL_RenderDrawRect(renderer, &inAimBtn);
+			drawRect(inAimBtn, col::white, 130);
 			setFontSize(10);
 			drawText(col2Str(col::white) + L"해당 부위를 정조준", aimBtn.x + 31, aimBtn.y + 11);
 			setFontSize(7);
@@ -913,13 +908,11 @@ public:
 
 			SDL_Rect inModeBtn = { modeBtn.x + 3, modeBtn.y + 3, modeBtn.w - 6, modeBtn.h - 6 };
 			drawStadium(modeBtn.x, modeBtn.y, modeBtn.w, modeBtn.h, btnColor, 200, 5);
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 130);
-			SDL_RenderDrawRect(renderer, &inModeBtn);
+			drawRect(inModeBtn, col::white, 130);
 
 			if (playerEquipInfo[Player::ins()->getAimWeaponIndex()].modeTemplate == 1)
 			{
-				SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 255);
-				SDL_RenderDrawLine(renderer, modeBtn.x + modeBtn.w / 2 - 16, modeBtn.y + 3, modeBtn.x + modeBtn.w / 2 + 16, modeBtn.y + 3);
+				drawLine(modeBtn.x + modeBtn.w / 2 - 16, modeBtn.y + 3, modeBtn.x + modeBtn.w / 2 + 16, modeBtn.y + 3, btnColor);
 				setFontSize(8);
 				drawTextCenter(col2Str(col::white) + L"MODE", modeBtn.x + modeBtn.w / 2, modeBtn.y + 6);
 
@@ -1310,6 +1303,9 @@ public:
 			}
 		}
 	}
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step()
 	{
 		if (victimEntity != nullptr)
@@ -1439,10 +1435,8 @@ public:
 			else { btnColor = lowCol::blue; }
 		}
 
-		SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 255);
-		SDL_RenderFillRect(renderer, &partRect);
-		SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 255);
-		SDL_RenderDrawRect(renderer, &partRect);
+		drawFillRect(partRect, btnColor);
+		drawRect(partRect, lowCol::green);
 		setFontSize(8);
 		drawText(col2Str(lowCol::white) + partName, partRect.x + 3, partRect.y + 3);
 		setFontSize(10);

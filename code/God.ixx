@@ -8,7 +8,6 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
@@ -171,8 +170,7 @@ public:
 						drawText(col2Str(lowCol::yellow) + L"★1", pivotX + 4, pivotY + 4);
 
 						SDL_Rect talentRect = { pivotX + 31, pivotY + 5, 34,34 };
-						SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
-						SDL_RenderDrawRect(renderer, &talentRect);
+						drawRect(talentRect, col::gray);
 
 						setFontSize(14);
 						drawTextCenter(col2Str(col::white) + L"권능 이름", pivotX + 47, pivotY + 48);
@@ -198,11 +196,9 @@ public:
 					if (click) btnCol = lowCol::deepBlue;
 					else btnCol = lowCol::blue;
 				}
-				SDL_SetRenderDrawColor(renderer, btnCol.r, btnCol.g, btnCol.b, 255);
-				SDL_RenderFillRect(renderer, &convertBtn);
 
+				drawFillRect(convertBtn,btnCol);
 				drawEdgeWindow(convertBtn.x, convertBtn.y, convertBtn.w, convertBtn.h, 16);
-
 				drawTextCenter(col2Str(col::yellow) + L"개종하기", convertBtn.x + 90, convertBtn.y + 26);
 			}
 		}
@@ -239,5 +235,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

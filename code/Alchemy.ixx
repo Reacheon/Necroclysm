@@ -8,7 +8,6 @@ import GUI;
 import textureVar;
 import drawText;
 import drawSprite;
-import drawPrimitive;
 import globalVar;
 import checkCursor;
 import drawWindow;
@@ -194,13 +193,11 @@ public:
 			drawText(toolStr, tooltipBox.x + tooltipBox.w / 2 - 120, tooltipBox.y + 58);
 
 			SDL_Rect tooltipGauge = { cameraW / 2 - 130, 100, 260,16 };
-			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			SDL_RenderDrawRect(renderer, &tooltipGauge);
+			drawRect(tooltipGauge, col::white);
 
 			SDL_Rect tooltipInGauge = { cameraW / 2 - 130 + 4, 100 + 4, 252,8 };
 			tooltipInGauge.w = 252.0 * ((float)elapsedTime / (float)targetCraftingTime);
-			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			SDL_RenderFillRect(renderer, &tooltipInGauge);
+			drawFillRect(tooltipInGauge, col::white);
 
 			setFontSize(11);
 			std::wstring topText = std::to_wstring(targetCraftingTime - elapsedTime);
@@ -364,8 +361,7 @@ public:
 
 			if (reactPtrVec.size() == 1)
 			{
-				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
-				SDL_RenderFillRect(renderer, &alchemyStartBtn);
+				drawFillRect(alchemyStartBtn, col::black, 200);
 			}
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,36 +371,24 @@ public:
 			if (dropDownList::mode != selectFlag::none)//셀렉트박스 아이템들 그리기
 			{
 				dropDownList::rect.h = 13 + 17 * myMin(10, dropDownList::itemVec.size());
-				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
-				SDL_RenderFillRect(renderer, &dropDownList::rect);
+				drawFillRect(dropDownList::rect, col::black);
 
-				SDL_SetRenderDrawColor(renderer, 0x4a, 0x4a, 0x4a, 0xff);
 				SDL_Rect line1 = { dropDownList::rect.x, dropDownList::rect.y, 1, dropDownList::rect.h };
-				SDL_RenderFillRect(renderer, &line1);
+				drawFillRect(line1, { 0x4a,0x4a,0x4a });
 
 				SDL_Rect line2 = { dropDownList::rect.x + dropDownList::rect.w - 1, dropDownList::rect.y, 1, dropDownList::rect.h };
-				SDL_RenderFillRect(renderer, &line2);
+				drawFillRect(line2, { 0x4a,0x4a,0x4a });
 
 				SDL_Rect line3 = { dropDownList::rect.x, dropDownList::rect.y + dropDownList::rect.h - 1, dropDownList::rect.w, 1 };
-				SDL_RenderFillRect(renderer, &line3);
+				drawFillRect(line3, { 0x4a,0x4a,0x4a });
 
 				//선택 창에 나오는 개별 아이템 그리기
 				for (int i = 0; i < myMin(10, dropDownList::itemVec.size()); i++)
 				{
 					SDL_Rect miniRect = { dropDownList::rect.x, dropDownList::rect.y + 17 * i ,205, 16 };
-					if (cursorCheck(miniRect) == cursorFlag::hover)
-					{
-						SDL_SetRenderDrawColor(renderer, 0x2b, 0x81, 0xe8, 0xff);
-					}
-					else if (cursorCheck(miniRect) == cursorFlag::click)
-					{
-						SDL_SetRenderDrawColor(renderer, 0x20, 0x50, 0xa8, 0xff);
-					}
-					else
-					{
-						SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
-					}
-					SDL_RenderFillRect(renderer, &miniRect);
+					if (cursorCheck(miniRect) == cursorFlag::hover) drawFillRect(miniRect, { 0x2b,0x81,0xe8 });
+					else if (cursorCheck(miniRect) == cursorFlag::click) drawFillRect(miniRect, { 0x20,0x50,0xa8 });
+					else drawFillRect(miniRect, { 0,0,0 });
 
 					int targetSprIndex = 0;
 					if (dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr == nullptr || ((ItemPocket*)(dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr))->itemInfo.size() == 0)
@@ -440,15 +424,14 @@ public:
 					drawText(col2Str(col::white) + indivItemName, dropDownList::rect.x + 34, dropDownList::rect.y + 1 + yCorrection + 17 * i);
 				}
 
-				SDL_SetRenderDrawColor(renderer, 0x4a, 0x4a, 0x4a, 0xff);
 				for (int i = 0; i < myMin(10, dropDownList::itemVec.size()); i++)
 				{
 					SDL_Rect lineSep = { dropDownList::rect.x + 4, dropDownList::rect.y + 16 + 17 * i, 197, 1 };
-					SDL_RenderFillRect(renderer, &lineSep);
+					drawFillRect(lineSep, { 0x4a,0x4a,0x4a });
 				}
 
 				SDL_Rect scrollBox = { dropDownList::rect.x + 205, dropDownList::rect.y + 2, 2, 15 + 17 * (myMin(10,dropDownList::itemVec.size()) - 1) };
-				SDL_RenderFillRect(renderer, &scrollBox);
+				drawFillRect(scrollBox, { 0x4a,0x4a,0x4a });
 			}
 		}
 		else
@@ -661,6 +644,9 @@ public:
 	{
 		dropDownList::initScroll = dropDownList::scroll;
 	}
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step()
 	{
 		//잘못된 스크롤 위치 조정

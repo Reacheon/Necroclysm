@@ -393,7 +393,7 @@ public:
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_Rect dstWhite = { 0, 0, textureW, textureH };
-		SDL_RenderFillRect(renderer, &dstWhite);
+		drawFillRect(dstWhite, col::white);
 		SDL_SetRenderTarget(renderer, nullptr);
 		if (spriteFlash != nullptr) { delete spriteFlash; }
 		spriteFlash = new Sprite(renderer, drawingTexture, 48, 48);
@@ -1709,14 +1709,12 @@ public:
 		{
 			SDL_Rect dst = { drawingX - (int)(8 * zoomScale), drawingY + (int)(3 * zoomScale), (int)(16 * zoomScale),(int)(3 * zoomScale) };
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			SDL_SetRenderDrawColor(renderer, col::black.r, col::black.g, col::black.b, 255);
-			SDL_RenderFillRect(renderer, &dst);
+			drawFillRect(dst, col::black);
 
 			float ratioFakeHP = myMax((float)0.0, (entityInfo.fakeHP) / (float)(entityInfo.maxHP));
 			dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-			SDL_SetRenderDrawColor(renderer, col::white.r, col::white.g, col::white.b, 255);
-			SDL_RenderFillRect(renderer, &dst);
+			drawFillRect(dst, col::white);
 
 			float ratioHP = myMax((float)0.0, (float)(entityInfo.HP) / (float)(entityInfo.maxHP));
 			dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
@@ -1724,13 +1722,12 @@ public:
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 			if (isPlayer)
 			{
-				SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 255);
+				drawFillRect(dst, lowCol::green);
 			}
 			else
 			{
-				SDL_SetRenderDrawColor(renderer, lowCol::red.r, lowCol::red.g, lowCol::red.b, 255);
+				drawFillRect(dst, lowCol::red);
 			}
-			SDL_RenderFillRect(renderer, &dst);
 		}
 
 		if (getFlashType() != NULL) //엔티티에 플래시 효과가 있을 경우

@@ -74,6 +74,9 @@ public:
     virtual void clickUpGUI() = 0;
 	virtual void clickMotionGUI(int dx, int dy) = 0;
 	virtual void clickDownGUI() = 0;
+	virtual void gamepadBtnDown() = 0;
+	virtual void gamepadBtnMotion() = 0;
+	virtual void gamepadBtnUp() = 0;
 	virtual void step() = 0;
     virtual bool runAnimation(bool shutdown)
 	{

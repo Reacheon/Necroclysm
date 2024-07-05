@@ -77,8 +77,7 @@ export __int64 renderTile()
 	//전체광
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 	SDL_Rect screenRect = { 0,0,cameraW,cameraH };
-	SDL_SetRenderDrawColor(renderer, mainLightColor.r, mainLightColor.g, mainLightColor.b, mainLightBright);
-	SDL_RenderFillRect(renderer, &screenRect);
+	drawFillRect(screenRect, mainLightColor, mainLightBright);
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	return (getNanoTimer() - timeStampStart);
@@ -679,8 +678,7 @@ __int64 drawFogs()
 		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
 		dst.w = tileSize;
 		dst.h = tileSize;
-		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 255);
-		SDL_RenderFillRect(renderer, &dst);
+		drawFillRect(dst, { 0x16,0x16,0x16 });
 	}
 
 	for (const auto& elem : grayFogList)
@@ -694,8 +692,7 @@ __int64 drawFogs()
 		dst.h = tileSize;
 
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 185);
-		SDL_RenderFillRect(renderer, &dst);
+		drawFillRect(dst, { 0x16,0x16,0x16 }, 185);
 	}
 
 	for (const auto& elem : lightFogList)
@@ -710,15 +707,13 @@ __int64 drawFogs()
 		dst.h = tileSize;
 
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(renderer, 0x16, 0x16, 0x16, 90);
-		SDL_RenderFillRect(renderer, &dst);
+		drawFillRect(dst, { 0x16,0x16,0x16 }, 90);
 
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 		Uint8 targetR = myMin(255, thisTile->redLight);
 		Uint8 targetG = myMin(255, thisTile->greenLight);
 		Uint8 targetB = myMin(255, thisTile->blueLight);
-		SDL_SetRenderDrawColor(renderer, targetR, targetG, targetB, 200);
-		SDL_RenderFillRect(renderer, &dst);
+		drawFillRect(dst, { targetR,targetG,targetB }, 200);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 	}
 

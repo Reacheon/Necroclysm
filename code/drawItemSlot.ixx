@@ -5,7 +5,6 @@ export module drawItemSlot;
 import std;
 import util;
 import globalVar;
-import drawPrimitive;
 import drawText;
 import constVar;
 import checkCursor;

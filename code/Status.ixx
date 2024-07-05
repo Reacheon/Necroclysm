@@ -7,7 +7,6 @@ import util;
 import GUI;
 import globalVar;
 import checkCursor;
-import drawPrimitive;
 
 export class Status : public GUI
 {
@@ -83,5 +82,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy){/*사용 X*/}
 	void clickDownGUI(){/*사용 X*/}
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step() { }
 };

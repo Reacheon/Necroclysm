@@ -7,7 +7,6 @@ export module Equip;
 import std;
 import util;
 import Player;
-import drawPrimitive;
 import drawText;
 import globalVar;
 import textureVar;
@@ -246,13 +245,11 @@ public:
 			}
 
 			// 아이템 스크롤 그리기
-			SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-			SDL_RenderFillRect(renderer, &equipScrollBox);
+			drawFillRect(equipScrollBox, { 120,120,120 });
 			SDL_Rect inScrollBox = { equipWindow.x + 328, equipWindow.y + 40, 2, 42 * equipItemMax }; // 내부 스크롤 커서
 			inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)equipItemMax / equipPtr->itemInfo.size());
 			inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)equipPtr->itemInfo.size());
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			SDL_RenderFillRect(renderer, &inScrollBox);
+			drawFillRect(inScrollBox, col::white);
 		}
 
 
@@ -430,8 +427,7 @@ public:
 
 					//포켓 질량 게이지
 					SDL_Rect weightBar = { pocketWindow.x + 12, pocketWindow.y + 64, 72, 4 };
-					SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-					SDL_RenderDrawRect(renderer, &weightBar);
+					drawRect(weightBar, col::white);
 
 					SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 					setFontSize(10);
@@ -439,15 +435,14 @@ public:
 
 					//루팅 주머니 부피 게이지
 					SDL_Rect volumeBar = { pocketWindow.x + pocketWindow.w - 12 - 72, pocketWindow.y + 64, 72, 4 };
-					SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-					SDL_RenderDrawRect(renderer, &volumeBar);
-					SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 0xff);
+					drawRect(volumeBar, col::white);
+
 					SDL_Rect volumeGauge = { volumeBar.x + 1, volumeBar.y + 1, volumeBar.w - 2, 2 };
 
 					int maxVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketMaxVolume;
 					int currentVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketVolume;
 					volumeGauge.w = (volumeBar.w - 2) * ((float)currentVolume / (float)maxVolume);
-					SDL_RenderFillRect(renderer, &volumeGauge);
+					drawFillRect(volumeGauge, lowCol::green);
 					std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
 
 					SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -590,20 +585,17 @@ public:
 					}
 
 					// 아이템 스크롤 그리기
-					SDL_SetRenderDrawColor(renderer, 120, 120, 120, 255);
-					SDL_RenderFillRect(renderer, &lootScrollBox);
+					drawFillRect(lootScrollBox, { 120,120,120 });
 					SDL_Rect inScrollBox = { lootWindow.x + 328, lootWindow.y + 40, 2, 42 * lootItemMax }; // 내부 스크롤 커서
 					inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)lootItemMax / lootPtr->itemInfo.size());
 					inScrollBox.y = lootScrollBox.y + lootScrollBox.h * ((float)lootScroll / (float)lootPtr->itemInfo.size());
 					if (inScrollBox.y + inScrollBox.h > lootScrollBox.y + lootScrollBox.h) { inScrollBox.y = lootScrollBox.y + lootScrollBox.h - inScrollBox.h; }
-					SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-					SDL_RenderFillRect(renderer, &inScrollBox);
+					drawFillRect(inScrollBox, col::white);
 
 					//루팅(버리기)버튼 그리기
 					{
 						SDL_Rect bridgeRect = { pocketWindow.x + pocketWindow.w / 2 - 36, pocketWindow.y + pocketWindow.h, 72,10 };
-						SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
-						SDL_RenderFillRect(renderer, &bridgeRect);
+						drawFillRect(bridgeRect, col::black,150);
 
 						SDL_Color lootBtnColor;
 						if (checkCursor(&lootBtn))
@@ -613,10 +605,9 @@ public:
 						}
 						else { lootBtnColor = lowCol::black; }
 
-						SDL_SetRenderDrawColor(renderer, lootBtnColor.r, lootBtnColor.g, lootBtnColor.b, 200);
-						SDL_RenderFillRect(renderer, &lootBtn);
-						SDL_SetRenderDrawColor(renderer, 0x57, 0x57, 0x57, 255);
-						SDL_RenderDrawRect(renderer, &lootBtn);
+						drawFillRect(lootBtn, lootBtnColor, 200);
+
+						drawRect(lootBtn, { 0x57,0x57,0x57 });
 
 						setZoom(0.7);
 						drawSpriteCenter(spr::icon32, 0, lootWindow.x + lootWindow.w / 2, lootWindow.y - 2);
@@ -909,6 +900,9 @@ public:
 		initLootScroll = lootScroll;
 		initPocketCursor = pocketCursor;
 	}
+	void gamepadBtnDown() { }
+	void gamepadBtnMotion() { }
+	void gamepadBtnUp() { }
 	void step()
 	{
 		//셀렉트 홀드 이벤트

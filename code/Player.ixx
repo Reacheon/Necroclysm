@@ -139,6 +139,7 @@ public:
 			{
 				if (isCircle(minimapDiameter / 2, dx, dy))
 				{
+					SDL_Color ptCol;
 					TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
 					if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 					{
@@ -148,7 +149,7 @@ public:
 						case 0:
 							break;
 						default:
-							SDL_SetRenderDrawColor(renderer, 112, 112, 112, 255);
+							ptCol = { 112,112, 112 };
 							break;
 						}
 
@@ -158,35 +159,20 @@ public:
 						case 0:
 							break;
 						default:
-							SDL_SetRenderDrawColor(renderer, 29, 29, 29, 255);
+							ptCol = { 29,29, 29 };
 							break;
 						}
-
+						
 						//prop
-						if (tgtTile->PropPtr != nullptr)
-						{
-							SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 255);
-						}
-
+						if (tgtTile->PropPtr != nullptr) ptCol = lowCol::yellow;
 						//vehicle
-						if (tgtTile->VehiclePtr != nullptr)
-						{
-							SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 255);
-						}
+						if (tgtTile->VehiclePtr != nullptr) ptCol = lowCol::orange;
 
-						SDL_RenderDrawPoint(renderer, dx + (minimapDiameter / 2), dy + (minimapDiameter / 2));
+						drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2),ptCol);
 
-						if (tgtTile->fov == fovFlag::gray)
-						{
-							SDL_SetRenderDrawColor(renderer, col::black.r, col::black.g, col::black.b, 100);
-							SDL_RenderDrawPoint(renderer, dx + (minimapDiameter / 2), dy + (minimapDiameter / 2));
-						}
+						if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2), col::black, 100);
 					}
-					else
-					{
-						SDL_SetRenderDrawColor(renderer, col::black.r, col::black.g, col::black.b, 255);
-						SDL_RenderDrawPoint(renderer, dx + (minimapDiameter / 2), dy + (minimapDiameter / 2));
-					}
+					else drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2), col::black);
 				}
 			}
 		}
@@ -392,6 +378,4 @@ public:
 		}
 		return itemNumber;
 	}
-
-
 };
