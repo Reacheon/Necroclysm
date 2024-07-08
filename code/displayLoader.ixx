@@ -18,23 +18,21 @@ export void displayLoader()
     bool debugSquare = true;
 
 
-    SDL_DisplayMode display;
-    SDL_GetCurrentDisplayMode(0, &display);
-    cameraW = (int)(display.w * 1.0);
-    cameraH = (int)(display.h * 1.0);
+    cameraW = 720;
+    cameraH = 720;
 
     window = SDL_CreateWindow("Chemiclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);
 
 
-    SDL_DisplayMode displayMode;
-    if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
-    else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);
+    //SDL_DisplayMode displayMode;
+    //if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
+    //else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);
 
-    cameraW = displayMode.w;
-    cameraH = displayMode.h;
+    //cameraW = displayMode.w;
+    //cameraH = displayMode.h;
 
     if (cameraW > cameraH)
     {
@@ -45,11 +43,6 @@ export void displayLoader()
     {
         cameraH = ((float)cameraH / (float)cameraW) * (float)720;
         cameraW = 720;
-    }
-    else
-    {
-        cameraW = 720;
-        cameraH = 720;
     }
 
     ////////PC 테스트용 강제 해상도 조정////////

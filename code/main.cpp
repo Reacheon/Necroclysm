@@ -1,4 +1,5 @@
-﻿#include <SDL.h>
+﻿#include <tbb/tbb.h>
+#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
@@ -98,16 +99,26 @@ int main(int argc, char** argv)
 
 		//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
 		dur::renderTile = renderTile();
-		renderWeather();
+		dur::renderWeather = renderWeather();
 		dur::renderSticker = renderSticker(cameraX, cameraY);
 		dur::renderUI = renderUI();
 		dur::renderLog = renderLog(renderer);
-		__int64 loopEnd = getNanoTimer();
-
-		const int constDelay = 17000000;
-		__int64 delayTime = constDelay - (loopEnd - loopStart);
+		dur::totalDelay = getNanoTimer() - loopStart;
+		const int constDelay = 16000000;
+		__int64 delayTime = constDelay - dur::totalDelay;
 		if (delayTime >= constDelay) delayTime = constDelay; // 만약 루프 시간이 음수(오류)가 나왔을 경우
-		else if (delayTime < 0) delayTime = 0;
+		else if (delayTime < 0)
+		{
+			//prt(L"루프가 16ms를 넘는 과부하가 발생했다.");
+			//if (turnCycle == turn::playerInput) prt(L"현재 턴은 playerInput이다.	");
+			//else if (turnCycle == turn::playerAnime) prt(L"현재 턴은 playerAnime이다.	");
+			//else if (turnCycle == turn::monsterAI) prt(L"현재 턴은 monsterAI이다.	");
+			//else prt(L"현재 턴은 monsterAnime이다.	");
+			//prt(L"turn : %ls ms, ", decimalCutter(dur::turnCycle / 1000000.0, 5).c_str());
+			//prt(L"tile : %ls ms, ", decimalCutter(dur::renderTile / 1000000.0, 5).c_str());
+			//prt(L"UI : %ls ms\n", decimalCutter(dur::renderUI / 1000000.0, 5).c_str());
+			delayTime = 0;
+		}
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
 		renderFPS(getNanoTimer() - loopStart);
 		SDL_RenderPresent(renderer);
@@ -119,7 +130,7 @@ int main(int argc, char** argv)
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
-	_CrtDumpMemoryLeaks();
+	//_CrtDumpMemoryLeaks();
 
 	return 0;
 };

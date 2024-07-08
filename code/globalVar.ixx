@@ -142,6 +142,7 @@ export namespace dur
 	__int64 turnCycle = 0;
 	__int64 stepEvent = 0;
 	__int64 renderTile = 0;
+    __int64 renderWeather = 0;
 	__int64 renderSticker = 0;
 	__int64 renderUI = 0;
 	__int64 renderLog = 0;
@@ -154,6 +155,8 @@ export namespace dur
     __int64 damage = 0;
     __int64 fog = 0;
     __int64 marker = 0;
+
+    __int64 totalDelay = 0;
 }
 
 export int extraCameraLength = 0;

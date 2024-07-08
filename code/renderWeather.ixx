@@ -14,7 +14,6 @@ export __int64 renderWeather()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-
 	int cx, cy;
 	int pz = Player::ins()->getGridZ();
 	World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);

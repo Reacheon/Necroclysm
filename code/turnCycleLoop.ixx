@@ -1,4 +1,5 @@
-#include <SDL.h>;
+#include <tbb/tbb.h>
+#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
@@ -46,20 +47,17 @@ export __int64 turnCycleLoop()
 		}
 	}
 
-	std::vector<Entity*> entityList = (World::ins())->getEntityList();
-	for (int i = 0; i < entityList.size(); i++)
-	{
-		Entity* address = (Entity*)entityList[i];
-		if (address->entityInfo.fakeHP > address->entityInfo.HP) { address->entityInfo.fakeHP--; }
+	//for (auto* ePtr : entityList)
+	//{
+	//	if (ePtr->entityInfo.fakeHP > ePtr->entityInfo.HP) { ePtr->entityInfo.fakeHP--; }
 
-
-		if (address->entityInfo.fakeHP != address->entityInfo.HP)
-		{
-			if (address->entityInfo.fakeHPAlpha > 30) { address->entityInfo.fakeHPAlpha -= 30; }
-			else { address->entityInfo.fakeHPAlpha = 0; }
-		}
-		else { address->entityInfo.fakeHPAlpha = 255; }
-	}
+	//	if (ePtr->entityInfo.fakeHP != ePtr->entityInfo.HP)
+	//	{
+	//		if (ePtr->entityInfo.fakeHPAlpha > 30) { ePtr->entityInfo.fakeHPAlpha -= 30; }
+	//		else { ePtr->entityInfo.fakeHPAlpha = 0; }
+	//	}
+	//	else { ePtr->entityInfo.fakeHPAlpha = 255; }
+	//}
 
 	__int64 playerInputTime = 0, animationTime = 0, entityAITime = 0;
 	if (turnCycle == turn::playerInput)
@@ -104,8 +102,6 @@ __int64 playerInputTurn()
 
 		}
 	}
-
-
 
 	if (Player::ins()->getHasAStarDst() == true) //자동이동 기능이 활성화되었을 경우
 	{
@@ -415,26 +411,19 @@ __int64 animationTurn()
 		}
 	}
 
-	auto distributeTime = []() {
-		addTimeTurn(timeGift);
-		for (int i = 0; i < (World::ins())->getEntityList().size(); i++)
+	auto endAnimeTurn = [=]() 
 		{
-			if ((World::ins())->getEntityList()[i] != (Player::ins()))
-			{
-				((Monster*)(World::ins())->getEntityList()[i])->addTimeResource(timeGift);
-			}
-		}
-		for (int i = 0; i < (World::ins())->getVehicleList().size(); i++)
-		{
-			((Vehicle*)(World::ins())->getVehicleList()[i])->addTimeResource(timeGift);
-		}
-		timeGift = 0;
-		};
-
-	auto endAnimeTurn = [=]() {
 		if (turnCycle == turn::playerAnime)
 		{
-			distributeTime();
+			std::vector<Entity*> entityList = (World::ins())->getEntityList();
+			std::vector<Vehicle*> vehList = (World::ins())->getVehicleList();
+			addTimeTurn(timeGift);
+			for (auto ePtr : entityList)
+			{
+				if (ePtr != (Player::ins())) ((Monster*)ePtr)->addTimeResource(timeGift);
+			}
+			for (auto vPtr : vehList) vPtr->addTimeResource(timeGift);
+			timeGift = 0;
 			turnCycle = turn::monsterAI;
 		}
 		else if (turnCycle == turn::monsterAnime) turnCycle = turn::monsterAI;
@@ -446,25 +435,23 @@ __int64 animationTurn()
 		for (auto it = aniUSet.begin(); it != aniUSet.end();)
 		{
 			bool loopBreak = false;
-			if (((Ani*)(*it))->isDictator()) { loopBreak = true; }
+			if ((*it)->isDictator()) { loopBreak = true; }
 
-			if (((Ani*)(*it))->runAnimation(false) == true)//종료하는 애니메이션을 실행했을 경우
+			if ((*it)->runAnimation(false) == true)//종료하는 애니메이션을 실행했을 경우
 			{
 				aniUSet.erase(it++);//it가 가리키는 요소를 제거하고 후위연산자로 늘려버려서 반복자가 무효화되지않도록 함
-				if (aniUSet.size() == 0) endAnimeTurn();
+				if (aniUSet.size() == 0)
+				{
+					endAnimeTurn();
+					//prt(L"runAnimation 종료, 걸린 시간은 %ls이다.\n", decimalCutter((getNanoTimer()- timeStampStart) / 1000000.0, 5).c_str());
+				}
 			}
-			else
-			{
-				it++;
-			}
+			else it++;
 
 			if (loopBreak) break;
 			else if (it != aniUSet.end())//설령 Dictator가 아니라도 다음 Ani가 Dictator면 미리 종료함, 다음은 Dictator만의 독무대를 위해 
 			{
-				if (((Ani*)(*it))->isDictator())
-				{
-					break;
-				}
+				if ((*it)->isDictator()) break;
 			}
 
 		}
@@ -489,18 +476,19 @@ __int64 entityAITurn()
 
 	bool endMonsterTurn = true;
 
+	std::vector<Entity*> entityList = (World::ins())->getEntityList();
 	std::vector<Vehicle*> vehList = (World::ins())->getVehicleList();
-	for (int i = 0; i < vehList.size(); i++)
+
+	for (auto vPtr : vehList)
 	{
-		if (((Vehicle*)vehList[i])->runAI() == false) endMonsterTurn = false;
+		if (vPtr->runAI() == false) endMonsterTurn = false;
 	}
 
-	std::vector<Entity*> entityList = (World::ins())->getEntityList();
-	for (int i = 0; i < entityList.size(); i++)
+	for (auto ePtr : entityList)
 	{
-		if (entityList[i] != (Player::ins()))
+		if (ePtr != (Player::ins()))
 		{
-			if (((Monster*)entityList[i])->runAI() == false) endMonsterTurn = false;
+			if (((Monster*)ePtr)->runAI() == false) endMonsterTurn = false;
 		}
 	}
 

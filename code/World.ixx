@@ -1,4 +1,5 @@
-﻿#include <SDL_image.h>
+﻿#include <tbb/tbb.h>
+#include <SDL_image.h>
 
 export module World;
 
@@ -9,6 +10,8 @@ import Mapmaker;
 import constVar;
 import TileData;
 
+
+
 export class ItemPocket;
 export class ItemStack;
 export class World
@@ -17,6 +20,7 @@ private:
 	std::unordered_map<std::array<int, 3>, Chunk*, decltype(arrayHasher3)> chunkPtr;
 	std::vector<Chunk*> activeChunk;
 	std::unordered_set<std::array<int, 3>, decltype(arrayHasher3)> isSectorCreated;
+
 public:
 	static World* ins()//싱글톤 함수
 	{
@@ -108,8 +112,11 @@ public:
 	{
 		activeChunk.clear();
 	}
+
+	//(1) 고전방식
 	std::vector<Entity*> getEntityList()
 	{
+		//__int64 startTime = getNanoTimer();
 		std::vector<Entity*> entityList;
 		std::vector<Entity*> chunkEntityList;
 		for (int i = 0; i < activeChunk.size(); i++)
@@ -120,24 +127,12 @@ public:
 				entityList.push_back(chunkEntityList[j]);
 			}
 		}
+		//printTimeMax(startTime, __func__, 20);
 		return entityList;
-	}
-	std::vector<ItemStack*> getItemList()
-	{
-		std::vector<ItemStack*> itemList;
-		std::vector<ItemStack*> chunkItemList;
-		for (int i = 0; i < activeChunk.size(); i++)
-		{
-			chunkItemList = activeChunk[i]->getChunkItemList();
-			for (int j = 0; j < chunkItemList.size(); j++)
-			{
-				itemList.push_back(chunkItemList[j]);
-			}
-		}
-		return itemList;
 	}
 	std::vector<Vehicle*> getVehicleList()
 	{
+		__int64 startTime = getNanoTimer();
 		std::vector<Vehicle*> VehicleList;
 		std::vector<Vehicle*> chunkVehicleList;
 		for (int i = 0; i < activeChunk.size(); i++)
@@ -151,9 +146,122 @@ public:
 				}
 			}
 		}
+		printTimeMax(startTime, __func__,20);
 		return VehicleList;
 	}
 
+	////(2)리스트 Splice 방식
+	//std::list<Entity*> getEntityList()
+	//{
+	//	__int64 startTime = getNanoTimer();
+	//	std::list<Entity*> resultEntityList;
+
+	//	for (size_t i = 0; i < activeChunk.size(); ++i)
+	//	{
+	//		std::list<Entity*> chunkEntityList = activeChunk[i]->getChunkEntityList();
+	//		resultEntityList.splice(resultEntityList.end(), chunkEntityList);
+	//	}
+	//	printTimeMax(startTime, __func__, 20);
+	//	return resultEntityList;
+	//}
+
+	//std::list<Vehicle*> getVehicleList()
+	//{
+	//	__int64 startTime = getNanoTimer();
+	//	std::list<Vehicle*> resultVehicleList;
+
+	//	for (size_t i = 0; i < activeChunk.size(); ++i)
+	//	{
+	//		std::list<Vehicle*> chunkVehicleList = activeChunk[i]->getChunkVehicleList();
+	//		resultVehicleList.splice(resultVehicleList.end(), chunkVehicleList);
+	//	}
+
+	//	//중복원소 제거
+	//	std::unordered_set<Vehicle*> cache;
+	//	auto it = resultVehicleList.begin();
+	//	while (it != resultVehicleList.end())
+	//	{
+	//		if (cache.find(*it) != cache.end()) it = resultVehicleList.erase(it);
+	//		else
+	//		{
+	//			cache.insert(*it);
+	//			++it;
+	//		}
+	//	}
+	//	printTimeMax(startTime, __func__,20);
+	//	return resultVehicleList;
+	//}
+
+	////(3)병렬화 방식
+	//std::list<Entity*> getEntityList()
+	//{
+	//	__int64 startTime = getNanoTimer();
+	//	tbb::concurrent_vector<std::list<Entity*>> fragList(activeChunk.size());
+	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
+	//		[&](const tbb::blocked_range<size_t>& range)
+	//		{
+	//			for (size_t i = range.begin(); i != range.end(); ++i)
+	//			{
+	//				fragList[i] = std::move(activeChunk[i]->getChunkEntityList());
+	//			}
+	//		}
+	//	);
+	//	std::list<Entity*> resultEntityList;
+	//	for (size_t i = 0; i < fragList.size(); i++) resultEntityList.splice(resultEntityList.end(), fragList[i]);
+	//	printTimeMax(startTime, __func__, 20);
+	//	return resultEntityList;
+	//}
+
+	//std::list<Vehicle*> getVehicleList()
+	//{
+	//	__int64 startTime = getNanoTimer();
+	//	tbb::concurrent_vector<std::list<Vehicle*>> fragList(activeChunk.size());
+	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
+	//		[&](const tbb::blocked_range<size_t>& range)
+	//		{
+	//			for (size_t i = range.begin(); i != range.end(); ++i)
+	//			{
+	//				fragList[i] = std::move(activeChunk[i]->getChunkVehicleList());
+	//			}
+	//		}
+	//	);
+	//	std::list<Vehicle*> resultVehicleList;
+	//	for (size_t i = 0; i < fragList.size(); i++) resultVehicleList.splice(resultVehicleList.end(), fragList[i]);
+
+	//	//중복원소 제거
+	//	std::unordered_set<Vehicle*> cache;
+	//	auto it = resultVehicleList.begin();
+	//	while (it != resultVehicleList.end())
+	//	{
+	//		if (cache.find(*it) != cache.end()) it = resultVehicleList.erase(it);
+	//		else
+	//		{
+	//			cache.insert(*it);
+	//			++it;
+	//		}
+	//	}
+	//	printTimeMax(startTime, __func__,20);
+	//	return resultVehicleList;
+	//}
+
+
+
+	//std::list<ItemStack*> getItemList()
+	//{
+	//	tbb::concurrent_vector<std::list<ItemStack*>> fragList(activeChunk.size());
+	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
+	//		[&](const tbb::blocked_range<size_t>& range)
+	//		{
+	//			for (size_t i = range.begin(); i != range.end(); ++i)
+	//			{
+	//				fragList[i] = std::move(activeChunk[i]->getChunkItemList());
+	//			}
+	//		}
+	//	);
+	//	std::list<ItemStack*> resultItemList;
+	//	for (size_t i = 0; i < fragList.size(); i++) resultItemList.splice(resultItemList.end(), fragList[i]);
+	//	return resultItemList;
+	//}
 
 
 	//섹터 관련
@@ -201,7 +309,7 @@ public:
 				filePath += std::to_string(number);
 				filePath += ".png";
 				std::wstring wPath(filePath.begin(), filePath.end());
-				std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
+				//std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
 				SDL_Surface* refSector = IMG_Load(filePath.c_str());
 				errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
 				Uint32* pixels = (Uint32*)refSector->pixels;

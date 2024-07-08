@@ -96,7 +96,7 @@ public:
 	Vehicle* getChunkVehiclePos(int x, int y) { return (Vehicle*)getChunkTile(x, y).VehiclePtr; }
 	void setChunkVehiclePos(int x, int y, Vehicle* inputPtr) { prt(lowCol::green, L"Chunk : %d,%d에 Vehicle %p를 배정했다.\n",x,y,inputPtr); getChunkTile(x, y).VehiclePtr = inputPtr; }
 	
-	std::vector<Entity*>getChunkEntityList()
+	std::vector<Entity*> getChunkEntityList()
 	{
 		std::vector<Entity*> entityList;
 		for (int x = 0; x < chunkSizeX; x++)
@@ -108,9 +108,26 @@ public:
 		}
 		return entityList;
 	}
-	std::vector<ItemStack*>getChunkItemList()
+
+	std::vector<Vehicle*> getChunkVehicleList()
 	{
-		std::vector<ItemStack*> itemList;
+		std::vector<Vehicle*> VehicleList;
+		for (int x = 0; x < chunkSizeX; x++)
+		{
+			for (int y = 0; y < chunkSizeY; y++)
+			{
+				if (getChunkTile(x, y).VehiclePtr != nullptr)
+				{
+					VehicleList.push_back((Vehicle*)getChunkTile(x, y).VehiclePtr);
+				}
+			}
+		}
+		return VehicleList;
+	}
+
+	std::list<ItemStack*> getChunkItemList()
+	{
+		std::list<ItemStack*> itemList;
 		for (int x = 0; x < chunkSizeX; x++)
 		{
 			for (int y = 0; y < chunkSizeY; y++)
@@ -119,25 +136,6 @@ public:
 			}
 		}
 		return itemList;
-	}
-
-	std::vector<Vehicle*>getChunkVehicleList()
-	{
-		std::vector<Vehicle*> VehicleList;
-		for (int x = 0; x < chunkSizeX; x++)
-		{
-			for (int y = 0; y < chunkSizeY; y++)
-			{
-				if (getChunkTile(x, y).VehiclePtr != nullptr) 
-				{
-					if (std::find(VehicleList.begin(), VehicleList.end(), getChunkTile(x, y).VehiclePtr) == VehicleList.end())
-					{
-						VehicleList.push_back((Vehicle*)getChunkTile(x, y).VehiclePtr);
-					}
-				}
-			}
-		}
-		return VehicleList;
 	}
 
 	weatherFlag getWeather() {

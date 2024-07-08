@@ -242,9 +242,6 @@ public:
 
 		threadPoolPtr->waitForThreads();
 
-
-
-
 		//float duration = (float)(getNanoTimer() - timeStampStart) / 1000000.0;
 		//timeDurations.push_back(duration);
 		//if (timeDurations.size() > maxDurations) {
