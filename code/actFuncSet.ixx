@@ -1,4 +1,6 @@
-﻿export module actFuncSet;
+﻿
+
+export module actFuncSet;
 
 import std;
 import util;

@@ -125,9 +125,9 @@ public:
 		return VehicleList;
 	}
 
-	std::list<ItemStack*> getChunkItemList()
+	std::vector<ItemStack*> getChunkItemList()
 	{
-		std::list<ItemStack*> itemList;
+		std::vector<ItemStack*> itemList;
 		for (int x = 0; x < chunkSizeX; x++)
 		{
 			for (int y = 0; y < chunkSizeY; y++)

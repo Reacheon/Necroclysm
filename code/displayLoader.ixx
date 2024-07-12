@@ -21,18 +21,18 @@ export void displayLoader()
     cameraW = 720;
     cameraH = 720;
 
+    SDL_DisplayMode displayMode;
+    if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
+    else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);
+
+    cameraW = displayMode.w;
+    cameraH = displayMode.h;
+
     window = SDL_CreateWindow("Chemiclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);
 
-
-    //SDL_DisplayMode displayMode;
-    //if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
-    //else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);
-
-    //cameraW = displayMode.w;
-    //cameraH = displayMode.h;
 
     if (cameraW > cameraH)
     {
@@ -86,6 +86,6 @@ export void displayLoader()
     {
         barButton[i] = { cameraW / 2 - 300 + (88 * i), cameraH - 80, 72,72 };
     }
-    tab = { 20, 20, 120, 120 };
+    
     letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
 }

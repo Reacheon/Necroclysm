@@ -1,4 +1,5 @@
-﻿export module clickUp;
+﻿
+export module clickUp;
 
 import std;
 import checkCursor;

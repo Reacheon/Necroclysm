@@ -1,4 +1,5 @@
 #include <SDL.h>
+
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module Alchemy;

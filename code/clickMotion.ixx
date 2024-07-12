@@ -1,4 +1,5 @@
-﻿export module clickMotion;
+﻿
+export module clickMotion;
 
 import std;
 import globalVar;

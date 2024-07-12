@@ -1,4 +1,6 @@
-﻿export module Monster;
+﻿
+
+export module Monster;
 
 import std;
 import Entity;

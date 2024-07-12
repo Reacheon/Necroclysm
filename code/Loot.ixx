@@ -1,4 +1,5 @@
 #include <SDL.h>
+
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module Loot;
@@ -23,6 +24,8 @@ import GUI;
 import actFuncSet;
 import drawWindow;
 import Lst;
+
+static int delayR2 = 0;
 
 export class Loot : public GUI
 {
@@ -74,7 +77,7 @@ public:
 		lootTile[axis::y] = targetGridY;
 		lootTile[axis::z] = Player::ins()->getGridZ();
 
-		changeXY((cameraW / 2) + 17, (cameraH / 2) - 210, false);
+		changeXY(cameraW -335 - 37, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
 		tabType = tabFlag::closeWin;
@@ -163,482 +166,26 @@ public:
 			y = inputY - lootBase.h / 2;
 		}
 	}
-	void drawGUI()
-	{
-		if (getStateDraw() == false) { return; }
-
-		const Uint8* state = SDL_GetKeyboardState(NULL);
-		Sprite* targetBtnSpr = nullptr;
-
-		drawWindow(&lootBase, sysStr[10], 1);
-
-		//포켓
-		{
-			//drawStadium(pocketWindow.x, pocketWindow.y, pocketWindow.w, pocketWindow.h, { 0,0,0 }, 150, 5);
-
-			//가방이 몇 개 있는지 체크
-			std::vector<int> pocketList;
-			int numberOfBag = 0;
-			ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-				{
-					pocketList.push_back(i);
-					numberOfBag++;
-				}
-			}
-
-			if (numberOfBag == 0)
-			{
-				//가방을 가지고 있지 않다.
-				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-				setFontSize(16);
-				drawTextCenter(sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 35);
-			}
-			else
-			{
-				//포켓 1~3번째 칸 그리기
-				if (pocketCursor != 0)
-				{
-
-					setZoom(2.0);
-					drawStadium(pocketItem[2].x, pocketItem[2].y, pocketItem[2].w, pocketItem[2].h, { 0,0,0 }, 200, 5);
-					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 1]].sprIndex, pocketItem[2].x + (pocketItem[2].w / 2), pocketItem[2].y + (pocketItem[2].h / 2));
-					if (pocketCursor != 1)
-					{
-						drawStadium(pocketItem[1].x, pocketItem[1].y, pocketItem[1].w, pocketItem[1].h, { 0,0,0 }, 200, 5);
-						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 2]].sprIndex, pocketItem[1].x + (pocketItem[1].w / 2), pocketItem[1].y + (pocketItem[1].h / 2));
-						if (pocketCursor != 2)
-						{
-							drawStadium(pocketItem[0].x, pocketItem[0].y, pocketItem[0].w, pocketItem[0].h, { 0,0,0 }, 200, 5);
-							drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 3]].sprIndex, pocketItem[0].x + (pocketItem[0].w / 2), pocketItem[0].y + (pocketItem[0].h / 2));
-						}
-					}
-				}
-
-				//포켓 4번째 칸
-				setZoom(3.0);
-				drawStadium(pocketItem[3].x, pocketItem[3].y, pocketItem[3].w, pocketItem[3].h, lowCol::blue, 200, 5);
-				drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor]].sprIndex, pocketItem[3].x + (pocketItem[3].w / 2), pocketItem[3].y + (pocketItem[3].h / 2));
-
-				//포켓 5~7번째 칸 
-				if (pocketCursor != numberOfBag - 1)
-				{
-					setZoom(2.0);
-					drawStadium(pocketItem[4].x, pocketItem[4].y, pocketItem[4].w, pocketItem[4].h, { 0,0,0 }, 200, 5);
-					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 1]].sprIndex, pocketItem[4].x + (pocketItem[4].w / 2), pocketItem[4].y + (pocketItem[4].h / 2));
-					if (pocketCursor != numberOfBag - 2)
-					{
-						drawStadium(pocketItem[5].x, pocketItem[5].y, pocketItem[5].w, pocketItem[5].h, { 0,0,0 }, 200, 5);
-						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 2]].sprIndex, pocketItem[5].x + (pocketItem[5].w / 2), pocketItem[5].y + (pocketItem[5].h / 2));
-						if (pocketCursor != numberOfBag - 3)
-						{
-							drawStadium(pocketItem[6].x, pocketItem[6].y, pocketItem[6].w, pocketItem[6].h, { 0,0,0 }, 200, 5);
-							drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 3]].sprIndex, pocketItem[6].x + (pocketItem[6].w / 2), pocketItem[6].y + (pocketItem[6].h / 2));
-						}
-					}
-				}
-				setZoom(1.0);
-
-
-				//포켓 질량 게이지
-				SDL_Rect weightBar = { pocketWindow.x + 12, pocketWindow.y + 64, 72, 4 };
-				drawRect(weightBar, col::white);
-
-				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-				setFontSize(10);
-				drawTextCenter(L"132.9/99.9 KG", weightBar.x + (weightBar.w / 2), weightBar.y - 8);
-
-				//루팅 주머니 부피 게이지
-				SDL_Rect volumeBar = { pocketWindow.x + pocketWindow.w - 12 - 72, pocketWindow.y + 64, 72, 4 };
-				drawRect(volumeBar, col::white);
-				SDL_Rect volumeGauge = { volumeBar.x + 1, volumeBar.y + 1, volumeBar.w - 2, 2 };
-				int maxVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketMaxVolume;
-				int currentVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketVolume;
-				volumeGauge.w = (volumeBar.w - 2) * ((float)currentVolume / (float)maxVolume);
-				drawFillRect(volumeGauge, lowCol::green);
-
-				std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
-				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-				setFontSize(10);
-				drawTextCenter(volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
-				setFontSize(13);
-				drawTextCenter(L"테스트 아이템", pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + pocketWindow.h - 10);
-
-
-
-				//포켓 좌우 변경 버튼
-				{
-					SDL_Color leftBtnColor;
-					if (checkCursor(&pocketLeft))
-					{
-						if (click == true) { leftBtnColor = lowCol::deepBlue; }
-						else { leftBtnColor = lowCol::blue; }
-					}
-					else { leftBtnColor = lowCol::black; }
-					drawStadium(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, leftBtnColor, 200, 5);
-					drawSpriteCenter(spr::windowArrow, 2, pocketWindow.x + 16, pocketWindow.y + 27);
-
-					if (inputType == input::keyboard)
-					{
-						if (state[SDL_SCANCODE_LSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
-						else { targetBtnSpr = spr::buttons; }
-						drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_LShift, pocketLeft.x + pocketLeft.w / 2, pocketLeft.y + pocketRight.h / 2);
-					}
-
-					if (pocketCursor == 0) { drawStadium(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, leftBtnColor, 200, 5); }
-
-				}
-				{
-					SDL_Color rightBtnColor;
-					if (checkCursor(&pocketRight))
-					{
-						if (click == true) { rightBtnColor = lowCol::deepBlue; }
-						else { rightBtnColor = lowCol::blue; }
-					}
-					else { rightBtnColor = lowCol::black; }
-					drawStadium(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, rightBtnColor, 200, 5);
-					drawSpriteCenter(spr::windowArrow, 0, pocketWindow.x + pocketWindow.w - 16, pocketWindow.y + 27);
-
-					if (inputType == input::keyboard)
-					{
-						if (state[SDL_SCANCODE_RSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
-						else { targetBtnSpr = spr::buttons; }
-						drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_RShift, pocketRight.x + pocketRight.w / 2, pocketRight.y + pocketRight.h / 2);
-					}
-
-					if (pocketCursor == numberOfBag - 1) { drawStadium(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, rightBtnColor, 200, 5); }
-				}
-			}
-		}
-
-
-
-		//여기서부턴 루팅 윈도우
-		{
-			//루팅 윈도우 본체
-			//drawStadium(lootWindow.x, lootWindow.y, lootWindow.w, lootWindow.h, { 0,0,0 }, 150, 5);
-			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			setFontSize(10);
-			drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPtr->itemInfo.size()), lootWindow.x + 6, lootWindow.y + lootWindow.h - 16);
-
-			//우측 아이템 상단바 라벨(선택 이름 물리량)
-			drawStadium(lootLabel.x, lootLabel.y, lootLabel.w, lootLabel.h, { 0,0,0 }, 150, 5);
-			if (checkCursor(&lootLabelSelect) || labelCursor == 0)
-			{
-				SDL_Color btnColor;
-				if (click == true) { btnColor = lowCol::deepBlue; }
-				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelSelect.x, lootLabelSelect.y, lootLabelSelect.w, lootLabelSelect.h, btnColor, 150, 5);
-			}
-			else if (checkCursor(&lootLabelName) || labelCursor == 1)
-			{
-				SDL_Color btnColor;
-				if (click == true) { btnColor = lowCol::deepBlue; }
-				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelName.x, lootLabelName.y, lootLabelName.w, lootLabelName.h, btnColor, 150, 5);
-			}
-			else if (checkCursor(&lootLabelQuantity) || labelCursor == 2)
-			{
-				SDL_Color btnColor;
-				if (click == true) { btnColor = lowCol::deepBlue; }
-				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 150, 5);
-			}
-
-			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			setFontSize(13);
-			drawTextCenter(sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //선택(상단바)
-
-			{ //이름(상단바)
-				std::wstring tailStr = L"";
-				int grayNumber = 0;
-				int whiteNumber = 0;
-				//이미 검색 중인지 체크
-				for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-				{
-					if (lootPtr->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//이미 검색 중일 경우 검색 상태를 해제함
-					{
-						grayNumber++;
-					}
-				}
-
-				if (grayNumber > 0)
-				{
-					whiteNumber = lootPtr->itemInfo.size() - grayNumber;
-					tailStr = L"(" + std::to_wstring(whiteNumber) + sysStr[87] + L")";// n개 아이템 검색됨
-				}
-
-				drawTextCenter(sysStr[16] + tailStr, lootLabel.x + 152, lootLabel.y + 12);
-			}
-
-			switch (getSortType())
-			{
-			default:
-				drawTextCenter(sysStr[24], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
-				break;
-			case sortFlag::weightDescend:
-				drawTextCenter(sysStr[45], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
-				break;
-			case sortFlag::weightAscend:
-				drawTextCenter(sysStr[46], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
-				break;
-			case sortFlag::volumeDescend:
-				drawTextCenter(sysStr[47], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
-				break;
-			case sortFlag::volumeAscend:
-				drawTextCenter(sysStr[48], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
-				break;
-			}
-
-
-			//개별 아이템
-			drawItemList(lootPtr, lootArea.x, lootArea.y, lootItemMax, lootCursor, lootScroll, true);
-
-			// 아이템 스크롤 그리기
-			drawFillRect(lootScrollBox, { 120,120,120 });
-			SDL_Rect inScrollBox = { lootWindow.x + 328, lootWindow.y + 40, 2, 42 * lootItemMax }; // 내부 스크롤 커서
-			inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)lootItemMax / lootPtr->itemInfo.size());
-			inScrollBox.y = lootScrollBox.y + lootScrollBox.h * ((float)lootScroll / (float)lootPtr->itemInfo.size());
-			if (inScrollBox.y + inScrollBox.h > lootScrollBox.y + lootScrollBox.h) { inScrollBox.y = lootScrollBox.y + lootScrollBox.h - inScrollBox.h; }
-			drawFillRect(inScrollBox, col::white);
-
-			//루팅버튼 그리기
-			{
-				SDL_Color lootBtnColor;
-				if (checkCursor(&lootBtn))
-				{
-					if (click == true) { lootBtnColor = lowCol::deepBlue; }
-					else { lootBtnColor = lowCol::blue; }
-				}
-				else { lootBtnColor = lowCol::black; }
-
-				drawFillRect(lootBtn, lootBtnColor, 200);
-				drawRect(lootBtn, { 0x57, 0x57, 0x57 });
-
-				drawSpriteCenter(spr::lootBagArrow, 1, lootWindow.x + lootWindow.w / 2, lootWindow.y - 4);
-
-				for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-				{
-					if (lootPtr->itemInfo[i].lootSelect > 0)
-					{
-						break;
-					}
-					if (i == lootPtr->itemInfo.size() - 1)
-					{
-						drawStadium(lootBtn.x, lootBtn.y, lootBtn.w, lootBtn.h, lootBtnColor, 200, 5);
-					}
-				}
-
-				if (inputType == input::keyboard)
-				{
-					if (state[SDL_SCANCODE_V]) { targetBtnSpr = spr::buttonsPressed; }
-					else { targetBtnSpr = spr::buttons; }
-					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_V, lootBtn.x, lootBtn.y + lootBtn.h / 2);
-				}
-			}
-		}
-
-
-	}
-	void clickUpGUI()
-	{
-		if (checkCursor(&tab) == true)// 탭박스
-		{
-			executeTab();
-			return;
-		}
-		else if (checkCursor(&lootArea)) //아이템 클릭 -> 에러 파트
-		{
-			//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-			for (int i = 0; i < lootItemMax; i++)
-			{
-				if (lootPtr->itemInfo.size() - 1 >= i)
-				{
-					if (checkCursor(&lootItem[i]))
-					{
-						if (lootCursor != lootScroll + i) //새로운 커서 생성
-						{
-							lootCursor = lootScroll + i;
-							updateBarAct();
-							tabType = tabFlag::back;
-						}
-						else //커서 삭제
-						{
-							lootCursor = -1;
-							barAct = actSet::null;
-							tabType = tabFlag::closeWin;
-						}
-						return;
-					}
-				}
-			}
-
-			//아이템 좌측 셀렉트 클릭
-			for (int i = 0; i < lootItemMax; i++)
-			{
-				if (checkCursor(&lootItemSelect[i]))
-				{
-					if (lootPtr->itemInfo.size() - 1 >= i)
-					{
-						if (lootPtr->itemInfo[i + lootScroll].lootSelect == 0)
-						{
-							if (inputType == input::mouse)
-							{
-								if (event.button.button == SDL_BUTTON_LEFT)
-								{
-									executeSelectItem(i + lootScroll);
-								}
-								else if (event.button.button == SDL_BUTTON_RIGHT)
-								{
-									CORO(executeSelectItemEx(i + lootScroll));
-								}
-							}
-							else if (inputType == input::touch)
-							{
-								executeSelectItem(i + lootScroll);
-							}
-						}
-						else
-						{
-							lootPtr->itemInfo[i + lootScroll].lootSelect = 0;
-						}
-					}
-				}
-			}
-		}
-		else if (checkCursor(&lootLabel))
-		{
-			if (checkCursor(&lootLabelSelect))
-			{
-				executeSelectAll();
-			}
-			else if (checkCursor(&lootLabelName))
-			{
-				CORO(executeSearch());
-				//lootPtr->sortPocket(sortFlag::null);
-				//lootScroll = 0;
-			}
-			else if (checkCursor(&lootLabelQuantity))
-			{
-				executeSort();
-			}
-		}
-		else if (checkCursor(&pocketLeft))
-		{
-			if (pocketCursor != 0) { pocketCursor--; }
-		}
-		else if (checkCursor(&pocketRight))
-		{
-			int numberOfBag = 0;
-			ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-				{
-					numberOfBag++;
-				}
-			}
-			if (pocketCursor != numberOfBag - 1) { pocketCursor++; }
-		}
-		else if (checkCursor(&lootBtn))
-		{
-			executePickSelect();
-		}
-		else if (checkCursor(&letterbox)) //버튼은 return 없음
-		{
-			for (int i = 0; i < barAct.size(); i++) // 하단 UI 터치 이벤트
-			{
-				if (checkCursor(&barButton[i]))
-				{
-					switch (barAct[i])
-					{
-					case act::pick://넣기
-						executePick();
-						break;
-					case act::equip://장비
-						executeEquip();
-						break;
-					case act::wield://들기
-						CORO(executeWield());
-						break;
-						//case act::insert:
-						//	CORO(executeInsert());
-						//	break;
-					case act::reloadBulletToMagazine:
-					case act::reloadBulletToGun:
-						if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
-						{
-							CORO(actFunc::reloadSelf(actEnv::Loot, lootPtr, lootCursor));
-						}
-						else if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::AMMO))
-						{
-							CORO(actFunc::reloadOther(actEnv::Loot, lootPtr, lootCursor));
-						}
-						else if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::GUN))
-						{
-							CORO(actFunc::reloadSelf(actEnv::Equip, lootPtr, lootCursor));
-						}
-						break;
-					case act::reloadMagazine:
-						//총에서 사용하는 경우와 탄창에서 사용하는 경우가 다름
-						//총에서 사용하면 자기 자신에게 장전함(self)
-						//탄창에 사용하면 다른 타일의 총에게 장비함
-						if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
-						{
-							CORO(actFunc::reloadOther(actEnv::Loot, lootPtr, lootCursor));
-						}
-						else
-						{
-							CORO(actFunc::reloadSelf(actEnv::Loot, lootPtr, lootCursor));
-						}
-						break;
-					case act::unloadMagazine:
-					case act::unloadBulletFromMagazine:
-					case act::unloadBulletFromGun:
-						actFunc::unload(lootPtr, lootCursor);
-						break;
-					}
-				}
-			}
-		}
-
-		//위의 모든 경우에서 return을 받지 못했으면 버튼 이외를 누른 것이므로 커서를 -1로 복구
-		{
-			lootCursor = -1;
-			barAct = actSet::null;
-			tabType = tabFlag::closeWin;
-		}
-	}
-	void clickMotionGUI(int dx, int dy)
-	{
-		if (checkCursor(&lootBase))
-		{
-			if (click == true)
-			{
-				int scrollAccelConst = 20; // 가속상수, 작아질수록 스크롤 속도가 빨라짐
-				lootScroll = initLootScroll + dy / scrollAccelConst;
-				if (abs(dy / scrollAccelConst) >= 1)
-				{
-					deactClickUp = true;
-					cursorMotionLock = true;
-				}
-			}
-		}
-	}
-	void clickDownGUI()
-	{
-		//아이템 좌측 셀렉트 클릭
-		selectTouchTime = SDL_GetTicks();
-		initLootScroll = lootScroll;
-		initPocketCursor = pocketCursor;
-	}
-	void gamepadBtnDown() { }
-	void gamepadBtnMotion() { }
-	void gamepadBtnUp() { }
+	void drawGUI();
+	void clickUpGUI();
+	void clickMotionGUI(int dx, int dy);
+	void clickDownGUI();
+	void gamepadBtnDown();
+	void gamepadBtnMotion();
+	void gamepadBtnUp();
 	void step()
 	{
+		if (SDL_NumJoysticks() > 0)
+		{
+			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			{
+				prt(L"탭이 실행되었다.\n");
+				executeTab();
+				delayR2 = 20;
+			}
+			else delayR2--;
+		}
+
 		//셀렉트 홀드 이벤트
 		if (coFunc == nullptr)
 		{
@@ -1031,7 +578,6 @@ public:
 		lootPtr->itemInfo[index].lootSelect = inputSelectNumber;
 	}
 
-
 	Corouter executeWield()
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
@@ -1167,7 +713,6 @@ public:
 			barActCursor = -1;
 		}
 	}
-
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
 	{

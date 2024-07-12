@@ -1,4 +1,5 @@
-﻿#include <SDL.h>
+﻿
+#include <SDL.h>
 
 export module CoordSelect;
 

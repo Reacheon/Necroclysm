@@ -51,6 +51,9 @@ export constexpr const wchar_t* printMagenta = L"\x1b[35m";
 export constexpr const wchar_t* printCyan = L"\x1b[36m";
 export constexpr const wchar_t* printReset = L"\x1b[0m";
 
+export constexpr int cutoffLStick = 10000;
+
+
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
@@ -758,6 +761,46 @@ export namespace keyIcon
 
     constexpr int keyboard_LShift = 64;
     constexpr int keyboard_RShift = 65;
+
+    constexpr int duelSense_L1 = 66;
+    constexpr int duelSense_L2 = 67;
+    constexpr int duelSense_R1 = 68;
+    constexpr int duelSense_R2 = 69;
+
+    constexpr int duelSense_X = 70;
+    constexpr int duelSense_CIR = 71;
+    constexpr int duelSense_RECT = 72;
+    constexpr int duelSense_TRI = 73;
+    constexpr int duelSense_LStick = 74;
+    constexpr int duelSense_RStick = 75;
+  
+    constexpr int duelSense_RIGHT = 77;
+    constexpr int duelSense_TOP = 78;
+    constexpr int duelSense_LEFT = 79;
+    constexpr int duelSense_BOT = 80;
+    constexpr int duelSense_OPTIONS = 81;
+    constexpr int duelSense_SHARE = 82;
+
+    ////////
+
+    constexpr int joyCon_L = 88;
+    constexpr int joyCon_ZL = 89;
+    constexpr int joyCon_R = 90;
+    constexpr int joyCon_ZR = 91;
+
+    constexpr int joyCon_A = 92;
+    constexpr int joyCon_B = 93;
+    constexpr int joyCon_X = 94;
+    constexpr int joyCon_Y = 95;
+    constexpr int joyCon_LStick = 96;
+    constexpr int joyCon_RStick = 97;
+
+    constexpr int joyCon_RIGHT = 99;
+    constexpr int joyCon_TOP = 100;
+    constexpr int joyCon_LEFT = 101;
+    constexpr int joyCon_BOT = 102;
+    constexpr int joyCon_PLUS = 103;
+    constexpr int joycon_MINUS = 104;
 };
 
 export namespace sprInf

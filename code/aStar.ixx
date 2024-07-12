@@ -3,6 +3,8 @@
 import std;
 import hasher;
 import prt;
+import nanoTimer;
+import timeKeeper;
 
 export int aStar(std::set<std::array<int, 2>> walkableTile, int playerX, int playerY, int dstX, int dstY)//(x2,y2)는 A*을 계산할 객체의 위치고 (x1,y1)은 도착지, 성공하면 최단거리로의 방향을 반환, 아니면 -1 반환
 {

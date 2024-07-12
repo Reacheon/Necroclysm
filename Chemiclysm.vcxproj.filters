@@ -79,6 +79,15 @@
     <Filter Include="소스 파일\00_var\Skill">
       <UniqueIdentifier>{5f5a64ad-856a-41c1-88c7-ce014c9be36c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\HUD">
+      <UniqueIdentifier>{22f9baed-4728-4fb7-8327-47dc9f1961ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\LOOT">
+      <UniqueIdentifier>{d408acbb-070f-4da7-8883-b3d5eea7fcc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\EQUIP">
+      <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -163,9 +172,6 @@
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Equip.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\ItemData.ixx">
@@ -342,12 +348,6 @@
     <ClCompile Include="code\Msg.ixx">
       <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\HUD.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Loot.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\debugConsole.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
@@ -378,9 +378,6 @@
     <ClCompile Include="code\drawItemTooltip.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
-    <ClCompile Include="code\drawSprite.ixx">
-      <Filter>소스 파일\03_renderer\draw</Filter>
-    </ClCompile>
     <ClCompile Include="code\drawText.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
@@ -408,12 +405,6 @@
     <ClCompile Include="code\readSkillDex.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="code\Flame.ixx">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Gas.ixx">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="code\ThreadPool.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -428,6 +419,54 @@
     </ClCompile>
     <ClCompile Include="code\gamepadBtnUp.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\HUD.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\HUD_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\HUD_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\HUD_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Loot.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Loot_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Loot_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Loot_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\timeKeeper.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Flame.ixx">
+      <Filter>소스 파일\05_Class</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Gas.ixx">
+      <Filter>소스 파일\05_Class</Filter>
+    </ClCompile>
+    <ClCompile Include="code\drawSprite.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Equip.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Equip_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Equip_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Equip_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -72,22 +72,20 @@ export void renderFPS(__int64 loopTime)
 
 
     setFontSize(12);
-    drawText(col2Str(col::white) + decimalCutter(avgFPS, 2), 20, 160);
+    drawText(col2Str(col::white) + decimalCutter(avgFPS, 2), 20, 170);
 
     setFontSize(9);
-    drawText(col2Str(col::white)+L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 5) + L" ms", 20, 180);
-    drawText(col2Str(col::white) + L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 5) + L" ms", 20, 180 + 12 * 1);
-    drawText(col2Str(col::white) + L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 5) + L" ms", 20, 180 + 12 * 2);
-    drawText(col2Str(col::white) + L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 5) + L" ms", 20, 180 + 12 * 3);
-    drawText(col2Str(col::white) + L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 4);
-    drawText(col2Str(col::white) + L">tile : " + decimalCutter(tileAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 5);
-    drawText(col2Str(col::white) + L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 6);
-    drawText(col2Str(col::white) + L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 7);
-    drawText(col2Str(col::white) + L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 8);
-    drawText(col2Str(col::white) + L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 9);
-    drawText(col2Str(col::white) + L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 10);
-    drawText(col2Str(col::white) + L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 5) + L" ms", 30, 180 + 12 * 11);
-    drawText(col2Str(col::white) + L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 5) + L" ms", 20, 180 + 12 * 12);
-    drawText(col2Str(col::white) + L"renderFPS : " + decimalCutter((getNanoTimer() - startTime) / 1000000.0, 5) + L" ms", 20, 180 + 12 * 13);
-
+    drawText(col2Str(col::white)+L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 5) + L" ms", 20, 190);
+    drawText(col2Str(col::white) + L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 1);
+    drawText(col2Str(col::white) + L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 2);
+    drawText(col2Str(col::white) + L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 3);
+    drawText(col2Str(col::white) + L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 4);
+    drawText(col2Str(col::white) + L">tile : " + decimalCutter(tileAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 5);
+    drawText(col2Str(col::white) + L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 6);
+    drawText(col2Str(col::white) + L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 7);
+    drawText(col2Str(col::white) + L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 8);
+    drawText(col2Str(col::white) + L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 9);
+    drawText(col2Str(col::white) + L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 10);
+    drawText(col2Str(col::white) + L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 11);
+    drawText(col2Str(col::white) + L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 12);
 }

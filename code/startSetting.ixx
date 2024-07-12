@@ -1,3 +1,6 @@
+
+
+
 export module startSetting;
 
 import globalVar;
@@ -142,7 +145,7 @@ export void startSetting()
 	{
 		for (int dy = -1; dy <= 1; dy++)
 		{
-			World::ins()->getTile(pX - 4 + dx, pY - 3 + dy, pZ + 1).floor = 292;
+			World::ins()->getTile(pX - 3 + dx, pY - 4 + dy, pZ + 1).floor = 292;
 		}
 	}
 
@@ -759,5 +762,5 @@ export void startSetting()
 	World::ins()->createSector(0, 0, 0);
 
 	Player::ins()->updateVision(Player::ins()->getEyeSight());
-	Player::ins()->updateMinimap();
+	Player::ins()->updateMinimap();//렌더링이 연산파트에서 일어나서 처음에는 화면에 안그려지는듯?
 };

@@ -1,4 +1,4 @@
-﻿#include <tbb/tbb.h>
+﻿
 #include <SDL_image.h>
 
 export module World;
@@ -9,8 +9,6 @@ import Chunk;
 import Mapmaker;
 import constVar;
 import TileData;
-
-
 
 export class ItemPocket;
 export class ItemStack;
@@ -113,10 +111,8 @@ public:
 		activeChunk.clear();
 	}
 
-	//(1) 고전방식
 	std::vector<Entity*> getEntityList()
 	{
-		//__int64 startTime = getNanoTimer();
 		std::vector<Entity*> entityList;
 		std::vector<Entity*> chunkEntityList;
 		for (int i = 0; i < activeChunk.size(); i++)
@@ -127,7 +123,6 @@ public:
 				entityList.push_back(chunkEntityList[j]);
 			}
 		}
-		//printTimeMax(startTime, __func__, 20);
 		return entityList;
 	}
 	std::vector<Vehicle*> getVehicleList()
@@ -138,131 +133,38 @@ public:
 		for (int i = 0; i < activeChunk.size(); i++)
 		{
 			chunkVehicleList = activeChunk[i]->getChunkVehicleList();
-			for (auto it = chunkVehicleList.begin(); it != chunkVehicleList.end(); it++)
+			for (int j = 0; j < chunkVehicleList.size(); j++)
 			{
-				if (std::find(VehicleList.begin(), VehicleList.end(), *it) == VehicleList.end())
-				{
-					VehicleList.push_back(*it);
-				}
+				VehicleList.push_back(chunkVehicleList[j]);
 			}
 		}
-		printTimeMax(startTime, __func__,20);
+		std::unordered_set<Vehicle*> cache;
+		auto it = VehicleList.begin();
+		while (it != VehicleList.end())
+		{
+			if (cache.find(*it) != cache.end()) it = VehicleList.erase(it);
+			else
+			{
+				cache.insert(*it);
+				++it;
+			}
+		}
 		return VehicleList;
 	}
-
-	////(2)리스트 Splice 방식
-	//std::list<Entity*> getEntityList()
-	//{
-	//	__int64 startTime = getNanoTimer();
-	//	std::list<Entity*> resultEntityList;
-
-	//	for (size_t i = 0; i < activeChunk.size(); ++i)
-	//	{
-	//		std::list<Entity*> chunkEntityList = activeChunk[i]->getChunkEntityList();
-	//		resultEntityList.splice(resultEntityList.end(), chunkEntityList);
-	//	}
-	//	printTimeMax(startTime, __func__, 20);
-	//	return resultEntityList;
-	//}
-
-	//std::list<Vehicle*> getVehicleList()
-	//{
-	//	__int64 startTime = getNanoTimer();
-	//	std::list<Vehicle*> resultVehicleList;
-
-	//	for (size_t i = 0; i < activeChunk.size(); ++i)
-	//	{
-	//		std::list<Vehicle*> chunkVehicleList = activeChunk[i]->getChunkVehicleList();
-	//		resultVehicleList.splice(resultVehicleList.end(), chunkVehicleList);
-	//	}
-
-	//	//중복원소 제거
-	//	std::unordered_set<Vehicle*> cache;
-	//	auto it = resultVehicleList.begin();
-	//	while (it != resultVehicleList.end())
-	//	{
-	//		if (cache.find(*it) != cache.end()) it = resultVehicleList.erase(it);
-	//		else
-	//		{
-	//			cache.insert(*it);
-	//			++it;
-	//		}
-	//	}
-	//	printTimeMax(startTime, __func__,20);
-	//	return resultVehicleList;
-	//}
-
-	////(3)병렬화 방식
-	//std::list<Entity*> getEntityList()
-	//{
-	//	__int64 startTime = getNanoTimer();
-	//	tbb::concurrent_vector<std::list<Entity*>> fragList(activeChunk.size());
-	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
-	//		[&](const tbb::blocked_range<size_t>& range)
-	//		{
-	//			for (size_t i = range.begin(); i != range.end(); ++i)
-	//			{
-	//				fragList[i] = std::move(activeChunk[i]->getChunkEntityList());
-	//			}
-	//		}
-	//	);
-	//	std::list<Entity*> resultEntityList;
-	//	for (size_t i = 0; i < fragList.size(); i++) resultEntityList.splice(resultEntityList.end(), fragList[i]);
-	//	printTimeMax(startTime, __func__, 20);
-	//	return resultEntityList;
-	//}
-
-	//std::list<Vehicle*> getVehicleList()
-	//{
-	//	__int64 startTime = getNanoTimer();
-	//	tbb::concurrent_vector<std::list<Vehicle*>> fragList(activeChunk.size());
-	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
-	//		[&](const tbb::blocked_range<size_t>& range)
-	//		{
-	//			for (size_t i = range.begin(); i != range.end(); ++i)
-	//			{
-	//				fragList[i] = std::move(activeChunk[i]->getChunkVehicleList());
-	//			}
-	//		}
-	//	);
-	//	std::list<Vehicle*> resultVehicleList;
-	//	for (size_t i = 0; i < fragList.size(); i++) resultVehicleList.splice(resultVehicleList.end(), fragList[i]);
-
-	//	//중복원소 제거
-	//	std::unordered_set<Vehicle*> cache;
-	//	auto it = resultVehicleList.begin();
-	//	while (it != resultVehicleList.end())
-	//	{
-	//		if (cache.find(*it) != cache.end()) it = resultVehicleList.erase(it);
-	//		else
-	//		{
-	//			cache.insert(*it);
-	//			++it;
-	//		}
-	//	}
-	//	printTimeMax(startTime, __func__,20);
-	//	return resultVehicleList;
-	//}
-
-
-
-	//std::list<ItemStack*> getItemList()
-	//{
-	//	tbb::concurrent_vector<std::list<ItemStack*>> fragList(activeChunk.size());
-	//	tbb::parallel_for(tbb::blocked_range<size_t>(0, activeChunk.size()),
-	//		[&](const tbb::blocked_range<size_t>& range)
-	//		{
-	//			for (size_t i = range.begin(); i != range.end(); ++i)
-	//			{
-	//				fragList[i] = std::move(activeChunk[i]->getChunkItemList());
-	//			}
-	//		}
-	//	);
-	//	std::list<ItemStack*> resultItemList;
-	//	for (size_t i = 0; i < fragList.size(); i++) resultItemList.splice(resultItemList.end(), fragList[i]);
-	//	return resultItemList;
-	//}
-
+	std::vector<ItemStack*> getItemList()
+	{
+		std::vector<ItemStack*> itemList;
+		std::vector<ItemStack*> chunkItemList;
+		for (int i = 0; i < activeChunk.size(); i++)
+		{
+			chunkItemList = activeChunk[i]->getChunkItemList();
+			for (int j = 0; j < chunkItemList.size(); j++)
+			{
+				itemList.push_back(chunkItemList[j]);
+			}
+		}
+		return itemList;
+	}
 
 	//섹터 관련
 	std::array<int, 2> changeToSectorCoord(int inputGridX, int inputGridY)

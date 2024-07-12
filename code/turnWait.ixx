@@ -1,3 +1,5 @@
+
+
 export module turnWait;
 
 import std;
@@ -15,8 +17,9 @@ import Prop;
 //@param waitTime 기다린 턴(분), 예로 1.5를 입력하면 1.5턴(분)
 export void turnWait(float waitTime)
 {
-    //prt(L"[대기] %f분을 대기했다.\n", waitTime);
+    //240708기준 2ms 정도의 실행속도
 
+    //prt(L"[대기] %f분을 대기했다.\n", waitTime);
     const int GAS_UPDATE_RANGE = 29;
     std::unordered_map<std::array<int, 2>, std::vector<gasData>> tempGas;
     int px = Player::ins()->getGridX();

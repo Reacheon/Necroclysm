@@ -1,4 +1,4 @@
-#include <tbb/tbb.h>
+
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -144,135 +144,12 @@ __int64 playerInputTurn()
 			{
 			case SDL_CONTROLLERBUTTONDOWN:
 				gamepadBtnDown();
-				switch (event.cbutton.button) {
-				case SDL_CONTROLLER_BUTTON_A:
-					std::printf("Button A (Cross) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_B:
-					std::printf("Button B (Circle) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_X:
-					std::printf("Button X (Square) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_Y:
-					std::printf("Button Y (Triangle) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_BACK:
-					std::printf("Button Back (Share) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_GUIDE:
-					std::printf("Button Guide (PS Button) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_START:
-					std::printf("Button Start (Options) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_LEFTSTICK:
-					std::printf("Button LeftStick (L3) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
-					std::printf("Button RightStick (R3) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-					std::printf("Button LeftShoulder (L1) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-					std::printf("Button RightShoulder (R1) pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_UP:
-					std::printf("Button DPad Up pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-					std::printf("Button DPad Down pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-					std::printf("Button DPad Left pressed\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-					std::printf("Button DPad Right pressed\n");
-					break;
-				default:
-					std::printf("Unknown button %d pressed\n", event.cbutton.button);
-					break;
-				}
 				break;
 			case SDL_CONTROLLERBUTTONUP:
 				gamepadBtnUp();
-				switch (event.cbutton.button) {
-				case SDL_CONTROLLER_BUTTON_A:
-					std::printf("Button A (Cross) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_B:
-					std::printf("Button B (Circle) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_X:
-					std::printf("Button X (Square) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_Y:
-					std::printf("Button Y (Triangle) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_BACK:
-					std::printf("Button Back (Share) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_GUIDE:
-					std::printf("Button Guide (PS Button) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_START:
-					std::printf("Button Start (Options) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_LEFTSTICK:
-					std::printf("Button LeftStick (L3) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
-					std::printf("Button RightStick (R3) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-					std::printf("Button LeftShoulder (L1) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-					std::printf("Button RightShoulder (R1) released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_UP:
-					std::printf("Button DPad Up released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-					std::printf("Button DPad Down released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-					std::printf("Button DPad Left released\n");
-					break;
-				case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-					std::printf("Button DPad Right released\n");
-					break;
-				default:
-					std::printf("Unknown button %d released\n", event.cbutton.button);
-					break;
-				}
 				break;
 			case SDL_CONTROLLERAXISMOTION:
 				gamepadBtnMotion();
-				switch (event.caxis.axis) {
-				case SDL_CONTROLLER_AXIS_LEFTX:
-					std::printf("Axis LeftX moved to %d\n", event.caxis.value);
-					break;
-				case SDL_CONTROLLER_AXIS_LEFTY:
-					std::printf("Axis LeftY moved to %d\n", event.caxis.value);
-					break;
-				case SDL_CONTROLLER_AXIS_RIGHTX:
-					std::printf("Axis RightX moved to %d\n", event.caxis.value);
-					break;
-				case SDL_CONTROLLER_AXIS_RIGHTY:
-					std::printf("Axis RightY moved to %d\n", event.caxis.value);
-					break;
-				case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
-					std::printf("Axis TriggerLeft (L2) moved to %d\n", event.caxis.value);
-					break;
-				case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
-					std::printf("Axis TriggerRight (R2) moved to %d\n", event.caxis.value);
-					break;
-				default:
-					std::printf("Unknown axis %d moved to %d\n", event.caxis.axis, event.caxis.value);
-					break;
-				}
 				break;
 			case SDL_WINDOWEVENT:
 				switch (event.window.event)
@@ -434,6 +311,7 @@ __int64 animationTurn()
 		//aniUSet에 있는 모든 인스턴스를 체크해서 애니메이션을 실행시킴. 
 		for (auto it = aniUSet.begin(); it != aniUSet.end();)
 		{
+			//prt(L"aniUSet의 사이즈는 %d이다.\n",aniUSet.size());
 			bool loopBreak = false;
 			if ((*it)->isDictator()) { loopBreak = true; }
 
@@ -494,6 +372,7 @@ __int64 entityAITurn()
 
 	if (endMonsterTurn == true) { turnCycle = turn::playerInput; }
 	else { turnCycle = turn::monsterAnime; }
+
 
 	return (getNanoTimer() - timeStampStart);
 }

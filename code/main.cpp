@@ -1,4 +1,4 @@
-﻿#include <tbb/tbb.h>
+﻿
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -75,7 +75,6 @@ int main(int argc, char** argv)
 	//// 윈도우 크기를 2배로 설정합니다.
 	//SDL_SetWindowSize(window, currentWidth * 0.5, currentHeight * 0.5);
 	//SDL_RenderSetScale(renderer, 0.5f, 0.5f);
-
 	int fpsTimeStack = 0;
 	int fpsFrame = 0;
 	int fps = 60;

@@ -74,6 +74,7 @@ public:
 	}
 	bool runAnimation(bool shutdown)
 	{
+		//prt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
 		if (getAniType() == aniFlag::drop)
 		{
 			addTimer();

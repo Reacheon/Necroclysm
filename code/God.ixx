@@ -12,6 +12,8 @@ import globalVar;
 import checkCursor;
 import drawWindow;
 
+static int delayR2 = 0;
+
 export class God : public GUI
 {
 private:
@@ -238,5 +240,17 @@ public:
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
-	void step() { }
+	void step() 
+	{
+		if (SDL_NumJoysticks() > 0)
+		{
+			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			{
+				prt(L"탭이 실행되었다.\n");
+				close(aniFlag::winUnfoldClose);
+				delayR2 = 20;
+			}
+			else delayR2--;
+		}
+	}
 };

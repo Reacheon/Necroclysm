@@ -1,6 +1,7 @@
 ﻿//타일캐시 없는 버전
 #include <SDL.h>
 
+
 export module renderTile;
 
 import std;
@@ -816,6 +817,37 @@ __int64 drawMarkers()
 				}
 				setZoom(1.0);
 			}
+		}
+	}
+
+	if (controller != nullptr)
+	{
+		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+
+		int tgtX = Player::ins()->getGridX();
+		int tgtY = Player::ins()->getGridY();
+
+		if (leftX > cutoffLStick) tgtX += 1;
+		if (leftX < -cutoffLStick) tgtX -= 1;
+		if (leftY > cutoffLStick) tgtY += 1;
+		if (leftY < -cutoffLStick) tgtY -= 1;
+
+		if (tgtX != Player::ins()->getGridX() || tgtY != Player::ins()->getGridY())
+		{
+			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+			dst.w = tileSize;
+			dst.h = tileSize;
+			setZoom(zoomScale);
+			drawSpriteCenter
+			(
+				spr::cursorMarker,
+				0,
+				dst.x + dst.w / 2,
+				dst.y + dst.h / 2
+			);
+			setZoom(1.0);
 		}
 	}
 

@@ -1,5 +1,6 @@
 ﻿#include <SDL.h>
 
+
 export module Talent;
 
 import std;

@@ -1,5 +1,6 @@
 #include <SDL.h>
 
+
 export module CoordSelectCraft;
 
 import std;

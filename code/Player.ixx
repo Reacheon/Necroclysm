@@ -129,6 +129,7 @@ public:
 
 	void updateMinimap()
 	{
+		auto timeStampStart = getNanoTimer();
 		SDL_SetRenderTarget(renderer, texture::minimap);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
@@ -140,7 +141,7 @@ public:
 				if (isCircle(minimapDiameter / 2, dx, dy))
 				{
 					SDL_Color ptCol;
-					TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
+					const TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
 					if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 					{
 						//floor
@@ -186,8 +187,6 @@ public:
 
 	void updateVision(int range, int cx, int cy)
 	{
-		static std::vector<float> timeDurations;
-		static const int maxDurations = 10;
 		__int64 timeStampStart = getNanoTimer();
 		//prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
 
@@ -241,15 +240,6 @@ public:
 		}
 
 		threadPoolPtr->waitForThreads();
-
-		//float duration = (float)(getNanoTimer() - timeStampStart) / 1000000.0;
-		//timeDurations.push_back(duration);
-		//if (timeDurations.size() > maxDurations) {
-		//	timeDurations.erase(timeDurations.begin());
-		//}
-		//float averageDuration = std::accumulate(timeDurations.begin(), timeDurations.end(), 0.0) / timeDurations.size();
-		//prt(L"updateVision 실행에 %f ms만큼의 시간이 걸렸다.\n", duration);
-		//prt(L"최근 10회의 평균 실행 시간: %f ms\n", averageDuration);
 	}
 
 

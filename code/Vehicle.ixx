@@ -1,5 +1,6 @@
 ﻿#include <SDL.h>
 
+
 export module Vehicle;
 
 import std;
@@ -1068,6 +1069,7 @@ public:
 
     bool runAnimation(bool shutdown)
     {
+        //prt(L"Vehicle %p의 runAnimation이 실행되었다.\n", this);
         if (getAniType() == aniFlag::propRush)
         {
             addTimer();

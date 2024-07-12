@@ -3,14 +3,14 @@ export module timeKeeper;
 import std;
 import nanoTimer;
 
-export void printTime(__int64 startTime, const char* funcName)
+export void prtTime(__int64 startTime, const char* funcName)
 {
     auto currentTime = getNanoTimer();
     auto elapsedTime = currentTime - startTime;
     std::printf("%s: %f ms (%lld ns)\n", funcName, static_cast<double>(elapsedTime) / 1000000.0, elapsedTime);
 }
 
-export void printTimeMax(__int64 startTime, const char* funcName, int count)
+export void prtTimeAvg(__int64 startTime, const char* funcName, int count)
 {
     static std::vector<__int64> elapsedTimes;
     static __int64 maxTime = 0;

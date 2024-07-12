@@ -1,4 +1,4 @@
-#include <tbb/tbb.h>
+
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -1039,6 +1039,9 @@ public:
 
 	bool runAnimation(bool shutdown)
 	{
+		//if (isPlayer) prt(L"Player의 runAnimation이 실행되었다.\n");
+		//else prt(L"Entity %p의 runAnimation이 실행되었다.\n",this);
+
 		if (getAniType() == aniFlag::move)//만약 플레이어 인스턴스의 좌표와 목적좌표가 다를 경우
 		{
 			// 1 / 60초마다 runAnimation이 실행됨

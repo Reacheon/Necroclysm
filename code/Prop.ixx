@@ -1,3 +1,4 @@
+
 #include <SDL.h>
 
 export module Prop;
@@ -259,6 +260,7 @@ public:
 
     bool runAnimation(bool shutdown)
     {
+        //prt(L"Prop %p의 runAnimation이 실행되었다.\n", this);
         if (getAniType() == aniFlag::propRush)
         {
             addTimer();
