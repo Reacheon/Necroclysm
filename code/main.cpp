@@ -53,6 +53,7 @@ int main(int argc, char** argv)
 					prt(L"다음 게임패드가 감지되었다. : ");
 					std::printf(SDL_GameControllerName(controller));
 					prt(L"\n");
+					inputType = input::gamepad;
 					break;
 				}
 				else errorBox(L"게임패드를 열 수가 없다.");

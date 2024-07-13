@@ -29,7 +29,7 @@ export void displayLoader()
     cameraH = displayMode.h;
 
     window = SDL_CreateWindow("Chemiclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
-    SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);
 
@@ -45,33 +45,33 @@ export void displayLoader()
         cameraW = 720;
     }
 
-    ////////PC 테스트용 강제 해상도 조정////////
-    //{
-    //    int resolution = 0;
-    //    switch (resolution)
-    //    {
-    //    default://1:1
-    //        cameraW = 720;
-    //        cameraH = 720;
-    //        break;
-    //    case 1://9:16
-    //        cameraW = 720;
-    //        cameraH = 1280;
-    //        break;
-    //    case 2://4:3
-    //        cameraW = 960;
-    //        cameraH = 720;
-    //        break;
-    //    case 3://1:2
-    //        cameraW = 720;
-    //        cameraH = 1440;
-    //        break;
-    //    case 4://16:9
-    //        cameraW = 1280;
-    //        cameraH = 720;
-    //        break;
-    //    }
-    //}
+    //////PC 테스트용 강제 해상도 조정////////
+    {
+        int resolution = 0;
+        switch (resolution)
+        {
+        default://1:1
+            cameraW = 720;
+            cameraH = 720;
+            break;
+        case 1://9:16
+            cameraW = 720;
+            cameraH = 1280;
+            break;
+        case 2://4:3
+            cameraW = 960;
+            cameraH = 720;
+            break;
+        case 3://1:2
+            cameraW = 720;
+            cameraH = 1440;
+            break;
+        case 4://16:9
+            cameraW = 1280;
+            cameraH = 720;
+            break;
+        }
+    }
 
 
     SDL_SetWindowSize(window, cameraW, cameraH);

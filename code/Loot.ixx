@@ -77,7 +77,7 @@ public:
 		lootTile[axis::y] = targetGridY;
 		lootTile[axis::z] = Player::ins()->getGridZ();
 
-		changeXY(cameraW -335 - 37, (cameraH / 2) - 210, false);
+		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
 		tabType = tabFlag::closeWin;
@@ -92,7 +92,7 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (inputType == input::keyboard)
+		if (inputType == input::keyboard || inputType == input::gamepad)
 		{
 			lootCursor = 0;
 		}

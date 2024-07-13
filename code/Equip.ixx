@@ -89,7 +89,7 @@ public:
 		errorBox(ptr != nullptr, "More than equip instance was generated.");
 		ptr = this;
 
-		changeXY((cameraW / 2) - 352, (cameraH / 2) - 210, false);
+		changeXY( 50, (cameraH / 2) - 210, false);
 		setAniSlipDir(4);
 
 		//barAct = actSet::null;

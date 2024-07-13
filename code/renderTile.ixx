@@ -820,7 +820,7 @@ __int64 drawMarkers()
 		}
 	}
 
-	if (controller != nullptr)
+	if (inputType == input::gamepad)
 	{
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);

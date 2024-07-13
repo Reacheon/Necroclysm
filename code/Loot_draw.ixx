@@ -128,13 +128,23 @@ void Loot::drawGUI()
 				}
 				else { leftBtnColor = lowCol::black; }
 				drawStadium(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, leftBtnColor, 200, 5);
-				drawSpriteCenter(spr::windowArrow, 2, pocketWindow.x + 16, pocketWindow.y + 27);
+				
 
 				if (inputType == input::keyboard)
 				{
 					if (state[SDL_SCANCODE_LSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
 					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_LShift, pocketLeft.x + pocketLeft.w / 2, pocketLeft.y + pocketRight.h / 2);
+				}
+				else if (inputType == input::gamepad)
+				{
+					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+					else { targetBtnSpr = spr::buttons; }
+					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, pocketLeft.x + pocketLeft.w / 2, pocketLeft.y + pocketRight.h / 2);
+				}
+				else
+				{
+					drawSpriteCenter(spr::windowArrow, 2, pocketWindow.x + 16, pocketWindow.y + 27);
 				}
 
 				if (pocketCursor == 0) { drawStadium(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, leftBtnColor, 200, 5); }
@@ -149,13 +159,22 @@ void Loot::drawGUI()
 				}
 				else { rightBtnColor = lowCol::black; }
 				drawStadium(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, rightBtnColor, 200, 5);
-				drawSpriteCenter(spr::windowArrow, 0, pocketWindow.x + pocketWindow.w - 16, pocketWindow.y + 27);
 
 				if (inputType == input::keyboard)
 				{
 					if (state[SDL_SCANCODE_RSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
 					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_RShift, pocketRight.x + pocketRight.w / 2, pocketRight.y + pocketRight.h / 2);
+				}
+				else if (inputType == input::gamepad)
+				{
+					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+					else { targetBtnSpr = spr::buttons; }
+					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, pocketRight.x + pocketRight.w / 2, pocketRight.y + pocketRight.h / 2);
+				}
+				else
+				{
+					drawSpriteCenter(spr::windowArrow, 0, pocketWindow.x + pocketWindow.w - 16, pocketWindow.y + 27);
 				}
 
 				if (pocketCursor == numberOfBag - 1) { drawStadium(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, rightBtnColor, 200, 5); }
@@ -267,7 +286,24 @@ void Loot::drawGUI()
 			drawFillRect(lootBtn, lootBtnColor, 200);
 			drawRect(lootBtn, { 0x57, 0x57, 0x57 });
 
-			drawSpriteCenter(spr::lootBagArrow, 1, lootWindow.x + lootWindow.w / 2, lootWindow.y - 4);
+			
+
+			if (inputType == input::keyboard)
+			{
+				if (state[SDL_SCANCODE_V]) { targetBtnSpr = spr::buttonsPressed; }
+				else { targetBtnSpr = spr::buttons; }
+				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_V, lootBtn.x + lootBtn.w / 2, lootBtn.y + lootBtn.h / 2);
+			}
+			else if (inputType == input::gamepad)
+			{
+				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
+				else { targetBtnSpr = spr::buttons; }
+				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, lootBtn.x + lootBtn.w / 2, lootBtn.y + lootBtn.h / 2);
+			}
+			else
+			{
+				drawSpriteCenter(spr::lootBagArrow, 1, lootWindow.x + lootWindow.w / 2, lootWindow.y - 4);
+			}
 
 			for (int i = 0; i < lootPtr->itemInfo.size(); i++)
 			{
@@ -279,13 +315,6 @@ void Loot::drawGUI()
 				{
 					drawStadium(lootBtn.x, lootBtn.y, lootBtn.w, lootBtn.h, lootBtnColor, 200, 5);
 				}
-			}
-
-			if (inputType == input::keyboard)
-			{
-				if (state[SDL_SCANCODE_V]) { targetBtnSpr = spr::buttonsPressed; }
-				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_V, lootBtn.x, lootBtn.y + lootBtn.h / 2);
 			}
 		}
 	}

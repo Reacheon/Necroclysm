@@ -248,7 +248,7 @@ void HUD::drawGUI()
 
 			drawStadium(letterboxPopUpButton.x, letterboxPopUpButton.y, letterboxPopUpButton.w, letterboxPopUpButton.h, popUpBtnColor, 200, 5);
 
-			if (controller != nullptr)
+			if (inputType == input::gamepad)
 			{
 				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
@@ -357,7 +357,7 @@ void HUD::drawTab()
 	}
 
 	Sprite* targetBtnSpr;
-	if (controller != nullptr)
+	if (inputType == input::gamepad)
 	{
 		if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 0) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }
@@ -385,7 +385,7 @@ void HUD::drawQuickSlot()
 
 
 	Sprite* targetBtnSpr;
-	if (controller != nullptr)
+	if (inputType == input::gamepad)
 	{
 		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }
