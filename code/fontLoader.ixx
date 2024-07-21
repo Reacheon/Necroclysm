@@ -14,7 +14,7 @@ export void fontLoader()
     if (option::language == L"Korean")
     {
         //한국어일 경우에는 갈무리 폰트
-        for (int i = 0; i < maxFontSize; i++)
+        for (int i = 0; i < MAX_FONT_SIZE; i++)
         {
             mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
             errorBox(mainFont[i] == nullptr, "Failed to open the font file.");
@@ -23,7 +23,7 @@ export void fontLoader()
     else if (option::language == L"English")
     {
         //영어일 경우에도 갈무리 폰트
-        for (int i = 0; i < maxFontSize; i++)
+        for (int i = 0; i < MAX_FONT_SIZE; i++)
         {
             mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
             errorBox(mainFont[i] == nullptr, "Failed to open the font file.");

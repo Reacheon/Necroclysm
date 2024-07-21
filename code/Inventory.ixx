@@ -31,8 +31,8 @@ private:
 	std::wstring titleInventory = L"배낭";
 	int titleItemSprIndex = 60;
 
-	std::array<SDL_Rect, inventoryItemMax> inventoryItemRect; //마우스를 위한 인벤아이템렉트 판정 박스
-	std::array<SDL_Rect, inventoryItemMax> inventoryItemSelectRect; //마우스를 위한 인벤아이템렉트 셀렉트 판정 박스
+	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemRect; //마우스를 위한 인벤아이템렉트 판정 박스
+	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemSelectRect; //마우스를 위한 인벤아이템렉트 셀렉트 판정 박스
 	SDL_Rect inventoryLabel;
 	SDL_Rect inventoryLabelSelect;
 	SDL_Rect inventoryLabelName;
@@ -67,7 +67,7 @@ public:
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		inventoryBase = { 0, 0, 335, 336 };
-		inventoryBase.h = 164 + 32 * myMax(0, (myMin(inventoryItemMax, inventoryPocket->itemInfo.size() - 1)));
+		inventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size() - 1)));
 
 		if (center == false)
 		{
@@ -91,7 +91,7 @@ public:
 			y = inputY - inventoryBase.h / 2;
 		}
 
-		for (int i = 0; i < inventoryItemMax; i++)
+		for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
 		{
 			inventoryItemRect[i] = { inventoryBase.x + 52, inventoryBase.y + 125 + 32*i, 270, 26 };
 			inventoryItemSelectRect[i] = { inventoryBase.x + 10, inventoryBase.y + 125 + 32 * i, 36, 26 };
@@ -117,6 +117,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

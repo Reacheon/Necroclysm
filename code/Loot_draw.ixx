@@ -35,7 +35,7 @@ void Loot::drawGUI()
 	}
 
 	SDL_Rect newLootBase = lootBase;
-	newLootBase.h = 164 + 32 * myMax(0, (myMin(lootItemMax - 1, lootPocket->itemInfo.size() - 1)));
+	newLootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
 	drawWindow(&newLootBase, sysStr[10], 1);
 
 	//포켓
@@ -353,13 +353,13 @@ void Loot::drawGUI()
 		}
 
 		//개별 아이템
-		drawItemList(lootPocket, lootArea.x, lootArea.y, lootItemMax, lootCursor, lootScroll, true);
+		drawItemList(lootPocket, lootArea.x, lootArea.y, LOOT_ITEM_MAX, lootCursor, lootScroll, true);
 
 		// 아이템 스크롤 그리기
-		SDL_Rect lootScrollBox = { lootBase.x + 325, lootItemRect[0].y, 2, lootItemRect[lootItemMax - 1].y + lootItemRect[lootItemMax - 1].h - lootItemRect[0].y };
+		SDL_Rect lootScrollBox = { lootBase.x + 325, lootItemRect[0].y, 2, lootItemRect[LOOT_ITEM_MAX - 1].y + lootItemRect[LOOT_ITEM_MAX - 1].h - lootItemRect[0].y };
 		drawFillRect(lootScrollBox, { 120,120,120 });
 		SDL_Rect inScrollBox = lootScrollBox; // 내부 스크롤 커서
-		inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)lootItemMax / lootPocket->itemInfo.size());
+		inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)LOOT_ITEM_MAX / lootPocket->itemInfo.size());
 		inScrollBox.y = lootScrollBox.y + lootScrollBox.h * ((float)lootScroll / (float)lootPocket->itemInfo.size());
 		if (inScrollBox.y + inScrollBox.h > lootScrollBox.y + lootScrollBox.h) { inScrollBox.y = lootScrollBox.y + lootScrollBox.h - inScrollBox.h; }
 		drawFillRect(inScrollBox, col::white);

@@ -220,6 +220,8 @@ public:
 		}
 	}
 	void clickDownGUI() { }
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

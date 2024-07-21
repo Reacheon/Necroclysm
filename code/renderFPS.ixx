@@ -27,7 +27,7 @@ export void renderFPS(__int64 loopTime)
     const int samplingTime = 100;
     const int samplingSize = 10;
     static int lastUpdateTime = 0;
-    int currentTime = SDL_GetTicks();
+    int currentTime = getMilliTimer();
 
     static std::deque<float> fpsArr;
     static float loopFPS, avgFPS;

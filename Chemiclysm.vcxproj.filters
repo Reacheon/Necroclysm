@@ -480,5 +480,11 @@
     <ClCompile Include="code\ContextMenu.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\clickRight.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\clickHold.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

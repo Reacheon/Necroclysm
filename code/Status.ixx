@@ -82,6 +82,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy){/*사용 X*/}
 	void clickDownGUI(){/*사용 X*/}
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

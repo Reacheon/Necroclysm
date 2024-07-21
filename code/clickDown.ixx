@@ -1,8 +1,7 @@
-﻿#include <SDL.h>
-
-export module clickDown;
+﻿export module clickDown;
 
 import std;
+import util;
 import globalVar;
 import GUI;
 
@@ -12,7 +11,10 @@ export void clickDown()
 	dxClickStack = 0;
 	dyClickStack = 0;
 	dtClickStack = 0;
-	dtClickStackStart = SDL_GetTicks();
+	dtClickStackStart = getMilliTimer();
+	clickStartTime = getMilliTimer();
+	deactHold = false;
+
 	switch (inputType)
 	{
 		case input::mouse:

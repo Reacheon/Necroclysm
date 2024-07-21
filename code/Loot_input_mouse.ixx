@@ -19,7 +19,7 @@ void Loot::clickUpGUI()
 	else if (checkCursor(&lootArea)) //아이템 클릭 -> 에러 파트
 	{
 		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-		for (int i = 0; i < lootItemMax; i++)
+		for (int i = 0; i < LOOT_ITEM_MAX; i++)
 		{
 			if (lootPocket->itemInfo.size() - 1 >= i)
 			{
@@ -43,7 +43,7 @@ void Loot::clickUpGUI()
 		}
 
 		//아이템 좌측 셀렉트 클릭
-		for (int i = 0; i < lootItemMax; i++)
+		for (int i = 0; i < LOOT_ITEM_MAX; i++)
 		{
 			if (checkCursor(&lootItemSelectRect[i]))
 			{
@@ -197,7 +197,7 @@ void Loot::clickMotionGUI(int dx, int dy)
 void Loot::clickDownGUI()
 {
 	//아이템 좌측 셀렉트 클릭
-	selectTouchTime = SDL_GetTicks();
+	selectTouchTime = getMilliTimer();
 	initLootScroll = lootScroll;
 	initPocketCursor = pocketCursor;
 }

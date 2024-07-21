@@ -4,55 +4,28 @@ export module constVar;
 
 import std;
 
-export constexpr int mapGridW = 120;
-export constexpr int mapGridH = 100;
+export constexpr int DARK_VISION_HALF_W = 18; //어둠시야
+export constexpr int DARK_VISION_HALF_H = 9; //어둠시야
 
-//export constexpr int userVisionHalfW = 10; //어둠시야
-//export constexpr int userVisionHalfH = 9; //어둠시야
+export constexpr int GRAY_VISION_HALF_W = 23; //주변 FOV 회색으로 바꾸는 최대 W
+export constexpr int GRAY_VISION_HALF_H = 23; //주변 FOV 회색으로 바꾸는 최대 H
 
-export constexpr int userVisionHalfW = 18; //어둠시야
-export constexpr int userVisionHalfH = 9; //어둠시야
-
-export constexpr int userVisionHalfGrayW = 23; //주변 FOV 회색으로 바꾸는 최대 W
-export constexpr int userVisionHalfGrayH = 23; //주변 FOV 회색으로 바꾸는 최대 H
-
-export constexpr int maxEntityNumber = 128;
-export constexpr int entityDexWidth = 150;
-export constexpr int entityDexHeight = 300;
-export constexpr int maxItemNumber = 128;
-export constexpr int itemDexWidth = 200;
-export constexpr int itemDexHeight = 300;
-export constexpr int effectDexWidth = 6;
-export constexpr int maxMap = 10;
-export constexpr int mapFlagSize = 20;
-export constexpr int chunkSizeX = 13;
-export constexpr int chunkSizeY = 13;
-export constexpr int chunkSizeZ = 1;
-export constexpr int maxFontSize = 32;
-export constexpr int pocketFlagWidth = 6;
-export constexpr int exInputTextMax = 30;
-export constexpr int lootItemMax = 9;
-export constexpr int equipItemMax = 10;
-export constexpr int inventoryItemMax = 9;
-export constexpr int dmgFlagSize = 3;
-export constexpr int partsSize = 10;
-export constexpr int talentSize = 19;
-export constexpr int noActHeightHUD = 82;
-export constexpr int maxVehicleSize = 31;
-export constexpr int chunkLoadingRange = 5;
-
-export constexpr int minimapDiameter = 41; //미니맵의 지름 (홀수)
-export constexpr int sectorSize = 400; // 절차적 맵 생성할 때 작용하는 범위
-
-export constexpr const wchar_t* printRed = L"\x1b[31m";
-export constexpr const wchar_t* printGreen = L"\x1b[32m";
-export constexpr const wchar_t* printYellow = L"\x1b[33m";
-export constexpr const wchar_t* printBlue = L"\x1b[34m";
-export constexpr const wchar_t* printMagenta = L"\x1b[35m";
-export constexpr const wchar_t* printCyan = L"\x1b[36m";
-export constexpr const wchar_t* printReset = L"\x1b[0m";
-
-export constexpr int cutoffLStick = 10000;
+export constexpr int CHUNK_SIZE_X = 13; //청크의 x길이
+export constexpr int CHUNK_SIZE_Y = 13; //청크의 y길이
+export constexpr int CHUNK_SIZE_Z = 1; //청크의 z길이, 현재 1로 미사용됨
+export constexpr int MAX_FONT_SIZE = 32;
+export constexpr int EX_INPUT_TEXT_MAX = 30;
+export constexpr int EQUIP_ITEM_MAX = 10;
+export constexpr int LOOT_ITEM_MAX = 9;
+export constexpr int INVENTORY_ITEM_MAX = 9;
+export constexpr int DMG_FLAG_SIZE = 3;
+export constexpr int TALENT_SIZE = 19;
+export constexpr int MAX_VEHICLE_SIZE = 31;
+export constexpr int CHUNK_LOADING_RANGE = 5;
+export constexpr int MINIMAP_DIAMETER = 41; //미니맵의 지름 (홀수)
+export constexpr int SECTOR_SIZE = 400; // 절차적 맵 생성할 때 작용하는 범위
+export constexpr int TOLERANCE_LSTICK = 10000; //LStick이 이 값을 넘어야 판정이 일어남
+export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 이벤트가 일어나지 않음
 
 
 export constexpr std::array<int, 27> expTable =

@@ -48,9 +48,8 @@ private:
 	int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
 	SDL_RendererFlip flip = SDL_FLIP_NONE;
 	ItemPocket* equipment;
-	std::vector<std::array<int, pocketFlagWidth>> pocketInfo;
 	ItemStack* dropItemPtr = nullptr; //버리기 및 던지기에 사용하는 아이템스택 포인터
-	std::vector<std::array<int, dmgFlagSize>> dmgVec;//현재 이 개체가 받은 데미지의 총량
+	std::vector<std::array<int, DMG_FLAG_SIZE>> dmgVec;//현재 이 개체가 받은 데미지의 총량
 
 	bool hasAStarDst = false;
 	int aStarDstX = 0;
@@ -58,9 +57,9 @@ private:
 
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
-	std::array<int, talentSize> talentExp = { 0, }; //경험치
-	std::array<float, talentSize> talentApt; //적성
-	std::array<int, talentSize> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
+	std::array<int, TALENT_SIZE> talentExp = { 0, }; //경험치
+	std::array<float, TALENT_SIZE> talentApt; //적성
+	std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -920,10 +919,6 @@ public:
 		if (targetB != NULL) { targetB = flash.b; }
 		if (targetAlpha != NULL) { targetAlpha = flash.a; }
 	}
-	std::array<int, pocketFlagWidth> getPocketInfo(int vectorIndex) { return pocketInfo[vectorIndex]; }
-	int getPocketInfo(int vectorIndex, int arrayIndex) { return pocketInfo[vectorIndex][arrayIndex]; }
-	void setPocketInfo(int vectorIndex, int arrayIndex, int val) { pocketInfo[vectorIndex][arrayIndex] = val; }
-	int getPocketInfoSize() { return pocketInfo.size(); }
 	void drop(ItemPocket* txPtr)
 	{
 		ItemStack* targetStack;
@@ -1008,18 +1003,18 @@ public:
 	void addTalentExp(int expVal)
 	{
 		int divider = 0;
-		for (int i = 0; i < talentSize; i++)
+		for (int i = 0; i < TALENT_SIZE; i++)
 		{
 			divider += talentFocus[i];
 		}
 		errorBox(divider == 0, "You need to enable at least one talent(divider=0 at addTalentExp).");
 		int frag = floor((float)(expVal) / (float)divider);
-		for (int i = 0; i < talentSize; i++)
+		for (int i = 0; i < TALENT_SIZE; i++)
 		{
 			talentExp[i] += (frag * talentFocus[i]);
 		}
 		//만렙이 된 재능의 포커스 해제
-		for (int i = 0; i < talentSize; i++)
+		for (int i = 0; i < TALENT_SIZE; i++)
 		{
 			if (talentFocus[i] > 0)
 			{

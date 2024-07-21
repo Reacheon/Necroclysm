@@ -31,8 +31,6 @@ static int delayR2 = 0;
 export class Loot : public GUI
 {
 private:
-
-
 	inline static Loot* ptr = nullptr;
 	ItemPocket* lootPocket = nullptr;
 	const int lootScrollSize = 6; //한 스크롤에 들어가는 아이템의 수
@@ -132,7 +130,7 @@ public:
 		lootWindow = { lootBase.x + 0, lootBase.y + 120, 335, 300 };
 
 		lootArea = { lootBase.x + 10, lootBase.y + 125,312, 246 };
-		for (int i = 0; i < lootItemMax; i++)
+		for (int i = 0; i < LOOT_ITEM_MAX; i++)
 		{
 			lootItemRect[i] = { lootBase.x + 52, lootBase.y + 125 + 32*i, 270, 26 };
 			lootItemSelectRect[i] = { lootBase.x + 10, lootBase.y + 125 + 32*i, 36, 26 };
@@ -178,6 +176,8 @@ public:
 	void clickUpGUI();
 	void clickMotionGUI(int dx, int dy);
 	void clickDownGUI();
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
@@ -200,7 +200,7 @@ public:
 			if (selectTouchTime != -1)
 			{
 				//아이템 좌측 셀렉트 클릭
-				for (int i = 0; i < lootItemMax; i++)
+				for (int i = 0; i < LOOT_ITEM_MAX; i++)
 				{
 					if (checkCursor(&lootItemSelectRect[i]))
 					{
@@ -215,7 +215,7 @@ public:
 						break;
 					}
 
-					if (i == lootItemMax - 1)
+					if (i == LOOT_ITEM_MAX - 1)
 					{
 						selectTouchTime = -1;
 					}
@@ -229,7 +229,7 @@ public:
 		//잘못된 스크롤 위치 조정
 		if (inputType == input::mouse || inputType == input::touch)
 		{
-			if (lootScroll + lootItemMax >= lootPocket->itemInfo.size()) { lootScroll = myMax(0, (int)lootPocket->itemInfo.size() - lootItemMax); }
+			if (lootScroll + LOOT_ITEM_MAX >= lootPocket->itemInfo.size()) { lootScroll = myMax(0, (int)lootPocket->itemInfo.size() - LOOT_ITEM_MAX); }
 			else if (lootScroll < 0) { lootScroll = 0; }
 		}
 

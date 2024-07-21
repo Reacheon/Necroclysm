@@ -43,9 +43,9 @@ void Loot::gamepadBtnDown()
 		case SDL_CONTROLLER_BUTTON_DPAD_UP:
 			if (lootCursor > 0)
 			{
-				if (lootCursor % lootItemMax == 0)//스크롤 변경
+				if (lootCursor % LOOT_ITEM_MAX == 0)//스크롤 변경
 				{
-					lootScroll -= lootItemMax;
+					lootScroll -= LOOT_ITEM_MAX;
 					if (lootScroll < 0) { lootScroll = 0; }
 				}
 				lootCursor--;
@@ -59,9 +59,9 @@ void Loot::gamepadBtnDown()
 		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
 			if (lootCursor < lootPocket->itemInfo.size() - 1)
 			{
-				if (lootCursor % lootItemMax == 5 && lootCursor != lootPocket->itemInfo.size() - 1)
+				if (lootCursor % LOOT_ITEM_MAX == 5 && lootCursor != lootPocket->itemInfo.size() - 1)
 				{
-					lootScroll += lootItemMax;
+					lootScroll += LOOT_ITEM_MAX;
 				}
 				lootCursor++;
 			}

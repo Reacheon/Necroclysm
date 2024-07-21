@@ -645,6 +645,8 @@ public:
 	{
 		dropDownList::initScroll = dropDownList::scroll;
 	}
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
@@ -919,15 +921,11 @@ public:
 			turnWait(1.0);
 			coTurnSkip = true;
 
-			prt(printRed);
 			prt(L"exeCraft 内风凭 角青 傈\n");
-			prt(printReset);
 
 			co_await std::suspend_always();
 
-			prt(printRed);
 			prt(L"exeCraft 内风凭 角青 饶\n");
-			prt(printReset);
 
 			elapsedTime++;
 			if (elapsedTime >= targetCraftingTime)

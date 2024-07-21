@@ -11,7 +11,7 @@ export class Vehicle;
 export class Chunk
 {
 private:
-	std::array<std::array<TileData, chunkSizeY>, chunkSizeX> singleTile;
+	std::array<std::array<TileData, CHUNK_SIZE_Y>, CHUNK_SIZE_X> singleTile;
 	chunkFlag flag = chunkFlag::none;
 	weatherFlag chunkWeather = weatherFlag::sunny;
 public:
@@ -19,9 +19,9 @@ public:
 	{
 		//prt(lowCol::green, L"Chunk : 생성자가 호출되었습니다..\n");
 		
-		for (int x = 0; x < chunkSizeX; x++)
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
-			for (int y = 0; y < chunkSizeY; y++)
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
 				singleTile[x][y].randomVal = randomRange(0, 65535);
 			}
@@ -30,9 +30,9 @@ public:
 		if (input == chunkFlag::seawater)
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < chunkSizeX; x++)
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
-				for (int y = 0; y < chunkSizeY; y++)
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
 					singleTile[x][y].floor = tileFloorFlag::seawater;
 				}
@@ -41,9 +41,9 @@ public:
 		else if (input == chunkFlag::none)
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < chunkSizeX; x++)
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
-				for (int y = 0; y < chunkSizeY; y++)
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
 					singleTile[x][y].floor = 0;
 				}
@@ -51,9 +51,9 @@ public:
 		}
 		else if (input == chunkFlag::underground)
 		{
-			for (int x = 0; x < chunkSizeX; x++)
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
-				for (int y = 0; y < chunkSizeY; y++)
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
 					singleTile[x][y].floor = 109;
 
@@ -64,9 +64,9 @@ public:
 		else
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < chunkSizeX; x++)
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
-				for (int y = 0; y < chunkSizeY; y++)
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
 					singleTile[x][y].floor = tileFloorFlag::grass;
 				}
@@ -99,9 +99,9 @@ public:
 	std::vector<Entity*> getChunkEntityList()
 	{
 		std::vector<Entity*> entityList;
-		for (int x = 0; x < chunkSizeX; x++)
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
-			for (int y = 0; y < chunkSizeY; y++)
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
 				if (getChunkTile(x, y).EntityPtr != nullptr) { entityList.push_back((Entity*)getChunkTile(x, y).EntityPtr); }
 			}
@@ -112,9 +112,9 @@ public:
 	std::vector<Vehicle*> getChunkVehicleList()
 	{
 		std::vector<Vehicle*> VehicleList;
-		for (int x = 0; x < chunkSizeX; x++)
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
-			for (int y = 0; y < chunkSizeY; y++)
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
 				if (getChunkTile(x, y).VehiclePtr != nullptr)
 				{
@@ -128,9 +128,9 @@ public:
 	std::vector<ItemStack*> getChunkItemList()
 	{
 		std::vector<ItemStack*> itemList;
-		for (int x = 0; x < chunkSizeX; x++)
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
-			for (int y = 0; y < chunkSizeY; y++)
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
 				if (getChunkTile(x, y).ItemStackPtr != nullptr) { itemList.push_back((ItemStack*)getChunkTile(x, y).ItemStackPtr); }
 			}

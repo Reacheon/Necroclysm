@@ -62,7 +62,6 @@ export std::vector<SkillData> skillDex; //스킬 DB
 export std::vector<std::wstring> itemTooltip;
 export std::vector<std::wstring> entityTooltip;
 
-export std::vector<std::array<int, effectDexWidth>> effectDex; // 이펙트 DB
 
 export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; // 화면에 고정되는 텍스처 객체에 대한 맵
 export int cameraW = 304; // 카메라의 Width
@@ -82,15 +81,18 @@ export int detailScroll = 0; //상단 디테일의 스크롤
 export input inputType = input::mouse; //조작방식 설정
 export SDL_Point clickDownPoint = { 0,0 }; //다운 이벤트를 실행한 좌표
 export SDL_Point clickUpPoint = { 0,0 }; //업 이벤트를 실행한 좌표
-export bool deactClickUp = false; //true일 경우 클릭업 함수를 실행하지 않음
+export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌표
+export bool deactClickUp = false; //true일 경우 클릭업 및 클릭라이트(업) 함수를 실행하지 않음
 export bool cursorMotionLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
 export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트
 export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
 export int dtClickStackStart = 0; //클릭 시간 측정 시작한 시간
 export int dtClickStack = -1; //총 시간, 단 측정 중이지 않을 때에는 값이 -1
-export TTF_Font* mainFont[maxFontSize] = { nullptr, }; //메인 폰트의 사이즈(언어 설정이 바뀌면 다른 폰트로 바뀜)
-export TTF_Font* outlineFont[maxFontSize] = { nullptr, }; //메인 폰트의 사이즈(언어 설정이 바뀌면 다른 폰트로 바뀜)
+export __int64 clickStartTime = std::numeric_limits<__int64>::max(); //밀리초로 저장되는 클릭을 시작한 시간
+export bool deactHold = false; //홀드이벤트를 비활성화, 예를 들어 카메라를 일정 값만큼 이동했을 경우 홀드 이벤트가 발생하지않음
+export TTF_Font* mainFont[MAX_FONT_SIZE] = { nullptr, }; //메인 폰트의 사이즈(언어 설정이 바뀌면 다른 폰트로 바뀜)
+export TTF_Font* outlineFont[MAX_FONT_SIZE] = { nullptr, }; //메인 폰트의 사이즈(언어 설정이 바뀌면 다른 폰트로 바뀜)
 export int selectMode = 0; // 선택모드 0일 경우 전체선택, 1이면 정밀선택
 /////////////////////////////////////////////////////////////////
 export bool exInput = false; // exInput(외부 텍스트 입력)가 작동 중인지의 여부

@@ -22,7 +22,7 @@ void Inventory::drawGUI()
 		ItemPocket* invenPocketPtr = (ItemPocket*)(inventoryItemData->pocketPtr);
 
 		SDL_Rect newInventoryBase = inventoryBase;
-		newInventoryBase.h = 164 + 32 * myMax(0, (myMin(inventoryItemMax - 1, invenPocketPtr->itemInfo.size() - 1)));
+		newInventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, invenPocketPtr->itemInfo.size() - 1)));
 		drawWindowItemset(&newInventoryBase, titleInventory, titleItemSprIndex);
 
 		drawFillRect(inventoryBase.x + 13, inventoryBase.y + 40, 50, 50, col::black);
@@ -81,7 +81,7 @@ void Inventory::drawGUI()
 		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)
 
 		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 30, 315, 200 };
-		drawItemList(invenPocketPtr, invenArea.x, invenArea.y, myMax(0, (myMin(inventoryItemMax, invenPocketPtr->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
+		drawItemList(invenPocketPtr, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, invenPocketPtr->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
 
 		if (invenPocketPtr->itemInfo.size() == 0)
 		{

@@ -17,7 +17,7 @@ void HUD::clickDownGUI()
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
-	if (click && dtClickStack > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
+	if (click && getMilliTimer() - clickStartTime > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
 	{
 		const int maxDist = 160;
 		int prevCameraX = cameraX, prevCameraY = cameraY;
@@ -51,9 +51,9 @@ void HUD::clickUpGUI()
 		int playerX = Player::ins()->getGridX();
 		int playerY = Player::ins()->getGridY();
 		int playerZ = Player::ins()->getGridZ();
-		for (int i = playerX - userVisionHalfW; i <= playerX + userVisionHalfW; i++)
+		for (int i = playerX - DARK_VISION_HALF_W; i <= playerX + DARK_VISION_HALF_W; i++)
 		{
-			for (int j = playerY - userVisionHalfH; j <= playerY + userVisionHalfH; j++)
+			for (int j = playerY - DARK_VISION_HALF_H; j <= playerY + DARK_VISION_HALF_H; j++)
 			{
 				if (World::ins()->getTile(i, j, playerZ).fov == fovFlag::white)
 				{
@@ -171,7 +171,7 @@ void HUD::mouseStep()
 		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&tabSmallBox) == false)
 		{
 			//터치한 좌표를 얻어내는 부분
-			//prt(L"1초 이상 눌렀다.\n");
+			// prt(L"1초 이상 눌렀다.\n");
 			int revX, revY, revGridX, revGridY;
 			revX = clickDownPoint.x - (cameraW / 2);
 			//revY = clickDownPoint.y - (cameraH / 2);

@@ -60,7 +60,7 @@ void Equip::drawGUI()
 		drawText(sysStr[24], equipLabel.x + 250, equipLabel.y + 4); //무리량(상단바)
 
 		//개별 아이템
-		drawItemList(equipPtr, equipArea.x, equipArea.y, equipItemMax, equipCursor, equipScroll, isTargetPocket == false);
+		drawItemList(equipPtr, equipArea.x, equipArea.y, EQUIP_ITEM_MAX, equipCursor, equipScroll, isTargetPocket == false);
 
 		if (equipPtr->itemInfo.size() == 0) // 만약 아이템이 없을 경우
 		{
@@ -68,10 +68,10 @@ void Equip::drawGUI()
 		}
 
 		// 아이템 스크롤 그리기
-		SDL_Rect equipScrollBox = { equipBase.x + 325, equipItemRect[0].y, 2, equipItemRect[equipItemMax - 1].y + equipItemRect[equipItemMax - 1].h - equipItemRect[0].y };
+		SDL_Rect equipScrollBox = { equipBase.x + 325, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
 		drawFillRect(equipScrollBox, { 120,120,120 });
 		SDL_Rect inScrollBox = equipScrollBox; // 내부 스크롤 커서
-		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)equipItemMax / Player::ins()->getEquipPtr()->itemInfo.size());
+		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / Player::ins()->getEquipPtr()->itemInfo.size());
 		inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)Player::ins()->getEquipPtr()->itemInfo.size());
 		if (inScrollBox.y + inScrollBox.h > equipScrollBox.y + equipScrollBox.h) { inScrollBox.y = equipScrollBox.y + equipScrollBox.h - inScrollBox.h; }
 		drawFillRect(inScrollBox, col::white);

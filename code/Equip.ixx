@@ -142,7 +142,7 @@ public:
 		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 71 , 26 };
 
 		equipArea = { equipWindow.x + 10, equipWindow.y + 56,312, 42 * 8 - 6 };
-		for (int i = 0; i < equipItemMax; i++)
+		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
 		{
 			equipItemRect[i] = { equipArea.x + 42, equipArea.y + 32 * i, 270, 26 };
 			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 32 * i, 36, 26 };
@@ -167,6 +167,8 @@ public:
 	void clickUpGUI();
 	void clickMotionGUI(int dx, int dy);
 	void clickDownGUI();
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
@@ -178,7 +180,7 @@ public:
 			if (selectTouchTime != -1)
 			{
 				//아이템 좌측 셀렉트 클릭
-				for (int i = 0; i < lootItemMax; i++)
+				for (int i = 0; i < LOOT_ITEM_MAX; i++)
 				{
 					if (checkCursor(&lootItemSelect[i]))
 					{
@@ -193,7 +195,7 @@ public:
 						break;
 					}
 
-					if (i == lootItemMax - 1)
+					if (i == LOOT_ITEM_MAX - 1)
 					{
 						selectTouchTime = -1;
 					}

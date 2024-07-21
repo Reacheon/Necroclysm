@@ -41,6 +41,7 @@ import debugConsole;
 import updateBarAct;
 import CoordSelect;
 import SkillData;
+import ContextMenu;
 
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
@@ -136,6 +137,11 @@ public:
 	void clickDownGUI();
 	void clickMotionGUI(int dx, int dy);
 	void clickUpGUI();
+	void clickRightGUI() 
+	{
+		new ContextMenu(event.motion.x, event.motion.y);
+	}
+	void clickHoldGUI() { }
 	void mouseStep();
 
 	void gamepadBtnDown();
@@ -155,7 +161,6 @@ public:
 			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
 			static float initDist = 0;
 			float dstDist = popUpDist;
-			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
 
 			addTimer();
 			switch (getTimer())
@@ -177,8 +182,7 @@ public:
 				changeXY(0, y - floor(spd[getTimer() - 2]), false);
 				break;
 			case 12:
-				if (inputType == input::keyboard) { changeXY(0, -dstDist + noActHeightHUD, false); }
-				else { changeXY(0, -dstDist, false); }
+				changeXY(0, -dstDist, false);
 				resetTimer();
 				actInput();
 				setAniType(aniFlag::null);
@@ -193,10 +197,7 @@ public:
 			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
 			static float initDist = 0;
 			float dstDist = popUpDist;
-			if (inputType == input::keyboard) { dstDist += noActHeightHUD; }
-
-			if (inputType == input::keyboard) { dstDist = -y + noActHeightHUD; }
-			else { dstDist = -y; }
+			dstDist = -y;
 
 			addTimer();
 			switch (getTimer())
@@ -216,43 +217,6 @@ public:
 				break;
 			default:
 				changeXY(0, y + floor(spd[getTimer() - 2]), false);
-				break;
-			case 12:
-				if (inputType == input::keyboard) { changeXY(0, noActHeightHUD, false); }
-				else { changeXY(0, 0, false); }
-				resetTimer();
-				actInput();
-				setAniType(aniFlag::null);
-				return true;
-				break;
-			}
-		}
-		else if (getAniType() == aniFlag::popUpSingleLetterbox)//키보드에서만 발생하는 1칸 팝업
-		{
-			//initDist가 정해져있어야 한다.
-			//역으로 initDist에서 가속을 구할 수 있어야 함
-			static std::array<float, 10> spd = { 0, };//spd[0]은 0프레임일 때의 속도
-			static float initDist = 0;
-			float dstDist = noActHeightHUD;
-
-			addTimer();
-			switch (getTimer())
-			{
-			case 1:
-				initDist = 0;
-				for (int i = 9; i >= 0; i--)
-				{
-					spd[9 - i] = acc * i + initSpeed;
-					initDist += spd[9 - i];
-				}
-				//정규화
-				for (int i = 0; i <= 9; i++)
-				{
-					spd[i] *= (dstDist / initDist);
-				}
-				break;
-			default:
-				changeXY(0, y - floor(spd[getTimer() - 2]), false);
 				break;
 			case 12:
 				changeXY(0, 0, false);
@@ -349,11 +313,11 @@ public:
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
 		if (Talent::ins() == nullptr)
 		{
-			for (int i = 0; i < talentSize; i++)
+			for (int i = 0; i < TALENT_SIZE; i++)
 			{
 				if (Player::ins()->getTalentFocus(i) > 0) { break; }
 
-				if (i == talentSize - 1)
+				if (i == TALENT_SIZE - 1)
 				{
 					new Talent();
 					Talent::ins()->setWarningIndex(1);

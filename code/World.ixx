@@ -58,7 +58,7 @@ public:
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(x + ((-chunkSizeX * chunkX) + ((chunkSizeX - 1) / 2)), y + ((-chunkSizeY * chunkY) + ((chunkSizeY - 1) / 2)));
+		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
 	}
 	void createChunk(int chunkX, int chunkY, int chunkZ)
 	{
@@ -77,30 +77,30 @@ public:
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkItemPos(x + ((-chunkSizeX * chunkX) + ((chunkSizeX - 1) / 2)), y + ((-chunkSizeY * chunkY) + ((chunkSizeY - 1) / 2)));
+		return chunkPtr[{chunkX, chunkY, z}]->getChunkItemPos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
 	}
 	void setItemPos(int x, int y, int z, ItemStack* inputPtr)
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		chunkPtr[{chunkX, chunkY, z}]->setChunkItemPos(x + ((-chunkSizeX * chunkX) + ((chunkSizeX - 1) / 2)), y + ((-chunkSizeY * chunkY) + ((chunkSizeY - 1) / 2)), inputPtr);
+		chunkPtr[{chunkX, chunkY, z}]->setChunkItemPos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)), inputPtr);
 	}
 	Vehicle* getVehiclePos(int x, int y, int z)
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkVehiclePos(x + ((-chunkSizeX * chunkX) + ((chunkSizeX - 1) / 2)), y + ((-chunkSizeY * chunkY) + ((chunkSizeY - 1) / 2)));
+		return chunkPtr[{chunkX, chunkY, z}]->getChunkVehiclePos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
 	}
 	void setVehiclePos(int x, int y, int z, Vehicle* inputPtr)
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		chunkPtr[{chunkX, chunkY, z}]->setChunkVehiclePos(x + ((-chunkSizeX * chunkX) + ((chunkSizeX - 1) / 2)), y + ((-chunkSizeY * chunkY) + ((chunkSizeY - 1) / 2)), inputPtr);
+		chunkPtr[{chunkX, chunkY, z}]->setChunkVehiclePos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)), inputPtr);
 	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
-		chunkX = (sgn(x)) * ((std::abs(x) + ((chunkSizeX - 1) / 2)) / chunkSizeX);
-		chunkY = (sgn(y)) * ((std::abs(y) + ((chunkSizeY - 1) / 2)) / chunkSizeY);
+		chunkX = (sgn(x)) * ((std::abs(x) + ((CHUNK_SIZE_X - 1) / 2)) / CHUNK_SIZE_X);
+		chunkY = (sgn(y)) * ((std::abs(y) + ((CHUNK_SIZE_Y - 1) / 2)) / CHUNK_SIZE_Y);
 	}
 	void activate(int x, int y, int z)
 	{
@@ -183,11 +183,11 @@ public:
 		changeToChunkCoord(inputGridX, inputGridY, chunkX, chunkY);
 		
 		//청크 좌표를 섹터 좌표로 변환
-		if (chunkX > 0) sectorX = chunkX / sectorSize;
-		else sectorX = (chunkX + 1) / sectorSize - 1;
+		if (chunkX > 0) sectorX = chunkX / SECTOR_SIZE;
+		else sectorX = (chunkX + 1) / SECTOR_SIZE - 1;
 		
-		if (chunkY > 0) sectorY = chunkY / sectorSize;
-		else sectorY = (chunkY + 1) / sectorSize - 1;
+		if (chunkY > 0) sectorY = chunkY / SECTOR_SIZE;
+		else sectorY = (chunkY + 1) / SECTOR_SIZE - 1;
 
 		return { sectorX,sectorY };
 	}

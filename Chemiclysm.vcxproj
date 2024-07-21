@@ -169,6 +169,8 @@
     <ClCompile Include="code\Bionic.ixx" />
     <ClCompile Include="code\calc.ixx" />
     <ClCompile Include="code\camera.ixx" />
+    <ClCompile Include="code\clickHold.ixx" />
+    <ClCompile Include="code\clickRight.ixx" />
     <ClCompile Include="code\constVar.ixx" />
     <ClCompile Include="code\ContextMenu.ixx" />
     <ClCompile Include="code\CoordSelectCraft.ixx" />

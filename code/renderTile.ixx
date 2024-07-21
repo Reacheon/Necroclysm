@@ -828,10 +828,10 @@ __int64 drawMarkers()
 		int tgtX = Player::ins()->getGridX();
 		int tgtY = Player::ins()->getGridY();
 
-		if (leftX > cutoffLStick) tgtX += 1;
-		if (leftX < -cutoffLStick) tgtX -= 1;
-		if (leftY > cutoffLStick) tgtY += 1;
-		if (leftY < -cutoffLStick) tgtY -= 1;
+		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
+		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
+		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
+		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
 
 		if (tgtX != Player::ins()->getGridX() || tgtY != Player::ins()->getGridY())
 		{

@@ -18,7 +18,7 @@ void Equip::clickUpGUI()
 	{
 		//아이템 메인 클릭
 		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-		for (int i = 0; i < equipItemMax; i++)
+		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
 		{
 			if (equipPtr->itemInfo.size() - 1 >= i)
 			{

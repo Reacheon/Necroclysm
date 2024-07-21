@@ -1280,9 +1280,9 @@ public:
 
 			prt(L"절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
 
-			if (clickTile.x <= Player::ins()->getGridX() + userVisionHalfW && clickTile.x >= Player::ins()->getGridX() - userVisionHalfW)
+			if (clickTile.x <= Player::ins()->getGridX() + DARK_VISION_HALF_W && clickTile.x >= Player::ins()->getGridX() - DARK_VISION_HALF_W)
 			{
-				if (clickTile.y <= Player::ins()->getGridY() + userVisionHalfH && clickTile.y >= Player::ins()->getGridY() - userVisionHalfH)
+				if (clickTile.y <= Player::ins()->getGridY() + DARK_VISION_HALF_H && clickTile.y >= Player::ins()->getGridY() - DARK_VISION_HALF_H)
 				{
 					cameraX += 16 * (clickTile.x - targetX);
 					cameraY += 16 * (clickTile.y - targetY);
@@ -1304,6 +1304,8 @@ public:
 			}
 		}
 	}
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
@@ -1319,9 +1321,9 @@ public:
 				int playerX = Player::ins()->getGridX();
 				int playerY = Player::ins()->getGridY();
 				int playerZ = Player::ins()->getGridZ();
-				for (int i = playerX - userVisionHalfW; i <= playerX + userVisionHalfW; i++)
+				for (int i = playerX - DARK_VISION_HALF_W; i <= playerX + DARK_VISION_HALF_W; i++)
 				{
-					for (int j = playerY - userVisionHalfH; j <= playerY + userVisionHalfH; j++)
+					for (int j = playerY - DARK_VISION_HALF_H; j <= playerY + DARK_VISION_HALF_H; j++)
 					{
 						if (World::ins()->getTile(i, j, playerZ).fov == fovFlag::white)
 						{

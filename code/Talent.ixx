@@ -24,7 +24,7 @@ private:
 
 	bool warningIndex = 0;
 
-	std::array<SDL_Rect, talentSize> talentButton = { { 0,0,0,0 }, };
+	std::array<SDL_Rect, TALENT_SIZE> talentButton = { { 0,0,0,0 }, };
 public:
 	Talent() : GUI(false)
 	{
@@ -64,7 +64,7 @@ public:
 
 		int pivotX = talentBase.x + 20;
 		int pivotY = talentBase.y + 56;
-		for (int i = 0; i < talentSize; i++)
+		for (int i = 0; i < TALENT_SIZE; i++)
 		{
 			int targetX = pivotX + 210 * (i / 8);
 			int targetY = pivotY + (28 * (i % 8));
@@ -109,7 +109,7 @@ public:
 
 
 			setZoom(1.5);
-			for (int i = 0; i < talentSize; i++)
+			for (int i = 0; i < TALENT_SIZE; i++)
 			{
 				SDL_Color btnColor;
 				if (checkCursor(&talentButton[i]))
@@ -325,7 +325,7 @@ public:
 
 		if (checkCursor(&tab))
 		{
-			for (int i = 0; i < talentSize; i++)
+			for (int i = 0; i < TALENT_SIZE; i++)
 			{
 				if (Player::ins()->getTalentFocus(i) > 0) //수련 중인 재능을 1개라도 발견했을 경우
 				{
@@ -333,7 +333,7 @@ public:
 					return;
 				}
 
-				if (i == talentSize - 1) //만약 수련 중인 재능이 없으면
+				if (i == TALENT_SIZE - 1) //만약 수련 중인 재능이 없으면
 				{
 					warningIndex = 1;
 					return;
@@ -342,7 +342,7 @@ public:
 		}
 		else
 		{
-			for (int i = 0; i < talentSize; i++)
+			for (int i = 0; i < TALENT_SIZE; i++)
 			{
 				if (checkCursor(&talentButton[i]))
 				{
@@ -370,6 +370,8 @@ public:
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

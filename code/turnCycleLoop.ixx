@@ -17,6 +17,7 @@ import Vehicle;
 import clickUp;
 import clickDown;
 import clickMotion;
+import clickRight;
 import gamepadBtnDown;
 import gamepadBtnMotion;
 import gamepadBtnUp;
@@ -24,7 +25,6 @@ import AI;
 import turnWait;
 import dirToXY;
 import globalTime;
-import ContextMenu;
 
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
@@ -95,9 +95,7 @@ __int64 playerInputTurn()
 
 		if (coTurnSkip)
 		{
-			prt(printRed);
 			prt(L"메인 함수 코루틴 재실행\n");
-			prt(printReset);
 			coTurnSkip = false;
 			(*coFunc).run();
 
@@ -186,12 +184,7 @@ __int64 playerInputTurn()
 				if (inputType == input::mouse) 
 				{ 
 					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
-					else if (event.button.button == SDL_BUTTON_RIGHT)
-					{
-						new ContextMenu(event.motion.x, event.motion.y);
-					}
-
-					
+					else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
 				}
 				break;
 			case SDL_FINGERUP:
@@ -230,10 +223,10 @@ __int64 playerInputTurn()
 					exInputText.insert(exInputCursor, singleChar);
 					exInputCursor++;
 					exInputEditing = false;
-					if (exInputText.size() > exInputTextMax)
+					if (exInputText.size() > EX_INPUT_TEXT_MAX)
 					{
-						exInputText = exInputText.substr(0, exInputTextMax);
-						exInputCursor = exInputTextMax;
+						exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
+						exInputCursor = EX_INPUT_TEXT_MAX;
 					}
 				}
 				break;
@@ -248,10 +241,10 @@ __int64 playerInputTurn()
 					exInputText.replace(exInputCursor, 1, singleChar);
 					if (exInputText[exInputCursor] == 0) { exInputEditing = false; }
 					else { exInputEditing = true; }
-					if (exInputText.size() > exInputTextMax)
+					if (exInputText.size() > EX_INPUT_TEXT_MAX)
 					{
-						exInputText = exInputText.substr(0, exInputTextMax);
-						exInputCursor = exInputTextMax;
+						exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
+						exInputCursor = EX_INPUT_TEXT_MAX;
 					}
 				}
 				break;

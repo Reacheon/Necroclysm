@@ -1231,6 +1231,8 @@ public:
 	{
 		initCraftScroll = craftScroll;
 	}
+	void clickRightGUI() { }
+	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
@@ -1343,9 +1345,7 @@ public:
 
 	Corouter executeCraft()
 	{
-		prt(printMagenta);
 		prt(L"executeCraft 실행됨\n");
-		prt(printReset);
 
 		bool negateMonster = false;
 
@@ -1609,15 +1609,11 @@ public:
 			turnWait(1.0);
 			coTurnSkip = true;
 
-			prt(printRed);
 			prt(L"exeCraft 코루틴 실행 전\n");
-			prt(printReset);
 
 			co_await std::suspend_always();
 
-			prt(printRed);
 			prt(L"exeCraft 코루틴 실행 후\n");
-			prt(printReset);
 
 			elapsedTime++;
 			if (elapsedTime >= itemDex[targetItemCode].craftTime) break;

@@ -1,5 +1,4 @@
-﻿
-export module clickUp;
+﻿export module clickUp;
 
 import std;
 import checkCursor;
@@ -16,6 +15,7 @@ export void clickUp()
 	dxClickStack = 0;
 	dyClickStack = 0;
 	dtClickStack = -1;
+	clickStartTime = std::numeric_limits<__int64>::max();
 
 	switch (inputType)
 	{
@@ -28,7 +28,6 @@ export void clickUp()
 			clickUpPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };
 			break;
 	}
-
 
 	if (deactClickUp == false) { GUI::getActiveGUIList()[GUI::getActiveGUIList().size() - 1]->clickUpGUI(); }
 	else { deactClickUp = false; }

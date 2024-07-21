@@ -12,7 +12,7 @@ import Sprite;
 export void textureLoader()
 {
 	//load texture
-	texture::minimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, minimapDiameter, minimapDiameter);
+	texture::minimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, MINIMAP_DIAMETER, MINIMAP_DIAMETER);
 	texture::worldmap = IMG_LoadTexture(renderer, "image/worldmap.png");
 
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");

@@ -216,9 +216,9 @@ public:
             std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> newPartInfo;
             auto currentCoordTransform = coordTransform[bodyDir];
             auto targetCoordTransform = coordTransform[inputDir16];
-            for (int x = getGridX() - maxVehicleSize / 2; x <= getGridX() + maxVehicleSize / 2; x++)
+            for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
             {
-                for (int y = getGridY() - maxVehicleSize / 2; y <= getGridY() + maxVehicleSize / 2; y++)
+                for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
                 {
                     if (partInfo.find({ x,y }) != partInfo.end())
                     {
@@ -258,9 +258,9 @@ public:
 
             auto currentCoordTransform = coordTransform[bodyDir];
             auto targetCoordTransform = coordTransform[inputDir16];
-            for (int x = getGridX() - maxVehicleSize / 2; x <= getGridX() + maxVehicleSize / 2; x++)
+            for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
             {
-                for (int y = getGridY() - maxVehicleSize / 2; y <= getGridY() + maxVehicleSize / 2; y++)
+                for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
                 {
                     if (partInfo.find({ x,y }) != partInfo.end())
                     {

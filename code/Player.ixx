@@ -134,11 +134,11 @@ public:
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
-		for (int dx = -(minimapDiameter / 2); dx <= (minimapDiameter / 2); dx++)
+		for (int dx = -(MINIMAP_DIAMETER / 2); dx <= (MINIMAP_DIAMETER / 2); dx++)
 		{
-			for (int dy = -(minimapDiameter / 2); dy <= (minimapDiameter / 2); dy++)
+			for (int dy = -(MINIMAP_DIAMETER / 2); dy <= (MINIMAP_DIAMETER / 2); dy++)
 			{
-				if (isCircle(minimapDiameter / 2, dx, dy))
+				if (isCircle(MINIMAP_DIAMETER / 2, dx, dy))
 				{
 					SDL_Color ptCol;
 					const TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
@@ -169,17 +169,17 @@ public:
 						//vehicle
 						if (tgtTile->VehiclePtr != nullptr) ptCol = lowCol::orange;
 
-						drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2),ptCol);
+						drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2),ptCol);
 
-						if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2), col::black, 100);
+						if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black, 100);
 					}
-					else drawPoint(dx + (minimapDiameter / 2), dy + (minimapDiameter / 2), col::black);
+					else drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black);
 				}
 			}
 		}
 
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderDrawPoint(renderer, (minimapDiameter / 2), (minimapDiameter / 2));
+		SDL_RenderDrawPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
 
 		SDL_SetRenderTarget(renderer, nullptr);
 	}
@@ -195,9 +195,9 @@ public:
 		else correctionRange = range / 2;
 
 		//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
-		for (int i = cx - userVisionHalfGrayW; i <= cx + userVisionHalfGrayW; i++)
+		for (int i = cx - GRAY_VISION_HALF_W; i <= cx + GRAY_VISION_HALF_W; i++)
 		{
-			for (int j = cy - userVisionHalfGrayH; j <= cy + userVisionHalfGrayH; j++)
+			for (int j = cy - GRAY_VISION_HALF_H; j <= cy + GRAY_VISION_HALF_H; j++)
 			{
 				TileData* tgtTile = &World::ins()->getTile(i, j, getGridZ());
 				if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;
@@ -206,10 +206,10 @@ public:
 
 
 		std::vector<Point2> tasksVec;
-		tasksVec.reserve((2 * userVisionHalfW + 1) * (2 * userVisionHalfH + 1));
-		for (int tgtX = cx - userVisionHalfW; tgtX <= cx + userVisionHalfW; tgtX++)
+		tasksVec.reserve((2 * DARK_VISION_HALF_W + 1) * (2 * DARK_VISION_HALF_H + 1));
+		for (int tgtX = cx - DARK_VISION_HALF_W; tgtX <= cx + DARK_VISION_HALF_W; tgtX++)
 		{
-			for (int tgtY = cy - userVisionHalfH; tgtY <= cy + userVisionHalfH; tgtY++)
+			for (int tgtY = cy - DARK_VISION_HALF_H; tgtY <= cy + DARK_VISION_HALF_H; tgtY++)
 			{
 				tasksVec.push_back({ tgtX,tgtY });
 			}
@@ -307,7 +307,7 @@ public:
 			dir2Coord(dir, dx, dy);
 			if (World::ins()->isEmptySector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ()) == true) World::ins()->createSector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ());
 		}
-		updateNearbyChunk(chunkLoadingRange);
+		updateNearbyChunk(CHUNK_LOADING_RANGE);
 		updateNearbyBarAct(inputGridX, inputGridY, inputGridZ);
 	}
 
