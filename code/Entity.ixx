@@ -1693,7 +1693,7 @@ public:
 					errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
 					break;
 				}
-				errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
+				//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
 				drawOrder[priority] = tgtSpr;
 			}
 

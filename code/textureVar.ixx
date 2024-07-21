@@ -145,4 +145,6 @@ export namespace spr
 
 	Sprite* gasEffect1 = nullptr;
 	Sprite* steamEffect1 = nullptr;
+	
+	Sprite* inventoryItemRect = nullptr;
 }

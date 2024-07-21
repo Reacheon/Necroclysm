@@ -28,6 +28,11 @@ export void drawWindow(int x, int y, int w, int h)
 	SDL_RenderDrawRect(renderer, &windowRect);
 }
 
+export void drawWindow(const SDL_Rect* rect)
+{
+	drawWindow(rect->x, rect->y, rect->w, rect->h);
+}
+
 export void drawWindow(int x, int y, int w, int h, std::wstring titleName, int titleSprIndex)
 {
 	drawWindow(x,y,w,h);
@@ -47,14 +52,33 @@ export void drawWindow(int x, int y, int w, int h, std::wstring titleName, int t
 	setZoom(1.0);
 }
 
-export void drawWindow(const SDL_Rect* rect)
-{
-	drawWindow(rect->x, rect->y, rect->w, rect->h);
-}
-
 export void drawWindow(const SDL_Rect* rect, std::wstring titleName, int titleSprIndex)
 {
 	drawWindow(rect->x, rect->y, rect->w, rect->h,titleName, titleSprIndex);
+}
+
+export void drawWindowItemset(int x, int y, int w, int h, std::wstring titleName, int titleSprIndex)
+{
+	drawWindow(x, y, w, h);
+
+	//제목 부분
+	SDL_Rect windowRect = { x,y,w,h };
+	SDL_Rect titleRect = { windowRect.x, windowRect.y, windowRect.w, 30 };
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
+	SDL_RenderFillRect(renderer, &titleRect);
+	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
+	SDL_RenderDrawRect(renderer, &titleRect);
+
+	setFontSize(16);
+	drawTextCenter(col2Str(col::white) + titleName, x + w / 2, y + 14);
+	setZoom(1.5);
+	drawSpriteCenter(spr::itemset, titleSprIndex, x + w / 2 - queryTextWidth(titleName, true) / 2 - 20, y + 14);
+	setZoom(1.0);
+}
+
+export void drawWindowItemset(const SDL_Rect* rect, std::wstring titleName, int titleSprIndex)
+{
+	drawWindowItemset(rect->x, rect->y, rect->w, rect->h, titleName, titleSprIndex);
 }
 
 export void drawEdgeWindow(int x, int y, int w, int h, int edgeWidth, dir16 arrowDir)

@@ -39,22 +39,22 @@ public:
 
 		int i = 0;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[2]);
+		getEquipPtr()->addItemFromDex(2);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[290]);
+		getEquipPtr()->addItemFromDex(290);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[105]);
+		getEquipPtr()->addItemFromDex(105);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[106]);
+		getEquipPtr()->addItemFromDex(106);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[107]);
+		getEquipPtr()->addItemFromDex(107);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-		getEquipPtr()->itemInfo.push_back(itemDex[374]);
+		getEquipPtr()->addItemFromDex(374);
 		getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
 		addSkill(27);

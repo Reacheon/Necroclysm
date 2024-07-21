@@ -36,7 +36,7 @@ void Loot::gamepadBtnDown()
 			break;
 		}
 	}
-	else if (barActCursor == -1)//레터박스 액트 조작 중일 때
+	else if (barActCursor == -1)//일반 루팅 아이템 상하 조작 중
 	{
 		switch (event.cbutton.button)
 		{
@@ -57,9 +57,9 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-			if (lootCursor < lootPtr->itemInfo.size() - 1)
+			if (lootCursor < lootPocket->itemInfo.size() - 1)
 			{
-				if (lootCursor % lootItemMax == 5 && lootCursor != lootPtr->itemInfo.size() - 1)
+				if (lootCursor % lootItemMax == 5 && lootCursor != lootPocket->itemInfo.size() - 1)
 				{
 					lootScroll += lootItemMax;
 				}
@@ -68,19 +68,19 @@ void Loot::gamepadBtnDown()
 			break;
 		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
 		{
-			int currentNumber = lootPtr->itemInfo[lootCursor].lootSelect;
+			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
 			if (currentNumber > 0)
 			{
-				lootPtr->itemInfo[lootCursor].lootSelect = currentNumber - 1;
+				lootPocket->itemInfo[lootCursor].lootSelect = currentNumber - 1;
 			}
 			break;
 		}
 		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
 		{
-			int currentNumber = lootPtr->itemInfo[lootCursor].lootSelect;
-			if (currentNumber < lootPtr->itemInfo[lootCursor].number)
+			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
+			if (currentNumber < lootPocket->itemInfo[lootCursor].number)
 			{
-				lootPtr->itemInfo[lootCursor].lootSelect = currentNumber + 1;
+				lootPocket->itemInfo[lootCursor].lootSelect = currentNumber + 1;
 			}
 			break;
 		}
@@ -91,24 +91,19 @@ void Loot::gamepadBtnDown()
 		}
 		case SDL_CONTROLLER_BUTTON_A://아이템 상세 행동
 		{
-			if (doPopUpSingleHUD == false)
-			{
-				doPopUpSingleHUD = true;
-				barActCursor = 0;
-				//해당 아이템의 고유한 액트로 바꿈
-				updateBarAct();
-			}
+			updateBarAct();
+			barActCursor = 0;
 			break;
 		}
 		case SDL_CONTROLLER_BUTTON_X://아이템 선택
 		{
-			if (lootPtr->itemInfo[lootCursor].lootSelect == 0)
+			if (lootPocket->itemInfo[lootCursor].lootSelect == 0)
 			{
 				executeSelectItem(lootCursor);
 			}
 			else
 			{
-				lootPtr->itemInfo[lootCursor].lootSelect = 0;
+				lootPocket->itemInfo[lootCursor].lootSelect = 0;
 			}
 			break;
 		}
@@ -125,7 +120,7 @@ void Loot::gamepadBtnDown()
 			break;
 		}
 	}
-	else
+	else //루팅 아이템 상세 바액트 조작
 	{
 		switch (event.cbutton.button)
 		{
@@ -156,8 +151,8 @@ void Loot::gamepadBtnDown()
 			break;
 		case SDL_CONTROLLER_BUTTON_B:
 		{
-			doPopDownHUD = true;
 			barActCursor = -1;
+			barAct = actSet::null;
 		}
 		case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
 			executePocketLeft();
@@ -187,7 +182,8 @@ void Loot::gamepadBtnUp()
 			}
 			else if (labelCursor == 1)
 			{
-				CORO(executeSearch());
+				//게임패드로는 글 입력을 못하므로
+				//CORO(executeSearch());
 			}
 			else
 			{

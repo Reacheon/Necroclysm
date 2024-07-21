@@ -756,6 +756,24 @@ export void startSetting()
 		myHeli->addPart(cx, cy + 5, { 119, 315 });
 	}
 
+	//수레 3종
+	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);//차량 설치
+	cart1->isVehicle = true;
+	cart1->vehType = vehFlag::car;
+
+	Vehicle* cart2 = new Vehicle(8, 5, 0, 379);//차량 설치
+	cart2->isVehicle = true;
+	cart2->vehType = vehFlag::car;
+
+	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);//차량 설치
+	cart3->isVehicle = true;
+	cart3->vehType = vehFlag::car;
+
+
+	//new Vehicle(8, 5, 0, 379);//차량 설치
+	//new Vehicle(6, 5, 0, 137);//차량 설치
+
+
 	///////////////////////////////////////////////////////////////
 	//new Vehicle(pX, pY + 2, pZ, 140);//모닥불 설치
 

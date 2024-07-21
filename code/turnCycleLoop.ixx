@@ -24,6 +24,7 @@ import AI;
 import turnWait;
 import dirToXY;
 import globalTime;
+import ContextMenu;
 
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
@@ -182,7 +183,16 @@ __int64 playerInputTurn()
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
-				if (inputType == input::mouse) { clickUp(); }
+				if (inputType == input::mouse) 
+				{ 
+					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
+					else if (event.button.button == SDL_BUTTON_RIGHT)
+					{
+						new ContextMenu(event.motion.x, event.motion.y);
+					}
+
+					
+				}
 				break;
 			case SDL_FINGERUP:
 				if (inputType == input::touch) { clickUp(); }

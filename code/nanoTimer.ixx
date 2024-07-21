@@ -14,3 +14,9 @@ export __int64 getNanoTimer()
     auto now = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(now - programStartTime).count();
 }
+
+export __int64 getMilliTimer()
+{
+    auto now = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(now - programStartTime).count();
+}

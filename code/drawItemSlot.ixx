@@ -29,7 +29,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 	int yCorrection = 0;
 	const int widthLimit = 162;
 	bool split = false;
-	SDL_Rect itemBox = { x, y, 210, 36 };
+	SDL_Rect itemBox = { x, y, 210, 26 };
 	SDL_Color stadiumColor = { 0,0,0 };
 
 	switch (inputCursor)
@@ -42,7 +42,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 			break;
 	}
 
-	drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 150, 5);
+	drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5);
 
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	setFontSize(16);
@@ -120,10 +120,10 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 			break;
 		}
 	}
-	if (!split) drawText(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + 6 + yCorrection);
-	else drawTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + 6 + yCorrection - 8, false, widthLimit, 15, 2);
+	if (!split) drawText(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 11 + yCorrection);
+	else drawTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 11 + yCorrection - 8, false, widthLimit, 15, 2);
 
-	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 150, 5); }
+	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
 	//아이템 아이콘 그리기
 	setZoom(2.5);
@@ -131,12 +131,12 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 	{
 		SDL_SetTextureBlendMode(spr::itemset->getTexture(), SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 128, 128, 128);
-		drawSpriteCenter(spr::itemset, inputItem.sprIndex, itemBox.x + 15, itemBox.y + 18);
+		drawSpriteCenter(spr::itemset, inputItem.sprIndex, itemBox.x + 15, itemBox.y + itemBox.h/2);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 255, 255, 255);
 	}
 	else
 	{
-		drawSpriteCenter(spr::itemset, inputItem.sprIndex, itemBox.x + 15, itemBox.y + 18);
+		drawSpriteCenter(spr::itemset, inputItem.sprIndex, itemBox.x + 15, itemBox.y + itemBox.h / 2);
 	}
 	setZoom(1.0);
 }
@@ -151,7 +151,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 	//////////////////////////////     ▼BOX1(셀렉트박스) 그리기    ///////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	SDL_Rect box1 = { x, y, 36, 36 };
+	SDL_Rect box1 = { x, y, 36, 26 };
 	SDL_Color statusColor;
 	SDL_Color statusStrColor;
 	std::wstring statusStr = L"-";
@@ -215,7 +215,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 
 	if (hasBox1 == true)
 	{
-		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 150, 5);
+		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 183, 5);
 		int fontSize = 16;
 		setFontSize(fontSize);
 		while (queryTextWidth(statusStr, true) > box1.w)
@@ -223,7 +223,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 			fontSize--;
 			setFontSize(fontSize);
 		}
-		drawTextCenter(col2Str(statusStrColor) + statusStr, box1.x + box1.w / 2, box1.y + 16);
+		drawTextCenter(col2Str(statusStrColor) + statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2);
 	}
 	else
 	{
@@ -238,7 +238,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 	if (cursor == true) drawItemRect(cursorFlag::hover, box2.x, box2.y, inputItem);
 	else
 	{
-		SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), 32 };
+		SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), box2.h };
 		//박스 3가 존재하지 않을 경우
 		if (quantity == -1) { clickRect.w = box2.w; }
 
@@ -261,36 +261,36 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 	{
 		SDL_Rect box3 = { box2.x + box2.w + gapWidth, box1.y, 54, box1.h };
 
-		if (cursor == true) drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 150, 5);
+		if (cursor == true) drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 183, 5);
 		else
 		{
-			SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), 32 };
+			SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), box2.h };
 			//박스 3가 존재하지 않을 경우
 			if (quantity == -1) { clickRect.w = box2.w; }
 
 			if (checkCursor(&clickRect) && cursorMotionLock == false)
 			{
-				if (click == false)  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 150, 5);
-				else  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::deepBlue, 150, 5);
+				if (click == false)  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 183, 5);
+				else  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::deepBlue, 183, 5);
 			}
 			else
 			{
-				drawStadium(box3.x, box3.y, box3.w, box3.h, col::black, 150, 5);
+				drawStadium(box3.x, box3.y, box3.w, box3.h, col::black, 183, 5);
 			}
 		}
 
 
 
-		drawSpriteCenter(spr::icon13, 29, box3.x + 10, box2.y + 9);
-		drawSpriteCenter(spr::icon13, 30, box3.x + 10, box2.y + 9 + 16);
+		drawSpriteCenter(spr::icon13, 29, box3.x + 10, box2.y + 9 - 4);
+		drawSpriteCenter(spr::icon13, 30, box3.x + 10, box2.y + 9 + 16 - 7);
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(7);
 
 		std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
 		std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
-		drawText(kgStr + L" KG", box3.x + 10 + 9, box2.y + 13 - 7);
-		drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7);
+		drawText(kgStr + L" KG", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+		drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
 	}
 
 	if (whiteCursor == true)

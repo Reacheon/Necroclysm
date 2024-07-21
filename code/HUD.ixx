@@ -839,7 +839,7 @@ public:
 				}
 				else
 				{
-					Player::ins()->startMove(coord2Dir(touchX - Player::ins()->getGridX(), touchY) - Player::ins()->getGridY());
+					Player::ins()->startMove(coord2Dir(touchX - Player::ins()->getGridX(), touchY - Player::ins()->getGridY()));
 				}
 			}
 			else

@@ -23,6 +23,7 @@ import actFuncSet;
 import drawWindow;
 import CoordSelect;
 import Lst;
+import Inventory;
 
 export class Equip : public GUI
 {
@@ -51,14 +52,13 @@ private:
 
 	SDL_Rect equipBase;
 	SDL_Rect equipTitle;
-	SDL_Rect equipItem[30];
-	SDL_Rect equipItemSelect[30];
+	SDL_Rect equipItemRect[30];
+	SDL_Rect equipItemSelectRect[30];
 	SDL_Rect equipLabel;
 	SDL_Rect equipLabelSelect;
 	SDL_Rect equipLabelName;
 	SDL_Rect equipLabelQuantity;
 	SDL_Rect equipArea;
-	SDL_Rect equipScrollBox;
 	SDL_Rect equipWindow;
 
 	SDL_Rect lootBase;
@@ -83,13 +83,15 @@ private:
 	SDL_Rect lootBtn;
 
 	SDL_Rect topWindow;//상단에 표시되는 저항이나 방어 상성, 아이템의 설명
+
+
 public:
 	Equip() : GUI(false)
 	{
 		errorBox(ptr != nullptr, "More than equip instance was generated.");
 		ptr = this;
 
-		changeXY( 50, (cameraH / 2) - 210, false);
+		changeXY(0, (cameraH / 2) - 210, false);
 		setAniSlipDir(4);
 
 		//barAct = actSet::null;
@@ -133,59 +135,19 @@ public:
 
 		equipTitle = { equipBase.x + 103, equipBase.y, 130, 30 };
 		equipWindow = { equipBase.x, equipBase.y + 30, 335, 380 };
-		equipLabel = { equipWindow.x + 10, equipWindow.y + 10, equipWindow.w - 20 , 26 };
+
+		equipLabel = { equipWindow.x + 10, equipWindow.y + 26, equipWindow.w - 20 , 26 };
 		equipLabelSelect = { equipLabel.x, equipLabel.y, 62 , 26 };
 		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 182 , 26 };
 		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 71 , 26 };
-		equipArea = { equipWindow.x + 10, equipWindow.y + 40,312, 42 * 8 - 6 };
+
+		equipArea = { equipWindow.x + 10, equipWindow.y + 56,312, 42 * 8 - 6 };
 		for (int i = 0; i < equipItemMax; i++)
 		{
-			equipItem[i] = { equipArea.x + 42, equipArea.y + 42 * i, 270, 36 };
-			equipItemSelect[i] = { equipArea.x, equipArea.y + 42 * i, 36, 36 };
+			equipItemRect[i] = { equipArea.x + 42, equipArea.y + 32 * i, 270, 26 };
+			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 32 * i, 36, 26 };
 		}
-		equipScrollBox = { equipWindow.x + 328, equipWindow.y + 40, 2, 42 * equipItemMax };
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-
-		int lootPivotX = (cameraW / 2) + 17;
-		int lootPivotY = (cameraH / 2) - 210;
-		lootBase = { 0,0,335,420 };
-		if (center == false)
-		{
-			lootBase.x += lootPivotX;
-			lootBase.y += lootPivotY;
-		}
-		else
-		{
-			lootBase.x += lootPivotX - lootBase.w / 2;
-			lootBase.y += lootPivotY - lootBase.h / 2;
-		}
-		lootTitle = { lootBase.x + 102, lootBase.y + 0, 130, 30 };
-		lootWindow = { lootBase.x + 0, lootBase.y + 120, 335, 300 };
-		lootArea = { lootWindow.x + 10, lootWindow.y + 40,312, 246 };
-		for (int i = 0; i < lootItemMax; i++)
-		{
-			lootItem[i] = { lootArea.x + 42, lootArea.y + 42 * i, 270, 36 };
-			lootItemSelect[i] = { lootArea.x, lootArea.y + 42 * i, 236, 36 };
-		}
-		lootLabel = { lootWindow.x + 10, lootWindow.y + 10, lootWindow.w - 20 , 26 };
-		lootLabelSelect = { lootLabel.x, lootLabel.y, 62 , 26 };
-		lootLabelName = { lootLabel.x + lootLabelSelect.w, lootLabel.y, 182 , 26 };
-		lootLabelQuantity = { lootLabel.x + lootLabelName.w + lootLabelSelect.w, lootLabel.y, 71 , 26 };
-		lootScrollBox = { lootWindow.x + 328, lootWindow.y + 40, 2, 42 * lootItemMax };
-		pocketWindow = { lootBase.x + 0, lootBase.y + 34, 335, 70 };
-		pocketWeight = { pocketWindow.x + 12, pocketWindow.y + 64, 72, 4 };
-		pocektVolume = { pocketWindow.x + pocketWindow.w - 12 - 72, pocketWindow.h + 64, 72, 4 };
-		pocketItem[0] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 3,pocketWindow.y + 11,32,32 };
-		pocketItem[1] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 2,pocketWindow.y + 11,32,32 };
-		pocketItem[2] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38,pocketWindow.y + 11,32,32 };
-		pocketItem[3] = { pocketWindow.x + (pocketWindow.w / 2) - 24,pocketWindow.y + 11 - 8,48,48 };
-		pocketItem[4] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38,pocketWindow.y + 11,32,32 };
-		pocketItem[5] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38 * 2,pocketWindow.y + 11,32,32 };
-		pocketItem[6] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38 * 3,pocketWindow.y + 11,32,32 };
-		pocketLeft = { pocketWindow.x + 4,pocketWindow.y + 6, 24,44 };
-		pocketRight = { pocketWindow.x + pocketWindow.w - pocketLeft.w - 4,pocketWindow.y + 6,24,44 };
-		lootBtn = { lootWindow.x + lootWindow.w / 2 - 28, lootWindow.y - 2 - 16 + 2, 56, 24 };
 
 		topWindow = { 0, 0, 410,140 };
 		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
@@ -467,30 +429,33 @@ public:
 	}
 	void executeOpen()
 	{
-		lootPtr = (ItemPocket*)equipPtr->itemInfo[equipCursor].pocketPtr;
-		pocketCursor = 0;
-		isTargetPocket = true;
-		for (int j = 0; j < equipPtr->itemInfo.size(); j++)
-		{
-			if (equipPtr->itemInfo[j].pocketMaxVolume > 0)
-			{
-				if (j == equipCursor)
-				{
-					break;
-				}
-				else
-				{
-					pocketCursor++;
-				}
-			}
-		}
+		new Inventory(334, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
 
-		if (inputType == input::keyboard)
-		{
-			lootCursor = 0;
-			doPopDownHUD = true;
-			barActCursor = -1;
-		}
+
+		//lootPtr = (ItemPocket*)(equipPtr->itemInfo[equipCursor].pocketPtr);
+		//pocketCursor = 0;
+		//isTargetPocket = true;
+		//for (int j = 0; j < equipPtr->itemInfo.size(); j++)
+		//{
+		//	if (equipPtr->itemInfo[j].pocketMaxVolume > 0)
+		//	{
+		//		if (j == equipCursor)
+		//		{
+		//			break;
+		//		}
+		//		else
+		//		{
+		//			pocketCursor++;
+		//		}
+		//	}
+		//}
+
+		//if (inputType == input::keyboard)
+		//{
+		//	lootCursor = 0;
+		//	doPopDownHUD = true;
+		//	barActCursor = -1;
+		//}
 	}
 	void updateBarAct()
 	{

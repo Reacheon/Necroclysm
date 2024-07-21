@@ -145,4 +145,6 @@ export void textureLoader()
 	spr::gasEffect1 = new Sprite(renderer, "image/gas/gasEffect1.png", 48, 48);
 	spr::steamEffect1 = new Sprite(renderer, "image/gas/steamEffect1.png", 48, 48);
 
+	spr::inventoryItemRect = new Sprite(renderer, "image/UI/GUI/Inventory/inventoryItemRect.png", 50, 50);
+
 }

@@ -21,9 +21,9 @@ void Loot::clickUpGUI()
 		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
 		for (int i = 0; i < lootItemMax; i++)
 		{
-			if (lootPtr->itemInfo.size() - 1 >= i)
+			if (lootPocket->itemInfo.size() - 1 >= i)
 			{
-				if (checkCursor(&lootItem[i]))
+				if (checkCursor(&lootItemRect[i]))
 				{
 					if (lootCursor != lootScroll + i) //새로운 커서 생성
 					{
@@ -45,11 +45,11 @@ void Loot::clickUpGUI()
 		//아이템 좌측 셀렉트 클릭
 		for (int i = 0; i < lootItemMax; i++)
 		{
-			if (checkCursor(&lootItemSelect[i]))
+			if (checkCursor(&lootItemSelectRect[i]))
 			{
-				if (lootPtr->itemInfo.size() - 1 >= i)
+				if (lootPocket->itemInfo.size() - 1 >= i)
 				{
-					if (lootPtr->itemInfo[i + lootScroll].lootSelect == 0)
+					if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
 					{
 						if (inputType == input::mouse)
 						{
@@ -69,7 +69,7 @@ void Loot::clickUpGUI()
 					}
 					else
 					{
-						lootPtr->itemInfo[i + lootScroll].lootSelect = 0;
+						lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
 					}
 				}
 			}
@@ -84,7 +84,7 @@ void Loot::clickUpGUI()
 		else if (checkCursor(&lootLabelName))
 		{
 			CORO(executeSearch());
-			//lootPtr->sortPocket(sortFlag::null);
+			//lootPocket->sortPocket(sortFlag::null);
 			//lootScroll = 0;
 		}
 		else if (checkCursor(&lootLabelQuantity))
@@ -135,36 +135,36 @@ void Loot::clickUpGUI()
 					//	break;
 				case act::reloadBulletToMagazine:
 				case act::reloadBulletToGun:
-					if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
+					if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Loot, lootPtr, lootCursor));
+						CORO(actFunc::reloadSelf(actEnv::Loot, lootPocket, lootCursor));
 					}
-					else if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::AMMO))
+					else if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::AMMO))
 					{
-						CORO(actFunc::reloadOther(actEnv::Loot, lootPtr, lootCursor));
+						CORO(actFunc::reloadOther(actEnv::Loot, lootPocket, lootCursor));
 					}
-					else if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::GUN))
+					else if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::GUN))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, lootPtr, lootCursor));
+						CORO(actFunc::reloadSelf(actEnv::Equip, lootPocket, lootCursor));
 					}
 					break;
 				case act::reloadMagazine:
 					//총에서 사용하는 경우와 탄창에서 사용하는 경우가 다름
 					//총에서 사용하면 자기 자신에게 장전함(self)
 					//탄창에 사용하면 다른 타일의 총에게 장비함
-					if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
+					if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadOther(actEnv::Loot, lootPtr, lootCursor));
+						CORO(actFunc::reloadOther(actEnv::Loot, lootPocket, lootCursor));
 					}
 					else
 					{
-						CORO(actFunc::reloadSelf(actEnv::Loot, lootPtr, lootCursor));
+						CORO(actFunc::reloadSelf(actEnv::Loot, lootPocket, lootCursor));
 					}
 					break;
 				case act::unloadMagazine:
 				case act::unloadBulletFromMagazine:
 				case act::unloadBulletFromGun:
-					actFunc::unload(lootPtr, lootCursor);
+					actFunc::unload(lootPocket, lootCursor);
 					break;
 				}
 			}

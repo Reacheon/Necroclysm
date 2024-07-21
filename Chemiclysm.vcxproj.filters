@@ -88,6 +88,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\EQUIP">
       <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\INVENTORY">
+      <UniqueIdentifier>{3d8fab15-a267-4023-b6cb-b5868c2a8072}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -467,6 +470,15 @@
     </ClCompile>
     <ClCompile Include="code\Equip_input_gamepad.ixx">
       <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Inventory.ixx">
+      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Inventory_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ContextMenu.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

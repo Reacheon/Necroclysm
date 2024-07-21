@@ -170,6 +170,7 @@
     <ClCompile Include="code\calc.ixx" />
     <ClCompile Include="code\camera.ixx" />
     <ClCompile Include="code\constVar.ixx" />
+    <ClCompile Include="code\ContextMenu.ixx" />
     <ClCompile Include="code\CoordSelectCraft.ixx" />
     <ClCompile Include="code\Craft.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
@@ -222,9 +223,11 @@
     <ClCompile Include="code\getDegree.ixx" />
     <ClCompile Include="code\AI.ixx" />
     <ClCompile Include="code\Entity.ixx" />
+    <ClCompile Include="code\Inventory_draw.ixx" />
     <ClCompile Include="code\Loot_draw.ixx" />
     <ClCompile Include="code\Loot_input_gamepad.ixx" />
     <ClCompile Include="code\Loot_input_mouse.ixx" />
+    <ClCompile Include="code\Inventory.ixx" />
     <ClCompile Include="code\Prop.ixx" />
     <ClCompile Include="code\lineMaker.ixx" />
     <ClCompile Include="code\Loot.ixx" />

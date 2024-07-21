@@ -22,7 +22,7 @@ void Equip::clickUpGUI()
 		{
 			if (equipPtr->itemInfo.size() - 1 >= i)
 			{
-				if (checkCursor(&equipItem[i]))
+				if (checkCursor(&equipItemRect[i]))
 				{
 					if (equipCursor != equipScroll + i) //새로운 커서 생성
 					{
@@ -39,100 +39,6 @@ void Equip::clickUpGUI()
 					return;
 				}
 			}
-		}
-	}
-	else if (checkCursor(&lootBase))
-	{
-		if (checkCursor(&lootArea)) //아이템 클릭 -> 에러 파트
-		{
-			//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-			for (int i = 0; i < lootItemMax; i++)
-			{
-				if (lootPtr->itemInfo.size() - 1 >= i)
-				{
-					if (checkCursor(&lootItem[i]))
-					{
-						if (lootCursor != lootScroll + i) //새로운 커서 생성
-						{
-							lootCursor = lootScroll + i;
-							updateBarAct();
-							tabType = tabFlag::back;
-						}
-						else //커서 삭제
-						{
-							lootCursor = -1;
-							barAct = actSet::null;
-							tabType = tabFlag::closeWin;
-						}
-						return;
-					}
-				}
-			}
-
-			//아이템 좌측 셀렉트 클릭
-			for (int i = 0; i < lootItemMax; i++)
-			{
-				if (checkCursor(&lootItemSelect[i]))
-				{
-					if (lootPtr->itemInfo.size() - 1 >= i)
-					{
-						if (lootPtr->itemInfo[i + lootScroll].lootSelect == 0)
-						{
-							if (inputType == input::mouse)
-							{
-								if (event.button.button == SDL_BUTTON_LEFT)
-								{
-									executeSelectItem(i + lootScroll);
-								}
-								else if (event.button.button == SDL_BUTTON_RIGHT)
-								{
-									CORO(executeSelectItemEx(pocketCursor, i + lootScroll));
-								}
-							}
-							else if (inputType == input::touch)
-							{
-								executeSelectItem(i + lootScroll);
-							}
-						}
-						else
-						{
-							lootPtr->itemInfo[i + lootScroll].lootSelect = 0;
-						}
-					}
-				}
-			}
-		}
-		else if (checkCursor(&lootLabel))
-		{
-			if (checkCursor(&lootLabelSelect))
-			{
-				executeSelectAll();
-			}
-			else if (checkCursor(&lootLabelName))
-			{
-				CORO(executeSearch());
-				//lootPtr->sortPocket(sortFlag::null);
-				//lootScroll = 0;
-			}
-			else if (checkCursor(&lootLabelQuantity))
-			{
-				executeSort();
-			}
-		}
-		else if (checkCursor(&pocketLeft) || checkCursor(&pocketRight)) // 포켓 변경 버튼(좌우) 클릭
-		{
-			if (checkCursor(&pocketLeft)) //왼쪽 포켓으로
-			{
-				executePocketLeft();
-			}
-			else //오른쪽 포켓으로
-			{
-				executePocketRight();
-			}
-		}
-		else if (checkCursor(&lootBtn))
-		{
-			executePickDrop();
 		}
 	}
 	else if (checkCursor(&letterbox)) //버튼은 return 없음
@@ -156,15 +62,7 @@ void Equip::clickUpGUI()
 				}
 				case act::throwing:
 				{
-					if (lootCursor != -1)
-					{
-						CORO(executeThrowing(lootPtr, lootCursor));
-					}
-					else if (equipCursor != -1)
-					{
-						CORO(executeThrowing(equipPtr, equipCursor));
-					}
-
+					CORO(executeThrowing(equipPtr, equipCursor));
 					break;
 				}
 				case act::open:
@@ -209,14 +107,7 @@ void Equip::clickUpGUI()
 				case act::unloadBulletFromMagazine:
 				case act::unloadBulletFromGun:
 				{
-					if (equipCursor != -1)
-					{
-						actFunc::unload(equipPtr, equipCursor);
-					}
-					else
-					{
-						actFunc::unload(lootPtr, lootCursor);
-					}
+					actFunc::unload(equipPtr, equipCursor);
 				}
 				}
 
@@ -237,7 +128,6 @@ void Equip::clickUpGUI()
 
 	//위의 모든 경우에서 return을 받지 못했으면 버튼 이외를 누른 것이므로 커서를 -1로 복구
 	{
-		lootCursor = -1;
 		equipCursor = -1;
 		barAct = actSet::null;
 		tabType = tabFlag::closeWin;
@@ -245,24 +135,7 @@ void Equip::clickUpGUI()
 }
 void Equip::clickMotionGUI(int dx, int dy)
 {
-	if (checkCursor(&lootArea))
-	{
-		if (click == true)
-		{
-			int scrollAccelConst = 20; // 가속상수, 작아질수록 스크롤 속도가 빨라짐
-			//lootScroll = initLootScroll + dy / scrollAccelConst;
-			if (abs(dy / scrollAccelConst) >= 1)
-			{
-				deactClickUp = true;
-				cursorMotionLock = true;
-			}
-		}
-	}
 }
 void Equip::clickDownGUI()
 {
-	//아이템 좌측 셀렉트 클릭
-	selectTouchTime = SDL_GetTicks();
-	initLootScroll = lootScroll;
-	initPocketCursor = pocketCursor;
 }
