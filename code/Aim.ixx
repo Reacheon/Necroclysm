@@ -1272,7 +1272,6 @@ public:
 				revGridX = revX / (16 * zoomScale);
 				revY += sgn(revY) * (8 * zoomScale);
 				revGridY = revY / (16 * zoomScale);
-
 				//상대좌표를 절대좌표로 변환
 				clickTile.x = targetX + revGridX;
 				clickTile.y = targetY + revGridY;

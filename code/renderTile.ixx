@@ -26,6 +26,7 @@ import globalTime;
 import Drawable;
 import TileData;
 import Flame;
+import mouseGrid;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -147,7 +148,6 @@ __int64 drawTiles()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-	bool targetMarker = false;
 	for (const auto& elem : tileList)
 	{
 		int tgtX = elem.x;
@@ -244,43 +244,7 @@ __int64 drawTiles()
 			setZoom(1.0);
 
 
-			//마우스가 가리키는 타일에 마커 그리기
-			if (targetMarker == false && GUI::getActiveGUIList().size() == 1)
-			{
-				SDL_Rect tileRect = { cameraW / 2 + zoomScale * ((16 * tgtX) - cameraX), cameraH / 2 + zoomScale * ((16 * tgtY) - cameraY), 16 * zoomScale, 16 * zoomScale };
-				if (UIType == act::null)
-				{
-					SDL_Rect bottomBox = { 0,0,630, 140 };
-					bottomBox.x = (cameraW - bottomBox.w) / 2;
-					bottomBox.y = cameraH - bottomBox.h + 6;
-					SDL_Rect tabBox = { cameraW - 120 - 20, 20, 120, 120 };
 
-					if (checkCursor(&tileRect) == true)
-					{
-						if (checkCursor(&bottomBox) == false && checkCursor(&tabBox) == false && checkCursor(&quickSlotRegion) == false)
-						{
-							int markerIndex = 0;
-							if (timer::timer600 % 30 < 5) markerIndex = 0;
-							else if (timer::timer600 % 30 < 10) markerIndex = 1;
-							else if (timer::timer600 % 30 < 15) markerIndex = 2;
-							else if (timer::timer600 % 30 < 20) markerIndex = 3;
-							else if (timer::timer600 % 30 < 25) markerIndex = 4;
-							else markerIndex = 0;
-
-							setZoom(zoomScale);
-							drawSpriteCenter
-							(
-								spr::cursorMarker,
-								markerIndex,
-								cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-								cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-							);
-							setZoom(1.0);
-							targetMarker = true;
-						}
-					}
-				}
-			}
 			break;
 		}
 
@@ -739,6 +703,37 @@ __int64 drawMarkers()
 		SDL_SetTextureColorMod(spr->getTexture(), 255, 255, 255);
 		};
 
+
+
+
+	//화이트마커 그리기
+	if (whiteMarkerCoord.z == Player::ins()->getGridZ())
+	{
+		if (std::abs(whiteMarkerCoord.x - Player::ins()->getGridX()) <= MARKER_LIMIT_DIST)
+		{
+			if (std::abs(whiteMarkerCoord.y - Player::ins()->getGridY()) <= MARKER_LIMIT_DIST)
+			{
+				int tgtX = whiteMarkerCoord.x;
+				int tgtY = whiteMarkerCoord.y;
+
+				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+				dst.w = tileSize;
+				dst.h = tileSize;
+				setZoom(zoomScale);
+				drawSpriteCenter
+				(
+					spr::cursorMarker,
+					0,
+					dst.x + dst.w / 2,
+					dst.y + dst.h / 2
+				);
+				setZoom(1.0);
+			}
+		}
+	}
+	whiteMarkerEnd:
+
 	if (Craft::ins() != nullptr && Craft::ins()->getIsNowBuilding())
 	{
 		std::array<int, 3> nowBuildLocation = Craft::ins()->getBuildLocation();
@@ -820,36 +815,8 @@ __int64 drawMarkers()
 		}
 	}
 
-	if (inputType == input::gamepad)
-	{
-		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 
-		int tgtX = Player::ins()->getGridX();
-		int tgtY = Player::ins()->getGridY();
 
-		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
-		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
-		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
-		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
-
-		if (tgtX != Player::ins()->getGridX() || tgtY != Player::ins()->getGridY())
-		{
-			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-			dst.w = tileSize;
-			dst.h = tileSize;
-			setZoom(zoomScale);
-			drawSpriteCenter
-			(
-				spr::cursorMarker,
-				0,
-				dst.x + dst.w / 2,
-				dst.y + dst.h / 2
-			);
-			setZoom(1.0);
-		}
-	}
 
 	return getNanoTimer() - timeStampStart;
 }

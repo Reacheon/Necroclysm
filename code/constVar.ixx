@@ -27,6 +27,7 @@ export constexpr int SECTOR_SIZE = 400; // 절차적 맵 생성할 때 작용하는 범위
 export constexpr int TOLERANCE_LSTICK = 10000; //LStick이 이 값을 넘어야 판정이 일어남
 export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 이벤트가 일어나지 않음
 
+export constexpr int MARKER_LIMIT_DIST = 100; //플레이어로부터 100칸 이상 떨어지면 마커가 그려지지 않음
 
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,

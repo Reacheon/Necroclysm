@@ -42,6 +42,7 @@ import updateBarAct;
 import CoordSelect;
 import SkillData;
 import ContextMenu;
+import mouseGrid;
 
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
@@ -139,9 +140,14 @@ public:
 	void clickUpGUI();
 	void clickRightGUI() 
 	{
+		updateLog(L"#FFFFFFRight click event triggered.");
 		new ContextMenu(event.motion.x, event.motion.y);
 	}
-	void clickHoldGUI() { }
+	void clickHoldGUI() 
+	{ 
+		updateLog(L"#FFFFFFTouch hold event triggered.");
+		new ContextMenu(event.motion.x, event.motion.y);
+	}
 	void mouseStep();
 
 	void gamepadBtnDown();
@@ -309,6 +315,38 @@ public:
 	{
 		gamepadStep();
 		mouseStep();
+
+		if (GUI::getLastGUI() == this)
+		{
+			if (inputType == input::mouse || inputType == input::touch)
+			{
+				whiteMarkerCoord.x = getAbsMouseGrid().x;
+				whiteMarkerCoord.y = getAbsMouseGrid().y;
+				whiteMarkerCoord.z = Player::ins()->getGridZ();
+			}
+			else if (inputType == input::gamepad)
+			{
+				__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+				__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+
+				int tgtX = Player::ins()->getGridX();
+				int tgtY = Player::ins()->getGridY();
+
+				if (leftX > TOLERANCE_LSTICK) tgtX += 1;
+				if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
+				if (leftY > TOLERANCE_LSTICK) tgtY += 1;
+				if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
+
+				if (!(tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY()))
+				{
+					whiteMarkerCoord.x = tgtX;
+					whiteMarkerCoord.y = tgtY;
+					whiteMarkerCoord.z = Player::ins()->getGridZ();
+				}
+				else whiteMarkerCoord.z = std::numeric_limits<int>::max();
+			}
+		}
+		
 
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
 		if (Talent::ins() == nullptr)

@@ -14,7 +14,7 @@ import drawText;
 import globalTime;
 import checkCursor;
 import Vehicle;
-
+import mouseGrid;
 
 namespace segmentIndex
 {
@@ -33,13 +33,14 @@ namespace segmentIndex
 	int pm = 12;
 	int am = 13;
 	float popUpDist = 360;
-
 };
 
 void HUD::drawGUI()
 {
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	Sprite* targetBtnSpr = nullptr;
+
+
 
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, letterbox.h + 10, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr) drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73);

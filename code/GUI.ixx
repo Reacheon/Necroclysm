@@ -36,6 +36,7 @@ public:
 		if (isCorouter) (*coFunc).run();
 	};
 	static std::vector<GUI*> getActiveGUIList() { return activeGUIList; }
+	static GUI* getLastGUI() { return activeGUIList[activeGUIList.size() - 1]; }
 	void setDistCounter(float val)
 	{
 		distCounter = val;

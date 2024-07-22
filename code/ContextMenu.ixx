@@ -89,17 +89,33 @@ public:
 
 
 			int index = 0;
-			drawFillRect(options[index], lowCol::blue);
+
+			if (checkCursor(&options[index]))
+			{
+				if(click) drawFillRect(options[index], lowCol::deepBlue);
+				else  drawFillRect(options[index], lowCol::blue);
+			}
+			else drawFillRect(options[index], lowCol::black);
 			setFontSize(16);
 			drawTextCenter(col2Str(col::white) + L"Inspect", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
 
 			index++;
-			drawFillRect(options[index], col::black);
+			if (checkCursor(&options[index]))
+			{
+				if (click) drawFillRect(options[index], lowCol::deepBlue);
+				else  drawFillRect(options[index], lowCol::blue);
+			}
+			else drawFillRect(options[index], lowCol::black);
 			setFontSize(16);
 			drawTextCenter(col2Str(col::white) + L"Open", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
 
 			index++;
-			drawFillRect(options[index], col::black);
+			if (checkCursor(&options[index]))
+			{
+				if (click) drawFillRect(options[index], lowCol::deepBlue);
+				else  drawFillRect(options[index], lowCol::blue);
+			}
+			else drawFillRect(options[index], lowCol::black);
 			setFontSize(16);
 			drawTextCenter(col2Str(col::white) + L"Pull", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
 
@@ -156,10 +172,11 @@ public:
 		{
 			close(aniFlag::winUnfoldClose);
 		}
-		else
+		else if(checkCursor(&contextMenuBase))
 		{
-
+			close(aniFlag::winUnfoldClose);
 		}
+		else close(aniFlag::winUnfoldClose);
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }

@@ -185,6 +185,10 @@ export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해
 
 export ThreadPool* threadPoolPtr;
 
+//흰색마커, 유일하게 존재하며 보통은 마우스의 위치, 상세선택에서는 가리키는 타일
+export Point3 whiteMarkerCoord = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() };
+
+
 auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
 
     if (a->getAniPriority() == b->getAniPriority()) return a < b;
