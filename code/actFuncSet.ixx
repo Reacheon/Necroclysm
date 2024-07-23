@@ -11,6 +11,7 @@ import ItemPocket;
 import log;
 import Lst;
 import Player;
+import Prop;
 
 //액트가 실행되는 환경은 3가지 경우가 가능
 // 0:기본 HUD, 1:Loot, 2:Equip 
@@ -184,5 +185,24 @@ export namespace actFunc
 		ItemPocket* drop = new ItemPocket(storageType::null);
 		for (int i = 0; i < targetPocket->itemInfo.size(); i++) { targetPocket->transferItem(drop, i, targetPocket->itemInfo[i].number); }
 		Player::ins()->drop(drop);
+	}
+
+	export void closeDoor(int tgtX, int tgtY, int tgtZ)
+	{
+		Prop* tgtProp = (Prop*)World::ins()->getTile(tgtX, tgtY, tgtZ).PropPtr;
+		tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
+		tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
+
+		if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_OFF))
+		{
+			tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+			tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+		}
+
+		tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
+		tgtProp->leadItem.extraSprIndexSingle--;
+		tgtProp->updateTile();
+		Player::ins()->updateVision(Player::ins()->getEyeSight());
 	}
 };

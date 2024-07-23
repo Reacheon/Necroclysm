@@ -151,6 +151,8 @@ export enum class act
     skillActive,
     skillToggle,
 
+    inspect,
+
     //skillInfo,
 };
 

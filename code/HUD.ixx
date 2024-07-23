@@ -141,12 +141,27 @@ public:
 	void clickRightGUI() 
 	{
 		updateLog(L"#FFFFFFRight click event triggered.");
-		new ContextMenu(event.motion.x, event.motion.y);
+
+		std::vector<act> inputOptions;
+		Point2 tagetGrid = getAbsMouseGrid();
+		if (World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).PropPtr != nullptr)
+		{
+			Prop* instlPtr = (Prop*)World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).PropPtr;
+			if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
+			{
+				inputOptions.push_back(act::closeDoor);
+			}
+		}
+		inputOptions.push_back(act::inspect);
+
+		new ContextMenu(getMouseXY().x, getMouseXY().y, getAbsMouseGrid().x, getAbsMouseGrid().y, inputOptions);
 	}
 	void clickHoldGUI() 
 	{ 
+		//new ContextMenu(getTouchXY().x, getTouchXY().y, getAbsMouseGrid().x, getAbsMouseGrid().y);
+
 		updateLog(L"#FFFFFFTouch hold event triggered.");
-		new ContextMenu(event.motion.x, event.motion.y);
+		//new ContextMenu(event.motion.x, event.motion.y);
 	}
 	void mouseStep();
 

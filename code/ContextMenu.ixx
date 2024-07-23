@@ -11,24 +11,30 @@ import drawSprite;
 import globalVar;
 import checkCursor;
 import drawWindow;
+import actFuncSet;
+import Player;
 
 export class ContextMenu : public GUI
 {
 private:
 	inline static ContextMenu* ptr = nullptr;
 	SDL_Rect contextMenuBase;
+	SDL_Rect subContextMenuBase;
 	int contextMenuCursor = -1;
 	int contextMenuScroll = 0;
-
+	std::vector<act> actOptions;
+	Point2 targetGrid; //컨텍스트메뉴가 액트를 얻어낼 그리드 좌표
 public:
-	ContextMenu(int inputX, int inputY) : GUI(false)
+	ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int inputGridY, std::vector<act> inputOptions) : GUI(false)
 	{
+		actOptions = inputOptions;
+		targetGrid = { inputGridX, inputGridY };
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
 		//메세지 박스 렌더링
-		changeXY(inputX, inputY, false);
+		changeXY(inputMouseX, inputMouseY, false);
 
 		tabType = tabFlag::closeWin;
 
@@ -44,7 +50,9 @@ public:
 	static ContextMenu* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		contextMenuBase = { 0, 0, 94, 28 + 22*2 };
+		//94
+		contextMenuBase = { 0, 0, 110, 6 + 22 * (int)actOptions.size() };
+		subContextMenuBase = { 0,0,0,0 };
 
 		if (center == false)
 		{
@@ -79,46 +87,40 @@ public:
 
 			drawFillRect(contextMenuBase, col::black);
 			drawRect(contextMenuBase, col::gray);
+
+
+			//94 110
+			for (int i = 0; i < actOptions.size(); i++)
+			{
+
+				//64,65
+				std::wstring optionText;
+				int iconIndex = 0;
+				if (actOptions[i] == act::closeDoor)
+				{
+					optionText = L"Close";
+					iconIndex = 64;
+				}
+				else if (actOptions[i] == act::inspect)
+				{
+					optionText = L"Inspect";
+					iconIndex = 65;
+				}
+				else optionText = L"???";
+
+
+				SDL_Rect optionRect = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22 * i, contextMenuBase.w-8, 20 };
+				if (checkCursor(&optionRect))
+				{
+					if (click) drawFillRect(optionRect, lowCol::deepBlue);
+					else  drawFillRect(optionRect, lowCol::blue);
+				}
+				else drawFillRect(optionRect, lowCol::black);
+				setFontSize(16);
+				drawTextCenter(col2Str(col::white) + optionText, optionRect.x + optionRect.w / 2 + 16, optionRect.y + optionRect.h / 2);
+				drawSpriteCenter(spr::icon16, iconIndex, optionRect.x + 10, optionRect.y + 10);
+			}
 			
-
-			SDL_Rect option[3];
-			std::array<SDL_Rect, 3> options;
-			options[0] = { contextMenuBase.x + 4, contextMenuBase.y + 4, 86, 20 };
-			options[1] = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22, 86, 20 };
-			options[2] = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22*2, 86, 20 };
-
-
-			int index = 0;
-
-			if (checkCursor(&options[index]))
-			{
-				if(click) drawFillRect(options[index], lowCol::deepBlue);
-				else  drawFillRect(options[index], lowCol::blue);
-			}
-			else drawFillRect(options[index], lowCol::black);
-			setFontSize(16);
-			drawTextCenter(col2Str(col::white) + L"Inspect", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
-
-			index++;
-			if (checkCursor(&options[index]))
-			{
-				if (click) drawFillRect(options[index], lowCol::deepBlue);
-				else  drawFillRect(options[index], lowCol::blue);
-			}
-			else drawFillRect(options[index], lowCol::black);
-			setFontSize(16);
-			drawTextCenter(col2Str(col::white) + L"Open", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
-
-			index++;
-			if (checkCursor(&options[index]))
-			{
-				if (click) drawFillRect(options[index], lowCol::deepBlue);
-				else  drawFillRect(options[index], lowCol::blue);
-			}
-			else drawFillRect(options[index], lowCol::black);
-			setFontSize(16);
-			drawTextCenter(col2Str(col::white) + L"Pull", options[index].x + options[index].w / 2, options[index].y + options[index].h / 2);
-
 			// 좌측상단
 			drawLine(contextMenuBase.x, contextMenuBase.y, contextMenuBase.x + 12, contextMenuBase.y, col::lightGray);
 			drawLine(contextMenuBase.x, contextMenuBase.y + 1, contextMenuBase.x + 12, contextMenuBase.y + 1, col::lightGray);
@@ -144,6 +146,7 @@ public:
 			drawLine(contextMenuBase.x + contextMenuBase.w - 2, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x + contextMenuBase.w - 2, contextMenuBase.y + contextMenuBase.h - 13, col::lightGray);
 
 
+			drawFillRect(subContextMenuBase, col::black);
 
 		}
 		else
@@ -174,6 +177,15 @@ public:
 		}
 		else if(checkCursor(&contextMenuBase))
 		{
+			for (int i = 0; i < actOptions.size(); i++)
+			{
+				if (actOptions[i] == act::closeDoor)
+				{
+					actFunc::closeDoor(targetGrid.x, targetGrid.y, Player::ins()->getGridZ());
+					break;
+				}
+			}
+
 			close(aniFlag::winUnfoldClose);
 		}
 		else close(aniFlag::winUnfoldClose);
@@ -185,5 +197,23 @@ public:
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
-	void step() { }
+	void step() 
+	{
+		contextMenuBase.h = 6 + 22 * (int)actOptions.size();
+		//bool openSub = false;
+		//for (int i = 0; i < actOptions.size(); i++)
+		//{
+		//	if (actOptions[i] == act::inspect)
+		//	{
+		//		SDL_Rect optionRect = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22 * i, 90, 20 };
+		//		if (checkCursor(&optionRect) || checkCursor(&subContextMenuBase))
+		//		{
+		//			subContextMenuBase = { contextMenuBase.x + contextMenuBase.w, contextMenuBase.y + 4 + 22 * i - 1, contextMenuBase.w,100 };
+		//			openSub = true;
+		//		}
+		//	}
+		//}
+
+		//if(openSub==false) subContextMenuBase = { -1, -1, -1,-1 };
+	}
 };
