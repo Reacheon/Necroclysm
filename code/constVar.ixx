@@ -152,6 +152,8 @@ export enum class act
     skillToggle,
 
     inspect,
+    unbox,
+    pull,
 
     //skillInfo,
 };
@@ -489,6 +491,8 @@ export enum class itemFlag
     PROP_GAS_OBSTACLE_ON,
     PROP_GAS_OBSTACLE_OFF,
     WALL_GAS_PERMEABLE,
+
+    POCKET,
 };
 
 export namespace toolQuality

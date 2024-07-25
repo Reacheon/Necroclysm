@@ -1,34 +1,14 @@
-ï»¿#include <SDL.h>
+#include <SDL.h>
 
-
-export module Vehicle;
-
-import std;
-import globalVar;
-import textureVar;
-import constVar;
-import util;
-import World;
-import ItemPocket;
-import ItemData;
-import Ani;
-import Entity;
-import Player;
-import AI;
-import Light;
-import Coord;
-import log;
-import Prop;
-import Drawable;
-import drawSprite;
+import Vehicle;
 
 /*
-* ê° íŒŒì¸ ê°€ ê°€ì§€ëŠ” ë°ì´í„°
-* íŠ¹ì • ë¶€í’ˆì˜ ì¢…ë¥˜, ë‚´êµ¬ë„, ì—°ë£ŒëŸ‰?
-* ì–´ì°¨í”¼ í”Œë ˆì´ì–´ ì‹œì•¼ì— ê·¸ë ¤ì§ˆ ìˆ˜ ìˆëŠ”ê±´ ìµœëŒ€ 2ì²­í¬ì´ë‹¤. ì¦‰ ì£¼ë³€ 9ì²­í¬ì— ìˆëŠ” ì°¨ëŸ‰ë§Œ ì „ë¶€ ê·¸ë ¤ë‚´ë©´ ë¨
-* ì°¨ëŸ‰ì˜ í¬ê¸°ì œí•œì€ 1ì²­í¬ë¥¼ ë„˜ì§€ ëª»í•˜ê²Œ í•˜ëŠ”ê²Œ ë‚«ì§€ ì•Šë‚˜ ë¼ê³  ìƒê°
-* ë¬¸ì œëŠ” ë¶€í’ˆì´ë‹¤.
-* ìˆ˜ë¦¬ëŠ” ë‚´êµ¬ë„ì— ë”°ë¥¸ ë‚´ë¦¼ ê³„ì‚°ìœ¼ë¡œ í•˜ë©´ë¨
+* °¢ ÆÄÃ÷°¡ °¡Áö´Â µ¥ÀÌÅÍ
+* Æ¯Á¤ ºÎÇ°ÀÇ Á¾·ù, ³»±¸µµ, ¿¬·á·®?
+* ¾îÂ÷ÇÇ ÇÃ·¹ÀÌ¾î ½Ã¾ß¿¡ ±×·ÁÁú ¼ö ÀÖ´Â°Ç ÃÖ´ë 2Ã»Å©ÀÌ´Ù. Áï ÁÖº¯ 9Ã»Å©¿¡ ÀÖ´Â Â÷·®¸¸ ÀüºÎ ±×·Á³»¸é µÊ
+* Â÷·®ÀÇ Å©±âÁ¦ÇÑÀº 1Ã»Å©¸¦ ³ÑÁö ¸øÇÏ°Ô ÇÏ´Â°Ô ³´Áö ¾Ê³ª ¶ó°í »ı°¢
+* ¹®Á¦´Â ºÎÇ°ÀÌ´Ù.
+* ¼ö¸®´Â ³»±¸µµ¿¡ µû¸¥ ³»¸² °è»êÀ¸·Î ÇÏ¸éµÊ
 */
 
 
@@ -48,13 +28,13 @@ public:
     gearFlag gearState = gearFlag::drive;
     float xAcc = 0;
     float yAcc = 0;
-    float zAcc = 0; //í—¬ê¸° ë“±ì—ì„œëŠ” ì‚¬ìš©ë  ìˆ˜ ìˆì„ ê²ƒ ê°™ë‹¤
+    float zAcc = 0; //Çï±â µî¿¡¼­´Â »ç¿ëµÉ ¼ö ÀÖÀ» °Í °°´Ù
     float rotateAcc = 0;
     Vehicle* rearTrain = nullptr;
 
-    Point2 trainWheelCenter = { 0,0 }; //ì—´ì°¨ì˜ íšŒì „ì¤‘ì‹¬, ì—´ì°¨ë°”í€´ë“¤ì˜ ì¤‘ì‹¬ì¢Œí‘œë¡œ ì •í•´ì§
+    Point2 trainWheelCenter = { 0,0 }; //¿­Â÷ÀÇ È¸ÀüÁß½É, ¿­Â÷¹ÙÄûµéÀÇ Áß½ÉÁÂÇ¥·Î Á¤ÇØÁü
 
-    //í—¬ê¸°ìš© ë³€ìˆ˜
+    //Çï±â¿ë º¯¼ö
     __int8 collectiveState = 0;
     __int8 cyclicState = -1;
     __int8 rpmState = 0; //0~6
@@ -72,10 +52,10 @@ public:
         trainWheelCenter = { inputX, inputY };
 
         setAniPriority(3);
-        prt(L"[Vehicle:constructor] ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤. ìƒì„±ëœ ì¢Œí‘œëŠ” %d,%d,%dì´ë‹¤.\n", inputX, inputY, inputZ);
+        prt(L"[Vehicle:constructor] »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú´Ù. »ı¼ºµÈ ÁÂÇ¥´Â %d,%d,%dÀÌ´Ù.\n", inputX, inputY, inputZ);
         setGrid(inputX, inputY, inputZ);
 
-        errorBox(World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr != nullptr, L"ìƒì„±ìœ„ì¹˜ì— ì´ë¯¸ í”„ë¡­ì´ ì¡´ì¬í•œë‹¤!");
+        errorBox(World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr != nullptr, L"»ı¼ºÀ§Ä¡¿¡ ÀÌ¹Ì ÇÁ·ÓÀÌ Á¸ÀçÇÑ´Ù!");
         World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr = this;
 
         partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
@@ -83,13 +63,13 @@ public:
 
         updateTile(inputX, inputY);
 
-        deactivateAI();//ì°¨ëŸ‰ì„ ì œì™¸í•˜ê³  ê¸°ë³¸ì ìœ¼ë¡œ ë¹„í™œì„±í™”
+        deactivateAI();//Â÷·®À» Á¦¿ÜÇÏ°í ±âº»ÀûÀ¸·Î ºñÈ°¼ºÈ­
     }
 
     ~Vehicle()
     {
         for (auto it = partInfo.begin(); it != partInfo.end(); it++) delete it->second;
-        prt(L"[Vehicle:destructor] ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤. \n");
+        prt(L"[Vehicle:destructor] ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú´Ù. \n");
     }
 
     void updateTile(int inputX, int inputY)
@@ -99,7 +79,7 @@ public:
             World::ins()->getTile(inputX, inputY, getGridZ()).update();
             if (partInfo[{inputX, inputY}]->itemInfo.size() > 0)
             {
-                //walkable ì²´í¬
+                //walkable Ã¼Å©
                 if (World::ins()->getTile(inputX, inputY, getGridZ()).walkable == true)
                 {
                     for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
@@ -112,7 +92,7 @@ public:
                     }
                 }
 
-                //blocker ì²´í¬
+                //blocker Ã¼Å©
                 if (World::ins()->getTile(inputX, inputY, getGridZ()).blocker == false)
                 {
                     for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
@@ -126,7 +106,7 @@ public:
                 }
             }
         }
-        else errorBox(L"[Vehicle:updateTile] updateTileì´ ë¶€í’ˆì´ ì—†ëŠ” íƒ€ì¼ì„ ì„ íƒì§€ë¡œ ê°€ë¦¬ì¼°ë‹¤.");
+        else errorBox(L"[Vehicle:updateTile] updateTileÀÌ ºÎÇ°ÀÌ ¾ø´Â Å¸ÀÏÀ» ¼±ÅÃÁö·Î °¡¸®Ä×´Ù.");
     }
     void updateAllTiles()
     {
@@ -146,24 +126,24 @@ public:
     }
 
 
-    /////////////////////////////////////////â€» ê¸°ì¡´ í”„ë ˆì„ì— ë¶€í’ˆ ì¶”ê°€////////////////////////////////////////////////////
-    void addPart(int inputX, int inputY, ItemData inputPart) //ê¸°ë³¸ ë¶€í’ˆì¶”ê°€ í•¨ìˆ˜, ëª¨ë“  í•¨ìˆ˜ë“¤ì´ ì´ í•¨ìˆ˜ë¥¼ ê¸°ë³¸ìœ¼ë¡œ ë“¤ì–´ê°, ì—¬ê¸°ì— ì•Œê³ ë¦¬ì¦˜ ë„£ì„ ê²ƒ
+    /////////////////////////////////////////¡Ø ±âÁ¸ ÇÁ·¹ÀÓ¿¡ ºÎÇ° Ãß°¡////////////////////////////////////////////////////
+    void addPart(int inputX, int inputY, ItemData inputPart) //±âº» ºÎÇ°Ãß°¡ ÇÔ¼ö, ¸ğµç ÇÔ¼öµéÀÌ ÀÌ ÇÔ¼ö¸¦ ±âº»À¸·Î µé¾î°¨, ¿©±â¿¡ ¾Ë°í¸®Áò ³ÖÀ» °Í
     {
-        errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] ì…ë ¥í•œ ìœ„ì¹˜ì— í”„ë ˆì„ì´ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤.");
-        errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:addPart] ì…ë ¥í•œ ìœ„ì¹˜ì˜ í”„ë ˆì„ì˜ itemInfo.sizeê°€ 0ê³¼ ê°™ë‹¤.");
-        if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))//íƒ€ì´ì–´ì¼ ê²½ìš° ë§¨ ì•ì— ì¶”ê°€
+        errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] ÀÔ·ÂÇÑ À§Ä¡¿¡ ÇÁ·¹ÀÓÀÌ Á¸ÀçÇÏÁö ¾Ê´Â´Ù.");
+        errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:addPart] ÀÔ·ÂÇÑ À§Ä¡ÀÇ ÇÁ·¹ÀÓÀÇ itemInfo.size°¡ 0°ú °°´Ù.");
+        if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))//Å¸ÀÌ¾îÀÏ °æ¿ì ¸Ç ¾Õ¿¡ Ãß°¡
         {
             partInfo[{inputX, inputY}]->itemInfo.insert(partInfo[{inputX, inputY}]->itemInfo.begin(), inputPart);
         }
-        else//ê·¸ ì™¸ ë¶€í’ˆì€ ë’¤ì— ì¶”ê°€
+        else//±× ¿Ü ºÎÇ°Àº µÚ¿¡ Ãß°¡
         {
             partInfo[{inputX, inputY}]->itemInfo.push_back(inputPart);
         }
 
-        //ì—´ì°¨ë°”í€´ ì¤‘ì‹¬ ì„¤ì •
+        //¿­Â÷¹ÙÄû Áß½É ¼³Á¤
         if (inputPart.checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
 
-        //prt(L"[Vehicle:addPart] (%d,%d)ì— ìƒˆë¡œìš´ ë¶€í’ˆ %lsë¥¼ ì¶”ê°€í•˜ì˜€ë‹¤.\n", inputX, inputY, inputPart.name.c_str());
+        //prt(L"[Vehicle:addPart] (%d,%d)¿¡ »õ·Î¿î ºÎÇ° %ls¸¦ Ãß°¡ÇÏ¿´´Ù.\n", inputX, inputY, inputPart.name.c_str());
         updateSpr();
     }
     void addPart(int inputX, int inputY, int dexIndex) { addPart(inputX, inputY, itemDex[dexIndex]); }
@@ -179,26 +159,26 @@ public:
         partInfo[{ inputX, inputY }]->eraseItemInfo(index);
     }
 
-    //////////////////////////////////////////////â€» í”„ë ˆì„ í™•ì¥/////////////////////////////////////////////////////////
+    //////////////////////////////////////////////¡Ø ÇÁ·¹ÀÓ È®Àå/////////////////////////////////////////////////////////
     void extendPart(int inputX, int inputY, int inputItemCode)
     {
-        //ì‹­ì ë°©í–¥ì— ë¶€í’ˆì´ ìˆëŠ”ì§€ ì²´í¬
+        //½ÊÀÚ ¹æÇâ¿¡ ºÎÇ°ÀÌ ÀÖ´ÂÁö Ã¼Å©
         for (int i = 0; i < 4; i++)
         {
             int dir = 2 * i;
             int dx, dy;
             dir2Coord(dir, dx, dy);
-            //ì¡´ì¬í•  ê²½ìš°
+            //Á¸ÀçÇÒ °æ¿ì
             if (partInfo.find({ inputX + dx, inputY + dy }) != partInfo.end()) break;
-            errorBox(i == 3, "[Vehicle:extendPart] ìƒí•˜ì¢Œìš°ì— í”„ë ˆì„ì´ ì—†ëŠ”ë° í•´ë‹¹ íƒ€ì¼ë¡œ í™•ì¥ì„ ì‹œë„í–ˆë‹¤.");
+            errorBox(i == 3, "[Vehicle:extendPart] »óÇÏÁÂ¿ì¿¡ ÇÁ·¹ÀÓÀÌ ¾ø´Âµ¥ ÇØ´ç Å¸ÀÏ·Î È®ÀåÀ» ½ÃµµÇß´Ù.");
         }
-        errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), "[Vehicle:extendPart] ì´ë¯¸ ì´ í”„ë¡­ í”„ë ˆì„ì´ ìˆëŠ” ì¢Œí‘œë¡œ í™•ì¥ì„ ì‹œë„í–ˆë‹¤.");
+        errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), "[Vehicle:extendPart] ÀÌ¹Ì ÀÌ ÇÁ·Ó ÇÁ·¹ÀÓÀÌ ÀÖ´Â ÁÂÇ¥·Î È®ÀåÀ» ½ÃµµÇß´Ù.");
 
         partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
         partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
         World::ins()->getTile(inputX, inputY, getGridZ()).VehiclePtr = this;
 
-        //prt(L"[Vehicle:extendPart] %p ì°¨ëŸ‰ì´ %d,%d ìœ„ì¹˜ë¡œ %d ì•„ì´í…œì„ í™•ì¥ì— ì„±ê³µí—€ë‹¤.\n", inputX, inputY, inputItemCode);
+        //prt(L"[Vehicle:extendPart] %p Â÷·®ÀÌ %d,%d À§Ä¡·Î %d ¾ÆÀÌÅÛÀ» È®Àå¿¡ ¼º°øÁ™´Ù.\n", inputX, inputY, inputItemCode);
         updateSpr();
     }
 
@@ -246,7 +226,7 @@ public:
     {
         if (bodyDir != inputDir16)
         {
-            std::map<std::array<int, 2>, Entity*> entityWormhole; //ì—”í‹°í‹°ë¥¼ ìƒˆë¡œìš´ ì¢Œí‘œë¡œ ì˜®ê¸°ê¸° ì „ì— ì„ì‹œì ìœ¼ë¡œ ì €ì¥í•˜ëŠ” ì»¨í…Œì´ë„ˆ
+            std::map<std::array<int, 2>, Entity*> entityWormhole; //¿£Æ¼Æ¼¸¦ »õ·Î¿î ÁÂÇ¥·Î ¿Å±â±â Àü¿¡ ÀÓ½ÃÀûÀ¸·Î ÀúÀåÇÏ´Â ÄÁÅ×ÀÌ³Ê
             for (auto it = partInfo.begin(); it != partInfo.end(); it++)
             {
                 if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
@@ -303,7 +283,7 @@ public:
                 World::ins()->getTile(it->first[0], it->first[1], getGridZ()).VehiclePtr = this;
             }
 
-            //íšŒì „í•˜ëŠ” ë°©í–¥ì— ëŒ€í•´ ë°”í€´ ë°©í–¥ ì¬ì„¤ì •
+            //È¸ÀüÇÏ´Â ¹æÇâ¿¡ ´ëÇØ ¹ÙÄû ¹æÇâ Àç¼³Á¤
             if (ACW2(bodyDir) == wheelDir) wheelDir = ACW2(inputDir16);
             else if (ACW(bodyDir) == wheelDir) wheelDir = ACW(inputDir16);
             else if (CW(bodyDir) == wheelDir) wheelDir = CW(inputDir16);
@@ -312,7 +292,7 @@ public:
 
             bodyDir = inputDir16;
         }
-        //else errorBox(L"[Vehicle:roate] ì´ë¯¸ ì°¨ëŸ‰ì´ í•´ë‹¹ ë°©í–¥ì„ í–¥í•˜ê³  ìˆë‹¤.");
+        //else errorBox(L"[Vehicle:roate] ÀÌ¹Ì Â÷·®ÀÌ ÇØ´ç ¹æÇâÀ» ÇâÇÏ°í ÀÖ´Ù.");
         updateSpr();
     }
 
@@ -413,7 +393,7 @@ public:
 
     void shift(int dx, int dy)
     {
-        std::map<std::array<int, 2>, Entity*> entityWormhole;//ì—”í‹°í‹°ë¥¼ ìƒˆë¡œìš´ ì¢Œí‘œë¡œ ì˜®ê¸°ê¸° ì „ì— ì„ì‹œì ìœ¼ë¡œ ì €ì¥í•˜ëŠ” ì»¨í…Œì´ë„ˆ
+        std::map<std::array<int, 2>, Entity*> entityWormhole;//¿£Æ¼Æ¼¸¦ »õ·Î¿î ÁÂÇ¥·Î ¿Å±â±â Àü¿¡ ÀÓ½ÃÀûÀ¸·Î ÀúÀåÇÏ´Â ÄÁÅ×ÀÌ³Ê
 
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
@@ -425,15 +405,15 @@ public:
             }
         }
 
-        //ì—”í‹°í‹° ì˜®ê¸°ê¸°
+        //¿£Æ¼Æ¼ ¿Å±â±â
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
             World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr = this;
             if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
             {
                 Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
-                tgtEntity->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//ìœ„ì¹˜ ê·¸ë¦¬ë“œ ë³€ê²½
-                World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).EntityPtr = tgtEntity;//í¬ì¸í„° ë³€ê²½
+                tgtEntity->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//À§Ä¡ ±×¸®µå º¯°æ
+                World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).EntityPtr = tgtEntity;//Æ÷ÀÎÅÍ º¯°æ
 
 
             }
@@ -452,7 +432,7 @@ public:
 
     void zShift(int dz)
     {
-        std::map<std::array<int, 2>, Entity*> entityWormhole;//ì—”í‹°í‹°ë¥¼ ìƒˆë¡œìš´ ì¢Œí‘œë¡œ ì˜®ê¸°ê¸° ì „ì— ì„ì‹œì ìœ¼ë¡œ ì €ì¥í•˜ëŠ” ì»¨í…Œì´ë„ˆ
+        std::map<std::array<int, 2>, Entity*> entityWormhole;//¿£Æ¼Æ¼¸¦ »õ·Î¿î ÁÂÇ¥·Î ¿Å±â±â Àü¿¡ ÀÓ½ÃÀûÀ¸·Î ÀúÀåÇÏ´Â ÄÁÅ×ÀÌ³Ê
 
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
@@ -464,15 +444,15 @@ public:
             }
         }
 
-        //ì—”í‹°í‹° ì˜®ê¸°ê¸°
+        //¿£Æ¼Æ¼ ¿Å±â±â
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
             World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).VehiclePtr = this;
             if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
             {
                 Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
-                tgtEntity->setGrid(it->first[0], it->first[1], getGridZ() + dz);//ìœ„ì¹˜ ê·¸ë¦¬ë“œ ë³€ê²½
-                World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).EntityPtr = tgtEntity;//í¬ì¸í„° ë³€ê²½
+                tgtEntity->setGrid(it->first[0], it->first[1], getGridZ() + dz);//À§Ä¡ ±×¸®µå º¯°æ
+                World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).EntityPtr = tgtEntity;//Æ÷ÀÎÅÍ º¯°æ
             }
         }
         addGridZ(dz);
@@ -483,28 +463,28 @@ public:
         auto rotatePartInfo = getRotatePartInfo(inputDir16);
         for (auto it = rotatePartInfo.begin(); it != rotatePartInfo.end(); it++)
         {
-            //ë²½ ì¶©ëŒ ì²´í¬
+            //º® Ãæµ¹ Ã¼Å©
             if (World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).wall != 0) return true;
 
-            //í”„ë¡­ ì¶©ëŒ ì²´í¬
+            //ÇÁ·Ó Ãæµ¹ Ã¼Å©
             Vehicle* targetPtr = (Vehicle*)World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr;
             if (targetPtr != nullptr && targetPtr != this) return true;
         }
         return false;
     }
 
-    bool colisionCheck(int dx, int dy)//í•´ë‹¹ dx,dyë§Œí¼ ì´ë™í–ˆì„ ë•Œ propì´ ë²½ ë˜ëŠ” ê¸°ì¡´ì˜ Vehicleê³¼ ì¶©ëŒí•˜ëŠ”ì§€
+    bool colisionCheck(int dx, int dy)//ÇØ´ç dx,dy¸¸Å­ ÀÌµ¿ÇßÀ» ¶§ propÀÌ º® ¶Ç´Â ±âÁ¸ÀÇ Vehicle°ú Ãæµ¹ÇÏ´ÂÁö
     {
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
-            //ë²½ ì¶©ëŒ ì²´í¬
+            //º® Ãæµ¹ Ã¼Å©
             if (World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).wall != 0) return true;
 
-            //í”„ë¡­ ì¶©ëŒ ì²´í¬
+            //ÇÁ·Ó Ãæµ¹ Ã¼Å©
             Vehicle* targetPtr = (Vehicle*)World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr;
             if (targetPtr != nullptr && targetPtr != this)
             {
-                prt(L"(%d,%d)ë§Œí¼ ì´ë™í–ˆì„ ë•Œ í¬ì¸í„° %pì™€ ì¶©ëŒí–ˆë‹¤.\n", dx, dy, targetPtr);
+                prt(L"(%d,%d)¸¸Å­ ÀÌµ¿ÇßÀ» ¶§ Æ÷ÀÎÅÍ %p¿Í Ãæµ¹Çß´Ù.\n", dx, dy, targetPtr);
                 return true;
             }
         }
@@ -545,11 +525,11 @@ public:
     {
         if (isAIFirstRun) isAIFirstRun = false;
 
-        //prt(L"[Vehicle:AI] ID : %pì˜ AIë¥¼ ì‹¤í–‰ì‹œì¼°ë‹¤.\n", this);
+        //prt(L"[Vehicle:AI] ID : %pÀÇ AI¸¦ ½ÇÇà½ÃÄ×´Ù.\n", this);
         while (1)
         {
 
-            //prt(L"[Vehicle:AI] ID : %pì˜ timeResourceëŠ” %fì…ë‹ˆë‹¤.\n", this, getTimeResource());
+            //prt(L"[Vehicle:AI] ID : %pÀÇ timeResource´Â %fÀÔ´Ï´Ù.\n", this, getTimeResource());
             if (getTimeResource() > 2.0)
             {
                 clearTimeResource();
@@ -566,74 +546,74 @@ public:
 
                     //dir16 lastDir = trainSpdDir;
                     //
-                    
-                    //[ë°˜ë³µë¬¸] ê³„ì‚°ëœ ë°©í–¥ê³¼ ì†ë„ê°’ìœ¼ë¡œ trainMoveVecì„ ìˆœì„œëŒ€ë¡œ ì±„ì›Œë„£ìŒ
+
+                    //[¹İº¹¹®] °è»êµÈ ¹æÇâ°ú ¼Óµµ°ªÀ¸·Î trainMoveVecÀ» ¼ø¼­´ë·Î Ã¤¿ö³ÖÀ½
                     for (int i = 0; i < trainSpdVal; i++)
                     {
-                        //prt(L"[Vehicle:train %p] (%d,%d,%d) ì»¤ì„œì—ì„œ ì—´ì°¨ ì´ë™ ë£¨í”„ê°€ ì‹¤í–‰ë¨\n", this, trainCursorX, trainCursorY, trainCursorZ);
+                        //prt(L"[Vehicle:train %p] (%d,%d,%d) Ä¿¼­¿¡¼­ ¿­Â÷ ÀÌµ¿ ·çÇÁ°¡ ½ÇÇàµÊ\n", this, trainCursorX, trainCursorY, trainCursorZ);
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        //1. ì—´ì°¨ì˜ í˜„ì¬ ìœ„ì¹˜ì— ë”°ë¼ ì†ë„ì˜ ë°©í–¥ ìˆ˜ì •////////////////////////////////////////////////////////////////////
+                        //1. ¿­Â÷ÀÇ ÇöÀç À§Ä¡¿¡ µû¶ó ¼ÓµµÀÇ ¹æÇâ ¼öÁ¤////////////////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         Prop* currentRail = (Prop*)World::ins()->getTile(trainCursorX, trainCursorY, trainCursorZ).PropPtr;
                         dir16 prevSpdDir = trainSpdDir;
                         if (currentRail != nullptr)
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_BUFFER))//ë²„í¼ ë ˆì¼ ê°•ì œì •ì§€
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_BUFFER))//¹öÆÛ ·¹ÀÏ °­Á¦Á¤Áö
                             {
-                                prt(L"ì—´ì°¨ê°€ ë²„í¼ ë ˆì¼ì„ ë§Œë‚˜ì„œ ì •ì§€í•˜ì˜€ë‹¤.\n");
+                                prt(L"¿­Â÷°¡ ¹öÆÛ ·¹ÀÏÀ» ¸¸³ª¼­ Á¤ÁöÇÏ¿´´Ù.\n");
                                 trainSpdVal = 0;
                                 break;
                             }
 
-                            if (gearState == gearFlag::drive)//ì£¼í–‰ê¸°ì–´
+                            if (gearState == gearFlag::drive)//ÁÖÇà±â¾î
                             {
-                                if (trainSpdDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
+                                if (trainSpdDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                 }
-                                else if (trainSpdDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                 }
-                                else if (trainSpdDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                 }
-                                else if (trainSpdDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                 }
                             }
-                            else if (gearState == gearFlag::reverse)//í›„ì§„ê¸°ì–´
+                            else if (gearState == gearFlag::reverse)//ÈÄÁø±â¾î
                             {
-                                if (trainSpdDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
+                                if (trainSpdDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                 }
-                                else if (trainSpdDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                 }
-                                else if (trainSpdDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                 }
-                                else if (trainSpdDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
+                                else if (trainSpdDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
                                 {
                                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                     else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
@@ -643,7 +623,7 @@ public:
                         }
                         else
                         {
-                            prt(L"[Vehicle:train %p] í˜„ì¬ ì´ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ë ˆì¼ì´ ì„¤ì¹˜ë˜ì–´ìˆì§€ ì•Šë‹¤.\n", this);
+                            prt(L"[Vehicle:train %p] ÇöÀç ÀÌ Â÷·®ÀÇ À§Ä¡¿¡ ·¹ÀÏÀÌ ¼³Ä¡µÇ¾îÀÖÁö ¾Ê´Ù.\n", this);
                             trainSpdVal = 0;
                             break;
                         }
@@ -651,7 +631,7 @@ public:
 
 
                         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        ////2. ì†ë„ ë°©í–¥ì— ë”°ë¼ ì œìë¦¬ì—ì„œ íšŒì „//////////////////////////////////////////////////////////////////////////
+                        ////2. ¼Óµµ ¹æÇâ¿¡ µû¶ó Á¦ÀÚ¸®¿¡¼­ È¸Àü//////////////////////////////////////////////////////////////////////////
                         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         //if (trainSpdDir != bodyDir)
                         //{
@@ -662,14 +642,14 @@ public:
                         //    else
                         //    {
                         //        trainSpdVal = 0;
-                        //        prt(L"[Vehicle:train] ê³„ì‚° ë£¨í”„ ì§„í–‰ ì¤‘ì— íšŒì „í•  ìˆ˜ ì—†ëŠ” ìƒí™©ì´ ë°œìƒí–ˆë‹¤.(íšŒì „ì¶©ëŒ)\n");
+                        //        prt(L"[Vehicle:train] °è»ê ·çÇÁ ÁøÇà Áß¿¡ È¸ÀüÇÒ ¼ö ¾ø´Â »óÈ²ÀÌ ¹ß»ıÇß´Ù.(È¸ÀüÃæµ¹)\n");
                         //        break;
                         //    }
                         //}
 
-                        
+
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                        //3. ì†ë„ ë°©í–¥ì— ë”°ë¼ ì¢ŒíšŒì „,ìš°íšŒì „,ì§ì§„ í”Œë˜ê·¸ ì„¤ì •///////////////////////////////////////////////////////////
+                        //3. ¼Óµµ ¹æÇâ¿¡ µû¶ó ÁÂÈ¸Àü,¿ìÈ¸Àü,Á÷Áø ÇÃ·¡±× ¼³Á¤///////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         itemFlag straightFlag, leftFlag, rightFlag;
                         dir16 straightDir = trainSpdDir, leftDir, rightDir;
@@ -695,13 +675,13 @@ public:
                                     break;
                                 }
                             };
-                        
+
                         if (trainSpdDir == dir16::dir0)
                         {
                             straightFlag = itemFlag::RAIL_CNCT_RIGHT;
                             leftFlag = itemFlag::RAIL_CNCT_TOP;
                             rightFlag = itemFlag::RAIL_CNCT_BOT;
-                            
+
                             leftDir = dir16::dir2;
                             rightDir = dir16::dir6;
                         }
@@ -748,7 +728,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dx, trainCursorY - getGridY() + dy) == true)
                             {
-                                //prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
+                                //prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;
@@ -764,7 +744,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dxLeft, trainCursorY - getGridY() + dyLeft) == true)
                             {
-                                //prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
+                                //prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;
@@ -780,7 +760,7 @@ public:
                         {
                             if (colisionCheck(trainSpdDir, trainCursorX - getGridX() + dxRight, trainCursorY - getGridY() + dyRight) == true)
                             {
-                                //prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
+                                //prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
                                 trainSpdDir = prevSpdDir;
                                 trainSpdVal = 0;
                                 break;
@@ -798,23 +778,23 @@ public:
                     //{
                     //    if (*it == dir16::dir0)
                     //    {
-                    //        prt(L"[trainMoveVec] ë™ìª½ ë°©í–¥ìœ¼ë¡œ 1ì¹¸ ì´ë™\n");
+                    //        prt(L"[trainMoveVec] µ¿ÂÊ ¹æÇâÀ¸·Î 1Ä­ ÀÌµ¿\n");
                     //    }
                     //    else if (*it == dir16::dir2)
                     //    {
-                    //        prt(L"[trainMoveVec] ë¶ìª½ ë°©í–¥ìœ¼ë¡œ 1ì¹¸ ì´ë™\n");
+                    //        prt(L"[trainMoveVec] ºÏÂÊ ¹æÇâÀ¸·Î 1Ä­ ÀÌµ¿\n");
                     //    }
                     //    else if (*it == dir16::dir4)
                     //    {
-                    //        prt(L"[trainMoveVec] ì„œìª½ ë°©í–¥ìœ¼ë¡œ 1ì¹¸ ì´ë™\n");
+                    //        prt(L"[trainMoveVec] ¼­ÂÊ ¹æÇâÀ¸·Î 1Ä­ ÀÌµ¿\n");
                     //    }
                     //    else if (*it == dir16::dir6)
                     //    {
-                    //        prt(L"[trainMoveVec] ë‚¨ìª½ ë°©í–¥ìœ¼ë¡œ 1ì¹¸ ì´ë™\n");
+                    //        prt(L"[trainMoveVec] ³²ÂÊ ¹æÇâÀ¸·Î 1Ä­ ÀÌµ¿\n");
                     //    }
                     //}
 
-                    //prt(L"[Vehicle:train] ì—´ì°¨ì˜ ì´ë™ì´ (%d,%d)ë¡œ ì‹¤í–‰ë˜ì—ˆë‹¤. ë³€ìœ„ëŠ” (%d,%d)ì´ë‹¤.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
+                    //prt(L"[Vehicle:train] ¿­Â÷ÀÇ ÀÌµ¿ÀÌ (%d,%d)·Î ½ÇÇàµÇ¾ú´Ù. º¯À§´Â (%d,%d)ÀÌ´Ù.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
                     trainSpdVal = 0;
                     shift(trainCursorX - getGridX(), trainCursorY - getGridY());
                     rotate(trainSpdDir);
@@ -832,8 +812,8 @@ public:
                             }
                         }
 
-                        //prt(L"[Vehicle : train %p ] ì°¨ëŸ‰ì˜ fake ì¢Œí‘œëŠ” (%f,%f)ë¡œ ì„¤ì •í–ˆë‹¤\n", this, getFloatFakeX(), getFloatFakeY());
-                        
+                        //prt(L"[Vehicle : train %p ] Â÷·®ÀÇ fake ÁÂÇ¥´Â (%f,%f)·Î ¼³Á¤Çß´Ù\n", this, getFloatFakeX(), getFloatFakeY());
+
                         //iAmDictator();
                         addAniUSetMonster(this, aniFlag::trainRush);
 
@@ -853,14 +833,14 @@ public:
                         rearTrain->runAI();
                         rearTrain->runAI();
                     }
-                        
+
                     return false;
                 }
 
                 if (getTimeResource() >= 1.0)
                 {
                     useTimeResource(1.0);
-                    if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0)|| (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
+                    if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0) || (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
                     {
                         if (vehType == vehFlag::car || vehType == vehFlag::heli)
                         {
@@ -894,10 +874,10 @@ public:
                                 }
                             }
 
-                            //ê°€ì†ë„ì— ì˜í•œ ì†ë„ ê°€ê°
+                            //°¡¼Óµµ¿¡ ÀÇÇÑ ¼Óµµ °¡°¨
                             spdVec.addVec(accVec);
                             accVec = getZeroVec();
-                            //ë§ˆì°°ì— ì˜í•œ ì†ì‹¤
+                            //¸¶Âû¿¡ ÀÇÇÑ ¼Õ½Ç
                             if (spdVec.getLength() != 0)
                             {
                                 int beforeXSpdSgn = sgn(spdVec.compX);
@@ -924,7 +904,7 @@ public:
 
                             if (dstX != 0 || dstY != 0)
                             {
-                                // (0,0)ì—ì„œ (dstX,dstY)ê¹Œì§€ ì§ì„ ì„ ê·¸ì–´ì•¼ í•¨
+                                // (0,0)¿¡¼­ (dstX,dstY)±îÁö Á÷¼±À» ±×¾î¾ß ÇÔ
                                 std::vector<std::array<int, 2>> path;
                                 makeLine(path, dstX, dstY);
 
@@ -932,7 +912,7 @@ public:
                                 int dyFinal = 0;
                                 for (int i = 1; i < path.size(); i++)
                                 {
-                                    if (colisionCheck(path[i][0], path[i][1]))//ì¶©ëŒí•  ê²½ìš°
+                                    if (colisionCheck(path[i][0], path[i][1]))//Ãæµ¹ÇÒ °æ¿ì
                                     {
                                         dxFinal = path[i - 1][0];
                                         dyFinal = path[i - 1][1];
@@ -966,17 +946,17 @@ public:
                         }
                         else if (vehType == vehFlag::train)
                         {
-                            //ì—´ì°¨ ì—£ì§€ (7,-16)
+                            //¿­Â÷ ¿§Áö (7,-16)
                             int vx = getGridX();
                             int vy = getGridY();
                             int vz = getGridZ();
-                            //prt(L"[Vehicle:train] ì—´ì°¨ AI ìµœì´ˆ ì‹¤í–‰, ì—´ì°¨ ì¤‘ì‹¬ ìœ„ì¹˜ (%d,%d,%d)\n", vx, vy, vz);
+                            //prt(L"[Vehicle:train] ¿­Â÷ AI ÃÖÃÊ ½ÇÇà, ¿­Â÷ Áß½É À§Ä¡ (%d,%d,%d)\n", vx, vy, vz);
 
-                            if (rpmState >= 1)//ì—´ì°¨ rpm stateì— ë”°ë¥¸ ê°€ì†ë„ ì¶”ê°€
+                            if (rpmState >= 1)//¿­Â÷ rpm state¿¡ µû¸¥ °¡¼Óµµ Ãß°¡
                             {
-                                //1. ì°¨ëŸ‰ ì†ë„ê°’ ì„¤ì •
+                                //1. Â÷·® ¼Óµµ°ª ¼³Á¤
                                 trainSpdVal = 10;
-                                if (trainSpdVal != 0)//ë§ˆì°°ì— ì˜í•œ ì†ì‹¤
+                                if (trainSpdVal != 0)//¸¶Âû¿¡ ÀÇÇÑ ¼Õ½Ç
                                 {
                                     float massCoeff = 1.5;
                                     float frictionCoeff = 1.0;
@@ -986,58 +966,58 @@ public:
                                     else trainSpdVal - delSpd;
                                 }
 
-                                //2. í˜„ì¬ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ìˆëŠ” ë ˆì¼ì— ë”°ë¼ ì‹œì‘í•˜ëŠ” ì†ë„ì˜ ë°©í–¥(trainSpdDir)ì„ ì •í•œë‹¤.
+                                //2. ÇöÀç Â÷·®ÀÇ À§Ä¡¿¡ ÀÖ´Â ·¹ÀÏ¿¡ µû¶ó ½ÃÀÛÇÏ´Â ¼ÓµµÀÇ ¹æÇâ(trainSpdDir)À» Á¤ÇÑ´Ù.
                                 Prop* currentRail = (Prop*)World::ins()->getTile(vx, vy, vz).PropPtr;
                                 if (currentRail != nullptr)
                                 {
-                                    if (gearState == gearFlag::drive)//ì£¼í–‰ê¸°ì–´
+                                    if (gearState == gearFlag::drive)//ÁÖÇà±â¾î
                                     {
-                                        if (bodyDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
+                                        if (bodyDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                         }
-                                        else if (bodyDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                         }
-                                        else if (bodyDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                         }
-                                        else if (bodyDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                         }
                                     }
-                                    else if (gearState == gearFlag::reverse)//í›„ì§„ê¸°ì–´
+                                    else if (gearState == gearFlag::reverse)//ÈÄÁø±â¾î
                                     {
-                                        if (bodyDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
+                                        if (bodyDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                         }
-                                        else if (bodyDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                         }
-                                        else if (bodyDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) trainSpdDir = dir16::dir0;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) trainSpdDir = dir16::dir6;
                                         }
-                                        else if (bodyDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
+                                        else if (bodyDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
                                         {
                                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) trainSpdDir = dir16::dir2;
                                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) trainSpdDir = dir16::dir4;
@@ -1047,7 +1027,7 @@ public:
                                 }
                                 else
                                 {
-                                    prt(L"[Vehicle:train] í˜„ì¬ ì´ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ë ˆì¼ì´ ì„¤ì¹˜ë˜ì–´ìˆì§€ ì•Šë‹¤.\n");
+                                    prt(L"[Vehicle:train] ÇöÀç ÀÌ Â÷·®ÀÇ À§Ä¡¿¡ ·¹ÀÏÀÌ ¼³Ä¡µÇ¾îÀÖÁö ¾Ê´Ù.\n");
                                     return false;
                                 }
                             }
@@ -1060,8 +1040,8 @@ public:
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            //ìœ„ì˜ ëª¨ë“  íŒ¨í„´ ì¡°ê±´ì„ ë§Œì¡±í•˜ì§€ì•Šì„ì‹œ return true
-            //prt(L"[Vehicle:AI] AIê°€ trueë¥¼ ë°˜í™˜í–ˆë‹¤. AIë¥¼ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+            //À§ÀÇ ¸ğµç ÆĞÅÏ Á¶°ÇÀ» ¸¸Á·ÇÏÁö¾ÊÀ»½Ã return true
+            //prt(L"[Vehicle:AI] AI°¡ true¸¦ ¹İÈ¯Çß´Ù. AI¸¦ Á¾·áÇÕ´Ï´Ù.\n");
             isAIFirstRun = true;
             return true;
         }
@@ -1069,7 +1049,7 @@ public:
 
     bool runAnimation(bool shutdown)
     {
-        //prt(L"Vehicle %pì˜ runAnimationì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n", this);
+        //prt(L"Vehicle %pÀÇ runAnimationÀÌ ½ÇÇàµÇ¾ú´Ù.\n", this);
         if (getAniType() == aniFlag::propRush)
         {
             addTimer();
@@ -1117,7 +1097,7 @@ public:
                     if (arrIndex >= lineCheck)
                     {
                         std::array<int, 2> visionTarget = line[arrIndex];
-                        //prt(L"ì‹œì•¼ ì—…ë°ì´íŠ¸ì˜ ì¤‘ì‹¬ì€ (%d,%d)ì´ê³  ì¸ë±ìŠ¤ëŠ” %dì´ë©° ì‚¬ì´ì¦ˆëŠ” %dì´ë‹¤.\n", Player::ins()->getGridX() + visionTarget[0], Player::ins()->getGridY() + visionTarget[1], arrIndex, line.size());
+                        //prt(L"½Ã¾ß ¾÷µ¥ÀÌÆ®ÀÇ Áß½ÉÀº (%d,%d)ÀÌ°í ÀÎµ¦½º´Â %dÀÌ¸ç »çÀÌÁî´Â %dÀÌ´Ù.\n", Player::ins()->getGridX() + visionTarget[0], Player::ins()->getGridY() + visionTarget[1], arrIndex, line.size());
 
                         Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() - getDelGridX() + visionTarget[0], Player::ins()->getGridY() - getDelGridY() + visionTarget[1]);
                         lineCheck++;
@@ -1126,7 +1106,7 @@ public:
 
                 setFloatFakeX(getFloatFakeX() + xSpd);
                 setFloatFakeY(getFloatFakeY() + ySpd);
-                //prt(L"xë°©í–¥ì˜ ì†ë„ë¥¼ %f, yë°©í–¥ì˜ ì†ë„ë¥¼ %fë§Œí¼ ë”í–ˆë‹¤.í˜„ì¬ì˜ fake ì¢Œí‘œëŠ” (%f,%f)ì´ë‹¤.\n", xSpd, ySpd, getFloatFakeX(), getFloatFakeY());
+                //prt(L"x¹æÇâÀÇ ¼Óµµ¸¦ %f, y¹æÇâÀÇ ¼Óµµ¸¦ %f¸¸Å­ ´õÇß´Ù.ÇöÀçÀÇ fake ÁÂÇ¥´Â (%f,%f)ÀÌ´Ù.\n", xSpd, ySpd, getFloatFakeX(), getFloatFakeY());
 
                 if (xSpd > 0 && getFloatFakeX() > 0) { setFloatFakeX(0); }
                 if (xSpd < 0 && getFloatFakeX() < 0) { setFloatFakeX(0); }
@@ -1145,16 +1125,16 @@ public:
                 cameraX = Player::ins()->getX() + Player::ins()->getFakeX();
                 cameraY = Player::ins()->getY() + Player::ins()->getFakeY();
 
-                if (getFloatFakeX() == 0 && getFloatFakeY() == 0)//ë„ì°©
+                if (getFloatFakeX() == 0 && getFloatFakeY() == 0)//µµÂø
                 {
-                    prt(L"ë„ì°©í–ˆë‹¤! í˜„ì¬ì˜ fake ì¢Œí‘œëŠ” (%f,%f)ì´ë‹¤.\n", getFloatFakeX(), getFloatFakeY());
-                    
+                    prt(L"µµÂøÇß´Ù! ÇöÀçÀÇ fake ÁÂÇ¥´Â (%f,%f)ÀÌ´Ù.\n", getFloatFakeX(), getFloatFakeY());
+
                     extraRenderSet.clear();
                     extraRenderEntityList.clear();
                     setDelGrid(0, 0);
                     setFakeX(0);
                     setFakeY(0);
-                    for (auto it = partInfo.begin(); it != partInfo.end(); it++)//ì—”í‹°í‹° í˜ì´í¬ ì„¤ì •
+                    for (auto it = partInfo.begin(); it != partInfo.end(); it++)//¿£Æ¼Æ¼ ÆäÀÌÅ© ¼³Á¤
                     {
                         if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
                         {
@@ -1176,7 +1156,7 @@ public:
                         if (iPtr != nullptr)
                         {
                             auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
-                            if(eraseIt != extraRenderEntityList.end()) extraRenderEntityList.erase(eraseIt);
+                            if (eraseIt != extraRenderEntityList.end()) extraRenderEntityList.erase(eraseIt);
                         }
                     }
                     return true;
@@ -1193,7 +1173,7 @@ public:
                 else if (trainMoveVec[0] == dir16::dir2) setFakeY(getFakeY() - 4.0);
                 else if (trainMoveVec[0] == dir16::dir4) setFakeX(getFakeX() - 4.0);
                 else if (trainMoveVec[0] == dir16::dir6) setFakeY(getFakeY() + 4.0);
-                
+
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
                     if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
@@ -1203,15 +1183,15 @@ public:
                     }
                 }
 
-               // prt(L"[Vehicle : train %p ] íƒ€ì´ë¨¸ %d : ì—°ì‚° í›„ì˜ fake ì¢Œí‘œëŠ” (%d,%d)ì´ë‹¤.\n", this, getTimer(),getFakeX(), getFakeY());
+                // prt(L"[Vehicle : train %p ] Å¸ÀÌ¸Ó %d : ¿¬»ê ÈÄÀÇ fake ÁÂÇ¥´Â (%d,%d)ÀÌ´Ù.\n", this, getTimer(),getFakeX(), getFakeY());
 
                 cameraX = Player::ins()->getX() + Player::ins()->getFakeX();
                 cameraY = Player::ins()->getY() + Player::ins()->getFakeY();
 
-                if (getTimer()>=4)
+                if (getTimer() >= 4)
                 {
-                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getFakeX()/16), Player::ins()->getGridY() + (Player::ins()->getFakeY() / 16));
-                    //prt(L"[Vehicle : train %p ] ì¹´ìš´í„°ê°€ 4ë³´ë‹¤ ì»¤ì ¸ fake ì¢Œí‘œê°€ ì´ˆê¸°í™”ë˜ì—ˆë‹¤.\n", this);
+                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getFakeY() / 16));
+                    //prt(L"[Vehicle : train %p ] Ä«¿îÅÍ°¡ 4º¸´Ù Ä¿Á® fake ÁÂÇ¥°¡ ÃÊ±âÈ­µÇ¾ú´Ù.\n", this);
                     trainMoveVec.erase(trainMoveVec.begin());
                     resetTimer();
                 }
@@ -1228,7 +1208,7 @@ public:
                 //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
                 //    }
                 //}
-                //prt(L"[Vehicle : train %p ] ì´ë™ì´ ì „ë¶€ ì™„ë£Œëœ í›„ì˜ í˜ì´í¬ ì¢Œí‘œëŠ” (%f,%f)ì´ë‹¤.\n", this, getFloatFakeX(), getFloatFakeY());
+                //prt(L"[Vehicle : train %p ] ÀÌµ¿ÀÌ ÀüºÎ ¿Ï·áµÈ ÈÄÀÇ ÆäÀÌÅ© ÁÂÇ¥´Â (%f,%f)ÀÌ´Ù.\n", this, getFloatFakeX(), getFloatFakeY());
                 extraRenderSet.clear();
                 extraRenderVehList.clear();
                 extraRenderEntityList.clear();
@@ -1239,7 +1219,7 @@ public:
                 return true;
             }
 
-            
+
         }
         return false;
     }
@@ -1255,14 +1235,14 @@ public:
             {
                 if (pocketPtr->itemInfo[i].checkFlag(itemFlag::TRAIN_WHEEL))
                 {
-                    if (std::find(trainWheelList.begin(), trainWheelList.end(), it->first) == trainWheelList.end()) //ì—´ì°¨ ë°”í€´ ì¢Œí‘œê°€ ì¤‘ë³µëœ ê°’ì´ ì—†ìœ¼ë©´
+                    if (std::find(trainWheelList.begin(), trainWheelList.end(), it->first) == trainWheelList.end()) //¿­Â÷ ¹ÙÄû ÁÂÇ¥°¡ Áßº¹µÈ °ªÀÌ ¾øÀ¸¸é
                     {
                         trainWheelList.push_back({ it->first[0],it->first[1] });
                     }
                 }
             }
         }
-        //trainWheelListì˜ ì¤‘ê°„ì¢Œí‘œë¥¼ êµ¬í•¨
+        //trainWheelListÀÇ Áß°£ÁÂÇ¥¸¦ ±¸ÇÔ
         trainWheelCenter = calcMidpoint(trainWheelList);
     }
 
@@ -1279,8 +1259,8 @@ public:
                 dst.h = tileSize;
 
                 setZoom(zoomScale);
-                SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
-                SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
+                SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+                SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
                 int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
                 drawSpriteCenter
                 (
@@ -1289,24 +1269,24 @@ public:
                     dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
                     dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
                 );
-                SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+                SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
                 setZoom(1.0);
             };
 
 
         for (auto it = this->partInfo.begin(); it != this->partInfo.end(); it++)
         {
-            ////////////////////////////////ì¼ë°˜ ì°¨ëŸ‰ë¶€í’ˆ/////////////////////////////////////////////////
+            ////////////////////////////////ÀÏ¹İ Â÷·®ºÎÇ°/////////////////////////////////////////////////
             for (int layer = 0; layer < (it->second)->itemInfo.size(); layer++)
             {
-                //ë°”ë‹¥í”„ë¡­,ì²œì¥í”„ë¡­ í”Œë˜ê·¸ê°€ ì—†ëŠ” ì¼ë°˜ í”„ë¡­ì¼ ê²½ìš°
+                //¹Ù´ÚÇÁ·Ó,ÃµÀåÇÁ·Ó ÇÃ·¡±×°¡ ¾ø´Â ÀÏ¹İ ÇÁ·ÓÀÏ °æ¿ì
                 if (!(it->second)->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
                 {
                     drawVehicleComponent(this, (it->first)[0], (it->first)[1], layer, 255);
                 }
             }
 
-            ////////////////////////////////ì²œì¥ ì°¨ëŸ‰ë¶€í’ˆ////////////////////////////////////////////////////
+            ////////////////////////////////ÃµÀå Â÷·®ºÎÇ°////////////////////////////////////////////////////
             int propCeilAlpha = 255;
             if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).VehiclePtr == this) propCeilAlpha = 50;
 
@@ -1337,8 +1317,8 @@ public:
             dst.h = tileSize;
 
             setZoom(zoomScale);
-            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), propCeilAlpha); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
-            SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
+            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), propCeilAlpha); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+            SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
             //int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
             drawSpriteCenter
             (
@@ -1347,7 +1327,7 @@ public:
                 dst.x + dst.w / 2 + zoomScale * getFakeX(),
                 dst.y + dst.h / 2 + zoomScale * getFakeY()
             );
-            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+            SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
             setZoom(1.0);
         }
     };

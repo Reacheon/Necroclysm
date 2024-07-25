@@ -13,6 +13,11 @@ import checkCursor;
 import drawWindow;
 import actFuncSet;
 import Player;
+import Loot;
+import World;
+import Vehicle;
+import Bionic;
+import log;
 
 export class ContextMenu : public GUI
 {
@@ -24,6 +29,8 @@ private:
 	int contextMenuScroll = 0;
 	std::vector<act> actOptions;
 	Point2 targetGrid; //컨텍스트메뉴가 액트를 얻어낼 그리드 좌표
+	std::array<SDL_Rect,30> optionRect;
+
 public:
 	ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int inputGridY, std::vector<act> inputOptions) : GUI(false)
 	{
@@ -35,7 +42,6 @@ public:
 
 		//메세지 박스 렌더링
 		changeXY(inputMouseX, inputMouseY, false);
-
 		tabType = tabFlag::closeWin;
 
 		deactInput();
@@ -53,6 +59,8 @@ public:
 		//94
 		contextMenuBase = { 0, 0, 110, 6 + 22 * (int)actOptions.size() };
 		subContextMenuBase = { 0,0,0,0 };
+
+		
 
 		if (center == false)
 		{
@@ -76,6 +84,8 @@ public:
 			x = inputX - contextMenuBase.w / 2;
 			y = inputY - contextMenuBase.h / 2;
 		}
+
+		for (int i = 0; i < 30; i++) optionRect[i] = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22 * i, contextMenuBase.w - 8, 20 };
 
 	}
 	void drawGUI()
@@ -106,19 +116,28 @@ public:
 					optionText = L"Inspect";
 					iconIndex = 65;
 				}
+				else if (actOptions[i] == act::unbox)
+				{
+					optionText = L"Unbox";
+					iconIndex = 66;
+				}
+				else if (actOptions[i] == act::pull)
+				{
+					optionText = L"Pull";
+					iconIndex = 67;
+				}
 				else optionText = L"???";
 
 
-				SDL_Rect optionRect = { contextMenuBase.x + 4, contextMenuBase.y + 4 + 22 * i, contextMenuBase.w-8, 20 };
-				if (checkCursor(&optionRect))
+				if (checkCursor(&optionRect[i]))
 				{
-					if (click) drawFillRect(optionRect, lowCol::deepBlue);
-					else  drawFillRect(optionRect, lowCol::blue);
+					if (click) drawFillRect(optionRect[i], lowCol::deepBlue);
+					else  drawFillRect(optionRect[i], lowCol::blue);
 				}
-				else drawFillRect(optionRect, lowCol::black);
+				else drawFillRect(optionRect[i], lowCol::black);
 				setFontSize(16);
-				drawTextCenter(col2Str(col::white) + optionText, optionRect.x + optionRect.w / 2 + 16, optionRect.y + optionRect.h / 2);
-				drawSpriteCenter(spr::icon16, iconIndex, optionRect.x + 10, optionRect.y + 10);
+				drawTextCenter(col2Str(col::white) + optionText, optionRect[i].x + optionRect[i].w / 2 + 16, optionRect[i].y + optionRect[i].h / 2);
+				drawSpriteCenter(spr::icon16, iconIndex, optionRect[i].x + 10, optionRect[i].y + 10);
 			}
 			
 			// 좌측상단
@@ -179,14 +198,39 @@ public:
 		{
 			for (int i = 0; i < actOptions.size(); i++)
 			{
-				if (actOptions[i] == act::closeDoor)
+				if (checkCursor(&optionRect[i]))
 				{
-					actFunc::closeDoor(targetGrid.x, targetGrid.y, Player::ins()->getGridZ());
-					break;
+					if (actOptions[i] == act::closeDoor)
+					{
+						actFunc::closeDoor(targetGrid.x, targetGrid.y, Player::ins()->getGridZ());
+						break;
+					}
+					else if (actOptions[i] == act::unbox)
+					{
+						if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+						{
+							Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+							for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
+							{
+								if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+								{
+									new Loot((ItemPocket*)(vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].pocketPtr), &(vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i]));
+									break;
+								}
+							}
+						}
+						break;
+					}
+					else if (actOptions[i] == act::pull)
+					{
+						updateLog(L"#FFFFFFact::pull을 실행했다.");
+						break;
+					}
 				}
+
 			}
 
-			close(aniFlag::winUnfoldClose);
+			close(aniFlag::null);
 		}
 		else close(aniFlag::winUnfoldClose);
 	}

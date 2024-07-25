@@ -19,10 +19,8 @@ void Inventory::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-		ItemPocket* invenPocketPtr = (ItemPocket*)(inventoryItemData->pocketPtr);
-
 		SDL_Rect newInventoryBase = inventoryBase;
-		newInventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, invenPocketPtr->itemInfo.size() - 1)));
+		newInventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
 		drawWindowItemset(&newInventoryBase, titleInventory, titleItemSprIndex);
 
 		drawFillRect(inventoryBase.x + 13, inventoryBase.y + 40, 50, 50, col::black);
@@ -81,9 +79,9 @@ void Inventory::drawGUI()
 		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)
 
 		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 30, 315, 200 };
-		drawItemList(invenPocketPtr, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, invenPocketPtr->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
+		drawItemList(inventoryPocket, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
 
-		if (invenPocketPtr->itemInfo.size() == 0)
+		if (inventoryPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
 			drawTextCenter(col2Str(col::lightGray) + L"가방 안에 아이템이 없다.", inventoryBase.x + 162, inventoryBase.y + 140); //선택(상단바)

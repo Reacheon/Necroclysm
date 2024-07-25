@@ -489,5 +489,8 @@
     <ClCompile Include="code\mouseGrid.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="Vehicle.cpp">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

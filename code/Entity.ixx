@@ -25,7 +25,6 @@ import util;
 import Drawable;
 import drawSprite;
 import SkillData;
-//import CoordSelect;
 import Flame;
 
 export class Entity : public Ani, public Coord, public Drawable//엔티티는 시야 기능과 개인 FOV, 현재 좌표, 그리고 화면에 표시되는 기능과 고유 텍스쳐를 가진다.

@@ -450,6 +450,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"PROP_GAS_OBSTACLE_OFF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::PROP_GAS_OBSTACLE_OFF);
                                     else if (strFragment.substr(0, j) == L"WALL_GAS_PERMEABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WALL_GAS_PERMEABLE);
 
+                                    else if (strFragment.substr(0, j) == L"POCKET") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::POCKET);
 
 
                                     else

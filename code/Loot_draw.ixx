@@ -34,9 +34,7 @@ void Loot::drawGUI()
 		}
 	}
 
-	SDL_Rect newLootBase = lootBase;
-	newLootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
-	drawWindow(&newLootBase, sysStr[10], 1);
+	drawWindow(&lootBase, sysStr[10], 1);
 
 	//포켓
 	if (hasSelect == false)
@@ -45,11 +43,15 @@ void Loot::drawGUI()
 		drawSprite(spr::inventoryItemRect, 0, lootBase.x + 13, lootBase.y + 40);
 
 		setZoom(3.0);
-		drawSpriteCenter(spr::itemset, 140, lootBase.x + 13 + 25, lootBase.y + 40 + 25);
+		int tileIndex = 140;
+		if (lootItemData != nullptr) tileIndex = lootItemData->sprIndex;
+		drawSpriteCenter(spr::itemset, tileIndex, lootBase.x + 13 + 25, lootBase.y + 40 + 25);
 		setZoom(1.0);
 
 		setFontSize(16);
-		drawText(col2Str(col::white) + L"타일 이름", lootBase.x + 73, lootBase.y + 39);
+		std::wstring tileName = L"타일 이름";
+		if (lootItemData != nullptr) tileName = lootItemData->name;
+		drawText(col2Str(col::white) + tileName, lootBase.x + 73, lootBase.y + 39);
 
 		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//회색 분리선
 
@@ -356,7 +358,7 @@ void Loot::drawGUI()
 		drawItemList(lootPocket, lootArea.x, lootArea.y, LOOT_ITEM_MAX, lootCursor, lootScroll, true);
 
 		// 아이템 스크롤 그리기
-		SDL_Rect lootScrollBox = { lootBase.x + 325, lootItemRect[0].y, 2, lootItemRect[LOOT_ITEM_MAX - 1].y + lootItemRect[LOOT_ITEM_MAX - 1].h - lootItemRect[0].y };
+		SDL_Rect lootScrollBox = { lootBase.x + 325, lootItemRect[0].y, 2, lootBase.h - 135 };
 		drawFillRect(lootScrollBox, { 120,120,120 });
 		SDL_Rect inScrollBox = lootScrollBox; // 내부 스크롤 커서
 		inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)LOOT_ITEM_MAX / lootPocket->itemInfo.size());
@@ -365,10 +367,14 @@ void Loot::drawGUI()
 		drawFillRect(inScrollBox, col::white);
 
 
-
+		if (lootPocket->itemInfo.size() == 0)
+		{
+			setFontSize(10);
+			drawTextCenter(col2Str(col::lightGray) + L"가방 안에 아이템이 없다.", lootBase.x + 162, lootBase.y + 140); //선택(상단바)
+		}
 
 		setFontSize(10);
-		drawText(col2Str(col::white) + std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootWindow.x + 6, lootWindow.y + lootWindow.h - 16);
+		drawText(col2Str(col::white) + std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 6, lootBase.y + lootBase.h - 16);
 
 	}
 

@@ -189,13 +189,14 @@ export ThreadPool* threadPoolPtr;
 export Point3 whiteMarkerCoord = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() };
 
 
-auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
-
-    if (a->getAniPriority() == b->getAniPriority()) return a < b;
-    else if (a->getAniPriority() > b->getAniPriority()) return true;
-    else return false;
-    };
-export std::set<Ani*, decltype(aniUSetComp)> aniUSet;//애니메이션 저장 해시셋, 해당 애니메이션의 우선도 순서대로 정렬됨
+export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
+    [](Ani* a, Ani* b) -> bool {
+        if (a->getAniPriority() == b->getAniPriority())
+            return a < b;
+        else
+            return a->getAniPriority() > b->getAniPriority();
+    }
+);
 //AniUSet에 애니메이션을 추가한다. 단 턴을 넘기지는 않는다. 몬스터의 경우 모든 AI에서 실행 후 자동으로 턴이 넘어가므로...
 export std::function<void(Ani*, aniFlag)> addAniUSet = [](Ani* tgtPtr, aniFlag inputType)
     {

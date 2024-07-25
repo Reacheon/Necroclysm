@@ -32,7 +32,10 @@ export class Loot : public GUI
 {
 private:
 	inline static Loot* ptr = nullptr;
+
+	ItemData* lootItemData = nullptr;
 	ItemPocket* lootPocket = nullptr;
+
 	const int lootScrollSize = 6; //한 스크롤에 들어가는 아이템의 수
 	int lootScroll = 0; //우측 루팅창의 스크롤
 	int lootCursor = -1; //우측 루팅창의 커서
@@ -69,15 +72,13 @@ private:
 public:
 	Corouter errorFunc();
 
-	Loot(int targetGridX, int targetGridY) : GUI(false)
+
+	Loot(ItemPocket* inputPocket, ItemData* inputData) : GUI(false)
 	{
+		ptr = this;
 		prt(L"Loot : 생성자가 생성되었습니다..\n");
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
-		ptr = this;
-		lootTile[axis::x] = targetGridX;
-		lootTile[axis::y] = targetGridY;
-		lootTile[axis::z] = Player::ins()->getGridZ();
 
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
@@ -85,8 +86,9 @@ public:
 		tabType = tabFlag::closeWin;
 		UIType = act::loot;
 
-		lootPocket = World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], Player::ins()->getGridZ())->getPocket();
-		lootPocket->sortByUnicode();
+		lootPocket = inputPocket;
+		lootItemData = inputData;
+		if(lootPocket->itemInfo.size()>=2) lootPocket->sortByUnicode();
 
 		deactInput();
 		deactDraw();
@@ -94,11 +96,38 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (inputType == input::keyboard || inputType == input::gamepad)
-		{
-			lootCursor = 0;
-		}
+		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
 	}
+	//Loot(int targetGridX, int targetGridY) : GUI(false)
+	//{
+	//	prt(L"Loot : 생성자가 생성되었습니다..\n");
+	//	prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
+	//	//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+	//	ptr = this;
+	//	lootTile[axis::x] = targetGridX;
+	//	lootTile[axis::y] = targetGridY;
+	//	lootTile[axis::z] = Player::ins()->getGridZ();
+
+	//	changeXY(cameraW - 335, (cameraH / 2) - 210, false);
+	//	setAniSlipDir(0);
+
+	//	tabType = tabFlag::closeWin;
+	//	UIType = act::loot;
+
+	//	lootPocket = World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], Player::ins()->getGridZ())->getPocket();
+	//	lootPocket->sortByUnicode();
+
+	//	deactInput();
+	//	deactDraw();
+	//	addAniUSetPlayer(this, aniFlag::winSlipOpen);
+
+	//	prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
+
+	//	if (inputType == input::keyboard || inputType == input::gamepad)
+	//	{
+	//		lootCursor = 0;
+	//	}
+	//}
 	~Loot()
 	{
 		prt(L"Loot : 소멸자가 호출되었습니다..\n");
@@ -183,6 +212,8 @@ public:
 	void gamepadBtnUp();
 	void step()
 	{
+		lootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
+
 		if (SDL_NumJoysticks() > 0)
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
@@ -234,7 +265,7 @@ public:
 		}
 
 		//루트 아이템의 갯수가 0이 되었을 경우 창을 닫음
-		if (lootPocket->itemInfo.size() == 0)
+		if (lootPocket->itemInfo.size() == 0 && lootItemData == nullptr)
 		{
 			close(aniFlag::null);
 			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
