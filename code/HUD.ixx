@@ -73,6 +73,8 @@ private:
 	int barActCursorMoveDelay = 0;
 	int rStickPressDelay = 0;
 	int quickSlotCursor = -1;
+
+	int delayR2 = 0;
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -993,5 +995,75 @@ public:
 				break;
 			}
 		}
+	}
+
+	void openContextMenu(Point2 targetGrid)
+	{
+		std::vector<act> inputOptions;
+		//문닫기 추가
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).PropPtr != nullptr)
+		{
+			Prop* instlPtr = (Prop*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).PropPtr;
+			if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
+			{
+				inputOptions.push_back(act::closeDoor);
+			}
+		}
+
+		//열기 추가
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+		{
+			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+
+			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
+			{
+				if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+				{
+					inputOptions.push_back(act::unbox);
+					break;
+				}
+			}
+		}
+
+		//당기기 추가
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+		{
+			inputOptions.push_back(act::pull);
+		}
+
+		inputOptions.push_back(act::inspect);
+
+		Point2 windowCoord;
+		if (inputType == input::mouse || inputType == input::touch)
+		{
+			windowCoord = { getMouseXY().x, getMouseXY().y };
+		}
+		else if (inputType == input::gamepad)
+		{
+			SDL_Rect dst;
+			dst.x = cameraW / 2 + zoomScale * ((16 * targetGrid.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+			dst.y = cameraH / 2 + zoomScale * ((16 * targetGrid.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+			windowCoord = { dst.x, dst.y };
+		}
+
+		//수영하기 추가
+		if(itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+		{
+			inputOptions.push_back(act::swim);
+		}
+
+		//등반 추가
+		if (itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).wall].checkFlag(itemFlag::CAN_CLIMB))
+		{
+			inputOptions.push_back(act::climb);
+		}
+
+		//승마 추가
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr != nullptr)
+		{
+			inputOptions.push_back(act::ride);
+		}
+
+		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 };

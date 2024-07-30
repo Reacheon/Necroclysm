@@ -22,7 +22,7 @@ export class CoordSelect : public GUI
 {
 private:
 	inline static CoordSelect* ptr = nullptr;
-	std::wstring telepathyStr = L"좌표를 선택해주세요.";
+	std::wstring telepathyStr = sysStr[175];
 	int index = -1;
 	std::wstring parameter = L"";
 	std::vector<std::array<int, 2>> selectableCoord;

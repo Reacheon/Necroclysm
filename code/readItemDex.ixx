@@ -451,6 +451,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"WALL_GAS_PERMEABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::WALL_GAS_PERMEABLE);
 
                                     else if (strFragment.substr(0, j) == L"POCKET") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::POCKET);
+                                    else if (strFragment.substr(0, j) == L"CAN_CLIMB") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CAN_CLIMB);
 
 
                                     else
@@ -735,24 +736,24 @@ export int readItemDex(const wchar_t* file)
                             break;
 
                         case csvItem::equipSpr:
-                            errorBox(spr::equipMapper.find(strFragment) == spr::equipMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::equipMapper에 없음 : " + strFragment);
-                            itemDex[arrayCounter / (csvWidth)-1].equipSpr = spr::equipMapper[strFragment.c_str()];
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            itemDex[arrayCounter / (csvWidth)-1].equipSpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvItem::equipPriority:
                             itemDex[arrayCounter / (csvWidth)-1].equipPriority = wtoi(strFragment.c_str());
                             break;
 
                         case csvItem::leftWieldSpr:
-                            errorBox(spr::equipMapper.find(strFragment) == spr::equipMapper.end(), L"이 아이템의 leftWield 이미지 파일이 spr::equipMapper에 없음 : " + strFragment);
-                            itemDex[arrayCounter / (csvWidth)-1].leftWieldSpr = spr::equipMapper[strFragment.c_str()];
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 leftWield 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            itemDex[arrayCounter / (csvWidth)-1].leftWieldSpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvItem::leftWieldPriority:
                             itemDex[arrayCounter / (csvWidth)-1].leftWieldPriority = wtoi(strFragment.c_str());
                             break;
 
                         case csvItem::rightWieldSpr:
-                            errorBox(spr::equipMapper.find(strFragment) == spr::equipMapper.end(), L"이 아이템의 rightWield 이미지 파일이 spr::equipMapper에 없음 : " + strFragment);
-                            itemDex[arrayCounter / (csvWidth)-1].rightWieldSpr = spr::equipMapper[strFragment.c_str()];
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 rightWield 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            itemDex[arrayCounter / (csvWidth)-1].rightWieldSpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvItem::rightWieldPriority:
                             itemDex[arrayCounter / (csvWidth)-1].rightWieldPriority = wtoi(strFragment.c_str());

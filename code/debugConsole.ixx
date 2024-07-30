@@ -328,6 +328,13 @@ export void debugConsole()
 		prt(L" 날씨를 성공적으로 변경했다! \n");
 		break;
 	}
+	case 22: //말 생성
+	{
+		Player* ptr = Player::ins();
+		new Monster(ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ(), 4);
+		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
+		break;
+	}
 
 	}
 }

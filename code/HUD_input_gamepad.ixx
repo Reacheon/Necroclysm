@@ -10,23 +10,18 @@ import World;
 import Prop;
 import updateBarAct;
 
-static int delayR2 = 0;
 
 void HUD::gamepadBtnDown()
 {
 	switch (event.cbutton.button)
 	{
 	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		dpadUpPressed = true;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		dpadDownPressed = true;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		dpadLeftPressed = true;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		dpadRightPressed = true;
 		break;
 	case SDL_CONTROLLER_BUTTON_Y:
 		if (y == 0)
@@ -59,18 +54,14 @@ void HUD::gamepadBtnUp()
 	switch (event.cbutton.button)
 	{
 	case SDL_CONTROLLER_BUTTON_DPAD_UP:
-		dpadUpPressed = false;
 		if (isQuickSlotPop && quickSlotCursor > 0) quickSlotCursor--;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-		dpadDownPressed = false;
 		if (isQuickSlotPop && quickSlotCursor < 7) quickSlotCursor++;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-		dpadLeftPressed = false;
 		break;
 	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-		dpadRightPressed = false;
 		break;
 	case SDL_CONTROLLER_BUTTON_A:
 		if (barActCursor != -1) clickLetterboxBtn(barAct[barActCursor]);
@@ -90,6 +81,20 @@ void HUD::gamepadBtnUp()
 			tileTouch(tgtX, tgtY);
 		}
 		break;
+	case SDL_CONTROLLER_BUTTON_X:
+		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+
+		int tgtX = Player::ins()->getGridX();
+		int tgtY = Player::ins()->getGridY();
+
+		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
+		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
+		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
+		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
+
+		openContextMenu({ tgtX,tgtY });
+
 	}
 }
 void HUD::gamepadStep()
@@ -98,7 +103,14 @@ void HUD::gamepadStep()
 	{
 		if (dpadDelay <= 0)
 		{
+			dpadDelay = 6;
 			int dir = -1;
+			SDL_PollEvent(&event);
+			bool dpadUpPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
+			bool dpadDownPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+			bool dpadLeftPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+			bool dpadRightPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+
 			if (dpadUpPressed && dpadLeftPressed) dir = 3;
 			else if (dpadUpPressed && dpadRightPressed) dir = 1;
 			else if (dpadDownPressed && dpadLeftPressed) dir = 5;
@@ -118,7 +130,6 @@ void HUD::gamepadStep()
 					{
 						cameraFix = true;
 						Player::ins()->startMove(dir);
-						dpadDelay = 6;
 					}
 					else
 					{
@@ -191,13 +202,19 @@ void HUD::gamepadStep()
 		else barActCursorMoveDelay--;
 
 
-		if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+		if (GUI::getLastGUI() == this)
 		{
-			prt(L"탭이 실행되었다.\n");
-			executeTab();
-			delayR2 = 20;
+			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			{
+				prt(L"[HUD:STEP] 탭이 실행되었다.\n");
+				executeTab();
+				delayR2 = 20;
+			}
+			else
+			{
+				delayR2--;
+			}
 		}
-		else delayR2--;
 
 		__int16 rightX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX); // -32768 ~ 32767
 		__int16 rightY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY); // -32768 ~ 32767

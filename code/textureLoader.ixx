@@ -18,7 +18,6 @@ export void textureLoader()
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");
 	spr::defaultItem = new Sprite(renderer, "image/orbTexture.png", 48, 48);
 	spr::defaultMonster = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);
-	spr::zombie1 = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);
 	spr::blockTexture = new Sprite(renderer, "image/block.png", 16, 32);
 	spr::tileTexture = new Sprite(renderer, "image/tile.png", 16, 16);
 	spr::effectBash1 = new Sprite(renderer, "image/effect/effectBash1.png", 48, 48);
@@ -130,7 +129,12 @@ export void textureLoader()
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset/equip"))
 	{
-		spr::equipMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+		spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+	}
+
+	for (const auto& entry : std::filesystem::directory_iterator("image/charset"))
+	{
+		spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
 	}
 
 	spr::singleQuickSlot = new Sprite(renderer, "image/UI/GUI/HUD/singleQuickSlot.png", 180, 38);
@@ -146,5 +150,6 @@ export void textureLoader()
 	spr::steamEffect1 = new Sprite(renderer, "image/gas/steamEffect1.png", 48, 48);
 
 	spr::inventoryItemRect = new Sprite(renderer, "image/UI/GUI/Inventory/inventoryItemRect.png", 50, 50);
+
 
 }

@@ -16,6 +16,7 @@ export namespace spr
 {
 	Sprite* charsetHero = nullptr;
 	Sprite* zombie1 = nullptr;
+	Sprite* arabianHorse = nullptr;
 	Sprite* defaultMonster = nullptr;
 	Sprite* defaultItem = nullptr;
 	Sprite* blockTexture = nullptr;
@@ -134,7 +135,7 @@ export namespace spr
 	Sprite* trainBrake = nullptr;
 	Sprite* mainRotor = nullptr;
 
-	std::unordered_map<std::wstring, Sprite*> equipMapper;
+	std::unordered_map<std::wstring, Sprite*> spriteMapper;
 
 	Sprite* singleQuickSlot = nullptr;
 	Sprite* topQuickSlotBtn = nullptr;

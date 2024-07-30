@@ -155,6 +155,10 @@ export enum class act
     unbox,
     pull,
 
+    climb,
+    swim,
+    ride,
+
     //skillInfo,
 };
 
@@ -493,6 +497,7 @@ export enum class itemFlag
     WALL_GAS_PERMEABLE,
 
     POCKET,
+    CAN_CLIMB,
 };
 
 export namespace toolQuality

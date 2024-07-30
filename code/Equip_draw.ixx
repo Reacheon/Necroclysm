@@ -24,15 +24,15 @@ void Equip::drawGUI()
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		
 		//플레이어 무게 제한 게이지 그리기
-
-		SDL_Rect weightGaugeRect = { equipBase.x + 55,equipBase.y + 39,104,9 };
+		SDL_Rect weightGaugeRect = { equipBase.x + 65,equipBase.y + 39,104,9 };
 		drawRect(weightGaugeRect, col::white);
 		drawFillRect({ weightGaugeRect.x + 2,weightGaugeRect.y + 2,50,5 }, lowCol::green);
-		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 37, weightGaugeRect.y + 4);
+		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 47, weightGaugeRect.y + 4);
 		setFontSize(10);
-		drawText(col2Str(col::white)+ L"무게", weightGaugeRect.x - 28, weightGaugeRect.y - 2);
+		drawText(col2Str(col::white)+ sysStr[163], weightGaugeRect.x - 38, weightGaugeRect.y - 2);//무게
 		setFontSize(8);
 		drawText(col2Str(col::white) + L"32.5 / 92.3 kg", weightGaugeRect.x + 110, weightGaugeRect.y - 1);
+
 
 		//이큅 윈도우 본체
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -93,20 +93,20 @@ void Equip::drawGUI()
 
 		SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 0xff);
 
-		drawText(col2Str(col::lightGray)+L"머리", topWindow.x + 10, topWindow.y + 24 + 18 * 0);
-		drawText(col2Str(col::lightGray) + L"상체", topWindow.x + 10, topWindow.y + 24 + 18 * 1);
-		drawText(col2Str(col::lightGray) + L"왼팔", topWindow.x + 10, topWindow.y + 24 + 18 * 2);
-		drawText(col2Str(col::lightGray) + L"오른팔", topWindow.x + 10, topWindow.y + 24 + 18 * 3);
-		drawText(col2Str(col::lightGray) + L"왼다리", topWindow.x + 10, topWindow.y + 24 + 18 * 4);
-		drawText(col2Str(col::lightGray) + L"오른다리", topWindow.x + 10, topWindow.y + 24 + 18 * 5);
+		drawText(col2Str(col::lightGray) + sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0);//머리
+		drawText(col2Str(col::lightGray) + sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1);//몸통
+		drawText(col2Str(col::lightGray) + sysStr[108], topWindow.x + 10, topWindow.y + 24 + 18 * 2);//왼팔
+		drawText(col2Str(col::lightGray) + sysStr[109], topWindow.x + 10, topWindow.y + 24 + 18 * 3);//오른팔
+		drawText(col2Str(col::lightGray) + sysStr[110], topWindow.x + 10, topWindow.y + 24 + 18 * 4);//왼다리
+		drawText(col2Str(col::lightGray) + sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5);//오른다리
 
 		SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 0xff);
 
 		setFontSize(11);
-		drawTextCenter(L"관통저항", topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);
-		drawTextCenter(L"참격저항", topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);
-		drawTextCenter(L"타격저항", topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);
-		drawTextCenter(L"방해도", topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);
+		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//관통저항
+		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//참격저항
+		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//타격저항
+		drawTextCenter(sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);//방해도
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -150,14 +150,14 @@ void Equip::drawGUI()
 
 
 		setFontSize(14);
-		drawText(col2Str(lowCol::orange)+L"방어", topWindow.x + 290, topWindow.y + 24 + 18 * -1);
-		drawText(col2Str(lowCol::orange) + L"회피", topWindow.x + 290, topWindow.y + 24 + 18 * 0);
+		drawText(col2Str(lowCol::orange)+ sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1);//방어
+		drawText(col2Str(lowCol::orange) + sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0);//회피
 
-		drawText(col2Str(col::lightGray)+L"화염저항", topWindow.x + 290, topWindow.y + 24 + 18 * 1);
-		drawText(col2Str(col::lightGray) + L"냉기저항", topWindow.x + 290, topWindow.y + 24 + 18 * 2);
-		drawText(col2Str(col::lightGray) + L"전기저항", topWindow.x + 290, topWindow.y + 24 + 18 * 3);
-		drawText(col2Str(col::lightGray) + L"피폭저항", topWindow.x + 290, topWindow.y + 24 + 18 * 4);
-		drawText(col2Str(col::lightGray) + L"부식저항", topWindow.x + 290, topWindow.y + 24 + 18 * 5);
+		drawText(col2Str(col::lightGray) + sysStr[170], topWindow.x + 290, topWindow.y + 24 + 18 * 1);//화염저항
+		drawText(col2Str(col::lightGray) + sysStr[171], topWindow.x + 290, topWindow.y + 24 + 18 * 2);//냉기저항
+		drawText(col2Str(col::lightGray) + sysStr[172], topWindow.x + 290, topWindow.y + 24 + 18 * 3);//전기저항
+		drawText(col2Str(col::lightGray) + sysStr[173], topWindow.x + 290, topWindow.y + 24 + 18 * 4);//피폭저항
+		drawText(col2Str(col::lightGray) + sysStr[174], topWindow.x + 290, topWindow.y + 24 + 18 * 5);//부식저항
 
 		int SH = Player::ins()->getSH();
 		int EV = Player::ins()->getEV();

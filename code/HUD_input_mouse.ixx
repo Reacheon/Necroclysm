@@ -193,44 +193,7 @@ void HUD::mouseStep()
 void HUD::clickRightGUI()
 {
 	updateLog(L"#FFFFFF[HUD] Right click event triggered.");
-
-	std::vector<act> inputOptions;
-	Point2 tagetGrid = getAbsMouseGrid();
-
-	//문닫기 추가
-	if (World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).PropPtr != nullptr)
-	{
-		Prop* instlPtr = (Prop*)World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).PropPtr;
-		if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
-		{
-			inputOptions.push_back(act::closeDoor);
-		}
-	}
-
-	//열기 추가
-	if (World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
-	{
-		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
-
-		for (int i = 0; i < vPtr->partInfo[{tagetGrid.x, tagetGrid.y}]->itemInfo.size(); i++)
-		{
-			if (vPtr->partInfo[{tagetGrid.x, tagetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
-			{
-				inputOptions.push_back(act::unbox);
-				break;
-			}
-		}
-	}
-
-	//당기기 추가
-	if (World::ins()->getTile(tagetGrid.x, tagetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
-	{
-		inputOptions.push_back(act::pull);
-	}
-
-	inputOptions.push_back(act::inspect);
-
-	new ContextMenu(getMouseXY().x, getMouseXY().y, getAbsMouseGrid().x, getAbsMouseGrid().y, inputOptions);
+	openContextMenu(getAbsMouseGrid());
 }
 void HUD::clickHoldGUI()
 {

@@ -35,12 +35,12 @@ void Inventory::drawGUI()
 
 		drawLine(inventoryBase.x + 72, inventoryBase.y + 63, inventoryBase.x + 72 + 255, inventoryBase.y + 63, col::gray);//회색 분리선
 
-		SDL_Rect volumeGaugeRect = { inventoryBase.x + 113,inventoryBase.y + 72,104,9 };
+		SDL_Rect volumeGaugeRect = { inventoryBase.x + 123,inventoryBase.y + 72,104,9 };
 		drawRect(volumeGaugeRect, col::white);
 		drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,50,5 }, lowCol::green);
-		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 37, volumeGaugeRect.y + 4);
+		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 		setFontSize(10);
-		drawText(col2Str(col::white) + L"부피", volumeGaugeRect.x - 28, volumeGaugeRect.y - 2);
+		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//부피
 		setFontSize(8);
 		drawText(col2Str(col::white) + L"32.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
 
@@ -50,7 +50,7 @@ void Inventory::drawGUI()
 		drawRect(dropBtn, col::gray);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 11, dropBtn.y + 12);
 		setFontSize(10);
-		drawTextCenter(col2Str(col::white) + L"버리기", dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);
+		drawTextCenter(col2Str(col::white) + sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//버리기
 		drawFillRect(dropBtn, col::black, 150);
 
 
@@ -84,7 +84,7 @@ void Inventory::drawGUI()
 		if (inventoryPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
-			drawTextCenter(col2Str(col::lightGray) + L"가방 안에 아이템이 없다.", inventoryBase.x + 162, inventoryBase.y + 140); //선택(상단바)
+			drawTextCenter(col2Str(col::lightGray) + sysStr[162], inventoryBase.x + 162, inventoryBase.y + 140); //가방 안에 아이템이 없다
 		}
 
 	}

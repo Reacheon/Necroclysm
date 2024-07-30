@@ -22,13 +22,13 @@ export void dataLoader()
 	std::wstring alchemyPath = L"language/" + option::language + L"/alchemyDex.tsv";
 	readAlchemyDex(alchemyPath.c_str());
 
-	//연금술 조합법 로드
+	//스킬 데이터 로드
 	std::wstring skillPath = L"language/" + option::language + L"/skillDex.tsv";
 	readSkillDex(skillPath.c_str());
 
 	//시스템(UI) 문자열 로드
 	std::wstring systemPath = L"language/" + option::language + L"/sysStr.tsv";
-	std::vector<std::array<std::wstring, 3>> tempSysStr(1, { L" ", L" ", L" " });
+	std::vector<std::array<std::wstring, 4>> tempSysStr(1, { L" ", L" ", L" " });
 	readCSV(systemPath.c_str(), tempSysStr);
 	systemPath.clear();
 	for (int i = 0; i < tempSysStr.size(); i++) { sysStr.push_back(tempSysStr[i][1]); }

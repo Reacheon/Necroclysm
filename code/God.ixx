@@ -12,15 +12,13 @@ import globalVar;
 import checkCursor;
 import drawWindow;
 
-static int delayR2 = 0;
-
 export class God : public GUI
 {
 private:
 	inline static God* ptr = nullptr;
 	SDL_Rect godBase;
 	godFlag thisGod = godFlag::none;
-	
+	int delayR2 = 0;
 	SDL_Rect convertBtn;
 public:
 	God(godFlag inputGod) : GUI(false)
@@ -244,15 +242,19 @@ public:
 	void gamepadBtnUp() { }
 	void step() 
 	{
+		std::wprintf(L"delayR2의 값은 %d이다.\n", delayR2);
 		if (SDL_NumJoysticks() > 0)
 		{
-			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			if (GUI::getLastGUI() == this)
 			{
-				prt(L"탭이 실행되었다.\n");
-				close(aniFlag::winUnfoldClose);
-				delayR2 = 20;
+				if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 10000)
+				{
+					prt(L"탭이 실행되었다.\n");
+					close(aniFlag::winUnfoldClose);
+					delayR2 = 20;
+				}
+				else delayR2--;
 			}
-			else delayR2--;
 		}
 	}
 };

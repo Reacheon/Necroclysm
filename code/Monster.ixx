@@ -20,9 +20,11 @@ private:
 public:
 	Monster(int gridX, int gridY, int gridZ, int index) : Entity(gridX, gridY, gridZ)
 	{
-		setSprite(spr::defaultMonster);
 		
 		loadDataFromDex(index);
+		setSprite(entityInfo.entitySpr);
+
+
 		prt(entityInfo.name.c_str());
 		prt(lowCol::red, L"Monster : 생성자가 호출되었습니다! ID : %p\n", this);
 

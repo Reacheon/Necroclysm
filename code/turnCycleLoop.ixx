@@ -309,6 +309,7 @@ __int64 animationTurn()
 		else if (turnCycle == turn::monsterAnime) turnCycle = turn::monsterAI;
 		};
 
+
 	if (aniUSet.size() > 0)
 	{
 		//aniUSet에 있는 모든 인스턴스를 체크해서 애니메이션을 실행시킴. 

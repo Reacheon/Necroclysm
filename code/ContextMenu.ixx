@@ -98,36 +98,48 @@ public:
 			drawFillRect(contextMenuBase, col::black);
 			drawRect(contextMenuBase, col::gray);
 
-
 			//94 110
 			for (int i = 0; i < actOptions.size(); i++)
 			{
-
 				//64,65
 				std::wstring optionText;
 				int iconIndex = 0;
 				if (actOptions[i] == act::closeDoor)
 				{
-					optionText = L"Close";
+					optionText = sysStr[176];//닫기
 					iconIndex = 64;
 				}
 				else if (actOptions[i] == act::inspect)
 				{
-					optionText = L"Inspect";
+					optionText = sysStr[177];//조사
 					iconIndex = 65;
 				}
 				else if (actOptions[i] == act::unbox)
 				{
-					optionText = L"Unbox";
+					optionText = sysStr[178];//열기
 					iconIndex = 66;
 				}
 				else if (actOptions[i] == act::pull)
 				{
-					optionText = L"Pull";
+					optionText = sysStr[179];//당기기
 					iconIndex = 67;
 				}
+				else if (actOptions[i] == act::climb)
+				{
+					optionText = sysStr[188];//등반
+					iconIndex = 69;
+				}
+				else if (actOptions[i] == act::swim)
+				{
+					optionText = sysStr[186];//수영
+					iconIndex = 70;
+				}
+				else if (actOptions[i] == act::ride)
+				{
+					optionText = sysStr[187];//탑승
+					iconIndex = 71;
+				}
 				else optionText = L"???";
-
 
 				if (checkCursor(&optionRect[i]))
 				{
@@ -223,7 +235,15 @@ public:
 					}
 					else if (actOptions[i] == act::pull)
 					{
-						updateLog(L"#FFFFFFact::pull을 실행했다.");
+						//Entity* tgtEntity = (Entity*)Player::ins();
+						if (Player::ins()->pulledCart == nullptr)
+						{
+							Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+						}
+						else
+						{
+							Player::ins()->pulledCart = nullptr;
+						}
 						break;
 					}
 				}

@@ -302,7 +302,6 @@ __int64 drawTiles()
 	return getNanoTimer() - timeStampStart;
 }
 
-
 __int64 drawCorpses()
 {
 	__int64 timeStampStart = getNanoTimer();

@@ -17,7 +17,6 @@ export void displayLoader()
 {
     bool debugSquare = true;
 
-
     cameraW = 720;
     cameraH = 720;
 
@@ -45,7 +44,7 @@ export void displayLoader()
         cameraW = 720;
     }
 
-    //////PC 테스트용 강제 해상도 조정////////
+    ////PC 테스트용 강제 해상도 조정////////
     {
         int resolution = 0;
         switch (resolution)

@@ -9,12 +9,13 @@ import util;
 import constVar;
 import globalVar;
 import EntityData;
+import textureVar;
 
 namespace csvEntity
 {
     constexpr int name = 0;
     constexpr int entityCode = 1;
-    constexpr int sprIndex = 2;
+    constexpr int sprFileName = 2;
     constexpr int tooltip = 3;
     constexpr int category = 4;
     constexpr int bodyTemplate = 5;
@@ -104,8 +105,9 @@ export int readEntityDex(const wchar_t* file)
                         case csvEntity::entityCode:
                             entityDex[arrayCounter / (csvWidth)-1].entityCode = wtoi(strFragment.c_str());
                             break;
-                        case csvEntity::sprIndex:
-                            entityDex[arrayCounter / (csvWidth)-1].sprIndex = wtoi(strFragment.c_str());
+                        case csvEntity::sprFileName:
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            entityDex[arrayCounter / (csvWidth)-1].entitySpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvEntity::tooltip:
                             entityTooltip.push_back(strFragment);

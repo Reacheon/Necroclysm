@@ -102,9 +102,9 @@ public:
 				setFontSize(10);
 				int targetX = pivotX + 10;
 				int targetY = pivotY + (28 * (-1)) + 20;
-				drawTextCenter(L"#234A63재능", targetX + 54 + (210 * i), targetY + 1);
-				drawTextCenter(L"#234A63랭크", targetX + 125 + (210 * i), targetY + 1);
-				drawTextCenter(L"#234A63적성", targetX + 174 + (210 * i), targetY + 1);
+				drawTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY + 1); //재능
+				drawTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY + 1); //랭크
+				drawTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY + 1); //적성
 			}
 
 
@@ -298,8 +298,10 @@ public:
 			setZoom(1.0);
 
 			if (warningIndex > 0) { drawText(L"#FF0000" + sysStr[74], talentBase.x + 20, talentBase.y + talentBase.h - 70); }
-			drawText(L"#FFFFFF클릭하여 재능포인트의 분배 우선 순위를 결정합니다. 예로 3개의 재능을 우선분배하면 각 재능 당 경험치가 33%씩 쌓입니다.", talentBase.x + 20, talentBase.y + talentBase.h - 50);
-			drawText(L"#FFFFFF적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능 레벨은 최대 18레벨까지 올릴 수 있습니다.", talentBase.x + 20, talentBase.y + talentBase.h - 30);
+			//클릭하여 재능포인트의 분배 우선 순위를 결정합니다. 예로 3개의 재능을 우선분배하면 각 재능 당 경험치가 33%씩 쌓입니다.
+			drawText(col2Str(col::white)+sysStr[180], talentBase.x + 20, talentBase.y + talentBase.h - 50);
+			//적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능은 최대 S랭크까지 올릴 수 있습니다.
+			drawText(col2Str(col::white) + sysStr[181], talentBase.x + 20, talentBase.y + talentBase.h - 30);
 		}
 		else
 		{

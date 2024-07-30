@@ -2,6 +2,7 @@
 
 import std;
 import constVar;
+import Sprite;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767
@@ -12,7 +13,8 @@ export struct EntityData
     std::wstring name = L"DEFAULT ENTITY";
 
     unsigned __int16 entityCode = 1;
-    unsigned __int16 sprIndex = 1;
+    Sprite* entitySpr = nullptr;
+
     unsigned __int16 tooltipIndex = 0;
 
     unsigned __int8 category = 0;

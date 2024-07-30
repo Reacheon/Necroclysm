@@ -15,7 +15,6 @@ import ItemData;
 import ItemPocket;
 import drawItemList;
 
-
 export class Inventory : public GUI
 {
 private:
@@ -28,7 +27,7 @@ private:
 	int inventoryCursor = -1;
 	int inventoryScroll = 0;
 
-	std::wstring titleInventory = L"배낭";
+	std::wstring titleInventory = sysStr[185];
 	int titleItemSprIndex = 60;
 
 	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemRect; //마우스를 위한 인벤아이템렉트 판정 박스
