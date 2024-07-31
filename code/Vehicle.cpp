@@ -485,8 +485,8 @@ void Vehicle::rush(int dx, int dy)
     {
         if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
         {
-            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeX(getFloatFakeX());
-            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeY(getFloatFakeY());
+            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getFakeX());
+            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
         }
     }
 }
@@ -786,7 +786,7 @@ bool Vehicle::runAI()
                         }
                     }
 
-                    //prt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFloatFakeX(), getFloatFakeY());
+                    //prt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFakeX(), getFakeY());
 
                     //iAmDictator();
                     addAniUSetMonster(this, aniFlag::trainRush);
@@ -1105,30 +1105,30 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
             }
 
-            setFloatFakeX(getFloatFakeX() + xSpd);
-            setFloatFakeY(getFloatFakeY() + ySpd);
-            //prt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFloatFakeX(), getFloatFakeY());
+            setFakeX(getFakeX() + xSpd);
+            setFakeY(getFakeY() + ySpd);
+            //prt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFakeX(), getFakeY());
 
-            if (xSpd > 0 && getFloatFakeX() > 0) { setFloatFakeX(0); }
-            if (xSpd < 0 && getFloatFakeX() < 0) { setFloatFakeX(0); }
-            if (ySpd > 0 && getFloatFakeY() > 0) { setFloatFakeY(0); }
-            if (ySpd < 0 && getFloatFakeY() < 0) { setFloatFakeY(0); }
+            if (xSpd > 0 && getFakeX() > 0) { setFakeX(0); }
+            if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
+            if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
+            if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
 
             for (auto it = partInfo.begin(); it != partInfo.end(); it++)
             {
                 if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
                 {
-                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeX(getFloatFakeX());
-                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFloatFakeY(getFloatFakeY());
+                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getFakeX());
+                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
                 }
             }
 
             cameraX = Player::ins()->getX() + Player::ins()->getIntegerFakeX();
             cameraY = Player::ins()->getY() + Player::ins()->getIntegerFakeY();
 
-            if (getFloatFakeX() == 0 && getFloatFakeY() == 0)//도착
+            if (getFakeX() == 0 && getFakeY() == 0)//도착
             {
-                prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFloatFakeX(), getFloatFakeY());
+                prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
 
                 extraRenderSet.clear();
                 extraRenderEntityList.clear();
@@ -1209,7 +1209,7 @@ bool Vehicle::runAnimation(bool shutdown)
             //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getIntegerFakeY());
             //    }
             //}
-            //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFloatFakeX(), getFloatFakeY());
+            //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderSet.clear();
             extraRenderVehList.clear();
             extraRenderEntityList.clear();

@@ -1027,7 +1027,7 @@ void Entity::drawSelf()
 	setZoom(zoomScale);
 	setFlip(getEntityFlip());
 
-	//prt(L"현재 이 객체의 fake 좌표는 %f,%f이다.\n", getFloatFakeX(), getFloatFakeY());
+	//prt(L"현재 이 객체의 fake 좌표는 %f,%f이다.\n", getFakeX(), getFakeY());
 	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
 	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
 

@@ -33,8 +33,7 @@ public:
 	int getDstGridX() { return dstGridX; }
 	int getDstGridY() { return dstGridY; }
 
-
-	int getIntegerFakeX() { return fakeX; }
+	int getIntegerFakeX() { return std::floor(fakeX); }
 	int getIntegerFakeY() { return std::floor(fakeY); }
 	float getFakeX() { return fakeX; }
 	float getFakeY() { return fakeY; }
@@ -42,12 +41,6 @@ public:
 	void addFakeY(float val) { fakeY += val; }
 	void setFakeX(float val) { fakeX = val; }
 	void setFakeY(float val) { fakeY = val; }
-
-	//아직 호환
-	float getFloatFakeX() { return fakeX; }
-	float getFloatFakeY() { return fakeY; }
-	void setFloatFakeX(float inputVal) { fakeX = inputVal; }
-	void setFloatFakeY(float inputVal) { fakeY = inputVal; }
 
 	void setGridZ(int val) { gridZ = val; }
 

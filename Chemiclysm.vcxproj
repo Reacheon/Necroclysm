@@ -178,6 +178,7 @@
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
+    <ClCompile Include="code\Entity.cpp" />
     <ClCompile Include="code\Entity_runAnimation.cpp" />
     <ClCompile Include="code\Equip_draw.ixx" />
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
@@ -232,6 +233,7 @@
     <ClCompile Include="code\Loot_input_mouse.ixx" />
     <ClCompile Include="code\Inventory.ixx" />
     <ClCompile Include="code\mouseGrid.ixx" />
+    <ClCompile Include="code\Player.cpp" />
     <ClCompile Include="code\Prop.ixx" />
     <ClCompile Include="code\lineMaker.ixx" />
     <ClCompile Include="code\Loot.ixx" />
@@ -289,13 +291,11 @@
     <ClCompile Include="code\turnWait.ixx" />
     <ClCompile Include="code\utf8Decoder.ixx" />
     <ClCompile Include="code\util.ixx" />
+    <ClCompile Include="code\Vehicle.cpp" />
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\connectGroupExtraIndex.ixx" />
     <ClCompile Include="code\World.ixx" />
     <ClCompile Include="code\wstring2Number.ixx" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

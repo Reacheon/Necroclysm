@@ -128,13 +128,13 @@ public:
 			xSpd = spd * cosVal;
 			ySpd = spd * sinVal;
 
-			setFloatFakeX(getFloatFakeX() + xSpd);
-			setFloatFakeY(getFloatFakeY() + ySpd);
+			setFakeX(getFakeX() + xSpd);
+			setFakeY(getFakeY() + ySpd);
 
-			if (xSpd > 0 && getFloatFakeX() > 0) {setFloatFakeX(0);}
-			if (xSpd < 0 && getFloatFakeX() < 0) { setFloatFakeX(0); }
-			if (ySpd > 0 && getFloatFakeY() > 0) { setFloatFakeY(0); }
-			if (ySpd < 0 && getFloatFakeY() < 0) { setFloatFakeY(0); }
+			if (xSpd > 0 && getFakeX() > 0) {setFakeX(0);}
+			if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
+			if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
+			if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
 
 			if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
 			{
@@ -148,8 +148,8 @@ public:
 					}
 				}
 
-				setFloatFakeX(0);
-				setFloatFakeY(0);
+				setFakeX(0);
+				setFakeY(0);
 				prt(L"애니메이션 종료\n");
 				resetTimer();
 				setAniType(aniFlag::null);
