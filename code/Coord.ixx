@@ -32,14 +32,25 @@ public:
 	int getDstY() { return dstY; }
 	int getDstGridX() { return dstGridX; }
 	int getDstGridY() { return dstGridY; }
-	int getFakeX() { return fakeX; }
-	int getFakeY() { return fakeY; }
-	void addFakeX(int val) { fakeX += val; }
-	void addFakeY(int val) { fakeY += val; }
+
+
+	int getIntegerFakeX() { return fakeX; }
+	int getIntegerFakeY() { return std::floor(fakeY); }
+	float getFakeX() { return fakeX; }
+	float getFakeY() { return fakeY; }
+	void addFakeX(float val) { fakeX += val; }
+	void addFakeY(float val) { fakeY += val; }
+	void setFakeX(float val) { fakeX = val; }
+	void setFakeY(float val) { fakeY = val; }
+
+	//아직 호환
+	float getFloatFakeX() { return fakeX; }
+	float getFloatFakeY() { return fakeY; }
+	void setFloatFakeX(float inputVal) { fakeX = inputVal; }
+	void setFloatFakeY(float inputVal) { fakeY = inputVal; }
 
 	void setGridZ(int val) { gridZ = val; }
-	void setFakeX(int val) { fakeX = val; }
-	void setFakeY(int val) { fakeY = val; }
+
 	void setXY(int inputX, int inputY)
 	{
 		x = inputX;
@@ -69,10 +80,7 @@ public:
 		setGrid(getGridX(), getGridY(), getGridZ() + input);
 	}
 
-	float getFloatFakeX() { return fakeX; }
-	float getFloatFakeY() { return fakeY; }
-	void setFloatFakeX(float inputVal) { fakeX = inputVal; }
-	void setFloatFakeY(float inputVal) { fakeY = inputVal; }
+
 
 	void setDstGrid(int inputGridX, int inputGridY)
 	{

@@ -20,8 +20,8 @@ export void cameraChaseTarget()
 
     if (fakeChase)
     {
-        cameraX += target->getFakeX();
-        cameraY += target->getFakeY();
+        cameraX += target->getIntegerFakeX();
+        cameraY += target->getIntegerFakeY();
     }
 }
 

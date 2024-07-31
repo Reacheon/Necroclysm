@@ -118,10 +118,10 @@ public:
 
 			float spd = 6;
 			float xSpd, ySpd;
-			int relX = getFakeX();
-			int relY = getFakeY();
+			int relX = getIntegerFakeX();
+			int relY = getIntegerFakeY();
 			float dist = sqrt(pow(relX, 2) + pow(relY, 2));
-			prt(L"[전]현재 fake는 (%d,%d)\n", getFakeX(), getFakeY());
+			prt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
 
 			float cosVal = - relX / dist;
 			float sinVal = - relY / dist;
@@ -136,7 +136,7 @@ public:
 			if (ySpd > 0 && getFloatFakeY() > 0) { setFloatFakeY(0); }
 			if (ySpd < 0 && getFloatFakeY() < 0) { setFloatFakeY(0); }
 
-			if (getFakeX() == 0 && getFakeY() == 0)//도착
+			if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
 			{
 				for (int i = 0; i < storage->itemInfo.size(); i++)//만약 탄두가 있으면 그걸 납으로 바꿈
 				{

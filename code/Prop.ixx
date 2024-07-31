@@ -292,8 +292,8 @@ public:
         (
             spr::propset,
             sprIndex,
-            dst.x + dst.w / 2 + zoomScale * getFakeX(),
-            dst.y + dst.h / 2 + zoomScale * getFakeY()
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
         );
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
         setZoom(1.0);

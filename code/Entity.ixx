@@ -80,6 +80,11 @@ private:
     std::vector<SkillData> divinePowerList;
     std::vector<SkillData> magicList;
     Point3 skillTarget;
+
+
+    //애니메이션 실행에서만 사용되는 변수
+    bool footChanged = false;
+
 public:
     EntityData entityInfo;
     Entity(int gridX, int gridY, int gridZ);

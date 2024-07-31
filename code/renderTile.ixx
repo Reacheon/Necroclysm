@@ -347,8 +347,8 @@ __int64 drawItems()
 		(
 			address->getSprite(),
 			address->getSprIndex(),
-			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getFakeX()),
-			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getFakeY())
+			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 		);
 		setZoom(1.0);
 	}
@@ -387,8 +387,8 @@ __int64 drawEntities()
 		(
 			spr::propset,
 			sprIndex,
-			dst.x + dst.w / 2 + zoomScale * iPtr->getFakeX(),
-			dst.y + dst.h / 2 + zoomScale * iPtr->getFakeY()
+			dst.x + dst.w / 2 + zoomScale * iPtr->getIntegerFakeX(),
+			dst.y + dst.h / 2 + zoomScale * iPtr->getIntegerFakeY()
 		);
 		SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
 		setZoom(1.0);
@@ -477,8 +477,8 @@ __int64 drawEntities()
 		(
 			spr::mainRotor,
 			0,
-			dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-			dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
+			dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+			dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
 		);
 		SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 255); //텍스쳐 투명도 설정
 
@@ -512,8 +512,8 @@ __int64 drawEntities()
 					(
 						spr::propset,
 						sprIndex,
-						dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-						dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
+						dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+						dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
 					);
 					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 150); //텍스쳐 투명도 설정
 					SDL_SetTextureBlendMode(spr::dirMarker->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
@@ -521,8 +521,8 @@ __int64 drawEntities()
 					(
 						spr::dirMarker,
 						128 + dir16toInt16(vPtr->wheelDir),
-						dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-						dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
+						dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+						dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
 					);
 					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
 					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255); //텍스쳐 투명도 설정
@@ -553,8 +553,8 @@ __int64 drawEntities()
 					(
 						spr::dirMarker,
 						160 + getNearDir16(vPtr->spdVec) + 16 * spdExtraIndex,
-						dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-						dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
+						dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+						dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
 					);
 					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255); //텍스쳐 투명도 설정
 					setZoom(1.0);

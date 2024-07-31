@@ -38,8 +38,8 @@ export __int64 renderSticker(int cameraX, int cameraY)
 				(
 					address->getSprite(),
 					address->getSpriteIndex(),
-					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getFakeX()),
-					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getFakeY())
+					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 				);
 				setZoom(1.0);
 			}
@@ -50,8 +50,8 @@ export __int64 renderSticker(int cameraX, int cameraY)
 				(
 					address->getSprite(),
 					address->getSpriteIndex(),
-					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getFakeX()),
-					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getFakeY())
+					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 				);
 				setZoom(1.0);
 			}

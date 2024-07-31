@@ -1028,8 +1028,8 @@ void Entity::drawSelf()
 	setFlip(getEntityFlip());
 
 	//prt(L"현재 이 객체의 fake 좌표는 %f,%f이다.\n", getFloatFakeX(), getFloatFakeY());
-	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getFakeX());
-	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getFakeY());
+	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
+	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
 
 	//캐릭터 그림자 그리기
 	drawSpriteCenter(spr::shadow, getSpriteIndex(), drawingX, drawingY);
@@ -1165,8 +1165,8 @@ void Entity::drawSelf()
 		(
 			getSpriteFlash(),
 			getSpriteIndex(),
-			(cameraW / 2) + zoomScale * (getX() - cameraX + getFakeX()),
-			(cameraH / 2) + zoomScale * (getY() - cameraY + getFakeY())
+			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
+			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
 		);
 	}
 	setZoom(1.0);

@@ -781,8 +781,8 @@ bool Vehicle::runAI()
                     {
                         if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
                         {
-                            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getFakeX());
-                            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
+                            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getIntegerFakeX());
+                            ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getIntegerFakeY());
                         }
                     }
 
@@ -798,7 +798,7 @@ bool Vehicle::runAI()
                         if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                     }
                     cameraFix = false;
-                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getFakeY() / 16));
+                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
                 }
 
                 if (rearTrain != nullptr)
@@ -1030,10 +1030,10 @@ bool Vehicle::runAnimation(bool shutdown)
         const char speed = 4;
         addTimer();
 
-        if (getX() + getFakeX() > getDstX()) setFakeX(getFakeX() - speed);
-        else if (getX() + getFakeX() < getDstX()) setFakeX(getFakeX() + speed);
-        if (getY() + getFakeY() > getDstY()) setFakeY(getFakeY() - speed);
-        else if (getY() + getFakeY() < getDstY()) setFakeY(getFakeY() + speed);
+        if (getX() + getIntegerFakeX() > getDstX()) setFakeX(getIntegerFakeX() - speed);
+        else if (getX() + getIntegerFakeX() < getDstX()) setFakeX(getIntegerFakeX() + speed);
+        if (getY() + getIntegerFakeY() > getDstY()) setFakeY(getIntegerFakeY() - speed);
+        else if (getY() + getIntegerFakeY() < getDstY()) setFakeY(getIntegerFakeY() + speed);
 
         switch (getTimer())
         {
@@ -1123,8 +1123,8 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
             }
 
-            cameraX = Player::ins()->getX() + Player::ins()->getFakeX();
-            cameraY = Player::ins()->getY() + Player::ins()->getFakeY();
+            cameraX = Player::ins()->getX() + Player::ins()->getIntegerFakeX();
+            cameraY = Player::ins()->getY() + Player::ins()->getIntegerFakeY();
 
             if (getFloatFakeX() == 0 && getFloatFakeY() == 0)//도착
             {
@@ -1170,28 +1170,28 @@ bool Vehicle::runAnimation(bool shutdown)
 
         if (trainMoveVec.size() > 0)
         {
-            if (trainMoveVec[0] == dir16::dir0) setFakeX(getFakeX() + 4.0);
-            else if (trainMoveVec[0] == dir16::dir2) setFakeY(getFakeY() - 4.0);
-            else if (trainMoveVec[0] == dir16::dir4) setFakeX(getFakeX() - 4.0);
-            else if (trainMoveVec[0] == dir16::dir6) setFakeY(getFakeY() + 4.0);
+            if (trainMoveVec[0] == dir16::dir0) setFakeX(getIntegerFakeX() + 4.0);
+            else if (trainMoveVec[0] == dir16::dir2) setFakeY(getIntegerFakeY() - 4.0);
+            else if (trainMoveVec[0] == dir16::dir4) setFakeX(getIntegerFakeX() - 4.0);
+            else if (trainMoveVec[0] == dir16::dir6) setFakeY(getIntegerFakeY() + 4.0);
 
             for (auto it = partInfo.begin(); it != partInfo.end(); it++)
             {
                 if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
                 {
-                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getFakeX());
-                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
+                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getIntegerFakeX());
+                    ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getIntegerFakeY());
                 }
             }
 
-            // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getFakeX(), getFakeY());
+            // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
 
-            cameraX = Player::ins()->getX() + Player::ins()->getFakeX();
-            cameraY = Player::ins()->getY() + Player::ins()->getFakeY();
+            cameraX = Player::ins()->getX() + Player::ins()->getIntegerFakeX();
+            cameraY = Player::ins()->getY() + Player::ins()->getIntegerFakeY();
 
             if (getTimer() >= 4)
             {
-                Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getFakeY() / 16));
+                Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
                 //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 trainMoveVec.erase(trainMoveVec.begin());
                 resetTimer();
@@ -1205,8 +1205,8 @@ bool Vehicle::runAnimation(bool shutdown)
             //{
             //    if (World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr != nullptr)
             //    {
-            //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getFakeX());
-            //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getFakeY());
+            //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeX(getIntegerFakeX());
+            //        ((Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr)->setFakeY(getIntegerFakeY());
             //    }
             //}
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFloatFakeX(), getFloatFakeY());
@@ -1267,8 +1267,8 @@ void Vehicle::drawSelf()
             (
                 spr::propset,
                 sprIndex,
-                dst.x + dst.w / 2 + zoomScale * vPtr->getFakeX(),
-                dst.y + dst.h / 2 + zoomScale * vPtr->getFakeY()
+                dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+                dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
             );
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
             setZoom(1.0);
@@ -1325,8 +1325,8 @@ void Vehicle::drawSelf()
         (
             spr::mainRotor,
             0,
-            dst.x + dst.w / 2 + zoomScale * getFakeX(),
-            dst.y + dst.h / 2 + zoomScale * getFakeY()
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
         );
         SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 255); //텍스쳐 투명도 설정
         setZoom(1.0);
