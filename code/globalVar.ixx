@@ -188,7 +188,6 @@ export ThreadPool* threadPoolPtr;
 //흰색마커, 유일하게 존재하며 보통은 마우스의 위치, 상세선택에서는 가리키는 타일
 export Point3 whiteMarkerCoord = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() };
 
-
 export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
     [](Ani* a, Ani* b) -> bool {
         if (a->getAniPriority() == b->getAniPriority())

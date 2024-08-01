@@ -31,7 +31,7 @@ public:
     {
         leadItem = itemDex[leadItemCode];
         setAniPriority(3);
-        prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
+        //prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
         setGrid(inputX, inputY, inputZ);
 
         errorBox(World::ins()->getTile(inputX, inputY, inputZ).PropPtr != nullptr, L"생성위치에 이미 설치물이 존재한다!");

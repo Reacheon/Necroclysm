@@ -25,7 +25,7 @@ public:
 	static Player* ins()//½Ì±ÛÅæ ÇÔ¼ö
 	{
 		static Player* ptr = new Player(0, 0, 0);
-		ptr->setIsPlayer(true);
+		ptr->entityInfo.isPlayer = true;
 		return ptr;
 	}
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType) override;

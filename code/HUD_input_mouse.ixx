@@ -193,11 +193,10 @@ void HUD::mouseStep()
 void HUD::clickRightGUI()
 {
 	updateLog(L"#FFFFFF[HUD] Right click event triggered.");
-	openContextMenu(getAbsMouseGrid());
+	/*if(inputType==input::mouse) */openContextMenu(getAbsMouseGrid());
 }
 void HUD::clickHoldGUI()
 {
-	//new ContextMenu(getTouchXY().x, getTouchXY().y, getAbsMouseGrid().x, getAbsMouseGrid().y);
 	updateLog(L"#FFFFFF[HUD] Touch hold event triggered.");
-	//new ContextMenu(event.motion.x, event.motion.y);
+	/*if (inputType == input::touch) */openContextMenu(getAbsMouseGrid());
 }

@@ -37,7 +37,6 @@ Entity::Entity(int gridX, int gridY, int gridZ)//생성자
 	hp = 20;
 	direction = 0;
 	canMove = true;
-
 	std::fill(talentApt.begin(), talentApt.end(), 2.0f);
 }
 Entity::~Entity()//소멸자
@@ -297,8 +296,6 @@ void Entity::setDrawEquip(bool val) { drawEquip = val; }
 bool Entity::getDrawEquip() { return drawEquip; }
 int Entity::getEyeSight() { return eyeSight; }
 void Entity::setEyeSight(int inputInt) { eyeSight = inputInt; }
-bool Entity::getIsPlayer() { return isPlayer; }
-void Entity::setIsPlayer(bool input) { isPlayer = input; }
 void Entity::setDropItemPtr(ItemStack* inputPtr) { dropItemPtr = inputPtr; }
 ItemStack* Entity::getDropItemPtr() { return dropItemPtr; }
 void Entity::loadDataFromDex(int index)
@@ -1149,14 +1146,8 @@ void Entity::drawSelf()
 		dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 		if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		if (isPlayer)
-		{
-			drawFillRect(dst, lowCol::green);
-		}
-		else
-		{
-			drawFillRect(dst, lowCol::red);
-		}
+		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green);
+		else drawFillRect(dst, lowCol::red);
 	}
 
 	if (getFlashType() != NULL) //엔티티에 플래시 효과가 있을 경우

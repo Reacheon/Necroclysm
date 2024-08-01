@@ -32,7 +32,6 @@ private:
     bool canMove;
     bool drawEquip = false;
     int eyeSight = 8; //기본 시야
-    bool isPlayer = false;
     int spriteInfimum = 0;
     bool bothHand = false;//양손무기인지 체크? 아직 구현 안함
 
@@ -160,8 +159,6 @@ public:
     bool getDrawEquip();
     int getEyeSight();
     void setEyeSight(int inputInt);
-    bool getIsPlayer();
-    void setIsPlayer(bool input);
     void setDropItemPtr(ItemStack* inputPtr);
     ItemStack* getDropItemPtr();
     void loadDataFromDex(int index);

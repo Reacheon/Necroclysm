@@ -120,7 +120,7 @@ public:
 		tab = { cameraW - 128, 22, 120, 120 };
 
 
-		quickSlotRegion =  { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, } ;
+		quickSlotRegion = { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, };
 		quickSlotPopBtn = { quickSlotRegion.x, quickSlotRegion.y, 43, 38 };
 		for (int i = 0; i < 8; i++)
 		{
@@ -148,7 +148,7 @@ public:
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
 	void gamepadStep();
-	
+
 	bool runAnimation(bool shutdown) override
 	{
 		//prt(L"HUD의 runAnimation이 실행되었다.\n");
@@ -340,7 +340,7 @@ public:
 				else whiteMarkerCoord.z = std::numeric_limits<int>::max();
 			}
 		}
-		
+
 
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
 		if (Talent::ins() == nullptr)
@@ -554,7 +554,7 @@ public:
 			Vehicle* myCar = (Vehicle*)ctrlVeh;
 			myCar->rpmState++;
 			if (myCar->rpmState >= 7) myCar->rpmState = 0;
-			
+
 			if (myCar->vehType == vehFlag::train)
 			{
 				dir16 startDir = dir16::dir2;
@@ -637,7 +637,7 @@ public:
 		}
 		case act::closeDoor:
 		{
-			CORO(closeDoor(Player::ins()->getGridX(),Player::ins()->getGridY(),Player::ins()->getGridZ()));
+			CORO(closeDoor(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()));
 			break;
 		}
 		default:
@@ -794,7 +794,7 @@ public:
 
 							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->getEyeSight());
-							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(),Player::ins()->getGridZ());
+							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
@@ -1047,7 +1047,7 @@ public:
 		}
 
 		//수영하기 추가
-		if(itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+		if (itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
 		{
 			inputOptions.push_back(act::swim);
 		}

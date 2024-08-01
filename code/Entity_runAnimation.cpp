@@ -20,34 +20,29 @@ bool Entity::runAnimation(bool shutdown)
 		//4프레임-2(스피드4)
 
 		// 1 / 60초마다 runAnimation이 실행됨
-
-		static float totalDistX = 0;
-		static float totalDistY = 0;
 		
 		float speed = 2.5;
-		if (Player::ins()->getSpriteInfimum() == sprInf::run) speed = 3.5;
-		else if (Player::ins()->getSpriteInfimum() == sprInf::walk) speed = 3.0;
-		else if (Player::ins()->getSpriteInfimum() == sprInf::walk) speed = 2.0;
-		else if (Player::ins()->getSpriteInfimum() == sprInf::walk) speed = 2.0;
+		if (getSpriteInfimum() == sprInf::run) speed = 3.5;
+		else if (getSpriteInfimum() == sprInf::walk) speed = 3.0;
+		else if (getSpriteInfimum() == sprInf::walk) speed = 2.0;
+		else if (getSpriteInfimum() == sprInf::walk) speed = 2.0;
 		
 		addTimer();
 
 		if (getTimer() == 1)
 		{
 			footChanged = false;
-			totalDistX = 0;
-			totalDistY = 0;
+			setFakeX(0);
+			setFakeY(0);
 		}
 
-		if (getX() + getIntegerFakeX() > getDstX()) totalDistX -= speed;
-		else if (getX() + getIntegerFakeX() < getDstX()) totalDistX += speed;
-		if (getY() + getIntegerFakeY() > getDstY()) totalDistY -= speed;
-		else if (getY() + getIntegerFakeY() < getDstY()) totalDistY += speed;
 
-		setFakeX(std::floor(totalDistX));
-		setFakeY(std::floor(totalDistY));
+		if (getX() + getIntegerFakeX() > getDstX()) addFakeX(-speed);
+		else if (getX() + getIntegerFakeX() < getDstX()) addFakeX(+speed);
+		if (getY() + getIntegerFakeY() > getDstY()) addFakeY(-speed);
+		else if (getY() + getIntegerFakeY() < getDstY()) addFakeY(+speed);
 
-		if (isPlayer)
+		if (entityInfo.isPlayer)
 		{
 			cameraFix = false;
 			cameraX = getX() + getIntegerFakeX();
@@ -82,7 +77,10 @@ bool Entity::runAnimation(bool shutdown)
 			setGrid(getDstGridX(), getDstGridY(), getGridZ());
 			turnWait(1.0);
 			endMove();
-			if (isPlayer) cameraFix = true;
+			if (entityInfo.isPlayer)
+			{
+				cameraFix = true;
+			}
 			return true;
 		}
 
@@ -182,7 +180,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			if (isPlayer == true) { turnWait(endAtk()); }
+			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
 		}
@@ -299,7 +297,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			if (isPlayer == true) { turnWait(endAtk()); }
+			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
 		}
@@ -423,7 +421,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			if (isPlayer == true) { turnWait(endAtk()); }
+			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
 		}

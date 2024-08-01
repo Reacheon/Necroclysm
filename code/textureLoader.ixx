@@ -16,7 +16,6 @@ export void textureLoader()
 	texture::worldmap = IMG_LoadTexture(renderer, "image/worldmap.png");
 
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");
-	spr::defaultItem = new Sprite(renderer, "image/orbTexture.png", 48, 48);
 	spr::defaultMonster = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);
 	spr::blockTexture = new Sprite(renderer, "image/block.png", 16, 32);
 	spr::tileTexture = new Sprite(renderer, "image/tile.png", 16, 16);
@@ -52,11 +51,6 @@ export void textureLoader()
 	spr::bionicSkeleton = new Sprite(renderer, "image/UI/bionicSkeleton.png", 36, 72);
 	spr::bionicSlotGauge = new Sprite(renderer, "image/UI/bionicSlotGauge.png", 64, 10);
 	spr::mutationIcon = new Sprite(renderer, "image/UI/mutationIcon.png", 16, 16);
-	spr::constructPreviewBase = new Sprite(renderer, "image/UI/construct/constructPreviewBase.png", 100, 100);
-	spr::constructPreviewWall = new Sprite(renderer, "image/UI/construct/constructPreviewWall.png", 100, 100);
-	spr::constructPreviewFloor = new Sprite(renderer, "image/UI/construct/constructPreviewFloor.png", 100, 100);
-	spr::constructPreviewCeil = new Sprite(renderer, "image/UI/construct/constructPreviewCeil.png", 100, 100);
-	spr::constructPreviewEtc = new Sprite(renderer, "image/UI/construct/constructPreviewEtc.png", 100, 100);
 	spr::constructCategory = new Sprite(renderer, "image/UI/construct/constructCategory.png", 86, 22);
 	spr::staminaGauge = new Sprite(renderer, "image/UI/staminaGauge.png", 48, 48);
 	spr::segment = new Sprite(renderer, "image/UI/segment.png", 12, 16);

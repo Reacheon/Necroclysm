@@ -1,5 +1,6 @@
 ﻿#include <SDL.h>
 #define DEC_SPR(name) Sprite* name = nullptr;
+#define DEC_TXT(name) SDL_Texture* name = nullptr;
 
 export module textureVar;
 
@@ -18,7 +19,6 @@ export namespace spr
 	Sprite* zombie1 = nullptr;
 	Sprite* arabianHorse = nullptr;
 	Sprite* defaultMonster = nullptr;
-	Sprite* defaultItem = nullptr;
 	Sprite* blockTexture = nullptr;
 	Sprite* tileTexture = nullptr;
 	Sprite* equipIcon = nullptr;
@@ -58,11 +58,6 @@ export namespace spr
 	Sprite* bionicSkeleton = nullptr;
 	Sprite* bionicSlotGauge = nullptr;
 	Sprite* mutationIcon = nullptr;
-	Sprite* constructPreviewBase = nullptr;
-	Sprite* constructPreviewWall = nullptr;
-	Sprite* constructPreviewFloor = nullptr;
-	Sprite* constructPreviewCeil = nullptr;
-	Sprite* constructPreviewEtc = nullptr;
 	Sprite* constructCategory = nullptr;
 	Sprite* staminaGauge = nullptr;
 	Sprite* segment = nullptr;

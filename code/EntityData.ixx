@@ -61,4 +61,6 @@ export struct EntityData
     unsigned __int8 statStr = 5;
     unsigned __int8 statInt = 5;
     unsigned __int8 statDex = 5;
+
+    bool isPlayer = false;
 };
