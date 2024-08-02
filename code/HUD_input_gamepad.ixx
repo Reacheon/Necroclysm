@@ -157,7 +157,7 @@ void HUD::gamepadStep()
 									}
 
 									tgtProp->updateTile();
-									Player::ins()->updateVision(Player::ins()->getEyeSight());
+									Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 									updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 								}
 							}

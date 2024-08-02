@@ -12,6 +12,7 @@ import Vehicle;
 import Sticker;
 import Light;
 import Flame;
+import ItemStack;
 
 export void debugConsole()
 {
@@ -62,7 +63,7 @@ export void debugConsole()
 		if (autoLight)
 		{
 			Light* light = new Light(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 8, 255, { 0xd8,0x56,0x00 });
-			Player::ins()->updateVision(Player::ins()->getEyeSight());
+			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 		else
 		{
@@ -83,7 +84,7 @@ export void debugConsole()
 			std::cin >> lightColorB;
 
 			Light* light = new Light(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
-			Player::ins()->updateVision(Player::ins()->getEyeSight());
+			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 		updateLog(L"#FFFFFF디버그 : 테스트 광원을 생성했다.");
 		prt(L"[디버그]테스트 광원을 생성했다!\n");

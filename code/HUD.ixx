@@ -43,7 +43,8 @@ import CoordSelect;
 import SkillData;
 import ContextMenu;
 import mouseGrid;
-
+import ItemPocket;
+import ItemStack;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -734,7 +735,7 @@ public:
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
-								Player::ins()->updateVision(Player::ins()->getEyeSight());
+								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
 								Prop* upProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
@@ -756,7 +757,7 @@ public:
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() - 1);
 								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
-								Player::ins()->updateVision(Player::ins()->getEyeSight());
+								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
 								Prop* downProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
@@ -793,7 +794,7 @@ public:
 							}
 
 							tgtProp->updateTile();
-							Player::ins()->updateVision(Player::ins()->getEyeSight());
+							Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 						}
 					}
@@ -888,7 +889,7 @@ public:
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 				tgtProp->leadItem.extraSprIndexSingle--;
 				tgtProp->updateTile();
-				Player::ins()->updateVision(Player::ins()->getEyeSight());
+				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 				updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 			};
 
@@ -916,7 +917,7 @@ public:
 			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 			tgtProp->leadItem.extraSprIndexSingle--;
 			tgtProp->updateTile();
-			Player::ins()->updateVision(Player::ins()->getEyeSight());
+			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 			updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
 		}
 	};

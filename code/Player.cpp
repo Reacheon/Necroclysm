@@ -18,7 +18,6 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(gridX, gridY, gridZ)//�
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
-	setDrawEquip(true);
 	setSprite(spr::charsetHero);
 	loadDataFromDex(1);
 	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
@@ -310,7 +309,7 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
-	updateVision(getEyeSight());
+	updateVision(entityInfo.eyeSight);
 	updateMinimap();
 }
 

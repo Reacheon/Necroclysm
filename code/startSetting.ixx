@@ -1,12 +1,11 @@
 
-
-
 export module startSetting;
 
 import globalVar;
 import HUD;
 import Player;
 import ItemData;
+import ItemStack;
 import World;
 import Vehicle;
 import Prop;
@@ -792,6 +791,6 @@ export void startSetting()
 
 	World::ins()->createSector(0, 0, 0);
 
-	Player::ins()->updateVision(Player::ins()->getEyeSight());
+	Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 	Player::ins()->updateMinimap();//렌더링이 연산파트에서 일어나서 처음에는 화면에 안그려지는듯?
 };

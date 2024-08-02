@@ -26,52 +26,30 @@ private:
     Sprite* sprite = nullptr; //메인 스프라이트
     Sprite* spriteFlash = nullptr; //플래시용 흰색 마스킹 스프라이트
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
-    int hp;
-    int direction = 7;
     int spriteIndex = 0;
-    bool canMove;
-    bool drawEquip = false;
-    int eyeSight = 8; //기본 시야
     int spriteInfimum = 0;
-    bool bothHand = false;//양손무기인지 체크? 아직 구현 안함
-
-    bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     SDL_RendererFlip flip = SDL_FLIP_NONE;
     ItemPocket* equipment;
-    ItemStack* dropItemPtr = nullptr; //버리기 및 던지기에 사용하는 아이템스택 포인터
     std::vector<std::array<int, DMG_FLAG_SIZE>> dmgVec;//현재 이 개체가 받은 데미지의 총량
-
     bool hasAStarDst = false;
     int aStarDstX = 0;
     int aStarDstY = 0;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////
-
     std::array<int, TALENT_SIZE> talentExp = { 0, }; //경험치
     std::array<float, TALENT_SIZE> talentApt; //적성
     std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    std::vector<int> mutationVec;//현재 이 객체의 돌연변이 목록
-    std::vector<int> bionicVec;//현재 이 객체의 바이오닉 목록
-
     int atkTargetGridX = 0;
     int atkTargetGridY = 0;
     int atkTargetGridZ = 0;
     int atkTargetPart = -1;
-
     atkType nextAtkType = atkType::bash; //다음 공격에 사용할 공격의 타입
     unsigned __int8 aimStack = 0; //다음 공격에 가산될 조준 스택
-
     int aimWeaponHand = equip::right;//현재 적에게 겨누는 주무기
-
     humanCustom::skin skin = humanCustom::skin::null;
     humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;
     humanCustom::beard beard = humanCustom::beard::null;
     humanCustom::hair hair = humanCustom::hair::null;
-
     std::vector<SkillData> bionicList;
     std::vector<SkillData> mutationList;
     std::vector<SkillData> martialArtList;
@@ -80,6 +58,7 @@ private:
     Point3 skillTarget;
     //애니메이션 실행에서만 사용되는 변수
     bool footChanged = false;
+    bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
 
 public:
     EntityData entityInfo;
@@ -147,17 +126,9 @@ public:
     Sprite* getSprite();
     void setSprite(Sprite* inputSprite);
     void setDirection(int dir);
-    int getDirection();
-    bool getCanMove();
 
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType);
     float endAtk();
-    void setDrawEquip(bool val);
-    bool getDrawEquip();
-    int getEyeSight();
-    void setEyeSight(int inputInt);
-    void setDropItemPtr(ItemStack* inputPtr);
-    ItemStack* getDropItemPtr();
     void loadDataFromDex(int index);
     void addDmg(int inputPartIndex, int inputDmg);
     bool existPart(int inputPartIndex);

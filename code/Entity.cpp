@@ -34,9 +34,8 @@ Entity::Entity(int gridX, int gridY, int gridZ)//생성자
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
 	setSprite(spr::defaultMonster);
 	equipment = new ItemPocket(storageType::equip);
-	hp = 20;
-	direction = 0;
-	canMove = true;
+	entityInfo.HP = 20;
+	entityInfo.direction = 0;
 	std::fill(talentApt.begin(), talentApt.end(), 2.0f);
 }
 Entity::~Entity()//소멸자
@@ -275,13 +274,11 @@ void Entity::setSprite(Sprite* inputSprite)
 }
 void Entity::setDirection(int dir)
 {
-	direction = dir;
+	entityInfo.direction = dir;
 	if (dir == 2 || dir == 6) {}
 	else if (dir == 0 || (dir == 1 || dir == 7)) { setEntityFlip(SDL_FLIP_NONE); }
 	else { setEntityFlip(SDL_FLIP_HORIZONTAL); }
 }
-int Entity::getDirection() { return direction; }
-bool Entity::getCanMove() { return canMove; }
 void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
 {
 	setDirection(getIntDegree(getGridX(), getGridY(), inputGridX, inputGridY));
@@ -292,12 +289,6 @@ float Entity::endAtk()
 	setAniType(aniFlag::null);
 	return 1 / 0.8; //원래 여기에 공격속도가 들어가야함
 }
-void Entity::setDrawEquip(bool val) { drawEquip = val; }
-bool Entity::getDrawEquip() { return drawEquip; }
-int Entity::getEyeSight() { return eyeSight; }
-void Entity::setEyeSight(int inputInt) { eyeSight = inputInt; }
-void Entity::setDropItemPtr(ItemStack* inputPtr) { dropItemPtr = inputPtr; }
-ItemStack* Entity::getDropItemPtr() { return dropItemPtr; }
 void Entity::loadDataFromDex(int index)
 {
 	entityInfo = entityDex[index];

@@ -179,7 +179,7 @@ export struct ItemData
     }
 };
 
-export bool overlay(ItemData& a, ItemData& b)
+export bool itemOverlay(ItemData& a, ItemData& b)
 {
     if (a.checkFlag(itemFlag::NONSTACK) == true || b.checkFlag(itemFlag::NONSTACK) == true) { return false; }
 

@@ -15,7 +15,6 @@ import ItemData;
 export class ItemPocket
 {
 private:
-	
 	storageType type = storageType::null;//스토리지의 타입, 0:일반_1:장비
 public:
 	std::vector<ItemData> itemInfo;
@@ -74,7 +73,7 @@ public:
 		for (int i = 0; i < storagePtr->itemInfo.size(); i++)
 		{
 			//완전히 일치하는 아이템이 있을 경우
-			if (overlay(itemInfo[index], storagePtr->itemInfo[i]) == true)
+			if (itemOverlay(itemInfo[index], storagePtr->itemInfo[i]) == true)
 			{
 				storagePtr->itemInfo[i].number += number;
 				itemInfo[index].lootSelect = 0;
@@ -114,7 +113,7 @@ public:
 
 			for (int i = 0; i < itemInfo.size(); i++)
 			{
-				if (overlay(targetItem, itemInfo[i])) //일치하는 아이템을 찾 았을 경우
+				if (itemOverlay(targetItem, itemInfo[i])) //일치하는 아이템을 찾 았을 경우
 				{
 					itemInfo[i].number += targetItem.number;
 					return i;

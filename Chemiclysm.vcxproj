@@ -228,6 +228,7 @@
     <ClCompile Include="code\AI.ixx" />
     <ClCompile Include="code\Entity.ixx" />
     <ClCompile Include="code\Inventory_draw.ixx" />
+    <ClCompile Include="code\ItemPocket.ixx" />
     <ClCompile Include="code\Loot_draw.ixx" />
     <ClCompile Include="code\Loot_input_gamepad.ixx" />
     <ClCompile Include="code\Loot_input_mouse.ixx" />
@@ -260,7 +261,6 @@
     <ClCompile Include="code\HSVConverter.ixx" />
     <ClCompile Include="code\isCircle.ixx" />
     <ClCompile Include="code\ItemData.ixx" />
-    <ClCompile Include="code\ItemPocket.ixx" />
     <ClCompile Include="code\ItemStack.ixx" />
     <ClCompile Include="code\Light.ixx" />
     <ClCompile Include="code\log.ixx" />

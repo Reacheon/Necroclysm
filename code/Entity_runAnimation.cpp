@@ -96,7 +96,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (getDirection())
+		switch (entityInfo.direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -213,7 +213,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (getDirection())
+		switch (entityInfo.direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -330,7 +330,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (getDirection())
+		switch (entityInfo.direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;

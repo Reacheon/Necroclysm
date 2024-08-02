@@ -180,9 +180,6 @@
     <ClCompile Include="code\ItemData.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemPocket.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\ItemStack.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
@@ -500,6 +497,9 @@
     </ClCompile>
     <ClCompile Include="code\Player.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ItemPocket.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

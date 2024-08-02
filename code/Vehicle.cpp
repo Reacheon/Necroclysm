@@ -798,7 +798,7 @@ bool Vehicle::runAI()
                         if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                     }
                     cameraFix = false;
-                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
+                    Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
                 }
 
                 if (rearTrain != nullptr)
@@ -1100,7 +1100,7 @@ bool Vehicle::runAnimation(bool shutdown)
                     std::array<int, 2> visionTarget = line[arrIndex];
                     //prt(L"시야 업데이트의 중심은 (%d,%d)이고 인덱스는 %d이며 사이즈는 %d이다.\n", Player::ins()->getGridX() + visionTarget[0], Player::ins()->getGridY() + visionTarget[1], arrIndex, line.size());
 
-                    Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() - getDelGridX() + visionTarget[0], Player::ins()->getGridY() - getDelGridY() + visionTarget[1]);
+                    Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, Player::ins()->getGridX() - getDelGridX() + visionTarget[0], Player::ins()->getGridY() - getDelGridY() + visionTarget[1]);
                     lineCheck++;
                 }
             }
@@ -1147,7 +1147,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
 
                 cameraFix = true;
-                Player::ins()->updateVision(Player::ins()->getEyeSight());
+                Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
                 resetTimer();
                 setAniType(aniFlag::null);
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), (void*)this));
@@ -1191,7 +1191,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getTimer() >= 4)
             {
-                Player::ins()->updateVision(Player::ins()->getEyeSight(), Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
+                Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, Player::ins()->getGridX() + (Player::ins()->getIntegerFakeX() / 16), Player::ins()->getGridY() + (Player::ins()->getIntegerFakeY() / 16));
                 //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 trainMoveVec.erase(trainMoveVec.begin());
                 resetTimer();
@@ -1213,7 +1213,7 @@ bool Vehicle::runAnimation(bool shutdown)
             extraRenderSet.clear();
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
-            Player::ins()->updateVision(Player::ins()->getEyeSight());
+            Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
             Player::ins()->updateMinimap();
             cameraFix = true;
             resetTimer();

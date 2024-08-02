@@ -25,9 +25,7 @@ export struct EntityData
     std::vector<unsigned __int16> material;
     unsigned __int8 HD = 1;
 
-
     //방어 계열 변수
-
     __int16 maxHP = 100; //hp
     std::vector<std::array<int, 4>> parts = { { partType::head, 100, 100,100 } };
 
@@ -49,6 +47,8 @@ export struct EntityData
     void* pocketPtr = nullptr;
 
 
+    int eyeSight = 8; //기본 시야
+
     ////////////////////////////////csv에 없는 데이터/////////////////////////////////////
 
     __int16 HP = 100;
@@ -63,4 +63,5 @@ export struct EntityData
     unsigned __int8 statDex = 5;
 
     bool isPlayer = false;
+    __int8 direction = 0;
 };

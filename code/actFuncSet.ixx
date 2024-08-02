@@ -203,6 +203,6 @@ export namespace actFunc
 		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 		tgtProp->leadItem.extraSprIndexSingle--;
 		tgtProp->updateTile();
-		Player::ins()->updateVision(Player::ins()->getEyeSight());
+		Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 	}
 };

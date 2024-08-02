@@ -15,8 +15,6 @@ import AI;
 
 export class Monster : public Entity, public AI
 {
-private:
-	int chaseStack = 0;
 public:
 	Monster(int gridX, int gridY, int gridZ, int index) : Entity(gridX, gridY, gridZ)
 	{

@@ -42,7 +42,7 @@ public:
         {
 
             myLight = new Light(inputX + leadItem.lightDelX, inputY + leadItem.lightDelY, inputZ, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
-            //Player::ins()->updateVision(Player::ins()->getEyeSight());
+            //Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
         }
 
 
