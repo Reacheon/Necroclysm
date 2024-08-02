@@ -53,7 +53,6 @@ private:
     std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
 
     ///////////////////////////////////////////////////////////////////////////////////////////
-
     std::vector<int> mutationVec;//현재 이 객체의 돌연변이 목록
     std::vector<int> bionicVec;//현재 이 객체의 바이오닉 목록
 
@@ -79,8 +78,6 @@ private:
     std::vector<SkillData> divinePowerList;
     std::vector<SkillData> magicList;
     Point3 skillTarget;
-
-
     //애니메이션 실행에서만 사용되는 변수
     bool footChanged = false;
 
