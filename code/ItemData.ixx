@@ -9,7 +9,6 @@ import constVar;
 //__int32 : –2,147,483,648 ~2,147,483,647
 
 class ItemPocket;
-
 export struct ItemData
 {
     std::wstring name = L"DEFAULT ITEM";
@@ -125,7 +124,7 @@ export struct ItemData
     __int8 lightDelY = 0;
 
     __int8 animeSize = 1;
-    __int8 animeFPS = 0;
+    __int16 animeFPS = 0;
     __int8 randomPropSprSize = 1;
 
     //liqColorR	liqColorG	liqColorB	gasColorR	gasColorG	gasColorB	gasAlphaMax	vaporP

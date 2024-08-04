@@ -164,7 +164,8 @@ __int64 drawTiles()
 			setZoom(zoomScale);
 
 			int dirCorrection = 0;
-
+			int tileAniExtraIndex16 = 0;
+			int tileAniExtraIndexSingle = 0;
 			if (itemDex[thisTile->floor].tileConnectGroup != -1)
 			{
 				bool topCheck, botCheck, leftCheck, rightCheck;
@@ -201,15 +202,8 @@ __int64 drawTiles()
 				{
 					int animeFPS = itemDex[thisTile->floor].animeFPS;
 					int animeSize = itemDex[thisTile->floor].animeSize;
+					tileAniExtraIndex16 = getMilliTimer() / animeFPS % animeSize;
 
-					if (timer::timer600 % animeFPS == 0)
-					{
-						itemDex[thisTile->floor].extraSprIndex16++;
-						if (itemDex[thisTile->floor].extraSprIndex16 >= animeSize)
-						{
-							itemDex[thisTile->floor].extraSprIndex16 = 0;
-						}
-					}
 				}
 			}
 			else
@@ -218,19 +212,13 @@ __int64 drawTiles()
 				{
 					int animeFPS = itemDex[thisTile->floor].animeFPS;
 					int animeSize = itemDex[thisTile->floor].animeSize;
+					tileAniExtraIndexSingle = getMilliTimer() / animeFPS % animeSize;
 
-					if (timer::timer600 % animeFPS == 0)
-					{
-						itemDex[thisTile->floor].extraSprIndexSingle++;
-						if (itemDex[thisTile->floor].extraSprIndexSingle >= animeSize)
-						{
-							itemDex[thisTile->floor].extraSprIndexSingle = 0;
-						}
-					}
 				}
 			}
 
 			int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
+			sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
 			if (thisTile->floor == 0) sprIndex = 506;
 
 			drawSpriteCenter

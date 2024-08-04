@@ -8,6 +8,7 @@ import Sprite;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
+export class ItemPocket;
 export struct EntityData
 {
     std::wstring name = L"DEFAULT ENTITY";
@@ -64,4 +65,5 @@ export struct EntityData
 
     bool isPlayer = false;
     __int8 direction = 0;
+    ItemPocket* equipment;
 };

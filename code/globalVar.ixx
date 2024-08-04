@@ -33,7 +33,7 @@ export namespace actSet
 };
 export namespace option
 {
-    std::wstring language = L"English";// 또는 "English"
+    std::wstring language = L"Korean";// 또는 "English"
 };
 
 export std::vector<std::wstring> sysStr;

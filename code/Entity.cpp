@@ -384,51 +384,51 @@ void Entity::updateStatus()
 
 	//sh
 	entityInfo.sh = entityDex[entityInfo.entityCode].sh;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.sh += equipment->itemInfo[i].sh;
+		entityInfo.sh += getEquipPtr()->itemInfo[i].sh;
 	}
 
 	//ev
 	entityInfo.ev = entityDex[entityInfo.entityCode].ev;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.ev += equipment->itemInfo[i].ev;
+		entityInfo.ev += getEquipPtr()->itemInfo[i].ev;
 	}
 
 	//rFire
 	entityInfo.rFire = entityDex[entityInfo.entityCode].rFire;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rFire += equipment->itemInfo[i].rFire;
+		entityInfo.rFire += getEquipPtr()->itemInfo[i].rFire;
 	}
 
 	//rCold
 	entityInfo.rCold = entityDex[entityInfo.entityCode].rCold;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rCold += equipment->itemInfo[i].rCold;
+		entityInfo.rCold += getEquipPtr()->itemInfo[i].rCold;
 	}
 
 	//rElec
 	entityInfo.rElec = entityDex[entityInfo.entityCode].rElec;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rElec += equipment->itemInfo[i].rElec;
+		entityInfo.rElec += getEquipPtr()->itemInfo[i].rElec;
 	}
 
 	//rCorr
 	entityInfo.rCorr = entityDex[entityInfo.entityCode].rCorr;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rCorr += equipment->itemInfo[i].rCorr;
+		entityInfo.rCorr += getEquipPtr()->itemInfo[i].rCorr;
 	}
 
 	//rRad
 	entityInfo.rRad = entityDex[entityInfo.entityCode].rRad;//기본 개체값으로 재설정
-	for (int i = 0; i < equipment->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rRad += equipment->itemInfo[i].rRad;
+		entityInfo.rRad += getEquipPtr()->itemInfo[i].rRad;
 	}
 }
 //입력한 파츠 인덱스의 rPierce를 반환
@@ -457,9 +457,9 @@ int Entity::getSH()
 	//기본 개체값 더하기
 	totalSH += entityInfo.sh;
 
-	for (int i = 0; i < equipment->itemInfo.size(); i++)
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
-		totalSH += equipment->itemInfo[i].sh;
+		totalSH += getEquipPtr()->itemInfo[i].sh;
 	}
 	return totalSH;
 }
@@ -471,9 +471,9 @@ int Entity::getEV()
 	//기본 개체값 더하기
 	totalEV += entityInfo.ev;
 
-	for (int i = 0; i < equipment->itemInfo.size(); i++)
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
-		totalEV += equipment->itemInfo[i].ev;
+		totalEV += getEquipPtr()->itemInfo[i].ev;
 	}
 	return totalEV;
 }
@@ -482,13 +482,13 @@ int Entity::getEnc(int inputPartIndex)
 {
 	int totalEnc = 0;
 
-	for (int i = 0; i < equipment->itemInfo.size(); i++)
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
-		for (int j = 0; j < equipment->itemInfo[i].enc.size(); j++)
+		for (int j = 0; j < getEquipPtr()->itemInfo[i].enc.size(); j++)
 		{
-			if (equipment->itemInfo[i].enc[j].first == inputPartIndex)
+			if (getEquipPtr()->itemInfo[i].enc[j].first == inputPartIndex)
 			{
-				totalEnc += equipment->itemInfo[i].enc[j].second;
+				totalEnc += getEquipPtr()->itemInfo[i].enc[j].second;
 			}
 		}
 

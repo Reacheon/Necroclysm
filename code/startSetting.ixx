@@ -488,18 +488,18 @@ export void startSetting()
 	World::ins()->getTile(pX - 4, pY + 1, pZ).floor = 226;
 	World::ins()->getTile(pX - 4, pY + 2, pZ).floor = 225;
 
-	int startX = -3;
-	int startY = 16;
-	for (int dy = 0; dy <= 12; dy++)
+	int startX = -33;
+	int startY = 36;
+	for (int dy = 0; dy <= 30; dy++)
 	{
-		for (int dx = 0; dx <= 18; dx++)
+		for (int dx = 0; dx <= 60; dx++)
 		{
-			if(dy <=2)World::ins()->getTile(startX + dx, startY + dy, pZ).floor = 225;
-			else World::ins()->getTile(startX + dx, startY + dy, pZ).floor = 226;
+			if(dy <=2)World::ins()->getTile(startX + dx, startY + dy, pZ).floor = 381;
+			else if(dy <=4) World::ins()->getTile(startX + dx, startY + dy, pZ).floor = 231;
+			else World::ins()->getTile(startX + dx, startY + dy, pZ).floor = 232;
 			
 		}
 	}
-
 
 	//하단연못
 	World::ins()->getTile(pX + 5, pY + 8, pZ).floor = 225;
@@ -510,10 +510,6 @@ export void startSetting()
 		World::ins()->getTile(pX + 5 + dx, pY + 10, pZ).floor = 225;
 		World::ins()->getTile(pX + 5 + dx, pY + 11, pZ).floor = 225;
 	}
-	
-	for(int dy = 0; dy <= 10; dy++) World::ins()->getTile(pX + 3, pY + 12 + dy, pZ).floor = 225;
-
-	
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
