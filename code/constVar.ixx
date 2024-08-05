@@ -159,6 +159,11 @@ export enum class act
     swim,
     ride,
 
+    phone,
+    message,
+    camera,
+    internet,
+
     //skillInfo,
 };
 

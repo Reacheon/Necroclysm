@@ -665,6 +665,10 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::tailRotorPedalL) setBtnLayout(sysStr[154], 0);
 		else if (barAct[i] == act::tailRotorPedalR) setBtnLayout(sysStr[155], 0);
 		else if (barAct[i] == act::closeDoor) setBtnLayout(sysStr[156], 91);
+		else if (barAct[i] == act::phone) setBtnLayout(sysStr[189], 150);
+		else if (barAct[i] == act::message) setBtnLayout(sysStr[190], 151);
+		else if (barAct[i] == act::camera) setBtnLayout(sysStr[191], 152);
+		else if (barAct[i] == act::internet) setBtnLayout(sysStr[192], 154);
 		else if (barAct[i] == act::skillActive)
 		{
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");

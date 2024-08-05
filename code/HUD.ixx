@@ -348,7 +348,7 @@ public:
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (Player::ins()->getTalentFocus(i) > 0) { break; }
+				if (Player::ins()->entityInfo.talentFocus[i] > 0) { break; }
 
 				if (i == TALENT_SIZE - 1)
 				{

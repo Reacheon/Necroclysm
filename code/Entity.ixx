@@ -30,14 +30,10 @@ private:
     int spriteInfimum = 0;
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     SDL_RendererFlip flip = SDL_FLIP_NONE;
-    ItemPocket* equipment;
     std::vector<std::array<int, DMG_FLAG_SIZE>> dmgVec;//현재 이 개체가 받은 데미지의 총량
     bool hasAStarDst = false;
     int aStarDstX = 0;
     int aStarDstY = 0;
-    std::array<int, TALENT_SIZE> talentExp = { 0, }; //경험치
-    std::array<float, TALENT_SIZE> talentApt; //적성
-    std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
     int atkTargetGridX = 0;
     int atkTargetGridY = 0;
     int atkTargetGridZ = 0;
@@ -45,11 +41,13 @@ private:
     atkType nextAtkType = atkType::bash; //다음 공격에 사용할 공격의 타입
     unsigned __int8 aimStack = 0; //다음 공격에 가산될 조준 스택
     int aimWeaponHand = equip::right;//현재 적에게 겨누는 주무기
+
     humanCustom::skin skin = humanCustom::skin::null;
     humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;
     humanCustom::beard beard = humanCustom::beard::null;
     humanCustom::hair hair = humanCustom::hair::null;
+    
     std::vector<SkillData> bionicList;
     std::vector<SkillData> mutationList;
     std::vector<SkillData> martialArtList;
@@ -62,7 +60,7 @@ private:
 
 public:
     EntityData entityInfo;
-    Entity(int gridX, int gridY, int gridZ);
+    Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     ~Entity();
 
     Vehicle* pulledCart = nullptr;
@@ -158,15 +156,9 @@ public:
     void drop(ItemPocket* txPtr);
     void throwing(ItemPocket* txPtr, int gridX, int gridY);
 
-    float getTalentApt(int index);
-    int getSKillExp(int index);
-    int getTalentFocus(int index);
+
     float getTalentLevel(int index);
     void addTalentExp(int expVal);
-
-    void setTalentApt(int index, float val);
-    void setTalentExp(int index, int val);
-    void setTalentFocus(int index, int val);
 
     virtual void endMove() = 0;
     bool runAnimation(bool shutdown);

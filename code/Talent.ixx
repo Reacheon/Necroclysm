@@ -148,9 +148,9 @@ public:
 				else levelStr += L"S";
 
 				std::wstring aptStr;
-				aptStr = L"x" + decimalCutter(Player::ins()->getTalentApt(i), 1);
+				aptStr = L"x" + decimalCutter(Player::ins()->entityInfo.talentApt[i], 1);
 
-				switch (Player::ins()->getTalentFocus(i))
+				switch (Player::ins()->entityInfo.talentFocus[i])
 				{
 					case 1:
 						focusStr = L"+";
@@ -273,7 +273,7 @@ public:
 				drawText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 4);
 
 				//회색 필터
-				if (Player::ins()->getTalentFocus(i) == 0 && Player::ins()->getTalentLevel(i) < 18)
+				if (Player::ins()->entityInfo.talentFocus[i] == 0 && Player::ins()->getTalentLevel(i) < 18)
 				{
 					drawStadium(talentButton[i].x, talentButton[i].y, talentButton[i].w, talentButton[i].h, btnColor, 150, 5);
 				}
@@ -283,7 +283,7 @@ public:
 				if (Player::ins()->getTalentLevel(i) < 18)
 				{
 					drawSprite(spr::talentIcon, i, targetX, targetY);
-					if (Player::ins()->getTalentFocus(i) == 0)
+					if (Player::ins()->entityInfo.talentFocus[i] == 0)
 					{
 						SDL_Rect rect = { targetX,targetY,24,24 };
 						drawFillRect(rect, col::black, 150);
@@ -329,7 +329,7 @@ public:
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (Player::ins()->getTalentFocus(i) > 0) //수련 중인 재능을 1개라도 발견했을 경우
+				if (Player::ins()->entityInfo.talentFocus[i] > 0) //수련 중인 재능을 1개라도 발견했을 경우
 				{
 					close(aniFlag::winUnfoldClose);
 					return;
@@ -350,16 +350,16 @@ public:
 				{
 					if (Player::ins()->getTalentLevel(i) < 18)
 					{
-						switch (Player::ins()->getTalentFocus(i))
+						switch (Player::ins()->entityInfo.talentFocus[i])
 						{
 							case 0:
-								Player::ins()->setTalentFocus(i, 1);
+								Player::ins()->entityInfo.talentFocus[i] = 1;
 								break;
 							case 1:
-								Player::ins()->setTalentFocus(i, 2);
+								Player::ins()->entityInfo.talentFocus[i] = 2;
 								break;
 							case 2:
-								Player::ins()->setTalentFocus(i, 0);
+								Player::ins()->entityInfo.talentFocus[i] = 0;
 								break;
 							default:
 								errorBox("Unvalid talent focus point");

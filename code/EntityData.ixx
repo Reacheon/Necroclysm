@@ -66,4 +66,7 @@ export struct EntityData
     bool isPlayer = false;
     __int8 direction = 0;
     ItemPocket* equipment;
+    std::array<int, TALENT_SIZE> talentExp = { 0, }; //경험치
+    std::array<float, TALENT_SIZE> talentApt = { 2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0, }; //적성
+    std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
 };

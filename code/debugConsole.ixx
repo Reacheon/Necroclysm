@@ -94,7 +94,7 @@ export void debugConsole()
 	case 2: // generateEntity
 	{
 		Player* ptr = Player::ins();
-		new Monster(ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ(), 2);
+		new Monster(2, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
@@ -332,7 +332,7 @@ export void debugConsole()
 	case 22: //말 생성
 	{
 		Player* ptr = Player::ins();
-		new Monster(ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ(), 4);
+		new Monster(4, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}

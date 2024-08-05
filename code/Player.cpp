@@ -14,22 +14,19 @@ import nanoTimer;
 import globalTime;
 import updateBarAct;
 
-Player::Player(int gridX, int gridY, int gridZ) : Entity(gridX, gridY, gridZ)//생성자입니다.
+Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
-	setSprite(spr::charsetHero);
-	loadDataFromDex(1);
+	//setSprite(spr::charsetHero);
 	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
-	setTalentFocus(talentFlag::fighting, 1);
-	setTalentFocus(talentFlag::dodging, 1);
-	setTalentFocus(talentFlag::stealth, 1);
 
 	setSkin(humanCustom::skin::yellow);
 	setEyes(humanCustom::eyes::blue);
 	setHair(humanCustom::hair::middlePart);
 
 	int i = 0;
+	
 
 	getEquipPtr()->addItemFromDex(2);
 	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
@@ -66,6 +63,8 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(gridX, gridY, gridZ)//�
 
 	addSkill(1);
 	quickSlot[5] = { quickSlotFlag::SKILL, 1 };
+
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
 }
 Player::~Player()
 {

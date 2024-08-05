@@ -26,17 +26,18 @@ import SkillData;
 import Flame;
 import Vehicle;
 
-Entity::Entity(int gridX, int gridY, int gridZ)//생성자
+Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
 	prt(L"Entity : 생성자가 호출되었습니다!\n");
+	loadDataFromDex(newEntityIndex);
+	setSprite(entityInfo.entitySpr);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
-	setSprite(spr::defaultMonster);
-	equipment = new ItemPocket(storageType::equip);
-	entityInfo.HP = 20;
+	entityInfo.equipment = new ItemPocket(storageType::equip);
 	entityInfo.direction = 0;
-	std::fill(talentApt.begin(), talentApt.end(), 2.0f);
+	entityInfo.talentFocus[0] = 1;
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
@@ -44,7 +45,7 @@ Entity::~Entity()//소멸자
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
 	//delete sprite;
 	delete spriteFlash;
-	delete equipment;
+	delete entityInfo.equipment;
 }
 #pragma region getset method
 std::vector<SkillData>& Entity::getBionicList() { return bionicList; }
@@ -224,7 +225,10 @@ void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
 {
 	setAtkTarget(inputX, inputY, inputZ, -1);
 }
-ItemPocket* Entity::getEquipPtr() { return equipment; }
+ItemPocket* Entity::getEquipPtr() 
+{ 
+	return entityInfo.equipment; 
+}
 Sprite* Entity::getSpriteFlash() { return spriteFlash; }
 void Entity::setFlashType(int inputType)
 {
@@ -851,27 +855,25 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	targetStack->setFakeX(getX() - targetStack->getX());
 	targetStack->setFakeY(getY() - targetStack->getY());
 }
-float Entity::getTalentApt(int index) { return talentApt[index]; }
-int Entity::getSKillExp(int index) { return talentExp[index]; }
-int Entity::getTalentFocus(int index) { return talentFocus[index]; }
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getTalentLevel(int index)
 {
 	float resultLevel = 0;
 	for (int i = 18; i >= 0; i--)
 	{
-		if (talentExp[index] >= expTable[i] / talentApt[index])
+
+		if (entityInfo.talentExp[index] >= expTable[i] / entityInfo.talentApt[index])
 		{
 			resultLevel = i + 1;
 			if (i == 18) { return resultLevel; } //레벨이 18이상일 경우 
 			else
 			{
-				resultLevel += (float)(talentExp[index] - expTable[i] / talentApt[index]) / (float)(expTable[i + 1] / talentApt[index] - expTable[i] / talentApt[index]);
+				resultLevel += (float)(entityInfo.talentExp[index] - expTable[i] / entityInfo.talentApt[index]) / (float)(expTable[i + 1] / entityInfo.talentApt[index] - expTable[i] / entityInfo.talentApt[index]);
 				return resultLevel;
 			}
 		}
 	}
-	resultLevel += (float)(talentExp[index]) / (float)(expTable[1] / talentApt[index] - expTable[0] / talentApt[index]);
+	resultLevel += (float)(entityInfo.talentExp[index]) / (float)(expTable[1] / entityInfo.talentApt[index] - expTable[0] / entityInfo.talentApt[index]);
 	return resultLevel;
 }
 void Entity::addTalentExp(int expVal)
@@ -879,30 +881,26 @@ void Entity::addTalentExp(int expVal)
 	int divider = 0;
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		divider += talentFocus[i];
+		divider += entityInfo.talentFocus[i];
 	}
 	errorBox(divider == 0, "You need to enable at least one talent(divider=0 at addTalentExp).");
 	int frag = floor((float)(expVal) / (float)divider);
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		talentExp[i] += (frag * talentFocus[i]);
+		entityInfo.talentExp[i] += (frag * entityInfo.talentFocus[i]);
 	}
 	//만렙이 된 재능의 포커스 해제
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		if (talentFocus[i] > 0)
+		if (entityInfo.talentFocus[i] > 0)
 		{
 			if (getTalentLevel(i) >= 18)
 			{
-				talentFocus[i] = 0;
+				entityInfo.talentFocus[i] = 0;
 			}
 		}
 	}
 }
-void Entity::setTalentApt(int index, float val) { talentApt[index] = val; }
-void Entity::setTalentExp(int index, int val) { talentExp[index] = val; }
-void Entity::setTalentFocus(int index, int val) { talentFocus[index] = val; }
-
 //메소드를 실행한 객체를 죽이고 아이템을 드랍한다.
 //현재 개체가 보유한 모든 부위를 벡터 형태로 반환한다.
 std::vector<int> Entity::getAllParts()
