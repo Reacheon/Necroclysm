@@ -1,6 +1,4 @@
-﻿
-
-export module Monster;
+﻿export module Monster;
 
 import std;
 import Entity;
@@ -18,9 +16,8 @@ export class Monster : public Entity, public AI
 public:
 	Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 	{
-		//setSprite(entityInfo.entitySpr);
 		prt(entityInfo.name.c_str());
-		prt(lowCol::red, L"Monster : 생성자가 호출되었습니다! ID : %p\n", this);
+		prt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
 
 	}
 	~Monster()
@@ -44,17 +41,17 @@ public:
 
 	bool runAI()
 	{
-		prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
+		//prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
 		while (1)
 		{
-			prt(lowCol::red, L"[ID : %p]의 timeResource는 %f입니다.\n", this, getTimeResource());
+			//prt(lowCol::red, L"[ID : %p]의 timeResource는 %f입니다.\n", this, getTimeResource());
 			if (getTimeResource() >= 2.0) 
 			{
 				clearTimeResource();
 				addTimeResource(2.0);
 			}
 
-			if (getTimeResource() >= 1.2)//플레이어에게 직선 경로로 이동
+			if (getTimeResource() >= 1.2 && entityInfo.entityCode != 5)//플레이어에게 직선 경로로 이동
 			{
 				if (std::abs(Player::ins()->getGridX() - getGridX()) > 1 || std::abs(Player::ins()->getGridY() - getGridY()) > 1)//1칸 이내에 있지 않으면
 				{
@@ -151,7 +148,7 @@ public:
 			}
 
 
-			if (getTimeResource() >= 1.3)//추적스택이 0보다 크고 플레이어가 1칸 이내에 잇을 경우 평타를 날림
+			if (getTimeResource() >= 1.3 && entityInfo.entityCode != 5)//추적스택이 0보다 크고 플레이어가 1칸 이내에 잇을 경우 평타를 날림
 			{
 				if (std::abs(Player::ins()->getGridX() - getGridX()) <= 1 && std::abs(Player::ins()->getGridY() - getGridY()) <= 1)//1칸 이내에 있으면
 				{
@@ -168,7 +165,7 @@ public:
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			//위의 모든 패턴 조건을 만족하지않을시 return true
-			prt(lowCol::red, L"[Monster] AI가 true를 반환했다. AI를 종료합니다.\n");
+			//prt(lowCol::red, L"[Monster] AI가 true를 반환했다. AI를 종료합니다.\n");
 			return true;
 		}
 	}

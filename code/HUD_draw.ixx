@@ -41,6 +41,7 @@ void HUD::drawGUI()
 	Sprite* targetBtnSpr = nullptr;
 
 
+	drawStatusEffects();
 
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, letterbox.h + 10, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr) drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73);
@@ -64,58 +65,84 @@ void HUD::drawGUI()
 			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 1);
 		}
 
-		if (1)//플레이어 HP바 그리기
+		//HP바 그리기
 		{
-			SDL_Rect hpRect = { letterbox.x + 18 + vShift,letterbox.y + 20, 216,4 };
-			__int16 currentHP = Player::ins()->entityInfo.HP;
-			__int16	fakeHP = Player::ins()->entityInfo.fakeHP;
-			__int16 maxHP = Player::ins()->entityInfo.maxHP;
+			int pivotX = letterbox.x + 11 + 1.02*vShift;
+			int pivotY = letterbox.y + 21;
+			drawSprite(spr::icon16, 72, pivotX, pivotY);
 
-			drawStadium(hpRect.x, hpRect.y, hpRect.w, hpRect.h, col::black, 255, 1);
+			setFontSize(9);
+			drawText(col2Str(lowCol::green) + L"HEALTH", pivotX + 16, pivotY + 1);
 
-			float ratioFakeHP = myMax((float)0.0, (float)(fakeHP) / (float)(maxHP));
-			drawStadium(hpRect.x, hpRect.y, hpRect.w * ratioFakeHP, hpRect.h, col::white, Player::ins()->entityInfo.fakeHPAlpha, 1);
+			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
 
-			float ratioHP = myMax((float)0.0, (float)(currentHP) / (float)(maxHP));
-			drawStadium(hpRect.x, hpRect.y, hpRect.w * ratioHP, hpRect.h, { 0x75, 0xf0, 0x3f }, 255, 1);
+			//페이크 HP
+			float ratioFakeHP = myMax((float)0.0, (Player::ins()->entityInfo.fakeHP) / (float)(Player::ins()->entityInfo.maxHP));
+			SDL_Rect fakeRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioFakeHP, 5 };
+			drawFillRect(fakeRect, lowCol::white, Player::ins()->entityInfo.fakeHPAlpha);
+			float ratioHP = myMax((float)0.0, (float)(Player::ins()->entityInfo.HP) / (float)(Player::ins()->entityInfo.maxHP));
+			SDL_Rect realRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioHP, 5 };
+			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+			drawFillRect(realRect, lowCol::green);
 
-			std::wstring strHP = L"HP ";
-			std::wstring slash = L"/";
-			strHP += std::to_wstring(currentHP) + slash + std::to_wstring(maxHP);
-
+			std::wstring hpStr = std::to_wstring(Player::ins()->entityInfo.HP) + L" / " + std::to_wstring(Player::ins()->entityInfo.maxHP);
 			setFontSize(8);
-			drawTextCenter(col2Str(lowCol::black) + strHP, hpRect.x + (hpRect.w / 2) + 1, hpRect.y + (hpRect.h / 2));
-			drawTextCenter(col2Str(lowCol::black) + strHP, hpRect.x + (hpRect.w / 2), hpRect.y + (hpRect.h / 2) - 1);
-			drawTextCenter(col2Str(lowCol::black) + strHP, hpRect.x + (hpRect.w / 2) - 1, hpRect.y + (hpRect.h / 2));
-			drawTextCenter(col2Str(lowCol::black) + strHP, hpRect.x + (hpRect.w / 2), hpRect.y + (hpRect.h / 2) + 1);
-			drawTextCenter(col2Str(lowCol::white) + strHP, hpRect.x + (hpRect.w / 2), hpRect.y + (hpRect.h / 2));
+			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142 + 1, pivotY + 7);
+			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142 - 1, pivotY + 7);
+			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142, pivotY + 7 + 1);
+			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142, pivotY + 7 - 1);
+			drawTextCenter(col2Str(lowCol::white) + hpStr, pivotX + 142, pivotY + 7);
 		}
 
-		if (1)//플레이어 부위별 HP 그리기
+		//MP바 그리기
 		{
-			setFontSize(12);
-			drawText(col2Str(col::lightGray) + L"LARM", letterbox.x + 18 + +vShift + 80 * 0, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 0, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(col::lightGray) + L"LLEG", letterbox.x + 18 + +vShift + 80 * 0, letterbox.y + 8 + 15 * 2);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 0, letterbox.y + 8 + 15 * 2);
+			int pivotX = letterbox.x + 11 + 1.02 * vShift;
+			int pivotY = letterbox.y + 21 +15;
+			drawSprite(spr::icon16, 73, pivotX, pivotY);
 
-			drawText(col2Str(col::lightGray) + L"HEAD", letterbox.x + 18 + +vShift + 80 * 1, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 1, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(col::lightGray) + L"TORSO", letterbox.x + 18 + +vShift + 80 * 1, letterbox.y + 8 + 15 * 2);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 1, letterbox.y + 8 + 15 * 2);
+			setFontSize(9);
+			drawText(col2Str(lowCol::blue) + L"MENTAL", pivotX + 16, pivotY + 1);
 
-			drawText(col2Str(col::lightGray) + L"RARM", letterbox.x + 18 + +vShift + 80 * 2, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 2, letterbox.y + 9 + 15 * 1);
-			drawText(col2Str(col::lightGray) + L"RLEG", letterbox.x + 18 + +vShift + 80 * 2, letterbox.y + 8 + 15 * 2);
-			drawText(col2Str(lowCol::green) + L"|||||", letterbox.x + 18 + +vShift + 38 + 80 * 2, letterbox.y + 8 + 15 * 2);
+			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
+			
+			float ratioFakeMP = myMax((float)0.0, (Player::ins()->entityInfo.fakeMP) / (float)(Player::ins()->entityInfo.maxMP));
+			SDL_Rect fakeRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioFakeMP, 5 };
+			drawFillRect(fakeRect, lowCol::white, Player::ins()->entityInfo.fakeMPAlpha);
+			float ratioMP = myMax((float)0.0, (float)(Player::ins()->entityInfo.MP) / (float)(Player::ins()->entityInfo.maxMP));
+			SDL_Rect realRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioMP, 5 };
+			if (ratioMP > 0 && realRect.w == 0) { realRect.w = 1; }
+			drawFillRect(pivotX + 55 + 3, pivotY + 1 + 3, 176* ratioMP, 5, lowCol::blue);
+
+			std::wstring mpStr = std::to_wstring(Player::ins()->entityInfo.MP) + L" / " + std::to_wstring(Player::ins()->entityInfo.maxMP);
+			setFontSize(8);
+			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142 + 1, pivotY + 7);
+			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142 - 1, pivotY + 7);
+			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142, pivotY + 7 + 1);
+			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142, pivotY + 7 - 1);
+			drawTextCenter(col2Str(lowCol::white) + mpStr, pivotX + 142, pivotY + 7);
 		}
+
 
 		if (ctrlVeh == nullptr)
 		{
-			setFontSize(10);
-			drawSprite(spr::staminaGauge, 6, letterbox.x + 18 + 238, letterbox.y + 4);
-			drawTextCenter(col2Str(lowCol::yellow) + L"STA", letterbox.x + 18 + 238 + 24, letterbox.y + 4 + 16);
-			drawTextCenter(col2Str(lowCol::green) + L"72%", letterbox.x + 18 + 238 + 24, letterbox.y + 4 + 14 + 15);
+			//스테미나
+			{
+				int pivotX = letterbox.x + 18 + 238;
+				int pivotY = letterbox.y + 4;
+				setFontSize(10);
+
+				int sprIndex = (int)(16.0 * ((double)Player::ins()->entityInfo.STA / (double)Player::ins()->entityInfo.maxSTA));
+				drawSprite(spr::staminaGauge, sprIndex, pivotX, pivotY);
+				drawTextCenter(col2Str(lowCol::yellow) + L"STA", pivotX + 24, pivotY + 16);
+
+				std::wstring STAStr = std::to_wstring(Player::ins()->entityInfo.STA) + L"/" + std::to_wstring(Player::ins()->entityInfo.maxSTA);
+				setFontSize(8);
+				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24 + 1, pivotY + 29);
+				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24 - 1, pivotY + 29);
+				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24, pivotY + 29 + 1);
+				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24, pivotY + 29 - 1);
+				drawTextCenter(col2Str(lowCol::white) + STAStr, pivotX + 24, pivotY + 29);
+			}
 
 			setFontSize(12);
 			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 1);
@@ -277,10 +304,7 @@ void HUD::drawGUI()
 	drawBarAct();
 	drawTab();
 	drawQuickSlot();
-
 }
-
-
 
 
 void HUD::drawTab()
@@ -421,36 +445,8 @@ void HUD::drawQuickSlot()
 		{
 			setZoom(2.0);
 			std::wstring skillName = L"";
-			if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
-			{
-				int index = Player::ins()->searchBionicCode(quickSlot[i].second);
-				if (index != -1) drawSprite(spr::skillSet, Player::ins()->getBionicList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
-				skillName = Player::ins()->getBionicList()[index].name;
-			}
-			else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
-			{
-				int index = Player::ins()->searchMutationCode(quickSlot[i].second);
-				if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMutationList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
-				skillName = Player::ins()->getMutationList()[index].name;
-			}
-			else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
-			{
-				int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
-				if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMartialArtList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
-				skillName = Player::ins()->getMartialArtList()[index].name;
-			}
-			else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
-			{
-				int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
-				if (index != -1) drawSprite(spr::skillSet, Player::ins()->getDivinePowerList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
-				skillName = Player::ins()->getDivinePowerList()[index].name;
-			}
-			else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
-			{
-				int index = Player::ins()->searchMagicCode(quickSlot[i].second);
-				if (index != -1) drawSprite(spr::skillSet, Player::ins()->getMagicList()[index].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
-				skillName = Player::ins()->getMagicList()[index].name;
-			}
+			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
+			skillName = skillDex[quickSlot[i].second].name;
 			setZoom(1.0);
 
 			setFontSize(14);
@@ -669,6 +665,8 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::message) setBtnLayout(sysStr[190], 151);
 		else if (barAct[i] == act::camera) setBtnLayout(sysStr[191], 152);
 		else if (barAct[i] == act::internet) setBtnLayout(sysStr[192], 154);
+		else if (barAct[i] == act::settings) setBtnLayout(sysStr[193], 155);
+		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[194], 156);
 		else if (barAct[i] == act::skillActive)
 		{
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
@@ -738,5 +736,77 @@ void HUD::drawBarAct()
 		}
 
 		if (deactRect == true) drawStadium(barButton[i].x, barButton[i].y, 72, 72, { 0,0,0 }, 120, 5);
+	}
+}
+
+void HUD::drawStatusEffects()
+{
+	std::vector<std::pair<statEfctFlag, int>>& myEfcts = Player::ins()->entityInfo.statusEffects;
+	for (int i = 0; i < myEfcts.size(); i++)
+	{
+		int pivotX = 10;
+		int pivotY = 185 + 38*i;
+		std::wstring statEfctName = L"";
+		int statEfctIcon = 0;
+
+		switch (myEfcts[i].first)
+		{
+		case statEfctFlag::confusion:
+			statEfctName = L"Confusion";
+			statEfctIcon = 1;
+			break;
+		case statEfctFlag::bleeding:
+			statEfctName = L"Bleeding";
+			statEfctIcon = 2;
+			break;
+		case statEfctFlag::hunger:
+			statEfctName = L"Hunger";
+			statEfctIcon = 3;
+			break;
+		case statEfctFlag::dehydration:
+			statEfctName = L"Dehydration";
+			statEfctIcon = 4;
+			break;
+		case statEfctFlag::blindness:
+			statEfctName = L"Blindness";
+			statEfctIcon = 15;
+			break;
+		}
+
+		drawSprite(spr::statusEffectRect, pivotX, pivotY);
+
+		setZoom(2.0);
+		drawSprite(spr::statusIcon, statEfctIcon, pivotX + 1, pivotY + 1);
+		setZoom(1.0);
+
+		drawCross2(pivotX, pivotY, 0, 5, 0, 5);
+		drawCross2(pivotX + 32, pivotY, 0, 5, 5, 0);
+		drawCross2(pivotX, pivotY + 32, 5, 0, 0, 5);
+		drawCross2(pivotX + 32, pivotY + 32, 5, 0, 5, 0);
+
+		setFontSize(13);
+		drawText(col2Str(lowCol::red) + statEfctName, pivotX + 37, pivotY + 1);
+
+		if (myEfcts[i].second > 0)
+		{
+			setZoom(0.7);
+			int seg1 = myEfcts[i].second / 100;
+			int seg2 = (myEfcts[i].second % 100) / 10;
+			int seg3 = myEfcts[i].second % 10;
+			
+			if (seg1 > 0) drawSprite(spr::segment, myEfcts[i].second / 100, pivotX + 97, pivotY + 20);
+			if (seg2 > 0 || seg1 > 0) drawSprite(spr::segment, (myEfcts[i].second % 100)/10, pivotX + 97 + 11, pivotY + 20);
+			if (seg3 > 0 || seg2 > 0 || seg3 > 0) drawSprite(spr::segment, myEfcts[i].second % 10, pivotX + 97 + 22, pivotY + 20);
+			setZoom(1.0);
+		}
+		else
+		{
+			if (myEfcts[i].first == statEfctFlag::bleeding)
+			{
+				//게이지
+				drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
+				drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
+			}
+		}
 	}
 }

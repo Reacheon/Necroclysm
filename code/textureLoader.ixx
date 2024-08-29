@@ -144,6 +144,10 @@ export void textureLoader()
 	spr::steamEffect1 = new Sprite(renderer, "image/gas/steamEffect1.png", 48, 48);
 
 	spr::inventoryItemRect = new Sprite(renderer, "image/UI/GUI/Inventory/inventoryItemRect.png", 50, 50);
+	spr::trail = new Sprite(renderer, "image/trail.png", 16, 16);
 
+	spr::statusEffectRect = new Sprite(renderer, "image/UI/GUI/HUD//statusEffectRect.png", 130, 34);
+	spr::statusIcon = new Sprite(renderer, "image/UI/statusIcon.png", 16, 16);
+	spr::hpBlankGauge = new Sprite(renderer, "image/UI/hpGauge.png", 182, 11);
 
 }

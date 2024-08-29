@@ -199,7 +199,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 		statusStrColor = col::white;
 	}
 
-	if (checkCursor(&box1) && cursorMotionLock == false)
+	if (checkCursor(&box1) && itemListColorLock == false)
 	{
 		if (click == false)
 		{
@@ -242,7 +242,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 		//박스 3가 존재하지 않을 경우
 		if (quantity == -1) { clickRect.w = box2.w; }
 
-		if (checkCursor(&clickRect) && cursorMotionLock == false)
+		if (checkCursor(&clickRect) && itemListColorLock == false)
 		{
 			if (click == false) drawItemRect(cursorFlag::hover, box2.x, box2.y, inputItem);
 			else drawItemRect(cursorFlag::click, box2.x, box2.y, inputItem);
@@ -268,7 +268,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 			//박스 3가 존재하지 않을 경우
 			if (quantity == -1) { clickRect.w = box2.w; }
 
-			if (checkCursor(&clickRect) && cursorMotionLock == false)
+			if (checkCursor(&clickRect) && itemListColorLock == false)
 			{
 				if (click == false)  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 183, 5);
 				else  drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::deepBlue, 183, 5);

@@ -41,6 +41,9 @@ namespace csvEntity
     constexpr int statStr = 25;
     constexpr int statInt = 26;
     constexpr int statDex = 27;
+    constexpr int hpBarHeight = 28;
+    constexpr int partsPosition = 29;
+    constexpr int partsSprIndexStart = 30;
 };
 
 
@@ -316,6 +319,40 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::statDex:
                             entityDex[arrayCounter / (csvWidth)-1].statDex = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::hpBarHeight:
+                            entityDex[arrayCounter / (csvWidth)-1].hpBarHeight = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::partsPosition:
+                        {
+                            entityDex[arrayCounter / (csvWidth)-1].partsPosition.clear();
+                            std::array<int, 3> val;
+                            int counter = 0;
+                            for (int j = 0; j < strFragment.size(); j++)
+                            {
+                                if (strFragment[j] == SDLK_PERIOD)
+                                {
+                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
+                                    counter++;
+                                    strFragment.erase(0, j + 1);
+                                    j = 0;
+                                }
+
+                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
+                                {
+                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
+
+                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
+                                    counter = 0;
+                                    strFragment.erase(0, j + 1);
+                                    j = 0;
+                                    entityDex[arrayCounter / (csvWidth)-1].partsPosition[val[0]] = { val[1], val[2] };
+                                }
+                            }
+                            break;
+                        }
+                        case csvEntity::partsSprIndexStart:
+                            entityDex[arrayCounter / (csvWidth)-1].partsStartIndex = wtoi(strFragment.c_str());
                             break;
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

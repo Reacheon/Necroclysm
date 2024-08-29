@@ -37,12 +37,20 @@ export namespace actFunc
 
 		//탐사할 타일 추가 (장비, 주변타일 9칸)
 		{
+			//장비타일
 			targetSearchPtr.push_back(equipPtr);
-
-			//바닥타일
-			ItemStack* stack = World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], lootTile[axis::z]);
-			ItemPocket* lootPtr = stack->getPocket();
-			targetSearchPtr.push_back(lootPtr);
+			//바닥타일(주변9타일)
+			for (int dir = -1; dir < 8; dir++)
+			{
+				int dx = 0, dy = 0;
+				dir2Coord(dir, dx, dy);
+				ItemStack* stack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				if (stack != nullptr)
+				{
+					ItemPocket* lootPtr = stack->getPocket();
+					targetSearchPtr.push_back(lootPtr);
+				}
+			}
 		}
 
 		for (int j = 0; j < targetSearchPtr.size(); j++)
@@ -113,11 +121,18 @@ export namespace actFunc
 		//탐사할 타일 추가 (장비, 주변타일 9칸)
 		{
 			targetSearchPtr.push_back(equipPtr);
-
-			//바닥타일
-			ItemStack* stack = World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], lootTile[axis::z]);
-			ItemPocket* lootPtr = stack->getPocket();
-			targetSearchPtr.push_back(lootPtr);
+			//바닥타일(주변9타일)
+			for (int dir = -1; dir < 8; dir++)
+			{
+				int dx = 0, dy = 0;
+				dir2Coord(dir, dx, dy);
+				ItemStack* stack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				if (stack != nullptr)
+				{
+					ItemPocket* lootPtr = stack->getPocket();
+					targetSearchPtr.push_back(lootPtr);
+				}
+			}
 		}
 
 		//장비 중인 아이템에서 pocketList 추가

@@ -177,6 +177,7 @@
     <ClCompile Include="code\Craft.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
+    <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Entity.cpp" />
     <ClCompile Include="code\Entity_runAnimation.cpp" />

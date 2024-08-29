@@ -164,6 +164,9 @@ export enum class act
     camera,
     internet,
 
+    settings,
+    saveAndQuit,
+
     //skillInfo,
 };
 
@@ -1076,6 +1079,7 @@ export namespace UNI
     constexpr int RIGHT_CURLY_BRACKET = 125;  // '}'
     constexpr int TILDE = 126;  // '~'
     constexpr int DEL = 127;   // Delete
+    constexpr int MIDDLE_DOT = 183;
 };
 
 
@@ -1193,3 +1197,23 @@ export enum class gasFlag
     NORMAL,
     BIG,
 };
+
+export enum statEfctFlag
+{
+    confusion=0,
+    bleeding=1,
+    hunger=2,
+    dehydration=3,
+    blindness=4,
+};
+
+//전방선언
+export class ItemPocket;
+export class ItemStack;
+export struct ItemData;
+export class Entity;
+export class Vehicle;
+export class World;
+export class Chunk;
+export class Loot;
+export void turnWait(float waitTime);

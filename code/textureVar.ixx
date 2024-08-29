@@ -143,4 +143,10 @@ export namespace spr
 	Sprite* steamEffect1 = nullptr;
 	
 	Sprite* inventoryItemRect = nullptr;
+
+	Sprite* trail = nullptr;
+
+	Sprite* statusEffectRect = nullptr;
+	Sprite* statusIcon = nullptr;
+	Sprite* hpBlankGauge = nullptr;
 }

@@ -27,6 +27,7 @@ import Drawable;
 import TileData;
 import Flame;
 import mouseGrid;
+import HUD;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -287,6 +288,9 @@ __int64 drawTiles()
 			setZoom(1.0);
 		}
 	}
+
+
+
 	return getNanoTimer() - timeStampStart;
 }
 
@@ -692,30 +696,79 @@ __int64 drawMarkers()
 
 
 
+	if (inputType == input::mouse)
+	{
+		if (isPlayerMoving == false && turnCycle == turn::playerInput)
+		{
+			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false)
+			{
+				if (GUI::getLastGUI() == HUD::ins())
+				{
+					int tgtX = getAbsMouseGrid().x;
+					int tgtY = getAbsMouseGrid().y;
+					dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+					dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+					dst.w = tileSize;
+					dst.h = tileSize;
+					setZoom(zoomScale);
+					drawSpriteCenter
+					(
+						spr::cursorMarker,
+						0,
+						dst.x + dst.w / 2,
+						dst.y + dst.h / 2
+					);
+					setZoom(1.0);
+				}
+			}
+		}
+	}
+
+	for (int i = 1; i < aStarTrail.size(); i++)
+	{
+		int tgtX = aStarTrail[i].x;
+		int tgtY = aStarTrail[i].y;
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+		setZoom(zoomScale);
+		drawSpriteCenter
+		(
+			spr::trail,
+			0,
+			dst.x + dst.w / 2,
+			dst.y + dst.h / 2
+		);
+		setZoom(1.0);
+	}
+
 
 	//화이트마커 그리기
-	if (whiteMarkerCoord.z == Player::ins()->getGridZ())
+	if (inputType == input::gamepad)
 	{
-		if (std::abs(whiteMarkerCoord.x - Player::ins()->getGridX()) <= MARKER_LIMIT_DIST)
+		if (gamepadWhiteMarker.z == Player::ins()->getGridZ())
 		{
-			if (std::abs(whiteMarkerCoord.y - Player::ins()->getGridY()) <= MARKER_LIMIT_DIST)
+			if (std::abs(gamepadWhiteMarker.x - Player::ins()->getGridX()) <= MARKER_LIMIT_DIST)
 			{
-				int tgtX = whiteMarkerCoord.x;
-				int tgtY = whiteMarkerCoord.y;
-
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
-				setZoom(zoomScale);
-				drawSpriteCenter
-				(
-					spr::cursorMarker,
-					0,
-					dst.x + dst.w / 2,
-					dst.y + dst.h / 2
-				);
-				setZoom(1.0);
+				if (std::abs(gamepadWhiteMarker.y - Player::ins()->getGridY()) <= MARKER_LIMIT_DIST)
+				{
+					int tgtX = gamepadWhiteMarker.x;
+					int tgtY = gamepadWhiteMarker.y;
+					dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+					dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+					dst.w = tileSize;
+					dst.h = tileSize;
+					setZoom(zoomScale);
+					drawSpriteCenter
+					(
+						spr::cursorMarker,
+						0,
+						dst.x + dst.w / 2,
+						dst.y + dst.h / 2
+					);
+					setZoom(1.0);
+				}
 			}
 		}
 	}

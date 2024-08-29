@@ -289,26 +289,29 @@ void Loot::drawGUI()
 	{
 		//우측 아이템 상단바 라벨(선택 이름 물리량)
 		drawStadium(lootLabel.x, lootLabel.y, lootLabel.w, lootLabel.h, { 0,0,0 }, 183, 5);
-		if (checkCursor(&lootLabelSelect) || labelCursor == 0)
+		if (GUI::getLastGUI() == this)
 		{
-			SDL_Color btnColor;
-			if (click == true) { btnColor = lowCol::deepBlue; }
-			else { btnColor = lowCol::blue; }
-			drawStadium(lootLabelSelect.x, lootLabelSelect.y, lootLabelSelect.w, lootLabelSelect.h, btnColor, 183, 5);
-		}
-		else if (checkCursor(&lootLabelName) || labelCursor == 1)
-		{
-			SDL_Color btnColor;
-			if (click == true) { btnColor = lowCol::deepBlue; }
-			else { btnColor = lowCol::blue; }
-			drawStadium(lootLabelName.x, lootLabelName.y, lootLabelName.w, lootLabelName.h, btnColor, 183, 5);
-		}
-		else if (checkCursor(&lootLabelQuantity) || labelCursor == 2)
-		{
-			SDL_Color btnColor;
-			if (click == true) { btnColor = lowCol::deepBlue; }
-			else { btnColor = lowCol::blue; }
-			drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 183, 5);
+			if (checkCursor(&lootLabelSelect) || labelCursor == 0)
+			{
+				SDL_Color btnColor;
+				if (click == true) { btnColor = lowCol::deepBlue; }
+				else { btnColor = lowCol::blue; }
+				drawStadium(lootLabelSelect.x, lootLabelSelect.y, lootLabelSelect.w, lootLabelSelect.h, btnColor, 183, 5);
+			}
+			else if (checkCursor(&lootLabelName) || labelCursor == 1)
+			{
+				SDL_Color btnColor;
+				if (click == true) { btnColor = lowCol::deepBlue; }
+				else { btnColor = lowCol::blue; }
+				drawStadium(lootLabelName.x, lootLabelName.y, lootLabelName.w, lootLabelName.h, btnColor, 183, 5);
+			}
+			else if (checkCursor(&lootLabelQuantity) || labelCursor == 2)
+			{
+				SDL_Color btnColor;
+				if (click == true) { btnColor = lowCol::deepBlue; }
+				else { btnColor = lowCol::blue; }
+				drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 183, 5);
+			}
 		}
 		setFontSize(13);
 		drawTextCenter(col2Str(col::white)+sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //선택(상단바)
@@ -355,6 +358,8 @@ void Loot::drawGUI()
 		}
 
 		//개별 아이템
+		if (GUI::getLastGUI() != this) itemListColorLock = true;
+		else  itemListColorLock = false;
 		drawItemList(lootPocket, lootArea.x, lootArea.y, LOOT_ITEM_MAX, lootCursor, lootScroll, true);
 
 		// 아이템 스크롤 그리기

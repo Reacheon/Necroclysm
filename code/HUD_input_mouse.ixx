@@ -14,28 +14,48 @@ import log;
 import Prop;
 import ContextMenu;
 import mouseGrid;
+import Entity;
+
+Entity* touchMonster = nullptr;
 
 void HUD::clickDownGUI()
 {
 	executedHold = false;
+
+	Entity* targetEntity = (Entity*)(World::ins()->getTile(getAbsMouseGrid().x, getAbsMouseGrid().y, Player::ins()->getGridZ()).EntityPtr);
+	if (targetEntity != nullptr && targetEntity->entityInfo.isPlayer == false)
+	{
+		touchMonster = (Entity*)(World::ins()->getTile(getAbsMouseGrid().x, getAbsMouseGrid().y, Player::ins()->getGridZ()).EntityPtr);
+	}
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
-	if (click && getMilliTimer() - clickStartTime > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
+	if (click == true)
 	{
-		const int maxDist = 160;
-		int prevCameraX = cameraX, prevCameraY = cameraY;
-		cameraFix = false;
-		cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
-		cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
-		disableClickUp4Motion = true;
+		if (touchMonster != nullptr)
+		{
+			touchMonster->selfAimTarget = std::min(5,std::max(0,dy / 10));
+		}
+		else if (getMilliTimer() - clickStartTime > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
+		{
+			const int maxDist = 160;
+			int prevCameraX = cameraX, prevCameraY = cameraY;
+			cameraFix = false;
+			cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
+			cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
+			disableClickUp4Motion = true;
 
-		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
-		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+			if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+			if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+		}
 	}
+
+
+
 }
 void HUD::clickUpGUI()
 {
+	touchMonster = nullptr;
 	if (disableClickUp4Motion)
 	{
 		disableClickUp4Motion = false;
@@ -101,32 +121,7 @@ void HUD::clickUpGUI()
 			if (checkCursor(&quickSlotBtn[i]))
 			{
 				prt(L"%d번 스킬 슬롯을 눌렀다!\n", i + 1);
-
-				if (skillDex[quickSlot[i].second].src == skillSrc::BIONIC)
-				{
-					int index = Player::ins()->searchBionicCode(quickSlot[i].second);
-					CORO(useSkill(Player::ins()->getBionicList()[index]));
-				}
-				else if (skillDex[quickSlot[i].second].src == skillSrc::MUTATION)
-				{
-					int index = Player::ins()->searchMutationCode(quickSlot[i].second);
-					CORO(useSkill(Player::ins()->getMutationList()[index]));
-				}
-				else if (skillDex[quickSlot[i].second].src == skillSrc::MARTIAL_ART)
-				{
-					int index = Player::ins()->searchMartialArtCode(quickSlot[i].second);
-					CORO(useSkill(Player::ins()->getMartialArtList()[index]));
-				}
-				else if (skillDex[quickSlot[i].second].src == skillSrc::DIVINE_POWER)
-				{
-					int index = Player::ins()->searchDivinePowerCode(quickSlot[i].second);
-					CORO(useSkill(Player::ins()->getDivinePowerList()[index]));
-				}
-				else if (skillDex[quickSlot[i].second].src == skillSrc::MAGIC)
-				{
-					int index = Player::ins()->searchMagicCode(quickSlot[i].second);
-					CORO(useSkill(Player::ins()->getMagicList()[index]));
-				}
+				CORO(useSkill(quickSlot[i].second));
 			}
 		}
 	}
@@ -197,6 +192,9 @@ void HUD::clickRightGUI()
 }
 void HUD::clickHoldGUI()
 {
-	updateLog(L"#FFFFFF[HUD] Touch hold event triggered.");
-	/*if (inputType == input::touch) */openContextMenu(getAbsMouseGrid());
+	if (inputType == input::touch)
+	{
+		updateLog(L"#FFFFFF[HUD] Touch hold event triggered.");
+		openContextMenu(getAbsMouseGrid());
+	}
 }

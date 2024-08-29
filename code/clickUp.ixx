@@ -32,7 +32,7 @@ export void clickUp()
 	if (deactClickUp == false) { GUI::getActiveGUIList()[GUI::getActiveGUIList().size() - 1]->clickUpGUI(); }
 	else { deactClickUp = false; }
 
-	cursorMotionLock = false;
+	itemListColorLock = false;
 
 	if (inputType == input::touch)
 	{

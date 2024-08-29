@@ -26,7 +26,6 @@ import turnWait;
 import dirToXY;
 import globalTime;
 
-
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
 __int64 playerInputTurn(), animationTurn(), entityAITurn();
@@ -98,8 +97,9 @@ __int64 playerInputTurn()
 			prt(L"메인 함수 코루틴 재실행\n");
 			coTurnSkip = false;
 			(*coFunc).run();
-
 		}
+
+		if (Player::ins()->getHasAStarDst() == false) isPlayerMoving = false;
 	}
 
 	if (Player::ins()->getHasAStarDst() == true) //자동이동 기능이 활성화되었을 경우
@@ -107,12 +107,7 @@ __int64 playerInputTurn()
 		int dx = Player::ins()->getAStarDstX() - Player::ins()->getGridX();
 		int dy = Player::ins()->getAStarDstY() - Player::ins()->getGridY();
 
-		if (abs(dx) <= 1 && abs(dy) <= 1)
-		{
-			Player::ins()->startMove(coord2Dir(dx, dy));
-			Player::ins()->deactAStarDst();
-		}
-		else
+		if (dx != 0 || dy != 0)
 		{
 			//주변 10칸으로 이동 가능한 타일 배열 계산
 			std::set<std::array<int, 2>> walkableTile;
@@ -125,13 +120,30 @@ __int64 playerInputTurn()
 				}
 			}
 
-			int finalDir = -1;
 			if (walkableTile.find({ Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY() }) != walkableTile.end())//목적지가 이동 가능할 경우
 			{
-				finalDir = aStar(walkableTile, Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
-				Player::ins()->startMove((finalDir + 4) % 8);
+				aStarTrail = aStar(walkableTile, Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
+				if (aStarTrail.size() >= 2)
+				{
+					Player::ins()->startMove(coord2Dir(aStarTrail[1].x - aStarTrail[0].x, aStarTrail[1].y - aStarTrail[0].y));
+					aStarTrail.erase(aStarTrail.begin());
+				}
+				else
+				{
+					Player::ins()->deactAStarDst();
+					isPlayerMoving = false;
+				}
 			}
-			else Player::ins()->deactAStarDst();
+			else
+			{
+				Player::ins()->deactAStarDst();
+				isPlayerMoving = false;
+			}
+		}
+		else
+		{
+			Player::ins()->deactAStarDst();
+			isPlayerMoving = false;
 		}
 
 	}
@@ -374,7 +386,22 @@ __int64 entityAITurn()
 		}
 	}
 
-	if (endMonsterTurn == true) { turnCycle = turn::playerInput; }
+	if (endMonsterTurn == true) 
+	{ 
+		turnCycle = turn::playerInput; 
+
+		//턴사이클 모두 종료
+		for (auto ePtr : entityList)
+		{
+			for (auto it = ePtr->entityInfo.statusEffects.begin(); it != ePtr->entityInfo.statusEffects.end();)
+			{
+				if (it->second > 0) it->second--;
+
+				if (it->second == 0) it = ePtr->entityInfo.statusEffects.erase(it);
+				else it++;
+			}
+		}
+	}
 	else { turnCycle = turn::monsterAnime; }
 
 

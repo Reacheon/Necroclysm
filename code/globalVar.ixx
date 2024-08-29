@@ -19,7 +19,7 @@ import AlchemyData;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::inventory, act::bionic, act::talent, act::runMode, act::mutation, act::test, act::identify, act::craft, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet };
+    std::vector<act> null = { act::status, act::inventory, act::bionic, act::talent, act::runMode, act::mutation, act::test, act::identify, act::craft, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
@@ -83,7 +83,7 @@ export SDL_Point clickDownPoint = { 0,0 }; //다운 이벤트를 실행한 좌�
 export SDL_Point clickUpPoint = { 0,0 }; //업 이벤트를 실행한 좌표
 export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌표
 export bool deactClickUp = false; //true일 경우 클릭업 및 클릭라이트(업) 함수를 실행하지 않음
-export bool cursorMotionLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
+export bool itemListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
 export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트
 export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
@@ -136,7 +136,6 @@ export void* availableRecipe;
 
 export bool vehicleMode = false;
 export void* ctrlVeh = nullptr;
-
 export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환
 
 export namespace dur
@@ -185,8 +184,10 @@ export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해
 
 export ThreadPool* threadPoolPtr;
 
-//흰색마커, 유일하게 존재하며 보통은 마우스의 위치, 상세선택에서는 가리키는 타일
-export Point3 whiteMarkerCoord = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() };
+
+export Point3 gamepadWhiteMarker = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() }; //게임패드 방향을 가리키는 마커
+export bool isPlayerMoving = false; //플레이어가 aStar를 따라서 움직이고 있는지.. 마우스의 whiteMarker 표시 여부를 바꿈
+export std::vector<Point2> aStarTrail; //플레이어의 aStar로 생기는 궤적
 
 export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
     [](Ani* a, Ani* b) -> bool {
@@ -241,6 +242,3 @@ namespace std
     };
 }
 
-//전방선언
-
-export void turnWait(float waitTime);

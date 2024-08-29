@@ -501,5 +501,8 @@
     <ClCompile Include="code\ItemPocket.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
+    <ClCompile Include="code\drawEpsilonText.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

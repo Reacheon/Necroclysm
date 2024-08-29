@@ -8,14 +8,12 @@ import constVar;
 import textureVar;
 import log;
 import Sprite;
-import ItemPocket;
 import Ani;
 import constVar;
 import Coord;
 import World;
 import Sticker;
 import ItemStack;
-import ItemPocket;
 import EntityData;
 import ItemData;
 import Damage;
@@ -26,16 +24,15 @@ import SkillData;
 import Flame;
 import Vehicle;
 
+
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
 	prt(L"Entity : 생성자가 호출되었습니다!\n");
 	loadDataFromDex(newEntityIndex);
-	setSprite(entityInfo.entitySpr);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
 	entityInfo.equipment = new ItemPocket(storageType::equip);
-	entityInfo.direction = 0;
 	entityInfo.talentFocus[0] = 1;
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
 }
@@ -48,11 +45,7 @@ Entity::~Entity()//소멸자
 	delete entityInfo.equipment;
 }
 #pragma region getset method
-std::vector<SkillData>& Entity::getBionicList() { return bionicList; }
-std::vector<SkillData>& Entity::getMutationList() { return mutationList; }
-std::vector<SkillData>& Entity::getMartialArtList() { return martialArtList; }
-std::vector<SkillData>& Entity::getDivinePowerList() { return divinePowerList; }
-std::vector<SkillData>& Entity::getMagicList() { return magicList; }
+
 void Entity::setSkillTarget(int gridX, int gridY, int gridZ)
 {
 	skillTarget.x = gridX;
@@ -63,152 +56,18 @@ Point3 Entity::getSkillTarget() { return skillTarget; }
 void Entity::addSkill(int index)
 {
 	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
-	if (skillDex[index].src == skillSrc::BIONIC) bionicList.push_back(skillDex[index]);
-	else if (skillDex[index].src == skillSrc::MUTATION) mutationList.push_back(skillDex[index]);
-	else if (skillDex[index].src == skillSrc::MARTIAL_ART) martialArtList.push_back(skillDex[index]);
-	else if (skillDex[index].src == skillSrc::DIVINE_POWER) divinePowerList.push_back(skillDex[index]);
-	else if (skillDex[index].src == skillSrc::MAGIC) magicList.push_back(skillDex[index]);
+	entityInfo.skillList.insert(index);
 }
-int Entity::searchBionicCode(int inputCode)
-{
-	for (int i = 0; i < bionicList.size(); i++)
-	{
-		if (bionicList[i].skillCode == inputCode) return i;
-	}
-	return -1;
-}
-bool Entity::eraseBionicCode(int inputCode)
-{
-	for (int i = 0; i < bionicList.size(); i++) if (bionicList[i].skillCode == inputCode)
-	{
-		bionicList.erase(bionicList.begin() + i);
-		return true;
-	}
-	return false;
-}
-bool Entity::eraseBionicIndex(int inputIndex)
-{
-	if (inputIndex >= 0 && inputIndex < bionicList.size())
-	{
-		bionicList.erase(bionicList.begin() + inputIndex);
-		return true;
-	}
-	return false;
-}
-int Entity::searchMutationCode(int inputCode)
-{
-	for (int i = 0; i < mutationList.size(); i++)
-	{
-		if (mutationList[i].skillCode == inputCode) return i;
-	}
-	return -1;
-}
-bool Entity::eraseMutationCode(int inputCode)
-{
-	for (int i = 0; i < mutationList.size(); i++) if (mutationList[i].skillCode == inputCode)
-	{
-		mutationList.erase(mutationList.begin() + i);
-		return true;
-	}
-	return false;
-}
-bool Entity::eraseMutationIndex(int inputIndex)
-{
-	if (inputIndex >= 0 && inputIndex < mutationList.size())
-	{
-		mutationList.erase(mutationList.begin() + inputIndex);
-		return true;
-	}
-	return false;
-}
-int Entity::searchMartialArtCode(int inputCode)
-{
-	for (int i = 0; i < martialArtList.size(); i++)
-	{
-		if (martialArtList[i].skillCode == inputCode) return i;
-	}
-	return -1;
-}
-bool Entity::eraseMartialArtCode(int inputCode)
-{
-	for (int i = 0; i < martialArtList.size(); i++) if (martialArtList[i].skillCode == inputCode)
-	{
-		martialArtList.erase(martialArtList.begin() + i);
-		return true;
-	}
-	return false;
-}
-bool Entity::eraseMartialArtIndex(int inputIndex)
-{
-	if (inputIndex >= 0 && inputIndex < martialArtList.size())
-	{
-		martialArtList.erase(martialArtList.begin() + inputIndex);
-		return true;
-	}
-	return false;
-}
-int Entity::searchDivinePowerCode(int inputCode)
-{
-	for (int i = 0; i < divinePowerList.size(); i++)
-	{
-		if (divinePowerList[i].skillCode == inputCode) return i;
-	}
-	return -1;
-}
-bool Entity::eraseDivinePowerCode(int inputCode)
-{
-	for (int i = 0; i < divinePowerList.size(); i++) if (divinePowerList[i].skillCode == inputCode)
-	{
-		divinePowerList.erase(divinePowerList.begin() + i);
-		return true;
-	}
-	return false;
-}
-bool Entity::eraseDivinePowerIndex(int inputIndex)
-{
-	if (inputIndex >= 0 && inputIndex < divinePowerList.size())
-	{
-		divinePowerList.erase(divinePowerList.begin() + inputIndex);
-		return true;
-	}
-	return false;
-}
-int Entity::searchMagicCode(int inputCode)
-{
-	for (int i = 0; i < magicList.size(); i++)
-	{
-		if (magicList[i].skillCode == inputCode) return i;
-	}
-	return -1;
-}
-bool Entity::eraseMagicCode(int inputCode)
-{
-	for (int i = 0; i < magicList.size(); i++) if (magicList[i].skillCode == inputCode)
-	{
-		magicList.erase(magicList.begin() + i);
-		return true;
-	}
-	return false;
-}
-bool Entity::eraseMagicIndex(int inputIndex)
-{
-	if (inputIndex >= 0 && inputIndex < magicList.size())
-	{
-		magicList.erase(magicList.begin() + inputIndex);
-		return true;
-	}
-	return false;
-}
-humanCustom::skin Entity::getSkin() { return skin; }
-void Entity::setSkin(humanCustom::skin input) { skin = input; }
-humanCustom::eyes Entity::getEyes() { return eyes; }
-void Entity::setEyes(humanCustom::eyes input) { eyes = input; }
-humanCustom::scar Entity::getScar() { return scar; }
-void Entity::setScar(humanCustom::scar input) { scar = input; }
-humanCustom::beard Entity::getBeard() { return beard; }
-void Entity::setBeard(humanCustom::beard input) { beard = input; }
-humanCustom::hair Entity::getHair() { return hair; }
-void Entity::setHair(humanCustom::hair input) { hair = input; }
+humanCustom::skin Entity::getSkin() { return entityInfo.skin; }
+void Entity::setSkin(humanCustom::skin input) { entityInfo.skin = input; }
+humanCustom::eyes Entity::getEyes() { return entityInfo.eyes; }
+void Entity::setEyes(humanCustom::eyes input) { entityInfo.eyes = input; }
+humanCustom::scar Entity::getScar() { return entityInfo.scar; }
+void Entity::setScar(humanCustom::scar input) { entityInfo.scar = input; }
+humanCustom::beard Entity::getBeard() { return entityInfo.beard; }
+void Entity::setBeard(humanCustom::beard input) { entityInfo.beard = input; }
+humanCustom::hair Entity::getHair() { return entityInfo.hair; }
+void Entity::setHair(humanCustom::hair input) { entityInfo.hair = input; }
 unsigned __int8 Entity::getAimStack() { return aimStack; }
 void Entity::initAimStack() { aimStack = 0; }
 void Entity::addAimStack() { aimStack++; }
@@ -216,9 +75,9 @@ void Entity::setNextAtkType(atkType inputAtkType) { nextAtkType = inputAtkType; 
 atkType Entity::getNextAtkType() { return nextAtkType; }
 void Entity::setAtkTarget(int inputX, int inputY, int inputZ, int inputPart)
 {
-	atkTargetGridX = inputX;
-	atkTargetGridY = inputY;
-	atkTargetGridZ = inputZ;
+	atkTarget.x = inputX;
+	atkTarget.y = inputY;
+	atkTarget.z = inputZ;
 	atkTargetPart = inputPart;
 }
 void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
@@ -229,7 +88,31 @@ ItemPocket* Entity::getEquipPtr()
 { 
 	return entityInfo.equipment; 
 }
-Sprite* Entity::getSpriteFlash() { return spriteFlash; }
+Sprite* Entity::getSpriteFlash() 
+{ 
+	if (spriteFlash == nullptr)
+	{
+		int textureW, textureH;
+		SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
+		SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
+		SDL_SetRenderTarget(renderer, drawingTexture);
+		SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
+		SDL_Rect src = { 0, 0, textureW, textureH };
+		SDL_Rect dst = src;
+		//하얗게 만들 텍스쳐를 그려넣음
+		SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+		//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_Rect dstWhite = { 0, 0, textureW, textureH };
+		drawFillRect(dstWhite, col::white);
+		SDL_SetRenderTarget(renderer, nullptr);
+		if (spriteFlash != nullptr) { delete spriteFlash; }
+		spriteFlash = new Sprite(renderer, drawingTexture, 48, 48);
+	}
+
+	return spriteFlash; 
+}
 void Entity::setFlashType(int inputType)
 {
 	flashType = inputType;
@@ -242,46 +125,20 @@ void Entity::setFlashType(int inputType)
 		setFlashRGBA(0, 0, 0, 0);
 	}
 }
-void Entity::setSpriteFlash(Sprite* inputSprite) { spriteFlash = inputSprite; }
 int Entity::getFlashType() { return flashType; }
 bool Entity::getLeftFoot() { return leftFoot; }
 void Entity::setLeftFoot(bool input) { leftFoot = input; }
-void Entity::setSpriteInfimum(int inputVal) { spriteInfimum = inputVal; }
-int Entity::getSpriteInfimum() { return spriteInfimum; }
-SDL_RendererFlip Entity::getEntityFlip() { return flip; }
-void Entity::setEntityFlip(SDL_RendererFlip inputFlip) { flip = inputFlip; }
-void Entity::setSpriteIndex(int index) { spriteIndex = index; }
-int Entity::getSpriteIndex() { return spriteIndex; }
-Sprite* Entity::getSprite() { return sprite; }
-void Entity::setSprite(Sprite* inputSprite)
-{
-	sprite = inputSprite;
-
-	// make textureFlash
-	int textureW, textureH;
-	SDL_QueryTexture(inputSprite->getTexture(), NULL, NULL, &textureW, &textureH);
-	SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
-	SDL_SetRenderTarget(renderer, drawingTexture);
-	SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
-	SDL_Rect src = { 0, 0, textureW, textureH };
-	SDL_Rect dst = src;
-	//하얗게 만들 텍스쳐를 그려넣음
-	SDL_RenderCopy(renderer, inputSprite->getTexture(), &src, &dst);
-	//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_Rect dstWhite = { 0, 0, textureW, textureH };
-	drawFillRect(dstWhite, col::white);
-	SDL_SetRenderTarget(renderer, nullptr);
-	if (spriteFlash != nullptr) { delete spriteFlash; }
-	spriteFlash = new Sprite(renderer, drawingTexture, 48, 48);
-}
+void Entity::setSpriteInfimum(int inputVal) { entityInfo.sprIndexInfimum = inputVal; }
+int Entity::getSpriteInfimum() { return entityInfo.sprIndexInfimum; }
+void Entity::setSpriteIndex(int index) { entityInfo.sprIndex = index; }
+int Entity::getSpriteIndex() { return entityInfo.sprIndex; }
+Sprite* Entity::getSprite() { return entityInfo.entitySpr; }
 void Entity::setDirection(int dir)
 {
 	entityInfo.direction = dir;
 	if (dir == 2 || dir == 6) {}
-	else if (dir == 0 || (dir == 1 || dir == 7)) { setEntityFlip(SDL_FLIP_NONE); }
-	else { setEntityFlip(SDL_FLIP_HORIZONTAL); }
+	else if (dir == 0 || (dir == 1 || dir == 7)) { entityInfo.sprFlip = false; }
+	else { entityInfo.sprFlip = true; }
 }
 void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
 {
@@ -306,7 +163,7 @@ void Entity::addDmg(int inputPartIndex, int inputDmg)
 	{
 		if (entityInfo.parts[i][partsFlag::index] == inputPartIndex)
 		{
-			new Damage(std::to_wstring(inputDmg), this->getX(), this->getY() - 8, col::white, 10);
+			new Damage(std::to_wstring(inputDmg), this->getX(), this->getY() - 8, col::white, 9);
 
 			entityInfo.parts[i][partsFlag::hp] -= inputDmg;
 			entityInfo.HP -= inputDmg;
@@ -504,18 +361,19 @@ void Entity::deactAStarDst() { hasAStarDst = false; }
 int Entity::getAStarDstX()
 {
 	errorBox(hasAStarDst == false, "getAStarDstX activated while hasAStarDst is false");
-	return aStarDstX;
+	return aStarDst.x;
 }
 int Entity::getAStarDstY()
 {
 	errorBox(hasAStarDst == false, "getAStarDstY activated while hasAStarDst is false");
-	return aStarDstY;
+	return aStarDst.y;
 }
 void Entity::setAStarDst(int inputX, int inputY)
 {
+	isPlayerMoving = true;
 	hasAStarDst = true;
-	aStarDstX = inputX;
-	aStarDstY = inputY;
+	aStarDst.x = inputX;
+	aStarDst.y = inputY;
 }
 #pragma endregion
 void Entity::move(int dir, bool jump)
@@ -577,7 +435,7 @@ void Entity::attack(int gridX, int gridY, int inputPartType)
 		}
 		else
 		{
-			new Damage(L"dodged", victimEntity->getX(), victimEntity->getY() - 8, col::yellow, 9);
+			new Damage(L"dodged", victimEntity->getX(), victimEntity->getY() - 8, col::yellow, 8);
 			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}
@@ -787,9 +645,9 @@ void Entity::startFlash(int inputFlashType)
 void Entity::setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputAlpha)
 {
 	flash = { inputR, inputG, inputB, inputAlpha };
-	SDL_SetTextureColorMod(spriteFlash->getTexture(), inputR, inputG, inputB);
-	SDL_SetTextureAlphaMod(spriteFlash->getTexture(), inputAlpha);
-	SDL_SetTextureBlendMode(spriteFlash->getTexture(), SDL_BLENDMODE_BLEND);
+	SDL_SetTextureColorMod(getSpriteFlash()->getTexture(), inputR, inputG, inputB);
+	SDL_SetTextureAlphaMod(getSpriteFlash()->getTexture(), inputAlpha);
+	SDL_SetTextureBlendMode(getSpriteFlash()->getTexture(), SDL_BLENDMODE_BLEND);
 }
 void Entity::getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha)
 {
@@ -1011,7 +869,8 @@ void Entity::drawSelf()
 {
 	stepEvent();
 	setZoom(zoomScale);
-	setFlip(getEntityFlip());
+	if(entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
+	else setFlip(SDL_FLIP_HORIZONTAL);
 
 	//prt(L"현재 이 객체의 fake 좌표는 %f,%f이다.\n", getFakeX(), getFakeY());
 	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
@@ -1112,13 +971,15 @@ void Entity::drawSelf()
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (entityInfo.HP != entityInfo.maxHP)//개체 HP 표기
 	{
-		SDL_Rect dst = { drawingX - (int)(8 * zoomScale), drawingY + (int)(3 * zoomScale), (int)(16 * zoomScale),(int)(3 * zoomScale) };
+		int pivotX = drawingX - (int)(8 * zoomScale);
+		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
+		SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		drawFillRect(dst, col::black);
 
 		//페이크 HP
 		if (entityInfo.fakeHP > entityInfo.HP) { entityInfo.fakeHP--; }
-
+		else if (entityInfo.fakeHP < entityInfo.HP) entityInfo.fakeHP = entityInfo.HP;
 		if (entityInfo.fakeHP != entityInfo.HP)
 		{
 			if (entityInfo.fakeHPAlpha > 30) { entityInfo.fakeHPAlpha -= 30; }
@@ -1126,13 +987,24 @@ void Entity::drawSelf()
 		}
 		else { entityInfo.fakeHPAlpha = 255; }
 
+		//페이크 MP
+		if (entityInfo.fakeMP > entityInfo.MP) { entityInfo.fakeMP--; }
+		else if (entityInfo.fakeMP < entityInfo.MP) entityInfo.fakeMP = entityInfo.MP;
+		if (entityInfo.fakeMP != entityInfo.MP)
+		{
+			if (entityInfo.fakeMPAlpha > 30) { entityInfo.fakeMPAlpha -= 30; }
+			else { entityInfo.fakeMPAlpha = 0; }
+		}
+		else { entityInfo.fakeMPAlpha = 255; }
+
+
 		float ratioFakeHP = myMax((float)0.0, (entityInfo.fakeHP) / (float)(entityInfo.maxHP));
-		dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
+		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		drawFillRect(dst, col::white);
+		drawFillRect(dst, col::white, entityInfo.fakeHPAlpha);
 
 		float ratioHP = myMax((float)0.0, (float)(entityInfo.HP) / (float)(entityInfo.maxHP));
-		dst = { drawingX - (int)(7 * zoomScale), drawingY + (int)(4 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
+		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 		if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green);
@@ -1148,6 +1020,21 @@ void Entity::drawSelf()
 			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
 		);
+	}
+
+	if (selfAimTarget != -1) //부위타격
+	{
+		SDL_SetTextureAlphaMod(getSprite()->getTexture(), 180);
+		SDL_SetTextureBlendMode(getSprite()->getTexture(), SDL_BLENDMODE_BLEND);
+
+		drawSpriteCenter
+		(
+			getSprite(),
+			entityInfo.partsStartIndex + selfAimTarget,
+			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
+			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
+		);
+		SDL_SetTextureAlphaMod(getSprite()->getTexture(), 255);
 	}
 	setZoom(1.0);
 	setFlip(SDL_FLIP_NONE);

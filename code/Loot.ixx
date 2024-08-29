@@ -255,7 +255,10 @@ public:
 		}
 
 		//잘못된 커서 위치 조정
-		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1)) { lootCursor = lootPocket->itemInfo.size() - 1; }
+		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1)) 
+		{ 
+			lootCursor = lootPocket->itemInfo.size() - 1; 
+		}
 
 		//잘못된 스크롤 위치 조정
 		if (inputType == input::mouse || inputType == input::touch)

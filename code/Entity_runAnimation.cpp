@@ -77,10 +77,7 @@ bool Entity::runAnimation(bool shutdown)
 			setGrid(getDstGridX(), getDstGridY(), getGridZ());
 			turnWait(1.0);
 			endMove();
-			if (entityInfo.isPlayer)
-			{
-				cameraFix = true;
-			}
+			if (entityInfo.isPlayer) cameraFix = true;
 			return true;
 		}
 
@@ -108,7 +105,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -143,9 +140,9 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
 
-			if (atkTargetPart == -1) { attack(atkTargetGridX, atkTargetGridY); }
-			else { attack(atkTargetGridX, atkTargetGridY, atkTargetPart); }
-			new Sticker(false, getX() + (16 * (atkTargetGridX - getGridX())), getY() + (16 * (atkTargetGridY - getGridY())), spr::effectCut1, 0, stickerID, true);
+			if (atkTargetPart == -1) { attack(atkTarget.x, atkTarget.y); }
+			else { attack(atkTarget.x, atkTarget.y, atkTargetPart); }
+			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
 			setFakeX(getIntegerFakeX() - 1 * dx);
@@ -187,7 +184,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() >= 5)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 			if (address != nullptr)
 			{
 				Uint8 targetR, targetG, targetB, targetAlpha;
@@ -225,7 +222,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -260,9 +257,9 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
 
-			if (atkTargetPart == -1) { attack(atkTargetGridX, atkTargetGridY); }
-			else { attack(atkTargetGridX, atkTargetGridY, atkTargetPart); }
-			new Sticker(false, getX() + (16 * (atkTargetGridX - getGridX())), getY() + (16 * (atkTargetGridY - getGridY())), spr::effectCut1, 0, stickerID, true);
+			if (atkTargetPart == -1) { attack(atkTarget.x, atkTarget.y); }
+			else { attack(atkTarget.x, atkTarget.y, atkTargetPart); }
+			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
 			setFakeX(getIntegerFakeX() - 1 * dx);
@@ -304,7 +301,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() >= 5)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 			if (address != nullptr)
 			{
 				Uint8 targetR, targetG, targetB, targetAlpha;
@@ -342,7 +339,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -380,13 +377,13 @@ bool Entity::runAnimation(bool shutdown)
 			if (atkTargetPart == -1)
 			{
 				//명중률 계산 만들기
-				attack(atkTargetGridX, atkTargetGridY);
+				attack(atkTarget.x, atkTarget.y);
 			}
 			else
 			{
-				attack(atkTargetGridX, atkTargetGridY, atkTargetPart);
+				attack(atkTarget.x, atkTarget.y, atkTargetPart);
 			}
-			new Sticker(false, getX() + (16 * (atkTargetGridX - getGridX())), getY() + (16 * (atkTargetGridY - getGridY())), spr::effectCut1, 0, stickerID, true);
+			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
 			setFakeX(getIntegerFakeX() + 1 * dx);
@@ -428,7 +425,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() >= 5)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTargetGridX, atkTargetGridY, atkTargetGridZ).EntityPtr;
+			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 			if (address != nullptr)
 			{
 				Uint8 targetR, targetG, targetB, targetAlpha;

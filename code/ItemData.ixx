@@ -9,6 +9,7 @@ import constVar;
 //__int32 : –2,147,483,648 ~2,147,483,647
 
 class ItemPocket;
+
 export struct ItemData
 {
     std::wstring name = L"DEFAULT ITEM";

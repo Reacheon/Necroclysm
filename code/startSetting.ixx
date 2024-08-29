@@ -9,6 +9,7 @@ import ItemStack;
 import World;
 import Vehicle;
 import Prop;
+import Monster;
 
 export void startSetting()
 {
@@ -60,7 +61,19 @@ export void startSetting()
 	(item->getPocket())->addItemFromDex(91, 1000);//벤젠
 	(item->getPocket())->addItemFromDex(82, 1);//증류기
 
+	ItemStack* itemBow = new ItemStack(0, 18, 0);
+	(itemBow->getPocket())->addItemFromDex(383, 1);
+	(itemBow->getPocket())->addItemFromDex(385, 30);
+	itemBow->setSprIndex(itemDex[383].sprIndex);
+	
+	ItemStack* itemCrossbow = new ItemStack(4, 18, 0);
+	(itemCrossbow->getPocket())->addItemFromDex(382, 1);
+	(itemCrossbow->getPocket())->addItemFromDex(384, 30);
+	itemCrossbow->setSprIndex(itemDex[382].sprIndex);
 
+	new Monster(5, 0, 13, 0);
+	new Monster(5, 4, 13, 0);
+	new Monster(5, 8, 13, 0);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////▼아이템 레시피 추가////////////////////////////////////////////////////////////////////////////
@@ -532,7 +545,7 @@ export void startSetting()
 
 	new Prop(pX + 9, pY - 4, pZ, 237);//나무 설치
 
-
+	new Prop(pX - 2, pY + 36, pZ, 242);//나무 설치
 
 	new Prop(pX, pY - 20, pZ, 237);//벚꽃낙엽 설치
 

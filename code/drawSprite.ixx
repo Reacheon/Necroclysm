@@ -42,6 +42,8 @@ export void drawSprite(Sprite* spr, int index, int x, int y)
 	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }
 
+export void drawSprite(Sprite* spr, int x, int y) { drawSprite(spr, 0, x, y); }
+
 export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
 {
 	int textureW, textureH;
@@ -80,3 +82,5 @@ export void drawSpriteCenterF(Sprite* spr, int index, double x, double y)
 	dst.y = y - (dst.h / 2);
 	SDL_RenderCopyExF(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }
+
+

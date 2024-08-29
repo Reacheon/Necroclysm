@@ -41,17 +41,20 @@ void Equip::drawGUI()
 
 		//우측 아이템 상단바(선택 이름 물리량)
 		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);
-		if (checkCursor(&equipLabelSelect))
+		if (GUI::getLastGUI() == this)
 		{
-			drawStadium(equipLabelSelect.x, equipLabelSelect.y, equipLabelSelect.w, equipLabelSelect.h, lowCol::blue, 183, 5);
-		}
-		else if (checkCursor(&equipLabelName))
-		{
-			drawStadium(equipLabelName.x, equipLabelName.y, equipLabelName.w, equipLabelName.h, lowCol::blue, 183, 5);
-		}
-		else if (checkCursor(&equipLabelQuantity))
-		{
-			drawStadium(equipLabelQuantity.x, equipLabelQuantity.y, equipLabelQuantity.w, equipLabelQuantity.h, lowCol::blue, 183, 5);
+			if (checkCursor(&equipLabelSelect))
+			{
+				drawStadium(equipLabelSelect.x, equipLabelSelect.y, equipLabelSelect.w, equipLabelSelect.h, lowCol::blue, 183, 5);
+			}
+			else if (checkCursor(&equipLabelName))
+			{
+				drawStadium(equipLabelName.x, equipLabelName.y, equipLabelName.w, equipLabelName.h, lowCol::blue, 183, 5);
+			}
+			else if (checkCursor(&equipLabelQuantity))
+			{
+				drawStadium(equipLabelQuantity.x, equipLabelQuantity.y, equipLabelQuantity.w, equipLabelQuantity.h, lowCol::blue, 183, 5);
+			}
 		}
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(13);
@@ -60,6 +63,8 @@ void Equip::drawGUI()
 		drawText(sysStr[24], equipLabel.x + 250, equipLabel.y + 4); //무리량(상단바)
 
 		//개별 아이템
+		if (GUI::getLastGUI() != this) itemListColorLock = true;
+		else  itemListColorLock = false;
 		drawItemList(equipPtr, equipArea.x, equipArea.y, EQUIP_ITEM_MAX, equipCursor, equipScroll, isTargetPocket == false);
 
 		if (equipPtr->itemInfo.size() == 0) // 만약 아이템이 없을 경우

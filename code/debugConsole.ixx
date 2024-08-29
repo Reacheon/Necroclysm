@@ -45,6 +45,8 @@ export void debugConsole()
 	prt(L"19. 시간 강제 설정\n");
 	prt(L"20. 날짜 강제 설정\n");
 	prt(L"21. 날씨 변경\n");
+	prt(L"22. 말 생성\n");
+	prt(L"23. 상태이상 추가\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -334,6 +336,22 @@ export void debugConsole()
 		Player* ptr = Player::ins();
 		new Monster(4, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
+		break;
+	}
+	case 23: //상태이상 생성
+	{
+		int tgtEfctIndex = 0;
+		int tgtEfctDur = 1;
+
+		prt(L"[1/2] 추가할 상태이상의 인덱스를 입력해주세요.\n");
+		std::cin >> tgtEfctIndex;
+
+		prt(L"[2/2] 추가할 상태이상의 턴수를 입력해주세요.\n");
+		std::cin >> tgtEfctDur;
+
+		prt(L"상태이상을 성공적으로 추가하였다.\n");
+		Player::ins()->entityInfo.statusEffects.push_back({(statEfctFlag)tgtEfctIndex,tgtEfctDur});
+
 		break;
 	}
 

@@ -636,7 +636,7 @@ public:
 				if (abs(dy / scrollAccelConst) >= 1)
 				{
 					deactClickUp = true;
-					cursorMotionLock = true;
+					itemListColorLock = true;
 				}
 			}
 		}

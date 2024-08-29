@@ -10,8 +10,6 @@ import Mapmaker;
 import constVar;
 import TileData;
 
-export class ItemPocket;
-export class ItemStack;
 export class World
 {
 private:

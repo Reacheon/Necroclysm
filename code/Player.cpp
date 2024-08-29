@@ -18,15 +18,20 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
-	//setSprite(spr::charsetHero);
 	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
 
 	setSkin(humanCustom::skin::yellow);
 	setEyes(humanCustom::eyes::blue);
-	setHair(humanCustom::hair::middlePart);
+	setHair(humanCustom::hair::bob1Black);
 
 	int i = 0;
-	
+
+	getEquipPtr()->addItemFromDex(387);
+	getEquipPtr()->itemInfo[i++].equipState = equip::left;
+
+	getEquipPtr()->addItemFromDex(386);
+	getEquipPtr()->itemInfo[i++].equipState = equip::right;
+
 
 	getEquipPtr()->addItemFromDex(2);
 	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
@@ -43,8 +48,9 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	getEquipPtr()->addItemFromDex(107);
 	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
-	getEquipPtr()->addItemFromDex(374);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	//방독면
+	//getEquipPtr()->addItemFromDex(374);
+	//getEquipPtr()->itemInfo[i++].equipState = equip::normal;
 
 	addSkill(27);
 	quickSlot[0] = { quickSlotFlag::SKILL, 27 };
@@ -242,7 +248,6 @@ void Player::updateVision(int range) {
 	updateVision(range, getGridX(), getGridY());
 }
 
-
 void Player::updateNearbyChunk(int range)
 {
 	int chunkX, chunkY;
@@ -308,8 +313,26 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
+	if (Player::ins()->getSpriteInfimum() == sprInf::run)
+	{
+		entityInfo.STA -= 7;
+		if (entityInfo.STA < 0)
+		{
+			entityInfo.STA = 0;
+			Player::ins()->setSpriteInfimum(sprInf::walk);
+
+		}
+	}
 	updateVision(entityInfo.eyeSight);
 	updateMinimap();
+	if (getHasAStarDst())
+	{
+		if (getAStarDstX() == getGridX() && getAStarDstY() == getGridY())
+		{
+			Player::ins()->deactAStarDst();
+			aStarTrail.clear();
+		}
+	}
 }
 
 void Player::death()

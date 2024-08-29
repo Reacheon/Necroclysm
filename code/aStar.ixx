@@ -1,28 +1,26 @@
 ﻿export module aStar;
 
 import std;
+import Point;
 import hasher;
 import prt;
 import nanoTimer;
 import timeKeeper;
+import dirToXY;
 
-export int aStar(std::set<std::array<int, 2>> walkableTile, int playerX, int playerY, int dstX, int dstY)//(x2,y2)는 A*을 계산할 객체의 위치고 (x1,y1)은 도착지, 성공하면 최단거리로의 방향을 반환, 아니면 -1 반환
+export std::vector<Point2> aStar(std::set<std::array<int, 2>> walkableTile, int playerX, int playerY, int dstX, int dstY)//(x2,y2)는 A*을 계산할 객체의 위치고 (x1,y1)은 도착지, 성공하면 최단거리로의 방향을 반환, 아니면 -1 반환
 {
 	//prt(L"////////////////////////////aStar 알고리즘 실행됨/////////////////////////////\n");
 	//prt(L"이 엔티티의 현재 위치는 (%d,%d)이고 목적지는 (%d,%d)이다\n",playerX,playerY, dstX, dstY);
 
 	//에러 : 목표가 바로 옆에 있는데도 이동 명령을 내림
-	if (dstX == playerX && dstY == playerY) return -1;
+	if (dstX == playerX && dstY == playerY) return {};
 	else if (std::abs(playerX - dstX) <= 1 && std::abs(playerY - dstY) <= 1)
 	{
-		if (dstX - playerX == 1 && dstY - playerY == 0) return 4;
-		else if (dstX - playerX == 1 && dstY - playerY == -1) return 5;
-		else if (dstX - playerX == 0 && dstY - playerY == -1) return 6;
-		else if (dstX - playerX == -1 && dstY - playerY == -1) return 7;
-		else if (dstX - playerX == -1 && dstY - playerY == 0) return 0;
-		else if (dstX - playerX == -1 && dstY - playerY == 1) return 1;
-		else if (dstX - playerX == 0 && dstY - playerY == 1) return 2;
-		else return 3;
+		std::vector<Point2> trail;
+		trail.push_back({ playerX,playerY });
+		trail.push_back({ dstX,dstY });
+		return trail;
 	}
 
 	walkableTile.insert({ playerX,playerY });
@@ -150,13 +148,25 @@ export int aStar(std::set<std::array<int, 2>> walkableTile, int playerX, int pla
 		//prt(L"%d개의 오픈리스트를 연산에 이용했다.\n", stack);
 		//prt(L"현재 위치에서 %d 방향으로 이동하기 시작한다.\n", valDir[{ playerX, playerY }]);
 		//prt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
-		
-		return (valDir[{ playerX, playerY }]+4)%8;
+		std::vector<Point2> trail;
+		int currentX = playerX, currentY = playerY;
+		while (1)
+		{
+			trail.push_back({ currentX,currentY });
+			if (currentX == dstX && currentY == dstY) break;
+			
+			int dx = 0, dy = 0;
+			dir2Coord(valDir[{ currentX, currentY }], dx, dy);
+			currentX += dx;
+			currentY += dy;
+		}
+
+		return trail;
 	}
 	else
 	{
 		//prt(L"[디버그] 길찾기 실패\n");
 		//prt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
-		return -1;
+		return {};
 	}
 }

@@ -61,17 +61,20 @@ void Inventory::drawGUI()
 		SDL_Rect inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 71 , 26 };
 
 		drawStadium(inventoryLabel.x, inventoryLabel.y, inventoryLabel.w, inventoryLabel.h, { 0,0,0 }, 183, 5);
-		if (checkCursor(&inventoryLabelSelect))
+		if (GUI::getLastGUI() == this)
 		{
-			drawStadium(inventoryLabelSelect.x, inventoryLabelSelect.y, inventoryLabelSelect.w, inventoryLabelSelect.h, lowCol::blue, 183, 5);
-		}
-		else if (checkCursor(&inventoryLabelName))
-		{
-			drawStadium(inventoryLabelName.x, inventoryLabelName.y, inventoryLabelName.w, inventoryLabelName.h, lowCol::blue, 183, 5);
-		}
-		else if (checkCursor(&inventoryLabelQuantity))
-		{
-			drawStadium(inventoryLabelQuantity.x, inventoryLabelQuantity.y, inventoryLabelQuantity.w, inventoryLabelQuantity.h, lowCol::blue, 183, 5);
+			if (checkCursor(&inventoryLabelSelect))
+			{
+				drawStadium(inventoryLabelSelect.x, inventoryLabelSelect.y, inventoryLabelSelect.w, inventoryLabelSelect.h, lowCol::blue, 183, 5);
+			}
+			else if (checkCursor(&inventoryLabelName))
+			{
+				drawStadium(inventoryLabelName.x, inventoryLabelName.y, inventoryLabelName.w, inventoryLabelName.h, lowCol::blue, 183, 5);
+			}
+			else if (checkCursor(&inventoryLabelQuantity))
+			{
+				drawStadium(inventoryLabelQuantity.x, inventoryLabelQuantity.y, inventoryLabelQuantity.w, inventoryLabelQuantity.h, lowCol::blue, 183, 5);
+			}
 		}
 		setFontSize(13);
 		drawText(col2Str(col::white) + sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //선택(상단바)
@@ -79,6 +82,9 @@ void Inventory::drawGUI()
 		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)
 
 		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 30, 315, 200 };
+
+		if (GUI::getLastGUI() != this) itemListColorLock = true;
+		else  itemListColorLock = false;
 		drawItemList(inventoryPocket, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
 
 		if (inventoryPocket->itemInfo.size() == 0)

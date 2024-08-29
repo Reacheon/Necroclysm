@@ -137,6 +137,7 @@ public:
 	void drawTab();
 	void drawQuickSlot();
 	void drawBarAct();
+	void drawStatusEffects();
 
 	void clickDownGUI();
 	void clickMotionGUI(int dx, int dy);
@@ -313,20 +314,12 @@ public:
 
 		if (GUI::getLastGUI() == this)
 		{
-			if (inputType == input::mouse || inputType == input::touch)
-			{
-				whiteMarkerCoord.x = getAbsMouseGrid().x;
-				whiteMarkerCoord.y = getAbsMouseGrid().y;
-				whiteMarkerCoord.z = Player::ins()->getGridZ();
-			}
-			else if (inputType == input::gamepad)
+			if (inputType == input::gamepad)
 			{
 				__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 				__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-
 				int tgtX = Player::ins()->getGridX();
 				int tgtY = Player::ins()->getGridY();
-
 				if (leftX > TOLERANCE_LSTICK) tgtX += 1;
 				if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
 				if (leftY > TOLERANCE_LSTICK) tgtY += 1;
@@ -334,11 +327,11 @@ public:
 
 				if (!(tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY()))
 				{
-					whiteMarkerCoord.x = tgtX;
-					whiteMarkerCoord.y = tgtY;
-					whiteMarkerCoord.z = Player::ins()->getGridZ();
+					gamepadWhiteMarker.x = tgtX;
+					gamepadWhiteMarker.y = tgtY;
+					gamepadWhiteMarker.z = Player::ins()->getGridZ();
 				}
-				else whiteMarkerCoord.z = std::numeric_limits<int>::max();
+				else gamepadWhiteMarker.z = std::numeric_limits<int>::max();
 			}
 		}
 
@@ -660,7 +653,8 @@ public:
 				if (World::ins()->getItemPos(touchX, touchY, Player::ins()->getGridZ()) != nullptr)
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
-					new Loot(World::ins()->getItemPos(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ())->getPocket(), nullptr);
+					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).ItemStackPtr;
+					new Loot(targetStack->getPocket(), nullptr);
 					click = false;
 				}
 				else if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).VehiclePtr != nullptr)
@@ -922,10 +916,10 @@ public:
 		}
 	};
 
-	Corouter useSkill(SkillData dat)
+	Corouter useSkill(int skillCode)
 	{
 		const int SKILL_MAX_RANGE = 30;
-		switch (dat.skillCode)
+		switch (skillCode)
 		{
 		default:
 			prt(L"[Entity:useSkill] 플레이어가 알 수 없는 스킬을 시전하였다.\n", this);

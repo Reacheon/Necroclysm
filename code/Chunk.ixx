@@ -5,9 +5,6 @@ import util;
 import constVar;
 import TileData;
 
-export class Entity;
-export class ItemStack;
-export class Vehicle;
 export class Chunk
 {
 private:
