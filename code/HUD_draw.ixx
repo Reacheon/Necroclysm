@@ -611,10 +611,11 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::talent) setBtnLayout(sysStr[7], 7);
 		else if (barAct[i] == act::runMode)
 		{
-			if (Player::ins()->getSpriteInfimum() == sprInf::walk) setBtnLayout(sysStr[8], 9);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::run) setBtnLayout(sysStr[8], 10);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::sit) setBtnLayout(sysStr[8], 12);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::crawl) setBtnLayout(sysStr[8], 11);
+
+			if (Player::ins()->entityInfo.walkMode == walkFlag::walk) setBtnLayout(sysStr[8], 9);
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::run) setBtnLayout(sysStr[8], 10);
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::crouch) setBtnLayout(sysStr[8], 12);
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::crawl) setBtnLayout(sysStr[8], 11);
 		}
 		else if (barAct[i] == act::identify) setBtnLayout(sysStr[135], 52);
 		else if (barAct[i] == act::vehicle) setBtnLayout(sysStr[128], 48);

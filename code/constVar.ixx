@@ -506,6 +506,16 @@ export enum class itemFlag
 
     POCKET,
     CAN_CLIMB,
+
+    SPR_TH_WEAPON,
+};
+
+export enum class walkFlag
+{
+    walk,
+    run,
+    crouch,
+    crawl,
 };
 
 export namespace toolQuality
@@ -1205,6 +1215,44 @@ export enum statEfctFlag
     hunger=2,
     dehydration=3,
     blindness=4,
+};
+
+export enum charIndex
+{
+    WALK = 0,
+    WALK_2H = 3,
+
+    RUN = 6,
+    RUN_2H = 9,
+
+    CROUCH = 12,
+    CROUCH_2H = 15,
+
+    CRAWL = 18,
+
+    SIT = 21,
+    HOVER = 22,
+    SUPINE = 23,
+
+    DASH = 24,
+    AIM_BOW = 30,
+    AIM_BOW_CROUCH = 31,
+    AIM_RIFLE = 32,
+    AIM_RIFLE_CROUCH = 33,
+    LCAST = 34,
+    LCAST_CROUCH = 35,
+
+    RCAST = 36,
+    RCASH_CROUCH = 37,
+    BCAST = 38,
+    BCAST_CROUCH = 39,
+    MINING1 = 40,
+    MINING2 = 41,
+
+    LAND = 42,
+    AIM_PISTOL = 43,
+    AIM_PISTOL_CROUCH = 44,
+    AIM_PISTOL_CRAWL = 45,
 };
 
 //전방선언

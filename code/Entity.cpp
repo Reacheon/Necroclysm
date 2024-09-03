@@ -876,24 +876,64 @@ void Entity::drawSelf()
 	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
 	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
 
+	int localSprIndex = getSpriteIndex();
+	if (entityInfo.isPlayer == true)
+	{
+		if (getSpriteIndex() >= 0 && getSpriteIndex() <= 2)
+		{
+			if (entityInfo.walkMode == walkFlag::walk)
+			{
+			}
+			else if (entityInfo.walkMode == walkFlag::run)
+			{
+				localSprIndex += 6;
+			}
+			else if (entityInfo.walkMode == walkFlag::crouch)
+			{
+				localSprIndex += 12;
+			}
+			else if (entityInfo.walkMode == walkFlag::crawl)
+			{
+				localSprIndex += 18;
+			}
+
+
+			if (entityInfo.walkMode != walkFlag::crawl)
+			{
+				for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+				{
+					if (getEquipPtr()->itemInfo[i].equipState == equip::both)
+					{
+						if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::SPR_TH_WEAPON))
+						{
+							localSprIndex += 3;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	//캐릭터 그림자 그리기
-	drawSpriteCenter(spr::shadow, getSpriteIndex(), drawingX, drawingY);
+	drawSpriteCenter(spr::shadow, localSprIndex, drawingX, drawingY);
 
 	//캐릭터 본체 그리기
-	drawSpriteCenter(getSprite(), getSpriteIndex(), drawingX, drawingY);
+	drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);
+
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//캐릭터 커스타미이징 그리기
 	if (getSkin() != humanCustom::skin::null)
 	{
-		if (getSkin() == humanCustom::skin::yellow) drawSpriteCenter(spr::skinYellow, getSpriteIndex(), drawingX, drawingY);
+		if (getSkin() == humanCustom::skin::yellow) drawSpriteCenter(spr::skinYellow, localSprIndex, drawingX, drawingY);
 	}
 
 	if (getEyes() != humanCustom::eyes::null)
 	{
-		if (getEyes() == humanCustom::eyes::blue) drawSpriteCenter(spr::eyesBlue, getSpriteIndex(), drawingX, drawingY);
-		else if (getEyes() == humanCustom::eyes::red) drawSpriteCenter(spr::eyesRed, getSpriteIndex(), drawingX, drawingY);
+		if (getEyes() == humanCustom::eyes::blue) drawSpriteCenter(spr::eyesBlue, localSprIndex, drawingX, drawingY);
+		else if (getEyes() == humanCustom::eyes::red) drawSpriteCenter(spr::eyesRed, localSprIndex, drawingX, drawingY);
 	}
 
 	if (getScar() != humanCustom::scar::null)
@@ -902,7 +942,7 @@ void Entity::drawSelf()
 
 	if (getBeard() != humanCustom::beard::null)
 	{
-		if (getBeard() == humanCustom::beard::mustache) drawSpriteCenter(spr::beardMustacheBlack, getSpriteIndex(), drawingX, drawingY);
+		if (getBeard() == humanCustom::beard::mustache) drawSpriteCenter(spr::beardMustacheBlack, localSprIndex, drawingX, drawingY);
 	}
 
 	if (getHair() != humanCustom::hair::null)
@@ -910,16 +950,16 @@ void Entity::drawSelf()
 		switch (getHair())
 		{
 		case humanCustom::hair::commaBlack:
-			drawSpriteCenter(spr::hairCommaBlack, getSpriteIndex(), drawingX, drawingY);
+			drawSpriteCenter(spr::hairCommaBlack, localSprIndex, drawingX, drawingY);
 			break;
 		case humanCustom::hair::bob1Black:
-			drawSpriteCenter(spr::hairBob1Black, getSpriteIndex(), drawingX, drawingY);
+			drawSpriteCenter(spr::hairBob1Black, localSprIndex, drawingX, drawingY);
 			break;
 		case humanCustom::hair::ponytail:
-			drawSpriteCenter(spr::hairPonytailBlack, getSpriteIndex(), drawingX, drawingY);
+			drawSpriteCenter(spr::hairPonytailBlack, localSprIndex, drawingX, drawingY);
 			break;
 		case humanCustom::hair::middlePart:
-			drawSpriteCenter(spr::hairMiddlePart, getSpriteIndex(), drawingX, drawingY);
+			drawSpriteCenter(spr::hairMiddlePart, localSprIndex, drawingX, drawingY);
 			break;
 		}
 	}
@@ -961,7 +1001,7 @@ void Entity::drawSelf()
 		{
 			if (it->second != nullptr)
 			{
-				drawSpriteCenter(it->second, getSpriteIndex(), drawingX, drawingY);
+				drawSpriteCenter(it->second, localSprIndex, drawingX, drawingY);
 			}
 		}
 
@@ -1016,7 +1056,7 @@ void Entity::drawSelf()
 		drawSpriteCenter
 		(
 			getSpriteFlash(),
-			getSpriteIndex(),
+			localSprIndex,
 			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
 		);

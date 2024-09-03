@@ -407,11 +407,10 @@ public:
 			new Bionic();
 			break;
 		case act::runMode:
-			if (Player::ins()->getSpriteInfimum() == sprInf::walk) Player::ins()->setSpriteInfimum(sprInf::run);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::run) Player::ins()->setSpriteInfimum(sprInf::sit);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::sit) Player::ins()->setSpriteInfimum(sprInf::crawl);
-			else if (Player::ins()->getSpriteInfimum() == sprInf::crawl)Player::ins()->setSpriteInfimum(sprInf::walk);
-			Player::ins()->setSpriteIndex(Player::ins()->getSpriteInfimum());
+			if (Player::ins()->entityInfo.walkMode == walkFlag::walk) Player::ins()->entityInfo.walkMode = walkFlag::run;
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::run) Player::ins()->entityInfo.walkMode = walkFlag::crouch;
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::crouch) Player::ins()->entityInfo.walkMode = walkFlag::crawl;
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::crawl) Player::ins()->entityInfo.walkMode = walkFlag::walk;
 			popDownWhenEnd = false;
 			break;
 		case act::craft:

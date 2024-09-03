@@ -75,4 +75,6 @@ export struct EntityData
     humanCustom::hair hair = humanCustom::hair::null;
 
     std::vector<std::pair<statEfctFlag, int>> statusEffects;
+
+    walkFlag walkMode = walkFlag::walk;
 };

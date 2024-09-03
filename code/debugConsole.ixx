@@ -217,7 +217,7 @@ export void debugConsole()
 		{
 			World::ins()->getTile(xp, yp, zp).gasVec.push_back({ gasCode, gasVol });
 		}
-		prt(col::white,L"%ls를 %d의 부피만큼 좌표 (%d,%d,%d)에 생성하였다!\n",itemDex[gasCode].name.c_str(),gasVol,xp,yp,zp);
+		prt(col::white, L"%ls를 %d의 부피만큼 좌표 (%d,%d,%d)에 생성하였다!\n", itemDex[gasCode].name.c_str(), gasVol, xp, yp, zp);
 		break;
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
@@ -233,10 +233,6 @@ export void debugConsole()
 	}
 	case 13:
 	{
-		if (Player::ins()->getSpriteInfimum() == sprInf::walk) Player::ins()->setSpriteInfimum(sprInf::run);
-		else if (Player::ins()->getSpriteInfimum() == sprInf::run) Player::ins()->setSpriteInfimum(sprInf::sit);
-		else if (Player::ins()->getSpriteInfimum() == sprInf::sit) Player::ins()->setSpriteInfimum(sprInf::crawl);
-		else if (Player::ins()->getSpriteInfimum() == sprInf::crawl) Player::ins()->setSpriteInfimum(sprInf::walk);
 		break;
 	}
 	case 14:
@@ -350,10 +346,9 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		Player::ins()->entityInfo.statusEffects.push_back({(statEfctFlag)tgtEfctIndex,tgtEfctDur});
+		Player::ins()->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}
-
 	}
 }

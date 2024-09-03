@@ -22,10 +22,10 @@ bool Entity::runAnimation(bool shutdown)
 		// 1 / 60초마다 runAnimation이 실행됨
 		
 		float speed = 2.5;
-		if (getSpriteInfimum() == sprInf::run) speed = 3.5;
-		else if (getSpriteInfimum() == sprInf::walk) speed = 3.0;
-		else if (getSpriteInfimum() == sprInf::walk) speed = 2.0;
-		else if (getSpriteInfimum() == sprInf::walk) speed = 2.0;
+		if (entityInfo.walkMode == walkFlag::run) speed = 3.5;
+		else if (entityInfo.walkMode == walkFlag::walk) speed = 3.0;
+		else if (entityInfo.walkMode == walkFlag::crawl) speed = 2.0;
+		else if (entityInfo.walkMode == walkFlag::crouch) speed = 2.0;
 		
 		addTimer();
 
@@ -55,12 +55,12 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				if (getLeftFoot() == true)
 				{
-					setSpriteIndex(getSpriteInfimum() + 1);
+					setSpriteIndex(1);
 					setLeftFoot(false);
 				}
 				else
 				{
-					setSpriteIndex(getSpriteInfimum() + 2);
+					setSpriteIndex(2);
 					setLeftFoot(true);
 				}
 				footChanged = true;
@@ -69,7 +69,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (std::abs(getIntegerFakeX()) >= 16.0 || std::abs(getIntegerFakeY()) >= 16.0)
 		{
-			setSpriteIndex(getSpriteInfimum() + 0);
+			setSpriteIndex(0);
 			resetTimer();
 			setAniType(aniFlag::null);
 			setFakeX(0);
