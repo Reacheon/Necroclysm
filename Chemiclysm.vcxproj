@@ -161,7 +161,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\actFuncSet.ixx" />
-    <ClCompile Include="code\Aim.ixx" />
     <ClCompile Include="code\Alchemy.ixx" />
     <ClCompile Include="code\AlchemyData.ixx" />
     <ClCompile Include="code\Ani.ixx" />

@@ -139,9 +139,7 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
-
-			if (atkTargetPart == -1) { attack(atkTarget.x, atkTarget.y); }
-			else { attack(atkTarget.x, atkTarget.y, atkTargetPart); }
+			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
@@ -257,8 +255,7 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
 
-			if (atkTargetPart == -1) { attack(atkTarget.x, atkTarget.y); }
-			else { attack(atkTarget.x, atkTarget.y, atkTargetPart); }
+			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
@@ -374,15 +371,7 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
 
-			if (atkTargetPart == -1)
-			{
-				//명중률 계산 만들기
-				attack(atkTarget.x, atkTarget.y);
-			}
-			else
-			{
-				attack(atkTarget.x, atkTarget.y, atkTargetPart);
-			}
+			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:

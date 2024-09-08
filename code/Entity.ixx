@@ -40,7 +40,6 @@ private:
 
 public:
     EntityData entityInfo;
-    int selfAimTarget = -1; //몬스터용, 자신을 가리키는 뭐시기
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     ~Entity();
 
@@ -85,7 +84,7 @@ public:
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType);
     float endAtk();
     void loadDataFromDex(int index);
-    void addDmg(int inputPartIndex, int inputDmg);
+    void addDmg(int inputDmg);
     bool existPart(int inputPartIndex);
     void updateStatus();
     int getRPierce(int inputPartIndex);
@@ -101,7 +100,6 @@ public:
     void setAStarDst(int inputX, int inputY);
 
     void move(int dir, bool jump);
-    void attack(int gridX, int gridY, int inputPartType);
     void attack(int gridX, int gridY);
     void updateWalkable(int gridX, int gridY);
     void rayCasting(int x1, int y1, int x2, int y2);

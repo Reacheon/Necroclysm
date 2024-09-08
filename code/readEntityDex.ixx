@@ -167,106 +167,18 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::parts:
                         {
-                            entityDex[arrayCounter / (csvWidth)-1].parts.clear();
-                            std::array<int, 4> val;
-                            int counter = 0;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == SDLK_PERIOD)
-                                {
-                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
-                                    counter++;
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                }
-
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
-                                    counter = 0;
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                    val[partsFlag::maxHP] = val[partsFlag::hp];
-                                    entityDex[arrayCounter / (csvWidth)-1].parts.push_back(val);
-                                }
-                            }
                             break;
                         }
                         case csvEntity::rPierce:
                         {
-                            __int16 lVal, rVal;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == UNI::x)
-                                {
-                                    lVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                }
-
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    rVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-
-                                    entityDex[arrayCounter / (csvWidth)-1].rPierce.push_back({ lVal, rVal });
-                                }
-                            }
                             break;
                         }
                         case csvEntity::rCut:
                         {
-                            __int16 lVal, rVal;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == UNI::x)
-                                {
-                                    lVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                }
-
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    rVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-
-                                    entityDex[arrayCounter / (csvWidth)-1].rCut.push_back({ lVal, rVal });
-                                }
-                            }
                             break;
                         }
                         case csvEntity::rBash:
                         {
-                            __int16 lVal, rVal;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == UNI::x)
-                                {
-                                    lVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                }
-
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    rVal = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-
-                                    entityDex[arrayCounter / (csvWidth)-1].rBash.push_back({ lVal, rVal });
-                                }
-                            }
                             break;
                         }
                         case csvEntity::SH:

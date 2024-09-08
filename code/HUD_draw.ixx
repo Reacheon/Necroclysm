@@ -359,6 +359,15 @@ void HUD::drawTab()
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 92);
 		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 92 + 14);
+
+		Sprite* targetBtnSpr;
+		if (inputType == input::gamepad)
+		{
+			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			else { targetBtnSpr = spr::buttons; }
+			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
+		}
+
 		break;
 	case tabFlag::aim:
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
@@ -429,9 +438,9 @@ void HUD::drawQuickSlot()
 	Sprite* targetBtnSpr;
 	if (inputType == input::gamepad)
 	{
-		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X)) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }
-		drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, pivotX + 23, pivotY + 18);
+		drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_RECT, pivotX + 23, pivotY + 20);
 	}
 	else
 	{

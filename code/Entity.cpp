@@ -157,87 +157,16 @@ void Entity::loadDataFromDex(int index)
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
-void Entity::addDmg(int inputPartIndex, int inputDmg)
+void Entity::addDmg(int inputDmg)
 {
-	for (int i = 0; i < entityInfo.parts.size(); i++)
+	new Damage(std::to_wstring(inputDmg), this->getX(), this->getY() - 8, col::white, 9);
+	entityInfo.HP -= inputDmg;
+	if (entityInfo.HP <= 0)//HP 0, 사망
 	{
-		if (entityInfo.parts[i][partsFlag::index] == inputPartIndex)
-		{
-			new Damage(std::to_wstring(inputDmg), this->getX(), this->getY() - 8, col::white, 9);
-
-			entityInfo.parts[i][partsFlag::hp] -= inputDmg;
-			entityInfo.HP -= inputDmg;
-			prt(L"[공격] %d의 데미지를 부위 %d에 가하였다. 해당 부위의 남은 HP는 %d이며 전체 HP는 %d이다.\n", inputDmg, inputPartIndex, entityInfo.parts[i][partsFlag::hp], entityInfo.HP);
-
-			if (entityInfo.HP <= 0)//HP 0, 사망
-			{
-				death();
-				return;
-			}
-
-			if (entityInfo.parts[i][partsFlag::hp] <= 0)//부위파괴
-			{
-				switch (entityInfo.bodyTemplate)
-				{
-				case bodyTemplateFlag::human://사람일 경우
-				{
-					//머리 또는 몸 파괴
-					if (inputPartIndex == partType::head || inputPartIndex == partType::torso)
-					{
-						death();
-					}
-					//팔 파괴
-					else if (inputPartIndex == partType::larm || inputPartIndex == partType::rarm)
-					{
-
-					}
-					//다리 파괴
-					else if (inputPartIndex == partType::lleg || inputPartIndex == partType::rleg)
-					{
-
-					}
-					break;
-				}
-				case bodyTemplateFlag::zombie://좀비일 경우
-				{
-					//몸 파괴
-					if (inputPartIndex == partType::torso)
-					{
-						death();
-					}
-					//머리 파괴
-					if (inputPartIndex == partType::head)
-					{
-					}
-					//팔 파괴
-					else if (inputPartIndex == partType::larm || inputPartIndex == partType::rarm)
-					{
-
-					}
-					//다리 파괴
-					else if (inputPartIndex == partType::lleg || inputPartIndex == partType::rleg)
-					{
-
-					}
-					break;
-				}
-				}
-			}
-
-			break;
-		}
+		death();
+		return;
 	}
-}
-bool Entity::existPart(int inputPartIndex)
-{
-	for (int i = 0; i < entityInfo.parts.size(); i++)
-	{
-		if (entityInfo.parts[i][partsFlag::index] == inputPartIndex)
-		{
-			return true;
-		}
-	}
-	return false;
+
 }
 void Entity::updateStatus()
 {
@@ -415,7 +344,7 @@ void Entity::move(int dir, bool jump)
 		pulledCart->setGrid(getGridX(), getGridY(),getGridZ());
 	}
 }
-void Entity::attack(int gridX, int gridY, int inputPartType)
+void Entity::attack(int gridX, int gridY)
 {
 	Entity* victimEntity = (Entity*)World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr;
 	if (victimEntity == nullptr)
@@ -426,12 +355,12 @@ void Entity::attack(int gridX, int gridY, int inputPartType)
 	{
 		//명중률 계산
 		float aimAcc;
-		aimAcc = getAimAcc(victimEntity, inputPartType, true);
+		aimAcc = 1.00;
 
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			victimEntity->setFlashType(1);
-			victimEntity->addDmg(inputPartType, 9);
+			victimEntity->addDmg(9);
 		}
 		else
 		{
@@ -439,14 +368,6 @@ void Entity::attack(int gridX, int gridY, int inputPartType)
 			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}
-}
-void Entity::attack(int gridX, int gridY)
-{
-	Entity* victimEntity = (Entity*)World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr;
-	int targetPart;
-	if (randomRange(1, 10) <= 8) { targetPart = 0; }
-	else { targetPart = randomRange(1, victimEntity->entityInfo.parts.size() - 1); }
-	attack(gridX, gridY, victimEntity->entityInfo.parts[targetPart][partsFlag::index]);
 }
 void Entity::updateWalkable(int gridX, int gridY)//만약 다를 경우 개체에서 오버라이드해서 쓰시오
 {
@@ -761,17 +682,6 @@ void Entity::addTalentExp(int expVal)
 }
 //메소드를 실행한 객체를 죽이고 아이템을 드랍한다.
 //현재 개체가 보유한 모든 부위를 벡터 형태로 반환한다.
-std::vector<int> Entity::getAllParts()
-{
-	std::vector<int> partsVec;
-
-	for (int i = 0; i < entityInfo.parts.size(); i++)
-	{
-		partsVec.push_back(entityInfo.parts[i][partsFlag::index]);
-	}
-
-	return partsVec;
-}
 void Entity::aimWeaponRight() { aimWeaponHand = equip::right; }
 void Entity::aimWeaponLeft() { aimWeaponHand = equip::left; }
 int Entity::getAimHand()
@@ -780,49 +690,6 @@ int Entity::getAimHand()
 	else { return equip::left; }
 }
 //이 개체가 해당 개체를 공격했을 때 공격한 방법과 상대 부위에 따른 명중률을 확률(0~1.0)으로 반환해줌, aim이 false면 aimStack을 0로 계산 
-float Entity::getAimAcc(Entity* victimEntity, int inputPartType, bool aim)
-{
-	float aimAcc;
-	int victimTargetPartIndex = 0;
-	int distance = myMax(abs(getGridX() - victimEntity->getGridX()), abs(getGridY() - victimEntity->getGridY()));
-
-	unsigned __int8 aimStack = 0;
-	if (aim == true) { aimStack = getAimStack(); }
-	else { aimStack = 0; }
-
-	//입력한 파츠의 종류(팔,다리)를 피해자 개체의 파츠벡터의 index(단순순서)로 변환해줌
-	for (int i = 0; i < victimEntity->entityInfo.parts.size(); i++)
-	{
-		if (victimEntity->entityInfo.parts[i][partsFlag::index] == inputPartType)
-		{
-			victimTargetPartIndex = i;
-		}
-	}
-
-	if (getAimWeaponIndex() == -1)//맨손공격
-	{
-		return aimAcc = calcMelee::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, 0.9, 5, 13.5, 13.5, aimStack);
-	}
-	else//무기공격
-	{
-		switch (getNextAtkType())
-		{
-		case atkType::pierce:
-			return aimAcc = calcMelee::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, getEquipPtr()->itemInfo[getAimWeaponIndex()].meleeAtkAcc, 5, 13.5, 13.5, aimStack);
-		case atkType::cut:
-			return aimAcc = calcMelee::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, getEquipPtr()->itemInfo[getAimWeaponIndex()].meleeAtkAcc, 5, 13.5, 13.5, aimStack);
-		case atkType::bash:
-			return aimAcc = calcMelee::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, getEquipPtr()->itemInfo[getAimWeaponIndex()].meleeAtkAcc, 5, 13.5, 13.5, aimStack);
-		case atkType::shot:
-			return aimAcc = calcShot::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, getEquipPtr()->itemInfo[getAimWeaponIndex()].gunAccInit, 5, 13.5, aimStack, distance);
-		case atkType::throwing:
-			return aimAcc = calcThrow::acc(victimEntity->entityInfo.parts[victimTargetPartIndex][partsFlag::acc] / 100.0, getEquipPtr()->itemInfo[getAimWeaponIndex()].throwAtkAcc, 5, 13.5, aimStack, distance);
-		default:
-			errorBox("Unknown attack type in getAimAcc(Entity.ixx)");
-			break;
-		}
-	}
-}
 int Entity::getAimWeaponIndex()
 {
 	//현재 플레이어가 적에게 겨누는 무기의 인덱스를 반환함(-1이면 맨손)
@@ -1062,20 +929,6 @@ void Entity::drawSelf()
 		);
 	}
 
-	if (selfAimTarget != -1) //부위타격
-	{
-		SDL_SetTextureAlphaMod(getSprite()->getTexture(), 180);
-		SDL_SetTextureBlendMode(getSprite()->getTexture(), SDL_BLENDMODE_BLEND);
-
-		drawSpriteCenter
-		(
-			getSprite(),
-			entityInfo.partsStartIndex + selfAimTarget,
-			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
-			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
-		);
-		SDL_SetTextureAlphaMod(getSprite()->getTexture(), 255);
-	}
 	setZoom(1.0);
 	setFlip(SDL_FLIP_NONE);
 };

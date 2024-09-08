@@ -35,7 +35,7 @@ void HUD::gamepadBtnDown()
 			barActCursor = -1;
 		}
 		break;
-	case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+	case SDL_CONTROLLER_BUTTON_X:
 		quickSlotToggle();
 		if (isQuickSlotPop) quickSlotCursor = 0;
 		else quickSlotCursor = -1;
@@ -81,7 +81,7 @@ void HUD::gamepadBtnUp()
 			tileTouch(tgtX, tgtY);
 		}
 		break;
-	case SDL_CONTROLLER_BUTTON_X:
+	case SDL_CONTROLLER_BUTTON_START:
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 

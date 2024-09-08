@@ -28,7 +28,6 @@ import Light;
 import Sticker;
 import Monster;
 import Lst;
-import Aim;
 import CoordSelect;
 import Alchemy;
 import turnWait;

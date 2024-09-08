@@ -25,10 +25,7 @@ export struct EntityData
     __int16 maxHP = 100;
     __int16 maxMP = 100;
     __int16 maxSTA = 60;
-    std::vector<std::array<int, 4>> parts = { { partType::head, 100, 100,100 } };
-    std::vector<std::array<__int16, 2>> rPierce;
-    std::vector<std::array<__int16, 2>> rCut;
-    std::vector<std::array<__int16, 2>> rBash;
+
     std::vector<std::array<__int16, 2>> enc;
     __int16 sh = 0;
     __int16 ev = 0;

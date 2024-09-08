@@ -9,45 +9,31 @@ import globalVar;
 import Player;
 import World;
 import Vehicle;
-import Aim;
 import log;
 import Prop;
 import ContextMenu;
 import mouseGrid;
 import Entity;
 
-Entity* touchMonster = nullptr;
 
 void HUD::clickDownGUI()
 {
 	executedHold = false;
 
-	Entity* targetEntity = (Entity*)(World::ins()->getTile(getAbsMouseGrid().x, getAbsMouseGrid().y, Player::ins()->getGridZ()).EntityPtr);
-	if (targetEntity != nullptr && targetEntity->entityInfo.isPlayer == false)
-	{
-		touchMonster = (Entity*)(World::ins()->getTile(getAbsMouseGrid().x, getAbsMouseGrid().y, Player::ins()->getGridZ()).EntityPtr);
-	}
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
 	if (click == true)
 	{
-		if (touchMonster != nullptr)
-		{
-			touchMonster->selfAimTarget = std::min(5,std::max(0,dy / 10));
-		}
-		else if (getMilliTimer() - clickStartTime > 200)//200ms 이상 누르면 마우스를 움직여 카메라를 움직일 수 있음
-		{
-			const int maxDist = 160;
-			int prevCameraX = cameraX, prevCameraY = cameraY;
-			cameraFix = false;
-			cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
-			cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
-			disableClickUp4Motion = true;
+		const int maxDist = 160;
+		int prevCameraX = cameraX, prevCameraY = cameraY;
+		cameraFix = false;
+		cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
+		cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
+		disableClickUp4Motion = true;
 
-			if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
-			if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
-		}
+		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
 	}
 
 
@@ -55,7 +41,6 @@ void HUD::clickMotionGUI(int dx, int dy)
 }
 void HUD::clickUpGUI()
 {
-	touchMonster = nullptr;
 	if (disableClickUp4Motion)
 	{
 		disableClickUp4Motion = false;
@@ -99,7 +84,7 @@ void HUD::clickUpGUI()
 		}
 		else//찾았을 경우
 		{
-			new Aim(playerX + nearCoord[0], playerY + nearCoord[1], playerZ);
+			//new Aim(playerX + nearCoord[0], playerY + nearCoord[1], playerZ);
 		}
 	}
 	else if (checkCursor(&tab) == true) executeTab();

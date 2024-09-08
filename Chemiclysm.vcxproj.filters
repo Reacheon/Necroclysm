@@ -165,9 +165,6 @@
     <ClCompile Include="code\isCircle.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\Aim.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\Bionic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
