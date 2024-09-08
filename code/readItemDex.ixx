@@ -247,7 +247,7 @@ export int readItemDex(const wchar_t* file)
                             break;
                         case csvItem::tooltip:
                             itemTooltip.push_back(strFragment);
-                            itemDex[arrayCounter / (csvWidth)-1].tooltipIndex = arrayCounter / (csvWidth)-1;
+                            itemDex[arrayCounter / (csvWidth)-1].tooltipIndex = itemTooltip.size()-1;
                             break;
                         case csvItem::category:
                             if (strFragment == L"EQUIPMENT") { itemDex[arrayCounter / (csvWidth)-1].category = itemCategory::equipment; }

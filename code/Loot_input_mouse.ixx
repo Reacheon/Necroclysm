@@ -16,6 +16,23 @@ void Loot::clickUpGUI()
 		executeTab();
 		return;
 	}
+	else if (checkCursor(&lootLabel))
+	{
+		if (checkCursor(&lootLabelSelect))
+		{
+			executeSelectAll();
+		}
+		else if (checkCursor(&lootLabelName))
+		{
+			CORO(executeSearch());
+			//lootPocket->sortPocket(sortFlag::null);
+			//lootScroll = 0;
+		}
+		else if (checkCursor(&lootLabelQuantity))
+		{
+			executeSort();
+		}
+	}
 	else if (checkCursor(&lootBase)) //아이템 클릭 -> 에러 파트
 	{
 		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
@@ -73,23 +90,6 @@ void Loot::clickUpGUI()
 					}
 				}
 			}
-		}
-	}
-	else if (checkCursor(&lootLabel))
-	{
-		if (checkCursor(&lootLabelSelect))
-		{
-			executeSelectAll();
-		}
-		else if (checkCursor(&lootLabelName))
-		{
-			CORO(executeSearch());
-			//lootPocket->sortPocket(sortFlag::null);
-			//lootScroll = 0;
-		}
-		else if (checkCursor(&lootLabelQuantity))
-		{
-			executeSort();
 		}
 	}
 	else if (checkCursor(&pocketLeft))

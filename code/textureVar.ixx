@@ -149,4 +149,6 @@ export namespace spr
 	Sprite* statusEffectRect = nullptr;
 	Sprite* statusIcon = nullptr;
 	Sprite* hpBlankGauge = nullptr;
+
+	Sprite* minimapEdge = nullptr;
 }

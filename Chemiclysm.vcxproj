@@ -250,6 +250,7 @@
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\ThreadPool.ixx" />
     <ClCompile Include="code\timeKeeper.ixx" />
+    <ClCompile Include="code\TitleScreen.ixx" />
     <ClCompile Include="code\updateBarAct.ixx" />
     <ClCompile Include="code\Vec3.ixx" />
     <ClCompile Include="code\Player.ixx" />

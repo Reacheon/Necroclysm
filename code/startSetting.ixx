@@ -10,10 +10,13 @@ import World;
 import Vehicle;
 import Prop;
 import Monster;
+import TitleScreen;
 
 export void startSetting()
 {
 	new HUD();
+	//new TitleScreen();
+
 	Player* playerPtr = Player::ins();
 	playerPtr->setGrid(0, 0, 0);
 	playerPtr->setDstGrid(0, 0);
@@ -26,50 +29,22 @@ export void startSetting()
 	playerPtr->updateWalkable(playerPtr->getGridX() - 1, playerPtr->getGridY() + 1);
 	playerPtr->updateWalkable(playerPtr->getGridX(), playerPtr->getGridY() + 1);
 	playerPtr->updateWalkable(playerPtr->getGridX() + 1, playerPtr->getGridY() + 1);
-	
-
 
 	//테스트 아이템
 	int pX = (Player::ins())->getGridX();
 	int pY = (Player::ins())->getGridY();
 	int pZ = (Player::ins())->getGridZ();
 
-	ItemStack* item = new ItemStack(pX + 2, pY + 1, pZ);
-	(item->getPocket())->addItemFromDex(2, 1);
-	(item->getPocket())->addItemFromDex(0, 5);
-	(item->getPocket())->addItemFromDex(23, 1);
-	(item->getPocket())->addItemFromDex(24, 10);
-	(item->getPocket())->addItemFromDex(1, 4);
-	(item->getPocket())->addItemFromDex(0, 1);
-
-	(item->getPocket())->addItemFromDex(3, 1);
-	(item->getPocket())->addItemFromDex(12, 1);
-	(item->getPocket())->addItemFromDex(13, 1);
-	(item->getPocket())->addItemFromDex(14, 1);
-	(item->getPocket())->addItemFromDex(15, 1);
-	(item->getPocket())->addItemFromDex(16, 1);
-	(item->getPocket())->addItemFromDex(17, 1);
-	(item->getPocket())->addItemFromDex(18, 1);
-
-	//리볼버와 총알
-	(item->getPocket())->addItemFromDex(4, 1);
-	(item->getPocket())->addItemFromDex(5, 8);
-
-	//발효에탄올, 증류기, 에탄올, 벤젠
-	(item->getPocket())->addItemFromDex(88, 1);
-	(item->getPocket())->addItemFromDex(89, 1000);//에탄올
-	(item->getPocket())->addItemFromDex(91, 1000);//벤젠
-	(item->getPocket())->addItemFromDex(82, 1);//증류기
-
-	ItemStack* itemBow = new ItemStack(0, 18, 0);
-	(itemBow->getPocket())->addItemFromDex(383, 1);
-	(itemBow->getPocket())->addItemFromDex(385, 30);
-	itemBow->setSprIndex(itemDex[383].sprIndex);
-	
-	ItemStack* itemCrossbow = new ItemStack(4, 18, 0);
-	(itemCrossbow->getPocket())->addItemFromDex(382, 1);
-	(itemCrossbow->getPocket())->addItemFromDex(384, 30);
-	itemCrossbow->setSprIndex(itemDex[382].sprIndex);
+	new ItemStack(pX + 2, pY + 1, pZ, {
+		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
+		{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
+		{17, 1}, {18, 1}, {4, 1}, {5, 8}, {88, 1}, {89, 1000},
+		{91, 1000}, {82, 1}
+		}
+	);
+	new ItemStack(0, 18, 0, { {383,1},{385,30} });
+	new ItemStack(4, 18, 0, { {382,1},{384,30} });
+	new ItemStack(-1, 7, -1, { {388,1} });
 
 	new Monster(5, 0, 13, 0);
 	new Monster(5, 4, 13, 0);
@@ -800,4 +775,6 @@ export void startSetting()
 
 	Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 	Player::ins()->updateMinimap();//렌더링이 연산파트에서 일어나서 처음에는 화면에 안그려지는듯?
+
+
 };

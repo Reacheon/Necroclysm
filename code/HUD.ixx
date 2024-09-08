@@ -653,7 +653,7 @@ public:
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
 					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).ItemStackPtr;
-					new Loot(targetStack->getPocket(), nullptr);
+					new Loot(targetStack);
 					click = false;
 				}
 				else if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).VehiclePtr != nullptr)

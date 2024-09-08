@@ -106,7 +106,7 @@ __int64 analyseRender()
 			//아이템
 			if (thisTile->fov == fovFlag::white)
 			{
-				if ((World::ins())->getItemPos(tgtX, tgtY, pZ) != nullptr) itemList.push_back({ tgtX,tgtY });
+				if ((World::ins())->getTile(tgtX, tgtY, pZ).ItemStackPtr != nullptr) itemList.push_back({ tgtX,tgtY });
 			}
 			//바닥프롭
 			Prop* fpPtr = (Prop*)thisTile->PropPtr;
@@ -321,28 +321,22 @@ __int64 drawItems()
 		int tgtX = elem.x;
 		int tgtY = elem.y;
 		ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, pZ);
-		if (address->getAniType() == aniFlag::throwing)
-		{
-			setZoom(zoomScale);
-			drawSpriteCenter
-			(
-				address->getSprite(),
-				address->getTargetSprIndex(),
-				(cameraW / 2) + zoomScale * (address->getX() - cameraX),
-				(cameraH / 2) + zoomScale * (address->getY() - cameraY)
-			);
-			setZoom(1.0);
-		}
+
+		int itemSprIndex = 0;
+		if (address->getTargetSprIndex() != 0) itemSprIndex = address->getTargetSprIndex();
+		else itemSprIndex = address->getPocket()->itemInfo[0].sprIndex;
 
 		setZoom(zoomScale);
 		drawSpriteCenter
 		(
 			address->getSprite(),
-			address->getSprIndex(),
+			itemSprIndex,
 			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 		);
 		setZoom(1.0);
+
+
 	}
 
 	return getNanoTimer() - timeStampStart;

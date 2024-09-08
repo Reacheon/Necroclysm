@@ -17,7 +17,7 @@ export class ItemStack : public Ani, public Coord
 private:
 	Sprite* sprite;
 	ItemPocket* storage;
-	int sprIndex = 37;
+	int sprIndex = 0;
 	int targetSprIndex = 0;//던지기 이벤트일 때 타겟의 인덱스
 public:
 	ItemStack(int gridX, int gridY, int gridZ)
@@ -27,6 +27,17 @@ public:
 		World::ins()->setItemPos(getGridX(), getGridY(), getGridZ(), this);
 		setSprite(spr::itemset);
 	}
+
+	ItemStack(int gridX, int gridY, int gridZ, std::vector<std::pair<int,int>> inputItems)
+	{
+		storage = new ItemPocket(storageType::stack);
+		setGrid(gridX, gridY, gridZ);
+		World::ins()->setItemPos(getGridX(), getGridY(), getGridZ(), this);
+		setSprite(spr::itemset);
+
+		for (int i = 0; i < inputItems.size(); i++) getPocket()->addItemFromDex(inputItems[i].first, inputItems[i].second);
+	}
+
 	~ItemStack()
 	{
 		prt(L"ItemStack : 소멸자가 호출되었습니다..\n");

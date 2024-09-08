@@ -106,8 +106,6 @@ export namespace actFunc
 		}
 	}
 
-
-
 	export Corouter reloadOther(actEnv envType, ItemPocket* reloadItemPocket, int reloadItemCursor)//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
 	{
 		//탄창이 장착한 총에 바로 넣는 기능 추가? -> 탄창을 안 빼고 총알을 넣는게 현실적으로 가능할리가 없다

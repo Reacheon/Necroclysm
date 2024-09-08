@@ -50,11 +50,28 @@ void HUD::drawGUI()
 
 	if (isAdvancedMode == false)
 	{
+
 		SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(texture::minimap, 160);
 		setZoom(4.0);
 		drawTextureCenter(texture::minimap, 94, 94);
 		setZoom(1.0);
+
+
+		drawSprite(spr::minimapEdge, 1, 14, 14);
+		Sprite* targetBtnSpr;
+		if (inputType == input::gamepad)
+		{
+			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			else { targetBtnSpr = spr::buttons; }
+			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
+		}
+		else if (inputType == input::mouse)
+		{
+			targetBtnSpr = spr::buttons;
+			drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, 14 + 15, 14 + 15);
+		}
+
 
 		int vShift = 384 * (ctrlVeh != nullptr);
 
@@ -420,7 +437,6 @@ void HUD::drawQuickSlot()
 	{
 		if (isQuickSlotPop == false) drawSpriteCenter(spr::windowArrow, 2, pivotX + 21, pivotY + 18);
 		else drawSpriteCenter(spr::windowArrow, 0, pivotX + 21, pivotY + 18);
-
 	}
 
 	//개별 스킬창 그리기 1번부터 8번까지
@@ -606,7 +622,7 @@ void HUD::drawBarAct()
 		if (barAct[i] == act::status) setBtnLayout(sysStr[3], 33);
 		else if (barAct[i] == act::mutation) setBtnLayout(sysStr[54], 34);
 		else if (barAct[i] == act::ability) setBtnLayout(sysStr[4], 4);
-		else if (barAct[i] == act::inventory) setBtnLayout(sysStr[5], 50);
+		else if (barAct[i] == act::inventory) setBtnLayout(sysStr[5], 79);
 		else if (barAct[i] == act::bionic) setBtnLayout(sysStr[6], 47);
 		else if (barAct[i] == act::talent) setBtnLayout(sysStr[7], 7);
 		else if (barAct[i] == act::runMode)

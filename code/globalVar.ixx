@@ -75,7 +75,7 @@ export SDL_Event event; // SDL 이벤트
 export act UIType = act::null; // 0 : 일반, 1 :루팅, 2: 인벤토리
 export bool click = false; // 현재 플레이어가 화면을 누르고 있는지 나타냄
 export SDL_Point clickTile = { 0,0 }; // 현재 플레이어가 터치하고 있는 타일(그리드 단위 절대좌표)
-export std::array<int, 3> lootTile = { 0,0,0 };
+export Point3 lootTile = { 0,0,0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 export int detailScroll = 0; //상단 디테일의 스크롤
 export input inputType = input::mouse; //조작방식 설정

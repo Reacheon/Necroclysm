@@ -504,5 +504,8 @@
     <ClCompile Include="code\drawEpsilonText.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="code\TitleScreen.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

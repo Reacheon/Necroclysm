@@ -33,6 +33,7 @@ export class Loot : public GUI
 private:
 	inline static Loot* ptr = nullptr;
 
+	ItemStack* lootStack = nullptr; //만약 창고같이 스택이 없으면 null로 유지됨
 	ItemData* lootItemData = nullptr;
 	ItemPocket* lootPocket = nullptr;
 
@@ -72,7 +73,6 @@ private:
 public:
 	Corouter errorFunc();
 
-
 	Loot(ItemPocket* inputPocket, ItemData* inputData) : GUI(false)
 	{
 		ptr = this;
@@ -98,6 +98,34 @@ public:
 
 		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
 	}
+
+	Loot(ItemStack* inputStack) : GUI(false)
+	{
+		ptr = this;
+		prt(L"Loot : 생성자가 생성되었습니다..\n");
+		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
+		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+
+		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
+		setAniSlipDir(0);
+
+		tabType = tabFlag::closeWin;
+		UIType = act::loot;
+
+		lootStack = inputStack;
+		lootPocket = inputStack->getPocket();
+		lootItemData = nullptr;
+		if (lootPocket->itemInfo.size() >= 2) lootPocket->sortByUnicode();
+
+		deactInput();
+		deactDraw();
+		addAniUSetPlayer(this, aniFlag::winSlipOpen);
+
+		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
+
+		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
+	}
+
 	//Loot(int targetGridX, int targetGridY) : GUI(false)
 	//{
 	//	prt(L"Loot : 생성자가 생성되었습니다..\n");
@@ -225,6 +253,13 @@ public:
 			else delayR2--;
 		}
 
+		if (lootStack != nullptr && lootPocket->itemInfo.size() == 0)
+		{
+			delete lootStack;
+			delete this;
+			return;
+		}
+
 		//셀렉트 홀드 이벤트
 		if (coFunc == nullptr)
 		{
@@ -272,7 +307,7 @@ public:
 		{
 			close(aniFlag::null);
 			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
-			delete World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], Player::ins()->getGridZ());
+			delete World::ins()->getItemPos(lootTile.x, lootTile.y, Player::ins()->getGridZ());
 			return;
 		}
 	}
@@ -762,6 +797,14 @@ public:
 			doPopDownHUD = true;
 			barActCursor = -1;
 		}
+
+		//if (lootPocket->itemInfo.size() == 0)
+		//{
+		//	delete World::ins()->getTile(lootTile[0], lootTile[1], lootTile[2]).ItemStackPtr;
+		//	World::ins()->getTile(lootTile[0], lootTile[1], lootTile[2]).ItemStackPtr = nullptr;
+		//}
+
+
 	}
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
