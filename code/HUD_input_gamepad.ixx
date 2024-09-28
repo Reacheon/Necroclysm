@@ -9,6 +9,7 @@ import Player;
 import World;
 import Prop;
 import updateBarAct;
+import Aim;
 
 
 void HUD::gamepadBtnDown()
@@ -81,6 +82,9 @@ void HUD::gamepadBtnUp()
 			tileTouch(tgtX, tgtY);
 		}
 		break;
+	case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+		new Aim();
+		break;
 	case SDL_CONTROLLER_BUTTON_START:
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
@@ -99,7 +103,7 @@ void HUD::gamepadBtnUp()
 }
 void HUD::gamepadStep()
 {
-	if (SDL_NumJoysticks() > 0)
+	if (inputType == input::gamepad)
 	{
 		if (dpadDelay <= 0)
 		{
@@ -135,7 +139,7 @@ void HUD::gamepadStep()
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						Prop* tgtProp = ((Prop*)(World::ins()->getTile(Player::ins()->getGridX()+dx, Player::ins()->getGridY()+dy, Player::ins()->getGridZ()).PropPtr));
+						Prop* tgtProp = ((Prop*)(World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).PropPtr));
 						if (tgtProp != nullptr)
 						{
 							int tgtItemCode = tgtProp->leadItem.itemCode;
@@ -244,5 +248,25 @@ void HUD::gamepadStep()
 
 		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
 		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+
+
+
+
+		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
+		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+		int tgtX = Player::ins()->getGridX();
+		int tgtY = Player::ins()->getGridY();
+		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
+		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
+		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
+		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
+
+		if (!(tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY()))
+		{
+			gamepadWhiteMarker.x = tgtX;
+			gamepadWhiteMarker.y = tgtY;
+			gamepadWhiteMarker.z = Player::ins()->getGridZ();
+		}
+		else gamepadWhiteMarker.z = std::numeric_limits<int>::max();
 	}
 }

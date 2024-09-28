@@ -42,13 +42,14 @@ export void startSetting()
 		{91, 1000}, {82, 1}
 		}
 	);
-	new ItemStack(0, 18, 0, { {383,1},{385,30} });
-	new ItemStack(4, 18, 0, { {382,1},{384,30} });
+	
+	new ItemStack(3, 8, 0, { {383,1},{385,30},{382,1},{384,30} });//활과 석궁
+	new Monster(5, 8, 8, 0);//허수아비
+
 	new ItemStack(-1, 7, -1, { {388,1} });
 
-	new Monster(5, 0, 13, 0);
-	new Monster(5, 4, 13, 0);
-	new Monster(5, 8, 13, 0);
+
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////▼아이템 레시피 추가////////////////////////////////////////////////////////////////////////////
@@ -503,26 +504,35 @@ export void startSetting()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	new Prop(pX + 1, pY - 2, pZ, 237);//나무 설치
-	new Prop(pX + 1 - 1, pY - 2, pZ, 235);//벚꽃낙엽 설치
-	new Prop(pX + 1, pY - 2 + 1, pZ, 235);//벚꽃낙엽 설치
+	new Prop(pX + 1 - 1, pY - 2, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 1, pY - 2 + 1, pZ, 234);//벚꽃낙엽 설치
 
 	new Prop(pX + 3, pY - 2, pZ, 239);//나무 설치
 
 	new Prop(pX + 5, pY - 1, pZ, 248);//나무 설치
-	new Prop(pX + 5, pY - 1 + 1, pZ, 235);//벚꽃낙엽 설치
-	new Prop(pX + 5 - 1, pY - 1, pZ, 235);//벚꽃낙엽 설치
-	new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 235);//벚꽃낙엽 설치
+	new Prop(pX + 5, pY - 1 + 1, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 5 - 1, pY - 1, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//벚꽃낙엽 설치
+
+
+
+	//new Prop(pX + 6, pY - 4, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 6, pY - 5, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 7, pY - 3, pZ, 234);//벚꽃낙엽 설치
+	new Prop(pX + 7, pY - 4, pZ, 234);//벚꽃낙엽 설치
 
 	new Prop(pX + 7, pY + 1, pZ, 237);//나무 설치
-	new Prop(pX + 7 - 1, pY + 1, pZ, 235);//벚꽃낙엽 설치
+	new Prop(pX + 7 - 1, pY + 1, pZ, 234);//벚꽃낙엽 설치
 
 	new Prop(pX + 4, pY - 5, pZ, 248);//나무 설치
 
 	new Prop(pX + 9, pY - 4, pZ, 237);//나무 설치
+	new Prop(pX + 10, pY - 1, pZ, 244);//사과나무 설치
 
-	new Prop(pX - 2, pY + 36, pZ, 242);//나무 설치
+	new Prop(pX - 2, pY + 36, pZ, 242);//야자나무 설치
 
-	new Prop(pX, pY - 20, pZ, 237);//벚꽃낙엽 설치
+
+	new Prop(pX, pY - 20, pZ, 237);
 
 
 	new Prop(pX + 3, pY + 3, pZ, 338);//고철 설치
@@ -559,6 +569,9 @@ export void startSetting()
 	new Prop(pX + -1, pY + 4, pZ, 268);//꽃 설치
 	new Prop(pX + 0, pY + 4, pZ, 269);//꽃 설치
 	new Prop(pX + 1, pY + 4, pZ, 270);//꽃 설치
+
+
+	new Prop(pX + 6, pY - 4, pZ, 270);//꽃 설치
 
 	new Prop(pX, pY - 1, pZ, 118);//볼라드 등 설치
 
@@ -775,6 +788,4 @@ export void startSetting()
 
 	Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 	Player::ins()->updateMinimap();//렌더링이 연산파트에서 일어나서 처음에는 화면에 안그려지는듯?
-
-
 };

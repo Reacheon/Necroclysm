@@ -25,6 +25,7 @@ import AI;
 import turnWait;
 import dirToXY;
 import globalTime;
+import log;
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
@@ -154,9 +155,19 @@ __int64 playerInputTurn()
 			switch (event.type)
 			{
 			case SDL_CONTROLLERBUTTONDOWN:
+				if (inputType != input::gamepad)
+				{
+					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+					inputType = input::gamepad;
+				}
 				gamepadBtnDown();
 				break;
 			case SDL_CONTROLLERBUTTONUP:
+				if (inputType != input::gamepad)
+				{
+					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+					inputType = input::gamepad;
+				}
 				gamepadBtnUp();
 				break;
 			case SDL_CONTROLLERAXISMOTION:
@@ -178,12 +189,24 @@ __int64 playerInputTurn()
 				exit(0);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+				if (inputType != input::mouse)
+				{
+					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+					inputType = input::mouse;
+				}
+
 				if (inputType == input::mouse) { clickDown(); }
 				break;
 			case SDL_FINGERDOWN:
 				if (inputType == input::touch) { clickDown(); }
 				break;
 			case SDL_MOUSEMOTION:
+				if (inputType != input::mouse)
+				{
+					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+					inputType = input::mouse;
+				}
+
 				if (inputType == input::mouse) { clickMotion(); }
 				break;
 			case SDL_FINGERMOTION:
@@ -193,6 +216,12 @@ __int64 playerInputTurn()
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
+				if (inputType != input::mouse)
+				{
+					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+					inputType = input::mouse;
+				}
+
 				if (inputType == input::mouse) 
 				{ 
 					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
@@ -203,6 +232,12 @@ __int64 playerInputTurn()
 				if (inputType == input::touch) { clickUp(); }
 				break;
 			case SDL_MOUSEWHEEL:
+				if (inputType != input::mouse)
+				{
+					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+					inputType = input::mouse;
+				}
+
 				if (event.wheel.y > 0) 
 				{
 					zoomScale += 1;

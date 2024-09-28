@@ -295,7 +295,7 @@ export void drawTextEx(std::wstring text, int x, int y, bool center)
 		Uint16* unicode = new Uint16[text.size() + 1]();
 		for (int i = 0; i < text.size(); i++) { unicode[i] = text[i]; }
 		unicode[text.size()] = 0;
-		surface = TTF_RenderUNICODE_Blended(mainFont[s_fontSize], unicode, color);//병목 1/3
+		surface = TTF_RenderUNICODE_Solid(mainFont[s_fontSize], unicode, color);//병목 1/3
 		texture = SDL_CreateTextureFromSurface(renderer, surface); //병목 2/3
 		SDL_FreeSurface(surface);
 		textCache[cacheKey] = texture;

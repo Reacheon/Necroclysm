@@ -29,3 +29,4 @@ export import lineMaker;
 export import ThreadPool;
 export import drawPrimitive;
 export import timeKeeper;
+export import stringToWstring;

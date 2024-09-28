@@ -51,7 +51,6 @@ export class HUD : public GUI
 private:
 	inline static HUD* ptr = nullptr;
 	bool isPopUp = false;
-	SDL_Rect tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
 	vehFlag typeHUD = vehFlag::none;
 	bool executedHold = false;
 	bool isAdvancedMode = false;
@@ -69,10 +68,11 @@ private:
 	bool dpadDownPressed = false;
 	bool dpadLeftPressed = false;
 	bool dpadRightPressed = false;
-	int dpadDelay = 0;
+	
 	int barActCursorMoveDelay = 0;
 	int rStickPressDelay = 0;
 	int quickSlotCursor = -1;
+	
 
 	int delayR2 = 0;
 public:
@@ -118,6 +118,7 @@ public:
 		letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
 		//탭 버튼은 changeXY의 영향을 받지 않음
 		tab = { cameraW - 128, 22, 120, 120 };
+		tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
 
 
 		quickSlotRegion = { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, };
@@ -308,32 +309,11 @@ public:
 
 	void step()
 	{
-		gamepadStep();
-		mouseStep();
-
 		if (GUI::getLastGUI() == this)
 		{
-			if (inputType == input::gamepad)
-			{
-				__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-				__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-				int tgtX = Player::ins()->getGridX();
-				int tgtY = Player::ins()->getGridY();
-				if (leftX > TOLERANCE_LSTICK) tgtX += 1;
-				if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
-				if (leftY > TOLERANCE_LSTICK) tgtY += 1;
-				if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
-
-				if (!(tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY()))
-				{
-					gamepadWhiteMarker.x = tgtX;
-					gamepadWhiteMarker.y = tgtY;
-					gamepadWhiteMarker.z = Player::ins()->getGridZ();
-				}
-				else gamepadWhiteMarker.z = std::numeric_limits<int>::max();
-			}
+			gamepadStep();
+			mouseStep();
 		}
-
 
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
 		if (Talent::ins() == nullptr)

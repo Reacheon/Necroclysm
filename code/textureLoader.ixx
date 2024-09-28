@@ -43,7 +43,7 @@ export void textureLoader()
 	spr::buttons = new Sprite(renderer, "image/UI/buttons.png", 48, 48);
 	spr::buttonsPressed = new Sprite(renderer, "image/UI/buttonsPressed.png", 48, 48);
 	spr::menuPopUp = new Sprite(renderer, "image/UI/menuPopUp.png", 35, 36);
-	spr::floatLog = new Sprite(renderer, "image/UI/floatLog.png", 500, 40);
+	spr::floatLog = new Sprite(renderer, "image/UI/floatLog.png", 400, 40);
 	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 72, 72);
 	spr::talentIcon = new Sprite(renderer, "image/UI/talentIcon.png", 16, 16);
 	spr::talentIconGold = new Sprite(renderer, "image/UI/talentIconGold.png", 16, 16);

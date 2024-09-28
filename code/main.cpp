@@ -38,27 +38,7 @@ int main(int argc, char** argv)
 	if (numThreads == 0) numThreads = 4;
 	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
 	threadPoolPtr = new ThreadPool(numThreads);
-
 	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
-	if (SDL_NumJoysticks() > 0) 
-	{
-		for (int i = 0; i < SDL_NumJoysticks(); ++i) 
-		{
-			if (SDL_IsGameController(i)) 
-			{
-				controller = SDL_GameControllerOpen(i);
-				if (controller) 
-				{
-					prt(L"다음 게임패드가 감지되었다. : ");
-					std::printf(SDL_GameControllerName(controller));
-					prt(L"\n");
-					inputType = input::gamepad;
-					break;
-				}
-				else errorBox(L"게임패드를 열 수가 없다.");
-			}
-		}
-	}
 
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정

@@ -39,6 +39,9 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 Entity::~Entity()//소멸자
 {
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
+
+	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
+	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable = true;
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
 	//delete sprite;
 	delete spriteFlash;
@@ -116,14 +119,8 @@ Sprite* Entity::getSpriteFlash()
 void Entity::setFlashType(int inputType)
 {
 	flashType = inputType;
-	if (inputType == 1)
-	{
-		setFlashRGBA(255, 255, 255, 255);
-	}
-	else
-	{
-		setFlashRGBA(0, 0, 0, 0);
-	}
+	if (inputType == 1) setFlashRGBA(255, 255, 255, 255);
+	else setFlashRGBA(0, 0, 0, 0);
 }
 int Entity::getFlashType() { return flashType; }
 bool Entity::getLeftFoot() { return leftFoot; }
@@ -159,7 +156,7 @@ void Entity::loadDataFromDex(int index)
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
 void Entity::addDmg(int inputDmg)
 {
-	new Damage(std::to_wstring(inputDmg), this->getX(), this->getY() - 8, col::white, 9);
+	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
 	entityInfo.HP -= inputDmg;
 	if (entityInfo.HP <= 0)//HP 0, 사망
 	{
@@ -355,7 +352,7 @@ void Entity::attack(int gridX, int gridY)
 	{
 		//명중률 계산
 		float aimAcc;
-		aimAcc = 1.00;
+		aimAcc = 0.98;
 
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
@@ -364,7 +361,7 @@ void Entity::attack(int gridX, int gridY)
 		}
 		else
 		{
-			new Damage(L"dodged", victimEntity->getX(), victimEntity->getY() - 8, col::yellow, 8);
+			new Damage(L"dodged", col::yellow, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
 			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}
@@ -568,7 +565,7 @@ void Entity::setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputA
 	flash = { inputR, inputG, inputB, inputAlpha };
 	SDL_SetTextureColorMod(getSpriteFlash()->getTexture(), inputR, inputG, inputB);
 	SDL_SetTextureAlphaMod(getSpriteFlash()->getTexture(), inputAlpha);
-	SDL_SetTextureBlendMode(getSpriteFlash()->getTexture(), SDL_BLENDMODE_BLEND);
+	//SDL_SetTextureBlendMode(getSpriteFlash()->getTexture(), SDL_BLENDMODE_BLEND);
 }
 void Entity::getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha)
 {
@@ -783,7 +780,7 @@ void Entity::drawSelf()
 	}
 
 	//캐릭터 그림자 그리기
-	drawSpriteCenter(spr::shadow, localSprIndex, drawingX, drawingY);
+	drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
 
 	//캐릭터 본체 그리기
 	drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);

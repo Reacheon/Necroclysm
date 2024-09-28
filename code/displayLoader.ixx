@@ -27,7 +27,7 @@ export void displayLoader()
     cameraW = displayMode.w;
     cameraH = displayMode.h;
 
-    window = SDL_CreateWindow("Chemiclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
+    window = SDL_CreateWindow("ApocaRogue", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
     //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);
@@ -44,7 +44,7 @@ export void displayLoader()
         cameraW = 720;
     }
 
-    ////PC 테스트용 강제 해상도 조정////////
+    //PC 테스트용 강제 해상도 조정////////
     {
         int resolution = 0;
         switch (resolution)

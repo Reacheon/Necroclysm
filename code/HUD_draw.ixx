@@ -336,29 +336,38 @@ void HUD::drawTab()
 	switch (tabType)
 	{
 	case tabFlag::autoAtk:
-
-		if (checkCursor(&tabSmallBox))
+	{
+		if (inputType == input::gamepad)
 		{
-			if (click == false) { drawSprite(spr::tab, 3, tab.x, tab.y - 2); }
-			else { drawSprite(spr::tab, 4, tab.x, tab.y - 2); }
-		}
-		else if (checkCursor(&tab))
-		{
-			if (click == false) { drawSprite(spr::tab, 1, tab.x, tab.y - 2); }
-			else { drawSprite(spr::tab, 2, tab.x, tab.y - 2); }
+			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+			else if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
+			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 		else
 		{
-			drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+			if (checkCursor(&tabSmallBox))
+			{
+				if (click == false) { drawSprite(spr::tab, 3, tab.x, tab.y - 2); }
+				else { drawSprite(spr::tab, 4, tab.x, tab.y - 2); }
+			}
+			else if (checkCursor(&tab))
+			{
+				if (click == false) { drawSprite(spr::tab, 1, tab.x, tab.y - 2); }
+				else { drawSprite(spr::tab, 2, tab.x, tab.y - 2); }
+			}
+			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 
-		//drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		//drawSpriteCenter(spr::icon48, 2, tab.x + 40, tab.y + 39);
-		//drawSpriteCenter(spr::icon48, 1, tab.x + 80, tab.y + 45);
 		setFontSize(13);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 92);
 		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 92 + 14);
+
+
+		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
+		drawSpriteCenter(spr::icon48, 2, tab.x + 72, tab.y + 64);
+
+		drawSpriteCenter(spr::icon48, 158, tab.x + 99, tab.y + 18);
 
 		Sprite* targetBtnSpr;
 		if (inputType == input::gamepad)
@@ -367,17 +376,51 @@ void HUD::drawTab()
 			else { targetBtnSpr = spr::buttons; }
 			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
 		}
-
 		break;
-	case tabFlag::aim:
-		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		setZoom(1.5);
-		drawSpriteCenter(spr::icon48, 42, tab.x + 60, tab.y + 52);
-		setZoom(1.0);
+	}
+	case tabFlag::closeAim:
+	{
+		if (inputType == input::gamepad)
+		{
+			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+			else if(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
+			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+		}
+		else
+		{
+			if (checkCursor(&tabSmallBox))
+			{
+				if (click == false) { drawSprite(spr::tab, 3, tab.x, tab.y - 2); }
+				else { drawSprite(spr::tab, 4, tab.x, tab.y - 2); }
+			}
+			else if (checkCursor(&tab))
+			{
+				if (click == false) { drawSprite(spr::tab, 1, tab.x, tab.y - 2); }
+				else { drawSprite(spr::tab, 2, tab.x, tab.y - 2); }
+			}
+			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+		}
+
 		setFontSize(13);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[104], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
+
+
+		drawSpriteCenter(spr::icon48, 158, tab.x + 99, tab.y + 18);
+
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 42, tab.x + 60, tab.y + 55);
+		setZoom(1.0);
+
+		Sprite* targetBtnSpr;
+		if (inputType == input::gamepad)
+		{
+			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			else { targetBtnSpr = spr::buttons; }
+			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
+		}
 		break;
+	}
 	case tabFlag::closeWin:
 		//Ã¢ ´Ý±â
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);

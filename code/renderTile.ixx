@@ -628,7 +628,8 @@ __int64 drawFogs()
 		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
 		dst.w = tileSize;
 		dst.h = tileSize;
-		drawFillRect(dst, { 0x16,0x16,0x16 });
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+		drawFillRect(dst, { 0x16,0x16,0x16},255);
 	}
 
 	for (const auto& elem : grayFogList)

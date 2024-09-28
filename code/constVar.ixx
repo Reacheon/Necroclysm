@@ -656,7 +656,8 @@ export enum class tabFlag
     closeWin,
     back,
     confirm,
-    aim,
+    closeAim,
+  
 };
 
 export enum class sortFlag
@@ -1220,7 +1221,7 @@ export enum statEfctFlag
     blindness=4,
 };
 
-export enum charIndex
+export enum charSprIndex
 {
     WALK = 0,
     WALK_2H = 3,
@@ -1257,6 +1258,13 @@ export enum charIndex
     AIM_PISTOL_CROUCH = 44,
     AIM_PISTOL_CRAWL = 45,
 };
+
+export enum class dmgAniFlag
+{
+    none,
+    dodged,
+};
+
 
 //전방선언
 export class ItemPocket;

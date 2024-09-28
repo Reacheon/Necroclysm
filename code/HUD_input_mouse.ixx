@@ -1,5 +1,7 @@
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
+#include <SDL.h>
+
 import HUD;
 
 import std;
@@ -19,11 +21,10 @@ import Entity;
 void HUD::clickDownGUI()
 {
 	executedHold = false;
-
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
-	if (click == true)
+	if (click == true && (event.button.button == SDL_BUTTON_MIDDLE||inputType == input::touch) )
 	{
 		const int maxDist = 160;
 		int prevCameraX = cameraX, prevCameraY = cameraY;
@@ -35,17 +36,15 @@ void HUD::clickMotionGUI(int dx, int dy)
 		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
 		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
 	}
-
-
-
 }
 void HUD::clickUpGUI()
 {
-	if (disableClickUp4Motion)
+	if (disableClickUp4Motion && (event.button.button == SDL_BUTTON_MIDDLE || inputType == input::touch))
 	{
 		disableClickUp4Motion = false;
 		return;
 	}
+
 	if (executedHold) return;
 
 	if (checkCursor(&letterboxPopUpButton) == true)//ÆË¾÷ ±â´É

@@ -26,7 +26,6 @@ import drawWindow;
 import Lst;
 import ItemData;
 
-static int delayR2 = 0;
 
 export class Loot : public GUI
 {
@@ -242,7 +241,7 @@ public:
 	{
 		lootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
 
-		if (SDL_NumJoysticks() > 0)
+		if (inputType == input::gamepad)
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
@@ -322,15 +321,14 @@ public:
 		}
 		else
 		{
-			if (inputType != input::keyboard)
+
+			if (inputType == input::keyboard) close(aniFlag::winSlipClose);
+			else if (inputType == input::gamepad) close(aniFlag::winSlipClose);
+			else
 			{
 				lootCursor = -1;
 				barAct = actSet::null;
 				tabType = tabFlag::closeWin;
-			}
-			else
-			{
-				close(aniFlag::winSlipClose);
 			}
 		}
 	}

@@ -19,6 +19,7 @@ import log;
 import Drawable;
 import drawSprite;
 import globalTime;
+import Player;
 
 export class Prop : public Ani, public AI, public Coord, public Drawable
 {
@@ -279,7 +280,15 @@ public:
         dst.h = tileSize;
 
         setZoom(zoomScale);
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+        if (leadItem.checkFlag(itemFlag::TREE) && getGridX() == Player::ins()->getGridX() && getGridY() - 1 == Player::ins()->getGridY() && getGridZ() == Player::ins()->getGridZ())
+        {
+            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100); //텍스쳐 투명도 설정
+        }
+        else
+        {
+            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+        }
+
         SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
         int sprIndex = leadItem.propSprIndex + leadItem.extraSprIndexSingle + 16 * leadItem.extraSprIndex16;
         if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))

@@ -1,4 +1,6 @@
-﻿export module stepEvent;
+﻿#include <SDL.h>
+
+export module stepEvent;
 
 import globalVar;
 import constVar;
@@ -7,12 +9,41 @@ import Damage;
 import Corpse;
 import GUI;
 import clickHold;
+import log;
 
 //GUI의 스텝이벤트를 실행시키는 함수
 
 export __int64 stepEvent()
 {
     __int64 timeStampStart = getNanoTimer();
+
+	//게임패드 감지
+
+	if (SDL_NumJoysticks() > 0)
+	{
+		if (controller == nullptr)
+		{
+			for (int i = 0; i < SDL_NumJoysticks(); ++i)
+			{
+				if (SDL_IsGameController(i))
+				{
+					controller = SDL_GameControllerOpen(i);
+					if (controller)
+					{
+						std::wstring str = L"다음 게임패드가 감지되었다. : ";
+						str += stringToWstring(SDL_GameControllerName(controller));
+						updateLog(col2Str(col::white) + str);
+						inputType = input::gamepad;
+						break;
+					}
+					else errorBox(L"게임패드를 열 수가 없다.");
+				}
+			}
+		}
+	}
+	else controller = nullptr;
+
+
 
     if (dxClickStack > TOLERANCE_HOLD_DEL_XY || dyClickStack > TOLERANCE_HOLD_DEL_XY) deactHold = true;
 

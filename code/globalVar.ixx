@@ -109,6 +109,7 @@ export SDL_Rect letterboxInButton[35] = { 0, 0, 0, 0 };
 export SDL_Rect letterboxPopUpButton = { 0, 0, 0, 0 };
 export int letterboxPopUpRelY = 0;
 export SDL_Rect tab = { 0, 0, 0, 0 };
+export SDL_Rect tabSmallBox = { 0, 0, 0, 0 };
 export bool doPopUpSingleHUD = false;
 export bool doPopDownHUD = false;
 
@@ -188,6 +189,9 @@ export ThreadPool* threadPoolPtr;
 export Point3 gamepadWhiteMarker = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() }; //게임패드 방향을 가리키는 마커
 export bool isPlayerMoving = false; //플레이어가 aStar를 따라서 움직이고 있는지.. 마우스의 whiteMarker 표시 여부를 바꿈
 export std::vector<Point2> aStarTrail; //플레이어의 aStar로 생기는 궤적
+
+export int dpadDelay = 0; //상하좌우키 연속입력 딜레이(꾹 누르는경우 여러번 입력되게..)
+export int delayR2 = 0;
 
 export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
     [](Ani* a, Ani* b) -> bool {
