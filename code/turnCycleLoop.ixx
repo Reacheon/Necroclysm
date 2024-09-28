@@ -342,8 +342,8 @@ __int64 animationTurn()
 		{
 		if (turnCycle == turn::playerAnime)
 		{
-			std::vector<Entity*> entityList = (World::ins())->getEntityList();
-			std::vector<Vehicle*> vehList = (World::ins())->getVehicleList();
+			std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
+			std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
 			addTimeTurn(timeGift);
 			for (auto ePtr : entityList)
 			{
@@ -405,8 +405,8 @@ __int64 entityAITurn()
 
 	bool endMonsterTurn = true;
 
-	std::vector<Entity*> entityList = (World::ins())->getEntityList();
-	std::vector<Vehicle*> vehList = (World::ins())->getVehicleList();
+	std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
+	std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
 
 	for (auto vPtr : vehList)
 	{

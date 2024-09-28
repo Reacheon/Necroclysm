@@ -71,18 +71,6 @@ public:
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
 		else return false;
 	}
-	Vehicle* getVehiclePos(int x, int y, int z)
-	{
-		int chunkX, chunkY;
-		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkVehiclePos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
-	}
-	void setVehiclePos(int x, int y, int z, Vehicle* inputPtr)
-	{
-		int chunkX, chunkY;
-		changeToChunkCoord(x, y, chunkX, chunkY);
-		chunkPtr[{chunkX, chunkY, z}]->setChunkVehiclePos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)), inputPtr);
-	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
 		chunkX = (sgn(x)) * ((std::abs(x) + ((CHUNK_SIZE_X - 1) / 2)) / CHUNK_SIZE_X);
@@ -97,7 +85,7 @@ public:
 		activeChunk.clear();
 	}
 
-	std::vector<Entity*> getEntityList()
+	std::vector<Entity*> getActiveEntityList()
 	{
 		std::vector<Entity*> entityList;
 		std::vector<Entity*> chunkEntityList;
@@ -111,7 +99,7 @@ public:
 		}
 		return entityList;
 	}
-	std::vector<Vehicle*> getVehicleList()
+	std::vector<Vehicle*> getActiveVehicleList()
 	{
 		__int64 startTime = getNanoTimer();
 		std::vector<Vehicle*> VehicleList;
@@ -137,7 +125,7 @@ public:
 		}
 		return VehicleList;
 	}
-	std::vector<ItemStack*> getItemList()
+	std::vector<ItemStack*> getActiveItemList()
 	{
 		std::vector<ItemStack*> itemList;
 		std::vector<ItemStack*> chunkItemList;
