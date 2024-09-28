@@ -628,7 +628,7 @@ public:
 			//화면에 있는 아이템 터치
 			if (touchX == Player::ins()->getGridX() && touchY == Player::ins()->getGridY())
 			{
-				if (World::ins()->getItemPos(touchX, touchY, Player::ins()->getGridZ()) != nullptr)
+				if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).ItemStackPtr != nullptr)
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
 					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).ItemStackPtr;

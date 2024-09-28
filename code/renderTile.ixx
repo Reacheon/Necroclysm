@@ -320,7 +320,8 @@ __int64 drawItems()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		ItemStack* address = (World::ins())->getItemPos(tgtX, tgtY, pZ);
+
+		ItemStack* address = (ItemStack*)World::ins()->getTile(tgtX, tgtY, pZ).ItemStackPtr;
 
 		int itemSprIndex = 0;
 		if (address->getTargetSprIndex() != 0) itemSprIndex = address->getTargetSprIndex();

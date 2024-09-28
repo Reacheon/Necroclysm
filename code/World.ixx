@@ -71,18 +71,6 @@ public:
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
 		else return false;
 	}
-	ItemStack* getItemPos(int x, int y, int z)
-	{
-		int chunkX, chunkY;
-		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkItemPos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
-	}
-	void setItemPos(int x, int y, int z, ItemStack* inputPtr)
-	{
-		int chunkX, chunkY;
-		changeToChunkCoord(x, y, chunkX, chunkY);
-		chunkPtr[{chunkX, chunkY, z}]->setChunkItemPos(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)), inputPtr);
-	}
 	Vehicle* getVehiclePos(int x, int y, int z)
 	{
 		int chunkX, chunkY;

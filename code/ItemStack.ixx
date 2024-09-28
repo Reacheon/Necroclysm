@@ -24,7 +24,7 @@ public:
 	{
 		storage = new ItemPocket(storageType::stack);
 		setGrid(gridX, gridY, gridZ);
-		World::ins()->setItemPos(getGridX(), getGridY(), getGridZ(), this);
+		World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr = this;
 		setSprite(spr::itemset);
 	}
 
@@ -32,7 +32,7 @@ public:
 	{
 		storage = new ItemPocket(storageType::stack);
 		setGrid(gridX, gridY, gridZ);
-		World::ins()->setItemPos(getGridX(), getGridY(), getGridZ(), this);
+		World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr = this;
 		setSprite(spr::itemset);
 
 		for (int i = 0; i < inputItems.size(); i++) getPocket()->addItemFromDex(inputItems[i].first, inputItems[i].second);
@@ -41,7 +41,7 @@ public:
 	~ItemStack()
 	{
 		prt(L"ItemStack : 소멸자가 호출되었습니다..\n");
-		World::ins()->setItemPos(getGridX(), getGridY(), getGridZ(), nullptr);//itemPos에서 지운다
+		World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr = this;
 	}
 	Sprite* getSprite()
 	{

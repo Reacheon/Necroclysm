@@ -347,7 +347,7 @@ int Player::checkItemSur(int index)//주변에 있는 타일을 포함해 아이템을 가지고 �
 	//주변 9타일의 아이템스택 검사
 	for (int i = 0; i < 9; i++)
 	{
-		ItemStack* ptr = World::ins()->getItemPos(getGridX(), getGridY(), getGridZ());
+		ItemStack* ptr = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
 	}
 	//자기 자신의 장비 검사 
 	{

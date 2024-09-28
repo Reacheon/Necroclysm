@@ -125,36 +125,6 @@ public:
 		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
 	}
 
-	//Loot(int targetGridX, int targetGridY) : GUI(false)
-	//{
-	//	prt(L"Loot : 생성자가 생성되었습니다..\n");
-	//	prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
-	//	//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
-	//	ptr = this;
-	//	lootTile[axis::x] = targetGridX;
-	//	lootTile[axis::y] = targetGridY;
-	//	lootTile[axis::z] = Player::ins()->getGridZ();
-
-	//	changeXY(cameraW - 335, (cameraH / 2) - 210, false);
-	//	setAniSlipDir(0);
-
-	//	tabType = tabFlag::closeWin;
-	//	UIType = act::loot;
-
-	//	lootPocket = World::ins()->getItemPos(lootTile[axis::x], lootTile[axis::y], Player::ins()->getGridZ())->getPocket();
-	//	lootPocket->sortByUnicode();
-
-	//	deactInput();
-	//	deactDraw();
-	//	addAniUSetPlayer(this, aniFlag::winSlipOpen);
-
-	//	prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
-
-	//	if (inputType == input::keyboard || inputType == input::gamepad)
-	//	{
-	//		lootCursor = 0;
-	//	}
-	//}
 	~Loot()
 	{
 		prt(L"Loot : 소멸자가 호출되었습니다..\n");
@@ -306,7 +276,7 @@ public:
 		{
 			close(aniFlag::null);
 			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
-			delete World::ins()->getItemPos(lootTile.x, lootTile.y, Player::ins()->getGridZ());
+			delete World::ins()->getTile(lootTile.x, lootTile.y, Player::ins()->getGridZ()).ItemStackPtr;
 			return;
 		}
 	}

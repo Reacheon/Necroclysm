@@ -578,7 +578,8 @@ void Entity::drop(ItemPocket* txPtr)
 {
 	ItemStack* targetStack;
 	//아이템 스택이 이미 있는 경우와 없는 경우
-	if (World::ins()->getItemPos(getGridX(), getGridY(), getGridZ()) == nullptr) //그 자리에 템 없는 경우
+
+	if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		targetStack = new ItemStack(getGridX(), getGridY(), getGridZ());
@@ -588,7 +589,7 @@ void Entity::drop(ItemPocket* txPtr)
 	else //이미 그 자리에 아이템이 있는 경우
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
-		targetStack = World::ins()->getItemPos(getGridX(), getGridY(), getGridZ());
+		targetStack = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
 
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
 
@@ -605,7 +606,8 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 {
 	ItemStack* targetStack;
 	//아이템 스택이 이미 있는 경우와 없는 경우
-	if (World::ins()->getItemPos(gridX, gridY, getGridZ()) == nullptr) //그 자리에 템 없는 경우
+
+	if (World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		targetStack = new ItemStack(gridX, gridY, getGridZ());
@@ -615,7 +617,7 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	else //이미 그 자리에 아이템이 있는 경우
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
-		targetStack = World::ins()->getItemPos(gridX, gridY, getGridZ());
+		targetStack = (ItemStack*)World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr;
 
 		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
