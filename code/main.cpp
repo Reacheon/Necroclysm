@@ -22,7 +22,7 @@ import Player;
 import stepEvent;
 import log;
 import turnCycleLoop;
-import startSetting;
+import startingArea;
 import initCoordTransform;
 
 int main(int argc, char** argv)
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 	initLog();
 	initNanoTimer();
 	initCoordTransform();
-	startSetting();//스타트 세팅
+	startingArea();//스타트 세팅
 
 	//int currentWidth, currentHeight;
 	//SDL_GetWindowSize(window, &currentWidth, &currentHeight); // 현재 윈도우 크기를 가져옵니다.

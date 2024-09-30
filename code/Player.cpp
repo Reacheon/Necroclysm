@@ -78,15 +78,14 @@ Player::~Player()
 }
 
 
-void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
+void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
-	Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, inputAniType);
+	Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputAniType);
 	addAniUSetPlayer(this, inputAniType);
 }
 
-void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget) { startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, aniFlag::atk); }
+void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, aniFlag::atk); }
 
-void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, -1); }
 
 void Player::startMove(int inputDir)
 {

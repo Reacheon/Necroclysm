@@ -81,11 +81,10 @@ public:
     Sprite* getSprite();
     void setDirection(int dir);
 
-    virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType);
+    virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType);
     float endAtk();
     void loadDataFromDex(int index);
     void addDmg(int inputDmg);
-    bool existPart(int inputPartIndex);
     void updateStatus();
     int getRPierce(int inputPartIndex);
     int getRCut(int inputPartIndex);
@@ -118,8 +117,6 @@ public:
     bool runAnimation(bool shutdown);
 
     virtual void death() = 0;
-
-    std::vector<int> getAllParts();
 
     void aimWeaponRight();
     void aimWeaponLeft();

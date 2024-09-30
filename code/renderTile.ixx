@@ -28,6 +28,7 @@ import TileData;
 import Flame;
 import mouseGrid;
 import HUD;
+import Bullet;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -38,6 +39,7 @@ __int64 drawCorpses();
 __int64 drawItems();
 __int64 drawEntities();
 __int64 drawDamages();
+__int64 drawBullets();
 __int64 drawFogs();
 __int64 drawMarkers();
 
@@ -74,6 +76,7 @@ export __int64 renderTile()
 	dur::item = drawItems();
 	dur::entity = drawEntities();
 	dur::damage = drawDamages();
+	drawBullets();
 	dur::fog = drawFogs();
 	dur::marker = drawMarkers();
 
@@ -567,6 +570,29 @@ __int64 drawDamages()
 		setZoom(zoomScale);
 		SDL_SetTextureAlphaMod(address->getSprite()->getTexture(), address->getAlpha());
 		drawSpriteCenter(address->getSprite(), 0, drawingX, drawingY);
+		setZoom(1.0);
+	}
+
+	return getNanoTimer() - timeStampStart;
+}
+
+__int64 drawBullets()
+{
+	__int64 timeStampStart = getNanoTimer();
+
+	for (int i = 0; i < Bullet::list.size(); i++)
+	{
+		Bullet* address = Bullet::list[i];
+		int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
+		int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
+		setZoom(zoomScale);
+		drawSpriteCenter
+		(
+			address->getSprite(),
+			2,
+			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+		);
 		setZoom(1.0);
 	}
 

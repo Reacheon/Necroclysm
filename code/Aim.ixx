@@ -14,6 +14,7 @@ import drawWindow;
 import Player;
 import World;
 import Entity;
+import log;
 
 export class Aim : public GUI
 {
@@ -26,6 +27,7 @@ private:
 	double aimAcc = 0;
 	double fakeAimAcc = aimAcc;
 	int aimStack = 0;
+	atkType targetAtkType = atkType::shot;
 public:
 	Aim() : GUI(false)
 	{
@@ -172,6 +174,10 @@ public:
 				aimStack++;
 			}
 			break;
+		case SDL_CONTROLLER_BUTTON_B:
+			close(aniFlag::null);
+			break;
+
 		}
 	}
 	void gamepadBtnMotion() {}
@@ -277,6 +283,105 @@ public:
 
 	void executeTab()
 	{
-		close(aniFlag::null);
+		Entity* victimEntity = (Entity*)World::ins()->getTile(aimCoord.x, aimCoord.y, aimCoord.z).EntityPtr;
+		int targetX = aimCoord.x;
+		int targetY = aimCoord.y;
+		int targetZ = aimCoord.z;
+		int weaponRange = 10;
+
+		Player::ins()->aimWeaponLeft();
+
+		if (victimEntity == nullptr)
+		{
+			return;
+		}
+		//맨손 사거리 이탈
+		else if (Player::ins()->getAimWeaponIndex() == -1)
+		{
+			if (1 < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)))
+			{
+				return;
+			}
+
+			Player::ins()->startAtk(targetX, targetY, targetZ);
+			turnWait(1.0);
+			Player::ins()->initAimStack();
+
+		}
+		//무기 사거리 이탈
+		else
+		{
+			if (targetAtkType == atkType::throwing) //던지기
+			{
+				if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)) ) { return; }
+
+				/*if (targetX != Player::ins()->getGridX() || targetY != Player::ins()->getGridY())
+				{*/
+
+				//자기 자신에게 던지는 경우도 고려해야 되나?
+				ItemPocket* drop = new ItemPocket(storageType::null);
+				Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
+				Player::ins()->throwing(drop, targetX, targetY);
+				Player::ins()->updateStatus();
+				updateLog(L"#FFFFFF아이템을 던졌다.");
+				//}
+				//else
+				//{
+				//	ItemPocket* drop = new ItemPocket(storageType::null);
+				//	Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
+				//	Player::ins()->drop(drop);
+				//	Player::ins()->updateStatus();
+				//	updateLog(L"#FFFFFF아이템을 버렸다.");
+				//}
+
+				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::throwing);
+				turnWait(1.0);
+				Player::ins()->initAimStack();
+				Player::ins()->setNextAtkType(targetAtkType);
+			}
+			else if (targetAtkType == atkType::shot) //사격
+			{
+				ItemData tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
+				if (getBulletNumber(tmpAimWeapon) > 0)
+				{
+					if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY))) { return; }
+				}
+				else//사격인데 총알이 없을 경우
+				{
+					return;
+				}
+
+				ItemPocket* drop = new ItemPocket(storageType::null);
+				drop->addItemFromDex(25, 1);
+				Player::ins()->throwing(drop, targetX, targetY);
+				Player::ins()->updateStatus();
+
+				//직탄식 총
+				if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
+				{
+					popTopBullet(((ItemPocket*)tmpAimWeapon.pocketPtr));
+				}
+				//탄창식 총
+				else if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
+				{
+					popTopBullet((ItemPocket*)((ItemPocket*)tmpAimWeapon.pocketPtr)->itemInfo[0].pocketPtr);
+				}
+
+				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);
+				turnWait(1.0);
+				Player::ins()->initAimStack();
+				aimAcc = 0.6;
+				Player::ins()->setNextAtkType(targetAtkType);
+			}
+			else//근접공격
+			{
+				if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY))) { return; }
+
+				Player::ins()->startAtk(targetX, targetY, targetZ);
+				turnWait(1.0);
+				Player::ins()->initAimStack();
+				Player::ins()->setNextAtkType(targetAtkType);
+			}
+		}
 	}
 };

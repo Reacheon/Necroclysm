@@ -1,3 +1,4 @@
+import util;
 import Entity;
 import globalVar;
 import constVar;
@@ -7,6 +8,7 @@ import World;
 import Sticker;
 import Flame;
 import Player;
+import Bullet;
 
 bool Entity::runAnimation(bool shutdown)
 {
@@ -318,33 +320,18 @@ bool Entity::runAnimation(bool shutdown)
 	}
 	else if (getAniType() == aniFlag::shotSingle)
 	{
-		//거리에 따라 적이 피격하는데에 걸리는 시간을 길게 만들 것
 		addTimer();
-
-		char dx;
-		char dy;
-
-		switch (entityInfo.direction)
-		{
-		case 0: dx = 1; dy = 0; break;
-		case 1: dx = 1; dy = -1; break;
-		case 2: dx = 0; dy = -1; break;
-		case 3: dx = -1; dy = -1; break;
-		case 4: dx = -1; dy = 0; break;
-		case 5: dx = -1; dy = 1; break;
-		case 6: dx = 0; dy = 1; break;
-		case 7: dx = 1; dy = 1; break;
-		}
-
-		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+		//거리에 따라 적이 피격하는데에 걸리는 시간을 길게 만들 것
+		static Bullet* bulletPtr = nullptr;
+		
+		int dx, dy;
+		dir2Coord(entityInfo.direction, dx, dy);
+		Entity* ePtr = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			if (address != nullptr)
-			{
-				address->setFlashRGBA(0, 0, 0, 0);
-			}
+			if (ePtr != nullptr) ePtr->setFlashRGBA(0, 0, 0, 0);
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
@@ -352,82 +339,119 @@ bool Entity::runAnimation(bool shutdown)
 			return true;
 		}
 
+		float spd = 3.0;
+		float delX = 16.0 * (atkTarget.x - getGridX());
+		float delY = 16.0 * (atkTarget.y - getGridY());
+		float dist = std::sqrt(std::pow(delX, 2) + std::pow(delY, 2));
+		float cosVal = delX / dist;
+		float sinVal = delY / dist;
+		float xSpd = spd * cosVal;
+		float ySpd = spd * sinVal;
+		static int hitTimer = -1;
+		if (getTimer() == 1) bulletPtr = new Bullet(getX(), getY());
+
+		if (bulletPtr != nullptr)
+		{
+			bulletPtr->addFakeX(xSpd);
+			bulletPtr->addFakeY(ySpd);
+			
+
+			std::wprintf(L"bullet fake X:%f, fake Y:%f, delX :%f, delY: %f\n", bulletPtr->getFakeX(), bulletPtr->getFakeY(),delX,delY);
+			if (std::fabs(bulletPtr->getFakeX()) >= std::fabs(delX) && std::fabs(bulletPtr->getFakeY()) >= std::fabs(delY))
+			{
+				delete bulletPtr;
+				bulletPtr = nullptr;
+				hitTimer = getTimer();
+			}
+		}
+
 		switch (getTimer())
 		{
 		case 2:
-			setFakeX(getIntegerFakeX() - 3 * dx);
-			setFakeY(getIntegerFakeY() - 3 * dy);
-			break;
-		case 3:
+
 			setFakeX(getIntegerFakeX() - 2 * dx);
 			setFakeY(getIntegerFakeY() - 2 * dy);
 			break;
-		case 4:
+		case 3:
 			setFakeX(getIntegerFakeX() - 1 * dx);
 			setFakeY(getIntegerFakeY() - 1 * dy);
-			if (address != nullptr)
-			{
-				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
-				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
-			}
-
-			attack(atkTarget.x, atkTarget.y);
-			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			break;
 		case 5:
 			setFakeX(getIntegerFakeX() + 1 * dx);
 			setFakeY(getIntegerFakeY() + 1 * dy);
-			if (address != nullptr)
-			{
-				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
-				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
-			}
 			break;
 		case 6:
 			setFakeX(getIntegerFakeX() + 2 * dx);
 			setFakeY(getIntegerFakeY() + 2 * dy);
-			if (address != nullptr)
-			{
-				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
-				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
-			}
-			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
 			break;
-		case 7:
-			setFakeX(getIntegerFakeX() + 3 * dx);
-			setFakeY(getIntegerFakeY() + 3 * dy);
-			break;
-		case 8:
-			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
-			break;
-		case 10:
-			delete(((Sticker*)(StickerList.find(stickerID))->second));
-		case 20:
-			setFakeX(0);
-			setFakeY(0);
-			resetTimer();
-			setAniType(aniFlag::null);
-			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
-			else { endAtk(); }
-			return true;
 		}
 
-		if (getTimer() >= 5)
+		if (bulletPtr == nullptr)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
-			if (address != nullptr)
+			if (getTimer() == hitTimer)
 			{
-				Uint8 targetR, targetG, targetB, targetAlpha;
-				address->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-				if (address->getFlashType() == 1)
+				if (ePtr != nullptr)
 				{
-					if (targetG > 51) { targetG -= 51; }
-					else { targetG = 0; }
-					if (targetB > 51) { targetB -= 51; }
-					else { targetB = 0; }
-					if (targetAlpha > 51) { targetAlpha -= 51; }
-					else { targetAlpha = 0; }
-					address->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
+					ePtr->setFakeX(ePtr->getIntegerFakeX() + 2 * dx);
+					ePtr->setFakeY(ePtr->getIntegerFakeY() + 2 * dy);
+				}
+				attack(atkTarget.x, atkTarget.y);
+				new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
+			}
+			else if (getTimer() == hitTimer + 1)
+			{
+				if (ePtr != nullptr)
+				{
+					ePtr->setFakeX(ePtr->getIntegerFakeX() - 1 * dx);
+					ePtr->setFakeY(ePtr->getIntegerFakeY() - 1 * dy);
+				}
+			}
+			else if (getTimer() == hitTimer + 2)
+			{
+				if (ePtr != nullptr)
+				{
+					ePtr->setFakeX(ePtr->getIntegerFakeX() - 1 * dx);
+					ePtr->setFakeY(ePtr->getIntegerFakeY() - 1 * dy);
+				}
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
+			}
+			else if (getTimer() == hitTimer + 4)
+			{
+				((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
+			}
+			else if (getTimer() == hitTimer + 6)
+			{
+				delete(((Sticker*)(StickerList.find(stickerID))->second));
+			}
+			else if (getTimer() == hitTimer + 16)
+			{
+				setFakeX(0);
+				setFakeY(0);
+				resetTimer();
+				setAniType(aniFlag::null);
+				if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
+				else { endAtk(); }
+				return true;
+			}
+
+
+			if (getTimer() >= hitTimer)
+			{
+				Entity* ePtr = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+				if (ePtr != nullptr)
+				{
+					Uint8 targetR, targetG, targetB, targetAlpha;
+					ePtr->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
+					if (ePtr->getFlashType() == 1)
+					{
+						if (targetG > 51) { targetG -= 51; }
+						else { targetG = 0; }
+						if (targetB > 51) { targetB -= 51; }
+						else { targetB = 0; }
+						if (targetAlpha > 51) { targetAlpha -= 51; }
+						else { targetAlpha = 0; }
+						ePtr->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
+					}
 				}
 			}
 		}

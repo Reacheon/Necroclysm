@@ -162,11 +162,13 @@
   <ItemGroup>
     <ClCompile Include="code\actFuncSet.ixx" />
     <ClCompile Include="code\Aim.ixx" />
+    <ClCompile Include="code\AimOld.ixx" />
     <ClCompile Include="code\Alchemy.ixx" />
     <ClCompile Include="code\AlchemyData.ixx" />
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\aStar.ixx" />
     <ClCompile Include="code\Bionic.ixx" />
+    <ClCompile Include="code\Bullet.ixx" />
     <ClCompile Include="code\calc.ixx" />
     <ClCompile Include="code\camera.ixx" />
     <ClCompile Include="code\clickHold.ixx" />
@@ -284,7 +286,7 @@
     <ClCompile Include="code\sgn.ixx" />
     <ClCompile Include="code\Talent.ixx" />
     <ClCompile Include="code\Sprite.ixx" />
-    <ClCompile Include="code\startSetting.ixx" />
+    <ClCompile Include="code\startingArea.ixx" />
     <ClCompile Include="code\Status.ixx" />
     <ClCompile Include="code\stepEvent.ixx" />
     <ClCompile Include="code\textureLoader.ixx" />

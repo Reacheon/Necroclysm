@@ -26,8 +26,7 @@ public:
 		ptr->entityInfo.isPlayer = true;
 		return ptr;
 	}
-	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType) override;
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget);
+	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;
 	void startAtk(int inputGridX, int inputGridY, int inputGridZ);
 	void startMove(int inputDir);
 	void updateMinimap();

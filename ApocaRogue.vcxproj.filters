@@ -267,7 +267,7 @@
     <ClCompile Include="code\AlchemyData.ixx">
       <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
-    <ClCompile Include="code\startSetting.ixx">
+    <ClCompile Include="code\startingArea.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
     <ClCompile Include="code\Vec3.ixx">
@@ -509,6 +509,12 @@
     </ClCompile>
     <ClCompile Include="code\stringToWstring.ixx">
       <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\AimOld.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Bullet.ixx">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

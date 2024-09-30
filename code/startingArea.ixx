@@ -1,5 +1,5 @@
 
-export module startSetting;
+export module startingArea;
 
 import globalVar;
 import HUD;
@@ -12,7 +12,7 @@ import Prop;
 import Monster;
 import TitleScreen;
 
-export void startSetting()
+export void startingArea()
 {
 	new HUD();
 	//new TitleScreen();
@@ -43,7 +43,12 @@ export void startSetting()
 		}
 	);
 	
-	new ItemStack(3, 8, 0, { {383,1},{385,30},{382,1},{384,30} });//활과 석궁
+	//활과 석궁
+	new ItemStack(3, 8, 0, { {383,1} });
+	new ItemStack(4, 8, 0, { {385,30} });
+	new ItemStack(3, 9, 0, { {382,1}});
+	new ItemStack(4, 9, 0, { {384,30} });
+
 	new Monster(5, 8, 8, 0);//허수아비
 
 	new ItemStack(-1, 7, -1, { {388,1} });

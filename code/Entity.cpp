@@ -137,10 +137,10 @@ void Entity::setDirection(int dir)
 	else if (dir == 0 || (dir == 1 || dir == 7)) { entityInfo.sprFlip = false; }
 	else { entityInfo.sprFlip = true; }
 }
-void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType)
+void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
 	setDirection(getIntDegree(getGridX(), getGridY(), inputGridX, inputGridY));
-	setAtkTarget(inputGridX, inputGridY, inputGridZ, inputTarget);
+	setAtkTarget(inputGridX, inputGridY, inputGridZ);
 }
 float Entity::endAtk()
 {
@@ -357,7 +357,7 @@ void Entity::attack(int gridX, int gridY)
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			victimEntity->setFlashType(1);
-			victimEntity->addDmg(9);
+			victimEntity->addDmg(randomRange(6,10));
 		}
 		else
 		{

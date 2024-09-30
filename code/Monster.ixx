@@ -25,15 +25,13 @@ public:
 		prt(lowCol::red, L"Monster : 소멸자가 호출되었습니다..\n");
 	}
 
-	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget, aniFlag inputAniType) override
+	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override
 	{
-		Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, inputAniType);
+		Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputAniType);
 		addAniUSet(this, inputAniType);
 	}
 
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ, int inputTarget) { startAtk(inputGridX, inputGridY, inputGridZ, inputTarget, aniFlag::atk); }
-
-	void startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, -1); }
+	void startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, aniFlag::atk); }
 
 	void endMove()
 	{
