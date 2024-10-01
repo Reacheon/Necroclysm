@@ -152,4 +152,5 @@ export void textureLoader()
 
 	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 160, 160);
 
+	spr::bulletset = new Sprite(renderer, "image/item/bulletset.png", 48, 48);
 }

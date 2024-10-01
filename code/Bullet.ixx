@@ -14,9 +14,10 @@ import util;
 export class Bullet : public Coord
 {
 private:
+   
+public:
     Sprite* sprite = spr::itemset;
     int sprIndex = 2;
-public:
     static std::vector<Bullet*> list;
     Bullet(int inputX, int inputY)
     {
@@ -30,7 +31,7 @@ public:
     void step()
     {
     }
-    Sprite* getSprite() { return sprite; }
+    
 };
 
 std::vector<Bullet*> Bullet::list;

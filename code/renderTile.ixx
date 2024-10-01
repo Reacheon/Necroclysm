@@ -588,8 +588,8 @@ __int64 drawBullets()
 		setZoom(zoomScale);
 		drawSpriteCenter
 		(
-			address->getSprite(),
-			2,
+			address->sprite,
+			address->sprIndex,
 			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 		);

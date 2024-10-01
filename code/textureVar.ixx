@@ -151,4 +151,5 @@ export namespace spr
 	Sprite* hpBlankGauge = nullptr;
 
 	Sprite* minimapEdge = nullptr;
+	Sprite* bulletset = nullptr;
 }

@@ -620,7 +620,9 @@ export enum class aniFlag
     popUpLetterbox, //GUI에 존재하는 HUD 전용 애니메이션
     popDownLetterbox,
     popUpSingleLetterbox,
+
     shotSingle,
+    
     shotBurst,
     shotAuto,
     shotArrow,
@@ -1265,6 +1267,13 @@ export enum class dmgAniFlag
     dodged,
 };
 
+//export enum class projFlag
+//{
+//    arrow,
+//    bolt,
+//    whiteBullet,
+//    yellowBullet,
+//};
 
 //전방선언
 export class ItemPocket;

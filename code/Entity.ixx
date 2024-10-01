@@ -121,7 +121,6 @@ public:
     void aimWeaponRight();
     void aimWeaponLeft();
     int getAimHand();
-    float getAimAcc(Entity* victimEntity, int inputPartType, bool aim);
     int getAimWeaponIndex();
 
     virtual void drawSelf() override;

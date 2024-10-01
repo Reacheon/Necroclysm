@@ -9,6 +9,7 @@ import Sticker;
 import Flame;
 import Player;
 import Bullet;
+import Aim;
 
 bool Entity::runAnimation(bool shutdown)
 {
@@ -22,13 +23,13 @@ bool Entity::runAnimation(bool shutdown)
 		//4프레임-2(스피드4)
 
 		// 1 / 60초마다 runAnimation이 실행됨
-		
+
 		float speed = 2.5;
 		if (entityInfo.walkMode == walkFlag::run) speed = 3.5;
 		else if (entityInfo.walkMode == walkFlag::walk) speed = 3.0;
 		else if (entityInfo.walkMode == walkFlag::crawl) speed = 2.0;
 		else if (entityInfo.walkMode == walkFlag::crouch) speed = 2.0;
-		
+
 		addTimer();
 
 		if (getTimer() == 1)
@@ -321,11 +322,11 @@ bool Entity::runAnimation(bool shutdown)
 	else if (getAniType() == aniFlag::shotSingle)
 	{
 		addTimer();
-		//거리에 따라 적이 피격하는데에 걸리는 시간을 길게 만들 것
 		static Bullet* bulletPtr = nullptr;
-		
+
 		int dx, dy;
 		dir2Coord(entityInfo.direction, dx, dy);
+
 		Entity* ePtr = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
@@ -339,7 +340,7 @@ bool Entity::runAnimation(bool shutdown)
 			return true;
 		}
 
-		float spd = 3.0;
+		float spd = 7.0;
 		float delX = 16.0 * (atkTarget.x - getGridX());
 		float delY = 16.0 * (atkTarget.y - getGridY());
 		float dist = std::sqrt(std::pow(delX, 2) + std::pow(delY, 2));
@@ -348,15 +349,20 @@ bool Entity::runAnimation(bool shutdown)
 		float xSpd = spd * cosVal;
 		float ySpd = spd * sinVal;
 		static int hitTimer = -1;
-		if (getTimer() == 1) bulletPtr = new Bullet(getX(), getY());
+		if (getTimer() == 1)
+		{
+			bulletPtr = new Bullet(getX(), getY());
+			bulletPtr->sprite = spr::bulletset;
+			bulletPtr->sprIndex = 0 + del2Dir(delX, delY);
+		}
 
 		if (bulletPtr != nullptr)
 		{
 			bulletPtr->addFakeX(xSpd);
 			bulletPtr->addFakeY(ySpd);
-			
 
-			std::wprintf(L"bullet fake X:%f, fake Y:%f, delX :%f, delY: %f\n", bulletPtr->getFakeX(), bulletPtr->getFakeY(),delX,delY);
+
+			std::wprintf(L"bullet fake X:%f, fake Y:%f, delX :%f, delY: %f\n", bulletPtr->getFakeX(), bulletPtr->getFakeY(), delX, delY);
 			if (std::fabs(bulletPtr->getFakeX()) >= std::fabs(delX) && std::fabs(bulletPtr->getFakeY()) >= std::fabs(delY))
 			{
 				delete bulletPtr;
@@ -364,6 +370,7 @@ bool Entity::runAnimation(bool shutdown)
 				hitTimer = getTimer();
 			}
 		}
+
 
 		switch (getTimer())
 		{
@@ -423,12 +430,18 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				delete(((Sticker*)(StickerList.find(stickerID))->second));
 			}
-			else if (getTimer() == hitTimer + 16)
+			else if (getTimer() == hitTimer + 8)
 			{
 				setFakeX(0);
 				setFakeY(0);
 				resetTimer();
 				setAniType(aniFlag::null);
+
+				if (Aim::ins() != nullptr)
+				{
+					Aim::ins()->close(aniFlag::null);
+				}
+
 				if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 				else { endAtk(); }
 				return true;

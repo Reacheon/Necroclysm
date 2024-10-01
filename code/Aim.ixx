@@ -92,7 +92,7 @@ public:
 		setFontSize(13);
 
 
-		if (aimAcc != 0)
+		if (aimAcc != 0 && turnCycle == turn::playerInput)
 		{
 			std::wstring accStr = decimalCutter(fakeAimAcc * 100.0, 1);
 			accStr += L"%";
@@ -197,15 +197,15 @@ public:
 		}
 
 
-		if (fabs(aimAcc - fakeAimAcc) > 0.001)
+		if (fabs(aimAcc - fakeAimAcc) > 0.002)
 		{
 			if (aimAcc > fakeAimAcc)
 			{
-				fakeAimAcc += 0.002;
+				fakeAimAcc += 0.004;
 			}
 			else if (aimAcc < fakeAimAcc)
 			{
-				fakeAimAcc -= 0.002;
+				fakeAimAcc -= 0.004;
 			}
 		}
 
@@ -342,19 +342,11 @@ public:
 			else if (targetAtkType == atkType::shot) //사격
 			{
 				ItemData tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
-				if (getBulletNumber(tmpAimWeapon) > 0)
+				if (getBulletNumber(tmpAimWeapon) > 0) //사격인데 총알이 없을 경우
 				{
 					if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY))) { return; }
 				}
-				else//사격인데 총알이 없을 경우
-				{
-					return;
-				}
-
-				ItemPocket* drop = new ItemPocket(storageType::null);
-				drop->addItemFromDex(25, 1);
-				Player::ins()->throwing(drop, targetX, targetY);
-				Player::ins()->updateStatus();
+				else return;
 
 				//직탄식 총
 				if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
