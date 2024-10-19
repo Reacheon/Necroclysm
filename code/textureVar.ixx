@@ -152,4 +152,6 @@ export namespace spr
 
 	Sprite* minimapEdge = nullptr;
 	Sprite* bulletset = nullptr;
+
+	Sprite* aimMarkerWhite = nullptr;
 }

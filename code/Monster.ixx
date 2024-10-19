@@ -176,7 +176,6 @@ public:
 			runAnimation(true);
 		}
 		new Corpse(corpseType::bloodM, getX(), getY(), getGridZ());
-		updateLog(L"#FFFFFFEntity died.. Generate corpse item.");
 		ItemPocket* dropItem = new ItemPocket(storageType::temp);
 		dropItem->addItemFromDex(20, 1);
 		drop(dropItem);

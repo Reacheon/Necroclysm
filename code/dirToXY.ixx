@@ -63,8 +63,8 @@ export int del2Dir(float delX, float delY)
 	else
 	{
 		if (-0.5 <= m && m < 0.5) return 4;
-		else if (0.5 <= m && m < 2) return 3;
-		else if (-2 <= m && m < -0.5) return 5;
+		else if (0.5 <= m && m < 2) return 5;
+		else if (-2 <= m && m < -0.5) return 3;
 		else if (m < -2) return 2;
 		else if (m >= 2) return 6;
 		else

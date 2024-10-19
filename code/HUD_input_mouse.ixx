@@ -16,6 +16,7 @@ import Prop;
 import ContextMenu;
 import mouseGrid;
 import Entity;
+import Aim;
 
 
 void HUD::clickDownGUI()
@@ -83,7 +84,7 @@ void HUD::clickUpGUI()
 		}
 		else//찾았을 경우
 		{
-			//new Aim(playerX + nearCoord[0], playerY + nearCoord[1], playerZ);
+			new Aim();
 		}
 	}
 	else if (checkCursor(&tab) == true) executeTab();

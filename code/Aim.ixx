@@ -15,6 +15,7 @@ import Player;
 import World;
 import Entity;
 import log;
+import mouseGrid;
 
 export class Aim : public GUI
 {
@@ -28,6 +29,8 @@ private:
 	double fakeAimAcc = aimAcc;
 	int aimStack = 0;
 	atkType targetAtkType = atkType::shot;
+
+	bool deactClickUp = false;
 public:
 	Aim() : GUI(false)
 	{
@@ -45,7 +48,35 @@ public:
 		
 		if(Player::ins()->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
 		else  aimCoord = { pX - 1, pY, pZ };
-		
+
+		Entity* nearTarget = nullptr;
+		double hiDist = 99999;
+		const int searchRange = 10;
+		for (int dx = -searchRange; dx <= searchRange; dx++)
+		{
+			for (int dy = -searchRange; dy <= searchRange; dy++)
+			{
+				if (World::ins()->getTile(pX + dx, pY + dy, pZ).fov == fovFlag::white)
+				{
+					if (World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr != nullptr)
+					{
+						if (World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr != Player::ins())
+						{
+							if (std::sqrt(dx * dx + dy * dy) < hiDist)
+							{
+								nearTarget = (Entity*)World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr;
+								hiDist = std::sqrt(dx * dx + dy * dy);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (nearTarget != nullptr)
+		{
+			changeAimTarget(nearTarget->getGridX(), nearTarget->getGridY());
+		}
 	}
 	~Aim()
 	{
@@ -107,6 +138,31 @@ public:
 		}
 
 
+		if(checkCursor(&tab)==false && checkCursor(&letterbox) == false && checkCursor(&quickSlotRegion) == false)
+		{
+			double tileSize = 16 * zoomScale;
+			int tgtX = getAbsMouseGrid().x;
+			int tgtY = getAbsMouseGrid().y;
+			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+			dst.w = tileSize;
+			dst.h = tileSize;
+
+
+
+			setZoom(zoomScale);
+			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 150); //텍스쳐 투명도 설정
+			drawSpriteCenter
+			(
+				spr::aimMarkerWhite,
+				0,
+				dst.x + dst.w / 2,
+				dst.y + dst.h / 2
+			);
+			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 255); //텍스쳐 투명도 설정
+			setZoom(1.0);
+		}
+
 		{
 			int tgtX = aimCoord.x;
 			int tgtY = aimCoord.y;
@@ -115,10 +171,18 @@ public:
 			dst.w = 16.0 * zoomScale;
 			dst.h = 16.0 * zoomScale;
 			setZoom(zoomScale);
+
+
+			int sprIndex = 0;
+			if (SDL_GetTicks() % 800 < 200) sprIndex = 0;
+			else if (SDL_GetTicks() % 800 < 400) sprIndex = 1;
+			else if (SDL_GetTicks() % 800 < 600) sprIndex = 2;
+			else sprIndex = 1;
+
 			drawSpriteCenter
 			(
 				spr::aimMarkerTmp,
-				0,
+				sprIndex,
 				dst.x + dst.w / 2,
 				dst.y + dst.h / 2
 			);
@@ -148,17 +212,68 @@ public:
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 52);
 		drawTextCenter(L"#FFFFFF사격할 위치를 선택해주세요.", cameraW / 2, 52);
 	}
+
+	void changeAimTarget(int tgtX, int tgtY)
+	{
+		aimCoord.x = tgtX;
+		aimCoord.y = tgtY;
+
+		if (World::ins()->getTile(aimCoord.x, aimCoord.y, aimCoord.z).EntityPtr != nullptr) aimAcc = randomRangeFloat(0.5, 0.8);
+		else aimAcc = 0;
+		fakeAimAcc = aimAcc;
+		aimStack = 0;
+
+		if (aimCoord.x < Player::ins()->getGridX()) Player::ins()->setDirection(4);
+		else if (aimCoord.x > Player::ins()->getGridX()) Player::ins()->setDirection(0);
+
+		std::vector<std::array<int, 2>> lineCoord;
+		makeLine(lineCoord, aimCoord.x - Player::ins()->getGridX(), aimCoord.y - Player::ins()->getGridY());
+		aimTrailRev.clear();
+		for (int i = 0; i < lineCoord.size(); i++)
+		{
+			if (lineCoord[i][0] != 0 || lineCoord[i][1] != 0)
+			{
+				aimTrailRev.push_back({ Player::ins()->getGridX() + lineCoord[i][0],Player::ins()->getGridY() + lineCoord[i][1],Player::ins()->getGridZ() });
+			}
+		}
+	}
+	void aimAddAcc()
+	{
+		if (aimAcc != 0)
+		{
+			aimAcc += randomRangeFloat(0.03, 0.07);
+			if (aimAcc > 0.999) aimAcc = 0.999;
+			Player::ins()->setFlashType(1);
+			aimStack++;
+		}
+	}
+
 	void clickUpGUI()
 	{
 		if (getStateInput() == false) { return; }
 
-		if (checkCursor(&tab))
+		if (checkCursor(&tabSmallBox))
 		{
-			close(aniFlag::null);
+			aimAddAcc();
+		}
+		else if (checkCursor(&tab))
+		{
+			executeTab();
 		}
 	}
 	void clickMotionGUI(int dx, int dy) {}
-	void clickDownGUI() {}
+	void clickDownGUI() 
+	{
+		if (checkCursor(&letterbox) || checkCursor(&quickSlotRegion))
+		{
+			close(aniFlag::null);
+		}
+		else if (checkCursor(&tab) == false)
+		{
+			changeAimTarget(getAbsMouseGrid().x, getAbsMouseGrid().y);
+		}
+		
+	}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
 	void gamepadBtnDown() 
@@ -166,13 +281,7 @@ public:
 		switch (event.cbutton.button)
 		{
 		case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-			if (aimAcc != 0)
-			{
-				aimAcc += randomRangeFloat(0.03, 0.07);
-				if (aimAcc > 0.999) aimAcc = 0.999;
-				Player::ins()->setFlashType(1);
-				aimStack++;
-			}
+			aimAddAcc();
 			break;
 		case SDL_CONTROLLER_BUTTON_B:
 			close(aniFlag::null);
@@ -245,41 +354,14 @@ public:
 				{
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
-					aimCoord.x += dx;
-					aimCoord.y += dy;
-
-					if (World::ins()->getTile(aimCoord.x, aimCoord.y, aimCoord.z).EntityPtr != nullptr)
-					{
-						aimAcc = randomRangeFloat(0.5, 0.8);
-					}
-					else aimAcc = 0;
-					fakeAimAcc = aimAcc;
-					aimStack = 0;
-
-					if (aimCoord.x < Player::ins()->getGridX())
-					{
-						Player::ins()->setDirection(4);
-					}
-					else if (aimCoord.x > Player::ins()->getGridX())
-					{
-						Player::ins()->setDirection(0);
-					}
-
-					std::vector<std::array<int, 2>> lineCoord;
-					makeLine(lineCoord, aimCoord.x - Player::ins()->getGridX(), aimCoord.y - Player::ins()->getGridY());
-					aimTrailRev.clear();
-					for (int i = 0; i < lineCoord.size(); i++)
-					{
-						if (lineCoord[i][0] != 0 || lineCoord[i][1] != 0)
-						{
-							aimTrailRev.push_back({ Player::ins()->getGridX() + lineCoord[i][0],Player::ins()->getGridY() + lineCoord[i][1],Player::ins()->getGridZ() });
-						}
-					}
+					changeAimTarget(aimCoord.x + dx, aimCoord.y + dy);
 				}
 			}
 			else dpadDelay--;
 		}
 	}
+
+	
 
 	void executeTab()
 	{

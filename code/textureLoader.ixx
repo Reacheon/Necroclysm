@@ -62,6 +62,7 @@ export void textureLoader()
 	spr::bodyTmpZombie = new Sprite(renderer, "image/charFrame/bodyTmpZombie.png", 240, 128);
 	spr::aimMarker = new Sprite(renderer, "image/UI/aimMarker.png", 48, 48);
 	spr::aimMarkerTmp = new Sprite(renderer, "image/UI/aimMarkerTmp.png", 48, 48);
+
 	spr::aimAtkTypeMarker = new Sprite(renderer, "image/UI/aimAtkTypeMarker.png", 64, 64);
 	spr::bodyTmpHuman = new Sprite(renderer, "image/charFrame/bodyTmpHuman.png", 240, 128);
 	spr::partsSlotGauge = new Sprite(renderer, "image/UI/partsSlotGauge.png", 64,10);
@@ -153,4 +154,6 @@ export void textureLoader()
 	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 160, 160);
 
 	spr::bulletset = new Sprite(renderer, "image/item/bulletset.png", 48, 48);
+	spr::aimMarkerWhite = new Sprite(renderer, "image/UI/aimMarkerWhite.png", 48, 48);
+
 }
