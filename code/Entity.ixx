@@ -39,6 +39,9 @@ private:
     bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
 
 public:
+    Entity* ridingEntity = nullptr;
+    ridingFlag ridingType = ridingFlag::none;
+
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     ~Entity();

@@ -235,7 +235,6 @@ public:
 					}
 					else if (actOptions[i] == act::pull)
 					{
-						//Entity* tgtEntity = (Entity*)Player::ins();
 						if (Player::ins()->pulledCart == nullptr)
 						{
 							Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
@@ -244,6 +243,13 @@ public:
 						{
 							Player::ins()->pulledCart = nullptr;
 						}
+						break;
+					}
+					else if (actOptions[i] == act::ride)
+					{
+						Player::ins()->ridingEntity = (Entity*)(World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr);
+						World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr = nullptr;
+						Player::ins()->ridingType = ridingFlag::horse;
 						break;
 					}
 				}

@@ -453,6 +453,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"POCKET") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::POCKET);
                                     else if (strFragment.substr(0, j) == L"CAN_CLIMB") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CAN_CLIMB);
                                     else if (strFragment.substr(0, j) == L"SPR_TH_WEAPON") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::SPR_TH_WEAPON);
+                                    else if (strFragment.substr(0, j) == L"NO_HAIR_HELMET") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::NO_HAIR_HELMET);
                                     else
                                     {
                                         errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

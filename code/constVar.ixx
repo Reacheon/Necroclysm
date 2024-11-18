@@ -508,6 +508,7 @@ export enum class itemFlag
     CAN_CLIMB,
 
     SPR_TH_WEAPON,
+    NO_HAIR_HELMET,//머리카락이 안보이는 헬멧
 };
 
 export enum class walkFlag
@@ -1265,6 +1266,14 @@ export enum class dmgAniFlag
 {
     none,
     dodged,
+};
+
+export enum class ridingFlag
+{
+    none,
+    horse,
+    wyvern,
+    dolphin,
 };
 
 //export enum class projFlag

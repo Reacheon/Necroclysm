@@ -738,9 +738,6 @@ void Entity::drawSelf()
 	if(entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
 	else setFlip(SDL_FLIP_HORIZONTAL);
 
-	//prt(L"현재 이 객체의 fake 좌표는 %f,%f이다.\n", getFakeX(), getFakeY());
-	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
-	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
 
 	int localSprIndex = getSpriteIndex();
 	if (entityInfo.isPlayer == true)
@@ -781,12 +778,56 @@ void Entity::drawSelf()
 		}
 	}
 
+	int offsetX = 0;
+	int offsetY = 0;
+	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
+	{
+		offsetX = 0;
+		offsetY = -9;
+
+		if (entityInfo.walkMode == walkFlag::walk)
+		{
+			if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+			{
+				offsetY += 1;
+			}
+			localSprIndex = 0;
+		}
+		else if (entityInfo.walkMode == walkFlag::run)
+		{
+			if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+			{
+				offsetY += 1;
+			}
+			localSprIndex = 6;
+		}
+	}
+
+
+	int originX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
+	int originY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
+
+	int drawingX = originX + zoomScale * (offsetX);
+	int drawingY = originY + zoomScale * (offsetY);
+
+
+
 	//캐릭터 그림자 그리기
-	drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
+	
 
-	//캐릭터 본체 그리기
-	drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);
+	if (ridingEntity == nullptr)//일반 걷는 상태
+	{
+		drawSpriteCenter(spr::shadow, 1, originX, originY);
+		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 
+	}
+	else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
+	{
+		drawSpriteCenter(spr::shadow, 2, originX, originY);
+		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex(), originX, originY);
+		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);
+		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex() + 4, originX, originY);
+	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -813,20 +854,33 @@ void Entity::drawSelf()
 
 	if (getHair() != humanCustom::hair::null)
 	{
-		switch (getHair())
+		bool noHair = false;
+		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 		{
-		case humanCustom::hair::commaBlack:
-			drawSpriteCenter(spr::hairCommaBlack, localSprIndex, drawingX, drawingY);
-			break;
-		case humanCustom::hair::bob1Black:
-			drawSpriteCenter(spr::hairBob1Black, localSprIndex, drawingX, drawingY);
-			break;
-		case humanCustom::hair::ponytail:
-			drawSpriteCenter(spr::hairPonytailBlack, localSprIndex, drawingX, drawingY);
-			break;
-		case humanCustom::hair::middlePart:
-			drawSpriteCenter(spr::hairMiddlePart, localSprIndex, drawingX, drawingY);
-			break;
+			if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::NO_HAIR_HELMET) == true)
+			{
+				noHair = true;
+				break;
+			}
+		}
+		
+		if (noHair == false)
+		{
+			switch (getHair())
+			{
+			case humanCustom::hair::commaBlack:
+				drawSpriteCenter(spr::hairCommaBlack, localSprIndex, drawingX, drawingY);
+				break;
+			case humanCustom::hair::bob1Black:
+				drawSpriteCenter(spr::hairBob1Black, localSprIndex, drawingX, drawingY);
+				break;
+			case humanCustom::hair::ponytail:
+				drawSpriteCenter(spr::hairPonytailBlack, localSprIndex, drawingX, drawingY);
+				break;
+			case humanCustom::hair::middlePart:
+				drawSpriteCenter(spr::hairMiddlePart, localSprIndex, drawingX, drawingY);
+				break;
+			}
 		}
 	}
 
@@ -872,7 +926,6 @@ void Entity::drawSelf()
 		}
 
 	}
-
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (entityInfo.HP != entityInfo.maxHP)//개체 HP 표기
@@ -926,6 +979,11 @@ void Entity::drawSelf()
 			(cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY())
 		);
+	}
+
+	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽
+	{
+		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex() + 4, originX, originY);
 	}
 
 	setZoom(1.0);
