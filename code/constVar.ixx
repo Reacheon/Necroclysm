@@ -34,6 +34,9 @@ export constexpr std::array<int, 27> expTable =
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
 1500, 1650, 1800, 1950, 2100, 2250, 2400, 2550, 2750 };
 
+export constexpr int CHAR_TEXTURE_WIDTH = 288;
+export constexpr int CHAR_TEXTURE_HEIGHT = 384;
+
 export namespace col
 {
     constexpr SDL_Color black = { 0x00, 0x00, 0x00 };

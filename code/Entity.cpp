@@ -731,6 +731,118 @@ int Entity::getAimWeaponIndex()
 //bool Entity::hasPulledVehicle() { return (pulledCart != nullptr); }
 //Vehicle* Entity::getPulledVehicle() { return pulledCart; }
 
+void Entity::updateSpriteHuman()
+{
+	if (sprite != nullptr)
+	{
+		delete sprite->getTexture();
+		delete sprite;
+	}
+	SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
+
+	SDL_SetRenderTarget(renderer, targetTexture);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+
+	if (getSkin() != humanCustom::skin::null)
+	{
+		if (getSkin() == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0,0);
+	}
+
+	if (getEyes() != humanCustom::eyes::null)
+	{
+		if (getEyes() == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+		else if (getEyes() == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+	}
+
+	if (getScar() != humanCustom::scar::null)
+	{
+	}
+
+	if (getBeard() != humanCustom::beard::null)
+	{
+		if (getBeard() == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
+	}
+
+	if (getHair() != humanCustom::hair::null)
+	{
+		bool noHair = false;
+		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+		{
+			if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::NO_HAIR_HELMET) == true)
+			{
+				noHair = true;
+				break;
+			}
+		}
+
+		if (noHair == false)
+		{
+			switch (getHair())
+			{
+			case humanCustom::hair::commaBlack:
+				drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::bob1Black:
+				drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::ponytail:
+				drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::middlePart:
+				drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
+				break;
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//캐릭터 장비 그리기
+	if (getEquipPtr()->itemInfo.size() > 0)
+	{
+		std::map<int, Sprite*, std::less<int>> drawOrder;
+
+		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
+		{
+			int priority = 0;
+			Sprite* tgtSpr = nullptr;
+			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
+			{
+			case equip::left:
+			case equip::both:
+				priority = getEquipPtr()->itemInfo[equipCounter].leftWieldPriority;
+				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].leftWieldSpr;
+				break;
+			case equip::right:
+				priority = getEquipPtr()->itemInfo[equipCounter].rightWieldPriority;
+				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].rightWieldSpr;
+				break;
+			case equip::normal:
+				priority = getEquipPtr()->itemInfo[equipCounter].equipPriority;
+				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].equipSpr;
+				break;
+			default:
+				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
+				break;
+			}
+			//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
+			drawOrder[priority] = tgtSpr;
+		}
+
+		for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
+		{
+			if (it->second != nullptr)
+			{
+				drawTexture(it->second->getTexture(), 0,0);
+			}
+		}
+
+	}
+
+	SDL_SetRenderTarget(renderer, nullptr);
+	sprite = new Sprite(renderer, targetTexture, 48, 48);
+}
+
 void Entity::drawSelf()
 {
 	stepEvent();
@@ -818,113 +930,26 @@ void Entity::drawSelf()
 	if (ridingEntity == nullptr)//일반 걷는 상태
 	{
 		drawSpriteCenter(spr::shadow, 1, originX, originY);
-		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 
 	}
 	else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
 	{
 		drawSpriteCenter(spr::shadow, 2, originX, originY);
 		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex(), originX, originY);
-		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);
-		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex() + 4, originX, originY);
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//캐릭터 커스타미이징 그리기
-	if (getSkin() != humanCustom::skin::null)
+	if (sprite != nullptr)
 	{
-		if (getSkin() == humanCustom::skin::yellow) drawSpriteCenter(spr::skinYellow, localSprIndex, drawingX, drawingY);
+		SDL_SetTextureBlendMode(sprite->getTexture(), SDL_BLENDMODE_BLEND);
+		drawSpriteCenter(sprite, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 	}
-
-	if (getEyes() != humanCustom::eyes::null)
+	else
 	{
-		if (getEyes() == humanCustom::eyes::blue) drawSpriteCenter(spr::eyesBlue, localSprIndex, drawingX, drawingY);
-		else if (getEyes() == humanCustom::eyes::red) drawSpriteCenter(spr::eyesRed, localSprIndex, drawingX, drawingY);
-	}
 
-	if (getScar() != humanCustom::scar::null)
-	{
-	}
-
-	if (getBeard() != humanCustom::beard::null)
-	{
-		if (getBeard() == humanCustom::beard::mustache) drawSpriteCenter(spr::beardMustacheBlack, localSprIndex, drawingX, drawingY);
-	}
-
-	if (getHair() != humanCustom::hair::null)
-	{
-		bool noHair = false;
-		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
-		{
-			if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::NO_HAIR_HELMET) == true)
-			{
-				noHair = true;
-				break;
-			}
-		}
-		
-		if (noHair == false)
-		{
-			switch (getHair())
-			{
-			case humanCustom::hair::commaBlack:
-				drawSpriteCenter(spr::hairCommaBlack, localSprIndex, drawingX, drawingY);
-				break;
-			case humanCustom::hair::bob1Black:
-				drawSpriteCenter(spr::hairBob1Black, localSprIndex, drawingX, drawingY);
-				break;
-			case humanCustom::hair::ponytail:
-				drawSpriteCenter(spr::hairPonytailBlack, localSprIndex, drawingX, drawingY);
-				break;
-			case humanCustom::hair::middlePart:
-				drawSpriteCenter(spr::hairMiddlePart, localSprIndex, drawingX, drawingY);
-				break;
-			}
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//캐릭터 장비 그리기
-	if (getEquipPtr()->itemInfo.size() > 0)
-	{
-		std::map<int, Sprite*, std::less<int>> drawOrder;
-
-		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
-		{
-			int priority = 0;
-			Sprite* tgtSpr = nullptr;
-			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
-			{
-			case equip::left:
-			case equip::both:
-				priority = getEquipPtr()->itemInfo[equipCounter].leftWieldPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].leftWieldSpr;
-				break;
-			case equip::right:
-				priority = getEquipPtr()->itemInfo[equipCounter].rightWieldPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].rightWieldSpr;
-				break;
-			case equip::normal:
-				priority = getEquipPtr()->itemInfo[equipCounter].equipPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].equipSpr;
-				break;
-			default:
-				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
-				break;
-			}
-			//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
-			drawOrder[priority] = tgtSpr;
-		}
-
-		for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
-		{
-			if (it->second != nullptr)
-			{
-				drawSpriteCenter(it->second, localSprIndex, drawingX, drawingY);
-			}
-		}
-
+		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
