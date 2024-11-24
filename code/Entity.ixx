@@ -24,7 +24,7 @@ import Vehicle;
 export class Entity : public Ani, public Coord, public Drawable 
 {
 private:
-    Sprite* sprite = nullptr;
+    Sprite* customSprite = nullptr;
     Sprite* spriteFlash = nullptr; //플래시용 흰색 마스킹 스프라이트
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
@@ -82,7 +82,6 @@ public:
     int getSpriteInfimum();
     void setSpriteIndex(int index);
     int getSpriteIndex();
-    Sprite* getSprite();
     void setDirection(int dir);
 
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType);
@@ -127,7 +126,7 @@ public:
     int getAimHand();
     int getAimWeaponIndex();
 
-    void updateSpriteHuman();
+    void updateCustomSpriteHuman();
 
     virtual void drawSelf() override;
 };

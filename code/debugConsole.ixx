@@ -229,6 +229,7 @@ export void debugConsole()
 			equipPtr->transferItem(txPtr, 0, 1);
 			Player::ins()->drop(txPtr);
 		}
+		Player::ins()->updateCustomSpriteHuman();
 		break;
 	}
 	case 13:

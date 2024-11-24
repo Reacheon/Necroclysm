@@ -60,6 +60,60 @@ export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
 	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }
 
+export void drawSpriteCenterExSrc(Sprite* spr, int index, int x, int y, SDL_Rect exSrc)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	int srcX = (spr->getW() * index) % textureW;
+	int srcY = (spr->getH() * (spr->getW() * index / textureW));
+	SDL_Rect src = { srcX + exSrc.x, srcY + exSrc.y, exSrc.w, exSrc.h };
+
+	int dstW = static_cast<int>(std::floor(src.w * s_zoomScale));
+	int dstH = static_cast<int>(std::floor(src.h * s_zoomScale));
+
+	double offsetX = (exSrc.x + exSrc.w / 2.0) - (spr->getW() / 2.0);
+	double offsetY = (exSrc.y + exSrc.h / 2.0) - (spr->getH() / 2.0);
+	int dstOffsetX = static_cast<int>(std::floor(offsetX * s_zoomScale));
+	int dstOffsetY = static_cast<int>(std::floor(offsetY * s_zoomScale));
+
+	SDL_Rect dst = { x - dstW / 2 + dstOffsetX, y - dstH / 2 + dstOffsetY, dstW, dstH };
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+}
+
+export void drawSpriteCenterHalfUp(Sprite* spr, int index, int x, int y)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	int srcX = (spr->getW() * index) % textureW;
+	int srcY = (spr->getH() * (spr->getW() * index / textureW));
+	SDL_Rect src = { srcX, srcY, spr->getW(), spr->getH()/2.0 };
+
+	int dstW = static_cast<int>(std::floor(src.w * s_zoomScale));
+	int dstH = static_cast<int>(std::floor(src.h * s_zoomScale));
+	SDL_Rect dst = { x - dstW / 2, y - dstH, dstW, dstH };
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+}
+
+export void drawSpriteCenterHalfDown(Sprite* spr, int index, int x, int y)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	int srcX = (spr->getW() * index) % textureW;
+	int srcY = (spr->getH() * (spr->getW() * index / textureW));
+	SDL_Rect src = { srcX, srcY + spr->getH() / 2.0, spr->getW(), spr->getH() / 2.0 };
+
+	int dstW = static_cast<int>(std::floor(src.w * s_zoomScale));
+	int dstH = static_cast<int>(std::floor(src.h * s_zoomScale));
+	SDL_Rect dst = { x - dstW / 2, y, dstW, dstH };
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+}
+
 //export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
 //{
 //	int textureW, textureH;

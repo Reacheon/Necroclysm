@@ -397,24 +397,14 @@ public:
 			{
 				if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)) ) { return; }
 
-				/*if (targetX != Player::ins()->getGridX() || targetY != Player::ins()->getGridY())
-				{*/
-
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				ItemPocket* drop = new ItemPocket(storageType::null);
 				Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
 				Player::ins()->throwing(drop, targetX, targetY);
 				Player::ins()->updateStatus();
+				Player::ins()->updateCustomSpriteHuman();
 				updateLog(L"#FFFFFF아이템을 던졌다.");
-				//}
-				//else
-				//{
-				//	ItemPocket* drop = new ItemPocket(storageType::null);
-				//	Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
-				//	Player::ins()->drop(drop);
-				//	Player::ins()->updateStatus();
-				//	updateLog(L"#FFFFFF아이템을 버렸다.");
-				//}
+
 
 				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::throwing);
 				turnWait(1.0);

@@ -759,6 +759,7 @@ public:
 			}
 		}
 		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 		if (inputType == input::keyboard)
 		{
 

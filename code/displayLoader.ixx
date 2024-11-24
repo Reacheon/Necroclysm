@@ -27,7 +27,7 @@ export void displayLoader()
     cameraW = displayMode.w;
     cameraH = displayMode.h;
 
-    window = SDL_CreateWindow("ApocaRogue", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
+    window = SDL_CreateWindow("DeepRogue Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
     //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);

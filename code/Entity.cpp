@@ -96,14 +96,19 @@ Sprite* Entity::getSpriteFlash()
 	if (spriteFlash == nullptr)
 	{
 		int textureW, textureH;
-		SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
+		if(customSprite == nullptr) SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
+		else  SDL_QueryTexture(customSprite->getTexture(), NULL, NULL, &textureW, &textureH);
+
 		SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
 		SDL_SetRenderTarget(renderer, drawingTexture);
 		SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
 		SDL_Rect src = { 0, 0, textureW, textureH };
 		SDL_Rect dst = src;
 		//하얗게 만들 텍스쳐를 그려넣음
-		SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+
+		if (customSprite == nullptr) SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+		else SDL_RenderCopy(renderer, customSprite->getTexture(), &src, &dst);
+		
 		//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -129,7 +134,6 @@ void Entity::setSpriteInfimum(int inputVal) { entityInfo.sprIndexInfimum = input
 int Entity::getSpriteInfimum() { return entityInfo.sprIndexInfimum; }
 void Entity::setSpriteIndex(int index) { entityInfo.sprIndex = index; }
 int Entity::getSpriteIndex() { return entityInfo.sprIndex; }
-Sprite* Entity::getSprite() { return entityInfo.entitySpr; }
 void Entity::setDirection(int dir)
 {
 	entityInfo.direction = dir;
@@ -731,12 +735,13 @@ int Entity::getAimWeaponIndex()
 //bool Entity::hasPulledVehicle() { return (pulledCart != nullptr); }
 //Vehicle* Entity::getPulledVehicle() { return pulledCart; }
 
-void Entity::updateSpriteHuman()
+void Entity::updateCustomSpriteHuman()
 {
-	if (sprite != nullptr)
+
+	if (customSprite != nullptr)
 	{
-		delete sprite->getTexture();
-		delete sprite;
+		SDL_DestroyTexture(customSprite->getTexture());
+		delete customSprite;
 	}
 	SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
 
@@ -840,7 +845,8 @@ void Entity::updateSpriteHuman()
 	}
 
 	SDL_SetRenderTarget(renderer, nullptr);
-	sprite = new Sprite(renderer, targetTexture, 48, 48);
+	customSprite = new Sprite(renderer, targetTexture, 48, 48);
+	delete spriteFlash;
 }
 
 void Entity::drawSelf()
@@ -925,31 +931,49 @@ void Entity::drawSelf()
 
 
 	//캐릭터 그림자 그리기
-	
-
-	if (ridingEntity == nullptr)//일반 걷는 상태
+	if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW) == false && itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP) == false)
 	{
-		drawSpriteCenter(spr::shadow, 1, originX, originY);
-
+		if (ridingEntity == nullptr)
+		{
+			drawSpriteCenter(spr::shadow, 1, originX, originY);
+		}
+		else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
+		{
+			drawSpriteCenter(spr::shadow, 2, originX, originY);
+			drawSpriteCenter(ridingEntity->entityInfo.entitySpr, getSpriteIndex(), originX, originY);
+		}
 	}
-	else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
-	{
-		drawSpriteCenter(spr::shadow, 2, originX, originY);
-		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex(), originX, originY);
-	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//캐릭터 커스타미이징 그리기
-	if (sprite != nullptr)
+	if (customSprite != nullptr)
 	{
-		SDL_SetTextureBlendMode(sprite->getTexture(), SDL_BLENDMODE_BLEND);
-		drawSpriteCenter(sprite, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+		SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND);
+
+		if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW))
+		{
+			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, {0,0,48,24});
+			SDL_SetTextureAlphaMod(customSprite->getTexture(), 130); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,24,48,24 });
+			SDL_SetTextureAlphaMod(customSprite->getTexture(), 255); //텍스쳐 투명도 설정
+		}
+		else if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+		{
+			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,0,48,27 });
+			SDL_SetTextureAlphaMod(customSprite->getTexture(), 80); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,24,48,21 });
+			SDL_SetTextureAlphaMod(customSprite->getTexture(), 255); //텍스쳐 투명도 설정
+		}
+		else
+		{
+			drawSpriteCenter(customSprite, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+		}
 	}
 	else
 	{
-
-		drawSpriteCenter(getSprite(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1008,7 +1032,7 @@ void Entity::drawSelf()
 
 	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽
 	{
-		drawSpriteCenter(ridingEntity->getSprite(), getSpriteIndex() + 4, originX, originY);
+		drawSpriteCenter(ridingEntity->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
 	}
 
 	setZoom(1.0);

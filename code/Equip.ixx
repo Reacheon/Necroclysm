@@ -402,6 +402,7 @@ public:
 		int returnIndex = lootPtr->transferItem(Player::ins()->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equip::normal;
 		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 		if (inputType == input::keyboard)
 		{
 			doPopDownHUD = true;
@@ -422,6 +423,7 @@ public:
 		}
 		Player::ins()->drop(drop);
 		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 		if (inputType == input::keyboard)
 			doPopDownHUD = true;
 		{
@@ -432,32 +434,6 @@ public:
 	void executeOpen()
 	{
 		new Inventory(334, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
-
-
-		//lootPtr = (ItemPocket*)(equipPtr->itemInfo[equipCursor].pocketPtr);
-		//pocketCursor = 0;
-		//isTargetPocket = true;
-		//for (int j = 0; j < equipPtr->itemInfo.size(); j++)
-		//{
-		//	if (equipPtr->itemInfo[j].pocketMaxVolume > 0)
-		//	{
-		//		if (j == equipCursor)
-		//		{
-		//			break;
-		//		}
-		//		else
-		//		{
-		//			pocketCursor++;
-		//		}
-		//	}
-		//}
-
-		//if (inputType == input::keyboard)
-		//{
-		//	lootCursor = 0;
-		//	doPopDownHUD = true;
-		//	barActCursor = -1;
-		//}
 	}
 	void updateBarAct()
 	{
@@ -647,6 +623,7 @@ public:
 			int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equip::both; //양손
 			equipPtr->sortEquip();
+
 			updateLog(L"#FFFFFF아이템을 들었다.");
 		}
 		else
@@ -762,6 +739,9 @@ public:
 			doPopDownHUD = true;
 			barActCursor = -1;
 		}
+
+		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 	}
 
 	Corouter executeReload()//장전 : 타겟아이템(탄창이나 총)에 넣을 수 있는 탄환을 넣는다.
@@ -944,7 +924,6 @@ public:
 			ItemPocket* drop = new ItemPocket(storageType::null);
 			inputPocket->transferItem(drop, inputIndex, 1);
 			Player::ins()->drop(drop);
-			Player::ins()->updateStatus();
 			updateLog(L"#FFFFFF아이템을 버렸다.");
 		}
 		else
@@ -953,9 +932,11 @@ public:
 			//이큅일 떄는 그렇다쳐도 가방 안에 있는 아이템을 던질 떄 원하는대로 작동하지않아 오류가 생긴다
 			inputPocket->transferItem(throwing, inputIndex, 1);
 			Player::ins()->throwing(throwing, targetX, targetY);
-			Player::ins()->updateStatus();
 			updateLog(L"#FFFFFF아이템을 던졌다.");
 		}
+
+		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 		close(aniFlag::null);
 	}
 
