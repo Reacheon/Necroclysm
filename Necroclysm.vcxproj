@@ -22,9 +22,9 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{63385295-0bec-4a32-8fa4-2aea0bc09d86}</ProjectGuid>
-    <RootNamespace>ApocaRogue</RootNamespace>
+    <RootNamespace>Necroclysm</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>ApocaRogue</ProjectName>
+    <ProjectName>Necroclysm</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
