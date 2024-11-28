@@ -737,12 +737,6 @@ int Entity::getAimWeaponIndex()
 
 void Entity::updateCustomSpriteHuman()
 {
-
-	if (customSprite != nullptr)
-	{
-		SDL_DestroyTexture(customSprite->getTexture());
-		delete customSprite;
-	}
 	SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
 
 	SDL_SetRenderTarget(renderer, targetTexture);
@@ -802,6 +796,7 @@ void Entity::updateCustomSpriteHuman()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	//캐릭터 장비 그리기
 	if (getEquipPtr()->itemInfo.size() > 0)
 	{
@@ -845,7 +840,7 @@ void Entity::updateCustomSpriteHuman()
 	}
 
 	SDL_SetRenderTarget(renderer, nullptr);
-	customSprite = new Sprite(renderer, targetTexture, 48, 48);
+	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
 	delete spriteFlash;
 }
 
@@ -948,27 +943,27 @@ void Entity::drawSelf()
 	//캐릭터 커스타미이징 그리기
 	if (customSprite != nullptr)
 	{
-		SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 
 		if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW))
 		{
-			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, {0,0,48,24});
-			SDL_SetTextureAlphaMod(customSprite->getTexture(), 130); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,24,48,24 });
-			SDL_SetTextureAlphaMod(customSprite->getTexture(), 255); //텍스쳐 투명도 설정
+			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, {0,0,48,24});
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
 		else if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
 		{
-			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,0,48,27 });
-			SDL_SetTextureAlphaMod(customSprite->getTexture(), 80); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(customSprite->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenterExSrc(customSprite, localSprIndex, drawingX, drawingY, { 0,24,48,21 });
-			SDL_SetTextureAlphaMod(customSprite->getTexture(), 255); //텍스쳐 투명도 설정
+			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 80); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,21 });
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
 		else
 		{
-			drawSpriteCenter(customSprite, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+			drawSpriteCenter(customSprite.get(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 		}
 	}
 	else

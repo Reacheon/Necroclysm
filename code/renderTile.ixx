@@ -333,7 +333,7 @@ __int64 drawItems()
 		setZoom(zoomScale);
 		drawSpriteCenter
 		(
-			address->getSprite(),
+			spr::itemset,
 			itemSprIndex,
 			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())

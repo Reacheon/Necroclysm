@@ -13,18 +13,6 @@ private:
     int w;
     int h;
 public:
-    Sprite(SDL_Renderer* renderer, const char* adr, int inputW, int inputH)
-    {
-        texturePtr = IMG_LoadTexture(renderer, adr);
-        if (texturePtr == nullptr)
-        {
-            std::string errorMsg = "Failed to load PNG file in the Sprite class. Path:  ";
-            errorMsg += adr;
-            errorBox(errorMsg.c_str());
-        }
-        w = inputW;
-        h = inputH;
-    }
     Sprite(SDL_Renderer* renderer, std::string adr, int inputW, int inputH)
     {
         texturePtr = IMG_LoadTexture(renderer, adr.c_str());
