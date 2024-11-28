@@ -32,6 +32,7 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
+	updateSpriteFlash();
 	entityInfo.equipment = new ItemPocket(storageType::equip);
 	entityInfo.talentFocus[0] = 1;
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
@@ -39,12 +40,9 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 Entity::~Entity()//소멸자
 {
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
-
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable = true;
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
-	//delete sprite;
-	delete spriteFlash;
 	delete entityInfo.equipment;
 }
 #pragma region getset method
@@ -91,35 +89,35 @@ ItemPocket* Entity::getEquipPtr()
 { 
 	return entityInfo.equipment; 
 }
+
+void Entity::updateSpriteFlash()
+{
+	int textureW, textureH;
+	if (customSprite == nullptr) SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
+	else  SDL_QueryTexture(customSprite->getTexture(), NULL, NULL, &textureW, &textureH);
+
+	SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
+	SDL_SetRenderTarget(renderer, drawingTexture);
+	SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
+	SDL_Rect src = { 0, 0, textureW, textureH };
+	SDL_Rect dst = src;
+	//하얗게 만들 텍스쳐를 그려넣음
+
+	if (customSprite == nullptr) SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+	else SDL_RenderCopy(renderer, customSprite->getTexture(), &src, &dst);
+
+	//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_Rect dstWhite = { 0, 0, textureW, textureH };
+	drawFillRect(dstWhite, col::white);
+	SDL_SetRenderTarget(renderer, nullptr);
+
+	spriteFlash = std::make_unique<Sprite>(renderer, drawingTexture, 48, 48);
+}
 Sprite* Entity::getSpriteFlash() 
 { 
-	if (spriteFlash == nullptr)
-	{
-		int textureW, textureH;
-		if(customSprite == nullptr) SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
-		else  SDL_QueryTexture(customSprite->getTexture(), NULL, NULL, &textureW, &textureH);
-
-		SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
-		SDL_SetRenderTarget(renderer, drawingTexture);
-		SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
-		SDL_Rect src = { 0, 0, textureW, textureH };
-		SDL_Rect dst = src;
-		//하얗게 만들 텍스쳐를 그려넣음
-
-		if (customSprite == nullptr) SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
-		else SDL_RenderCopy(renderer, customSprite->getTexture(), &src, &dst);
-		
-		//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_Rect dstWhite = { 0, 0, textureW, textureH };
-		drawFillRect(dstWhite, col::white);
-		SDL_SetRenderTarget(renderer, nullptr);
-		if (spriteFlash != nullptr) { delete spriteFlash; }
-		spriteFlash = new Sprite(renderer, drawingTexture, 48, 48);
-	}
-
-	return spriteFlash; 
+	return spriteFlash.get(); 
 }
 void Entity::setFlashType(int inputType)
 {
@@ -841,7 +839,7 @@ void Entity::updateCustomSpriteHuman()
 
 	SDL_SetRenderTarget(renderer, nullptr);
 	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
-	delete spriteFlash;
+	updateSpriteFlash();
 }
 
 void Entity::drawSelf()

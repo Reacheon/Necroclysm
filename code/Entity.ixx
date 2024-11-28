@@ -25,7 +25,7 @@ export class Entity : public Ani, public Coord, public Drawable
 {
 private:
     std::unique_ptr<Sprite> customSprite = nullptr;
-    Sprite* spriteFlash = nullptr; //플래시용 흰색 마스킹 스프라이트
+    std::unique_ptr<Sprite> spriteFlash = nullptr; //플래시용 흰색 마스킹 스프라이트
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     bool hasAStarDst = false;
@@ -73,6 +73,7 @@ public:
     void setAtkTarget(int inputX, int inputY, int inputZ, int inputPart);
     void setAtkTarget(int inputX, int inputY, int inputZ);
     ItemPocket* getEquipPtr();
+    void updateSpriteFlash();
     Sprite* getSpriteFlash();
     void setFlashType(int inputType);
     int getFlashType();
