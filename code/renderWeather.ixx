@@ -31,15 +31,34 @@ export __int64 renderWeather()
 	}
 	else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
 	{
-		static int yShift = 0;
-		if (timer::timer600 % 3 == 0)
 		{
-			yShift++;
-			if (yShift == 720) yShift = 0;
+			static int yShift1 = 0;
+			if (timer::timer600 % 2 == 0)
+			{
+				yShift1++;
+				if (yShift1 == 720) yShift1 = 0;
+			}
+
+			drawSprite(spr::screenSnow, 0, 0, yShift1);
+			drawSprite(spr::screenSnow, 0, 0, yShift1 - 720);
 		}
 
-		drawSprite(spr::screenSnow, 0, 0, yShift);
-		drawSprite(spr::screenSnow, 0, 0, yShift - 720);
+		{
+			static int yShift2 = 0;
+			if (timer::timer600 % 3 == 0)
+			{
+				yShift2++;
+				if (yShift2 == 720) yShift2 = 0;
+			}
+
+			setFlip(SDL_FLIP_HORIZONTAL);
+			SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 130); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(spr::screenSnow->getTexture(), SDL_BLENDMODE_BLEND);
+			drawSprite(spr::screenSnow, 0, 0, yShift2);
+			drawSprite(spr::screenSnow, 0, 0, yShift2 - 720);
+			setFlip(SDL_FLIP_NONE);
+			SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 255); //텍스쳐 투명도 설정
+		}
 	}
 	else
 	{

@@ -293,9 +293,13 @@ public:
         int sprIndex = leadItem.propSprIndex + leadItem.extraSprIndexSingle + 16 * leadItem.extraSprIndex16;
         if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
         {
-            if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
-            else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
-            else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
+            if (World::ins()->getTile(getGridX(), getGridY(), Player::ins()->getGridZ()).hasSnow == true) sprIndex += 5;
+            else
+            {
+                if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
+                else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
+                else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
+            }
         }
         drawSpriteCenter
         (

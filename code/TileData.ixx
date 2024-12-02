@@ -47,6 +47,7 @@ export struct TileData //총용량 29바이트
 
     unsigned __int16 randomVal = 0;
 
+    bool hasSnow = false;
 
     TileData()
     {

@@ -225,6 +225,19 @@ __int64 drawTiles()
 			sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
 			if (thisTile->floor == 0) sprIndex = 506;
 
+			if (thisTile->floor == 220)
+			{
+				if (getSeason() == seasonFlag::winter)
+				{
+					sprIndex += 16;
+				}
+				else if (getSeason() == seasonFlag::winter)
+				{
+					sprIndex += 32;
+
+				}
+			}
+
 			drawSpriteCenter
 			(
 				spr::tileset,
@@ -238,6 +251,39 @@ __int64 drawTiles()
 
 
 			break;
+		}
+
+		if (thisTile->hasSnow == true)
+		{
+			setZoom(zoomScale);
+
+			int dirCorrection = 0;
+
+			bool topCheck, botCheck, leftCheck, rightCheck;
+
+			int currentSnow = thisTile->hasSnow;
+			int	topTileSnow = topTile->hasSnow;
+			int	botTileSnow = botTile->hasSnow;
+			int	leftTileSnow = leftTile->hasSnow;
+			int	rightTileSnow = rightTile->hasSnow;
+
+			topCheck = currentSnow == topTileSnow;
+			botCheck = currentSnow == botTileSnow;
+			leftCheck = currentSnow == leftTileSnow;
+			rightCheck = currentSnow == rightTileSnow;
+
+			dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+
+			int sprIndex = 848;
+			drawSpriteCenter
+			(
+				spr::tileset,
+				sprIndex + dirCorrection,
+				cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+				cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+			);
+
+			setZoom(1.0);
 		}
 
 		switch (thisTile->wall)//벽 그리기
@@ -369,10 +415,19 @@ __int64 drawEntities()
 		int sprIndex = iPtr->leadItem.propSprIndex + iPtr->leadItem.extraSprIndexSingle + 16 * iPtr->leadItem.extraSprIndex16;
 		if (iPtr->leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
 		{
-			if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
-			else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
-			else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
+			if (World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).hasSnow == true) sprIndex += 5;
+			else
+			{
+				if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
+				else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
+				else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
+			}
+
+
 		}
+
+
+
 		drawSpriteCenter
 		(
 			spr::propset,

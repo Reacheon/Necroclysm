@@ -1,3 +1,4 @@
+#define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
 
 export module startingArea;
 
@@ -163,8 +164,8 @@ export void startingArea()
 	}
 
 	//Ã¶Á¶¸Á ¿ìÃø ÀÔ±¸ ÀüÅëµî 2°³
-	new Prop(pX + 12, pY + 0, pZ + 0, 211);//ÀüÅëµî
-	new Prop(pX + 12, pY + 4, pZ + 0, 211);//ÀüÅëµî
+	new Prop(pX + 12, pY + 0, pZ + 0, 118);//º¼¶óµåµî
+	new Prop(pX + 12, pY + 4, pZ + 0, 118);//º¼¶óµåµî
 
 
 	//ÁöÇÏ
@@ -508,26 +509,95 @@ export void startingArea()
 	/////////////////////////////////////////////////¡å¼³Ä¡¹° Ãß°¡////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	new Prop(pX + 1, pY - 2, pZ, 237);//³ª¹« ¼³Ä¡
-	new Prop(pX + 1 - 1, pY - 2, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 1, pY - 2 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+
+
+
+	//new Prop(pX + 1 - 1, pY - 2, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 1, pY - 2 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 6, pY - 5, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 7, pY - 3, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 7, pY - 4, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 5, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 5 - 1, pY - 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 7 - 1, pY + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+
+
+	for (int x = 0; x <= 10; x++) {
+		for (int y = -8; y <= -2; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	for (int x = 4; x <= 10; x++) SNOW(x, -1, pZ);
+
+	for (int x = 6; x <= 10; x++) SNOW(x, 0, pZ);
+
+	SNOW(3, 4, pZ);
+	SNOW(3, 5, pZ);
+	SNOW(4, 5, pZ);
+
+	for (int x = 5; x <= 13; x++) {
+		for (int y = 4; y <= 7; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	for (int x = -5; x <= 1; x++) {
+		for (int y = 4; y <= 11; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	for (int x = 2; x <= 3; x++) {
+		for (int y = 6; y <= 8; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	for (int x = -2; x <= 1; x++) {
+		for (int y = 2; y <= 3; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	SNOW(-3, 3, pZ);
+
+	for (int x = 11; x <= 13; x++) {
+		for (int y = -8; y <= -1; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	for (int x = -6; x <= -1; x++) {
+		for (int y = -9; y <= -7; y++) {
+			SNOW(x, y, pZ);
+		}
+	}
+
+	SNOW(6, 3, pZ);
+	SNOW(9, 3, pZ);
+	SNOW(10, 3, pZ);
+	SNOW(-5, 3, pZ);
+	SNOW(7, 1, pZ);
+	SNOW(-5, 2, pZ);
+
+	for (int y = -7; y <= -3; y++) SNOW(14, y, pZ);
+
+
+	new Prop(1, -3, 0, 117);//³ª¹« ¼³Ä¡
 
 	new Prop(pX + 3, pY - 2, pZ, 239);//³ª¹« ¼³Ä¡
 
-	new Prop(pX + 5, pY - 1, pZ, 248);//³ª¹« ¼³Ä¡
-	new Prop(pX + 5, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 5 - 1, pY - 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	new Prop(pX + 5, pY - 1, pZ, 247);//³ª¹« ¼³Ä¡
+
+	new Prop(0, -5, pZ, 238);//³ª¹« ¼³Ä¡
 
 
 
-	//new Prop(pX + 6, pY - 4, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 6, pY - 5, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 7, pY - 3, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	new Prop(pX + 7, pY - 4, pZ, 234);//º¢²É³«¿± ¼³Ä¡
 
 	new Prop(pX + 7, pY + 1, pZ, 237);//³ª¹« ¼³Ä¡
-	new Prop(pX + 7 - 1, pY + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+
 
 	new Prop(pX + 4, pY - 5, pZ, 248);//³ª¹« ¼³Ä¡
 
@@ -538,6 +608,8 @@ export void startingArea()
 
 
 	new Prop(pX, pY - 20, pZ, 237);
+
+	new Prop(-4, 5, 0, 245);//»ç°ú³ª¹« ¼³Ä¡
 
 
 	new Prop(pX + 3, pY + 3, pZ, 338);//°íÃ¶ ¼³Ä¡
@@ -578,7 +650,8 @@ export void startingArea()
 
 	new Prop(pX + 6, pY - 4, pZ, 270);//²É ¼³Ä¡
 
-	new Prop(pX, pY - 1, pZ, 118);//º¼¶óµå µî ¼³Ä¡
+	new Prop(0, -1, 0, 211);//ÀüÅë µî ¼³Ä¡
+	new Prop(4, 0, 0, 211);//º¼¶óµå µî ¼³Ä¡
 
 	//¿ïÅ¸¸® ¼³Ä¡
 	new Prop(pX - 3, pY + 2, pZ, 206);

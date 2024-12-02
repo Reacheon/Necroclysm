@@ -26,11 +26,8 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	int i = 0;
 
-	getEquipPtr()->addItemFromDex(387);
-	getEquipPtr()->itemInfo[i++].equipState = equip::left;
-
-	getEquipPtr()->addItemFromDex(386);
-	getEquipPtr()->itemInfo[i++].equipState = equip::right;
+	getEquipPtr()->addItemFromDex(383);
+	getEquipPtr()->itemInfo[i++].equipState = equip::both;
 
 
 	getEquipPtr()->addItemFromDex(2);

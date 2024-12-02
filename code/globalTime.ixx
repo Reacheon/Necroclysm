@@ -3,7 +3,7 @@
 import constVar;
 
 static int year = 2099;
-static int month = 9;
+static int month = 1;
 static int day  = 15;
 static int hour = 9;
 static int min = 9;
