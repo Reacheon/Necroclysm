@@ -244,11 +244,13 @@
     <ClCompile Include="code\Map.ixx" />
     <ClCompile Include="code\Mapmaker.ixx" />
     <ClCompile Include="code\Msg.ixx" />
+    <ClCompile Include="code\Raindrop.ixx" />
     <ClCompile Include="code\readSkillDex.ixx" />
     <ClCompile Include="code\renderFPS.ixx" />
     <ClCompile Include="code\renderSticker.ixx" />
     <ClCompile Include="code\renderWeather.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
+    <ClCompile Include="code\Snowflake.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\stringToWstring.ixx" />
     <ClCompile Include="code\ThreadPool.ixx" />

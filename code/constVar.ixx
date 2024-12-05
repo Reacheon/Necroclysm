@@ -1296,4 +1296,6 @@ export class Vehicle;
 export class World;
 export class Chunk;
 export class Loot;
+
+
 export void turnWait(float waitTime);

@@ -10,6 +10,7 @@ import World;
 import Player;
 import textureVar;
 import drawSprite;
+import Snowflake;
 
 export __int64 renderWeather()
 {
@@ -31,38 +32,46 @@ export __int64 renderWeather()
 	}
 	else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
 	{
-		{
-			static int yShift1 = 0;
-			if (timer::timer600 % 2 == 0)
-			{
-				yShift1++;
-				if (yShift1 == 720) yShift1 = 0;
-			}
+		//{
+		//	static int yShift1 = 0;
+		//	if (timer::timer600 % 2 == 0)
+		//	{
+		//		yShift1++;
+		//		if (yShift1 == 720) yShift1 = 0;
+		//	}
 
-			drawSprite(spr::screenSnow, 0, 0, yShift1);
-			drawSprite(spr::screenSnow, 0, 0, yShift1 - 720);
-		}
+		//	drawSprite(spr::screenSnow, 0, 0, yShift1);
+		//	drawSprite(spr::screenSnow, 0, 0, yShift1 - 720);
+		//}
 
-		{
-			static int yShift2 = 0;
-			if (timer::timer600 % 3 == 0)
-			{
-				yShift2++;
-				if (yShift2 == 720) yShift2 = 0;
-			}
+		//{
+		//	static int yShift2 = 0;
+		//	if (timer::timer600 % 3 == 0)
+		//	{
+		//		yShift2++;
+		//		if (yShift2 == 720) yShift2 = 0;
+		//	}
 
-			setFlip(SDL_FLIP_HORIZONTAL);
-			SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 130); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(spr::screenSnow->getTexture(), SDL_BLENDMODE_BLEND);
-			drawSprite(spr::screenSnow, 0, 0, yShift2);
-			drawSprite(spr::screenSnow, 0, 0, yShift2 - 720);
-			setFlip(SDL_FLIP_NONE);
-			SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 255); //텍스쳐 투명도 설정
-		}
+		//	setFlip(SDL_FLIP_HORIZONTAL);
+		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 130); //텍스쳐 투명도 설정
+		//	SDL_SetTextureBlendMode(spr::screenSnow->getTexture(), SDL_BLENDMODE_BLEND);
+		//	drawSprite(spr::screenSnow, 0, 0, yShift2);
+		//	drawSprite(spr::screenSnow, 0, 0, yShift2 - 720);
+		//	setFlip(SDL_FLIP_NONE);
+		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 255); //텍스쳐 투명도 설정
+		//}
 	}
 	else
 	{
 	}
+
+	for (int i = 0; i < snowflakes.size(); i++)
+	{
+		drawFillRect({ (snowflakes[i].get())->x, (snowflakes[i].get())->y,2,2 }, { 0xff, 0xff, 0xff });
+		//drawPoint((snowflakes[i].get())->x, (snowflakes[i].get())->y, { 0xff, 0xff, 0xff });
+
+	}
+
 
 	return (getNanoTimer() - timeStampStart);
 }

@@ -516,5 +516,11 @@
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
+    <ClCompile Include="code\Snowflake.ixx">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Raindrop.ixx">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

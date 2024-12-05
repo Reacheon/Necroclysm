@@ -193,6 +193,30 @@ export std::vector<Point2> aStarTrail; //플레이어의 aStar로 생기는 궤�
 export int dpadDelay = 0; //상하좌우키 연속입력 딜레이(꾹 누르는경우 여러번 입력되게..)
 export int delayR2 = 0;
 
+export class Snowflake
+{
+public:
+    int dstX = 0;
+    int dstY = 0;
+    int x = -50;
+    int y = -50;
+    int alpha = 255;
+
+    Snowflake(int inputDstX, int inputDstY)
+    {
+        dstX = inputDstX;
+        dstY = inputDstY;
+        x = inputDstX;
+        y = inputDstY - 150;
+        alpha = randomRange(120, 255);
+    };
+
+};
+
+export std::vector<std::unique_ptr<Snowflake>> snowflakes;
+
+/////////////////////////////////////////////전역함수////////////////////////////////////////////////////////////
+
 export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
     [](Ani* a, Ani* b) -> bool {
         if (a->getAniPriority() == b->getAniPriority())

@@ -10,6 +10,10 @@ import Corpse;
 import GUI;
 import clickHold;
 import log;
+import Player;
+import World;
+import Snowflake;
+
 
 //GUI의 스텝이벤트를 실행시키는 함수
 
@@ -62,6 +66,26 @@ export __int64 stepEvent()
 
     //GUI 객체 스텝 이벤트 실행
     for (int i = 0; i < GUI::getActiveGUIList().size(); i++){GUI::getActiveGUIList()[i]->step();}
+
+	int cx, cy;
+	int pz = Player::ins()->getGridZ();
+	World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
+	if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
+	{
+		int randX = randomRange(0, cameraW);
+		int randY = randomRange(0, cameraH);
+		snowflakes.push_back(std::make_unique<Snowflake>(randX,randY));
+	}
+
+	for (int i = snowflakes.size() - 1; i >= 0; --i) 
+	{
+		snowflakes[i]->y += 2;
+		if (snowflakes[i]->y > snowflakes[i]->dstY) 
+		{
+			snowflakes.erase(snowflakes.begin() + i);
+		}
+	}
+
 
     return (getNanoTimer() - timeStampStart);
 }
