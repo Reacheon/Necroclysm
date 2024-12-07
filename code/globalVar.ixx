@@ -196,24 +196,44 @@ export int delayR2 = 0;
 export class Snowflake
 {
 public:
-    int dstX = 0;
-    int dstY = 0;
     int x = -50;
     int y = -50;
-    int alpha = 255;
+    int dstX = 0;
+    int dstY = 0;
+    unsigned __int8 alpha = 255;
+    int size = 2;
 
-    Snowflake(int inputDstX, int inputDstY)
+
+    Snowflake(int inputDstX, int inputDstY, int inputSize)
     {
         dstX = inputDstX;
         dstY = inputDstY;
         x = inputDstX;
         y = inputDstY - 150;
+        size = inputSize;
         alpha = randomRange(120, 255);
     };
+};
 
+export class Raindrop
+{
+public:
+    int x = -50;
+    int y = -50;
+    int dstY = 0;
+    int alpha = 255;
+
+    Raindrop(int inputDstX, int inputDstY)
+    {
+        dstY = inputDstY;
+        x = inputDstX;
+        y = inputDstY - 150;
+        alpha = randomRange(190, 255);
+    };
 };
 
 export std::vector<std::unique_ptr<Snowflake>> snowflakes;
+export std::vector<std::unique_ptr<Raindrop>> raindrops;
 
 /////////////////////////////////////////////전역함수////////////////////////////////////////////////////////////
 

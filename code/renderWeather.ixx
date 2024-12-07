@@ -10,7 +10,6 @@ import World;
 import Player;
 import textureVar;
 import drawSprite;
-import Snowflake;
 
 export __int64 renderWeather()
 {
@@ -21,14 +20,14 @@ export __int64 renderWeather()
 	World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
 	if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::rain)
 	{
-		static int index = 0;
-		int sprSize = 12;
-		if (timer::timer600 % 3 == 0)
-		{
-			index++;
-			if (index >= sprSize) index = 0;
-		}
-		drawSprite(spr::screenRain, index, 0, 0);
+		//static int index = 0;
+		//int sprSize = 12;
+		//if (timer::timer600 % 3 == 0)
+		//{
+		//	index++;
+		//	if (index >= sprSize) index = 0;
+		//}
+		//drawSprite(spr::screenRain, index, 0, 0);
 	}
 	else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
 	{
@@ -67,11 +66,20 @@ export __int64 renderWeather()
 
 	for (int i = 0; i < snowflakes.size(); i++)
 	{
-		drawFillRect({ (snowflakes[i].get())->x, (snowflakes[i].get())->y,2,2 }, { 0xff, 0xff, 0xff });
+		drawFillRect({ (snowflakes[i].get())->x, (snowflakes[i].get())->y,(snowflakes[i].get())->size,(snowflakes[i].get())->size }, { 0xff, 0xff, 0xff }, (Uint8)(snowflakes[i].get())->alpha);
 		//drawPoint((snowflakes[i].get())->x, (snowflakes[i].get())->y, { 0xff, 0xff, 0xff });
-
 	}
 
+	for (int i = 0; i < raindrops.size(); i++)
+	{
+		Point2 p1 = { (raindrops[i].get())->x, (raindrops[i].get())->y };
+		Point2 p2 = { (raindrops[i].get())->x + 8, (raindrops[i].get())->y - 20 };
+
+
+		drawLine(p1.x, p1.y, p2.x, p2.y, { 0xa5, 0xbe, 0xd8 }, (Uint8)(raindrops[i].get())->alpha);
+		drawLine(p1.x+1, p1.y, p2.x+1, p2.y, { 0xa5, 0xbe, 0xd8 }, (Uint8)(raindrops[i].get())->alpha);
+
+	}
 
 	return (getNanoTimer() - timeStampStart);
 }

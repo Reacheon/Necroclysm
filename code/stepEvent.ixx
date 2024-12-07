@@ -12,7 +12,6 @@ import clickHold;
 import log;
 import Player;
 import World;
-import Snowflake;
 
 
 //GUI의 스텝이벤트를 실행시키는 함수
@@ -74,15 +73,60 @@ export __int64 stepEvent()
 	{
 		int randX = randomRange(0, cameraW);
 		int randY = randomRange(0, cameraH);
-		snowflakes.push_back(std::make_unique<Snowflake>(randX,randY));
+		snowflakes.push_back(std::make_unique<Snowflake>(randX,randY,randomRange(2,3)));
+	}
+	else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::rain)
+	{
+		{
+			int randX = randomRange(0, cameraW + 100);
+			int randY = randomRange(0 - 100, cameraH);
+			raindrops.push_back(std::make_unique<Raindrop>(randX, randY));
+		}
+
+		{
+			int randX = randomRange(0, cameraW + 100);
+			int randY = randomRange(0 - 100, cameraH);
+			raindrops.push_back(std::make_unique<Raindrop>(randX, randY));
+		}
+
+		{
+			int randX = randomRange(0, cameraW + 100);
+			int randY = randomRange(0 - 100, cameraH);
+			raindrops.push_back(std::make_unique<Raindrop>(randX, randY));
+		}
 	}
 
 	for (int i = snowflakes.size() - 1; i >= 0; --i) 
 	{
-		snowflakes[i]->y += 2;
-		if (snowflakes[i]->y > snowflakes[i]->dstY) 
+		if (snowflakes[i]->y < snowflakes[i]->dstY) 
 		{
-			snowflakes.erase(snowflakes.begin() + i);
+			snowflakes[i]->y += 2;
+		}
+		else
+		{
+			if (snowflakes[i]->alpha > 0)
+			{
+				if (snowflakes[i]->alpha >= 10) snowflakes[i]->alpha -= 10;
+				else snowflakes[i]->alpha = 0;
+			}
+			else
+			{
+				snowflakes.erase(snowflakes.begin() + i);
+
+			}
+		}
+	}
+
+	for (int i = raindrops.size() - 1; i >= 0; --i)
+	{
+		if (raindrops[i]->y < 720)
+		{
+			raindrops[i]->y += 20;
+			raindrops[i]->x -= 8;
+		}
+		else
+		{
+			raindrops.erase(raindrops.begin() + i);
 		}
 	}
 
