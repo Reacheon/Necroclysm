@@ -94,6 +94,7 @@ export void textureLoader()
 	spr::hairBob1Black = new Sprite(renderer, "image/charset/body/hairBob1Black.png", 48, 48);
 	spr::hairPonytailBlack = new Sprite(renderer, "image/charset/body/hairPonytailBlack.png", 48, 48);
 	spr::hairMiddlePart = new Sprite(renderer, "image/charset/body/hairMiddlePart.png", 48, 48);
+	spr::hornCoverRed = new Sprite(renderer, "image/charset/body/hornCoverRed.png", 48, 48);
 
 	spr::shadow = new Sprite(renderer, "image/charset/shadow.png", 48, 48);
 
@@ -155,5 +156,7 @@ export void textureLoader()
 
 	spr::bulletset = new Sprite(renderer, "image/item/bulletset.png", 48, 48);
 	spr::aimMarkerWhite = new Sprite(renderer, "image/UI/aimMarkerWhite.png", 48, 48);
+
+
 
 }

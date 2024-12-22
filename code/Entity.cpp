@@ -35,6 +35,9 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	updateSpriteFlash();
 	entityInfo.equipment = new ItemPocket(storageType::equip);
 	entityInfo.talentFocus[0] = 1;
+
+
+
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
@@ -59,16 +62,8 @@ void Entity::addSkill(int index)
 	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
 	entityInfo.skillList.insert(index);
 }
-humanCustom::skin Entity::getSkin() { return entityInfo.skin; }
-void Entity::setSkin(humanCustom::skin input) { entityInfo.skin = input; }
-humanCustom::eyes Entity::getEyes() { return entityInfo.eyes; }
-void Entity::setEyes(humanCustom::eyes input) { entityInfo.eyes = input; }
-humanCustom::scar Entity::getScar() { return entityInfo.scar; }
-void Entity::setScar(humanCustom::scar input) { entityInfo.scar = input; }
-humanCustom::beard Entity::getBeard() { return entityInfo.beard; }
-void Entity::setBeard(humanCustom::beard input) { entityInfo.beard = input; }
-humanCustom::hair Entity::getHair() { return entityInfo.hair; }
-void Entity::setHair(humanCustom::hair input) { entityInfo.hair = input; }
+
+
 unsigned __int8 Entity::getAimStack() { return aimStack; }
 void Entity::initAimStack() { aimStack = 0; }
 void Entity::addAimStack() { aimStack++; }
@@ -683,21 +678,21 @@ void Entity::addTalentExp(int expVal)
 }
 //메소드를 실행한 객체를 죽이고 아이템을 드랍한다.
 //현재 개체가 보유한 모든 부위를 벡터 형태로 반환한다.
-void Entity::aimWeaponRight() { aimWeaponHand = equip::right; }
-void Entity::aimWeaponLeft() { aimWeaponHand = equip::left; }
-int Entity::getAimHand()
+void Entity::aimWeaponRight() { aimWeaponHand = equipHandFlag::right; }
+void Entity::aimWeaponLeft() { aimWeaponHand = equipHandFlag::left; }
+equipHandFlag Entity::getAimHand()
 {
-	if (aimWeaponHand == equip::right) { return equip::right; }
-	else { return equip::left; }
+	if (aimWeaponHand == equipHandFlag::right) { return equipHandFlag::right; }
+	else { return equipHandFlag::left; }
 }
 //이 개체가 해당 개체를 공격했을 때 공격한 방법과 상대 부위에 따른 명중률을 확률(0~1.0)으로 반환해줌, aim이 false면 aimStack을 0로 계산 
 int Entity::getAimWeaponIndex()
 {
 	//현재 플레이어가 적에게 겨누는 무기의 인덱스를 반환함(-1이면 맨손)
-	int targetHand;
+	equipHandFlag targetHand;
 	std::vector<ItemData> equipInfo = getEquipPtr()->itemInfo;
-	if (getAimHand() == equip::left) { targetHand = equip::left; }
-	else { targetHand = equip::right; }
+	if (getAimHand() == equipHandFlag::left) { targetHand = equipHandFlag::left; }
+	else { targetHand = equipHandFlag::right; }
 
 
 	if (equipInfo.size() == 0)
@@ -713,7 +708,7 @@ int Entity::getAimWeaponIndex()
 				return i;
 				break;
 			}
-			else if (equipInfo[i].equipState == equip::both)
+			else if (equipInfo[i].equipState == equipHandFlag::both)
 			{
 				return i;
 				break;
@@ -741,27 +736,27 @@ void Entity::updateCustomSpriteHuman()
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	if (getSkin() != humanCustom::skin::null)
+	if (entityInfo.skin != humanCustom::skin::null)
 	{
-		if (getSkin() == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0,0);
+		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0,0);
 	}
 
-	if (getEyes() != humanCustom::eyes::null)
+	if (entityInfo.eyes != humanCustom::eyes::null)
 	{
-		if (getEyes() == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-		else if (getEyes() == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+		if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+		else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
 	}
 
-	if (getScar() != humanCustom::scar::null)
+	if (entityInfo.scar != humanCustom::scar::null)
 	{
 	}
 
-	if (getBeard() != humanCustom::beard::null)
+	if (entityInfo.beard != humanCustom::beard::null)
 	{
-		if (getBeard() == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
+		if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
 	}
 
-	if (getHair() != humanCustom::hair::null)
+	if (entityInfo.hair != humanCustom::hair::null)
 	{
 		bool noHair = false;
 		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
@@ -775,7 +770,7 @@ void Entity::updateCustomSpriteHuman()
 
 		if (noHair == false)
 		{
-			switch (getHair())
+			switch (entityInfo.hair)
 			{
 			case humanCustom::hair::commaBlack:
 				drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
@@ -793,6 +788,17 @@ void Entity::updateCustomSpriteHuman()
 		}
 	}
 
+	if (entityInfo.horn != humanCustom::horn::null)
+	{
+		switch (entityInfo.horn)
+		{
+		case humanCustom::horn::coverRed:
+			drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
+			break;
+
+		}
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//캐릭터 장비 그리기
@@ -806,16 +812,16 @@ void Entity::updateCustomSpriteHuman()
 			Sprite* tgtSpr = nullptr;
 			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
 			{
-			case equip::left:
-			case equip::both:
+			case equipHandFlag::left:
+			case equipHandFlag::both:
 				priority = getEquipPtr()->itemInfo[equipCounter].leftWieldPriority;
 				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].leftWieldSpr;
 				break;
-			case equip::right:
+			case equipHandFlag::right:
 				priority = getEquipPtr()->itemInfo[equipCounter].rightWieldPriority;
 				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].rightWieldSpr;
 				break;
-			case equip::normal:
+			case equipHandFlag::normal:
 				priority = getEquipPtr()->itemInfo[equipCounter].equipPriority;
 				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].equipSpr;
 				break;
@@ -837,6 +843,9 @@ void Entity::updateCustomSpriteHuman()
 
 	}
 
+
+
+
 	SDL_SetRenderTarget(renderer, nullptr);
 	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
 	updateSpriteFlash();
@@ -851,7 +860,7 @@ void Entity::drawSelf()
 
 
 	int localSprIndex = getSpriteIndex();
-	if (entityInfo.isPlayer == true)
+	if (entityInfo.isHumanCustomSprite == true)
 	{
 		if (getSpriteIndex() >= 0 && getSpriteIndex() <= 2)
 		{
@@ -876,7 +885,7 @@ void Entity::drawSelf()
 			{
 				for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 				{
-					if (getEquipPtr()->itemInfo[i].equipState == equip::both)
+					if (getEquipPtr()->itemInfo[i].equipState == equipHandFlag::both)
 					{
 						if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::SPR_TH_WEAPON))
 						{

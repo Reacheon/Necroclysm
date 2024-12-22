@@ -34,7 +34,7 @@ private:
     Point3 skillTarget = { 0,0,0 };
     atkType nextAtkType = atkType::bash; //다음 공격에 사용할 공격의 타입
     int atkTargetPart = -1;
-    int aimWeaponHand = equip::right;//현재 적에게 겨누는 주무기
+    equipHandFlag aimWeaponHand = equipHandFlag::right;//현재 적에게 겨누는 주무기
     unsigned __int8 aimStack = 0; //다음 공격에 가산될 조준 스택
     bool footChanged = false;
     bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
@@ -53,16 +53,6 @@ public:
     void setSkillTarget(int gridX, int gridY, int gridZ);
     Point3 getSkillTarget();
     void addSkill(int index);
-    humanCustom::skin getSkin();
-    void setSkin(humanCustom::skin input);
-    humanCustom::eyes getEyes();
-    void setEyes(humanCustom::eyes input);
-    humanCustom::scar getScar();
-    void setScar(humanCustom::scar input);
-    humanCustom::beard getBeard();
-    void setBeard(humanCustom::beard input);
-    humanCustom::hair getHair();
-    void setHair(humanCustom::hair input);
 
     unsigned __int8 getAimStack();
     void initAimStack();
@@ -73,6 +63,7 @@ public:
     void setAtkTarget(int inputX, int inputY, int inputZ, int inputPart);
     void setAtkTarget(int inputX, int inputY, int inputZ);
     ItemPocket* getEquipPtr();
+    //void addEquipFromDex(int index, equip inputState);
     void updateSpriteFlash();
     Sprite* getSpriteFlash();
     void setFlashType(int inputType);
@@ -124,7 +115,7 @@ public:
 
     void aimWeaponRight();
     void aimWeaponLeft();
-    int getAimHand();
+    equipHandFlag getAimHand();
     int getAimWeaponIndex();
 
     void updateCustomSpriteHuman();

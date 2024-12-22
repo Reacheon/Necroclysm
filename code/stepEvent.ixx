@@ -119,16 +119,49 @@ export __int64 stepEvent()
 
 	for (int i = raindrops.size() - 1; i >= 0; --i)
 	{
-		if (raindrops[i]->y < 720)
+		if (raindrops[i]->y < raindrops[i]->dstY)
 		{
-			raindrops[i]->y += 20;
-			raindrops[i]->x -= 8;
+			int dx = cos((raindrops[i].get())->angle) * (raindrops[i].get())->velocity;
+			int dy = sin((raindrops[i].get())->angle) * (raindrops[i].get())->velocity;
+
+			raindrops[i]->x -= dx;
+			raindrops[i]->y += dy;
 		}
 		else
 		{
-			raindrops.erase(raindrops.begin() + i);
+			if (raindrops[i]->length > 0)
+			{
+				raindrops[i]->length -= 2.0;
+				raindrops[i]->alpha -= 10;
+
+				if (raindrops[i]->length < 3.0)
+				{
+					raindrops[i]->alpha = 255;
+				}
+			}
+			else
+			{
+				raindrops.erase(raindrops.begin() + i);
+			}
+
 		}
 	}
+
+	//for (int i = raindrops.size() - 1; i >= 0; --i)
+	//{
+	//	if (raindrops[i]->y < 720)
+	//	{
+	//		int dx = cos((raindrops[i].get())->angle) * (raindrops[i].get())->velocity;
+	//		int dy = sin((raindrops[i].get())->angle) * (raindrops[i].get())->velocity;
+
+	//		raindrops[i]->x -= dx;
+	//		raindrops[i]->y += dy;
+	//	}
+	//	else
+	//	{
+	//		raindrops.erase(raindrops.begin() + i);
+	//	}
+	//}
 
 
     return (getNanoTimer() - timeStampStart);

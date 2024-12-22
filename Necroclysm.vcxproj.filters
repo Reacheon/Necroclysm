@@ -267,7 +267,7 @@
     <ClCompile Include="code\AlchemyData.ixx">
       <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
-    <ClCompile Include="code\startingArea.ixx">
+    <ClCompile Include="code\startArea.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
     <ClCompile Include="code\Vec3.ixx">

@@ -87,8 +87,8 @@ public:
 		nextItem.number = number;
 		nextItem.lootSelect = 0;
 		nextItem.eraseFlag(itemFlag::GRAYFILTER);
-		if (storagePtr->getType() == storageType::equip) { nextItem.equipState = equip::normal; }
-		else { nextItem.equipState = equip::none; }
+		if (storagePtr->getType() == storageType::equip) { nextItem.equipState = equipHandFlag::normal; }
+		else { nextItem.equipState = equipHandFlag::none; }
 		storagePtr->itemInfo.push_back(nextItem);
 		subtractItemIndex(index, number);//원래 자리에 있는 아이템을 number개 제거함
 		return storagePtr->itemInfo.size() - 1;
@@ -179,7 +179,7 @@ public:
 		//양손
 		for (int i = itemInfo.size() - 1; i >= 0; i--)
 		{
-			if (itemInfo[i].equipState == 4)
+			if (itemInfo[i].equipState == equipHandFlag::both)
 			{
 				swap(stackCursor, i);
 				stackCursor++;
@@ -190,7 +190,7 @@ public:
 		//왼손
 		for (int i = itemInfo.size() - 1; i >= 0; i--)
 		{
-			if (itemInfo[i].equipState == 2)
+			if (itemInfo[i].equipState == equipHandFlag::left)
 			{
 				swap(stackCursor, i);
 				stackCursor++;
@@ -201,7 +201,7 @@ public:
 		//오른손
 		for (int i = itemInfo.size() - 1; i >= 0; i--)
 		{
-			if (itemInfo[i].equipState == 3)
+			if (itemInfo[i].equipState == equipHandFlag::right)
 			{
 				swap(stackCursor, i);
 				stackCursor++;

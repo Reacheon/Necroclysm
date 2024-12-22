@@ -222,18 +222,34 @@ public:
     int y = -50;
     int dstY = 0;
     int alpha = 255;
+    double length = 20.0;
+    double angle = 82.0*(M_PI/180.0);
+    double velocity = 20.0;
 
     Raindrop(int inputDstX, int inputDstY)
     {
         dstY = inputDstY;
         x = inputDstX;
         y = inputDstY - 150;
-        alpha = randomRange(190, 255);
+        alpha = randomRange(50, 200);
     };
+};
+
+export class Spatter
+{
+public:
+    SDL_Color col = { 0xff,0xff,0xff };
+    int lifetime = 30; //스텝
+    int x = 0;
+    int y = 0;
+    double veloX = 1.0;
+    double veloY = 1.0;
+    double grad = 0.3;
 };
 
 export std::vector<std::unique_ptr<Snowflake>> snowflakes;
 export std::vector<std::unique_ptr<Raindrop>> raindrops;
+export std::vector<std::unique_ptr<Spatter>> spatters;
 
 /////////////////////////////////////////////전역함수////////////////////////////////////////////////////////////
 

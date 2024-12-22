@@ -42,6 +42,9 @@ export struct EntityData
     __int8 hpBarHeight = -12;
     __int8 partsStartIndex = 0;
     std::unordered_map<int,std::array<int,2>> partsPosition;
+
+    relationFlag relation = relationFlag::hostile;
+    bool isHumanCustomSprite = false;
     
     ////////////////////////////////csv에 없는 데이터/////////////////////////////////////
     __int16 HP = 100;
@@ -70,6 +73,7 @@ export struct EntityData
     humanCustom::scar scar = humanCustom::scar::null;
     humanCustom::beard beard = humanCustom::beard::null;
     humanCustom::hair hair = humanCustom::hair::null;
+    humanCustom::horn horn = humanCustom::horn::null;
 
     std::vector<std::pair<statEfctFlag, int>> statusEffects;
 

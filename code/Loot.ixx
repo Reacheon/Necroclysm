@@ -491,7 +491,7 @@ public:
 		updateLog(col2Str(col::white) + sysStr[125]);
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		int returnIndex = lootPocket->transferItem(Player::ins()->getEquipPtr(), lootCursor, 1);
-		equipPtr->itemInfo[returnIndex].equipState = equip::normal;
+		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
 		if (inputType == input::keyboard)
 		{
@@ -640,7 +640,7 @@ public:
 			ItemPocket* drop = new ItemPocket(storageType::null);
 			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 			{
-				if (equipPtr->itemInfo[i].equipState == equip::left || equipPtr->itemInfo[i].equipState == equip::right || equipPtr->itemInfo[i].equipState == equip::both)
+				if (equipPtr->itemInfo[i].equipState == equipHandFlag::left || equipPtr->itemInfo[i].equipState == equipHandFlag::right || equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 				{
 					equipPtr->transferItem(drop, i, 1);
 					isWield = true;
@@ -649,7 +649,7 @@ public:
 			if (isWield == true) { Player::ins()->drop(drop); }
 			else { delete drop; }
 			int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
-			equipPtr->itemInfo[returnIndex].equipState = equip::both; //양손
+			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
 			updateLog(L"#FFFFFF아이템을 들었다.");
 		}
@@ -661,13 +661,13 @@ public:
 			{
 				switch (equipPtr->itemInfo[i].equipState)
 				{
-				case equip::left:
+				case equipHandFlag::left:
 					hasLeft = true;
 					break;
-				case equip::right:
+				case equipHandFlag::right:
 					hasRight = true;
 					break;
-				case equip::both:
+				case equipHandFlag::both:
 					hasLeft = true;
 					hasRight = true;
 					break;
@@ -684,14 +684,14 @@ public:
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
 
-				int handDir = 0;
+				equipHandFlag handDir = equipHandFlag::none;
 				if (coAnswer == sysStr[49])//왼손
 				{
-					handDir = equip::left;
+					handDir = equipHandFlag::left;
 				}
 				else//오른손
 				{
-					handDir = equip::right;
+					handDir = equipHandFlag::right;
 				}
 
 				//왼손 아이템 떨구기
@@ -707,7 +707,7 @@ public:
 				//양손 아이템 떨구기
 				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
-					if (equipPtr->itemInfo[i].equipState == equip::both)
+					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 					{
 						equipPtr->transferItem(drop, i, 1);
 						break;
@@ -729,14 +729,14 @@ public:
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
 
-				int handDir = 0;
+				equipHandFlag handDir = equipHandFlag::none;
 				if (coAnswer == sysStr[49])//왼손
 				{
-					handDir = equip::left;
+					handDir = equipHandFlag::left;
 				}
 				else//오른손
 				{
-					handDir = equip::right;
+					handDir = equipHandFlag::right;
 				}
 
 				int returnIndex = lootPocket->transferItem(equipPtr, fixedLootCursor, 1);
@@ -746,14 +746,14 @@ public:
 			else if (hasLeft == false && hasRight == true)//왼손에 들기
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = equip::left;
+				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
 				equipPtr->sortEquip();
 				updateLog(L"#FFFFFF아이템을 들었다.");
 			}
 			else//오른손에 들기
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = equip::right;
+				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
 				equipPtr->sortEquip();
 				updateLog(L"#FFFFFF아이템을 들었다.");
 			}

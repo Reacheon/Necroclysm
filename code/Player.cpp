@@ -20,37 +20,36 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
 	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
 
-	setSkin(humanCustom::skin::yellow);
-	setEyes(humanCustom::eyes::blue);
-	setHair(humanCustom::hair::bob1Black);
+	entityInfo.skin = humanCustom::skin::yellow;
+	entityInfo.eyes = humanCustom::eyes::blue;
+	entityInfo.hair = humanCustom::hair::bob1Black;
 
 	int i = 0;
 
 	getEquipPtr()->addItemFromDex(383);
-	getEquipPtr()->itemInfo[i++].equipState = equip::both;
-
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
 
 	getEquipPtr()->addItemFromDex(2);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	getEquipPtr()->addItemFromDex(290);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	getEquipPtr()->addItemFromDex(105);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	getEquipPtr()->addItemFromDex(106);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	getEquipPtr()->addItemFromDex(107);
-	getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	updateStatus();
 	updateCustomSpriteHuman();
 
 	//방독면
 	//getEquipPtr()->addItemFromDex(374);
-	//getEquipPtr()->itemInfo[i++].equipState = equip::normal;
+	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	addSkill(27);
 	quickSlot[0] = { quickSlotFlag::SKILL, 27 };

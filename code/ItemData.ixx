@@ -146,7 +146,7 @@ export struct ItemData
     unsigned __int32 lootSelect = 0;
     unsigned __int32 reactSelect = 0;
     void* pocketPtr = nullptr;
-    unsigned __int8 equipState = 0;
+    equipHandFlag equipState = equipHandFlag::none;
     unsigned __int8 modeCurrent = 0;
 
     unsigned __int16 unfinishItemCode = 0;

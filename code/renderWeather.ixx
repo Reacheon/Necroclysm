@@ -72,8 +72,11 @@ export __int64 renderWeather()
 
 	for (int i = 0; i < raindrops.size(); i++)
 	{
+		int dx = cos((raindrops[i].get())->angle) * (raindrops[i].get())->length;
+		int dy = sin((raindrops[i].get())->angle) * (raindrops[i].get())->length;
+
 		Point2 p1 = { (raindrops[i].get())->x, (raindrops[i].get())->y };
-		Point2 p2 = { (raindrops[i].get())->x + 8, (raindrops[i].get())->y - 20 };
+		Point2 p2 = { (raindrops[i].get())->x + dx, (raindrops[i].get())->y - dy };
 
 
 		drawLine(p1.x, p1.y, p2.x, p2.y, { 0xa5, 0xbe, 0xd8 }, (Uint8)(raindrops[i].get())->alpha);

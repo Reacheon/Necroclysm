@@ -215,6 +215,12 @@ export namespace humanCustom
         middlePart,
     };
 
+    enum class horn
+    {
+        null,
+        coverRed,
+    };
+
 
 };
 
@@ -676,13 +682,15 @@ export enum class sortFlag
     equip,
 };
 
-export namespace equip
+
+
+export enum class equipHandFlag
 {
-    constexpr int none = 0;
-    constexpr int normal = 1;
-    constexpr int left = 2;
-    constexpr int right = 3;
-    constexpr int both = 4;
+    none,
+    normal,
+    left,
+    right,
+    both,
 };
 
 export enum class turn
@@ -1277,6 +1285,13 @@ export enum class ridingFlag
     horse,
     wyvern,
     dolphin,
+};
+
+export enum class relationFlag
+{
+    neutral,
+    hostile,
+    friendly,
 };
 
 //export enum class projFlag

@@ -1,6 +1,6 @@
 #define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
 
-export module startingArea;
+export module startArea;
 
 import globalVar;
 import HUD;
@@ -13,7 +13,7 @@ import Prop;
 import Monster;
 import TitleScreen;
 
-export void startingArea()
+export void startArea()
 {
 	new HUD();
 	//new TitleScreen();
@@ -35,6 +35,8 @@ export void startingArea()
 	int pX = (Player::ins())->getGridX();
 	int pY = (Player::ins())->getGridY();
 	int pZ = (Player::ins())->getGridZ();
+
+	new Monster(6, 5, 0, 0);//NPC
 
 	new ItemStack(pX + 2, pY + 1, pZ, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},

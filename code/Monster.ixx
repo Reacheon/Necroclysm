@@ -16,9 +16,29 @@ export class Monster : public Entity, public AI
 public:
 	Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 	{
+		if (entityInfo.isHumanCustomSprite == true && entityInfo.isPlayer == false)
+		{
+			if (entityInfo.entityCode == 6)
+			{
+				
+				entityInfo.skin = humanCustom::skin::yellow;
+				entityInfo.eyes = humanCustom::eyes::red;
+				entityInfo.hair = humanCustom::hair::ponytail;
+				entityInfo.horn = humanCustom::horn::coverRed;
+
+				int i = 0;
+				getEquipPtr()->addItemFromDex(390);
+				getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
+
+				entityInfo.sprFlip = true;
+
+				updateStatus();
+				updateCustomSpriteHuman();
+			}
+		}
+
 		prt(entityInfo.name.c_str());
 		prt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
-
 	}
 	~Monster()
 	{
@@ -49,7 +69,7 @@ public:
 				addTimeResource(2.0);
 			}
 
-			if (getTimeResource() >= 1.2 && entityInfo.entityCode != 5)//플레이어에게 직선 경로로 이동
+			if (getTimeResource() >= 1.2 && entityInfo.entityCode != 5 && entityInfo.relation == relationFlag::hostile)//플레이어에게 직선 경로로 이동
 			{
 				if (std::abs(Player::ins()->getGridX() - getGridX()) > 1 || std::abs(Player::ins()->getGridY() - getGridY()) > 1)//1칸 이내에 있지 않으면
 				{
@@ -146,7 +166,7 @@ public:
 			}
 
 
-			if (getTimeResource() >= 1.3 && entityInfo.entityCode != 5)//추적스택이 0보다 크고 플레이어가 1칸 이내에 잇을 경우 평타를 날림
+			if (getTimeResource() >= 1.3 && entityInfo.entityCode != 5 && entityInfo.relation == relationFlag::hostile)//추적스택이 0보다 크고 플레이어가 1칸 이내에 잇을 경우 평타를 날림
 			{
 				if (std::abs(Player::ins()->getGridX() - getGridX()) <= 1 && std::abs(Player::ins()->getGridY() - getGridY()) <= 1)//1칸 이내에 있으면
 				{

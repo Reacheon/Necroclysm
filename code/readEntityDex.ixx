@@ -44,6 +44,8 @@ namespace csvEntity
     constexpr int hpBarHeight = 28;
     constexpr int partsPosition = 29;
     constexpr int partsSprIndexStart = 30;
+    constexpr int relation = 31;
+    constexpr int isHumanCustomSprite = 32;
 };
 
 
@@ -266,6 +268,20 @@ export int readEntityDex(const wchar_t* file)
                         case csvEntity::partsSprIndexStart:
                             entityDex[arrayCounter / (csvWidth)-1].partsStartIndex = wtoi(strFragment.c_str());
                             break;
+                        case csvEntity::relation:
+                        {
+                            if (strFragment == L"NEUTRAL") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::neutral; }
+                            else if (strFragment == L"HOSTILE") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::hostile; }
+                            else if (strFragment == L"FRIENDLY") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::friendly; }
+                            else { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::neutral; }
+                            break;
+                        }
+                        case csvEntity::isHumanCustomSprite:
+                        {
+                            if (strFragment == L"TRUE") { entityDex[arrayCounter / (csvWidth)-1].isHumanCustomSprite = true; }
+                            else { entityDex[arrayCounter / (csvWidth)-1].isHumanCustomSprite = false; }
+                            break;
+                        }
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
                             break;

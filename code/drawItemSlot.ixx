@@ -49,7 +49,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 	std::wstring mainName = L"";
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
-	if (inputItem.equipState == equip::none && inputItem.number > 1) { mainName += std::to_wstring(inputItem.number) + L" "; }
+	if (inputItem.equipState == equipHandFlag::none && inputItem.number > 1) { mainName += std::to_wstring(inputItem.number) + L" "; }
 
 	//아이템 이름
 	mainName += inputItem.name;
@@ -156,25 +156,25 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 	SDL_Color statusStrColor;
 	std::wstring statusStr = L"-";
 
-	if (inputItem.equipState == equip::normal)
+	if (inputItem.equipState == equipHandFlag::normal)
 	{
 		statusColor = col::black;
 		statusStr = L"E";
 		statusStrColor = lowCol::green;
 	}
-	else if (inputItem.equipState == equip::left)
+	else if (inputItem.equipState == equipHandFlag::left)
 	{
 		statusColor = col::black;
 		statusStr = sysStr[49];//왼손
 		statusStrColor = lowCol::yellow;
 	}
-	else if (inputItem.equipState == equip::right)
+	else if (inputItem.equipState == equipHandFlag::right)
 	{
 		statusColor = col::black;
 		statusStr = sysStr[50];
 		statusStrColor = lowCol::yellow;
 	}
-	else if (inputItem.equipState == equip::both)
+	else if (inputItem.equipState == equipHandFlag::both)
 	{
 		statusColor = col::black;
 		statusStr = sysStr[51];
@@ -389,7 +389,7 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData in
 	std::wstring mainName = L"";
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
-	if (inputItem.equipState == equip::none && inputItem.number > 1) { mainName += std::to_wstring(inputItem.number) + L" "; }
+	if (inputItem.equipState == equipHandFlag::none && inputItem.number > 1) { mainName += std::to_wstring(inputItem.number) + L" "; }
 
 	//아이템 이름
 	mainName += inputItem.name;

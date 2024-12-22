@@ -91,7 +91,7 @@
 //		//생성될 때 아이템이 있는 쪽을 우선해서 수정
 //		for (int i = 0; i < Player::ins()->getEquipPtr()->itemInfo.size(); i++)
 //		{
-//			if (Player::ins()->getEquipPtr()->itemInfo[i].equipState == equip::right)
+//			if (Player::ins()->getEquipPtr()->itemInfo[i].equipState == equipHandFlag::right)
 //			{
 //				break;
 //			}
@@ -257,14 +257,14 @@
 //				int targetHand = 0;
 //				std::wstring behindStr = L"";
 //
-//				if (Player::ins()->getAimHand() == equip::left)
+//				if (Player::ins()->getAimHand() == equipHandFlag::left)
 //				{
-//					targetHand = equip::left;
+//					targetHand = equipHandFlag::left;
 //					behindStr = L"[L] ";
 //				}
 //				else
 //				{
-//					targetHand = equip::right;
+//					targetHand = equipHandFlag::right;
 //					behindStr = L"[R] ";
 //				}
 //
@@ -276,7 +276,7 @@
 //						behindSprIndex = playerEquipInfo[i].sprIndex;
 //						break;
 //					}
-//					else if (playerEquipInfo[i].equipState == equip::both)
+//					else if (playerEquipInfo[i].equipState == equipHandFlag::both)
 //					{
 //						behindStr = L"[B]";
 //						behindStr += playerEquipInfo[i].name;
@@ -309,14 +309,14 @@
 //				int frontSprIndex = 0;
 //				int targetHand = 0;
 //				std::wstring frontStr = L"";
-//				if (Player::ins()->getAimHand() == equip::left)
+//				if (Player::ins()->getAimHand() == equipHandFlag::left)
 //				{
-//					targetHand = equip::left;
+//					targetHand = equipHandFlag::left;
 //					frontStr = L"[L] ";
 //				}
 //				else
 //				{
-//					targetHand = equip::right;
+//					targetHand = equipHandFlag::right;
 //					frontStr = L"[R] ";
 //				}
 //
@@ -327,7 +327,7 @@
 //				}
 //				else
 //				{
-//					if (playerEquipInfo[Player::ins()->getAimWeaponIndex()].equipState == equip::both) { frontStr = L"[B] "; }
+//					if (playerEquipInfo[Player::ins()->getAimWeaponIndex()].equipState == equipHandFlag::both) { frontStr = L"[B] "; }
 //
 //					frontStr += playerEquipInfo[Player::ins()->getAimWeaponIndex()].name;
 //
@@ -965,7 +965,7 @@
 //		{
 //			if (checkCursor(&equipSlotFront) || checkCursor(&equipSlotBehind))
 //			{
-//				if (Player::ins()->getAimHand() == equip::right)
+//				if (Player::ins()->getAimHand() == equipHandFlag::right)
 //				{
 //					Player::ins()->aimWeaponLeft();
 //				}

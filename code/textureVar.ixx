@@ -154,4 +154,7 @@ export namespace spr
 	Sprite* bulletset = nullptr;
 
 	Sprite* aimMarkerWhite = nullptr;
+
+	Sprite* hornCoverRed = nullptr;
+
 }

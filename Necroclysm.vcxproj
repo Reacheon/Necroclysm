@@ -287,7 +287,7 @@
     <ClCompile Include="code\sgn.ixx" />
     <ClCompile Include="code\Talent.ixx" />
     <ClCompile Include="code\Sprite.ixx" />
-    <ClCompile Include="code\startingArea.ixx" />
+    <ClCompile Include="code\startArea.ixx" />
     <ClCompile Include="code\Status.ixx" />
     <ClCompile Include="code\stepEvent.ixx" />
     <ClCompile Include="code\textureLoader.ixx" />
