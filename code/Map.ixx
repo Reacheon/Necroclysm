@@ -20,6 +20,9 @@ private:
 	SDL_Rect mapBase;
 
 	SDL_Texture* mapTexture = nullptr;
+
+	int cursorX = 0;
+	int cursorY = 0;
 public:
 	Map() : GUI(false)
 	{
@@ -78,17 +81,31 @@ public:
 		{
 			drawWindow(&mapBase, sysStr[150],45);
 
-			SDL_Rect src = { 0,0, 700, 350 };
-			SDL_Rect dst = { 0,0, 700, 350 };
-			dst.x = mapBase.x + 1;
-			dst.y = mapBase.y + 30;
-			SDL_RenderCopy(renderer, mapTexture, &src, &dst);
+			//SDL_Rect src = { 0,0, 700, 350 };
+			//SDL_Rect dst = { 0,0, 700, 350 };
+			//dst.x = mapBase.x + 1;
+			//dst.y = mapBase.y + 30;
+			//SDL_RenderCopy(renderer, mapTexture, &src, &dst);
 
 			setFontSize(10);
 			drawTextCenter(L"[ 플레이어 좌표 ]", mapBase.x + 66, mapBase.y + 389);
-			drawText(L"x = 39,273", mapBase.x + 8, mapBase.y + 396 );
-			drawText(L"y = 21,732", mapBase.x + 8, mapBase.y + 396 + 11);
-			drawText(L"z = 0", mapBase.x + 8, mapBase.y + 396 + 22);
+			drawText(L"X = 39,273", mapBase.x + 8, mapBase.y + 396 );
+			drawText(L"Y = 21,732", mapBase.x + 8, mapBase.y + 396 + 11);
+			drawText(L"Z = 0", mapBase.x + 8, mapBase.y + 396 + 22);
+
+			for (int x = 0; x < 43; x++)
+			{
+				for (int y = 0; y < 21; y++)
+				{
+
+					drawRect({ mapBase.x + 7 + 16 * x,mapBase.y + 37 + 16 * y,16,16 }, col::white);
+
+					if (x == 21 && y == 10) drawFillRect({ mapBase.x + 7 + 16 * x,mapBase.y + 37 + 16 * y,16,16 }, col::red);
+					
+				}
+			}
+
+			
 
 			setFontSize(10);
 			drawTextCenter(L"마킹", mapBase.x + 397, mapBase.y + 388);
@@ -124,7 +141,7 @@ public:
 			drawLine(mapBase.x + 525 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 127, mapBase.y + 411 + 2,col::white);
 			drawLine(mapBase.x + 525 + 1 + 127, mapBase.y + 411 - 2, mapBase.x + 525 + 1 + 127, mapBase.y + 411 + 2,col::white);
 
-			drawSprite(spr::mapHereMarker, 0, mapBase.x+339, mapBase.y + 193);
+			//drawSprite(spr::mapHereMarker, 0, mapBase.x+339, mapBase.y + 193);
 		}
 		else
 		{
