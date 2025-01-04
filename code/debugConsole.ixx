@@ -47,6 +47,7 @@ export void debugConsole()
 	prt(L"21. 날씨 변경\n");
 	prt(L"22. 말 생성\n");
 	prt(L"23. 상태이상 추가\n");
+	prt(L"24. 플레이어 텔레포트\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -351,5 +352,28 @@ export void debugConsole()
 
 		break;
 	}
+	case 24:
+	{
+		int px = Player::ins()->getGridX();
+		int py = Player::ins()->getGridY();
+		int pz = Player::ins()->getGridZ();
+
+		int tgtGridX, tgtGridY, tgtGridZ;
+		prt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");
+		std::cin >> tgtGridX;
+
+		prt(L"텔레포트할 위치의 gridY 좌표를 입력해주세요.\n");
+		std::cin >> tgtGridY;
+
+		prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
+		std::cin >> tgtGridZ;
+
+		World::ins()->getTile(px, py, pz).EntityPtr = nullptr;
+		Player::ins()->setGrid(tgtGridX, tgtGridY, tgtGridZ);
+		World::ins()->getTile(tgtGridX, tgtGridY, tgtGridZ).EntityPtr = (Entity*)Player::ins();
+	}
+
+
+
 	}
 }

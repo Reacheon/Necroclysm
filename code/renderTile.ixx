@@ -777,7 +777,7 @@ __int64 drawMarkers()
 	{
 		if (isPlayerMoving == false && turnCycle == turn::playerInput)
 		{
-			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false)
+			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false)
 			{
 				if (GUI::getLastGUI() == HUD::ins())
 				{

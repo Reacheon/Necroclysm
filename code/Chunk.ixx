@@ -58,6 +58,26 @@ public:
 				}
 			}
 		}
+		else if (input == chunkFlag::meadow)
+		{
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
+			{
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
+				{
+					singleTile[x][y].floor = 220;
+				}
+			}
+		}
+		else if (input == chunkFlag::dirt)
+		{
+			for (int x = 0; x < CHUNK_SIZE_X; x++)
+			{
+				for (int y = 0; y < CHUNK_SIZE_Y; y++)
+				{
+					singleTile[x][y].floor = 109;
+				}
+			}
+		}
 		else
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
@@ -141,5 +161,9 @@ public:
 
 	void setWeather(weatherFlag input) {
 		chunkWeather = input;
+	}
+
+	chunkFlag getChunkFlag() {
+		return flag;
 	}
 };

@@ -33,7 +33,7 @@ export void textureLoader()
 	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 72, 35);
 	spr::itemset = new Sprite(renderer, "image/item/itemset.png", 48, 48);
 	spr::windowArrow = new Sprite(renderer, "image/UI/windowArrow.png", 16, 16);
-	spr::cursorMarker = new Sprite(renderer, "image/UI/blueMarker.png", 16, 16);
+	spr::cursorMarker = new Sprite(renderer, "image/UI/whiteMarker.png", 16, 16);
 	spr::yellowMarker = new Sprite(renderer, "image/UI/yellowMarker.png", 16, 16);
 	spr::itemCursorLong = new Sprite(renderer, "image/UI/itemCursorLong.png", 304, 64);
 	spr::itemCursorShort = new Sprite(renderer, "image/UI/itemCursorShort.png", 304, 64);
@@ -157,6 +157,5 @@ export void textureLoader()
 	spr::bulletset = new Sprite(renderer, "image/item/bulletset.png", 48, 48);
 	spr::aimMarkerWhite = new Sprite(renderer, "image/UI/aimMarkerWhite.png", 48, 48);
 
-
-
+	spr::mapMagnifyIcon = new Sprite(renderer, "image/UI/GUI/Map/mapMagnifyIcon.png", 128, 40);
 }

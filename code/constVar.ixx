@@ -1126,19 +1126,23 @@ export enum class chunkFlag
     seawater,//해수
     meadow,//초원
     underground,//지하
+    dirt,//흙
     //도로
     //도시
 };
 
 export namespace chunkCol
 {
-    SDL_Color seawater = { 22, 33, 255 };
+    SDL_Color seawater = { 0x16,0x21,0xff };
+    SDL_Color river = { 0x9d,0xa2,0xfb };
+    SDL_Color city = { 0xa2,0xa2,0xa2 };
+    SDL_Color land = { 0x59,0xc6,0x82 };
 };
 
 export namespace tileFloorFlag
 {
     int none = 0;
-    int seawater = 220;
+    int seawater = 222;
     int grass = 221;
 };
 

@@ -157,4 +157,7 @@ export namespace spr
 
 	Sprite* hornCoverRed = nullptr;
 
+	Sprite* mapMagnifyIcon = nullptr;
+
+
 }
