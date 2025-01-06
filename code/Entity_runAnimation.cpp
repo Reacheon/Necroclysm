@@ -24,12 +24,6 @@ bool Entity::runAnimation(bool shutdown)
 
 		// 1 / 60초마다 runAnimation이 실행됨
 
-		float speed = 2.5;
-		if (entityInfo.walkMode == walkFlag::run) speed = 3.5;
-		else if (entityInfo.walkMode == walkFlag::walk) speed = 3.0;
-		else if (entityInfo.walkMode == walkFlag::crawl) speed = 2.0;
-		else if (entityInfo.walkMode == walkFlag::crouch) speed = 2.0;
-
 		addTimer();
 
 		if (getTimer() == 1)
@@ -39,11 +33,10 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 		}
 
-
-		if (getX() + getIntegerFakeX() > getDstX()) addFakeX(-speed);
-		else if (getX() + getIntegerFakeX() < getDstX()) addFakeX(+speed);
-		if (getY() + getIntegerFakeY() > getDstY()) addFakeY(-speed);
-		else if (getY() + getIntegerFakeY() < getDstY()) addFakeY(+speed);
+		if (getX() + getIntegerFakeX() > getDstX()) addFakeX(-entityInfo.gridMoveSpd);
+		else if (getX() + getIntegerFakeX() < getDstX()) addFakeX(+entityInfo.gridMoveSpd);
+		if (getY() + getIntegerFakeY() > getDstY()) addFakeY(-entityInfo.gridMoveSpd);
+		else if (getY() + getIntegerFakeY() < getDstY()) addFakeY(+entityInfo.gridMoveSpd);
 
 		if (entityInfo.isPlayer)
 		{

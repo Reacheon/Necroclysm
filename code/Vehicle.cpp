@@ -1024,31 +1024,26 @@ bool Vehicle::runAI()
 bool Vehicle::runAnimation(bool shutdown)
 {
     //prt(L"Vehicle %p의 runAnimation이 실행되었다.\n", this);
+    //move는 사실상 pulled 카트 용도로만 사용됨
     if (getAniType() == aniFlag::move)//만약 플레이어 인스턴스의 좌표와 목적좌표가 다를 경우
     {
         // 1 / 60초마다 runAnimation이 실행됨
-        const char speed = 4;
         addTimer();
+        const double spd = pullMoveSpd;
+        if (getX() + getIntegerFakeX() > getDstX()) addFakeX(-spd);
+        else if (getX() + getIntegerFakeX() < getDstX()) addFakeX(+spd);
+        if (getY() + getIntegerFakeY() > getDstY()) addFakeY(-spd);
+        else if (getY() + getIntegerFakeY() < getDstY()) addFakeY(+spd);
 
-        if (getX() + getIntegerFakeX() > getDstX()) setFakeX(getIntegerFakeX() - speed);
-        else if (getX() + getIntegerFakeX() < getDstX()) setFakeX(getIntegerFakeX() + speed);
-        if (getY() + getIntegerFakeY() > getDstY()) setFakeY(getIntegerFakeY() - speed);
-        else if (getY() + getIntegerFakeY() < getDstY()) setFakeY(getIntegerFakeY() + speed);
-
-        switch (getTimer())
+        if (std::abs(getIntegerFakeX()) >= 16.0 || std::abs(getIntegerFakeY()) >= 16.0)
         {
-
-        case 4://도착
             resetTimer();
             setAniType(aniFlag::null);
             shift(getDstGridX() - getGridX(), getDstGridY() - getGridY());
             setGrid(getDstGridX(), getDstGridY(), getGridZ());
             setFakeX(0);
             setFakeY(0);
-
-
             return true;
-            break;
         }
     }
     else if (getAniType() == aniFlag::propRush)

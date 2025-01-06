@@ -321,12 +321,19 @@ void Entity::move(int dir, bool jump)
 
 	if (jump == false)
 	{
+		if (entityInfo.walkMode == walkFlag::run) entityInfo.gridMoveSpd = 3.5;
+		else if (entityInfo.walkMode == walkFlag::wade) entityInfo.gridMoveSpd = 1.8;
+		else if (entityInfo.walkMode == walkFlag::walk) entityInfo.gridMoveSpd = 3.0;
+		else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim) entityInfo.gridMoveSpd = 2.0;
+		else if (entityInfo.walkMode == walkFlag::crouch) entityInfo.gridMoveSpd = 2.0;
+
 		addAniUSet(this, aniFlag::move);
 		setDstGrid(dstGridX, dstGridY);
 		if (pulledCart != nullptr)
 		{
 			addAniUSet(pulledCart, aniFlag::move);
 			pulledCart->setDstGrid(getGridX(), getGridY());
+			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
 		}
 	}
 	else
@@ -864,7 +871,7 @@ void Entity::drawSelf()
 	{
 		if (getSpriteIndex() >= 0 && getSpriteIndex() <= 2)
 		{
-			if (entityInfo.walkMode == walkFlag::walk)
+			if (entityInfo.walkMode == walkFlag::walk || entityInfo.walkMode == walkFlag::wade)
 			{
 			}
 			else if (entityInfo.walkMode == walkFlag::run)
@@ -875,13 +882,13 @@ void Entity::drawSelf()
 			{
 				localSprIndex += 12;
 			}
-			else if (entityInfo.walkMode == walkFlag::crawl)
+			else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim)
 			{
 				localSprIndex += 18;
 			}
 
 
-			if (entityInfo.walkMode != walkFlag::crawl)
+			if (entityInfo.walkMode != walkFlag::crawl && entityInfo.walkMode != walkFlag::swim)
 			{
 				for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 				{

@@ -526,6 +526,8 @@ export enum class walkFlag
     run,
     crouch,
     crawl,
+    wade,
+    swim,
 };
 
 export namespace toolQuality

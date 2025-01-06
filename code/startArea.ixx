@@ -867,5 +867,5 @@ export void startArea()
 	World::ins()->createSector(0, 0, 0);
 
 	Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-	Player::ins()->updateMinimap();//렌더링이 연산파트에서 일어나서 처음에는 화면에 안그려지는듯?
+	
 };

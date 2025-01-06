@@ -318,10 +318,24 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 		if (entityInfo.STA < 0)
 		{
 			entityInfo.STA = 0;
-			Player::ins()->setSpriteInfimum(sprInf::walk);
-
+			entityInfo.walkMode = walkFlag::walk;
 		}
 	}
+
+
+	if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW))
+	{
+		entityInfo.walkMode = walkFlag::wade;
+	}
+	else if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+	{
+		entityInfo.walkMode = walkFlag::swim;
+	}
+	else if (entityInfo.walkMode == walkFlag::swim || entityInfo.walkMode == walkFlag::wade)
+	{
+		entityInfo.walkMode = walkFlag::walk;
+	}
+
 	updateVision(entityInfo.eyeSight);
 	updateMinimap();
 	if (getHasAStarDst())

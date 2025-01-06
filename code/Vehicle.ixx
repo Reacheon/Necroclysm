@@ -28,6 +28,7 @@ export class Vehicle : public Ani, public AI, public Coord, public Drawable
 {
 public:
     std::wstring name = L"FNAME";
+    double pullMoveSpd = 3.0; //카트이동 시의 이동속도
     std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> partInfo;
     bool isVehicle = false;
     vehFlag vehType = vehFlag::none;

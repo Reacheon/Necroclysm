@@ -58,9 +58,11 @@ int main(int argc, char** argv)
 	int fpsTimeStack = 0;
 	int fpsFrame = 0;
 	int fps = 60;
+	bool hasInitMinimap = false; //실행 초기에 미니맵이 생성되지않는 버그를 고치기위해(startArea에 추가하면 왜 안되는거지?)
 	while (!quit)
 	{
 		__int64 loopStart = getNanoTimer();
+
 		//■Timer 변수
 		if (timer::cursorHightlight < 23) { timer::cursorHightlight++; }
 		else { timer::cursorHightlight = 0; }
@@ -101,6 +103,12 @@ int main(int argc, char** argv)
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
 		//renderFPS(getNanoTimer() - loopStart);
 		SDL_RenderPresent(renderer);
+
+		if (hasInitMinimap == false)
+		{
+			Player::ins()->updateMinimap();
+			hasInitMinimap = true;
+		}
 	}
 
 

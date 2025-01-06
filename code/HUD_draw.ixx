@@ -684,6 +684,16 @@ void HUD::drawBarAct()
 			else if (Player::ins()->entityInfo.walkMode == walkFlag::run) setBtnLayout(sysStr[8], 10);
 			else if (Player::ins()->entityInfo.walkMode == walkFlag::crouch) setBtnLayout(sysStr[8], 12);
 			else if (Player::ins()->entityInfo.walkMode == walkFlag::crawl) setBtnLayout(sysStr[8], 11);
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::wade)
+			{
+				setBtnLayout(sysStr[8], 161);
+				deactRect = true;
+			}
+			else if (Player::ins()->entityInfo.walkMode == walkFlag::swim)
+			{
+				setBtnLayout(sysStr[8], 160);
+				deactRect = true;
+			}
 		}
 		else if (barAct[i] == act::identify) setBtnLayout(sysStr[135], 52);
 		else if (barAct[i] == act::vehicle) setBtnLayout(sysStr[128], 48);

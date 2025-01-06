@@ -251,6 +251,8 @@ export std::vector<std::unique_ptr<Snowflake>> snowflakes;
 export std::vector<std::unique_ptr<Raindrop>> raindrops;
 export std::vector<std::unique_ptr<Spatter>> spatters;
 
+
+
 /////////////////////////////////////////////전역함수////////////////////////////////////////////////////////////
 
 export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
