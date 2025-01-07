@@ -518,6 +518,9 @@ export enum class itemFlag
 
     SPR_TH_WEAPON,
     NO_HAIR_HELMET,//머리카락이 안보이는 헬멧
+
+    BOW,
+    CROSSBOW,
 };
 
 export enum class walkFlag

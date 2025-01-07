@@ -493,6 +493,7 @@ public:
 		int returnIndex = lootPocket->transferItem(Player::ins()->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
+		Player::ins()->updateCustomSpriteHuman();
 		if (inputType == input::keyboard)
 		{
 			doPopDownHUD = true;
@@ -762,18 +763,9 @@ public:
 		Player::ins()->updateCustomSpriteHuman();
 		if (inputType == input::keyboard)
 		{
-
 			doPopDownHUD = true;
 			barActCursor = -1;
 		}
-
-		//if (lootPocket->itemInfo.size() == 0)
-		//{
-		//	delete World::ins()->getTile(lootTile[0], lootTile[1], lootTile[2]).ItemStackPtr;
-		//	World::ins()->getTile(lootTile[0], lootTile[1], lootTile[2]).ItemStackPtr = nullptr;
-		//}
-
-
 	}
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음

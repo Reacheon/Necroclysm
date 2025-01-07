@@ -850,9 +850,6 @@ void Entity::updateCustomSpriteHuman()
 
 	}
 
-
-
-
 	SDL_SetRenderTarget(renderer, nullptr);
 	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
 	updateSpriteFlash();

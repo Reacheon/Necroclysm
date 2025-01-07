@@ -42,7 +42,13 @@ public:
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		tabType = tabFlag::closeAim;
-		Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
+
+
+		auto pEquip = Player::ins()->getEquipPtr();
+		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
+		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_BOW);
+
+		
 
 		int pX = Player::ins()->getGridX(), pY = Player::ins()->getGridY(), pZ = Player::ins()->getGridZ();
 		
@@ -293,18 +299,20 @@ public:
 	void gamepadBtnUp() {}
 	void step() 
 	{
-
 		{
 			Uint8 targetR, targetG, targetB, targetAlpha;
 			Player::ins()->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
 			if (Player::ins()->getFlashType() == 1)
 			{
 				if (targetAlpha > 17) { targetAlpha -= 17; }
-				else { targetAlpha = 0; }
+				else 
+				{ 
+					targetAlpha = 0; 
+					Player::ins()->setFlashType(0);
+				}
 				Player::ins()->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
 			}
 		}
-
 
 		if (fabs(aimAcc - fakeAimAcc) > 0.002)
 		{
@@ -430,6 +438,9 @@ public:
 				{
 					popTopBullet((ItemPocket*)((ItemPocket*)tmpAimWeapon.pocketPtr)->itemInfo[0].pocketPtr);
 				}
+
+				auto pEquip = Player::ins()->getEquipPtr();
+				if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::WALK);
 
 				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);
 				turnWait(1.0);
