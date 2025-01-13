@@ -34,6 +34,9 @@ export namespace actSet
 export namespace option
 {
     std::wstring language = L"Korean";// 또는 "English"
+    bool fullScreen = false;
+    bool fixScreenRatio = true;
+    input inputMethod = input::touch; //조작방식 설정
 };
 
 export std::vector<std::wstring> sysStr;
@@ -78,7 +81,6 @@ export SDL_Point clickTile = { 0,0 }; // 현재 플레이어가 터치하고 있
 export Point3 lootTile = { 0,0,0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 export int detailScroll = 0; //상단 디테일의 스크롤
-export input inputType = input::mouse; //조작방식 설정
 export SDL_Point clickDownPoint = { 0,0 }; //다운 이벤트를 실행한 좌표
 export SDL_Point clickUpPoint = { 0,0 }; //업 이벤트를 실행한 좌표
 export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌표

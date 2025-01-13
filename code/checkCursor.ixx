@@ -22,7 +22,7 @@ export Point2 getTouchXY()
 
 export bool checkCursor(const SDL_Rect* rect)
 {
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 		case input::mouse:
 		{

@@ -56,7 +56,7 @@ public:
 		lstText = inputText;
 		lstOptionVec = option;
 
-		if (inputType == input::keyboard) { lstCursor = 0; }
+		if (option::inputMethod == input::keyboard) { lstCursor = 0; }
 
 		deactInput();
 		deactDraw();

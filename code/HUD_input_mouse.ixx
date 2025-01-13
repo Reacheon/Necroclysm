@@ -25,7 +25,7 @@ void HUD::clickDownGUI()
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
-	if (click == true && (event.button.button == SDL_BUTTON_MIDDLE||inputType == input::touch) )
+	if (click == true && (event.button.button == SDL_BUTTON_MIDDLE||option::inputMethod == input::touch) )
 	{
 		const int maxDist = 160;
 		int prevCameraX = cameraX, prevCameraY = cameraY;
@@ -40,7 +40,7 @@ void HUD::clickMotionGUI(int dx, int dy)
 }
 void HUD::clickUpGUI()
 {
-	if (disableClickUp4Motion && (event.button.button == SDL_BUTTON_MIDDLE || inputType == input::touch))
+	if (disableClickUp4Motion && (event.button.button == SDL_BUTTON_MIDDLE || option::inputMethod == input::touch))
 	{
 		disableClickUp4Motion = false;
 		return;
@@ -124,7 +124,7 @@ void HUD::clickUpGUI()
 		int camDelY = cameraY - (16 * cameraGridY + 8);
 
 		int revX, revY, revGridX, revGridY;
-		if (inputType == input::touch)
+		if (option::inputMethod == input::touch)
 		{
 			revX = event.tfinger.x * cameraW - (cameraW / 2);
 			revY = event.tfinger.y * cameraH - (cameraH / 2);
@@ -173,11 +173,11 @@ void HUD::mouseStep()
 void HUD::clickRightGUI()
 {
 	updateLog(L"#FFFFFF[HUD] Right click event triggered.");
-	/*if(inputType==input::mouse) */openContextMenu(getAbsMouseGrid());
+	/*if(option::inputMethod==input::mouse) */openContextMenu(getAbsMouseGrid());
 }
 void HUD::clickHoldGUI()
 {
-	if (inputType == input::touch)
+	if (option::inputMethod == input::touch)
 	{
 		updateLog(L"#FFFFFF[HUD] Touch hold event triggered.");
 		openContextMenu(getAbsMouseGrid());

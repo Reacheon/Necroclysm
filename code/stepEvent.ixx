@@ -37,7 +37,7 @@ export __int64 stepEvent()
 						std::wstring str = L"다음 게임패드가 감지되었다. : ";
 						str += stringToWstring(SDL_GameControllerName(controller));
 						updateLog(col2Str(col::white) + str);
-						inputType = input::gamepad;
+						option::inputMethod = input::gamepad;
 						break;
 					}
 					else errorBox(L"게임패드를 열 수가 없다.");

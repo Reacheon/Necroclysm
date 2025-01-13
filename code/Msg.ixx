@@ -78,7 +78,7 @@ public:
 			exInputEditing = false;
 		}
 
-		if (inputType == input::keyboard) { msgCursor = 0; }
+		if (option::inputMethod == input::keyboard) { msgCursor = 0; }
 
 		deactInput();
 		deactDraw();

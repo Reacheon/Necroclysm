@@ -86,6 +86,7 @@ public:
 	bool runAnimation(bool shutdown)
 	{
 		//prt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
+		auto aniTyhpe = getAniType();
 		if (getAniType() == aniFlag::drop)
 		{
 			addTimer();
@@ -121,6 +122,50 @@ public:
 					resetTimer();
 					setAniType(aniFlag::null);
 					return true;
+			}
+		}
+		else if (getAniType() == aniFlag::throwing)
+		{
+			addTimer();
+
+			float spd = 6;
+			float xSpd, ySpd;
+			int relX = getIntegerFakeX();
+			int relY = getIntegerFakeY();
+			float dist = sqrt(pow(relX, 2) + pow(relY, 2));
+			prt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
+
+			float cosVal = -relX / dist;
+			float sinVal = -relY / dist;
+			xSpd = spd * cosVal;
+			ySpd = spd * sinVal;
+
+			setFakeX(getFakeX() + xSpd);
+			setFakeY(getFakeY() + ySpd);
+
+			if (xSpd > 0 && getFakeX() > 0) { setFakeX(0); }
+			if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
+			if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
+			if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
+
+			if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
+			{
+				for (int i = 0; i < storage->itemInfo.size(); i++)//만약 탄두가 있으면 그걸 납으로 바꿈
+				{
+					if (storage->itemInfo[i].itemCode == 25)
+					{
+						storage->eraseItemInfo(i);
+						storage->addItemFromDex(11, 1);
+						updateSprIndex();
+					}
+				}
+
+				setFakeX(0);
+				setFakeY(0);
+				prt(L"애니메이션 종료\n");
+				resetTimer();
+				setAniType(aniFlag::null);
+				return true;
 			}
 		}
 		return false;

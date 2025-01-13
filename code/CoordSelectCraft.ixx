@@ -100,7 +100,7 @@ public:
 			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false)
 			{
 				int revX, revY, revGridX, revGridY;
-				if (inputType == input::touch)
+				if (option::inputMethod == input::touch)
 				{
 					revX = event.tfinger.x * cameraW - (cameraW / 2);
 					revY = event.tfinger.y * cameraH - (cameraH / 2);
@@ -206,7 +206,7 @@ public:
 				if (targetSelect == false)//Å¸°Ù ¼±ÅÃ Àü
 				{
 					int revX, revY, revGridX, revGridY;
-					if (inputType == input::touch)
+					if (option::inputMethod == input::touch)
 					{
 						revX = event.tfinger.x * cameraW - (cameraW / 2);
 						revY = event.tfinger.y * cameraH - (cameraH / 2);

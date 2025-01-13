@@ -174,7 +174,6 @@ public:
 		else return false;
 	}
 
-
 	void createSector(int sectorX, int sectorY, int sectorZ)
 	{
 		if (sectorZ == 0)

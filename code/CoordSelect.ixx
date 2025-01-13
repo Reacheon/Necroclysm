@@ -110,7 +110,7 @@ public:
 		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&quickSlotRegion) == false)
 		{
 			int revX, revY, revGridX, revGridY;
-			if (inputType == input::touch)
+			if (option::inputMethod == input::touch)
 			{
 				revX = event.tfinger.x * cameraW - (cameraW / 2);
 				revY = event.tfinger.y * cameraH - (cameraH / 2);
@@ -191,7 +191,7 @@ public:
 				int camDelY = cameraY - (16 * cameraGridY + 8);
 
 				int revX, revY, revGridX, revGridY;
-				if (inputType == input::touch)
+				if (option::inputMethod == input::touch)
 				{
 					revX = event.tfinger.x * cameraW - (cameraW / 2);
 					revY = event.tfinger.y * cameraH - (cameraH / 2);

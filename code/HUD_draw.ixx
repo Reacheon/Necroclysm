@@ -60,13 +60,13 @@ void HUD::drawGUI()
 
 		drawSprite(spr::minimapEdge, 1, 14, 14);
 		Sprite* targetBtnSpr;
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
 			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
 		}
-		else if (inputType == input::mouse)
+		else if (option::inputMethod == input::mouse)
 		{
 			targetBtnSpr = spr::buttons;
 			drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, 14 + 15, 14 + 15);
@@ -79,7 +79,7 @@ void HUD::drawGUI()
 		{
 			setFontSize(12);
 			SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 0xff);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 1);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 3);
 		}
 
 		//HP바 그리기
@@ -148,9 +148,53 @@ void HUD::drawGUI()
 				int pivotY = letterbox.y + 4;
 				setFontSize(10);
 
-				int sprIndex = (int)(16.0 * ((double)Player::ins()->entityInfo.STA / (double)Player::ins()->entityInfo.maxSTA));
-				drawSprite(spr::staminaGauge, sprIndex, pivotX, pivotY);
+				int pSTA = Player::ins()->entityInfo.STA;
+				int pSTAMax = Player::ins()->entityInfo.maxSTA;
+
+
+				if (fakeSTA > pSTA)
+				{
+					fakeSTA -= 1;
+					if (alphaSTA > 10) alphaSTA -= 10;
+					else alphaSTA = 0;
+				}
+				else if (fakeSTA < pSTA) fakeSTA++;
+				else alphaSTA = 255;
+
+
+				SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), 0, 0, 0);
+				SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+				drawSprite(spr::staminaGaugeCircle, 0, pivotX, pivotY);
+
+				if (fakeSTA > pSTA)
+				{
+
+					int sprIndexFake = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
+					SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), alphaSTA);
+					SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::red.r, lowCol::red.g, lowCol::red.b);
+					SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+					drawSprite(spr::staminaGaugeCircle, sprIndexFake, pivotX, pivotY);
+					SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), 255);
+
+
+					int sprIndex = (int)(90.0 - 90.0 * ((double)pSTA / (double)pSTAMax));
+					SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
+					SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+					drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
+				}
+				else
+				{
+					int sprIndex = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
+					SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
+					SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+					drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
+				}
+
+
 				drawTextCenter(col2Str(lowCol::yellow) + L"STA", pivotX + 24, pivotY + 16);
+
+
+
 
 				std::wstring STAStr = std::to_wstring(Player::ins()->entityInfo.STA) + L"/" + std::to_wstring(Player::ins()->entityInfo.maxSTA);
 				setFontSize(8);
@@ -293,13 +337,13 @@ void HUD::drawGUI()
 
 			drawStadium(letterboxPopUpButton.x, letterboxPopUpButton.y, letterboxPopUpButton.w, letterboxPopUpButton.h, popUpBtnColor, 200, 5);
 
-			if (inputType == input::gamepad)
+			if (option::inputMethod == input::gamepad)
 			{
 				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
 				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 			}
-			else if (inputType != input::keyboard)
+			else if (option::inputMethod != input::keyboard)
 			{
 				if (y == 0) drawSpriteCenter(spr::windowArrow, 1, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 				else drawSpriteCenter(spr::windowArrow, 3, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
@@ -337,7 +381,7 @@ void HUD::drawTab()
 	{
 	case tabFlag::autoAtk:
 	{
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
 			else if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
@@ -370,7 +414,7 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon48, 158, tab.x + 99, tab.y + 18);
 
 		Sprite* targetBtnSpr;
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
@@ -380,7 +424,7 @@ void HUD::drawTab()
 	}
 	case tabFlag::closeAim:
 	{
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
 			else if(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
@@ -413,7 +457,7 @@ void HUD::drawTab()
 		setZoom(1.0);
 
 		Sprite* targetBtnSpr;
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
@@ -451,7 +495,7 @@ void HUD::drawTab()
 	}
 
 	Sprite* targetBtnSpr;
-	if (inputType == input::gamepad)
+	if (option::inputMethod == input::gamepad)
 	{
 		if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 0) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }
@@ -479,7 +523,7 @@ void HUD::drawQuickSlot()
 
 
 	Sprite* targetBtnSpr;
-	if (inputType == input::gamepad)
+	if (option::inputMethod == input::gamepad)
 	{
 		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X)) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }

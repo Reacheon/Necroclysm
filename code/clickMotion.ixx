@@ -12,7 +12,7 @@ import GUI;
 
 export void clickMotion()
 {
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 		case input::mouse:
 			dxClickStack += event.motion.xrel;
@@ -28,7 +28,7 @@ export void clickMotion()
 
 	// 입력 방식에 따라 커서 이동 델타값 조정
 	int dx, dy = 0;
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 		case input::mouse:// 마우스 조작
 			dx = clickDownPoint.x - event.motion.x;

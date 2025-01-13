@@ -28,7 +28,7 @@ export void displayLoader()
     cameraH = displayMode.h;
 
     window = SDL_CreateWindow("Necroclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
-    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    if(option::fullScreen) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, 0);
     setPrimitiveRenderer(renderer);
 
@@ -45,6 +45,7 @@ export void displayLoader()
     }
 
     //PC 테스트용 강제 해상도 조정////////
+    if(option::fixScreenRatio)
     {
         int resolution = 0;
         switch (resolution)

@@ -95,7 +95,7 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
+		if (option::inputMethod == input::keyboard || option::inputMethod == input::gamepad) lootCursor = 0;
 	}
 
 	Loot(ItemStack* inputStack) : GUI(false)
@@ -122,7 +122,7 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (inputType == input::keyboard || inputType == input::gamepad) lootCursor = 0;
+		if (option::inputMethod == input::keyboard || option::inputMethod == input::gamepad) lootCursor = 0;
 	}
 
 	~Loot()
@@ -211,7 +211,7 @@ public:
 	{
 		lootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
 
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
@@ -265,7 +265,7 @@ public:
 		}
 
 		//잘못된 스크롤 위치 조정
-		if (inputType == input::mouse || inputType == input::touch)
+		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
 			if (lootScroll + LOOT_ITEM_MAX >= lootPocket->itemInfo.size()) { lootScroll = myMax(0, (int)lootPocket->itemInfo.size() - LOOT_ITEM_MAX); }
 			else if (lootScroll < 0) { lootScroll = 0; }
@@ -292,8 +292,8 @@ public:
 		else
 		{
 
-			if (inputType == input::keyboard) close(aniFlag::winSlipClose);
-			else if (inputType == input::gamepad) close(aniFlag::winSlipClose);
+			if (option::inputMethod == input::keyboard) close(aniFlag::winSlipClose);
+			else if (option::inputMethod == input::gamepad) close(aniFlag::winSlipClose);
 			else
 			{
 				lootCursor = -1;
@@ -479,7 +479,7 @@ public:
 			lootPocket->itemInfo[lootCursor].lootSelect = itemNumber;
 			//아직 질량&부피 체크 추가하지 않았음
 			lootPocket->transferItem((ItemPocket*)equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr, lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
-			if (inputType == input::keyboard)
+			if (option::inputMethod == input::keyboard)
 			{
 				doPopDownHUD = true;
 				barActCursor = -1;
@@ -494,7 +494,7 @@ public:
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 		{
 			doPopDownHUD = true;
 			barActCursor = -1;
@@ -761,7 +761,7 @@ public:
 		}
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 		{
 			doPopDownHUD = true;
 			barActCursor = -1;

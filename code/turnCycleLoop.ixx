@@ -37,7 +37,7 @@ export __int64 turnCycleLoop()
 
 	if (dtClickStack != -1)
 	{
-		switch (inputType)
+		switch (option::inputMethod)
 		{
 			case input::mouse:
 				dtClickStack = SDL_GetTicks() - dtClickStackStart;
@@ -155,18 +155,18 @@ __int64 playerInputTurn()
 			switch (event.type)
 			{
 			case SDL_CONTROLLERBUTTONDOWN:
-				if (inputType != input::gamepad)
+				if (option::inputMethod != input::gamepad)
 				{
 					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
-					inputType = input::gamepad;
+					option::inputMethod = input::gamepad;
 				}
 				gamepadBtnDown();
 				break;
 			case SDL_CONTROLLERBUTTONUP:
-				if (inputType != input::gamepad)
+				if (option::inputMethod != input::gamepad)
 				{
 					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
-					inputType = input::gamepad;
+					option::inputMethod = input::gamepad;
 				}
 				gamepadBtnUp();
 				break;
@@ -189,53 +189,53 @@ __int64 playerInputTurn()
 				exit(0);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (inputType != input::mouse)
+				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					inputType = input::mouse;
+					option::inputMethod = input::mouse;
 				}
 
-				if (inputType == input::mouse) { clickDown(); }
+				if (option::inputMethod == input::mouse) { clickDown(); }
 				break;
 			case SDL_FINGERDOWN:
-				if (inputType == input::touch) { clickDown(); }
+				if (option::inputMethod == input::touch) { clickDown(); }
 				break;
 			case SDL_MOUSEMOTION:
-				if (inputType != input::mouse)
+				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					inputType = input::mouse;
+					option::inputMethod = input::mouse;
 				}
 
-				if (inputType == input::mouse) { clickMotion(); }
+				if (option::inputMethod == input::mouse) { clickMotion(); }
 				break;
 			case SDL_FINGERMOTION:
-				if (inputType == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
+				if (option::inputMethod == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
 				{
 					clickMotion();
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
-				if (inputType != input::mouse)
+				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					inputType = input::mouse;
+					option::inputMethod = input::mouse;
 				}
 
-				if (inputType == input::mouse) 
+				if (option::inputMethod == input::mouse) 
 				{ 
 					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
 					else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
 				}
 				break;
 			case SDL_FINGERUP:
-				if (inputType == input::touch) { clickUp(); }
+				if (option::inputMethod == input::touch) { clickUp(); }
 				break;
 			case SDL_MOUSEWHEEL:
-				if (inputType != input::mouse)
+				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					inputType = input::mouse;
+					option::inputMethod = input::mouse;
 				}
 
 				if (event.wheel.y > 0) 
@@ -357,6 +357,7 @@ __int64 animationTurn()
 		};
 
 
+	int aniSize = aniUSet.size();
 	if (aniUSet.size() > 0)
 	{
 		//aniUSet에 있는 모든 인스턴스를 체크해서 애니메이션을 실행시킴. 
@@ -424,6 +425,9 @@ __int64 entityAITurn()
 	if (endMonsterTurn == true) 
 	{ 
 		turnCycle = turn::playerInput; 
+
+		//플레이어 스테미나 회복
+
 
 		//턴사이클 모두 종료
 		for (auto ePtr : entityList)

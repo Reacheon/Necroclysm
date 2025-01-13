@@ -41,11 +41,13 @@ public:
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         setFontSize(inputSize);
+        setSolidText();
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 - 1, textureH / 2);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 + 1);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 - 1);//외곽선
         drawTextCenter(col2Str(inputCol) + letters, textureW / 2, textureH / 2);
+        disableSolidText();
         SDL_SetRenderTarget(renderer, nullptr);
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);
     }
@@ -67,11 +69,13 @@ public:
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         setFontSize(8);
+        setSolidText();
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 - 1, textureH / 2);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 + 1);//외곽선
         drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 - 1);//외곽선
         drawTextCenter(col2Str(inputCol) + letters, textureW / 2, textureH / 2);
+        disableSolidText();
         SDL_SetRenderTarget(renderer, nullptr);
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);
     }

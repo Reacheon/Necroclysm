@@ -12,7 +12,7 @@ export void clickHold()
 	clickStartTime = std::numeric_limits<__int64>::max();
 	deactClickUp = true;
 
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 	case input::mouse:
 		clickHoldPoint = { event.motion.x, event.motion.y };

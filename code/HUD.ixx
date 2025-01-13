@@ -73,8 +73,12 @@ private:
 	int rStickPressDelay = 0;
 	int quickSlotCursor = -1;
 	
+	int fakeSTA = 0;
+	int alphaSTA = 255;
+
 
 	int delayR2 = 0;
+
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -82,7 +86,7 @@ public:
 		prt(L"HUD instance was generated.\n");
 		errorBox(ptr != nullptr, "More than one Loot instance was generated.");
 		ptr = this;
-		if (inputType != input::keyboard)
+		if (option::inputMethod != input::keyboard)
 		{
 			changeXY(0, 0, false);
 		}
@@ -1007,11 +1011,11 @@ public:
 		inputOptions.push_back(act::inspect);
 
 		Point2 windowCoord;
-		if (inputType == input::mouse || inputType == input::touch)
+		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
 			windowCoord = { getMouseXY().x, getMouseXY().y };
 		}
-		else if (inputType == input::gamepad)
+		else if (option::inputMethod == input::gamepad)
 		{
 			SDL_Rect dst;
 			dst.x = cameraW / 2 + zoomScale * ((16 * targetGrid.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;

@@ -17,7 +17,7 @@ export void clickRight()
 	dyClickStack = 0;
 	dtClickStack = -1;
 
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 	case input::mouse:
 		prt(L"마우스 클릭라이트 Up 입력 (%d,%d)\n", event.motion.x, event.motion.y);
@@ -34,7 +34,7 @@ export void clickRight()
 
 	itemListColorLock = false;
 
-	if (inputType == input::touch)
+	if (option::inputMethod == input::touch)
 	{
 		event.tfinger.x = 0;
 		event.tfinger.y = 0;

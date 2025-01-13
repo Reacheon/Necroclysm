@@ -103,7 +103,7 @@ void HUD::gamepadBtnUp()
 }
 void HUD::gamepadStep()
 {
-	if (inputType == input::gamepad)
+	if (option::inputMethod == input::gamepad)
 	{
 		if (dpadDelay <= 0)
 		{

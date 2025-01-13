@@ -8,7 +8,7 @@ import std;
 export std::array<int,2> getRevMouseGrid()
 {
 	int revX, revY, revGridX, revGridY;
-	if (inputType == input::touch)
+	if (option::inputMethod == input::touch)
 	{
 		revX = event.tfinger.x * cameraW - (cameraW / 2);
 		revY = event.tfinger.y * cameraH - (cameraH / 2);
@@ -39,7 +39,7 @@ export Point2 getAbsMouseGrid()
 	int camDelY = cameraY - (16 * cameraGridY + 8);
 
 	int revX, revY, revGridX, revGridY;
-	if (inputType == input::touch)
+	if (option::inputMethod == input::touch)
 	{
 		revX = event.tfinger.x * cameraW - (cameraW / 2);
 		revY = event.tfinger.y * cameraH - (cameraH / 2);

@@ -328,7 +328,7 @@ public:
 
 
 
-		if (inputType == input::gamepad)
+		if (option::inputMethod == input::gamepad)
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{

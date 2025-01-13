@@ -158,4 +158,6 @@ export void textureLoader()
 	spr::aimMarkerWhite = new Sprite(renderer, "image/UI/aimMarkerWhite.png", 48, 48);
 
 	spr::mapMagnifyIcon = new Sprite(renderer, "image/UI/GUI/Map/mapMagnifyIcon.png", 128, 40);
+	spr::staminaGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/staminaGaugeCircle.png", 48, 48);
+
 }

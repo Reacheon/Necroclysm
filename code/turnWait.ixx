@@ -110,6 +110,9 @@ export void turnWait(float waitTime)
         }
     }
     
+    Player::ins()->entityInfo.STA += 2;
+    if (Player::ins()->entityInfo.STA > Player::ins()->entityInfo.maxSTA) Player::ins()->entityInfo.STA = Player::ins()->entityInfo.maxSTA;
+
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;

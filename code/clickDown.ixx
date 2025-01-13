@@ -15,7 +15,7 @@ export void clickDown()
 	clickStartTime = getMilliTimer();
 	deactHold = false;
 
-	switch (inputType)
+	switch (option::inputMethod)
 	{
 		case input::mouse:
 			clickDownPoint = { event.motion.x, event.motion.y };

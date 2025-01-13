@@ -773,11 +773,11 @@ __int64 drawMarkers()
 
 
 
-	if (inputType == input::mouse)
+	if (option::inputMethod == input::mouse)
 	{
 		if (isPlayerMoving == false && turnCycle == turn::playerInput)
 		{
-			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false)
+			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&quickSlotRegion) == false)
 			{
 				if (GUI::getLastGUI() == HUD::ins())
 				{
@@ -822,7 +822,7 @@ __int64 drawMarkers()
 
 
 	//화이트마커 그리기
-	if (inputType == input::gamepad)
+	if (option::inputMethod == input::gamepad)
 	{
 		if (gamepadWhiteMarker.z == Player::ins()->getGridZ())
 		{

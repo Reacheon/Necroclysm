@@ -1260,10 +1260,10 @@
 //		}
 //		else
 //		{
-//			if (inputType != input::keyboard)//클릭한 타일의 좌표를 얻어대는 함수
+//			if (option::inputMethod != input::keyboard)//클릭한 타일의 좌표를 얻어대는 함수
 //			{
 //				int revX, revY, revGridX, revGridY;
-//				if (inputType == input::touch)
+//				if (option::inputMethod == input::touch)
 //				{
 //					revX = event.tfinger.x * cameraW - (cameraW / 2);
 //					revY = event.tfinger.y * cameraH - (cameraH / 2);

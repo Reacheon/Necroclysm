@@ -16,7 +16,8 @@ export __int64 renderLog(SDL_Renderer* renderer)
 	std::deque<std::wstring> logStrDeque = getLogStrDeque();
 	std::deque<int> logTimerDeque = getLogTimerDeque();
 
-	setFontSize(16);
+	setFontSize(13);
+	setSolidText();
 	int textHeight = queryTextHeight(L"가", true);
 
 	for (int i = 0; i < maxLogLine; i++)
@@ -33,6 +34,7 @@ export __int64 renderLog(SDL_Renderer* renderer)
 			}
 		}
 	}
+	disableSolidText();
 
 	return (getNanoTimer() - timeStampStart);
 }

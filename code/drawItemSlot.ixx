@@ -25,7 +25,7 @@ export enum class cursorFlag
 //아이템이 들어있는 사각형을 그림, 질량과 부피는 포함하지않음
 export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputItem)
 {
-	int fontSize = 16;
+	int fontSize = 14;
 	int yCorrection = 0;
 	const int widthLimit = 162;
 	bool split = false;
@@ -45,7 +45,6 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData inputIte
 	drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5);
 
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-	setFontSize(16);
 	std::wstring mainName = L"";
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
@@ -285,12 +284,34 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData inputItem, in
 		drawSpriteCenter(spr::icon13, 30, box3.x + 10, box2.y + 9 + 16 - 7);
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-		setFontSize(7);
+		setFontSize(8);
+		setSolidText();
 
-		std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
-		std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
-		drawText(kgStr + L" KG", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
-		drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+
+		if (inputItem.weight > 1000)
+		{
+			std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
+			drawText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+		}
+		else
+		{
+			std::wstring kgStr = std::to_wstring(inputItem.weight);
+			drawText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+		}
+
+		if (inputItem.volume > 1000)
+		{
+			std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
+			drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+		}
+		else
+		{
+			std::wstring volStr = std::to_wstring(inputItem.volume);
+			drawText(volStr + L" mL", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+		}
+		
+		disableSolidText();
+
 	}
 
 	if (whiteCursor == true)

@@ -68,7 +68,7 @@ void Loot::clickUpGUI()
 				{
 					if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
 					{
-						if (inputType == input::mouse)
+						if (option::inputMethod == input::mouse)
 						{
 							if (event.button.button == SDL_BUTTON_LEFT)
 							{
@@ -79,7 +79,7 @@ void Loot::clickUpGUI()
 								CORO(executeSelectItemEx(i + lootScroll));
 							}
 						}
-						else if (inputType == input::touch)
+						else if (option::inputMethod == input::touch)
 						{
 							executeSelectItem(i + lootScroll);
 						}

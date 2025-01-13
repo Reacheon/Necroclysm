@@ -68,7 +68,7 @@ public:
 			World::ins()->getTile(x, y, z).redLight += redLight;
 			World::ins()->getTile(x, y, z).greenLight += greenLight;
 			World::ins()->getTile(x, y, z).blueLight += blueLight;
-			prt(L"(%d,%d,%d)의 월드 RGB값은 %d,%d,%d, 컬러 RGB값은 %d,%d,%d \n", x, y, z, World::ins()->getTile(x, y, z).redLight, World::ins()->getTile(x, y, z).greenLight, World::ins()->getTile(x, y, z).blueLight, lightColor.r, lightColor.g, lightColor.b);
+			//prt(L"(%d,%d,%d)의 월드 RGB값은 %d,%d,%d, 컬러 RGB값은 %d,%d,%d \n", x, y, z, World::ins()->getTile(x, y, z).redLight, World::ins()->getTile(x, y, z).greenLight, World::ins()->getTile(x, y, z).blueLight, lightColor.r, lightColor.g, lightColor.b);
 		}
 	}
 	void releaseLight()

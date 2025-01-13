@@ -102,7 +102,7 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winSlipOpen);
 
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 		{
 			equipCursor = 0;
 		}
@@ -215,7 +215,7 @@ public:
 			}
 			else
 			{
-				if (inputType != input::keyboard)
+				if (option::inputMethod != input::keyboard)
 				{
 					//select 아이템이 하나라도 있을 경우 전부 제거
 					equipScroll = 0;
@@ -403,7 +403,7 @@ public:
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 		{
 			doPopDownHUD = true;
 			barActCursor = -1;
@@ -424,7 +424,7 @@ public:
 		Player::ins()->drop(drop);
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 			doPopDownHUD = true;
 		{
 			barActCursor = -1;
@@ -734,7 +734,7 @@ public:
 			}
 		}
 		Player::ins()->updateStatus();
-		if (inputType == input::keyboard)
+		if (option::inputMethod == input::keyboard)
 		{
 			doPopDownHUD = true;
 			barActCursor = -1;

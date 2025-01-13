@@ -10,6 +10,17 @@ import constVar;
 
 static int s_fontSize = 16;
 static int s_fontGap = 4;
+static bool solidDraw = false;
+
+export void setSolidText()
+{
+	solidDraw = true;
+}
+
+export void disableSolidText()
+{
+	solidDraw = false;
+}
 
 //@brief 텍스트 스캔, 제어문자를 포함해 스캔할 경우(exConChar = true) 더 빠름
 export void queryTextSize(std::wstring text, int* w, int* h, bool isColorCodeText)
@@ -295,7 +306,9 @@ export void drawTextEx(std::wstring text, int x, int y, bool center)
 		Uint16* unicode = new Uint16[text.size() + 1]();
 		for (int i = 0; i < text.size(); i++) { unicode[i] = text[i]; }
 		unicode[text.size()] = 0;
-		surface = TTF_RenderUNICODE_Solid(mainFont[s_fontSize], unicode, color);//병목 1/3
+		if(solidDraw) surface = TTF_RenderUNICODE_Solid(mainFont[s_fontSize], unicode, color);//병목 1/3
+		else  surface = TTF_RenderUNICODE_Blended(mainFont[s_fontSize], unicode, color);
+		
 		texture = SDL_CreateTextureFromSurface(renderer, surface); //병목 2/3
 		SDL_FreeSurface(surface);
 		textCache[cacheKey] = texture;
