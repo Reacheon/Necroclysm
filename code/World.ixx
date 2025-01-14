@@ -56,7 +56,9 @@ public:
 	{
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(x + ((-CHUNK_SIZE_X * chunkX) + ((CHUNK_SIZE_X - 1) / 2)), y + ((-CHUNK_SIZE_Y * chunkY) + ((CHUNK_SIZE_Y - 1) / 2)));
+		int localX = x - (chunkX * CHUNK_SIZE_X);
+		int localY = y - (chunkY * CHUNK_SIZE_Y);
+		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(localX, localY);
 	}
 	void createChunk(int chunkX, int chunkY, int chunkZ)
 	{
@@ -75,8 +77,14 @@ public:
 	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
-		chunkX = (sgn(x)) * ((std::abs(x) + ((CHUNK_SIZE_X - 1) / 2)) / CHUNK_SIZE_X);
-		chunkY = (sgn(y)) * ((std::abs(y) + ((CHUNK_SIZE_Y - 1) / 2)) / CHUNK_SIZE_Y);
+		chunkX = (x >= 0)
+			? (x / CHUNK_SIZE_X)
+			: ((x - (CHUNK_SIZE_X - 1)) / CHUNK_SIZE_X);
+
+		chunkY = (y >= 0)
+			? (y / CHUNK_SIZE_Y)
+			: ((y - (CHUNK_SIZE_Y - 1)) / CHUNK_SIZE_Y);
+
 	}
 	void activate(int x, int y, int z)
 	{
@@ -251,6 +259,11 @@ public:
 	void setChunkWeather(int chunkX, int chunkY, int chunkZ, weatherFlag input)
 	{
 		chunkPtr[{chunkX, chunkY, chunkZ}]->setWeather(input);
+	}
+
+	void chunkOverwrite(int chunkX, int chunkY, int chunkZ,chunkFlag inputChunk)
+	{
+		chunkPtr[{chunkX, chunkY, chunkZ}]->chunkLoad(inputChunk);
 	}
 };
 

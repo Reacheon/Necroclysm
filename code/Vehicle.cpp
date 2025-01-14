@@ -1125,7 +1125,6 @@ bool Vehicle::runAnimation(bool shutdown)
             {
                 prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
 
-                extraRenderSet.clear();
                 extraRenderEntityList.clear();
                 setDelGrid(0, 0);
                 setFakeX(0);
@@ -1205,7 +1204,6 @@ bool Vehicle::runAnimation(bool shutdown)
             //    }
             //}
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
-            extraRenderSet.clear();
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
             Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);

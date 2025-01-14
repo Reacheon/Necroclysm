@@ -39,6 +39,11 @@ export namespace option
     input inputMethod = input::touch; //조작방식 설정
 };
 
+export namespace debug
+{
+    bool chunkLineDraw = false;
+};
+
 export std::vector<std::wstring> sysStr;
 
 export namespace timer
@@ -64,7 +69,6 @@ export std::vector<SkillData> skillDex; //스킬 DB
 
 export std::vector<std::wstring> itemTooltip;
 export std::vector<std::wstring> entityTooltip;
-
 
 export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; // 화면에 고정되는 텍스처 객체에 대한 맵
 export int cameraW = 304; // 카메라의 Width
@@ -125,9 +129,8 @@ export int mainLightSight = 0;
 export Corouter* coFunc;
 export std::wstring coAnswer = L"";
 export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴, 즉 코루틴함수 도중에 턴을 스킵하는 기능을 할 수 있음
-
 /////////////////////////////////////////////////////////////////
-export bool isLeftHanded = false;
+
 
 //fac, tile, wall, ceil(따로 추가적으로 객체없음)
 export std::vector<int> canBuildListWall = { 1, 2 }; //나무벽, 흙벽
@@ -137,7 +140,6 @@ export std::vector<int> canBuildListFac = { 1, 2, 3 }; //차량 철 프레임, �
 
 export void* availableRecipe;
 
-export bool vehicleMode = false;
 export void* ctrlVeh = nullptr;
 export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환
 
@@ -165,14 +167,6 @@ export namespace dur
 
 export int extraCameraLength = 0;
 
-export __int64 nextCameraX = 0;
-export __int64 nextCameraY = 0;
-
-export __int64 delCameraX = 0;
-export __int64 delCameraY = 0;
-
-export std::set<std::array<int, 2>> extraRenderSet;
-
 export godFlag playerGod = godFlag::none;
 export int godPiety = 0;
 
@@ -186,7 +180,6 @@ export SDL_Rect quickSlotRegion;
 export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해 원래 마우스 클릭좌표, 기존 클릭좌표랑은 조금 다르니 유의할 것, 카메라 이동에 사용됨
 
 export ThreadPool* threadPoolPtr;
-
 
 export Point3 gamepadWhiteMarker = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max(),std::numeric_limits<int>::max() }; //게임패드 방향을 가리키는 마커
 export bool isPlayerMoving = false; //플레이어가 aStar를 따라서 움직이고 있는지.. 마우스의 whiteMarker 표시 여부를 바꿈

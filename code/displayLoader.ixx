@@ -20,6 +20,12 @@ export void displayLoader()
     cameraW = 720;
     cameraH = 720;
 
+    //창을 최소화하면 커스텀스프라이트들이 사라지는 버그가 이 라인들이 있으면 안 일어남.. 왜일까?
+    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+
     SDL_DisplayMode displayMode;
     if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
     else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);

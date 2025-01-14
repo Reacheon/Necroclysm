@@ -15,7 +15,16 @@ public:
 	Chunk(chunkFlag input)
 	{
 		//prt(lowCol::green, L"Chunk : 생성자가 호출되었습니다..\n");
-		
+		chunkLoad(input);
+	}
+	~Chunk()
+	{
+		//prt(lowCol::green, L"Chunk : 소멸자가 호출되었습니다..\n");
+	}
+	TileData& getChunkTile(int x, int y){return singleTile[y][x];}
+
+	void chunkLoad(chunkFlag inputChunk)
+	{
 		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; y++)
@@ -24,7 +33,7 @@ public:
 			}
 		}
 
-		if (input == chunkFlag::seawater)
+		if (inputChunk == chunkFlag::seawater)
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
 			for (int x = 0; x < CHUNK_SIZE_X; x++)
@@ -35,7 +44,7 @@ public:
 				}
 			}
 		}
-		else if (input == chunkFlag::none)
+		else if (inputChunk == chunkFlag::none)
 		{
 			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
 			for (int x = 0; x < CHUNK_SIZE_X; x++)
@@ -46,7 +55,7 @@ public:
 				}
 			}
 		}
-		else if (input == chunkFlag::underground)
+		else if (inputChunk == chunkFlag::underground)
 		{
 			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
@@ -58,7 +67,7 @@ public:
 				}
 			}
 		}
-		else if (input == chunkFlag::meadow)
+		else if (inputChunk == chunkFlag::meadow)
 		{
 			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
@@ -68,7 +77,7 @@ public:
 				}
 			}
 		}
-		else if (input == chunkFlag::dirt)
+		else if (inputChunk == chunkFlag::dirt)
 		{
 			for (int x = 0; x < CHUNK_SIZE_X; x++)
 			{
@@ -89,14 +98,8 @@ public:
 				}
 			}
 		}
-
-		flag = input;
+		flag = inputChunk;
 	}
-	~Chunk()
-	{
-		//prt(lowCol::green, L"Chunk : 소멸자가 호출되었습니다..\n");
-	}
-	TileData& getChunkTile(int x, int y){return singleTile[y][x];}
 
 	chunkFlag getFlag()
 	{

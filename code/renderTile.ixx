@@ -33,6 +33,7 @@ import Bullet;
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
 
+
 __int64 analyseRender();
 __int64 drawTiles();
 __int64 drawCorpses();
@@ -42,9 +43,10 @@ __int64 drawDamages();
 __int64 drawBullets();
 __int64 drawFogs();
 __int64 drawMarkers();
+__int64 drawDebug();
 
 //차량과 엔티티는 중복을 허용하면 안됨
-std::list<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList;
+std::list<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList,allTileList;
 std::list<Drawable*> renderVehList, renderEntityList;
 
 export __int64 renderTile()
@@ -79,6 +81,7 @@ export __int64 renderTile()
 	drawBullets();
 	dur::fog = drawFogs();
 	dur::marker = drawMarkers();
+	drawDebug();
 
 	//전체광
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
@@ -336,7 +339,12 @@ __int64 drawTiles()
 			);
 			setZoom(1.0);
 		}
+
+
+
 	}
+
+
 
 
 
@@ -935,5 +943,49 @@ __int64 drawMarkers()
 
 
 
+	return getNanoTimer() - timeStampStart;
+}
+
+__int64 drawDebug()
+{
+	__int64 timeStampStart = getNanoTimer();
+	if (debug::chunkLineDraw)
+	{
+		for (const auto& elem : tileList)
+		{
+			int tgtX = elem.x;
+			int tgtY = elem.y;
+
+			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+			dst.w = tileSize;
+			dst.h = tileSize;
+
+			if (tgtX % 13 == 0) drawLine(dst.x, dst.y, dst.x, dst.y + dst.h, col::red);
+			else if (tgtX % 13 == 12)  drawLine(dst.x + dst.w, dst.y, dst.x + dst.w, dst.y + dst.h, col::red);
+
+			if (tgtY % 13 == 0) drawLine(dst.x, dst.y, dst.x + dst.w, dst.y, col::red);
+			else if (tgtY % 13 == 12)  drawLine(dst.x, dst.y + dst.h, dst.x + dst.w, dst.y + dst.h, col::red);
+
+			if (std::abs(tgtX % 13) == 6 && std::abs(tgtY % 13) == 6)
+			{
+				setFontSize(20);
+
+
+				drawTextCenter(col2Str(col::red) + L"CHUNK", dst.x + dst.w / 2, dst.y + dst.h / 2-12);
+
+				int cx, cy;
+				World::ins()->changeToChunkCoord(tgtX, tgtY, cx, cy);
+				std::wstring chunkName = L"";
+				chunkName += std::to_wstring(cx);
+				chunkName += L",";
+				chunkName += std::to_wstring(cy);
+				chunkName += L",";
+				chunkName += std::to_wstring(Player::ins()->getGridZ());
+				drawTextCenter(col2Str(col::red) + chunkName, dst.x + dst.w/2, dst.y + dst.h/2+12);
+			}
+
+		}
+	}
 	return getNanoTimer() - timeStampStart;
 }

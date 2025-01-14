@@ -15,6 +15,8 @@ export namespace texture
 
 export namespace spr
 {
+	std::unordered_map<std::wstring, Sprite*> spriteMapper;
+
 	Sprite* charsetHero = nullptr;
 	Sprite* zombie1 = nullptr;
 	Sprite* arabianHorse = nullptr;
@@ -85,80 +87,57 @@ export namespace spr
 	Sprite* vehicleTemplate = nullptr;
 	Sprite* vehicleCenterCursor = nullptr;
 	Sprite* lstSelectBox = nullptr;
-
 	Sprite* alchemyArrow = nullptr;
 	Sprite* alchemyPicture = nullptr;
 	Sprite* alchemyStart = nullptr;
 	Sprite* alchemyMaterialEdge = nullptr;
-
 	Sprite* skinYellow = nullptr;
 	Sprite* eyesBlue = nullptr;
 	Sprite* eyesRed = nullptr;
 	Sprite* beardMustacheBlack = nullptr;
-
 	Sprite* hairCommaBlack = nullptr;
 	Sprite* hairBob1Black = nullptr;
 	Sprite* hairPonytailBlack = nullptr;
 	Sprite* hairMiddlePart = nullptr;
-
 	Sprite* shadow = nullptr;
-
 	Sprite* vehicleHUD = nullptr;
 	Sprite* vehicleHUDParts = nullptr;
 	Sprite* vehicleHUDSteeringWheel = nullptr;
 	Sprite* vehicleActCursor = nullptr;
-
 	Sprite* dirMarker = nullptr;
 	Sprite* craftEdge = nullptr;
-
 	Sprite* craftSelectWindow = nullptr;
 	Sprite* windowArrow2 = nullptr;
 	Sprite* mapHereMarker = nullptr;
-
 	Sprite* screenRain = nullptr;
 	Sprite* screenSnow = nullptr;
-
 	Sprite* symbolSunny = nullptr;
 	Sprite* symbolCloudy = nullptr;
 	Sprite* symbolMoon = nullptr;
 	Sprite* symbolRain = nullptr;
 	Sprite* symbolStorm = nullptr;
 	Sprite* symbolSnow = nullptr;
-
 	Sprite* tailPedalL = nullptr;
 	Sprite* tailPedalR = nullptr;
 	Sprite* trainBrake = nullptr;
 	Sprite* mainRotor = nullptr;
-
-	std::unordered_map<std::wstring, Sprite*> spriteMapper;
-
 	Sprite* singleQuickSlot = nullptr;
 	Sprite* topQuickSlotBtn = nullptr;
 	Sprite* skillSet = nullptr;
-
 	Sprite* fireStorm = nullptr;
 	Sprite* flameSet = nullptr;
-
 	Sprite* gasEffect1 = nullptr;
 	Sprite* steamEffect1 = nullptr;
-	
 	Sprite* inventoryItemRect = nullptr;
-
 	Sprite* trail = nullptr;
-
 	Sprite* statusEffectRect = nullptr;
 	Sprite* statusIcon = nullptr;
 	Sprite* hpBlankGauge = nullptr;
-
 	Sprite* minimapEdge = nullptr;
 	Sprite* bulletset = nullptr;
-
 	Sprite* aimMarkerWhite = nullptr;
-
 	Sprite* hornCoverRed = nullptr;
-
 	Sprite* mapMagnifyIcon = nullptr;
-	
 	Sprite* staminaGaugeCircle = nullptr;
 
 

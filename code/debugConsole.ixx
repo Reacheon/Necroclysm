@@ -48,6 +48,8 @@ export void debugConsole()
 	prt(L"22. 말 생성\n");
 	prt(L"23. 상태이상 추가\n");
 	prt(L"24. 플레이어 텔레포트\n");
+	prt(L"25. 청크 라인 표시\n");
+	prt(L"26. 청크 덮어쓰기\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -371,8 +373,44 @@ export void debugConsole()
 		World::ins()->getTile(px, py, pz).EntityPtr = nullptr;
 		Player::ins()->setGrid(tgtGridX, tgtGridY, tgtGridZ);
 		World::ins()->getTile(tgtGridX, tgtGridY, tgtGridZ).EntityPtr = (Entity*)Player::ins();
+		break;
 	}
+	case 25://청크라인 그리기
+	{
+		if(debug::chunkLineDraw ==false) debug::chunkLineDraw = true;
+		else  debug::chunkLineDraw = false;
+		break;
+	}
+	case 26://청크 덮어쓰기
+	{
+		int chunkX = 0;
+		int chunkY = 0;
+		int chunkZ = 0;
+		int chunkInput = 0;
 
+		prt(L"chunkX를 입력해주세요.\n");
+		std::cin >> chunkX;
+
+		prt(L"chunkY를 입력해주세요.\n");
+		std::cin >> chunkY;
+
+		prt(L"chunkZ를 입력해주세요.\n");
+		std::cin >> chunkZ;
+
+
+		prt(L"바꿀 청크를 입력해주세요.\n");
+		prt(L"1.바다\n");
+		prt(L"2.흙\n");
+		prt(L"3.도로\n");
+		prt(L"4.편의점\n");
+		prt(L"5.아파트\n");
+		std::cin >> chunkInput;
+
+		if (chunkInput == 1) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::seawater);
+		if (chunkInput == 2) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::dirt);
+
+		break;
+	}
 
 
 	}

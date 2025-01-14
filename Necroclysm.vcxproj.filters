@@ -510,9 +510,6 @@
     <ClCompile Include="code\stringToWstring.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\AimOld.ixx">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
