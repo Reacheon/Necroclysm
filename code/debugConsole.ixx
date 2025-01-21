@@ -1,3 +1,5 @@
+#include <sol/sol.hpp>
+
 export module debugConsole;
 
 import util;
@@ -50,6 +52,7 @@ export void debugConsole()
 	prt(L"24. 플레이어 텔레포트\n");
 	prt(L"25. 청크 라인 표시\n");
 	prt(L"26. 청크 덮어쓰기\n");
+	prt(L"27. Lua 스크립트 실행\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -409,6 +412,18 @@ export void debugConsole()
 		if (chunkInput == 1) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::seawater);
 		if (chunkInput == 2) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::dirt);
 
+		break;
+	}
+	case 27://Lua 스크립트 실행
+	{
+		lua["cppValue"] = 10;
+		sol::protected_function_result result = lua.script_file("exampleScript.lua");
+		if (result.valid()) std::wprintf(L"루아스크립트가 성공적으로 실행되었다.\n");
+		else
+		{
+			sol::error err = result;
+			std::wcerr << "Error: " << err.what() << std::endl;
+		}
 		break;
 	}
 

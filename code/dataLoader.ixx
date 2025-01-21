@@ -1,4 +1,6 @@
-﻿export module dataLoader;
+﻿#include <sol/sol.hpp>
+
+export module dataLoader;
 
 import std;
 import util;
@@ -10,6 +12,9 @@ import readSkillDex;
 
 export void dataLoader()
 {
+	//루아스크립트 로드
+	lua.open_libraries(sol::lib::base);
+
 	//아이템 데이터 로드
 	std::wstring itemPath = L"language/" + option::language + L"/itemDex.tsv";
 	readItemDex(itemPath.c_str());

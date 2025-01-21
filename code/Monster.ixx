@@ -1,4 +1,6 @@
-﻿export module Monster;
+﻿#include <sol/sol.hpp>
+
+export module Monster;
 
 import std;
 import Entity;
@@ -68,6 +70,9 @@ public:
 				clearTimeResource();
 				addTimeResource(2.0);
 			}
+
+
+
 
 			if (getTimeResource() >= 1.2 && entityInfo.entityCode != 5 && entityInfo.relation == relationFlag::hostile)//플레이어에게 직선 경로로 이동
 			{

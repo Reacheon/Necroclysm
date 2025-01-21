@@ -1,4 +1,5 @@
 #define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
+#include <sol/sol.hpp>
 
 export module startArea;
 

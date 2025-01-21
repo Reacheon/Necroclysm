@@ -243,7 +243,6 @@
     <ClCompile Include="code\Map.ixx" />
     <ClCompile Include="code\Mapmaker.ixx" />
     <ClCompile Include="code\Msg.ixx" />
-    <ClCompile Include="code\Raindrop.ixx" />
     <ClCompile Include="code\readSkillDex.ixx" />
     <ClCompile Include="code\renderFPS.ixx" />
     <ClCompile Include="code\renderSticker.ixx" />

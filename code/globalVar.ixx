@@ -1,5 +1,7 @@
 ﻿#include <SDL.h>
 #include <SDL_ttf.h>
+#include <sol/sol.hpp>
+
 
 #define 낮 { 0xFF,0xF8,0xED }
 #define 황혼 { 0x79,0x87,0xff}
@@ -56,6 +58,7 @@ export namespace timer
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
 export SDL_GameController* controller; //메인컨트롤러
+export sol::state lua; //루아스크립트
 
 export turn turnCycle = turn::playerInput;//0:플레이어 입력_1:플레이어 애니메이션 재생_2:모든 엔티티 AI 작동(하나라도 false 반환시 3으로, 없으면 0으로)_3:엔티티 애니메이션 재생
 export bool quit = false;// true일 경우 게임을 종료시킴
