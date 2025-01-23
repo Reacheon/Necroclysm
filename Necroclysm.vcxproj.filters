@@ -513,5 +513,8 @@
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
+    <ClCompile Include="code\scriptLoader.ixx">
+      <Filter>소스 파일\01_system\05_Loader</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

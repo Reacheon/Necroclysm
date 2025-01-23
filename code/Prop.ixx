@@ -25,7 +25,7 @@ export class Prop : public Ani, public AI, public Coord, public Drawable
 {
 public:
     ItemData leadItem;
-    float timeResource = 0;
+    float turnResource = 0;
     Light* myLight = nullptr;
 
     Prop(int inputX, int inputY, int inputZ, int leadItemCode)
@@ -243,11 +243,11 @@ public:
         while (1)
         {
 
-            //prt(L"[Prop:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
-            if (getTimeResource() >= 2.0)
+            //prt(L"[Prop:AI] ID : %p의 turnResource는 %f입니다.\n", this, getTurnResource());
+            if (getTurnResource() >= 2.0)
             {
-                clearTimeResource();
-                addTimeResource(2.0);
+                clearTurnResource();
+                addTurnResource(2.0);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -247,6 +247,7 @@
     <ClCompile Include="code\renderFPS.ixx" />
     <ClCompile Include="code\renderSticker.ixx" />
     <ClCompile Include="code\renderWeather.ixx" />
+    <ClCompile Include="code\scriptLoader.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\stringToWstring.ixx" />

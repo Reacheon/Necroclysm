@@ -347,9 +347,9 @@ __int64 animationTurn()
 			addTimeTurn(timeGift);
 			for (auto ePtr : entityList)
 			{
-				if (ePtr != (Player::ins())) ((Monster*)ePtr)->addTimeResource(timeGift);
+				if (ePtr != (Player::ins())) ((Monster*)ePtr)->addTurnResource(timeGift);
 			}
-			for (auto vPtr : vehList) vPtr->addTimeResource(timeGift);
+			for (auto vPtr : vehList) vPtr->addTurnResource(timeGift);
 			timeGift = 0;
 			turnCycle = turn::monsterAI;
 		}

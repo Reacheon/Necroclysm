@@ -503,11 +503,11 @@ bool Vehicle::runAI()
     while (1)
     {
 
-        //prt(L"[Vehicle:AI] ID : %p의 timeResource는 %f입니다.\n", this, getTimeResource());
-        if (getTimeResource() > 2.0)
+        //prt(L"[Vehicle:AI] ID : %p의 turnResource는 %f입니다.\n", this, getTurnResource());
+        if (getTurnResource() > 2.0)
         {
-            clearTimeResource();
-            addTimeResource(2.0);
+            clearTurnResource();
+            addTurnResource(2.0);
         }
 
         if (isVehicle)
@@ -811,9 +811,9 @@ bool Vehicle::runAI()
                 return false;
             }
 
-            if (getTimeResource() >= 1.0)
+            if (getTurnResource() >= 1.0)
             {
-                useTimeResource(1.0);
+                useTurnResource(1.0);
                 if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0) || (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
                 {
                     if (vehType == vehFlag::car || vehType == vehFlag::heli)

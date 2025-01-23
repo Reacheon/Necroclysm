@@ -12,6 +12,7 @@ import displayLoader;
 import fontLoader;
 import textureLoader;
 import dataLoader;
+import scriptLoader;
 import textureVar;
 import renderUI;
 import renderTile;
@@ -50,6 +51,8 @@ int main(int argc, char** argv)
 	initNanoTimer();
 	initCoordTransform();
 	startArea();//스타트 세팅
+
+	scriptLoader();
 
 	//int currentWidth, currentHeight;
 	//SDL_GetWindowSize(window, &currentWidth, &currentHeight); // 현재 윈도우 크기를 가져옵니다.

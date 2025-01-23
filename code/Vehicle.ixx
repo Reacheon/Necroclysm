@@ -37,7 +37,7 @@ public:
     Vec3 spdVec = getZeroVec();
     Vec3 accVec = getZeroVec();
     bool turnOnBrake = false;
-    float timeResource = 0;
+    float turnResource = 0;
     gearFlag gearState = gearFlag::drive;
     float xAcc = 0;
     float yAcc = 0;
