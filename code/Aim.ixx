@@ -46,7 +46,7 @@ public:
 
 		auto pEquip = Player::ins()->getEquipPtr();
 		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
-		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_BOW);
+		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
 
 		
 

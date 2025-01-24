@@ -341,8 +341,11 @@ void Entity::move(int dir, bool jump)
 		setDstGrid(dstGridX, dstGridY);
 		setGrid(dstGridX, dstGridY, getGridZ());
 
-		pulledCart->setDstGrid(getGridX(), getGridY());
-		pulledCart->setGrid(getGridX(), getGridY(),getGridZ());
+		if (pulledCart != nullptr)
+		{
+			pulledCart->setDstGrid(getGridX(), getGridY());
+			pulledCart->setGrid(getGridX(), getGridY(), getGridZ());
+		}
 	}
 }
 void Entity::attack(int gridX, int gridY)

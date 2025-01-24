@@ -44,6 +44,7 @@ import ContextMenu;
 import mouseGrid;
 import ItemPocket;
 import ItemStack;
+import Dialogue;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -809,6 +810,11 @@ public:
 					{
 						new God(godFlag::ra);
 					}
+				}
+				else if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).EntityPtr != nullptr && ((Entity*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).EntityPtr))->entityInfo.relation == relationFlag::friendly)
+				{
+					new Dialogue();
+
 				}
 				else
 				{

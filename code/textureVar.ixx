@@ -139,6 +139,5 @@ export namespace spr
 	Sprite* hornCoverRed = nullptr;
 	Sprite* mapMagnifyIcon = nullptr;
 	Sprite* staminaGaugeCircle = nullptr;
-
-
+	Sprite* speechBubble = nullptr;
 }

@@ -177,6 +177,7 @@
     <ClCompile Include="code\CoordSelectCraft.ixx" />
     <ClCompile Include="code\Craft.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
+    <ClCompile Include="code\Dialogue.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
@@ -186,6 +187,7 @@
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
     <ClCompile Include="code\Equip_input_mouse.ixx" />
     <ClCompile Include="code\Flame.ixx" />
+    <ClCompile Include="code\funcVar.ixx" />
     <ClCompile Include="code\gamepadBtnDown.ixx" />
     <ClCompile Include="code\gamepadBtnMotion.ixx" />
     <ClCompile Include="code\gamepadBtnUp.ixx" />
