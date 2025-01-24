@@ -9,6 +9,7 @@ import util;
 import GUI;
 import errorBox;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import drawText;
@@ -69,11 +70,11 @@ private:
 	bool dpadDownPressed = false;
 	bool dpadLeftPressed = false;
 	bool dpadRightPressed = false;
-	
+
 	int barActCursorMoveDelay = 0;
 	int rStickPressDelay = 0;
 	int quickSlotCursor = -1;
-	
+
 	int fakeSTA = 0;
 	int alphaSTA = 255;
 
@@ -538,7 +539,7 @@ public:
 				int vx = myCar->getGridX();
 				int vy = myCar->getGridY();
 				int vz = myCar->getGridZ();
-				Prop* tgtProp = (Prop*)World::ins()->getTile(vx, vy, vz).PropPtr;
+				Prop* tgtProp = TileProp(vx, vy, vz);
 				if (tgtProp != nullptr)
 				{
 					if (myCar->gearState == gearFlag::drive)//주행기어
@@ -614,7 +615,7 @@ public:
 		}
 		case act::closeDoor:
 		{
-			CORO(closeDoor(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()));
+			CORO(closeDoor(PlayerX(), PlayerY(), PlayerZ()));
 			break;
 		}
 		default:
@@ -631,18 +632,18 @@ public:
 		if (ctrlVeh == nullptr)//차량 조종 중이 아닐 경우
 		{
 			//화면에 있는 아이템 터치
-			if (touchX == Player::ins()->getGridX() && touchY == Player::ins()->getGridY())
+			if (touchX == PlayerX() && touchY == PlayerY())
 			{
-				if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).ItemStackPtr != nullptr)
+				if (World::ins()->getTile(touchX, touchY, PlayerZ()).ItemStackPtr != nullptr)
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
-					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).ItemStackPtr;
+					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).ItemStackPtr;
 					new Loot(targetStack);
 					click = false;
 				}
-				else if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+				else if (World::ins()->getTile(touchX, touchY, PlayerZ()).VehiclePtr != nullptr)
 				{
-					Vehicle* belowVehicle = (Vehicle*)World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).VehiclePtr;
+					Vehicle* belowVehicle = (Vehicle*)World::ins()->getTile(touchX, touchY, PlayerZ()).VehiclePtr;
 					bool findController = false;
 					prt(L"below prop의 사이즈는 %d이다.\n", belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size());
 					for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size(); i++)
@@ -696,62 +697,62 @@ public:
 				}
 				else
 				{
-					if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr != nullptr)
+					if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
 					{
-						Prop* tgtProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+						Prop* tgtProp = TileProp(touchX, touchY, PlayerZ());
 						int tgtItemCode = tgtProp->leadItem.itemCode;
 						if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
 						{
-							if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).floor == 0)
+							if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 							{
 								updateLog(L"#FFFFFF이 계단의 위층에 바닥이 존재하지 않는다.");
 							}
 							else
 							{
 								updateLog(L"#FFFFFF계단을 올라갔다.");
-								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
-								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1);
-								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
+								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
+								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
+								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
 								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
-								Prop* upProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+								Prop* upProp = TileProp(touchX, touchY, PlayerZ());
 								if (upProp == nullptr)
 								{
-									new Prop(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 299);//하강계단
+									new Prop(PlayerX(), PlayerY(), PlayerZ(), 299);//하강계단
 								}
 							}
 						}
 						else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
 						{
-							if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).wall != 0)
+							if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != 0)
 							{
 								updateLog(L"#FFFFFF내려가는 계단이 벽으로 막혀있다.");
 							}
 							else
 							{
 								updateLog(L"#FFFFFF계단을 내려갔다.");
-								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = nullptr;
-								Player::ins()->setGrid(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() - 1);
-								(World::ins())->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()).EntityPtr = Player::ins();
+								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
+								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
+								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
 								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
-								Prop* downProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+								Prop* downProp = TileProp(touchX, touchY, PlayerZ());
 								if (downProp == nullptr)
 								{
-									new Prop(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 298);//상승계단
+									new Prop(PlayerX(), PlayerY(), PlayerZ(), 298);//상승계단
 								}
 							}
 						}
 					}
 				}
 			}
-			else if ((std::abs(touchX - Player::ins()->getGridX()) <= 1 && std::abs(touchY - Player::ins()->getGridY()) <= 1) && World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).walkable == false)//1칸 이내
+			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && World::ins()->getTile(touchX, touchY, PlayerZ()).walkable == false)//1칸 이내
 			{
-				if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr != nullptr)
+				if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
 				{
-					Prop* tgtProp = ((Prop*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).PropPtr));
+					Prop* tgtProp = TileProp(touchX, touchY, PlayerZ());
 					int tgtItemCode = tgtProp->leadItem.itemCode;
 					if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
 					{
@@ -772,12 +773,12 @@ public:
 
 							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-							updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
+							updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
 					{
-						if (World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ() + 1).floor == 0)
+						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 						{
 							updateLog(L"#FFFFFF이 계단의 위층에 바닥이 존재하지 않는다.");
 						}
@@ -811,14 +812,14 @@ public:
 						new God(godFlag::ra);
 					}
 				}
-				else if (World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).EntityPtr != nullptr && ((Entity*)(World::ins()->getTile(touchX, touchY, Player::ins()->getGridZ()).EntityPtr))->entityInfo.relation == relationFlag::friendly)
+				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && ((Entity*)(World::ins()->getTile(touchX, touchY, PlayerZ()).EntityPtr))->entityInfo.relation == relationFlag::friendly)
 				{
 					new Dialogue();
 
 				}
 				else
 				{
-					Player::ins()->startMove(coord2Dir(touchX - Player::ins()->getGridX(), touchY - Player::ins()->getGridY()));
+					Player::ins()->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 				}
 			}
 			else
@@ -828,7 +829,7 @@ public:
 		}
 		else//차량을 조종하는 상태일 경우
 		{
-			if (touchX == Player::ins()->getGridX() && touchY == Player::ins()->getGridY())
+			if (touchX == PlayerX() && touchY == PlayerY())
 			{
 				ctrlVeh = nullptr;
 				barAct = actSet::null;
@@ -844,9 +845,9 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(dir, dx, dy);
-			if (World::ins()->getTile(cx + dx, cy + dy, cz).PropPtr != nullptr)
+			if (TileProp(cx + dx, cy + dy, cz) != nullptr)
 			{
-				Prop* instlPtr = (Prop*)World::ins()->getTile(cx + dx, cy + dy, cz).PropPtr;
+				Prop* instlPtr = TileProp(cx + dx, cy + dy, cz);
 				if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
 				{
 					doorNumber++;
@@ -857,7 +858,7 @@ public:
 
 		auto closeDoorCoord = [=](int inputX, int inputY, int inputZ)
 			{
-				Prop* tgtProp = (Prop*)World::ins()->getTile(inputX, inputY, inputZ).PropPtr;
+				Prop* tgtProp = TileProp(inputX, inputY, inputZ);
 				tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
 				tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
 
@@ -872,7 +873,7 @@ public:
 				tgtProp->leadItem.extraSprIndexSingle--;
 				tgtProp->updateTile();
 				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-				updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
+				updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 			};
 
 		if (doorNumber == 1)
@@ -891,7 +892,7 @@ public:
 			targetStr.erase(0, targetStr.find(L",") + 1);
 
 
-			Prop* tgtProp = (Prop*)World::ins()->getTile(targetX, targetY, cz).PropPtr;
+			Prop* tgtProp = TileProp(targetX, targetY, cz);
 			tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
 			tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
 
@@ -900,7 +901,7 @@ public:
 			tgtProp->leadItem.extraSprIndexSingle--;
 			tgtProp->updateTile();
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-			updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
+			updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 		}
 	};
 
@@ -923,9 +924,9 @@ public:
 			{
 				for (int tgtX = -SKILL_MAX_RANGE; tgtX <= SKILL_MAX_RANGE; tgtX++)
 				{
-					if (World::ins()->getTile(Player::ins()->getGridX() + tgtX, Player::ins()->getGridY() + tgtY, Player::ins()->getGridZ()).fov == fovFlag::white)
+					if (World::ins()->getTile(PlayerX() + tgtX, PlayerY() + tgtY, PlayerZ()).fov == fovFlag::white)
 					{
-						coordList.push_back({ Player::ins()->getGridX() + tgtX, Player::ins()->getGridY() + tgtY });
+						coordList.push_back({ PlayerX() + tgtX, PlayerY() + tgtY });
 
 					}
 				}
@@ -971,9 +972,9 @@ public:
 		for (int dir = 0; dir < 8; dir++)
 		{
 			dir2Coord(dir, dx, dy);
-			if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).EntityPtr != nullptr)
+			if (TileEntity(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
 			{
-				Player::ins()->startAtk(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ());
+				Player::ins()->startAtk(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				turnWait(1.0);
 				break;
 			}
@@ -984,9 +985,9 @@ public:
 	{
 		std::vector<act> inputOptions;
 		//문닫기 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).PropPtr != nullptr)
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
-			Prop* instlPtr = (Prop*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).PropPtr;
+			Prop* instlPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
 			if (instlPtr->leadItem.checkFlag(itemFlag::DOOR_OPEN))
 			{
 				inputOptions.push_back(act::closeDoor);
@@ -994,9 +995,9 @@ public:
 		}
 
 		//열기 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
 
 			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
 			{
@@ -1009,7 +1010,7 @@ public:
 		}
 
 		//당기기 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
 		{
 			inputOptions.push_back(act::pull);
 		}
@@ -1030,19 +1031,19 @@ public:
 		}
 
 		//수영하기 추가
-		if (itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+		if (itemDex[TileFloor(targetGrid.x, targetGrid.y, PlayerZ())].checkFlag(itemFlag::WATER_DEEP))
 		{
 			inputOptions.push_back(act::swim);
 		}
 
 		//등반 추가
-		if (itemDex[World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).wall].checkFlag(itemFlag::CAN_CLIMB))
+		if (itemDex[TileWall(targetGrid.x, targetGrid.y, PlayerZ())].checkFlag(itemFlag::CAN_CLIMB))
 		{
 			inputOptions.push_back(act::climb);
 		}
 
 		//승마 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr != nullptr)
+		if (TileEntity(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			inputOptions.push_back(act::ride);
 		}

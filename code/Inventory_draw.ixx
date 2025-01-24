@@ -2,6 +2,7 @@ export module Inventory_draw;
 
 import Inventory;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import util;

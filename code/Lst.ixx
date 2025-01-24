@@ -7,6 +7,7 @@ import std;
 import util;
 import GUI;
 import globalVar;
+import wrapVar;
 import drawText;
 import checkCursor;
 import drawSprite;

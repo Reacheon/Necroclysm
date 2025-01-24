@@ -6,6 +6,7 @@ import util;
 import Entity;
 import World;
 import globalVar;
+import wrapVar;
 import textureVar;
 import constVar;
 import log;
@@ -107,7 +108,7 @@ void Player::startMove(int inputDir)
 		else
 		{
 			player->setDirection(inputDir);
-			if (World::ins()->getTile(player->getGridX() + dx, player->getGridY() + dy, player->getGridZ()).EntityPtr != nullptr)
+			if (TileEntity(player->getGridX() + dx, player->getGridY() + dy, player->getGridZ()) != nullptr)
 			{
 				player->startAtk(player->getGridX() + dx, player->getGridY() + dy, player->getGridZ());
 				turnWait(1.0);
@@ -323,11 +324,11 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 	}
 
 
-	if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW))
+	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 	{
 		entityInfo.walkMode = walkFlag::wade;
 	}
-	else if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+	else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 	{
 		entityInfo.walkMode = walkFlag::swim;
 	}

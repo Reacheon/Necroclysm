@@ -11,6 +11,7 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import wrapVar;
 import constVar;
 import checkCursor;
 import drawItemSlot;
@@ -1391,7 +1392,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).VehiclePtr == nullptr) selectableTile.push_back({ Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy });
+						if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).VehiclePtr == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 					}
 
 					if (selectableTile.size() > 0)
@@ -1425,12 +1426,12 @@ public:
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
 						//차량부품이므로 이미 있는 프레임 위에 건설되어야 함
-						Vehicle* targetVehicle = (Vehicle*)(World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).VehiclePtr);
+						Vehicle* targetVehicle = (Vehicle*)(World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).VehiclePtr);
 						if (targetVehicle != nullptr)
 						{
-							if (targetVehicle->hasFrame(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy))
+							if (targetVehicle->hasFrame(PlayerX() + dx, PlayerY() + dy))
 							{
-								selectableTile.push_back({ Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy });
+								selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 							}
 						}
 					}
@@ -1466,7 +1467,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).PropPtr == nullptr) selectableTile.push_back({ Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy });
+						if (TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 					}
 
 					if (selectableTile.size() > 0)
@@ -1483,7 +1484,7 @@ public:
 						targetStr.erase(0, targetStr.find(L",") + 1);
 						targetItemCode = wtoi(targetStr.c_str());
 
-						buildLocation = { targetX,targetY,Player::ins()->getGridZ() };
+						buildLocation = { targetX,targetY,PlayerZ() };
 
 					}
 					else
@@ -1516,9 +1517,9 @@ public:
 			}
 			else if (existCraftDataStructure())
 			{
-				int dx = abs(Player::ins()->getGridX() - buildLocation[0]);
-				int dy = abs(Player::ins()->getGridY() - buildLocation[1]);
-				int dz = abs(Player::ins()->getGridZ() - buildLocation[2]);
+				int dx = abs(PlayerX() - buildLocation[0]);
+				int dy = abs(PlayerY() - buildLocation[1]);
+				int dz = abs(PlayerZ() - buildLocation[2]);
 
 				if (dx <= 1 && dy <= 1 && dz == 0)
 				{
@@ -1570,13 +1571,13 @@ public:
 			prt(L"Craft While 루프 실행됨\n");
 			if (negateMonster == false)
 			{
-				for (int x = Player::ins()->getGridX() - 1; x <= Player::ins()->getGridX() + 1; x++)
+				for (int x = PlayerX() - 1; x <= PlayerX() + 1; x++)
 				{
-					for (int y = Player::ins()->getGridY() - 1; y <= Player::ins()->getGridY() + 1; y++)
+					for (int y = PlayerY() - 1; y <= PlayerY() + 1; y++)
 					{
-						if (!(x == Player::ins()->getGridX() && y == Player::ins()->getGridY()))
-							if (World::ins()->getTile(x, y, Player::ins()->getGridZ()).fov == fovFlag::white)
-								if (World::ins()->getTile(x, y, Player::ins()->getGridZ()).EntityPtr != nullptr)
+						if (!(x == PlayerX() && y == PlayerY()))
+							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
+								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									new Msg(msgFlag::normal, L"경고", L"주변에 적이 있습니다. 계속 조합하시겠습니까?", { L"네",L"아니오",L"무시하기" });
 									deactColorChange = true;
@@ -1695,7 +1696,7 @@ public:
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))
 			{
-				errorBox(World::ins()->getTile(buildLocation[0], buildLocation[1], buildLocation[2]).PropPtr != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
+				errorBox(TileProp(buildLocation[0], buildLocation[1], buildLocation[2]) != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
 				new Prop(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
 			}
 		}

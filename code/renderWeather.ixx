@@ -5,6 +5,7 @@ export module renderWeather;
 
 import util;
 import globalVar;
+import wrapVar;
 import constVar;
 import World;
 import Player;
@@ -16,8 +17,8 @@ export __int64 renderWeather()
 	__int64 timeStampStart = getNanoTimer();
 
 	int cx, cy;
-	int pz = Player::ins()->getGridZ();
-	World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
+	int pz = PlayerZ();
+	World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 	if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::rain)
 	{
 		//static int index = 0;

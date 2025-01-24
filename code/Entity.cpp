@@ -4,6 +4,7 @@
 import Entity;
 import std;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import log;
@@ -350,7 +351,7 @@ void Entity::move(int dir, bool jump)
 }
 void Entity::attack(int gridX, int gridY)
 {
-	Entity* victimEntity = (Entity*)World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr;
+	Entity* victimEntity = TileEntity(gridX, gridY, getGridZ());
 	if (victimEntity == nullptr)
 	{
 		prt(L"[디버그] 공격이 빗나갔다.\n");
@@ -379,7 +380,7 @@ void Entity::updateWalkable(int gridX, int gridY)//만약 다를 경우 개체에서 오버�
 
 	if (World::ins()->getTile(gridX, gridY, getGridZ()).walkable == true)
 	{
-		if (World::ins()->getTile(gridX, gridY, getGridZ()).EntityPtr != nullptr)
+		if (TileEntity(gridX, gridY, getGridZ()) != nullptr)
 		{
 			World::ins()->getTile(gridX, gridY, getGridZ()).walkable = false;
 		}
@@ -938,9 +939,8 @@ void Entity::drawSelf()
 	int drawingY = originY + zoomScale * (offsetY);
 
 
-
 	//캐릭터 그림자 그리기
-	if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW) == false && itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP) == false)
+	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW) == false && itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP) == false)
 	{
 		if (ridingEntity == nullptr)
 		{
@@ -959,7 +959,7 @@ void Entity::drawSelf()
 	{
 		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 
-		if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_SHALLOW))
+		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 		{
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, {0,0,48,24});
 			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
@@ -967,7 +967,7 @@ void Entity::drawSelf()
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
 			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
-		else if (itemDex[World::ins()->getTile(getGridX(), getGridY(), getGridZ()).floor].checkFlag(itemFlag::WATER_DEEP))
+		else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 		{
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
 			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 80); //텍스쳐 투명도 설정

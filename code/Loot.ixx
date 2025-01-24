@@ -7,6 +7,7 @@ export module Loot;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import constVar;
 import drawWindowArrow;
 import ItemPocket;
@@ -276,7 +277,7 @@ public:
 		{
 			close(aniFlag::null);
 			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
-			delete World::ins()->getTile(lootTile.x, lootTile.y, Player::ins()->getGridZ()).ItemStackPtr;
+			delete World::ins()->getTile(lootTile.x, lootTile.y, PlayerZ()).ItemStackPtr;
 			return;
 		}
 	}

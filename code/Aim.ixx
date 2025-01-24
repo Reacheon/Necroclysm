@@ -9,6 +9,7 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import wrapVar;
 import checkCursor;
 import drawWindow;
 import Player;
@@ -50,7 +51,7 @@ public:
 
 		
 
-		int pX = Player::ins()->getGridX(), pY = Player::ins()->getGridY(), pZ = Player::ins()->getGridZ();
+		int pX = PlayerX(), pY = PlayerY(), pZ = PlayerZ();
 		
 		if(Player::ins()->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
 		else  aimCoord = { pX - 1, pY, pZ };
@@ -64,13 +65,13 @@ public:
 			{
 				if (World::ins()->getTile(pX + dx, pY + dy, pZ).fov == fovFlag::white)
 				{
-					if (World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr != nullptr)
+					if (TileEntity(pX + dx, pY + dy, pZ) != nullptr)
 					{
-						if (World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr != Player::ins())
+						if (TileEntity(pX + dx, pY + dy, pZ) != Player::ins())
 						{
 							if (std::sqrt(dx * dx + dy * dy) < hiDist)
 							{
-								nearTarget = (Entity*)World::ins()->getTile(pX + dx, pY + dy, pZ).EntityPtr;
+								nearTarget = TileEntity(pX + dx, pY + dy, pZ);
 								hiDist = std::sqrt(dx * dx + dy * dy);
 							}
 						}
@@ -224,22 +225,22 @@ public:
 		aimCoord.x = tgtX;
 		aimCoord.y = tgtY;
 
-		if (World::ins()->getTile(aimCoord.x, aimCoord.y, aimCoord.z).EntityPtr != nullptr) aimAcc = randomRangeFloat(0.5, 0.8);
+		if (TileEntity(aimCoord.x, aimCoord.y, aimCoord.z) != nullptr) aimAcc = randomRangeFloat(0.5, 0.8);
 		else aimAcc = 0;
 		fakeAimAcc = aimAcc;
 		aimStack = 0;
 
-		if (aimCoord.x < Player::ins()->getGridX()) Player::ins()->setDirection(4);
-		else if (aimCoord.x > Player::ins()->getGridX()) Player::ins()->setDirection(0);
+		if (aimCoord.x < PlayerX()) Player::ins()->setDirection(4);
+		else if (aimCoord.x > PlayerX()) Player::ins()->setDirection(0);
 
 		std::vector<std::array<int, 2>> lineCoord;
-		makeLine(lineCoord, aimCoord.x - Player::ins()->getGridX(), aimCoord.y - Player::ins()->getGridY());
+		makeLine(lineCoord, aimCoord.x - PlayerX(), aimCoord.y - PlayerY());
 		aimTrailRev.clear();
 		for (int i = 0; i < lineCoord.size(); i++)
 		{
 			if (lineCoord[i][0] != 0 || lineCoord[i][1] != 0)
 			{
-				aimTrailRev.push_back({ Player::ins()->getGridX() + lineCoord[i][0],Player::ins()->getGridY() + lineCoord[i][1],Player::ins()->getGridZ() });
+				aimTrailRev.push_back({ PlayerX() + lineCoord[i][0],PlayerY() + lineCoord[i][1],PlayerZ() });
 			}
 		}
 	}
@@ -373,7 +374,7 @@ public:
 
 	void executeTab()
 	{
-		Entity* victimEntity = (Entity*)World::ins()->getTile(aimCoord.x, aimCoord.y, aimCoord.z).EntityPtr;
+		Entity* victimEntity = TileEntity(aimCoord.x, aimCoord.y, aimCoord.z);
 		int targetX = aimCoord.x;
 		int targetY = aimCoord.y;
 		int targetZ = aimCoord.z;
@@ -388,7 +389,7 @@ public:
 		//맨손 사거리 이탈
 		else if (Player::ins()->getAimWeaponIndex() == -1)
 		{
-			if (1 < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)))
+			if (1 < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)))
 			{
 				return;
 			}
@@ -403,7 +404,7 @@ public:
 		{
 			if (targetAtkType == atkType::throwing) //던지기
 			{
-				if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY)) ) { return; }
+				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)) ) { return; }
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				ItemPocket* drop = new ItemPocket(storageType::null);
@@ -424,7 +425,7 @@ public:
 				ItemData tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
 				if (getBulletNumber(tmpAimWeapon) > 0) //사격인데 총알이 없을 경우
 				{
-					if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY))) { return; }
+					if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
 				}
 				else return;
 
@@ -450,7 +451,7 @@ public:
 			}
 			else//근접공격
 			{
-				if (weaponRange < myMax(abs(Player::ins()->getGridX() - targetX), abs(Player::ins()->getGridY() - targetY))) { return; }
+				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
 
 				Player::ins()->startAtk(targetX, targetY, targetZ);
 				turnWait(1.0);

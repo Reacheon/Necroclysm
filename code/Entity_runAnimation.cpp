@@ -1,6 +1,7 @@
 import util;
 import Entity;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import turnWait;
@@ -8,6 +9,7 @@ import World;
 import Sticker;
 import Flame;
 import Player;
+
 import Bullet;
 import Aim;
 
@@ -101,7 +103,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -178,7 +180,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() >= 5)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+			Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 			if (address != nullptr)
 			{
 				Uint8 targetR, targetG, targetB, targetAlpha;
@@ -216,7 +218,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -294,7 +296,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() >= 5)
 		{
-			Entity* address = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+			Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 			if (address != nullptr)
 			{
 				Uint8 targetR, targetG, targetB, targetAlpha;
@@ -320,7 +322,7 @@ bool Entity::runAnimation(bool shutdown)
 		int dx, dy;
 		dir2Coord(entityInfo.direction, dx, dy);
 
-		Entity* ePtr = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+		Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
 		if (shutdown == true)//사망으로 인한 강제종료
@@ -443,7 +445,7 @@ bool Entity::runAnimation(bool shutdown)
 
 			if (getTimer() >= hitTimer)
 			{
-				Entity* ePtr = (Entity*)World::ins()->getTile(atkTarget.x, atkTarget.y, atkTarget.z).EntityPtr;
+				Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 				if (ePtr != nullptr)
 				{
 					Uint8 targetR, targetG, targetB, targetAlpha;

@@ -10,6 +10,7 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import wrapVar;
 import checkCursor;
 import drawWindow;
 import util;
@@ -673,7 +674,7 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(i, dx, dy);
-			if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr != nullptr)
+			if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr != nullptr)
 			{
 				rootPathPocket->itemInfo.push_back(itemDex[86]);
 				switch (i)
@@ -706,7 +707,7 @@ public:
 					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"타일(↘)";
 					break;
 				}
-				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
 				rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].pocketPtr = targetStack->getPocket();
 			}
 		}
@@ -730,9 +731,9 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(i, dx, dy);
-			if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr != nullptr)
+			if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr != nullptr)
 			{
-				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
 				ItemPocket* targetPocket = targetStack->getPocket();
 				for (int j = 0; j < targetPocket->itemInfo.size(); j++)
 				{
@@ -889,13 +890,13 @@ public:
 			if (negateMonster == false)
 			{
 				prt(L"적을 무시할까?\n");
-				for (int x = Player::ins()->getGridX() - 1; x <= Player::ins()->getGridX() + 1; x++)
+				for (int x = PlayerX() - 1; x <= PlayerX() + 1; x++)
 				{
-					for (int y = Player::ins()->getGridY() - 1; y <= Player::ins()->getGridY() + 1; y++)
+					for (int y = PlayerY() - 1; y <= PlayerY() + 1; y++)
 					{
-						if (!(x == Player::ins()->getGridX() && y == Player::ins()->getGridY()))
-							if (World::ins()->getTile(x, y, Player::ins()->getGridZ()).fov == fovFlag::white)
-								if (World::ins()->getTile(x, y, Player::ins()->getGridZ()).EntityPtr != nullptr)
+						if (!(x == PlayerX() && y == PlayerY()))
+							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
+								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									new Msg(msgFlag::normal, L"경고", L"주변에 적이 있습니다. 계속 조합하시겠습니까?", { L"네",L"아니오",L"무시하기" });
 									co_await std::suspend_always();

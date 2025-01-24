@@ -282,17 +282,17 @@ export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, an
         turnCycle = turn::monsterAnime;
     };
 
-export struct gasData
+
+export class gasData
 {
+public:
     int gasCode = 0;
     int gasVol = 0;
-
     bool operator==(const gasData& other) const
     {
         return gasCode == other.gasCode && gasVol == other.gasVol;
     }
 };
-
 //▼ 해시함수 모음
 namespace std
 {

@@ -5,6 +5,7 @@ export module turnWait;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import constVar;
 import Player;
 import World;
@@ -22,9 +23,9 @@ export void turnWait(float waitTime)
     //prt(L"[대기] %f분을 대기했다.\n", waitTime);
     const int GAS_UPDATE_RANGE = 29;
     std::unordered_map<std::array<int, 2>, std::vector<gasData>> tempGas;
-    int px = Player::ins()->getGridX();
-    int py = Player::ins()->getGridY();
-    int pz = Player::ins()->getGridZ();
+    int px = PlayerX();
+    int py = PlayerY();
+    int pz = PlayerZ();
 
     static std::unordered_map<int, double> gasStack;
 
@@ -34,7 +35,7 @@ export void turnWait(float waitTime)
         for (int tgtY = py - GAS_UPDATE_RANGE; tgtY <= py + GAS_UPDATE_RANGE; tgtY++)
         {
             TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, pz);
-            if(thisTile->gasVec.size()>0) tempGas[{tgtX, tgtY}] = thisTile->gasVec;
+            if (thisTile->gasVec.size() > 0) tempGas[{tgtX, tgtY}] = thisTile->gasVec;
             thisTile->gasVec.clear();
         }
     }
@@ -54,7 +55,7 @@ export void turnWait(float waitTime)
                 if (gasStack.find(tgtGasCode) == gasStack.end()) gasStack[tgtGasCode] = 0;
 
                 gasStack[tgtGasCode] += 18.0 / (double)itemDex[tgtGasCode].molecularWeight;
-                
+
                 if (gasStack[tgtGasCode] > 1.0)
                 {
                     gasStack[tgtGasCode] = 0;
@@ -109,7 +110,7 @@ export void turnWait(float waitTime)
             }
         }
     }
-    
+
     Player::ins()->entityInfo.STA += 2;
     if (Player::ins()->entityInfo.STA > Player::ins()->entityInfo.maxSTA) Player::ins()->entityInfo.STA = Player::ins()->entityInfo.maxSTA;
 

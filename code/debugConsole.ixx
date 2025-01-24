@@ -4,6 +4,7 @@ export module debugConsole;
 
 import util;
 import globalVar;
+import wrapVar;
 import globalTime;
 import textureVar;
 import log;
@@ -18,14 +19,14 @@ import ItemStack;
 
 export void debugConsole()
 {
-	int xp = Player::ins()->getGridX();
-	int yp = Player::ins()->getGridY();
-	int zp = Player::ins()->getGridZ();
+	int xp = PlayerX();
+	int yp = PlayerY();
+	int zp = PlayerZ();
 
 	updateLog(L"#FFFFFF디버그 테스트 기능을 실행했다.");
 	prt(L"////////////////////////////////////////\n");
 	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
-	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
+	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
 	prt(L"1.광원 생성\n");
 	prt(L"2.적 생성\n");
 	prt(L"3.테스트 로그 갱신\n");
@@ -70,7 +71,7 @@ export void debugConsole()
 		std::cin >> autoLight;
 		if (autoLight)
 		{
-			Light* light = new Light(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), 8, 255, { 0xd8,0x56,0x00 });
+			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), 8, 255, { 0xd8,0x56,0x00 });
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 		else
@@ -91,7 +92,7 @@ export void debugConsole()
 			prt(L"광원의 B값을 입력해주세요(0~255).\n");
 			std::cin >> lightColorB;
 
-			Light* light = new Light(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
+			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 		updateLog(L"#FFFFFF디버그 : 테스트 광원을 생성했다.");
@@ -115,7 +116,7 @@ export void debugConsole()
 	case 4: //테스트 아이템
 	{
 		updateLog(L"#FFFFFF디버그 : 테스트 아이템을 생성했다.");
-		ItemStack* item = new ItemStack((Player::ins())->getGridX(), (Player::ins())->getGridY(), (Player::ins())->getGridZ());
+		ItemStack* item = new ItemStack(PlayerX(), PlayerY(), PlayerZ());
 		(item->getPocket())->addItemFromDex(0, 2);
 		(item->getPocket())->addItemFromDex(1, 4);
 		prt(L"[디버그]테스트 아이템을 생성했다!\n");
@@ -152,15 +153,15 @@ export void debugConsole()
 	}
 	case 6: //entityPtr 출력
 	{
-		int xp = Player::ins()->getGridX();
-		int yp = Player::ins()->getGridY();
-		int zp = Player::ins()->getGridZ();
+		int xp = PlayerX();
+		int yp = PlayerY();
+		int zp = PlayerZ();
 		for (int y = yp - 8; y <= yp + 8; y++)
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (World::ins()->getTile(x, y, zp).EntityPtr == nullptr) prt(L"□");
-				else if (World::ins()->getTile(x, y, zp).EntityPtr == Player::ins()) prt(lowCol::yellow, L"@");
+				if (TileEntity(x, y, zp) == nullptr) prt(L"□");
+				else if (TileEntity(x, y, zp) == Player::ins()) prt(lowCol::yellow, L"@");
 				else prt(lowCol::red, L"E");
 			}
 			prt(L"\n");
@@ -316,7 +317,7 @@ export void debugConsole()
 	case 21: //날씨 변경
 	{
 		int cx, cy;
-		World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
+		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 
 		int tgtWeather;
 		prt(L" 바꿀 날씨를 선택해주세요.\n");
@@ -359,9 +360,9 @@ export void debugConsole()
 	}
 	case 24:
 	{
-		int px = Player::ins()->getGridX();
-		int py = Player::ins()->getGridY();
-		int pz = Player::ins()->getGridZ();
+		int px = PlayerX();
+		int py = PlayerY();
+		int pz = PlayerZ();
 
 		int tgtGridX, tgtGridY, tgtGridZ;
 		prt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");

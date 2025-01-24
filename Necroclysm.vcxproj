@@ -187,7 +187,6 @@
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
     <ClCompile Include="code\Equip_input_mouse.ixx" />
     <ClCompile Include="code\Flame.ixx" />
-    <ClCompile Include="code\funcVar.ixx" />
     <ClCompile Include="code\gamepadBtnDown.ixx" />
     <ClCompile Include="code\gamepadBtnMotion.ixx" />
     <ClCompile Include="code\gamepadBtnUp.ixx" />
@@ -239,6 +238,7 @@
     <ClCompile Include="code\Inventory.ixx" />
     <ClCompile Include="code\mouseGrid.ixx" />
     <ClCompile Include="code\Player.cpp" />
+    <ClCompile Include="code\Prop.cpp" />
     <ClCompile Include="code\Prop.ixx" />
     <ClCompile Include="code\lineMaker.ixx" />
     <ClCompile Include="code\Loot.ixx" />
@@ -256,7 +256,6 @@
     <ClCompile Include="code\ThreadPool.ixx" />
     <ClCompile Include="code\timeKeeper.ixx" />
     <ClCompile Include="code\TitleScreen.ixx" />
-    <ClCompile Include="code\updateBarAct.ixx" />
     <ClCompile Include="code\Vec3.ixx" />
     <ClCompile Include="code\Player.ixx" />
     <ClCompile Include="code\Monster.ixx" />
@@ -302,6 +301,7 @@
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\connectGroupExtraIndex.ixx" />
     <ClCompile Include="code\World.ixx" />
+    <ClCompile Include="code\wrapVar.ixx" />
     <ClCompile Include="code\wstring2Number.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -390,9 +390,6 @@
     <ClCompile Include="code\actFuncSet.ixx">
       <Filter>소스 파일\01_system\04_GUI\act</Filter>
     </ClCompile>
-    <ClCompile Include="code\updateBarAct.ixx">
-      <Filter>소스 파일\05_Class\06_Static</Filter>
-    </ClCompile>
     <ClCompile Include="code\Drawable.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
@@ -519,8 +516,11 @@
     <ClCompile Include="code\Dialogue.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\funcVar.ixx">
+    <ClCompile Include="code\wrapVar.ixx">
       <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Prop.cpp">
+      <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

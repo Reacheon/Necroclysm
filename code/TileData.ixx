@@ -9,6 +9,8 @@ import constVar;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
+
+
 export struct TileData //총용량 29바이트
 {
     std::vector<gasData> gasVec;

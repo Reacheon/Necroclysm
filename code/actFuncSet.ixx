@@ -5,6 +5,7 @@ export module actFuncSet;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import World;
 import ItemStack;
 import ItemPocket;
@@ -44,7 +45,7 @@ export namespace actFunc
 			{
 				int dx = 0, dy = 0;
 				dir2Coord(dir, dx, dy);
-				ItemStack* stack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				ItemStack* stack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
 				if (stack != nullptr)
 				{
 					ItemPocket* lootPtr = stack->getPocket();
@@ -124,7 +125,7 @@ export namespace actFunc
 			{
 				int dx = 0, dy = 0;
 				dir2Coord(dir, dx, dy);
-				ItemStack* stack = (ItemStack*)World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).ItemStackPtr;
+				ItemStack* stack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
 				if (stack != nullptr)
 				{
 					ItemPocket* lootPtr = stack->getPocket();
@@ -202,7 +203,7 @@ export namespace actFunc
 
 	export void closeDoor(int tgtX, int tgtY, int tgtZ)
 	{
-		Prop* tgtProp = (Prop*)World::ins()->getTile(tgtX, tgtY, tgtZ).PropPtr;
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
 		tgtProp->leadItem.eraseFlag(itemFlag::DOOR_OPEN);
 		tgtProp->leadItem.addFlag(itemFlag::DOOR_CLOSE);
 

@@ -2,6 +2,7 @@
 
 import std;
 import globalVar;
+import wrapVar;
 import textureVar;
 import Player;
 import World;

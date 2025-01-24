@@ -5,6 +5,7 @@ export module Monster;
 import std;
 import Entity;
 import globalVar;
+import wrapVar;
 import textureVar;
 import Player;
 import World;

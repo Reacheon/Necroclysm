@@ -10,6 +10,7 @@ import util;
 import Player;
 import drawText;
 import globalVar;
+import wrapVar;
 import textureVar;
 import ItemPocket;
 import checkCursor;
@@ -915,11 +916,11 @@ public:
 		targetStr.erase(0, targetStr.find(L",") + 1);
 		int targetZ = wtoi(targetStr.c_str());
 
-		Player::ins()->setDirection(getIntDegree(Player::ins()->getGridX(), Player::ins()->getGridY(), targetX, targetY));
+		Player::ins()->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
 
 		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
 
-		if (targetX == Player::ins()->getGridX() && targetY == Player::ins()->getGridY() && targetZ == Player::ins()->getGridZ())
+		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ())
 		{
 			ItemPocket* drop = new ItemPocket(storageType::null);
 			inputPocket->transferItem(drop, inputIndex, 1);

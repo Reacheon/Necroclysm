@@ -7,6 +7,7 @@ export module renderTile;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import checkCursor;
@@ -58,7 +59,7 @@ export __int64 renderTile()
 	cameraGridY = (cameraY - 8) / (16);
 	renderRangeW = 3 + (cameraW + extraCameraLength) / tileSize;
 	renderRangeH = 3 + (cameraH + extraCameraLength) / tileSize;
-	pZ = Player::ins()->getGridZ();
+	pZ = PlayerZ();
 	renderRegion = { cameraGridX - (renderRangeW / 2), cameraGridY - (renderRangeH / 2), renderRangeW, renderRangeH };
 
 	tileList.clear();
@@ -159,11 +160,11 @@ __int64 drawTiles()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
-		const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, Player::ins()->getGridZ());
-		const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, Player::ins()->getGridZ());
-		const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, Player::ins()->getGridZ());
-		const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, Player::ins()->getGridZ());
+		const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
+		const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
+		const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());
+		const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
+		const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
 
 		switch (thisTile->floor)//바닥 타일 그리기 
 		{
@@ -409,7 +410,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Prop* iPtr = (Prop*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->PropPtr;
+		Prop* iPtr = (Prop*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->PropPtr;
 		int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::PROP_BIG));
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -423,7 +424,7 @@ __int64 drawEntities()
 		int sprIndex = iPtr->leadItem.propSprIndex + iPtr->leadItem.extraSprIndexSingle + 16 * iPtr->leadItem.extraSprIndex16;
 		if (iPtr->leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
 		{
-			if (World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()).hasSnow == true) sprIndex += 5;
+			if (World::ins()->getTile(tgtX, tgtY, PlayerZ()).hasSnow == true) sprIndex += 5;
 			else
 			{
 				if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
@@ -452,7 +453,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Flame* tgtFlame = (Flame*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->flamePtr;
+		Flame* tgtFlame = (Flame*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->flamePtr;
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -512,7 +513,7 @@ __int64 drawEntities()
 	{
 		int tgtX = rotorList[i][0];
 		int tgtY = rotorList[i][1];
-		Vehicle* vPtr = (Vehicle*)(&World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ()))->VehiclePtr;
+		Vehicle* vPtr = (Vehicle*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->VehiclePtr;
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -521,7 +522,7 @@ __int64 drawEntities()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		if ((&World::ins()->getTile(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ()))->VehiclePtr == vPtr)
+		if ((&World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()))->VehiclePtr == vPtr)
 		{
 			SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 50); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
@@ -584,7 +585,7 @@ __int64 drawEntities()
 			}
 
 			//플레이어 속도 표현
-			if (tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY())
+			if (tgtX == PlayerX() && tgtY == PlayerY())
 			{
 				if (vPtr->spdVec.isZeroVec() == false)
 				{
@@ -678,7 +679,7 @@ __int64 drawFogs()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
+		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
 
 		for (int j = 0; j < thisTile->gasVec.size(); j++)
 		{
@@ -740,7 +741,7 @@ __int64 drawFogs()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, Player::ins()->getGridZ());
+		TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
 
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
 		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
@@ -832,11 +833,11 @@ __int64 drawMarkers()
 	//화이트마커 그리기
 	if (option::inputMethod == input::gamepad)
 	{
-		if (gamepadWhiteMarker.z == Player::ins()->getGridZ())
+		if (gamepadWhiteMarker.z == PlayerZ())
 		{
-			if (std::abs(gamepadWhiteMarker.x - Player::ins()->getGridX()) <= MARKER_LIMIT_DIST)
+			if (std::abs(gamepadWhiteMarker.x - PlayerX()) <= MARKER_LIMIT_DIST)
 			{
-				if (std::abs(gamepadWhiteMarker.y - Player::ins()->getGridY()) <= MARKER_LIMIT_DIST)
+				if (std::abs(gamepadWhiteMarker.y - PlayerY()) <= MARKER_LIMIT_DIST)
 				{
 					int tgtX = gamepadWhiteMarker.x;
 					int tgtY = gamepadWhiteMarker.y;
@@ -981,7 +982,7 @@ __int64 drawDebug()
 				chunkName += L",";
 				chunkName += std::to_wstring(cy);
 				chunkName += L",";
-				chunkName += std::to_wstring(Player::ins()->getGridZ());
+				chunkName += std::to_wstring(PlayerZ());
 				drawTextCenter(col2Str(col::red) + chunkName, dst.x + dst.w/2, dst.y + dst.h/2+12);
 			}
 

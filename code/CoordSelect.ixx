@@ -11,6 +11,7 @@ import World;
 import checkCursor;
 import constVar;
 import globalVar;
+import wrapVar;
 import drawSprite;
 import textureVar;
 import drawText;
@@ -91,8 +92,8 @@ public:
 			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 옐로커서로 표시
 			for (int i = 0; i < selectableCoord.size(); i++)
 			{
-				int revX = Player::ins()->getGridX() - selectableCoord[i][axis::x];
-				int revY = Player::ins()->getGridY() - selectableCoord[i][axis::y];
+				int revX = PlayerX() - selectableCoord[i][axis::x];
+				int revY = PlayerY() - selectableCoord[i][axis::y];
 
 				setZoom(zoomScale);
 				drawSpriteCenter
@@ -213,7 +214,7 @@ public:
 				//상대좌표를 절대좌표로 변환
 				int throwingX = clickTile.x;
 				int throwingY = clickTile.y;
-				int throwingZ = Player::ins()->getGridZ();
+				int throwingZ = PlayerZ();
 				std::wstring xStr = std::to_wstring(throwingX);
 				std::wstring yStr = std::to_wstring(throwingY);
 				std::wstring zStr = std::to_wstring(throwingZ);

@@ -10,6 +10,7 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import wrapVar;
 import checkCursor;
 import drawWindow;
 import Player;
@@ -99,8 +100,8 @@ public:
 
 
 			int pChunkX, pChunkY;
-			int pChunkZ = Player::ins()->getGridZ();
-			World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), pChunkX, pChunkY);
+			int pChunkZ = PlayerZ();
+			World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), pChunkX, pChunkY);
 			for (int x = 0; x < 43; x++)
 			{
 				for (int y = 0; y < 21; y++)

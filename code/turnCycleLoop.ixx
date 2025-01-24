@@ -9,6 +9,7 @@ export module turnCycleLoop;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import Entity;
 import World;
 import Player;
@@ -105,25 +106,25 @@ __int64 playerInputTurn()
 
 	if (Player::ins()->getHasAStarDst() == true) //자동이동 기능이 활성화되었을 경우
 	{
-		int dx = Player::ins()->getAStarDstX() - Player::ins()->getGridX();
-		int dy = Player::ins()->getAStarDstY() - Player::ins()->getGridY();
+		int dx = Player::ins()->getAStarDstX() - PlayerX();
+		int dy = Player::ins()->getAStarDstY() - PlayerY();
 
 		if (dx != 0 || dy != 0)
 		{
 			//주변 10칸으로 이동 가능한 타일 배열 계산
 			std::set<std::array<int, 2>> walkableTile;
-			for (int i = Player::ins()->getGridX() - 20; i <= Player::ins()->getGridX() + 20; i++)
+			for (int i = PlayerX() - 20; i <= PlayerX() + 20; i++)
 			{
-				for (int j = Player::ins()->getGridY() - 20; j <= Player::ins()->getGridY() + 20; j++)
+				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)
 				{
-					if (World::ins()->getTile(i, j, Player::ins()->getGridZ()).walkable == true) walkableTile.insert({ i,j });
+					if (World::ins()->getTile(i, j, PlayerZ()).walkable == true) walkableTile.insert({ i,j });
 					//else prt(L"(%d,%d) 타일은 이동 불가능한 타일이다.\n",i,j);
 				}
 			}
 
 			if (walkableTile.find({ Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY() }) != walkableTile.end())//목적지가 이동 가능할 경우
 			{
-				aStarTrail = aStar(walkableTile, Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
+				aStarTrail = aStar(walkableTile, PlayerX(), PlayerY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
 				if (aStarTrail.size() >= 2)
 				{
 					Player::ins()->startMove(coord2Dir(aStarTrail[1].x - aStarTrail[0].x, aStarTrail[1].y - aStarTrail[0].y));

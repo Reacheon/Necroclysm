@@ -4,6 +4,7 @@ import HUD;
 import std;
 import util;
 import globalVar;
+import wrapVar;
 import constVar;
 import Player;
 import World;
@@ -71,8 +72,8 @@ void HUD::gamepadBtnUp()
 			__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 			__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 
-			int tgtX = Player::ins()->getGridX();
-			int tgtY = Player::ins()->getGridY();
+			int tgtX = PlayerX();
+			int tgtY = PlayerY();
 
 			if (leftX > TOLERANCE_LSTICK) tgtX += 1;
 			if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
@@ -89,8 +90,8 @@ void HUD::gamepadBtnUp()
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
 
-		int tgtX = Player::ins()->getGridX();
-		int tgtY = Player::ins()->getGridY();
+		int tgtX = PlayerX();
+		int tgtY = PlayerY();
 
 		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
 		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
@@ -130,7 +131,7 @@ void HUD::gamepadStep()
 				{
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
-					if (World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).walkable == true)//1Ä­ ÀÌ³»
+					if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).walkable == true)//1Ä­ ÀÌ³»
 					{
 						cameraFix = true;
 						Player::ins()->startMove(dir);
@@ -139,7 +140,7 @@ void HUD::gamepadStep()
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						Prop* tgtProp = ((Prop*)(World::ins()->getTile(Player::ins()->getGridX() + dx, Player::ins()->getGridY() + dy, Player::ins()->getGridZ()).PropPtr));
+						Prop* tgtProp = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 						if (tgtProp != nullptr)
 						{
 							int tgtItemCode = tgtProp->leadItem.itemCode;
@@ -162,7 +163,7 @@ void HUD::gamepadStep()
 
 									tgtProp->updateTile();
 									Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-									updateNearbyBarAct(Player::ins()->getGridX(), Player::ins()->getGridY(), Player::ins()->getGridZ());
+									updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 								}
 							}
 						}
@@ -254,18 +255,18 @@ void HUD::gamepadStep()
 
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
 		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
-		int tgtX = Player::ins()->getGridX();
-		int tgtY = Player::ins()->getGridY();
+		int tgtX = PlayerX();
+		int tgtY = PlayerY();
 		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
 		if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
 		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
 		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
 
-		if (!(tgtX == Player::ins()->getGridX() && tgtY == Player::ins()->getGridY()))
+		if (!(tgtX == PlayerX() && tgtY == PlayerY()))
 		{
 			gamepadWhiteMarker.x = tgtX;
 			gamepadWhiteMarker.y = tgtY;
-			gamepadWhiteMarker.z = Player::ins()->getGridZ();
+			gamepadWhiteMarker.z = PlayerZ();
 		}
 		else gamepadWhiteMarker.z = std::numeric_limits<int>::max();
 	}

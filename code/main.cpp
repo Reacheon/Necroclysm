@@ -21,6 +21,7 @@ import renderLog;
 import renderWeather;
 import renderFPS;
 import Player;
+import wrapVar;
 import stepEvent;
 import log;
 import turnCycleLoop;

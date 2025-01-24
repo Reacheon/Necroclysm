@@ -9,6 +9,7 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import wrapVar;
 import checkCursor;
 import drawWindow;
 import actFuncSet;
@@ -214,14 +215,14 @@ public:
 				{
 					if (actOptions[i] == act::closeDoor)
 					{
-						actFunc::closeDoor(targetGrid.x, targetGrid.y, Player::ins()->getGridZ());
+						actFunc::closeDoor(targetGrid.x, targetGrid.y, PlayerZ());
 						break;
 					}
 					else if (actOptions[i] == act::unbox)
 					{
-						if (World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr != nullptr)
+						if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
 						{
-							Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+							Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
 							for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
 							{
 								if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
@@ -237,7 +238,7 @@ public:
 					{
 						if (Player::ins()->pulledCart == nullptr)
 						{
-							Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).VehiclePtr;
+							Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
 						}
 						else
 						{
@@ -247,8 +248,8 @@ public:
 					}
 					else if (actOptions[i] == act::ride)
 					{
-						Player::ins()->ridingEntity = (Entity*)(World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr);
-						World::ins()->getTile(targetGrid.x, targetGrid.y, Player::ins()->getGridZ()).EntityPtr = nullptr;
+						Player::ins()->ridingEntity = TileEntity(targetGrid.x, targetGrid.y, PlayerZ());
+						World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).EntityPtr = nullptr;
 						Player::ins()->ridingType = ridingFlag::horse;
 						break;
 					}

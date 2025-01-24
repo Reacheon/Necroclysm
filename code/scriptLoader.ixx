@@ -3,15 +3,16 @@
 export module scriptLoader;
 
 import globalVar;
+import wrapVar;
 import Player;
 import util;
 import World;
 
 export void scriptLoader()
 {
-    lua["playerX"] = []() -> int { return Player::ins()->getGridX(); };
-    lua["playerY"] = []() -> int { return Player::ins()->getGridY(); };
-    lua["playerZ"] = []() -> int { return Player::ins()->getGridZ(); };
+    lua["playerX"] = []() -> int { return PlayerX(); };
+    lua["playerY"] = []() -> int { return PlayerY(); };
+    lua["playerZ"] = []() -> int { return PlayerZ(); };
 
     lua["isWalkableTile"] = [](int x, int y, int z)->bool { return World::ins()->getTile(x, y, z).walkable; };
     lua["coord2Dir"] = [](int dx, int dy)->int { return coord2Dir(dx, dy); };

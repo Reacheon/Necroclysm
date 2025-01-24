@@ -4,6 +4,7 @@ import std;
 import util;
 import checkCursor;
 import globalVar;
+import wrapVar;
 import textureVar;
 import Player;
 import World;

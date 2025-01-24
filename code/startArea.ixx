@@ -4,6 +4,7 @@
 export module startArea;
 
 import globalVar;
+import wrapVar;
 import HUD;
 import Player;
 import ItemData;
@@ -23,19 +24,19 @@ export void startArea()
 	playerPtr->setGrid(0, 0, 0);
 	playerPtr->setDstGrid(0, 0);
 
-	playerPtr->updateWalkable(playerPtr->getGridX() + 1, playerPtr->getGridY());
-	playerPtr->updateWalkable(playerPtr->getGridX() + 1, playerPtr->getGridY() - 1);
-	playerPtr->updateWalkable(playerPtr->getGridX(), playerPtr->getGridY() - 1);
-	playerPtr->updateWalkable(playerPtr->getGridX() - 1, playerPtr->getGridY() - 1);
-	playerPtr->updateWalkable(playerPtr->getGridX() - 1, playerPtr->getGridY());
-	playerPtr->updateWalkable(playerPtr->getGridX() - 1, playerPtr->getGridY() + 1);
-	playerPtr->updateWalkable(playerPtr->getGridX(), playerPtr->getGridY() + 1);
-	playerPtr->updateWalkable(playerPtr->getGridX() + 1, playerPtr->getGridY() + 1);
+	playerPtr->updateWalkable(PlayerX() + 1, PlayerY());
+	playerPtr->updateWalkable(PlayerX() + 1, PlayerY() - 1);
+	playerPtr->updateWalkable(PlayerX(), PlayerY() - 1);
+	playerPtr->updateWalkable(PlayerX() - 1, PlayerY() - 1);
+	playerPtr->updateWalkable(PlayerX() - 1, PlayerY());
+	playerPtr->updateWalkable(PlayerX() - 1, PlayerY() + 1);
+	playerPtr->updateWalkable(PlayerX(), PlayerY() + 1);
+	playerPtr->updateWalkable(PlayerX() + 1, PlayerY() + 1);
 
 	//테스트 아이템
-	int pX = (Player::ins())->getGridX();
-	int pY = (Player::ins())->getGridY();
-	int pZ = (Player::ins())->getGridZ();
+	int pX = PlayerX();
+	int pY = PlayerY();
+	int pZ = PlayerZ();
 
 	new Monster(6, 5, 0, 0);//NPC
 
@@ -56,6 +57,8 @@ export void startArea()
 	new Monster(5, 8, 8, 0);//허수아비
 
 	new ItemStack(-1, 7, -1, { {388,1} });
+
+
 
 
 

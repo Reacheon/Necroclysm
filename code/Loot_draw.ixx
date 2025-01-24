@@ -2,6 +2,7 @@
 
 import Loot;
 import globalVar;
+import wrapVar;
 import constVar;
 import textureVar;
 import util;

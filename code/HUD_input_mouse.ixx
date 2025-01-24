@@ -8,6 +8,7 @@ import std;
 import util;
 import checkCursor;
 import globalVar;
+import wrapVar;
 import Player;
 import World;
 import Vehicle;
@@ -57,9 +58,9 @@ void HUD::clickUpGUI()
 	{
 		//플레이어의 시야에 있는 모든 객체들을 체크
 		std::array<int, 2> nearCoord = { 0,0 };//상대좌표
-		int playerX = Player::ins()->getGridX();
-		int playerY = Player::ins()->getGridY();
-		int playerZ = Player::ins()->getGridZ();
+		int playerX = PlayerX();
+		int playerY = PlayerY();
+		int playerZ = PlayerZ();
 		for (int i = playerX - DARK_VISION_HALF_W; i <= playerX + DARK_VISION_HALF_W; i++)
 		{
 			for (int j = playerY - DARK_VISION_HALF_H; j <= playerY + DARK_VISION_HALF_H; j++)
@@ -67,7 +68,7 @@ void HUD::clickUpGUI()
 				if (World::ins()->getTile(i, j, playerZ).fov == fovFlag::white)
 				{
 					//없는 타일이거나 플레이어 개체는 제외함
-					if (World::ins()->getTile(i, j, playerZ).EntityPtr != nullptr && World::ins()->getTile(i, j, playerZ).EntityPtr != Player::ins())
+					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != Player::ins())
 					{
 						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//갱신
 						{
@@ -165,7 +166,7 @@ void HUD::mouseStep()
 			//revGridY = revY / (16 * zoomScale);
 			//dtClickStack = -1;
 			//executedHold = true;
-			////advancedTileTouch(Player::ins()->getGridX() + revGridX, Player::ins()->getGridY() + revGridY);
+			////advancedTileTouch(PlayerX() + revGridX, PlayerY() + revGridY);
 		}
 	}
 }

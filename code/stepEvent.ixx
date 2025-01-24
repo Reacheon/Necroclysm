@@ -3,6 +3,7 @@
 export module stepEvent;
 
 import globalVar;
+import wrapVar;
 import constVar;
 import util;
 import Damage;
@@ -68,8 +69,8 @@ export __int64 stepEvent()
     for (int i = 0; i < GUI::getActiveGUIList().size(); i++){GUI::getActiveGUIList()[i]->step();}
 
 	int cx, cy;
-	int pz = Player::ins()->getGridZ();
-	World::ins()->changeToChunkCoord(Player::ins()->getGridX(), Player::ins()->getGridY(), cx, cy);
+	int pz = PlayerZ();
+	World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 	if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
 	{
 		int randX = randomRange(0, cameraW);
