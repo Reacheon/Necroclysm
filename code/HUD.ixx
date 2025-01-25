@@ -38,7 +38,6 @@ import Prop;
 import Map;
 import globalTime;
 import debugConsole;
-import updateBarAct;
 import CoordSelect;
 import SkillData;
 import ContextMenu;
@@ -773,7 +772,6 @@ public:
 
 							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-							updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
@@ -873,7 +871,6 @@ public:
 				tgtProp->leadItem.extraSprIndexSingle--;
 				tgtProp->updateTile();
 				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-				updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 			};
 
 		if (doorNumber == 1)
@@ -901,7 +898,6 @@ public:
 			tgtProp->leadItem.extraSprIndexSingle--;
 			tgtProp->updateTile();
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-			updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 		}
 	};
 

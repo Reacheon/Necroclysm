@@ -13,7 +13,6 @@ import log;
 import ItemData;
 import nanoTimer;
 import globalTime;
-import updateBarAct;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -307,7 +306,6 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 		if (World::ins()->isEmptySector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ()) == true) World::ins()->createSector(sectorXY[0] + dx, sectorXY[1] + dy, getGridZ());
 	}
 	updateNearbyChunk(CHUNK_LOADING_RANGE);
-	updateNearbyBarAct(inputGridX, inputGridY, inputGridZ);
 }
 
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우

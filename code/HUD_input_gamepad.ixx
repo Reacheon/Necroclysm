@@ -9,7 +9,6 @@ import constVar;
 import Player;
 import World;
 import Prop;
-import updateBarAct;
 import Aim;
 
 
@@ -163,7 +162,6 @@ void HUD::gamepadStep()
 
 									tgtProp->updateTile();
 									Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-									updateNearbyBarAct(PlayerX(), PlayerY(), PlayerZ());
 								}
 							}
 						}

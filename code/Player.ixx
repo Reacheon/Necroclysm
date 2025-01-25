@@ -13,7 +13,6 @@ import log;
 import ItemData;
 import nanoTimer;
 import globalTime;
-import updateBarAct;
 
 export class Player :public Entity //플레이어는 엔티티를 상속받고 시야에 따라 미니맵을 업데이트하는 기능을 가지고 있다.
 {
