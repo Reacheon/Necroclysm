@@ -232,24 +232,6 @@ export namespace axis
 };
 
 
-export namespace mapFlag
-{
-    constexpr int floor = 0; //바닥의 종류
-    constexpr int wall = 1; //벽의 종류
-    constexpr int base = 2; //
-    constexpr int opaque = 3; //시야를 막는 방해물 여부
-    constexpr int fov = 4; //현재 fov 상태
-    constexpr int walkable = 5; //보행 가능 여부
-
-    // ※ 광원
-    //아래 RGB값의 보색만큼 안개의 색이 빠짐 {R,G,B} = {255,0,0}일 경우
-    //{255,255,255}-{0,255,255}해서 {255,0,0}, 최댓값은 항상 255이다.
-    constexpr int light = 6;
-    constexpr int redLight = 7;
-    constexpr int greenLight = 8;
-    constexpr int blueLight = 9;
-};
-
 export enum entityIndex
 {
     test = 1,
@@ -1147,7 +1129,7 @@ export namespace chunkCol
 export namespace tileFloorFlag
 {
     int none = 0;
-    int seawater = 222;
+    int seawater = 232;
     int grass = 221;
 };
 
