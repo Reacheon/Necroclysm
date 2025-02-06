@@ -130,7 +130,7 @@ void HUD::gamepadStep()
 				{
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
-					if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).walkable == true)//1Ä­ ÀÌ³»
+					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1Ä­ ÀÌ³»
 					{
 						cameraFix = true;
 						Player::ins()->startMove(dir);
@@ -160,7 +160,6 @@ void HUD::gamepadStep()
 										tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 									}
 
-									tgtProp->updateTile();
 									Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								}
 							}

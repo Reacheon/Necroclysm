@@ -747,7 +747,7 @@ public:
 					}
 				}
 			}
-			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && World::ins()->getTile(touchX, touchY, PlayerZ()).walkable == false)//1Ä­ ÀÌ³»
+			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1Ä­ ÀÌ³»
 			{
 				if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
 				{
@@ -770,7 +770,6 @@ public:
 								tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 							}
 
-							tgtProp->updateTile();
 							Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 						}
 					}
@@ -869,7 +868,6 @@ public:
 				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 				tgtProp->leadItem.extraSprIndexSingle--;
-				tgtProp->updateTile();
 				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 			};
 
@@ -896,7 +894,6 @@ public:
 			tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 			tgtProp->leadItem.extraSprIndexSingle--;
-			tgtProp->updateTile();
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 	};

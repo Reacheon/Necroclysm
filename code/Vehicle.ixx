@@ -57,8 +57,6 @@ public:
 
     Vehicle(int inputX, int inputY, int inputZ, int leadItemCode);
     ~Vehicle();
-    void updateTile(int inputX, int inputY);
-    void updateAllTiles();
     bool hasFrame(int inputX, int inputY);
     /////////////////////////////////////////※ 기존 프레임에 부품 추가////////////////////////////////////////////////////
     void addPart(int inputX, int inputY, ItemData inputPart); //기본 부품추가 함수, 모든 함수들이 이 함수를 기본으로 들어감, 여기에 알고리즘 넣을 것

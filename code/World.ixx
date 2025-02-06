@@ -1,5 +1,4 @@
-﻿
-#include <SDL_image.h>
+﻿#include <SDL_image.h>
 
 export module World;
 

@@ -10,7 +10,6 @@ import constVar;
 //__int32 : –2,147,483,648 ~2,147,483,647
 
 
-
 export struct TileData //총용량 29바이트
 {
     std::vector<gasData> gasVec;
@@ -51,51 +50,11 @@ export struct TileData //총용량 29바이트
 
     bool hasSnow = false;
 
-    TileData()
-    {
-        randomVal = randomRange(0, 65535);
-    }
-
-
-    void update()
-    {
-        if (wall != 0)
-        {
-            walkable = false;
-            //벽 투명 설정
-            if (itemDex[wall].checkFlag(itemFlag::TRANSPARENT_WALL)) blocker = false;
-            else blocker = true;
-        }
-        else
-        {
-            walkable = true;
-            blocker = false;
-        }
-    }
-
-    void setWall(int inputIndex)
-    {
-        wall = inputIndex;
-        update();
-    }
-
-    void destoryWall()
-    {
-        wall = 0;
-        update();
-    }
-
-    void setFloor(int inputIndex)
-    {
-        floor = inputIndex;
-        update();
-    }
-
-    void setCeil(int inputIndex)
-    {
-        ceil = inputIndex;
-        update();
-    }
+    TileData() { randomVal = randomRange(0, 65535); }
+    void destoryWall() { wall = 0; }
+    void setWall(int inputIndex) { wall = inputIndex; }
+    void setFloor(int inputIndex) { floor = inputIndex; }
+    void setCeil(int inputIndex) { ceil = inputIndex; }
 
     int checkGas(int inputCode)
     {

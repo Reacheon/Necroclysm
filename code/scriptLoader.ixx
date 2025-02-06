@@ -14,7 +14,7 @@ export void scriptLoader()
     lua["playerY"] = []() -> int { return PlayerY(); };
     lua["playerZ"] = []() -> int { return PlayerZ(); };
 
-    lua["isWalkableTile"] = [](int x, int y, int z)->bool { return World::ins()->getTile(x, y, z).walkable; };
+    lua["isWalkableTile"] = [](int x, int y, int z)->bool { return isWalkable({ x,y,z }); };
     lua["coord2Dir"] = [](int dx, int dy)->int { return coord2Dir(dx, dy); };
     lua["noFogTile"] = [](int x, int y, int z)->bool { return World::ins()->getTile(x, y, z).fov == fovFlag::white; };
 };

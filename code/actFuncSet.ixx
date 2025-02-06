@@ -216,7 +216,6 @@ export namespace actFunc
 		tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 		tgtProp->leadItem.extraSprIndexSingle--;
-		tgtProp->updateTile();
 		Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 	}
 };

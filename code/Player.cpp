@@ -98,7 +98,7 @@ void Player::startMove(int inputDir)
 		Player* player = Player::ins();
 		player->updateWalkable(player->getGridX() + dx, player->getGridY() + dy);
 		//걸을 수 있는 타일이면
-		if (World::ins()->getTile(player->getGridX() + dx, player->getGridY() + dy, player->getGridZ()).walkable)
+		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{
 			player->setDirection(inputDir);
 			player->move(inputDir, false);

@@ -62,7 +62,6 @@ public:
 				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
 					singleTile[x][y].floor = 109;
-
 					singleTile[x][y].setWall(302);
 				}
 			}

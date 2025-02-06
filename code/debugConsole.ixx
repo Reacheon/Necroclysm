@@ -183,8 +183,6 @@ export void debugConsole()
 		std::cin >> wallZ;
 		prt(L"[디버그](%d,%d,%d) 위치에 벽을 생성했다!\n", xp + wallX, yp + wallY, zp + wallZ);
 		World::ins()->getTile(xp + wallX, yp + wallY, zp + wallZ).wall = true;
-		World::ins()->getTile(xp + wallX, yp + wallY, zp + wallZ).blocker = true;
-		World::ins()->getTile(xp + wallX, yp + wallY, zp + wallZ).walkable = false;
 		break;
 	}
 	case 8:

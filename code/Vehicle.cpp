@@ -35,7 +35,6 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
     partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(leadItemCode, 1);
 
-    updateTile(inputX, inputY);
 
     deactivateAI();//차량을 제외하고 기본적으로 비활성화
 }
@@ -46,49 +45,7 @@ Vehicle::~Vehicle()
     prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
 }
 
-void Vehicle::updateTile(int inputX, int inputY)
-{
-    if (partInfo.find({ inputX,inputY }) != partInfo.end())
-    {
-        World::ins()->getTile(inputX, inputY, getGridZ()).update();
-        if (partInfo[{inputX, inputY}]->itemInfo.size() > 0)
-        {
-            //walkable 체크
-            if (World::ins()->getTile(inputX, inputY, getGridZ()).walkable == true)
-            {
-                for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
-                {
-                    if (!partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::PROP_WALKABLE))
-                    {
-                        World::ins()->getTile(inputX, inputY, getGridZ()).walkable = false;
-                        break;
-                    }
-                }
-            }
 
-            //blocker 체크
-            if (World::ins()->getTile(inputX, inputY, getGridZ()).blocker == false)
-            {
-                for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
-                {
-                    if (partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::PROP_BLOCKER))
-                    {
-                        World::ins()->getTile(inputX, inputY, getGridZ()).blocker = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    else errorBox(L"[Vehicle:updateTile] updateTile이 부품이 없는 타일을 선택지로 가리켰다.");
-}
-void Vehicle::updateAllTiles()
-{
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-    {
-        updateTile(it->first[0], it->first[1]);
-    }
-}
 
 bool Vehicle::hasFrame(int inputX, int inputY)
 {

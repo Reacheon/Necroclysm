@@ -117,7 +117,7 @@ __int64 playerInputTurn()
 			{
 				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)
 				{
-					if (World::ins()->getTile(i, j, PlayerZ()).walkable == true) walkableTile.insert({ i,j });
+					if (isWalkable({ i, j, PlayerZ() })) walkableTile.insert({ i,j });
 					//else prt(L"(%d,%d) 타일은 이동 불가능한 타일이다.\n",i,j);
 				}
 			}

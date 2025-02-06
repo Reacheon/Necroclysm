@@ -45,7 +45,6 @@ Entity::~Entity()//소멸자
 {
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
-	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable = true;
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
 	delete entityInfo.equipment;
 }
@@ -376,15 +375,6 @@ void Entity::attack(int gridX, int gridY)
 }
 void Entity::updateWalkable(int gridX, int gridY)//만약 다를 경우 개체에서 오버라이드해서 쓰시오
 {
-	//만약 걸을 수 있다해도 해당 위치에 엔티티가 존재하면 걷기불가로 만듬
-
-	if (World::ins()->getTile(gridX, gridY, getGridZ()).walkable == true)
-	{
-		if (TileEntity(gridX, gridY, getGridZ()) != nullptr)
-		{
-			World::ins()->getTile(gridX, gridY, getGridZ()).walkable = false;
-		}
-	}
 }
 void Entity::rayCasting(int x1, int y1, int x2, int y2)
 {
@@ -407,7 +397,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; }
 				else { x1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * dely);
 			}
 			else
@@ -417,7 +407,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
 			i++;
@@ -436,7 +426,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { y1++; }
 				else { y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * delx);
 			}
 			else
@@ -446,7 +436,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
 			i++;
@@ -461,7 +451,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 			else if (x1 > x2 && y2 > y1) { x1--; y1++; }
 			else { x1--; y1--; }
 			World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-			if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+			if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 			i++;
 		}
 	}
@@ -490,7 +480,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * dely);
 			}
 			else
@@ -503,7 +493,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
 			i++;
@@ -525,7 +515,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * delx);
 			}
 			else
@@ -538,7 +528,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
 			i++;
@@ -556,7 +546,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 			{
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 			}
-			if (World::ins()->getTile(x1, y1, getGridZ()).blocker) { return; }
+			if (isRayBlocker({x1, y1, getGridZ()})) { return; }
 			i++;
 		}
 	}

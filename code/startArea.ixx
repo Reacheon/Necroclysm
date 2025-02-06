@@ -47,11 +47,11 @@ export void startArea()
 		{91, 1000}, {82, 1},{389,1}
 		}
 	);
-	
+
 	//활과 석궁
 	new ItemStack(3, 8, 0, { {383,1} });
 	new ItemStack(4, 8, 0, { {385,30} });
-	new ItemStack(3, 9, 0, { {382,1}});
+	new ItemStack(3, 9, 0, { {382,1} });
 	new ItemStack(4, 9, 0, { {384,30} });
 
 	new Monster(5, 8, 8, 0);//허수아비
@@ -75,65 +75,60 @@ export void startArea()
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			TileFloor(dx, dy, 0) = 109;
+			setFloor({ dx,dy,0 }, 109);
 		}
 	}
-
 	for (int dx = -30; dx <= 30; dx++)
 	{
 		for (int dy = -30; dy <= -2; dy++)
 		{
-			TileFloor(dx, dy, 0) = 220;
+			setFloor({ dx,dy,0 }, 220);
 		}
 	}
-
 	for (int dx = -6; dx >= -14; dx--)
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			if (dx == -10 && ((dy + 30) % 6 < 3)) TileFloor(dx, dy, 0) = 377;//노랑아스팔트
-			else TileFloor(dx, dy, 0) = 296;//검정아스팔트
+			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, 377); //노랑아스팔트
+			else setFloor({ dx,dy,0 }, 296); //검정아스팔트
 		}
 	}
 
 	//오솔길
-	TileFloor(-3, -1, 0) = 293;
-	TileFloor(-2, -1, 0) = 293;
-	TileFloor(-2, 0, 0) = 293;
-	TileFloor(-1, 0, 0) = 293;
-	TileFloor(-0, 0, 0) = 293;
-	TileFloor(+1, 0, 0) = 293;
-	TileFloor(+2, 0, 0) = 293;
-	TileFloor(+2, +1, 0) = 293;
-	TileFloor(+3, +1, 0) = 293;
-	TileFloor(+4, +1, 0) = 293;
-	TileFloor(+4, +2, 0) = 293;
-	for (int i = 0; i < 9; i++) TileFloor(5 + i, 2, 0) = 293;
+	setFloor({ -3,-1,0 }, 293);
+	setFloor({ -2,-1,0 }, 293);
+	setFloor({ -2,0,0 }, 293);
+	setFloor({ -1,0,0 }, 293);
+	setFloor({ 0,0,0 }, 293);
+	setFloor({ 1,0,0 }, 293);
+	setFloor({ 2,0,0 }, 293);
+	setFloor({ 2,1,0 }, 293);
+	setFloor({ 3,1,0 }, 293);
+	setFloor({ 4,1,0 }, 293);
+	setFloor({ 4,2,0 }, 293);
+	for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
 
 	//나무벽 설치
 	//집 하단 5타일
-	World::ins()->getTile(-1, -2, 0).setWall(375);
-	World::ins()->getTile(-2, -2, 0).setWall(375);
+	setWall({ -1,-2,0 }, 375);
+	setWall({ -2,-2,0 }, 375);
 	new Prop(-3, -2, 0, 291);//나무문 설치
-	World::ins()->getTile(-4, -2, 0).setWall(375);
-	World::ins()->getTile(-5, -2, 0).setWall(375);
-
+	setWall({ -4,-2,0 }, 375);
+	setWall({ -5,-2,0 }, 375);
 	//집 우측 4타일
-	World::ins()->getTile(-1, -3, 0).setWall(375);
-	World::ins()->getTile(-1, -4, 0).setWall(114);
-	World::ins()->getTile(-1, -5, 0).setWall(375);
-	World::ins()->getTile(-1, -6, 0).setWall(375);
-
+	setWall({ -1,-3,0 }, 375);
+	setWall({ -1,-4,0 }, 114);
+	setWall({ -1,-5,0 }, 375);
+	setWall({ -1,-6,0 }, 375);
 	//집 좌측 4타일
-	World::ins()->getTile(-5, -3, 0).setWall(375);
-	World::ins()->getTile(-5, -4, 0).setWall(114);
-	World::ins()->getTile(-5, -5, 0).setWall(375);
-	World::ins()->getTile(-5, -6, 0).setWall(375);
-
+	setWall({ -5,-3,0 }, 375);
+	setWall({ -5,-4,0 }, 114);
+	setWall({ -5,-5,0 }, 375);
+	setWall({ -5,-6,0 }, 375);
 	//잡 상단 중앙 3타일
-	World::ins()->getTile(-2, -6, 0).setWall(375);
-	World::ins()->getTile(-3, -6, 0).setWall(375);
-	World::ins()->getTile(-4, -6, 0).setWall(375);
+	setWall({ -2,-6,0 }, 375);
+	setWall({ -3,-6,0 }, 375);
+	setWall({ -4,-6,0 }, 375);
 
 	new Prop(-4, -5, 0, 295);//책장
 	new Prop(-2, -5, 0, 294);//침대
@@ -143,7 +138,7 @@ export void startArea()
 	{
 		for (int dy = -1; dy <= 1; dy++)
 		{
-			TileFloor(-3 + dx, -4 + dy, 1) = 292;
+			setFloor({ -3 + dx, -4 + dy, 1 }, 292);
 		}
 	}
 
@@ -153,20 +148,20 @@ export void startArea()
 	//철조망
 	for (int i = 0; i < 17; i++)//상단
 	{
-		TileWall(-5 + i, -9, 0) = 376;
+		setWall({ -5 + i, -9, 0 }, 376);
 	}
 
 	for (int i = 0; i < 20; i++)//우측
 	{
-		if (- 8 + i != 1 && - 8 + i != 2 && - 8 + i != 3)
+		if (-8 + i != 1 && -8 + i != 2 && -8 + i != 3)
 		{
-			TileWall(11, -8 + i, 0) = 376;
+			setWall({ 11, -8 + i, 0 }, 376);
 		}
 	}
 
 	for (int i = 0; i < 17; i++)//상단
 	{
-		TileWall(11 - i, 12, 0) = 376;
+		setWall({ 11 - i, 12, 0 }, 376);
 	}
 
 	//철조망 우측 입구 전통등 2개
@@ -184,16 +179,16 @@ export void startArea()
 			}
 		}
 
-		new Prop(pX - 2, pY - 5,  - 1, 211);//전통등
+		new Prop(pX - 2, pY - 5, -1, 211);//전통등
 		{
-			int cx = - 1;
-			int cy = - 1;
+			int cx = -1;
+			int cy = -1;
 
-			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i,  - 1);
-			new Prop(cx, cy + 1,  - 1, 291);//나무문 설치
+			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i, -1);
+			new Prop(cx, cy + 1, -1, 291);//나무문 설치
 
-			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy,  - 1);
-			Prop* door2 = new Prop(cx + 1, cy,  - 1, 291);//나무문 설치
+			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy, -1);
+			Prop* door2 = new Prop(cx + 1, cy, -1, 291);//나무문 설치
 			door2->leadItem.extraSprIndexSingle = 2;
 
 			int aisleEndX = cx + 8;
@@ -202,7 +197,7 @@ export void startArea()
 			{
 				for (int dy = -40; dy <= 40; dy++)
 				{
-					DestroyWall(aisleEndX + dx, aisleEndY + dy,  - 1);
+					DestroyWall(aisleEndX + dx, aisleEndY + dy, -1);
 				}
 			}
 
@@ -212,7 +207,7 @@ export void startArea()
 			{
 				for (int dy = -40; dy <= 40; dy++)
 				{
-					DestroyWall(aisleEndX2 + dx, aisleEndY2 + dy,  - 1);
+					DestroyWall(aisleEndX2 + dx, aisleEndY2 + dy, -1);
 				}
 			}
 
@@ -222,7 +217,7 @@ export void startArea()
 			{
 				for (int dy = -3; dy <= 3; dy++)
 				{
-					DestroyWall(aisleEndX3 + dx, aisleEndY3 + dy,  - 1);
+					DestroyWall(aisleEndX3 + dx, aisleEndY3 + dy, -1);
 				}
 			}
 
@@ -232,7 +227,7 @@ export void startArea()
 			{
 				for (int dy = -3; dy <= 3; dy++)
 				{
-					DestroyWall(aisleEndX4 + dx, aisleEndY4 + dy,  - 1);
+					DestroyWall(aisleEndX4 + dx, aisleEndY4 + dy, -1);
 				}
 			}
 
@@ -242,26 +237,26 @@ export void startArea()
 
 			for (int i = 0; i <= 25; i++)
 			{
-				new Prop(cursorX, cursorY,  - 1, itemVIPCode::railTB);
+				new Prop(cursorX, cursorY, -1, itemVIPCode::railTB);
 				cursorY--;
 			}
 
-			new Prop(cursorX, cursorY,  - 1, itemVIPCode::railBR);
+			new Prop(cursorX, cursorY, -1, itemVIPCode::railBR);
 			cursorX++;
 
 			for (int i = 0; i < 11; i++)
 			{
-				new Prop(cursorX, cursorY,  - 1, itemVIPCode::railRL);
+				new Prop(cursorX, cursorY, -1, itemVIPCode::railRL);
 				cursorX++;
 			}
 
-			new Prop(cursorX, cursorY,  - 1, itemVIPCode::railSwitchWS);//전환기
+			new Prop(cursorX, cursorY, -1, itemVIPCode::railSwitchWS);//전환기
 
-			int secondCursorX = cursorX+1;
+			int secondCursorX = cursorX + 1;
 			int secondCursorY = cursorY;
 			for (int i = 0; i < 22; i++)
 			{
-				new Prop(secondCursorX, secondCursorY,  - 1, itemVIPCode::railRL);//나무문 설치
+				new Prop(secondCursorX, secondCursorY, -1, itemVIPCode::railRL);//나무문 설치
 				secondCursorX++;
 			}
 
@@ -269,25 +264,25 @@ export void startArea()
 
 			for (int i = 0; i < 26; i++)
 			{
-				new Prop(cursorX, cursorY,  - 1, itemVIPCode::railTB);//나무문 설치
+				new Prop(cursorX, cursorY, -1, itemVIPCode::railTB);//나무문 설치
 				cursorY++;
 			}
 
-			new Prop(cursorX, cursorY,  - 1, itemVIPCode::railTL);//나무문 설치
+			new Prop(cursorX, cursorY, -1, itemVIPCode::railTL);//나무문 설치
 			cursorX--;
 
 			for (int i = 0; i < 11; i++)
 			{
-				new Prop(cursorX, cursorY,  - 1, itemVIPCode::railRL);//나무문 설치
+				new Prop(cursorX, cursorY, -1, itemVIPCode::railRL);//나무문 설치
 				cursorX--;
 			}
-			new Prop(cursorX, cursorY,  - 1, itemVIPCode::railTR);//나무문 설치
+			new Prop(cursorX, cursorY, -1, itemVIPCode::railTR);//나무문 설치
 
 
 			//지하철 설치
 			int vX = 7;
-			int vY = - 1;
-			Vehicle* myTrainPower = new Vehicle(vX, vY,  - 1, 48);//차량 설치
+			int vY = -1;
+			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, 48);//차량 설치
 			{
 
 				myTrainPower->vehType = vehFlag::train;
@@ -298,7 +293,7 @@ export void startArea()
 				myTrainPower->extendPart(vX - 1, vY - 1, 48);
 				myTrainPower->extendPart(vX + 1, vY - 1, 48);
 				myTrainPower->extendPart(vX + 2, vY - 1, 48);
-				myTrainPower->extendPart(vX-2, vY - 1, 48);
+				myTrainPower->extendPart(vX - 2, vY - 1, 48);
 
 				myTrainPower->extendPart(vX - 1, vY - 2, 48);
 				myTrainPower->extendPart(vX, vY - 2, 48);
@@ -333,16 +328,16 @@ export void startArea()
 				{
 					for (int y = topLeftY; y <= topLeftY + 7; y++)
 					{
-						if ((x == topLeftX || x == topLeftX + 4)|| (y == topLeftY || y == topLeftY + 7))
+						if ((x == topLeftX || x == topLeftX + 4) || (y == topLeftY || y == topLeftY + 7))
 						{
 							if (x == topLeftX + 2 && y == topLeftY + 7)  myTrainPower->addPart(x, y, { 120 });
-							else if( y == topLeftY + 4)  myTrainPower->addPart(x, y, { 120 });
-							else if(y == topLeftY) myTrainPower->addPart(x, y, { 121 });
+							else if (y == topLeftY + 4)  myTrainPower->addPart(x, y, { 120 });
+							else if (y == topLeftY) myTrainPower->addPart(x, y, { 121 });
 							else myTrainPower->addPart(x, y, { 119 });
 						}
 						else if ((y == topLeftY + 2))
 						{
-							if(x == topLeftX + 2) myTrainPower->addPart(x, y, { 120 });
+							if (x == topLeftX + 2) myTrainPower->addPart(x, y, { 120 });
 							else myTrainPower->addPart(x, y, { 119 });
 						}
 						else
@@ -368,7 +363,7 @@ export void startArea()
 			{
 				int vX = 7;
 				int vY = 7;
-				Vehicle* myTrain = new Vehicle(vX, vY, - 1, 48);//차량 설치
+				Vehicle* myTrain = new Vehicle(vX, vY, -1, 48);//차량 설치
 				myTrainPower->rearTrain = myTrain;
 				myTrain->isVehicle = true;
 				myTrain->vehType = vehFlag::train;
@@ -415,7 +410,7 @@ export void startArea()
 					{
 						if ((x == topLeftX || x == topLeftX + 4) || (y == topLeftY || y == topLeftY + 7))
 						{
-							if( x == topLeftX + 2)  myTrain->addPart(x, y, { 120 });
+							if (x == topLeftX + 2)  myTrain->addPart(x, y, { 120 });
 							else if (y == topLeftY + 4)  myTrain->addPart(x, y, { 120 });
 							else myTrain->addPart(x, y, { 119 });
 						}
@@ -456,7 +451,6 @@ export void startArea()
 			//{
 			//	new Prop(targetX, endY - 20, pZ - 1, 303);//나무문 설치
 			//}
-
 		}
 	}
 
@@ -465,63 +459,50 @@ export void startArea()
 	{
 		for (int dy = 0; dy < 4; dy++)
 		{
-			TileFloor( - 5 + dx,  - 5 + dy, 0) = 292;
+			setFloor({ -5 + dx, -5 + dy, 0 }, 292);
 		}
 	}
-
 	new Prop(2, -1, 0, 297);//표지판
-
-
 	//유리벽 설치
-
-	TileWall(2, -4, 0) = 114;
-	TileWall(2, -3, 0) = 114;
-	TileWall(2, -2, 0) = 114;
-	TileWall(4, -4, 0) = 114;
-	TileWall(4, -3, 0) = 114;
-
+	setWall({ 2,-4,0 }, 114);
+	setWall({ 2,-3,0 }, 114);
+	setWall({ 2,-2,0 }, 114);
+	setWall({ 4,-4,0 }, 114);
+	setWall({ 4,-3,0 }, 114);
 	//얕은 물 타일(연못)
-	TileFloor( - 3,  + 0, 0) = 225;
-	TileFloor( - 4,  + 0, 0) = 226;
-	TileFloor( - 3,  + 1, 0) = 225;
-	TileFloor( - 4,  + 1, 0) = 226;
-	TileFloor( - 4,  + 2, 0) = 225;
-
+	setFloor({ -3,0,0 }, 225);
+	setFloor({ -4,0,0 }, 226);
+	setFloor({ -3,1,0 }, 225);
+	setFloor({ -4,1,0 }, 226);
+	setFloor({ -4,2,0 }, 225);
 	int startX = -33;
 	int startY = 36;
 	for (int dy = 0; dy <= 30; dy++)
 	{
 		for (int dx = 0; dx <= 60; dx++)
 		{
-			if (dy <= 1) TileFloor(startX + dx, startY + dy, 0) = 231;//얕은해수
-			else if(dy <=5)TileFloor(startX + dx, startY + dy, 0) = 381;//모래
-			else if(dy <=7) TileFloor(startX + dx, startY + dy, 0) = 231;//얕은해수
-			else TileFloor(startX + dx, startY + dy, 0) = 232;//깊은해수
-			
+			if (dy <= 1) setFloor({ startX + dx, startY + dy, 0 }, 231);//얕은해수
+			else if (dy <= 5) setFloor({ startX + dx, startY + dy, 0 }, 381);//모래
+			else if (dy <= 7) setFloor({ startX + dx, startY + dy, 0 }, 231);//얕은해수
+			else setFloor({ startX + dx, startY + dy, 0 }, 232);//깊은해수
 		}
 	}
-	TileFloor(-7, 41, 0) = 231;
-	TileFloor(0, 38, 0) = 231;
-	TileFloor(1, 38, 0) = 231;
-	TileFloor(1, 36, 0) = 232;
-
-	TileFloor(4, 41, 0) = 231;
-	TileFloor(5, 41, 0) = 231;
-	TileFloor(6, 41, 0) = 231;
-
-	TileFloor(5, 43, 0) = 232;
-	TileFloor(6, 43, 0) = 232;
-
-
-
+	setFloor({ -7,41,0 }, 231);
+	setFloor({ 0,38,0 }, 231);
+	setFloor({ 1,38,0 }, 231);
+	setFloor({ 1,36,0 }, 232);
+	setFloor({ 4,41,0 }, 231);
+	setFloor({ 5,41,0 }, 231);
+	setFloor({ 6,41,0 }, 231);
+	setFloor({ 5,43,0 }, 232);
+	setFloor({ 6,43,0 }, 232);
 	//하단연못
-	TileFloor( + 5,  + 8, 0) = 225;
-	TileFloor( + 5,  + 9, 0) = 225;
-
+	setFloor({ 5,8,0 }, 225);
+	setFloor({ 5,9,0 }, 225);
 	for (int dx = -3; dx <= 2; dx++)
 	{
-		TileFloor( + 5 + dx,  + 10, 0) = 225;
-		TileFloor( + 5 + dx,  + 11, 0) = 225;
+		setFloor({ 5 + dx,10,0 }, 225);
+		setFloor({ 5 + dx,11,0 }, 225);
 	}
 
 
@@ -647,24 +628,24 @@ export void startArea()
 
 
 	//잔디
-	World::ins()->getTile(pX + -2, pY + 3, 0).floor = 220;
-	World::ins()->getTile(pX + -1, pY + 3, 0).floor = 220;
-	World::ins()->getTile(pX + 0, pY + 3, 0).floor = 220;
-	World::ins()->getTile(pX + 1, pY + 3, 0).floor = 220;
+	setFloor({ pX - 2, pY + 3, 0 }, 220);
+	setFloor({ pX - 1, pY + 3, 0 }, 220);
+	setFloor({ pX, pY + 3, 0 }, 220);
+	setFloor({ pX + 1, pY + 3, 0 }, 220);
 
-	World::ins()->getTile(pX + -2, pY + 4, 0).floor = 220;
-	World::ins()->getTile(pX + -1, pY + 4, 0).floor = 220;
-	World::ins()->getTile(pX + 0, pY + 4, 0).floor = 220;
-	World::ins()->getTile(pX + 1, pY + 4, 0).floor = 220;
+	setFloor({ pX - 2, pY + 4, 0 }, 220);
+	setFloor({ pX - 1, pY + 4, 0 }, 220);
+	setFloor({ pX, pY + 4, 0 }, 220);
+	setFloor({ pX + 1, pY + 4, 0 }, 220);
 
-	new Prop(pX + -2, pY + 3, 0, 270);//꽃 설치
-	new Prop(pX + -1, pY + 3, 0, 265);//꽃 설치
-	new Prop(pX + 0, pY + 3, 0, 266);//꽃 설치
+	new Prop(pX - 2, pY + 3, 0, 270);//꽃 설치
+	new Prop(pX - 1, pY + 3, 0, 265);//꽃 설치
+	new Prop(pX, pY + 3, 0, 266);//꽃 설치
 	new Prop(pX + 1, pY + 3, 0, 267);//꽃 설치
 
-	new Prop(pX + -2, pY + 4, 0, 271);//꽃 설치
-	new Prop(pX + -1, pY + 4, 0, 268);//꽃 설치
-	new Prop(pX + 0, pY + 4, 0, 269);//꽃 설치
+	new Prop(pX - 2, pY + 4, 0, 271);//꽃 설치
+	new Prop(pX - 1, pY + 4, 0, 268);//꽃 설치
+	new Prop(pX, pY + 4, 0, 269);//꽃 설치
 	new Prop(pX + 1, pY + 4, 0, 270);//꽃 설치
 
 
@@ -697,10 +678,10 @@ export void startArea()
 
 	//전선 설치
 	new Prop(pX + 8, pY + 1, 0, 143);
-	new Prop(pX + 8, pY + 0, 0, 143);
+	new Prop(pX + 8, pY, 0, 143);
 	new Prop(pX + 8, pY - 1, 0, 143);
 	new Prop(pX + 8, pY - 2, 0, 143);
-	new Prop(pX + 9, pY + 0, 0, 143);
+	new Prop(pX + 9, pY, 0, 143);
 
 	//배관 설치
 	new Prop(pX + 3, pY + 6, 0, 144);
@@ -756,40 +737,40 @@ export void startArea()
 	myCar->extendPart(vX + 1, vY - 3, 130);
 	myCar->extendPart(vX + 2, vY - 3, 130);
 	//////////////////////////▼최상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 2, { 142,119,126 }); //바퀴, 차벽
-	myCar->addPart(vX, vY - 2, { 119 }); //차벽
-	myCar->addPart(vX + 1, vY - 2, { 119 }); //차벽
-	myCar->addPart(vX + 2, vY - 2, { 142,119,126 }); //바퀴, 차벽
+	myCar->addPart(vX - 1, vY - 2, { 142,119,126 });
+	myCar->addPart(vX, vY - 2, { 119 });
+	myCar->addPart(vX + 1, vY - 2, { 119 });
+	myCar->addPart(vX + 2, vY - 2, { 142,119,126 });
 	//////////////////////////▼중상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 1, 121); //차유리
-	myCar->addPart(vX, vY - 1, 121); //차유리
-	myCar->addPart(vX + 1, vY - 1, 121); //차유리
-	myCar->addPart(vX + 2, vY - 1, 121); //차유리
+	myCar->addPart(vX - 1, vY - 1, 121);
+	myCar->addPart(vX, vY - 1, 121);
+	myCar->addPart(vX + 1, vY - 1, 121);
+	myCar->addPart(vX + 2, vY - 1, 121);
 	////////////////////////////////▼운전석 4타일///////////////////////////////
-	myCar->addPart(vX - 1, vY, { 120 });//차문
-	myCar->addPart(vX, vY, { 122, 123, 99, 128 });//통로,의자
-	myCar->addPart(vX + 1, vY, { 122, 123, 128 });//통로,의자
-	myCar->addPart(vX + 2, vY, { 120 });//차문
+	myCar->addPart(vX - 1, vY, { 120 });
+	myCar->addPart(vX, vY, { 122, 123, 99, 128 });
+	myCar->addPart(vX + 1, vY, { 122, 123, 128 });
+	myCar->addPart(vX + 2, vY, { 120 });
 	//////////////////////////▼운전석 아래 통로 4타일/////////////////////////////
-	myCar->addPart(vX - 1, vY + 1, { 119 });//차벽
-	myCar->addPart(vX, vY + 1, { 122, 128 });//통로
-	myCar->addPart(vX + 1, vY + 1, { 122, 128,129 });//통로
-	myCar->addPart(vX + 2, vY + 1, { 119 });//차벽
+	myCar->addPart(vX - 1, vY + 1, { 119 });
+	myCar->addPart(vX, vY + 1, { 122, 128 });
+	myCar->addPart(vX + 1, vY + 1, { 122, 128,129 });
+	myCar->addPart(vX + 2, vY + 1, { 119 });
 	///////////////////////////////▼뒷자석 4타일/////////////////////
-	myCar->addPart(vX - 1, vY + 2, { 120 });//차문
-	myCar->addPart(vX, vY + 2, { 122, 123, 128 });//통로,의자
-	myCar->addPart(vX + 1, vY + 2, { 122, 123, 128 });//통로,의자
-	myCar->addPart(vX + 2, vY + 2, { 120 });//차문
+	myCar->addPart(vX - 1, vY + 2, { 120 });
+	myCar->addPart(vX, vY + 2, { 122, 123, 128 });
+	myCar->addPart(vX + 1, vY + 2, { 122, 123, 128 });
+	myCar->addPart(vX + 2, vY + 2, { 120 });
 	///////////////////////////////▼최후방 4타일///////////////////////////
-	myCar->addPart(vX - 1, vY + 3, { 119,127 });//차벽
-	myCar->addPart(vX, vY + 3, { 124 });//트렁크문
-	myCar->addPart(vX + 1, vY + 3, { 124 });//트렁크문
-	myCar->addPart(vX + 2, vY + 3, { 119,127 });//차벽
+	myCar->addPart(vX - 1, vY + 3, { 119,127 });
+	myCar->addPart(vX, vY + 3, { 124 });
+	myCar->addPart(vX + 1, vY + 3, { 124 });
+	myCar->addPart(vX + 2, vY + 3, { 119,127 });
 
 
 
 	///////////////////오토바이///////////////////////////////////////////
-	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, 48);//차량 설치
+	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, 48);
 	myMoto->isVehicle = true;
 	myMoto->extendPart(vX + 6, vY + 4, 48);
 	myMoto->extendPart(vX + 6, vY + 6, 48);
@@ -799,7 +780,7 @@ export void startArea()
 	myMoto->addPart(vX + 6, vY + 6, 102);
 
 	////////////////////자전거////////////////////////////////////////////
-	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, 48);//차량 설치
+	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, 48);
 	myBike->isVehicle = true;
 	myBike->extendPart(vX + 9, vY + 3, 48);
 	myBike->extendPart(vX + 9, vY + 5, 48);
@@ -813,7 +794,7 @@ export void startArea()
 	{
 		int cx = 15;
 		int cy = 0;
-		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);//차량 설치
+		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
 		myHeli->isVehicle = true;
 		myHeli->addPart(cx, cy, { 311 });
 
@@ -829,58 +810,52 @@ export void startArea()
 		myHeli->extendPart(cx + 1, cy + 1, 48);
 		myHeli->extendPart(cx + 1, cy + 2, 48);
 
-
 		myHeli->extendPart(cx - 1, cy - 1, 48);
 		myHeli->extendPart(cx - 1, cy, 48);
 		myHeli->extendPart(cx - 1, cy + 1, 48);
 		myHeli->extendPart(cx - 1, cy + 2, 48);
 
-		//상단 3유리
 		myHeli->addPart(cx + 1, cy - 1, { 121 });
 		myHeli->addPart(cx, cy - 1, { 121 });
 		myHeli->addPart(cx - 1, cy - 1, { 121 });
 
-		//플레이어 3타일(조종석)
 		myHeli->addPart(cx + 1, cy, { 120 });
 		myHeli->addPart(cx, cy, { 122,123, 128 });
 		myHeli->addPart(cx - 1, cy, { 120 });
 
-		//짐칸
 		myHeli->addPart(cx + 1, cy + 1, { 119 });
-		myHeli->addPart(cx, cy + 1, { 122, 128, 314});
+		myHeli->addPart(cx, cy + 1, { 122, 128, 314 });
 		myHeli->addPart(cx - 1, cy + 1, { 119 });
-		
-		//꼬리 격리 3칸벽
+
 		myHeli->addPart(cx + 1, cy + 2, { 119 });
 		myHeli->addPart(cx, cy + 2, { 119 });
 		myHeli->addPart(cx - 1, cy + 2, { 119 });
 
-		//꼬리 3칸
 		myHeli->addPart(cx, cy + 3, { 119 });
 		myHeli->addPart(cx, cy + 4, { 119 });
 		myHeli->addPart(cx, cy + 5, { 119, 315 });
 	}
 
 	//수레 3종
-	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);//차량 설치
+	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);
 	cart1->isVehicle = true;
 	cart1->vehType = vehFlag::car;
 
-	Vehicle* cart2 = new Vehicle(8, 5, 0, 379);//차량 설치
+	Vehicle* cart2 = new Vehicle(8, 5, 0, 379);
 	cart2->isVehicle = true;
 	cart2->vehType = vehFlag::car;
 
-	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);//차량 설치
+	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);
 	cart3->isVehicle = true;
 	cart3->vehType = vehFlag::car;
 
 
-	//new Vehicle(8, 5, 0, 379);//차량 설치
-	//new Vehicle(6, 5, 0, 137);//차량 설치
+	//new Vehicle(8, 5, 0, 379);
+	//new Vehicle(6, 5, 0, 137);
 
 
 	///////////////////////////////////////////////////////////////
-	//new Vehicle(pX, pY + 2, 0, 140);//모닥불 설치
+	//new Vehicle(pX, pY + 2, 0, 140);
 
 	World::ins()->createSector(0, 0, 0);
 

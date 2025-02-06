@@ -522,5 +522,8 @@
     <ClCompile Include="code\Prop.cpp">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
+    <ClCompile Include="code\Light.cpp">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

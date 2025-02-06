@@ -28,7 +28,6 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
 
     errorBox(TileProp(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
     World::ins()->getTile(inputX, inputY, inputZ).PropPtr = this;
-    updateTile();
 
     if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
     {
@@ -203,28 +202,6 @@ void Prop::updateSprIndex()
         leftTile = sameCheck(-1, 0);
         rightTile = sameCheck(1, 0);
         leadItem.extraSprIndexSingle = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
-    }
-}
-
-void Prop::updateTile()
-{
-    World::ins()->getTile(getGridX(), getGridY(), getGridZ()).update();
-    //walkable 체크
-    if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable == true)
-    {
-        if (leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
-        {
-            World::ins()->getTile(getGridX(), getGridY(), getGridZ()).walkable = false;
-        }
-    }
-
-    //blocker 체크
-    if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).blocker == false)
-    {
-        if (leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true)
-        {
-            World::ins()->getTile(getGridX(), getGridY(), getGridZ()).blocker = true;
-        }
     }
 }
 
