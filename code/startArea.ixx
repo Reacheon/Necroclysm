@@ -59,7 +59,7 @@ export void startArea()
 	new ItemStack(-1, 7, -1, { {388,1} });
 
 
-
+	new ItemStack(7, -4, 0, { {391,1} }); //¹ú¸ñµµ³¢
 
 
 
@@ -511,8 +511,6 @@ export void startArea()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
 	//new Prop(pX + 1 - 1, pY - 2, pZ, 234);//º¢²É³«¿± ¼³Ä¡
 	//new Prop(pX + 1, pY - 2 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
 	//new Prop(pX + 6, pY - 5, pZ, 234);//º¢²É³«¿± ¼³Ä¡
@@ -795,6 +793,7 @@ export void startArea()
 		int cx = 15;
 		int cy = 0;
 		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
+		myHeli->vehType = vehFlag::heli;
 		myHeli->isVehicle = true;
 		myHeli->addPart(cx, cy, { 311 });
 

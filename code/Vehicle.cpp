@@ -475,17 +475,13 @@ bool Vehicle::runAI()
                 int trainCursorX = getGridX(), trainCursorY = getGridY(), trainCursorZ = getGridZ();
                 int prevX = trainCursorX, prevY = trainCursorY, prevZ = trainCursorZ;
 
-                //dir16 lastDir = trainSpdDir;
-                //
 
                 //[반복문] 계산된 방향과 속도값으로 trainMoveVec을 순서대로 채워넣음
                 for (int i = 0; i < trainSpdVal; i++)
                 {
                     //prt(L"[Vehicle:train %p] (%d,%d,%d) 커서에서 열차 이동 루프가 실행됨\n", this, trainCursorX, trainCursorY, trainCursorZ);
 
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     //1. 열차의 현재 위치에 따라 속도의 방향 수정////////////////////////////////////////////////////////////////////
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     Prop* currentRail = TileProp(trainCursorX, trainCursorY, trainCursorZ);
                     dir16 prevSpdDir = trainSpdDir;
                     if (currentRail != nullptr)
@@ -775,7 +771,10 @@ bool Vehicle::runAI()
                 {
                     if (vehType == vehFlag::car || vehType == vehFlag::heli)
                     {
-                        if (spdVec.compZ != 0) zShift(spdVec.compZ);
+                        if (spdVec.compZ != 0)
+                        {
+                            zShift(spdVec.compZ);
+                        }
 
                         if (bodyDir != wheelDir)
                         {
@@ -968,7 +967,6 @@ bool Vehicle::runAI()
             }
         }
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //위의 모든 패턴 조건을 만족하지않을시 return true

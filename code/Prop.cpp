@@ -259,6 +259,18 @@ void Prop::drawSelf()
 
     SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
     int sprIndex = leadItem.propSprIndex + leadItem.extraSprIndexSingle + 16 * leadItem.extraSprIndex16;
+
+    if (leadItem.checkFlag(itemFlag::TREE))//나무일 경우 그림자
+    {
+        drawSpriteCenter
+        (
+            spr::propset,
+            sprIndex+8,
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
+        );
+    }
+
     if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
     {
         if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) sprIndex += 5;
