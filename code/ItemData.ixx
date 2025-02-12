@@ -47,9 +47,9 @@ export struct ItemData
     unsigned __int32 pocketMaxNumber = 0;
     std::vector<unsigned __int16> pocketOnlyItem;
 
-    std::vector<std::pair<unsigned __int8, __int16>> rPierce;
-    std::vector<std::pair<unsigned __int8, __int16>> rCut;
-    std::vector<std::pair<unsigned __int8, __int16>> rBash;
+    __int16 rPierce;
+    __int16 rCut;
+    __int16 rBash;
     std::vector<std::pair<unsigned __int8, __int16>> enc;
     __int16 sh = 0;
     __int16 ev = 0;
@@ -139,6 +139,13 @@ export struct ItemData
     unsigned __int8 gasColorB = 255;
     unsigned __int8 gasAlphaMax = 0; //가스연기의 짙은 정도, 만약 무색의 기체의 경우 값은 0
 
+
+    //나무같은 프롭의 HP나 방어상성 설정
+    __int16 propMaxHP = 100;
+    __int8 propRPierce = 0;
+    __int8 propRCut = 0;
+    __int8 propRBash = 0;
+
     ///////////////////비데이터베이스 변수////////////////////
 
     unsigned __int32 pocketVolume = 0;
@@ -160,6 +167,8 @@ export struct ItemData
     dir16 propDir16 = dir16::dir0;
 
     void* lightPtr = nullptr;
+    __int16 propHP = 100;
+    __int16 propFakeHP = 100;
 
     bool checkFlag(itemFlag inputFlag)
     {

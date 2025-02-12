@@ -9,6 +9,7 @@ import World;
 import Sticker;
 import Flame;
 import Player;
+import Prop;
 
 import Bullet;
 import Aim;
@@ -78,11 +79,6 @@ bool Entity::runAnimation(bool shutdown)
 			if (entityInfo.isPlayer) cameraFix = true;
 			return true;
 		}
-
-
-
-
-
 	}
 	else if (getAniType() == aniFlag::atk)
 	{
@@ -196,6 +192,103 @@ bool Entity::runAnimation(bool shutdown)
 					address->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
 				}
 			}
+		}
+	}
+	else if (getAniType() == aniFlag::felling)
+	{
+		addTimer();
+
+		char dx;
+		char dy;
+
+		switch (entityInfo.direction)
+		{
+		case 0: dx = 1; dy = 0; break;
+		case 1: dx = 1; dy = -1; break;
+		case 2: dx = 0; dy = -1; break;
+		case 3: dx = -1; dy = -1; break;
+		case 4: dx = -1; dy = 0; break;
+		case 5: dx = -1; dy = 1; break;
+		case 6: dx = 0; dy = 1; break;
+		case 7: dx = 1; dy = 1; break;
+		}
+
+		Prop* address = TileProp(PlayerX()+dx, PlayerY()+dy, PlayerZ());
+		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+
+		if (shutdown == true)//사망으로 인한 강제종료
+		{
+			aniUSet.erase(aniUSet.find(this));
+			delete(((Sticker*)(StickerList.find(stickerID))->second));
+			setFakeX(0);
+			setFakeY(0);
+			return true;
+		}
+
+		switch (getTimer())
+		{
+		case 1:
+			Player::ins()->setSpriteIndex(charSprIndex::MINING1);
+			break;
+		case 2:
+			setFakeX(getIntegerFakeX() + 3 * dx);
+			setFakeY(getIntegerFakeY() + 3 * dy);
+			break;
+		case 3:
+			setFakeX(getIntegerFakeX() + 2 * dx);
+			setFakeY(getIntegerFakeY() + 2 * dy);
+			break;
+		case 4:
+			setFakeX(getIntegerFakeX() + 1 * dx);
+			setFakeY(getIntegerFakeY() + 1 * dy);
+			if (address != nullptr)
+			{
+				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
+				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
+			}
+			Player::ins()->setSpriteIndex(charSprIndex::MINING2);
+			address->leadItem.propHP -= 180;
+			address->displayHPBarCount = 100;
+			address->alphaHPBar = 255;
+			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
+			break;
+		case 5:
+			setFakeX(getIntegerFakeX() - 1 * dx);
+			setFakeY(getIntegerFakeY() - 1 * dy);
+			if (address != nullptr)
+			{
+				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
+				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
+			}
+			break;
+		case 6:
+			setFakeX(getIntegerFakeX() - 2 * dx);
+			setFakeY(getIntegerFakeY() - 2 * dy);
+			if (address != nullptr)
+			{
+				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
+				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
+			}
+			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
+			break;
+		case 7:
+			setFakeX(getIntegerFakeX() - 3 * dx);
+			setFakeY(getIntegerFakeY() - 3 * dy);
+			break;
+		case 8:
+			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
+			break;
+		case 10:
+			delete(((Sticker*)(StickerList.find(stickerID))->second));
+		case 20:
+			setFakeX(0);
+			setFakeY(0);
+			resetTimer();
+			setAniType(aniFlag::null);
+			Player::ins()->setSpriteIndex(charSprIndex::WALK_2H);
+			if (entityInfo.isPlayer == true) { turnWait(1.0); }
+			else {  }
+			return true;
 		}
 	}
 	else if (getAniType() == aniFlag::throwing)

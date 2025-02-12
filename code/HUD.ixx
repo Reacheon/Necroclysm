@@ -631,7 +631,7 @@ public:
 		if (ctrlVeh == nullptr)//차량 조종 중이 아닐 경우
 		{
 			//화면에 있는 아이템 터치
-			if (touchX == PlayerX() && touchY == PlayerY())
+			if (touchX == PlayerX() && touchY == PlayerY()) //자신 위치 터치
 			{
 				if (World::ins()->getTile(touchX, touchY, PlayerZ()).ItemStackPtr != nullptr)
 				{
@@ -787,6 +787,12 @@ public:
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
 					{
+					}
+					else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))
+					{
+						Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+						addAniUSetPlayer(Player::ins(), aniFlag::felling);
+
 					}
 					else if (tgtItemCode == 213 || tgtItemCode == 218)//불교 제단
 					{

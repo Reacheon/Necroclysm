@@ -608,6 +608,7 @@ export enum class aniFlag
     null,
     move,
     atk,
+    felling,
     drop,
     winUnfoldOpen,
     winUnfoldClose,

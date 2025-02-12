@@ -134,6 +134,12 @@ namespace csvItem
     constexpr int gasColorB = 97;
     constexpr int gasAlphaMax = 98;
 
+    constexpr int propMaxHP = 99;
+    constexpr int propRPierce = 100;
+    constexpr int propRCut = 101;
+    constexpr int propRBash = 102;
+
+
 };
 
 export int readItemDex(const wchar_t* file)
@@ -579,17 +585,17 @@ export int readItemDex(const wchar_t* file)
                         }
                         case csvItem::rPierce:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].rPierce);
+                            itemDex[arrayCounter / (csvWidth)-1].rPierce = wtoi(strFragment.c_str());
                             break;
                         }
                         case csvItem::rCut:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].rCut);
+                            itemDex[arrayCounter / (csvWidth)-1].rCut = wtoi(strFragment.c_str());
                             break;
                         }
                         case csvItem::rBash:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].rBash);
+                            itemDex[arrayCounter / (csvWidth)-1].rBash = wtoi(strFragment.c_str());
                             break;
                         }
                         case csvItem::SH:
@@ -827,6 +833,18 @@ export int readItemDex(const wchar_t* file)
                             break;
                         case csvItem::gasAlphaMax:
                             itemDex[arrayCounter / (csvWidth)-1].gasAlphaMax = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::propMaxHP:
+                            itemDex[arrayCounter / (csvWidth)-1].propMaxHP = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::propRPierce:
+                            itemDex[arrayCounter / (csvWidth)-1].propRPierce = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::propRCut:
+                            itemDex[arrayCounter / (csvWidth)-1].propRCut = wtoi(strFragment.c_str());
+                            break;
+                        case csvItem::propRBash:
+                            itemDex[arrayCounter / (csvWidth)-1].propRBash = wtoi(strFragment.c_str());
                             break;
                         default:
                             prt(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
