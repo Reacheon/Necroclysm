@@ -24,8 +24,13 @@ private:
 	TTF_Font* font;
 	SDL_Color color;
 	int fontSize;
+
+
 public:
-	Sticker(bool inputViewFix, int inputX, int inputY, Sprite* inputSprite, int inputIndex, std::wstring inputKey, bool inputIsCenter)//mode 0 : image
+	Uint8 alpha = 255;
+	float rotateAngle = 0.0;
+	Point2 rotateCenter = { 0,0 };
+	Sticker(bool inputViewFix, int inputX, int inputY, Sprite* inputSprite, int inputIndex, std::wstring inputKey, bool inputIsCenter, float inputRotateAngle = 0.0, Point2 inputRotateCenter = { 0,0 })//mode 0 : image
 	{
 		spriteMode = 0;
 		setXY(inputX, inputY);
@@ -35,6 +40,9 @@ public:
 		StickerList.insert({ inputKey,this });
 		isCenter = inputIsCenter;
 		viewFix = inputViewFix;
+
+		rotateAngle = inputRotateAngle;
+		rotateCenter = inputRotateCenter;
 	}
 	Sticker(bool inputViewFix, int inputX, int inputY, std::wstring inputString, TTF_Font* inputFont, SDL_Color inputColor, std::wstring inputKey, bool inputIsCenter, int inputFontSize) //mode 1 : font
 	{

@@ -42,6 +42,28 @@ export void drawSprite(Sprite* spr, int index, int x, int y)
 	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
 }
 
+export void drawSpriteRotate(Sprite* spr, int index, int x, int y, double rotateAngle, SDL_Point* rotateCenter)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	SDL_Rect src = {
+		(spr->getW() * index) % textureW,
+		spr->getH() * ((spr->getW() * index) / textureW),
+		spr->getW(),
+		spr->getH()
+	};
+
+	SDL_Rect dst = {
+		x,
+		y,
+		src.w * s_zoomScale,
+		src.h * s_zoomScale
+	};
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, rotateAngle, rotateCenter, s_flip);
+}
+
 export void drawSprite(Sprite* spr, int x, int y) { drawSprite(spr, 0, x, y); }
 
 export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
@@ -58,6 +80,31 @@ export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
 	SDL_Rect dst = { x - dstW / 2, y - dstH / 2, dstW, dstH };
 
 	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, 0, NULL, s_flip);
+}
+
+export void drawSpriteCenterRotate(Sprite* spr, int index, int x, int y, double rotateAngle, SDL_Point* rotateCenter)
+{
+	int textureW, textureH;
+	SDL_QueryTexture(spr->getTexture(), nullptr, nullptr, &textureW, &textureH);
+
+	int srcX = (spr->getW() * index) % textureW;
+	int srcY = (spr->getH() * ((spr->getW() * index) / textureW));
+	SDL_Rect src = { srcX, srcY, spr->getW(), spr->getH() };
+
+	int dstW = static_cast<int>(std::floor(src.w * s_zoomScale));
+	int dstH = static_cast<int>(std::floor(src.h * s_zoomScale));
+
+	SDL_Rect dst = { x - dstW / 2, y - dstH / 2, dstW, dstH };
+
+	SDL_Point center;
+	if (rotateCenter == nullptr) {
+		center = { dstW / 2, dstH / 2 };
+	}
+	else {
+		center = *rotateCenter;
+	}
+
+	SDL_RenderCopyEx(renderer, spr->getTexture(), &src, &dst, rotateAngle, &center, s_flip);
 }
 
 export void drawSpriteCenterExSrc(Sprite* spr, int index, int x, int y, SDL_Rect exSrc)

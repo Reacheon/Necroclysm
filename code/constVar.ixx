@@ -503,6 +503,8 @@ export enum class itemFlag
 
     BOW,
     CROSSBOW,
+
+    STUMP,
 };
 
 export enum class walkFlag
@@ -629,6 +631,9 @@ export enum class aniFlag
     quickSlotPopLeft,
     quickSlotPopRight,
     fireStorm,
+
+
+    treeFalling,
 };
 
 export enum class input

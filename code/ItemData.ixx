@@ -168,7 +168,7 @@ export struct ItemData
 
     void* lightPtr = nullptr;
     __int16 propHP = 100;
-    __int16 propFakeHP = 100;
+    float propFakeHP = 100.0;
 
     bool checkFlag(itemFlag inputFlag)
     {

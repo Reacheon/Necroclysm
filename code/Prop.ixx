@@ -21,6 +21,7 @@ public:
     Light* myLight = nullptr;
     int displayHPBarCount = 0; //양수 200으로 설정시 점점 떨어지다가 1이 되면 alpha를 대신 줄임. alpha마저 모두 줄면 0으로
     int alphaHPBar = 0;
+    float treeAngle = 0.0; //벌목 때 나무들이 가지는 앵글, 0이 아닐 경우 활성화됨
 
     Prop(int inputX, int inputY, int inputZ, int leadItemCode);
 

@@ -23,41 +23,84 @@ export __int64 renderSticker(int cameraX, int cameraY)
 	{
 		Sticker* address = (Sticker*)it->second;
 
+
+
 		if (address->getViewFix() == true)
 		{
 			cameraX = 0;
 			cameraY = 0;
 		}
 
-		if (address->getSpriteMode() == 0)
+		if (address->getSpriteMode() == 0)//그림스티커모드
 		{
-			if (address->getIsCenter() == true)
+			//텍스쳐 투명도 설정
+			if (address->alpha != 255) SDL_SetTextureAlphaMod(address->getSprite()->getTexture(), address->alpha);
+
+			if (address->rotateAngle == 0.0)
 			{
-				setZoom(zoomScale);
-				drawSpriteCenter
-				(
-					address->getSprite(),
-					address->getSpriteIndex(),
-					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
-					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
-				);
-				setZoom(1.0);
+				if (address->getIsCenter() == true)
+				{
+					setZoom(zoomScale);
+					drawSpriteCenter
+					(
+						address->getSprite(),
+						address->getSpriteIndex(),
+						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+					);
+					setZoom(1.0);
+				}
+				else
+				{
+					setZoom(zoomScale);
+					drawSprite
+					(
+						address->getSprite(),
+						address->getSpriteIndex(),
+						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+					);
+					setZoom(1.0);
+				}
 			}
 			else
 			{
-				setZoom(zoomScale);
-				drawSprite
-				(
-					address->getSprite(),
-					address->getSpriteIndex(),
-					(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
-					(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
-				);
-				setZoom(1.0);
+				if (address->getIsCenter() == true)
+				{
+					SDL_Point rCenter = { (float)address->rotateCenter.x * zoomScale, (float)address->rotateCenter.y * zoomScale };
+					setZoom(zoomScale);
+					drawSpriteCenterRotate
+					(
+						address->getSprite(),
+						address->getSpriteIndex(),
+						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY()),
+						address->rotateAngle,
+						&rCenter
+					);
+					setZoom(1.0);
+				}
+				else
+				{
+					SDL_Point rCenter = { (float)address->rotateCenter.x * zoomScale, (float)address->rotateCenter.y * zoomScale };
+					setZoom(zoomScale);
+					drawSpriteRotate
+					(
+						address->getSprite(),
+						address->getSpriteIndex(),
+						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY()),
+						address->rotateAngle,
+						&rCenter
+					);
+					setZoom(1.0);
+				}
 			}
 
+
+			if (address->alpha != 255) SDL_SetTextureAlphaMod(address->getSprite()->getTexture(), 255);
 		}
-		else
+		else//폰트스티커 모드
 		{
 			if (address->getFont() != nullptr)
 			{

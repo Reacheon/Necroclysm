@@ -18,6 +18,7 @@ import Drawable;
 import drawSprite;
 import globalTime;
 import Player;
+import Sticker;
 
 Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
 {
@@ -238,6 +239,45 @@ bool Prop::runAnimation(bool shutdown)
     {
         addTimer();
     }
+    else if (getAniType() == aniFlag::treeFalling)
+    {
+        addTimer();
+
+        std::wstring stickerID = L"TREE_FALLING";
+
+        if (getTimer() == 1)
+        {
+            int extraSprIndex = 9;
+            if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) extraSprIndex += 4;
+            else
+            {
+                if (getSeason() == seasonFlag::summer) { extraSprIndex += 1; }
+                else if (getSeason() == seasonFlag::autumn) { extraSprIndex += 2; }
+                else if (getSeason() == seasonFlag::winter) { extraSprIndex += 3; }
+            }
+
+            
+
+            Sticker* stk = new Sticker(false, getX(), getY() + (16 * -1), spr::propset, leadItem.propSprIndex + extraSprIndex, stickerID, true, 0.0, { 24,40 });
+        }
+        else
+        {
+            Sticker* stk = ((Sticker*)(StickerList.find(stickerID))->second);
+            if (PlayerX() <= getGridX()) stk->rotateAngle += 0.7 + (float)(getTimer()) * 0.04;
+            else stk->rotateAngle -= 0.7 + (float)(getTimer()) * 0.04;
+            
+            
+            
+            
+            if (stk->rotateAngle >= 90.0 || stk->rotateAngle <= -90.0)
+            {
+                delete stk;
+                resetTimer();
+                setAniType(aniFlag::null);
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -276,7 +316,7 @@ void Prop::drawSelf()
         );
     }
 
-    if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
+    if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT) && !leadItem.checkFlag(itemFlag::STUMP))
     {
         if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) sprIndex += 4;
         else
@@ -286,6 +326,12 @@ void Prop::drawSelf()
             else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
         }
     }
+    else if (leadItem.checkFlag(itemFlag::STUMP))
+    {
+        sprIndex +=7;
+    }
+
+
     drawSpriteCenter
     (
         spr::propset,
@@ -304,27 +350,20 @@ void Prop::drawSelf()
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         drawFillRect(dst, col::black, alphaHPBar);
 
-        //ÆäÀÌÅ© HP
-        if (leadItem.propFakeHP > leadItem.propHP) { leadItem.propFakeHP--; }
+
+        if (leadItem.propFakeHP > leadItem.propHP) { leadItem.propFakeHP-=((float)leadItem.propMaxHP/100.0); }
         else if (leadItem.propFakeHP < leadItem.propHP) leadItem.propFakeHP = leadItem.propHP;
+
         if (leadItem.propFakeHP != leadItem.propHP)
         {
-            if (alphaFakeHPBar > 10) { alphaFakeHPBar -= 10; }
-            else { alphaFakeHPBar = 0; }
+            if (alphaFakeHPBar > 20) { alphaFakeHPBar -= 20; }
+            else 
+            { 
+                alphaFakeHPBar = 0;
+                leadItem.propFakeHP = leadItem.propHP;
+            }
         }
         else { alphaFakeHPBar = 255; }
-
-
-        //if (leadItem.propFakeHP != leadItem.propHP)
-        //{
-        //    if (alphaFakeHPBar > 20) { alphaFakeHPBar -= 20; }
-        //    else 
-        //    { 
-        //        alphaFakeHPBar = 0;
-        //        leadItem.propFakeHP = leadItem.propHP;
-        //    }
-        //}
-        //else { alphaFakeHPBar = 255; }
 
         float ratioFakeHP = myMax((float)0.0, (leadItem.propFakeHP) / (float)(leadItem.propMaxHP));
         dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
