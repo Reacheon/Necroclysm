@@ -23,8 +23,6 @@ export __int64 renderSticker(int cameraX, int cameraY)
 	{
 		Sticker* address = (Sticker*)it->second;
 
-
-
 		if (address->getViewFix() == true)
 		{
 			cameraX = 0;

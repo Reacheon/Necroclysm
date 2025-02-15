@@ -1291,6 +1291,12 @@ export enum class relationFlag
     friendly,
 };
 
+export enum class particleFlag
+{
+    parabolic,
+    leaf,
+};
+
 //export enum class projFlag
 //{
 //    arrow,

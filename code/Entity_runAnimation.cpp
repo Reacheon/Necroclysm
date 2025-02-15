@@ -253,9 +253,17 @@ bool Entity::runAnimation(bool shutdown)
 
 			if (address->leadItem.propHP <= 0)
 			{
-				addAniUSetPlayer(address, aniFlag::treeFalling);
-				address->displayHPBarCount = 50;
-				address->leadItem.addFlag(itemFlag::STUMP);
+				if (address->leadItem.checkFlag(itemFlag::STUMP) == false)
+				{
+					addAniUSetPlayer(address, aniFlag::treeFalling);
+					address->displayHPBarCount = 50;
+					address->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+					Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+				}
+				else
+				{
+					address->displayHPBarCount = 50;
+				}
 			}
 
 			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);

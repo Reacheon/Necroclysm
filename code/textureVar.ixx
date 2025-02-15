@@ -140,4 +140,5 @@ export namespace spr
 	Sprite* mapMagnifyIcon = nullptr;
 	Sprite* staminaGaugeCircle = nullptr;
 	Sprite* speechBubble = nullptr;
+	Sprite* particle = nullptr;
 }

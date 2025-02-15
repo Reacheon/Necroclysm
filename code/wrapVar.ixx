@@ -6,6 +6,7 @@ import Player;
 import World;
 import Entity;
 import Prop;
+import ItemStack;
 
 export inline int PlayerX() { return Player::ins()->getGridX(); }
 export inline int PlayerY() { return Player::ins()->getGridY(); }

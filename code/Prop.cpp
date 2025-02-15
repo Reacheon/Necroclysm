@@ -7,6 +7,7 @@ import textureVar;
 import constVar;
 import util;
 import World;
+import ItemStack;
 import ItemPocket;
 import ItemData;
 import Ani;
@@ -19,6 +20,7 @@ import drawSprite;
 import globalTime;
 import Player;
 import Sticker;
+import Particle;
 
 Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
 {
@@ -243,39 +245,44 @@ bool Prop::runAnimation(bool shutdown)
     {
         addTimer();
 
-        std::wstring stickerID = L"TREE_FALLING";
+        if(getTimer()==1) leadItem.addFlag(itemFlag::STUMP);
 
-        if (getTimer() == 1)
+        if (PlayerX() <= getGridX()) treeAngle += 0.7 + (float)(getTimer()) * 0.04;
+        else treeAngle -= 0.7 + (float)(getTimer()) * 0.04;
+
+        if (treeAngle >= 90.0 || treeAngle <= -90.0)
         {
-            int extraSprIndex = 9;
-            if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) extraSprIndex += 4;
+            ItemStack* itemPtr1;
+            ItemStack* itemPtr2;
+            if (treeAngle >= 90.0)
+            {
+                itemPtr1 = new ItemStack(getGridX() + 1, getGridY(), getGridZ(), { {392,1} });
+
+                for (int i = 0; i < 8; i++)
+                {
+                    new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8) , randomRange(0, 5), randomRangeFloat(-1.2,1.2), randomRangeFloat(-2.6,-3.2), 0.18, randomRange(25,35));
+                }
+            }
             else
             {
-                if (getSeason() == seasonFlag::summer) { extraSprIndex += 1; }
-                else if (getSeason() == seasonFlag::autumn) { extraSprIndex += 2; }
-                else if (getSeason() == seasonFlag::winter) { extraSprIndex += 3; }
+                itemPtr1 = new ItemStack(getGridX() - 1, getGridY(), getGridZ(), { {392,1} });
+
+                for (int i = 0; i < 8; i++)
+                {
+                    new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 5), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
+                }
             }
 
-            
 
-            Sticker* stk = new Sticker(false, getX(), getY() + (16 * -1), spr::propset, leadItem.propSprIndex + extraSprIndex, stickerID, true, 0.0, { 24,40 });
-        }
-        else
-        {
-            Sticker* stk = ((Sticker*)(StickerList.find(stickerID))->second);
-            if (PlayerX() <= getGridX()) stk->rotateAngle += 0.7 + (float)(getTimer()) * 0.04;
-            else stk->rotateAngle -= 0.7 + (float)(getTimer()) * 0.04;
+
             
             
-            
-            
-            if (stk->rotateAngle >= 90.0 || stk->rotateAngle <= -90.0)
-            {
-                delete stk;
-                resetTimer();
-                setAniType(aniFlag::null);
-                return true;
-            }
+            addAniUSetPlayer(itemPtr1, aniFlag::drop);
+            //addAniUSetPlayer(itemPtr2, aniFlag::drop);
+            treeAngle = 0;
+            resetTimer();
+            setAniType(aniFlag::null);
+            return true;
         }
     }
     return false;
@@ -339,6 +346,28 @@ void Prop::drawSelf()
         dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
         dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
     );
+
+    if (treeAngle != 0)
+    {
+        int extraSprIndex = 9;
+        if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) extraSprIndex += 4;
+        else
+        {
+            if (getSeason() == seasonFlag::summer) { extraSprIndex += 1; }
+            else if (getSeason() == seasonFlag::autumn) { extraSprIndex += 2; }
+            else if (getSeason() == seasonFlag::winter) { extraSprIndex += 3; }
+        }
+        SDL_Point pt = { 24.0*zoomScale,40.0*zoomScale };
+        drawSpriteCenterRotate
+        (
+            spr::propset,
+            leadItem.propSprIndex + extraSprIndex,
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 + zoomScale * getIntegerFakeY(),
+            treeAngle,
+            &pt
+        );
+    }
 
 
 
