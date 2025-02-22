@@ -38,6 +38,7 @@ public:
 
         type = particleFlag::parabolic;
         list.push_back(this);
+        if (list.size() > 10000) prt(L"[메모리 누수 경고] Particle의 객체 수가 100개를 넘어갔습니다.\n");
         setXY(inputRealX, inputRealY);
     }
     ~Particle()

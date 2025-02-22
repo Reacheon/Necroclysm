@@ -9,6 +9,7 @@ import util;
 import Damage;
 import Corpse;
 import Particle;
+import Footprint;
 import GUI;
 import clickHold;
 import log;
@@ -68,6 +69,9 @@ export __int64 stepEvent()
 
 	//파티클 객체 스탭 이벤트 실행
 	for (int i = 0; i < Particle::list.size(); i++) { Particle::list[i]->step(); }
+
+	//파티클 객체 스탭 이벤트 실행
+	for (int i = 0; i < Footprint::list.size(); i++) { Footprint::list[i]->step(); }
 
     //GUI 객체 스텝 이벤트 실행
     for (int i = 0; i < GUI::getActiveGUIList().size(); i++){GUI::getActiveGUIList()[i]->step();}

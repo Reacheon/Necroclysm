@@ -1174,6 +1174,8 @@ export namespace itemVIPCode
     int railSwitchWS = 331;
     int railSwitchSW = 332;
     int railSwitchSE = 333;
+
+    int sandFloor = 381;
 };
 
 export enum class skillSrc

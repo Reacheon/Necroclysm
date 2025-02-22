@@ -31,6 +31,7 @@ import mouseGrid;
 import HUD;
 import Bullet;
 import Particle;
+import Footprint;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -38,6 +39,7 @@ int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
 
 __int64 analyseRender();
 __int64 drawTiles();
+__int64 drawFootprints();
 __int64 drawCorpses();
 __int64 drawItems();
 __int64 drawEntities();
@@ -77,6 +79,7 @@ export __int64 renderTile()
 
 	dur::analysis = analyseRender();
 	dur::tile = drawTiles();
+	drawFootprints();
 	dur::corpse = drawCorpses();
 	dur::item = drawItems();
 	dur::entity = drawEntities();
@@ -678,6 +681,32 @@ __int64 drawParticles()
 		setZoom(zoomScale);
 		SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
 		drawSpriteCenter
+		(
+			address->sprite,
+			address->sprIndex,
+			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+		);
+		SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
+		setZoom(1.0);
+	}
+
+	return getNanoTimer() - timeStampStart;
+}
+
+
+__int64 drawFootprints()
+{
+	__int64 timeStampStart = getNanoTimer();
+
+	for (int i = 0; i < Footprint::list.size(); i++)
+	{
+		Footprint* address = Footprint::list[i];
+		int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
+		int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
+		setZoom(zoomScale);
+		SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
+		drawSprite
 		(
 			address->sprite,
 			address->sprIndex,

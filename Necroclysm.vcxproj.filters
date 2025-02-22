@@ -528,5 +528,8 @@
     <ClCompile Include="code\Particle.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
+    <ClCompile Include="code\Footprint.ixx">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,6 +23,7 @@ public:
     {
         list.push_back(this);
         setXY(inputX, inputY);
+        if (list.size() > 500) prt(L"[메모리 누수 경고] Bullet의 객체 수가 500개를 넘어갔습니다.\n");
     }
     ~Bullet()
     {

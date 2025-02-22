@@ -187,6 +187,7 @@
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
     <ClCompile Include="code\Equip_input_mouse.ixx" />
     <ClCompile Include="code\Flame.ixx" />
+    <ClCompile Include="code\Footprint.ixx" />
     <ClCompile Include="code\gamepadBtnDown.ixx" />
     <ClCompile Include="code\gamepadBtnMotion.ixx" />
     <ClCompile Include="code\gamepadBtnUp.ixx" />

@@ -162,4 +162,6 @@ export void textureLoader()
 	spr::speechBubble = new Sprite(renderer, "image/UI/GUI/speechBubble.png", 320, 137);
 
 	spr::particle = new Sprite(renderer, "image/particle.png", 16, 16);
+
+	spr::footprint = new Sprite(renderer, "image/footprint.png", 16, 16);
 }

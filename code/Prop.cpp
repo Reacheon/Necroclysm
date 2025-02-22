@@ -252,29 +252,33 @@ bool Prop::runAnimation(bool shutdown)
 
         if (treeAngle >= 90.0 || treeAngle <= -90.0)
         {
+            Point3 itemPos;
             ItemStack* itemPtr1;
             ItemStack* itemPtr2;
             if (treeAngle >= 90.0)
             {
-                itemPtr1 = new ItemStack(getGridX() + 1, getGridY(), getGridZ(), { {392,1} });
+                if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };
+                else  itemPos = { getGridX(), getGridY(), getGridZ() };
+
+                itemPtr1 = new ItemStack(itemPos.x, itemPos.y, itemPos.z, { {392,1} });
 
                 for (int i = 0; i < 8; i++)
                 {
-                    new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8) , randomRange(0, 5), randomRangeFloat(-1.2,1.2), randomRangeFloat(-2.6,-3.2), 0.18, randomRange(25,35));
+                    new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8) , randomRange(0, 7), randomRangeFloat(-1.2,1.2), randomRangeFloat(-2.6,-3.2), 0.18, randomRange(25,35));
                 }
             }
             else
             {
-                itemPtr1 = new ItemStack(getGridX() - 1, getGridY(), getGridZ(), { {392,1} });
+                if (1/*TileWall(getGridX() - 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() - 1, getGridY(), getGridZ() };
+                else  itemPos = { getGridX(), getGridY(), getGridZ() };
+
+                itemPtr1 = new ItemStack(itemPos.x, itemPos.y, itemPos.z, { {392,1} });
 
                 for (int i = 0; i < 8; i++)
                 {
-                    new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 5), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
+                    new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
                 }
             }
-
-
-
             
             
             addAniUSetPlayer(itemPtr1, aniFlag::drop);

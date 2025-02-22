@@ -13,6 +13,7 @@ import log;
 import ItemData;
 import nanoTimer;
 import globalTime;
+import Footprint;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -101,6 +102,10 @@ void Player::startMove(int inputDir)
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{
 			player->setDirection(inputDir);
+			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemVIPCode::sandFloor)
+			{
+				new Footprint(getGridX(), getGridY(), entityInfo.direction);
+			}
 			player->move(inputDir, false);
 			turnCycle = turn::playerAnime;
 		}
@@ -335,6 +340,7 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 		entityInfo.walkMode = walkFlag::walk;
 	}
 
+	
 	updateVision(entityInfo.eyeSight);
 	updateMinimap();
 	if (getHasAStarDst())

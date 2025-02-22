@@ -141,4 +141,5 @@ export namespace spr
 	Sprite* staminaGaugeCircle = nullptr;
 	Sprite* speechBubble = nullptr;
 	Sprite* particle = nullptr;
+	Sprite* footprint = nullptr;
 }

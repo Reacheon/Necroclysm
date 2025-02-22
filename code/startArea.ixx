@@ -56,10 +56,15 @@ export void startArea()
 
 	new Monster(5, 8, 8, 0);//Çã¼ö¾Æºñ
 
-	new ItemStack(-1, 7, -1, { {388,1} });
 
 
 	new ItemStack(7, -4, 0, { {391,1} }); //¹ú¸ñµµ³¢
+
+	new ItemStack(-5, 1, 0, { {394,1} }); //³¬½Ã´ë
+
+	new ItemStack(-3, -4, -1, { {388,1} });//°î±ªÀÌ
+	new ItemStack(-2, -4, -1, { {393,1} });//±¤ºÎÇï¸ä
+	new ItemStack(-1, -4, -1, { {395,1} });//»ð
 
 
 
@@ -847,6 +852,10 @@ export void startArea()
 	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);
 	cart3->isVehicle = true;
 	cart3->vehType = vehFlag::car;
+
+	Vehicle* cart4 = new Vehicle(7, -5, 0, 378);
+	cart1->isVehicle = true;
+	cart1->vehType = vehFlag::car;
 
 
 	//new Vehicle(8, 5, 0, 379);
