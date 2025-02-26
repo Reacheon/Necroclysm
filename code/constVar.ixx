@@ -611,6 +611,8 @@ export enum class aniFlag
     move,
     atk,
     felling,
+    miningWall,
+    diggingWall,
     drop,
     winUnfoldOpen,
     winUnfoldClose,
@@ -1176,6 +1178,9 @@ export namespace itemVIPCode
     int railSwitchSE = 333;
 
     int sandFloor = 381;
+
+    int pickaxe = 388;
+    int fellingAxe = 391;
 };
 
 export enum class skillSrc

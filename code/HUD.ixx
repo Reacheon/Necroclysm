@@ -633,6 +633,7 @@ public:
 			//화면에 있는 아이템 터치
 			if (touchX == PlayerX() && touchY == PlayerY()) //자신 위치 터치
 			{
+
 				if (World::ins()->getTile(touchX, touchY, PlayerZ()).ItemStackPtr != nullptr)
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
@@ -749,7 +750,23 @@ public:
 			}
 			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1칸 이내
 			{
-				if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
+				if (TileWall(touchX, touchY, PlayerZ()) != 0)
+				{
+					auto ePtr = Player::ins()->getEquipPtr();
+					for (int i = 0; i < ePtr->itemInfo.size(); i++)
+					{
+						if (ePtr->itemInfo[i].itemCode == itemVIPCode::pickaxe)
+						{
+							if (ePtr->itemInfo[i].equipState == equipHandFlag::both)
+							{
+								Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+								addAniUSetPlayer(Player::ins(), aniFlag::miningWall);
+								break;
+							}
+						}
+					}
+				}
+				else if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
 				{
 					Prop* tgtProp = TileProp(touchX, touchY, PlayerZ());
 					int tgtItemCode = tgtProp->leadItem.itemCode;
@@ -792,7 +809,6 @@ public:
 					{
 						Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 						addAniUSetPlayer(Player::ins(), aniFlag::felling);
-
 					}
 					else if (tgtItemCode == 213 || tgtItemCode == 218)//불교 제단
 					{

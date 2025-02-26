@@ -337,6 +337,7 @@ __int64 drawTiles()
 			}
 
 
+
 			drawSpriteCenter
 			(
 				spr::tileset,
@@ -348,9 +349,12 @@ __int64 drawTiles()
 
 			if (thisTile->displayHPBarCount > 0)//개체 HP 표기
 			{
+				int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
+				int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
+
 				TileData& t = World::ins()->getTile(tgtX, tgtY, PlayerZ());
-				int pivotX = dst.x + dst.w / 2 - (int)(8 * zoomScale);
-				int pivotY = dst.y + dst.h / 2 + (int)(16 * zoomScale);
+				int pivotX = drawingX - (int)(8 * zoomScale);
+				int pivotY = drawingY;
 				SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
 				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 				drawFillRect(dst, col::black, t.alphaHPBar);
@@ -378,7 +382,7 @@ __int64 drawTiles()
 				dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 				if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-				drawFillRect(dst, lowCol::green, t.alphaHPBar);
+				drawFillRect(dst, lowCol::red, t.alphaHPBar);
 
 				if (t.displayHPBarCount > 1) t.displayHPBarCount--;
 				else if (t.displayHPBarCount == 1)

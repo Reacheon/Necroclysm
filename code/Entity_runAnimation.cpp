@@ -13,6 +13,9 @@ import Prop;
 
 import Bullet;
 import Aim;
+import TileData;
+import ItemStack;
+import Particle;
 
 bool Entity::runAnimation(bool shutdown)
 {
@@ -353,6 +356,120 @@ bool Entity::runAnimation(bool shutdown)
 			Player::ins()->setSpriteIndex(charSprIndex::WALK_2H);
 			if (entityInfo.isPlayer == true) { turnWait(1.0); }
 			else {  }
+			return true;
+		}
+	}
+	else if (getAniType() == aniFlag::miningWall)
+	{
+		addTimer();
+
+		char dx;
+		char dy;
+
+		switch (entityInfo.direction)
+		{
+		case 0: dx = 1; dy = 0; break;
+		case 1: dx = 1; dy = -1; break;
+		case 2: dx = 0; dy = -1; break;
+		case 3: dx = -1; dy = -1; break;
+		case 4: dx = -1; dy = 0; break;
+		case 5: dx = -1; dy = 1; break;
+		case 6: dx = 0; dy = 1; break;
+		case 7: dx = 1; dy = 1; break;
+		}
+
+		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+
+		if (shutdown == true)//사망으로 인한 강제종료
+		{
+			aniUSet.erase(aniUSet.find(this));
+			delete(((Sticker*)(StickerList.find(stickerID))->second));
+			setFakeX(0);
+			setFakeY(0);
+			return true;
+		}
+
+		TileData& tile = World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+
+		switch (getTimer())
+		{
+		case 1:
+			Player::ins()->setSpriteIndex(charSprIndex::MINING1);
+			break;
+		case 3:
+			setFakeX(getFakeX() + 2.5 * dx);
+			setFakeY(getFakeY() + 2.5 * dy);
+			break;
+		case 4:
+			setFakeX(getFakeX() + 2.0 * dx);
+			setFakeY(getFakeY() + 2.0 * dy);
+			break;
+		case 5:
+			setFakeX(getFakeX() + 1.5 * dx);
+			setFakeY(getFakeY() + 1.5 * dy);
+			break;
+		case 6:
+			setFakeX(getFakeX() + 1.0 * dx);
+			setFakeY(getFakeY() + 1.0 * dy);
+			break;
+		case 7:
+			setFakeX(getFakeX() + 0.5 * dx);
+			setFakeY(getFakeY() + 0.5 * dy);
+			Player::ins()->setSpriteIndex(charSprIndex::MINING2);
+			tile.wallHP -= 10;
+			tile.displayHPBarCount = 100;
+			tile.alphaHPBar = 255;
+
+			if (tile.wallHP <= 0)
+			{
+				DestroyWall(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+				tile.displayHPBarCount = 50;
+
+				auto itemPtr1 = new ItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ(), { {392,1} });
+
+				for (int i = 0; i < 8; i++)
+				{
+					new Particle(getX() + 16*dx + 8, getY() + 16*dy+ randomRange(-6, 6), randomRange(8, 15), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
+				}
+			}
+
+			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
+			break;
+		case 9:
+			setFakeX(getIntegerFakeX() - 0.5 * dx);
+			setFakeY(getIntegerFakeY() - 0.5 * dy);
+			break;
+		case 10:
+			setFakeX(getFakeX() - 1.0 * (float)dx);
+			setFakeY(getIntegerFakeY() - 1.0 * (float)dy);
+			break;
+		case 11:
+			setFakeX(getFakeX() - 1.5 * dx);
+			setFakeY(getFakeY() - 1.5 * dy);
+			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
+			break;
+		case 12:
+			setFakeX(getFakeX() - 2.0 * (float)dx);
+			setFakeY(getFakeY() - 2.0 * (float)dy);
+			break;
+		case 13:
+			setFakeX(getFakeX() - 2.5 * dx);
+			setFakeY(getFakeY() - 2.5 * dy);
+			break;
+		case 15:
+			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
+			break;
+		case 17:
+			delete(((Sticker*)(StickerList.find(stickerID))->second));
+		case 19:
+			setFakeX(0);
+			setFakeY(0);
+			resetTimer();
+			setAniType(aniFlag::null);
+			Player::ins()->setSpriteIndex(charSprIndex::WALK_2H);
+			if (entityInfo.isPlayer == true) { turnWait(1.0); }
+			else {}
 			return true;
 		}
 	}
