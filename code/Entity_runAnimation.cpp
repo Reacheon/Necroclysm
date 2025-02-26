@@ -87,6 +87,8 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
+		static bool rightAtk = true;
+
 		switch (entityInfo.direction)
 		{
 		case 0: dx = 1; dy = 0; break;
@@ -117,17 +119,29 @@ bool Entity::runAnimation(bool shutdown)
 
 		switch (getTimer())
 		{
-		case 2:
-			setFakeX(getIntegerFakeX() + 3 * dx);
-			setFakeY(getIntegerFakeY() + 3 * dy);
+		case 1:
+			if(rightAtk) Player::ins()->setSpriteIndex(charSprIndex::RATK1);
+			else  Player::ins()->setSpriteIndex(charSprIndex::LATK1);
 			break;
 		case 3:
-			setFakeX(getIntegerFakeX() + 2 * dx);
-			setFakeY(getIntegerFakeY() + 2 * dy);
+			setFakeX(getFakeX() + 2.5 * dx);
+			setFakeY(getFakeY() + 2.5 * dy);
 			break;
 		case 4:
-			setFakeX(getIntegerFakeX() + 1 * dx);
-			setFakeY(getIntegerFakeY() + 1 * dy);
+			setFakeX(getFakeX() + 2.0 * dx);
+			setFakeY(getFakeY() + 2.0 * dy);
+			break;
+		case 5:
+			setFakeX(getFakeX() + 1.5 * dx);
+			setFakeY(getFakeY() + 1.5 * dy);
+			break;
+		case 6:
+			setFakeX(getFakeX() + 1.0 * dx);
+			setFakeY(getFakeY() + 1.0 * dy);
+			break;
+		case 7:
+			setFakeX(getFakeX() + 0.5 * dx);
+			setFakeY(getFakeY() + 0.5 * dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
@@ -135,19 +149,33 @@ bool Entity::runAnimation(bool shutdown)
 			}
 			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
+			if (rightAtk)
+			{
+				Player::ins()->setSpriteIndex(charSprIndex::RATK2);
+				rightAtk = false;
+			}
+			else
+			{
+				Player::ins()->setSpriteIndex(charSprIndex::LATK2);
+				rightAtk = true;
+			}
 			break;
-		case 5:
-			setFakeX(getIntegerFakeX() - 1 * dx);
-			setFakeY(getIntegerFakeY() - 1 * dy);
+		case 9:
+			setFakeX(getFakeX() - 0.5 * dx);
+			setFakeY(getFakeY() - 0.5 * dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
 				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
 			}
 			break;
-		case 6:
-			setFakeX(getIntegerFakeX() - 2 * dx);
-			setFakeY(getIntegerFakeY() - 2 * dy);
+		case 10:
+			setFakeX(getFakeX() - 1.0 * dx);
+			setFakeY(getFakeY() - 1.0 * dy);
+			break;
+		case 11:
+			setFakeX(getFakeX() - 1.5 * dx);
+			setFakeY(getFakeY() - 1.5 * dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
@@ -155,20 +183,25 @@ bool Entity::runAnimation(bool shutdown)
 			}
 			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
 			break;
-		case 7:
-			setFakeX(getIntegerFakeX() - 3 * dx);
-			setFakeY(getIntegerFakeY() - 3 * dy);
+		case 12:
+			setFakeX(getFakeX() - 2.0 * dx);
+			setFakeY(getFakeY() - 2.0 * dy);
 			break;
-		case 8:
+		case 13:
+			setFakeX(getFakeX() - 2.5 * dx);
+			setFakeY(getFakeY() - 2.5 * dy);
+			break;
+		case 15:
 			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
 			break;
-		case 10:
+		case 17:
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
-		case 20:
+		case 19:
 			setFakeX(0);
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
+			Player::ins()->setSpriteIndex(charSprIndex::WALK);
 			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
@@ -230,17 +263,25 @@ bool Entity::runAnimation(bool shutdown)
 		case 1:
 			Player::ins()->setSpriteIndex(charSprIndex::MINING1);
 			break;
-		case 2:
-			setFakeX(getIntegerFakeX() + 3 * dx);
-			setFakeY(getIntegerFakeY() + 3 * dy);
-			break;
 		case 3:
-			setFakeX(getIntegerFakeX() + 2 * dx);
-			setFakeY(getIntegerFakeY() + 2 * dy);
+			setFakeX(getFakeX() + 2.5 * dx);
+			setFakeY(getFakeY() + 2.5 * dy);
 			break;
 		case 4:
-			setFakeX(getIntegerFakeX() + 1 * dx);
-			setFakeY(getIntegerFakeY() + 1 * dy);
+			setFakeX(getFakeX() + 2.0 * dx);
+			setFakeY(getFakeY() + 2.0 * dy);
+			break;
+		case 5:
+			setFakeX(getFakeX() + 1.5 * dx);
+			setFakeY(getFakeY() + 1.5 * dy);
+			break;
+		case 6:
+			setFakeX(getFakeX() + 1.0 * dx);
+			setFakeY(getFakeY() + 1.0 * dy);
+			break;
+		case 7:
+			setFakeX(getFakeX() + 0.5 * dx);
+			setFakeY(getFakeY() + 0.5 *dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
@@ -268,18 +309,22 @@ bool Entity::runAnimation(bool shutdown)
 
 			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
 			break;
-		case 5:
-			setFakeX(getIntegerFakeX() - 1 * dx);
-			setFakeY(getIntegerFakeY() - 1 * dy);
+		case 9:
+			setFakeX(getIntegerFakeX() - 0.5 * dx);
+			setFakeY(getIntegerFakeY() - 0.5 * dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
 				address->setFakeY(address->getIntegerFakeY() - 1 * dy);
 			}
 			break;
-		case 6:
-			setFakeX(getIntegerFakeX() - 2 * dx);
-			setFakeY(getIntegerFakeY() - 2 * dy);
+		case 10:
+			setFakeX(getFakeX() - 1.0 * (float)dx);
+			setFakeY(getIntegerFakeY() - 1.0 * (float)dy);
+			break;
+		case 11:
+			setFakeX(getFakeX() - 1.5 * dx);
+			setFakeY(getFakeY() - 1.5 * dy);
 			if (address != nullptr)
 			{
 				address->setFakeX(address->getIntegerFakeX() - 1 * dx);
@@ -287,16 +332,20 @@ bool Entity::runAnimation(bool shutdown)
 			}
 			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(1);
 			break;
-		case 7:
-			setFakeX(getIntegerFakeX() - 3 * dx);
-			setFakeY(getIntegerFakeY() - 3 * dy);
+		case 12:
+			setFakeX(getFakeX() - 2.0 * (float)dx);
+			setFakeY(getFakeY() - 2.0 * (float)dy);
 			break;
-		case 8:
+		case 13:
+			setFakeX(getFakeX() - 2.5 * dx);
+			setFakeY(getFakeY() - 2.5 * dy);
+			break;
+		case 15:
 			((Sticker*)(StickerList.find(stickerID))->second)->setSpriteIndex(2);
 			break;
-		case 10:
+		case 17:
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
-		case 20:
+		case 19:
 			setFakeX(0);
 			setFakeY(0);
 			resetTimer();

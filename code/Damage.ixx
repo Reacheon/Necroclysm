@@ -40,6 +40,8 @@ public:
         SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
         setFontSize(inputSize);
         setSolidText();
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선
@@ -68,6 +70,8 @@ public:
         SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
         setFontSize(8);
         setSolidText();
         drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선

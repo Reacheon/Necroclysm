@@ -383,7 +383,6 @@ void Prop::drawSelf()
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         drawFillRect(dst, col::black, alphaHPBar);
 
-
         if (leadItem.propFakeHP > leadItem.propHP) { leadItem.propFakeHP-=((float)leadItem.propMaxHP/100.0); }
         else if (leadItem.propFakeHP < leadItem.propHP) leadItem.propFakeHP = leadItem.propHP;
 

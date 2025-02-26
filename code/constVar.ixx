@@ -1252,8 +1252,11 @@ export enum charSprIndex
     SUPINE = 23,
 
     DASH = 24,
-    AIM_BOW = 30,
-    AIM_BOW_CROUCH = 31,
+
+    LATK1 = 28,
+    LATK2 = 29,
+    RATK1 = 30,
+    RATK2 = 31,
     AIM_RIFLE = 32,
     AIM_RIFLE_CROUCH = 33,
     LCAST = 34,

@@ -191,7 +191,6 @@ export struct ItemData
 export bool itemOverlay(ItemData& a, ItemData& b)
 {
     if (a.checkFlag(itemFlag::NONSTACK) == true || b.checkFlag(itemFlag::NONSTACK) == true) { return false; }
-
     //////////////////////////////////////////////////////////////////////////
 
     if (a.name != b.name) { return false; }

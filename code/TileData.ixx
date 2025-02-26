@@ -39,6 +39,13 @@ export struct TileData //총용량 29바이트
     unsigned __int16 blueLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
     //식물의 광원으로 계산할 땐 각각이 최댓값 255에 3값의 평균으로 광량 설정
 
+    __int16 wallHP = 100;
+    __int16 wallFakeHP = 100;
+    __int16 wallMaxHP = 100;
+    int displayHPBarCount = 0; //양수 200으로 설정시 점점 떨어지다가 1이 되면 alpha를 대신 줄임. alpha마저 모두 줄면 0으로
+    int alphaHPBar = 0;
+    int alphaFakeHPBar = 0;
+
     void* EntityPtr = nullptr;
     void* ItemStackPtr = nullptr;
     void* VehiclePtr = nullptr;

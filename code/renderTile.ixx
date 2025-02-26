@@ -345,6 +345,52 @@ __int64 drawTiles()
 				cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
 			);
 			setZoom(1.0);
+
+			if (thisTile->displayHPBarCount > 0)//개체 HP 표기
+			{
+				TileData& t = World::ins()->getTile(tgtX, tgtY, PlayerZ());
+				int pivotX = dst.x + dst.w / 2 - (int)(8 * zoomScale);
+				int pivotY = dst.y + dst.h / 2 + (int)(16 * zoomScale);
+				SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+				drawFillRect(dst, col::black, t.alphaHPBar);
+
+				if (t.wallFakeHP > t.wallHP) { t.wallFakeHP -= ((float)t.wallMaxHP / 100.0); }
+				else if (t.wallFakeHP < t.wallHP) t.wallFakeHP = t.wallHP;
+
+				if (t.wallFakeHP != t.wallHP)
+				{
+					if (t.alphaFakeHPBar > 20) { t.alphaFakeHPBar -= 20; }
+					else
+					{
+						t.alphaFakeHPBar = 0;
+						t.wallFakeHP = t.wallHP;
+					}
+				}
+				else { t.alphaFakeHPBar = 255; }
+
+				float ratioFakeHP = myMax((float)0.0, (t.wallFakeHP) / (float)(t.wallMaxHP));
+				dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+				drawFillRect(dst, col::white, t.alphaFakeHPBar);
+
+				float ratioHP = myMax((float)0.0, (float)(t.wallHP) / (float)(t.wallMaxHP));
+				dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
+				if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+				drawFillRect(dst, lowCol::green, t.alphaHPBar);
+
+				if (t.displayHPBarCount > 1) t.displayHPBarCount--;
+				else if (t.displayHPBarCount == 1)
+				{
+					t.alphaHPBar -= 10;
+					if (t.alphaHPBar <= 0)
+					{
+						t.alphaHPBar = 0;
+						t.displayHPBarCount = 0;
+					}
+				}
+			}
 		}
 
 
