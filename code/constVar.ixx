@@ -170,6 +170,9 @@ export enum class act
     settings,
     saveAndQuit,
 
+    toggleOn,
+    toggleOff,
+
     //skillInfo,
 };
 
@@ -505,6 +508,10 @@ export enum class itemFlag
     CROSSBOW,
 
     STUMP,
+
+    TOGGLE_ON,
+    TOGGLE_OFF,
+    HAS_TOGGLE_SPRITE,
 };
 
 export enum class walkFlag
@@ -1168,6 +1175,7 @@ export namespace itemVIPCode
     int railTL = 324;
     int railBL = 325;
 
+
     int railSwitchEN = 326;
     int railSwitchES = 327;
     int railSwitchNW = 328;
@@ -1177,10 +1185,21 @@ export namespace itemVIPCode
     int railSwitchSW = 332;
     int railSwitchSE = 333;
 
+    int wideRailVLeft = 402;
+    int wideRailVMid = 403;
+    int wideRailVRight = 404;
+
+    int wideRailHTop = 399;
+    int wideRailHMid = 400;
+    int wideRailHBot = 401;
+
     int sandFloor = 381;
 
     int pickaxe = 388;
     int fellingAxe = 391;
+
+    int dirtWall = 302;
+    int stoneWall = 397;
 };
 
 export enum class skillSrc

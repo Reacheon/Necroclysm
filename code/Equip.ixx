@@ -518,6 +518,9 @@ public:
 				{
 					barAct.push_back(act::reloadBulletToGun);
 				}
+
+				if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
+				else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
 			}
 		}
 		else if (lootCursor != -1)

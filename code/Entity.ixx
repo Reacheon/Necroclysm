@@ -20,6 +20,7 @@ import SkillData;
 import EntityData;
 import util;
 import Vehicle;
+import Light;
 
 export class Entity : public Ani, public Coord, public Drawable 
 {
@@ -42,6 +43,7 @@ private:
 public:
     Entity* ridingEntity = nullptr;
     ridingFlag ridingType = ridingFlag::none;
+    std::vector<std::unique_ptr<Light>> lightList;
 
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);

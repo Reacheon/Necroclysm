@@ -174,6 +174,23 @@ export void startArea()
 	new Prop(12, 4, 0, 118);//볼라드등
 
 
+	//철조망 아래 선로
+
+	new Prop(-2, 15, 0, itemVIPCode::railBR);
+	for(int i=0; i<11; i++)  new Prop(-1 + i, 15, 0, itemVIPCode::railRL);
+	new Prop(10, 15, 0, itemVIPCode::railSwitchWS);
+	for (int i = 0; i < 7; i++)  new Prop(10, 16 + i, 0, itemVIPCode::railTB);
+	new Prop(10, 23, 0, itemVIPCode::railTL);
+	for (int i = 0; i < 6; i++)  new Prop(9-i, 23, 0, itemVIPCode::railRL);
+	new Prop(3, 23, 0, itemVIPCode::railTR);
+	for (int i = 0; i < 3; i++) new Prop(3, 22 - i, 0, itemVIPCode::railTB);
+	new Prop(3, 19, 0, itemVIPCode::railBL);
+	for (int i = 0; i < 4; i++) new Prop(2 - i, 19, 0, itemVIPCode::railRL);
+	new Prop(-2, 19, 0, itemVIPCode::railTR);
+	for (int i = 0; i < 3; i++) new Prop(-2, 18 - i, 0, itemVIPCode::railTB);
+
+	for (int i = 0; i < 5; i++)  new Prop(11 + i, 15, 0, itemVIPCode::railRL);
+
 	//지하
 	{
 		for (int dx = -1; dx <= 1; dx++)
@@ -181,6 +198,14 @@ export void startArea()
 			for (int dy = -2; dy <= 2; dy++)
 			{
 				DestroyWall(-2 + dx, -3 + dy, -1);
+			}
+		}
+
+		for (int dx = -4; dx >= -20; dx--)
+		{
+			for (int dy = -6; dy <= 20; dy++)
+			{
+				setWall({ dx, dy, -1 },397);
 			}
 		}
 
@@ -240,48 +265,13 @@ export void startArea()
 			int cursorX = aisleEndX;
 			int cursorY = aisleEndY + 12;
 
-			for (int i = 0; i <= 25; i++)
+			for (int i = 0; i <= 78; i++)
 			{
-				new Prop(cursorX, cursorY, -1, itemVIPCode::railTB);
+				new Prop(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
+				new Prop(7, 39 - i, -1, itemVIPCode::wideRailVMid);
+				new Prop(8, 39 - i, -1, itemVIPCode::wideRailVRight);
 				cursorY--;
 			}
-
-			new Prop(cursorX, cursorY, -1, itemVIPCode::railBR);
-			cursorX++;
-
-			for (int i = 0; i < 11; i++)
-			{
-				new Prop(cursorX, cursorY, -1, itemVIPCode::railRL);
-				cursorX++;
-			}
-
-			new Prop(cursorX, cursorY, -1, itemVIPCode::railSwitchWS);//전환기
-
-			int secondCursorX = cursorX + 1;
-			int secondCursorY = cursorY;
-			for (int i = 0; i < 22; i++)
-			{
-				new Prop(secondCursorX, secondCursorY, -1, itemVIPCode::railRL);//나무문 설치
-				secondCursorX++;
-			}
-
-			cursorY++;
-
-			for (int i = 0; i < 26; i++)
-			{
-				new Prop(cursorX, cursorY, -1, itemVIPCode::railTB);//나무문 설치
-				cursorY++;
-			}
-
-			new Prop(cursorX, cursorY, -1, itemVIPCode::railTL);//나무문 설치
-			cursorX--;
-
-			for (int i = 0; i < 11; i++)
-			{
-				new Prop(cursorX, cursorY, -1, itemVIPCode::railRL);//나무문 설치
-				cursorX--;
-			}
-			new Prop(cursorX, cursorY, -1, itemVIPCode::railTR);//나무문 설치
 
 
 			//지하철 설치
@@ -854,8 +844,13 @@ export void startArea()
 	cart3->vehType = vehFlag::car;
 
 	Vehicle* cart4 = new Vehicle(7, -5, 0, 378);
-	cart1->isVehicle = true;
-	cart1->vehType = vehFlag::car;
+	cart4->isVehicle = true;
+	cart4->vehType = vehFlag::car;
+
+	//광차
+	Vehicle* cart5 = new Vehicle(3, 15, 0, 405);
+	cart5->isVehicle = true;
+	cart5->vehType = vehFlag::car;
 
 
 	//new Vehicle(8, 5, 0, 379);

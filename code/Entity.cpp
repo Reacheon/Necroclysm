@@ -80,9 +80,9 @@ void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
 {
 	setAtkTarget(inputX, inputY, inputZ, -1);
 }
-ItemPocket* Entity::getEquipPtr() 
-{ 
-	return entityInfo.equipment; 
+ItemPocket* Entity::getEquipPtr()
+{
+	return entityInfo.equipment;
 }
 
 void Entity::updateSpriteFlash()
@@ -110,9 +110,9 @@ void Entity::updateSpriteFlash()
 
 	spriteFlash = std::make_unique<Sprite>(renderer, drawingTexture, 48, 48);
 }
-Sprite* Entity::getSpriteFlash() 
-{ 
-	return spriteFlash.get(); 
+Sprite* Entity::getSpriteFlash()
+{
+	return spriteFlash.get();
 }
 void Entity::setFlashType(int inputType)
 {
@@ -309,7 +309,7 @@ void Entity::move(int dir, bool jump)
 	dstY += 16 * dGridY;
 	int dstGridX = (dstX - 8) / 16;
 	int dstGridY = (dstY - 8) / 16;
-	
+
 	(World::ins())->getTile(dstGridX, dstGridY, getGridZ()).EntityPtr = this;
 	(World::ins())->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
 
@@ -341,6 +341,14 @@ void Entity::move(int dir, bool jump)
 		setDstGrid(dstGridX, dstGridY);
 		setGrid(dstGridX, dstGridY, getGridZ());
 
+		for (int i = 0; i < lightList.size(); i++)
+		{
+			auto lPtr = lightList[i].get();
+			lPtr->releaseLight();
+			lPtr->setGrid(getGridX(), getGridY(), getGridZ());
+			lPtr->updateLight(lPtr->lightRange);
+		}
+
 		if (pulledCart != nullptr)
 		{
 			pulledCart->setDstGrid(getGridX(), getGridY());
@@ -364,7 +372,7 @@ void Entity::attack(int gridX, int gridY)
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			victimEntity->setFlashType(1);
-			victimEntity->addDmg(randomRange(6,10));
+			victimEntity->addDmg(randomRange(6, 10));
 		}
 		else
 		{
@@ -397,7 +405,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; }
 				else { x1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely);
 			}
 			else
@@ -407,7 +415,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
 			i++;
@@ -426,7 +434,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { y1++; }
 				else { y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx);
 			}
 			else
@@ -436,7 +444,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
 			i++;
@@ -451,7 +459,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 			else if (x1 > x2 && y2 > y1) { x1--; y1++; }
 			else { x1--; y1--; }
 			World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
-			if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+			if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 			i++;
 		}
 	}
@@ -480,7 +488,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely);
 			}
 			else
@@ -493,7 +501,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
 			i++;
@@ -515,7 +523,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx);
 			}
 			else
@@ -528,7 +536,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				{
 					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 				}
-				if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
 			i++;
@@ -546,7 +554,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 			{
 				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
 			}
-			if (isRayBlocker({x1, y1, getGridZ()})) { return; }
+			if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 			i++;
 		}
 	}
@@ -739,7 +747,7 @@ void Entity::updateCustomSpriteHuman()
 
 	if (entityInfo.skin != humanCustom::skin::null)
 	{
-		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0,0);
+		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
 	}
 
 	if (entityInfo.eyes != humanCustom::eyes::null)
@@ -801,7 +809,7 @@ void Entity::updateCustomSpriteHuman()
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	//캐릭터 장비 그리기
 	if (getEquipPtr()->itemInfo.size() > 0)
 	{
@@ -811,20 +819,23 @@ void Entity::updateCustomSpriteHuman()
 		{
 			int priority = 0;
 			Sprite* tgtSpr = nullptr;
+			ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
 			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
 			{
 			case equipHandFlag::left:
 			case equipHandFlag::both:
-				priority = getEquipPtr()->itemInfo[equipCounter].leftWieldPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].leftWieldSpr;
+				priority = tgtItem.leftWieldPriority;
+				tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
 				break;
 			case equipHandFlag::right:
-				priority = getEquipPtr()->itemInfo[equipCounter].rightWieldPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].rightWieldSpr;
+				priority = tgtItem.rightWieldPriority;
+				tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
 				break;
 			case equipHandFlag::normal:
-				priority = getEquipPtr()->itemInfo[equipCounter].equipPriority;
-				tgtSpr = (Sprite*)getEquipPtr()->itemInfo[equipCounter].equipSpr;
+				priority = tgtItem.equipPriority;
+				tgtSpr = (Sprite*)tgtItem.equipSpr;
+				if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE)&& tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
+				
 				break;
 			default:
 				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
@@ -838,7 +849,7 @@ void Entity::updateCustomSpriteHuman()
 		{
 			if (it->second != nullptr)
 			{
-				drawTexture(it->second->getTexture(), 0,0);
+				drawTexture(it->second->getTexture(), 0, 0);
 			}
 		}
 
@@ -853,7 +864,7 @@ void Entity::drawSelf()
 {
 	stepEvent();
 	setZoom(zoomScale);
-	if(entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
+	if (entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
 	else setFlip(SDL_FLIP_HORIZONTAL);
 
 
@@ -951,7 +962,7 @@ void Entity::drawSelf()
 
 		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 		{
-			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, {0,0,48,24});
+			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,24 });
 			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });

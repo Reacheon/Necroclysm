@@ -462,6 +462,9 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"NO_HAIR_HELMET") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::NO_HAIR_HELMET);
                                     else if (strFragment.substr(0, j) == L"BOW") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::BOW);
                                     else if (strFragment.substr(0, j) == L"CROSSBOW") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CROSSBOW);
+                                    else if (strFragment.substr(0, j) == L"TOGGLE_ON") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TOGGLE_ON);
+                                    else if (strFragment.substr(0, j) == L"TOGGLE_OFF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TOGGLE_OFF);
+                                    else if (strFragment.substr(0, j) == L"HAS_TOGGLE_SPRITE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::HAS_TOGGLE_SPRITE);
                                     else
                                     {
                                         errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));
@@ -746,6 +749,11 @@ export int readItemDex(const wchar_t* file)
                         case csvItem::equipSpr:
                             errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
                             itemDex[arrayCounter / (csvWidth)-1].equipSpr = spr::spriteMapper[strFragment.c_str()];
+
+                            if (itemDex[arrayCounter / (csvWidth)-1].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
+                            {
+                                itemDex[arrayCounter / (csvWidth)-1].equipSprToggleOn = spr::spriteMapper[(strFragment+L"On").c_str()];
+                            }
                             break;
                         case csvItem::equipPriority:
                             itemDex[arrayCounter / (csvWidth)-1].equipPriority = wtoi(strFragment.c_str());

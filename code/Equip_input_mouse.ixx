@@ -109,6 +109,11 @@ void Equip::clickUpGUI()
 				{
 					actFunc::unload(equipPtr, equipCursor);
 				}
+				case act::toggleOff:
+				case act::toggleOn:
+					actFunc::toggle(equipPtr->itemInfo[equipCursor]);
+					updateBarAct();
+					return;
 				}
 
 				if (equipPtr->itemInfo.size() == 0)
@@ -122,6 +127,7 @@ void Equip::clickUpGUI()
 					equipScroll = equipPtr->itemInfo.size() - equipScrollSize;
 					if (equipScroll < 0) { equipScroll = 0; }
 				}
+				break;
 			}
 		}
 	}

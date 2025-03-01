@@ -167,6 +167,11 @@ void Loot::clickUpGUI()
 				case act::unloadBulletFromGun:
 					actFunc::unload(lootPocket, lootCursor);
 					break;
+				case act::toggleOff:
+				case act::toggleOn:
+					actFunc::toggle(lootPocket->itemInfo[lootCursor]);
+					updateBarAct();
+					return;
 				}
 			}
 		}

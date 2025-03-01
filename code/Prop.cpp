@@ -395,7 +395,7 @@ void Prop::drawSelf()
                 leadItem.propFakeHP = leadItem.propHP;
             }
         }
-        else { alphaFakeHPBar = 255; }
+        else { alphaFakeHPBar = 0; }
 
         float ratioFakeHP = myMax((float)0.0, (leadItem.propFakeHP) / (float)(leadItem.propMaxHP));
         dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };

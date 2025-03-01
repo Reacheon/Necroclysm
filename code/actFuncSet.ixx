@@ -7,12 +7,14 @@ import util;
 import globalVar;
 import wrapVar;
 import World;
+import Entity;
 import ItemStack;
 import ItemPocket;
 import log;
 import Lst;
 import Player;
 import Prop;
+import ItemData;
 
 //액트가 실행되는 환경은 3가지 경우가 가능
 // 0:기본 HUD, 1:Loot, 2:Equip 
@@ -217,5 +219,30 @@ export namespace actFunc
 		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 		tgtProp->leadItem.extraSprIndexSingle--;
 		Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+	}
+
+	export void toggle(ItemData& inputItem)
+	{
+		if (inputItem.checkFlag(itemFlag::TOGGLE_OFF))
+		{
+			inputItem.eraseFlag(itemFlag::TOGGLE_OFF);
+			inputItem.addFlag(itemFlag::TOGGLE_ON);
+
+			Player::ins()->lightList.push_back(std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 4, 80, SDL_Color{150, 150, 250}));
+
+			Player::ins()->updateCustomSpriteHuman();
+			updateLog(L"#FFFFFF헤드랜턴의 전원을 켰다.");
+		}
+		else if (inputItem.checkFlag(itemFlag::TOGGLE_ON))
+		{
+			inputItem.eraseFlag(itemFlag::TOGGLE_ON);
+			inputItem.addFlag(itemFlag::TOGGLE_OFF);
+
+			Player::ins()->lightList.clear();
+
+			Player::ins()->updateCustomSpriteHuman();
+			updateLog(L"#FFFFFF헤드랜턴의 전원을 껐다.");
+
+		}
 	}
 };

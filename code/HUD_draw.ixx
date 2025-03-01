@@ -821,6 +821,8 @@ void HUD::drawBarAct()
 				setBtnLayout(sysStr[161], 147);
 			}
 		}
+		else if (barAct[i] == act::toggleOff) setBtnLayout(sysStr[196], 162);
+		else if (barAct[i] == act::toggleOn) setBtnLayout(sysStr[196], 163);
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기

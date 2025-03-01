@@ -301,6 +301,7 @@ __int64 drawTiles()
 		case 0:
 			break;
 		default:
+
 			setZoom(zoomScale);
 			int dirCorrection = 0;
 			if (itemDex[thisTile->wall].tileConnectGroup != -1)
@@ -327,10 +328,10 @@ __int64 drawTiles()
 					int	leftTileGroup = itemDex[leftTile->wall].tileConnectGroup;
 					int	rightTileGroup = itemDex[rightTile->wall].tileConnectGroup;
 
-					topCheck = currentTileGroup == topTileGroup;
-					botCheck = currentTileGroup == botTileGroup;
-					leftCheck = currentTileGroup == leftTileGroup;
-					rightCheck = currentTileGroup == rightTileGroup;
+					topCheck = (currentTileGroup == topTileGroup);
+					botCheck = (currentTileGroup == botTileGroup);
+					leftCheck = (currentTileGroup == leftTileGroup);
+					rightCheck = (currentTileGroup == rightTileGroup);
 				}
 
 				dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
@@ -371,7 +372,7 @@ __int64 drawTiles()
 						t.wallFakeHP = t.wallHP;
 					}
 				}
-				else { t.alphaFakeHPBar = 255; }
+				else { t.alphaFakeHPBar = 0; }
 
 				float ratioFakeHP = myMax((float)0.0, (t.wallFakeHP) / (float)(t.wallMaxHP));
 				dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
