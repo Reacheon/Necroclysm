@@ -470,8 +470,8 @@ public:
 		{
 			Vehicle* myCar = (Vehicle*)ctrlVeh;
 			myCar->rpmState = 0;
-			myCar->trainMoveCounter = 0;
-			myCar->trainSpdVal = 0;
+			myCar->singleRailMoveCounter = 0;
+			myCar->singleRailSpdVal = 0;
 
 			if (myCar->spdVec.getLength() != 0)
 			{
@@ -532,7 +532,7 @@ public:
 			myCar->rpmState++;
 			if (myCar->rpmState >= 7) myCar->rpmState = 0;
 
-			if (myCar->vehType == vehFlag::train)
+			if (myCar->vehType == vehFlag::minecart)
 			{
 				dir16 startDir = dir16::dir2;
 				int vx = myCar->getGridX();
@@ -597,6 +597,14 @@ public:
 					}
 				}
 			}
+			else if (myCar->vehType == vehFlag::train)
+			{
+				if (myCar->gearState == gearFlag::drive) myCar->accVec = scalarMultiple(dir16ToVec(myCar->bodyDir), 7.0);
+				else if (myCar->gearState == gearFlag::reverse) myCar->accVec = scalarMultiple(dir16ToVec(reverse(myCar->bodyDir)), 7.0);
+				turnWait(1.0);
+			}
+
+			
 
 			break;
 		}
@@ -684,7 +692,7 @@ public:
 							{
 								ctrlVeh = belowVehicle;
 								barAct = actSet::train;
-								typeHUD = vehFlag::train;
+								typeHUD = vehFlag::minecart;
 							}
 							else
 							{

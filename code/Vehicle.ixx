@@ -30,7 +30,6 @@ public:
     std::wstring name = L"FNAME";
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도
     std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> partInfo;
-    bool isVehicle = false;
     vehFlag vehType = vehFlag::none;
     dir16 bodyDir = dir16::dir2;
     dir16 wheelDir = dir16::dir2;
@@ -43,17 +42,24 @@ public:
     float yAcc = 0;
     float zAcc = 0; //헬기 등에서는 사용될 수 있을 것 같다
     float rotateAcc = 0;
-    Vehicle* rearTrain = nullptr;
     Point2 trainWheelCenter = { 0,0 }; //열차의 회전중심, 열차바퀴들의 중심좌표로 정해짐
     //헬기용 변수
     __int8 collectiveState = 0;
     __int8 cyclicState = -1;
     __int8 rpmState = 0; //0~6
     bool isAIFirstRun = true;
-    float trainSpdVal = 0.0;
-    dir16 trainSpdDir = dir16::dir2;
-    int trainMoveCounter = 0;
-    std::vector<dir16> trainMoveVec;
+
+    Vehicle* rearVehicle = nullptr;
+
+    //싱글레일(협궤) 관련 변수
+    float singleRailSpdVal = 0.0;
+    dir16 singleRailSpdDir = dir16::dir2;
+    int singleRailMoveCounter = 0;
+    std::vector<dir16> singleRailMoveVec;
+
+    float wideRailSpdVal = 0.0;
+    dir16 wideRailSpdDir = dir16::dir2;
+    std::vector<dir16> wideRailMoveVec;
 
     Vehicle(int inputX, int inputY, int inputZ, int leadItemCode);
     ~Vehicle();

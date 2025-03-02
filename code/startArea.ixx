@@ -265,6 +265,14 @@ export void startArea()
 			int cursorX = aisleEndX;
 			int cursorY = aisleEndY + 12;
 
+			//for (int i = 0; i <= 78; i++)
+			//{
+			//	new Prop(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
+			//	new Prop(7, 39 - i, -1, itemVIPCode::wideRailVMid);
+			//	new Prop(8, 39 - i, -1, itemVIPCode::wideRailVRight);
+			//	cursorY--;
+			//}
+
 			for (int i = 0; i <= 78; i++)
 			{
 				new Prop(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
@@ -281,7 +289,6 @@ export void startArea()
 			{
 
 				myTrainPower->vehType = vehFlag::train;
-				myTrainPower->isVehicle = true;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
 				myTrainPower->extendPart(vX, vY - 1, 48);
@@ -359,8 +366,7 @@ export void startArea()
 				int vX = 7;
 				int vY = 7;
 				Vehicle* myTrain = new Vehicle(vX, vY, -1, 48);//차량 설치
-				myTrainPower->rearTrain = myTrain;
-				myTrain->isVehicle = true;
+				myTrainPower->rearVehicle = myTrain;
 				myTrain->vehType = vehFlag::train;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
@@ -697,7 +703,6 @@ export void startArea()
 	int vX = pY - 8;
 	int vY = pY + 3;
 	Vehicle* myCar = new Vehicle(vX, vY, 0, 48);//차량 설치
-	myCar->isVehicle = true;
 	myCar->vehType = vehFlag::car;
 
 	///////////////////////차량 기초 프레임//////////////////////////////////////
@@ -764,7 +769,6 @@ export void startArea()
 
 	///////////////////오토바이///////////////////////////////////////////
 	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, 48);
-	myMoto->isVehicle = true;
 	myMoto->extendPart(vX + 6, vY + 4, 48);
 	myMoto->extendPart(vX + 6, vY + 6, 48);
 
@@ -774,7 +778,6 @@ export void startArea()
 
 	////////////////////자전거////////////////////////////////////////////
 	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, 48);
-	myBike->isVehicle = true;
 	myBike->extendPart(vX + 9, vY + 3, 48);
 	myBike->extendPart(vX + 9, vY + 5, 48);
 
@@ -789,7 +792,6 @@ export void startArea()
 		int cy = 0;
 		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
 		myHeli->vehType = vehFlag::heli;
-		myHeli->isVehicle = true;
 		myHeli->addPart(cx, cy, { 311 });
 
 		myHeli->extendPart(cx, cy - 1, 48);
@@ -832,25 +834,21 @@ export void startArea()
 
 	//수레 3종
 	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);
-	cart1->isVehicle = true;
 	cart1->vehType = vehFlag::car;
 
 	Vehicle* cart2 = new Vehicle(8, 5, 0, 379);
-	cart2->isVehicle = true;
 	cart2->vehType = vehFlag::car;
 
 	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);
-	cart3->isVehicle = true;
 	cart3->vehType = vehFlag::car;
 
 	Vehicle* cart4 = new Vehicle(7, -5, 0, 378);
-	cart4->isVehicle = true;
 	cart4->vehType = vehFlag::car;
 
 	//광차
 	Vehicle* cart5 = new Vehicle(3, 15, 0, 405);
-	cart5->isVehicle = true;
-	cart5->vehType = vehFlag::car;
+	cart5->vehType = vehFlag::minecart;
+	//cart5->addPart(3, 15, { 313 });
 
 
 	//new Vehicle(8, 5, 0, 379);

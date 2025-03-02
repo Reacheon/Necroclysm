@@ -636,7 +636,7 @@ export enum class aniFlag
     shotAuto,
     shotArrow,
     propRush,
-    trainRush,
+    minecartRush,
     quickSlotPopLeft,
     quickSlotPopRight,
     fireStorm,
@@ -1162,6 +1162,7 @@ export enum class vehFlag
     none,
     car,
     heli,
+    minecart,
     train,
 };
 
