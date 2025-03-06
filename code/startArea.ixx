@@ -225,7 +225,7 @@ export void startArea()
 			int aisleEndY = cy;
 			for (int dx = -3; dx <= 3; dx++)
 			{
-				for (int dy = -40; dy <= 40; dy++)
+				for (int dy = -50; dy <= 40; dy++)
 				{
 					DestroyWall(aisleEndX + dx, aisleEndY + dy, -1);
 				}
@@ -366,7 +366,6 @@ export void startArea()
 				int vX = 7;
 				int vY = 7;
 				Vehicle* myTrain = new Vehicle(vX, vY, -1, 48);//차량 설치
-				myTrainPower->rearVehicle = myTrain;
 				myTrain->vehType = vehFlag::train;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
@@ -846,11 +845,25 @@ export void startArea()
 	cart4->vehType = vehFlag::car;
 
 	//광차
-	Vehicle* cart5 = new Vehicle(3, 15, 0, 405);
-	cart5->vehType = vehFlag::minecart;
-	//cart5->addPart(3, 15, { 313 });
+	Vehicle* minecart1 = new Vehicle(3, 15, 0, 405);
+	minecart1->vehType = vehFlag::minecart;
+	minecart1->addPart(3, 15, { itemVIPCode::minecartController });
+	minecart1->bodyDir = dir16::dir0;
+	minecart1->isPowerCart = true;
 
+	Vehicle* minecart2 = new Vehicle(2, 15, 0, 405);
+	minecart2->vehType = vehFlag::minecart;
+	minecart2->bodyDir = dir16::dir0;
 
+	Vehicle* minecart3 = new Vehicle(1, 15, 0, 405);
+	minecart3->vehType = vehFlag::minecart;
+	minecart3->bodyDir = dir16::dir0;
+
+	minecart1->rearCart = minecart2;
+	minecart2->rearCart = minecart3;
+
+	minecart3->frontCart = minecart2;
+	minecart2->frontCart = minecart1;
 	//new Vehicle(8, 5, 0, 379);
 	//new Vehicle(6, 5, 0, 137);
 

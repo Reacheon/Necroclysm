@@ -91,6 +91,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\INVENTORY">
       <UniqueIdentifier>{3d8fab15-a267-4023-b6cb-b5868c2a8072}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\07_Vehicle">
+      <UniqueIdentifier>{6f6cbb85-1d23-42d6-9843-603bea97363e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -218,9 +221,6 @@
     </ClCompile>
     <ClCompile Include="code\readEntityDex.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Vehicle.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\Alchemy.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
@@ -483,9 +483,6 @@
     <ClCompile Include="code\Entity_runAnimation.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
-    <ClCompile Include="code\Vehicle.cpp">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
     <ClCompile Include="code\Entity.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
@@ -530,6 +527,15 @@
     </ClCompile>
     <ClCompile Include="code\Footprint.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="Vehicle_runAI.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

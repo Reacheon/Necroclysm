@@ -1186,13 +1186,15 @@ export namespace itemVIPCode
     int railSwitchSW = 332;
     int railSwitchSE = 333;
 
+    int wideRailHTop = 399;
+    int wideRailHMid = 400;
+    int wideRailHBot = 401;
+
     int wideRailVLeft = 402;
     int wideRailVMid = 403;
     int wideRailVRight = 404;
 
-    int wideRailHTop = 399;
-    int wideRailHMid = 400;
-    int wideRailHBot = 401;
+
 
     int sandFloor = 381;
 
@@ -1201,6 +1203,9 @@ export namespace itemVIPCode
 
     int dirtWall = 302;
     int stoneWall = 397;
+
+    int minecart = 405;
+    int minecartController = 406;
 };
 
 export enum class skillSrc

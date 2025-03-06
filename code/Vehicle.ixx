@@ -49,14 +49,16 @@ public:
     __int8 rpmState = 0; //0~6
     bool isAIFirstRun = true;
 
-    Vehicle* rearVehicle = nullptr;
-
     //싱글레일(협궤) 관련 변수
     float singleRailSpdVal = 0.0;
     dir16 singleRailSpdDir = dir16::dir2;
     int singleRailMoveCounter = 0;
     std::vector<dir16> singleRailMoveVec;
+    Vehicle* frontCart = nullptr;
+    Vehicle* rearCart = nullptr;
+    bool isPowerCart = false;
 
+    //멀티레일(광궤) 관련 변수;
     float wideRailSpdVal = 0.0;
     dir16 wideRailSpdDir = dir16::dir2;
     std::vector<dir16> wideRailMoveVec;

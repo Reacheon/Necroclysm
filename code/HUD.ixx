@@ -451,10 +451,20 @@ public:
 		case act::shiftGear:
 		{
 			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			if (myCar->gearState == gearFlag::park) myCar->gearState = gearFlag::reverse;
-			else if (myCar->gearState == gearFlag::reverse) myCar->gearState = gearFlag::neutral;
-			else if (myCar->gearState == gearFlag::neutral) myCar->gearState = gearFlag::drive;
-			else myCar->gearState = gearFlag::park;
+			if (myCar->vehType == vehFlag::car)
+			{
+				if (myCar->gearState == gearFlag::park) myCar->gearState = gearFlag::reverse;
+				else if (myCar->gearState == gearFlag::reverse) myCar->gearState = gearFlag::neutral;
+				else if (myCar->gearState == gearFlag::neutral) myCar->gearState = gearFlag::drive;
+				else myCar->gearState = gearFlag::park;
+			}
+			else
+			{
+				if (myCar->gearState == gearFlag::park) myCar->gearState = gearFlag::drive;
+				else if (myCar->gearState == gearFlag::reverse) myCar->gearState = gearFlag::drive;
+				else if (myCar->gearState == gearFlag::neutral) myCar->gearState = gearFlag::drive;
+				else myCar->gearState = gearFlag::reverse;
+			}
 			turnWait(1.0);
 			break;
 		}
@@ -572,38 +582,31 @@ public:
 					{
 						if (myCar->bodyDir == dir16::dir0)//동쪽 방향 열차
 						{
-							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir0)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir2)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir6)), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir2)//북쪽 방향 열차
 						{
-							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir2)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir4)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir0)), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir4)//서쪽 방향 열차
 						{
-							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir6), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir4)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir2)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir6)), 7.0);
 						}
 						else if (myCar->bodyDir == dir16::dir6)//남쪽 방향 열차
 						{
-							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir2), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir4), 7.0);
-							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(dir16::dir0), 7.0);
+							if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir6)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir4)), 7.0);
+							else if (tgtProp->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) myCar->accVec = scalarMultiple(dir16ToVec(reverse(dir16::dir0)), 7.0);
 						}
 					}
 				}
 			}
-			else if (myCar->vehType == vehFlag::train)
-			{
-				if (myCar->gearState == gearFlag::drive) myCar->accVec = scalarMultiple(dir16ToVec(myCar->bodyDir), 7.0);
-				else if (myCar->gearState == gearFlag::reverse) myCar->accVec = scalarMultiple(dir16ToVec(reverse(myCar->bodyDir)), 7.0);
-				turnWait(1.0);
-			}
-
 			
 
 			break;
@@ -687,6 +690,21 @@ public:
 							}
 						}
 						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 313)//열차 조종장치
+						{
+							if (ctrlVeh == nullptr)
+							{
+								ctrlVeh = belowVehicle;
+								barAct = actSet::train;
+								typeHUD = vehFlag::minecart;
+							}
+							else
+							{
+								ctrlVeh = nullptr;
+								barAct = actSet::null;
+								typeHUD = vehFlag::none;;
+							}
+						}
+						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemVIPCode::minecartController) //열차 조종장치
 						{
 							if (ctrlVeh == nullptr)
 							{

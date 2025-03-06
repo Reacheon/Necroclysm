@@ -639,6 +639,27 @@ __int64 drawEntities()
 					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255); //텍스쳐 투명도 설정
 					setZoom(1.0);
 				}
+				else if (vPtr->isPowerCart)
+				{
+					SDL_Rect dst;
+					dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+					dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+					dst.w = tileSize;
+					dst.h = tileSize;
+
+					setZoom(zoomScale);
+					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 110); //텍스쳐 투명도 설정
+					SDL_SetTextureBlendMode(spr::dirMarker->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+					drawSpriteCenter
+					(
+						spr::dirMarker,
+						224 + dir16toInt16(vPtr->bodyDir),
+						dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+						dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
+					);
+					SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255); //텍스쳐 투명도 설정
+					setZoom(1.0);
+				}
 			}
 
 			//플레이어 속도 표현

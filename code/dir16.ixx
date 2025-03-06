@@ -1,9 +1,8 @@
-//16방향
-
 export module dir16;
 
 import std;
 import Vec3;
+import errorBox;
 
 export enum class dir16
 {
@@ -43,6 +42,7 @@ export dir16 ACW(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir7;
     else if (input == dir16::dir7) return dir16::dir7_5;
     else if (input == dir16::dir7_5) return dir16::dir0;
+    else errorBox(L"[utility] ACW에서 알 수 없는 방향이 입력되었다.");
 }
 
 export dir16 ACW2(dir16 input)
@@ -68,6 +68,7 @@ export dir16 CW(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir6;
     else if (input == dir16::dir7) return dir16::dir6_5;
     else if (input == dir16::dir7_5) return dir16::dir7;
+    else errorBox(L"[utility] CW에서 알 수 없는 방향이 입력되었다.");
 }
 
 export dir16 CW2(dir16 input)
@@ -93,6 +94,7 @@ export dir16 reverse(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir2_5;
     else if (input == dir16::dir7) return dir16::dir3;
     else if (input == dir16::dir7_5) return dir16::dir3_5;
+    else errorBox(L"[utility] reverse에서 알 수 없는 방향이 입력되었다.");
 }
 
 export std::wstring dir16ToString(dir16 input)
@@ -113,6 +115,7 @@ export std::wstring dir16ToString(dir16 input)
     else if (input == dir16::dir6_5) return L"292.5°";
     else if (input == dir16::dir7) return L"315°";
     else if (input == dir16::dir7_5) return L"337.5°";
+    else errorBox(L"[utility] dir16ToString에서 알 수 없는 방향이 입력되었다.");
 }
 
 export Vec3 dir16ToVec(dir16 input)
@@ -133,6 +136,7 @@ export Vec3 dir16ToVec(dir16 input)
     else if (input == dir16::dir6_5) return getDefaultVec(13);
     else if (input == dir16::dir7) return getDefaultVec(14);
     else if (input == dir16::dir7_5) return getDefaultVec(15);
+    else errorBox(L"[utility] dir16ToVec에서 알 수 없는 방향이 입력되었다.");
 }
 
 export int dir16toInt16(dir16 input)
@@ -153,4 +157,19 @@ export int dir16toInt16(dir16 input)
     else if (input == dir16::dir6_5) return 13;
     else if (input == dir16::dir7) return 14;
     else if (input == dir16::dir7_5) return 15;
+    else errorBox(L"[utility] dir16toInt16에서 알 수 없는 방향이 입력되었다.");
+}
+
+
+export dir16 int8todir16(int inputDir)
+{
+    if (inputDir == 0) return dir16::dir0;
+    else if (inputDir == 1) return dir16::dir1;
+    else if (inputDir == 2) return dir16::dir2;
+    else if (inputDir == 3) return dir16::dir3;
+    else if (inputDir == 4) return dir16::dir4;
+    else if (inputDir == 5) return dir16::dir5;
+    else if (inputDir == 6) return dir16::dir6;
+    else if (inputDir == 7) return dir16::dir7;
+    else errorBox(L"[utility] int8todir16에서 0~7 범위가 아닌 dir이 입력되었다.");
 }
