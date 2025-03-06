@@ -10,7 +10,7 @@ bool Vehicle::runAI()
 {
     if (isAIFirstRun) isAIFirstRun = false;
 
-    prt(L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
+    //prt(L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
 
 
     if (isPowerCart)
@@ -235,7 +235,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxLeft, trainCursorY - getGridY() + dyLeft) == true)
                     {
-                        //prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                        prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -251,7 +251,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxRight, trainCursorY - getGridY() + dyRight) == true)
                     {
-                        //prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                        prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -305,7 +305,7 @@ bool Vehicle::runAI()
             {
                 if (rearCart != nullptr)
                 {
-                    rearCart->singleRailSpdVal = 999;
+                    rearCart->singleRailSpdVal = initSingleRailSpdVal;
                     int dir = coord2Dir(initGridX - rearCart->getGridX(), initGridY - rearCart->getGridY());
                     rearCart->bodyDir = int8todir16(dir);
                     rearCart->singleRailSpdDir = int8todir16(dir);
@@ -320,11 +320,11 @@ bool Vehicle::runAI()
         //========================================================= ACT2 =========================================================
         if (getTurnResource() >= 1.0)
         {
-            useTurnResource(1.0);
             if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0) || (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
             {
                 if (vehType == vehFlag::car || vehType == vehFlag::heli || vehType == vehFlag::train)
                 {
+                    useTurnResource(1.0);
                     if (spdVec.compZ != 0)
                     {
                         zShift(spdVec.compZ);
@@ -428,95 +428,99 @@ bool Vehicle::runAI()
                         return false;
                     }
                 }
-                else if (vehType == vehFlag::minecart)
+                
+            }
+        }
+
+        //========================================================= ACT3 =========================================================
+        if (getTurnResource() >= 1.0)
+        {
+            if (vehType == vehFlag::minecart && rpmState >= 1)
+            {
+                useTurnResource(1.0);
+
+                //열차 엣지 (7,-16)
+                int vx = getGridX();
+                int vy = getGridY();
+                int vz = getGridZ();
+
+                //1. 차량 속도값 설정
+                singleRailSpdVal = 10;
+                if (singleRailSpdVal != 0)//마찰에 의한 손실
                 {
-                    //열차 엣지 (7,-16)
-                    int vx = getGridX();
-                    int vy = getGridY();
-                    int vz = getGridZ();
-                    //prt(L"[Vehicle:train] 열차 AI 최초 실행, 열차 중심 위치 (%d,%d,%d)\n", vx, vy, vz);
+                    float massCoeff = 1.5;
+                    float frictionCoeff = 1.0;
+                    float delSpd = frictionCoeff / massCoeff;
 
-                    if (rpmState >= 1)//열차 rpm state에 따른 가속도 추가
+                    if (delSpd > singleRailSpdVal) singleRailSpdVal = 0;
+                    else singleRailSpdVal - delSpd;
+                }
+
+                //2. 현재 차량의 위치에 있는 레일에 따라 시작하는 속도의 방향(singleRailSpdDir)을 정한다.
+                Prop* currentRail = TileProp(vx, vy, vz);
+                if (currentRail != nullptr)
+                {
+                    if (gearState == gearFlag::drive)//주행기어
                     {
-                        //1. 차량 속도값 설정
-                        singleRailSpdVal = 10;
-                        if (singleRailSpdVal != 0)//마찰에 의한 손실
+                        if (bodyDir == dir16::dir0)//동쪽 방향 열차
                         {
-                            float massCoeff = 1.5;
-                            float frictionCoeff = 1.0;
-                            float delSpd = frictionCoeff / massCoeff;
-
-                            if (delSpd > singleRailSpdVal) singleRailSpdVal = 0;
-                            else singleRailSpdVal - delSpd;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                         }
-
-                        //2. 현재 차량의 위치에 있는 레일에 따라 시작하는 속도의 방향(singleRailSpdDir)을 정한다.
-                        Prop* currentRail = TileProp(vx, vy, vz);
-                        if (currentRail != nullptr)
+                        else if (bodyDir == dir16::dir2)//북쪽 방향 열차
                         {
-                            if (gearState == gearFlag::drive)//주행기어
-                            {
-                                if (bodyDir == dir16::dir0)//동쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
-                                }
-                                else if (bodyDir == dir16::dir2)//북쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
-                                }
-                                else if (bodyDir == dir16::dir4)//서쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
-                                }
-                                else if (bodyDir == dir16::dir6)//남쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
-                                }
-                            }
-                            else if (gearState == gearFlag::reverse)//후진기어
-                            {
-                                if (bodyDir == dir16::dir0)//동쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
-                                }
-                                else if (bodyDir == dir16::dir2)//북쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
-                                }
-                                else if (bodyDir == dir16::dir4)//서쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
-                                }
-                                else if (bodyDir == dir16::dir6)//남쪽 방향 열차
-                                {
-                                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
-                                    else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
-                                }
-                            }
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
-                        else
+                        else if (bodyDir == dir16::dir4)//서쪽 방향 열차
                         {
-                            prt(L"[Vehicle:train] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n");
-                            return false;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                        }
+                        else if (bodyDir == dir16::dir6)//남쪽 방향 열차
+                        {
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
                     }
+                    else if (gearState == gearFlag::reverse)//후진기어
+                    {
+                        if (bodyDir == dir16::dir0)//동쪽 방향 열차
+                        {
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                        }
+                        else if (bodyDir == dir16::dir2)//북쪽 방향 열차
+                        {
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
+                        }
+                        else if (bodyDir == dir16::dir4)//서쪽 방향 열차
+                        {
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                        }
+                        else if (bodyDir == dir16::dir6)//남쪽 방향 열차
+                        {
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
+                        }
+                    }
+                }
+                else
+                {
+                    prt(L"[Vehicle:train] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n");
                     return false;
                 }
+                return false;
             }
         }
 

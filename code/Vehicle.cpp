@@ -611,7 +611,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
             }
 
-            bodyDir = singleRailMoveVec[0];
+            if(getTimer()==1) bodyDir = singleRailMoveVec[0];
 
             // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
 
@@ -628,16 +628,6 @@ bool Vehicle::runAnimation(bool shutdown)
         }
         else
         {
-            //setFakeX(0);
-            //setFakeY(0);
-            //for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-            //{
-            //    if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
-            //    {
-            //        TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getIntegerFakeX());
-            //       TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getIntegerFakeY());
-            //    }
-            //}
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
