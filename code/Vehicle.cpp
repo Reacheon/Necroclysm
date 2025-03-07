@@ -556,7 +556,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getFakeX() == 0 && getFakeY() == 0)//도착
             {
-                prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
+                //prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
 
                 extraRenderEntityList.clear();
                 setDelGrid(0, 0);
@@ -611,7 +611,11 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
             }
 
-            if(getTimer()==1) bodyDir = singleRailMoveVec[0];
+            if (getTimer() == 1)
+            {
+                if(gearState==gearFlag::drive) bodyDir = singleRailMoveVec[0];
+                else if (gearState == gearFlag::reverse) bodyDir = reverse(singleRailMoveVec[0]);
+            }
 
             // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
 

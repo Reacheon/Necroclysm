@@ -54,7 +54,6 @@ public:
     dir16 singleRailSpdDir = dir16::dir2;
     int singleRailMoveCounter = 0;
     std::vector<dir16> singleRailMoveVec;
-    Vehicle* frontCart = nullptr;
     Vehicle* rearCart = nullptr;
     bool isPowerCart = false;
 
@@ -62,6 +61,8 @@ public:
     float wideRailSpdVal = 0.0;
     dir16 wideRailSpdDir = dir16::dir2;
     std::vector<dir16> wideRailMoveVec;
+    bool isPowerTrain = false;
+    Vehicle* rearTrain = nullptr;
 
     Vehicle(int inputX, int inputY, int inputZ, int leadItemCode);
     ~Vehicle();

@@ -289,6 +289,7 @@ export void startArea()
 			{
 
 				myTrainPower->vehType = vehFlag::train;
+				myTrainPower->isPowerTrain = true;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
 				myTrainPower->extendPart(vX, vY - 1, 48);
@@ -361,11 +362,13 @@ export void startArea()
 				myTrainPower->addPart(topLeftX + 3, topLeftY + 6, { 123 });
 			}
 
-			//지하철 설치
+			//지하철(화물칸) 설치
+
+			Vehicle* myTrain = new Vehicle(7, 7, -1, 48);//차량 설치
+
 			{
 				int vX = 7;
 				int vY = 7;
-				Vehicle* myTrain = new Vehicle(vX, vY, -1, 48);//차량 설치
 				myTrain->vehType = vehFlag::train;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
@@ -433,6 +436,7 @@ export void startArea()
 				myTrain->addPart(topLeftX + 3, topLeftY + 5, { 123 });
 				myTrain->addPart(topLeftX + 3, topLeftY + 6, { 123 });
 			}
+			myTrainPower->rearTrain = myTrain;
 
 
 			//for (int targetY = endY; targetY >= endY - 19; targetY--)
@@ -862,14 +866,8 @@ export void startArea()
 	minecart1->rearCart = minecart2;
 	minecart2->rearCart = minecart3;
 
-	minecart3->frontCart = minecart2;
-	minecart2->frontCart = minecart1;
-	//new Vehicle(8, 5, 0, 379);
-	//new Vehicle(6, 5, 0, 137);
-
 
 	///////////////////////////////////////////////////////////////
-	//new Vehicle(pX, pY + 2, 0, 140);
 
 	World::ins()->createSector(0, 0, 0);
 
