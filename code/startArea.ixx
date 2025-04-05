@@ -596,7 +596,7 @@ export void startArea()
 	SNOW(-5, 2, 0);
 	*/
 
-	for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
+	//for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
 
 
 	new Prop(1, -3, 0, 117);//나무 설치

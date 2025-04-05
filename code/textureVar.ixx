@@ -143,4 +143,5 @@ export namespace spr
 	Sprite* particle = nullptr;
 	Sprite* footprint = nullptr;
 	Sprite* craftItemRect = nullptr;
+	Sprite* msgBox = nullptr;
 }

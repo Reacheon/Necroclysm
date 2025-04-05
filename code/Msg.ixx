@@ -146,13 +146,22 @@ public:
 	}
 	void drawGUI()
 	{
+		setSolidText();
 		if (getStateDraw() == false) { return; }
 
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 		if (getFoldRatio() == 1.0)
 		{
 			setWindowAlpha(230);
-			drawWindow(&msgBase, msgTitleText, 0);
+			//drawWindow(&msgBase, msgTitleText, 0);
+			drawSprite(spr::msgBox, msgBase.x, msgBase.y);
+
+			setFontSize(22);
+			drawTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
+
+			drawSpriteCenter(spr::icon32, 1,msgBase.x + 150- queryTextWidth(msgTitleText) / 2.0 -24, msgBase.y + 34);
+			
+
 			resetWindowAlpha();
 
 			//윈도우 박스 그리기
@@ -242,6 +251,7 @@ public:
 			setFontSize(16);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
+				
 				drawTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
 			}
 
@@ -292,6 +302,8 @@ public:
 			}
 			drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
 		}
+
+		disableSolidText();
 	}
 	void clickUpGUI()
 	{

@@ -163,4 +163,6 @@ export void textureLoader()
 	spr::particle = new Sprite(renderer, "image/particle.png", 16, 16);
 	spr::footprint = new Sprite(renderer, "image/footprint.png", 16, 16);
 	spr::craftItemRect = new Sprite(renderer, "image/UI/craftItemRect.png", 58, 58);
+	spr::msgBox = new Sprite(renderer, "image/UI/msgBox.png", 300, 236);
+
 }
