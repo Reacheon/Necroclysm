@@ -73,7 +73,16 @@ export void startArea()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	availableRecipe = new ItemPocket(storageType::recipe);
-	for (int i = 1; i <= 212; i++) ((ItemPocket*)availableRecipe)->addRecipe(i);
+	for (int i = 1; i <= 212; i++)
+	{
+		if (itemDex[i].name != L"?")
+		{
+			if (itemDex[i].checkFlag(itemFlag::CANCRAFT))
+			{
+				((ItemPocket*)availableRecipe)->addRecipe(i);
+			}
+		}
+	}
 
 	//≈∏¿œ ºº∆√
 	for (int dx = -30; dx <= 30; dx++)
@@ -526,6 +535,7 @@ export void startArea()
 	//new Prop(pX + 7 - 1, pY + 1, pZ, 234);//∫¢≤…≥´ø± º≥ƒ°
 
 
+	/*
 	for (int x = 0; x <= 10; x++) {
 		for (int y = -8; y <= -2; y++) {
 			SNOW(x, y, 0);
@@ -584,6 +594,7 @@ export void startArea()
 	SNOW(-5, 3, 0);
 	SNOW(7, 1, 0);
 	SNOW(-5, 2, 0);
+	*/
 
 	for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
 

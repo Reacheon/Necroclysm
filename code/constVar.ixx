@@ -512,6 +512,8 @@ export enum class itemFlag
     TOGGLE_ON,
     TOGGLE_OFF,
     HAS_TOGGLE_SPRITE,
+
+    CANCRAFT,//조합할 수 있는 아이템인지
 };
 
 export enum class walkFlag

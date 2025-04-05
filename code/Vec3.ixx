@@ -90,13 +90,14 @@ export struct Vec3
 export int getNearDir16(Vec3 inputVec)
 {
     Vec3 currentVec = inputVec.getNormDirVec();
-    int maxDotProduct = -999;
+    float maxDotProduct = -1.0f;
     int maxDir16 = -1;
     for (int i = 0; i < 16; i++)
     {
-        if (inputVec.dotProduct(getDefaultVec(i)) > maxDotProduct)
+        float dot = currentVec.dotProduct(getDefaultVec(i));
+        if (dot > maxDotProduct)
         {
-            maxDotProduct = inputVec.dotProduct(getDefaultVec(i));
+            maxDotProduct = dot;
             maxDir16 = i;
         }
     }

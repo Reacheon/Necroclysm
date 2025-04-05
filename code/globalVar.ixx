@@ -21,7 +21,7 @@ import AlchemyData;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::inventory, act::bionic, act::talent, act::runMode, act::mutation, act::test, act::identify, act::craft, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
+    std::vector<act> null = { act::status, act::inventory, act::bionic, act::talent, act::runMode, act::mutation, act::craft, act::test, act::identify, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };

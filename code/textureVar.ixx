@@ -142,4 +142,5 @@ export namespace spr
 	Sprite* speechBubble = nullptr;
 	Sprite* particle = nullptr;
 	Sprite* footprint = nullptr;
+	Sprite* craftItemRect = nullptr;
 }

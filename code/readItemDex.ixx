@@ -465,6 +465,7 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"TOGGLE_ON") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TOGGLE_ON);
                                     else if (strFragment.substr(0, j) == L"TOGGLE_OFF") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::TOGGLE_OFF);
                                     else if (strFragment.substr(0, j) == L"HAS_TOGGLE_SPRITE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::HAS_TOGGLE_SPRITE);
+                                    else if (strFragment.substr(0, j) == L"CANCRAFT") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CANCRAFT);
                                     else
                                     {
                                         errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

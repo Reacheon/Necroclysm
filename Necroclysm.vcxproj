@@ -176,6 +176,7 @@
     <ClCompile Include="code\ContextMenu.ixx" />
     <ClCompile Include="code\CoordSelectCraft.ixx" />
     <ClCompile Include="code\Craft.ixx" />
+    <ClCompile Include="code\Craft_draw.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Dialogue.ixx" />
     <ClCompile Include="code\Drawable.ixx" />

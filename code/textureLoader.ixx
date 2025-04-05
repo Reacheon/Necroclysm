@@ -160,8 +160,7 @@ export void textureLoader()
 	spr::mapMagnifyIcon = new Sprite(renderer, "image/UI/GUI/Map/mapMagnifyIcon.png", 128, 40);
 	spr::staminaGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/staminaGaugeCircle.png", 48, 48);
 	spr::speechBubble = new Sprite(renderer, "image/UI/GUI/speechBubble.png", 320, 137);
-
 	spr::particle = new Sprite(renderer, "image/particle.png", 16, 16);
-
 	spr::footprint = new Sprite(renderer, "image/footprint.png", 16, 16);
+	spr::craftItemRect = new Sprite(renderer, "image/UI/craftItemRect.png", 58, 58);
 }

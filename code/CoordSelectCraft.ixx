@@ -71,12 +71,7 @@ public:
 
 		if (targetSelect == false)
 		{
-			int markerIndex = 0;
-			if (timer::timer600 % 30 < 5) { markerIndex = 0; }
-			else if (timer::timer600 % 30 < 10) { markerIndex = 1; }
-			else if (timer::timer600 % 30 < 15) { markerIndex = 2; }
-			else if (timer::timer600 % 30 < 20) { markerIndex = 3; }
-			else if (timer::timer600 % 30 < 25) { markerIndex = 4; }
+
 
 			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 표시
 			for (int i = 0; i < selectableCoord.size(); i++)
@@ -85,11 +80,11 @@ public:
 				int revY = PlayerY() + selectableCoord[i][axis::y];
 
 				setZoom(zoomScale);
-				SDL_SetTextureAlphaMod(spr::yellowMarker->getTexture(), 120);
+				SDL_SetTextureAlphaMod(spr::yellowMarker->getTexture(), 150);
 				drawSpriteCenter
 				(
 					spr::yellowMarker,
-					markerIndex,
+					0,
 					cameraW / 2 + zoomScale * ((16 * selectableCoord[i][axis::x] + 8) - cameraX),
 					cameraH / 2 + zoomScale * ((16 * selectableCoord[i][axis::y] + 8) - cameraY)
 				);
@@ -239,6 +234,13 @@ public:
 						{
 							if (selectableCoord[i][axis::x] == throwingX && selectableCoord[i][axis::y] == throwingY)
 							{
+								if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
+								{
+									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
+									cameraFix = true;
+									delete this;
+									return;
+								}
 								targetSelect = true;
 								targetGridX = throwingX;
 								targetGridY = throwingY;
@@ -260,6 +262,13 @@ public:
 
 						if (World::ins()->getTile(throwingX, throwingY, throwingZ).fov == fovFlag::white)
 						{
+							if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
+							{
+								coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
+								cameraFix = true;
+								delete this;
+								return;
+							}
 							targetSelect = true;
 							targetGridX = throwingX;
 							targetGridY = throwingY;
