@@ -207,6 +207,8 @@ void HUD::drawGUI()
 			}
 
 			setFontSize(12);
+			drawText(col2Str(lowCol::yellow) + L"120,000 골드", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 0);
+			
 			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 1);
 			drawText(col2Str(lowCol::green) + L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 3 + 15 * 1);
 			drawText(col2Str(col::lightGray) + L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 2);
@@ -511,69 +513,69 @@ void HUD::drawQuickSlot()
 
 	//drawRect({ pivotX,pivotY,180,358, }, lowCol::skyBlue);
 
-	int sprIndex = 0;
-	if (checkCursor(&quickSlotPopBtn))
-	{
-		if (click == false) sprIndex = 1;
-		else sprIndex = 2;
-	}
-	else sprIndex = 0;
+	setSolidText();
 
-	drawSprite(spr::topQuickSlotBtn, sprIndex, pivotX, pivotY);
-	drawFillRect({ pivotX + 43,pivotY,137,38 }, col::black, 200);
-
-
-	Sprite* targetBtnSpr;
-	if (option::inputMethod == input::gamepad)
-	{
-		if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X)) { targetBtnSpr = spr::buttonsPressed; }
-		else { targetBtnSpr = spr::buttons; }
-		drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_RECT, pivotX + 23, pivotY + 20);
-	}
-	else
-	{
-		if (isQuickSlotPop == false) drawSpriteCenter(spr::windowArrow, 2, pivotX + 21, pivotY + 18);
-		else drawSpriteCenter(spr::windowArrow, 0, pivotX + 21, pivotY + 18);
-	}
 
 	//개별 스킬창 그리기 1번부터 8번까지
 	for (int i = 0; i < 8; i++)
 	{
-		if (isQuickSlotPop == true && (checkCursor(&quickSlotBtn[i]) || quickSlotCursor == i) && quickSlot[i].first != quickSlotFlag::NONE)
+		int pivotX = 185 + 48 * i;
+		int pivotY = 0;
+
+		SDL_Color btnCol = col::black;
+		if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE)
 		{
-			if (click) drawSprite(spr::singleQuickSlot, 2, quickSlotBtn[i].x, quickSlotBtn[i].y);
-			else drawSprite(spr::singleQuickSlot, 1, quickSlotBtn[i].x, quickSlotBtn[i].y);
+			if (click) btnCol = lowCol::deepBlue;
+			else btnCol = lowCol::blue;
+
+			setFontSize(10);
+			std::wstring skillName = L"";
+			skillName = skillDex[quickSlot[i].second].name;
+
+			drawTextCenter(col2Str(col::black) + skillName, 374 + 1, 57);
+			drawTextCenter(col2Str(col::black) + skillName, 374 - 1, 57);
+			drawTextCenter(col2Str(col::black) + skillName, 374, 57 + 1);
+			drawTextCenter(col2Str(col::black) + skillName, 374, 57 - 1);
+			drawTextCenter(col2Str(col::white) + skillName, 374, 57);
 		}
-		else drawSprite(spr::singleQuickSlot, 0, quickSlotBtn[i].x, quickSlotBtn[i].y);
+
+		drawFillRect({ pivotX,pivotY,44,39 }, btnCol, 200);
+		drawLine(pivotX + 1, pivotY + 39, pivotX + 42, pivotY + 39, btnCol, 200);
+		drawLine(pivotX + 2, pivotY + 39 + 1, pivotX + 41, pivotY + 39 + 1, btnCol, 200);
+		drawLine(pivotX + 3, pivotY + 39 + 2, pivotX + 40, pivotY + 39 + 2, btnCol, 200);
+		drawLine(pivotX + 4, pivotY + 39 + 3, pivotX + 39, pivotY + 39 + 3, btnCol, 200);
+		drawLine(pivotX + 5, pivotY + 39 + 4, pivotX + 38, pivotY + 39 + 4, btnCol, 200);
+		drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, btnCol, 200);
+
 
 		if (quickSlot[i].first == quickSlotFlag::NONE)
 		{
-			drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2, 0, 5, 0, 5);
-			drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2, 0, 5, 5, 0);
-			drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 + 32, 5, 0, 0, 5);
-			drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2 + 32, 5, 0, 5, 0);
-			drawFillRect({ quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 ,34,34 }, col::black, 180);
+			drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
+			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
+			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
+			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
+			drawFillRect({ pivotX + 5, pivotY ,34,34 }, col::black, 180);
 		}
 		else
 		{
 			setZoom(2.0);
 			std::wstring skillName = L"";
-			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, quickSlotBtn[i].x + 7, quickSlotBtn[i].y + 3);
+			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
 			skillName = skillDex[quickSlot[i].second].name;
 			setZoom(1.0);
 
-			setFontSize(14);
-			drawText(L"#FFFFFF" + skillName, quickSlotBtn[i].x + 43, quickSlotBtn[i].y + 5);
-
-			//setFontSize(10);
-			//drawText(L"#FFFF00-32 MP" + skillName, quickSlotBtn[i].x + 120, quickSlotBtn[i].y + 24);
-
-			drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2, 0, 5, 0, 5);
-			drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2, 0, 5, 5, 0);
-			drawCross2(quickSlotBtn[i].x + 6, quickSlotBtn[i].y + 2 + 32, 5, 0, 0, 5);
-			drawCross2(quickSlotBtn[i].x + 6 + 32, quickSlotBtn[i].y + 2 + 32, 5, 0, 5, 0);
+			drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
+			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
+			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
+			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
 		}
+		setFontSize(10);
+		drawText(col2Str(col::white) + std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+
+
 	}
+
+	disableSolidText();
 }
 
 void HUD::drawBarAct()
@@ -721,7 +723,9 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::ability) setBtnLayout(sysStr[4], 4);
 		else if (barAct[i] == act::inventory) setBtnLayout(sysStr[5], 79);
 		else if (barAct[i] == act::bionic) setBtnLayout(sysStr[6], 47);
-		else if (barAct[i] == act::talent) setBtnLayout(sysStr[7], 7);
+		else if (barAct[i] == act::profic) setBtnLayout(sysStr[7], 7);
+		else if (barAct[i] == act::skill) setBtnLayout(sysStr[197], 4);
+		else if (barAct[i] == act::quest) setBtnLayout(sysStr[198], 52);
 		else if (barAct[i] == act::runMode)
 		{
 

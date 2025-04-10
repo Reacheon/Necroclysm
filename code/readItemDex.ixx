@@ -32,15 +32,15 @@ namespace csvItem
 
     constexpr int recipe = 15;
     constexpr int recipeQualityNeed = 16;
-    constexpr int recipeTalentNeed = 17;
+    constexpr int recipeProficNeed = 17;
 
     constexpr int disassy = 18;
     constexpr int disassyQualityNeed = 19;
-    constexpr int disassyTalentNeed = 20;
+    constexpr int disassyProficNeed = 20;
 
     constexpr int repair = 21;
     constexpr int repairQualityNeed = 22;
-    constexpr int repairTalentNeed = 23;
+    constexpr int repairProficNeed = 23;
 
     constexpr int pocketMaxVolume = 24;
     constexpr int pocketMaxNumber = 25;
@@ -521,9 +521,9 @@ export int readItemDex(const wchar_t* file)
                             }
                             break;
                         }
-                        case csvItem::recipeTalentNeed:
+                        case csvItem::recipeProficNeed:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].recipeTalentNeed);
+                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].recipeProficNeed);
                             break;
                         }
                         case csvItem::disassy:
@@ -546,9 +546,9 @@ export int readItemDex(const wchar_t* file)
                             }
                             break;
                         }
-                        case csvItem::disassyTalentNeed:
+                        case csvItem::disassyProficNeed:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].disassyTalentNeed);
+                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].disassyProficNeed);
                             break;
                         }
                         case csvItem::repair:
@@ -571,9 +571,9 @@ export int readItemDex(const wchar_t* file)
                             }
                             break;
                         }
-                        case csvItem::repairTalentNeed:
+                        case csvItem::repairProficNeed:
                         {
-                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].repairTalentNeed);
+                            pairsToVec(strFragment, itemDex[arrayCounter / (csvWidth)-1].repairProficNeed);
                             break;
                         }
                         case csvItem::pocketMaxVolume:

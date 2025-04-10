@@ -15,7 +15,7 @@ export struct AlchemyData
     std::vector<std::pair<int, int>> product;
     int time = 1;
     int qualityNeed = -1;
-    std::vector<int> talentNeed;
+    std::vector<int> proficNeed;
     int difficulty = 0;
     bool heatSourceNeed = false;
 

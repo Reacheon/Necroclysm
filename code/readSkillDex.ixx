@@ -30,6 +30,8 @@ namespace csvSkill
     constexpr int mentalPerAct = 14;
     constexpr int mentalPerTurn = 15;
     constexpr int mentalPerDay = 16;
+
+    constexpr int skillRank = 17;
 };
 
 export int readSkillDex(const wchar_t* file)
@@ -147,11 +149,9 @@ export int readSkillDex(const wchar_t* file)
                         skillDex[arrayCounter / (csvWidth)-1].abstract = strFragment;
                         break;
                     case csvSkill::src:
-                        if (strFragment == L"NONE") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::NONE;
+                        if (strFragment == L"GENERAL") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::GENERAL;
                         else if (strFragment == L"BIONIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::BIONIC;
                         else if (strFragment == L"MUTATION") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MUTATION;
-                        else if (strFragment == L"MARTIAL_ART") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MARTIAL_ART;
-                        else if (strFragment == L"DIVINE_POWER") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::DIVINE_POWER;
                         else if (strFragment == L"MAGIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MAGIC;
                         else errorBox(L"잘못된 스킬 소스 %ls를 발견했다.",strFragment.c_str());
                         break;
@@ -183,6 +183,9 @@ export int readSkillDex(const wchar_t* file)
                     case csvSkill::mentalPerTurn:
                         break;
                     case csvSkill::mentalPerDay:
+                        break;
+                    case csvSkill::skillRank:
+                        skillDex[arrayCounter / (csvWidth)-1].skillRank = strFragment;
                         break;
                     default:
                         prt(L"readSkillDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

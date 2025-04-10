@@ -21,5 +21,11 @@ export struct SkillData
     bool isQuickSlot = false;
     bool toggle = false;
 
-    //스킬의 숙련레벨은 어떻게..?
+    int skillLevel = 1;
+    float skillExp = 0.0; //100.0 이상이면 자동으로 레벨업됨
+    int maxSkillLevel = 5;
+
+    float maxCooldown = 30.0;
+    float currentCooldown = 0.0;   
+    std::wstring skillRank = L"F";
 };

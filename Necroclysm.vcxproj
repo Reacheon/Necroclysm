@@ -254,12 +254,14 @@
     <ClCompile Include="code\renderSticker.ixx" />
     <ClCompile Include="code\renderWeather.ixx" />
     <ClCompile Include="code\scriptLoader.ixx" />
+    <ClCompile Include="code\Skill.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\stringToWstring.ixx" />
     <ClCompile Include="code\ThreadPool.ixx" />
     <ClCompile Include="code\timeKeeper.ixx" />
     <ClCompile Include="code\TitleScreen.ixx" />
+    <ClCompile Include="code\useSkill.ixx" />
     <ClCompile Include="code\Vec3.ixx" />
     <ClCompile Include="code\Player.ixx" />
     <ClCompile Include="code\Monster.ixx" />
@@ -289,7 +291,7 @@
     <ClCompile Include="code\renderUI.ixx" />
     <ClCompile Include="code\replaceStr.ixx" />
     <ClCompile Include="code\sgn.ixx" />
-    <ClCompile Include="code\Talent.ixx" />
+    <ClCompile Include="code\Profic.ixx" />
     <ClCompile Include="code\Sprite.ixx" />
     <ClCompile Include="code\startArea.ixx" />
     <ClCompile Include="code\Status.ixx" />

@@ -45,8 +45,8 @@ export void textureLoader()
 	spr::menuPopUp = new Sprite(renderer, "image/UI/menuPopUp.png", 35, 36);
 	spr::floatLog = new Sprite(renderer, "image/UI/floatLog.png", 400, 40);
 	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 72, 72);
-	spr::talentIcon = new Sprite(renderer, "image/UI/talentIcon.png", 16, 16);
-	spr::talentIconGold = new Sprite(renderer, "image/UI/talentIconGold.png", 16, 16);
+	spr::proficIcon = new Sprite(renderer, "image/UI/proficIcon.png", 16, 16);
+	spr::proficIconGold = new Sprite(renderer, "image/UI/proficIconGold.png", 16, 16);
 	spr::bionicGauge = new Sprite(renderer, "image/UI/bionicGauge.png", 72, 72);
 	spr::bionicSkeleton = new Sprite(renderer, "image/UI/bionicSkeleton.png", 36, 72);
 	spr::bionicSlotGauge = new Sprite(renderer, "image/UI/bionicSlotGauge.png", 64, 10);
@@ -164,5 +164,7 @@ export void textureLoader()
 	spr::footprint = new Sprite(renderer, "image/footprint.png", 16, 16);
 	spr::craftItemRect = new Sprite(renderer, "image/UI/craftItemRect.png", 58, 58);
 	spr::msgBox = new Sprite(renderer, "image/UI/msgBox.png", 300, 236);
+
+	spr::skillRect = new Sprite(renderer, "image/UI/GUI/Skill/skillRect.png", 250, 34);
 
 }

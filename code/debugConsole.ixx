@@ -246,7 +246,7 @@ export void debugConsole()
 		int expVal;
 		prt(L"추가할 경험치의 양을 입력해주세요.\n");
 		std::cin >> expVal;
-		Player::ins()->addTalentExp(expVal);
+		Player::ins()->addProficExp(expVal);
 		break;
 	}
 	case 15://탑승 중인 차량 회전

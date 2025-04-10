@@ -21,7 +21,7 @@ import AlchemyData;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::inventory, act::bionic, act::talent, act::runMode, act::mutation, act::craft, act::test, act::identify, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
+    std::vector<act> null = { act::status, act::inventory, act::profic, act::skill, act::runMode, act::craft, act::quest, act::mutation, act::test, act::identify, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
@@ -93,6 +93,7 @@ export SDL_Point clickUpPoint = { 0,0 }; //업 이벤트를 실행한 좌표
 export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌표
 export bool deactClickUp = false; //true일 경우 클릭업 및 클릭라이트(업) 함수를 실행하지 않음
 export bool itemListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
+export bool skillListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
 export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트
 export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
@@ -145,6 +146,8 @@ export void* availableRecipe;
 
 export void* ctrlVeh = nullptr;
 export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환
+
+export SDL_Rect quickSlotBtn[8];
 
 export namespace dur
 {

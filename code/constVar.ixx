@@ -29,6 +29,11 @@ export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 �
 
 export constexpr int MARKER_LIMIT_DIST = 100; //플레이어로부터 100칸 이상 떨어지면 마커가 그려지지 않음
 
+export constexpr int MAX_PROFIC_LEVEL = 99;
+
+export constexpr int SKILL_GUI_MAX = 7;
+export constexpr int QUICK_SLOT_MAX = 8;
+
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
@@ -85,8 +90,10 @@ export enum class act
     ability,    //특수능력
     inventory,  //인벤토리
     bionic,     //바이오닉
-    talent,      //재능
+    profic,      //재능
     runMode,    //달리기 모드
+    skill,      //스킬
+    quest,      //퀘스트
     menu,       //메뉴
 
     identify,   //감정
@@ -355,7 +362,7 @@ export namespace wound
     constexpr int shock = 6; //쇼크 : 정신적인 충격, 머리에만 발생함
 };
 
-export namespace talentFlag
+export namespace proficFlag
 {
     constexpr int fighting = 0;
     constexpr int dodging = 1;
@@ -1212,11 +1219,9 @@ export namespace itemVIPCode
 
 export enum class skillSrc
 {
-    NONE,
+    GENERAL,
     BIONIC,
     MUTATION,
-    MARTIAL_ART,
-    DIVINE_POWER,
     MAGIC,
 };
 

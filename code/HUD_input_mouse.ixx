@@ -18,6 +18,7 @@ import ContextMenu;
 import mouseGrid;
 import Entity;
 import Aim;
+import useSkill;
 
 
 void HUD::clickDownGUI()
@@ -48,6 +49,7 @@ void HUD::clickUpGUI()
 	}
 
 	if (executedHold) return;
+	
 
 	if (checkCursor(&letterboxPopUpButton) == true)//팝업 기능
 	{
@@ -146,6 +148,7 @@ void HUD::clickUpGUI()
 		prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
 		tileTouch(clickTile.x, clickTile.y);
 	}
+
 }
 
 void HUD::mouseStep()
@@ -174,7 +177,24 @@ void HUD::mouseStep()
 void HUD::clickRightGUI()
 {
 	updateLog(L"#FFFFFF[HUD] Right click event triggered.");
-	/*if(option::inputMethod==input::mouse) */openContextMenu(getAbsMouseGrid());
+
+	if (checkCursor(&quickSlotRegion) == true)
+	{
+		for (int i = 0; i < QUICK_SLOT_MAX; i++)
+		{
+			if (checkCursor(&quickSlotBtn[i]))
+			{
+				quickSlot[i].first = quickSlotFlag::NONE;
+				quickSlot[i].second = -1;
+			}
+		}
+	}
+	else
+	{
+		/*if(option::inputMethod==input::mouse) */openContextMenu(getAbsMouseGrid());
+	}
+
+	
 }
 void HUD::clickHoldGUI()
 {

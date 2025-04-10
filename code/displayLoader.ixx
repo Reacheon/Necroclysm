@@ -50,7 +50,7 @@ export void displayLoader()
         cameraW = 720;
     }
 
-    //PC 테스트용 강제 해상도 조정////////
+    ///////////PC 테스트용 강제 해상도 조정////////
     if(option::fixScreenRatio)
     {
         int resolution = 0;

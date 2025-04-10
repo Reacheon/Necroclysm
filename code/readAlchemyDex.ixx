@@ -18,7 +18,7 @@ namespace csvAlchemy
     constexpr int product = 3;
     constexpr int time = 4;
     constexpr int qualityNeed = 5;
-    constexpr int talentNeed = 6;
+    constexpr int proficNeed = 6;
     constexpr int difficulty = 7;
     constexpr int heatSourceNeed = 8;
 };
@@ -140,8 +140,8 @@ export int readAlchemyDex(const wchar_t* file)
                     case csvAlchemy::qualityNeed:
                         alchemyDex[arrayCounter / (csvWidth)-1].qualityNeed = wtoi(strFragment);
                         break;
-                    case csvAlchemy::talentNeed:
-                        valsToVec(strFragment, alchemyDex[arrayCounter / (csvWidth)-1].talentNeed);
+                    case csvAlchemy::proficNeed:
+                        valsToVec(strFragment, alchemyDex[arrayCounter / (csvWidth)-1].proficNeed);
                         break;
                     case csvAlchemy::difficulty:
                         alchemyDex[arrayCounter / (csvWidth)-1].difficulty = wtoi(strFragment);

@@ -107,8 +107,8 @@ public:
     void drop(ItemPocket* txPtr);
     void throwing(ItemPocket* txPtr, int gridX, int gridY);
 
-    float getTalentLevel(int index);
-    void addTalentExp(int expVal);
+    float getProficLevel(int index);
+    void addProficExp(int expVal);
 
     virtual void endMove() = 0;
     bool runAnimation(bool shutdown);

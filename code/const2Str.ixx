@@ -101,27 +101,27 @@ export std::wstring toolQuality2String(int input)
 	else return L"미확인 기술";
 };
 
-export std::wstring talent2String(int input)
+export std::wstring profic2String(int input)
 {
-	if (input == talentFlag::fighting) return L"전투";
-	else if (input == talentFlag::dodging) return L"회피";
-	else if (input == talentFlag::stealth) return L"은신";
-	else if (input == talentFlag::throwing) return L"투척";
-	else if (input == talentFlag::unarmedCombat) return L"격투";
-	else if (input == talentFlag::piercingWeapon) return L"관통";
-	else if (input == talentFlag::cuttingWeapon) return L"절단";
-	else if (input == talentFlag::bashingWeapon) return L"타격";
-	else if (input == talentFlag::archery) return L"궁술";
-	else if (input == talentFlag::gun) return L"총기";
-	else if (input == talentFlag::electronics) return L"전자공학";
-	else if (input == talentFlag::chemistry) return L"화학공학";
-	else if (input == talentFlag::mechanics) return L"기계공학";
-	else if (input == talentFlag::computer) return L"컴퓨터";
-	else if (input == talentFlag::medicine) return L"의학";
-	else if (input == talentFlag::cooking) return L"요리";
-	else if (input == talentFlag::fabrication) return L"재봉";
-	else if (input == talentFlag::social) return L"화술";
-	else if (input == talentFlag::architecture) return L"건축공학";
-	else if (input == talentFlag::architecture) return L"건축";
+	if (input == proficFlag::fighting) return L"전투";
+	else if (input == proficFlag::dodging) return L"회피";
+	else if (input == proficFlag::stealth) return L"은신";
+	else if (input == proficFlag::throwing) return L"투척";
+	else if (input == proficFlag::unarmedCombat) return L"격투";
+	else if (input == proficFlag::piercingWeapon) return L"관통";
+	else if (input == proficFlag::cuttingWeapon) return L"절단";
+	else if (input == proficFlag::bashingWeapon) return L"타격";
+	else if (input == proficFlag::archery) return L"궁술";
+	else if (input == proficFlag::gun) return L"총기";
+	else if (input == proficFlag::electronics) return L"전자공학";
+	else if (input == proficFlag::chemistry) return L"화학공학";
+	else if (input == proficFlag::mechanics) return L"기계공학";
+	else if (input == proficFlag::computer) return L"컴퓨터";
+	else if (input == proficFlag::medicine) return L"의학";
+	else if (input == proficFlag::cooking) return L"요리";
+	else if (input == proficFlag::fabrication) return L"재봉";
+	else if (input == proficFlag::social) return L"화술";
+	else if (input == proficFlag::architecture) return L"건축공학";
+	else if (input == proficFlag::architecture) return L"건축";
 	else return L"미확인 재능";
 };

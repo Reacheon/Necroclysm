@@ -600,27 +600,27 @@ void Craft::drawGUI()
 				std::wstring tooltipText;
 
 				//조합에 필요한 플레이어 재능
-				std::wstring talentStr = col2Str(col::gray) + L"필요 기술 : ";
-				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeTalentNeed.size(); i++)
+				std::wstring proficStr = col2Str(col::gray) + L"필요 기술 : ";
+				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeProficNeed.size(); i++)
 				{
-					int needLevel = recipePtr->itemInfo[targetCursor].recipeTalentNeed[i].second;
-					int playerLevel = Player::ins()->getTalentLevel(recipePtr->itemInfo[targetCursor].recipeTalentNeed[i].first);
-					if (playerLevel >= needLevel) talentStr += col2Str(lowCol::green);
+					int needLevel = recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second;
+					int playerLevel = Player::ins()->getProficLevel(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
+					if (playerLevel >= needLevel) proficStr += col2Str(lowCol::green);
 					else
 					{
-						talentStr += col2Str(lowCol::red);
+						proficStr += col2Str(lowCol::red);
 						canCraft = false;
 					}
 
-					talentStr += talent2String(recipePtr->itemInfo[targetCursor].recipeTalentNeed[i].first);
-					talentStr += L" ";
-					talentStr += std::to_wstring(recipePtr->itemInfo[targetCursor].recipeTalentNeed[i].second);
-					talentStr += L"레벨";
-					if (i != recipePtr->itemInfo[targetCursor].recipeTalentNeed.size() - 1) talentStr += L", ";
+					proficStr += profic2String(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
+					proficStr += L" ";
+					proficStr += std::to_wstring(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second);
+					proficStr += L"레벨";
+					if (i != recipePtr->itemInfo[targetCursor].recipeProficNeed.size() - 1) proficStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeTalentNeed.size() == 0) talentStr += col2Str(col::white) + L"없음";
+				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + L"없음";
 
-				tooltipText += talentStr + L"\n";
+				tooltipText += proficStr + L"\n";
 
 				//조합에 필요한 기술(툴 퀄리티)
 				std::wstring qualityStr = col2Str(col::gray) + L"필요 도구기술 : ";

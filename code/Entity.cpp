@@ -35,11 +35,11 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
 	updateSpriteFlash();
 	entityInfo.equipment = new ItemPocket(storageType::equip);
-	entityInfo.talentFocus[0] = 1;
+	entityInfo.proficFocus[0] = 1;
 
 
 
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
@@ -60,7 +60,7 @@ Point3 Entity::getSkillTarget() { return skillTarget; }
 void Entity::addSkill(int index)
 {
 	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
-	entityInfo.skillList.insert(index);
+	entityInfo.skillList.push_back(skillDex[index]);
 }
 
 
@@ -640,47 +640,49 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	targetStack->setFakeY(getY() - targetStack->getY());
 }
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
-float Entity::getTalentLevel(int index)
+float Entity::getProficLevel(int index)
 {
-	float resultLevel = 0;
-	for (int i = 18; i >= 0; i--)
-	{
+	float exp = entityInfo.proficExp[index];
 
-		if (entityInfo.talentExp[index] >= expTable[i] / entityInfo.talentApt[index])
+	if (exp < expTable[0]) return 1.0f + exp / expTable[0];
+
+	for (int i = 0; i < MAX_PROFIC_LEVEL - 1; i++)
+	{
+		float currentExp = expTable[i];
+		float nextExp = expTable[i + 1];
+
+		if (exp >= currentExp && exp < nextExp)
 		{
-			resultLevel = i + 1;
-			if (i == 18) { return resultLevel; } //레벨이 18이상일 경우 
-			else
-			{
-				resultLevel += (float)(entityInfo.talentExp[index] - expTable[i] / entityInfo.talentApt[index]) / (float)(expTable[i + 1] / entityInfo.talentApt[index] - expTable[i] / entityInfo.talentApt[index]);
-				return resultLevel;
-			}
+			float partial = (exp - currentExp) / (nextExp - currentExp);
+			return static_cast<float>(i + 2) + partial;
 		}
 	}
-	resultLevel += (float)(entityInfo.talentExp[index]) / (float)(expTable[1] / entityInfo.talentApt[index] - expTable[0] / entityInfo.talentApt[index]);
-	return resultLevel;
+
+	return static_cast<float>(MAX_PROFIC_LEVEL);
 }
-void Entity::addTalentExp(int expVal)
+
+
+void Entity::addProficExp(int expVal)
 {
 	int divider = 0;
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		divider += entityInfo.talentFocus[i];
+		divider += entityInfo.proficFocus[i];
 	}
-	errorBox(divider == 0, "You need to enable at least one talent(divider=0 at addTalentExp).");
+	errorBox(divider == 0, "You need to enable at least one profic(divider=0 at addProficExp).");
 	int frag = floor((float)(expVal) / (float)divider);
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		entityInfo.talentExp[i] += (frag * entityInfo.talentFocus[i]);
+		entityInfo.proficExp[i] += (frag * entityInfo.proficFocus[i]);
 	}
 	//만렙이 된 재능의 포커스 해제
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		if (entityInfo.talentFocus[i] > 0)
+		if (entityInfo.proficFocus[i] > 0)
 		{
-			if (getTalentLevel(i) >= 18)
+			if (getProficLevel(i) >= 18)
 			{
-				entityInfo.talentFocus[i] = 0;
+				entityInfo.proficFocus[i] = 0;
 			}
 		}
 	}

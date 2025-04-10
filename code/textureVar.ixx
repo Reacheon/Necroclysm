@@ -54,8 +54,8 @@ export namespace spr
 	Sprite* menuPopUp = nullptr;
 	Sprite* floatLog = nullptr;
 	Sprite* letterboxBtnMarker = nullptr;
-	Sprite* talentIcon = nullptr;
-	Sprite* talentIconGold = nullptr;
+	Sprite* proficIcon = nullptr;
+	Sprite* proficIconGold = nullptr;
 	Sprite* bionicGauge = nullptr;
 	Sprite* bionicSkeleton = nullptr;
 	Sprite* bionicSlotGauge = nullptr;
@@ -144,4 +144,5 @@ export namespace spr
 	Sprite* footprint = nullptr;
 	Sprite* craftItemRect = nullptr;
 	Sprite* msgBox = nullptr;
+	Sprite* skillRect = nullptr;
 }

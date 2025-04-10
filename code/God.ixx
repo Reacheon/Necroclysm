@@ -169,8 +169,8 @@ public:
 						setFontSize(14);
 						drawText(col2Str(lowCol::yellow) + L"★1", pivotX + 4, pivotY + 4);
 
-						SDL_Rect talentRect = { pivotX + 31, pivotY + 5, 34,34 };
-						drawRect(talentRect, col::gray);
+						SDL_Rect proficRect = { pivotX + 31, pivotY + 5, 34,34 };
+						drawRect(proficRect, col::gray);
 
 						setFontSize(14);
 						drawTextCenter(col2Str(col::white) + L"권능 이름", pivotX + 47, pivotY + 48);

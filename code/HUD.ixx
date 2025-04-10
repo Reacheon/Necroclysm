@@ -21,7 +21,7 @@ import Player;
 import World;
 import log;
 import Equip;
-import Talent;
+import Profic;
 import Mutation;
 import Bionic;
 import Craft;
@@ -45,6 +45,7 @@ import mouseGrid;
 import ItemPocket;
 import ItemStack;
 import Dialogue;
+import Skill;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -58,7 +59,7 @@ private:
 	Point2 advancedModeGrid;
 
 	SDL_Rect quickSlotPopBtn;
-	SDL_Rect quickSlotBtn[8];
+	
 	bool isQuickSlotPop = false; //화면우측의 퀵슬롯이 오른쪽으로 팝업되었는지를 나타내는 bool 변수
 	float popUpDist = 360;
 	int quickSlotDist = 0;
@@ -126,12 +127,8 @@ public:
 		tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
 
 
-		quickSlotRegion = { cameraW - 1 - 42 - quickSlotDist,cameraH / 2 - 177,180,358, };
-		quickSlotPopBtn = { quickSlotRegion.x, quickSlotRegion.y, 43, 38 };
-		for (int i = 0; i < 8; i++)
-		{
-			quickSlotBtn[i] = { quickSlotRegion.x, quickSlotRegion.y + 40 * (i + 1), 180,38 };
-		}
+		quickSlotRegion = { 185, 0,380,45, };
+		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 48 * i, 0, 44,45 };
 
 
 		x = 0;
@@ -321,16 +318,16 @@ public:
 		}
 
 		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
-		if (Talent::ins() == nullptr)
+		if (Profic::ins() == nullptr)
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (Player::ins()->entityInfo.talentFocus[i] > 0) { break; }
+				if (Player::ins()->entityInfo.proficFocus[i] > 0) { break; }
 
 				if (i == TALENT_SIZE - 1)
 				{
-					new Talent();
-					Talent::ins()->setWarningIndex(1);
+					new Profic();
+					Profic::ins()->setWarningIndex(1);
 				}
 			}
 		}
@@ -378,9 +375,9 @@ public:
 		case act::inventory:
 			new Equip();
 			break;
-		case act::talent:
+		case act::profic:
 			updateLog(L"#FFFFFF재능 창을 열었다.");
-			new Talent();
+			new Profic();
 			break;
 		case act::mutation:
 			updateLog(L"#FFFFFF돌연변이 창을 열었다.");
@@ -396,6 +393,9 @@ public:
 			else if (Player::ins()->entityInfo.walkMode == walkFlag::crouch) Player::ins()->entityInfo.walkMode = walkFlag::crawl;
 			else if (Player::ins()->entityInfo.walkMode == walkFlag::crawl) Player::ins()->entityInfo.walkMode = walkFlag::walk;
 			popDownWhenEnd = false;
+			break;
+		case act::skill:
+			new Skill();
 			break;
 		case act::craft:
 			updateLog(L"#FFFFFF조합 창을 열었다.");
@@ -877,48 +877,6 @@ public:
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
 	};
-
-	Corouter useSkill(int skillCode)
-	{
-		const int SKILL_MAX_RANGE = 30;
-		switch (skillCode)
-		{
-		default:
-			prt(L"[Entity:useSkill] 플레이어가 알 수 없는 스킬을 시전하였다.\n", this);
-			break;
-		case 0:
-			break;
-		case 1:
-			break;
-		case 30://화염폭풍
-		{
-			std::vector<std::array<int, 2>> coordList;
-			for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
-			{
-				for (int tgtX = -SKILL_MAX_RANGE; tgtX <= SKILL_MAX_RANGE; tgtX++)
-				{
-					if (World::ins()->getTile(PlayerX() + tgtX, PlayerY() + tgtY, PlayerZ()).fov == fovFlag::white)
-					{
-						coordList.push_back({ PlayerX() + tgtX, PlayerY() + tgtY });
-
-					}
-				}
-			}
-			new CoordSelect(CoordSelectFlag::FIRESTORM, L"화염폭풍을 시전할 위치를 입력해주세요.", coordList);
-			co_await std::suspend_always();
-			std::wstring targetStr = coAnswer;
-			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetZ = wtoi(targetStr.c_str());
-
-			Player::ins()->setSkillTarget(targetX, targetY, targetZ);
-			addAniUSetPlayer(Player::ins(), aniFlag::fireStorm);
-			break;
-		}
-		}
-	}
 
 	void quickSlotToggle()
 	{

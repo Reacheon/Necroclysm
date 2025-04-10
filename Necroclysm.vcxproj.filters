@@ -174,7 +174,7 @@
     <ClCompile Include="code\Bionic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\Talent.ixx">
+    <ClCompile Include="code\Profic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI.ixx">
@@ -542,6 +542,12 @@
     </ClCompile>
     <ClCompile Include="code\Craft_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Skill.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\useSkill.ixx">
+      <Filter>소스 파일\01_system\04_GUI\act</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

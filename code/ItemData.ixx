@@ -31,16 +31,16 @@ export struct ItemData
     unsigned __int16 craftTime = 2;
     std::vector<std::pair<unsigned __int16, unsigned __int32>> recipe;
     std::vector<unsigned __int8> recipeQualityNeed;
-    std::vector<std::pair<unsigned __int8, unsigned __int8>> recipeTalentNeed;
+    std::vector<std::pair<unsigned __int8, unsigned __int8>> recipeProficNeed;
 
 
     std::vector<std::pair<unsigned __int16, unsigned __int32>> disassy;
     std::vector<unsigned __int8> disassyQualityNeed;
-    std::vector<std::pair<unsigned __int8, unsigned __int8>> disassyTalentNeed;
+    std::vector<std::pair<unsigned __int8, unsigned __int8>> disassyProficNeed;
 
     std::vector<std::pair<unsigned __int16, unsigned __int32>> repair;
     std::vector<unsigned __int8> repairQualityNeed;
-    std::vector<std::pair<unsigned __int8, unsigned __int8>> repairTalentNeed;
+    std::vector<std::pair<unsigned __int8, unsigned __int8>> repairProficNeed;
 
 
     unsigned __int32 pocketMaxVolume = 0;
@@ -209,7 +209,7 @@ export bool itemOverlay(ItemData& a, ItemData& b)
 
     if (a.recipe != b.recipe) { return false; }
     if (a.recipeQualityNeed != b.recipeQualityNeed) { return false; }
-    if (a.recipeTalentNeed != b.recipeTalentNeed) { return false; }
+    if (a.recipeProficNeed != b.recipeProficNeed) { return false; }
 
     if (a.disassy != b.disassy) { return false; }
     if (a.disassyQualityNeed != b.disassyQualityNeed) { return false; }

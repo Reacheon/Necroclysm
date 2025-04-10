@@ -5,19 +5,19 @@ import extremum;
 
 export namespace calcMelee
 {
-    float maxDmg(int weaponAtk, int str, float fightingTalent, float weaponTalent)
+    float maxDmg(int weaponAtk, int str, float fightingProfic, float weaponProfic)
     {
-        float fightTotal = (1/3)*fightingTalent + (2/3)*weaponTalent;
+        float fightTotal = (1/3)*fightingProfic + (2/3)*weaponProfic;
         return weaponAtk + 0.5*str + 10*(fightTotal/27);
     } 
-    float minDmg(int weaponAtk , float balance, int dex, float fightingTalent, float weaponTalent)
+    float minDmg(int weaponAtk , float balance, int dex, float fightingProfic, float weaponProfic)
     {
-        float fightTotal = (1/3)*fightingTalent + (2/3)*weaponTalent;
+        float fightTotal = (1/3)*fightingProfic + (2/3)*weaponProfic;
         return weaponAtk*balance + dex + 15*(fightTotal/27);
     }
-    float acc(float partAcc, float weaponAcc, int dex, float fightingTalent, float weaponTalent, int aimStack)
+    float acc(float partAcc, float weaponAcc, int dex, float fightingProfic, float weaponProfic, int aimStack)
     {
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * weaponTalent;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * weaponProfic;
         //(부위명중률 + (0.4)(1-부위명중률)(dex/10) + (0.4)(1-부위명중률)(fightTotal/27))*(무기명중률)
         float accVal = (partAcc + (1 - partAcc) * (0.4) * (dex / 10) + (1 - partAcc) * (0.4) * (fightTotal / 27)) * weaponAcc;
         if (aimStack > 0)//조준 스택 보정
@@ -28,28 +28,28 @@ export namespace calcMelee
         if (accVal > 0.99) { accVal = 0.99; };
         return accVal;
     }
-    float atkSpd(float weaponSpd, int str, float fightingTalent, float weaponTalent)
+    float atkSpd(float weaponSpd, int str, float fightingProfic, float weaponProfic)
     {
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * weaponTalent;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * weaponProfic;
         return weaponSpd + (0.02 * str) + 0.1 * (fightTotal / 27);
     }
 };
 
 export namespace calcUnarmed
 {
-    float maxDmg(int str, float fightingTalent, float unarmedCombat)
+    float maxDmg(int str, float fightingProfic, float unarmedCombat)
     {
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * unarmedCombat;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * unarmedCombat;
         return 2 * str + 10 * (fightTotal / 27);
     }
-    float minDmg(int dex, float fightingTalent, float unarmedCombat)
+    float minDmg(int dex, float fightingProfic, float unarmedCombat)
     {
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * unarmedCombat;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * unarmedCombat;
         return dex + 9 * (fightTotal / 27);
     }
-    float acc(float partAcc, float weaponAcc, int dex, float fightingTalent, float unarmedCombat, int aimStack)
+    float acc(float partAcc, float weaponAcc, int dex, float fightingProfic, float unarmedCombat, int aimStack)
     {        
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * unarmedCombat;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * unarmedCombat;
         //(부위명중률 + (0.4)(1-부위명중률)(dex/10) + (0.4)(1-부위명중률)(fightTotal/27))*(무기명중률)
         float accVal = (partAcc + (1-partAcc)*(0.4)*(dex/10) + (1-partAcc)*(0.4)*(fightTotal/27))*weaponAcc;   
         if (aimStack > 0)//조준 스택 보정
@@ -60,9 +60,9 @@ export namespace calcUnarmed
         if (accVal > 0.99) { accVal = 0.99; };
         return accVal;
     }
-    float atkSpd(int str, float fightingTalent, float unarmedCombat)
+    float atkSpd(int str, float fightingProfic, float unarmedCombat)
     {
-        float fightTotal = (1 / 3) * fightingTalent + (2 / 3) * unarmedCombat;
+        float fightTotal = (1 / 3) * fightingProfic + (2 / 3) * unarmedCombat;
         return 1.00 + (0.02 * str) + 0.1 * (fightTotal / 27);
     }
 };

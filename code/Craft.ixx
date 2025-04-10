@@ -577,10 +577,10 @@ public:
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		//조합에 필요한 플레이어 재능 체크
-		for (int i = 0; i < itemDex[itemCode].recipeTalentNeed.size(); i++)
+		for (int i = 0; i < itemDex[itemCode].recipeProficNeed.size(); i++)
 		{
-			int needLevel = itemDex[itemCode].recipeTalentNeed[i].second;
-			int playerLevel = Player::ins()->getTalentLevel(itemDex[itemCode].recipeTalentNeed[i].first);
+			int needLevel = itemDex[itemCode].recipeProficNeed[i].second;
+			int playerLevel = Player::ins()->getProficLevel(itemDex[itemCode].recipeProficNeed[i].first);
 			if (playerLevel < needLevel) return false;
 		}
 

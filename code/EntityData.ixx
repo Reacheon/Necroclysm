@@ -3,6 +3,7 @@
 import std;
 import constVar;
 import Sprite;
+import SkillData;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767
@@ -37,7 +38,9 @@ export struct EntityData
     std::vector<unsigned __int16> bionicList;
     unsigned __int16 corpseItemCode = 0;
     int eyeSight = 8; //기본 시야
-    std::unordered_set<unsigned __int16> skillList;
+
+
+    std::vector<SkillData> skillList;
 
     __int8 hpBarHeight = -12;
     __int8 partsStartIndex = 0;
@@ -62,9 +65,9 @@ export struct EntityData
     bool isPlayer = false;
     __int8 direction = 0;
     ItemPocket* equipment;
-    std::array<int, TALENT_SIZE> talentExp = { 0, }; //경험치
-    std::array<float, TALENT_SIZE> talentApt = { 2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0, }; //적성
-    std::array<int, TALENT_SIZE> talentFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
+    std::array<int, TALENT_SIZE> proficExp = { 0, }; //경험치
+    std::array<float, TALENT_SIZE> proficApt = { 2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0, }; //적성
+    std::array<int, TALENT_SIZE> proficFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
     __int16 sprIndex = 0;
     __int16 sprIndexInfimum = 0;
     bool sprFlip = false;

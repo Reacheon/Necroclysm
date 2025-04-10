@@ -70,7 +70,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	addSkill(1);
 	quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.talentApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Player::~Player()
 {
