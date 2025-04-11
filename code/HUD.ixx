@@ -46,6 +46,7 @@ import ItemPocket;
 import ItemStack;
 import Dialogue;
 import Skill;
+import Quest;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -394,6 +395,9 @@ public:
 		case act::bionic:
 			updateLog(L"#FFFFFF바이오닉 창을 열었다.");
 			new Bionic();
+			break;
+		case act::quest:
+			new Quest();
 			break;
 		case act::runMode:
 			if (Player::ins()->entityInfo.walkMode == walkFlag::walk) Player::ins()->entityInfo.walkMode = walkFlag::run;
