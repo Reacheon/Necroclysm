@@ -12,7 +12,9 @@ import util;
 
 export Point2 getMouseXY()
 {
-	return { event.motion.x, event.motion.y };
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	return {x, y };
 }
 
 export Point2 getTouchXY()
@@ -48,7 +50,6 @@ export bool checkCursor(const SDL_Rect* rect)
 			}
 			break;
 		}
-		case input::keyboard:{return false;}
 	}
 
 	return false;

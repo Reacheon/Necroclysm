@@ -102,11 +102,6 @@ public:
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winSlipOpen);
-
-		if (option::inputMethod == input::keyboard)
-		{
-			equipCursor = 0;
-		}
 	}
 	~Equip()
 	{
@@ -170,6 +165,20 @@ public:
 	void clickDownGUI();
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
+	void mouseWheel() 
+	{
+		if (checkCursor(&equipBase))
+		{
+			if (event.wheel.y > 0)
+			{
+				if(equipScroll>1) equipScroll -= 1;
+			}
+			else if (event.wheel.y < 0)
+			{
+				if(equipScroll + EQUIP_ITEM_MAX < equipPtr->itemInfo.size()) equipScroll += 1;
+			}
+		}
+	}
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
@@ -216,19 +225,12 @@ public:
 			}
 			else
 			{
-				if (option::inputMethod != input::keyboard)
-				{
-					//select 아이템이 하나라도 있을 경우 전부 제거
-					equipScroll = 0;
-					equipCursor = -1;
-					for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
-					barAct = actSet::null;
-					tabType = tabFlag::closeWin;
-				}
-				else
-				{
-					close(aniFlag::winSlipClose);
-				}
+				//select 아이템이 하나라도 있을 경우 전부 제거
+				equipScroll = 0;
+				equipCursor = -1;
+				for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
+				barAct = actSet::null;
+				tabType = tabFlag::closeWin;
 			}
 		}
 		else//가방 닫기
@@ -404,11 +406,6 @@ public:
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (option::inputMethod == input::keyboard)
-		{
-			doPopDownHUD = true;
-			barActCursor = -1;
-		}
 	}
 
 	void executeDroping()
@@ -425,11 +422,6 @@ public:
 		Player::ins()->drop(drop);
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (option::inputMethod == input::keyboard)
-			doPopDownHUD = true;
-		{
-			barActCursor = -1;
-		}
 		updateLog(col2Str(col::white) + sysStr[126]);
 	}
 	void executeOpen()
@@ -738,12 +730,6 @@ public:
 			}
 		}
 		Player::ins()->updateStatus();
-		if (option::inputMethod == input::keyboard)
-		{
-			doPopDownHUD = true;
-			barActCursor = -1;
-		}
-
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
 	}

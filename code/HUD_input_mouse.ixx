@@ -24,6 +24,17 @@ import useSkill;
 void HUD::clickDownGUI()
 {
 	executedHold = false;
+
+	for (int i = 0; i < QUICK_SLOT_MAX; i++)
+	{
+		if (checkCursor(&quickSlotBtn[i]))
+		{
+			if (quickSlot[i].first != quickSlotFlag::NONE)
+			{
+				dragQuickSlotTarget = i;
+			}
+		}
+	}
 }
 void HUD::clickMotionGUI(int dx, int dy)
 {
@@ -115,40 +126,77 @@ void HUD::clickUpGUI()
 	}
 	else//타일터치
 	{
-		cameraFix = true;
-		//터치한 좌표를 얻어내는 부분
-		int cameraGridX, cameraGridY;
-		if (cameraX >= 0) cameraGridX = cameraX / 16;
-		else cameraGridX = -1 + cameraX / 16;
-		if (cameraY >= 0) cameraGridY = cameraY / 16;
-		else cameraGridY = -1 + cameraY / 16;
-
-		int camDelX = cameraX - (16 * cameraGridX + 8);
-		int camDelY = cameraY - (16 * cameraGridY + 8);
-
-		int revX, revY, revGridX, revGridY;
-		if (option::inputMethod == input::touch)
+		if (dragQuickSlotTarget == -1)
 		{
-			revX = event.tfinger.x * cameraW - (cameraW / 2);
-			revY = event.tfinger.y * cameraH - (cameraH / 2);
+			cameraFix = true;
+			//터치한 좌표를 얻어내는 부분
+			int cameraGridX, cameraGridY;
+			if (cameraX >= 0) cameraGridX = cameraX / 16;
+			else cameraGridX = -1 + cameraX / 16;
+			if (cameraY >= 0) cameraGridY = cameraY / 16;
+			else cameraGridY = -1 + cameraY / 16;
+
+			int camDelX = cameraX - (16 * cameraGridX + 8);
+			int camDelY = cameraY - (16 * cameraGridY + 8);
+
+			int revX, revY, revGridX, revGridY;
+			if (option::inputMethod == input::touch)
+			{
+				revX = event.tfinger.x * cameraW - (cameraW / 2);
+				revY = event.tfinger.y * cameraH - (cameraH / 2);
+			}
+			else
+			{
+				revX = event.motion.x - (cameraW / 2);
+				revY = event.motion.y - (cameraH / 2);
+			}
+			revX += sgn(revX) * (8 * zoomScale) + camDelX;
+			revGridX = revX / (16 * zoomScale);
+			revY += sgn(revY) * (8 * zoomScale) + camDelY;
+			revGridY = revY / (16 * zoomScale);
+
+			//상대좌표를 절대좌표로 변환
+			clickTile.x = cameraGridX + revGridX;
+			clickTile.y = cameraGridY + revGridY;
+			prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
+			tileTouch(clickTile.x, clickTile.y);
+		}
+	}
+
+	if (dragQuickSlotTarget != -1)
+	{
+		if (checkCursor(&quickSlotRegion) == false)
+		{
+			quickSlot[dragQuickSlotTarget].first = quickSlotFlag::NONE;
+			quickSlot[dragQuickSlotTarget].second = -1;
 		}
 		else
 		{
-			revX = event.motion.x - (cameraW / 2);
-			revY = event.motion.y - (cameraH / 2);
-		}
-		revX += sgn(revX) * (8 * zoomScale) + camDelX;
-		revGridX = revX / (16 * zoomScale);
-		revY += sgn(revY) * (8 * zoomScale) + camDelY;
-		revGridY = revY / (16 * zoomScale);
+			for (int i = 0; i < QUICK_SLOT_MAX; i++)
+			{
+				if (checkCursor(&quickSlotBtn[i]))
+				{
+					quickSlotFlag prevFlag = quickSlot[dragQuickSlotTarget].first;
+					int prevIndex = quickSlot[dragQuickSlotTarget].second;
 
-		//상대좌표를 절대좌표로 변환
-		clickTile.x = cameraGridX + revGridX;
-		clickTile.y = cameraGridY + revGridY;
-		prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
-		tileTouch(clickTile.x, clickTile.y);
+					for (int j = 0; j < QUICK_SLOT_MAX; j++)
+					{
+						if (quickSlot[j].first == prevFlag && quickSlot[j].second == prevIndex)
+						{
+							quickSlot[j].first = quickSlotFlag::NONE;
+							quickSlot[j].second = -1;
+						}
+					}
+
+					quickSlot[i].first = prevFlag;
+					quickSlot[i].second = prevIndex;
+					break;
+				}
+			}
+		}
 	}
 
+	dragQuickSlotTarget = -1;
 }
 
 void HUD::mouseStep()

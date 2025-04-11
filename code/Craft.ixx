@@ -537,16 +537,24 @@ public:
 	}
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
+	void mouseWheel() 
+	{
+		if (checkCursor(&craftBase))
+		{
+			int maxScroll = (numNoneBlackFilter - 1) / 6 - (CRAFT_MAX_ROW - 1);
+			if (maxScroll < 0) maxScroll = 0;
+
+			if (event.wheel.y > 0 && craftScroll > 0) craftScroll -= 1;
+			else if (event.wheel.y < 0 && craftScroll < maxScroll) craftScroll += 1;
+		}
+	}
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
 	void step()
 	{
-		//만약 제작 중인 아이템이 있으면
-		if (ongoingTargetCode != 0);
+		int maxScroll = myMax(0, (numNoneBlackFilter - 1) / 6 - (CRAFT_MAX_ROW - 1));
 
-		//잘못된 스크롤 위치 조정
-		int maxScroll = myMax(0, (numNoneBlackFilter - 23) / 6);
 		if (craftScroll > maxScroll) { craftScroll = maxScroll; }
 		else if (craftScroll < 0) { craftScroll = 0; }
 	}

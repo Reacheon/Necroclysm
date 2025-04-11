@@ -346,16 +346,10 @@ void HUD::drawGUI()
 				else { targetBtnSpr = spr::buttons; }
 				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 			}
-			else if (option::inputMethod != input::keyboard)
+			else
 			{
 				if (y == 0) drawSpriteCenter(spr::windowArrow, 1, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 				else drawSpriteCenter(spr::windowArrow, 3, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
-			}
-			else
-			{
-				if (state[SDL_SCANCODE_RETURN]) { targetBtnSpr = spr::buttonsPressed; }
-				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_Enter, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 			}
 		}
 
@@ -573,6 +567,19 @@ void HUD::drawQuickSlot()
 		drawText(col2Str(col::white) + std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
 
 
+	}
+
+	if (dragQuickSlotTarget != -1)
+	{
+		if (quickSlot[dragQuickSlotTarget].first == quickSlotFlag::SKILL)
+		{
+			setZoom(2.0);
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, event.motion.x, event.motion.y);
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //텍스쳐 투명도 설정
+			setZoom(1.0);
+		}
 	}
 
 	disableSolidText();

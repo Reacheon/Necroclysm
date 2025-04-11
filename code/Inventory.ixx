@@ -117,6 +117,14 @@ public:
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
 	void clickRightGUI() { }
+	void mouseWheel() 
+	{
+		if (checkCursor(&inventoryBase))
+		{
+			if (event.wheel.y > 0 && inventoryScroll > 1) inventoryScroll -= 1;
+			else if (event.wheel.y < 0 && inventoryScroll + INVENTORY_ITEM_MAX < inventoryPocket->itemInfo.size()) inventoryScroll += 1;
+		}
+	}
 	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }

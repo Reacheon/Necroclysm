@@ -42,7 +42,7 @@ private:
 
 	std::array<SDL_Rect,7> skillBtn;
 
-	std::vector<SkillData> currentSkills;
+	std::vector<SkillData> filteredSkills; //카테고리에 의해 필터링된 스킬들, 기본값은 전체 스킬(생성될 때)
 
 	int dragSkillTarget = -1;
 public:
@@ -61,7 +61,7 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
-		currentSkills = Player::ins()->entityInfo.skillList;
+		filteredSkills = Player::ins()->entityInfo.skillList;
 	}
 	~Skill()
 	{
@@ -165,13 +165,13 @@ public:
 			drawSubcategoryBox(sysStr[202], magicBox, categoryCursor == skillCategory::magic, false);
 
 			// 스킬 스크롤 그리기
-			if (currentSkills.size() > SKILL_GUI_MAX)
+			if (filteredSkills.size() > SKILL_GUI_MAX)
 			{
 				SDL_Rect skillScrollBox = { skillBase.x + 270, skillBase.y + 101, 2, 292 };
 				drawFillRect(skillScrollBox, { 120,120,120 });
 				SDL_Rect inScrollBox = skillScrollBox; // 내부 스크롤 커서
-				inScrollBox.h = skillScrollBox.h * myMin(1.0, (float)SKILL_GUI_MAX / (float)currentSkills.size());
-				inScrollBox.y = skillScrollBox.y + skillScrollBox.h * ((float)skillScroll / (float)currentSkills.size());
+				inScrollBox.h = skillScrollBox.h * myMin(1.0, (float)SKILL_GUI_MAX / (float)filteredSkills.size());
+				inScrollBox.y = skillScrollBox.y + skillScrollBox.h * ((float)skillScroll / (float)filteredSkills.size());
 				if (inScrollBox.y + inScrollBox.h > skillScrollBox.y + skillScrollBox.h) { inScrollBox.y = skillScrollBox.y + skillScrollBox.h - inScrollBox.h; }
 				drawFillRect(inScrollBox, col::white);
 			}
@@ -181,9 +181,9 @@ public:
 
 			for (int i = 0; i < 7; i++)
 			{
-				if (skillScroll + i < currentSkills.size())
+				if (skillScroll + i < filteredSkills.size())
 				{
-					SkillData tgtData = currentSkills[skillScroll + i];
+					SkillData tgtData = filteredSkills[skillScroll + i];
 
 
 					int btnIndex = 0;
@@ -330,42 +330,42 @@ public:
 		}
 
 
-		if (categoryCursor == skillCategory::all) currentSkills = Player::ins()->entityInfo.skillList;
+		if (categoryCursor == skillCategory::all) filteredSkills = Player::ins()->entityInfo.skillList;
 		else if (categoryCursor == skillCategory::general)
 		{
-			currentSkills.clear();
+			filteredSkills.clear();
 			for (int i = 0; i < Player::ins()->entityInfo.skillList.size(); i++)
 			{
-				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::GENERAL) currentSkills.push_back(Player::ins()->entityInfo.skillList[i]);
+				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::GENERAL) filteredSkills.push_back(Player::ins()->entityInfo.skillList[i]);
 			}
 		}
 		else if (categoryCursor == skillCategory::mutation)
 		{
-			currentSkills.clear();
+			filteredSkills.clear();
 			for (int i = 0; i < Player::ins()->entityInfo.skillList.size(); i++)
 			{
-				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::MUTATION) currentSkills.push_back(Player::ins()->entityInfo.skillList[i]);
+				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::MUTATION) filteredSkills.push_back(Player::ins()->entityInfo.skillList[i]);
 			}
 		}
 		else if (categoryCursor == skillCategory::bionic)
 		{
-			currentSkills.clear();
+			filteredSkills.clear();
 			for (int i = 0; i < Player::ins()->entityInfo.skillList.size(); i++)
 			{
 				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::BIONIC)
 				{
-					currentSkills.push_back(Player::ins()->entityInfo.skillList[i]);
+					filteredSkills.push_back(Player::ins()->entityInfo.skillList[i]);
 				}
 			}
 		}
 		else if (categoryCursor == skillCategory::magic)
 		{
-			currentSkills.clear();
+			filteredSkills.clear();
 			for (int i = 0; i < Player::ins()->entityInfo.skillList.size(); i++)
 			{
 				if (Player::ins()->entityInfo.skillList[i].src == skillSrc::MAGIC)
 				{
-					currentSkills.push_back(Player::ins()->entityInfo.skillList[i]);
+					filteredSkills.push_back(Player::ins()->entityInfo.skillList[i]);
 				}
 			}
 		}
@@ -383,7 +383,7 @@ public:
 		{
 			if (checkCursor(&skillBtn[i]))
 			{
-				dragSkillTarget = currentSkills[skillScroll + i].skillCode;
+				dragSkillTarget = filteredSkills[skillScroll + i].skillCode;
 			}
 		}
 		
@@ -403,6 +403,14 @@ public:
 		}
 	}
 	void clickHoldGUI() {}
+	void mouseWheel() 
+	{
+		if (checkCursor(&skillBase))
+		{
+			if (event.wheel.y > 0 && skillScroll > 1) skillScroll -= 1;
+			else if (event.wheel.y < 0 && skillScroll + SKILL_GUI_MAX < filteredSkills.size()) skillScroll += 1;
+		}
+	}
 	void gamepadBtnDown() {}
 	void gamepadBtnMotion() {}
 	void gamepadBtnUp() {}
@@ -411,7 +419,7 @@ public:
 		//잘못된 스크롤 위치 조정
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
-			if (skillScroll + SKILL_GUI_MAX >= currentSkills.size()) { skillScroll = myMax(0, (int)currentSkills.size() - SKILL_GUI_MAX); }
+			if (skillScroll + SKILL_GUI_MAX >= filteredSkills.size()) { skillScroll = myMax(0, (int)filteredSkills.size() - SKILL_GUI_MAX); }
 			else if (skillScroll < 0) { skillScroll = 0; }
 		}
 	}

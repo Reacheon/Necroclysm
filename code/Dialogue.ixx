@@ -113,6 +113,7 @@ public:
 	void clickDownGUI() {}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
+	void mouseWheel() {}
 	void gamepadBtnDown() {}
 	void gamepadBtnMotion() {}
 	void gamepadBtnUp() {}

@@ -81,6 +81,8 @@ private:
 
 	int delayR2 = 0;
 
+	int dragQuickSlotTarget = -1;//HUD에서 스킬창 옮길 때 용도(Skill GUI랑 기능 동일)
+
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -88,15 +90,7 @@ public:
 		prt(L"HUD instance was generated.\n");
 		errorBox(ptr != nullptr, "More than one Loot instance was generated.");
 		ptr = this;
-		if (option::inputMethod != input::keyboard)
-		{
-			changeXY(0, 0, false);
-		}
-		else
-		{
-			changeXY(0, 82, false);
-		}
-
+		changeXY(0, 0, false);
 	}
 	~HUD()
 	{
@@ -146,6 +140,20 @@ public:
 	void clickUpGUI();
 	void clickRightGUI();
 	void clickHoldGUI();
+	void mouseWheel() 
+	{
+		//줌인 줌아웃
+		if (event.wheel.y > 0)
+		{
+			zoomScale += 1;
+			if (zoomScale > 5.0) zoomScale = 5;
+		}
+		else if (event.wheel.y < 0)
+		{
+			zoomScale -= 1;
+			if (zoomScale < 1.0) zoomScale = 1;
+		}
+	}
 	void mouseStep();
 
 	void gamepadBtnDown();

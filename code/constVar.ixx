@@ -34,6 +34,8 @@ export constexpr int MAX_PROFIC_LEVEL = 99;
 export constexpr int SKILL_GUI_MAX = 7;
 export constexpr int QUICK_SLOT_MAX = 8;
 
+export constexpr int CRAFT_MAX_ROW = 4;
+
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
@@ -658,7 +660,6 @@ export enum class input
 {
     mouse,
     touch,
-    keyboard,
     gamepad
 };
 

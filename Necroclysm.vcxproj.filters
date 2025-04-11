@@ -549,5 +549,8 @@
     <ClCompile Include="code\useSkill.ixx">
       <Filter>소스 파일\01_system\04_GUI\act</Filter>
     </ClCompile>
+    <ClCompile Include="code\mouseWheel.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

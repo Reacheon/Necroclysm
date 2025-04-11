@@ -19,6 +19,7 @@ import clickUp;
 import clickDown;
 import clickMotion;
 import clickRight;
+import mouseWheel;
 import gamepadBtnDown;
 import gamepadBtnMotion;
 import gamepadBtnUp;
@@ -238,17 +239,8 @@ __int64 playerInputTurn()
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
 					option::inputMethod = input::mouse;
 				}
-
-				if (event.wheel.y > 0) 
-				{
-					zoomScale += 1;
-					if (zoomScale > 5.0) zoomScale = 5;
-				}
-				else if (event.wheel.y < 0) 
-				{
-					zoomScale -= 1;
-					if (zoomScale < 1.0) zoomScale = 1;
-				}
+				mouseWheel();
+		
 				break;
 			case SDL_KEYDOWN:
 				if (exInput == true && event.key.keysym.sym == UNI::BACKSPACE)

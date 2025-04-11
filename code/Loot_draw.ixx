@@ -196,13 +196,7 @@ void Loot::drawGUI()
 				drawFillRect(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, leftBtnColor, 200);
 				drawRect(pocketLeft.x, pocketLeft.y, pocketLeft.w, pocketLeft.h, col::lightGray, 200);
 
-				if (option::inputMethod == input::keyboard)
-				{
-					if (state[SDL_SCANCODE_LSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
-					else { targetBtnSpr = spr::buttons; }
-					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_LShift, pocketLeft.x + pocketLeft.w / 2, pocketLeft.y + pocketRight.h / 2);
-				}
-				else if (option::inputMethod == input::gamepad)
+				if (option::inputMethod == input::gamepad)
 				{
 					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
@@ -228,13 +222,7 @@ void Loot::drawGUI()
 				drawFillRect(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, rightBtnColor, 200);
 				drawRect(pocketRight.x, pocketRight.y, pocketRight.w, pocketRight.h, col::lightGray);
 
-				if (option::inputMethod == input::keyboard)
-				{
-					if (state[SDL_SCANCODE_RSHIFT]) { targetBtnSpr = spr::buttonsPressed; }
-					else { targetBtnSpr = spr::buttons; }
-					drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_RShift, pocketRight.x + pocketRight.w / 2, pocketRight.y + pocketRight.h / 2);
-				}
-				else if (option::inputMethod == input::gamepad)
+				if (option::inputMethod == input::gamepad)
 				{
 					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
@@ -263,13 +251,7 @@ void Loot::drawGUI()
 			drawFillRect(lootBtn, lootBtnColor, 200);
 			drawRect(lootBtn, { 0x57, 0x57, 0x57 });
 
-			if (option::inputMethod == input::keyboard)
-			{
-				if (state[SDL_SCANCODE_V]) { targetBtnSpr = spr::buttonsPressed; }
-				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_V, lootBtn.x + lootBtn.w / 2, lootBtn.y + lootBtn.h / 2);
-			}
-			else if (option::inputMethod == input::gamepad)
+			if (option::inputMethod == input::gamepad)
 			{
 				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }

@@ -84,6 +84,7 @@ public:
 	void clickDownGUI(){/*사용 X*/}
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
+	void mouseWheel() {}
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

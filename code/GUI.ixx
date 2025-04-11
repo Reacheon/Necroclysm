@@ -79,6 +79,7 @@ public:
 	virtual void clickDownGUI() = 0;
 	virtual void clickRightGUI() = 0;
 	virtual void clickHoldGUI() = 0;
+	virtual void mouseWheel() = 0;
 	virtual void gamepadBtnDown() = 0;
 	virtual void gamepadBtnMotion() = 0;
 	virtual void gamepadBtnUp() = 0;

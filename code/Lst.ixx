@@ -57,7 +57,6 @@ public:
 		lstText = inputText;
 		lstOptionVec = option;
 
-		if (option::inputMethod == input::keyboard) { lstCursor = 0; }
 
 		deactInput();
 		deactDraw();
@@ -223,6 +222,7 @@ public:
 	void clickDownGUI() { }
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
+	void mouseWheel() {}
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }

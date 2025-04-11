@@ -96,7 +96,7 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (option::inputMethod == input::keyboard || option::inputMethod == input::gamepad) lootCursor = 0;
+		if (option::inputMethod == input::gamepad) lootCursor = 0;
 	}
 
 	Loot(ItemStack* inputStack) : GUI(false)
@@ -123,7 +123,7 @@ public:
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
-		if (option::inputMethod == input::keyboard || option::inputMethod == input::gamepad) lootCursor = 0;
+		if (option::inputMethod == input::gamepad) lootCursor = 0;
 	}
 
 	~Loot()
@@ -205,6 +205,14 @@ public:
 	void clickDownGUI();
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
+	void mouseWheel() 
+	{
+		if (checkCursor(&lootBase))
+		{
+			if (event.wheel.y > 0 && lootScroll > 1) lootScroll -= 1;
+			else if (event.wheel.y < 0 && lootScroll + LOOT_ITEM_MAX < lootPocket->itemInfo.size()) lootScroll += 1;
+		}
+	}
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
@@ -293,8 +301,7 @@ public:
 		else
 		{
 
-			if (option::inputMethod == input::keyboard) close(aniFlag::winSlipClose);
-			else if (option::inputMethod == input::gamepad) close(aniFlag::winSlipClose);
+			if (option::inputMethod == input::gamepad) close(aniFlag::winSlipClose);
 			else
 			{
 				lootCursor = -1;
@@ -480,11 +487,6 @@ public:
 			lootPocket->itemInfo[lootCursor].lootSelect = itemNumber;
 			//아직 질량&부피 체크 추가하지 않았음
 			lootPocket->transferItem((ItemPocket*)equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr, lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
-			if (option::inputMethod == input::keyboard)
-			{
-				doPopDownHUD = true;
-				barActCursor = -1;
-			}
 		}
 	}
 	void executeEquip()
@@ -495,11 +497,6 @@ public:
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (option::inputMethod == input::keyboard)
-		{
-			doPopDownHUD = true;
-			barActCursor = -1;
-		}
 	}
 
 	void updateBarAct()
@@ -765,11 +762,6 @@ public:
 		}
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
-		if (option::inputMethod == input::keyboard)
-		{
-			doPopDownHUD = true;
-			barActCursor = -1;
-		}
 	}
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음

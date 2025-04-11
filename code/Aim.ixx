@@ -283,6 +283,7 @@ public:
 	}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
+	void mouseWheel() {}
 	void gamepadBtnDown() 
 	{
 		switch (event.cbutton.button)
