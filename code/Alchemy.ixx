@@ -920,7 +920,7 @@ public:
 
 		loopEnd:
 
-			turnWait(1.0);
+			//turnWait(1.0);
 			coTurnSkip = true;
 
 			prt(L"exeCraft 코루틴 실행 전\n");

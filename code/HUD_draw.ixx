@@ -16,6 +16,8 @@ import globalTime;
 import checkCursor;
 import Vehicle;
 import mouseGrid;
+import drawWindow;
+import drawEpsilonText;
 
 namespace segmentIndex
 {
@@ -207,7 +209,9 @@ void HUD::drawGUI()
 			}
 
 			setFontSize(12);
-			drawText(col2Str(lowCol::yellow) + L"120,000 골드", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 0);
+			
+			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 3 + 15 * 0 + 8);
+			drawText(col2Str(lowCol::yellow) + L"6,320", letterbox.x + 18 + 296 + 14, letterbox.y + 3 + 15 * 0);
 			
 			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 1);
 			drawText(col2Str(lowCol::green) + L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 3 + 15 * 1);
@@ -362,6 +366,7 @@ void HUD::drawGUI()
 	drawBarAct();
 	drawTab();
 	drawQuickSlot();
+	drawVehiclePartInfo();
 }
 
 
@@ -944,6 +949,53 @@ void HUD::drawStatusEffects()
 				drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
 				drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
 			}
+		}
+	}
+}
+
+void HUD::drawVehiclePartInfo()
+{
+	int mouseX = getAbsMouseGrid().x;
+	int mouseY = getAbsMouseGrid().y;
+
+	int tileW = (float)cameraW / (16.0*zoomScale);
+	int tileH = (float)cameraH / (16.0*zoomScale);
+
+	if (mouseX > PlayerX() - tileW / 2 - 1 && mouseX < PlayerX() + tileW / 2 + 1 && mouseY > PlayerY() - tileH / 2 - 1 && mouseY < PlayerY() + tileH / 2 + 1)
+	{
+		Vehicle* vehPtr = (Vehicle*)World::ins()->getTile(mouseX, mouseY, PlayerZ()).VehiclePtr;
+		if (vehPtr != nullptr)
+		{
+			int pivotX = cameraW - 200;
+			int pivotY = 148;
+
+			drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
+			drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
+			setFontSize(10);
+			setSolidText();
+			drawTextCenter(col2Str(col::white) + L"HM-300 험비",pivotX + 96, pivotY + 9);
+
+
+			int newPivotY = pivotY + 16;
+
+			drawFillRect(pivotX, newPivotY, 192, 25, col::black, 200);
+			drawRect(pivotX, newPivotY, 192, 25, col::lightGray, 255);
+
+			drawSpriteCenter(spr::itemset, 3, pivotX + 24, newPivotY +12);
+
+			drawText(col2Str(col::white) + L"알루미늄 프레임", pivotX + 35, newPivotY + 6);
+
+			drawRect(pivotX + 6, newPivotY + 6, 6, 13, col::white);
+			drawFillRect(pivotX + 8, newPivotY + 8, 2, 9, lowCol::green);
+
+			drawRect(pivotX + 135, newPivotY + 7, 53, 11, col::white);
+			drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2, 45, 7, lowCol::orange);
+
+			drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3,col::white);
+
+
+			disableSolidText();
+
 		}
 	}
 }
