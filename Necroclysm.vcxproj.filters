@@ -555,5 +555,8 @@
     <ClCompile Include="code\Quest.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\Maint.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

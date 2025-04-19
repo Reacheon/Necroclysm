@@ -1,4 +1,5 @@
 #include <SDL.h>
+#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module ContextMenu;
 
@@ -19,6 +20,8 @@ import World;
 import Vehicle;
 import Bionic;
 import log;
+import Lst;
+import Maint;
 
 export class ContextMenu : public GUI
 {
@@ -29,14 +32,13 @@ private:
 	int contextMenuCursor = -1;
 	int contextMenuScroll = 0;
 	std::vector<act> actOptions;
-	Point2 targetGrid; //컨텍스트메뉴가 액트를 얻어낼 그리드 좌표
 	std::array<SDL_Rect,30> optionRect;
 
 public:
 	ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int inputGridY, std::vector<act> inputOptions) : GUI(false)
 	{
 		actOptions = inputOptions;
-		targetGrid = { inputGridX, inputGridY };
+		contextMenuTargetGrid = { inputGridX, inputGridY };
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
@@ -51,7 +53,6 @@ public:
 	}
 	~ContextMenu()
 	{
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static ContextMenu* ins() { return ptr; }
@@ -92,6 +93,10 @@ public:
 	void drawGUI()
 	{
 		if (getStateDraw() == false) { return; }
+
+
+
+
 
 		if (getFoldRatio() == 1.0)
 		{
@@ -139,6 +144,16 @@ public:
 				{
 					optionText = sysStr[187];//탑승
 					iconIndex = 71;
+				}
+				else if (actOptions[i] == act::vehicleRepair)
+				{
+					optionText = sysStr[203];//수리
+					iconIndex = 28;
+				}
+				else if (actOptions[i] == act::vehicleDetach)
+				{
+					optionText = sysStr[204];//탈착
+					iconIndex = 85;
 				}
 				else optionText = L"???";
 
@@ -213,46 +228,7 @@ public:
 			{
 				if (checkCursor(&optionRect[i]))
 				{
-					if (actOptions[i] == act::closeDoor)
-					{
-						actFunc::closeDoor(targetGrid.x, targetGrid.y, PlayerZ());
-						break;
-					}
-					else if (actOptions[i] == act::unbox)
-					{
-						if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
-						{
-							Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
-							for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
-							{
-								if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
-								{
-									new Loot((ItemPocket*)(vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].pocketPtr), &(vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i]));
-									break;
-								}
-							}
-						}
-						break;
-					}
-					else if (actOptions[i] == act::pull)
-					{
-						if (Player::ins()->pulledCart == nullptr)
-						{
-							Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
-						}
-						else
-						{
-							Player::ins()->pulledCart = nullptr;
-						}
-						break;
-					}
-					else if (actOptions[i] == act::ride)
-					{
-						Player::ins()->ridingEntity = TileEntity(targetGrid.x, targetGrid.y, PlayerZ());
-						World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).EntityPtr = nullptr;
-						Player::ins()->ridingType = ridingFlag::horse;
-						break;
-					}
+					CORO(executeContextAct(actOptions[i]));
 				}
 
 			}
@@ -287,5 +263,75 @@ public:
 		//}
 
 		//if(openSub==false) subContextMenuBase = { -1, -1, -1,-1 };
+	}
+
+	Corouter executeContextAct(act inputAct)
+	{
+		if (inputAct == act::closeDoor)
+		{
+			actFunc::closeDoor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			tabType = tabFlag::autoAtk;
+		}
+		else if (inputAct == act::unbox)
+		{
+			if (World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+			{
+				Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+				for (int i = 0; i < vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo.size(); i++)
+				{
+					if (vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+					{
+						new Loot((ItemPocket*)(vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i].pocketPtr), &(vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i]));
+						break;
+					}
+				}
+			}
+			tabType = tabFlag::autoAtk;
+		}
+		else if (inputAct == act::pull)
+		{
+			if (Player::ins()->pulledCart == nullptr)
+			{
+				Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+			}
+			else
+			{
+				Player::ins()->pulledCart = nullptr;
+			}
+			tabType = tabFlag::autoAtk;
+		}
+		else if (inputAct == act::ride)
+		{
+			Player::ins()->ridingEntity = TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).EntityPtr = nullptr;
+			Player::ins()->ridingType = ridingFlag::horse;
+			tabType = tabFlag::autoAtk;
+		}
+		else if (inputAct == act::vehicleRepair)
+		{
+			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+			std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
+			std::vector<std::wstring> partNames;
+			for (int i = 0; i < vParts.size(); i++)
+			{
+				partNames.push_back(vParts[i].name);
+			}
+
+			new Maint(L"수리", L"수리할 부품을 선택해주세요.", {contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ()},maintFlag::repair);
+			co_await std::suspend_always();
+		}
+		else if (inputAct == act::vehicleDetach)
+		{
+			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+			std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
+			std::vector<std::wstring> partNames;
+			for (int i = 0; i < vParts.size(); i++)
+			{
+				partNames.push_back(vParts[i].name);
+			}
+
+			new Maint(L"탈착", L"차량에서 분리할 부품을 선택해주세요.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() },maintFlag::detach);
+			co_await std::suspend_always();
+		}
 	}
 };

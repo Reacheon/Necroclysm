@@ -296,7 +296,7 @@ export void startArea()
 			int vY = -1;
 			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, 48);//차량 설치
 			{
-
+				myTrainPower->name = L"동력차";
 				myTrainPower->vehType = vehFlag::train;
 				myTrainPower->isPowerTrain = true;
 
@@ -717,6 +717,7 @@ export void startArea()
 	int vX = pY - 8;
 	int vY = pY + 3;
 	Vehicle* myCar = new Vehicle(vX, vY, 0, 48);//차량 설치
+	myCar->name = L"SUV";
 	myCar->vehType = vehFlag::car;
 
 	///////////////////////차량 기초 프레임//////////////////////////////////////
@@ -805,6 +806,7 @@ export void startArea()
 		int cx = 15;
 		int cy = 0;
 		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
+		myHeli->name = L"헬기";
 		myHeli->vehType = vehFlag::heli;
 		myHeli->addPart(cx, cy, { 311 });
 

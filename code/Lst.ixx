@@ -15,6 +15,7 @@ import ItemPocket;
 import Player;
 import textureVar;
 import drawWindow;
+import World;
 
 //Lst는 Msg랑 다르게 coAnswer로 문자열이 아니라 선택한 입력지의 인덱스를 반환할것
 //coAnswer 반환형 : 현재 선택한 목록의 인덱스 숫자 정수형, 예로 0번째 선택지를 고르면 L"0" 반환
@@ -49,7 +50,6 @@ public:
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
@@ -65,6 +65,7 @@ public:
 		prevTabType = tabType;
 		tabType = tabFlag::back;
 	}
+
 	~Lst()
 	{
 		prt(L"Lst : 소멸자가 호출되었습니다..\n");
@@ -139,8 +140,6 @@ public:
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-			setFontSize(10);
-			drawTextCenter(L"#FFFFFF172/282", lstWindow.x + lstWindow.w - 30, lstWindow.y + lstWindow.h - 9);
 
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(14);
@@ -148,18 +147,25 @@ public:
 			drawTextCenter(lstText, lstWindow.x + lstWindow.w / 2, lstWindow.y + 14);
 
 			//선택지 버튼 그리기	
+			int hoverCursor = 0;
+
 			for (int i = 0; i < myMin(btnSize, (int)lstOptionVec.size() - lstScroll); i++)
 			{
 				int selectBoxIndex = 0;
 				if (checkCursor(&lstBtn[i + lstScroll]))
 				{
+					hoverCursor = i + lstScroll;
 					if (click == true) { selectBoxIndex = 2; }
 					else { selectBoxIndex = 1; }
 				}
-				drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i + lstScroll].x, lstBtn[i + lstScroll].y);
+				drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i ].y);
 				setFontSize(14);
-				drawText(col2Str(col::white) + lstOptionVec[i + lstScroll], lstBtn[i + lstScroll].x + 12, lstBtn[i + lstScroll].y + 5);
+				drawText(col2Str(col::white) + lstOptionVec[i], lstBtn[i].x + 12, lstBtn[i].y + 5);
 			}
+
+			setFontSize(10);
+			drawTextCenter(col2Str(col::white) + std::to_wstring(hoverCursor + 1) + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstWindow.y + lstWindow.h - 9);
+
 
 			// 아이템 스크롤 그리기
 			drawFillRect(lstScrollBox, { 120,120,120 });
@@ -171,14 +177,14 @@ public:
 			int type = 1;
 			switch (type)
 			{
-				case 0:
-					vRect.w = vRect.w * getFoldRatio();
-					vRect.h = vRect.h * getFoldRatio();
-					break;
-				case 1:
-					vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
-					vRect.w = vRect.w * getFoldRatio();
-					break;
+			case 0:
+				vRect.w = vRect.w * getFoldRatio();
+				vRect.h = vRect.h * getFoldRatio();
+				break;
+			case 1:
+				vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
+				vRect.w = vRect.w * getFoldRatio();
+				break;
 			}
 			drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
 		}
@@ -219,13 +225,13 @@ public:
 			}
 		}
 	}
-	void clickDownGUI() { }
-	void clickRightGUI() { }
-	void clickHoldGUI() { }
+	void clickDownGUI() {}
+	void clickRightGUI() {}
+	void clickHoldGUI() {}
 	void mouseWheel() {}
-	void gamepadBtnDown() { }
-	void gamepadBtnMotion() { }
-	void gamepadBtnUp() { }
-	void step() { }
+	void gamepadBtnDown() {}
+	void gamepadBtnMotion() {}
+	void gamepadBtnUp() {}
+	void step() {}
 };
 

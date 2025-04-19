@@ -60,7 +60,7 @@ export struct ItemData
     __int16 rRad = 0;
     unsigned __int16 bionicIndex = -1;
 
-    __int16 durablility = 10;
+    __int16 durablility = 100;
 
     __int16 pierce = 0;
     __int16 cut = 0;

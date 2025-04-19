@@ -239,6 +239,7 @@
     <ClCompile Include="code\Loot_input_gamepad.ixx" />
     <ClCompile Include="code\Loot_input_mouse.ixx" />
     <ClCompile Include="code\Inventory.ixx" />
+    <ClCompile Include="code\Maint.ixx" />
     <ClCompile Include="code\mouseGrid.ixx" />
     <ClCompile Include="code\mouseWheel.ixx" />
     <ClCompile Include="code\Particle.ixx" />

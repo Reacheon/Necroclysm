@@ -992,6 +992,16 @@ public:
 			inputOptions.push_back(act::ride);
 		}
 
+		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+		{
+			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
+			if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size()>0)
+			{
+				inputOptions.push_back(act::vehicleRepair);
+				inputOptions.push_back(act::vehicleDetach);
+			}
+		}
+
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 };

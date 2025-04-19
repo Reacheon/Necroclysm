@@ -194,6 +194,8 @@ export std::vector<Point2> aStarTrail; //플레이어의 aStar로 생기는 궤�
 export int dpadDelay = 0; //상하좌우키 연속입력 딜레이(꾹 누르는경우 여러번 입력되게..)
 export int delayR2 = 0;
 
+export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을때 커서위치(컨메뉴가 존재하는지 확인하고 쓸 것)
+
 export class Snowflake
 {
 public:

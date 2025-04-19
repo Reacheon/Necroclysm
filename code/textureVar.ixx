@@ -145,4 +145,5 @@ export namespace spr
 	Sprite* craftItemRect = nullptr;
 	Sprite* msgBox = nullptr;
 	Sprite* skillRect = nullptr;
+	Sprite* gridMarker = nullptr;
 }

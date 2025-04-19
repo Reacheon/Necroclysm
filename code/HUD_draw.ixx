@@ -18,6 +18,8 @@ import Vehicle;
 import mouseGrid;
 import drawWindow;
 import drawEpsilonText;
+import ContextMenu;
+import Maint;
 
 namespace segmentIndex
 {
@@ -362,6 +364,40 @@ void HUD::drawGUI()
 	{
 
 	}
+
+
+	if (getLastGUI() == ContextMenu::ins() || getLastGUI() == Maint::ins())
+	{
+		int tgtX = contextMenuTargetGrid.x;
+		int tgtY = contextMenuTargetGrid.y;
+		SDL_Rect dst;
+		int tileSize = 16 * zoomScale;
+		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+		dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+		dst.w = tileSize;
+		dst.h = tileSize;
+		setZoom(zoomScale);
+		Uint32 currentTime = SDL_GetTicks();
+		const Uint32 pulsationPeriodMs = 1500;
+		const Uint8 minAlpha = 100;
+		const Uint8 maxAlpha = 255;
+		double timeRatio = fmod((double)currentTime / pulsationPeriodMs, 1.0);
+		double normalizedAlpha = (sin(timeRatio * 2.0 * M_PI) + 1.0) / 2.0;
+		Uint8 alpha = static_cast<Uint8>(minAlpha + normalizedAlpha * (maxAlpha - minAlpha));
+		SDL_GetTicks();
+		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), alpha); //텍스쳐 투명도 설정
+		SDL_SetTextureBlendMode(spr::gridMarker->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+		drawSpriteCenter
+		(
+			spr::gridMarker,
+			0,
+			dst.x + dst.w / 2,
+			dst.y + dst.h / 2
+		);
+		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), 255);
+		setZoom(1.0);
+	}
+
 
 	drawBarAct();
 	drawTab();
@@ -955,47 +991,69 @@ void HUD::drawStatusEffects()
 
 void HUD::drawVehiclePartInfo()
 {
-	int mouseX = getAbsMouseGrid().x;
-	int mouseY = getAbsMouseGrid().y;
-
-	int tileW = (float)cameraW / (16.0*zoomScale);
-	int tileH = (float)cameraH / (16.0*zoomScale);
-
-	if (mouseX > PlayerX() - tileW / 2 - 1 && mouseX < PlayerX() + tileW / 2 + 1 && mouseY > PlayerY() - tileH / 2 - 1 && mouseY < PlayerY() + tileH / 2 + 1)
+	if (getLastGUI() == ContextMenu::ins() || getLastGUI() == this)
 	{
-		Vehicle* vehPtr = (Vehicle*)World::ins()->getTile(mouseX, mouseY, PlayerZ()).VehiclePtr;
-		if (vehPtr != nullptr)
+
+		int mouseX = getAbsMouseGrid().x;
+		int mouseY = getAbsMouseGrid().y;
+
+		int tileW = (float)cameraW / (16.0 * zoomScale);
+		int tileH = (float)cameraH / (16.0 * zoomScale);
+
+		Point2 tgtGrid;
+
+		//컨텍스트메뉴가 열려있으면 거기로 고정
+		if (ContextMenu::ins() != nullptr)  tgtGrid = { contextMenuTargetGrid.x,contextMenuTargetGrid.y };
+		else tgtGrid = { mouseX,mouseY };
+
+		if (tgtGrid.x > PlayerX() - tileW / 2 - 1 && tgtGrid.x < PlayerX() + tileW / 2 + 1 && tgtGrid.y > PlayerY() - tileH / 2 - 1 && tgtGrid.y < PlayerY() + tileH / 2 + 1)
 		{
-			int pivotX = cameraW - 200;
-			int pivotY = 148;
+			Vehicle* vehPtr = (Vehicle*)World::ins()->getTile(tgtGrid.x, tgtGrid.y, PlayerZ()).VehiclePtr;
+			if (vehPtr != nullptr)
+			{
+				int pivotX = cameraW - 200;
+				int pivotY = 148;
 
-			drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
-			drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
-			setFontSize(10);
-			setSolidText();
-			drawTextCenter(col2Str(col::white) + L"HM-300 험비",pivotX + 96, pivotY + 9);
-
-
-			int newPivotY = pivotY + 16;
-
-			drawFillRect(pivotX, newPivotY, 192, 25, col::black, 200);
-			drawRect(pivotX, newPivotY, 192, 25, col::lightGray, 255);
-
-			drawSpriteCenter(spr::itemset, 3, pivotX + 24, newPivotY +12);
-
-			drawText(col2Str(col::white) + L"알루미늄 프레임", pivotX + 35, newPivotY + 6);
-
-			drawRect(pivotX + 6, newPivotY + 6, 6, 13, col::white);
-			drawFillRect(pivotX + 8, newPivotY + 8, 2, 9, lowCol::green);
-
-			drawRect(pivotX + 135, newPivotY + 7, 53, 11, col::white);
-			drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2, 45, 7, lowCol::orange);
-
-			drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3,col::white);
+				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
+				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
+				setFontSize(10);
+				setSolidText();
+				drawTextCenter(col2Str(col::white) + vehPtr->name, pivotX + 96, pivotY + 9);
 
 
-			disableSolidText();
+				int newPivotY = pivotY + 16;
 
+
+				int vehSize = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo.size();
+				drawFillRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::black, 200);
+				drawRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::lightGray, 255);
+
+
+				for (int i = 0; i < vehSize; i++)
+				{
+					ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo[vehSize - 1 - i];
+					//내구도
+					drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
+					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
+
+					//아이템 아이콘
+					drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+
+					//아이템 이름
+					drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+
+					//연료량
+					drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
+					drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
+					drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
+				}
+
+
+
+
+				disableSolidText();
+
+			}
 		}
 	}
 }

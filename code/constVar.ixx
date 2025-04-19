@@ -182,6 +182,9 @@ export enum class act
     toggleOn,
     toggleOff,
 
+    vehicleRepair,
+    vehicleDetach,
+
     //skillInfo,
 };
 
