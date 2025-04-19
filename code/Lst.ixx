@@ -1,6 +1,5 @@
 #include <SDL.h>
 
-
 export module Lst;
 
 import std;
@@ -22,7 +21,7 @@ import World;
 export class Lst : public GUI
 {
 private:
-	const int btnSize = 9;
+	const int MAX_BTN = 9;
 	inline static Lst* ptr = nullptr;
 	int lstIndex = -1;
 	int lstCursor = -1; //키보드입력일 때 사용되는 커서
@@ -32,7 +31,7 @@ private:
 	std::vector<std::wstring> lstOptionVec; //메시지 박스에 표시되는 문구
 	std::wstring lstParameter = L""; //메시지를 열 때 전달되는 매개변수
 
-	SDL_Rect lstBase;//이 윈도우의 전체 면적과 그려지는 위치
+	SDL_Rect lstBase;    //이 윈도우의 전체 면적과 그려지는 위치
 	SDL_Rect lstTitle;
 	SDL_Rect lstWindow;
 	SDL_Rect lstScrollBox; //리스트 스크롤
@@ -41,7 +40,6 @@ private:
 	SDL_Rect lstInputBox;
 
 	tabFlag prevTabType;//메시지 창을 열기 전의 탭 타입(닫을 때 원래대로 돌아감)
-
 public:
 	Lst(std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option) : GUI(true)
 	{
@@ -56,6 +54,14 @@ public:
 		lstTitleText = inputTitle;
 		lstText = inputText;
 		lstOptionVec = option;
+
+
+		lstBtn.resize(MAX_BTN);
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 22 ,lstWindow.y + 48 + 32 * i, 240, 29 };
+
+
+		lstScrollBox = { lstWindow.x + 271, lstWindow.y + 48, 2, 285 };
+		lstInputBox = { lstWindow.x + 50, lstWindow.y + 60, 200, 40 };
 
 
 		deactInput();
@@ -77,44 +83,33 @@ public:
 		exInputIndex = -1;
 
 		tabType = prevTabType;
-
 	}
 	static Lst* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		lstBase = { 0, 0, 280, 393 };
-		lstTitle = { 140 - 65,0,130,30 };
 		lstWindow = { 0,36,280,357 };
 
 		if (center == false)
 		{
 			lstBase.x += inputX;
 			lstBase.y += inputY;
-			lstTitle.x += inputX;
-			lstTitle.y += inputY;
-			lstWindow.x += inputX;
-			lstWindow.y += inputY;
 		}
 		else
 		{
 			lstBase.x += inputX - lstBase.w / 2;
 			lstBase.y += inputY - lstBase.h / 2;
-			lstTitle.x += inputX - lstBase.w / 2;
-			lstTitle.y += inputY - lstBase.h / 2;
-			lstWindow.x += inputX - lstBase.w / 2;
-			lstWindow.y += inputY - lstBase.h / 2;
 		}
 
-		lstBtn.clear();
-		for (int i = 0; i < btnSize; i++)
-		{
-			SDL_Rect tempLstBtn = { lstWindow.x + 22 ,lstWindow.y + 48 + 32 * i, 240, 29 };
-			lstBtn.push_back(tempLstBtn);
-		}
+		lstWindow.x = lstBase.x;
+		lstWindow.y = lstBase.y + 36;
 
-		lstInputBox = { lstWindow.x + 50,lstWindow.y + 60, 200, 40 };
+
+		lstBtn.resize(MAX_BTN);
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 22 ,lstWindow.y + 48 + 32 * i, 240, 29 };
 
 		lstScrollBox = { lstWindow.x + 271,lstWindow.y + 48, 2, 285 };
+		lstInputBox = { lstWindow.x + 50,lstWindow.y + 60, 200, 40 };
 
 		if (center == false)
 		{
@@ -129,7 +124,7 @@ public:
 	}
 	void drawGUI()
 	{
-		if (getStateDraw() == false) { return; }
+		if (getStateDraw() == false) return;
 
 		if (getFoldRatio() == 1.0)
 		{
@@ -140,65 +135,94 @@ public:
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(14);
-			int hCorrection = 0;
-			drawTextCenter(lstText, lstWindow.x + lstWindow.w / 2, lstWindow.y + 14);
+			drawTextCenter(col2Str(col::white) + lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22);
 
-			//선택지 버튼 그리기	
-			int hoverCursor = 0;
+			//선택지 버튼 그리기
+			int hoverCursor = -1;
 
-			for (int i = 0; i < myMin(btnSize, (int)lstOptionVec.size() - lstScroll); i++)
+			for (int i = 0; i < MAX_BTN; i++)
 			{
-				int selectBoxIndex = 0;
-				if (checkCursor(&lstBtn[i + lstScroll]))
+				int currentItemIndex = lstScroll + i;
+
+				if (currentItemIndex >= 0 && currentItemIndex < lstOptionVec.size())
 				{
-					hoverCursor = i + lstScroll;
-					if (click == true) { selectBoxIndex = 2; }
-					else { selectBoxIndex = 1; }
+					int selectBoxIndex = 0;
+
+					if (checkCursor(&lstBtn[i]))
+					{
+						hoverCursor = currentItemIndex;
+						if (click == true) selectBoxIndex = 2;
+						else selectBoxIndex = 1;
+					}
+
+					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
+
+					setFontSize(14);
+					drawText(col2Str(col::white) + lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 5);
 				}
-				drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i ].y);
-				setFontSize(14);
-				drawText(col2Str(col::white) + lstOptionVec[i], lstBtn[i].x + 12, lstBtn[i].y + 5);
 			}
 
 			setFontSize(10);
-			drawTextCenter(col2Str(col::white) + std::to_wstring(hoverCursor + 1) + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstWindow.y + lstWindow.h - 9);
-
+			std::wstring hoverText = L"-";
+			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
+			drawTextCenter(col2Str(col::white) + hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstBase.y + lstBase.h - 17 + 8);
 
 			// 아이템 스크롤 그리기
-			drawFillRect(lstScrollBox, { 120,120,120 });
+			if (lstOptionVec.size() > MAX_BTN)
+			{
+				drawFillRect(lstScrollBox, { 120, 120, 120 });
+
+				SDL_Rect inScrollBox = lstScrollBox;
+
+				inScrollBox.h = lstScrollBox.h * myMin(1.0, (float)MAX_BTN / (float)lstOptionVec.size());
+				if (inScrollBox.h < 5) inScrollBox.h = 5;
+
+				if (!lstOptionVec.empty()) inScrollBox.y = lstScrollBox.y + lstScrollBox.h * ((float)lstScroll / (float)lstOptionVec.size());
+				else inScrollBox.y = lstScrollBox.y;
+
+				if (inScrollBox.y < lstScrollBox.y) inScrollBox.y = lstScrollBox.y;
+				if (inScrollBox.y + inScrollBox.h > lstScrollBox.y + lstScrollBox.h) inScrollBox.y = lstScrollBox.y + lstScrollBox.h - inScrollBox.h;
+
+				drawFillRect(inScrollBox, col::white);
+			}
 		}
 		else
 		{
 			SDL_Rect vRect = lstBase;
-			int a = 6;
 			int type = 1;
 			switch (type)
 			{
 			case 0:
 				vRect.w = vRect.w * getFoldRatio();
 				vRect.h = vRect.h * getFoldRatio();
+
 				break;
 			case 1:
 				vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
 				vRect.w = vRect.w * getFoldRatio();
 				break;
 			}
-			drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
+			drawWindow(&vRect);
 		}
 	}
+
 	void clickUpGUI()
 	{
-		if (getStateInput() == false) { return; }
+		if (getStateInput() == false) return;
 
-		for (int i = 0; i < lstBtn.size(); i++)
+		for (int i = 0; i < MAX_BTN; i++)
 		{
 			if (checkCursor(&lstBtn[i]))
 			{
-				coAnswer = std::to_wstring(lstScroll + i);
-				close(aniFlag::null);
+				int selectedIndex = lstScroll + i;
+
+				if (selectedIndex >= 0 && selectedIndex < lstOptionVec.size())
+				{
+					coAnswer = std::to_wstring(selectedIndex);
+					close(aniFlag::null);
+					return;
+				}
 			}
 		}
 
@@ -209,29 +233,34 @@ public:
 			return;
 		}
 	}
-	void clickMotionGUI(int dx, int dy)
-	{
-		//if (checkCursor(&lootArea))
-		{
-			if (click == true)
-			{
-				int scrollAccelConst = 20; // 가속상수, 작아질수록 스크롤 속도가 빨라짐
-				//lootScroll = initLootScroll + dy / scrollAccelConst;
-				if (abs(dy / scrollAccelConst) >= 1)
-				{
-					deactClickUp = true;
-					itemListColorLock = true;
-				}
-			}
-		}
-	}
+
+	void clickMotionGUI(int dx, int dy)	{}
+
 	void clickDownGUI() {}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
-	void mouseWheel() {}
+
+	void mouseWheel()
+	{
+		if (checkCursor(&lstBase))
+		{
+			if (event.wheel.y > 0 && lstScroll > 0) lstScroll -= 1;
+			else if (event.wheel.y < 0 && lstScroll + MAX_BTN < lstOptionVec.size()) lstScroll += 1;
+		}
+	}
+
 	void gamepadBtnDown() {}
 	void gamepadBtnMotion() {}
 	void gamepadBtnUp() {}
-	void step() {}
-};
 
+	void step()
+	{
+		if (lstOptionVec.empty() || lstOptionVec.size() <= MAX_BTN) lstScroll = 0;
+		else 
+		{
+			if (lstScroll < 0) lstScroll = 0;
+			int maxScroll = (int)lstOptionVec.size() - MAX_BTN;
+			if (lstScroll > maxScroll) lstScroll = maxScroll;
+		}
+	}
+};

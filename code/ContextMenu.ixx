@@ -53,6 +53,7 @@ public:
 	}
 	~ContextMenu()
 	{
+		if(getLastGUI()==this) tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static ContextMenu* ins() { return ptr; }
@@ -270,7 +271,6 @@ public:
 		if (inputAct == act::closeDoor)
 		{
 			actFunc::closeDoor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			tabType = tabFlag::autoAtk;
 		}
 		else if (inputAct == act::unbox)
 		{
@@ -286,7 +286,6 @@ public:
 					}
 				}
 			}
-			tabType = tabFlag::autoAtk;
 		}
 		else if (inputAct == act::pull)
 		{
@@ -298,14 +297,12 @@ public:
 			{
 				Player::ins()->pulledCart = nullptr;
 			}
-			tabType = tabFlag::autoAtk;
 		}
 		else if (inputAct == act::ride)
 		{
 			Player::ins()->ridingEntity = TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 			World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).EntityPtr = nullptr;
 			Player::ins()->ridingType = ridingFlag::horse;
-			tabType = tabFlag::autoAtk;
 		}
 		else if (inputAct == act::vehicleRepair)
 		{
@@ -327,6 +324,8 @@ public:
 			std::vector<std::wstring> partNames;
 			for (int i = 0; i < vParts.size(); i++)
 			{
+				partNames.push_back(vParts[i].name);
+				partNames.push_back(vParts[i].name);
 				partNames.push_back(vParts[i].name);
 			}
 

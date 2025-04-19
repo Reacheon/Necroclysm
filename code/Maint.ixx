@@ -142,14 +142,17 @@ public:
 	}
 	void drawGUI()
 	{
-		if (getStateDraw() == false) { return; }
+		if (getStateDraw() == false) return;
+
+		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		if (!vPtr) return;
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
+		std::vector<ItemData>& items = partIter->second->itemInfo;
 
 		if (getFoldRatio() == 1.0)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
-			std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
-			
-			if(maintMode == maintFlag::repair) drawWindow(&maintBase, maintTitleText, 86);
+			if (maintMode == maintFlag::repair) drawWindow(&maintBase, maintTitleText, 86);
 			else drawWindow(&maintBase, maintTitleText, 87);
 
 			SDL_Rect topWindow = { maintBase.x + 1, maintBase.y + 30, 278, 44 };
@@ -157,51 +160,67 @@ public:
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(14);
-			int hCorrection = 0;
-			drawTextCenter(maintText, maintWindow.x + maintWindow.w / 2, maintWindow.y + 14);
+			drawTextCenter(col2Str(col::white) + maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 30 + 22);
 
-			//선택지 버튼 그리기	
-			int hoverCursor = 0;
+			//선택지 버튼 그리기
+			int hoverCursor = -1;
 
-			for (int i = 0; i < myMin(MAX_BTN, (int)items.size() - maintScroll); i++)
+			for (int i = 0; i < MAX_BTN; i++)
 			{
-				int selectBoxIndex = 0;
-				if (checkCursor(&maintBtn[i + maintScroll]))
+				int currentItemIndex = maintScroll + i;
+
+				if (currentItemIndex >= 0 && currentItemIndex < items.size())
 				{
-					hoverCursor = i + maintScroll;
-					if (click == true) { selectBoxIndex = 2; }
-					else { selectBoxIndex = 1; }
+					int selectBoxIndex = 0;
+
+					if (checkCursor(&maintBtn[i]))
+					{
+						hoverCursor = currentItemIndex;
+						if (click == true) selectBoxIndex = 2;
+						else selectBoxIndex = 1;
+					}
+
+					drawSprite(spr::lstSelectBox, selectBoxIndex, maintBtn[i].x, maintBtn[i].y);
+
+					setZoom(2.0);
+					drawSpriteCenter(spr::itemset, items[currentItemIndex].sprIndex, maintBtn[i].x + 15, maintBtn[i].y + 14);
+					setZoom(1.0);
+
+					setFontSize(14);
+					drawText(col2Str(col::white) + items[currentItemIndex].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
+
+					drawRect({ maintBtn[i].x + 230, maintBtn[i].y + 3, 7, 23 }, col::lightGray);
+					drawFillRect({ maintBtn[i].x + 230 + 2, maintBtn[i].y + 3 + 2, 3, 19 }, lowCol::green);
 				}
-				drawSprite(spr::lstSelectBox, selectBoxIndex, maintBtn[i].x, maintBtn[i].y);
-
-				
-				setZoom(2.0);
-				drawSpriteCenter(spr::itemset, items[i + maintScroll].sprIndex, maintBtn[i].x + 15, maintBtn[i].y + 14);
-				setZoom(1.0);
-
-
-				setFontSize(14);
-				drawText(col2Str(col::white) + items[i + maintScroll].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
-
-				drawRect(maintBtn[i].x + 230, maintBtn[i].y + 3, 7, 23, col::lightGray);
-				drawFillRect(maintBtn[i].x + 230+2, maintBtn[i].y + 3 +2, 3, 19, lowCol::green);
-
 			}
 
 			setFontSize(10);
-			drawTextCenter(col2Str(col::white) + std::to_wstring(hoverCursor + 1) + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintWindow.y + maintWindow.h - 9);
-
+			std::wstring hoverText = L"-";
+			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
+			drawTextCenter(col2Str(col::white) + hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintBase.y + maintBase.h - 17 + 8);
 
 			// 아이템 스크롤 그리기
-			drawFillRect(maintScrollBox, { 120,120,120 });
+			if (items.size() > MAX_BTN)
+			{
+				drawFillRect(maintScrollBox, { 120,120,120 });
+
+				SDL_Rect inScrollBox = maintScrollBox;
+				inScrollBox.h = maintScrollBox.h * myMin(1.0, (float)MAX_BTN / (float)items.size());
+				if (inScrollBox.h < 5) inScrollBox.h = 5;
+
+				if (!items.empty()) inScrollBox.y = maintScrollBox.y + maintScrollBox.h * ((float)maintScroll / (float)items.size());
+				else inScrollBox.y = maintScrollBox.y;
+
+				if (inScrollBox.y < maintScrollBox.y) inScrollBox.y = maintScrollBox.y;
+				if (inScrollBox.y + inScrollBox.h > maintScrollBox.y + maintScrollBox.h) inScrollBox.y = maintScrollBox.y + maintScrollBox.h - inScrollBox.h;
+
+				drawFillRect(inScrollBox, col::white);
+			}
 		}
 		else
 		{
 			SDL_Rect vRect = maintBase;
-			int a = 6;
 			int type = 1;
 			switch (type)
 			{
@@ -214,7 +233,8 @@ public:
 				vRect.w = vRect.w * getFoldRatio();
 				break;
 			}
-			drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
+			// drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
+			drawWindow(&vRect);
 		}
 	}
 	void clickUpGUI()
@@ -237,29 +257,36 @@ public:
 			return;
 		}
 	}
-	void clickMotionGUI(int dx, int dy)
-	{
-		//if (checkCursor(&lootArea))
-		{
-			if (click == true)
-			{
-				int scrollAccelConst = 20; // 가속상수, 작아질수록 스크롤 속도가 빨라짐
-				//lootScroll = initLootScroll + dy / scrollAccelConst;
-				if (abs(dy / scrollAccelConst) >= 1)
-				{
-					deactClickUp = true;
-					itemListColorLock = true;
-				}
-			}
-		}
-	}
+	void clickMotionGUI(int dx, int dy) {}
 	void clickDownGUI() {}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
-	void mouseWheel() {}
+	void mouseWheel() 
+	{
+		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
+
+		if (checkCursor(&maintBase))
+		{
+			if (event.wheel.y > 0 && maintScroll > 0) maintScroll -= 1;
+			else if (event.wheel.y < 0 && maintScroll + MAX_BTN < items.size()) maintScroll += 1;
+		}
+	}
 	void gamepadBtnDown() {}
 	void gamepadBtnMotion() {}
 	void gamepadBtnUp() {}
-	void step() {}
+	void step() 
+	{
+		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
+
+		if (items.empty() || items.size() <= MAX_BTN) maintScroll = 0;
+		else
+		{
+			if (maintScroll < 0) maintScroll = 0;
+			int maxScroll = (int)items.size() - MAX_BTN;
+			if (maintScroll > maxScroll) maintScroll = maxScroll;
+		}
+	}
 };
 
