@@ -36,83 +36,87 @@ void Loot::clickUpGUI()
 	}
 	else if (checkCursor(&lootBase)) //아이템 클릭 -> 에러 파트
 	{
-		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-		for (int i = 0; i < LOOT_ITEM_MAX; i++)
+		if (checkCursor(&pocketLeft))
 		{
-			if (lootPocket->itemInfo.size() - 1 >= i)
+			if (pocketCursor != 0) { pocketCursor--; }
+		}
+		else if (checkCursor(&pocketRight))
+		{
+			int numberOfBag = 0;
+			ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 			{
-				if (checkCursor(&lootItemRect[i]))
+				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
 				{
-					if (lootCursor != lootScroll + i) //새로운 커서 생성
-					{
-						lootCursor = lootScroll + i;
-						updateBarAct();
-						tabType = tabFlag::back;
-					}
-					else //커서 삭제
-					{
-						lootCursor = -1;
-						barAct = actSet::null;
-						tabType = tabFlag::closeWin;
-					}
-					return;
+					numberOfBag++;
 				}
 			}
+			if (pocketCursor != numberOfBag - 1) { pocketCursor++; }
 		}
-
-		//아이템 좌측 셀렉트 클릭
-		for (int i = 0; i < LOOT_ITEM_MAX; i++)
+		else if (checkCursor(&lootBtn))
 		{
-			if (checkCursor(&lootItemSelectRect[i]))
+			executePickSelect();
+		}
+		else
+		{
+
+			//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
+			for (int i = 0; i < LOOT_ITEM_MAX; i++)
 			{
 				if (lootPocket->itemInfo.size() - 1 >= i)
 				{
-					if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
+					if (checkCursor(&lootItemRect[i]))
 					{
-						if (option::inputMethod == input::mouse)
+						if (lootCursor != lootScroll + i) //새로운 커서 생성
 						{
-							if (event.button.button == SDL_BUTTON_LEFT)
+							lootCursor = lootScroll + i;
+							updateBarAct();
+							tabType = tabFlag::back;
+						}
+						else //커서 삭제
+						{
+							lootCursor = -1;
+							barAct = actSet::null;
+							tabType = tabFlag::closeWin;
+						}
+						return;
+					}
+				}
+			}
+
+			//아이템 좌측 셀렉트 클릭
+			for (int i = 0; i < LOOT_ITEM_MAX; i++)
+			{
+				if (checkCursor(&lootItemSelectRect[i]))
+				{
+					if (lootPocket->itemInfo.size() - 1 >= i)
+					{
+						if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
+						{
+							if (option::inputMethod == input::mouse)
+							{
+								if (event.button.button == SDL_BUTTON_LEFT)
+								{
+									executeSelectItem(i + lootScroll);
+								}
+								else if (event.button.button == SDL_BUTTON_RIGHT)
+								{
+									CORO(executeSelectItemEx(i + lootScroll));
+								}
+							}
+							else if (option::inputMethod == input::touch)
 							{
 								executeSelectItem(i + lootScroll);
 							}
-							else if (event.button.button == SDL_BUTTON_RIGHT)
-							{
-								CORO(executeSelectItemEx(i + lootScroll));
-							}
 						}
-						else if (option::inputMethod == input::touch)
+						else
 						{
-							executeSelectItem(i + lootScroll);
+							lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
 						}
-					}
-					else
-					{
-						lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
 					}
 				}
 			}
 		}
-	}
-	else if (checkCursor(&pocketLeft))
-	{
-		if (pocketCursor != 0) { pocketCursor--; }
-	}
-	else if (checkCursor(&pocketRight))
-	{
-		int numberOfBag = 0;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-			{
-				numberOfBag++;
-			}
-		}
-		if (pocketCursor != numberOfBag - 1) { pocketCursor++; }
-	}
-	else if (checkCursor(&lootBtn))
-	{
-		executePickSelect();
 	}
 	else if (checkCursor(&letterbox)) //버튼은 return 없음
 	{

@@ -209,7 +209,7 @@ public:
 	{
 		if (checkCursor(&lootBase))
 		{
-			if (event.wheel.y > 0 && lootScroll > 1) lootScroll -= 1;
+			if (event.wheel.y > 0 && lootScroll > 0) lootScroll -= 1;
 			else if (event.wheel.y < 0 && lootScroll + LOOT_ITEM_MAX < lootPocket->itemInfo.size()) lootScroll += 1;
 		}
 	}
@@ -622,15 +622,22 @@ public:
 	{
 		//입력형 메시지 박스 열기
 		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
+		exInputText.clear();
 		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//아이템 선택, 얼마나?
 		co_await std::suspend_always();
 
-		int inputSelectNumber = wtoi(exInputText.c_str()); // 셀렉트 박스에 넣어질 숫자(플레이어가 입력한 값)
-		if (inputSelectNumber > lootPocket->itemInfo[index].number) //만약 실제 있는 숫자보다 많은 값을 입력했을 경우
+		if (exInputText.empty() == false)
 		{
-			inputSelectNumber = lootPocket->itemInfo[index].number; //Select의 값을 최댓값으로 맞춤
+			int inputSelectNumber = 0;
+			try {inputSelectNumber = wtoi(exInputText.c_str());}
+			catch (...) {  }
+
+
+			if (inputSelectNumber < 0) inputSelectNumber = 0;
+			else if (inputSelectNumber > lootPocket->itemInfo[index].number) inputSelectNumber = lootPocket->itemInfo[index].number;
+
+			lootPocket->itemInfo[index].lootSelect = inputSelectNumber;
 		}
-		lootPocket->itemInfo[index].lootSelect = inputSelectNumber;
 	}
 
 	Corouter executeWield()

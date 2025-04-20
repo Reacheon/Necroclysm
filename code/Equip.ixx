@@ -171,7 +171,7 @@ public:
 		{
 			if (event.wheel.y > 0)
 			{
-				if(equipScroll>1) equipScroll -= 1;
+				if(equipScroll>0) equipScroll -= 1;
 			}
 			else if (event.wheel.y < 0)
 			{

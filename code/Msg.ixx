@@ -195,7 +195,7 @@ public:
 			}
 		loopEnd:
 
-			if (exInput == true) drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40, true, 240, -1);
+			if (exInput == true) drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 240, -1);
 			else if (targetItemCode != 0)
 			{
 				drawTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 240, -1);
