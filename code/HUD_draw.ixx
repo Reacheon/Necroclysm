@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import HUD;
 import std;
@@ -80,14 +80,14 @@ void HUD::drawGUI()
 
 		int vShift = 384 * (ctrlVeh != nullptr);
 
-		if (1)//ÇÃ·¹ÀÌ¾î ÀÌ¸§ ±×¸®±â
+		if (1)//í”Œë ˆì´ì–´ ì´ë¦„ ê·¸ë¦¬ê¸°
 		{
 			setFontSize(12);
 			SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 0xff);
 			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 3);
 		}
 
-		//HP¹Ù ±×¸®±â
+		//HPë°” ê·¸ë¦¬ê¸°
 		{
 			int pivotX = letterbox.x + 11 + 1.02*vShift;
 			int pivotY = letterbox.y + 21;
@@ -98,7 +98,7 @@ void HUD::drawGUI()
 
 			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
 
-			//ÆäÀÌÅ© HP
+			//í˜ì´í¬ HP
 			float ratioFakeHP = myMax((float)0.0, (Player::ins()->entityInfo.fakeHP) / (float)(Player::ins()->entityInfo.maxHP));
 			SDL_Rect fakeRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioFakeHP, 5 };
 			drawFillRect(fakeRect, lowCol::white, Player::ins()->entityInfo.fakeHPAlpha);
@@ -116,7 +116,7 @@ void HUD::drawGUI()
 			drawTextCenter(col2Str(lowCol::white) + hpStr, pivotX + 142, pivotY + 7);
 		}
 
-		//MP¹Ù ±×¸®±â
+		//MPë°” ê·¸ë¦¬ê¸°
 		{
 			int pivotX = letterbox.x + 11 + 1.02 * vShift;
 			int pivotY = letterbox.y + 21 +15;
@@ -147,7 +147,7 @@ void HUD::drawGUI()
 
 		if (ctrlVeh == nullptr)
 		{
-			//½ºÅ×¹Ì³ª
+			//ìŠ¤í…Œë¯¸ë‚˜
 			{
 				int pivotX = letterbox.x + 18 + 238;
 				int pivotY = letterbox.y + 4;
@@ -220,39 +220,39 @@ void HUD::drawGUI()
 			drawText(col2Str(col::lightGray) + L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 2);
 			drawText(col2Str(lowCol::green) + L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 3 + 15 * 2);
 
-			//½Ã°£ Ç¥½Ã ±â´É
+			//ì‹œê°„ í‘œì‹œ ê¸°ëŠ¥
 			{
 				int timeIndex;
 				// PM or AM
 				if (getHour() >= 12) { timeIndex = segmentIndex::pm; }
 				else { timeIndex = segmentIndex::am; }
 				drawSprite(spr::segment, timeIndex, letterbox.x + 18 + 446 + 14 * 0, letterbox.y + 10);
-				//xx½Ã
+				//xxì‹œ
 				drawSprite(spr::segment, getHour() / 10, letterbox.x + 18 + 446 + 14 * 1, letterbox.y + 10);
 				drawSprite(spr::segment, getHour() % 10, letterbox.x + 18 + 446 + 14 * 2, letterbox.y + 10);
 				//:
 				drawSprite(spr::segment, segmentIndex::colon, letterbox.x + 18 + 446 + 14 * 3, letterbox.y + 10);
-				//xxºĞ
+				//xxë¶„
 				drawSprite(spr::segment, getMin() / 10, letterbox.x + 18 + 446 + 14 * 4, letterbox.y + 10);
 				drawSprite(spr::segment, getMin() % 10, letterbox.x + 18 + 446 + 14 * 5, letterbox.y + 10);
-				//xxÃÊ
+				//xxì´ˆ
 				setZoom(0.7);
 				drawSprite(spr::segment, getSec() / 10, letterbox.x + 18 + 446 + 14 * 6, letterbox.y + 15);
 				drawSprite(spr::segment, getSec() % 10, letterbox.x + 18 + 446 + 14 * 6 + 10, letterbox.y + 15);
 
-				//xxxx³â
+				//xxxxë…„
 				drawSprite(spr::segment, getYear() / 1000, letterbox.x + 18 + 460 + 10 * -1, letterbox.y + 7 + 25);
 				drawSprite(spr::segment, (getYear() % 1000) / 100, letterbox.x + 18 + 460 + 10 * 0, letterbox.y + 7 + 25);
 				drawSprite(spr::segment, ((getYear() % 100) / 10), letterbox.x + 18 + 460 + 10 * 1, letterbox.y + 7 + 25);
 				drawSprite(spr::segment, getYear() % 10, letterbox.x + 18 + 460 + 10 * 2, letterbox.y + 7 + 25);
 				//:
 				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 3, letterbox.y + 7 + 25);
-				//xx¿ù
+				//xxì›”
 				drawSprite(spr::segment, getMonth() / 10, letterbox.x + 18 + 460 + 10 * 4, letterbox.y + 7 + 25);
 				drawSprite(spr::segment, getMonth() % 10, letterbox.x + 18 + 460 + 10 * 5, letterbox.y + 7 + 25);
 				//:
 				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 6, letterbox.y + 7 + 25);
-				//xxÀÏ
+				//xxì¼
 				drawSprite(spr::segment, getDay() / 10, letterbox.x + 18 + 460 + 10 * 7, letterbox.y + 7 + 25);
 				drawSprite(spr::segment, getDay() % 10, letterbox.x + 18 + 460 + 10 * 8, letterbox.y + 7 + 25);
 				setZoom(1.0);
@@ -320,7 +320,7 @@ void HUD::drawGUI()
 			}
 
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-			drawTextCenter(L"15¡É", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 22);
+			drawTextCenter(L"15â„ƒ", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 22);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
@@ -332,7 +332,7 @@ void HUD::drawGUI()
 			drawTextCenter(col2Str(lowCol::white) + L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
 		}
 
-		//ÆË¾÷ ¹öÆ°
+		//íŒì—… ë²„íŠ¼
 		drawSprite(spr::menuPopUp, 0, letterbox.x + letterbox.w - 42, letterbox.y - 36);
 		{
 			SDL_Color popUpBtnColor;
@@ -385,8 +385,8 @@ void HUD::drawGUI()
 		double normalizedAlpha = (sin(timeRatio * 2.0 * M_PI) + 1.0) / 2.0;
 		Uint8 alpha = static_cast<Uint8>(minAlpha + normalizedAlpha * (maxAlpha - minAlpha));
 		SDL_GetTicks();
-		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), alpha); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
-		SDL_SetTextureBlendMode(spr::gridMarker->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), alpha); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+		SDL_SetTextureBlendMode(spr::gridMarker->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
 		drawSpriteCenter
 		(
 			spr::gridMarker,
@@ -504,7 +504,7 @@ void HUD::drawTab()
 		break;
 	}
 	case tabFlag::closeWin:
-		//Ã¢ ´İ±â
+		//ì°½ ë‹«ê¸°
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 14, tab.x + 60, tab.y + 52);
 		setFontSize(13);
@@ -512,7 +512,7 @@ void HUD::drawTab()
 		drawTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::back:
-		//µÚ·Î°¡±â
+		//ë’¤ë¡œê°€ê¸°
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 31, tab.x + 60, tab.y + 52);
 		setFontSize(13);
@@ -520,7 +520,7 @@ void HUD::drawTab()
 		drawTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::confirm:
-		//µÚ·Î°¡±â
+		//ë’¤ë¡œê°€ê¸°
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
 		setFontSize(13);
@@ -551,7 +551,7 @@ void HUD::drawQuickSlot()
 	setSolidText();
 
 
-	//°³º° ½ºÅ³Ã¢ ±×¸®±â 1¹øºÎÅÍ 8¹ø±îÁö
+	//ê°œë³„ ìŠ¤í‚¬ì°½ ê·¸ë¦¬ê¸° 1ë²ˆë¶€í„° 8ë²ˆê¹Œì§€
 	for (int i = 0; i < 8; i++)
 	{
 		int pivotX = 185 + 48 * i;
@@ -615,10 +615,10 @@ void HUD::drawQuickSlot()
 		if (quickSlot[dragQuickSlotTarget].first == quickSlotFlag::SKILL)
 		{
 			setZoom(2.0);
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
-			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
 			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, event.motion.x, event.motion.y);
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 			setZoom(1.0);
 		}
 	}
@@ -632,7 +632,7 @@ void HUD::drawBarAct()
 	{
 		if (typeHUD == vehFlag::car)
 		{
-			//ÇÚµé
+			//í•¸ë“¤
 			int wheelIndex = 0;
 			SDL_SetTextureAlphaMod(spr::vehicleHUDSteeringWheel->getTexture(), 140);
 			SDL_SetTextureBlendMode(spr::vehicleHUDSteeringWheel->getTexture(), SDL_BLENDMODE_BLEND);
@@ -644,13 +644,13 @@ void HUD::drawBarAct()
 			}
 			drawSpriteCenter(spr::vehicleHUDSteeringWheel, wheelIndex, barButton[1].x + (barButton[1].w / 2), barButton[1].y + (barButton[1].h / 2));
 
-			drawSpriteCenter(spr::vehicleHUDParts, 15, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2); //ÁÂÈ¸Àü ¸¶Å©
-			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1ÅÏ ´ë±â
-			drawSpriteCenter(spr::vehicleHUDParts, 17, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2); //¿ìÈ¸Àü ¸¶Å©
+			drawSpriteCenter(spr::vehicleHUDParts, 15, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2); //ì¢ŒíšŒì „ ë§ˆí¬
+			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1í„´ ëŒ€ê¸°
+			drawSpriteCenter(spr::vehicleHUDParts, 17, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2); //ìš°íšŒì „ ë§ˆí¬
 
-			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //¿£Áø ½ºÅ¸Æ®
+			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //ì—”ì§„ ìŠ¤íƒ€íŠ¸
 
-			//±â¾î(PRND) ±×¸®±â
+			//ê¸°ì–´(PRND) ê·¸ë¦¬ê¸°
 			int gearSprIndex = 0;
 			if (((Vehicle*)ctrlVeh)->gearState == gearFlag::park) gearSprIndex = 0;
 			else if (((Vehicle*)ctrlVeh)->gearState == gearFlag::reverse) gearSprIndex = 1;
@@ -666,34 +666,34 @@ void HUD::drawBarAct()
 			Vehicle* myHeli = ((Vehicle*)ctrlVeh);
 
 			setZoom(1.5);
-			//drawSpriteCenter(spr::collectiveLever, myHeli->collectiveState + 1, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 16); //Äİ·ºÆ¼ºê ·¹¹ö
+			//drawSpriteCenter(spr::collectiveLever, myHeli->collectiveState + 1, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 16); //ì½œë ‰í‹°ë¸Œ ë ˆë²„
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
 			drawSpriteCenter(spr::icon48, 88 + myHeli->collectiveState, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
-			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1ÅÏ ´ë±â
+			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1í„´ ëŒ€ê¸°
 
 			setZoom(1.5);
-			//drawSpriteCenter(spr::cyclicLever, myHeli->cyclicState + 1, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 16); //»çÀÌÅ¬¸¯ ·¹¹ö
+			//drawSpriteCenter(spr::cyclicLever, myHeli->cyclicState + 1, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 16); //ì‚¬ì´í´ë¦­ ë ˆë²„
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
 			drawSpriteCenter(spr::icon48, myHeli->cyclicState + 1 + 110, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 
-			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //¿£Áø ½ºÅ¸Æ®
+			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //ì—”ì§„ ìŠ¤íƒ€íŠ¸
 
 			setZoom(1.5);
-			//drawSpriteCenter(spr::rpmLever, myHeli->rpmState, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 + 9); //RPM ·¹¹ö
+			//drawSpriteCenter(spr::rpmLever, myHeli->rpmState, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 + 9); //RPM ë ˆë²„
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
 			drawSpriteCenter(spr::icon48, myHeli->rpmState + 100, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 
-			drawSpriteCenter(spr::tailPedalL, 0 + (checkCursor(&barButton[5]) && click), barButton[5].x + barButton[5].w / 2, barButton[5].y + barButton[5].h / 2); //ÁÂÈ¸Àü Å×ÀÏÆä´Ş
-			drawSpriteCenter(spr::tailPedalR, 0 + (checkCursor(&barButton[6]) && click), barButton[6].x + barButton[6].w / 2, barButton[6].y + barButton[6].h / 2); //¿ìÈ¸Àü Å×ÀÏÆä´Ş
+			drawSpriteCenter(spr::tailPedalL, 0 + (checkCursor(&barButton[5]) && click), barButton[5].x + barButton[5].w / 2, barButton[5].y + barButton[5].h / 2); //ì¢ŒíšŒì „ í…Œì¼í˜ë‹¬
+			drawSpriteCenter(spr::tailPedalR, 0 + (checkCursor(&barButton[6]) && click), barButton[6].x + barButton[6].w / 2, barButton[6].y + barButton[6].h / 2); //ìš°íšŒì „ í…Œì¼í˜ë‹¬
 		}
 		else if (typeHUD == vehFlag::minecart)
 		{
@@ -706,11 +706,11 @@ void HUD::drawBarAct()
 			drawSpriteCenter(spr::icon48, myTrain->rpmState + 100, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
-			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1ÅÏ ´ë±â
+			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1í„´ ëŒ€ê¸°
 
 			drawSpriteCenter(spr::icon48, 92 + (checkCursor(&barButton[2]) && click), barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 8);
 
-			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //¿£Áø ½ºÅ¸Æ®
+			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //ì—”ì§„ ìŠ¤íƒ€íŠ¸
 
 			int gearSprIndex = 0;
 			if (((Vehicle*)ctrlVeh)->gearState == gearFlag::park) gearSprIndex = 0;
@@ -719,15 +719,15 @@ void HUD::drawBarAct()
 			else gearSprIndex = 3;
 			drawSpriteCenter(spr::vehicleHUDParts, 5 + gearSprIndex, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 12);
 
-			drawSpriteCenter(spr::tailPedalL, 0 + (checkCursor(&barButton[5]) && click), barButton[5].x + barButton[5].w / 2, barButton[5].y + barButton[5].h / 2); //ÁÂÈ¸Àü Å×ÀÏÆä´Ş(¹Ì¹èÁ¤)
-			drawSpriteCenter(spr::tailPedalR, 0 + (checkCursor(&barButton[6]) && click), barButton[6].x + barButton[6].w / 2, barButton[6].y + barButton[6].h / 2); //¿ìÈ¸Àü Å×ÀÏÆä´Ş(¹Ì¹èÁ¤)
+			drawSpriteCenter(spr::tailPedalL, 0 + (checkCursor(&barButton[5]) && click), barButton[5].x + barButton[5].w / 2, barButton[5].y + barButton[5].h / 2); //ì¢ŒíšŒì „ í…Œì¼í˜ë‹¬(ë¯¸ë°°ì •)
+			drawSpriteCenter(spr::tailPedalR, 0 + (checkCursor(&barButton[6]) && click), barButton[6].x + barButton[6].w / 2, barButton[6].y + barButton[6].h / 2); //ìš°íšŒì „ í…Œì¼í˜ë‹¬(ë¯¸ë°°ì •)
 		}
 	}
 
-	//ÇÏ´Ü ·¹ÅÍ¹Ú½º 7¹öÆ° ±×¸®±â
+	//í•˜ë‹¨ ë ˆí„°ë°•ìŠ¤ 7ë²„íŠ¼ ê·¸ë¦¬ê¸°
 	for (int i = 0; i < barAct.size(); i++)
 	{
-		if (ctrlVeh == nullptr)//Â÷·® ¸ğµå°¡ ¾Æ´Ò °æ¿ì
+		if (ctrlVeh == nullptr)//ì°¨ëŸ‰ ëª¨ë“œê°€ ì•„ë‹ ê²½ìš°
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 			SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -749,17 +749,17 @@ void HUD::drawBarAct()
 			SDL_Rect letterboxInButton = { barButton[i].x + 3,  barButton[i].y + 3, 72 - 6, 72 - 6 };
 			drawRect(letterboxInButton, outlineColor);
 		}
-		else if (i <= 2)//¿ŞÂÊºÎÅÍ 3°³ÀÇ ¹öÆ°ÀÇ °æ¿ì(ÁÂÈ¸Àü, 1ÅÏ´ë±â, ¿ìÈ¸Àü)
+		else if (i <= 2)//ì™¼ìª½ë¶€í„° 3ê°œì˜ ë²„íŠ¼ì˜ ê²½ìš°(ì¢ŒíšŒì „, 1í„´ëŒ€ê¸°, ìš°íšŒì „)
 		{
-			//¹öÆ°À» Åõ¸íÇÏ°Ô ±×¸²
+			//ë²„íŠ¼ì„ íˆ¬ëª…í•˜ê²Œ ê·¸ë¦¼
 		}
-		else if (i <= 7) //±× ¿ÜÀÇ 4°³ÀÇ ¹öÆ°
+		else if (i <= 7) //ê·¸ ì™¸ì˜ 4ê°œì˜ ë²„íŠ¼
 		{
 		}
 
 		std::wstring actName = L" ";
 		int actIndex = 0;
-		bool deactRect = false; // trueÀÏ °æ¿ì È¸»öÀ¸·Î º¯ÇÔ
+		bool deactRect = false; // trueì¼ ê²½ìš° íšŒìƒ‰ìœ¼ë¡œ ë³€í•¨
 		auto setBtnLayout = [&actName, &actIndex](std::wstring inputString, int inputActIndex)
 			{
 				actName = inputString;
@@ -845,13 +845,13 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[194], 156);
 		else if (barAct[i] == act::skillActive)
 		{
-			errorBox(targetSkill == nullptr, L"HUDÀÇ targetSkillÀÌ nullptrÀÌ´Ù.\n");
+			errorBox(targetSkill == nullptr, L"HUDì˜ targetSkillì´ nullptrì´ë‹¤.\n");
 			setBtnLayout(sysStr[157], 140);
 
 		}
 		else if (barAct[i] == act::skillToggle)
 		{
-			errorBox(targetSkill == nullptr, L"HUDÀÇ targetSkillÀÌ nullptrÀÌ´Ù.\n");
+			errorBox(targetSkill == nullptr, L"HUDì˜ targetSkillì´ nullptrì´ë‹¤.\n");
 			if (targetSkill->toggle == false)
 			{
 				setBtnLayout(sysStr[158], 141);
@@ -863,7 +863,7 @@ void HUD::drawBarAct()
 		}
 		else if (barAct[i] == act::quickSlot)
 		{
-			errorBox(targetSkill == nullptr, L"HUDÀÇ targetSkillÀÌ nullptrÀÌ´Ù.\n");
+			errorBox(targetSkill == nullptr, L"HUDì˜ targetSkillì´ nullptrì´ë‹¤.\n");
 			if (targetSkill->isQuickSlot == false)
 			{
 				setBtnLayout(sysStr[160], 146);
@@ -877,10 +877,10 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::toggleOn) setBtnLayout(sysStr[196], 163);
 		else setBtnLayout(L" ", 0);
 
-		//48*48 ½Éº¼ ¾ÆÀÌÄÜ ±×¸®±â
+		//48*48 ì‹¬ë³¼ ì•„ì´ì½˜ ê·¸ë¦¬ê¸°
 		drawSpriteCenter(spr::icon48, actIndex, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) - 10);
 
-		//ÇÏ´Ü ÅØ½ºÆ®
+		//í•˜ë‹¨ í…ìŠ¤íŠ¸
 		int fontSize = 13;
 		setFontSize(fontSize);
 		while (queryTextWidth(actName, true) > barButton[0].w)
@@ -981,7 +981,7 @@ void HUD::drawStatusEffects()
 		{
 			if (myEfcts[i].first == statEfctFlag::bleeding)
 			{
-				//°ÔÀÌÁö
+				//ê²Œì´ì§€
 				drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
 				drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
 			}
@@ -1002,7 +1002,7 @@ void HUD::drawVehiclePartInfo()
 
 		Point2 tgtGrid;
 
-		//ÄÁÅØ½ºÆ®¸Ş´º°¡ ¿­·ÁÀÖÀ¸¸é °Å±â·Î °íÁ¤
+		//ì»¨í…ìŠ¤íŠ¸ë©”ë‰´ê°€ ì—´ë ¤ìˆìœ¼ë©´ ê±°ê¸°ë¡œ ê³ ì •
 		if (ContextMenu::ins() != nullptr)  tgtGrid = { contextMenuTargetGrid.x,contextMenuTargetGrid.y };
 		else tgtGrid = { mouseX,mouseY };
 
@@ -1032,17 +1032,17 @@ void HUD::drawVehiclePartInfo()
 				for (int i = 0; i < vehSize; i++)
 				{
 					ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo[vehSize - 1 - i];
-					//³»±¸µµ
+					//ë‚´êµ¬ë„
 					drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
 					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
-					//¾ÆÀÌÅÛ ¾ÆÀÌÄÜ
+					//ì•„ì´í…œ ì•„ì´ì½˜
 					drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
 
-					//¾ÆÀÌÅÛ ÀÌ¸§
+					//ì•„ì´í…œ ì´ë¦„
 					drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
 
-					//¿¬·á·®
+					//ì—°ë£ŒëŸ‰
 					drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
 					drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
 					drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);

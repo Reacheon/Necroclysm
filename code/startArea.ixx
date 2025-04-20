@@ -1,4 +1,4 @@
-#define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
+ï»¿#define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
 #include <sol/sol.hpp>
 
 export module startArea;
@@ -33,7 +33,7 @@ export void startArea()
 	playerPtr->updateWalkable(PlayerX(), PlayerY() + 1);
 	playerPtr->updateWalkable(PlayerX() + 1, PlayerY() + 1);
 
-	//Å×½ºÆ® ¾ÆÀÌÅÛ
+	//í…ŒìŠ¤íŠ¸ ì•„ì´í…œ
 	int pX = PlayerX();
 	int pY = PlayerY();
 	int pZ = PlayerZ();
@@ -48,28 +48,28 @@ export void startArea()
 		}
 	);
 
-	//È°°ú ¼®±Ã
+	//í™œê³¼ ì„ê¶
 	new ItemStack(3, 8, 0, { {383,1} });
 	new ItemStack(4, 8, 0, { {385,30} });
 	new ItemStack(3, 9, 0, { {382,1} });
 	new ItemStack(4, 9, 0, { {384,30} });
 
-	new Monster(5, 8, 8, 0);//Çã¼ö¾Æºñ
+	new Monster(5, 8, 8, 0);//í—ˆìˆ˜ì•„ë¹„
 
 
 
-	new ItemStack(7, -4, 0, { {391,1} }); //¹ú¸ñµµ³¢
+	new ItemStack(7, -4, 0, { {391,1} }); //ë²Œëª©ë„ë¼
 
-	new ItemStack(-5, 1, 0, { {394,1} }); //³¬½Ã´ë
+	new ItemStack(-5, 1, 0, { {394,1} }); //ë‚šì‹œëŒ€
 
-	new ItemStack(-3, -4, -1, { {388,1} });//°î±ªÀÌ
-	new ItemStack(-2, -4, -1, { {393,1} });//±¤ºÎÇï¸ä
-	new ItemStack(-1, -4, -1, { {395,1} });//»ğ
+	new ItemStack(-3, -4, -1, { {388,1} });//ê³¡ê´­ì´
+	new ItemStack(-2, -4, -1, { {393,1} });//ê´‘ë¶€í—¬ë©§
+	new ItemStack(-1, -4, -1, { {395,1} });//ì‚½
 
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////¡å¾ÆÀÌÅÛ ·¹½ÃÇÇ Ãß°¡////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////â–¼ì•„ì´í…œ ë ˆì‹œí”¼ ì¶”ê°€////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	availableRecipe = new ItemPocket(storageType::recipe);
@@ -84,7 +84,7 @@ export void startArea()
 		}
 	}
 
-	//Å¸ÀÏ ¼¼ÆÃ
+	//íƒ€ì¼ ì„¸íŒ…
 	for (int dx = -30; dx <= 30; dx++)
 	{
 		for (int dy = -30; dy <= 30; dy++)
@@ -103,12 +103,12 @@ export void startArea()
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, 377); //³ë¶û¾Æ½ºÆÈÆ®
-			else setFloor({ dx,dy,0 }, 296); //°ËÁ¤¾Æ½ºÆÈÆ®
+			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, 377); //ë…¸ë‘ì•„ìŠ¤íŒ”íŠ¸
+			else setFloor({ dx,dy,0 }, 296); //ê²€ì •ì•„ìŠ¤íŒ”íŠ¸
 		}
 	}
 
-	//¿À¼Ö±æ
+	//ì˜¤ì†”ê¸¸
 	setFloor({ -3,-1,0 }, 293);
 	setFloor({ -2,-1,0 }, 293);
 	setFloor({ -2,0,0 }, 293);
@@ -122,32 +122,32 @@ export void startArea()
 	setFloor({ 4,2,0 }, 293);
 	for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
 
-	//³ª¹«º® ¼³Ä¡
-	//Áı ÇÏ´Ü 5Å¸ÀÏ
+	//ë‚˜ë¬´ë²½ ì„¤ì¹˜
+	//ì§‘ í•˜ë‹¨ 5íƒ€ì¼
 	setWall({ -1,-2,0 }, 375);
 	setWall({ -2,-2,0 }, 375);
-	new Prop(-3, -2, 0, 291);//³ª¹«¹® ¼³Ä¡
+	new Prop(-3, -2, 0, 291);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 	setWall({ -4,-2,0 }, 375);
 	setWall({ -5,-2,0 }, 375);
-	//Áı ¿ìÃø 4Å¸ÀÏ
+	//ì§‘ ìš°ì¸¡ 4íƒ€ì¼
 	setWall({ -1,-3,0 }, 375);
 	setWall({ -1,-4,0 }, 114);
 	setWall({ -1,-5,0 }, 375);
 	setWall({ -1,-6,0 }, 375);
-	//Áı ÁÂÃø 4Å¸ÀÏ
+	//ì§‘ ì¢Œì¸¡ 4íƒ€ì¼
 	setWall({ -5,-3,0 }, 375);
 	setWall({ -5,-4,0 }, 114);
 	setWall({ -5,-5,0 }, 375);
 	setWall({ -5,-6,0 }, 375);
-	//Àâ »ó´Ü Áß¾Ó 3Å¸ÀÏ
+	//ì¡ ìƒë‹¨ ì¤‘ì•™ 3íƒ€ì¼
 	setWall({ -2,-6,0 }, 375);
 	setWall({ -3,-6,0 }, 375);
 	setWall({ -4,-6,0 }, 375);
 
-	new Prop(-4, -5, 0, 295);//Ã¥Àå
-	new Prop(-2, -5, 0, 294);//Ä§´ë
+	new Prop(-4, -5, 0, 295);//ì±…ì¥
+	new Prop(-2, -5, 0, 294);//ì¹¨ëŒ€
 
-	new Prop(-4, -3, 0, 298);//»ó½Â°è´Ü
+	new Prop(-4, -3, 0, 298);//ìƒìŠ¹ê³„ë‹¨
 	for (int dx = -1; dx <= 1; dx++)
 	{
 		for (int dy = -1; dy <= 1; dy++)
@@ -156,16 +156,16 @@ export void startArea()
 		}
 	}
 
-	new Prop(-2, -3, 0, 299);//ÇÏ°­°è´Ü
+	new Prop(-2, -3, 0, 299);//í•˜ê°•ê³„ë‹¨
 
 
-	//Ã¶Á¶¸Á
-	for (int i = 0; i < 17; i++)//»ó´Ü
+	//ì² ì¡°ë§
+	for (int i = 0; i < 17; i++)//ìƒë‹¨
 	{
 		setWall({ -5 + i, -9, 0 }, 376);
 	}
 
-	for (int i = 0; i < 20; i++)//¿ìÃø
+	for (int i = 0; i < 20; i++)//ìš°ì¸¡
 	{
 		if (-8 + i != 1 && -8 + i != 2 && -8 + i != 3)
 		{
@@ -173,17 +173,17 @@ export void startArea()
 		}
 	}
 
-	for (int i = 0; i < 17; i++)//»ó´Ü
+	for (int i = 0; i < 17; i++)//ìƒë‹¨
 	{
 		setWall({ 11 - i, 12, 0 }, 376);
 	}
 
-	//Ã¶Á¶¸Á ¿ìÃø ÀÔ±¸ ÀüÅëµî 2°³
-	new Prop(12, 0, 0, 118);//º¼¶óµåµî
-	new Prop(12, 4, 0, 118);//º¼¶óµåµî
+	//ì² ì¡°ë§ ìš°ì¸¡ ì…êµ¬ ì „í†µë“± 2ê°œ
+	new Prop(12, 0, 0, 118);//ë³¼ë¼ë“œë“±
+	new Prop(12, 4, 0, 118);//ë³¼ë¼ë“œë“±
 
 
-	//Ã¶Á¶¸Á ¾Æ·¡ ¼±·Î
+	//ì² ì¡°ë§ ì•„ë˜ ì„ ë¡œ
 
 	new Prop(-2, 15, 0, itemVIPCode::railBR);
 	for(int i=0; i<11; i++)  new Prop(-1 + i, 15, 0, itemVIPCode::railRL);
@@ -200,7 +200,7 @@ export void startArea()
 
 	for (int i = 0; i < 5; i++)  new Prop(11 + i, 15, 0, itemVIPCode::railRL);
 
-	//ÁöÇÏ
+	//ì§€í•˜
 	{
 		for (int dx = -1; dx <= 1; dx++)
 		{
@@ -218,16 +218,16 @@ export void startArea()
 			}
 		}
 
-		new Prop(pX - 2, pY - 5, -1, 211);//ÀüÅëµî
+		new Prop(pX - 2, pY - 5, -1, 211);//ì „í†µë“±
 		{
 			int cx = -1;
 			int cy = -1;
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i, -1);
-			new Prop(cx, cy + 1, -1, 291);//³ª¹«¹® ¼³Ä¡
+			new Prop(cx, cy + 1, -1, 291);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy, -1);
-			Prop* door2 = new Prop(cx + 1, cy, -1, 291);//³ª¹«¹® ¼³Ä¡
+			Prop* door2 = new Prop(cx + 1, cy, -1, 291);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 			door2->leadItem.extraSprIndexSingle = 2;
 
 			int aisleEndX = cx + 8;
@@ -291,16 +291,16 @@ export void startArea()
 			}
 
 
-			//ÁöÇÏÃ¶ ¼³Ä¡
+			//ì§€í•˜ì²  ì„¤ì¹˜
 			int vX = 7;
 			int vY = -1;
-			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, 48);//Â÷·® ¼³Ä¡
+			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, 48);//ì°¨ëŸ‰ ì„¤ì¹˜
 			{
-				myTrainPower->name = L"µ¿·ÂÂ÷";
+				myTrainPower->name = L"ë™ë ¥ì°¨";
 				myTrainPower->vehType = vehFlag::train;
 				myTrainPower->isPowerTrain = true;
 
-				///////////////////////Â÷·® ±âÃÊ ÇÁ·¹ÀÓ//////////////////////////////////////
+				///////////////////////ì°¨ëŸ‰ ê¸°ì´ˆ í”„ë ˆì„//////////////////////////////////////
 				myTrainPower->extendPart(vX, vY - 1, 48);
 				myTrainPower->extendPart(vX - 1, vY - 1, 48);
 				myTrainPower->extendPart(vX + 1, vY - 1, 48);
@@ -371,16 +371,16 @@ export void startArea()
 				myTrainPower->addPart(topLeftX + 3, topLeftY + 6, { 123 });
 			}
 
-			//ÁöÇÏÃ¶(È­¹°Ä­) ¼³Ä¡
+			//ì§€í•˜ì² (í™”ë¬¼ì¹¸) ì„¤ì¹˜
 
-			Vehicle* myTrain = new Vehicle(7, 7, -1, 48);//Â÷·® ¼³Ä¡
+			Vehicle* myTrain = new Vehicle(7, 7, -1, 48);//ì°¨ëŸ‰ ì„¤ì¹˜
 
 			{
 				int vX = 7;
 				int vY = 7;
 				myTrain->vehType = vehFlag::train;
 
-				///////////////////////Â÷·® ±âÃÊ ÇÁ·¹ÀÓ//////////////////////////////////////
+				///////////////////////ì°¨ëŸ‰ ê¸°ì´ˆ í”„ë ˆì„//////////////////////////////////////
 				myTrain->extendPart(vX, vY - 1, 48);
 				myTrain->extendPart(vX - 1, vY - 1, 48);
 				myTrain->extendPart(vX + 1, vY - 1, 48);
@@ -450,24 +450,24 @@ export void startArea()
 
 			//for (int targetY = endY; targetY >= endY - 19; targetY--)
 			//{
-			//	new Prop(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(endX + 3, targetY, pZ - 1, 303);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 			//}
 
-			//new Prop(endX + 3, endY - 20, pZ - 1, 317);//³ª¹«¹® ¼³Ä¡
+			//new Prop(endX + 3, endY - 20, pZ - 1, 317);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 
 			//for (int targetY = endY - 21; targetY >= endY - 50; targetY--)
 			//{
-			//	new Prop(endX + 3, targetY, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(endX + 3, targetY, pZ - 1, 303);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 			//}
 
 			//for (int targetX = endX + 1; targetX >= endX - 30; targetX--)
 			//{
-			//	new Prop(targetX, endY - 20, pZ - 1, 303);//³ª¹«¹® ¼³Ä¡
+			//	new Prop(targetX, endY - 20, pZ - 1, 303);//ë‚˜ë¬´ë¬¸ ì„¤ì¹˜
 			//}
 		}
 	}
 
-	//Áı ¹Ù´Ú Å¸ÀÏ
+	//ì§‘ ë°”ë‹¥ íƒ€ì¼
 	for (int dx = 0; dx < 5; dx++)
 	{
 		for (int dy = 0; dy < 4; dy++)
@@ -475,14 +475,14 @@ export void startArea()
 			setFloor({ -5 + dx, -5 + dy, 0 }, 292);
 		}
 	}
-	new Prop(2, -1, 0, 297);//Ç¥ÁöÆÇ
-	//À¯¸®º® ¼³Ä¡
+	new Prop(2, -1, 0, 297);//í‘œì§€íŒ
+	//ìœ ë¦¬ë²½ ì„¤ì¹˜
 	setWall({ 2,-4,0 }, 114);
 	setWall({ 2,-3,0 }, 114);
 	setWall({ 2,-2,0 }, 114);
 	setWall({ 4,-4,0 }, 114);
 	setWall({ 4,-3,0 }, 114);
-	//¾èÀº ¹° Å¸ÀÏ(¿¬¸ø)
+	//ì–•ì€ ë¬¼ íƒ€ì¼(ì—°ëª»)
 	setFloor({ -3,0,0 }, 225);
 	setFloor({ -4,0,0 }, 226);
 	setFloor({ -3,1,0 }, 225);
@@ -494,10 +494,10 @@ export void startArea()
 	{
 		for (int dx = 0; dx <= 60; dx++)
 		{
-			if (dy <= 1) setFloor({ startX + dx, startY + dy, 0 }, 231);//¾èÀºÇØ¼ö
-			else if (dy <= 5) setFloor({ startX + dx, startY + dy, 0 }, 381);//¸ğ·¡
-			else if (dy <= 7) setFloor({ startX + dx, startY + dy, 0 }, 231);//¾èÀºÇØ¼ö
-			else setFloor({ startX + dx, startY + dy, 0 }, 232);//±íÀºÇØ¼ö
+			if (dy <= 1) setFloor({ startX + dx, startY + dy, 0 }, 231);//ì–•ì€í•´ìˆ˜
+			else if (dy <= 5) setFloor({ startX + dx, startY + dy, 0 }, 381);//ëª¨ë˜
+			else if (dy <= 7) setFloor({ startX + dx, startY + dy, 0 }, 231);//ì–•ì€í•´ìˆ˜
+			else setFloor({ startX + dx, startY + dy, 0 }, 232);//ê¹Šì€í•´ìˆ˜
 		}
 	}
 	setFloor({ -7,41,0 }, 231);
@@ -509,7 +509,7 @@ export void startArea()
 	setFloor({ 6,41,0 }, 231);
 	setFloor({ 5,43,0 }, 232);
 	setFloor({ 6,43,0 }, 232);
-	//ÇÏ´Ü¿¬¸ø
+	//í•˜ë‹¨ì—°ëª»
 	setFloor({ 5,8,0 }, 225);
 	setFloor({ 5,9,0 }, 225);
 	for (int dx = -3; dx <= 2; dx++)
@@ -520,19 +520,19 @@ export void startArea()
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////¡å¼³Ä¡¹° Ãß°¡////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////â–¼ì„¤ì¹˜ë¬¼ ì¶”ê°€////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	//new Prop(pX + 1 - 1, pY - 2, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 1, pY - 2 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 6, pY - 5, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 7, pY - 3, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 7, pY - 4, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 5, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 5 - 1, pY - 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
-	//new Prop(pX + 7 - 1, pY + 1, pZ, 234);//º¢²É³«¿± ¼³Ä¡
+	//new Prop(pX + 1 - 1, pY - 2, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 1, pY - 2 + 1, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 6, pY - 5, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 7, pY - 3, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 7, pY - 4, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 5, pY - 1 + 1, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 5 - 1, pY - 1, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
+	//new Prop(pX + 7 - 1, pY + 1, pZ, 234);//ë²šê½ƒë‚™ì—½ ì„¤ì¹˜
 
 
 	/*
@@ -599,48 +599,48 @@ export void startArea()
 	//for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
 
 
-	new Prop(1, -3, 0, 117);//³ª¹« ¼³Ä¡
+	new Prop(1, -3, 0, 117);//ë‚˜ë¬´ ì„¤ì¹˜
 
-	new Prop(pX + 3, pY - 2, 0, 239);//³ª¹« ¼³Ä¡
+	new Prop(pX + 3, pY - 2, 0, 239);//ë‚˜ë¬´ ì„¤ì¹˜
 
-	new Prop(pX + 5, pY - 1, 0, 247);//³ª¹« ¼³Ä¡
+	new Prop(pX + 5, pY - 1, 0, 247);//ë‚˜ë¬´ ì„¤ì¹˜
 
-	new Prop(0, -5, 0, 238);//³ª¹« ¼³Ä¡
-
-
+	new Prop(0, -5, 0, 238);//ë‚˜ë¬´ ì„¤ì¹˜
 
 
-	new Prop(pX + 7, pY + 1, 0, 237);//³ª¹« ¼³Ä¡
 
 
-	new Prop(pX + 4, pY - 5, 0, 248);//³ª¹« ¼³Ä¡
+	new Prop(pX + 7, pY + 1, 0, 237);//ë‚˜ë¬´ ì„¤ì¹˜
 
-	new Prop(pX + 9, pY - 4, 0, 237);//³ª¹« ¼³Ä¡
-	new Prop(pX + 10, pY - 1, 0, 244);//»ç°ú³ª¹« ¼³Ä¡
 
-	new Prop(pX - 2, pY + 39, 0, 242);//¾ßÀÚ³ª¹« ¼³Ä¡
+	new Prop(pX + 4, pY - 5, 0, 248);//ë‚˜ë¬´ ì„¤ì¹˜
+
+	new Prop(pX + 9, pY - 4, 0, 237);//ë‚˜ë¬´ ì„¤ì¹˜
+	new Prop(pX + 10, pY - 1, 0, 244);//ì‚¬ê³¼ë‚˜ë¬´ ì„¤ì¹˜
+
+	new Prop(pX - 2, pY + 39, 0, 242);//ì•¼ìë‚˜ë¬´ ì„¤ì¹˜
 
 
 	new Prop(pX, pY - 20, 0, 237);
 
-	new Prop(-4, 5, 0, 245);//»ç°ú³ª¹« ¼³Ä¡
+	new Prop(-4, 5, 0, 245);//ì‚¬ê³¼ë‚˜ë¬´ ì„¤ì¹˜
 
 
-	new Prop(pX + 3, pY + 3, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 3 + 1, pY + 3, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 3 + 2, pY + 3, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 3 + 1, pY + 3 + 1, 0, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 3, pY + 3, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 3 + 1, pY + 3, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 3 + 2, pY + 3, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 3 + 1, pY + 3 + 1, 0, 338);//ê³ ì²  ì„¤ì¹˜
 
-	new Prop(pX + 10, pY + 11, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 10, pY + 11 - 1, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 10, pY + 11 - 2, 0, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 10, pY + 11, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 10, pY + 11 - 1, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 10, pY + 11 - 2, 0, 338);//ê³ ì²  ì„¤ì¹˜
 
-	new Prop(pX + 10 - 1, pY + 11, 0, 338);//°íÃ¶ ¼³Ä¡
-	new Prop(pX + 10 - 1, pY + 11 - 1, 0, 338);//°íÃ¶ ¼³Ä¡
+	new Prop(pX + 10 - 1, pY + 11, 0, 338);//ê³ ì²  ì„¤ì¹˜
+	new Prop(pX + 10 - 1, pY + 11 - 1, 0, 338);//ê³ ì²  ì„¤ì¹˜
 
 
 
-	//ÀÜµğ
+	//ì”ë””
 	setFloor({ pX - 2, pY + 3, 0 }, 220);
 	setFloor({ pX - 1, pY + 3, 0 }, 220);
 	setFloor({ pX, pY + 3, 0 }, 220);
@@ -651,23 +651,23 @@ export void startArea()
 	setFloor({ pX, pY + 4, 0 }, 220);
 	setFloor({ pX + 1, pY + 4, 0 }, 220);
 
-	new Prop(pX - 2, pY + 3, 0, 270);//²É ¼³Ä¡
-	new Prop(pX - 1, pY + 3, 0, 265);//²É ¼³Ä¡
-	new Prop(pX, pY + 3, 0, 266);//²É ¼³Ä¡
-	new Prop(pX + 1, pY + 3, 0, 267);//²É ¼³Ä¡
+	new Prop(pX - 2, pY + 3, 0, 270);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX - 1, pY + 3, 0, 265);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX, pY + 3, 0, 266);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX + 1, pY + 3, 0, 267);//ê½ƒ ì„¤ì¹˜
 
-	new Prop(pX - 2, pY + 4, 0, 271);//²É ¼³Ä¡
-	new Prop(pX - 1, pY + 4, 0, 268);//²É ¼³Ä¡
-	new Prop(pX, pY + 4, 0, 269);//²É ¼³Ä¡
-	new Prop(pX + 1, pY + 4, 0, 270);//²É ¼³Ä¡
+	new Prop(pX - 2, pY + 4, 0, 271);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX - 1, pY + 4, 0, 268);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX, pY + 4, 0, 269);//ê½ƒ ì„¤ì¹˜
+	new Prop(pX + 1, pY + 4, 0, 270);//ê½ƒ ì„¤ì¹˜
 
 
-	new Prop(pX + 6, pY - 4, 0, 270);//²É ¼³Ä¡
+	new Prop(pX + 6, pY - 4, 0, 270);//ê½ƒ ì„¤ì¹˜
 
-	new Prop(0, -1, 0, 211);//ÀüÅë µî ¼³Ä¡
-	new Prop(4, 0, 0, 211);//º¼¶óµå µî ¼³Ä¡
+	new Prop(0, -1, 0, 211);//ì „í†µ ë“± ì„¤ì¹˜
+	new Prop(4, 0, 0, 211);//ë³¼ë¼ë“œ ë“± ì„¤ì¹˜
 
-	//¿ïÅ¸¸® ¼³Ä¡
+	//ìš¸íƒ€ë¦¬ ì„¤ì¹˜
 	new Prop(pX - 3, pY + 2, 0, 206);
 	new Prop(pX - 2, pY + 2, 0, 206);
 	new Prop(pX - 1, pY + 2, 0, 206);
@@ -689,21 +689,21 @@ export void startArea()
 	new Prop(pX + 1, pY + 5, 0, 206);
 	new Prop(pX + 2, pY + 5, 0, 206);
 
-	//Àü¼± ¼³Ä¡
+	//ì „ì„  ì„¤ì¹˜
 	new Prop(pX + 8, pY + 1, 0, 143);
 	new Prop(pX + 8, pY, 0, 143);
 	new Prop(pX + 8, pY - 1, 0, 143);
 	new Prop(pX + 8, pY - 2, 0, 143);
 	new Prop(pX + 9, pY, 0, 143);
 
-	//¹è°ü ¼³Ä¡
+	//ë°°ê´€ ì„¤ì¹˜
 	new Prop(pX + 3, pY + 6, 0, 144);
 	new Prop(pX + 4, pY + 6, 0, 144);
 	new Prop(pX + 5, pY + 6, 0, 144);
 	new Prop(pX + 6, pY + 6, 0, 144);
 	new Prop(pX + 5, pY + 7, 0, 144);
 
-	//Á¾±³
+	//ì¢…êµ
 
 	new Prop(pX - 3, pY - 7, 0, 213);
 	new Prop(pX - 1, pY - 7, 0, 214);
@@ -716,11 +716,11 @@ export void startArea()
 
 	int vX = pY - 8;
 	int vY = pY + 3;
-	Vehicle* myCar = new Vehicle(vX, vY, 0, 48);//Â÷·® ¼³Ä¡
+	Vehicle* myCar = new Vehicle(vX, vY, 0, 48);//ì°¨ëŸ‰ ì„¤ì¹˜
 	myCar->name = L"SUV";
 	myCar->vehType = vehFlag::car;
 
-	///////////////////////Â÷·® ±âÃÊ ÇÁ·¹ÀÓ//////////////////////////////////////
+	///////////////////////ì°¨ëŸ‰ ê¸°ì´ˆ í”„ë ˆì„//////////////////////////////////////
 	myCar->extendPart(vX, vY - 1, 48);
 	myCar->extendPart(vX - 1, vY - 1, 48);
 	myCar->extendPart(vX + 1, vY - 1, 48);
@@ -749,32 +749,32 @@ export void startArea()
 	myCar->extendPart(vX, vY - 3, 130);
 	myCar->extendPart(vX + 1, vY - 3, 130);
 	myCar->extendPart(vX + 2, vY - 3, 130);
-	//////////////////////////¡åÃÖ»ó´Ü 4Å¸ÀÏ////////////////////////////////////
+	//////////////////////////â–¼ìµœìƒë‹¨ 4íƒ€ì¼////////////////////////////////////
 	myCar->addPart(vX - 1, vY - 2, { 142,119,126 });
 	myCar->addPart(vX, vY - 2, { 119 });
 	myCar->addPart(vX + 1, vY - 2, { 119 });
 	myCar->addPart(vX + 2, vY - 2, { 142,119,126 });
-	//////////////////////////¡åÁß»ó´Ü 4Å¸ÀÏ////////////////////////////////////
+	//////////////////////////â–¼ì¤‘ìƒë‹¨ 4íƒ€ì¼////////////////////////////////////
 	myCar->addPart(vX - 1, vY - 1, 121);
 	myCar->addPart(vX, vY - 1, 121);
 	myCar->addPart(vX + 1, vY - 1, 121);
 	myCar->addPart(vX + 2, vY - 1, 121);
-	////////////////////////////////¡å¿îÀü¼® 4Å¸ÀÏ///////////////////////////////
+	////////////////////////////////â–¼ìš´ì „ì„ 4íƒ€ì¼///////////////////////////////
 	myCar->addPart(vX - 1, vY, { 120 });
 	myCar->addPart(vX, vY, { 122, 123, 99, 128 });
 	myCar->addPart(vX + 1, vY, { 122, 123, 128 });
 	myCar->addPart(vX + 2, vY, { 120 });
-	//////////////////////////¡å¿îÀü¼® ¾Æ·¡ Åë·Î 4Å¸ÀÏ/////////////////////////////
+	//////////////////////////â–¼ìš´ì „ì„ ì•„ë˜ í†µë¡œ 4íƒ€ì¼/////////////////////////////
 	myCar->addPart(vX - 1, vY + 1, { 119 });
 	myCar->addPart(vX, vY + 1, { 122, 128 });
 	myCar->addPart(vX + 1, vY + 1, { 122, 128,129 });
 	myCar->addPart(vX + 2, vY + 1, { 119 });
-	///////////////////////////////¡åµŞÀÚ¼® 4Å¸ÀÏ/////////////////////
+	///////////////////////////////â–¼ë’·ìì„ 4íƒ€ì¼/////////////////////
 	myCar->addPart(vX - 1, vY + 2, { 120 });
 	myCar->addPart(vX, vY + 2, { 122, 123, 128 });
 	myCar->addPart(vX + 1, vY + 2, { 122, 123, 128 });
 	myCar->addPart(vX + 2, vY + 2, { 120 });
-	///////////////////////////////¡åÃÖÈÄ¹æ 4Å¸ÀÏ///////////////////////////
+	///////////////////////////////â–¼ìµœí›„ë°© 4íƒ€ì¼///////////////////////////
 	myCar->addPart(vX - 1, vY + 3, { 119,127 });
 	myCar->addPart(vX, vY + 3, { 124 });
 	myCar->addPart(vX + 1, vY + 3, { 124 });
@@ -782,7 +782,7 @@ export void startArea()
 
 
 
-	///////////////////¿ÀÅä¹ÙÀÌ///////////////////////////////////////////
+	///////////////////ì˜¤í† ë°”ì´///////////////////////////////////////////
 	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, 48);
 	myMoto->extendPart(vX + 6, vY + 4, 48);
 	myMoto->extendPart(vX + 6, vY + 6, 48);
@@ -791,7 +791,7 @@ export void startArea()
 	myMoto->addPart(vX + 6, vY + 5, 132);
 	myMoto->addPart(vX + 6, vY + 6, 102);
 
-	////////////////////ÀÚÀü°Å////////////////////////////////////////////
+	////////////////////ìì „ê±°////////////////////////////////////////////
 	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, 48);
 	myBike->extendPart(vX + 9, vY + 3, 48);
 	myBike->extendPart(vX + 9, vY + 5, 48);
@@ -806,7 +806,7 @@ export void startArea()
 		int cx = 15;
 		int cy = 0;
 		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
-		myHeli->name = L"Çï±â";
+		myHeli->name = L"í—¬ê¸°";
 		myHeli->vehType = vehFlag::heli;
 		myHeli->addPart(cx, cy, { 311 });
 
@@ -848,7 +848,7 @@ export void startArea()
 		myHeli->addPart(cx, cy + 5, { 119, 315 });
 	}
 
-	//¼ö·¹ 3Á¾
+	//ìˆ˜ë ˆ 3ì¢…
 	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);
 	cart1->vehType = vehFlag::car;
 
@@ -861,7 +861,7 @@ export void startArea()
 	Vehicle* cart4 = new Vehicle(7, -5, 0, 378);
 	cart4->vehType = vehFlag::car;
 
-	//±¤Â÷
+	//ê´‘ì°¨
 	Vehicle* minecart1 = new Vehicle(3, 15, 0, 405);
 	minecart1->vehType = vehFlag::minecart;
 	minecart1->addPart(3, 15, { itemVIPCode::minecartController });

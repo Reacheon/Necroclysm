@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Aim;
 
@@ -35,11 +35,11 @@ private:
 public:
 	Aim() : GUI(false)
 	{
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		tabType = tabFlag::closeAim;
@@ -158,7 +158,7 @@ public:
 
 
 			setZoom(zoomScale);
-			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 150); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 150); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 			drawSpriteCenter
 			(
 				spr::aimMarkerWhite,
@@ -166,7 +166,7 @@ public:
 				dst.x + dst.w / 2,
 				dst.y + dst.h / 2
 			);
-			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+			SDL_SetTextureAlphaMod(spr::aimMarkerWhite->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 			setZoom(1.0);
 		}
 
@@ -217,7 +217,7 @@ public:
 
 
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 52);
-		drawTextCenter(L"#FFFFFF»ç°İÇÒ À§Ä¡¸¦ ¼±ÅÃÇØÁÖ¼¼¿ä.", cameraW / 2, 52);
+		drawTextCenter(L"#FFFFFFì‚¬ê²©í•  ìœ„ì¹˜ë¥¼ ì„ íƒí•´ì£¼ì„¸ìš”.", cameraW / 2, 52);
 	}
 
 	void changeAimTarget(int tgtX, int tgtY)
@@ -334,7 +334,7 @@ public:
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
-				prt(L"ÅÇÀÌ ½ÇÇàµÇ¾ú´Ù.\n");
+				prt(L"íƒ­ì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
 				executeTab();
 				delayR2 = 20;
 			}
@@ -387,7 +387,7 @@ public:
 		{
 			return;
 		}
-		//¸Ç¼Õ »ç°Å¸® ÀÌÅ»
+		//ë§¨ì† ì‚¬ê±°ë¦¬ ì´íƒˆ
 		else if (Player::ins()->getAimWeaponIndex() == -1)
 		{
 			if (1 < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)))
@@ -400,20 +400,20 @@ public:
 			Player::ins()->initAimStack();
 
 		}
-		//¹«±â »ç°Å¸® ÀÌÅ»
+		//ë¬´ê¸° ì‚¬ê±°ë¦¬ ì´íƒˆ
 		else
 		{
-			if (targetAtkType == atkType::throwing) //´øÁö±â
+			if (targetAtkType == atkType::throwing) //ë˜ì§€ê¸°
 			{
 				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)) ) { return; }
 
-				//ÀÚ±â ÀÚ½Å¿¡°Ô ´øÁö´Â °æ¿ìµµ °í·ÁÇØ¾ß µÇ³ª?
+				//ìê¸° ìì‹ ì—ê²Œ ë˜ì§€ëŠ” ê²½ìš°ë„ ê³ ë ¤í•´ì•¼ ë˜ë‚˜?
 				ItemPocket* drop = new ItemPocket(storageType::null);
 				Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
 				Player::ins()->throwing(drop, targetX, targetY);
 				Player::ins()->updateStatus();
 				Player::ins()->updateCustomSpriteHuman();
-				updateLog(L"#FFFFFF¾ÆÀÌÅÛÀ» ´øÁ³´Ù.");
+				updateLog(L"#FFFFFFì•„ì´í…œì„ ë˜ì¡Œë‹¤.");
 
 
 				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::throwing);
@@ -421,21 +421,21 @@ public:
 				Player::ins()->initAimStack();
 				Player::ins()->setNextAtkType(targetAtkType);
 			}
-			else if (targetAtkType == atkType::shot) //»ç°İ
+			else if (targetAtkType == atkType::shot) //ì‚¬ê²©
 			{
 				ItemData tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
-				if (getBulletNumber(tmpAimWeapon) > 0) //»ç°İÀÎµ¥ ÃÑ¾ËÀÌ ¾øÀ» °æ¿ì
+				if (getBulletNumber(tmpAimWeapon) > 0) //ì‚¬ê²©ì¸ë° ì´ì•Œì´ ì—†ì„ ê²½ìš°
 				{
 					if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
 				}
 				else return;
 
-				//Á÷Åº½Ä ÃÑ
+				//ì§íƒ„ì‹ ì´
 				if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 				{
 					popTopBullet(((ItemPocket*)tmpAimWeapon.pocketPtr));
 				}
-				//ÅºÃ¢½Ä ÃÑ
+				//íƒ„ì°½ì‹ ì´
 				else if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 				{
 					popTopBullet((ItemPocket*)((ItemPocket*)tmpAimWeapon.pocketPtr)->itemInfo[0].pocketPtr);
@@ -450,7 +450,7 @@ public:
 				aimAcc = 0.6;
 				Player::ins()->setNextAtkType(targetAtkType);
 			}
-			else//±ÙÁ¢°ø°İ
+			else//ê·¼ì ‘ê³µê²©
 			{
 				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
 

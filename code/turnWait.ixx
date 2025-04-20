@@ -1,4 +1,4 @@
-
+ï»¿
 
 export module turnWait;
 
@@ -12,15 +12,15 @@ import World;
 import TileData;
 import Prop;
 
-//globalVar¿¡ Àü¹æ¼±¾ğµÊ
+//globalVarì— ì „ë°©ì„ ì–¸ë¨
 
-//@brief ÇÃ·¹ÀÌ¾îÀÇ ÅÏÀÏ ¶§ ÀÔ·ÂÇÑ ¼öÄ¡¸¸Å­ ÅÏÀ» ±â´Ù¸³´Ï´Ù.
-//@param waitTime ±â´Ù¸° ÅÏ(ºĞ), ¿¹·Î 1.5¸¦ ÀÔ·ÂÇÏ¸é 1.5ÅÏ(ºĞ)
+//@brief í”Œë ˆì´ì–´ì˜ í„´ì¼ ë•Œ ì…ë ¥í•œ ìˆ˜ì¹˜ë§Œí¼ í„´ì„ ê¸°ë‹¤ë¦½ë‹ˆë‹¤.
+//@param waitTime ê¸°ë‹¤ë¦° í„´(ë¶„), ì˜ˆë¡œ 1.5ë¥¼ ì…ë ¥í•˜ë©´ 1.5í„´(ë¶„)
 export void turnWait(float waitTime)
 {
-    //240708±âÁØ 2ms Á¤µµÀÇ ½ÇÇà¼Óµµ
+    //240708ê¸°ì¤€ 2ms ì •ë„ì˜ ì‹¤í–‰ì†ë„
 
-    //prt(L"[´ë±â] %fºĞÀ» ´ë±âÇß´Ù.\n", waitTime);
+    //prt(L"[ëŒ€ê¸°] %fë¶„ì„ ëŒ€ê¸°í–ˆë‹¤.\n", waitTime);
     const int GAS_UPDATE_RANGE = 29;
     std::unordered_map<std::array<int, 2>, std::vector<gasData>> tempGas;
     int px = PlayerX();
@@ -29,7 +29,7 @@ export void turnWait(float waitTime)
 
     static std::unordered_map<int, double> gasStack;
 
-    //°¡½º º¹»ç
+    //ê°€ìŠ¤ ë³µì‚¬
     for (int tgtX = px - GAS_UPDATE_RANGE; tgtX <= px + GAS_UPDATE_RANGE; tgtX++)
     {
         for (int tgtY = py - GAS_UPDATE_RANGE; tgtY <= py + GAS_UPDATE_RANGE; tgtY++)

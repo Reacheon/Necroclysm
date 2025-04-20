@@ -1,4 +1,4 @@
-export module Gas;
+ï»¿export module Gas;
 
 import util;
 import Coord;
@@ -19,8 +19,8 @@ export struct Gas
         TileData* thisTile = &World::ins()->getTile(inputGridX, inputGridY, inputGridZ);
         if (thisTile->gasPtr != nullptr)
         {
-            prt(L"[makeFlag] ÀÌ¹Ì (%d,%d,%d)¿¡´Â °¡½º°¡ Á¸ÀçÇÑ´Ù.\n", inputGridX, inputGridY, inputGridZ);
-            errorBox(L"Áßº¹µÈ À§Ä¡¿¡ GasÀÌ »ı¼ºµÇ¾ú´Ù.\n");
+            prt(L"[makeFlag] ì´ë¯¸ (%d,%d,%d)ì—ëŠ” ê°€ìŠ¤ê°€ ì¡´ì¬í•œë‹¤.\n", inputGridX, inputGridY, inputGridZ);
+            errorBox(L"ì¤‘ë³µëœ ìœ„ì¹˜ì— Gasì´ ìƒì„±ë˜ì—ˆë‹¤.\n");
         }
         else
         {

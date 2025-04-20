@@ -1,8 +1,8 @@
-export module lineMaker;
+ï»¿export module lineMaker;
 
 import std;
 
-//@brief ÁÂÇ¥µéÀ» ÀúÀåÇÏ´ÂinputPath º¤ÅÍ¿¡ srcXYºÎÅÍ delXY±îÁöÀÇ ¼±À» ±ß°í ÇØ´çÇÏ´Â ÁÂÇ¥µéÀ» ¼ø¼­´ë·Î º¤ÅÍ¿¡ ½×´Â ÇÔ¼ö 
+//@brief ì¢Œí‘œë“¤ì„ ì €ì¥í•˜ëŠ”inputPath ë²¡í„°ì— srcXYë¶€í„° delXYê¹Œì§€ì˜ ì„ ì„ ê¸‹ê³  í•´ë‹¹í•˜ëŠ” ì¢Œí‘œë“¤ì„ ìˆœì„œëŒ€ë¡œ ë²¡í„°ì— ìŒ“ëŠ” í•¨ìˆ˜ 
 export void makeLine(std::vector<std::array<int, 2>>& inputPath, int delX, int delY)
 {
     int cursorX = 0;

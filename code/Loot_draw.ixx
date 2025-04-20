@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import Loot;
 import globalVar;
@@ -21,7 +21,7 @@ void Loot::drawGUI()
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	Sprite* targetBtnSpr = nullptr;
 
-	bool hasSelect = false; //¾ÆÀÌÅÛ¿¡ ¼¿·ºÆ®°¡ ÇÏ³ª¶óµµ ÀÖÀ» °æ¿ì
+	bool hasSelect = false; //ì•„ì´í…œì— ì…€ë ‰íŠ¸ê°€ í•˜ë‚˜ë¼ë„ ìˆì„ ê²½ìš°
 	for (int i = 0; i < lootPocket->itemInfo.size(); i++)
 	{
 		if (lootPocket->itemInfo[i].lootSelect > 0)
@@ -37,7 +37,7 @@ void Loot::drawGUI()
 
 	drawWindow(&lootBase, sysStr[10], 1);
 
-	//Æ÷ÄÏ
+	//í¬ì¼“
 	if (hasSelect == false)
 	{
 		drawFillRect(lootBase.x + 13, lootBase.y + 40, 50, 50, col::black);
@@ -54,7 +54,7 @@ void Loot::drawGUI()
 		if (lootItemData != nullptr) tileName = lootItemData->name;
 		drawText(col2Str(col::white) + tileName, lootBase.x + 73, lootBase.y + 39);
 
-		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//È¸»ö ºĞ¸®¼±
+		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//íšŒìƒ‰ ë¶„ë¦¬ì„ 
 
 		SDL_Rect volumeGaugeRect = { lootBase.x + 123,lootBase.y + 72,104,9 };
 		drawRect(volumeGaugeRect, col::white);
@@ -65,7 +65,7 @@ void Loot::drawGUI()
 		setFontSize(8);
 		drawText(col2Str(col::white) + L"72.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
 
-		//ÁÂÃø»ó´Ü ¹ö¸®±â ¹öÆ°
+		//ì¢Œì¸¡ìƒë‹¨ ë²„ë¦¬ê¸° ë²„íŠ¼
 		SDL_Rect dropBtn = { lootBase.x + 259,lootBase.y + 36,69,23 };
 		drawFillRect(dropBtn, col::black);
 		drawRect(dropBtn, col::gray);
@@ -78,7 +78,7 @@ void Loot::drawGUI()
 	{
 		//drawStadium(pocketWindow.x, pocketWindow.y, pocketWindow.w, pocketWindow.h, { 0,0,0 }, 150, 5);
 
-		//°¡¹æÀÌ ¸î °³ ÀÖ´ÂÁö Ã¼Å©
+		//ê°€ë°©ì´ ëª‡ ê°œ ìˆëŠ”ì§€ ì²´í¬
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
@@ -93,7 +93,7 @@ void Loot::drawGUI()
 
 		if (numberOfBag == 0)
 		{
-			//°¡¹æÀ» °¡Áö°í ÀÖÁö ¾Ê´Ù.
+			//ê°€ë°©ì„ ê°€ì§€ê³  ìˆì§€ ì•Šë‹¤.
 			setFontSize(16);
 			drawTextCenter(col2Str(col::white)+sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 35);
 		}
@@ -110,7 +110,7 @@ void Loot::drawGUI()
 			pocketItem[5] = { lootBase.x + 167 - 16 + 38 + 27 * 1, lootBase.y + 50 - 16 + 5, 24, 24 };
 			pocketItem[6] = { lootBase.x + 167 - 16 + 38 + 27 * 2, lootBase.y + 50 - 16 + 5, 24, 24 };
 
-			//Æ÷ÄÏ 1~3¹øÂ° Ä­ ±×¸®±â
+			//í¬ì¼“ 1~3ë²ˆì§¸ ì¹¸ ê·¸ë¦¬ê¸°
 			if (pocketCursor != 0)
 			{
 
@@ -132,13 +132,13 @@ void Loot::drawGUI()
 				}
 			}
 
-			//Æ÷ÄÏ 4¹øÂ° Ä­
+			//í¬ì¼“ 4ë²ˆì§¸ ì¹¸
 			setZoom(2.0);
 			drawFillRect(pocketItem[3].x, pocketItem[3].y, pocketItem[3].w, pocketItem[3].h, lowCol::blue, 200);
 			drawRect(pocketItem[3], col::white);
 			drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor]].sprIndex, lootBase.x + 167, lootBase.y + 50);
 
-			//Æ÷ÄÏ 5~7¹øÂ° Ä­ 
+			//í¬ì¼“ 5~7ë²ˆì§¸ ì¹¸ 
 			if (pocketCursor != numberOfBag - 1)
 			{
 				setZoom(1.5);
@@ -161,14 +161,14 @@ void Loot::drawGUI()
 			setZoom(1.0);
 
 
-			//Æ÷ÄÏ Áú·® °ÔÀÌÁö
+			//í¬ì¼“ ì§ˆëŸ‰ ê²Œì´ì§€
 			SDL_Rect weightBar = { pocketWindow.x + 42, pocketWindow.y + 52, 72, 4 };
 			drawRect(weightBar, col::white);
 
 			setFontSize(10);
 			drawTextCenter(col2Str(col::white)+L"132.9/99.9 KG", weightBar.x + (weightBar.w / 2), weightBar.y - 8);
 
-			//·çÆÃ ÁÖ¸Ó´Ï ºÎÇÇ °ÔÀÌÁö
+			//ë£¨íŒ… ì£¼ë¨¸ë‹ˆ ë¶€í”¼ ê²Œì´ì§€
 			SDL_Rect volumeBar = { pocketWindow.x + pocketWindow.w - 114, pocketWindow.y + 52, 72, 4 };
 			drawRect(volumeBar, col::white);
 			SDL_Rect volumeGauge = { volumeBar.x + 1, volumeBar.y + 1, volumeBar.w - 2, 2 };
@@ -182,9 +182,9 @@ void Loot::drawGUI()
 			drawTextCenter(col2Str(col::white)+volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
 
 			//setFontSize(11);
-			//drawTextCenter(L"Å×½ºÆ® ¾ÆÀÌÅÛ", pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + pocketWindow.h - 10);
+			//drawTextCenter(L"í…ŒìŠ¤íŠ¸ ì•„ì´í…œ", pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + pocketWindow.h - 10);
 
-			//Æ÷ÄÏ ÁÂ¿ì º¯°æ ¹öÆ°
+			//í¬ì¼“ ì¢Œìš° ë³€ê²½ ë²„íŠ¼
 			{
 				SDL_Color leftBtnColor;
 				if (checkCursor(&pocketLeft))
@@ -238,7 +238,7 @@ void Loot::drawGUI()
 		}
 
 
-		//·çÆÃ¹öÆ° ±×¸®±â
+		//ë£¨íŒ…ë²„íŠ¼ ê·¸ë¦¬ê¸°
 		{
 			SDL_Color lootBtnColor;
 			if (checkCursor(&lootBtn))
@@ -268,9 +268,9 @@ void Loot::drawGUI()
 	}
 	
 
-	//¿©±â¼­ºÎÅÏ ·çÆÃ À©µµ¿ì
+	//ì—¬ê¸°ì„œë¶€í„´ ë£¨íŒ… ìœˆë„ìš°
 	{
-		//¿ìÃø ¾ÆÀÌÅÛ »ó´Ü¹Ù ¶óº§(¼±ÅÃ ÀÌ¸§ ¹°¸®·®)
+		//ìš°ì¸¡ ì•„ì´í…œ ìƒë‹¨ë°” ë¼ë²¨(ì„ íƒ ì´ë¦„ ë¬¼ë¦¬ëŸ‰)
 		drawStadium(lootLabel.x, lootLabel.y, lootLabel.w, lootLabel.h, { 0,0,0 }, 183, 5);
 		if (GUI::getLastGUI() == this)
 		{
@@ -297,16 +297,16 @@ void Loot::drawGUI()
 			}
 		}
 		setFontSize(13);
-		drawTextCenter(col2Str(col::white)+sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //¼±ÅÃ(»ó´Ü¹Ù)
+		drawTextCenter(col2Str(col::white)+sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //ì„ íƒ(ìƒë‹¨ë°”)
 
-		{ //ÀÌ¸§(»ó´Ü¹Ù)
+		{ //ì´ë¦„(ìƒë‹¨ë°”)
 			std::wstring tailStr = L"";
 			int grayNumber = 0;
 			int whiteNumber = 0;
-			//ÀÌ¹Ì °Ë»ö ÁßÀÎÁö Ã¼Å©
+			//ì´ë¯¸ ê²€ìƒ‰ ì¤‘ì¸ì§€ ì²´í¬
 			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
 			{
-				if (lootPocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//ÀÌ¹Ì °Ë»ö ÁßÀÏ °æ¿ì °Ë»ö »óÅÂ¸¦ ÇØÁ¦ÇÔ
+				if (lootPocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//ì´ë¯¸ ê²€ìƒ‰ ì¤‘ì¼ ê²½ìš° ê²€ìƒ‰ ìƒíƒœë¥¼ í•´ì œí•¨
 				{
 					grayNumber++;
 				}
@@ -315,7 +315,7 @@ void Loot::drawGUI()
 			if (grayNumber > 0)
 			{
 				whiteNumber = lootPocket->itemInfo.size() - grayNumber;
-				tailStr = L"(" + std::to_wstring(whiteNumber) + sysStr[87] + L")";// n°³ ¾ÆÀÌÅÛ °Ë»öµÊ
+				tailStr = L"(" + std::to_wstring(whiteNumber) + sysStr[87] + L")";// nê°œ ì•„ì´í…œ ê²€ìƒ‰ë¨
 			}
 
 			drawTextCenter(sysStr[16] + tailStr, lootLabel.x + 152, lootLabel.y + 12);
@@ -324,31 +324,31 @@ void Loot::drawGUI()
 		switch (getSortType())
 		{
 		default:
-			drawTextCenter(sysStr[24], lootLabel.x + 280, lootLabel.y + 12); //¹°¸®·®(»ó´Ü¹Ù)
+			drawTextCenter(sysStr[24], lootLabel.x + 280, lootLabel.y + 12); //ë¬¼ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 			break;
 		case sortFlag::weightDescend:
-			drawTextCenter(sysStr[45], lootLabel.x + 280, lootLabel.y + 12); //¹°¸®·®(»ó´Ü¹Ù)
+			drawTextCenter(sysStr[45], lootLabel.x + 280, lootLabel.y + 12); //ë¬¼ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 			break;
 		case sortFlag::weightAscend:
-			drawTextCenter(sysStr[46], lootLabel.x + 280, lootLabel.y + 12); //¹°¸®·®(»ó´Ü¹Ù)
+			drawTextCenter(sysStr[46], lootLabel.x + 280, lootLabel.y + 12); //ë¬¼ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 			break;
 		case sortFlag::volumeDescend:
-			drawTextCenter(sysStr[47], lootLabel.x + 280, lootLabel.y + 12); //¹°¸®·®(»ó´Ü¹Ù)
+			drawTextCenter(sysStr[47], lootLabel.x + 280, lootLabel.y + 12); //ë¬¼ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 			break;
 		case sortFlag::volumeAscend:
-			drawTextCenter(sysStr[48], lootLabel.x + 280, lootLabel.y + 12); //¹°¸®·®(»ó´Ü¹Ù)
+			drawTextCenter(sysStr[48], lootLabel.x + 280, lootLabel.y + 12); //ë¬¼ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 			break;
 		}
 
-		//°³º° ¾ÆÀÌÅÛ
+		//ê°œë³„ ì•„ì´í…œ
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
 		else  itemListColorLock = false;
 		drawItemList(lootPocket, lootArea.x, lootArea.y, LOOT_ITEM_MAX, lootCursor, lootScroll, true);
 
-		// ¾ÆÀÌÅÛ ½ºÅ©·Ñ ±×¸®±â
+		// ì•„ì´í…œ ìŠ¤í¬ë¡¤ ê·¸ë¦¬ê¸°
 		SDL_Rect lootScrollBox = { lootBase.x + 325, lootItemRect[0].y, 2, lootBase.h - 135 };
 		drawFillRect(lootScrollBox, { 120,120,120 });
-		SDL_Rect inScrollBox = lootScrollBox; // ³»ºÎ ½ºÅ©·Ñ Ä¿¼­
+		SDL_Rect inScrollBox = lootScrollBox; // ë‚´ë¶€ ìŠ¤í¬ë¡¤ ì»¤ì„œ
 		inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)LOOT_ITEM_MAX / lootPocket->itemInfo.size());
 		inScrollBox.y = lootScrollBox.y + lootScrollBox.h * ((float)lootScroll / (float)lootPocket->itemInfo.size());
 		if (inScrollBox.y + inScrollBox.h > lootScrollBox.y + lootScrollBox.h) { inScrollBox.y = lootScrollBox.y + lootScrollBox.h - inScrollBox.h; }
@@ -358,7 +358,7 @@ void Loot::drawGUI()
 		if (lootPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
-			drawTextCenter(col2Str(col::lightGray) + sysStr[162], lootBase.x + 162, lootBase.y + 140); //¼±ÅÃ(»ó´Ü¹Ù)
+			drawTextCenter(col2Str(col::lightGray) + sysStr[162], lootBase.x + 162, lootBase.y + 140); //ì„ íƒ(ìƒë‹¨ë°”)
 		}
 
 		setFontSize(10);

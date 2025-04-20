@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 
 export module Maint;
@@ -25,8 +25,8 @@ export enum class maintFlag
 };
 
 
-//Maint´Â Msg¶û ´Ù¸£°Ô coAnswer·Î ¹®ÀÚ¿­ÀÌ ¾Æ´Ï¶ó ¼±ÅÃÇÑ ÀÔ·ÂÁöÀÇ ÀÎµ¦½º¸¦ ¹İÈ¯ÇÒ°Í
-//coAnswer ¹İÈ¯Çü : ÇöÀç ¼±ÅÃÇÑ ¸ñ·ÏÀÇ ÀÎµ¦½º ¼ıÀÚ Á¤¼öÇü, ¿¹·Î 0¹øÂ° ¼±ÅÃÁö¸¦ °í¸£¸é L"0" ¹İÈ¯
+//MaintëŠ” Msgë‘ ë‹¤ë¥´ê²Œ coAnswerë¡œ ë¬¸ìì—´ì´ ì•„ë‹ˆë¼ ì„ íƒí•œ ì…ë ¥ì§€ì˜ ì¸ë±ìŠ¤ë¥¼ ë°˜í™˜í• ê²ƒ
+//coAnswer ë°˜í™˜í˜• : í˜„ì¬ ì„ íƒí•œ ëª©ë¡ì˜ ì¸ë±ìŠ¤ ìˆ«ì ì •ìˆ˜í˜•, ì˜ˆë¡œ 0ë²ˆì§¸ ì„ íƒì§€ë¥¼ ê³ ë¥´ë©´ L"0" ë°˜í™˜
 export class Maint : public GUI
 {
 private:
@@ -34,34 +34,34 @@ private:
 	const int MAX_BTN = 9;
 	inline static Maint* ptr = nullptr;
 	int maintIndex = -1;
-	int maintCursor = -1; //Å°º¸µåÀÔ·ÂÀÏ ¶§ »ç¿ëµÇ´Â Ä¿¼­
-	int maintScroll = 0; //½ºÅ©·Ñ
-	std::wstring maintTitleText; //¸Ş½ÃÁö ¹Ú½º ÇÏ´ÜÀÇ ¿É¼Ç(¼±ÅÃ È®ÀÎ Ãë¼Ò µî)
-	std::wstring maintText; //¸Ş½ÃÁö ¹Ú½º »ó´Ü¿¡ Ç¥½ÃµÇ´Â ¹®±¸
-	std::vector<std::wstring> maintOptionVec; //¸Ş½ÃÁö ¹Ú½º¿¡ Ç¥½ÃµÇ´Â ¹®±¸
-	std::wstring maintParameter = L""; //¸Ş½ÃÁö¸¦ ¿­ ¶§ Àü´ŞµÇ´Â ¸Å°³º¯¼ö
+	int maintCursor = -1; //í‚¤ë³´ë“œì…ë ¥ì¼ ë•Œ ì‚¬ìš©ë˜ëŠ” ì»¤ì„œ
+	int maintScroll = 0; //ìŠ¤í¬ë¡¤
+	std::wstring maintTitleText; //ë©”ì‹œì§€ ë°•ìŠ¤ í•˜ë‹¨ì˜ ì˜µì…˜(ì„ íƒ í™•ì¸ ì·¨ì†Œ ë“±)
+	std::wstring maintText; //ë©”ì‹œì§€ ë°•ìŠ¤ ìƒë‹¨ì— í‘œì‹œë˜ëŠ” ë¬¸êµ¬
+	std::vector<std::wstring> maintOptionVec; //ë©”ì‹œì§€ ë°•ìŠ¤ì— í‘œì‹œë˜ëŠ” ë¬¸êµ¬
+	std::wstring maintParameter = L""; //ë©”ì‹œì§€ë¥¼ ì—´ ë•Œ ì „ë‹¬ë˜ëŠ” ë§¤ê°œë³€ìˆ˜
 
-	SDL_Rect maintBase;//ÀÌ À©µµ¿ìÀÇ ÀüÃ¼ ¸éÀû°ú ±×·ÁÁö´Â À§Ä¡
+	SDL_Rect maintBase;//ì´ ìœˆë„ìš°ì˜ ì „ì²´ ë©´ì ê³¼ ê·¸ë ¤ì§€ëŠ” ìœ„ì¹˜
 	SDL_Rect maintTitle;
 	SDL_Rect maintWindow;
-	SDL_Rect maintScrollBox; //¸®½ºÆ® ½ºÅ©·Ñ
+	SDL_Rect maintScrollBox; //ë¦¬ìŠ¤íŠ¸ ìŠ¤í¬ë¡¤
 
 	std::vector<SDL_Rect> maintBtn;
 	SDL_Rect maintInputBox;
 
-	tabFlag prevTabType;//¸Ş½ÃÁö Ã¢À» ¿­±â ÀüÀÇ ÅÇ Å¸ÀÔ(´İÀ» ¶§ ¿ø·¡´ë·Î µ¹¾Æ°¨)
+	tabFlag prevTabType;//ë©”ì‹œì§€ ì°½ì„ ì—´ê¸° ì „ì˜ íƒ­ íƒ€ì…(ë‹«ì„ ë•Œ ì›ë˜ëŒ€ë¡œ ëŒì•„ê°)
 
 	Point3 maintCoor;
 
 public:
 	Maint(std::wstring inputTitle, std::wstring inputText, Point3 inputCoor, maintFlag inputMode) : GUI(true)
 	{
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
-		prt(L"Maint °´Ã¼°¡ »ı¼ºµÇ¾ú´Ù.\n");
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
+		prt(L"Maint ê°ì²´ê°€ ìƒì„±ë˜ì—ˆë‹¤.\n");
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		maintTitleText = inputTitle;
@@ -81,7 +81,7 @@ public:
 
 	~Maint()
 	{
-		prt(L"Maint : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"Maint : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		ptr = nullptr;
 
 		exInput = false;
@@ -163,7 +163,7 @@ public:
 			setFontSize(14);
 			drawTextCenter(col2Str(col::white) + maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 30 + 22);
 
-			//¼±ÅÃÁö ¹öÆ° ±×¸®±â
+			//ì„ íƒì§€ ë²„íŠ¼ ê·¸ë¦¬ê¸°
 			int hoverCursor = -1;
 
 			for (int i = 0; i < MAX_BTN; i++)
@@ -200,7 +200,7 @@ public:
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
 			drawTextCenter(col2Str(col::white) + hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintBase.y + maintBase.h - 17 + 8);
 
-			// ¾ÆÀÌÅÛ ½ºÅ©·Ñ ±×¸®±â
+			// ì•„ì´í…œ ìŠ¤í¬ë¡¤ ê·¸ë¦¬ê¸°
 			if (items.size() > MAX_BTN)
 			{
 				drawFillRect(maintScrollBox, { 120,120,120 });

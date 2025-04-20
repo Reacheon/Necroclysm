@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Inventory;
 
@@ -30,8 +30,8 @@ private:
 	std::wstring titleInventory = sysStr[185];
 	int titleItemSprIndex = 60;
 
-	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemRect; //¸¶¿ì½º¸¦ À§ÇÑ ÀÎº¥¾ÆÀÌÅÛ·ºÆ® ÆÇÁ¤ ¹Ú½º
-	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemSelectRect; //¸¶¿ì½º¸¦ À§ÇÑ ÀÎº¥¾ÆÀÌÅÛ·ºÆ® ¼¿·ºÆ® ÆÇÁ¤ ¹Ú½º
+	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemRect; //ë§ˆìš°ìŠ¤ë¥¼ ìœ„í•œ ì¸ë²¤ì•„ì´í…œë ‰íŠ¸ íŒì • ë°•ìŠ¤
+	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemSelectRect; //ë§ˆìš°ìŠ¤ë¥¼ ìœ„í•œ ì¸ë²¤ì•„ì´í…œë ‰íŠ¸ ì…€ë ‰íŠ¸ íŒì • ë°•ìŠ¤
 	SDL_Rect inventoryLabel;
 	SDL_Rect inventoryLabelSelect;
 	SDL_Rect inventoryLabelName;
@@ -44,11 +44,11 @@ public:
 		inventoryItemData = inputData;
 		inventoryPocket = (ItemPocket*)inputData->pocketPtr;
 
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(inputX, inputY, false);
 
 		tabType = tabFlag::closeWin;

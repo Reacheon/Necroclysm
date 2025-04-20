@@ -1,18 +1,18 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module constVar;
 
 import std;
 
-export constexpr int DARK_VISION_HALF_W = 18; //¾îµÒ½Ã¾ß
-export constexpr int DARK_VISION_HALF_H = 9; //¾îµÒ½Ã¾ß
+export constexpr int DARK_VISION_HALF_W = 18; //ì–´ë‘ ì‹œì•¼
+export constexpr int DARK_VISION_HALF_H = 9; //ì–´ë‘ ì‹œì•¼
 
-export constexpr int GRAY_VISION_HALF_W = 23; //ÁÖº¯ FOV È¸»öÀ¸·Î ¹Ù²Ù´Â ÃÖ´ë W
-export constexpr int GRAY_VISION_HALF_H = 23; //ÁÖº¯ FOV È¸»öÀ¸·Î ¹Ù²Ù´Â ÃÖ´ë H
+export constexpr int GRAY_VISION_HALF_W = 23; //ì£¼ë³€ FOV íšŒìƒ‰ìœ¼ë¡œ ë°”ê¾¸ëŠ” ìµœëŒ€ W
+export constexpr int GRAY_VISION_HALF_H = 23; //ì£¼ë³€ FOV íšŒìƒ‰ìœ¼ë¡œ ë°”ê¾¸ëŠ” ìµœëŒ€ H
 
-export constexpr int CHUNK_SIZE_X = 13; //Ã»Å©ÀÇ x±æÀÌ
-export constexpr int CHUNK_SIZE_Y = 13; //Ã»Å©ÀÇ y±æÀÌ
-export constexpr int CHUNK_SIZE_Z = 1; //Ã»Å©ÀÇ z±æÀÌ, ÇöÀç 1·Î ¹Ì»ç¿ëµÊ
+export constexpr int CHUNK_SIZE_X = 13; //ì²­í¬ì˜ xê¸¸ì´
+export constexpr int CHUNK_SIZE_Y = 13; //ì²­í¬ì˜ yê¸¸ì´
+export constexpr int CHUNK_SIZE_Z = 1; //ì²­í¬ì˜ zê¸¸ì´, í˜„ìž¬ 1ë¡œ ë¯¸ì‚¬ìš©ë¨
 export constexpr int MAX_FONT_SIZE = 32;
 export constexpr int EX_INPUT_TEXT_MAX = 30;
 export constexpr int EQUIP_ITEM_MAX = 10;
@@ -22,12 +22,12 @@ export constexpr int DMG_FLAG_SIZE = 3;
 export constexpr int TALENT_SIZE = 19;
 export constexpr int MAX_VEHICLE_SIZE = 31;
 export constexpr int CHUNK_LOADING_RANGE = 5;
-export constexpr int MINIMAP_DIAMETER = 41; //¹Ì´Ï¸ÊÀÇ Áö¸§ (È¦¼ö)
-export constexpr int SECTOR_SIZE = 400; // ÀýÂ÷Àû ¸Ê »ý¼ºÇÒ ¶§ ÀÛ¿ëÇÏ´Â ¹üÀ§
-export constexpr int TOLERANCE_LSTICK = 10000; //LStickÀÌ ÀÌ °ªÀ» ³Ñ¾î¾ß ÆÇÁ¤ÀÌ ÀÏ¾î³²
-export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //ÀÌ °ª ÀÌ»ó ¿òÁ÷ÀÏ °æ¿ì È¦µå ÀÌº¥Æ®°¡ ÀÏ¾î³ªÁö ¾ÊÀ½
+export constexpr int MINIMAP_DIAMETER = 41; //ë¯¸ë‹ˆë§µì˜ ì§€ë¦„ (í™€ìˆ˜)
+export constexpr int SECTOR_SIZE = 400; // ì ˆì°¨ì  ë§µ ìƒì„±í•  ë•Œ ìž‘ìš©í•˜ëŠ” ë²”ìœ„
+export constexpr int TOLERANCE_LSTICK = 10000; //LStickì´ ì´ ê°’ì„ ë„˜ì–´ì•¼ íŒì •ì´ ì¼ì–´ë‚¨
+export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //ì´ ê°’ ì´ìƒ ì›€ì§ì¼ ê²½ìš° í™€ë“œ ì´ë²¤íŠ¸ê°€ ì¼ì–´ë‚˜ì§€ ì•ŠìŒ
 
-export constexpr int MARKER_LIMIT_DIST = 100; //ÇÃ·¹ÀÌ¾î·ÎºÎÅÍ 100Ä­ ÀÌ»ó ¶³¾îÁö¸é ¸¶Ä¿°¡ ±×·ÁÁöÁö ¾ÊÀ½
+export constexpr int MARKER_LIMIT_DIST = 100; //í”Œë ˆì´ì–´ë¡œë¶€í„° 100ì¹¸ ì´ìƒ ë–¨ì–´ì§€ë©´ ë§ˆì»¤ê°€ ê·¸ë ¤ì§€ì§€ ì•ŠìŒ
 
 export constexpr int MAX_PROFIC_LEVEL = 99;
 
@@ -86,68 +86,68 @@ export namespace lowCol
 
 export enum class act
 {
-    null,       //ÀÏ¹Ý °ÔÀÓÇÃ·¹ÀÌ
-    blank,      //ºóÄ­
-    status,     //»óÅÂÃ¢
-    ability,    //Æ¯¼ö´É·Â
-    inventory,  //ÀÎº¥Åä¸®
-    bionic,     //¹ÙÀÌ¿À´Ð
-    profic,      //Àç´É
-    runMode,    //´Þ¸®±â ¸ðµå
-    skill,      //½ºÅ³
-    quest,      //Äù½ºÆ®
-    menu,       //¸Þ´º
+    null,       //ì¼ë°˜ ê²Œìž„í”Œë ˆì´
+    blank,      //ë¹ˆì¹¸
+    status,     //ìƒíƒœì°½
+    ability,    //íŠ¹ìˆ˜ëŠ¥ë ¥
+    inventory,  //ì¸ë²¤í† ë¦¬
+    bionic,     //ë°”ì´ì˜¤ë‹‰
+    profic,      //ìž¬ëŠ¥
+    runMode,    //ë‹¬ë¦¬ê¸° ëª¨ë“œ
+    skill,      //ìŠ¤í‚¬
+    quest,      //í€˜ìŠ¤íŠ¸
+    menu,       //ë©”ë‰´
 
-    identify,   //°¨Á¤
-    vehicle,    //Â÷·®
-    alchemy,    //¿¬±Ý¼ú
-    god, //½Å¾Ó
-    map, //Áöµµ
+    identify,   //ê°ì •
+    vehicle,    //ì°¨ëŸ‰
+    alchemy,    //ì—°ê¸ˆìˆ 
+    god, //ì‹ ì•™
+    map, //ì§€ë„
 
-    closeDoor, //¹®´Ý±â
+    closeDoor, //ë¬¸ë‹«ê¸°
 
 
-    armor,  //·¹ÀÌµå¾Æ¸Ó
-    cooking,    //¿ä¸®
-    loot,       //ÁÝ±â
-    pick,       //³Ö±â(°¡¹æ¿¡)
-    wield,      //µé±â
-    equip,      //Àåºñ
-    pickSelect, //ÁÝ±â(¼±ÅÃ)
-    selectAll,  //¼±ÅÃ(ÀüºÎ) ÇÊ¿ä¾øÀ½
-    searching,  //°Ë»ö
-    sorting,    //Á¤·Ä
-    select,     //¼±ÅÃ
-    eat,        //¸Ô±â
-    apply,      //»ç¿ë
-    selectMode, //¼±ÅÃ ¸ðµå
-    droping,    //¹ö¸®±â
-    throwing,   //´øÁö±â
-    dirSelect,  //¹æÇâ¼±ÅÃ
-    coordSelect,//À§Ä¡¼±ÅÃ
-    mutation,   //µ¹¿¬º¯ÀÌ
-    craft,      //Á¶ÇÕ
-    construct,  //°ÇÃà
-    open,       //°¡¹æ¿­±â
-    test,       //Å×½ºÆ® ±â´É
-    insert,     //¾ÆÀÌÅÛ ³Ö±â(°¡¹æ¿¡ ¿Å±â±â)
-    reload,     //¾ÆÀÌÅÛ ÀåÀü
-    reloadBulletToMagazine, //ÅºÈ¯ ÀåÀü
-    unloadBulletFromMagazine, //ÅºÈ¯ ºÐ¸®
-    reloadMagazine, //ÅºÃ¢ ÀåÀü, ÃÑ°ú ÅºÃ¢ ¾çÂÊ¿¡ ÀÖÀ¸¸ç ±â´ÉÀÌ ´Ù¸§
-    unloadMagazine, //ÅºÃ¢ ºÐ¸®
-    reloadBulletToGun, //ÅºÈ¯ ÀåÀü
-    unloadBulletFromGun, //ÅºÈ¯ ºÐ¸®
+    armor,  //ë ˆì´ë“œì•„ë¨¸
+    cooking,    //ìš”ë¦¬
+    loot,       //ì¤ê¸°
+    pick,       //ë„£ê¸°(ê°€ë°©ì—)
+    wield,      //ë“¤ê¸°
+    equip,      //ìž¥ë¹„
+    pickSelect, //ì¤ê¸°(ì„ íƒ)
+    selectAll,  //ì„ íƒ(ì „ë¶€) í•„ìš”ì—†ìŒ
+    searching,  //ê²€ìƒ‰
+    sorting,    //ì •ë ¬
+    select,     //ì„ íƒ
+    eat,        //ë¨¹ê¸°
+    apply,      //ì‚¬ìš©
+    selectMode, //ì„ íƒ ëª¨ë“œ
+    droping,    //ë²„ë¦¬ê¸°
+    throwing,   //ë˜ì§€ê¸°
+    dirSelect,  //ë°©í–¥ì„ íƒ
+    coordSelect,//ìœ„ì¹˜ì„ íƒ
+    mutation,   //ëŒì—°ë³€ì´
+    craft,      //ì¡°í•©
+    construct,  //ê±´ì¶•
+    open,       //ê°€ë°©ì—´ê¸°
+    test,       //í…ŒìŠ¤íŠ¸ ê¸°ëŠ¥
+    insert,     //ì•„ì´í…œ ë„£ê¸°(ê°€ë°©ì— ì˜®ê¸°ê¸°)
+    reload,     //ì•„ì´í…œ ìž¥ì „
+    reloadBulletToMagazine, //íƒ„í™˜ ìž¥ì „
+    unloadBulletFromMagazine, //íƒ„í™˜ ë¶„ë¦¬
+    reloadMagazine, //íƒ„ì°½ ìž¥ì „, ì´ê³¼ íƒ„ì°½ ì–‘ìª½ì— ìžˆìœ¼ë©° ê¸°ëŠ¥ì´ ë‹¤ë¦„
+    unloadMagazine, //íƒ„ì°½ ë¶„ë¦¬
+    reloadBulletToGun, //íƒ„í™˜ ìž¥ì „
+    unloadBulletFromGun, //íƒ„í™˜ ë¶„ë¦¬
 
-    turnLeft,//ÁÂÈ¸Àü
-    wait,//1ÅÏ´ë±â
-    turnRight,//¿ìÈ¸Àü
-    startEngine,//¿£½Å½Ãµ¿
-    stopEngine,//¿£Áø²ô±â
-    shiftGear,//±â¾îº¯°æ
-    accel,//¾×¼¿
-    brake,//ºê·¹ÀÌÅ©
-    autoGear,//ÀÚµ¿º¯¼Ó±â
+    turnLeft,//ì¢ŒíšŒì „
+    wait,//1í„´ëŒ€ê¸°
+    turnRight,//ìš°íšŒì „
+    startEngine,//ì—”ì‹ ì‹œë™
+    stopEngine,//ì—”ì§„ë„ê¸°
+    shiftGear,//ê¸°ì–´ë³€ê²½
+    accel,//ì•¡ì…€
+    brake,//ë¸Œë ˆì´í¬
+    autoGear,//ìžë™ë³€ì†ê¸°
 
     collectiveLever,
     cyclicLever,
@@ -155,9 +155,9 @@ export enum class act
     tailRotorPedalL,
     tailRotorPedalR,
 
-    confirm,//È®ÀÎ
-    rotate,//È¸Àü
-    cancel,//Ãë¼Ò
+    confirm,//í™•ì¸
+    rotate,//íšŒì „
+    cancel,//ì·¨ì†Œ
 
     quickSlot,
     skillActive,
@@ -335,8 +335,8 @@ export namespace dmgFlag
 
 
 /*
-* ÆÄÃ÷´Â 0¹øÀÌ ¸ÞÀÎÀÌ°í 0¹øÀÌ 0ÀÌ µÇ¸é »ç¸ÁÇÔ
-* µ¥¹ÌÁö¸¦ °¡ÇÏ¸é 1¹ø ÀÌ»óÀÇ ÆÄÃ÷ÀÎµ¦½º¿¡ ´©ÀûµÇ´Âµ¥ ÀÌ¶§ 0¹ø¿¡µµ °°Àº µ¥¹ÌÁö°¡ µé¾î°¨, ±âÅ¸ ÃâÇ÷°°Àº ¿ä¼Ò·Îµµ HP°¡ »ç¶óÁü
+* íŒŒì¸ ëŠ” 0ë²ˆì´ ë©”ì¸ì´ê³  0ë²ˆì´ 0ì´ ë˜ë©´ ì‚¬ë§í•¨
+* ë°ë¯¸ì§€ë¥¼ ê°€í•˜ë©´ 1ë²ˆ ì´ìƒì˜ íŒŒì¸ ì¸ë±ìŠ¤ì— ëˆ„ì ë˜ëŠ”ë° ì´ë•Œ 0ë²ˆì—ë„ ê°™ì€ ë°ë¯¸ì§€ê°€ ë“¤ì–´ê°, ê¸°íƒ€ ì¶œí˜ˆê°™ì€ ìš”ì†Œë¡œë„ HPê°€ ì‚¬ë¼ì§
 */
 export namespace partType
 {
@@ -358,13 +358,13 @@ export namespace partType
 
 export namespace wound
 {
-    constexpr int pierce = 0; //°üÅë»ó
-    constexpr int cut = 1; //Àý´Ü»ó
-    constexpr int bash = 2; //Å¸¹Ú»ó
-    constexpr int fracture = 3; //°ñÀý : ÇÇ°Ý½Ã Å¸¹Ú»ó Æ÷ÀÎÆ®°¡ ³ôÀ» °æ¿ì ¹ß»ý, ºÎ¸ñÀ¸·Î¸¸ Ä¡·á °¡´É 20% °íÁ¤ ¼Õ½Ç
-    constexpr int burn = 4; //È­»ó : Ä¡·á ºÒ°¡´É, ÀÇ»ç¿¡°Ô °¡¾ßÇÔ
-    constexpr int frostbite = 5; //µ¿»ó : µû¶æÇÑ °÷¿¡ °¡¸é ¾ÆÁÖ Á¶±Ý¾¿ Àç»ýµÊ
-    constexpr int shock = 6; //¼îÅ© : Á¤½ÅÀûÀÎ Ãæ°Ý, ¸Ó¸®¿¡¸¸ ¹ß»ýÇÔ
+    constexpr int pierce = 0; //ê´€í†µìƒ
+    constexpr int cut = 1; //ì ˆë‹¨ìƒ
+    constexpr int bash = 2; //íƒ€ë°•ìƒ
+    constexpr int fracture = 3; //ê³¨ì ˆ : í”¼ê²©ì‹œ íƒ€ë°•ìƒ í¬ì¸íŠ¸ê°€ ë†’ì„ ê²½ìš° ë°œìƒ, ë¶€ëª©ìœ¼ë¡œë§Œ ì¹˜ë£Œ ê°€ëŠ¥ 20% ê³ ì • ì†ì‹¤
+    constexpr int burn = 4; //í™”ìƒ : ì¹˜ë£Œ ë¶ˆê°€ëŠ¥, ì˜ì‚¬ì—ê²Œ ê°€ì•¼í•¨
+    constexpr int frostbite = 5; //ë™ìƒ : ë”°ëœ»í•œ ê³³ì— ê°€ë©´ ì•„ì£¼ ì¡°ê¸ˆì”© ìž¬ìƒë¨
+    constexpr int shock = 6; //ì‡¼í¬ : ì •ì‹ ì ì¸ ì¶©ê²©, ë¨¸ë¦¬ì—ë§Œ ë°œìƒí•¨
 };
 
 export namespace proficFlag
@@ -411,22 +411,22 @@ export enum class itemFlag
     BOOKMARK4,
     BOOKMARK5,
     BOOKMARK6,
-    POWERED,//µ¿·Â°ø±¸
-    VFRAME,//Â÷·®ÇÁ·¹ÀÓ : ¼³Ä¡ °¡´É
-    RAIDARMOR,//¾Æ¸ÓÇÁ·¹ÀÓ : ¼³Ä¡ °¡´É
+    POWERED,//ë™ë ¥ê³µêµ¬
+    VFRAME,//ì°¨ëŸ‰í”„ë ˆìž„ : ì„¤ì¹˜ ê°€ëŠ¥
+    RAIDARMOR,//ì•„ë¨¸í”„ë ˆìž„ : ì„¤ì¹˜ ê°€ëŠ¥
     WHITEFILTER,
-    GRAYFILTER,//°Ë»ö ¹× Á¶ÇÕ GUI¿¡¼­ ¾ÆÀÌÅÛÀ» È¸»öÀ¸·Î Ç¥½ÃÇÏ°Ô ¸¸µë
-    BLACKFILTER,//Á¶ÇÕ GUI¿¡¼­ ¹ÌÇØ´ç ¾ÆÀÌÅÛÀ» °ËÀº»öÀ¸·Î Ç¥½ÃÇÏ°Ô ¸¸µë(¹ÌÇ¥½Ã)
-    COORDCRAFT,//ÁÂÇ¥Á¶ÇÕ, °ÇÃà¹°ÀÌ³ª Â÷·® µî
-    ALCHEMYTOOL,//¿¬±Ý¼ú¿¡¼­ »ç¿ë °¡´ÉÇÑ µµ±¸
-    ALCHEMYMATERIAL, //¿¬±Ý¼ú¿¡ »ç¿ë °¡´ÉÇÑ Àç·á
-    LIQUID, //¾×Ã¼ »ó
-    GAS, // ±âÃ¼ »ó
-    VPART, //Â÷·®ºÎÇ°
-    TRANSPARENT_WALL, //Åõ¸íº®
+    GRAYFILTER,//ê²€ìƒ‰ ë° ì¡°í•© GUIì—ì„œ ì•„ì´í…œì„ íšŒìƒ‰ìœ¼ë¡œ í‘œì‹œí•˜ê²Œ ë§Œë“¬
+    BLACKFILTER,//ì¡°í•© GUIì—ì„œ ë¯¸í•´ë‹¹ ì•„ì´í…œì„ ê²€ì€ìƒ‰ìœ¼ë¡œ í‘œì‹œí•˜ê²Œ ë§Œë“¬(ë¯¸í‘œì‹œ)
+    COORDCRAFT,//ì¢Œí‘œì¡°í•©, ê±´ì¶•ë¬¼ì´ë‚˜ ì°¨ëŸ‰ ë“±
+    ALCHEMYTOOL,//ì—°ê¸ˆìˆ ì—ì„œ ì‚¬ìš© ê°€ëŠ¥í•œ ë„êµ¬
+    ALCHEMYMATERIAL, //ì—°ê¸ˆìˆ ì— ì‚¬ìš© ê°€ëŠ¥í•œ ìž¬ë£Œ
+    LIQUID, //ì•¡ì²´ ìƒ
+    GAS, // ê¸°ì²´ ìƒ
+    VPART, //ì°¨ëŸ‰ë¶€í’ˆ
+    TRANSPARENT_WALL, //íˆ¬ëª…ë²½
 
-    VPART_WALL_CONNECT,//Â÷º®°°ÀÌ ÁÖº¯¿¡ ¿¬°áµÇ´Â 16Å¸ÀÏ
-    VPART_DIR_DEPEND,//¹æÇâ¿¡ ÀÇÁ¸ÇÏ¿© 16¹æÇâÀÌ Á¸ÀçÇÏ´Â ÇÁ·Ó
+    VPART_WALL_CONNECT,//ì°¨ë²½ê°™ì´ ì£¼ë³€ì— ì—°ê²°ë˜ëŠ” 16íƒ€ì¼
+    VPART_DIR_DEPEND,//ë°©í–¥ì— ì˜ì¡´í•˜ì—¬ 16ë°©í–¥ì´ ì¡´ìž¬í•˜ëŠ” í”„ë¡­
     VPART_DOOR_OPEN,
     VPART_DOOR_CLOSE,
 
@@ -438,11 +438,11 @@ export enum class itemFlag
     TIRE_NORMAL,
     TIRE_STEER,
 
-    PROP, //¼³Ä¡ °¡´ÉÇÑ ¾ÆÀÌÅÛ
-    PROP_BIG,//48px°¡ ¾Æ´Ï¶ó 80px*80pxÀÇ giantVehicleset ÂüÁ¶ÇÔ
-    PROP_WALKABLE,//ÀÌµ¿°¡´É ÇÁ·Ó
-    PROP_BLOCKER,//½Ã¾ß¹æÇØ ÇÁ·Ó
-    PROP_DEPTH_LOWER,//±âÁ¸ ¼³Ä¡¹°(&¿£Æ¼Æ¼)µé°ú °ãÃÄÁöÁö ¾Ê°í ¹Ù´Ú¿¡ ±ò¸®´Â ¼³Ä¡¹°
+    PROP, //ì„¤ì¹˜ ê°€ëŠ¥í•œ ì•„ì´í…œ
+    PROP_BIG,//48pxê°€ ì•„ë‹ˆë¼ 80px*80pxì˜ giantVehicleset ì°¸ì¡°í•¨
+    PROP_WALKABLE,//ì´ë™ê°€ëŠ¥ í”„ë¡­
+    PROP_BLOCKER,//ì‹œì•¼ë°©í•´ í”„ë¡­
+    PROP_DEPTH_LOWER,//ê¸°ì¡´ ì„¤ì¹˜ë¬¼(&ì—”í‹°í‹°)ë“¤ê³¼ ê²¹ì³ì§€ì§€ ì•Šê³  ë°”ë‹¥ì— ê¹”ë¦¬ëŠ” ì„¤ì¹˜ë¬¼
 
 
     PIPE_CNCT_RIGHT,
@@ -471,7 +471,7 @@ export enum class itemFlag
     RAIL_CNCT_LEFT,
     RAIL_CNCT_RIGHT,
 
-    //¼±·ÎÀüÈ¯±â¿¡¼­ °íÁ¤µÈ ·¹ÀÏ
+    //ì„ ë¡œì „í™˜ê¸°ì—ì„œ ê³ ì •ëœ ë ˆì¼
     RAIL_INPUT_TOP,
     RAIL_INPUT_BOT,
     RAIL_INPUT_LEFT,
@@ -479,32 +479,32 @@ export enum class itemFlag
 
     RAIL_BUFFER,
 
-    NOT_RECIPE, //Á¶ÇÕ¹ý¿¡ µû·Î Ãß°¡µÇÁö ¾ÊÀ½(È¸ÀüµÈ ¼³Ä¡¹°°°Àº Áßº¹ ¼³Ä¡¹°µé)
+    NOT_RECIPE, //ì¡°í•©ë²•ì— ë”°ë¡œ ì¶”ê°€ë˜ì§€ ì•ŠìŒ(íšŒì „ëœ ì„¤ì¹˜ë¬¼ê°™ì€ ì¤‘ë³µ ì„¤ì¹˜ë¬¼ë“¤)
 
-    /// ¿©±â¼­ºÎÅÍ »õ·Î Ãß°¡ÇØ¾ßµÊ
-    TREE, //³ª¹«
-    PLANT, //½Ä¹°
-    PLANT_SEASON_DEPENDENT, //°èÀýÀÇÁ¸½Ä¹°
-    PLANT_GROWTH_DEPENDENT, //¼ºÀåÀÇÁ¸½Ä¹°
-    MUSHROOM, //¹ö¼¸
-    FLOOR, //¹Ù´ÚÅ¸ÀÏ
-    WALL, //º®
-    CEIL, //ÃµÀå
-    WATER_SHALLOW, //¾èÀº¹°
-    WATER_DEEP, //±íÀº¹°
-    FRESHWATER, //´ã¼ö
-    SEAWATER, //ÇØ¼ö
-    TILE_SEASON, //°èÀý¿¡ µû¶ó º¯ÇÏ´Â Å¸ÀÏ
+    /// ì—¬ê¸°ì„œë¶€í„° ìƒˆë¡œ ì¶”ê°€í•´ì•¼ë¨
+    TREE, //ë‚˜ë¬´
+    PLANT, //ì‹ë¬¼
+    PLANT_SEASON_DEPENDENT, //ê³„ì ˆì˜ì¡´ì‹ë¬¼
+    PLANT_GROWTH_DEPENDENT, //ì„±ìž¥ì˜ì¡´ì‹ë¬¼
+    MUSHROOM, //ë²„ì„¯
+    FLOOR, //ë°”ë‹¥íƒ€ì¼
+    WALL, //ë²½
+    CEIL, //ì²œìž¥
+    WATER_SHALLOW, //ì–•ì€ë¬¼
+    WATER_DEEP, //ê¹Šì€ë¬¼
+    FRESHWATER, //ë‹´ìˆ˜
+    SEAWATER, //í•´ìˆ˜
+    TILE_SEASON, //ê³„ì ˆì— ë”°ë¼ ë³€í•˜ëŠ” íƒ€ì¼
     DOOR,
     UPSTAIR,
     DOWNSTAIR,
-    SIGN,//³ª¹«Ç¥ÁöÆÇ°°ÀÌ ¹®±¸¸¦ ÀúÀåÇÏ´Â °´Ã¼
+    SIGN,//ë‚˜ë¬´í‘œì§€íŒê°™ì´ ë¬¸êµ¬ë¥¼ ì €ìž¥í•˜ëŠ” ê°ì²´
 
 
     DOOR_CLOSE,
     DOOR_OPEN,
 
-    TRAIN_WHEEL, //¿­Â÷¹ÙÄû
+    TRAIN_WHEEL, //ì—´ì°¨ë°”í€´
 
     PROP_GAS_OBSTACLE_ON,
     PROP_GAS_OBSTACLE_OFF,
@@ -514,7 +514,7 @@ export enum class itemFlag
     CAN_CLIMB,
 
     SPR_TH_WEAPON,
-    NO_HAIR_HELMET,//¸Ó¸®Ä«¶ôÀÌ ¾Èº¸ÀÌ´Â Çï¸ä
+    NO_HAIR_HELMET,//ë¨¸ë¦¬ì¹´ë½ì´ ì•ˆë³´ì´ëŠ” í—¬ë©§
 
     BOW,
     CROSSBOW,
@@ -525,7 +525,7 @@ export enum class itemFlag
     TOGGLE_OFF,
     HAS_TOGGLE_SPRITE,
 
-    CANCRAFT,//Á¶ÇÕÇÒ ¼ö ÀÖ´Â ¾ÆÀÌÅÛÀÎÁö
+    CANCRAFT,//ì¡°í•©í•  ìˆ˜ ìžˆëŠ” ì•„ì´í…œì¸ì§€
 };
 
 export enum class walkFlag
@@ -618,12 +618,12 @@ export enum class btn
 
 export enum class storageType
 {
-    null,//ÀÓ½Ã¿ë
-    equip,//Àåºñ
-    stack,//½ºÅÃ
-    pocket,//¾ÆÀÌÅÛÀÇ ³»ºÎ ÁÖ¸Ó´Ï
-    temp,//ÀÓ½Ã¿ë
-    recipe,//·¹½ÃÇÇ(ÇÃ·¹ÀÌ¾î¿ë)
+    null,//ìž„ì‹œìš©
+    equip,//ìž¥ë¹„
+    stack,//ìŠ¤íƒ
+    pocket,//ì•„ì´í…œì˜ ë‚´ë¶€ ì£¼ë¨¸ë‹ˆ
+    temp,//ìž„ì‹œìš©
+    recipe,//ë ˆì‹œí”¼(í”Œë ˆì´ì–´ìš©)
 };
 
 export enum class aniFlag
@@ -640,7 +640,7 @@ export enum class aniFlag
     winSlipOpen,
     winSlipClose,
     throwing,
-    popUpLetterbox, //GUI¿¡ Á¸ÀçÇÏ´Â HUD Àü¿ë ¾Ö´Ï¸ÞÀÌ¼Ç
+    popUpLetterbox, //GUIì— ì¡´ìž¬í•˜ëŠ” HUD ì „ìš© ì• ë‹ˆë©”ì´ì…˜
     popDownLetterbox,
     popUpSingleLetterbox,
 
@@ -887,19 +887,19 @@ export enum class itemSubcategory
     consumable_fuel,
     consumable_etc,
 
-    vehicle_frame,//ÇÁ·¹ÀÓ
-    vehicle_engine,//¿£Áø : °¡¼Ö¸°, µðÁ©, Àü±â¸ðÅÍ
-    vehicle_exterior,//¿ÜÀå : ¹ÙÄû, Â÷¹®, Æ®··Å©¹®
-    vehicle_transport,//¼ö¼Û : Æ®··Å©, ÀÇÀÚ
-    vehicle_energy,//¿¡³ÊÁö : ¹èÅÍ¸®, ¹ßÀü±â
-    vehicle_device,//ÀåÄ¡ : ¿Àµð¿À, Á¶Á¾ÀåÄ¡ µî
+    vehicle_frame,//í”„ë ˆìž„
+    vehicle_engine,//ì—”ì§„ : ê°€ì†”ë¦°, ë””ì ¤, ì „ê¸°ëª¨í„°
+    vehicle_exterior,//ì™¸ìž¥ : ë°”í€´, ì°¨ë¬¸, íŠ¸ë í¬ë¬¸
+    vehicle_transport,//ìˆ˜ì†¡ : íŠ¸ë í¬, ì˜ìž
+    vehicle_energy,//ì—ë„ˆì§€ : ë°°í„°ë¦¬, ë°œì „ê¸°
+    vehicle_device,//ìž¥ì¹˜ : ì˜¤ë””ì˜¤, ì¡°ì¢…ìž¥ì¹˜ ë“±
 
-    bionic_core,//ÄÚ¾î
-    bionic_active,//¹ßµ¿°è
-    bionic_passive,//Áö¼Ó°è
-    bionic_toggle,//ÀüÈ¯°è
-    bionic_generator,//»ý»ê°è
-    bionic_storage,//ÀúÀå°è
+    bionic_core,//ì½”ì–´
+    bionic_active,//ë°œë™ê³„
+    bionic_passive,//ì§€ì†ê³„
+    bionic_toggle,//ì „í™˜ê³„
+    bionic_generator,//ìƒì‚°ê³„
+    bionic_storage,//ì €ìž¥ê³„
 
     structure_wall,
     structure_floor,
@@ -937,16 +937,16 @@ export namespace entityCategory
 export namespace bodyTemplateFlag
 {
     constexpr int none = 0;
-    //¸ðµç ºÎÀ§°¡ ÆÄ±«µÇ¸é »ç¸Á
+    //ëª¨ë“  ë¶€ìœ„ê°€ íŒŒê´´ë˜ë©´ ì‚¬ë§
     constexpr int human = 1;
-    //¸Ó¸® ¸öÅë ¿ÞÆÈ ¿À¸¥ÆÈ ¿Þ´Ù¸® ¿À¸¥´Ù¸®
-    //¸Ó¸®³ª ¸öÅë ÅÍÁö¸é Áï»ç, ÆÈ ÅÍÁö¸é °ø°Ý·Â 30% °¨¼Ò, ´Ù¸® ÅÍÁö¸é ÀÌ¼Ó 30% °¨¼Ò
+    //ë¨¸ë¦¬ ëª¸í†µ ì™¼íŒ” ì˜¤ë¥¸íŒ” ì™¼ë‹¤ë¦¬ ì˜¤ë¥¸ë‹¤ë¦¬
+    //ë¨¸ë¦¬ë‚˜ ëª¸í†µ í„°ì§€ë©´ ì¦‰ì‚¬, íŒ” í„°ì§€ë©´ ê³µê²©ë ¥ 30% ê°ì†Œ, ë‹¤ë¦¬ í„°ì§€ë©´ ì´ì† 30% ê°ì†Œ
     constexpr int zombie = 2;
-    //¸Ó¸® ¸öÅë ¿ÞÆÈ ¿À¸¥ÆÈ ¿Þ´Ù¸® ¿À¸¥´Ù¸®
-    //¸öÅë ÅÍÁö¸é Áï»ç, ÆÈ ÅÍÁö¸é °ø°Ý·Â 30% °¨¼Ò, ´Ù¸® ÅÍÁö¸é ÀÌ¼Ó 30% °¨¼Ò, ¸Ó¸® ÅÍÁö¸é ½Ã¾ß 0
+    //ë¨¸ë¦¬ ëª¸í†µ ì™¼íŒ” ì˜¤ë¥¸íŒ” ì™¼ë‹¤ë¦¬ ì˜¤ë¥¸ë‹¤ë¦¬
+    //ëª¸í†µ í„°ì§€ë©´ ì¦‰ì‚¬, íŒ” í„°ì§€ë©´ ê³µê²©ë ¥ 30% ê°ì†Œ, ë‹¤ë¦¬ í„°ì§€ë©´ ì´ì† 30% ê°ì†Œ, ë¨¸ë¦¬ í„°ì§€ë©´ ì‹œì•¼ 0
     constexpr int tank = 3;
-    //Æ÷Å¾ Â÷Ã¼ ÁÂ¹«ÇÑ±Ëµµ ¿ì¹«ÇÑ±Ëµµ
-    //Â÷Ã¼ ÅÍÁö¸é Áï»ç, Æ÷Å¾ ÅÍÁö¸é »ç°ÝºÒ°¡, ±Ëµµ ÅÍÁö¸é °¢°¢ ÀÌµ¿¼Óµµ 30% °¨¼Ò
+    //í¬íƒ‘ ì°¨ì²´ ì¢Œë¬´í•œê¶¤ë„ ìš°ë¬´í•œê¶¤ë„
+    //ì°¨ì²´ í„°ì§€ë©´ ì¦‰ì‚¬, í¬íƒ‘ í„°ì§€ë©´ ì‚¬ê²©ë¶ˆê°€, ê¶¤ë„ í„°ì§€ë©´ ê°ê° ì´ë™ì†ë„ 30% ê°ì†Œ
 };
 
 export namespace partsFlag
@@ -973,16 +973,16 @@ export namespace weaponMode
     constexpr int autoMode = 4;
 };
 
-//ÀÔÀº µ¥¹ÌÁöÀÇ Á¾·ù
+//ìž…ì€ ë°ë¯¸ì§€ì˜ ì¢…ë¥˜
 export namespace dmgType
 {
-    constexpr int none = 0; //¹«¼Ó¼º °ø°Ý
-    constexpr int pierce = 1;//°üÅë(¹°¸®)
-    constexpr int cut = 2;//Àý´Ü(¹°¸®)
-    constexpr int bash = 3;//Å¸°Ý(¹°¸®)
+    constexpr int none = 0; //ë¬´ì†ì„± ê³µê²©
+    constexpr int pierce = 1;//ê´€í†µ(ë¬¼ë¦¬)
+    constexpr int cut = 2;//ì ˆë‹¨(ë¬¼ë¦¬)
+    constexpr int bash = 3;//íƒ€ê²©(ë¬¼ë¦¬)
 };
 
-//ÇÃ·¹ÀÌ¾î°¡ ÃëÇÒ ¼ö ÀÖ´Â °ø°ÝÀÇ Å¸ÀÔ, AimÀÇ 5°¡Áö Á¾·ù(°üÅë, Àý´Ü, Å¸°Ý, »ç°Ý, ÅõÃ´)
+//í”Œë ˆì´ì–´ê°€ ì·¨í•  ìˆ˜ ìžˆëŠ” ê³µê²©ì˜ íƒ€ìž…, Aimì˜ 5ê°€ì§€ ì¢…ë¥˜(ê´€í†µ, ì ˆë‹¨, íƒ€ê²©, ì‚¬ê²©, íˆ¬ì²™)
 export enum class atkType
 {
     pierce,
@@ -1137,13 +1137,13 @@ export enum class gearFlag
 export enum class chunkFlag
 {
     none,
-    freshwater,//´ã¼ö
-    seawater,//ÇØ¼ö
-    meadow,//ÃÊ¿ø
-    underground,//ÁöÇÏ
-    dirt,//Èë
-    //µµ·Î
-    //µµ½Ã
+    freshwater,//ë‹´ìˆ˜
+    seawater,//í•´ìˆ˜
+    meadow,//ì´ˆì›
+    underground,//ì§€í•˜
+    dirt,//í™
+    //ë„ë¡œ
+    //ë„ì‹œ
 };
 
 export namespace chunkCol
@@ -1351,7 +1351,7 @@ export enum class particleFlag
 //    yellowBullet,
 //};
 
-//Àü¹æ¼±¾ð
+//ì „ë°©ì„ ì–¸
 export class ItemPocket;
 export class ItemStack;
 export struct ItemData;

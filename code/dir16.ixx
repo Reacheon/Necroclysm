@@ -1,4 +1,4 @@
-export module dir16;
+ï»¿export module dir16;
 
 import std;
 import Vec3;
@@ -42,7 +42,7 @@ export dir16 ACW(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir7;
     else if (input == dir16::dir7) return dir16::dir7_5;
     else if (input == dir16::dir7_5) return dir16::dir0;
-    else errorBox(L"[utility] ACW¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] ACWì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 export dir16 ACW2(dir16 input)
@@ -68,7 +68,7 @@ export dir16 CW(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir6;
     else if (input == dir16::dir7) return dir16::dir6_5;
     else if (input == dir16::dir7_5) return dir16::dir7;
-    else errorBox(L"[utility] CW¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] CWì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 export dir16 CW2(dir16 input)
@@ -94,28 +94,28 @@ export dir16 reverse(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir2_5;
     else if (input == dir16::dir7) return dir16::dir3;
     else if (input == dir16::dir7_5) return dir16::dir3_5;
-    else errorBox(L"[utility] reverse¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] reverseì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 export std::wstring dir16ToString(dir16 input)
 {
-    if (input == dir16::dir0) return L"0¡Æ";
-    else if (input == dir16::dir0_5) return L"22.5¡Æ";
-    else if (input == dir16::dir1) return L"45¡Æ";
-    else if (input == dir16::dir1_5) return L"67.5¡Æ";
-    else if (input == dir16::dir2) return L"90¡Æ";
-    else if (input == dir16::dir2_5) return L"112.5¡Æ";
-    else if (input == dir16::dir3) return L"135¡Æ";
-    else if (input == dir16::dir3_5) return L"157.5¡Æ";
-    else if (input == dir16::dir4) return L"180¡Æ";
-    else if (input == dir16::dir4_5) return L"202.5¡Æ";
-    else if (input == dir16::dir5) return L"225¡Æ";
-    else if (input == dir16::dir5_5) return L"247.5¡Æ";
-    else if (input == dir16::dir6) return L"270¡Æ";
-    else if (input == dir16::dir6_5) return L"292.5¡Æ";
-    else if (input == dir16::dir7) return L"315¡Æ";
-    else if (input == dir16::dir7_5) return L"337.5¡Æ";
-    else errorBox(L"[utility] dir16ToString¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    if (input == dir16::dir0) return L"0Â°";
+    else if (input == dir16::dir0_5) return L"22.5Â°";
+    else if (input == dir16::dir1) return L"45Â°";
+    else if (input == dir16::dir1_5) return L"67.5Â°";
+    else if (input == dir16::dir2) return L"90Â°";
+    else if (input == dir16::dir2_5) return L"112.5Â°";
+    else if (input == dir16::dir3) return L"135Â°";
+    else if (input == dir16::dir3_5) return L"157.5Â°";
+    else if (input == dir16::dir4) return L"180Â°";
+    else if (input == dir16::dir4_5) return L"202.5Â°";
+    else if (input == dir16::dir5) return L"225Â°";
+    else if (input == dir16::dir5_5) return L"247.5Â°";
+    else if (input == dir16::dir6) return L"270Â°";
+    else if (input == dir16::dir6_5) return L"292.5Â°";
+    else if (input == dir16::dir7) return L"315Â°";
+    else if (input == dir16::dir7_5) return L"337.5Â°";
+    else errorBox(L"[utility] dir16ToStringì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 export Vec3 dir16ToVec(dir16 input)
@@ -136,7 +136,7 @@ export Vec3 dir16ToVec(dir16 input)
     else if (input == dir16::dir6_5) return getDefaultVec(13);
     else if (input == dir16::dir7) return getDefaultVec(14);
     else if (input == dir16::dir7_5) return getDefaultVec(15);
-    else errorBox(L"[utility] dir16ToVec¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] dir16ToVecì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 export int dir16toInt16(dir16 input)
@@ -157,7 +157,7 @@ export int dir16toInt16(dir16 input)
     else if (input == dir16::dir6_5) return 13;
     else if (input == dir16::dir7) return 14;
     else if (input == dir16::dir7_5) return 15;
-    else errorBox(L"[utility] dir16toInt16¿¡¼­ ¾Ë ¼ö ¾ø´Â ¹æÇâÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] dir16toInt16ì—ì„œ ì•Œ ìˆ˜ ì—†ëŠ” ë°©í–¥ì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }
 
 
@@ -171,5 +171,5 @@ export dir16 int8todir16(int inputDir)
     else if (inputDir == 5) return dir16::dir5;
     else if (inputDir == 6) return dir16::dir6;
     else if (inputDir == 7) return dir16::dir7;
-    else errorBox(L"[utility] int8todir16¿¡¼­ 0~7 ¹üÀ§°¡ ¾Æ´Ñ dirÀÌ ÀÔ·ÂµÇ¾ú´Ù.");
+    else errorBox(L"[utility] int8todir16ì—ì„œ 0~7 ë²”ìœ„ê°€ ì•„ë‹Œ dirì´ ì…ë ¥ë˜ì—ˆë‹¤.");
 }

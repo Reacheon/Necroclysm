@@ -1,4 +1,4 @@
-#include <SDL.h>
+﻿#include <SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import Equip;

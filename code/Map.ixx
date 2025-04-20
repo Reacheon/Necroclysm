@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #include <SDL_image.h>
 
 export module Map;
@@ -33,11 +33,11 @@ private:
 public:
 	Map() : GUI(false)
 	{
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one Map instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 
@@ -132,7 +132,7 @@ public:
 
 
 			setFontSize(10);
-			std::wstring pCoordStr = L"[ ÇÃ·¹ÀÌ¾î ÁÂÇ¥ ]";
+			std::wstring pCoordStr = L"[ í”Œë ˆì´ì–´ ì¢Œí‘œ ]";
 
 			drawRect({ mapBase.x + 6, mapBase.y + 38,128,46 }, col::white);
 
@@ -154,7 +154,7 @@ public:
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			setFontSize(10);
-			drawTextCenter(col2Str(col::white) + L"¸¶Å·", mapBase.x + 397, mapBase.y + 39);
+			drawTextCenter(col2Str(col::white) + L"ë§ˆí‚¹", mapBase.x + 397, mapBase.y + 39);
 
 
 			SDL_Rect markingBtnRed = { mapBase.x + 345, mapBase.y + 47, 32, 32 };
@@ -175,7 +175,7 @@ public:
 
 
 			setFontSize(10);
-			drawTextCenter(L"¹èÀ²", mapBase.x + 585, mapBase.y + 39);
+			drawTextCenter(L"ë°°ìœ¨", mapBase.x + 585, mapBase.y + 39);
 
 			SDL_Rect reduceBtn = { mapBase.x + 487, mapBase.y + 47, 32, 32 };
 			drawFillRect(reduceBtn, col::black);
@@ -234,7 +234,7 @@ public:
 		{
 			if (click == true)
 			{
-				int scrollAccelConst = 20; // °¡¼Ó»ó¼ö, ÀÛ¾ÆÁú¼ö·Ï ½ºÅ©·Ñ ¼Óµµ°¡ »¡¶óÁü
+				int scrollAccelConst = 20; // ê°€ì†ìƒìˆ˜, ì‘ì•„ì§ˆìˆ˜ë¡ ìŠ¤í¬ë¡¤ ì†ë„ê°€ ë¹¨ë¼ì§
 				cursorX = initCursorX + dx / scrollAccelConst;
 				cursorY = initCursorY + dy / scrollAccelConst;
 			}

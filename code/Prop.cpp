@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import Prop;
 import globalVar;
@@ -26,23 +26,23 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
 {
     leadItem = itemDex[leadItemCode];
     setAniPriority(3);
-    //prt(L"[Prop:constructor] »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú´Ù. »ı¼ºµÈ ÁÂÇ¥´Â %d,%d,%dÀÌ´Ù.\n", inputX, inputY, inputZ);
+    //prt(L"[Prop:constructor] ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤. ìƒì„±ëœ ì¢Œí‘œëŠ” %d,%d,%dì´ë‹¤.\n", inputX, inputY, inputZ);
     setGrid(inputX, inputY, inputZ);
 
-    errorBox(TileProp(inputX, inputY, inputZ) != nullptr, L"»ı¼ºÀ§Ä¡¿¡ ÀÌ¹Ì ¼³Ä¡¹°ÀÌ Á¸ÀçÇÑ´Ù!");
+    errorBox(TileProp(inputX, inputY, inputZ) != nullptr, L"ìƒì„±ìœ„ì¹˜ì— ì´ë¯¸ ì„¤ì¹˜ë¬¼ì´ ì¡´ì¬í•œë‹¤!");
     World::ins()->getTile(inputX, inputY, inputZ).PropPtr = this;
 
     if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
     {
 
-        myLight = new Light(inputX + leadItem.lightDelX, inputY + leadItem.lightDelY, inputZ, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//ÀÓ½Ã·Î ÀÌ·¸°Ô ¸¸µé¾î³ùÀ½
+        myLight = new Light(inputX + leadItem.lightDelX, inputY + leadItem.lightDelY, inputZ, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//ì„ì‹œë¡œ ì´ë ‡ê²Œ ë§Œë“¤ì–´ë†¨ìŒ
         //Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
     }
 
 
-    deactivateAI();//Â÷·®À» Á¦¿ÜÇÏ°í ±âº»ÀûÀ¸·Î ºñÈ°¼ºÈ­
+    deactivateAI();//ì°¨ëŸ‰ì„ ì œì™¸í•˜ê³  ê¸°ë³¸ì ìœ¼ë¡œ ë¹„í™œì„±í™”
 
-    //ÁÖº¯ Å¸ÀÏÀ» ºĞ¼®ÇØ extraIndex ¼³Á¤
+    //ì£¼ë³€ íƒ€ì¼ì„ ë¶„ì„í•´ extraIndex ì„¤ì •
     int dx = 0;
     int dy = 0;
     for (int i = 0; i < 8; i++)
@@ -57,7 +57,7 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
         leadItem.propSprIndex += randomRange(0, leadItem.randomPropSprSize - 1);
     }
 
-    //HP ¼³Á¤
+    //HP ì„¤ì •
     leadItem.propHP = leadItem.propMaxHP;
     leadItem.propFakeHP = leadItem.propMaxHP;
 
@@ -67,9 +67,9 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
 Prop::~Prop()
 {
     delete myLight;
-    prt(L"[Prop:destructor] ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú´Ù. \n");
+    prt(L"[Prop:destructor] ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤. \n");
 
-    //ÁÖº¯ Å¸ÀÏÀ» ºĞ¼®ÇØ extraIndex ¼³Á¤
+    //ì£¼ë³€ íƒ€ì¼ì„ ë¶„ì„í•´ extraIndex ì„¤ì •
     int dx = 0;
     int dy = 0;
     for (int i = 0; i < 8; i++)
@@ -90,14 +90,14 @@ void Prop::updateSprIndex()
 
 
 
-    if (leadItem.checkFlag(itemFlag::WIRE))//Àü¼±ÀÏ °æ¿ì
+    if (leadItem.checkFlag(itemFlag::WIRE))//ì „ì„ ì¼ ê²½ìš°
     {
         auto wireCheck = [=](int dx, int dy) -> bool
             {
                 Prop* tgtProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
                 if (tgtProp != nullptr)
                 {
-                    if (tgtProp->leadItem.checkFlag(itemFlag::WIRE))//°°Àº Àü¼±ÀÏ °æ¿ì
+                    if (tgtProp->leadItem.checkFlag(itemFlag::WIRE))//ê°™ì€ ì „ì„ ì¼ ê²½ìš°
                     {
                         return true;
                     }
@@ -119,14 +119,14 @@ void Prop::updateSprIndex()
         rightTile = wireCheck(1, 0);
         leadItem.extraSprIndexSingle = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
     }
-    else if (leadItem.checkFlag(itemFlag::PIPE))//¹è°üÀÏ °æ¿ì
+    else if (leadItem.checkFlag(itemFlag::PIPE))//ë°°ê´€ì¼ ê²½ìš°
     {
         auto pipeCheck = [=](int dx, int dy) -> bool
             {
                 Prop* tgtProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
                 if (tgtProp != nullptr)
                 {
-                    if (tgtProp->leadItem.checkFlag(itemFlag::PIPE))//°°Àº Àü¼±ÀÏ °æ¿ì
+                    if (tgtProp->leadItem.checkFlag(itemFlag::PIPE))//ê°™ì€ ì „ì„ ì¼ ê²½ìš°
                     {
                         return true;
                     }
@@ -148,14 +148,14 @@ void Prop::updateSprIndex()
         rightTile = pipeCheck(1, 0);
         leadItem.extraSprIndexSingle = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
     }
-    else if (leadItem.checkFlag(itemFlag::CONVEYOR))//ÄÁº£ÀÌ¾î º§Æ®ÀÏ °æ¿ì
+    else if (leadItem.checkFlag(itemFlag::CONVEYOR))//ì»¨ë² ì´ì–´ ë²¨íŠ¸ì¼ ê²½ìš°
     {
         auto conveyorCheck = [=](int dx, int dy) -> bool
             {
                 Prop* tgtProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
                 if (tgtProp != nullptr)
                 {
-                    if (tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR))//°°Àº Àü¼±ÀÏ °æ¿ì
+                    if (tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR))//ê°™ì€ ì „ì„ ì¼ ê²½ìš°
                     {
                         return true;
                     }
@@ -214,11 +214,11 @@ void Prop::updateSprIndex()
 
 bool Prop::runAI()
 {
-    //prt(L"[Prop:AI] ID : %pÀÇ AI¸¦ ½ÇÇà½ÃÄ×´Ù.\n", this);
+    //prt(L"[Prop:AI] ID : %pì˜ AIë¥¼ ì‹¤í–‰ì‹œì¼°ë‹¤.\n", this);
     while (1)
     {
 
-        //prt(L"[Prop:AI] ID : %pÀÇ turnResource´Â %fÀÔ´Ï´Ù.\n", this, getTurnResource());
+        //prt(L"[Prop:AI] ID : %pì˜ turnResourceëŠ” %fì…ë‹ˆë‹¤.\n", this, getTurnResource());
         if (getTurnResource() >= 2.0)
         {
             clearTurnResource();
@@ -228,15 +228,15 @@ bool Prop::runAI()
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        //À§ÀÇ ¸ğµç ÆĞÅÏ Á¶°ÇÀ» ¸¸Á·ÇÏÁö¾ÊÀ»½Ã return true
-        //prt(L"[Prop:AI] AI°¡ true¸¦ ¹İÈ¯Çß´Ù. AI¸¦ Á¾·áÇÕ´Ï´Ù.\n");
+        //ìœ„ì˜ ëª¨ë“  íŒ¨í„´ ì¡°ê±´ì„ ë§Œì¡±í•˜ì§€ì•Šì„ì‹œ return true
+        //prt(L"[Prop:AI] AIê°€ trueë¥¼ ë°˜í™˜í–ˆë‹¤. AIë¥¼ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
         return true;
     }
 }
 
 bool Prop::runAnimation(bool shutdown)
 {
-    //prt(L"Prop %pÀÇ runAnimationÀÌ ½ÇÇàµÇ¾ú´Ù.\n", this);
+    //prt(L"Prop %pì˜ runAnimationì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n", this);
     if (getAniType() == aniFlag::propRush)
     {
         addTimer();
@@ -306,17 +306,17 @@ void Prop::drawSelf()
     setZoom(zoomScale);
     if (leadItem.checkFlag(itemFlag::TREE) && getGridX() == PlayerX() && getGridY() - 1 == PlayerY() && getGridZ() == PlayerZ())
     {
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
     }
     else
     {
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
     }
 
-    SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+    SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
     int sprIndex = leadItem.propSprIndex + leadItem.extraSprIndexSingle + 16 * leadItem.extraSprIndex16;
 
-    if (leadItem.checkFlag(itemFlag::TREE))//³ª¹«ÀÏ °æ¿ì ±×¸²ÀÚ
+    if (leadItem.checkFlag(itemFlag::TREE))//ë‚˜ë¬´ì¼ ê²½ìš° ê·¸ë¦¼ì
     {
         drawSpriteCenter
         (
@@ -375,7 +375,7 @@ void Prop::drawSelf()
 
 
 
-    if (displayHPBarCount > 0)//°³Ã¼ HP Ç¥±â
+    if (displayHPBarCount > 0)//ê°œì²´ HP í‘œê¸°
     {
         int pivotX = dst.x + dst.w / 2 - (int)(8 * zoomScale);
         int pivotY = dst.y + dst.h / 2 + (int)(16 * zoomScale);
@@ -420,6 +420,6 @@ void Prop::drawSelf()
         }
     }
 
-    SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+    SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
     setZoom(1.0);
 };

@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module drawPrimitive;
 
@@ -51,7 +51,7 @@ export void drawRect(const SDL_Rect& rect, const SDL_Color& col) { drawRect(rect
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-//µÎ²² 1 ½ÊÀÚ°¡
+//ë‘ê»˜ 1 ì‹­ìê°€
 export void drawCross(int x, int y, int north, int south, int west, int east)
 {
     SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
@@ -61,7 +61,7 @@ export void drawCross(int x, int y, int north, int south, int west, int east)
     SDL_RenderDrawLine(localRenderer, x, y, x + east, y);
 }
 
-//µÎ²² 2 ½ÊÀÚ°¡
+//ë‘ê»˜ 2 ì‹­ìê°€
 export void drawCross2(int x, int y, int north, int south, int west, int east)
 {
     SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
@@ -79,7 +79,7 @@ export void drawCross2(int x, int y, int north, int south, int west, int east)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-//5´Â ÀÏ¹İÀûÀÎ µÕ±Ù Å×µÎ¸®, 6Àº ÇÏ´ÜÀÌ ÆòÆòÇÑ 5¹ø, 7Àº »ó´ÜÀÌ ÆòÆòÇÑ 5¹ø
+//5ëŠ” ì¼ë°˜ì ì¸ ë‘¥ê·¼ í…Œë‘ë¦¬, 6ì€ í•˜ë‹¨ì´ í‰í‰í•œ 5ë²ˆ, 7ì€ ìƒë‹¨ì´ í‰í‰í•œ 5ë²ˆ
 export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, int edge)
 {
 	int xEnd = x + w - 1;
@@ -186,7 +186,7 @@ export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, 
 
 		break;
 	}
-	case 6://ÇÏ´Ü Á÷¼±
+	case 6://í•˜ë‹¨ ì§ì„ 
 	{
 		SDL_SetRenderDrawColor(localRenderer, color.r, color.g, color.b, alpha);
 		SDL_Rect rect;
@@ -203,7 +203,7 @@ export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, 
 		SDL_RenderDrawLine(localRenderer, x + 1, y + 4, xEnd - 1, y + 4);
 		break;
 	}
-	case 7://»ó´Ü Á÷¼±
+	case 7://ìƒë‹¨ ì§ì„ 
 	{
 		SDL_SetRenderDrawColor(localRenderer, color.r, color.g, color.b, alpha);
 		SDL_Rect rect;

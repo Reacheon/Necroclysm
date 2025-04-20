@@ -1,34 +1,34 @@
-export module Mapmaker;
+ï»¿export module Mapmaker;
 
 import std;
 import util;
 import constVar;
 
 // Mapmaker
-// ¾ÕÀ¸·Î »ı¼ºµÉ Ã»Å©µéÀ» ±â·ÏÇÏ´Â °´Ã¼ (Å« ÀıÂ÷Àû »ı¼ºÀ¸·Î ¸¸µé¾îÁø °ªµé)
-// ÇÃ·¹ÀÌ¾î ÁÖº¯¿¡ ¾ø´Â °è½Ã´Â µû·Î ÆÄÀÏ·Î ÀúÀåÇÔ
-// ÀúÀå ±â´ÉÀÌ Á¸Àç
+// ì•ìœ¼ë¡œ ìƒì„±ë  ì²­í¬ë“¤ì„ ê¸°ë¡í•˜ëŠ” ê°ì²´ (í° ì ˆì°¨ì  ìƒì„±ìœ¼ë¡œ ë§Œë“¤ì–´ì§„ ê°’ë“¤)
+// í”Œë ˆì´ì–´ ì£¼ë³€ì— ì—†ëŠ” ê³„ì‹œëŠ” ë”°ë¡œ íŒŒì¼ë¡œ ì €ì¥í•¨
+// ì €ì¥ ê¸°ëŠ¥ì´ ì¡´ì¬
 
 
-// ¿ÏÀüÈ÷ array ±â¹İÀ¸·Î ¹Ù²Ü °Í(º´·ÄÈ­·Î ¸Ê»ı¼º °¡´ÉÇÏµµ·Ï!!!)
+// ì™„ì „íˆ array ê¸°ë°˜ìœ¼ë¡œ ë°”ê¿€ ê²ƒ(ë³‘ë ¬í™”ë¡œ ë§µìƒì„± ê°€ëŠ¥í•˜ë„ë¡!!!)
 export class Mapmaker
 {
 private:
 	std::unordered_map<std::array<int, 3>, chunkFlag, decltype(arrayHasher3)> prophecy;
 public:
-	static Mapmaker* ins()//½Ì±ÛÅæ ÇÔ¼ö
+	static Mapmaker* ins()//ì‹±ê¸€í†¤ í•¨ìˆ˜
 	{
 		static Mapmaker* ptr = new Mapmaker();
 		return ptr;
 	}
 	void addProphecy(int chunkX, int chunkY, int chunkZ, chunkFlag input)
 	{
-		//errorBox(prophecy.find({ chunkX,chunkY,chunkZ }) == prophecy.end(), L"ÀÌ¹Ì °è½ÃµÈ Ã»Å©°¡ Mapmaker¿¡ ÀÔ·ÂµÊ");
+		//errorBox(prophecy.find({ chunkX,chunkY,chunkZ }) == prophecy.end(), L"ì´ë¯¸ ê³„ì‹œëœ ì²­í¬ê°€ Mapmakerì— ì…ë ¥ë¨");
 		prophecy[{ chunkX, chunkY, chunkZ }] = input;
 	}
 	chunkFlag getProphecy(int chunkX, int chunkY, int chunkZ)
 	{
-		errorBox(prophecy.find({ chunkX,chunkY,chunkZ }) == prophecy.end(), L"¾ò¾î³¾ Ã»Å©°¡ Mapmaker¿¡ Á¸ÀçÇÏÁö ¾ÊÀ½");
+		errorBox(prophecy.find({ chunkX,chunkY,chunkZ }) == prophecy.end(), L"ì–»ì–´ë‚¼ ì²­í¬ê°€ Mapmakerì— ì¡´ì¬í•˜ì§€ ì•ŠìŒ");
 		return prophecy[{ chunkX, chunkY, chunkZ }];
 	}
 	bool isEmptyProphecy(int chunkX, int chunkY, int chunkZ)

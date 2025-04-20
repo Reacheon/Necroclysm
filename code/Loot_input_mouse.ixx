@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import Loot;
@@ -12,7 +12,7 @@ import actFuncSet;
 
 void Loot::clickUpGUI()
 {
-	if (checkCursor(&tab) == true)// ÅÇ¹Ú½º
+	if (checkCursor(&tab) == true)// íƒ­ë°•ìŠ¤
 	{
 		executeTab();
 		return;
@@ -34,7 +34,7 @@ void Loot::clickUpGUI()
 			executeSort();
 		}
 	}
-	else if (checkCursor(&lootBase)) //¾ÆÀÌÅÛ Å¬¸¯ -> ¿¡·¯ ÆÄÆ®
+	else if (checkCursor(&lootBase)) //ì•„ì´í…œ í´ë¦­ -> ì—ëŸ¬ íŒŒíŠ¸
 	{
 		if (checkCursor(&pocketLeft))
 		{
@@ -60,20 +60,20 @@ void Loot::clickUpGUI()
 		else
 		{
 
-			//¸¸¾à ¾ÆÀÌÅÛÀ» Å¬¸¯ÇßÀ¸¸é Ä¿¼­¸¦ ±× ¾ÆÀÌÅÛÀ¸·Î ¿Å±è, ´Ù¸¥ °÷ ´©¸£¸é -1·Î ¹Ù²Ş
+			//ë§Œì•½ ì•„ì´í…œì„ í´ë¦­í–ˆìœ¼ë©´ ì»¤ì„œë¥¼ ê·¸ ì•„ì´í…œìœ¼ë¡œ ì˜®ê¹€, ë‹¤ë¥¸ ê³³ ëˆ„ë¥´ë©´ -1ë¡œ ë°”ê¿ˆ
 			for (int i = 0; i < LOOT_ITEM_MAX; i++)
 			{
 				if (lootPocket->itemInfo.size() - 1 >= i)
 				{
 					if (checkCursor(&lootItemRect[i]))
 					{
-						if (lootCursor != lootScroll + i) //»õ·Î¿î Ä¿¼­ »ı¼º
+						if (lootCursor != lootScroll + i) //ìƒˆë¡œìš´ ì»¤ì„œ ìƒì„±
 						{
 							lootCursor = lootScroll + i;
 							updateBarAct();
 							tabType = tabFlag::back;
 						}
-						else //Ä¿¼­ »èÁ¦
+						else //ì»¤ì„œ ì‚­ì œ
 						{
 							lootCursor = -1;
 							barAct = actSet::null;
@@ -84,7 +84,7 @@ void Loot::clickUpGUI()
 				}
 			}
 
-			//¾ÆÀÌÅÛ ÁÂÃø ¼¿·ºÆ® Å¬¸¯
+			//ì•„ì´í…œ ì¢Œì¸¡ ì…€ë ‰íŠ¸ í´ë¦­
 			for (int i = 0; i < LOOT_ITEM_MAX; i++)
 			{
 				if (checkCursor(&lootItemSelectRect[i]))
@@ -118,21 +118,21 @@ void Loot::clickUpGUI()
 			}
 		}
 	}
-	else if (checkCursor(&letterbox)) //¹öÆ°Àº return ¾øÀ½
+	else if (checkCursor(&letterbox)) //ë²„íŠ¼ì€ return ì—†ìŒ
 	{
-		for (int i = 0; i < barAct.size(); i++) // ÇÏ´Ü UI ÅÍÄ¡ ÀÌº¥Æ®
+		for (int i = 0; i < barAct.size(); i++) // í•˜ë‹¨ UI í„°ì¹˜ ì´ë²¤íŠ¸
 		{
 			if (checkCursor(&barButton[i]))
 			{
 				switch (barAct[i])
 				{
-				case act::pick://³Ö±â
+				case act::pick://ë„£ê¸°
 					executePick();
 					break;
-				case act::equip://Àåºñ
+				case act::equip://ì¥ë¹„
 					executeEquip();
 					break;
-				case act::wield://µé±â
+				case act::wield://ë“¤ê¸°
 					CORO(executeWield());
 					break;
 					//case act::insert:
@@ -154,9 +154,9 @@ void Loot::clickUpGUI()
 					}
 					break;
 				case act::reloadMagazine:
-					//ÃÑ¿¡¼­ »ç¿ëÇÏ´Â °æ¿ì¿Í ÅºÃ¢¿¡¼­ »ç¿ëÇÏ´Â °æ¿ì°¡ ´Ù¸§
-					//ÃÑ¿¡¼­ »ç¿ëÇÏ¸é ÀÚ±â ÀÚ½Å¿¡°Ô ÀåÀüÇÔ(self)
-					//ÅºÃ¢¿¡ »ç¿ëÇÏ¸é ´Ù¸¥ Å¸ÀÏÀÇ ÃÑ¿¡°Ô ÀåºñÇÔ
+					//ì´ì—ì„œ ì‚¬ìš©í•˜ëŠ” ê²½ìš°ì™€ íƒ„ì°½ì—ì„œ ì‚¬ìš©í•˜ëŠ” ê²½ìš°ê°€ ë‹¤ë¦„
+					//ì´ì—ì„œ ì‚¬ìš©í•˜ë©´ ìê¸° ìì‹ ì—ê²Œ ì¥ì „í•¨(self)
+					//íƒ„ì°½ì— ì‚¬ìš©í•˜ë©´ ë‹¤ë¥¸ íƒ€ì¼ì˜ ì´ì—ê²Œ ì¥ë¹„í•¨
 					if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::MAGAZINE))
 					{
 						CORO(actFunc::reloadOther(actEnv::Loot, lootPocket, lootCursor));
@@ -181,7 +181,7 @@ void Loot::clickUpGUI()
 		}
 	}
 
-	//À§ÀÇ ¸ğµç °æ¿ì¿¡¼­ returnÀ» ¹ŞÁö ¸øÇßÀ¸¸é ¹öÆ° ÀÌ¿Ü¸¦ ´©¸¥ °ÍÀÌ¹Ç·Î Ä¿¼­¸¦ -1·Î º¹±¸
+	//ìœ„ì˜ ëª¨ë“  ê²½ìš°ì—ì„œ returnì„ ë°›ì§€ ëª»í–ˆìœ¼ë©´ ë²„íŠ¼ ì´ì™¸ë¥¼ ëˆ„ë¥¸ ê²ƒì´ë¯€ë¡œ ì»¤ì„œë¥¼ -1ë¡œ ë³µêµ¬
 	{
 		lootCursor = -1;
 		barAct = actSet::null;
@@ -194,7 +194,7 @@ void Loot::clickMotionGUI(int dx, int dy)
 	{
 		if (click == true)
 		{
-			int scrollAccelConst = 20; // °¡¼Ó»ó¼ö, ÀÛ¾ÆÁú¼ö·Ï ½ºÅ©·Ñ ¼Óµµ°¡ »¡¶óÁü
+			int scrollAccelConst = 20; // ê°€ì†ìƒìˆ˜, ì‘ì•„ì§ˆìˆ˜ë¡ ìŠ¤í¬ë¡¤ ì†ë„ê°€ ë¹¨ë¼ì§
 			lootScroll = initLootScroll + dy / scrollAccelConst;
 			if (abs(dy / scrollAccelConst) >= 1)
 			{
@@ -206,7 +206,7 @@ void Loot::clickMotionGUI(int dx, int dy)
 }
 void Loot::clickDownGUI()
 {
-	//¾ÆÀÌÅÛ ÁÂÃø ¼¿·ºÆ® Å¬¸¯
+	//ì•„ì´í…œ ì¢Œì¸¡ ì…€ë ‰íŠ¸ í´ë¦­
 	selectTouchTime = getMilliTimer();
 	initLootScroll = lootScroll;
 	initPocketCursor = pocketCursor;

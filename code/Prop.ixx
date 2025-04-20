@@ -1,4 +1,4 @@
-export module Prop;
+ï»¿export module Prop;
 
 import std;
 import constVar;
@@ -19,10 +19,10 @@ public:
     ItemData leadItem;
     float turnResource = 0;
     Light* myLight = nullptr;
-    int displayHPBarCount = 0; //¾ç¼ö 200À¸·Î ¼³Á¤½Ã Á¡Á¡ ¶³¾îÁö´Ù°¡ 1ÀÌ µÇ¸é alpha¸¦ ´ë½Å ÁÙÀÓ. alpha¸¶Àú ¸ğµÎ ÁÙ¸é 0À¸·Î
+    int displayHPBarCount = 0; //ì–‘ìˆ˜ 200ìœ¼ë¡œ ì„¤ì •ì‹œ ì ì  ë–¨ì–´ì§€ë‹¤ê°€ 1ì´ ë˜ë©´ alphaë¥¼ ëŒ€ì‹  ì¤„ì„. alphaë§ˆì € ëª¨ë‘ ì¤„ë©´ 0ìœ¼ë¡œ
     int alphaHPBar = 0;
     int alphaFakeHPBar = 0;
-    float treeAngle = 0.0; //¹ú¸ñ ¶§ ³ª¹«µéÀÌ °¡Áö´Â ¾Ş±Û, 0ÀÌ ¾Æ´Ò °æ¿ì È°¼ºÈ­µÊ
+    float treeAngle = 0.0; //ë²Œëª© ë•Œ ë‚˜ë¬´ë“¤ì´ ê°€ì§€ëŠ” ì•µê¸€, 0ì´ ì•„ë‹ ê²½ìš° í™œì„±í™”ë¨
 
     Prop(int inputX, int inputY, int inputZ, int leadItemCode);
 

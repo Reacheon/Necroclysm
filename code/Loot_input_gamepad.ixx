@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import std;
@@ -9,7 +9,7 @@ import ItemData;
 
 void Loot::gamepadBtnDown() 
 { 
-	if (labelCursor != -1)//¶óº§ Ä¿¼­ Á¶ÀÛ Áß
+	if (labelCursor != -1)//ë¼ë²¨ ì»¤ì„œ ì¡°ì‘ ì¤‘
 	{
 		switch (event.cbutton.button)
 		{
@@ -36,14 +36,14 @@ void Loot::gamepadBtnDown()
 			break;
 		}
 	}
-	else if (barActCursor == -1)//ÀÏ¹İ ·çÆÃ ¾ÆÀÌÅÛ »óÇÏ Á¶ÀÛ Áß
+	else if (barActCursor == -1)//ì¼ë°˜ ë£¨íŒ… ì•„ì´í…œ ìƒí•˜ ì¡°ì‘ ì¤‘
 	{
 		switch (event.cbutton.button)
 		{
 		case SDL_CONTROLLER_BUTTON_DPAD_UP:
 			if (lootCursor > 0)
 			{
-				if (lootCursor % LOOT_ITEM_MAX == 0)//½ºÅ©·Ñ º¯°æ
+				if (lootCursor % LOOT_ITEM_MAX == 0)//ìŠ¤í¬ë¡¤ ë³€ê²½
 				{
 					lootScroll -= LOOT_ITEM_MAX;
 					if (lootScroll < 0) { lootScroll = 0; }
@@ -84,18 +84,18 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_B://Ãë¼Ò
+		case SDL_CONTROLLER_BUTTON_B://ì·¨ì†Œ
 		{
 			executeTab();
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_A://¾ÆÀÌÅÛ »ó¼¼ Çàµ¿
+		case SDL_CONTROLLER_BUTTON_A://ì•„ì´í…œ ìƒì„¸ í–‰ë™
 		{
 			updateBarAct();
 			barActCursor = 0;
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_X://¾ÆÀÌÅÛ ¼±ÅÃ
+		case SDL_CONTROLLER_BUTTON_X://ì•„ì´í…œ ì„ íƒ
 		{
 			if (lootPocket->itemInfo[lootCursor].lootSelect == 0)
 			{
@@ -107,7 +107,7 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_Y://¾ÆÀÌÅÛ Áİ±â
+		case SDL_CONTROLLER_BUTTON_Y://ì•„ì´í…œ ì¤ê¸°
 		{
 			executePickSelect();
 			break;
@@ -120,7 +120,7 @@ void Loot::gamepadBtnDown()
 			break;
 		}
 	}
-	else //·çÆÃ ¾ÆÀÌÅÛ »ó¼¼ ¹Ù¾×Æ® Á¶ÀÛ
+	else //ë£¨íŒ… ì•„ì´í…œ ìƒì„¸ ë°”ì•¡íŠ¸ ì¡°ì‘
 	{
 		switch (event.cbutton.button)
 		{
@@ -136,16 +136,16 @@ void Loot::gamepadBtnDown()
 		case SDL_CONTROLLER_BUTTON_A:
 			switch (barAct[barActCursor])
 			{
-			case act::pick://³Ö±â
+			case act::pick://ë„£ê¸°
 				executePick();
 				break;
-			case act::equip://Àåºñ
+			case act::equip://ì¥ë¹„
 				executeEquip();
 				break;
-			case act::wield://µé±â
+			case act::wield://ë“¤ê¸°
 				CORO(executeWield());
 				break;
-			case act::insert://¾ÆÀÌÅÛ ³Ö±â
+			case act::insert://ì•„ì´í…œ ë„£ê¸°
 				CORO(executeInsert());
 			}
 			break;
@@ -169,12 +169,12 @@ void Loot::gamepadBtnMotion()
 }
 void Loot::gamepadBtnUp()
 {
-	//Å°´Ù¿î¿¡¼­ Ã³¸®ÇÏ¸é exText¿¡ ¿­ ¶§ »ç¿ëµÈ ¹®ÀÚ°¡ µé¾î°¡´Â ¹ö±× ¹ß»ıÇØ¼­ Å°¾÷¿¡ ³ÖÀ½
-	if (labelCursor != -1)//¶óº§ Ä¿¼­ Á¶ÀÛ Áß
+	//í‚¤ë‹¤ìš´ì—ì„œ ì²˜ë¦¬í•˜ë©´ exTextì— ì—´ ë•Œ ì‚¬ìš©ëœ ë¬¸ìê°€ ë“¤ì–´ê°€ëŠ” ë²„ê·¸ ë°œìƒí•´ì„œ í‚¤ì—…ì— ë„£ìŒ
+	if (labelCursor != -1)//ë¼ë²¨ ì»¤ì„œ ì¡°ì‘ ì¤‘
 	{
 		switch (event.cbutton.button)
 		{
-		case SDL_CONTROLLER_BUTTON_A://È®ÀÎ
+		case SDL_CONTROLLER_BUTTON_A://í™•ì¸
 		{
 			if (labelCursor == 0)
 			{
@@ -182,7 +182,7 @@ void Loot::gamepadBtnUp()
 			}
 			else if (labelCursor == 1)
 			{
-				//°ÔÀÓÆĞµå·Î´Â ±Û ÀÔ·ÂÀ» ¸øÇÏ¹Ç·Î
+				//ê²Œì„íŒ¨ë“œë¡œëŠ” ê¸€ ì…ë ¥ì„ ëª»í•˜ë¯€ë¡œ
 				//CORO(executeSearch());
 			}
 			else

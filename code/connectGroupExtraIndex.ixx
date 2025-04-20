@@ -1,6 +1,6 @@
-export module connectGroupExtraIndex;
+ï»¿export module connectGroupExtraIndex;
 
-//@brief »óÇÏÁÂ¿ì Å¸ÀÏ¿¡ µû¶ó ÇöÀç Å¸ÀÏÀÇ Ãß°¡ÀÎµ¦½º(0~15)¸¦ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
+//@brief ìƒí•˜ì¢Œìš° íƒ€ì¼ì— ë”°ë¼ í˜„ì¬ íƒ€ì¼ì˜ ì¶”ê°€ì¸ë±ìŠ¤(0~15)ë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
 export int connectGroupExtraIndex(bool topCheck, bool botCheck, bool leftCheck, bool rightCheck)
 {
 	if (!topCheck && !botCheck && !leftCheck && !rightCheck) return 1;

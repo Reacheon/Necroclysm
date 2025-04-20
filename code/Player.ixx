@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Player;
 
@@ -14,12 +14,12 @@ import ItemData;
 import nanoTimer;
 import globalTime;
 
-export class Player :public Entity //ÇÃ·¹ÀÌ¾î´Â ¿£Æ¼Æ¼¸¦ »ó¼Ó¹Ş°í ½Ã¾ß¿¡ µû¶ó ¹Ì´Ï¸ÊÀ» ¾÷µ¥ÀÌÆ®ÇÏ´Â ±â´ÉÀ» °¡Áö°í ÀÖ´Ù.
+export class Player :public Entity //í”Œë ˆì´ì–´ëŠ” ì—”í‹°í‹°ë¥¼ ìƒì†ë°›ê³  ì‹œì•¼ì— ë”°ë¼ ë¯¸ë‹ˆë§µì„ ì—…ë°ì´íŠ¸í•˜ëŠ” ê¸°ëŠ¥ì„ ê°€ì§€ê³  ìˆë‹¤.
 {
 public:
-	Player(int gridX, int gridY, int gridZ);//»ı¼ºÀÚÀÔ´Ï´Ù.
+	Player(int gridX, int gridY, int gridZ);//ìƒì„±ìì…ë‹ˆë‹¤.
 	~Player();
-	static Player* ins()//½Ì±ÛÅæ ÇÔ¼ö
+	static Player* ins()//ì‹±ê¸€í†¤ í•¨ìˆ˜
 	{
 		static Player* ptr = new Player(0, 0, 0);
 		ptr->entityInfo.isPlayer = true;
@@ -33,9 +33,9 @@ public:
 	void updateVision(int range);
 	void updateNearbyChunk(int range);
 	void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
-	void endMove() override; //aStar·Î ÀÎÇØ ÀÌµ¿ÀÌ ³¡³µÀ» °æ¿ì
+	void endMove() override; //aStarë¡œ ì¸í•´ ì´ë™ì´ ëë‚¬ì„ ê²½ìš°
 	void death();
-	int checkItemSur(int index);//ÁÖº¯¿¡ ÀÖ´Â Å¸ÀÏÀ» Æ÷ÇÔÇØ ¾ÆÀÌÅÛÀ» °¡Áö°í ÀÖ´ÂÁö Á¶»ç
-	void eraseItemSur(int index, int number); //ÁÖº¯°´Ã¼¸¦ Áß½ÉÀ¸·Î ÃÑ 9Ä­
-	int checkToolQualitySur(int index); //¾øÀ¸¸é 0 ¹İÈ¯, ÀÖÀ¸¸é °ø±¸·¹º§ ¹İÈ¯
+	int checkItemSur(int index);//ì£¼ë³€ì— ìˆëŠ” íƒ€ì¼ì„ í¬í•¨í•´ ì•„ì´í…œì„ ê°€ì§€ê³  ìˆëŠ”ì§€ ì¡°ì‚¬
+	void eraseItemSur(int index, int number); //ì£¼ë³€ê°ì²´ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ì´ 9ì¹¸
+	int checkToolQualitySur(int index); //ì—†ìœ¼ë©´ 0 ë°˜í™˜, ìˆìœ¼ë©´ ê³µêµ¬ë ˆë²¨ ë°˜í™˜
 };

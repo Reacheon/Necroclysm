@@ -1,4 +1,4 @@
-#include <SDL.h>
+Ôªø#include <SDL.h>
 
 import Equip;
 import util;
@@ -20,27 +20,27 @@ void Equip::drawGUI()
 	drawWindow(&equipBase, sysStr[13], 2);
 
 
-	//ø©±‚º≠∫Œ≈œ ¿Ã≈¢ ¿©µµøÏ
+	//Ïó¨Í∏∞ÏÑúÎ∂ÄÌÑ¥ Ïù¥ÌÅÖ ÏúàÎèÑÏö∞
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		
-		//«√∑π¿ÃæÓ π´∞‘ ¡¶«— ∞‘¿Ã¡ˆ ±◊∏Æ±‚
+		//ÌîåÎ†àÏù¥Ïñ¥ Î¨¥Í≤å Ï†úÌïú Í≤åÏù¥ÏßÄ Í∑∏Î¶¨Í∏∞
 		SDL_Rect weightGaugeRect = { equipBase.x + 65,equipBase.y + 39,104,9 };
 		drawRect(weightGaugeRect, col::white);
 		drawFillRect({ weightGaugeRect.x + 2,weightGaugeRect.y + 2,50,5 }, lowCol::green);
 		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 47, weightGaugeRect.y + 4);
 		setFontSize(10);
-		drawText(col2Str(col::white)+ sysStr[163], weightGaugeRect.x - 38, weightGaugeRect.y - 2);//π´∞‘
+		drawText(col2Str(col::white)+ sysStr[163], weightGaugeRect.x - 38, weightGaugeRect.y - 2);//Î¨¥Í≤å
 		setFontSize(8);
 		drawText(col2Str(col::white) + L"32.5 / 92.3 kg", weightGaugeRect.x + 110, weightGaugeRect.y - 1);
 
 
-		//¿Ã≈¢ ¿©µµøÏ ∫ª√º
+		//Ïù¥ÌÅÖ ÏúàÎèÑÏö∞ Î≥∏Ï≤¥
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(10);
 		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 6, equipWindow.y + equipWindow.h - 16);
 
-		//øÏ√¯ æ∆¿Ã≈€ ªÛ¥‹πŸ(º±≈√ ¿Ã∏ß π∞∏Æ∑Æ)
+		//Ïö∞Ï∏° ÏïÑÏù¥ÌÖú ÏÉÅÎã®Î∞î(ÏÑ†ÌÉù Ïù¥Î¶Ñ Î¨ºÎ¶¨Îüâ)
 		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);
 		if (GUI::getLastGUI() == this)
 		{
@@ -59,24 +59,24 @@ void Equip::drawGUI()
 		}
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(13);
-		drawText(sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //º±≈√(ªÛ¥‹πŸ)
-		drawText(sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //¿Ã∏ß(ªÛ¥‹πŸ)
-		drawText(sysStr[24], equipLabel.x + 250, equipLabel.y + 4); //π´∏Æ∑Æ(ªÛ¥‹πŸ)
+		drawText(sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //ÏÑ†ÌÉù(ÏÉÅÎã®Î∞î)
+		drawText(sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //Ïù¥Î¶Ñ(ÏÉÅÎã®Î∞î)
+		drawText(sysStr[24], equipLabel.x + 250, equipLabel.y + 4); //Î¨¥Î¶¨Îüâ(ÏÉÅÎã®Î∞î)
 
-		//∞≥∫∞ æ∆¿Ã≈€
+		//Í∞úÎ≥Ñ ÏïÑÏù¥ÌÖú
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
 		else  itemListColorLock = false;
 		drawItemList(equipPtr, equipArea.x, equipArea.y, EQUIP_ITEM_MAX, equipCursor, equipScroll, isTargetPocket == false);
 
-		if (equipPtr->itemInfo.size() == 0) // ∏∏æ‡ æ∆¿Ã≈€¿Ã æ¯¿ª ∞ÊøÏ
+		if (equipPtr->itemInfo.size() == 0) // ÎßåÏïΩ ÏïÑÏù¥ÌÖúÏù¥ ÏóÜÏùÑ Í≤ΩÏö∞
 		{
 			drawTextCenter(col2Str(col::white) + sysStr[90], equipArea.x + equipArea.w / 2, equipArea.y + equipArea.h / 2);
 		}
 
-		// æ∆¿Ã≈€ Ω∫≈©∑— ±◊∏Æ±‚
+		// ÏïÑÏù¥ÌÖú Ïä§ÌÅ¨Î°§ Í∑∏Î¶¨Í∏∞
 		SDL_Rect equipScrollBox = { equipBase.x + 325, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
 		drawFillRect(equipScrollBox, { 120,120,120 });
-		SDL_Rect inScrollBox = equipScrollBox; // ≥ª∫Œ Ω∫≈©∑— ƒøº≠
+		SDL_Rect inScrollBox = equipScrollBox; // ÎÇ¥Î∂Ä Ïä§ÌÅ¨Î°§ Ïª§ÏÑú
 		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / Player::ins()->getEquipPtr()->itemInfo.size());
 		inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)Player::ins()->getEquipPtr()->itemInfo.size());
 		if (inScrollBox.y + inScrollBox.h > equipScrollBox.y + equipScrollBox.h) { inScrollBox.y = equipScrollBox.y + equipScrollBox.h - inScrollBox.h; }
@@ -99,20 +99,20 @@ void Equip::drawGUI()
 
 		SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 0xff);
 
-		drawText(col2Str(col::lightGray) + sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0);//∏”∏Æ
-		drawText(col2Str(col::lightGray) + sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1);//∏ˆ≈Î
-		drawText(col2Str(col::lightGray) + sysStr[108], topWindow.x + 10, topWindow.y + 24 + 18 * 2);//øﬁ∆»
-		drawText(col2Str(col::lightGray) + sysStr[109], topWindow.x + 10, topWindow.y + 24 + 18 * 3);//ø¿∏•∆»
-		drawText(col2Str(col::lightGray) + sysStr[110], topWindow.x + 10, topWindow.y + 24 + 18 * 4);//øﬁ¥Ÿ∏Æ
-		drawText(col2Str(col::lightGray) + sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5);//ø¿∏•¥Ÿ∏Æ
+		drawText(col2Str(col::lightGray) + sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0);//Î®∏Î¶¨
+		drawText(col2Str(col::lightGray) + sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1);//Î™∏ÌÜµ
+		drawText(col2Str(col::lightGray) + sysStr[108], topWindow.x + 10, topWindow.y + 24 + 18 * 2);//ÏôºÌåî
+		drawText(col2Str(col::lightGray) + sysStr[109], topWindow.x + 10, topWindow.y + 24 + 18 * 3);//Ïò§Î•∏Ìåî
+		drawText(col2Str(col::lightGray) + sysStr[110], topWindow.x + 10, topWindow.y + 24 + 18 * 4);//ÏôºÎã§Î¶¨
+		drawText(col2Str(col::lightGray) + sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5);//Ïò§Î•∏Îã§Î¶¨
 
 		SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 0xff);
 
 		setFontSize(11);
-		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//∞¸≈Î¿˙«◊
-		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//¬¸∞›¿˙«◊
-		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//≈∏∞›¿˙«◊
-		drawTextCenter(sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);//πÊ«ÿµµ
+		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//Í¥ÄÌÜµÏ†ÄÌï≠
+		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//Ï∞∏Í≤©Ï†ÄÌï≠
+		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//ÌÉÄÍ≤©Ï†ÄÌï≠
+		drawTextCenter(sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);//Î∞©Ìï¥ÎèÑ
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -156,14 +156,14 @@ void Equip::drawGUI()
 
 
 		setFontSize(14);
-		drawText(col2Str(lowCol::orange)+ sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1);//πÊæÓ
-		drawText(col2Str(lowCol::orange) + sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0);//»∏««
+		drawText(col2Str(lowCol::orange)+ sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1);//Î∞©Ïñ¥
+		drawText(col2Str(lowCol::orange) + sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0);//ÌöåÌîº
 
-		drawText(col2Str(col::lightGray) + sysStr[170], topWindow.x + 290, topWindow.y + 24 + 18 * 1);//»≠ø∞¿˙«◊
-		drawText(col2Str(col::lightGray) + sysStr[171], topWindow.x + 290, topWindow.y + 24 + 18 * 2);//≥√±‚¿˙«◊
-		drawText(col2Str(col::lightGray) + sysStr[172], topWindow.x + 290, topWindow.y + 24 + 18 * 3);//¿¸±‚¿˙«◊
-		drawText(col2Str(col::lightGray) + sysStr[173], topWindow.x + 290, topWindow.y + 24 + 18 * 4);//««∆¯¿˙«◊
-		drawText(col2Str(col::lightGray) + sysStr[174], topWindow.x + 290, topWindow.y + 24 + 18 * 5);//∫ŒΩƒ¿˙«◊
+		drawText(col2Str(col::lightGray) + sysStr[170], topWindow.x + 290, topWindow.y + 24 + 18 * 1);//ÌôîÏóºÏ†ÄÌï≠
+		drawText(col2Str(col::lightGray) + sysStr[171], topWindow.x + 290, topWindow.y + 24 + 18 * 2);//ÎÉâÍ∏∞Ï†ÄÌï≠
+		drawText(col2Str(col::lightGray) + sysStr[172], topWindow.x + 290, topWindow.y + 24 + 18 * 3);//Ï†ÑÍ∏∞Ï†ÄÌï≠
+		drawText(col2Str(col::lightGray) + sysStr[173], topWindow.x + 290, topWindow.y + 24 + 18 * 4);//ÌîºÌè≠Ï†ÄÌï≠
+		drawText(col2Str(col::lightGray) + sysStr[174], topWindow.x + 290, topWindow.y + 24 + 18 * 5);//Î∂ÄÏãùÏ†ÄÌï≠
 
 		int SH = Player::ins()->getSH();
 		int EV = Player::ins()->getEV();

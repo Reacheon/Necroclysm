@@ -1,4 +1,4 @@
-export module AI;
+ï»¿export module AI;
 
 export class AI
 {
@@ -7,7 +7,7 @@ private:
     float turnResource = 0;
 
 public:
-    //¸ğµç AI ½ÇÇàÀ» ³¡³»¸é true ¹İÈ¯
+    //ëª¨ë“  AI ì‹¤í–‰ì„ ëë‚´ë©´ true ë°˜í™˜
     virtual bool runAI() = 0;
     bool getActivate() { return isActivate; }
     void activateAI() { isActivate = true; }

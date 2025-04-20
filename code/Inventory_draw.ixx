@@ -1,4 +1,4 @@
-export module Inventory_draw;
+ï»¿export module Inventory_draw;
 
 import Inventory;
 import globalVar;
@@ -34,28 +34,28 @@ void Inventory::drawGUI()
 		setFontSize(16);
 		drawText(col2Str(col::white) + inventoryItemData->name, inventoryBase.x + 73, inventoryBase.y + 39);
 
-		drawLine(inventoryBase.x + 72, inventoryBase.y + 63, inventoryBase.x + 72 + 255, inventoryBase.y + 63, col::gray);//È¸»ö ºĞ¸®¼±
+		drawLine(inventoryBase.x + 72, inventoryBase.y + 63, inventoryBase.x + 72 + 255, inventoryBase.y + 63, col::gray);//íšŒìƒ‰ ë¶„ë¦¬ì„ 
 
 		SDL_Rect volumeGaugeRect = { inventoryBase.x + 123,inventoryBase.y + 72,104,9 };
 		drawRect(volumeGaugeRect, col::white);
 		drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,50,5 }, lowCol::green);
 		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 		setFontSize(10);
-		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//ºÎÇÇ
+		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//ë¶€í”¼
 		setFontSize(8);
 		drawText(col2Str(col::white) + L"32.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
 
-		//ÁÂÃø»ó´Ü ¹ö¸®±â ¹öÆ°
+		//ì¢Œì¸¡ìƒë‹¨ ë²„ë¦¬ê¸° ë²„íŠ¼
 		SDL_Rect dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };
 		drawFillRect(dropBtn, col::black);
 		drawRect(dropBtn, col::gray);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 11, dropBtn.y + 12);
 		setFontSize(10);
-		drawTextCenter(col2Str(col::white) + sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//¹ö¸®±â
+		drawTextCenter(col2Str(col::white) + sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//ë²„ë¦¬ê¸°
 		drawFillRect(dropBtn, col::black, 150);
 
 
-		//¶óº§
+		//ë¼ë²¨
 		SDL_Rect inventoryLabel = { inventoryBase.x + 10, inventoryBase.y + 95, 315, 26 };
 		SDL_Rect inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 62 , 26 };
 		SDL_Rect inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 182 , 26 };
@@ -78,9 +78,9 @@ void Inventory::drawGUI()
 			}
 		}
 		setFontSize(13);
-		drawText(col2Str(col::white) + sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //¼±ÅÃ(»ó´Ü¹Ù)
-		drawText(col2Str(col::white) + sysStr[16], inventoryLabel.x + 140, inventoryLabel.y + 4); //ÀÌ¸§(»ó´Ü¹Ù)
-		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //¹«¸®·®(»ó´Ü¹Ù)
+		drawText(col2Str(col::white) + sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //ì„ íƒ(ìƒë‹¨ë°”)
+		drawText(col2Str(col::white) + sysStr[16], inventoryLabel.x + 140, inventoryLabel.y + 4); //ì´ë¦„(ìƒë‹¨ë°”)
+		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //ë¬´ë¦¬ëŸ‰(ìƒë‹¨ë°”)
 
 		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 30, 315, 200 };
 
@@ -91,7 +91,7 @@ void Inventory::drawGUI()
 		if (inventoryPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
-			drawTextCenter(col2Str(col::lightGray) + sysStr[162], inventoryBase.x + 162, inventoryBase.y + 140); //°¡¹æ ¾È¿¡ ¾ÆÀÌÅÛÀÌ ¾ø´Ù
+			drawTextCenter(col2Str(col::lightGray) + sysStr[162], inventoryBase.x + 162, inventoryBase.y + 140); //ê°€ë°© ì•ˆì— ì•„ì´í…œì´ ì—†ë‹¤
 		}
 
 	}

@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import HUD;
 import std;
@@ -130,7 +130,7 @@ void HUD::gamepadStep()
 				{
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
-					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1Ä­ ÀÌ³»
+					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1ì¹¸ ì´ë‚´
 					{
 						cameraFix = true;
 						Player::ins()->startMove(dir);
@@ -208,7 +208,7 @@ void HUD::gamepadStep()
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
-				prt(L"[HUD:STEP] ÅÇÀÌ ½ÇÇàµÇ¾ú´Ù.\n");
+				prt(L"[HUD:STEP] íƒ­ì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
 				executeTab();
 				delayR2 = 20;
 			}

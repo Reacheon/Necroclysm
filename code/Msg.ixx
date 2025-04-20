@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 
 export module Msg;
@@ -24,43 +24,43 @@ import ItemStack;
 import ItemPocket;
 import drawWindow;
 
-//ÀÌ msg Å¬·¡½º´Â Ã³À½ ¸¸µé¾îÁø ±âÃÊ GUIÀÌ¸ç ¸ğµç GUIµéÀº msg¸¦ ±â¹İÀ¸·Î ¸¸µé¾îÁü
+//ì´ msg í´ë˜ìŠ¤ëŠ” ì²˜ìŒ ë§Œë“¤ì–´ì§„ ê¸°ì´ˆ GUIì´ë©° ëª¨ë“  GUIë“¤ì€ msgë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë§Œë“¤ì–´ì§
 //msgIndex
 //0 : null
-//1 : ·çÆÃ ¾ÆÀÌÅÛ °¹¼ö ¼±ÅÃ
-//2 : ¾ç¼Õ ºñ¾úÀ» ¶§ µå´Â ¼Õ ¼±ÅÃ
-//3 : ¾ç¼Õ ²Ë Ã¡À» ¶§ µå´Â ¼Õ ¼±ÅÃ
-//4 : ·çÆÃ ¾ÆÀÌÅÛ °Ë»ö¾î
-//5 : ÀÌÅ¢ ·çÆÃ ¾ÆÀÌÅÛ °¹¼ö ¼±ÅÃ
-//6 : ÀÌÅ¢ ·çÆÃ ¾ÆÀÌÅÛ °Ë»ö¾î
+//1 : ë£¨íŒ… ì•„ì´í…œ ê°¯ìˆ˜ ì„ íƒ
+//2 : ì–‘ì† ë¹„ì—ˆì„ ë•Œ ë“œëŠ” ì† ì„ íƒ
+//3 : ì–‘ì† ê½‰ ì°¼ì„ ë•Œ ë“œëŠ” ì† ì„ íƒ
+//4 : ë£¨íŒ… ì•„ì´í…œ ê²€ìƒ‰ì–´
+//5 : ì´í… ë£¨íŒ… ì•„ì´í…œ ê°¯ìˆ˜ ì„ íƒ
+//6 : ì´í… ë£¨íŒ… ì•„ì´í…œ ê²€ìƒ‰ì–´
 export class Msg : public GUI
 {
 private:
 	inline static Msg* ptr = nullptr;
-	int msgCursor = -1; //Å°º¸µåÀÔ·ÂÀÏ ¶§ »ç¿ëµÇ´Â Ä¿¼­
-	msgFlag msgType = msgFlag::deact; // ¸Ş½ÃÁöÀÇ Å¸ÀÔ, -1ÀÌ¸é ºñÈ°¼ºÈ­, 0ÀÌ¸é ÀÏ¹İ ¸Ş½ÃÁö, 1ÀÌ¸é ÀÔ·Â ¸Ş½ÃÁö ¹Ú½º
-	std::wstring msgTitleText; //¸Ş½ÃÁö ¹Ú½º ÇÏ´ÜÀÇ ¿É¼Ç(¼±ÅÃ È®ÀÎ Ãë¼Ò µî)
-	std::wstring msgText; //¸Ş½ÃÁö ¹Ú½º »ó´Ü¿¡ Ç¥½ÃµÇ´Â ¹®±¸
-	std::vector<std::wstring> msgOptionVec; //¸Ş½ÃÁö ¹Ú½º¿¡ Ç¥½ÃµÇ´Â ¹®±¸
+	int msgCursor = -1; //í‚¤ë³´ë“œì…ë ¥ì¼ ë•Œ ì‚¬ìš©ë˜ëŠ” ì»¤ì„œ
+	msgFlag msgType = msgFlag::deact; // ë©”ì‹œì§€ì˜ íƒ€ì…, -1ì´ë©´ ë¹„í™œì„±í™”, 0ì´ë©´ ì¼ë°˜ ë©”ì‹œì§€, 1ì´ë©´ ì…ë ¥ ë©”ì‹œì§€ ë°•ìŠ¤
+	std::wstring msgTitleText; //ë©”ì‹œì§€ ë°•ìŠ¤ í•˜ë‹¨ì˜ ì˜µì…˜(ì„ íƒ í™•ì¸ ì·¨ì†Œ ë“±)
+	std::wstring msgText; //ë©”ì‹œì§€ ë°•ìŠ¤ ìƒë‹¨ì— í‘œì‹œë˜ëŠ” ë¬¸êµ¬
+	std::vector<std::wstring> msgOptionVec; //ë©”ì‹œì§€ ë°•ìŠ¤ì— í‘œì‹œë˜ëŠ” ë¬¸êµ¬
 
-	SDL_Rect msgBase;//ÀÌ À©µµ¿ìÀÇ ÀüÃ¼ ¸éÀû°ú ±×·ÁÁö´Â À§Ä¡
+	SDL_Rect msgBase;//ì´ ìœˆë„ìš°ì˜ ì „ì²´ ë©´ì ê³¼ ê·¸ë ¤ì§€ëŠ” ìœ„ì¹˜
 	std::vector<std::vector<SDL_Rect>> msgBtn;
 	SDL_Rect msgInputBox;
 
-	tabFlag prevTabType;//¸Ş½ÃÁö Ã¢À» ¿­±â ÀüÀÇ ÅÇ Å¸ÀÔ(´İÀ» ¶§ ¿ø·¡´ë·Î µ¹¾Æ°¨)
+	tabFlag prevTabType;//ë©”ì‹œì§€ ì°½ì„ ì—´ê¸° ì „ì˜ íƒ­ íƒ€ì…(ë‹«ì„ ë•Œ ì›ë˜ëŒ€ë¡œ ëŒì•„ê°)
 
 public:
 	Msg(msgFlag type, std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option) : GUI(true)
 	{
-		prt(L"Msg : »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù.\n");
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		prt(L"Msg : ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
 
-		coAnswer = L""; //ÄÚ·çÆ¾ °´Ã¼ ÃÊ±âÈ­
+		coAnswer = L""; //ì½”ë£¨í‹´ ê°ì²´ ì´ˆê¸°í™”
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		msgType = type;
@@ -89,7 +89,7 @@ public:
 	}
 	~Msg()
 	{
-		prt(L"Msg : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"Msg : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		ptr = nullptr;
 
 		if (msgType == msgFlag::input)
@@ -163,7 +163,7 @@ public:
 
 			resetWindowAlpha();
 
-			//À©µµ¿ì ¹Ú½º ±×¸®±â
+			//ìœˆë„ìš° ë°•ìŠ¤ ê·¸ë¦¬ê¸°
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(16);
 
@@ -228,10 +228,10 @@ public:
 			}
 
 
-			//////////////////////////////////////////////////////////////////¹öÆ°///////////////////////////////////////////////////////////////////////
+			//////////////////////////////////////////////////////////////////ë²„íŠ¼///////////////////////////////////////////////////////////////////////
 
 
-			//¹öÆ° Èò»ö ¶Ñ²±
+			//ë²„íŠ¼ í°ìƒ‰ ëšœê»‘
 			drawLine(msgBase.x + 1, msgBase.y + msgBase.h - 63, msgBase.x + msgBase.w - 1, msgBase.y + msgBase.h - 63, { 0x63,0x63,0x63 });
 
 			for (int i = 0; i < msgOptionVec.size(); i++)
@@ -245,7 +245,7 @@ public:
 				drawSprite(spr::msgChoiceBtn, btnColorSprIndex, msgBtn[msgOptionVec.size()][i].x, msgBtn[msgOptionVec.size()][i].y);
 			}
 
-			//¹öÆ° ±ÛÀÚµé
+			//ë²„íŠ¼ ê¸€ìë“¤
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(16);
 			for (int i = 0; i < msgOptionVec.size(); i++)
@@ -256,10 +256,10 @@ public:
 
 			if (exInput == true)
 			{
-				//ÁÂÃø ¾ÆÀÌÅÛ ¾ÆÀÌÄÜ°ú ¼ıÀÚ ±×¸®±â
+				//ì¢Œì¸¡ ì•„ì´í…œ ì•„ì´ì½˜ê³¼ ìˆ«ì ê·¸ë¦¬ê¸°
 				bool lootItemExist = false;
-				//¸Ş½ÃÁö ÀÔ·Â ¹Ú½º
-				SDL_Rect fMsgInputBox = msgInputBox; // ¾ÆÀÌÅÛ Á¸Àç·Î ÃÖÁ¾º¸Á¤µÈ »ç°¢Çü
+				//ë©”ì‹œì§€ ì…ë ¥ ë°•ìŠ¤
+				SDL_Rect fMsgInputBox = msgInputBox; // ì•„ì´í…œ ì¡´ì¬ë¡œ ìµœì¢…ë³´ì •ëœ ì‚¬ê°í˜•
 				fMsgInputBox.x = msgInputBox.x + 30 * lootItemExist;
 				drawRect(fMsgInputBox, col::white);
 

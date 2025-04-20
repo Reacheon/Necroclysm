@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import Player;
 import std;
@@ -15,10 +15,10 @@ import nanoTimer;
 import globalTime;
 import Footprint;
 
-Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//»ı¼ºÀÚÀÔ´Ï´Ù.
+Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//ìƒì„±ìì…ë‹ˆë‹¤.
 {
 	static Player* ptr = this;
-	prt(L"[µğ¹ö±×] ÇÃ·¹ÀÌ¾î »ı¼º ¿Ï·á ID : %p\n", this);
+	prt(L"[ë””ë²„ê·¸] í”Œë ˆì´ì–´ ìƒì„± ì™„ë£Œ ID : %p\n", this);
 	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
 
 	entityInfo.skin = humanCustom::skin::yellow;
@@ -48,7 +48,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	updateStatus();
 	updateCustomSpriteHuman();
 
-	//¹æµ¶¸é
+	//ë°©ë…ë©´
 	//getEquipPtr()->addItemFromDex(374);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
@@ -74,7 +74,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 }
 Player::~Player()
 {
-	prt(L"Player : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+	prt(L"Player : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 }
 
 
@@ -98,7 +98,7 @@ void Player::startMove(int inputDir)
 		dir2Coord(inputDir, dx, dy);
 		Player* player = Player::ins();
 		player->updateWalkable(player->getGridX() + dx, player->getGridY() + dy);
-		//°ÉÀ» ¼ö ÀÖ´Â Å¸ÀÏÀÌ¸é
+		//ê±¸ì„ ìˆ˜ ìˆëŠ” íƒ€ì¼ì´ë©´
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{
 			player->setDirection(inputDir);
@@ -183,13 +183,13 @@ void Player::updateMinimap()
 void Player::updateVision(int range, int cx, int cy)
 {
 	__int64 timeStampStart = getNanoTimer();
-	//prt(L"[updateVision] %d,%d¿¡¼­ ½Ã¾ß¾÷µ¥ÀÌÆ®°¡ ÁøÇàµÇ¾ú´Ù.\n",cx,cy);
+	//prt(L"[updateVision] %d,%dì—ì„œ ì‹œì•¼ì—…ë°ì´íŠ¸ê°€ ì§„í–‰ë˜ì—ˆë‹¤.\n",cx,cy);
 
 	int correctionRange = range;
 	if (getHour() >= 6 && getHour() < 18) correctionRange = range;
 	else correctionRange = range / 2;
 
-	//ÁÜ½ºÄÉÀÏÀÌ ÃÖ´ëÀÏ ¶§ 45Ä­ Á¤µµ°¡ ÃÖ´ë·Î µé¾î¿È
+	//ì¤ŒìŠ¤ì¼€ì¼ì´ ìµœëŒ€ì¼ ë•Œ 45ì¹¸ ì •ë„ê°€ ìµœëŒ€ë¡œ ë“¤ì–´ì˜´
 	for (int i = cx - GRAY_VISION_HALF_W; i <= cx + GRAY_VISION_HALF_W; i++)
 	{
 		for (int j = cy - GRAY_VISION_HALF_H; j <= cy + GRAY_VISION_HALF_H; j++)
@@ -234,7 +234,7 @@ void Player::updateVision(int range, int cx, int cy)
 		std::vector<Point2>::iterator startPoint = tasksVec.begin() + i * chunkSize;
 
 		std::vector<Point2>::iterator endPoint;
-		if (i == numThreads - 1) endPoint = tasksVec.end(); //¸¸¾à ¸¶Áö¸· ½º·¹µåÀÏ °æ¿ì º¤ÅÍÀÇ ³¡À» °­Á¦·Î ¼³Á¤
+		if (i == numThreads - 1) endPoint = tasksVec.end(); //ë§Œì•½ ë§ˆì§€ë§‰ ìŠ¤ë ˆë“œì¼ ê²½ìš° ë²¡í„°ì˜ ëì„ ê°•ì œë¡œ ì„¤ì •
 		else endPoint = startPoint + chunkSize;
 		std::vector<Point2> chunk(startPoint, endPoint);
 
@@ -313,7 +313,7 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 	updateNearbyChunk(CHUNK_LOADING_RANGE);
 }
 
-void Player::endMove()//aStar·Î ÀÎÇØ ÀÌµ¿ÀÌ ³¡³µÀ» °æ¿ì
+void Player::endMove()//aStarë¡œ ì¸í•´ ì´ë™ì´ ëë‚¬ì„ ê²½ìš°
 {
 
 	if (Player::ins()->entityInfo.walkMode == walkFlag::run)
@@ -355,47 +355,47 @@ void Player::endMove()//aStar·Î ÀÎÇØ ÀÌµ¿ÀÌ ³¡³µÀ» °æ¿ì
 
 void Player::death()
 {
-	updateLog(L"#FFFFFFÁ×¾î¹ö·È´Ù~~!!!!.");
+	updateLog(L"#FFFFFFì£½ì–´ë²„ë ¸ë‹¤~~!!!!.");
 }
 
-int Player::checkItemSur(int index)//ÁÖº¯¿¡ ÀÖ´Â Å¸ÀÏÀ» Æ÷ÇÔÇØ ¾ÆÀÌÅÛÀ» °¡Áö°í ÀÖ´ÂÁö Á¶»ç
+int Player::checkItemSur(int index)//ì£¼ë³€ì— ìˆëŠ” íƒ€ì¼ì„ í¬í•¨í•´ ì•„ì´í…œì„ ê°€ì§€ê³  ìˆëŠ”ì§€ ì¡°ì‚¬
 {
 	int itemNumber = 0;
-	//ÁÖº¯ 9Å¸ÀÏÀÇ ¾ÆÀÌÅÛ½ºÅÃ °Ë»ç
+	//ì£¼ë³€ 9íƒ€ì¼ì˜ ì•„ì´í…œìŠ¤íƒ ê²€ì‚¬
 	for (int i = 0; i < 9; i++)
 	{
 		ItemStack* ptr = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
 	}
-	//ÀÚ±â ÀÚ½ÅÀÇ Àåºñ °Ë»ç 
+	//ìê¸° ìì‹ ì˜ ì¥ë¹„ ê²€ì‚¬ 
 	{
 		itemNumber++;
 	}
 	return itemNumber;
 }
-void Player::eraseItemSur(int index, int number) //ÁÖº¯°´Ã¼¸¦ Áß½ÉÀ¸·Î ÃÑ 9Ä­
+void Player::eraseItemSur(int index, int number) //ì£¼ë³€ê°ì²´ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ ì´ 9ì¹¸
 {
 	int residue = number;
-	//ÁÖº¯ 9Å¸ÀÏÀÇ ¾ÆÀÌÅÛ½ºÅÃ °Ë»ç
+	//ì£¼ë³€ 9íƒ€ì¼ì˜ ì•„ì´í…œìŠ¤íƒ ê²€ì‚¬
 	for (int i = 0; i < 9; i++)
 	{
 		residue--;
 		if (residue == 0) { return; }
 	}
-	//ÀÚ±â ÀÚ½ÅÀÇ Àåºñ °Ë»ç 
+	//ìê¸° ìì‹ ì˜ ì¥ë¹„ ê²€ì‚¬ 
 	{
 		residue--;
 		if (residue == 0) { return; }
 	}
 }
-int Player::checkToolQualitySur(int index) //¾øÀ¸¸é 0 ¹İÈ¯, ÀÖÀ¸¸é °ø±¸·¹º§ ¹İÈ¯
+int Player::checkToolQualitySur(int index) //ì—†ìœ¼ë©´ 0 ë°˜í™˜, ìˆìœ¼ë©´ ê³µêµ¬ë ˆë²¨ ë°˜í™˜
 {
 	int itemNumber = 0;
-	//ÁÖº¯ 9Å¸ÀÏÀÇ ¾ÆÀÌÅÛ½ºÅÃ °Ë»ç
+	//ì£¼ë³€ 9íƒ€ì¼ì˜ ì•„ì´í…œìŠ¤íƒ ê²€ì‚¬
 	for (int i = 0; i < 9; i++)
 	{
 		itemNumber++;
 	}
-	//ÀÚ±â ÀÚ½ÅÀÇ Àåºñ °Ë»ç 
+	//ìê¸° ìì‹ ì˜ ì¥ë¹„ ê²€ì‚¬ 
 	{
 		itemNumber++;
 	}

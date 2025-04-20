@@ -1,4 +1,4 @@
-export module Flame;
+ï»¿export module Flame;
 
 import util;
 import Coord;
@@ -21,8 +21,8 @@ export struct Flame
         TileData* thisTile = &World::ins()->getTile(inputGridX, inputGridY, inputGridZ);
         if (thisTile->flamePtr != nullptr)
         {
-            prt(L"[makeFlag] ÀÌ¹Ì (%d,%d,%d)¿¡´Â È­¿°ÀÌ Á¸ÀçÇÑ´Ù.\n", inputGridX, inputGridY, inputGridZ);
-            errorBox(L"Áßº¹µÈ À§Ä¡¿¡ FlameÀÌ »ı¼ºµÇ¾ú´Ù.\n");
+            prt(L"[makeFlag] ì´ë¯¸ (%d,%d,%d)ì—ëŠ” í™”ì—¼ì´ ì¡´ì¬í•œë‹¤.\n", inputGridX, inputGridY, inputGridZ);
+            errorBox(L"ì¤‘ë³µëœ ìœ„ì¹˜ì— Flameì´ ìƒì„±ë˜ì—ˆë‹¤.\n");
         }
         else
         {

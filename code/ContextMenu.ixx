@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module ContextMenu;
@@ -39,11 +39,11 @@ public:
 	{
 		actOptions = inputOptions;
 		contextMenuTargetGrid = { inputGridX, inputGridY };
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(inputMouseX, inputMouseY, false);
 		tabType = tabFlag::closeWin;
 
@@ -113,47 +113,47 @@ public:
 				int iconIndex = 0;
 				if (actOptions[i] == act::closeDoor)
 				{
-					optionText = sysStr[176];//´İ±â
+					optionText = sysStr[176];//ë‹«ê¸°
 					iconIndex = 64;
 				}
 				else if (actOptions[i] == act::inspect)
 				{
-					optionText = sysStr[177];//Á¶»ç
+					optionText = sysStr[177];//ì¡°ì‚¬
 					iconIndex = 65;
 				}
 				else if (actOptions[i] == act::unbox)
 				{
-					optionText = sysStr[178];//¿­±â
+					optionText = sysStr[178];//ì—´ê¸°
 					iconIndex = 66;
 				}
 				else if (actOptions[i] == act::pull)
 				{
-					optionText = sysStr[179];//´ç±â±â
+					optionText = sysStr[179];//ë‹¹ê¸°ê¸°
 					iconIndex = 67;
 				}
 				else if (actOptions[i] == act::climb)
 				{
-					optionText = sysStr[188];//µî¹İ
+					optionText = sysStr[188];//ë“±ë°˜
 					iconIndex = 69;
 				}
 				else if (actOptions[i] == act::swim)
 				{
-					optionText = sysStr[186];//¼ö¿µ
+					optionText = sysStr[186];//ìˆ˜ì˜
 					iconIndex = 70;
 				}
 				else if (actOptions[i] == act::ride)
 				{
-					optionText = sysStr[187];//Å¾½Â
+					optionText = sysStr[187];//íƒ‘ìŠ¹
 					iconIndex = 71;
 				}
 				else if (actOptions[i] == act::vehicleRepair)
 				{
-					optionText = sysStr[203];//¼ö¸®
+					optionText = sysStr[203];//ìˆ˜ë¦¬
 					iconIndex = 28;
 				}
 				else if (actOptions[i] == act::vehicleDetach)
 				{
-					optionText = sysStr[204];//Å»Âø
+					optionText = sysStr[204];//íƒˆì°©
 					iconIndex = 85;
 				}
 				else optionText = L"???";
@@ -169,25 +169,25 @@ public:
 				drawSpriteCenter(spr::icon16, iconIndex, optionRect[i].x + 10, optionRect[i].y + 10);
 			}
 			
-			// ÁÂÃø»ó´Ü
+			// ì¢Œì¸¡ìƒë‹¨
 			drawLine(contextMenuBase.x, contextMenuBase.y, contextMenuBase.x + 12, contextMenuBase.y, col::lightGray);
 			drawLine(contextMenuBase.x, contextMenuBase.y + 1, contextMenuBase.x + 12, contextMenuBase.y + 1, col::lightGray);
 			drawLine(contextMenuBase.x, contextMenuBase.y, contextMenuBase.x, contextMenuBase.y + 12, col::lightGray);
 			drawLine(contextMenuBase.x + 1, contextMenuBase.y, contextMenuBase.x + 1, contextMenuBase.y + 12, col::lightGray);
 
-			// ¿ìÃø»ó´Ü
+			// ìš°ì¸¡ìƒë‹¨
 			drawLine(contextMenuBase.x + contextMenuBase.w - 13, contextMenuBase.y, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y, col::lightGray);
 			drawLine(contextMenuBase.x + contextMenuBase.w - 13, contextMenuBase.y + 1, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + 1, col::lightGray);
 			drawLine(contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + 12, col::lightGray);
 			drawLine(contextMenuBase.x + contextMenuBase.w - 2, contextMenuBase.y, contextMenuBase.x + contextMenuBase.w - 2, contextMenuBase.y + 12, col::lightGray);
 
-			// ÁÂÃøÇÏ´Ü
+			// ì¢Œì¸¡í•˜ë‹¨
 			drawLine(contextMenuBase.x, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x + 12, contextMenuBase.y + contextMenuBase.h - 1, col::lightGray);
 			drawLine(contextMenuBase.x, contextMenuBase.y + contextMenuBase.h - 2, contextMenuBase.x + 12, contextMenuBase.y + contextMenuBase.h - 2, col::lightGray);
 			drawLine(contextMenuBase.x, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x, contextMenuBase.y + contextMenuBase.h - 13, col::lightGray);
 			drawLine(contextMenuBase.x + 1, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x + 1, contextMenuBase.y + contextMenuBase.h - 13, col::lightGray);
 
-			// ¿ìÃøÇÏ´Ü
+			// ìš°ì¸¡í•˜ë‹¨
 			drawLine(contextMenuBase.x + contextMenuBase.w - 13, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + contextMenuBase.h - 1, col::lightGray);
 			drawLine(contextMenuBase.x + contextMenuBase.w - 13, contextMenuBase.y + contextMenuBase.h - 2, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + contextMenuBase.h - 2, col::lightGray);
 			drawLine(contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + contextMenuBase.h - 1, contextMenuBase.x + contextMenuBase.w - 1, contextMenuBase.y + contextMenuBase.h - 13, col::lightGray);
@@ -314,7 +314,7 @@ public:
 				partNames.push_back(vParts[i].name);
 			}
 
-			new Maint(L"¼ö¸®", L"¼ö¸®ÇÒ ºÎÇ°À» ¼±ÅÃÇØÁÖ¼¼¿ä.", {contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ()},maintFlag::repair);
+			new Maint(L"ìˆ˜ë¦¬", L"ìˆ˜ë¦¬í•  ë¶€í’ˆì„ ì„ íƒí•´ì£¼ì„¸ìš”.", {contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ()},maintFlag::repair);
 			co_await std::suspend_always();
 		}
 		else if (inputAct == act::vehicleDetach)
@@ -329,7 +329,7 @@ public:
 				partNames.push_back(vParts[i].name);
 			}
 
-			new Maint(L"Å»Âø", L"Â÷·®¿¡¼­ ºĞ¸®ÇÒ ºÎÇ°À» ¼±ÅÃÇØÁÖ¼¼¿ä.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() },maintFlag::detach);
+			new Maint(L"íƒˆì°©", L"ì°¨ëŸ‰ì—ì„œ ë¶„ë¦¬í•  ë¶€í’ˆì„ ì„ íƒí•´ì£¼ì„¸ìš”.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() },maintFlag::detach);
 			co_await std::suspend_always();
 		}
 	}

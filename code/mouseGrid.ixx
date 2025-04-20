@@ -1,10 +1,10 @@
-export module mouseGrid;
+ï»¿export module mouseGrid;
 
 import globalVar;
 import util;
 import std;
 
-//Ä«¸Ş¶ó¿¡ ´ëÇÑ »ó´ëÁÂÇ¥
+//ì¹´ë©”ë¼ì— ëŒ€í•œ ìƒëŒ€ì¢Œí‘œ
 export std::array<int,2> getRevMouseGrid()
 {
 	int revX, revY, revGridX, revGridY;
@@ -26,7 +26,7 @@ export std::array<int,2> getRevMouseGrid()
 	return { revGridX,revGridY };
 }
 
-//ÇöÀç ¸¶¿ì½ºÀÇ Àı´ëÁÂÇ¥
+//í˜„ì¬ ë§ˆìš°ìŠ¤ì˜ ì ˆëŒ€ì¢Œí‘œ
 export Point2 getAbsMouseGrid()
 {
 	int cameraGridX, cameraGridY;

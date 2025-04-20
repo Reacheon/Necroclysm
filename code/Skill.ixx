@@ -1,4 +1,4 @@
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
+ï»¿#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 #include <SDL.h>
 
 export module Skill;
@@ -36,23 +36,23 @@ private:
 	SDL_Rect magicBox;
 	int skillCursor = -1;
 	int skillScroll = 0;
-	int initSkillScroll = 0; //¸ğ¼Ç½ºÅ©·ÑÀÌ ½ÃÀÛµÇ±â Á÷ÀüÀÇ ½ºÅ©·Ñ
+	int initSkillScroll = 0; //ëª¨ì…˜ìŠ¤í¬ë¡¤ì´ ì‹œì‘ë˜ê¸° ì§ì „ì˜ ìŠ¤í¬ë¡¤
 
-	skillCategory categoryCursor = skillCategory::all; //0ÀÏ¹İ, 1µ¹¿¬º¯ÀÌ, 2¹ÙÀÌ¿À´Ğ, 3¸¶¹ı
+	skillCategory categoryCursor = skillCategory::all; //0ì¼ë°˜, 1ëŒì—°ë³€ì´, 2ë°”ì´ì˜¤ë‹‰, 3ë§ˆë²•
 
 	std::array<SDL_Rect,7> skillBtn;
 
-	std::vector<SkillData> filteredSkills; //Ä«Å×°í¸®¿¡ ÀÇÇØ ÇÊÅÍ¸µµÈ ½ºÅ³µé, ±âº»°ªÀº ÀüÃ¼ ½ºÅ³(»ı¼ºµÉ ¶§)
+	std::vector<SkillData> filteredSkills; //ì¹´í…Œê³ ë¦¬ì— ì˜í•´ í•„í„°ë§ëœ ìŠ¤í‚¬ë“¤, ê¸°ë³¸ê°’ì€ ì „ì²´ ìŠ¤í‚¬(ìƒì„±ë  ë•Œ)
 
 	int dragSkillTarget = -1;
 public:
 	Skill() : GUI(false)
 	{
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		tabType = tabFlag::closeWin;
@@ -164,12 +164,12 @@ public:
 			drawSubcategoryBox(sysStr[201], bionicBox, categoryCursor == skillCategory::bionic, false);
 			drawSubcategoryBox(sysStr[202], magicBox, categoryCursor == skillCategory::magic, false);
 
-			// ½ºÅ³ ½ºÅ©·Ñ ±×¸®±â
+			// ìŠ¤í‚¬ ìŠ¤í¬ë¡¤ ê·¸ë¦¬ê¸°
 			if (filteredSkills.size() > SKILL_GUI_MAX)
 			{
 				SDL_Rect skillScrollBox = { skillBase.x + 270, skillBase.y + 101, 2, 292 };
 				drawFillRect(skillScrollBox, { 120,120,120 });
-				SDL_Rect inScrollBox = skillScrollBox; // ³»ºÎ ½ºÅ©·Ñ Ä¿¼­
+				SDL_Rect inScrollBox = skillScrollBox; // ë‚´ë¶€ ìŠ¤í¬ë¡¤ ì»¤ì„œ
 				inScrollBox.h = skillScrollBox.h * myMin(1.0, (float)SKILL_GUI_MAX / (float)filteredSkills.size());
 				inScrollBox.y = skillScrollBox.y + skillScrollBox.h * ((float)skillScroll / (float)filteredSkills.size());
 				if (inScrollBox.y + inScrollBox.h > skillScrollBox.y + skillScrollBox.h) { inScrollBox.y = skillScrollBox.y + skillScrollBox.h - inScrollBox.h; }
@@ -177,7 +177,7 @@ public:
 			}
 
 			setFontSize(10);
-			drawText(L"#FFFFFF½ÀµæÇÑ ½ºÅ³ : 13°³", skillBase.x + 190, skillBase.y +34);
+			drawText(L"#FFFFFFìŠµë“í•œ ìŠ¤í‚¬ : 13ê°œ", skillBase.x + 190, skillBase.y +34);
 
 			for (int i = 0; i < 7; i++)
 			{
@@ -243,10 +243,10 @@ public:
 			if (dragSkillTarget != -1)
 			{
 				setZoom(2.0);
-				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
-				SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+				SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
 				drawSpriteCenter(spr::skillSet, skillDex[dragSkillTarget].iconIndex, event.motion.x, event.motion.y);
-				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 				setZoom(1.0);
 			}
 
@@ -416,7 +416,7 @@ public:
 	void gamepadBtnUp() {}
 	void step() 
 	{
-		//Àß¸øµÈ ½ºÅ©·Ñ À§Ä¡ Á¶Á¤
+		//ì˜ëª»ëœ ìŠ¤í¬ë¡¤ ìœ„ì¹˜ ì¡°ì •
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
 			if (skillScroll + SKILL_GUI_MAX >= filteredSkills.size()) { skillScroll = myMax(0, (int)filteredSkills.size() - SKILL_GUI_MAX); }

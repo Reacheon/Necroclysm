@@ -1,4 +1,4 @@
-
+ï»¿
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
@@ -93,11 +93,11 @@ __int64 playerInputTurn()
 		firstMonsterAI = true;
 		firstMonsterAnime = true;
 
-		//prt(col::cyan, L"[ÅÏ ÆäÀÌÁî 1] ÇÃ·¹ÀÌ¾î ÀÔ·Â\n");
+		//prt(col::cyan, L"[í„´ í˜ì´ì¦ˆ 1] í”Œë ˆì´ì–´ ì…ë ¥\n");
 
 		if (coTurnSkip)
 		{
-			prt(L"¸ŞÀÎ ÇÔ¼ö ÄÚ·çÆ¾ Àç½ÇÇà\n");
+			prt(L"ë©”ì¸ í•¨ìˆ˜ ì½”ë£¨í‹´ ì¬ì‹¤í–‰\n");
 			coTurnSkip = false;
 			(*coFunc).run();
 		}
@@ -105,25 +105,25 @@ __int64 playerInputTurn()
 		if (Player::ins()->getHasAStarDst() == false) isPlayerMoving = false;
 	}
 
-	if (Player::ins()->getHasAStarDst() == true) //ÀÚµ¿ÀÌµ¿ ±â´ÉÀÌ È°¼ºÈ­µÇ¾úÀ» °æ¿ì
+	if (Player::ins()->getHasAStarDst() == true) //ìë™ì´ë™ ê¸°ëŠ¥ì´ í™œì„±í™”ë˜ì—ˆì„ ê²½ìš°
 	{
 		int dx = Player::ins()->getAStarDstX() - PlayerX();
 		int dy = Player::ins()->getAStarDstY() - PlayerY();
 
 		if (dx != 0 || dy != 0)
 		{
-			//ÁÖº¯ 10Ä­À¸·Î ÀÌµ¿ °¡´ÉÇÑ Å¸ÀÏ ¹è¿­ °è»ê
+			//ì£¼ë³€ 10ì¹¸ìœ¼ë¡œ ì´ë™ ê°€ëŠ¥í•œ íƒ€ì¼ ë°°ì—´ ê³„ì‚°
 			std::set<std::array<int, 2>> walkableTile;
 			for (int i = PlayerX() - 20; i <= PlayerX() + 20; i++)
 			{
 				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)
 				{
 					if (isWalkable({ i, j, PlayerZ() })) walkableTile.insert({ i,j });
-					//else prt(L"(%d,%d) Å¸ÀÏÀº ÀÌµ¿ ºÒ°¡´ÉÇÑ Å¸ÀÏÀÌ´Ù.\n",i,j);
+					//else prt(L"(%d,%d) íƒ€ì¼ì€ ì´ë™ ë¶ˆê°€ëŠ¥í•œ íƒ€ì¼ì´ë‹¤.\n",i,j);
 				}
 			}
 
-			if (walkableTile.find({ Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY() }) != walkableTile.end())//¸ñÀûÁö°¡ ÀÌµ¿ °¡´ÉÇÒ °æ¿ì
+			if (walkableTile.find({ Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY() }) != walkableTile.end())//ëª©ì ì§€ê°€ ì´ë™ ê°€ëŠ¥í•  ê²½ìš°
 			{
 				aStarTrail = aStar(walkableTile, PlayerX(), PlayerY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
 				if (aStarTrail.size() >= 2)
@@ -159,7 +159,7 @@ __int64 playerInputTurn()
 			case SDL_CONTROLLERBUTTONDOWN:
 				if (option::inputMethod != input::gamepad)
 				{
-					updateLog(col2Str(col::white) + L"°ÔÀÓÆĞµå ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ê²Œì„íŒ¨ë“œ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::gamepad;
 				}
 				gamepadBtnDown();
@@ -167,7 +167,7 @@ __int64 playerInputTurn()
 			case SDL_CONTROLLERBUTTONUP:
 				if (option::inputMethod != input::gamepad)
 				{
-					updateLog(col2Str(col::white) + L"°ÔÀÓÆĞµå ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ê²Œì„íŒ¨ë“œ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::gamepad;
 				}
 				gamepadBtnUp();
@@ -193,7 +193,7 @@ __int64 playerInputTurn()
 			case SDL_MOUSEBUTTONDOWN:
 				if (option::inputMethod != input::mouse)
 				{
-					updateLog(col2Str(col::white) + L"¸¶¿ì½º ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ë§ˆìš°ìŠ¤ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::mouse;
 				}
 
@@ -205,7 +205,7 @@ __int64 playerInputTurn()
 			case SDL_MOUSEMOTION:
 				if (option::inputMethod != input::mouse)
 				{
-					updateLog(col2Str(col::white) + L"¸¶¿ì½º ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ë§ˆìš°ìŠ¤ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::mouse;
 				}
 
@@ -220,7 +220,7 @@ __int64 playerInputTurn()
 			case SDL_MOUSEBUTTONUP:
 				if (option::inputMethod != input::mouse)
 				{
-					updateLog(col2Str(col::white) + L"¸¶¿ì½º ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ë§ˆìš°ìŠ¤ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::mouse;
 				}
 
@@ -236,7 +236,7 @@ __int64 playerInputTurn()
 			case SDL_MOUSEWHEEL:
 				if (option::inputMethod != input::mouse)
 				{
-					updateLog(col2Str(col::white) + L"¸¶¿ì½º ¸ğµå·Î º¯°æÇÏ¿´´Ù.\n");
+					updateLog(col2Str(col::white) + L"ë§ˆìš°ìŠ¤ ëª¨ë“œë¡œ ë³€ê²½í•˜ì˜€ë‹¤.\n");
 					option::inputMethod = input::mouse;
 				}
 				mouseWheel();
@@ -245,7 +245,7 @@ __int64 playerInputTurn()
 			case SDL_KEYDOWN:
 				if (exInput == true && event.key.keysym.sym == UNI::BACKSPACE)
 				{
-					prt(L"¹é½ºÆäÀÌ½º Å° ÀÔ·ÂµÊ\n");
+					prt(L"ë°±ìŠ¤í˜ì´ìŠ¤ í‚¤ ì…ë ¥ë¨\n");
 					if (exInputEditing == false)
 					{
 						if (exInputCursor != 0) { exInputCursor--; }
@@ -253,11 +253,11 @@ __int64 playerInputTurn()
 					}
 				}
 				break;
-			case SDL_TEXTINPUT: //ÅØ½ºÆ®°¡ ¿ÏÀüÈ÷ ÀÔ·ÂµÇ¾úÀ» ¶§ÀÇ ÀÌº¥Æ®(ÇÑ±ÛÀÌ ¿Ï¼ºµÇ¾úÀ» ¶§)
+			case SDL_TEXTINPUT: //í…ìŠ¤íŠ¸ê°€ ì™„ì „íˆ ì…ë ¥ë˜ì—ˆì„ ë•Œì˜ ì´ë²¤íŠ¸(í•œê¸€ì´ ì™„ì„±ë˜ì—ˆì„ ë•Œ)
 			{
 				if (exInput == true)
 				{
-					prt(L"¿Ï¼º ÀÌº¥Æ® ½ÇÇàµÊ\n");
+					prt(L"ì™„ì„± ì´ë²¤íŠ¸ ì‹¤í–‰ë¨\n");
 					std::wstring singleChar = L"";
 					singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
 					exInputText.insert(exInputCursor, singleChar);
@@ -271,11 +271,11 @@ __int64 playerInputTurn()
 				}
 				break;
 			}
-			case SDL_TEXTEDITING: //ÅØ½ºÆ®°¡ ÀÔ·Â µÇ¾úÀ» ¶§ÀÇ ÀÌº¥Æ®(¹Ì¿Ï¼ºµµ ½ÇÇàµÊ, TEXTINPUTº¸´Ù ´õ Å« °³³ä)
+			case SDL_TEXTEDITING: //í…ìŠ¤íŠ¸ê°€ ì…ë ¥ ë˜ì—ˆì„ ë•Œì˜ ì´ë²¤íŠ¸(ë¯¸ì™„ì„±ë„ ì‹¤í–‰ë¨, TEXTINPUTë³´ë‹¤ ë” í° ê°œë…)
 			{
 				if (exInput == true)
 				{
-					prt(L"ÆíÁı ÀÌº¥Æ® ÀÔ·ÂµÊ\n");
+					prt(L"í¸ì§‘ ì´ë²¤íŠ¸ ì…ë ¥ë¨\n");
 					std::wstring singleChar = L"";
 					singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
 					exInputText.replace(exInputCursor, 1, singleChar);
@@ -302,9 +302,9 @@ __int64 playerInputTurn()
 __int64 animationTurn()
 {
 	//AniUSet
-	//Ani Å¬·¡½º¸¦ »ó¼Ó¹ŞÀº Å¬·¡½º´Â aniUSetÀÌ¶ó´Â unordered set¿¡ ID°¡ Ãß°¡µÉ °æ¿ì
-	//·çÇÁ¸¶´Ù ±× IDÀÇ runAnimation ¸Ş¼Òµå¸¦ ½ÇÇà½ÃÅ´. ¸¸¾à runAnimationÀÌ true¸¦ ¹İÈ¯ÇÒ °æ¿ì
-	//aniUSet¿¡ ÀÖ´Â ±× ID¸¦ Áö¿ö¹ö¸®°í ¸¸¾à ¸ğµç ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÇÇà½ÃÄ×À» °æ¿ì turnCycleÀ» 2(EntityÀÇ AI ¿¬»ê)À¸·Î ³Ñ±è
+	//Ani í´ë˜ìŠ¤ë¥¼ ìƒì†ë°›ì€ í´ë˜ìŠ¤ëŠ” aniUSetì´ë¼ëŠ” unordered setì— IDê°€ ì¶”ê°€ë  ê²½ìš°
+	//ë£¨í”„ë§ˆë‹¤ ê·¸ IDì˜ runAnimation ë©”ì†Œë“œë¥¼ ì‹¤í–‰ì‹œí‚´. ë§Œì•½ runAnimationì´ trueë¥¼ ë°˜í™˜í•  ê²½ìš°
+	//aniUSetì— ìˆëŠ” ê·¸ IDë¥¼ ì§€ì›Œë²„ë¦¬ê³  ë§Œì•½ ëª¨ë“  ì• ë‹ˆë©”ì´ì…˜ì„ ì‹¤í–‰ì‹œì¼°ì„ ê²½ìš° turnCycleì„ 2(Entityì˜ AI ì—°ì‚°)ìœ¼ë¡œ ë„˜ê¹€
 	__int64 timeStampStart = getNanoTimer();
 	if (turnCycle == turn::playerAnime)
 	{
@@ -315,7 +315,7 @@ __int64 animationTurn()
 			firstMonsterAI = true;
 			firstMonsterAnime = true;
 
-			//prt(col::cyan, L"[ÅÏ ÆäÀÌÁî 2] ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌ¼Ç\n");
+			//prt(col::cyan, L"[í„´ í˜ì´ì¦ˆ 2] í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´ì…˜\n");
 		}
 	}
 	else if (turnCycle == turn::monsterAnime)
@@ -327,7 +327,7 @@ __int64 animationTurn()
 			firstMonsterAI = true;
 			firstMonsterAnime = false;
 
-			//prt(col::cyan, L"[ÅÏ ÆäÀÌÁî 4] ¸ó½ºÅÍ ¾Ö´Ï¸ŞÀÌ¼Ç\n");
+			//prt(col::cyan, L"[í„´ í˜ì´ì¦ˆ 4] ëª¬ìŠ¤í„° ì• ë‹ˆë©”ì´ì…˜\n");
 		}
 	}
 
@@ -353,33 +353,33 @@ __int64 animationTurn()
 	int aniSize = aniUSet.size();
 	if (aniUSet.size() > 0)
 	{
-		//aniUSet¿¡ ÀÖ´Â ¸ğµç ÀÎ½ºÅÏ½º¸¦ Ã¼Å©ÇØ¼­ ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÇÇà½ÃÅ´. 
+		//aniUSetì— ìˆëŠ” ëª¨ë“  ì¸ìŠ¤í„´ìŠ¤ë¥¼ ì²´í¬í•´ì„œ ì• ë‹ˆë©”ì´ì…˜ì„ ì‹¤í–‰ì‹œí‚´. 
 		for (auto it = aniUSet.begin(); it != aniUSet.end();)
 		{
-			//prt(L"aniUSetÀÇ »çÀÌÁî´Â %dÀÌ´Ù.\n",aniUSet.size());
+			//prt(L"aniUSetì˜ ì‚¬ì´ì¦ˆëŠ” %dì´ë‹¤.\n",aniUSet.size());
 			bool loopBreak = false;
 			if ((*it)->isDictator()) { loopBreak = true; }
 
-			if ((*it)->runAnimation(false) == true)//Á¾·áÇÏ´Â ¾Ö´Ï¸ŞÀÌ¼ÇÀ» ½ÇÇàÇßÀ» °æ¿ì
+			if ((*it)->runAnimation(false) == true)//ì¢…ë£Œí•˜ëŠ” ì• ë‹ˆë©”ì´ì…˜ì„ ì‹¤í–‰í–ˆì„ ê²½ìš°
 			{
-				aniUSet.erase(it++);//it°¡ °¡¸®Å°´Â ¿ä¼Ò¸¦ Á¦°ÅÇÏ°í ÈÄÀ§¿¬»êÀÚ·Î ´Ã·Á¹ö·Á¼­ ¹İº¹ÀÚ°¡ ¹«È¿È­µÇÁö¾Êµµ·Ï ÇÔ
+				aniUSet.erase(it++);//itê°€ ê°€ë¦¬í‚¤ëŠ” ìš”ì†Œë¥¼ ì œê±°í•˜ê³  í›„ìœ„ì—°ì‚°ìë¡œ ëŠ˜ë ¤ë²„ë ¤ì„œ ë°˜ë³µìê°€ ë¬´íš¨í™”ë˜ì§€ì•Šë„ë¡ í•¨
 				if (aniUSet.size() == 0)
 				{
 					endAnimeTurn();
-					//prt(L"runAnimation Á¾·á, °É¸° ½Ã°£Àº %lsÀÌ´Ù.\n", decimalCutter((getNanoTimer()- timeStampStart) / 1000000.0, 5).c_str());
+					//prt(L"runAnimation ì¢…ë£Œ, ê±¸ë¦° ì‹œê°„ì€ %lsì´ë‹¤.\n", decimalCutter((getNanoTimer()- timeStampStart) / 1000000.0, 5).c_str());
 				}
 			}
 			else it++;
 
 			if (loopBreak) break;
-			else if (it != aniUSet.end())//¼³·É Dictator°¡ ¾Æ´Ï¶óµµ ´ÙÀ½ Ani°¡ Dictator¸é ¹Ì¸® Á¾·áÇÔ, ´ÙÀ½Àº Dictator¸¸ÀÇ µ¶¹«´ë¸¦ À§ÇØ 
+			else if (it != aniUSet.end())//ì„¤ë ¹ Dictatorê°€ ì•„ë‹ˆë¼ë„ ë‹¤ìŒ Aniê°€ Dictatorë©´ ë¯¸ë¦¬ ì¢…ë£Œí•¨, ë‹¤ìŒì€ Dictatorë§Œì˜ ë…ë¬´ëŒ€ë¥¼ ìœ„í•´ 
 			{
 				if ((*it)->isDictator()) break;
 			}
 
 		}
 	}
-	//»ç¿ë °¡´ÉÇÑ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ÇÏ³ªµµ ¾ø´Â °æ¿ì
+	//ì‚¬ìš© ê°€ëŠ¥í•œ ì• ë‹ˆë©”ì´ì…˜ì´ í•˜ë‚˜ë„ ì—†ëŠ” ê²½ìš°
 	else endAnimeTurn();
 
 	return (getNanoTimer() - timeStampStart);
@@ -394,7 +394,7 @@ __int64 entityAITurn()
 		firstPlayerAnime = true;
 		firstMonsterAI = false;
 		firstMonsterAnime = true;
-		//prt(col::cyan, L"[ÅÏ ÆäÀÌÁî 3] ¸ó½ºÅÍ AI\n");
+		//prt(col::cyan, L"[í„´ í˜ì´ì¦ˆ 3] ëª¬ìŠ¤í„° AI\n");
 	}
 
 	bool endMonsterTurn = true;
@@ -419,10 +419,10 @@ __int64 entityAITurn()
 	{ 
 		turnCycle = turn::playerInput; 
 
-		//ÇÃ·¹ÀÌ¾î ½ºÅ×¹Ì³ª È¸º¹
+		//í”Œë ˆì´ì–´ ìŠ¤í…Œë¯¸ë‚˜ íšŒë³µ
 
 
-		//ÅÏ»çÀÌÅ¬ ¸ğµÎ Á¾·á
+		//í„´ì‚¬ì´í´ ëª¨ë‘ ì¢…ë£Œ
 		for (auto ePtr : entityList)
 		{
 			for (auto it = ePtr->entityInfo.statusEffects.begin(); it != ePtr->entityInfo.statusEffects.end();)

@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -48,7 +48,7 @@ import Dialogue;
 import Skill;
 import Quest;
 
-//HUD °´Ã¼´Â ¸â¹öº¯¼ö°¡ ¾Æ´Ï¶ó Àü¿ªº¯¼ö »ç¿ëÇÏµµ·Ï ¸¸µé °Í
+//HUD ê°ì²´ëŠ” ë©¤ë²„ë³€ìˆ˜ê°€ ì•„ë‹ˆë¼ ì „ì—­ë³€ìˆ˜ ì‚¬ìš©í•˜ë„ë¡ ë§Œë“¤ ê²ƒ
 export class HUD : public GUI
 {
 private:
@@ -61,7 +61,7 @@ private:
 
 	SDL_Rect quickSlotPopBtn;
 	
-	bool isQuickSlotPop = false; //È­¸é¿ìÃøÀÇ Äü½½·ÔÀÌ ¿À¸¥ÂÊÀ¸·Î ÆË¾÷µÇ¾ú´ÂÁö¸¦ ³ªÅ¸³»´Â bool º¯¼ö
+	bool isQuickSlotPop = false; //í™”ë©´ìš°ì¸¡ì˜ í€µìŠ¬ë¡¯ì´ ì˜¤ë¥¸ìª½ìœ¼ë¡œ íŒì—…ë˜ì—ˆëŠ”ì§€ë¥¼ ë‚˜íƒ€ë‚´ëŠ” bool ë³€ìˆ˜
 	float popUpDist = 360;
 	int quickSlotDist = 0;
 
@@ -82,10 +82,10 @@ private:
 
 	int delayR2 = 0;
 
-	int dragQuickSlotTarget = -1;//HUD¿¡¼­ ½ºÅ³Ã¢ ¿Å±æ ¶§ ¿ëµµ(Skill GUI¶û ±â´É µ¿ÀÏ)
+	int dragQuickSlotTarget = -1;//HUDì—ì„œ ìŠ¤í‚¬ì°½ ì˜®ê¸¸ ë•Œ ìš©ë„(Skill GUIë‘ ê¸°ëŠ¥ ë™ì¼)
 
 public:
-	SkillData* targetSkill; //GUIµéÀÌ °¡¸®Å°´Â ½ºÅ³
+	SkillData* targetSkill; //GUIë“¤ì´ ê°€ë¦¬í‚¤ëŠ” ìŠ¤í‚¬
 	HUD() : GUI(false)
 	{
 		prt(L"HUD instance was generated.\n");
@@ -101,9 +101,9 @@ public:
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		/*
-		* HUD´Â ´Ù¸¥ GUI °´Ã¼¿Í ´Ù¸£°Ô inputY¿¡ ÀÇÇØ¼­¸¸ °ªÀÌ Àû¿ë¹ŞÀ½
-		* ÆË¾÷ ¿ëµµÀÌ¸ç Áï center¿Í inputXÀÇ °ªÀº ¹Ù²ãµµ ¾Æ¹« ¿µÇâ ¾øÀ½
-		* inputY´Â »ó´ëÀ§Ä¡ÀÓ -10ÀÌ¸é Æò¼Ò À§Ä¡¿¡¼­ 10 ÇÈ¼¿¸¸Å­ À§·Î ¿Ã¶ó°£ °Í°ú °°À½
+		* HUDëŠ” ë‹¤ë¥¸ GUI ê°ì²´ì™€ ë‹¤ë¥´ê²Œ inputYì— ì˜í•´ì„œë§Œ ê°’ì´ ì ìš©ë°›ìŒ
+		* íŒì—… ìš©ë„ì´ë©° ì¦‰ centerì™€ inputXì˜ ê°’ì€ ë°”ê¿”ë„ ì•„ë¬´ ì˜í–¥ ì—†ìŒ
+		* inputYëŠ” ìƒëŒ€ìœ„ì¹˜ì„ -10ì´ë©´ í‰ì†Œ ìœ„ì¹˜ì—ì„œ 10 í”½ì…€ë§Œí¼ ìœ„ë¡œ ì˜¬ë¼ê°„ ê²ƒê³¼ ê°™ìŒ
 		*/
 
 		letterbox = { 0, 0, 630, 140 };
@@ -117,7 +117,7 @@ public:
 			letterboxInButton[i] = { barButton[i].x + 3,  barButton[i].y + 3, 72 - 6, 72 - 6 };
 		}
 		letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
-		//ÅÇ ¹öÆ°Àº changeXYÀÇ ¿µÇâÀ» ¹ŞÁö ¾ÊÀ½
+		//íƒ­ ë²„íŠ¼ì€ changeXYì˜ ì˜í–¥ì„ ë°›ì§€ ì•ŠìŒ
 		tab = { cameraW - 128, 22, 120, 120 };
 		tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
 
@@ -144,7 +144,7 @@ public:
 	void clickHoldGUI();
 	void mouseWheel() 
 	{
-		//ÁÜÀÎ ÁÜ¾Æ¿ô
+		//ì¤Œì¸ ì¤Œì•„ì›ƒ
 		if (event.wheel.y > 0)
 		{
 			zoomScale += 1;
@@ -165,14 +165,14 @@ public:
 
 	bool runAnimation(bool shutdown) override
 	{
-		//prt(L"HUDÀÇ runAnimationÀÌ ½ÇÇàµÇ¾ú´Ù.\n");
+		//prt(L"HUDì˜ runAnimationì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
 		const int acc = 20;
 		const int initSpeed = 4;
 		if (getAniType() == aniFlag::popUpLetterbox)
 		{
-			//initDist°¡ Á¤ÇØÁ®ÀÖ¾î¾ß ÇÑ´Ù.
-			//¿ªÀ¸·Î initDist¿¡¼­ °¡¼ÓÀ» ±¸ÇÒ ¼ö ÀÖ¾î¾ß ÇÔ
-			static std::array<float, 10> spd = { 0, };//spd[0]Àº 0ÇÁ·¹ÀÓÀÏ ¶§ÀÇ ¼Óµµ
+			//initDistê°€ ì •í•´ì ¸ìˆì–´ì•¼ í•œë‹¤.
+			//ì—­ìœ¼ë¡œ initDistì—ì„œ ê°€ì†ì„ êµ¬í•  ìˆ˜ ìˆì–´ì•¼ í•¨
+			static std::array<float, 10> spd = { 0, };//spd[0]ì€ 0í”„ë ˆì„ì¼ ë•Œì˜ ì†ë„
 			static float initDist = 0;
 			float dstDist = popUpDist;
 
@@ -186,7 +186,7 @@ public:
 					spd[9 - i] = acc * i + initSpeed;
 					initDist += spd[9 - i];
 				}
-				//Á¤±ÔÈ­
+				//ì •ê·œí™”
 				for (int i = 0; i <= 9; i++)
 				{
 					spd[i] *= (dstDist / initDist);
@@ -206,9 +206,9 @@ public:
 		}
 		else if (getAniType() == aniFlag::popDownLetterbox)
 		{
-			//initDist°¡ Á¤ÇØÁ®ÀÖ¾î¾ß ÇÑ´Ù.
-			//¿ªÀ¸·Î initDist¿¡¼­ °¡¼ÓÀ» ±¸ÇÒ ¼ö ÀÖ¾î¾ß ÇÔ
-			static std::array<float, 10> spd = { 0, };//spd[0]Àº 0ÇÁ·¹ÀÓÀÏ ¶§ÀÇ ¼Óµµ
+			//initDistê°€ ì •í•´ì ¸ìˆì–´ì•¼ í•œë‹¤.
+			//ì—­ìœ¼ë¡œ initDistì—ì„œ ê°€ì†ì„ êµ¬í•  ìˆ˜ ìˆì–´ì•¼ í•¨
+			static std::array<float, 10> spd = { 0, };//spd[0]ì€ 0í”„ë ˆì„ì¼ ë•Œì˜ ì†ë„
 			static float initDist = 0;
 			float dstDist = popUpDist;
 			dstDist = -y;
@@ -223,7 +223,7 @@ public:
 					spd[i] = acc * i + initSpeed;
 					initDist += spd[i];
 				}
-				//Á¤±ÔÈ­
+				//ì •ê·œí™”
 				for (int i = 0; i <= 9; i++)
 				{
 					spd[i] *= (dstDist / initDist);
@@ -243,7 +243,7 @@ public:
 		}
 		else if (getAniType() == aniFlag::quickSlotPopLeft)
 		{
-			static std::array<float, 10> spd = { 0, };//spd[0]Àº 0ÇÁ·¹ÀÓÀÏ ¶§ÀÇ ¼Óµµ
+			static std::array<float, 10> spd = { 0, };//spd[0]ì€ 0í”„ë ˆì„ì¼ ë•Œì˜ ì†ë„
 			static float initDist = 0;
 			float dstDist = 137;
 
@@ -258,7 +258,7 @@ public:
 					spd[9 - i] = acc * i + initSpeed;
 					initDist += spd[9 - i];
 				}
-				//Á¤±ÔÈ­
+				//ì •ê·œí™”
 				for (int i = 0; i <= 9; i++)
 				{
 					spd[i] *= (dstDist / initDist);
@@ -280,7 +280,7 @@ public:
 		}
 		else if (getAniType() == aniFlag::quickSlotPopRight)
 		{
-			static std::array<float, 10> spd = { 0, };//spd[0]Àº 0ÇÁ·¹ÀÓÀÏ ¶§ÀÇ ¼Óµµ
+			static std::array<float, 10> spd = { 0, };//spd[0]ì€ 0í”„ë ˆì„ì¼ ë•Œì˜ ì†ë„
 			static float initDist = 0;
 			float dstDist = 137;
 
@@ -295,7 +295,7 @@ public:
 					spd[9 - i] = acc * i + initSpeed;
 					initDist += spd[9 - i];
 				}
-				//Á¤±ÔÈ­
+				//ì •ê·œí™”
 				for (int i = 0; i <= 9; i++)
 				{
 					spd[i] *= (dstDist / initDist);
@@ -327,7 +327,7 @@ public:
 			mouseStep();
 		}
 
-		//ÇöÀç ¼ö·Ã ÁßÀÎ Àç´ÉÀÌ ¾øÀ» °æ¿ì °­Á¦·Î Àç´É Ã¢À» ¿­À½
+		//í˜„ì¬ ìˆ˜ë ¨ ì¤‘ì¸ ì¬ëŠ¥ì´ ì—†ì„ ê²½ìš° ê°•ì œë¡œ ì¬ëŠ¥ ì°½ì„ ì—´ìŒ
 		if (Profic::ins() == nullptr)
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
@@ -386,15 +386,15 @@ public:
 			new Equip();
 			break;
 		case act::profic:
-			updateLog(L"#FFFFFFÀç´É Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFì¬ëŠ¥ ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Profic();
 			break;
 		case act::mutation:
-			updateLog(L"#FFFFFFµ¹¿¬º¯ÀÌ Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFëŒì—°ë³€ì´ ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Mutation();
 			break;
 		case act::bionic:
-			updateLog(L"#FFFFFF¹ÙÀÌ¿À´Ğ Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFë°”ì´ì˜¤ë‹‰ ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Bionic();
 			break;
 		case act::quest:
@@ -411,14 +411,14 @@ public:
 			new Skill();
 			break;
 		case act::craft:
-			updateLog(L"#FFFFFFÁ¶ÇÕ Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFì¡°í•© ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Craft();
 			break;
 		case act::construct:
-			updateLog(L"#FFFFFF»èÁ¦µÈ GUIÀÌ´Ù.");
+			updateLog(L"#FFFFFFì‚­ì œëœ GUIì´ë‹¤.");
 			break;
 		case act::alchemy:
-			updateLog(L"#FFFFFF¿¬±İ¼ú Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFì—°ê¸ˆìˆ  ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Alchemy();
 			break;
 		case act::turnLeft:
@@ -520,11 +520,11 @@ public:
 			break;
 		}
 		case act::god:
-			updateLog(L"#FFFFFF½Å¾Ó Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFì‹ ì•™ ì°½ì„ ì—´ì—ˆë‹¤.");
 			new God(playerGod);
 			break;
 		case act::map:
-			updateLog(L"#FFFFFFÁöµµ Ã¢À» ¿­¾ú´Ù.");
+			updateLog(L"#FFFFFFì§€ë„ ì°½ì„ ì—´ì—ˆë‹¤.");
 			new Map();
 			break;
 		case act::test:
@@ -574,7 +574,7 @@ public:
 			break;
 		}
 		default:
-			updateLog(L"#FFFFFF¾Ë¼ö¾ø´Â ·¹ÅÍ¹Ú½º ¹öÆ°ÀÌ ´­·È´Ù.");
+			updateLog(L"#FFFFFFì•Œìˆ˜ì—†ëŠ” ë ˆí„°ë°•ìŠ¤ ë²„íŠ¼ì´ ëˆŒë ¸ë‹¤.");
 		}
 
 		if (popDownWhenEnd == true)
@@ -582,17 +582,17 @@ public:
 			if (y != 0) executePopDown();
 		}
 	}
-	void tileTouch(int touchX, int touchY) //ÀÏ¹İ Å¸ÀÏ ÅÍÄ¡
+	void tileTouch(int touchX, int touchY) //ì¼ë°˜ íƒ€ì¼ í„°ì¹˜
 	{
-		if (ctrlVeh == nullptr)//Â÷·® Á¶Á¾ ÁßÀÌ ¾Æ´Ò °æ¿ì
+		if (ctrlVeh == nullptr)//ì°¨ëŸ‰ ì¡°ì¢… ì¤‘ì´ ì•„ë‹ ê²½ìš°
 		{
-			//È­¸é¿¡ ÀÖ´Â ¾ÆÀÌÅÛ ÅÍÄ¡
-			if (touchX == PlayerX() && touchY == PlayerY()) //ÀÚ½Å À§Ä¡ ÅÍÄ¡
+			//í™”ë©´ì— ìˆëŠ” ì•„ì´í…œ í„°ì¹˜
+			if (touchX == PlayerX() && touchY == PlayerY()) //ìì‹  ìœ„ì¹˜ í„°ì¹˜
 			{
 
 				if (World::ins()->getTile(touchX, touchY, PlayerZ()).ItemStackPtr != nullptr)
 				{
-					prt(L"·çÆÃÃ¢ ¿ÀÇÂ ÇÔ¼ö ½ÇÇà\n");
+					prt(L"ë£¨íŒ…ì°½ ì˜¤í”ˆ í•¨ìˆ˜ ì‹¤í–‰\n");
 					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).ItemStackPtr;
 					new Loot(targetStack);
 					click = false;
@@ -601,10 +601,10 @@ public:
 				{
 					Vehicle* belowVehicle = (Vehicle*)World::ins()->getTile(touchX, touchY, PlayerZ()).VehiclePtr;
 					bool findController = false;
-					prt(L"below propÀÇ »çÀÌÁî´Â %dÀÌ´Ù.\n", belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size());
+					prt(L"below propì˜ ì‚¬ì´ì¦ˆëŠ” %dì´ë‹¤.\n", belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size());
 					for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size(); i++)
 					{
-						if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 99)//Â÷·® Á¶Á¾ÀåÄ¡
+						if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 99)//ì°¨ëŸ‰ ì¡°ì¢…ì¥ì¹˜
 						{
 							if (ctrlVeh == nullptr)
 							{
@@ -619,7 +619,7 @@ public:
 								typeHUD = vehFlag::none;
 							}
 						}
-						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 311)//Çï±â Á¶Á¾ÀåÄ¡
+						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 311)//í—¬ê¸° ì¡°ì¢…ì¥ì¹˜
 						{
 							if (ctrlVeh == nullptr)
 							{
@@ -634,7 +634,7 @@ public:
 								typeHUD = vehFlag::none;;
 							}
 						}
-						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 313)//¿­Â÷ Á¶Á¾ÀåÄ¡
+						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 313)//ì—´ì°¨ ì¡°ì¢…ì¥ì¹˜
 						{
 							if (ctrlVeh == nullptr)
 							{
@@ -649,7 +649,7 @@ public:
 								typeHUD = vehFlag::none;;
 							}
 						}
-						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemVIPCode::minecartController) //¿­Â÷ Á¶Á¾ÀåÄ¡
+						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemVIPCode::minecartController) //ì—´ì°¨ ì¡°ì¢…ì¥ì¹˜
 						{
 							if (ctrlVeh == nullptr)
 							{
@@ -676,11 +676,11 @@ public:
 						{
 							if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 							{
-								updateLog(L"#FFFFFFÀÌ °è´ÜÀÇ À§Ãş¿¡ ¹Ù´ÚÀÌ Á¸ÀçÇÏÁö ¾Ê´Â´Ù.");
+								updateLog(L"#FFFFFFì´ ê³„ë‹¨ì˜ ìœ„ì¸µì— ë°”ë‹¥ì´ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤.");
 							}
 							else
 							{
-								updateLog(L"#FFFFFF°è´ÜÀ» ¿Ã¶ó°¬´Ù.");
+								updateLog(L"#FFFFFFê³„ë‹¨ì„ ì˜¬ë¼ê°”ë‹¤.");
 								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
 								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
@@ -690,7 +690,7 @@ public:
 								Prop* upProp = TileProp(touchX, touchY, PlayerZ());
 								if (upProp == nullptr)
 								{
-									new Prop(PlayerX(), PlayerY(), PlayerZ(), 299);//ÇÏ°­°è´Ü
+									new Prop(PlayerX(), PlayerY(), PlayerZ(), 299);//í•˜ê°•ê³„ë‹¨
 								}
 							}
 						}
@@ -698,11 +698,11 @@ public:
 						{
 							if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != 0)
 							{
-								updateLog(L"#FFFFFF³»·Á°¡´Â °è´ÜÀÌ º®À¸·Î ¸·ÇôÀÖ´Ù.");
+								updateLog(L"#FFFFFFë‚´ë ¤ê°€ëŠ” ê³„ë‹¨ì´ ë²½ìœ¼ë¡œ ë§‰í˜€ìˆë‹¤.");
 							}
 							else
 							{
-								updateLog(L"#FFFFFF°è´ÜÀ» ³»·Á°¬´Ù.");
+								updateLog(L"#FFFFFFê³„ë‹¨ì„ ë‚´ë ¤ê°”ë‹¤.");
 								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
 								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
 								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
@@ -712,14 +712,14 @@ public:
 								Prop* downProp = TileProp(touchX, touchY, PlayerZ());
 								if (downProp == nullptr)
 								{
-									new Prop(PlayerX(), PlayerY(), PlayerZ(), 298);//»ó½Â°è´Ü
+									new Prop(PlayerX(), PlayerY(), PlayerZ(), 298);//ìƒìŠ¹ê³„ë‹¨
 								}
 							}
 						}
 					}
 				}
 			}
-			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1Ä­ ÀÌ³»
+			else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1ì¹¸ ì´ë‚´
 			{
 				if (TileWall(touchX, touchY, PlayerZ()) != 0)
 				{
@@ -765,11 +765,11 @@ public:
 					{
 						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 						{
-							updateLog(L"#FFFFFFÀÌ °è´ÜÀÇ À§Ãş¿¡ ¹Ù´ÚÀÌ Á¸ÀçÇÏÁö ¾Ê´Â´Ù.");
+							updateLog(L"#FFFFFFì´ ê³„ë‹¨ì˜ ìœ„ì¸µì— ë°”ë‹¥ì´ ì¡´ì¬í•˜ì§€ ì•ŠëŠ”ë‹¤.");
 						}
 						else
 						{
-							updateLog(L"#FFFFFF°è´ÜÀ» ¿Ã¶ó°¬´Ù.");
+							updateLog(L"#FFFFFFê³„ë‹¨ì„ ì˜¬ë¼ê°”ë‹¤.");
 							Player::ins()->addGridZ(1);
 						}
 					}
@@ -781,23 +781,23 @@ public:
 						Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 						addAniUSetPlayer(Player::ins(), aniFlag::felling);
 					}
-					else if (tgtItemCode == 213 || tgtItemCode == 218)//ºÒ±³ Á¦´Ü
+					else if (tgtItemCode == 213 || tgtItemCode == 218)//ë¶ˆêµ ì œë‹¨
 					{
 						new God(godFlag::buddha);
 					}
-					else if (tgtItemCode == 214)//Ãµ°ø·Î
+					else if (tgtItemCode == 214)//ì²œê³µë¡œ
 					{
 						new God(godFlag::yudi);
 					}
-					else if (tgtItemCode == 216)//½ÊÀÚ°¡
+					else if (tgtItemCode == 216)//ì‹­ìê°€
 					{
 						new God(godFlag::jesus);
 					}
-					else if (tgtItemCode == 217)//Åä¸®ÀÌ
+					else if (tgtItemCode == 217)//í† ë¦¬ì´
 					{
 						new God(godFlag::amaterasu);
 					}
-					else if (tgtItemCode == 219)//¼®ÆÇ
+					else if (tgtItemCode == 219)//ì„íŒ
 					{
 						new God(godFlag::ra);
 					}
@@ -817,7 +817,7 @@ public:
 				Player::ins()->setAStarDst(touchX, touchY);
 			}
 		}
-		else//Â÷·®À» Á¶Á¾ÇÏ´Â »óÅÂÀÏ °æ¿ì
+		else//ì°¨ëŸ‰ì„ ì¡°ì¢…í•˜ëŠ” ìƒíƒœì¼ ê²½ìš°
 		{
 			if (touchX == PlayerX() && touchY == PlayerY())
 			{
@@ -868,9 +868,9 @@ public:
 		{
 			closeDoorCoord(doorList[0][0], doorList[0][1], cz);
 		}
-		else //¹®ÀÌ 2°³ ÀÌ»óÀÏ °æ¿ì
+		else //ë¬¸ì´ 2ê°œ ì´ìƒì¼ ê²½ìš°
 		{
-			new CoordSelect(L"´İÀ» ¹®À» ¼±ÅÃÇØÁÖ¼¼¿ä.", doorList);
+			new CoordSelect(L"ë‹«ì„ ë¬¸ì„ ì„ íƒí•´ì£¼ì„¸ìš”.", doorList);
 			co_await std::suspend_always();
 
 			std::wstring targetStr = coAnswer;
@@ -928,7 +928,7 @@ public:
 	void openContextMenu(Point2 targetGrid)
 	{
 		std::vector<act> inputOptions;
-		//¹®´İ±â Ãß°¡
+		//ë¬¸ë‹«ê¸° ì¶”ê°€
 		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			Prop* instlPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
@@ -938,7 +938,7 @@ public:
 			}
 		}
 
-		//¿­±â Ãß°¡
+		//ì—´ê¸° ì¶”ê°€
 		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
 		{
 			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
@@ -953,7 +953,7 @@ public:
 			}
 		}
 
-		//´ç±â±â Ãß°¡
+		//ë‹¹ê¸°ê¸° ì¶”ê°€
 		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
 		{
 			inputOptions.push_back(act::pull);
@@ -974,19 +974,19 @@ public:
 			windowCoord = { dst.x, dst.y };
 		}
 
-		//¼ö¿µÇÏ±â Ãß°¡
+		//ìˆ˜ì˜í•˜ê¸° ì¶”ê°€
 		if (itemDex[TileFloor(targetGrid.x, targetGrid.y, PlayerZ())].checkFlag(itemFlag::WATER_DEEP))
 		{
 			inputOptions.push_back(act::swim);
 		}
 
-		//µî¹İ Ãß°¡
+		//ë“±ë°˜ ì¶”ê°€
 		if (itemDex[TileWall(targetGrid.x, targetGrid.y, PlayerZ())].checkFlag(itemFlag::CAN_CLIMB))
 		{
 			inputOptions.push_back(act::climb);
 		}
 
-		//½Â¸¶ Ãß°¡
+		//ìŠ¹ë§ˆ ì¶”ê°€
 		if (TileEntity(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			inputOptions.push_back(act::ride);

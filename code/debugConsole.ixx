@@ -1,4 +1,4 @@
-#include <sol/sol.hpp>
+ï»¿#include <sol/sol.hpp>
 
 export module debugConsole;
 
@@ -23,37 +23,37 @@ export void debugConsole()
 	int yp = PlayerY();
 	int zp = PlayerZ();
 
-	updateLog(L"#FFFFFFµğ¹ö±× Å×½ºÆ® ±â´ÉÀ» ½ÇÇàÇß´Ù.");
+	updateLog(L"#FFFFFFë””ë²„ê·¸ í…ŒìŠ¤íŠ¸ ê¸°ëŠ¥ì„ ì‹¤í–‰í–ˆë‹¤.");
 	prt(L"////////////////////////////////////////\n");
-	prt(L"[µğ¹ö±× ¸ğµå] ¿øÇÏ´Â °ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
-	prt(L"ÇöÀç ÇÃ·¹ÀÌ¾îÀÇ ÁÂÇ¥´Â (%d,%d,%d)ÀÌ´Ù.\n", PlayerX(), PlayerY(), PlayerZ());
-	prt(L"1.±¤¿ø »ı¼º\n");
-	prt(L"2.Àû »ı¼º\n");
-	prt(L"3.Å×½ºÆ® ·Î±× °»½Å\n");
-	prt(L"4.¾ÆÀÌÅÛ »ı¼º\n");
-	prt(L"5.ºÒ »ı¼º\n");
-	prt(L"6.EntityPtr ÄÜ¼Ö Ãâ·Â\n");
-	prt(L"7.º® »ı¼º\n");
-	prt(L"8.·Î±× Å¸ÀÌ¸Ó ºñÈ°¼ºÈ­/È°¼ºÈ­\n");
-	prt(L"9.·Î±× Å¬¸®¾î\n");
-	prt(L"10.°íÁ¤ ÅØ½ºÃÄ »ı¼º\n");
-	prt(L"11.°¡½º »ı¼º\n");
-	prt(L"12. ÀÌÅ¢ 1¹ø Á¦ÀÚ¸® µå·Ó\n");
-	prt(L"13. ´Ş¸®±â Åä±Û\n");
-	prt(L"14. °æÇèÄ¡ È¹µæ\n");
-	prt(L"15. Å¾½Â ÁßÀÎ Â÷·®À» ¹İ½Ã°è·Î 22.5µµ È¸Àü\n");
-	prt(L"16. Å¾½Â ÁßÀÎ Â÷·®À» ¿öÇÁ½ÃÅ°±â\n");
-	prt(L"17. Å¾½Â ÁßÀÎ Â÷·®À» ¿¬¼ÓÀûÀ¸·Î ÀÌµ¿½ÃÅ°±â\n");
-	prt(L"18. fov ÄÜ¼Ö Ãâ·Â\n");
-	prt(L"19. ½Ã°£ °­Á¦ ¼³Á¤\n");
-	prt(L"20. ³¯Â¥ °­Á¦ ¼³Á¤\n");
-	prt(L"21. ³¯¾¾ º¯°æ\n");
-	prt(L"22. ¸» »ı¼º\n");
-	prt(L"23. »óÅÂÀÌ»ó Ãß°¡\n");
-	prt(L"24. ÇÃ·¹ÀÌ¾î ÅÚ·¹Æ÷Æ®\n");
-	prt(L"25. Ã»Å© ¶óÀÎ Ç¥½Ã\n");
-	prt(L"26. Ã»Å© µ¤¾î¾²±â\n");
-	prt(L"27. Lua ½ºÅ©¸³Æ® ½ÇÇà\n");
+	prt(L"[ë””ë²„ê·¸ ëª¨ë“œ] ì›í•˜ëŠ” ê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+	prt(L"í˜„ì¬ í”Œë ˆì´ì–´ì˜ ì¢Œí‘œëŠ” (%d,%d,%d)ì´ë‹¤.\n", PlayerX(), PlayerY(), PlayerZ());
+	prt(L"1.ê´‘ì› ìƒì„±\n");
+	prt(L"2.ì  ìƒì„±\n");
+	prt(L"3.í…ŒìŠ¤íŠ¸ ë¡œê·¸ ê°±ì‹ \n");
+	prt(L"4.ì•„ì´í…œ ìƒì„±\n");
+	prt(L"5.ë¶ˆ ìƒì„±\n");
+	prt(L"6.EntityPtr ì½˜ì†” ì¶œë ¥\n");
+	prt(L"7.ë²½ ìƒì„±\n");
+	prt(L"8.ë¡œê·¸ íƒ€ì´ë¨¸ ë¹„í™œì„±í™”/í™œì„±í™”\n");
+	prt(L"9.ë¡œê·¸ í´ë¦¬ì–´\n");
+	prt(L"10.ê³ ì • í…ìŠ¤ì³ ìƒì„±\n");
+	prt(L"11.ê°€ìŠ¤ ìƒì„±\n");
+	prt(L"12. ì´í… 1ë²ˆ ì œìë¦¬ ë“œë¡­\n");
+	prt(L"13. ë‹¬ë¦¬ê¸° í† ê¸€\n");
+	prt(L"14. ê²½í—˜ì¹˜ íšë“\n");
+	prt(L"15. íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ì„ ë°˜ì‹œê³„ë¡œ 22.5ë„ íšŒì „\n");
+	prt(L"16. íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ì„ ì›Œí”„ì‹œí‚¤ê¸°\n");
+	prt(L"17. íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ì„ ì—°ì†ì ìœ¼ë¡œ ì´ë™ì‹œí‚¤ê¸°\n");
+	prt(L"18. fov ì½˜ì†” ì¶œë ¥\n");
+	prt(L"19. ì‹œê°„ ê°•ì œ ì„¤ì •\n");
+	prt(L"20. ë‚ ì§œ ê°•ì œ ì„¤ì •\n");
+	prt(L"21. ë‚ ì”¨ ë³€ê²½\n");
+	prt(L"22. ë§ ìƒì„±\n");
+	prt(L"23. ìƒíƒœì´ìƒ ì¶”ê°€\n");
+	prt(L"24. í”Œë ˆì´ì–´ í…”ë ˆí¬íŠ¸\n");
+	prt(L"25. ì²­í¬ ë¼ì¸ í‘œì‹œ\n");
+	prt(L"26. ì²­í¬ ë®ì–´ì“°ê¸°\n");
+	prt(L"27. Lua ìŠ¤í¬ë¦½íŠ¸ ì‹¤í–‰\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -61,13 +61,13 @@ export void debugConsole()
 	{
 	default:
 	{
-		prt(L"Àß¸øµÈ °ªÀ» ÀÔ·ÂÇÏ¿´½À´Ï´Ù.\n");
+		prt(L"ì˜ëª»ëœ ê°’ì„ ì…ë ¥í•˜ì˜€ìŠµë‹ˆë‹¤.\n");
 		break;
 	}
 	case 1:// generateLight
 	{
 		int autoLight = false;
-		prt(L"ÀÚµ¿ Á¶¸íÀ» »ı¼ºÇÏ½Ã°Ú½À´Ï±î?(0 or 1)\n");
+		prt(L"ìë™ ì¡°ëª…ì„ ìƒì„±í•˜ì‹œê² ìŠµë‹ˆê¹Œ?(0 or 1)\n");
 		std::cin >> autoLight;
 		if (autoLight)
 		{
@@ -81,22 +81,22 @@ export void debugConsole()
 			int lightColorB;
 			int sight;
 			int bright;
-			prt(L"±¤¿øÀÇ ½Ã¾ß ¹üÀ§¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä(0~10).\n");
+			prt(L"ê´‘ì›ì˜ ì‹œì•¼ ë²”ìœ„ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”(0~10).\n");
 			std::cin >> sight;
-			prt(L"±¤¿øÀÇ ¹à±â ÀÔ·ÂÇØÁÖ¼¼¿ä(0~255).\n");
+			prt(L"ê´‘ì›ì˜ ë°ê¸° ì…ë ¥í•´ì£¼ì„¸ìš”(0~255).\n");
 			std::cin >> bright;
-			prt(L"±¤¿øÀÇ R°ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä(0~255).\n");
+			prt(L"ê´‘ì›ì˜ Rê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(0~255).\n");
 			std::cin >> lightColorR;
-			prt(L"±¤¿øÀÇ G°ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä(0~255).\n");
+			prt(L"ê´‘ì›ì˜ Gê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(0~255).\n");
 			std::cin >> lightColorG;
-			prt(L"±¤¿øÀÇ B°ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä(0~255).\n");
+			prt(L"ê´‘ì›ì˜ Bê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(0~255).\n");
 			std::cin >> lightColorB;
 
 			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
 			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 		}
-		updateLog(L"#FFFFFFµğ¹ö±× : Å×½ºÆ® ±¤¿øÀ» »ı¼ºÇß´Ù.");
-		prt(L"[µğ¹ö±×]Å×½ºÆ® ±¤¿øÀ» »ı¼ºÇß´Ù!\n");
+		updateLog(L"#FFFFFFë””ë²„ê·¸ : í…ŒìŠ¤íŠ¸ ê´‘ì›ì„ ìƒì„±í–ˆë‹¤.");
+		prt(L"[ë””ë²„ê·¸]í…ŒìŠ¤íŠ¸ ê´‘ì›ì„ ìƒì„±í–ˆë‹¤!\n");
 
 		break;
 	}
@@ -104,35 +104,35 @@ export void debugConsole()
 	{
 		Player* ptr = Player::ins();
 		new Monster(2, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
-		prt(L"[µğ¹ö±×]»õ·Î¿î ¿£Æ¼Æ¼¸¦ ¸¸µé¾ú´Ù!\n");
+		prt(L"[ë””ë²„ê·¸]ìƒˆë¡œìš´ ì—”í‹°í‹°ë¥¼ ë§Œë“¤ì—ˆë‹¤!\n");
 		break;
 	}
-	case 3: //·Î±× ¾÷µ¥ÀÌÆ®
+	case 3: //ë¡œê·¸ ì—…ë°ì´íŠ¸
 	{
-		updateLog(L"#FFFFFFµğ¹ö±× : #FF0000Fire#2ECCFA¾óÀ½");
-		prt(L"[µğ¹ö±×]Å×½ºÆ®·Î±×¸¦ °»½ÅÇß´Ù!\n");
+		updateLog(L"#FFFFFFë””ë²„ê·¸ : #FF0000Fire#2ECCFAì–¼ìŒ");
+		prt(L"[ë””ë²„ê·¸]í…ŒìŠ¤íŠ¸ë¡œê·¸ë¥¼ ê°±ì‹ í–ˆë‹¤!\n");
 		break;
 	}
-	case 4: //Å×½ºÆ® ¾ÆÀÌÅÛ
+	case 4: //í…ŒìŠ¤íŠ¸ ì•„ì´í…œ
 	{
-		updateLog(L"#FFFFFFµğ¹ö±× : Å×½ºÆ® ¾ÆÀÌÅÛÀ» »ı¼ºÇß´Ù.");
+		updateLog(L"#FFFFFFë””ë²„ê·¸ : í…ŒìŠ¤íŠ¸ ì•„ì´í…œì„ ìƒì„±í–ˆë‹¤.");
 		ItemStack* item = new ItemStack(PlayerX(), PlayerY(), PlayerZ());
 		(item->getPocket())->addItemFromDex(0, 2);
 		(item->getPocket())->addItemFromDex(1, 4);
-		prt(L"[µğ¹ö±×]Å×½ºÆ® ¾ÆÀÌÅÛÀ» »ı¼ºÇß´Ù!\n");
+		prt(L"[ë””ë²„ê·¸]í…ŒìŠ¤íŠ¸ ì•„ì´í…œì„ ìƒì„±í–ˆë‹¤!\n");
 		break;
 	}
-	case 5: //¸ÊÇÙ
+	case 5: //ë§µí•µ
 	{
 		int inputX;
 		int inputY;
 		int fireSize;
-		prt(L"[»ó´ë ÁÂÇ¥]\n");
-		prt(L"»ı¼ºÇÒ ºÒÀÇ Å©±â¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.(1~3)\n");
+		prt(L"[ìƒëŒ€ ì¢Œí‘œ]\n");
+		prt(L"ìƒì„±í•  ë¶ˆì˜ í¬ê¸°ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.(1~3)\n");
 		std::cin >> fireSize;
-		prt(L"»ı¼ºÇÒ È­¿°ÀÇ x ÁÂÇ¥¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+		prt(L"ìƒì„±í•  í™”ì—¼ì˜ x ì¢Œí‘œë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
 		std::cin >> inputX;
-		prt(L"»ı¼ºÇÒ È­¿°ÀÇ y ÁÂÇ¥¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+		prt(L"ìƒì„±í•  í™”ì—¼ì˜ y ì¢Œí‘œë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
 		std::cin >> inputY;
 
 		switch (fireSize)
@@ -147,11 +147,11 @@ export void debugConsole()
 			new Flame(xp + inputX, yp + inputY, zp, flameFlag::BIG);
 			break;
 		}
-		updateLog(L"#FFFFFFÈ­¿°À» »ı¼ºÇß´Ù.");
-		prt(L"[µğ¹ö±×]È­¿°À» »ı¼ºÇß´Ù.\n");
+		updateLog(L"#FFFFFFí™”ì—¼ì„ ìƒì„±í–ˆë‹¤.");
+		prt(L"[ë””ë²„ê·¸]í™”ì—¼ì„ ìƒì„±í–ˆë‹¤.\n");
 		break;
 	}
-	case 6: //entityPtr Ãâ·Â
+	case 6: //entityPtr ì¶œë ¥
 	{
 		int xp = PlayerX();
 		int yp = PlayerY();
@@ -160,13 +160,13 @@ export void debugConsole()
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (TileEntity(x, y, zp) == nullptr) prt(L"¡à");
+				if (TileEntity(x, y, zp) == nullptr) prt(L"â–¡");
 				else if (TileEntity(x, y, zp) == Player::ins()) prt(lowCol::yellow, L"@");
 				else prt(lowCol::red, L"E");
 			}
 			prt(L"\n");
 		}
-		prt(L"[µğ¹ö±×] entityPtr Ãâ·ÂÀ» ³¡³Â´Ù!\n");
+		prt(L"[ë””ë²„ê·¸] entityPtr ì¶œë ¥ì„ ëëƒˆë‹¤!\n");
 		break;
 	}
 	case 7: //create wall
@@ -174,14 +174,14 @@ export void debugConsole()
 		int wallX;
 		int wallY;
 		int wallZ;
-		prt(L"[»ó´ë ÁÂÇ¥]\n");
-		prt(L"»ı¼ºÇÒ º®ÀÇ x ÁÂÇ¥¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+		prt(L"[ìƒëŒ€ ì¢Œí‘œ]\n");
+		prt(L"ìƒì„±í•  ë²½ì˜ x ì¢Œí‘œë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
 		std::cin >> wallX;
-		prt(L"»ı¼ºÇÒ º®ÀÇ y ÁÂÇ¥¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+		prt(L"ìƒì„±í•  ë²½ì˜ y ì¢Œí‘œë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
 		std::cin >> wallY;
-		prt(L"»ı¼ºÇÒ º®ÀÇ z ÁÂÇ¥¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
+		prt(L"ìƒì„±í•  ë²½ì˜ z ì¢Œí‘œë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
 		std::cin >> wallZ;
-		prt(L"[µğ¹ö±×](%d,%d,%d) À§Ä¡¿¡ º®À» »ı¼ºÇß´Ù!\n", xp + wallX, yp + wallY, zp + wallZ);
+		prt(L"[ë””ë²„ê·¸](%d,%d,%d) ìœ„ì¹˜ì— ë²½ì„ ìƒì„±í–ˆë‹¤!\n", xp + wallX, yp + wallY, zp + wallZ);
 		World::ins()->getTile(xp + wallX, yp + wallY, zp + wallZ).wall = true;
 		break;
 	}
@@ -210,22 +210,22 @@ export void debugConsole()
 		//new Sticker(false, Player::ins()->getX(), Player::ins()->y - 16, spr::defaultStranger, 0, L"123DEPTHTEST", true);
 		break;
 	}
-	case 11: // °¡½º »ı¼º
+	case 11: // ê°€ìŠ¤ ìƒì„±
 	{
 		int gasCode, gasVol;
-		prt(L"[»ó´ë ÁÂÇ¥]\n");
-		prt(L"»ı¼ºÇÒ °¡½ºÀÇ ¾ÆÀÌÅÛ ÄÚµå¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"[ìƒëŒ€ ì¢Œí‘œ]\n");
+		prt(L"ìƒì„±í•  ê°€ìŠ¤ì˜ ì•„ì´í…œ ì½”ë“œë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> gasCode;
-		prt(L"»ı¼ºÇÒ °¡½ºÀÇ ºÎÇÇ¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ìƒì„±í•  ê°€ìŠ¤ì˜ ë¶€í”¼ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> gasVol;
 		if (World::ins()->getTile(xp, yp, zp).checkGas(gasCode) == -1)
 		{
 			World::ins()->getTile(xp, yp, zp).gasVec.push_back({ gasCode, gasVol });
 		}
-		prt(col::white, L"%ls¸¦ %dÀÇ ºÎÇÇ¸¸Å­ ÁÂÇ¥ (%d,%d,%d)¿¡ »ı¼ºÇÏ¿´´Ù!\n", itemDex[gasCode].name.c_str(), gasVol, xp, yp, zp);
+		prt(col::white, L"%lsë¥¼ %dì˜ ë¶€í”¼ë§Œí¼ ì¢Œí‘œ (%d,%d,%d)ì— ìƒì„±í•˜ì˜€ë‹¤!\n", itemDex[gasCode].name.c_str(), gasVol, xp, yp, zp);
 		break;
 	}
-	case 12: // ÀÌÅ¢¸ÕÆ® 1¹ø ¾ÆÀÌÅÛ Á¦ÀÚ¸® µå·Ó
+	case 12: // ì´í…ë¨¼íŠ¸ 1ë²ˆ ì•„ì´í…œ ì œìë¦¬ ë“œë¡­
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		ItemPocket* txPtr = new ItemPocket(storageType::temp);
@@ -244,114 +244,114 @@ export void debugConsole()
 	case 14:
 	{
 		int expVal;
-		prt(L"Ãß°¡ÇÒ °æÇèÄ¡ÀÇ ¾çÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ì¶”ê°€í•  ê²½í—˜ì¹˜ì˜ ì–‘ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> expVal;
 		Player::ins()->addProficExp(expVal);
 		break;
 	}
-	case 15://Å¾½Â ÁßÀÎ Â÷·® È¸Àü
+	case 15://íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ íšŒì „
 	{
 		Vehicle* myCar = (Vehicle*)(ctrlVeh);
 		myCar->rotate(ACW(myCar->bodyDir));
 		break;
 	}
-	case 16://Å¾½Â ÁßÀÎ Â÷·® ¼ø°£ÀÌµ¿
+	case 16://íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ ìˆœê°„ì´ë™
 	{
 		Vehicle* myCar = (Vehicle*)(ctrlVeh);
 		int dx, dy;
-		prt(L"ÀÌµ¿ÇÒ °Å¸® dx¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ì´ë™í•  ê±°ë¦¬ dxë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> dx;
-		prt(L"ÀÌµ¿ÇÒ °Å¸® dy¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ì´ë™í•  ê±°ë¦¬ dyë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> dy;
 		myCar->shift(dx, dy);
 		break;
 	}
-	case 17://Å¾½Â ÁßÀÎ Â÷·® ÀÌµ¿
+	case 17://íƒ‘ìŠ¹ ì¤‘ì¸ ì°¨ëŸ‰ ì´ë™
 	{
 		Vehicle* myCar = (Vehicle*)(ctrlVeh);
 		int dx, dy;
-		prt(L"ÀÌµ¿ÇÒ °Å¸® dx¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ì´ë™í•  ê±°ë¦¬ dxë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> dx;
-		prt(L"ÀÌµ¿ÇÒ °Å¸® dy¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"ì´ë™í•  ê±°ë¦¬ dyë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> dy;
 		myCar->rush(dx, dy);
 		break;
 	}
-	case 18: //fov Ãâ·Â
+	case 18: //fov ì¶œë ¥
 	{
 		for (int y = yp - 8; y <= yp + 8; y++)
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (World::ins()->getTile(x, y, zp).fov == fovFlag::white) prt(L"¡Û");
-				else if (World::ins()->getTile(x, y, zp).fov == fovFlag::gray) prt(L"¡İ");
-				else prt(L"¡Ü");
+				if (World::ins()->getTile(x, y, zp).fov == fovFlag::white) prt(L"â—‹");
+				else if (World::ins()->getTile(x, y, zp).fov == fovFlag::gray) prt(L"â—");
+				else prt(L"â—");
 			}
 			prt(L"\n");
 		}
-		prt(L"[µğ¹ö±×] entityPtr Ãâ·ÂÀ» ³¡³Â´Ù!\n");
+		prt(L"[ë””ë²„ê·¸] entityPtr ì¶œë ¥ì„ ëëƒˆë‹¤!\n");
 		break;
 	}
-	case 19: //½Ã°£ °­Á¦ ¼³Á¤
+	case 19: //ì‹œê°„ ê°•ì œ ì„¤ì •
 	{
 		int tgtHour, tgtMin;
-		prt(L"[1/2] ¹Ù²Ü ½Ã°£À» ÀÔ·ÂÇØÁÖ¼¼¿ä(0~23).\n");
+		prt(L"[1/2] ë°”ê¿€ ì‹œê°„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(0~23).\n");
 		std::cin >> tgtHour;
-		prt(L"[2/2] ¹Ù²Ü ºĞÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä(0~59)\n");
+		prt(L"[2/2] ë°”ê¿€ ë¶„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(0~59)\n");
 		std::cin >> tgtMin;
 		setDebugTime(tgtHour, tgtMin);
 		break;
 	}
-	case 20: //³¯Â¥ °­Á¦ ¼³Á¤
+	case 20: //ë‚ ì§œ ê°•ì œ ì„¤ì •
 	{
 		int tgtMonth, tgtDay;
-		prt(L"[1/2] ¹Ù²Ü ´ŞÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä(1~12).\n");
+		prt(L"[1/2] ë°”ê¿€ ë‹¬ì„ ì…ë ¥í•´ì£¼ì„¸ìš”(1~12).\n");
 		std::cin >> tgtMonth;
-		prt(L"[2/2] ¹Ù²Ü ÀÏÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"[2/2] ë°”ê¿€ ì¼ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtDay;
 		setDebugDay(tgtMonth, tgtDay);
 		break;
 	}
-	case 21: //³¯¾¾ º¯°æ
+	case 21: //ë‚ ì”¨ ë³€ê²½
 	{
 		int cx, cy;
 		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 
 		int tgtWeather;
-		prt(L" ¹Ù²Ü ³¯¾¾¸¦ ¼±ÅÃÇØÁÖ¼¼¿ä.\n");
-		prt(L" 1. ¸¼À½\n");
-		prt(L" 2. Èå¸²\n");
-		prt(L" 3. ºñ\n");
-		prt(L" 4. ÃµµÕ\n");
-		prt(L" 5. ´«\n");
+		prt(L" ë°”ê¿€ ë‚ ì”¨ë¥¼ ì„ íƒí•´ì£¼ì„¸ìš”.\n");
+		prt(L" 1. ë§‘ìŒ\n");
+		prt(L" 2. íë¦¼\n");
+		prt(L" 3. ë¹„\n");
+		prt(L" 4. ì²œë‘¥\n");
+		prt(L" 5. ëˆˆ\n");
 		std::cin >> tgtWeather;
 		if (tgtWeather == 1) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::sunny);
 		else if (tgtWeather == 2) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::cloudy);
 		else if (tgtWeather == 3) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::rain);
 		else if (tgtWeather == 4) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::storm);
 		else if (tgtWeather == 5) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::snow);
-		prt(L" ³¯¾¾¸¦ ¼º°øÀûÀ¸·Î º¯°æÇß´Ù! \n");
+		prt(L" ë‚ ì”¨ë¥¼ ì„±ê³µì ìœ¼ë¡œ ë³€ê²½í–ˆë‹¤! \n");
 		break;
 	}
-	case 22: //¸» »ı¼º
+	case 22: //ë§ ìƒì„±
 	{
 		Player* ptr = Player::ins();
 		new Monster(4, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
-		prt(L"[µğ¹ö±×]»õ·Î¿î ¿£Æ¼Æ¼¸¦ ¸¸µé¾ú´Ù!\n");
+		prt(L"[ë””ë²„ê·¸]ìƒˆë¡œìš´ ì—”í‹°í‹°ë¥¼ ë§Œë“¤ì—ˆë‹¤!\n");
 		break;
 	}
-	case 23: //»óÅÂÀÌ»ó »ı¼º
+	case 23: //ìƒíƒœì´ìƒ ìƒì„±
 	{
 		int tgtEfctIndex = 0;
 		int tgtEfctDur = 1;
 
-		prt(L"[1/2] Ãß°¡ÇÒ »óÅÂÀÌ»óÀÇ ÀÎµ¦½º¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"[1/2] ì¶”ê°€í•  ìƒíƒœì´ìƒì˜ ì¸ë±ìŠ¤ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtEfctIndex;
 
-		prt(L"[2/2] Ãß°¡ÇÒ »óÅÂÀÌ»óÀÇ ÅÏ¼ö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"[2/2] ì¶”ê°€í•  ìƒíƒœì´ìƒì˜ í„´ìˆ˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtEfctDur;
 
-		prt(L"»óÅÂÀÌ»óÀ» ¼º°øÀûÀ¸·Î Ãß°¡ÇÏ¿´´Ù.\n");
+		prt(L"ìƒíƒœì´ìƒì„ ì„±ê³µì ìœ¼ë¡œ ì¶”ê°€í•˜ì˜€ë‹¤.\n");
 		Player::ins()->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
@@ -363,13 +363,13 @@ export void debugConsole()
 		int pz = PlayerZ();
 
 		int tgtGridX, tgtGridY, tgtGridZ;
-		prt(L"ÅÚ·¹Æ÷Æ®ÇÒ À§Ä¡ÀÇ gridX ÁÂÇ¥¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"í…”ë ˆí¬íŠ¸í•  ìœ„ì¹˜ì˜ gridX ì¢Œí‘œë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtGridX;
 
-		prt(L"ÅÚ·¹Æ÷Æ®ÇÒ À§Ä¡ÀÇ gridY ÁÂÇ¥¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"í…”ë ˆí¬íŠ¸í•  ìœ„ì¹˜ì˜ gridY ì¢Œí‘œë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtGridY;
 
-		prt(L"ÅÚ·¹Æ÷Æ®ÇÒ À§Ä¡ÀÇ gridZ ÁÂÇ¥¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"í…”ë ˆí¬íŠ¸í•  ìœ„ì¹˜ì˜ gridZ ì¢Œí‘œë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> tgtGridZ;
 
 		World::ins()->getTile(px, py, pz).EntityPtr = nullptr;
@@ -377,35 +377,35 @@ export void debugConsole()
 		World::ins()->getTile(tgtGridX, tgtGridY, tgtGridZ).EntityPtr = (Entity*)Player::ins();
 		break;
 	}
-	case 25://Ã»Å©¶óÀÎ ±×¸®±â
+	case 25://ì²­í¬ë¼ì¸ ê·¸ë¦¬ê¸°
 	{
 		if(debug::chunkLineDraw ==false) debug::chunkLineDraw = true;
 		else  debug::chunkLineDraw = false;
 		break;
 	}
-	case 26://Ã»Å© µ¤¾î¾²±â
+	case 26://ì²­í¬ ë®ì–´ì“°ê¸°
 	{
 		int chunkX = 0;
 		int chunkY = 0;
 		int chunkZ = 0;
 		int chunkInput = 0;
 
-		prt(L"chunkX¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"chunkXë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> chunkX;
 
-		prt(L"chunkY¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"chunkYë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> chunkY;
 
-		prt(L"chunkZ¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+		prt(L"chunkZë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
 		std::cin >> chunkZ;
 
 
-		prt(L"¹Ù²Ü Ã»Å©¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
-		prt(L"1.¹Ù´Ù\n");
-		prt(L"2.Èë\n");
-		prt(L"3.µµ·Î\n");
-		prt(L"4.ÆíÀÇÁ¡\n");
-		prt(L"5.¾ÆÆÄÆ®\n");
+		prt(L"ë°”ê¿€ ì²­í¬ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+		prt(L"1.ë°”ë‹¤\n");
+		prt(L"2.í™\n");
+		prt(L"3.ë„ë¡œ\n");
+		prt(L"4.í¸ì˜ì \n");
+		prt(L"5.ì•„íŒŒíŠ¸\n");
 		std::cin >> chunkInput;
 
 		if (chunkInput == 1) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::seawater);
@@ -413,11 +413,11 @@ export void debugConsole()
 
 		break;
 	}
-	case 27://Lua ½ºÅ©¸³Æ® ½ÇÇà
+	case 27://Lua ìŠ¤í¬ë¦½íŠ¸ ì‹¤í–‰
 	{
 		lua["cppValue"] = 10;
 		sol::protected_function_result result = lua.script_file("exampleScript.lua");
-		if (result.valid()) std::wprintf(L"·ç¾Æ½ºÅ©¸³Æ®°¡ ¼º°øÀûÀ¸·Î ½ÇÇàµÇ¾ú´Ù.\n");
+		if (result.valid()) std::wprintf(L"ë£¨ì•„ìŠ¤í¬ë¦½íŠ¸ê°€ ì„±ê³µì ìœ¼ë¡œ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
 		else
 		{
 			sol::error err = result;

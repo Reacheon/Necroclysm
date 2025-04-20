@@ -1,4 +1,4 @@
-export module initCoordTransform;
+Ôªøexport module initCoordTransform;
 
 import std;
 import util;
@@ -29,7 +29,7 @@ export void initCoordTransform()
         coordTransform[dir][{x, -MAX_VEHICLE_SIZE / 2}][1]--;
         };
 
-    //°⁄πÊ«‚ 0µµ
+    //‚òÖÎ∞©Ìñ• 0ÎèÑ
     for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2; x++)
     {
         for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -38,7 +38,7 @@ export void initCoordTransform()
         }
     }
 
-    //°⁄πÊ«‚ 90µµ
+    //‚òÖÎ∞©Ìñ• 90ÎèÑ
     for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2; x++)
     {
         for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -47,7 +47,7 @@ export void initCoordTransform()
         }
     }
 
-    //°⁄πÊ«‚ 180µµ
+    //‚òÖÎ∞©Ìñ• 180ÎèÑ
     for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2; x++)
     {
         for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -56,7 +56,7 @@ export void initCoordTransform()
         }
     }
 
-    //°⁄πÊ«‚ 270µµ
+    //‚òÖÎ∞©Ìñ• 270ÎèÑ
     for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2; x++)
     {
         for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -65,7 +65,7 @@ export void initCoordTransform()
         }
     }
 
-    //°⁄πÊ«‚ 27.5µµ
+    //‚òÖÎ∞©Ìñ• 27.5ÎèÑ
     coordTransform[dir16::dir0_5] = coordTransform[dir16::dir0];
     int repeat = 1;
     for (int x = 1; x <= MAX_VEHICLE_SIZE / 2; x++)
@@ -80,7 +80,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //°⁄πÊ«‚ 45µµ
+    //‚òÖÎ∞©Ìñ• 45ÎèÑ
     coordTransform[dir16::dir1] = coordTransform[dir16::dir2];
     for (int i = 0; i <= MAX_VEHICLE_SIZE / 2 - 1; i++)
     {
@@ -89,7 +89,7 @@ export void initCoordTransform()
         for (int y = +1 + i; y <= MAX_VEHICLE_SIZE / 2; y++) xShiftLeft(dir16::dir1, y);
     }
 
-    //°⁄πÊ«‚ 67.5µµ
+    //‚òÖÎ∞©Ìñ• 67.5ÎèÑ
     coordTransform[dir16::dir1_5] = coordTransform[dir16::dir2];
     repeat = 1;
     for (int y = 1; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -104,7 +104,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 112.5µµ
+    //Î∞©Ìñ• 112.5ÎèÑ
     coordTransform[dir16::dir2_5] = coordTransform[dir16::dir2];
     repeat = 1;
     for (int y = 1; y <= MAX_VEHICLE_SIZE / 2; y++)
@@ -119,7 +119,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 135µµ
+    //Î∞©Ìñ• 135ÎèÑ
     coordTransform[dir16::dir3] = coordTransform[dir16::dir2];
     for (int i = 0; i <= MAX_VEHICLE_SIZE / 2 - 1; i++)
     {
@@ -128,7 +128,7 @@ export void initCoordTransform()
         for (int y = +1 + i; y <= MAX_VEHICLE_SIZE / 2; y++) xShiftRight(dir16::dir3, y);
     }
 
-    //πÊ«‚ 157.5µµ
+    //Î∞©Ìñ• 157.5ÎèÑ
     coordTransform[dir16::dir3_5] = coordTransform[dir16::dir4];
     repeat = 1;
     for (int x = 1; x <= MAX_VEHICLE_SIZE / 2; x++)
@@ -143,7 +143,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 202.5µµ
+    //Î∞©Ìñ• 202.5ÎèÑ
     coordTransform[dir16::dir4_5] = coordTransform[dir16::dir4];
     repeat = 1;
     for (int x = 1; x <= MAX_VEHICLE_SIZE / 2; x++)
@@ -158,7 +158,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 225µµ
+    //Î∞©Ìñ• 225ÎèÑ
     coordTransform[dir16::dir5] = coordTransform[dir16::dir6];
     for (int i = 0; i <= MAX_VEHICLE_SIZE / 2 - 1; i++)
     {
@@ -167,7 +167,7 @@ export void initCoordTransform()
         for (int y = +1 + i; y <= MAX_VEHICLE_SIZE / 2; y++) xShiftLeft(dir16::dir5, y);
     }
 
-    //πÊ«‚ 247.5µµ
+    //Î∞©Ìñ• 247.5ÎèÑ
     coordTransform[dir16::dir5_5] = coordTransform[dir16::dir6];
     repeat = 1;
     for (int y = -1; y >= -MAX_VEHICLE_SIZE / 2; y--)
@@ -182,7 +182,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 292.5µµ
+    //Î∞©Ìñ• 292.5ÎèÑ
     coordTransform[dir16::dir6_5] = coordTransform[dir16::dir6];
     repeat = 1;
     for (int y = -1; y >= -MAX_VEHICLE_SIZE / 2; y--)
@@ -197,7 +197,7 @@ export void initCoordTransform()
         repeat++;
     }
 
-    //πÊ«‚ 315µµ
+    //Î∞©Ìñ• 315ÎèÑ
     coordTransform[dir16::dir7] = coordTransform[dir16::dir6];
     for (int i = 0; i <= MAX_VEHICLE_SIZE / 2 - 1; i++)
     {
@@ -206,7 +206,7 @@ export void initCoordTransform()
         for (int y = +1 + i; y <= MAX_VEHICLE_SIZE / 2; y++) xShiftRight(dir16::dir7, y);
     }
 
-    //πÊ«‚ 337.5µµ
+    //Î∞©Ìñ• 337.5ÎèÑ
     coordTransform[dir16::dir7_5] = coordTransform[dir16::dir0];
     repeat = 1;
     for (int x = 1; x <= MAX_VEHICLE_SIZE / 2; x++)
@@ -227,7 +227,7 @@ export void initCoordTransform()
         bool indicateCoord = false;
         auto prtCoordTransform = [=](dir16 input)
             {
-                prt(L"\n[initCoordTransform] °Âπ›Ω√∞ËπÊ«‚¿∏∑Œ %ls∏∏≈≠ »∏¿¸°Â\n", dir16ToString(input).c_str());
+                prt(L"\n[initCoordTransform] ‚ñºÎ∞òÏãúÍ≥ÑÎ∞©Ìñ•ÏúºÎ°ú %lsÎßåÌÅº ÌöåÏ†Ñ‚ñº\n", dir16ToString(input).c_str());
 
                 for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
                 {
@@ -245,7 +245,7 @@ export void initCoordTransform()
                         }
                         else
                         {
-                            std::printf("°·");
+                            std::printf("‚ñ†");
                         }
                         if (coordTransform[input][{x, y}][0] == 0 && coordTransform[input][{x, y}][1] == 0) std::printf("\033[0m");
                         if (std::abs(coordTransform[input][{x, y}][1]) <= 2 && coordTransform[input][{x, y}][0] <= 14 && coordTransform[input][{x, y}][0] >= -4) std::printf("\033[0m");

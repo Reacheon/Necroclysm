@@ -1,4 +1,4 @@
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
+ï»¿#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 #include <SDL.h>
 
@@ -62,15 +62,15 @@ void HUD::clickUpGUI()
 	if (executedHold) return;
 	
 
-	if (checkCursor(&letterboxPopUpButton) == true)//ÆË¾÷ ±â´É
+	if (checkCursor(&letterboxPopUpButton) == true)//íŒì—… ê¸°ëŠ¥
 	{
 		if (y == 0) { executePopUp(); }
 		else { executePopDown(); }
 	}
 	else if (checkCursor(&tabSmallBox) == true)
 	{
-		//ÇÃ·¹ÀÌ¾îÀÇ ½Ã¾ß¿¡ ÀÖ´Â ¸ğµç °´Ã¼µéÀ» Ã¼Å©
-		std::array<int, 2> nearCoord = { 0,0 };//»ó´ëÁÂÇ¥
+		//í”Œë ˆì´ì–´ì˜ ì‹œì•¼ì— ìˆëŠ” ëª¨ë“  ê°ì²´ë“¤ì„ ì²´í¬
+		std::array<int, 2> nearCoord = { 0,0 };//ìƒëŒ€ì¢Œí‘œ
 		int playerX = PlayerX();
 		int playerY = PlayerY();
 		int playerZ = PlayerZ();
@@ -80,10 +80,10 @@ void HUD::clickUpGUI()
 			{
 				if (World::ins()->getTile(i, j, playerZ).fov == fovFlag::white)
 				{
-					//¾ø´Â Å¸ÀÏÀÌ°Å³ª ÇÃ·¹ÀÌ¾î °³Ã¼´Â Á¦¿ÜÇÔ
+					//ì—†ëŠ” íƒ€ì¼ì´ê±°ë‚˜ í”Œë ˆì´ì–´ ê°œì²´ëŠ” ì œì™¸í•¨
 					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != Player::ins())
 					{
-						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//°»½Å
+						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//ê°±ì‹ 
 						{
 							nearCoord = { i - playerX, j - playerY };
 						}
@@ -92,11 +92,11 @@ void HUD::clickUpGUI()
 			}
 		}
 
-		if (nearCoord[0] == 0 && nearCoord[1] == 0)//Ã£Áö ¸øÇßÀ» °æ¿ì
+		if (nearCoord[0] == 0 && nearCoord[1] == 0)//ì°¾ì§€ ëª»í–ˆì„ ê²½ìš°
 		{
 			updateLog(col2Str(col::white) + sysStr[105]);
 		}
-		else//Ã£¾ÒÀ» °æ¿ì
+		else//ì°¾ì•˜ì„ ê²½ìš°
 		{
 			new Aim();
 		}
@@ -105,7 +105,7 @@ void HUD::clickUpGUI()
 	else if (checkCursor(&quickSlotPopBtn)) quickSlotToggle();
 	else if (checkCursor(&letterbox))
 	{
-		for (int i = 0; i < barAct.size(); i++) // ÇÏ´Ü UI ÅÍÄ¡ ÀÌº¥Æ®
+		for (int i = 0; i < barAct.size(); i++) // í•˜ë‹¨ UI í„°ì¹˜ ì´ë²¤íŠ¸
 		{
 			if (checkCursor(&barButton[i]))
 			{
@@ -113,23 +113,23 @@ void HUD::clickUpGUI()
 			}
 		}
 	}
-	else if (checkCursor(&quickSlotRegion))//Äü½½·Ô ÀÌº¥Æ® ÅÍÄ¡
+	else if (checkCursor(&quickSlotRegion))//í€µìŠ¬ë¡¯ ì´ë²¤íŠ¸ í„°ì¹˜
 	{
 		for (int i = 0; i < 8; i++)
 		{
 			if (checkCursor(&quickSlotBtn[i]))
 			{
-				prt(L"%d¹ø ½ºÅ³ ½½·ÔÀ» ´­·¶´Ù!\n", i + 1);
+				prt(L"%dë²ˆ ìŠ¤í‚¬ ìŠ¬ë¡¯ì„ ëˆŒë €ë‹¤!\n", i + 1);
 				CORO(useSkill(quickSlot[i].second));
 			}
 		}
 	}
-	else//Å¸ÀÏÅÍÄ¡
+	else//íƒ€ì¼í„°ì¹˜
 	{
 		if (dragQuickSlotTarget == -1)
 		{
 			cameraFix = true;
-			//ÅÍÄ¡ÇÑ ÁÂÇ¥¸¦ ¾ò¾î³»´Â ºÎºĞ
+			//í„°ì¹˜í•œ ì¢Œí‘œë¥¼ ì–»ì–´ë‚´ëŠ” ë¶€ë¶„
 			int cameraGridX, cameraGridY;
 			if (cameraX >= 0) cameraGridX = cameraX / 16;
 			else cameraGridX = -1 + cameraX / 16;
@@ -155,10 +155,10 @@ void HUD::clickUpGUI()
 			revY += sgn(revY) * (8 * zoomScale) + camDelY;
 			revGridY = revY / (16 * zoomScale);
 
-			//»ó´ëÁÂÇ¥¸¦ Àı´ëÁÂÇ¥·Î º¯È¯
+			//ìƒëŒ€ì¢Œí‘œë¥¼ ì ˆëŒ€ì¢Œí‘œë¡œ ë³€í™˜
 			clickTile.x = cameraGridX + revGridX;
 			clickTile.y = cameraGridY + revGridY;
-			prt(L"[HUD] Àı´ëÁÂÇ¥ (%d,%d) Å¸ÀÏÀ» ÅÍÄ¡Çß´Ù.\n", clickTile.x, clickTile.y);
+			prt(L"[HUD] ì ˆëŒ€ì¢Œí‘œ (%d,%d) íƒ€ì¼ì„ í„°ì¹˜í–ˆë‹¤.\n", clickTile.x, clickTile.y);
 			tileTouch(clickTile.x, clickTile.y);
 		}
 	}
@@ -201,13 +201,13 @@ void HUD::clickUpGUI()
 
 void HUD::mouseStep()
 {
-	//È¦µå ÀÌº¥Æ®
-	if (dtClickStack >= 1000) //1ÃÊ°£ ´©¸£°í ÀÖÀ» °æ¿ì
+	//í™€ë“œ ì´ë²¤íŠ¸
+	if (dtClickStack >= 1000) //1ì´ˆê°„ ëˆ„ë¥´ê³  ìˆì„ ê²½ìš°
 	{
 		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&tabSmallBox) == false)
 		{
-			//ÅÍÄ¡ÇÑ ÁÂÇ¥¸¦ ¾ò¾î³»´Â ºÎºĞ
-			// prt(L"1ÃÊ ÀÌ»ó ´­·¶´Ù.\n");
+			//í„°ì¹˜í•œ ì¢Œí‘œë¥¼ ì–»ì–´ë‚´ëŠ” ë¶€ë¶„
+			// prt(L"1ì´ˆ ì´ìƒ ëˆŒë €ë‹¤.\n");
 			int revX, revY, revGridX, revGridY;
 			revX = clickDownPoint.x - (cameraW / 2);
 			//revY = clickDownPoint.y - (cameraH / 2);

@@ -1,4 +1,4 @@
-export module nanoTimer;
+﻿export module nanoTimer;
 
 import std;
 

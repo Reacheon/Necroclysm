@@ -1,4 +1,4 @@
-export module clickRight;
+ï»¿export module clickRight;
 
 import std;
 import util;
@@ -21,11 +21,11 @@ export void clickRight()
 	switch (option::inputMethod)
 	{
 	case input::mouse:
-		prt(L"¸¶¿ì½º Å¬¸¯¶óÀÌÆ® Up ÀÔ·Â (%d,%d)\n", event.motion.x, event.motion.y);
+		prt(L"ë§ˆìš°ìŠ¤ í´ë¦­ë¼ì´íŠ¸ Up ì…ë ¥ (%d,%d)\n", event.motion.x, event.motion.y);
 		clickUpPoint = { event.motion.x, event.motion.y };
 		break;
 	case input::touch:
-		prt(L"ÅÍÄ¡ Å¬¸¯¶óÀÌÆ® Up ÀÔ·Â (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));
+		prt(L"í„°ì¹˜ í´ë¦­ë¼ì´íŠ¸ Up ì…ë ¥ (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));
 		clickUpPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };
 		break;
 	}

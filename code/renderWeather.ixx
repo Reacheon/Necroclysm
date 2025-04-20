@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 
 export module renderWeather;
@@ -53,12 +53,12 @@ export __int64 renderWeather()
 		//	}
 
 		//	setFlip(SDL_FLIP_HORIZONTAL);
-		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 130); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 130); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 		//	SDL_SetTextureBlendMode(spr::screenSnow->getTexture(), SDL_BLENDMODE_BLEND);
 		//	drawSprite(spr::screenSnow, 0, 0, yShift2);
 		//	drawSprite(spr::screenSnow, 0, 0, yShift2 - 720);
 		//	setFlip(SDL_FLIP_NONE);
-		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+		//	SDL_SetTextureAlphaMod(spr::screenSnow->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 		//}
 	}
 	else

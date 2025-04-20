@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #include <cmath>
 #include <cstdlib>
 #include <set>
@@ -14,7 +14,7 @@ import Coord;
 
 Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uint8 inputBright, SDL_Color inputColor)
 {
-	prt(L"Light : »ı¼ºÀÚ°¡ ½ÇÇàµÇ¾ú½À´Ï´Ù..\n");
+	prt(L"Light : ìƒì„±ìê°€ ì‹¤í–‰ë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 	bright = inputBright;
 	lightColor = inputColor;
 	setLightRange(inputRange);
@@ -24,7 +24,7 @@ Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uin
 
 Light::~Light()
 {
-	prt(L"Light : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+	prt(L"Light : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 	releaseLight();
 }
 

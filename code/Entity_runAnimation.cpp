@@ -1,4 +1,4 @@
-import util;
+ï»¿import util;
 import Entity;
 import globalVar;
 import wrapVar;
@@ -19,16 +19,16 @@ import Particle;
 
 bool Entity::runAnimation(bool shutdown)
 {
-	//if (isPlayer) prt(L"PlayerÀÇ runAnimationÀÌ ½ÇÇàµÇ¾ú´Ù.\n");
-	//else prt(L"Entity %pÀÇ runAnimationÀÌ ½ÇÇàµÇ¾ú´Ù.\n",this);
+	//if (isPlayer) prt(L"Playerì˜ runAnimationì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
+	//else prt(L"Entity %pì˜ runAnimationì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n",this);
 
-	if (getAniType() == aniFlag::move)//¸¸¾à ÇÃ·¹ÀÌ¾î ÀÎ½ºÅÏ½ºÀÇ ÁÂÇ¥¿Í ¸ñÀûÁÂÇ¥°¡ ´Ù¸¦ °æ¿ì
+	if (getAniType() == aniFlag::move)//ë§Œì•½ í”Œë ˆì´ì–´ ì¸ìŠ¤í„´ìŠ¤ì˜ ì¢Œí‘œì™€ ëª©ì ì¢Œí‘œê°€ ë‹¤ë¥¼ ê²½ìš°
 	{
-		//8ÇÁ·¹ÀÓ-4(½ºÇÇµå2)
-		//6ÇÁ·¹ÀÓ-3(½ºÇÇµå3)
-		//4ÇÁ·¹ÀÓ-2(½ºÇÇµå4)
+		//8í”„ë ˆìž„-4(ìŠ¤í”¼ë“œ2)
+		//6í”„ë ˆìž„-3(ìŠ¤í”¼ë“œ3)
+		//4í”„ë ˆìž„-2(ìŠ¤í”¼ë“œ4)
 
-		// 1 / 60ÃÊ¸¶´Ù runAnimationÀÌ ½ÇÇàµÊ
+		// 1 / 60ì´ˆë§ˆë‹¤ runAnimationì´ ì‹¤í–‰ë¨
 
 		addTimer();
 
@@ -116,7 +116,7 @@ bool Entity::runAnimation(bool shutdown)
 		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
-		if (shutdown == true)//»ç¸ÁÀ¸·Î ÀÎÇÑ °­Á¦Á¾·á
+		if (shutdown == true)//ì‚¬ë§ìœ¼ë¡œ ì¸í•œ ê°•ì œì¢…ë£Œ
 		{
 			if (address != nullptr)
 			{
@@ -261,7 +261,7 @@ bool Entity::runAnimation(bool shutdown)
 		Prop* address = TileProp(PlayerX()+dx, PlayerY()+dy, PlayerZ());
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
-		if (shutdown == true)//»ç¸ÁÀ¸·Î ÀÎÇÑ °­Á¦Á¾·á
+		if (shutdown == true)//ì‚¬ë§ìœ¼ë¡œ ì¸í•œ ê°•ì œì¢…ë£Œ
 		{
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
@@ -390,7 +390,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
-		if (shutdown == true)//»ç¸ÁÀ¸·Î ÀÎÇÑ °­Á¦Á¾·á
+		if (shutdown == true)//ì‚¬ë§ìœ¼ë¡œ ì¸í•œ ê°•ì œì¢…ë£Œ
 		{
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
@@ -507,7 +507,7 @@ bool Entity::runAnimation(bool shutdown)
 	}
 	else if (getAniType() == aniFlag::throwing)
 	{
-		//°Å¸®¿¡ µû¶ó ÀûÀÌ ÇÇ°ÝÇÏ´Âµ¥¿¡ °É¸®´Â ½Ã°£À» ±æ°Ô ¸¸µé °Í
+		//ê±°ë¦¬ì— ë”°ë¼ ì ì´ í”¼ê²©í•˜ëŠ”ë°ì— ê±¸ë¦¬ëŠ” ì‹œê°„ì„ ê¸¸ê²Œ ë§Œë“¤ ê²ƒ
 		addTimer();
 
 		char dx;
@@ -528,7 +528,7 @@ bool Entity::runAnimation(bool shutdown)
 		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
-		if (shutdown == true)//»ç¸ÁÀ¸·Î ÀÎÇÑ °­Á¦Á¾·á
+		if (shutdown == true)//ì‚¬ë§ìœ¼ë¡œ ì¸í•œ ê°•ì œì¢…ë£Œ
 		{
 			if (address != nullptr)
 			{
@@ -632,7 +632,7 @@ bool Entity::runAnimation(bool shutdown)
 		Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
 
-		if (shutdown == true)//»ç¸ÁÀ¸·Î ÀÎÇÑ °­Á¦Á¾·á
+		if (shutdown == true)//ì‚¬ë§ìœ¼ë¡œ ì¸í•œ ê°•ì œì¢…ë£Œ
 		{
 			if (ePtr != nullptr) ePtr->setFlashRGBA(0, 0, 0, 0);
 			aniUSet.erase(aniUSet.find(this));

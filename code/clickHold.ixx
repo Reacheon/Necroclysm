@@ -1,4 +1,4 @@
-export module clickHold;
+ï»¿export module clickHold;
 
 import std;
 import util;
@@ -8,7 +8,7 @@ import GUI;
 export void clickHold()
 {
 	click = false;
-	prt(L"1ÃÊ ÀÌ»ó ´­·¶´Ù.\n");
+	prt(L"1ì´ˆ ì´ìƒ ëˆŒë €ë‹¤.\n");
 	clickStartTime = std::numeric_limits<__int64>::max();
 	deactClickUp = true;
 

@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -34,7 +34,7 @@ enum class selectFlag
 	prod,
 };
 
-const int reactantMaxSize = 13; //Á¶ÇÕ ¾ÆÀÌÅÛÀº ÃÖ´ë 13Á¾·ù±îÁö ÀÔ·Â °¡´É, °á°ú¹°µµ 13Á¾·ù
+const int reactantMaxSize = 13; //ì¡°í•© ì•„ì´í…œì€ ìµœëŒ€ 13ì¢…ë¥˜ê¹Œì§€ ì…ë ¥ ê°€ëŠ¥, ê²°ê³¼ë¬¼ë„ 13ì¢…ë¥˜
 
 namespace dropDownList
 {
@@ -65,7 +65,7 @@ private:
 	SDL_Rect prodFirstRect;
 
 	ItemPocket* rootPathPocket;
-	std::vector<ItemPocket*> currentPathPocket; //ÇöÀç Æú´õÀÇ À§Ä¡¸¦ ¾Ë·ÁÁÖ´Â º¤ÅÍ C/FOLDER1/FOLDER2, ¸¶Áö¸·Àº ÇöÀç Æú´õ
+	std::vector<ItemPocket*> currentPathPocket; //í˜„ì¬ í´ë”ì˜ ìœ„ì¹˜ë¥¼ ì•Œë ¤ì£¼ëŠ” ë²¡í„° C/FOLDER1/FOLDER2, ë§ˆì§€ë§‰ì€ í˜„ì¬ í´ë”
 
 	int targetProductIndex = -1;
 	int targetToolQuality = -1;
@@ -73,17 +73,17 @@ private:
 	ItemPocket* prodPocket;
 
 	bool showAlchemyTooltip = false;
-	int elapsedTime = 0; //ÃÑ°ı Á¦ÀÛ ½Ã°£
+	int elapsedTime = 0; //ì´ê´„ ì œì‘ ì‹œê°„
 	int targetCraftingTime = 10;
 public:
 	Alchemy() : GUI(false)
 	{
-		prt(L"Alchemy : »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú´Ù.\n");
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		prt(L"Alchemy : ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤.\n");
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
 
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		tabType = tabFlag::closeWin;
@@ -98,7 +98,7 @@ public:
 	}
 	~Alchemy()
 	{
-		prt(L"Alchemy : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú´Ù.\n");
+		prt(L"Alchemy : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆë‹¤.\n");
 		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 		delete rootPathPocket;
@@ -165,9 +165,9 @@ public:
 			}
 			drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 78, tooltipBox.y + 6);
 			setFontSize(13);
-			drawText(col2Str(col::white) + L"¾ÆÀÌÅÛ Á¶ÇÕ Áß...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
+			drawText(col2Str(col::white) + L"ì•„ì´í…œ ì¡°í•© ì¤‘...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
 
-			std::wstring reactStr = col2Str(lowCol::yellow) + L"¹İÀÀ¹° : ";
+			std::wstring reactStr = col2Str(lowCol::yellow) + L"ë°˜ì‘ë¬¼ : ";
 			reactStr += col2Str(col::white);
 			for (int i = 0; i < reactPtrVec.size(); i++)
 			{
@@ -184,9 +184,9 @@ public:
 					}
 				}
 			}
-			std::wstring toolStr = col2Str(lowCol::yellow) + L"µµ±¸ ±â¼ú : ";
+			std::wstring toolStr = col2Str(lowCol::yellow) + L"ë„êµ¬ ê¸°ìˆ  : ";
 			toolStr += col2Str(col::white);
-			if (targetToolQuality == -1) {toolStr += L"¾øÀ½";}
+			if (targetToolQuality == -1) {toolStr += L"ì—†ìŒ";}
 			else
 			{
 				toolStr += toolQuality2String(targetToolQuality);
@@ -203,7 +203,7 @@ public:
 
 			setFontSize(11);
 			std::wstring topText = std::to_wstring(targetCraftingTime - elapsedTime);
-			topText += L" ºĞ ³²À½ ( ";
+			topText += L" ë¶„ ë‚¨ìŒ ( ";
 			topText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)targetCraftingTime)));
 			topText += L"% )";
 
@@ -219,7 +219,7 @@ public:
 			auto cursorCheck = [](SDL_Rect checkRect)->cursorFlag {
 				if (checkCursor(&checkRect))
 				{
-					//´Ù¸¥ ÄÚ·çÆ¾ °´Ã¼°¡ Á¸ÀçÇÏ´ÂÁö È®ÀÎ
+					//ë‹¤ë¥¸ ì½”ë£¨í‹´ ê°ì²´ê°€ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸
 					if (Msg::ins() == nullptr && Lst::ins() == nullptr)
 					{
 						if (click == true) { return cursorFlag::click; }
@@ -233,11 +233,11 @@ public:
 
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////¹İÀÀ¹°///////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////ë°˜ì‘ë¬¼///////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Point2 reactPivot = { alchemyBase.x + 10, alchemyBase.y + 59 };
 			setFontSize(11);
-			drawTextCenter(col2Str(col::white) + L"¹İÀÀ¹°", reactPivot.x + 109, reactPivot.y - 9);
+			drawTextCenter(col2Str(col::white) + L"ë°˜ì‘ë¬¼", reactPivot.x + 109, reactPivot.y - 9);
 			drawSprite(spr::alchemyMaterialEdge, 0, reactPivot.x - 1, reactPivot.y - 1);
 			for (int i = 0; i < myMin(reactPtrVec.size(), reactantMaxSize); i++)
 			{
@@ -258,11 +258,11 @@ public:
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////»ı¼º¹°///////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////ìƒì„±ë¬¼///////////////////////////////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Point2 prodPivot = { alchemyBase.x + 476, alchemyBase.y + 59 };
 			setFontSize(11);
-			drawTextCenter(col2Str(col::white) + L"»ı¼º¹°", prodPivot.x + 109, prodPivot.y - 9);
+			drawTextCenter(col2Str(col::white) + L"ìƒì„±ë¬¼", prodPivot.x + 109, prodPivot.y - 9);
 			drawSprite(spr::alchemyMaterialEdge, 0, prodPivot.x - 1, prodPivot.y - 1);
 			
 			for (int i = 0; i < myMin(prodPocket->itemInfo.size(), reactantMaxSize); i++)
@@ -280,18 +280,18 @@ public:
 			}
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////µµ±¸//////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////ë„êµ¬//////////////////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			SDL_Point toolPivot = { alchemyBase.x + 248, alchemyBase.y + 89 };
 			setFontSize(11);
-			drawTextCenter(col2Str(col::white) + L"µµ±¸", alchemyBase.x + 350, alchemyBase.y + 182);
+			drawTextCenter(col2Str(col::white) + L"ë„êµ¬", alchemyBase.x + 350, alchemyBase.y + 182);
 
 
 
 
 			drawSprite(spr::alchemyArrow, 0, alchemyBase.x + 242, alchemyBase.y + 181);
 
-			//»õ·Î¿î ºÎÇ° Ãß°¡ ¹öÆ°
+			//ìƒˆë¡œìš´ ë¶€í’ˆ ì¶”ê°€ ë²„íŠ¼
 			if (toolPtr == nullptr)
 			{
 				drawSimpleItemRectAdd(cursorCheck(toolItemBtn), toolItemBtn.x, toolItemBtn.y);
@@ -303,7 +303,7 @@ public:
 				indivItemName += toolQuality2String(targetToolQuality);
 				indivItemName += L"#FFFFFF";
 				indivItemName += toolPtr->name;
-				drawSimpleItemRect(cursorCheck(toolItemBtn), toolItemBtn.x, toolItemBtn.y, toolPtr->sprIndex, L"#CEC327Áõ·ù #FFFFFFÁõ·ù±â", false);
+				drawSimpleItemRect(cursorCheck(toolItemBtn), toolItemBtn.x, toolItemBtn.y, toolPtr->sprIndex, L"#CEC327ì¦ë¥˜ #FFFFFFì¦ë¥˜ê¸°", false);
 			}
 
 			//355,106
@@ -334,7 +334,7 @@ public:
 			setZoom(1.0);
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			/////////////////////////////////////////////Á¶ÇÕÇÏ±â ¹öÆ°///////////////////////////////////////////////////////////
+			/////////////////////////////////////////////ì¡°í•©í•˜ê¸° ë²„íŠ¼///////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			int startSprIndex = 0;
@@ -356,10 +356,10 @@ public:
 
 			drawSprite(spr::alchemyStart, startSprIndex, alchemyStartBtn.x, alchemyStartBtn.y);
 			setFontSize(20);
-			drawTextCenter(L"#FFFFFFÁ¶ÇÕÇÏ±â", alchemyStartBtn.x + 100, alchemyStartBtn.y + 22);
+			drawTextCenter(L"#FFFFFFì¡°í•©í•˜ê¸°", alchemyStartBtn.x + 100, alchemyStartBtn.y + 22);
 			setFontSize(10);
-			drawText(L"#FFFFFF¼º°ø·ü : 82%", alchemyStartBtn.x + 45, alchemyStartBtn.y + 38);
-			drawText(L"#FFFFFFÁ¶ÇÕ½Ã°£ : 12ºĞ 30ÃÊ", alchemyStartBtn.x + 45, alchemyStartBtn.y + 51);
+			drawText(L"#FFFFFFì„±ê³µë¥  : 82%", alchemyStartBtn.x + 45, alchemyStartBtn.y + 38);
+			drawText(L"#FFFFFFì¡°í•©ì‹œê°„ : 12ë¶„ 30ì´ˆ", alchemyStartBtn.x + 45, alchemyStartBtn.y + 51);
 
 			if (reactPtrVec.size() == 1)
 			{
@@ -367,10 +367,10 @@ public:
 			}
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			///////////////////////////////////////////¼¿·ºÆ®¹Ú½º ¹öÆ°///////////////////////////////////////////////////////////
+			///////////////////////////////////////////ì…€ë ‰íŠ¸ë°•ìŠ¤ ë²„íŠ¼///////////////////////////////////////////////////////////
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			if (dropDownList::mode != selectFlag::none)//¼¿·ºÆ®¹Ú½º ¾ÆÀÌÅÛµé ±×¸®±â
+			if (dropDownList::mode != selectFlag::none)//ì…€ë ‰íŠ¸ë°•ìŠ¤ ì•„ì´í…œë“¤ ê·¸ë¦¬ê¸°
 			{
 				dropDownList::rect.h = 13 + 17 * myMin(10, dropDownList::itemVec.size());
 				drawFillRect(dropDownList::rect, col::black);
@@ -384,7 +384,7 @@ public:
 				SDL_Rect line3 = { dropDownList::rect.x, dropDownList::rect.y + dropDownList::rect.h - 1, dropDownList::rect.w, 1 };
 				drawFillRect(line3, { 0x4a,0x4a,0x4a });
 
-				//¼±ÅÃ Ã¢¿¡ ³ª¿À´Â °³º° ¾ÆÀÌÅÛ ±×¸®±â
+				//ì„ íƒ ì°½ì— ë‚˜ì˜¤ëŠ” ê°œë³„ ì•„ì´í…œ ê·¸ë¦¬ê¸°
 				for (int i = 0; i < myMin(10, dropDownList::itemVec.size()); i++)
 				{
 					SDL_Rect miniRect = { dropDownList::rect.x, dropDownList::rect.y + 17 * i ,205, 16 };
@@ -464,7 +464,7 @@ public:
 		{
 			close(aniFlag::winUnfoldClose);
 		}
-		else if (dropDownList::mode == selectFlag::none) //¾ÆÀÌÅÛ ¼±ÅÃ ¸®½ºÆ®°¡ Á¸ÀçÇÏÁö ¾ÊÀ» °æ¿ì
+		else if (dropDownList::mode == selectFlag::none) //ì•„ì´í…œ ì„ íƒ ë¦¬ìŠ¤íŠ¸ê°€ ì¡´ì¬í•˜ì§€ ì•Šì„ ê²½ìš°
 		{
 			if (checkCursor(&alchemyStartBtn))
 			{
@@ -489,14 +489,14 @@ public:
 			}
 			else
 			{
-				//¹İÀÀ¹° ¹öÆ°À» ´­·¶À» °æ¿ì
+				//ë°˜ì‘ë¬¼ ë²„íŠ¼ì„ ëˆŒë €ì„ ê²½ìš°
 				for (int i = 0; i < 13; i++)
 				{
 					if (checkCursor(&reactRect[i]))
 					{
-						if (i < reactPtrVec.size())//Á¤»ó¹üÀ§ÀÇ ¹İÀÀ¹°(¾ø´Â ¹İÀÀ¹° Å¬¸¯ ¹æÁö)
+						if (i < reactPtrVec.size())//ì •ìƒë²”ìœ„ì˜ ë°˜ì‘ë¬¼(ì—†ëŠ” ë°˜ì‘ë¬¼ í´ë¦­ ë°©ì§€)
 						{
-							if (i == reactPtrVec.size() - 1) // ¸¶Áö¸· ¹öÆ°À» ´­·¶À» °æ¿ì »õ·Î¿î ¹İÀÀ¹° Ãß°¡
+							if (i == reactPtrVec.size() - 1) // ë§ˆì§€ë§‰ ë²„íŠ¼ì„ ëˆŒë €ì„ ê²½ìš° ìƒˆë¡œìš´ ë°˜ì‘ë¬¼ ì¶”ê°€
 							{
 								dropDownList::itemVec.clear();
 								updateLootPath();
@@ -508,7 +508,7 @@ public:
 									dropDownList::rect = { reactRect[i].x, reactRect[i].y + 18, 210, 17 * myMin(10,dropDownList::itemVec.size()) + 13 };
 								}
 							}
-							else//±× ¿ÜÀÇ ¹İÀÀ¹°À» ´­·¶À» °æ¿ì 
+							else//ê·¸ ì™¸ì˜ ë°˜ì‘ë¬¼ì„ ëˆŒë €ì„ ê²½ìš° 
 							{
 								reactPtrVec.erase(reactPtrVec.begin() + i);
 								updateProduct();
@@ -518,7 +518,7 @@ public:
 				}
 			}
 		}
-		else //¾Æ·¡¿¡ µå·Ó´Ù¿î¸®½ºÆ®°¡ ÇÃ·ÎÆÃµÈ »óÅÂÀÏ ¶§(¼±ÅÃ Áß)
+		else //ì•„ë˜ì— ë“œë¡­ë‹¤ìš´ë¦¬ìŠ¤íŠ¸ê°€ í”Œë¡œíŒ…ëœ ìƒíƒœì¼ ë•Œ(ì„ íƒ ì¤‘)
 		{
 			if (checkCursor(&dropDownList::rect))
 			{
@@ -529,37 +529,37 @@ public:
 					SDL_Rect selectMiniRect = { dropDownList::rect.x , dropDownList::rect.y + 17 * i, 205,16 };
 					if (checkCursor(&selectMiniRect))
 					{
-						if (dropDownList::mode == selectFlag::tool) //µµ±¸¸¦ ¼±ÅÃÇßÀ» °æ¿ì
+						if (dropDownList::mode == selectFlag::tool) //ë„êµ¬ë¥¼ ì„ íƒí–ˆì„ ê²½ìš°
 						{
 							CORO(selectTool(dropDownList::scroll + i));
 							dropDownList::mode = selectFlag::none;
 						}
 						else if (dropDownList::mode == selectFlag::react)
 						{
-							//¼±ÅÃÇÑ »õ·Î¿î ¹İÀÀ¹° ¾ÆÀÌÅÛ Ãß°¡ÇÏ±â(¾È¿¡ ¾ÆÀÌÅÛÀÌ ¾øÀ» °æ¿ì)
+							//ì„ íƒí•œ ìƒˆë¡œìš´ ë°˜ì‘ë¬¼ ì•„ì´í…œ ì¶”ê°€í•˜ê¸°(ì•ˆì— ì•„ì´í…œì´ ì—†ì„ ê²½ìš°)
 							if (dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr == nullptr || ((ItemPocket*)(dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr))->itemInfo.size() == 0)
 							{
 								CORO(executeAddNewReactant(dropDownList::scroll + i));
 							}
-							else if (dropDownList::itemVec[dropDownList::scroll + i]->itemCode == 87) //Æú´õ ¿ÜºÎ·Î ÀÌµ¿(µÚ·Î °¡±â)
+							else if (dropDownList::itemVec[dropDownList::scroll + i]->itemCode == 87) //í´ë” ì™¸ë¶€ë¡œ ì´ë™(ë’¤ë¡œ ê°€ê¸°)
 							{
 								ItemPocket* prevPtr = (ItemPocket*)dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr;
 								if (prevPtr->itemInfo.size() > 0)
 								{
 									dropDownList::itemVec.clear();
-									currentPathPocket.erase(currentPathPocket.end() - 1);//¸¶Áö¸· ¿ø¼Ò »èÁ¦
-									if (prevPtr != rootPathPocket) //¸¸¾à ÃÖ»óÀ§ Æú´õ°¡ ¾Æ´Ò °æ¿ì µÚ·Î°¡±â
+									currentPathPocket.erase(currentPathPocket.end() - 1);//ë§ˆì§€ë§‰ ì›ì†Œ ì‚­ì œ
+									if (prevPtr != rootPathPocket) //ë§Œì•½ ìµœìƒìœ„ í´ë”ê°€ ì•„ë‹ ê²½ìš° ë’¤ë¡œê°€ê¸°
 									{
-										dropDownList::itemVec.push_back(&itemDex[87]);//µÚ·Î °¡±â
+										dropDownList::itemVec.push_back(&itemDex[87]);//ë’¤ë¡œ ê°€ê¸°
 										itemDex[87].pocketPtr = currentPathPocket[currentPathPocket.size() - 2];
 									}
 
-									//ÀÌÀü Ptr¿¡ ÀÖ¾ú´ø ¿ä¼Òµé ÀüºÎ ÀÔ·Â
+									//ì´ì „ Ptrì— ìˆì—ˆë˜ ìš”ì†Œë“¤ ì „ë¶€ ì…ë ¥
 									for (int j = 0; j < prevPtr->itemInfo.size(); j++)
 									{
 										dropDownList::itemVec.push_back(&prevPtr->itemInfo[j]);
 
-										//sort¸¦ »ç¿ëÇØ Æ÷ÄÏÀÌ ÀÖ´Â ¾ÆÀÌÅÛÀ» ÆÇº°ÇÔ
+										//sortë¥¼ ì‚¬ìš©í•´ í¬ì¼“ì´ ìˆëŠ” ì•„ì´í…œì„ íŒë³„í•¨
 										std::sort(dropDownList::itemVec.begin() + (currentPathPocket.size() != 1), dropDownList::itemVec.end(), [](ItemData* a, ItemData* b) -> bool {
 											if (a->pocketPtr != nullptr && b->pocketPtr != nullptr)
 											{
@@ -578,23 +578,23 @@ public:
 									}
 								}
 							}
-							else //Æú´õ ³»ºÎ·Î ÀÌµ¿
+							else //í´ë” ë‚´ë¶€ë¡œ ì´ë™
 							{
 								ItemPocket* newPtr = (ItemPocket*)dropDownList::itemVec[dropDownList::scroll + i]->pocketPtr;
 								if (newPtr->itemInfo.size() > 0)
 								{
 									dropDownList::itemVec.clear();
-									dropDownList::itemVec.push_back(&itemDex[87]);//µÚ·Î °¡±â
+									dropDownList::itemVec.push_back(&itemDex[87]);//ë’¤ë¡œ ê°€ê¸°
 									itemDex[87].pocketPtr = currentPathPocket[currentPathPocket.size() - 1];
 									currentPathPocket.push_back(newPtr);
 
-									//³»ºÎ Ptr¿¡ ÀÖ¾ú´ø ¿ä¼Òµé ÀüºÎ ÀÔ·Â
+									//ë‚´ë¶€ Ptrì— ìˆì—ˆë˜ ìš”ì†Œë“¤ ì „ë¶€ ì…ë ¥
 									for (int j = 0; j < newPtr->itemInfo.size(); j++)
 									{
 										newPtr->itemInfo[j].lootSelect = 0;
 										dropDownList::itemVec.push_back(&newPtr->itemInfo[j]);
 
-										//sort¸¦ »ç¿ëÇØ Æ÷ÄÏÀÌ ÀÖ´Â ¾ÆÀÌÅÛÀ» ÆÇº°ÇÔ
+										//sortë¥¼ ì‚¬ìš©í•´ í¬ì¼“ì´ ìˆëŠ” ì•„ì´í…œì„ íŒë³„í•¨
 										std::sort(dropDownList::itemVec.begin() + (currentPathPocket.size() != 1), dropDownList::itemVec.end(), [](ItemData* a, ItemData* b) -> bool {
 											if (a->pocketPtr != nullptr && b->pocketPtr != nullptr)
 											{
@@ -632,7 +632,7 @@ public:
 		{
 			if (click == true)
 			{
-				int scrollAccelConst = 20; // °¡¼Ó»ó¼ö, ÀÛ¾ÆÁú¼ö·Ï ½ºÅ©·Ñ ¼Óµµ°¡ »¡¶óÁü
+				int scrollAccelConst = 20; // ê°€ì†ìƒìˆ˜, ì‘ì•„ì§ˆìˆ˜ë¡ ìŠ¤í¬ë¡¤ ì†ë„ê°€ ë¹¨ë¼ì§
 				dropDownList::scroll = dropDownList::initScroll + dy / scrollAccelConst;
 				if (abs(dy / scrollAccelConst) >= 1)
 				{
@@ -654,7 +654,7 @@ public:
 	void gamepadBtnUp() { }
 	void step()
 	{
-		//Àß¸øµÈ ½ºÅ©·Ñ À§Ä¡ Á¶Á¤
+		//ì˜ëª»ëœ ìŠ¤í¬ë¡¤ ìœ„ì¹˜ ì¡°ì •
 		if (dropDownList::scroll + 10 >= dropDownList::itemVec.size()) { dropDownList::scroll = myMax(0, (int)dropDownList::itemVec.size() - 10); }
 		else if (dropDownList::scroll < 0) { dropDownList::scroll = 0; }
 	}
@@ -663,11 +663,11 @@ public:
 	{
 		rootPathPocket->itemInfo.clear();
 
-		//»ı¼ºµÉ ¶§ ÁÖº¯ Å¸ÀÏ¿¡ ¾ÆÀÌÅÛÀÌ ÀÖ´ÂÁö Ã¼Å©
+		//ìƒì„±ë  ë•Œ ì£¼ë³€ íƒ€ì¼ì— ì•„ì´í…œì´ ìˆëŠ”ì§€ ì²´í¬
 		if (Player::ins()->getEquipPtr()->itemInfo.size() > 0)
 		{
 			rootPathPocket->itemInfo.push_back(itemDex[86]);
-			rootPathPocket->itemInfo[0].name = L"Àåºñ";
+			rootPathPocket->itemInfo[0].name = L"ì¥ë¹„";
 			rootPathPocket->itemInfo[0].pocketPtr = Player::ins()->getEquipPtr();
 		}
 
@@ -681,31 +681,31 @@ public:
 				switch (i)
 				{
 				default:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"ÇÃ·¹ÀÌ¾î Å¸ÀÏ";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"í”Œë ˆì´ì–´ íƒ€ì¼";
 					break;
 				case 0:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¡æ)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†’)";
 					break;
 				case 1:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¢Ö)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†—)";
 					break;
 				case 2:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¡è)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†‘)";
 					break;
 				case 3:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¢Ø)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†–)";
 					break;
 				case 4:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¡ç)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†)";
 					break;
 				case 5:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¢×)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†™)";
 					break;
 				case 6:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¡é)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†“)";
 					break;
 				case 7:
-					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"Å¸ÀÏ(¢Ù)";
+					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"íƒ€ì¼(â†˜)";
 					break;
 				}
 				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
@@ -716,7 +716,7 @@ public:
 
 	void updateTool()
 	{
-		//ÇÃ·¹ÀÌ¾îÀÇ ÀÎº¥Åä¸®¸¦ µÚÁ®¼­ Ã£À½
+		//í”Œë ˆì´ì–´ì˜ ì¸ë²¤í† ë¦¬ë¥¼ ë’¤ì ¸ì„œ ì°¾ìŒ
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		dropDownList::itemVec.clear();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
@@ -727,7 +727,7 @@ public:
 			}
 		}
 
-		//ÁÖº¯ Å¸ÀÏÀ» µÚÁ®¼­ Ã£À½
+		//ì£¼ë³€ íƒ€ì¼ì„ ë’¤ì ¸ì„œ ì°¾ìŒ
 		for (int i = 0; i < 9; i++)
 		{
 			int dx, dy;
@@ -746,7 +746,7 @@ public:
 			}
 		}
 
-		if (dropDownList::itemVec.size() != 0) //°ø±¸¸¦ 1°³¶óµµ Ã£´Âµ¥ ¼º°øÇßÀ¸¸é
+		if (dropDownList::itemVec.size() != 0) //ê³µêµ¬ë¥¼ 1ê°œë¼ë„ ì°¾ëŠ”ë° ì„±ê³µí–ˆìœ¼ë©´
 		{
 			dropDownList::mode = selectFlag::tool;
 			dropDownList::rect = { toolItemBtn.x, toolItemBtn.y + 18, 210, 17 * myMin(10,dropDownList::itemVec.size()) + 13 };
@@ -755,27 +755,27 @@ public:
 
 	Corouter executeAddNewReactant(int cursor)
 	{
-		if (dropDownList::itemVec[cursor]->number == 1) //¾ÆÀÌÅÛÀÇ °¹¼ö°¡ 1°³ÀÏ °æ¿ì
+		if (dropDownList::itemVec[cursor]->number == 1) //ì•„ì´í…œì˜ ê°¯ìˆ˜ê°€ 1ê°œì¼ ê²½ìš°
 		{
 			dropDownList::itemVec[cursor]->reactSelect = 1;
 		}
 		else
 		{
-			std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//È®ÀÎ, Ãë¼Ò
-			new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//¾ÆÀÌÅÛ ¼±ÅÃ, ¾ó¸¶³ª?
+			std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//í™•ì¸, ì·¨ì†Œ
+			new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//ì•„ì´í…œ ì„ íƒ, ì–¼ë§ˆë‚˜?
 			co_await std::suspend_always();
 
-			if (coAnswer == sysStr[38])//È®ÀÎ
+			if (coAnswer == sysStr[38])//í™•ì¸
 			{
 				dropDownList::itemVec[cursor]->reactSelect = myMax(1, myMin(dropDownList::itemVec[cursor]->number, wtoi(exInputText.c_str())));
 			}
-			else//Ãë¼Ò and ÅÇ
+			else//ì·¨ì†Œ and íƒ­
 			{
 				co_return;
 			}
 		}
 
-		if (std::find(reactPtrVec.begin(), reactPtrVec.end(), dropDownList::itemVec[cursor]) != reactPtrVec.end())//±âÁ¸ ¹İÀÀ¹° ¸ñ·Ï¿¡ ¾øÀ» °æ¿ì
+		if (std::find(reactPtrVec.begin(), reactPtrVec.end(), dropDownList::itemVec[cursor]) != reactPtrVec.end())//ê¸°ì¡´ ë°˜ì‘ë¬¼ ëª©ë¡ì— ì—†ì„ ê²½ìš°
 		{
 			reactPtrVec.erase(std::find(reactPtrVec.begin(), reactPtrVec.end(), dropDownList::itemVec[cursor]));
 		}
@@ -791,13 +791,13 @@ public:
 		{
 			if (alchemyDex[alchemyCounter].qualityNeed != targetToolQuality)
 			{
-				prt(L"ÀÎµ¦½º %d ¿¬±İ¼ú Á¶ÇÕ °ø±¸±â¼ú ºÎÁ·À¸·Î Ãë¼ÒµÊ\n", alchemyCounter);
+				prt(L"ì¸ë±ìŠ¤ %d ì—°ê¸ˆìˆ  ì¡°í•© ê³µêµ¬ê¸°ìˆ  ë¶€ì¡±ìœ¼ë¡œ ì·¨ì†Œë¨\n", alchemyCounter);
 				continue;
 			}
 
 			for (int recipeCounter = 0; recipeCounter < alchemyDex[alchemyCounter].reactant.size(); recipeCounter++)
 			{
-				//find¸¦ À§ÇÑ itemCode vector¿Í number vector Á¦Á¶
+				//findë¥¼ ìœ„í•œ itemCode vectorì™€ number vector ì œì¡°
 				std::vector<int> itemCodeVec, numberVec;
 				for (int reactCounter = 0; reactCounter < reactPtrVec.size(); reactCounter++)
 				{
@@ -809,26 +809,26 @@ public:
 				}
 
 				auto codeIt = std::find(itemCodeVec.begin(), itemCodeVec.end(), alchemyDex[alchemyCounter].reactant[recipeCounter].first);
-				if (codeIt != itemCodeVec.end()) //¸¸¾à ÇÊ¿ä ¾ÆÀÌÅÛÀÌ ÇöÀç ¹İÀÀ¹°¿¡ Á¸ÀçÇÒ °æ¿ì
+				if (codeIt != itemCodeVec.end()) //ë§Œì•½ í•„ìš” ì•„ì´í…œì´ í˜„ì¬ ë°˜ì‘ë¬¼ì— ì¡´ì¬í•  ê²½ìš°
 				{
 					
-					int index = std::distance(itemCodeVec.begin(), codeIt); //¹İº¹ÀÚ¸¦ ÀÎµ¦½º·Î º¯È¯
-					prt(L"ÇÊ¿äÇÑ ¾ÆÀÌÅÛ %dÀÌ ÇöÀç ¹İÀÀ¹°¿¡ Á¸ÀçÇÔ\n", itemCodeVec[index]);
+					int index = std::distance(itemCodeVec.begin(), codeIt); //ë°˜ë³µìë¥¼ ì¸ë±ìŠ¤ë¡œ ë³€í™˜
+					prt(L"í•„ìš”í•œ ì•„ì´í…œ %dì´ í˜„ì¬ ë°˜ì‘ë¬¼ì— ì¡´ì¬í•¨\n", itemCodeVec[index]);
 					if (numberVec[index] < alchemyDex[alchemyCounter].reactant[recipeCounter].second)
 					{
-						prt(L"¾ÆÀÌÅÛ %d ¼ıÀÚ ºÎÁ·(ÇöÀç %d)À¸·Î break;\n", itemCodeVec[index],numberVec[index]);
-						break;//¼ıÀÚ°¡ ÃæºĞÇÑÁö È®ÀÎ
+						prt(L"ì•„ì´í…œ %d ìˆ«ì ë¶€ì¡±(í˜„ì¬ %d)ìœ¼ë¡œ break;\n", itemCodeVec[index],numberVec[index]);
+						break;//ìˆ«ìê°€ ì¶©ë¶„í•œì§€ í™•ì¸
 					}
 				}
 				else
 				{
-					prt(L"¾ÆÀÌÅÛ %d°¡ ¹İÀÀ¹°¿¡ ¾ø¾î¼­ break\n", alchemyDex[alchemyCounter].reactant[recipeCounter].first);
+					prt(L"ì•„ì´í…œ %dê°€ ë°˜ì‘ë¬¼ì— ì—†ì–´ì„œ break\n", alchemyDex[alchemyCounter].reactant[recipeCounter].first);
 					break;
 				}
 
-				if (recipeCounter == alchemyDex[alchemyCounter].reactant.size() - 1)//¸¶Áö¸·¿¡ ¹®Á¦¾øÀÌ µµ´ŞÇßÀ» °æ¿ì
+				if (recipeCounter == alchemyDex[alchemyCounter].reactant.size() - 1)//ë§ˆì§€ë§‰ì— ë¬¸ì œì—†ì´ ë„ë‹¬í–ˆì„ ê²½ìš°
 				{
-					prt(L"¿¬±İ¼ú ¸¶Áö¸· µµ´Ş\n");
+					prt(L"ì—°ê¸ˆìˆ  ë§ˆì§€ë§‰ ë„ë‹¬\n");
 
 					int reactPtrVecSize = 0;
 					for (int i = 0; i < reactPtrVec.size(); i++)
@@ -838,8 +838,8 @@ public:
 
 					if (itemCodeVec.size() == reactPtrVecSize)
 					{
-						prt(L"¿¬±İ¼ú ¼º°ø\n");
-						//std::wprintf(L"¼º°ø\n");
+						prt(L"ì—°ê¸ˆìˆ  ì„±ê³µ\n");
+						//std::wprintf(L"ì„±ê³µ\n");
 						targetProductIndex = alchemyCounter;
 						return;
 					}
@@ -860,7 +860,7 @@ public:
 			{
 				toolQualityList.push_back(toolQuality2String(dropDownList::itemVec[cursor]->toolQuality[i]));
 			}
-			new Lst(sysStr[95], sysStr[94], toolQualityList);//³Ö±â, ³ÖÀ» Æ÷ÄÏÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.
+			new Lst(sysStr[95], sysStr[94], toolQualityList);//ë„£ê¸°, ë„£ì„ í¬ì¼“ì„ ì„ íƒí•´ì£¼ì„¸ìš”.
 			co_await std::suspend_always();
 			if (wtoi(coAnswer) != -1)
 			{
@@ -886,11 +886,11 @@ public:
 		
 		while (1)
 		{
-			prt(L"Alchemy While ·çÇÁ ½ÇÇàµÊ\n");
+			prt(L"Alchemy While ë£¨í”„ ì‹¤í–‰ë¨\n");
 
 			if (negateMonster == false)
 			{
-				prt(L"ÀûÀ» ¹«½ÃÇÒ±î?\n");
+				prt(L"ì ì„ ë¬´ì‹œí• ê¹Œ?\n");
 				for (int x = PlayerX() - 1; x <= PlayerX() + 1; x++)
 				{
 					for (int y = PlayerY() - 1; y <= PlayerY() + 1; y++)
@@ -899,10 +899,10 @@ public:
 							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
-									new Msg(msgFlag::normal, L"°æ°í", L"ÁÖº¯¿¡ ÀûÀÌ ÀÖ½À´Ï´Ù. °è¼Ó Á¶ÇÕÇÏ½Ã°Ú½À´Ï±î?", { L"³×",L"¾Æ´Ï¿À",L"¹«½ÃÇÏ±â" });
+									new Msg(msgFlag::normal, L"ê²½ê³ ", L"ì£¼ë³€ì— ì ì´ ìˆìŠµë‹ˆë‹¤. ê³„ì† ì¡°í•©í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", { L"ë„¤",L"ì•„ë‹ˆì˜¤",L"ë¬´ì‹œí•˜ê¸°" });
 									co_await std::suspend_always();
-									if (coAnswer == L"³×") goto loopEnd;
-									else if (coAnswer == L"¹«½ÃÇÏ±â")
+									if (coAnswer == L"ë„¤") goto loopEnd;
+									else if (coAnswer == L"ë¬´ì‹œí•˜ê¸°")
 									{
 										negateMonster = true;
 										goto loopEnd;
@@ -923,11 +923,11 @@ public:
 			//turnWait(1.0);
 			coTurnSkip = true;
 
-			prt(L"exeCraft ÄÚ·çÆ¾ ½ÇÇà Àü\n");
+			prt(L"exeCraft ì½”ë£¨í‹´ ì‹¤í–‰ ì „\n");
 
 			co_await std::suspend_always();
 
-			prt(L"exeCraft ÄÚ·çÆ¾ ½ÇÇà ÈÄ\n");
+			prt(L"exeCraft ì½”ë£¨í‹´ ì‹¤í–‰ í›„\n");
 
 			elapsedTime++;
 			if (elapsedTime >= targetCraftingTime)

@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #include <SDL_image.h>
 
 export module Entity;
@@ -26,19 +26,19 @@ export class Entity : public Ani, public Coord, public Drawable
 {
 private:
     std::unique_ptr<Sprite> customSprite = nullptr;
-    std::unique_ptr<Sprite> spriteFlash = nullptr; //ÇÃ·¡½Ã¿ë Èò»ö ¸¶½ºÅ· ½ºÇÁ¶óÀÌÆ®
-    SDL_Color flash = { 0,0,0,0 }; //ÇÃ·¡½Ã ÄÃ·¯
+    std::unique_ptr<Sprite> spriteFlash = nullptr; //í”Œë˜ì‹œìš© í°ìƒ‰ ë§ˆìŠ¤í‚¹ ìŠ¤í”„ë¼ì´íŠ¸
+    SDL_Color flash = { 0,0,0,0 }; //í”Œë˜ì‹œ ì»¬ëŸ¬
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     bool hasAStarDst = false;
     Point2 aStarDst = { 0, 0 };
     Point3 atkTarget = { 0,0,0 };
     Point3 skillTarget = { 0,0,0 };
-    atkType nextAtkType = atkType::bash; //´ÙÀ½ °ø°İ¿¡ »ç¿ëÇÒ °ø°İÀÇ Å¸ÀÔ
+    atkType nextAtkType = atkType::bash; //ë‹¤ìŒ ê³µê²©ì— ì‚¬ìš©í•  ê³µê²©ì˜ íƒ€ì…
     int atkTargetPart = -1;
-    equipHandFlag aimWeaponHand = equipHandFlag::right;//ÇöÀç Àû¿¡°Ô °Ü´©´Â ÁÖ¹«±â
-    unsigned __int8 aimStack = 0; //´ÙÀ½ °ø°İ¿¡ °¡»êµÉ Á¶ÁØ ½ºÅÃ
+    equipHandFlag aimWeaponHand = equipHandFlag::right;//í˜„ì¬ ì ì—ê²Œ ê²¨ëˆ„ëŠ” ì£¼ë¬´ê¸°
+    unsigned __int8 aimStack = 0; //ë‹¤ìŒ ê³µê²©ì— ê°€ì‚°ë  ì¡°ì¤€ ìŠ¤íƒ
     bool footChanged = false;
-    bool leftFoot = true; //°È±â ¾Ö´Ï¸ŞÀÌ¼Ç¿¡¼­ÀÇ ¿Ş¹ß, ¿À¸¥¹ß ¼ø¼­
+    bool leftFoot = true; //ê±·ê¸° ì• ë‹ˆë©”ì´ì…˜ì—ì„œì˜ ì™¼ë°œ, ì˜¤ë¥¸ë°œ ìˆœì„œ
 
 public:
     Entity* ridingEntity = nullptr;

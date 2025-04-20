@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Particle;
 
@@ -38,7 +38,7 @@ public:
 
         type = particleFlag::parabolic;
         list.push_back(this);
-        if (list.size() > 10000) prt(L"[¸Ş¸ğ¸® ´©¼ö °æ°í] ParticleÀÇ °´Ã¼ ¼ö°¡ 100°³¸¦ ³Ñ¾î°¬½À´Ï´Ù.\n");
+        if (list.size() > 10000) prt(L"[ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ê²½ê³ ] Particleì˜ ê°ì²´ ìˆ˜ê°€ 100ê°œë¥¼ ë„˜ì–´ê°”ìŠµë‹ˆë‹¤.\n");
         setXY(inputRealX, inputRealY);
     }
     ~Particle()
@@ -64,7 +64,7 @@ public:
         else if (type == particleFlag::leaf)
         {
         }
-        else errorBox("¾Ë ¼ö ¾ø´Â particleFlag°¡ step ÀÌº¥Æ®¿¡¼­ ¹ß»ıÇÏ¿´À½");
+        else errorBox("ì•Œ ìˆ˜ ì—†ëŠ” particleFlagê°€ step ì´ë²¤íŠ¸ì—ì„œ ë°œìƒí•˜ì˜€ìŒ");
     }
 };
 

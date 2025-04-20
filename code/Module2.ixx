@@ -1,9 +1,9 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #include <SDL_ttf.h>
 
-#define ³· { 0xFF,0xF8,0xED }
-#define È²È¥ { 0x79,0x87,0xff}
-#define ³ëÀ» { 0xFF,0xB6,0x76 }
+#define ë‚® { 0xFF,0xF8,0xED }
+#define í™©í˜¼ { 0x79,0x87,0xff}
+#define ë…¸ì„ { 0xFF,0xB6,0x76 }
 
 export module globalVar;
 
@@ -26,7 +26,7 @@ export namespace actSet
 };
 export namespace option
 {
-    std::wstring language = L"Korean";// ¶Ç´Â "English"
+    std::wstring language = L"Korean";// ë˜ëŠ” "English"
 };
 
 export std::vector<std::wstring> sysStr;
@@ -38,8 +38,8 @@ export namespace timer
 };
 
 /////////////////////////////////////////////////////////////////
-export SDL_Window* window;//°ÔÀÓÀÇ ¸ŞÀÎ À©µµ¿ì
-export SDL_Renderer* renderer;//°ÔÀÓÀÇ ¸ŞÀÎ ·»´õ·¯
+export SDL_Window* window;//ê²Œì„ì˜ ë©”ì¸ ìœˆë„ìš°
+export SDL_Renderer* renderer;//ê²Œì„ì˜ ë©”ì¸ ë Œë”ëŸ¬
 
 auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
 
@@ -47,59 +47,59 @@ auto aniUSetComp = [](Ani* a, Ani* b) -> bool {
     else if (a->getAniPriority() > b->getAniPriority()) return true;
     else return false;
     };
-export std::set<Ani*, decltype(aniUSetComp)> aniUSet;//¾Ö´Ï¸ŞÀÌ¼Ç ÀúÀå ÇØ½Ã¼Â, ÇØ´ç ¾Ö´Ï¸ŞÀÌ¼ÇÀÇ ¿ì¼±µµ ¼ø¼­´ë·Î Á¤·ÄµÊ
-//export std::unordered_map<std::wstring, SDL_Texture*> textCache;// drawTextµéÀÇ ¹®ÀÚ¿­ ÀúÀå Ä³½Ã
-//export std::unordered_map<std::wstring, SDL_Texture*> textOutlineCache;// drawTextµéÀÇ ¹®ÀÚ¿­ ÀúÀå Ä³½Ã
-export turn turnCycle = turn::playerInput;//0:ÇÃ·¹ÀÌ¾î ÀÔ·Â_1:ÇÃ·¹ÀÌ¾î ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı_2:¸ğµç ¿£Æ¼Æ¼ AI ÀÛµ¿(ÇÏ³ª¶óµµ false ¹İÈ¯½Ã 3À¸·Î, ¾øÀ¸¸é 0À¸·Î)_3:¿£Æ¼Æ¼ ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı
-export bool quit = false;// trueÀÏ °æ¿ì °ÔÀÓÀ» Á¾·á½ÃÅ´
-export bool stopLog = false; // ·Î±×¸¦ ¸ØÃá´Ù. ½Ã°£ÀÌ Áö³ªµµ »ç¶óÁöÁö ¾ÊÀ½
-export float timeGift = 0; // À¯ÀúÀÇ Çàµ¿¿¡ ÀÇÇØ ¿£Æ¼Æ¼µé¿¡°Ô ÁÖ¾îÁö´Â ½Ã°£
+export std::set<Ani*, decltype(aniUSetComp)> aniUSet;//ì• ë‹ˆë©”ì´ì…˜ ì €ì¥ í•´ì‹œì…‹, í•´ë‹¹ ì• ë‹ˆë©”ì´ì…˜ì˜ ìš°ì„ ë„ ìˆœì„œëŒ€ë¡œ ì •ë ¬ë¨
+//export std::unordered_map<std::wstring, SDL_Texture*> textCache;// drawTextë“¤ì˜ ë¬¸ìì—´ ì €ì¥ ìºì‹œ
+//export std::unordered_map<std::wstring, SDL_Texture*> textOutlineCache;// drawTextë“¤ì˜ ë¬¸ìì—´ ì €ì¥ ìºì‹œ
+export turn turnCycle = turn::playerInput;//0:í”Œë ˆì´ì–´ ì…ë ¥_1:í”Œë ˆì´ì–´ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ_2:ëª¨ë“  ì—”í‹°í‹° AI ì‘ë™(í•˜ë‚˜ë¼ë„ false ë°˜í™˜ì‹œ 3ìœ¼ë¡œ, ì—†ìœ¼ë©´ 0ìœ¼ë¡œ)_3:ì—”í‹°í‹° ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ
+export bool quit = false;// trueì¼ ê²½ìš° ê²Œì„ì„ ì¢…ë£Œì‹œí‚´
+export bool stopLog = false; // ë¡œê·¸ë¥¼ ë©ˆì¶˜ë‹¤. ì‹œê°„ì´ ì§€ë‚˜ë„ ì‚¬ë¼ì§€ì§€ ì•ŠìŒ
+export float timeGift = 0; // ìœ ì €ì˜ í–‰ë™ì— ì˜í•´ ì—”í‹°í‹°ë“¤ì—ê²Œ ì£¼ì–´ì§€ëŠ” ì‹œê°„
 
 
 export std::vector<EntityData> entityDex; // Entity DB
-export std::vector<ItemData> itemDex;// ¾ÆÀÌÅÛ DB
-export std::vector<AlchemyData> alchemyDex; //¿¬±İ¼ú Á¶ÇÕ DB
+export std::vector<ItemData> itemDex;// ì•„ì´í…œ DB
+export std::vector<AlchemyData> alchemyDex; //ì—°ê¸ˆìˆ  ì¡°í•© DB
 export std::vector<std::wstring> itemTooltip;
 export std::vector<std::wstring> entityTooltip;
 
-export std::vector<std::array<int, effectDexWidth>> effectDex; // ÀÌÆåÆ® DB
+export std::vector<std::array<int, effectDexWidth>> effectDex; // ì´í™íŠ¸ DB
 
-export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; // È­¸é¿¡ °íÁ¤µÇ´Â ÅØ½ºÃ³ °´Ã¼¿¡ ´ëÇÑ ¸Ê
-export int cameraW = 304; // Ä«¸Ş¶óÀÇ Width
-export int cameraH = 244; // Ä«¸Ş¶óÀÇ Height
-export bool cameraFix = true; //Ä«¸Ş¶ó¸¦ ÇÃ·¹ÀÌ¾î¿¡ °íÁ¤
-export int cameraX = 0; // Ä«¸Ş¶óÀÇ X ÁÂÇ¥(ÁÂÃø»ó´Ü)
-export int cameraY = 0; // Ä«¸Ş¶óÀÇ Y ÁÂÇ¥(ÁÂÃø»ó´Ü)
-//¿©±â°¡ Ã¼Å©Æ÷ÀÎÆ®
-export float zoomScale = 3.0; // ÁÜ ¹èÀ², 2.0ºÎÅÍ ½ÃÀÛ
-export SDL_Event event; // SDL ÀÌº¥Æ®
-export act UIType = act::null; // 0 : ÀÏ¹İ, 1 :·çÆÃ, 2: ÀÎº¥Åä¸®
-export bool click = false; // ÇöÀç ÇÃ·¹ÀÌ¾î°¡ È­¸éÀ» ´©¸£°í ÀÖ´ÂÁö ³ªÅ¸³¿
-export SDL_Point clickTile = { 0,0 }; // ÇöÀç ÇÃ·¹ÀÌ¾î°¡ ÅÍÄ¡ÇÏ°í ÀÖ´Â Å¸ÀÏ(±×¸®µå ´ÜÀ§ Àı´ëÁÂÇ¥)
+export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; // í™”ë©´ì— ê³ ì •ë˜ëŠ” í…ìŠ¤ì²˜ ê°ì²´ì— ëŒ€í•œ ë§µ
+export int cameraW = 304; // ì¹´ë©”ë¼ì˜ Width
+export int cameraH = 244; // ì¹´ë©”ë¼ì˜ Height
+export bool cameraFix = true; //ì¹´ë©”ë¼ë¥¼ í”Œë ˆì´ì–´ì— ê³ ì •
+export int cameraX = 0; // ì¹´ë©”ë¼ì˜ X ì¢Œí‘œ(ì¢Œì¸¡ìƒë‹¨)
+export int cameraY = 0; // ì¹´ë©”ë¼ì˜ Y ì¢Œí‘œ(ì¢Œì¸¡ìƒë‹¨)
+//ì—¬ê¸°ê°€ ì²´í¬í¬ì¸íŠ¸
+export float zoomScale = 3.0; // ì¤Œ ë°°ìœ¨, 2.0ë¶€í„° ì‹œì‘
+export SDL_Event event; // SDL ì´ë²¤íŠ¸
+export act UIType = act::null; // 0 : ì¼ë°˜, 1 :ë£¨íŒ…, 2: ì¸ë²¤í† ë¦¬
+export bool click = false; // í˜„ì¬ í”Œë ˆì´ì–´ê°€ í™”ë©´ì„ ëˆ„ë¥´ê³  ìˆëŠ”ì§€ ë‚˜íƒ€ëƒ„
+export SDL_Point clickTile = { 0,0 }; // í˜„ì¬ í”Œë ˆì´ì–´ê°€ í„°ì¹˜í•˜ê³  ìˆëŠ” íƒ€ì¼(ê·¸ë¦¬ë“œ ë‹¨ìœ„ ì ˆëŒ€ì¢Œí‘œ)
 export std::array<int, 3> lootTile = { 0,0,0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-export int detailScroll = 0; //»ó´Ü µğÅ×ÀÏÀÇ ½ºÅ©·Ñ
-export input inputType = input::mouse; //Á¶ÀÛ¹æ½Ä ¼³Á¤
-export SDL_Point clickDownPoint = { 0,0 }; //´Ù¿î ÀÌº¥Æ®¸¦ ½ÇÇàÇÑ ÁÂÇ¥
-export SDL_Point clickUpPoint = { 0,0 }; //¾÷ ÀÌº¥Æ®¸¦ ½ÇÇàÇÑ ÁÂÇ¥
-export bool deactClickUp = false; //trueÀÏ °æ¿ì Å¬¸¯¾÷ ÇÔ¼ö¸¦ ½ÇÇàÇÏÁö ¾ÊÀ½
-export bool cursorMotionLock = false; //½ºÅ©·Ñ Çàµ¿½Ã ¸¶¿ì½º¸¦ ¿Å°åÀ» ¶§ ¹öÆ°µéÀÇ »öº¯È­ ¹æÁö
-export std::vector<act> barAct = actSet::null; //ÇÏ´Ü¿¡ Ç¥½ÃµÇ´Â Çàµ¿ ¸®½ºÆ®
-export int dxClickStack = 0; //x ÁÂÇ¥ÀÇ ÀÌµ¿°ª
-export int dyClickStack = 0; //y ÁÂÇ¥ÀÇ ÀÌµ¿°ª
-export int dtClickStackStart = 0; //Å¬¸¯ ½Ã°£ ÃøÁ¤ ½ÃÀÛÇÑ ½Ã°£
-export int dtClickStack = -1; //ÃÑ ½Ã°£, ´Ü ÃøÁ¤ ÁßÀÌÁö ¾ÊÀ» ¶§¿¡´Â °ªÀÌ -1
-export TTF_Font* mainFont[maxFontSize] = { nullptr, }; //¸ŞÀÎ ÆùÆ®ÀÇ »çÀÌÁî(¾ğ¾î ¼³Á¤ÀÌ ¹Ù²î¸é ´Ù¸¥ ÆùÆ®·Î ¹Ù²ñ)
-export TTF_Font* outlineFont[maxFontSize] = { nullptr, }; //¸ŞÀÎ ÆùÆ®ÀÇ »çÀÌÁî(¾ğ¾î ¼³Á¤ÀÌ ¹Ù²î¸é ´Ù¸¥ ÆùÆ®·Î ¹Ù²ñ)
-export int selectMode = 0; // ¼±ÅÃ¸ğµå 0ÀÏ °æ¿ì ÀüÃ¼¼±ÅÃ, 1ÀÌ¸é Á¤¹Ğ¼±ÅÃ
+export int detailScroll = 0; //ìƒë‹¨ ë””í…Œì¼ì˜ ìŠ¤í¬ë¡¤
+export input inputType = input::mouse; //ì¡°ì‘ë°©ì‹ ì„¤ì •
+export SDL_Point clickDownPoint = { 0,0 }; //ë‹¤ìš´ ì´ë²¤íŠ¸ë¥¼ ì‹¤í–‰í•œ ì¢Œí‘œ
+export SDL_Point clickUpPoint = { 0,0 }; //ì—… ì´ë²¤íŠ¸ë¥¼ ì‹¤í–‰í•œ ì¢Œí‘œ
+export bool deactClickUp = false; //trueì¼ ê²½ìš° í´ë¦­ì—… í•¨ìˆ˜ë¥¼ ì‹¤í–‰í•˜ì§€ ì•ŠìŒ
+export bool cursorMotionLock = false; //ìŠ¤í¬ë¡¤ í–‰ë™ì‹œ ë§ˆìš°ìŠ¤ë¥¼ ì˜®ê²¼ì„ ë•Œ ë²„íŠ¼ë“¤ì˜ ìƒ‰ë³€í™” ë°©ì§€
+export std::vector<act> barAct = actSet::null; //í•˜ë‹¨ì— í‘œì‹œë˜ëŠ” í–‰ë™ ë¦¬ìŠ¤íŠ¸
+export int dxClickStack = 0; //x ì¢Œí‘œì˜ ì´ë™ê°’
+export int dyClickStack = 0; //y ì¢Œí‘œì˜ ì´ë™ê°’
+export int dtClickStackStart = 0; //í´ë¦­ ì‹œê°„ ì¸¡ì • ì‹œì‘í•œ ì‹œê°„
+export int dtClickStack = -1; //ì´ ì‹œê°„, ë‹¨ ì¸¡ì • ì¤‘ì´ì§€ ì•Šì„ ë•Œì—ëŠ” ê°’ì´ -1
+export TTF_Font* mainFont[maxFontSize] = { nullptr, }; //ë©”ì¸ í°íŠ¸ì˜ ì‚¬ì´ì¦ˆ(ì–¸ì–´ ì„¤ì •ì´ ë°”ë€Œë©´ ë‹¤ë¥¸ í°íŠ¸ë¡œ ë°”ë€œ)
+export TTF_Font* outlineFont[maxFontSize] = { nullptr, }; //ë©”ì¸ í°íŠ¸ì˜ ì‚¬ì´ì¦ˆ(ì–¸ì–´ ì„¤ì •ì´ ë°”ë€Œë©´ ë‹¤ë¥¸ í°íŠ¸ë¡œ ë°”ë€œ)
+export int selectMode = 0; // ì„ íƒëª¨ë“œ 0ì¼ ê²½ìš° ì „ì²´ì„ íƒ, 1ì´ë©´ ì •ë°€ì„ íƒ
 /////////////////////////////////////////////////////////////////
-export bool exInput = false; // exInput(¿ÜºÎ ÅØ½ºÆ® ÀÔ·Â)°¡ ÀÛµ¿ ÁßÀÎÁöÀÇ ¿©ºÎ
-export std::wstring exInputText = L""; // ¸Ş½ÃÁö ¹Ú½º¿¡ ÀÔ·ÂÇÑ ¹®ÀÚ¿­
-export int exInputCursor = 0; // ¸Ş½ÃÁö ¹Ú½º¿¡¼­ ÇöÀç °¡¸®Å°´Â Ä¿¼­
-export bool exInputEditing = false; // ÇöÀç ÀÔ·ÂÀÌ ¼öÁ¤ ÁßÀÎÁö, ¿¹·Î ÇÑ±Û ¿Ï¼º Àü¿¡´Â trueÀÓ, ÀÌ °ªÀ» ¹ÙÅÁÀ¸·Î ±×¸®´Â À§Ä¡µµ º¯µ¿µÊ
-export int exInputIndex = -1; // -1Àº ¹Ì¼±ÅÃ, 0ºÎÅÍ ÇÒ´ç, 0Àº ¾ÆÀÌÅÛ ¼±ÅÃ ¼ıÀÚ ÀÔ·Â
+export bool exInput = false; // exInput(ì™¸ë¶€ í…ìŠ¤íŠ¸ ì…ë ¥)ê°€ ì‘ë™ ì¤‘ì¸ì§€ì˜ ì—¬ë¶€
+export std::wstring exInputText = L""; // ë©”ì‹œì§€ ë°•ìŠ¤ì— ì…ë ¥í•œ ë¬¸ìì—´
+export int exInputCursor = 0; // ë©”ì‹œì§€ ë°•ìŠ¤ì—ì„œ í˜„ì¬ ê°€ë¦¬í‚¤ëŠ” ì»¤ì„œ
+export bool exInputEditing = false; // í˜„ì¬ ì…ë ¥ì´ ìˆ˜ì • ì¤‘ì¸ì§€, ì˜ˆë¡œ í•œê¸€ ì™„ì„± ì „ì—ëŠ” trueì„, ì´ ê°’ì„ ë°”íƒ•ìœ¼ë¡œ ê·¸ë¦¬ëŠ” ìœ„ì¹˜ë„ ë³€ë™ë¨
+export int exInputIndex = -1; // -1ì€ ë¯¸ì„ íƒ, 0ë¶€í„° í• ë‹¹, 0ì€ ì•„ì´í…œ ì„ íƒ ìˆ«ì ì…ë ¥
 ////////////////////////////////////////////////////////////////
-//HUD °ü·Ã Àü¿ªº¯¼ö
+//HUD ê´€ë ¨ ì „ì—­ë³€ìˆ˜
 export tabFlag tabType = tabFlag::autoAtk;
 export SDL_Rect letterbox = { 0, 0, 0, 0 };
 export SDL_Rect barButton[35] = { 0, 0, 0, 0 };
@@ -110,32 +110,32 @@ export SDL_Rect tab = { 0, 0, 0, 0 };
 export bool doPopUpSingleHUD = false;
 export bool doPopDownHUD = false;
 
-export int barActCursor = -1; //Å°º¸µå ÀÔ·Â ½Ã¿¡ »ç¿ëµÇ´Â ·¹ÅÍ¹Ú½º Ä¿¼­, ºñÈ°¼ºÀº -1
+export int barActCursor = -1; //í‚¤ë³´ë“œ ì…ë ¥ ì‹œì— ì‚¬ìš©ë˜ëŠ” ë ˆí„°ë°•ìŠ¤ ì»¤ì„œ, ë¹„í™œì„±ì€ -1
 
-export SDL_Color mainLightColor = ³·;
+export SDL_Color mainLightColor = ë‚®;
 export int mainLightBright = 20;
 export int mainLightSight = 0;
 
-/////////////////////ÄÚ·çÆ¾ °ü·Ã º¯¼ö///////////////////////////////
+/////////////////////ì½”ë£¨í‹´ ê´€ë ¨ ë³€ìˆ˜///////////////////////////////
 export Corouter* coFunc;
 export std::wstring coAnswer = L"";
-export bool coTurnSkip = false; //trueÀÏ °æ¿ì ÇÃ·¹ÀÌ¾î ÅÏ¿¡ µµ´Ş½Ã coFunc¿¡ ÇÒ´çµÈ ÄÚ·çÆ¾ ÇÔ¼ö¸¦ ½ÇÇà½ÃÅ´, Áï ÄÚ·çÆ¾ÇÔ¼ö µµÁß¿¡ ÅÏÀ» ½ºÅµÇÏ´Â ±â´ÉÀ» ÇÒ ¼ö ÀÖÀ½
+export bool coTurnSkip = false; //trueì¼ ê²½ìš° í”Œë ˆì´ì–´ í„´ì— ë„ë‹¬ì‹œ coFuncì— í• ë‹¹ëœ ì½”ë£¨í‹´ í•¨ìˆ˜ë¥¼ ì‹¤í–‰ì‹œí‚´, ì¦‰ ì½”ë£¨í‹´í•¨ìˆ˜ ë„ì¤‘ì— í„´ì„ ìŠ¤í‚µí•˜ëŠ” ê¸°ëŠ¥ì„ í•  ìˆ˜ ìˆìŒ
 
 /////////////////////////////////////////////////////////////////
 export bool isLeftHanded = false;
 
-//fac, tile, wall, ceil(µû·Î Ãß°¡ÀûÀ¸·Î °´Ã¼¾øÀ½)
-export std::vector<int> canBuildListWall = { 1, 2 }; //³ª¹«º®, Èëº®
-export std::vector<int> canBuildListFloor = { 1 }; //³ª¹«¹Ù´Ú
-export std::vector<int> canBuildListCeil = { 1 }; //³ª¹«ÃµÀå
-export std::vector<int> canBuildListFac = { 1, 2, 3 }; //Â÷·® Ã¶ ÇÁ·¹ÀÓ, ÀÇÀÚ, Àå·Õ
+//fac, tile, wall, ceil(ë”°ë¡œ ì¶”ê°€ì ìœ¼ë¡œ ê°ì²´ì—†ìŒ)
+export std::vector<int> canBuildListWall = { 1, 2 }; //ë‚˜ë¬´ë²½, í™ë²½
+export std::vector<int> canBuildListFloor = { 1 }; //ë‚˜ë¬´ë°”ë‹¥
+export std::vector<int> canBuildListCeil = { 1 }; //ë‚˜ë¬´ì²œì¥
+export std::vector<int> canBuildListFac = { 1, 2, 3 }; //ì°¨ëŸ‰ ì²  í”„ë ˆì„, ì˜ì, ì¥ë¡±
 
 export void* availableRecipe;
 
 export bool vehicleMode = false;
 export void* ctrlVeh = nullptr;
 
-export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//ÁÂÇ¥º¯È¯
+export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//ì¢Œí‘œë³€í™˜
 
 export namespace dur
 {

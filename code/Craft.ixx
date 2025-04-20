@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -37,7 +37,7 @@ private:
 	std::array<SDL_Rect, 8> craftCategory;
 	SDL_Rect itemBox[24];
 
-	int selectCategory = -1; //-2ÀÌ¸é Áñ°ÜÃ£±â, -1ÀÌ¸é ºñÈ°¼ºÈ­, 0ÀÌ¸é ¹«±â, 1¸é ¹æ¾î±¸
+	int selectCategory = -1; //-2ì´ë©´ ì¦ê²¨ì°¾ê¸°, -1ì´ë©´ ë¹„í™œì„±í™”, 0ì´ë©´ ë¬´ê¸°, 1ë©´ ë°©ì–´êµ¬
 	int selectSubcategory = -1;
 
 	int craftScroll = 0;
@@ -52,33 +52,33 @@ private:
 	SDL_Rect unfoldBtn;
 	bool tooltipUnfold = false;
 
-	ItemPocket* recipePtr;//ÇÃ·¹ÀÌ¾î°¡ º¸À¯ÇÑ ·¹½ÃÇÇµé
+	ItemPocket* recipePtr;//í”Œë ˆì´ì–´ê°€ ë³´ìœ í•œ ë ˆì‹œí”¼ë“¤
 
-	bool deactColorChange = false;//¸¶¿ì½º¸¦ °¡Á®°¬À» ¶§ ¹öÆ°µéÀÇ ÄÃ·¯°¡ º¯ÇÏ´Â °ÍÀ» ºñÈ°¼ºÈ­
+	bool deactColorChange = false;//ë§ˆìš°ìŠ¤ë¥¼ ê°€ì ¸ê°”ì„ ë•Œ ë²„íŠ¼ë“¤ì˜ ì»¬ëŸ¬ê°€ ë³€í•˜ëŠ” ê²ƒì„ ë¹„í™œì„±í™”
 
-	int numNoneBlackFilter; //ºí·¢ÇÊÅÍ°¡ ¾Æ´Ñ ¾ÆÀÌÅÛÀÇ ¼ö, ½ºÅ©·Ñ Á¦ÇÑÀ» °É ¶§ »ç¿ëµÊ. µ¿ÀûÀ¸·Î ½ºÅÜ¸¶´Ù ÀÛµ¿½ÃÅ°¸é ·º °É·Á¼­ ºí·¢ÇÊÅÍ°¡ »ç¿ëµÇ¸é ¼öµ¿À¸·Î º¯°æÇØÁà¾ßÇÔ
+	int numNoneBlackFilter; //ë¸”ë™í•„í„°ê°€ ì•„ë‹Œ ì•„ì´í…œì˜ ìˆ˜, ìŠ¤í¬ë¡¤ ì œí•œì„ ê±¸ ë•Œ ì‚¬ìš©ë¨. ë™ì ìœ¼ë¡œ ìŠ¤í…ë§ˆë‹¤ ì‘ë™ì‹œí‚¤ë©´ ë ‰ ê±¸ë ¤ì„œ ë¸”ë™í•„í„°ê°€ ì‚¬ìš©ë˜ë©´ ìˆ˜ë™ìœ¼ë¡œ ë³€ê²½í•´ì¤˜ì•¼í•¨
 
-	bool showCraftingTooltip = false; //Á¦ÀÛ Áß¿¡ È­¸é »ó´Ü¿¡ ±×·ÁÁö´Â ÁøÃ´µµ, deactDraw¿Í »ó°ü¾øÀÌ µ¿ÀÛÇÔ
+	bool showCraftingTooltip = false; //ì œì‘ ì¤‘ì— í™”ë©´ ìƒë‹¨ì— ê·¸ë ¤ì§€ëŠ” ì§„ì²™ë„, deactDrawì™€ ìƒê´€ì—†ì´ ë™ì‘í•¨
 
 	bool isNowBuilding = false;
 	int targetItemCode = 0;
-	int elapsedTime = 0; //ÃÑ°ı Á¦ÀÛ ½Ã°£
+	int elapsedTime = 0; //ì´ê´„ ì œì‘ ì‹œê°„
 	inline static std::array<int, 3> buildLocation = { -1, -1, -1 };
 
-	inline static int ongoingTargetCode = -1; //Á¦ÀÛ ÁßÀÎ ¾ÆÀÌÅÛ
-	inline static int ongoingElapsedTime = -1; //Á¦ÀÛ °æ°ú ½Ã°£ ¾ÆÀÌÅÛ
+	inline static int ongoingTargetCode = -1; //ì œì‘ ì¤‘ì¸ ì•„ì´í…œ
+	inline static int ongoingElapsedTime = -1; //ì œì‘ ê²½ê³¼ ì‹œê°„ ì•„ì´í…œ
 
-	inline static int ongoingTargetCodeStructure = -1; //Á¦ÀÛ ÁßÀÎ °ÇÃà¹°
-	inline static int ongoingElapsedTimeStructure = -1; //Á¦ÀÛ °æ°ú ½Ã°£ °ÇÃà¹°
+	inline static int ongoingTargetCodeStructure = -1; //ì œì‘ ì¤‘ì¸ ê±´ì¶•ë¬¼
+	inline static int ongoingElapsedTimeStructure = -1; //ì œì‘ ê²½ê³¼ ì‹œê°„ ê±´ì¶•ë¬¼
 
 public:
 	Craft() : GUI(false)
 	{
-		prt(L"Craft : »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
-		//1°³ ÀÌ»óÀÇ ¸Ş½ÃÁö °´Ã¼ »ı¼º ½ÃÀÇ ¿¹¿Ü Ã³¸®
+		prt(L"Craft : ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
+		//1ê°œ ì´ìƒì˜ ë©”ì‹œì§€ ê°ì²´ ìƒì„± ì‹œì˜ ì˜ˆì™¸ ì²˜ë¦¬
 		errorBox(ptr != nullptr, "More than one message instance was generated.");
 		ptr = this;
-		//¸Ş¼¼Áö ¹Ú½º ·»´õ¸µ
+		//ë©”ì„¸ì§€ ë°•ìŠ¤ ë Œë”ë§
 		changeXY(cameraW / 2, cameraH / 2, true);
 
 		tabType = tabFlag::closeWin;
@@ -104,7 +104,7 @@ public:
 	}
 	~Craft()
 	{
-		prt(L"Craft : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"Craft : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
@@ -188,9 +188,9 @@ public:
 			if (showCraftingTooltip == false) close(aniFlag::winUnfoldClose);
 			else
 			{
-				updateLog(L"#FFFFFF¾ÆÀÌÅÛ Á¶ÇÕÀ» Ãë¼ÒÇß´Ù.");
+				updateLog(L"#FFFFFFì•„ì´í…œ ì¡°í•©ì„ ì·¨ì†Œí–ˆë‹¤.");
 
-				//Á¶ÇÕ µ¥ÀÌÅÍ ÀúÀå
+				//ì¡°í•© ë°ì´í„° ì €ì¥
 				if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 				{
 					saveCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
@@ -201,15 +201,15 @@ public:
 				close(aniFlag::null);
 			}
 		}
-		else if (checkCursor(&tooltipCraftBtn) && craftCursor >= 0)//ÅøÆÁ Á¶ÇÕÇÏ±â
+		else if (checkCursor(&tooltipCraftBtn) && craftCursor >= 0)//íˆ´íŒ ì¡°í•©í•˜ê¸°
 		{
 			CORO(executeCraft());
 		}
-		else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//ÅøÆÁ Áñ°ÜÃ£±â
+		else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//íˆ´íŒ ì¦ê²¨ì°¾ê¸°
 		{
 			CORO(executeBookmark());
 		}
-		else if (checkCursor(&unfoldBtn) && craftCursor >= 0)//ÅøÆÁ ÆîÄ¡±â
+		else if (checkCursor(&unfoldBtn) && craftCursor >= 0)//íˆ´íŒ í¼ì¹˜ê¸°
 		{
 			if (tooltipUnfold == false)
 			{
@@ -226,7 +226,7 @@ public:
 				unfoldBtn.y -= 300;
 			}
 		}
-		else if (checkCursor(&bookmarkCategory))//Áñ°ÜÃ£±â Ä«Å×°í¸® Å¬¸¯¾÷
+		else if (checkCursor(&bookmarkCategory))//ì¦ê²¨ì°¾ê¸° ì¹´í…Œê³ ë¦¬ í´ë¦­ì—…
 		{
 			craftCursor = -1;
 			if (selectCategory != -2)
@@ -238,7 +238,7 @@ public:
 				filterUpdate(matchCount);
 
 			}
-			else //ÀçÂ÷ ´­·¶À» °æ¿ì ÀüÃ¼ ºĞ·ù·Î º¯°æ
+			else //ì¬ì°¨ ëˆŒë €ì„ ê²½ìš° ì „ì²´ ë¶„ë¥˜ë¡œ ë³€ê²½
 			{
 				selectCategory = -1;
 			}
@@ -256,7 +256,7 @@ public:
 		}
 		else
 		{
-			//Ä«Å×°í¸® 8¹öÆ° Å¬¸¯¾÷
+			//ì¹´í…Œê³ ë¦¬ 8ë²„íŠ¼ í´ë¦­ì—…
 			for (int i = 0; i < 8; i++)
 			{
 				if (checkCursor(&craftCategory[i]))
@@ -310,39 +310,39 @@ public:
 				}
 			}
 
-			//¼­ºêÄ«Å×°í¸® ÀÔ·Â
+			//ì„œë¸Œì¹´í…Œê³ ë¦¬ ì…ë ¥
 			{
 				int maxSubcategorySize;
 				switch (selectCategory)
 				{
-				case -2://Áñ°ÜÃ£±â
+				case -2://ì¦ê²¨ì°¾ê¸°
 					maxSubcategorySize = 6;
 					break;
-				case -1://ÀüÃ¼
+				case -1://ì „ì²´
 					maxSubcategorySize = 1;
 					break;
-				case 0://¹«±â
+				case 0://ë¬´ê¸°
 					maxSubcategorySize = 5;
 					break;
-				case 1://¹æ¾î±¸
+				case 1://ë°©ì–´êµ¬
 					maxSubcategorySize = 5;
 					break;
-				case 2://µµ±¸
+				case 2://ë„êµ¬
 					maxSubcategorySize = 6;
 					break;
-				case 3://½Ä·®
+				case 3://ì‹ëŸ‰
 					maxSubcategorySize = 6;
 					break;
-				case 4://¼Ò¸ğÇ°
+				case 4://ì†Œëª¨í’ˆ
 					maxSubcategorySize = 5;
 					break;
-				case 5://¹ÙÀÌ¿À´Ğ
+				case 5://ë°”ì´ì˜¤ë‹‰
 					maxSubcategorySize = 6;
 					break;
-				case 6://°ÇÃà¹°
+				case 6://ê±´ì¶•ë¬¼
 					maxSubcategorySize = 6;
 					break;
-				case 7://Àç·á
+				case 7://ì¬ë£Œ
 					maxSubcategorySize = 5;
 					break;
 				}
@@ -440,7 +440,7 @@ public:
 							}
 							filterUpdate(matchCount);
 						}
-						else//°°Àº ¼­ºêÄ«Å×°í¸® ¹öÆ°À» ÀçÂ÷ ´­·¶À» °æ¿ì
+						else//ê°™ì€ ì„œë¸Œì¹´í…Œê³ ë¦¬ ë²„íŠ¼ì„ ì¬ì°¨ ëˆŒë €ì„ ê²½ìš°
 						{
 							if (selectCategory >= 0)
 							{
@@ -482,7 +482,7 @@ public:
 				}
 			}
 
-			//¾ÆÀÌÅÛ¹Ú½º Å¬¸¯
+			//ì•„ì´í…œë°•ìŠ¤ í´ë¦­
 
 			for (int i = 0; i < 24; i++)
 			{
@@ -521,7 +521,7 @@ public:
 		{
 			if (click == true)
 			{
-				int scrollAccelConst = 20; // °¡¼Ó»ó¼ö, ÀÛ¾ÆÁú¼ö·Ï ½ºÅ©·Ñ ¼Óµµ°¡ »¡¶óÁü
+				int scrollAccelConst = 20; // ê°€ì†ìƒìˆ˜, ì‘ì•„ì§ˆìˆ˜ë¡ ìŠ¤í¬ë¡¤ ì†ë„ê°€ ë¹¨ë¼ì§
 				craftScroll = initCraftScroll + dy / scrollAccelConst;
 				if (abs(dy / scrollAccelConst) >= 1)
 				{
@@ -561,7 +561,7 @@ public:
 
 	void filterUpdate(int matchCount)
 	{
-		numNoneBlackFilter = matchCount;//Ä¿¼­ À§Ä¡ Á¦ÇÑ¿ë
+		numNoneBlackFilter = matchCount;//ì»¤ì„œ ìœ„ì¹˜ ì œí•œìš©
 
 		for (int i = 0; i < recipePtr->itemInfo.size(); i++) recipePtr->itemInfo[i].eraseFlag(itemFlag::WHITEFILTER);
 		for (int i = 0; i < recipePtr->itemInfo.size(); i++) recipePtr->itemInfo[i].eraseFlag(itemFlag::GRAYFILTER);
@@ -578,13 +578,13 @@ public:
 		}
 
 		int matchCountCanCraft = recipePtr->searchFlag(itemFlag::WHITEFILTER);
-		if (matchCountCanCraft >= 2) recipePtr->sortByUnicode(0, matchCountCanCraft - 1); //Á¶ÇÕ ºÒ°¡´É ¾ÆÀÌÅÛ¸¸ Á¤·Ä
+		if (matchCountCanCraft >= 2) recipePtr->sortByUnicode(0, matchCountCanCraft - 1); //ì¡°í•© ë¶ˆê°€ëŠ¥ ì•„ì´í…œë§Œ ì •ë ¬
 	}
 
 	bool canCraft(int itemCode, bool exceptMaterial)
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ ÇÃ·¹ÀÌ¾î Àç´É Ã¼Å©
+		//ì¡°í•©ì— í•„ìš”í•œ í”Œë ˆì´ì–´ ì¬ëŠ¥ ì²´í¬
 		for (int i = 0; i < itemDex[itemCode].recipeProficNeed.size(); i++)
 		{
 			int needLevel = itemDex[itemCode].recipeProficNeed[i].second;
@@ -592,7 +592,7 @@ public:
 			if (playerLevel < needLevel) return false;
 		}
 
-		//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ ±â¼ú(Åø Ä÷¸®Æ¼) Ã¼Å©
+		//ì¡°í•©ì— í•„ìš”í•œ ê¸°ìˆ (íˆ´ í€„ë¦¬í‹°) ì²´í¬
 		for (int i = 0; i < itemDex[itemCode].recipeQualityNeed.size(); i++)
 		{
 			if (equipPtr->checkToolQuality(itemDex[itemCode].recipeQualityNeed[i]) == false) return false;
@@ -600,10 +600,10 @@ public:
 
 		if (exceptMaterial == false)
 		{
-			//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ Àç·á Ã¼Å©
+			//ì¡°í•©ì— í•„ìš”í•œ ì¬ë£Œ ì²´í¬
 			for (int i = 0; i < itemDex[itemCode].recipe.size(); i++)
 			{
-				//Åø Ä÷¸®Æ¼¿¡ µû¶ó Àû»ö, ³ì»ö º¯È­
+				//íˆ´ í€„ë¦¬í‹°ì— ë”°ë¼ ì ìƒ‰, ë…¹ìƒ‰ ë³€í™”
 				int playerNumber = equipPtr->numberItem(itemDex[itemCode].recipe[i].first);
 				int needNumber = itemDex[itemCode].recipe[i].second;
 				if (playerNumber < needNumber) return false;
@@ -627,7 +627,7 @@ public:
 		{
 			//recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK1);
 			std::vector<std::wstring> numList = { L"1", L"2", L"3", L"4", L"5", L"6" };
-			new Lst(sysStr[95], sysStr[94], numList);//³Ö±â, ³ÖÀ» Æ÷ÄÏÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.
+			new Lst(sysStr[95], sysStr[94], numList);//ë„£ê¸°, ë„£ì„ í¬ì¼“ì„ ì„ íƒí•´ì£¼ì„¸ìš”.
 			deactColorChange = true;
 			co_await std::suspend_always();
 			deactColorChange = false;
@@ -657,32 +657,32 @@ public:
 
 	Corouter executeCraft()
 	{
-		prt(L"executeCraft ½ÇÇàµÊ\n");
+		prt(L"executeCraft ì‹¤í–‰ë¨\n");
 
 		bool negateMonster = false;
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////1.Á¶ÇÕ ÁÂÇ¥ ¹× ¾ÆÀÌÅÛ ¼³Á¤///////////////////////////////////////////
+		////////////////////////////////////////////1.ì¡°í•© ì¢Œí‘œ ë° ì•„ì´í…œ ì„¤ì •///////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if (craftCursor != -1)//ÃÖÃÊ Á¶ÇÕÀÏ ¶§
+		if (craftCursor != -1)//ìµœì´ˆ ì¡°í•©ì¼ ë•Œ
 		{
 			targetItemCode = recipePtr->itemInfo[craftCursor].itemCode;
 			elapsedTime = 0;
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//////////////////////////////////////////1-1.Àç·á,µµ±¸,Àç´É Ã¼Å© ¹× Á¦°Å///////////////////////////////////////////
+			//////////////////////////////////////////1-1.ì¬ë£Œ,ë„êµ¬,ì¬ëŠ¥ ì²´í¬ ë° ì œê±°///////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			if (canCraft(targetItemCode) == false)//Àç·á,µµ±¸,Àç´ÉÀ» ¸¸Á·ÇÏ´ÂÁö Ã¼Å©
+			if (canCraft(targetItemCode) == false)//ì¬ë£Œ,ë„êµ¬,ì¬ëŠ¥ì„ ë§Œì¡±í•˜ëŠ”ì§€ ì²´í¬
 			{
-				updateLog(L"#FFFFFFÀç·á°¡ ºÎÁ·ÇÏ´Ù.");
+				updateLog(L"#FFFFFFì¬ë£Œê°€ ë¶€ì¡±í•˜ë‹¤.");
 				co_return;
 			}
-			else//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ Àç·á Á¦°Å
+			else//ì¡°í•©ì— í•„ìš”í•œ ì¬ë£Œ ì œê±°
 			{
 				for (int i = 0; i < itemDex[targetItemCode].recipe.size(); i++)
 				{
-					//Åø Ä÷¸®Æ¼¿¡ µû¶ó Àû»ö, ³ì»ö º¯È­
+					//íˆ´ í€„ë¦¬í‹°ì— ë”°ë¼ ì ìƒ‰, ë…¹ìƒ‰ ë³€í™”
 					int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
 					int needNumber = itemDex[meterialItemCode].recipe[i].second;
 					Player::ins()->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
@@ -691,13 +691,13 @@ public:
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//////////////////////////////////////////1-2.ÁÂÇ¥ ¼±ÅÃ///////////////////////////////////////////
+			//////////////////////////////////////////1-2.ì¢Œí‘œ ì„ íƒ///////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 			{
 				if (itemDex[targetItemCode].checkFlag(itemFlag::VFRAME))
 				{
-					//»õ·Î¿î Â÷·®À» ¼³Ä¡ÇÏ½Ã°Ú½À´Ï±î?
+					//ìƒˆë¡œìš´ ì°¨ëŸ‰ì„ ì„¤ì¹˜í•˜ì‹œê² ìŠµë‹ˆê¹Œ?
 					std::vector<std::array<int, 2>> selectableTile;
 					for (int dir = -1; dir < 8; dir++)
 					{
@@ -709,7 +709,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						new CoordSelect(L"Â÷·® ÇÁ·¹ÀÓÀ» ¼³Ä¡ÇÒ À§Ä¡¸¦ ¼±ÅÃÇØÁÖ¼¼¿ä.");
+						new CoordSelect(L"ì°¨ëŸ‰ í”„ë ˆì„ì„ ì„¤ì¹˜í•  ìœ„ì¹˜ë¥¼ ì„ íƒí•´ì£¼ì„¸ìš”.");
 						co_await std::suspend_always();
 						actDraw();
 
@@ -725,7 +725,7 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFFÁÖº¯¿¡ Â÷·® ÇÁ·¹ÀÓÀ» ¼³Ä¡ÇÒ¸¸ÇÑ °ø°£ÀÌ ¾ø´Ù.");
+						updateLog(L"#FFFFFFì£¼ë³€ì— ì°¨ëŸ‰ í”„ë ˆì„ì„ ì„¤ì¹˜í• ë§Œí•œ ê³µê°„ì´ ì—†ë‹¤.");
 						co_return;
 					}
 				}
@@ -736,7 +736,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						//Â÷·®ºÎÇ°ÀÌ¹Ç·Î ÀÌ¹Ì ÀÖ´Â ÇÁ·¹ÀÓ À§¿¡ °Ç¼³µÇ¾î¾ß ÇÔ
+						//ì°¨ëŸ‰ë¶€í’ˆì´ë¯€ë¡œ ì´ë¯¸ ìˆëŠ” í”„ë ˆì„ ìœ„ì— ê±´ì„¤ë˜ì–´ì•¼ í•¨
 						Vehicle* targetVehicle = (Vehicle*)(World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).VehiclePtr);
 						if (targetVehicle != nullptr)
 						{
@@ -750,7 +750,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						new CoordSelect(L"Â÷·® ºÎÇ°À» ¼³Ä¡ÇÒ ÇÁ·¹ÀÓÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.");
+						new CoordSelect(L"ì°¨ëŸ‰ ë¶€í’ˆì„ ì„¤ì¹˜í•  í”„ë ˆì„ì„ ì„ íƒí•´ì£¼ì„¸ìš”.");
 						co_await std::suspend_always();
 						actDraw();
 
@@ -766,13 +766,13 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFFÁÖº¯¿¡ Â÷·® ºÎÇ°À» ¼³Ä¡ÇÒ¸¸ÇÑ ÇÁ·¹ÀÓÀÌ ¾ø´Ù.");
+						updateLog(L"#FFFFFFì£¼ë³€ì— ì°¨ëŸ‰ ë¶€í’ˆì„ ì„¤ì¹˜í• ë§Œí•œ í”„ë ˆì„ì´ ì—†ë‹¤.");
 						co_return;
 					}
 				}
 				else
 				{
-					//»õ·Î¿î Â÷·®À» ¼³Ä¡ÇÏ½Ã°Ú½À´Ï±î?
+					//ìƒˆë¡œìš´ ì°¨ëŸ‰ì„ ì„¤ì¹˜í•˜ì‹œê² ìŠµë‹ˆê¹Œ?
 					std::vector<std::array<int, 2>> selectableTile;
 					for (int dir = 0; dir < 8; dir++)
 					{
@@ -784,7 +784,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						new CoordSelectCraft(targetItemCode, L"Á¶ÇÕÇÑ ¾ÆÀÌÅÛÀ» ¼³Ä¡ÇÒ À§Ä¡¸¦ ¼±ÅÃÇØÁÖ¼¼¿ä.", selectableTile);
+						new CoordSelectCraft(targetItemCode, L"ì¡°í•©í•œ ì•„ì´í…œì„ ì„¤ì¹˜í•  ìœ„ì¹˜ë¥¼ ì„ íƒí•´ì£¼ì„¸ìš”.", selectableTile);
 						co_await std::suspend_always();
 						actDraw();
 
@@ -800,23 +800,23 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFFÁÖº¯¿¡ ÇØ´ç ¾ÆÀÌÅÛÀ» ¼³Ä¡ÇÒ¸¸ÇÑ °ø°£ÀÌ ¾ø´Ù.");
+						updateLog(L"#FFFFFFì£¼ë³€ì— í•´ë‹¹ ì•„ì´í…œì„ ì„¤ì¹˜í• ë§Œí•œ ê³µê°„ì´ ì—†ë‹¤.");
 						co_return;
 					}
 				}
 			}
 		}
-		else // Á¶ÇÕ Àç°³ : ÃÖÃÊ·Î Á¶ÇÕÃ¢À» ¿ÀÇÂÇÒ ¶§ Á¶ÇÕµ¥ÀÌÅÍ È®ÀÎ
+		else // ì¡°í•© ì¬ê°œ : ìµœì´ˆë¡œ ì¡°í•©ì°½ì„ ì˜¤í”ˆí•  ë•Œ ì¡°í•©ë°ì´í„° í™•ì¸
 		{
 			if (existCraftData())
 			{
 				int percent = (int)(100.0 * (float)ongoingElapsedTime / (float)itemDex[ongoingTargetCode].craftTime);
-				new Msg(msgFlag::normal, L"Á¦ÀÛ", std::to_wstring(percent) + L"%¿¡¼­ Á¶ÇÕÀ» Áß´ÜÇÑ ¾ÆÀÌÅÛÀÌ Á¸ÀçÇÕ´Ï´Ù.(%item3)°è¼Ó Á¶ÇÕÇÏ½Ã°Ú½À´Ï±î?", { L"³×",L"¾Æ´Ï¿À" });
+				new Msg(msgFlag::normal, L"ì œì‘", std::to_wstring(percent) + L"%ì—ì„œ ì¡°í•©ì„ ì¤‘ë‹¨í•œ ì•„ì´í…œì´ ì¡´ì¬í•©ë‹ˆë‹¤.(%item3)ê³„ì† ì¡°í•©í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", { L"ë„¤",L"ì•„ë‹ˆì˜¤" });
 				deactColorChange = true;
 				co_await std::suspend_always();
 				deactColorChange = false;
 
-				if (coAnswer == L"³×")
+				if (coAnswer == L"ë„¤")
 				{
 					loadCraftData(targetItemCode, elapsedTime);
 				}
@@ -834,14 +834,14 @@ public:
 
 				if (dx <= 1 && dy <= 1 && dz == 0)
 				{
-					new Msg(msgFlag::normal, L"Á¦ÀÛ", L"ÁÖº¯¿¡ Á¶ÇÕ ÁßÀÎ °ÇÃà¹°ÀÌ Á¸ÀçÇÕ´Ï´Ù. (%item3) °ÇÃà¹°ÀÇ Á¶ÇÕÀ» °è¼ÓÇÏ½Ã°Ú½À´Ï±î?", { L"³×",L"ÆÄ±â" });
+					new Msg(msgFlag::normal, L"ì œì‘", L"ì£¼ë³€ì— ì¡°í•© ì¤‘ì¸ ê±´ì¶•ë¬¼ì´ ì¡´ì¬í•©ë‹ˆë‹¤. (%item3) ê±´ì¶•ë¬¼ì˜ ì¡°í•©ì„ ê³„ì†í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", { L"ë„¤",L"íŒŒê¸°" });
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == L"³×")
+					if (coAnswer == L"ë„¤")
 					{
 						loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
-						prt(L"ÇöÀç ºôµå ·ÎÄÉÀÌ¼ÇÀÇ ÁÂÇ¥´Â %d,%d,%dÀÌ´Ù\n", buildLocation[0], buildLocation[1], buildLocation[2]);
+						prt(L"í˜„ì¬ ë¹Œë“œ ë¡œì¼€ì´ì…˜ì˜ ì¢Œí‘œëŠ” %d,%d,%dì´ë‹¤\n", buildLocation[0], buildLocation[1], buildLocation[2]);
 					}
 					else
 					{
@@ -851,12 +851,12 @@ public:
 				}
 				else
 				{
-					std::wstring text = replaceStr(L"¶³¾îÁø ÁÂÇ¥ (¡ã,¡ã,¡ã)¿¡ Á¶ÇÕ ÁßÀÎ °ÇÃà¹°ÀÌ Á¸ÀçÇÕ´Ï´Ù. (%item3) ÆÄ±âÇÏ°í »õ·Î¿î ¾ÆÀÌÅÛÀ» Á¦ÀÛÇÏ½Ã°Ú½À´Ï±î?", L"¡ã", { std::to_wstring(buildLocation[0]),std::to_wstring(buildLocation[1]),std::to_wstring(buildLocation[2]) });
-					new Msg(msgFlag::normal, L"Á¦ÀÛ", text, { L"³×",L"¾Æ´Ï¿À" });
+					std::wstring text = replaceStr(L"ë–¨ì–´ì§„ ì¢Œí‘œ (â–²,â–²,â–²)ì— ì¡°í•© ì¤‘ì¸ ê±´ì¶•ë¬¼ì´ ì¡´ì¬í•©ë‹ˆë‹¤. (%item3) íŒŒê¸°í•˜ê³  ìƒˆë¡œìš´ ì•„ì´í…œì„ ì œì‘í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", L"â–²", { std::to_wstring(buildLocation[0]),std::to_wstring(buildLocation[1]),std::to_wstring(buildLocation[2]) });
+					new Msg(msgFlag::normal, L"ì œì‘", text, { L"ë„¤",L"ì•„ë‹ˆì˜¤" });
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == L"³×")
+					if (coAnswer == L"ë„¤")
 					{
 						deleteCraftDataStructure();
 						co_return;
@@ -872,14 +872,14 @@ public:
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////2.ÁÂÇ¥ ¼±Á¤ ¿Ï·á ÈÄ Á¶ÇÕ ·çÇÁ///////////////////////////////////////////
+		////////////////////////////////////////////2.ì¢Œí‘œ ì„ ì • ì™„ë£Œ í›„ ì¡°í•© ë£¨í”„///////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT)) isNowBuilding = true;
 		deactDraw();
 		showCraftingTooltip = true;
 		while (1)
 		{
-			prt(L"Craft While ·çÇÁ ½ÇÇàµÊ\n");
+			prt(L"Craft While ë£¨í”„ ì‹¤í–‰ë¨\n");
 			if (negateMonster == false)
 			{
 				for (int x = PlayerX() - 1; x <= PlayerX() + 1; x++)
@@ -890,18 +890,18 @@ public:
 							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
-									new Msg(msgFlag::normal, L"°æ°í", L"ÁÖº¯¿¡ ÀûÀÌ ÀÖ½À´Ï´Ù. °è¼Ó Á¶ÇÕÇÏ½Ã°Ú½À´Ï±î?", { L"³×",L"¾Æ´Ï¿À",L"¹«½ÃÇÏ±â" });
+									new Msg(msgFlag::normal, L"ê²½ê³ ", L"ì£¼ë³€ì— ì ì´ ìˆìŠµë‹ˆë‹¤. ê³„ì† ì¡°í•©í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", { L"ë„¤",L"ì•„ë‹ˆì˜¤",L"ë¬´ì‹œí•˜ê¸°" });
 									deactColorChange = true;
 									co_await std::suspend_always();
-									if (coAnswer == L"³×") goto loopEnd;
-									else if (coAnswer == L"¹«½ÃÇÏ±â")
+									if (coAnswer == L"ë„¤") goto loopEnd;
+									else if (coAnswer == L"ë¬´ì‹œí•˜ê¸°")
 									{
 										negateMonster = true;
 										goto loopEnd;
 									}
 									else
 									{
-										//Á¶ÇÕ µ¥ÀÌÅÍ ÀúÀå
+										//ì¡°í•© ë°ì´í„° ì €ì¥
 										if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 										{
 											saveCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
@@ -922,11 +922,11 @@ public:
 			turnWait(1.0);
 			coTurnSkip = true;
 
-			prt(L"exeCraft ÄÚ·çÆ¾ ½ÇÇà Àü\n");
+			prt(L"exeCraft ì½”ë£¨í‹´ ì‹¤í–‰ ì „\n");
 
 			co_await std::suspend_always();
 
-			prt(L"exeCraft ÄÚ·çÆ¾ ½ÇÇà ÈÄ\n");
+			prt(L"exeCraft ì½”ë£¨í‹´ ì‹¤í–‰ í›„\n");
 
 			elapsedTime++;
 			if (elapsedTime >= itemDex[targetItemCode].craftTime) break;
@@ -934,17 +934,17 @@ public:
 
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////3.Á¶ÇÕ Á¾·á : ¾ÆÀÌÅÛ »ı¼º///////////////////////////////////////////
+		////////////////////////////////////////////3.ì¡°í•© ì¢…ë£Œ : ì•„ì´í…œ ìƒì„±///////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 		{
-			if (itemDex[targetItemCode].checkFlag(itemFlag::VFRAME))//»õ·Î¿î Â÷·® ¼³Ä¡
+			if (itemDex[targetItemCode].checkFlag(itemFlag::VFRAME))//ìƒˆë¡œìš´ ì°¨ëŸ‰ ì„¤ì¹˜
 			{
-				//¼³Ä¡Á¡ ÁÖº¯¿¡ ¿¬°á °¡´ÉÇÑ Â÷·®ÀÌ ÀÖ´ÂÁö Ã¼Å©
+				//ì„¤ì¹˜ì  ì£¼ë³€ì— ì—°ê²° ê°€ëŠ¥í•œ ì°¨ëŸ‰ì´ ìˆëŠ”ì§€ ì²´í¬
 				std::vector<Vehicle*> canConnect;
 				for (int dir = 0; dir < 8; dir++)
 				{
-					if (dir % 2 == 1) continue; //´ë°¢¼± ºñÇã¿ë
+					if (dir % 2 == 1) continue; //ëŒ€ê°ì„  ë¹„í—ˆìš©
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
 					Vehicle* targetCoordPtr = (Vehicle*)World::ins()->getTile(buildLocation[0] + dx, buildLocation[1] + dy, buildLocation[2]).VehiclePtr;
@@ -960,16 +960,16 @@ public:
 				if (canConnect.size() == 0)
 				{
 					Vehicle* newVehicle = new Vehicle(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
-					new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//»õ·Î¿î Â÷·®ÀÇ ÀÌ¸§À» ÀÔ·ÂÇØÁÖ¼¼¿ä. °áÁ¤, Ãë¼Ò
+					new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//ìƒˆë¡œìš´ ì°¨ëŸ‰ì˜ ì´ë¦„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”. ê²°ì •, ì·¨ì†Œ
 					co_await std::suspend_always();
 					if (coAnswer == sysStr[139]) newVehicle->name = exInputText;
-					else newVehicle->name = L"Â÷·® " + std::to_wstring(randomRange(1, 9999999));
+					else newVehicle->name = L"ì°¨ëŸ‰ " + std::to_wstring(randomRange(1, 9999999));
 				}
 				else
 				{
-					new Msg(msgFlag::normal, L"°æ°í", L"¼³Ä¡ÇÑ ÇÁ·¹ÀÓÀ» ÁÖº¯ Â÷·®¿¡ ¿¬°áÇÏ½Ã°Ú½À´Ï±î?", { L"³×",L"¾Æ´Ï¿À" });
+					new Msg(msgFlag::normal, L"ê²½ê³ ", L"ì„¤ì¹˜í•œ í”„ë ˆì„ì„ ì£¼ë³€ ì°¨ëŸ‰ì— ì—°ê²°í•˜ì‹œê² ìŠµë‹ˆê¹Œ?", { L"ë„¤",L"ì•„ë‹ˆì˜¤" });
 					co_await std::suspend_always();
-					if (coAnswer == L"³×")
+					if (coAnswer == L"ë„¤")
 					{
 						Vehicle* targetVehicle;
 						if (canConnect.size() == 1)
@@ -981,7 +981,7 @@ public:
 						{
 							std::vector<std::wstring> vehicleNameList;
 							for (int i = 0; i < canConnect.size(); i++) vehicleNameList.push_back(canConnect[i]->name);
-							new Lst(sysStr[95], sysStr[94], vehicleNameList);//³Ö±â, ³ÖÀ» Æ÷ÄÏÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.
+							new Lst(sysStr[95], sysStr[94], vehicleNameList);//ë„£ê¸°, ë„£ì„ í¬ì¼“ì„ ì„ íƒí•´ì£¼ì„¸ìš”.
 							co_await std::suspend_always();
 							errorBox(wtoi(coAnswer.c_str()) >= canConnect.size() || wtoi(coAnswer.c_str()) < 0, "Lst error, unknown vehicle selected");
 							targetVehicle = canConnect[wtoi(coAnswer.c_str())];
@@ -991,10 +991,10 @@ public:
 					else
 					{
 						Vehicle* newVehicle = new Vehicle(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
-						new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//»õ·Î¿î Â÷·®ÀÇ ÀÌ¸§À» ÀÔ·ÂÇØÁÖ¼¼¿ä. °áÁ¤, Ãë¼Ò
+						new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//ìƒˆë¡œìš´ ì°¨ëŸ‰ì˜ ì´ë¦„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”. ê²°ì •, ì·¨ì†Œ
 						co_await std::suspend_always();
 						if (coAnswer == sysStr[139]) newVehicle->name = exInputText;
-						else newVehicle->name = L"Â÷·® " + std::to_wstring(randomRange(1, 9999999));
+						else newVehicle->name = L"ì°¨ëŸ‰ " + std::to_wstring(randomRange(1, 9999999));
 					}
 				}
 			}
@@ -1007,17 +1007,17 @@ public:
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))
 			{
-				errorBox(TileProp(buildLocation[0], buildLocation[1], buildLocation[2]) != nullptr, L"ÀÌ¹Ì ÇØ´ç ÁÂÇ¥¿¡ ¼³Ä¡¹°ÀÌ Á¸ÀçÇÏ¿© »õ·Î¿î ¼³Ä¡¹°À» ¼³Ä¡ÇÒ ¼ö ¾ø´Ù.");
+				errorBox(TileProp(buildLocation[0], buildLocation[1], buildLocation[2]) != nullptr, L"ì´ë¯¸ í•´ë‹¹ ì¢Œí‘œì— ì„¤ì¹˜ë¬¼ì´ ì¡´ì¬í•˜ì—¬ ìƒˆë¡œìš´ ì„¤ì¹˜ë¬¼ì„ ì„¤ì¹˜í•  ìˆ˜ ì—†ë‹¤.");
 				new Prop(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
 			}
 		}
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////4.Á¶ÇÕ µ¥ÀÌÅÍ ÃÊ±âÈ­///////////////////////////////////////////
+		////////////////////////////////////////////4.ì¡°í•© ë°ì´í„° ì´ˆê¸°í™”///////////////////////////////////////////
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT)) deleteCraftDataStructure();
 		else deleteCraftData();
-		updateLog(L"#FFFFFF¾ÆÀÌÅÛ Á¶ÇÕÀÌ ¿Ï·áµÇ¾ú´Ù.");
+		updateLog(L"#FFFFFFì•„ì´í…œ ì¡°í•©ì´ ì™„ë£Œë˜ì—ˆë‹¤.");
 		isNowBuilding = false;
 		close(aniFlag::null);
 	}
@@ -1026,7 +1026,7 @@ public:
 	{
 		ongoingTargetCode = code;
 		ongoingElapsedTime = time;
-		prt(L"ÀúÀåÀÌ ÀÌ·ç¾îÁ³´Ù. ÄÚµå´Â %d ½Ã°£Àº %dÀÌ´Ù.\n", ongoingTargetCode, ongoingElapsedTime);
+		prt(L"ì €ì¥ì´ ì´ë£¨ì–´ì¡Œë‹¤. ì½”ë“œëŠ” %d ì‹œê°„ì€ %dì´ë‹¤.\n", ongoingTargetCode, ongoingElapsedTime);
 	}
 
 	void loadCraftData(int& code, int& time)
@@ -1053,7 +1053,7 @@ public:
 		ongoingTargetCodeStructure = code;
 		ongoingElapsedTimeStructure = time;
 		buildLocation = coord;
-		prt(L"ÀúÀåÀÌ ÀÌ·ç¾îÁ³´Ù. ÄÚµå´Â %d ½Ã°£Àº %dÀÌ´Ù. ÁÂÇ¥´Â %d,%d,%dÀÌ´Ù.\n", ongoingTargetCode, ongoingElapsedTime, buildLocation[0], buildLocation[1], buildLocation[2]);
+		prt(L"ì €ì¥ì´ ì´ë£¨ì–´ì¡Œë‹¤. ì½”ë“œëŠ” %d ì‹œê°„ì€ %dì´ë‹¤. ì¢Œí‘œëŠ” %d,%d,%dì´ë‹¤.\n", ongoingTargetCode, ongoingElapsedTime, buildLocation[0], buildLocation[1], buildLocation[2]);
 	}
 
 	void loadCraftDataStructure(int& code, int& time, std::array<int, 3> coord)

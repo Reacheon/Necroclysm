@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 
 export module CoordSelectCraft;
@@ -20,7 +20,7 @@ import drawWindow;
 import log;
 import ItemPocket;
 
-//¹İÈ¯Çü : wstring L"xÁÂÇ¥,yÁÂÇ¥,È¸ÀüÀ¸·Î º¯°æµÈ itemCode", ex) 3,5,167
+//ë°˜í™˜í˜• : wstring L"xì¢Œí‘œ,yì¢Œí‘œ,íšŒì „ìœ¼ë¡œ ë³€ê²½ëœ itemCode", ex) 3,5,167
 export class CoordSelectCraft : public GUI
 {
 private:
@@ -30,7 +30,7 @@ private:
 	std::wstring parameter = L"";
 	std::vector<std::array<int, 2>> selectableCoord;
 
-	bool advance = false; //ÁÂÇ¥¸¦ ¼±ÅÃÇÏ°í È®ÀÎ ¹öÆ°À» ÇÑ¹ø ´õ ´­·¯¾ß ÁøÇàµÇ´Â ¿É¼Ç
+	bool advance = false; //ì¢Œí‘œë¥¼ ì„ íƒí•˜ê³  í™•ì¸ ë²„íŠ¼ì„ í•œë²ˆ ë” ëˆŒëŸ¬ì•¼ ì§„í–‰ë˜ëŠ” ì˜µì…˜
 	int advanceIconIndex = -1;
 
 	bool targetSelect = false;
@@ -50,13 +50,13 @@ public:
 		selectableCoord = inputSelectableCoord;
 		telepathyStr = inputTelepathyStr;
 		rotatedItemCode = tgtItemCode;
-		prt(L"CoordSelectCraft : »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"CoordSelectCraft : ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		ptr = this;
 	}
 
 	~CoordSelectCraft()
 	{
-		prt(L"CoordSelectCraft : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"CoordSelectCraft : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		ptr = nullptr;
 		tabType = tabFlag::autoAtk;
 		UIType = act::null;
@@ -65,7 +65,7 @@ public:
 	void changeXY(int inputX, int inputY, bool center) {}
 	void drawGUI()
 	{
-		//»ç³äÆÄ
+		//ì‚¬ë…íŒŒ
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
 		drawTextCenter(L"#FFFFFF" + telepathyStr, cameraW / 2, 165);
 
@@ -73,7 +73,7 @@ public:
 		{
 
 
-			//ÇÃ·¹ÀÌ¾î ÁÖº¯ÀÇ Å¸ÀÏÀ» Ã¼Å©ÇØ ¼±ÅÃÀÌ °¡´ÉÇÑ ÁÂÇ¥¸¸ Ç¥½Ã
+			//í”Œë ˆì´ì–´ ì£¼ë³€ì˜ íƒ€ì¼ì„ ì²´í¬í•´ ì„ íƒì´ ê°€ëŠ¥í•œ ì¢Œí‘œë§Œ í‘œì‹œ
 			for (int i = 0; i < selectableCoord.size(); i++)
 			{
 				int revX = PlayerX() + selectableCoord[i][axis::x];
@@ -130,7 +130,7 @@ public:
 
 
 		}
-		else//Å¸°Ù ¼±ÅÃÀÌ ¿Ï·áµÈ ÈÄ
+		else//íƒ€ê²Ÿ ì„ íƒì´ ì™„ë£Œëœ í›„
 		{
 			setZoom(zoomScale);
 			SDL_SetTextureColorMod(spr::propset->getTexture(), 0, 255, 0);
@@ -199,7 +199,7 @@ public:
 		{
 			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false)
 			{
-				if (targetSelect == false)//Å¸°Ù ¼±ÅÃ Àü
+				if (targetSelect == false)//íƒ€ê²Ÿ ì„ íƒ ì „
 				{
 					int revX, revY, revGridX, revGridY;
 					if (option::inputMethod == input::touch)
@@ -217,7 +217,7 @@ public:
 					revY += sgn(revY) * (8 * zoomScale);
 					revGridY = revY / (16 * zoomScale);
 
-					//»ó´ëÁÂÇ¥¸¦ Àı´ëÁÂÇ¥·Î º¯È¯
+					//ìƒëŒ€ì¢Œí‘œë¥¼ ì ˆëŒ€ì¢Œí‘œë¡œ ë³€í™˜
 					int throwingX = PlayerX() + revGridX;
 					int throwingY = PlayerY() + revGridY;
 					int throwingZ = PlayerZ();
@@ -225,10 +225,10 @@ public:
 					std::wstring yStr = std::to_wstring(throwingY);
 					std::wstring zStr = std::to_wstring(throwingZ);
 
-					prt(L"Àı´ëÁÂÇ¥ (%d,%d) Å¸ÀÏÀ» ÅÍÄ¡Çß´Ù.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
+					prt(L"ì ˆëŒ€ì¢Œí‘œ (%d,%d) íƒ€ì¼ì„ í„°ì¹˜í–ˆë‹¤.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
 
 
-					if (selectableCoord.size() > 0)//¼±ÅÃÁÂÇ¥°¡ ÀÖ´Â °æ¿ìÀÏ ¶§
+					if (selectableCoord.size() > 0)//ì„ íƒì¢Œí‘œê°€ ìˆëŠ” ê²½ìš°ì¼ ë•Œ
 					{
 						for (int i = 0; i < selectableCoord.size(); i++)
 						{
@@ -253,11 +253,11 @@ public:
 
 							if (i == selectableCoord.size() - 1)
 							{
-								prt(L"ÇØ´ç ÁÂÇ¥´Â ¼±ÅÃÇÒ ¼ö ¾ø´Ù.\n");
+								prt(L"í•´ë‹¹ ì¢Œí‘œëŠ” ì„ íƒí•  ìˆ˜ ì—†ë‹¤.\n");
 							}
 						}
 					}
-					else//¼±ÅÃÁÂÇ¥°¡ ¾øÀ¸¸é ±×³É ½Ã¾ß°¡ Èò»öÀÌ¸é ¼±ÅÃ OK
+					else//ì„ íƒì¢Œí‘œê°€ ì—†ìœ¼ë©´ ê·¸ëƒ¥ ì‹œì•¼ê°€ í°ìƒ‰ì´ë©´ ì„ íƒ OK
 					{
 
 						if (World::ins()->getTile(throwingX, throwingY, throwingZ).fov == fovFlag::white)
@@ -278,7 +278,7 @@ public:
 						}
 						else
 						{
-							prt(L"ÇØ´ç ÁÂÇ¥´Â ½Ã¾ß¿¡ º¸ÀÌÁö ¾Ê´Â´Ù.\n");
+							prt(L"í•´ë‹¹ ì¢Œí‘œëŠ” ì‹œì•¼ì— ë³´ì´ì§€ ì•ŠëŠ”ë‹¤.\n");
 						}
 					}
 				}

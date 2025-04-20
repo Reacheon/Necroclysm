@@ -1,4 +1,4 @@
-#include <sol/sol.hpp>
+﻿#include <sol/sol.hpp>
 
 export module scriptLoader;
 

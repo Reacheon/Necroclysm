@@ -1,4 +1,4 @@
-export module ThreadPool;
+Ôªøexport module ThreadPool;
 
 import std;
 
@@ -9,7 +9,7 @@ public:
     ~ThreadPool();
     void addTask(std::function<void()> func);
     size_t getAvailableThreads();
-    void waitForThreads(); // waitForThreads∑Œ ¿Ã∏ß ∫Ø∞Ê
+    void waitForThreads(); // waitForThreadsÎ°ú Ïù¥Î¶Ñ Î≥ÄÍ≤Ω
 private:
     std::vector<std::thread> workers;
     std::queue<std::function<void()>> tasks;

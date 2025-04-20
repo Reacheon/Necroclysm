@@ -1,4 +1,4 @@
-#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+ï»¿#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
 export module readSkillDex;
@@ -38,7 +38,7 @@ export int readSkillDex(const wchar_t* file)
 {
     std::wifstream in(file);
     std::wstring str;
-    std::wstring strFragment;//Ç¥ ÇÑ Ä­ÀÇ ¹®ÀÚ¿­ÀÌ ÀúÀåµÇ´Â °´Ã¼, ¸Å¹ø ÃÊ±âÈ­µÊ
+    std::wstring strFragment;//í‘œ í•œ ì¹¸ì˜ ë¬¸ìì—´ì´ ì €ì¥ë˜ëŠ” ê°ì²´, ë§¤ë²ˆ ì´ˆê¸°í™”ë¨
 
     if (in.is_open())
     {
@@ -49,30 +49,30 @@ export int readSkillDex(const wchar_t* file)
         in.seekg(0, std::ios::beg);
         in.read(&str[0], size);
         in.close();
-        //ÀĞ±â Á¾·á
+        //ì½ê¸° ì¢…ë£Œ
 
-        //¹è¿­ÀÇ °¡·Î »çÀÌÁî¸¦ ±¸ÇÑ´Ù.
+        //ë°°ì—´ì˜ ê°€ë¡œ ì‚¬ì´ì¦ˆë¥¼ êµ¬í•œë‹¤.
         int csvWidth = 0;
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == UNI::TAB || str[i] == UNI::LF)//ÇØ´ç ¹®ÀÚ°¡ ½°Ç¥(44)°Å³ª ¶óÀÎÇÇµå(10)ÀÏ °æ¿ì
+            if (str[i] == UNI::TAB || str[i] == UNI::LF)//í•´ë‹¹ ë¬¸ìê°€ ì‰¼í‘œ(44)ê±°ë‚˜ ë¼ì¸í”¼ë“œ(10)ì¼ ê²½ìš°
             {
                 csvWidth++;
                 if (str[i] == UNI::LF)
                 {
-                    //prt(L"ÀÌ csv ÆÄÀÏÀÇ °¡·Î»çÀÌÁî´Â %dÀÌ´Ù!\n", csvWidth);
+                    //prt(L"ì´ csv íŒŒì¼ì˜ ê°€ë¡œì‚¬ì´ì¦ˆëŠ” %dì´ë‹¤!\n", csvWidth);
                     break;
                 }
             }
         }
-        // 3,5,7 ÇüÅÂÀÇ ¹®ÀÚ¿­À» º¤ÅÍ¿¡ ¼ø¼­´ë·Î 3->5->7 ¼ø¼­´ë·Î ÀÔ·ÂÇØÁÖ´Â ¶÷´ÙÇÔ¼ö
+        // 3,5,7 í˜•íƒœì˜ ë¬¸ìì—´ì„ ë²¡í„°ì— ìˆœì„œëŒ€ë¡œ 3->5->7 ìˆœì„œëŒ€ë¡œ ì…ë ¥í•´ì£¼ëŠ” ëŒë‹¤í•¨ìˆ˜
         auto valsToVec = [&](std::wstring strFragment, auto& container) {
             int val;
             for (int j = 0; j < strFragment.size(); j++)
             {
                 if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
                 {
-                    if (j == strFragment.size() - 1) { j++; } //¸¶Áö¸·ÀÌ¸é j°ªÀ» 1 ´õÇÏ¿© º¸Á¤
+                    if (j == strFragment.size() - 1) { j++; } //ë§ˆì§€ë§‰ì´ë©´ jê°’ì„ 1 ë”í•˜ì—¬ ë³´ì •
 
                     val = std::stoi(strFragment.substr(0, j));
                     strFragment.erase(0, j + 1);
@@ -84,7 +84,7 @@ export int readSkillDex(const wchar_t* file)
             };
 
 
-        // 3x3,5x6,2x6 ÇüÅÂÀÇ ¹®ÀÚ¿­À» pair ÇüÅÂ·Î º¤ÅÍ¿¡ ¼ø¼­´ë·Î ÀÔ·ÂÇØÁÖ´Â ¶÷´ÙÇÔ¼ö
+        // 3x3,5x6,2x6 í˜•íƒœì˜ ë¬¸ìì—´ì„ pair í˜•íƒœë¡œ ë²¡í„°ì— ìˆœì„œëŒ€ë¡œ ì…ë ¥í•´ì£¼ëŠ” ëŒë‹¤í•¨ìˆ˜
         auto pairsToVec = [&](std::wstring strFragment, auto& container) {
             using T1 = decltype(container[0].first);
             using T2 = decltype(container[0].second);
@@ -100,7 +100,7 @@ export int readSkillDex(const wchar_t* file)
 
                 if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
                 {
-                    if (j == strFragment.size() - 1) { j++; } //¸¶Áö¸·ÀÌ¸é j°ªÀ» 1 ´õÇÏ¿© º¸Á¤
+                    if (j == strFragment.size() - 1) { j++; } //ë§ˆì§€ë§‰ì´ë©´ jê°’ì„ 1 ë”í•˜ì—¬ ë³´ì •
 
                     container.back().second = static_cast<T2>(std::stoi(strFragment.substr(0, j)));
                     strFragment.erase(0, j + 1);
@@ -116,14 +116,14 @@ export int readSkillDex(const wchar_t* file)
 
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == UNI::TAB || str[i] == 10)//ASCII·Î 44(,)¿Í ¶Ç´Â ¶óÀÎÇÇµå(\n)¿Í °°À» ¶§
+            if (str[i] == UNI::TAB || str[i] == 10)//ASCIIë¡œ 44(,)ì™€ ë˜ëŠ” ë¼ì¸í”¼ë“œ(\n)ì™€ ê°™ì„ ë•Œ
             {
-                if (i == str.size() - 1) { i++; }//¸¶Áö¸· ¹®ÀÚ¸é endP-startP º¸Á¤À» À§ÇØ i¸¦ 1 ´õÇÔ.
+                if (i == str.size() - 1) { i++; }//ë§ˆì§€ë§‰ ë¬¸ìë©´ endP-startP ë³´ì •ì„ ìœ„í•´ ië¥¼ 1 ë”í•¨.
                 endPoint = i;
 
                 strFragment = str.substr(startPoint, endPoint - startPoint);
 
-                if (arrayCounter / csvWidth == skillDex.size() + 1) // ¸¸¾à º¤ÅÍ Å©±â(»óÇÏ)°¡ ºÎÁ·ÇÏ¸é 1Ä­ ´Ã¸²
+                if (arrayCounter / csvWidth == skillDex.size() + 1) // ë§Œì•½ ë²¡í„° í¬ê¸°(ìƒí•˜)ê°€ ë¶€ì¡±í•˜ë©´ 1ì¹¸ ëŠ˜ë¦¼
                 {
                     SkillData newSkill;
                     skillDex.push_back(newSkill);
@@ -153,13 +153,13 @@ export int readSkillDex(const wchar_t* file)
                         else if (strFragment == L"BIONIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::BIONIC;
                         else if (strFragment == L"MUTATION") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MUTATION;
                         else if (strFragment == L"MAGIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MAGIC;
-                        else errorBox(L"Àß¸øµÈ ½ºÅ³ ¼Ò½º %ls¸¦ ¹ß°ßÇß´Ù.",strFragment.c_str());
+                        else errorBox(L"ì˜ëª»ëœ ìŠ¤í‚¬ ì†ŒìŠ¤ %lsë¥¼ ë°œê²¬í–ˆë‹¤.",strFragment.c_str());
                         break;
                     case csvSkill::type:
                         if (strFragment == L"ACTIVE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::ACTIVE;
                         else if (strFragment == L"PASSIVE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::PASSIVE;
                         else if (strFragment == L"TOGGLE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::TOGGLE;
-                        else errorBox(L"Àß¸øµÈ ½ºÅ³ Å¸ÀÔ %ls¸¦ ¹ß°ßÇß´Ù.", strFragment.c_str()); 
+                        else errorBox(L"ì˜ëª»ëœ ìŠ¤í‚¬ íƒ€ì… %lsë¥¼ ë°œê²¬í–ˆë‹¤.", strFragment.c_str()); 
                         break;
                     case csvSkill::energyPerAct:
                         skillDex[arrayCounter / (csvWidth)-1].energyPerAct = wtof(strFragment);
@@ -188,12 +188,12 @@ export int readSkillDex(const wchar_t* file)
                         skillDex[arrayCounter / (csvWidth)-1].skillRank = strFragment;
                         break;
                     default:
-                        prt(L"readSkillDex.ixx¿¡¼­ ¿À·ù ¹ß»ı. csvÀÇ Àß¸øµÈ Àå¼Ò¸¦ ÀĞ¾ú´Ù.\n");
+                        prt(L"readSkillDex.ixxì—ì„œ ì˜¤ë¥˜ ë°œìƒ. csvì˜ ì˜ëª»ëœ ì¥ì†Œë¥¼ ì½ì—ˆë‹¤.\n");
                         break;
                     }
 
-                    //prt(L"[¹®ÀÚ¿­] %ws ", strFragment.c_str());
-                    //prt(L"¸¦ (%d,%d)¿¡ ÀÔ·ÂÇß´Ù.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
+                    //prt(L"[ë¬¸ìì—´] %ws ", strFragment.c_str());
+                    //prt(L"ë¥¼ (%d,%d)ì— ì…ë ¥í–ˆë‹¤.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
                 }
 
                 arrayCounter++;
@@ -202,7 +202,7 @@ export int readSkillDex(const wchar_t* file)
                 endPoint = -1;
                 strFragment.clear();
 
-                if (i != str.size() - 1)//¸¸¾à ´ÙÀ½ ±ÛÀÚ°¡ ¿¬¼ÓÀ¸·Î ½°Ç¥¸é ¿©¹éÀÌ¹Ç·Î °Ç³Ê¶Ü
+                if (i != str.size() - 1)//ë§Œì•½ ë‹¤ìŒ ê¸€ìê°€ ì—°ì†ìœ¼ë¡œ ì‰¼í‘œë©´ ì—¬ë°±ì´ë¯€ë¡œ ê±´ë„ˆëœ€
                 {
                     while (str[i + 1] == UNI::TAB || str[i + 1] == 10)
                     {
@@ -221,7 +221,7 @@ export int readSkillDex(const wchar_t* file)
         }
         return 1;
     }
-    else//ÀĞ±â ½ÇÆĞ
+    else//ì½ê¸° ì‹¤íŒ¨
     {
 
         return 0;

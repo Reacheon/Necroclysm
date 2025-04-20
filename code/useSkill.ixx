@@ -1,4 +1,4 @@
-export module useSkill;
+ï»¿export module useSkill;
 
 import std;
 import util;
@@ -22,13 +22,13 @@ export Corouter useSkill(int skillCode)
 	switch (skillCode)
 	{
 	default:
-		prt(L"[Entity:useSkill] ÇÃ·¹ÀÌ¾î°¡ ¾Ë ¼ö ¾ø´Â ½ºÅ³À» ½ÃÀüÇÏ¿´´Ù.\n");
+		prt(L"[Entity:useSkill] í”Œë ˆì´ì–´ê°€ ì•Œ ìˆ˜ ì—†ëŠ” ìŠ¤í‚¬ì„ ì‹œì „í•˜ì˜€ë‹¤.\n");
 		break;
 	case 0:
 		break;
 	case 1:
 		break;
-	case 30://È­¿°ÆøÇ³
+	case 30://í™”ì—¼í­í’
 	{
 		std::vector<std::array<int, 2>> coordList;
 		for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
@@ -42,7 +42,7 @@ export Corouter useSkill(int skillCode)
 				}
 			}
 		}
-		new CoordSelect(CoordSelectFlag::FIRESTORM, L"È­¿°ÆøÇ³À» ½ÃÀüÇÒ À§Ä¡¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.", coordList);
+		new CoordSelect(CoordSelectFlag::FIRESTORM, L"í™”ì—¼í­í’ì„ ì‹œì „í•  ìœ„ì¹˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.", coordList);
 		co_await std::suspend_always();
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());

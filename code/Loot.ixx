@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -33,22 +33,22 @@ export class Loot : public GUI
 private:
 	inline static Loot* ptr = nullptr;
 
-	ItemStack* lootStack = nullptr; //¸¸¾à Ã¢°í°°ÀÌ ½ºÅÃÀÌ ¾øÀ¸¸é null·Î À¯ÁöµÊ
+	ItemStack* lootStack = nullptr; //ë§Œì•½ ì°½ê³ ê°™ì´ ìŠ¤íƒì´ ì—†ìœ¼ë©´ nullë¡œ ìœ ì§€ë¨
 	ItemData* lootItemData = nullptr;
 	ItemPocket* lootPocket = nullptr;
 
-	const int lootScrollSize = 6; //ÇÑ ½ºÅ©·Ñ¿¡ µé¾î°¡´Â ¾ÆÀÌÅÛÀÇ ¼ö
-	int lootScroll = 0; //¿ìÃø ·çÆÃÃ¢ÀÇ ½ºÅ©·Ñ
-	int lootCursor = -1; //¿ìÃø ·çÆÃÃ¢ÀÇ Ä¿¼­
-	int pocketCursor = 0; //¿ìÃø »ó´ÜÀÇ ÇöÀç ¼±ÅÃµÈ °¡¹æ, EQUIPÀÇ °¡¹æÀÇ À§ºÎÅÍ ¼ø¼­´ë·Î 0,1,2...
-	//¸ğ¼Ç ½ºÅ©·Ñ ÀÌº¥Æ®¿¡¼­ ±âÁØÀ¸·Î Àâ´Â ÃÖÃÊ ÅÍÄ¡ ´ç½ÃÀÇ ½ºÅ©·Ñ
-	int initLootScroll = 0; //¸ğ¼Ç½ºÅ©·ÑÀÌ ½ÃÀÛµÇ±â Á÷ÀüÀÇ ½ºÅ©·Ñ
+	const int lootScrollSize = 6; //í•œ ìŠ¤í¬ë¡¤ì— ë“¤ì–´ê°€ëŠ” ì•„ì´í…œì˜ ìˆ˜
+	int lootScroll = 0; //ìš°ì¸¡ ë£¨íŒ…ì°½ì˜ ìŠ¤í¬ë¡¤
+	int lootCursor = -1; //ìš°ì¸¡ ë£¨íŒ…ì°½ì˜ ì»¤ì„œ
+	int pocketCursor = 0; //ìš°ì¸¡ ìƒë‹¨ì˜ í˜„ì¬ ì„ íƒëœ ê°€ë°©, EQUIPì˜ ê°€ë°©ì˜ ìœ„ë¶€í„° ìˆœì„œëŒ€ë¡œ 0,1,2...
+	//ëª¨ì…˜ ìŠ¤í¬ë¡¤ ì´ë²¤íŠ¸ì—ì„œ ê¸°ì¤€ìœ¼ë¡œ ì¡ëŠ” ìµœì´ˆ í„°ì¹˜ ë‹¹ì‹œì˜ ìŠ¤í¬ë¡¤
+	int initLootScroll = 0; //ëª¨ì…˜ìŠ¤í¬ë¡¤ì´ ì‹œì‘ë˜ê¸° ì§ì „ì˜ ìŠ¤í¬ë¡¤
 	int initPocketCursor = 0;
-	int labelCursor = -1; //»ó´Ü ¶óº§ Ä¿¼­, 0ºÎÅÍ 2±îÁö ±â´É, -1ÀÌ¸é ºñÈ°¼ºÈ­
+	int labelCursor = -1; //ìƒë‹¨ ë¼ë²¨ ì»¤ì„œ, 0ë¶€í„° 2ê¹Œì§€ ê¸°ëŠ¥, -1ì´ë©´ ë¹„í™œì„±í™”
 	Uint32 selectTouchTime = -1;
-	sortFlag sortType = sortFlag::null; //0:±âº»_1:¹«°Ô³»¸²_2:¹«°Ô¿Ã¸²_3:ºÎÇÇ³»¸²_4:ºÎÇÇ¿Ã¸²
+	sortFlag sortType = sortFlag::null; //0:ê¸°ë³¸_1:ë¬´ê²Œë‚´ë¦¼_2:ë¬´ê²Œì˜¬ë¦¼_3:ë¶€í”¼ë‚´ë¦¼_4:ë¶€í”¼ì˜¬ë¦¼
 
-	std::wstring titleInventory = L"¹è³¶";
+	std::wstring titleInventory = L"ë°°ë‚­";
 	int titleItemSprIndex = 60;
 
 	SDL_Rect lootBase;
@@ -76,8 +76,8 @@ public:
 	Loot(ItemPocket* inputPocket, ItemData* inputData) : GUI(false)
 	{
 		ptr = this;
-		prt(L"Loot : »ı¼ºÀÚ°¡ »ı¼ºµÇ¾ú½À´Ï´Ù..\n");
-		prt(L"ÇöÀç lootÀÇ ptr º¯¼ö´Â %pÀÔ´Ï´Ù.\n", ptr);
+		prt(L"Loot : ìƒì„±ìê°€ ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤..\n");
+		prt(L"í˜„ì¬ lootì˜ ptr ë³€ìˆ˜ëŠ” %pì…ë‹ˆë‹¤.\n", ptr);
 		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
 
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
@@ -94,7 +94,7 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winSlipOpen);
 
-		prt(L"itemÀÇ Å©±â´Â %dÀÔ´Ï´Ù.\n", sizeof(ItemData));
+		prt(L"itemì˜ í¬ê¸°ëŠ” %dì…ë‹ˆë‹¤.\n", sizeof(ItemData));
 
 		if (option::inputMethod == input::gamepad) lootCursor = 0;
 	}
@@ -102,8 +102,8 @@ public:
 	Loot(ItemStack* inputStack) : GUI(false)
 	{
 		ptr = this;
-		prt(L"Loot : »ı¼ºÀÚ°¡ »ı¼ºµÇ¾ú½À´Ï´Ù..\n");
-		prt(L"ÇöÀç lootÀÇ ptr º¯¼ö´Â %pÀÔ´Ï´Ù.\n", ptr);
+		prt(L"Loot : ìƒì„±ìê°€ ìƒì„±ë˜ì—ˆìŠµë‹ˆë‹¤..\n");
+		prt(L"í˜„ì¬ lootì˜ ptr ë³€ìˆ˜ëŠ” %pì…ë‹ˆë‹¤.\n", ptr);
 		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
 
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
@@ -121,14 +121,14 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winSlipOpen);
 
-		prt(L"itemÀÇ Å©±â´Â %dÀÔ´Ï´Ù.\n", sizeof(ItemData));
+		prt(L"itemì˜ í¬ê¸°ëŠ” %dì…ë‹ˆë‹¤.\n", sizeof(ItemData));
 
 		if (option::inputMethod == input::gamepad) lootCursor = 0;
 	}
 
 	~Loot()
 	{
-		prt(L"Loot : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+		prt(L"Loot : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 		ptr = nullptr;
 
 		UIType = act::null;
@@ -224,7 +224,7 @@ public:
 		{
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
-				prt(L"ÅÇÀÌ ½ÇÇàµÇ¾ú´Ù.\n");
+				prt(L"íƒ­ì´ ì‹¤í–‰ë˜ì—ˆë‹¤.\n");
 				executeTab();
 				delayR2 = 20;
 			}
@@ -238,12 +238,12 @@ public:
 			return;
 		}
 
-		//¼¿·ºÆ® È¦µå ÀÌº¥Æ®
+		//ì…€ë ‰íŠ¸ í™€ë“œ ì´ë²¤íŠ¸
 		if (coFunc == nullptr)
 		{
 			if (selectTouchTime != -1)
 			{
-				//¾ÆÀÌÅÛ ÁÂÃø ¼¿·ºÆ® Å¬¸¯
+				//ì•„ì´í…œ ì¢Œì¸¡ ì…€ë ‰íŠ¸ í´ë¦­
 				for (int i = 0; i < LOOT_ITEM_MAX; i++)
 				{
 					if (checkCursor(&lootItemSelectRect[i]))
@@ -267,34 +267,34 @@ public:
 			}
 		}
 
-		//Àß¸øµÈ Ä¿¼­ À§Ä¡ Á¶Á¤
+		//ì˜ëª»ëœ ì»¤ì„œ ìœ„ì¹˜ ì¡°ì •
 		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1)) 
 		{ 
 			lootCursor = lootPocket->itemInfo.size() - 1; 
 		}
 
-		//Àß¸øµÈ ½ºÅ©·Ñ À§Ä¡ Á¶Á¤
+		//ì˜ëª»ëœ ìŠ¤í¬ë¡¤ ìœ„ì¹˜ ì¡°ì •
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
 			if (lootScroll + LOOT_ITEM_MAX >= lootPocket->itemInfo.size()) { lootScroll = myMax(0, (int)lootPocket->itemInfo.size() - LOOT_ITEM_MAX); }
 			else if (lootScroll < 0) { lootScroll = 0; }
 		}
 
-		//·çÆ® ¾ÆÀÌÅÛÀÇ °¹¼ö°¡ 0ÀÌ µÇ¾úÀ» °æ¿ì Ã¢À» ´İÀ½
+		//ë£¨íŠ¸ ì•„ì´í…œì˜ ê°¯ìˆ˜ê°€ 0ì´ ë˜ì—ˆì„ ê²½ìš° ì°½ì„ ë‹«ìŒ
 		if (lootPocket->itemInfo.size() == 0 && lootItemData == nullptr)
 		{
 			close(aniFlag::null);
-			//Å¬·ÎÁî ÈÄÀÇ ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¹®Á¦°¡ µÈ´Ù. ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ¸ğµÎ ½ÇÇàµÇ°í Á¦°ÅÇØ¾ßµÊ
+			//í´ë¡œì¦ˆ í›„ì˜ ì• ë‹ˆë©”ì´ì…˜ì´ ë¬¸ì œê°€ ëœë‹¤. ì• ë‹ˆë©”ì´ì…˜ì´ ëª¨ë‘ ì‹¤í–‰ë˜ê³  ì œê±°í•´ì•¼ë¨
 			delete World::ins()->getTile(lootTile.x, lootTile.y, PlayerZ()).ItemStackPtr;
 			return;
 		}
 	}
 
 	sortFlag getSortType() { return sortType; }
-	//ÅÇ Å°¸¦ ´­·¶À» ¶§ÀÇ ¿¬»ê
+	//íƒ­ í‚¤ë¥¼ ëˆŒë €ì„ ë•Œì˜ ì—°ì‚°
 	void executeTab()
 	{
-		if (lootCursor == -1) //¾ÆÀÌÅÛÀ» ¼±ÅÃ ÁßÀÌÁö ¾ÊÀ» °æ¿ì
+		if (lootCursor == -1) //ì•„ì´í…œì„ ì„ íƒ ì¤‘ì´ì§€ ì•Šì„ ê²½ìš°
 		{
 			close(aniFlag::winSlipClose);
 		}
@@ -342,9 +342,9 @@ public:
 	}
 	void executePickSelect()
 	{
-		//³ªÁß¿¡ °¡µ¶¼º ¹× ·ÎÁ÷ ¼öÁ¤ÇÒ°Í
+		//ë‚˜ì¤‘ì— ê°€ë…ì„± ë° ë¡œì§ ìˆ˜ì •í• ê²ƒ
 
-		//1. Æ÷ÄÏ Ä¿¼­°¡ °¡¸®Å°´Â ¾ÆÀÌÅÛÀÇ ArrayÀÇ ÀÜ¿©ºÎÇÇ¿Í ÇÃ·¹ÀÌ¾îÀÇ Áú·® ÇÑ°è¸¦ ÂüÁ¶
+		//1. í¬ì¼“ ì»¤ì„œê°€ ê°€ë¦¬í‚¤ëŠ” ì•„ì´í…œì˜ Arrayì˜ ì”ì—¬ë¶€í”¼ì™€ í”Œë ˆì´ì–´ì˜ ì§ˆëŸ‰ í•œê³„ë¥¼ ì°¸ì¡°
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
 		ItemPocket* bagPtr = nullptr;
 		int bagIndex = -1;
@@ -358,10 +358,10 @@ public:
 
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			//°¡¹æÀÏ °æ¿ì
+			//ê°€ë°©ì¼ ê²½ìš°
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0) { bagNumber++; }
 
-			//Ä¿¼­°¡ °¡¸®Å°´Â Æ÷ÄÏÀÇ ÁÖ¼Ò¸¦ ÀúÀå
+			//ì»¤ì„œê°€ ê°€ë¦¬í‚¤ëŠ” í¬ì¼“ì˜ ì£¼ì†Œë¥¼ ì €ì¥
 			if (bagNumber - 1 == pocketCursor)
 			{
 				bagPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
@@ -369,7 +369,7 @@ public:
 				break;
 			}
 
-			//°¡¹æÀ» Ã£Áö ¸øÇßÀ» °æ¿ì
+			//ê°€ë°©ì„ ì°¾ì§€ ëª»í–ˆì„ ê²½ìš°
 			if (i == equipPtr->itemInfo.size() - 1 && bagPtr == nullptr)
 			{
 				updateLog(col2Str(col::white) + sysStr[123]);
@@ -406,7 +406,7 @@ public:
 			}
 			for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
 
-			updateLog(col2Str(col::white) + L"¾ÆÀÌÅÛÀ» °¡¹æ¿¡ Áı¾î ³Ö¾ú´Ù.");
+			updateLog(col2Str(col::white) + L"ì•„ì´í…œì„ ê°€ë°©ì— ì§‘ì–´ ë„£ì—ˆë‹¤.");
 		}
 	}
 	void executeSelectAll()
@@ -463,7 +463,7 @@ public:
 	//act
 	void executePick()
 	{
-		//pick ±¸ÇöÇÏ±â Àü¿¡ select ±â´É ¸ÕÀú ±¸ÇöÇØ¾ßµÊ
+		//pick êµ¬í˜„í•˜ê¸° ì „ì— select ê¸°ëŠ¥ ë¨¼ì € êµ¬í˜„í•´ì•¼ë¨
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
@@ -482,10 +482,10 @@ public:
 		}
 		else
 		{
-			//Áö±İ °¡¸®Å°´Â lootCursorÀÇ select¸¦ Ç®·Î ¸¸µë
+			//ì§€ê¸ˆ ê°€ë¦¬í‚¤ëŠ” lootCursorì˜ selectë¥¼ í’€ë¡œ ë§Œë“¬
 			int itemNumber = lootPocket->itemInfo[lootCursor].number;
 			lootPocket->itemInfo[lootCursor].lootSelect = itemNumber;
-			//¾ÆÁ÷ Áú·®&ºÎÇÇ Ã¼Å© Ãß°¡ÇÏÁö ¾Ê¾ÒÀ½
+			//ì•„ì§ ì§ˆëŸ‰&ë¶€í”¼ ì²´í¬ ì¶”ê°€í•˜ì§€ ì•Šì•˜ìŒ
 			lootPocket->transferItem((ItemPocket*)equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr, lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
 		}
 	}
@@ -507,10 +507,10 @@ public:
 			barAct.clear();
 			barAct.push_back(act::wield);
 
-			//¾÷µ¥ÀÌÆ®ÇÒ ¾ÆÀÌÅÛÀÌ ÃÑÀÏ °æ¿ì
+			//ì—…ë°ì´íŠ¸í•  ì•„ì´í…œì´ ì´ì¼ ê²½ìš°
 			if (targetItem.checkFlag(itemFlag::GUN))
 			{
-				//Àü¿ë ¾ÆÀÌÅÛÀÌ ÅºÃ¢ÀÏ °æ¿ì(ÀÏ¹İ ¼ÒÃÑ)
+				//ì „ìš© ì•„ì´í…œì´ íƒ„ì°½ì¼ ê²½ìš°(ì¼ë°˜ ì†Œì´)
 				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 				{
 					ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
@@ -524,17 +524,17 @@ public:
 						barAct.push_back(act::unloadMagazine);
 					}
 				}
-				//Àü¿ë ¾ÆÀÌÅÛÀÌ ÅºÀÏ °æ¿ì(¸®º¼¹ö·ù)
+				//ì „ìš© ì•„ì´í…œì´ íƒ„ì¼ ê²½ìš°(ë¦¬ë³¼ë²„ë¥˜)
 				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 				{
 					ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
-					//ÅºÈ¯ ºĞ¸®
+					//íƒ„í™˜ ë¶„ë¦¬
 					if (gunPtr->itemInfo.size() > 0)
 					{
 						barAct.push_back(act::unloadBulletFromGun);
 					}
 
-					//ÅºÈ¯ ÀåÀü
+					//íƒ„í™˜ ì¥ì „
 					int bulletNumber = 0;
 					for (int i = 0; i < gunPtr->itemInfo.size(); i++)
 					{
@@ -547,19 +547,19 @@ public:
 					}
 				}
 			}
-			//¾÷µ¥ÀÌÆ®ÇÒ ¾ÆÀÌÅÛÀÌ ÅºÃ¢ÀÏ °æ¿ì
+			//ì—…ë°ì´íŠ¸í•  ì•„ì´í…œì´ íƒ„ì°½ì¼ ê²½ìš°
 			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
 			{
 				barAct.push_back(act::reloadMagazine);
 
-				//ÅºÃ¢ ÀåÀü
+				//íƒ„ì°½ ì¥ì „
 				ItemPocket* magazinePtr = ((ItemPocket*)targetItem.pocketPtr);
 				if (magazinePtr->itemInfo.size() > 0)
 				{
 					barAct.push_back(act::unloadBulletFromMagazine);
 				}
 
-				//ÃÑ¾Ë ÀåÀü
+				//ì´ì•Œ ì¥ì „
 				int bulletNumber = 0;
 				for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
 				{
@@ -571,7 +571,7 @@ public:
 					barAct.push_back(act::reloadBulletToMagazine);
 				}
 			}
-			//¾÷µ¥ÀÌÆ®ÇÒ ¾ÆÀÌÅÛÀÌ ÅºÈ¯ÀÏ °æ¿ì
+			//ì—…ë°ì´íŠ¸í•  ì•„ì´í…œì´ íƒ„í™˜ì¼ ê²½ìš°
 			else if (targetItem.checkFlag(itemFlag::AMMO))
 			{
 				barAct.push_back(act::reloadBulletToGun);
@@ -584,27 +584,27 @@ public:
 		}
 	}
 
-	//¡åÄÚ·çÆ¾ ÇÔ¼ö¡å
+	//â–¼ì½”ë£¨í‹´ í•¨ìˆ˜â–¼
 	Corouter executeSearch()
 	{
-		//ÀÌ¹Ì °Ë»ö ÁßÀÎÁö Ã¼Å©
+		//ì´ë¯¸ ê²€ìƒ‰ ì¤‘ì¸ì§€ ì²´í¬
 		for (int i = 0; i < lootPocket->itemInfo.size(); i++)
 		{
-			if (lootPocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//ÀÌ¹Ì °Ë»ö ÁßÀÏ °æ¿ì °Ë»ö »óÅÂ¸¦ ÇØÁ¦ÇÔ
+			if (lootPocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//ì´ë¯¸ ê²€ìƒ‰ ì¤‘ì¼ ê²½ìš° ê²€ìƒ‰ ìƒíƒœë¥¼ í•´ì œí•¨
 			{
 				for (int j = 0; j < lootPocket->itemInfo.size(); j++)
 				{
 					lootPocket->itemInfo[j].eraseFlag(itemFlag::GRAYFILTER);
 				}
 				lootPocket->sortByUnicode();
-				updateLog(col2Str(col::white) + sysStr[86]);//°Ë»ö »óÅÂ¸¦ ÇØÁ¦Çß´Ù.
+				updateLog(col2Str(col::white) + sysStr[86]);//ê²€ìƒ‰ ìƒíƒœë¥¼ í•´ì œí–ˆë‹¤.
 				co_return;
 			}
 
-			if (i == lootPocket->itemInfo.size() - 1)//°Ë»ö ÁßÀÌ ¾Æ´Ò °æ¿ì
+			if (i == lootPocket->itemInfo.size() - 1)//ê²€ìƒ‰ ì¤‘ì´ ì•„ë‹ ê²½ìš°
 			{
-				std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//È®ÀÎ, Ãë¼Ò
-				new Msg(msgFlag::input, sysStr[27], sysStr[97], choiceVec);//°Ë»ö, °Ë»öÇÒ Å°¿öµå¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä
+				std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//í™•ì¸, ì·¨ì†Œ
+				new Msg(msgFlag::input, sysStr[27], sysStr[97], choiceVec);//ê²€ìƒ‰, ê²€ìƒ‰í•  í‚¤ì›Œë“œë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”
 				lootScroll = 0;
 				co_await std::suspend_always();
 				if (coAnswer == sysStr[38])
@@ -620,10 +620,10 @@ public:
 
 	Corouter executeSelectItemEx(int index)
 	{
-		//ÀÔ·ÂÇü ¸Ş½ÃÁö ¹Ú½º ¿­±â
-		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//È®ÀÎ, Ãë¼Ò
+		//ì…ë ¥í˜• ë©”ì‹œì§€ ë°•ìŠ¤ ì—´ê¸°
+		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//í™•ì¸, ì·¨ì†Œ
 		exInputText.clear();
-		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//¾ÆÀÌÅÛ ¼±ÅÃ, ¾ó¸¶³ª?
+		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//ì•„ì´í…œ ì„ íƒ, ì–¼ë§ˆë‚˜?
 		co_await std::suspend_always();
 
 		if (exInputText.empty() == false)
@@ -643,7 +643,7 @@ public:
 	Corouter executeWield()
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //¾ç¼ÕÀåºñÀÏ °æ¿ì
+		if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //ì–‘ì†ì¥ë¹„ì¼ ê²½ìš°
 		{
 			bool isWield = false;
 			ItemPocket* drop = new ItemPocket(storageType::null);
@@ -658,9 +658,9 @@ public:
 			if (isWield == true) { Player::ins()->drop(drop); }
 			else { delete drop; }
 			int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
-			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //¾ç¼Õ
+			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //ì–‘ì†
 			equipPtr->sortEquip();
-			updateLog(L"#FFFFFF¾ÆÀÌÅÛÀ» µé¾ú´Ù.");
+			updateLog(L"#FFFFFFì•„ì´í…œì„ ë“¤ì—ˆë‹¤.");
 		}
 		else
 		{
@@ -685,25 +685,25 @@ public:
 
 			if (hasLeft == true && hasRight == true)
 			{
-				int fixedLootCursor = lootCursor;//Msg°¡ ÄÑÁö¸é lootCursor°¡ -1·Î ÃÊ±âÈ­µÇ±â¿¡ ¹Ì¸® Áö¿ªº¯¼ö·Î ÀúÀå
+				int fixedLootCursor = lootCursor;//Msgê°€ ì¼œì§€ë©´ lootCursorê°€ -1ë¡œ ì´ˆê¸°í™”ë˜ê¸°ì— ë¯¸ë¦¬ ì§€ì—­ë³€ìˆ˜ë¡œ ì €ì¥
 
-				//¿Ş¼Õ, ¿À¸¥¼Õ
+				//ì™¼ì†, ì˜¤ë¥¸ì†
 				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
-				//¼±ÅÃ, ¾î´À ¼Õ¿¡ µé±î?
+				//ì„ íƒ, ì–´ëŠ ì†ì— ë“¤ê¹Œ?
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
 
 				equipHandFlag handDir = equipHandFlag::none;
-				if (coAnswer == sysStr[49])//¿Ş¼Õ
+				if (coAnswer == sysStr[49])//ì™¼ì†
 				{
 					handDir = equipHandFlag::left;
 				}
-				else//¿À¸¥¼Õ
+				else//ì˜¤ë¥¸ì†
 				{
 					handDir = equipHandFlag::right;
 				}
 
-				//¿Ş¼Õ ¾ÆÀÌÅÛ ¶³±¸±â
+				//ì™¼ì† ì•„ì´í…œ ë–¨êµ¬ê¸°
 				ItemPocket* drop = new ItemPocket(storageType::null);
 				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
@@ -713,7 +713,7 @@ public:
 						break;
 					}
 				}
-				//¾ç¼Õ ¾ÆÀÌÅÛ ¶³±¸±â
+				//ì–‘ì† ì•„ì´í…œ ë–¨êµ¬ê¸°
 				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
 					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
@@ -730,20 +730,20 @@ public:
 			}
 			else if (hasLeft == false && hasRight == false)
 			{
-				int fixedLootCursor = lootCursor;//Msg°¡ ÄÑÁö¸é lootCursor°¡ -1·Î ÃÊ±âÈ­µÇ±â¿¡ ¹Ì¸® Áö¿ªº¯¼ö·Î ÀúÀå
+				int fixedLootCursor = lootCursor;//Msgê°€ ì¼œì§€ë©´ lootCursorê°€ -1ë¡œ ì´ˆê¸°í™”ë˜ê¸°ì— ë¯¸ë¦¬ ì§€ì—­ë³€ìˆ˜ë¡œ ì €ì¥
 
-				//¿Ş¼Õ, ¿À¸¥¼Õ
+				//ì™¼ì†, ì˜¤ë¥¸ì†
 				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
-				//¼±ÅÃ, ¾î´À ¼Õ¿¡ µé±î?
+				//ì„ íƒ, ì–´ëŠ ì†ì— ë“¤ê¹Œ?
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
 
 				equipHandFlag handDir = equipHandFlag::none;
-				if (coAnswer == sysStr[49])//¿Ş¼Õ
+				if (coAnswer == sysStr[49])//ì™¼ì†
 				{
 					handDir = equipHandFlag::left;
 				}
-				else//¿À¸¥¼Õ
+				else//ì˜¤ë¥¸ì†
 				{
 					handDir = equipHandFlag::right;
 				}
@@ -752,26 +752,26 @@ public:
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
 				equipPtr->sortEquip();
 			}
-			else if (hasLeft == false && hasRight == true)//¿Ş¼Õ¿¡ µé±â
+			else if (hasLeft == false && hasRight == true)//ì™¼ì†ì— ë“¤ê¸°
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
 				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF¾ÆÀÌÅÛÀ» µé¾ú´Ù.");
+				updateLog(L"#FFFFFFì•„ì´í…œì„ ë“¤ì—ˆë‹¤.");
 			}
-			else//¿À¸¥¼Õ¿¡ µé±â
+			else//ì˜¤ë¥¸ì†ì— ë“¤ê¸°
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
 				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF¾ÆÀÌÅÛÀ» µé¾ú´Ù.");
+				updateLog(L"#FFFFFFì•„ì´í…œì„ ë“¤ì—ˆë‹¤.");
 			}
 		}
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
 	}
 
-	Corouter executeInsert()//»ğÅº : ÃÑ¾Ë¿¡ »ç¿ë, ÀÌ ÅºÈ¯À» ³ÖÀ» ¼ö ÀÖ´Â ÅºÃ¢ ¸®½ºÆ®¸¦ Ç¥½ÃÇÏ°í °Å±â¿¡ ³ÖÀ½
+	Corouter executeInsert()//ì‚½íƒ„ : ì´ì•Œì— ì‚¬ìš©, ì´ íƒ„í™˜ì„ ë„£ì„ ìˆ˜ ìˆëŠ” íƒ„ì°½ ë¦¬ìŠ¤íŠ¸ë¥¼ í‘œì‹œí•˜ê³  ê±°ê¸°ì— ë„£ìŒ
 	{
 		int targetLootCursor = lootCursor;
 		std::vector<std::wstring> pocketList;
@@ -780,11 +780,11 @@ public:
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0 || equipPtr->itemInfo[i].pocketMaxNumber > 0)
 			{
-				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //Àü¿ë ¾ÆÀÌÅÛÀÌ ÀÖÀ» °æ¿ì
+				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //ì „ìš© ì•„ì´í…œì´ ìˆì„ ê²½ìš°
 				{
 					if (std::find(equipPtr->itemInfo[i].pocketOnlyItem.begin(), equipPtr->itemInfo[i].pocketOnlyItem.end(), lootPocket->itemInfo[targetLootCursor].itemCode) == equipPtr->itemInfo[i].pocketOnlyItem.end())
 					{
-						//·çÆ®Ä¿¼­ÀÇ ÇØ´ç ¾ÆÀÌÅÛÀ» ³ÖÀ» ¼ö ¾ø´Â Æ÷ÄÏÀÌ¸é continue
+						//ë£¨íŠ¸ì»¤ì„œì˜ í•´ë‹¹ ì•„ì´í…œì„ ë„£ì„ ìˆ˜ ì—†ëŠ” í¬ì¼“ì´ë©´ continue
 						continue;
 					}
 				}
@@ -793,16 +793,16 @@ public:
 			}
 		}
 
-		if (pocketList.size() == 0) //³ÖÀ»¸¸ÇÑ Æ÷ÄÏÀ» Ã£Áö ¸øÇßÀ» °æ¿ì
+		if (pocketList.size() == 0) //ë„£ì„ë§Œí•œ í¬ì¼“ì„ ì°¾ì§€ ëª»í–ˆì„ ê²½ìš°
 		{
-			//ÀÌ ¾ÆÀÌÅÛÀ» ³ÖÀ»¸¸ÇÑ Æ÷ÄÏÀÌ ¾ø´Ù.
+			//ì´ ì•„ì´í…œì„ ë„£ì„ë§Œí•œ í¬ì¼“ì´ ì—†ë‹¤.
 			updateLog(col2Str(col::white) + sysStr[96]);
 			co_return;
 		}
 
 		////////////////////////////////////////////////////////////////////
 
-		new Lst(sysStr[95], sysStr[94], pocketList);//³Ö±â, ³ÖÀ» Æ÷ÄÏÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.
+		new Lst(sysStr[95], sysStr[94], pocketList);//ë„£ê¸°, ë„£ì„ í¬ì¼“ì„ ì„ íƒí•´ì£¼ì„¸ìš”.
 		co_await std::suspend_always();
 
 		////////////////////////////////////////////////////////////////////
@@ -812,11 +812,11 @@ public:
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0 || equipPtr->itemInfo[i].pocketMaxNumber > 0)
 			{
-				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //Àü¿ë ¾ÆÀÌÅÛÀÌ ÀÖÀ» °æ¿ì
+				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //ì „ìš© ì•„ì´í…œì´ ìˆì„ ê²½ìš°
 				{
 					if (std::find(equipPtr->itemInfo[i].pocketOnlyItem.begin(), equipPtr->itemInfo[i].pocketOnlyItem.end(), lootPocket->itemInfo[targetLootCursor].itemCode) == equipPtr->itemInfo[i].pocketOnlyItem.end())
 					{
-						//·çÆ®Ä¿¼­ÀÇ ÇØ´ç ¾ÆÀÌÅÛÀ» ³ÖÀ» ¼ö ¾ø´Â Æ÷ÄÏÀÌ¸é continue
+						//ë£¨íŠ¸ì»¤ì„œì˜ í•´ë‹¹ ì•„ì´í…œì„ ë„£ì„ ìˆ˜ ì—†ëŠ” í¬ì¼“ì´ë©´ continue
 						continue;
 					}
 				}
@@ -832,7 +832,7 @@ public:
 					}
 					else { transferNumber = lootPocket->itemInfo[targetLootCursor].number; }
 
-					//¸î °³ ³ÖÀ»±î?
+					//ëª‡ ê°œ ë„£ì„ê¹Œ?
 					lootPocket->transferItem
 					(
 						(ItemPocket*)equipPtr->itemInfo[i].pocketPtr,

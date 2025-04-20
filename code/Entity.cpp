@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 #include <SDL_image.h>
 
 import Entity;
@@ -26,9 +26,9 @@ import Flame;
 import Vehicle;
 
 
-Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//»ı¼ºÀÚ
+Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//ìƒì„±ì
 {
-	prt(L"Entity : »ı¼ºÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù!\n");
+	prt(L"Entity : ìƒì„±ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤!\n");
 	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
@@ -41,11 +41,11 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//»ı¼ºÀÚ
 
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
-Entity::~Entity()//¼Ò¸êÀÚ
+Entity::~Entity()//ì†Œë©¸ì
 {
 	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
-	//³ªÁß¿¡ ¹Ù´ÚÀÌ °ÉÀ» ¼ö ÀÖ´Â Å¸ÀÏÀÎÁö ¾Æ´ÑÁö¸¦ Ã¼Å©ÇÏ¿© true°¡ µÇ´ÂÁöÀÇ ¿©ºÎ¸¦ °áÁ¤ÇÏ´Â Á¶°Ç¹® Ãß°¡ÇÒ°Í
-	prt(L"Entity : ¼Ò¸êÀÚ°¡ È£ÃâµÇ¾ú½À´Ï´Ù..\n");
+	//ë‚˜ì¤‘ì— ë°”ë‹¥ì´ ê±¸ì„ ìˆ˜ ìˆëŠ” íƒ€ì¼ì¸ì§€ ì•„ë‹Œì§€ë¥¼ ì²´í¬í•˜ì—¬ trueê°€ ë˜ëŠ”ì§€ì˜ ì—¬ë¶€ë¥¼ ê²°ì •í•˜ëŠ” ì¡°ê±´ë¬¸ ì¶”ê°€í• ê²ƒ
+	prt(L"Entity : ì†Œë©¸ìê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤..\n");
 	delete entityInfo.equipment;
 }
 #pragma region getset method
@@ -59,7 +59,7 @@ void Entity::setSkillTarget(int gridX, int gridY, int gridZ)
 Point3 Entity::getSkillTarget() { return skillTarget; }
 void Entity::addSkill(int index)
 {
-	prt(L"½ºÅ³ %ls¸¦ Ãß°¡Çß´Ù.\n", skillDex[index].name.c_str());
+	prt(L"ìŠ¤í‚¬ %lsë¥¼ ì¶”ê°€í–ˆë‹¤.\n", skillDex[index].name.c_str());
 	entityInfo.skillList.push_back(skillDex[index]);
 }
 
@@ -96,12 +96,12 @@ void Entity::updateSpriteFlash()
 	SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
 	SDL_Rect src = { 0, 0, textureW, textureH };
 	SDL_Rect dst = src;
-	//ÇÏ¾é°Ô ¸¸µé ÅØ½ºÃÄ¸¦ ±×·Á³ÖÀ½
+	//í•˜ì–—ê²Œ ë§Œë“¤ í…ìŠ¤ì³ë¥¼ ê·¸ë ¤ë„£ìŒ
 
 	if (customSprite == nullptr) SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
 	else SDL_RenderCopy(renderer, customSprite->getTexture(), &src, &dst);
 
-	//ÅØ½ºÃÄ¿¡ Èò»öÀ¸·Î °¡»ê ºí·»µùÀ» »ç¿ëÇØ ÇÏ¾é°Ô ¸¸µë
+	//í…ìŠ¤ì³ì— í°ìƒ‰ìœ¼ë¡œ ê°€ì‚° ë¸”ë Œë”©ì„ ì‚¬ìš©í•´ í•˜ì–—ê²Œ ë§Œë“¬
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_Rect dstWhite = { 0, 0, textureW, textureH };
@@ -142,7 +142,7 @@ void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag in
 float Entity::endAtk()
 {
 	setAniType(aniFlag::null);
-	return 1 / 0.8; //¿ø·¡ ¿©±â¿¡ °ø°İ¼Óµµ°¡ µé¾î°¡¾ßÇÔ
+	return 1 / 0.8; //ì›ë˜ ì—¬ê¸°ì— ê³µê²©ì†ë„ê°€ ë“¤ì–´ê°€ì•¼í•¨
 }
 void Entity::loadDataFromDex(int index)
 {
@@ -150,12 +150,12 @@ void Entity::loadDataFromDex(int index)
 	entityInfo.HP = entityInfo.maxHP;
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
-//@brief ÇØ´ç ÆÄÃ÷¿¡ µ¥¹ÌÁö¸¦ Ãß°¡ÇÏ°í ¸ŞÀÎ HPµµ ±×¸¸Å­ »®´Ï´Ù.
+//@brief í•´ë‹¹ íŒŒì¸ ì— ë°ë¯¸ì§€ë¥¼ ì¶”ê°€í•˜ê³  ë©”ì¸ HPë„ ê·¸ë§Œí¼ ëºë‹ˆë‹¤.
 void Entity::addDmg(int inputDmg)
 {
 	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
 	entityInfo.HP -= inputDmg;
-	if (entityInfo.HP <= 0)//HP 0, »ç¸Á
+	if (entityInfo.HP <= 0)//HP 0, ì‚¬ë§
 	{
 		death();
 		return;
@@ -164,81 +164,81 @@ void Entity::addDmg(int inputDmg)
 }
 void Entity::updateStatus()
 {
-	//rPCB rFCECR SH EV µîÀ» ¾÷µ¥ÀÌÆ®ÇÔ
+	//rPCB rFCECR SH EV ë“±ì„ ì—…ë°ì´íŠ¸í•¨
 
 	//sh
-	entityInfo.sh = entityDex[entityInfo.entityCode].sh;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.sh = entityDex[entityInfo.entityCode].sh;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.sh += getEquipPtr()->itemInfo[i].sh;
 	}
 
 	//ev
-	entityInfo.ev = entityDex[entityInfo.entityCode].ev;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.ev = entityDex[entityInfo.entityCode].ev;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.ev += getEquipPtr()->itemInfo[i].ev;
 	}
 
 	//rFire
-	entityInfo.rFire = entityDex[entityInfo.entityCode].rFire;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.rFire = entityDex[entityInfo.entityCode].rFire;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.rFire += getEquipPtr()->itemInfo[i].rFire;
 	}
 
 	//rCold
-	entityInfo.rCold = entityDex[entityInfo.entityCode].rCold;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.rCold = entityDex[entityInfo.entityCode].rCold;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.rCold += getEquipPtr()->itemInfo[i].rCold;
 	}
 
 	//rElec
-	entityInfo.rElec = entityDex[entityInfo.entityCode].rElec;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.rElec = entityDex[entityInfo.entityCode].rElec;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.rElec += getEquipPtr()->itemInfo[i].rElec;
 	}
 
 	//rCorr
-	entityInfo.rCorr = entityDex[entityInfo.entityCode].rCorr;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.rCorr = entityDex[entityInfo.entityCode].rCorr;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.rCorr += getEquipPtr()->itemInfo[i].rCorr;
 	}
 
 	//rRad
-	entityInfo.rRad = entityDex[entityInfo.entityCode].rRad;//±âº» °³Ã¼°ªÀ¸·Î Àç¼³Á¤
-	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//Àåºñ¸¦ ±âÁØÀ¸·Î °ª ¾÷µ¥ÀÌÆ®
+	entityInfo.rRad = entityDex[entityInfo.entityCode].rRad;//ê¸°ë³¸ ê°œì²´ê°’ìœ¼ë¡œ ì¬ì„¤ì •
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//ì¥ë¹„ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ê°’ ì—…ë°ì´íŠ¸
 	{
 		entityInfo.rRad += getEquipPtr()->itemInfo[i].rRad;
 	}
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ rPierce¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ rPierceë¥¼ ë°˜í™˜
 int Entity::getRPierce(int inputPartIndex)
 {
 	int totalRPierce = 0;
 	return totalRPierce;
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ rCut¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ rCutë¥¼ ë°˜í™˜
 int Entity::getRCut(int inputPartIndex)
 {
 	int totalRCut = 0;
 	return totalRCut;
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ rBash¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ rBashë¥¼ ë°˜í™˜
 int Entity::getRBash(int inputPartIndex)
 {
 	int totalRBash = 0;
 	return totalRBash;
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ SH¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ SHë¥¼ ë°˜í™˜
 int Entity::getSH()
 {
 	int totalSH = 0;
 
-	//±âº» °³Ã¼°ª ´õÇÏ±â
+	//ê¸°ë³¸ ê°œì²´ê°’ ë”í•˜ê¸°
 	totalSH += entityInfo.sh;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
@@ -247,12 +247,12 @@ int Entity::getSH()
 	}
 	return totalSH;
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ EV¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ EVë¥¼ ë°˜í™˜
 int Entity::getEV()
 {
 	int totalEV = 0;
 
-	//±âº» °³Ã¼°ª ´õÇÏ±â
+	//ê¸°ë³¸ ê°œì²´ê°’ ë”í•˜ê¸°
 	totalEV += entityInfo.ev;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
@@ -261,7 +261,7 @@ int Entity::getEV()
 	}
 	return totalEV;
 }
-//ÀÔ·ÂÇÑ ÆÄÃ÷ ÀÎµ¦½ºÀÇ enc¸¦ ¹İÈ¯
+//ì…ë ¥í•œ íŒŒì¸  ì¸ë±ìŠ¤ì˜ encë¥¼ ë°˜í™˜
 int Entity::getEnc(int inputPartIndex)
 {
 	int totalEnc = 0;
@@ -361,11 +361,11 @@ void Entity::attack(int gridX, int gridY)
 	Entity* victimEntity = TileEntity(gridX, gridY, getGridZ());
 	if (victimEntity == nullptr)
 	{
-		prt(L"[µğ¹ö±×] °ø°İÀÌ ºø³ª°¬´Ù.\n");
+		prt(L"[ë””ë²„ê·¸] ê³µê²©ì´ ë¹—ë‚˜ê°”ë‹¤.\n");
 	}
 	else
 	{
-		//¸íÁß·ü °è»ê
+		//ëª…ì¤‘ë¥  ê³„ì‚°
 		float aimAcc;
 		aimAcc = 0.98;
 
@@ -377,11 +377,11 @@ void Entity::attack(int gridX, int gridY)
 		else
 		{
 			new Damage(L"dodged", col::yellow, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
-			prt(L"[µğ¹ö±×] °ø°İÀÌ ºø³ª°¬´Ù.\n");
+			prt(L"[ë””ë²„ê·¸] ê³µê²©ì´ ë¹—ë‚˜ê°”ë‹¤.\n");
 		}
 	}
 }
-void Entity::updateWalkable(int gridX, int gridY)//¸¸¾à ´Ù¸¦ °æ¿ì °³Ã¼¿¡¼­ ¿À¹ö¶óÀÌµåÇØ¼­ ¾²½Ã¿À
+void Entity::updateWalkable(int gridX, int gridY)//ë§Œì•½ ë‹¤ë¥¼ ê²½ìš° ê°œì²´ì—ì„œ ì˜¤ë²„ë¼ì´ë“œí•´ì„œ ì“°ì‹œì˜¤
 {
 }
 void Entity::rayCasting(int x1, int y1, int x2, int y2)
@@ -583,18 +583,18 @@ void Entity::getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8&
 void Entity::drop(ItemPocket* txPtr)
 {
 	ItemStack* targetStack;
-	//¾ÆÀÌÅÛ ½ºÅÃÀÌ ÀÌ¹Ì ÀÖ´Â °æ¿ì¿Í ¾ø´Â °æ¿ì
+	//ì•„ì´í…œ ìŠ¤íƒì´ ì´ë¯¸ ìˆëŠ” ê²½ìš°ì™€ ì—†ëŠ” ê²½ìš°
 
-	if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr == nullptr) //±× ÀÚ¸®¿¡ ÅÛ ¾ø´Â °æ¿ì
+	if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr == nullptr) //ê·¸ ìë¦¬ì— í…œ ì—†ëŠ” ê²½ìš°
 	{
-		//±âÁ¸ ½ºÅÃÀÌ ¾øÀ¸¸é »õ·Î ¸¸µé°í ±× ptrÀ» Àü´Ş
+		//ê¸°ì¡´ ìŠ¤íƒì´ ì—†ìœ¼ë©´ ìƒˆë¡œ ë§Œë“¤ê³  ê·¸ ptrì„ ì „ë‹¬
 		targetStack = new ItemStack(getGridX(), getGridY(), getGridZ());
-		targetStack->setPocket(txPtr);//½ºÅä¸®Áö ±³Ã¼(¸Ş¸ğ¸®´Â ¸Ş¼Òµå ³»ºÎ¿¡¼­ ÇØÁ¦µÊ)
+		targetStack->setPocket(txPtr);//ìŠ¤í† ë¦¬ì§€ êµì²´(ë©”ëª¨ë¦¬ëŠ” ë©”ì†Œë“œ ë‚´ë¶€ì—ì„œ í•´ì œë¨)
 		targetStack->updateSprIndex();
 	}
-	else //ÀÌ¹Ì ±× ÀÚ¸®¿¡ ¾ÆÀÌÅÛÀÌ ÀÖ´Â °æ¿ì
+	else //ì´ë¯¸ ê·¸ ìë¦¬ì— ì•„ì´í…œì´ ìˆëŠ” ê²½ìš°
 	{
-		//±âÁ¸ ½ºÅÃÀÌ ÀÖÀ¸¸é ±× ½ºÅÃÀ» ±×´ë·Î Àü´Ş
+		//ê¸°ì¡´ ìŠ¤íƒì´ ìˆìœ¼ë©´ ê·¸ ìŠ¤íƒì„ ê·¸ëŒ€ë¡œ ì „ë‹¬
 		targetStack = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
 
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
@@ -603,7 +603,7 @@ void Entity::drop(ItemPocket* txPtr)
 		{
 			txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 		}
-		delete txPtr; //ÀØÁö¾Ê°í ±âÁ¸ÀÇ ¸Å°³º¯¼ö dropÀ» Á¦°ÅÇØÁØ´Ù.
+		delete txPtr; //ìŠì§€ì•Šê³  ê¸°ì¡´ì˜ ë§¤ê°œë³€ìˆ˜ dropì„ ì œê±°í•´ì¤€ë‹¤.
 	}
 
 	addAniUSetPlayer(targetStack, aniFlag::drop);
@@ -611,35 +611,35 @@ void Entity::drop(ItemPocket* txPtr)
 void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 {
 	ItemStack* targetStack;
-	//¾ÆÀÌÅÛ ½ºÅÃÀÌ ÀÌ¹Ì ÀÖ´Â °æ¿ì¿Í ¾ø´Â °æ¿ì
+	//ì•„ì´í…œ ìŠ¤íƒì´ ì´ë¯¸ ìˆëŠ” ê²½ìš°ì™€ ì—†ëŠ” ê²½ìš°
 
-	if (World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr == nullptr) //±× ÀÚ¸®¿¡ ÅÛ ¾ø´Â °æ¿ì
+	if (World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr == nullptr) //ê·¸ ìë¦¬ì— í…œ ì—†ëŠ” ê²½ìš°
 	{
-		//±âÁ¸ ½ºÅÃÀÌ ¾øÀ¸¸é »õ·Î ¸¸µé°í ±× ptrÀ» Àü´Ş
+		//ê¸°ì¡´ ìŠ¤íƒì´ ì—†ìœ¼ë©´ ìƒˆë¡œ ë§Œë“¤ê³  ê·¸ ptrì„ ì „ë‹¬
 		targetStack = new ItemStack(gridX, gridY, getGridZ());
-		targetStack->setPocket(txPtr);//½ºÅä¸®Áö ±³Ã¼(¸Ş¸ğ¸®´Â ¸Ş¼Òµå ³»ºÎ¿¡¼­ ÇØÁ¦µÊ)
+		targetStack->setPocket(txPtr);//ìŠ¤í† ë¦¬ì§€ êµì²´(ë©”ëª¨ë¦¬ëŠ” ë©”ì†Œë“œ ë‚´ë¶€ì—ì„œ í•´ì œë¨)
 		targetStack->updateSprIndex();
 	}
-	else //ÀÌ¹Ì ±× ÀÚ¸®¿¡ ¾ÆÀÌÅÛÀÌ ÀÖ´Â °æ¿ì
+	else //ì´ë¯¸ ê·¸ ìë¦¬ì— ì•„ì´í…œì´ ìˆëŠ” ê²½ìš°
 	{
-		//±âÁ¸ ½ºÅÃÀÌ ÀÖÀ¸¸é ±× ½ºÅÃÀ» ±×´ë·Î Àü´Ş
+		//ê¸°ì¡´ ìŠ¤íƒì´ ìˆìœ¼ë©´ ê·¸ ìŠ¤íƒì„ ê·¸ëŒ€ë¡œ ì „ë‹¬
 		targetStack = (ItemStack*)World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr;
 
-		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //¿ø·¡ À§Ä¡¿¡ °¡Â¥ ¾ÆÀÌÅÛ ÀÌ¹ÌÁö
+		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //ì›ë˜ ìœ„ì¹˜ì— ê°€ì§œ ì•„ì´í…œ ì´ë¯¸ì§€
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
 
 		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--)
 		{
 			txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 		}
-		delete txPtr; //ÀØÁö¾Ê°í ±âÁ¸ÀÇ ¸Å°³º¯¼ö dropÀ» Á¦°ÅÇØÁØ´Ù.
+		delete txPtr; //ìŠì§€ì•Šê³  ê¸°ì¡´ì˜ ë§¤ê°œë³€ìˆ˜ dropì„ ì œê±°í•´ì¤€ë‹¤.
 	}
 	addAniUSetPlayer(targetStack, aniFlag::throwing);
 
 	targetStack->setFakeX(getX() - targetStack->getX());
 	targetStack->setFakeY(getY() - targetStack->getY());
 }
-//@brief °æÇèÄ¡ Å×ÀÌºí°ú Àû¼º°ªÀ» ÂüÁ¶ÇÏ¿© ÀÔ·ÂÇÑ indexÀÇ Àç´É·¹º§À» ¹İÈ¯ÇÔ
+//@brief ê²½í—˜ì¹˜ í…Œì´ë¸”ê³¼ ì ì„±ê°’ì„ ì°¸ì¡°í•˜ì—¬ ì…ë ¥í•œ indexì˜ ì¬ëŠ¥ë ˆë²¨ì„ ë°˜í™˜í•¨
 float Entity::getProficLevel(int index)
 {
 	float exp = entityInfo.proficExp[index];
@@ -675,7 +675,7 @@ void Entity::addProficExp(int expVal)
 	{
 		entityInfo.proficExp[i] += (frag * entityInfo.proficFocus[i]);
 	}
-	//¸¸·¾ÀÌ µÈ Àç´ÉÀÇ Æ÷Ä¿½º ÇØÁ¦
+	//ë§Œë ™ì´ ëœ ì¬ëŠ¥ì˜ í¬ì»¤ìŠ¤ í•´ì œ
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
 		if (entityInfo.proficFocus[i] > 0)
@@ -687,8 +687,8 @@ void Entity::addProficExp(int expVal)
 		}
 	}
 }
-//¸Ş¼Òµå¸¦ ½ÇÇàÇÑ °´Ã¼¸¦ Á×ÀÌ°í ¾ÆÀÌÅÛÀ» µå¶øÇÑ´Ù.
-//ÇöÀç °³Ã¼°¡ º¸À¯ÇÑ ¸ğµç ºÎÀ§¸¦ º¤ÅÍ ÇüÅÂ·Î ¹İÈ¯ÇÑ´Ù.
+//ë©”ì†Œë“œë¥¼ ì‹¤í–‰í•œ ê°ì²´ë¥¼ ì£½ì´ê³  ì•„ì´í…œì„ ë“œëí•œë‹¤.
+//í˜„ì¬ ê°œì²´ê°€ ë³´ìœ í•œ ëª¨ë“  ë¶€ìœ„ë¥¼ ë²¡í„° í˜•íƒœë¡œ ë°˜í™˜í•œë‹¤.
 void Entity::aimWeaponRight() { aimWeaponHand = equipHandFlag::right; }
 void Entity::aimWeaponLeft() { aimWeaponHand = equipHandFlag::left; }
 equipHandFlag Entity::getAimHand()
@@ -696,10 +696,10 @@ equipHandFlag Entity::getAimHand()
 	if (aimWeaponHand == equipHandFlag::right) { return equipHandFlag::right; }
 	else { return equipHandFlag::left; }
 }
-//ÀÌ °³Ã¼°¡ ÇØ´ç °³Ã¼¸¦ °ø°İÇßÀ» ¶§ °ø°İÇÑ ¹æ¹ı°ú »ó´ë ºÎÀ§¿¡ µû¸¥ ¸íÁß·üÀ» È®·ü(0~1.0)À¸·Î ¹İÈ¯ÇØÁÜ, aimÀÌ false¸é aimStackÀ» 0·Î °è»ê 
+//ì´ ê°œì²´ê°€ í•´ë‹¹ ê°œì²´ë¥¼ ê³µê²©í–ˆì„ ë•Œ ê³µê²©í•œ ë°©ë²•ê³¼ ìƒëŒ€ ë¶€ìœ„ì— ë”°ë¥¸ ëª…ì¤‘ë¥ ì„ í™•ë¥ (0~1.0)ìœ¼ë¡œ ë°˜í™˜í•´ì¤Œ, aimì´ falseë©´ aimStackì„ 0ë¡œ ê³„ì‚° 
 int Entity::getAimWeaponIndex()
 {
-	//ÇöÀç ÇÃ·¹ÀÌ¾î°¡ Àû¿¡°Ô °Ü´©´Â ¹«±âÀÇ ÀÎµ¦½º¸¦ ¹İÈ¯ÇÔ(-1ÀÌ¸é ¸Ç¼Õ)
+	//í˜„ì¬ í”Œë ˆì´ì–´ê°€ ì ì—ê²Œ ê²¨ëˆ„ëŠ” ë¬´ê¸°ì˜ ì¸ë±ìŠ¤ë¥¼ ë°˜í™˜í•¨(-1ì´ë©´ ë§¨ì†)
 	equipHandFlag targetHand;
 	std::vector<ItemData> equipInfo = getEquipPtr()->itemInfo;
 	if (getAimHand() == equipHandFlag::left) { targetHand = equipHandFlag::left; }
@@ -812,7 +812,7 @@ void Entity::updateCustomSpriteHuman()
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	//Ä³¸¯ÅÍ Àåºñ ±×¸®±â
+	//ìºë¦­í„° ì¥ë¹„ ê·¸ë¦¬ê¸°
 	if (getEquipPtr()->itemInfo.size() > 0)
 	{
 		std::map<int, Sprite*, std::less<int>> drawOrder;
@@ -840,10 +840,10 @@ void Entity::updateCustomSpriteHuman()
 				
 				break;
 			default:
-				errorBox(L"Àåºñ ±×¸®±â Áß¿¡ equipState°¡ ºñÁ¤»óÀûÀÎ °ªÀÎ Àåºñ¸¦ ¹ß°ß");
+				errorBox(L"ì¥ë¹„ ê·¸ë¦¬ê¸° ì¤‘ì— equipStateê°€ ë¹„ì •ìƒì ì¸ ê°’ì¸ ì¥ë¹„ë¥¼ ë°œê²¬");
 				break;
 			}
-			//errorBox(drawOrder.find(priority) != drawOrder.end(), L"ÀÌ¹Ì Á¸ÀçÇÏ´Â ¿ì¼±µµÀÇ Àåºñ°¡ Ãß°¡µÊ :" + std::to_wstring(priority) + L" ÀÌ¸§: " + getEquipPtr()->itemInfo[equipCounter].name);
+			//errorBox(drawOrder.find(priority) != drawOrder.end(), L"ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ìš°ì„ ë„ì˜ ì¥ë¹„ê°€ ì¶”ê°€ë¨ :" + std::to_wstring(priority) + L" ì´ë¦„: " + getEquipPtr()->itemInfo[equipCounter].name);
 			drawOrder[priority] = tgtSpr;
 		}
 
@@ -942,7 +942,7 @@ void Entity::drawSelf()
 	int drawingY = originY + zoomScale * (offsetY);
 
 
-	//Ä³¸¯ÅÍ ±×¸²ÀÚ ±×¸®±â
+	//ìºë¦­í„° ê·¸ë¦¼ì ê·¸ë¦¬ê¸°
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW) == false && itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP) == false)
 	{
 		if (ridingEntity == nullptr)
@@ -957,7 +957,7 @@ void Entity::drawSelf()
 	}
 
 
-	//Ä³¸¯ÅÍ Ä¿½ºÅ¸¹ÌÀÌÂ¡ ±×¸®±â
+	//ìºë¦­í„° ì»¤ìŠ¤íƒ€ë¯¸ì´ì§• ê·¸ë¦¬ê¸°
 	if (customSprite != nullptr)
 	{
 		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
@@ -965,31 +965,31 @@ void Entity::drawSelf()
 		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 		{
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,24 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
-			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 		}
 		else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 		{
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 80); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
-			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //ºí·»µå¸ğµå ¼³Á¤
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 80); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
+			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //ë¸”ë Œë“œëª¨ë“œ ì„¤ì •
 			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,21 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //ÅØ½ºÃÄ Åõ¸íµµ ¼³Á¤
+			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //í…ìŠ¤ì³ íˆ¬ëª…ë„ ì„¤ì •
 		}
 		else
 		{
-			drawSpriteCenter(customSprite.get(), localSprIndex, drawingX, drawingY);//Ä³¸¯ÅÍ º»Ã¼ ±×¸®±â
+			drawSpriteCenter(customSprite.get(), localSprIndex, drawingX, drawingY);//ìºë¦­í„° ë³¸ì²´ ê·¸ë¦¬ê¸°
 		}
 	}
 	else
 	{
-		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY);//Ä³¸¯ÅÍ º»Ã¼ ±×¸®±â
+		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY);//ìºë¦­í„° ë³¸ì²´ ê·¸ë¦¬ê¸°
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (entityInfo.HP != entityInfo.maxHP)//°³Ã¼ HP Ç¥±â
+	if (entityInfo.HP != entityInfo.maxHP)//ê°œì²´ HP í‘œê¸°
 	{
 		int pivotX = drawingX - (int)(8 * zoomScale);
 		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
@@ -997,7 +997,7 @@ void Entity::drawSelf()
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		drawFillRect(dst, col::black);
 
-		//ÆäÀÌÅ© HP
+		//í˜ì´í¬ HP
 		if (entityInfo.fakeHP > entityInfo.HP) { entityInfo.fakeHP--; }
 		else if (entityInfo.fakeHP < entityInfo.HP) entityInfo.fakeHP = entityInfo.HP;
 		if (entityInfo.fakeHP != entityInfo.HP)
@@ -1007,7 +1007,7 @@ void Entity::drawSelf()
 		}
 		else { entityInfo.fakeHPAlpha = 255; }
 
-		//ÆäÀÌÅ© MP
+		//í˜ì´í¬ MP
 		if (entityInfo.fakeMP > entityInfo.MP) { entityInfo.fakeMP--; }
 		else if (entityInfo.fakeMP < entityInfo.MP) entityInfo.fakeMP = entityInfo.MP;
 		if (entityInfo.fakeMP != entityInfo.MP)
@@ -1031,7 +1031,7 @@ void Entity::drawSelf()
 		else drawFillRect(dst, lowCol::red);
 	}
 
-	if (getFlashType() != NULL) //¿£Æ¼Æ¼¿¡ ÇÃ·¡½Ã È¿°ú°¡ ÀÖÀ» °æ¿ì
+	if (getFlashType() != NULL) //ì—”í‹°í‹°ì— í”Œë˜ì‹œ íš¨ê³¼ê°€ ìˆì„ ê²½ìš°
 	{
 		drawSpriteCenter
 		(
@@ -1042,7 +1042,7 @@ void Entity::drawSelf()
 		);
 	}
 
-	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//¸» ¾ÕÂÊ
+	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//ë§ ì•ìª½
 	{
 		drawSpriteCenter(ridingEntity->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
 	}

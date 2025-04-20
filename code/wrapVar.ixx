@@ -1,4 +1,4 @@
-export module wrapVar;
+﻿export module wrapVar;
 
 import std;
 import util;

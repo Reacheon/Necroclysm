@@ -1,8 +1,8 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Drawable;
 
-//ÀÚ±â ÀÚ½ÅÀ» ±×¸± ¼ö ÀÖ´Â ÀÎÅÍÆäÀÌ½º : ¾ÆÀÌÅÛ½ºÅÃ, ¿£Æ¼Æ¼, Â÷·®, ¼³Ä¡¹°
+//ìžê¸° ìžì‹ ì„ ê·¸ë¦´ ìˆ˜ ìžˆëŠ” ì¸í„°íŽ˜ì´ìŠ¤ : ì•„ì´í…œìŠ¤íƒ, ì—”í‹°í‹°, ì°¨ëŸ‰, ì„¤ì¹˜ë¬¼
 export class Drawable
 {
 public:

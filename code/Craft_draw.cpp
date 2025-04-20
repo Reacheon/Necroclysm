@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 import Craft;
 
@@ -49,9 +49,9 @@ void Craft::drawGUI()
 
 
 		setFontSize(13);
-		drawText(col2Str(col::white) + L"¾ÆÀÌÅÛ Á¶ÇÕ Áß...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
+		drawText(col2Str(col::white) + L"ì•„ì´í…œ ì¡°í•© ì¤‘...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
 
-		//¾ÆÀÌÅÛ ¾ÆÀÌÄÜ ±×¸®±â
+		//ì•„ì´í…œ ì•„ì´ì½˜ ê·¸ë¦¬ê¸°
 
 		int pivotX = tooltipBox.x + 18;
 		int pivotY = tooltipBox.y + 42;
@@ -75,7 +75,7 @@ void Craft::drawGUI()
 
 		setFontSize(11);
 		std::wstring topText = std::to_wstring(itemDex[targetItemCode].craftTime - elapsedTime);
-		topText += L" ºĞ ³²À½ ( ";
+		topText += L" ë¶„ ë‚¨ìŒ ( ";
 		topText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
 		topText += L"% )";
 
@@ -88,11 +88,11 @@ void Craft::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-		//À©µµ¿ì ¹Ú½º ±×¸®±â
+		//ìœˆë„ìš° ë°•ìŠ¤ ê·¸ë¦¬ê¸°
 		drawWindow(&craftBase, sysStr[75], 13);
 
 
-		//Áñ°ÜÃ£±â ¹öÆ°
+		//ì¦ê²¨ì°¾ê¸° ë²„íŠ¼
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 			SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -112,10 +112,10 @@ void Craft::drawGUI()
 			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 3,  bookmarkCategory.y + 3, bookmarkCategory.w - 6, bookmarkCategory.h - 6 };
 			drawRect(bookmarkInCategory, outlineColor);
 			setFontSize(13);
-			drawTextCenter(col2Str(col::white) + L"¡Ú " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
+			drawTextCenter(col2Str(col::white) + L"â˜… " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
 		}
 
-		//ÁÂÃø Ä«Å×°í¸® ºĞ·ù ±â´É ¸¸µé±â
+		//ì¢Œì¸¡ ì¹´í…Œê³ ë¦¬ ë¶„ë¥˜ ê¸°ëŠ¥ ë§Œë“¤ê¸°
 		for (int i = 0; i < 8; i++)
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
@@ -138,42 +138,42 @@ void Craft::drawGUI()
 
 			std::wstring categoryName = L" ";
 			int categoryIndex = 0;
-			bool deactRect = false; // trueÀÏ °æ¿ì È¸»öÀ¸·Î º¯ÇÔ
+			bool deactRect = false; // trueì¼ ê²½ìš° íšŒìƒ‰ìœ¼ë¡œ ë³€í•¨
 			switch (i)
 			{
-			default://ÀüÃ¼
+			default://ì „ì²´
 				categoryName = sysStr[76];
 				categoryIndex = 36;
 				break;
-			case 0://¹«±â
+			case 0://ë¬´ê¸°
 				categoryName = sysStr[78];
 				categoryIndex = 1;
 				break;
-			case 1://¹æ¾î±¸
+			case 1://ë°©ì–´êµ¬
 				categoryName = sysStr[77];
 				categoryIndex = 50;
 				break;
-			case 2://µµ±¸
+			case 2://ë„êµ¬
 				categoryName = sysStr[83];
 				categoryIndex = 15;
 				break;
-			case 3://¼Ò¸ğÇ°
+			case 3://ì†Œëª¨í’ˆ
 				categoryName = sysStr[81];
 				categoryIndex = 35;
 				break;
-			case 4://Â÷·®
+			case 4://ì°¨ëŸ‰
 				categoryName = sysStr[136];
 				categoryIndex = 48;
 				break;
-			case 5://¹ÙÀÌ¿À´Ğ
+			case 5://ë°”ì´ì˜¤ë‹‰
 				categoryName = sysStr[6];
 				categoryIndex = 47;
 				break;
-			case 6://°ÇÃà¹°
+			case 6://ê±´ì¶•ë¬¼
 				categoryName = sysStr[121];
 				categoryIndex = 20;
 				break;
-			case 7://Àç·á
+			case 7://ì¬ë£Œ
 				categoryName = sysStr[79];
 				categoryIndex = 6;
 				break;
@@ -209,7 +209,7 @@ void Craft::drawGUI()
 		}
 
 
-		//ÁÂÃø ´ëÇüÄ«Å×°í¸® ºĞ¸®¼±(È¸»ö)
+		//ì¢Œì¸¡ ëŒ€í˜•ì¹´í…Œê³ ë¦¬ ë¶„ë¦¬ì„ (íšŒìƒ‰)
 		drawLine(craftBase.x + 169, craftBase.y + 30, craftBase.x + 169, craftBase.y + 399, col::gray);
 
 		drawLine(craftBase.x + 0, craftBase.y + 29, craftBase.x + 15, craftBase.y + 29, col::lightGray);
@@ -233,9 +233,9 @@ void Craft::drawGUI()
 		drawLine(craftBase.x + 157, craftBase.y + 399, craftBase.x + 167, craftBase.y + 399, col::lightGray);
 
 
-		//°Ë»öÃ¢
+		//ê²€ìƒ‰ì°½
 		{
-			//°Ë»ö ÅØ½ºÆ® ÀÔ·ÂÄ­
+			//ê²€ìƒ‰ í…ìŠ¤íŠ¸ ì…ë ¥ì¹¸
 			{
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 				SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -274,7 +274,7 @@ void Craft::drawGUI()
 				}
 			}
 
-			//°Ë»ö ¹öÆ° ±×¸®±â
+			//ê²€ìƒ‰ ë²„íŠ¼ ê·¸ë¦¬ê¸°
 			{
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 				SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -295,9 +295,9 @@ void Craft::drawGUI()
 			}
 		}
 
-		//¼­ºêÄ«Å×°í¸®(¼ÒºĞ·ù) ±×¸®±â
+		//ì„œë¸Œì¹´í…Œê³ ë¦¬(ì†Œë¶„ë¥˜) ê·¸ë¦¬ê¸°
 		{
-			//¼­ºê Ä«Å×°í¸® ºĞ¸®¼±
+			//ì„œë¸Œ ì¹´í…Œê³ ë¦¬ ë¶„ë¦¬ì„ 
 			drawLine(craftBase.x + 170, craftBase.y + 112, craftBase.x + 648, craftBase.y + 112, col::gray);
 
 			auto drawSubcategoryBox = [](std::wstring boxStr, SDL_Rect box, bool pressed, bool deactColorChange)
@@ -339,13 +339,13 @@ void Craft::drawGUI()
 
 			std::vector<std::wstring> subcategoryList;
 			itemCategory targetCategory;
-			//¼ÒºĞ·ù(¼­ºêÄ«Å×°í¸®)
+			//ì†Œë¶„ë¥˜(ì„œë¸Œì¹´í…Œê³ ë¦¬)
 			switch (selectCategory)
 			{
-			default://ÀüÃ¼
-				drawSubcategoryBox(L"ÀüÃ¼", subcategoryBox[0], true, deactColorChange);
+			default://ì „ì²´
+				drawSubcategoryBox(L"ì „ì²´", subcategoryBox[0], true, deactColorChange);
 				break;
-			case -2://Áñ°ÜÃ£±â
+			case -2://ì¦ê²¨ì°¾ê¸°
 				drawSubcategoryBox(L"1", subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(L"2", subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(L"3", subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -353,14 +353,14 @@ void Craft::drawGUI()
 				drawSubcategoryBox(L"5", subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				drawSubcategoryBox(L"6", subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
-			case 0://¹«±â
+			case 0://ë¬´ê¸°
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_piercing), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_cutting), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_bashing), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_shooting), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_throwing), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
-			case 1://¹æ¾î±¸
+			case 1://ë°©ì–´êµ¬
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_hat), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_gloves), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -368,7 +368,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_accessory), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
-			case 2://µµ±¸
+			case 2://ë„êµ¬
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_hand), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_power), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_container), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -377,7 +377,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_etc), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
-			case 3://¼Ò¸ğÇ°
+			case 3://ì†Œëª¨í’ˆ
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_food), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -386,7 +386,7 @@ void Craft::drawGUI()
 				break;
 
 
-			case 4://Â÷·®
+			case 4://ì°¨ëŸ‰
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_frame), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_engine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_exterior), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -395,7 +395,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_device), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
-			case 5://¹ÙÀÌ¿À´Ğ
+			case 5://ë°”ì´ì˜¤ë‹‰
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_core), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_active), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_passive), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -404,7 +404,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_storage), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
-			case 6://±¸Á¶¹°
+			case 6://êµ¬ì¡°ë¬¼
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -413,7 +413,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_pneumatic), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
-			case 7://Àç·á
+			case 7://ì¬ë£Œ
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_chemical), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_biological), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_mechanical), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -425,7 +425,7 @@ void Craft::drawGUI()
 			}
 		}
 
-		//°¡´ÉÇÑ Á¶ÇÕ ¾ÆÀÌÅÛµé ±×¸®±â
+		//ê°€ëŠ¥í•œ ì¡°í•© ì•„ì´í…œë“¤ ê·¸ë¦¬ê¸°
 		//for (int i = 0; i < 12; i++)
 		//{
 		//	if (i + 2 * craftScroll < recipePtr->itemInfo.size())
@@ -535,13 +535,13 @@ void Craft::drawGUI()
 			}
 		}
 
-		if (numNoneBlackFilter == 0) // ¸¸¾à ¾ÆÀÌÅÛÀÌ ¾øÀ» °æ¿ì
+		if (numNoneBlackFilter == 0) // ë§Œì•½ ì•„ì´í…œì´ ì—†ì„ ê²½ìš°
 		{
 			setFontSize(13);
 			drawTextCenter(col2Str(col::white) + sysStr[127], craftBase.x + craftBase.w / 2 + 90, craftBase.y + craftBase.h / 2 + 40);
 		}
 
-		// ½ºÅ©·Ñ ±×¸®±â
+		// ìŠ¤í¬ë¡¤ ê·¸ë¦¬ê¸°
 		{
 			SDL_Rect craftScrollBox = { craftBase.x + craftBase.w - 18, craftBase.y + 36 + 95 - 6, 2, 252 };
 			drawFillRect(craftScrollBox, { 120,120,120 });
@@ -559,11 +559,11 @@ void Craft::drawGUI()
 		drawText(col2Str(col::white) + whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 382);
 
 
-		//¾ÆÀÌÅÛ µğÅ×ÀÏ¹Ú½º(ÅøÆÁ) ±×¸®±â
+		//ì•„ì´í…œ ë””í…Œì¼ë°•ìŠ¤(íˆ´íŒ) ê·¸ë¦¬ê¸°
 		if (aniUSet.find(this) == aniUSet.end() && (pointingCursor >= 0 || craftCursor >= 0))
 		{
 			ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-			bool canCraft = true; //ÇöÀç ÇÃ·¹ÀÌ¾îÀÇ »óÅÂ·Î Á¶ÇÕÀÌ °¡´ÉÇÑÁö Ã¼Å©ÇÔ 
+			bool canCraft = true; //í˜„ì¬ í”Œë ˆì´ì–´ì˜ ìƒíƒœë¡œ ì¡°í•©ì´ ê°€ëŠ¥í•œì§€ ì²´í¬í•¨ 
 			int targetCursor;
 			if (pointingCursor >= 0) targetCursor = pointingCursor + 6*craftScroll;
 			else targetCursor = craftCursor;
@@ -573,7 +573,7 @@ void Craft::drawGUI()
 
 				drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 210, 5);
 
-				//¾ÆÀÌÅÛ ¾ÆÀÌÄÜ ±×¸®±â
+				//ì•„ì´í…œ ì•„ì´ì½˜ ê·¸ë¦¬ê¸°
 				SDL_Rect iconBox = { topWindow.x + 36 - 24,topWindow.y + 36 - 24,48,48 };
 				drawWindow(&iconBox);
 				setZoom(3.0);
@@ -587,20 +587,20 @@ void Craft::drawGUI()
 
 				drawText(col2Str(col::lightGray) + categoryStr, topWindow.x + 68, topWindow.y + 10 + 18);
 
-				std::wstring weightStr = L"¹«°Ô : ";
+				std::wstring weightStr = L"ë¬´ê²Œ : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
 				weightStr += L"KG";
 				drawText(col2Str(col::white) + weightStr, topWindow.x + 68, topWindow.y + 10 + 34);
 
-				std::wstring volumeStr = L"ºÎÇÇ : ";
+				std::wstring volumeStr = L"ë¶€í”¼ : ";
 				volumeStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].volume)) / 1000.0, 3);
 				volumeStr += L"L";
 				drawText(col2Str(col::white) + volumeStr, topWindow.x + 168, topWindow.y + 10 + 34);
 
 				std::wstring tooltipText;
 
-				//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ ÇÃ·¹ÀÌ¾î Àç´É
-				std::wstring proficStr = col2Str(col::gray) + L"ÇÊ¿ä ±â¼ú : ";
+				//ì¡°í•©ì— í•„ìš”í•œ í”Œë ˆì´ì–´ ì¬ëŠ¥
+				std::wstring proficStr = col2Str(col::gray) + L"í•„ìš” ê¸°ìˆ  : ";
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeProficNeed.size(); i++)
 				{
 					int needLevel = recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second;
@@ -615,15 +615,15 @@ void Craft::drawGUI()
 					proficStr += profic2String(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
 					proficStr += L" ";
 					proficStr += std::to_wstring(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second);
-					proficStr += L"·¹º§";
+					proficStr += L"ë ˆë²¨";
 					if (i != recipePtr->itemInfo[targetCursor].recipeProficNeed.size() - 1) proficStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + L"¾øÀ½";
+				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + L"ì—†ìŒ";
 
 				tooltipText += proficStr + L"\n";
 
-				//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ ±â¼ú(Åø Ä÷¸®Æ¼)
-				std::wstring qualityStr = col2Str(col::gray) + L"ÇÊ¿ä µµ±¸±â¼ú : ";
+				//ì¡°í•©ì— í•„ìš”í•œ ê¸°ìˆ (íˆ´ í€„ë¦¬í‹°)
+				std::wstring qualityStr = col2Str(col::gray) + L"í•„ìš” ë„êµ¬ê¸°ìˆ  : ";
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeQualityNeed.size(); i++)
 				{
 					if (equipPtr->checkToolQuality(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]))
@@ -639,14 +639,14 @@ void Craft::drawGUI()
 					qualityStr += toolQuality2String(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]);
 					if (i != recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() - 1) qualityStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + L"¾øÀ½";
+				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + L"ì—†ìŒ";
 				tooltipText += qualityStr + L"\n";
 
-				//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ Àç·á
-				std::wstring materialStr = col2Str(col::gray) + L"ÇÊ¿ä Àç·á : ";
+				//ì¡°í•©ì— í•„ìš”í•œ ì¬ë£Œ
+				std::wstring materialStr = col2Str(col::gray) + L"í•„ìš” ì¬ë£Œ : ";
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipe.size(); i++)
 				{
-					//Åø Ä÷¸®Æ¼¿¡ µû¶ó Àû»ö, ³ì»ö º¯È­
+					//íˆ´ í€„ë¦¬í‹°ì— ë”°ë¼ ì ìƒ‰, ë…¹ìƒ‰ ë³€í™”
 					int playerNumber = equipPtr->numberItem(recipePtr->itemInfo[targetCursor].recipe[i].first);
 					int needNumber = recipePtr->itemInfo[targetCursor].recipe[i].second;
 					if (playerNumber >= needNumber) materialStr += col2Str(lowCol::green);
@@ -659,16 +659,16 @@ void Craft::drawGUI()
 
 					materialStr += itemDex[recipePtr->itemInfo[targetCursor].recipe[i].first].name;
 					materialStr += L"(";
-					materialStr += std::to_wstring(playerNumber);//ÇÃ·¹ÀÌ¾î°¡ ¼ÒÀ¯ÇÑ °¹¼ö
+					materialStr += std::to_wstring(playerNumber);//í”Œë ˆì´ì–´ê°€ ì†Œìœ í•œ ê°¯ìˆ˜
 					materialStr += L"/";
-					materialStr += std::to_wstring(needNumber);//Á¶ÇÕ¿¡ ÇÊ¿äÇÑ ¾ÆÀÌÅÛ °¹¼ö
+					materialStr += std::to_wstring(needNumber);//ì¡°í•©ì— í•„ìš”í•œ ì•„ì´í…œ ê°¯ìˆ˜
 					materialStr += L")";
 					if (i != recipePtr->itemInfo[targetCursor].recipe.size() - 1) materialStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + L"¾øÀ½";
+				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + L"ì—†ìŒ";
 				tooltipText += materialStr + L"\n";
 
-				//¾ÆÀÌÅÛ ¼³¸í
+				//ì•„ì´í…œ ì„¤ëª…
 				tooltipText += col2Str(col::white);
 				tooltipText += itemTooltip[recipePtr->itemInfo[targetCursor].tooltipIndex];
 
@@ -676,7 +676,7 @@ void Craft::drawGUI()
 				if (!tooltipUnfold) drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12, 6);
 				else drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12);
 
-				//Á¢±â-ÆîÄ¡±â ¹öÆ°
+				//ì ‘ê¸°-í¼ì¹˜ê¸° ë²„íŠ¼
 				{
 					SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 					SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -686,18 +686,18 @@ void Craft::drawGUI()
 						else { btnColor = lowCol::blue; }
 						outlineColor = { 0xa6, 0xa6, 0xa6 };
 					}
-					//±âº» »ç°¢Çü 
+					//ê¸°ë³¸ ì‚¬ê°í˜• 
 					drawFillRect(unfoldBtn, btnColor, 180);
-					//È¸»ö Å×µÎ¸®
+					//íšŒìƒ‰ í…Œë‘ë¦¬
 					drawRect(unfoldBtn, outlineColor);
-					//¾ÆÀÌÄÜ
+					//ì•„ì´ì½˜
 					if (tooltipUnfold == false) drawSpriteCenter(spr::icon16, 38, unfoldBtn.x + 14, unfoldBtn.y + unfoldBtn.h / 2);
 					else drawSpriteCenter(spr::icon16, 39, unfoldBtn.x + 14, unfoldBtn.y + unfoldBtn.h / 2);
 
 				}
 
 
-				//Á¶ÇÕÇÏ±â ¹öÆ°
+				//ì¡°í•©í•˜ê¸° ë²„íŠ¼
 				{
 
 					SDL_Color btnColor = { 0x00, 0x00, 0x00 };
@@ -709,19 +709,19 @@ void Craft::drawGUI()
 						outlineColor = { 0xa6, 0xa6, 0xa6 };
 					}
 					drawFillRect(tooltipCraftBtn, btnColor, 180);
-					//È¸»ö Å×µÎ¸®
+					//íšŒìƒ‰ í…Œë‘ë¦¬
 					drawRect(tooltipCraftBtn, outlineColor);
 					setFontSize(13);
 
-					drawTextCenter(col2Str(col::white) + L"Á¶ÇÕÇÏ±â", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);
+					drawTextCenter(col2Str(col::white) + L"ì¡°í•©í•˜ê¸°", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);
 					setFontSize(9);
-					drawTextCenter(col2Str(col::white) + L"1½Ã°£ 3ºĞ", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
+					drawTextCenter(col2Str(col::white) + L"1ì‹œê°„ 3ë¶„", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
 					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 14, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
 
 					if (canCraft == false) drawFillRect(tooltipCraftBtn, col::black, 100);
 				}
 
-				//Áñ°ÜÃ£±â ¹öÆ°
+				//ì¦ê²¨ì°¾ê¸° ë²„íŠ¼
 				{
 					SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 					SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -732,7 +732,7 @@ void Craft::drawGUI()
 						outlineColor = { 0xa6, 0xa6, 0xa6 };
 					}
 					drawFillRect(tooltipBookmarkBtn, btnColor, 180);
-					//È¸»ö Å×µÎ¸®
+					//íšŒìƒ‰ í…Œë‘ë¦¬
 					drawRect(tooltipBookmarkBtn, outlineColor);
 
 					int bookmarkSprIndex;
@@ -746,7 +746,7 @@ void Craft::drawGUI()
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
 					setFontSize(13);
-					drawTextCenter(col2Str(textColor) + L"Áñ°ÜÃ£±â", tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2);
+					drawTextCenter(col2Str(textColor) + L"ì¦ê²¨ì°¾ê¸°", tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2);
 					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 14, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 
 					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1));
@@ -763,7 +763,7 @@ void Craft::drawGUI()
 			}
 		}
 	}
-	else //Æúµå ¾Ö´Ï¸ŞÀÌ¼Ç ½ÇÇà ÁßÀÇ Draw
+	else //í´ë“œ ì• ë‹ˆë©”ì´ì…˜ ì‹¤í–‰ ì¤‘ì˜ Draw
 	{
 		SDL_Rect vRect = craftBase;
 		int type = 1;

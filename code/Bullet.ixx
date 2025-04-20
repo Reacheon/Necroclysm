@@ -1,4 +1,4 @@
-#include <SDL.h>
+ï»¿#include <SDL.h>
 
 export module Bullet;
 
@@ -23,7 +23,7 @@ public:
     {
         list.push_back(this);
         setXY(inputX, inputY);
-        if (list.size() > 500) prt(L"[¸Þ¸ð¸® ´©¼ö °æ°í] BulletÀÇ °´Ã¼ ¼ö°¡ 500°³¸¦ ³Ñ¾î°¬½À´Ï´Ù.\n");
+        if (list.size() > 500) prt(L"[ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ê²½ê³ ] Bulletì˜ ê°ì²´ ìˆ˜ê°€ 500ê°œë¥¼ ë„˜ì–´ê°”ìŠµë‹ˆë‹¤.\n");
     }
     ~Bullet()
     {
