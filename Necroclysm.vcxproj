@@ -312,6 +312,7 @@
     <ClCompile Include="code\World.ixx" />
     <ClCompile Include="code\wrapVar.ixx" />
     <ClCompile Include="code\wstring2Number.ixx" />
+    <ClCompile Include="ItemStack.cpp" />
     <ClCompile Include="Vehicle_runAI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

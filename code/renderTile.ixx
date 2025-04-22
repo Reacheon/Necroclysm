@@ -119,7 +119,7 @@ __int64 analyseRender()
 			//아이템
 			if (thisTile->fov == fovFlag::white)
 			{
-				if ((World::ins())->getTile(tgtX, tgtY, pZ).ItemStackPtr != nullptr) itemList.push_back({ tgtX,tgtY });
+				if (TileItemStack(tgtX, tgtY, pZ) != nullptr) itemList.push_back({ tgtX,tgtY });
 			}
 			//바닥프롭
 			Prop* fpPtr = (Prop*)thisTile->PropPtr;
@@ -436,7 +436,7 @@ __int64 drawItems()
 		int tgtX = elem.x;
 		int tgtY = elem.y;
 
-		ItemStack* address = (ItemStack*)World::ins()->getTile(tgtX, tgtY, pZ).ItemStackPtr;
+		ItemStack* address = TileItemStack(tgtX, tgtY, pZ);
 
 		int itemSprIndex = 0;
 		if (address->getTargetSprIndex() != 0) itemSprIndex = address->getTargetSprIndex();
@@ -467,7 +467,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Prop* iPtr = (Prop*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->PropPtr;
+		Prop* iPtr = TileProp(tgtX, tgtY, PlayerZ());
 		int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::PROP_BIG));
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -570,7 +570,7 @@ __int64 drawEntities()
 	{
 		int tgtX = rotorList[i][0];
 		int tgtY = rotorList[i][1];
-		Vehicle* vPtr = (Vehicle*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->VehiclePtr;
+		Vehicle* vPtr = TileVehicle(tgtX, tgtY, PlayerZ());
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -579,7 +579,7 @@ __int64 drawEntities()
 		dst.h = tileSize;
 
 		setZoom(zoomScale);
-		if ((&World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()))->VehiclePtr == vPtr)
+		if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == vPtr)
 		{
 			SDL_SetTextureAlphaMod(spr::mainRotor->getTexture(), 50); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(spr::mainRotor->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정

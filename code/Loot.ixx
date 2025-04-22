@@ -285,7 +285,7 @@ public:
 		{
 			close(aniFlag::null);
 			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
-			delete World::ins()->getTile(lootTile.x, lootTile.y, PlayerZ()).ItemStackPtr;
+			delete TileItemStack(lootTile.x, lootTile.y, PlayerZ());
 			return;
 		}
 	}

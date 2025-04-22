@@ -78,7 +78,7 @@ void HUD::clickUpGUI()
 		{
 			for (int j = playerY - DARK_VISION_HALF_H; j <= playerY + DARK_VISION_HALF_H; j++)
 			{
-				if (World::ins()->getTile(i, j, playerZ).fov == fovFlag::white)
+				if (TileFov(i, j, playerZ) == fovFlag::white)
 				{
 					//없는 타일이거나 플레이어 개체는 제외함
 					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != Player::ins())

@@ -260,7 +260,7 @@ public:
 					else//선택좌표가 없으면 그냥 시야가 흰색이면 선택 OK
 					{
 
-						if (World::ins()->getTile(throwingX, throwingY, throwingZ).fov == fovFlag::white)
+						if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 						{
 							if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
 							{

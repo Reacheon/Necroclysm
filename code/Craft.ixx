@@ -703,7 +703,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).VehiclePtr == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
+						if (TileVehicle(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 					}
 
 					if (selectableTile.size() > 0)
@@ -737,7 +737,7 @@ public:
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
 						//차량부품이므로 이미 있는 프레임 위에 건설되어야 함
-						Vehicle* targetVehicle = (Vehicle*)(World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).VehiclePtr);
+						Vehicle* targetVehicle = TileVehicle(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 						if (targetVehicle != nullptr)
 						{
 							if (targetVehicle->hasFrame(PlayerX() + dx, PlayerY() + dy))
@@ -887,7 +887,7 @@ public:
 					for (int y = PlayerY() - 1; y <= PlayerY() + 1; y++)
 					{
 						if (!(x == PlayerX() && y == PlayerY()))
-							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
+							if (TileFov(x, y, PlayerZ()) == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									new Msg(msgFlag::normal, L"경고", L"주변에 적이 있습니다. 계속 조합하시겠습니까?", { L"네",L"아니오",L"무시하기" });
@@ -947,7 +947,7 @@ public:
 					if (dir % 2 == 1) continue; //대각선 비허용
 					int dx, dy;
 					dir2Coord(dir, dx, dy);
-					Vehicle* targetCoordPtr = (Vehicle*)World::ins()->getTile(buildLocation[0] + dx, buildLocation[1] + dy, buildLocation[2]).VehiclePtr;
+					Vehicle* targetCoordPtr = TileVehicle(buildLocation[0] + dx, buildLocation[1] + dy, buildLocation[2]);
 					if (targetCoordPtr != nullptr)
 					{
 						if (std::find(canConnect.begin(), canConnect.end(), targetCoordPtr) == canConnect.end())
@@ -1000,7 +1000,7 @@ public:
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::VPART))
 			{
-				Vehicle* targetVehicle = (Vehicle*)(World::ins()->getTile(buildLocation[0], buildLocation[1], buildLocation[2]).VehiclePtr);
+				Vehicle* targetVehicle = TileVehicle(buildLocation[0], buildLocation[1], buildLocation[2]);
 				errorBox(targetVehicle == nullptr, "targetVehicle is nullptr in Craft.ixx");
 				errorBox(!targetVehicle->hasFrame(buildLocation[0], buildLocation[1]), "first part doesn't have VFRAME flag");
 				targetVehicle->addPart(buildLocation[0], buildLocation[1], targetItemCode);

@@ -182,7 +182,7 @@ export void debugConsole()
 		prt(L"생성할 벽의 z 좌표를 입력하세요.\n");
 		std::cin >> wallZ;
 		prt(L"[디버그](%d,%d,%d) 위치에 벽을 생성했다!\n", xp + wallX, yp + wallY, zp + wallZ);
-		World::ins()->getTile(xp + wallX, yp + wallY, zp + wallZ).wall = true;
+		setWall({ xp + wallX, yp + wallY, zp + wallZ }, 1);
 		break;
 	}
 	case 8:
@@ -283,8 +283,8 @@ export void debugConsole()
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (World::ins()->getTile(x, y, zp).fov == fovFlag::white) prt(L"○");
-				else if (World::ins()->getTile(x, y, zp).fov == fovFlag::gray) prt(L"◎");
+				if (TileFov(x, y, zp) == fovFlag::white) prt(L"○");
+				else if (TileFov(x, y, zp) == fovFlag::gray) prt(L"◎");
 				else prt(L"●");
 			}
 			prt(L"\n");
@@ -372,9 +372,9 @@ export void debugConsole()
 		prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
 		std::cin >> tgtGridZ;
 
-		World::ins()->getTile(px, py, pz).EntityPtr = nullptr;
+		TileEntity(px, py, pz) = nullptr;
 		Player::ins()->setGrid(tgtGridX, tgtGridY, tgtGridZ);
-		World::ins()->getTile(tgtGridX, tgtGridY, tgtGridZ).EntityPtr = (Entity*)Player::ins();
+		TileEntity(tgtGridX, tgtGridY, tgtGridZ) = (Entity*)Player::ins();
 		break;
 	}
 	case 25://청크라인 그리기

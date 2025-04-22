@@ -30,9 +30,13 @@ export inline void setFloor(Point3 coord, int val)
     World::ins()->getTile(coord.x, coord.y, coord.z).setFloor(val);
 };
 
-
 export inline Entity*& TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
 export inline Prop*& TileProp(int x, int y, int z) { return (Prop*&)World::ins()->getTile(x, y, z).PropPtr; }
+export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
+export inline ItemStack*& TileItemStack(int x, int y, int z) { return (ItemStack*&)World::ins()->getTile(x, y, z).ItemStackPtr; }
+export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
+
+
 export inline void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
 
 export inline bool isWalkable(Point3 coord)

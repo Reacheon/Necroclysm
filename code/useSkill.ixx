@@ -35,7 +35,7 @@ export Corouter useSkill(int skillCode)
 		{
 			for (int tgtX = -SKILL_MAX_RANGE; tgtX <= SKILL_MAX_RANGE; tgtX++)
 			{
-				if (World::ins()->getTile(PlayerX() + tgtX, PlayerY() + tgtY, PlayerZ()).fov == fovFlag::white)
+				if (TileFov(PlayerX() + tgtX, PlayerY() + tgtY, PlayerZ()) == fovFlag::white)
 				{
 					coordList.push_back({ PlayerX() + tgtX, PlayerY() + tgtY });
 

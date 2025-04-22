@@ -19,7 +19,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
-	(World::ins())->getTile(0, 0, 0).EntityPtr = this;
+	TileEntity(0, 0, 0) = this;
 
 	entityInfo.skin = humanCustom::skin::yellow;
 	entityInfo.eyes = humanCustom::eyes::blue;
@@ -364,7 +364,7 @@ int Player::checkItemSur(int index)//주변에 있는 타일을 포함해 아이
 	//주변 9타일의 아이템스택 검사
 	for (int i = 0; i < 9; i++)
 	{
-		ItemStack* ptr = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
+		ItemStack* ptr = TileItemStack(getGridX(), getGridY(), getGridZ());
 	}
 	//자기 자신의 장비 검사 
 	{

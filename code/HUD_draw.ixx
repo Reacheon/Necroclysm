@@ -1008,7 +1008,7 @@ void HUD::drawVehiclePartInfo()
 
 		if (tgtGrid.x > PlayerX() - tileW / 2 - 1 && tgtGrid.x < PlayerX() + tileW / 2 + 1 && tgtGrid.y > PlayerY() - tileH / 2 - 1 && tgtGrid.y < PlayerY() + tileH / 2 + 1)
 		{
-			Vehicle* vehPtr = (Vehicle*)World::ins()->getTile(tgtGrid.x, tgtGrid.y, PlayerZ()).VehiclePtr;
+			Vehicle* vehPtr = TileVehicle(tgtGrid.x, tgtGrid.y, PlayerZ());
 			if (vehPtr != nullptr)
 			{
 				int pivotX = cameraW - 200;

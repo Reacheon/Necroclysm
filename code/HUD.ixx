@@ -590,16 +590,16 @@ public:
 			if (touchX == PlayerX() && touchY == PlayerY()) //자신 위치 터치
 			{
 
-				if (World::ins()->getTile(touchX, touchY, PlayerZ()).ItemStackPtr != nullptr)
+				if (TileItemStack(touchX, touchY, PlayerZ()) != nullptr)
 				{
 					prt(L"루팅창 오픈 함수 실행\n");
-					ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).ItemStackPtr;
+					ItemStack* targetStack = TileItemStack(PlayerX(), PlayerY(), PlayerZ());
 					new Loot(targetStack);
 					click = false;
 				}
-				else if (World::ins()->getTile(touchX, touchY, PlayerZ()).VehiclePtr != nullptr)
+				else if (TileVehicle(touchX, touchY, PlayerZ()) != nullptr)
 				{
-					Vehicle* belowVehicle = (Vehicle*)World::ins()->getTile(touchX, touchY, PlayerZ()).VehiclePtr;
+					Vehicle* belowVehicle = TileVehicle(touchX, touchY, PlayerZ());
 					bool findController = false;
 					prt(L"below prop의 사이즈는 %d이다.\n", belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size());
 					for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size(); i++)
@@ -681,9 +681,9 @@ public:
 							else
 							{
 								updateLog(L"#FFFFFF계단을 올라갔다.");
-								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
+								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = nullptr;
 								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
-								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
+								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = Player::ins();
 								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
@@ -703,9 +703,9 @@ public:
 							else
 							{
 								updateLog(L"#FFFFFF계단을 내려갔다.");
-								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = nullptr;
+								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = nullptr;
 								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
-								(World::ins())->getTile(PlayerX(), PlayerY(), PlayerZ()).EntityPtr = Player::ins();
+								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = Player::ins();
 								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
 								Player::ins()->updateMinimap();
 
@@ -802,7 +802,7 @@ public:
 						new God(godFlag::ra);
 					}
 				}
-				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && ((Entity*)(World::ins()->getTile(touchX, touchY, PlayerZ()).EntityPtr))->entityInfo.relation == relationFlag::friendly)
+				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
 				{
 					new Dialogue();
 
@@ -939,9 +939,9 @@ public:
 		}
 
 		//열기 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
+			Vehicle* vPtr = TileVehicle(targetGrid.x, targetGrid.y, PlayerZ());
 
 			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
 			{
@@ -954,7 +954,7 @@ public:
 		}
 
 		//당기기 추가
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			inputOptions.push_back(act::pull);
 		}
@@ -992,9 +992,9 @@ public:
 			inputOptions.push_back(act::ride);
 		}
 
-		if (World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(targetGrid.x, targetGrid.y, PlayerZ()).VehiclePtr;
+			Vehicle* vPtr = TileVehicle(targetGrid.x, targetGrid.y, PlayerZ());
 			if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size()>0)
 			{
 				inputOptions.push_back(act::vehicleRepair);

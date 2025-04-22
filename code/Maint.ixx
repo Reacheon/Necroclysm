@@ -144,7 +144,7 @@ public:
 	{
 		if (getStateDraw() == false) return;
 
-		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
 		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
 		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
@@ -263,7 +263,7 @@ public:
 	void clickHoldGUI() {}
 	void mouseWheel() 
 	{
-		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
 
 		if (checkCursor(&maintBase))
@@ -277,7 +277,7 @@ public:
 	void gamepadBtnUp() {}
 	void step() 
 	{
-		Vehicle* vPtr = (Vehicle*)World::ins()->getTile(maintCoor.x, maintCoor.y, maintCoor.z).VehiclePtr;
+		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
 
 		if (items.empty() || items.size() <= MAX_BTN) maintScroll = 0;

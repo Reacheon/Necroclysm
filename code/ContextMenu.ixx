@@ -274,9 +274,9 @@ public:
 		}
 		else if (inputAct == act::unbox)
 		{
-			if (World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr != nullptr)
+			if (TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
 			{
-				Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+				Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 				for (int i = 0; i < vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo.size(); i++)
 				{
 					if (vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
@@ -291,7 +291,7 @@ public:
 		{
 			if (Player::ins()->pulledCart == nullptr)
 			{
-				Player::ins()->pulledCart = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+				Player::ins()->pulledCart = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 			}
 			else
 			{
@@ -301,12 +301,12 @@ public:
 		else if (inputAct == act::ride)
 		{
 			Player::ins()->ridingEntity = TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).EntityPtr = nullptr;
+			TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) = nullptr;
 			Player::ins()->ridingType = ridingFlag::horse;
 		}
 		else if (inputAct == act::vehicleRepair)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+			Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 			std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
 			std::vector<std::wstring> partNames;
 			for (int i = 0; i < vParts.size(); i++)
@@ -319,7 +319,7 @@ public:
 		}
 		else if (inputAct == act::vehicleDetach)
 		{
-			Vehicle* vPtr = (Vehicle*)World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).VehiclePtr;
+			Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 			std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
 			std::vector<std::wstring> partNames;
 			for (int i = 0; i < vParts.size(); i++)

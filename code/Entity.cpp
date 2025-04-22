@@ -32,7 +32,7 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
-	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = this;
+	TileEntity(getGridX(), getGridY(), getGridZ()) = this;
 	updateSpriteFlash();
 	entityInfo.equipment = new ItemPocket(storageType::equip);
 	entityInfo.proficFocus[0] = 1;
@@ -43,7 +43,7 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 }
 Entity::~Entity()//소멸자
 {
-	World::ins()->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
+	TileEntity(getGridX(), getGridY(), getGridZ()) = nullptr;
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
 	delete entityInfo.equipment;
@@ -310,13 +310,13 @@ void Entity::move(int dir, bool jump)
 	int dstGridX = (dstX - 8) / 16;
 	int dstGridY = (dstY - 8) / 16;
 
-	(World::ins())->getTile(dstGridX, dstGridY, getGridZ()).EntityPtr = this;
-	(World::ins())->getTile(getGridX(), getGridY(), getGridZ()).EntityPtr = nullptr;
+	TileEntity(dstGridX, dstGridY, getGridZ()) = this;
+	TileEntity(getGridX(), getGridY(), getGridZ()) = nullptr;
 
 	if (pulledCart != nullptr)
 	{
-		(World::ins())->getTile(pulledCart->getGridX(), pulledCart->getGridY(), getGridZ()).VehiclePtr = nullptr;
-		(World::ins())->getTile(getGridX(), getGridY(), getGridZ()).VehiclePtr = pulledCart;
+		TileVehicle(pulledCart->getGridX(), pulledCart->getGridY(), getGridZ()) = nullptr;
+		TileVehicle(getGridX(), getGridY(), getGridZ()) = pulledCart;
 	}
 
 	if (jump == false)
@@ -391,7 +391,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 	int delx = abs(x2 - x1);
 	int dely = abs(y2 - y1);
 	int i = 0;
-	World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+	TileFov(x1, y1, getGridZ()) = fovFlag::white;
 	double slope = fabs(1.0 * dely / delx);
 	if (slope < 1)
 	{
@@ -404,7 +404,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; }
 				else if (xo > x2 && y2 > yo) { x1--; }
 				else { x1--; }
-				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely);
 			}
@@ -414,7 +414,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
@@ -433,7 +433,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { y1--; }
 				else if (xo > x2 && y2 > yo) { y1++; }
 				else { y1--; }
-				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx);
 			}
@@ -443,7 +443,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
@@ -458,7 +458,7 @@ void Entity::rayCasting(int x1, int y1, int x2, int y2)
 			else if (x2 > x1 && y1 > y2) { x1++; y1--; }
 			else if (x1 > x2 && y2 > y1) { x1--; y1++; }
 			else { x1--; y1--; }
-			World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+			TileFov(x1, y1, getGridZ()) = fovFlag::white;
 			if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 			i++;
 		}
@@ -471,7 +471,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 	int delx = abs(x2 - x1);
 	int dely = abs(y2 - y1);
 	int i = 0;
-	World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+	TileFov(x1, y1, getGridZ()) = fovFlag::white;
 	double slope = fabs(1.0 * dely / delx);
 	if (slope < 1)
 	{
@@ -486,7 +486,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else { x1--; }
 				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
 				{
-					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely);
@@ -499,7 +499,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else { x1--; y1--; }
 				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
 				{
-					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely) - (2 * delx);
@@ -521,7 +521,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else { y1--; }
 				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
 				{
-					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx);
@@ -534,7 +534,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else { x1--; y1--; }
 				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
 				{
-					World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx) - (2 * dely);
@@ -552,7 +552,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 			else { x1--; y1--; }
 			if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
 			{
-				World::ins()->getTile(x1, y1, getGridZ()).fov = fovFlag::white;
+				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 			}
 			if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 			i++;
@@ -585,7 +585,7 @@ void Entity::drop(ItemPocket* txPtr)
 	ItemStack* targetStack;
 	//아이템 스택이 이미 있는 경우와 없는 경우
 
-	if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr == nullptr) //그 자리에 템 없는 경우
+	if (TileItemStack(getGridX(), getGridY(), getGridZ()) == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		targetStack = new ItemStack(getGridX(), getGridY(), getGridZ());
@@ -595,7 +595,7 @@ void Entity::drop(ItemPocket* txPtr)
 	else //이미 그 자리에 아이템이 있는 경우
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
-		targetStack = (ItemStack*)World::ins()->getTile(getGridX(), getGridY(), getGridZ()).ItemStackPtr;
+		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
 
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
 
@@ -613,7 +613,7 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	ItemStack* targetStack;
 	//아이템 스택이 이미 있는 경우와 없는 경우
 
-	if (World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr == nullptr) //그 자리에 템 없는 경우
+	if (TileItemStack(gridX, gridY, getGridZ()) == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		targetStack = new ItemStack(gridX, gridY, getGridZ());
@@ -623,7 +623,7 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	else //이미 그 자리에 아이템이 있는 경우
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
-		targetStack = (ItemStack*)World::ins()->getTile(gridX, gridY, getGridZ()).ItemStackPtr;
+		targetStack = TileItemStack(gridX, gridY, getGridZ());
 
 		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);

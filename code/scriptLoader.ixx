@@ -16,5 +16,5 @@ export void scriptLoader()
 
     lua["isWalkableTile"] = [](int x, int y, int z)->bool { return isWalkable({ x,y,z }); };
     lua["coord2Dir"] = [](int dx, int dy)->int { return coord2Dir(dx, dy); };
-    lua["noFogTile"] = [](int x, int y, int z)->bool { return World::ins()->getTile(x, y, z).fov == fovFlag::white; };
+    lua["noFogTile"] = [](int x, int y, int z)->bool { return TileFov(x, y, z) == fovFlag::white; };
 };

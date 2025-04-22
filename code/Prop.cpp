@@ -30,7 +30,7 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
     setGrid(inputX, inputY, inputZ);
 
     errorBox(TileProp(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
-    World::ins()->getTile(inputX, inputY, inputZ).PropPtr = this;
+    TileProp(inputX, inputY, inputZ) = this;
 
     if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
     {

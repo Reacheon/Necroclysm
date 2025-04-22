@@ -47,7 +47,8 @@ export namespace actFunc
 			{
 				int dx = 0, dy = 0;
 				dir2Coord(dir, dx, dy);
-				ItemStack* stack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
+				
+				ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				if (stack != nullptr)
 				{
 					ItemPocket* lootPtr = stack->getPocket();
@@ -127,7 +128,7 @@ export namespace actFunc
 			{
 				int dx = 0, dy = 0;
 				dir2Coord(dir, dx, dy);
-				ItemStack* stack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
+				ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				if (stack != nullptr)
 				{
 					ItemPocket* lootPtr = stack->getPocket();

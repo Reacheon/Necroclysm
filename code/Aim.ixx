@@ -6,6 +6,7 @@ import std;
 import util;
 import GUI;
 import textureVar;
+import wrapVar;
 import drawText;
 import drawSprite;
 import globalVar;
@@ -63,7 +64,7 @@ public:
 		{
 			for (int dy = -searchRange; dy <= searchRange; dy++)
 			{
-				if (World::ins()->getTile(pX + dx, pY + dy, pZ).fov == fovFlag::white)
+				if (TileFov(pX + dx, pY + dy, pZ) == fovFlag::white)
 				{
 					if (TileEntity(pX + dx, pY + dy, pZ) != nullptr)
 					{

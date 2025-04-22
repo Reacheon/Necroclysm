@@ -675,7 +675,7 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(i, dx, dy);
-			if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr != nullptr)
+			if (TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
 			{
 				rootPathPocket->itemInfo.push_back(itemDex[86]);
 				switch (i)
@@ -708,7 +708,7 @@ public:
 					rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].name = L"타일(↘)";
 					break;
 				}
-				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
+				ItemStack* targetStack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				rootPathPocket->itemInfo[rootPathPocket->itemInfo.size() - 1].pocketPtr = targetStack->getPocket();
 			}
 		}
@@ -732,9 +732,9 @@ public:
 		{
 			int dx, dy;
 			dir2Coord(i, dx, dy);
-			if (World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr != nullptr)
+			if (TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
 			{
-				ItemStack* targetStack = (ItemStack*)World::ins()->getTile(PlayerX() + dx, PlayerY() + dy, PlayerZ()).ItemStackPtr;
+				ItemStack* targetStack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				ItemPocket* targetPocket = targetStack->getPocket();
 				for (int j = 0; j < targetPocket->itemInfo.size(); j++)
 				{
@@ -896,7 +896,7 @@ public:
 					for (int y = PlayerY() - 1; y <= PlayerY() + 1; y++)
 					{
 						if (!(x == PlayerX() && y == PlayerY()))
-							if (World::ins()->getTile(x, y, PlayerZ()).fov == fovFlag::white)
+							if (TileFov(x, y, PlayerZ()) == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									new Msg(msgFlag::normal, L"경고", L"주변에 적이 있습니다. 계속 조합하시겠습니까?", { L"네",L"아니오",L"무시하기" });

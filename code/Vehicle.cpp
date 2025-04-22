@@ -31,8 +31,8 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
     prt(L"[Vehicle:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
     setGrid(inputX, inputY, inputZ);
 
-    errorBox(World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr != nullptr, L"생성위치에 이미 프롭이 존재한다!");
-    World::ins()->getTile(inputX, inputY, inputZ).VehiclePtr = this;
+    errorBox(TileVehicle(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 프롭이 존재한다!");
+    TileVehicle(inputX, inputY, inputZ) = this;
 
     partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(leadItemCode, 1);
@@ -109,7 +109,7 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
 
     partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
-    World::ins()->getTile(inputX, inputY, getGridZ()).VehiclePtr = this;
+    TileVehicle(inputX, inputY, getGridZ()) = this;
 
     //prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공다.\n", inputX, inputY, inputItemCode);
     updateSpr();
@@ -164,8 +164,8 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
         {
             if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
             {
-                entityWormhole[{it->first[0], it->first[1]}] = (Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr;
-                World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr = nullptr;
+                entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
+                TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
             }
         }
 
@@ -191,7 +191,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
                     if (entityWormhole.find({ x, y }) != entityWormhole.end())
                     {
                         entityWormhole[{x, y}]->setGrid(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ());
-                        World::ins()->getTile(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ()).EntityPtr = entityWormhole[{x, y}];
+                        TileEntity(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ()) = entityWormhole[{x, y}];
                     }
                 }
             }
@@ -205,7 +205,7 @@ void Vehicle::rotate(dir16 inputDir16)
     {
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
-            World::ins()->getTile(it->first[0], it->first[1], getGridZ()).VehiclePtr = nullptr;
+            TileVehicle(it->first[0], it->first[1], getGridZ()) = nullptr;
         }
 
         rotateEntityPtr(inputDir16);
@@ -213,7 +213,7 @@ void Vehicle::rotate(dir16 inputDir16)
 
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
-            World::ins()->getTile(it->first[0], it->first[1], getGridZ()).VehiclePtr = this;
+            TileVehicle(it->first[0], it->first[1], getGridZ()) = this;
         }
 
         //회전하는 방향에 대해 바퀴 방향 재설정
@@ -330,23 +330,23 @@ void Vehicle::shift(int dx, int dy)
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        World::ins()->getTile(it->first[0], it->first[1], getGridZ()).VehiclePtr = nullptr;
+        TileVehicle(it->first[0], it->first[1], getGridZ()) = nullptr;
         if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
         {
-            entityWormhole[{it->first[0], it->first[1]}] = (Entity*)World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr;
-            World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr = nullptr;
+            entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
+            TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
         }
     }
 
     //엔티티 옮기기
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr = this;
+        TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ()) = this;
         if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
         {
             Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
             tgtEntity->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//위치 그리드 변경
-            World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).EntityPtr = tgtEntity;//포인터 변경
+            TileEntity(it->first[0] + dx, it->first[1] + dy, getGridZ()) = tgtEntity;//포인터 변경
 
 
         }
@@ -369,23 +369,23 @@ void Vehicle::zShift(int dz)
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        World::ins()->getTile(it->first[0], it->first[1], getGridZ()).VehiclePtr = nullptr;
+        TileVehicle(it->first[0], it->first[1], getGridZ()) = nullptr;
         if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
         {
             entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
-            World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr = nullptr;
+            TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
         }
     }
 
     //엔티티 옮기기
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).VehiclePtr = this;
+        TileVehicle(it->first[0], it->first[1], getGridZ() + dz) = this;
         if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
         {
             Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
             tgtEntity->setGrid(it->first[0], it->first[1], getGridZ() + dz);//위치 그리드 변경
-            World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).EntityPtr = tgtEntity;//포인터 변경
+            TileEntity(it->first[0], it->first[1], getGridZ() + dz) = tgtEntity;//포인터 변경
         }
     }
     addGridZ(dz);
@@ -400,7 +400,7 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         if (TileWall(it->first[0] + dx, it->first[1] + dy, getGridZ()) != 0) return true;
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = (Vehicle*)World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr;
+        Vehicle* targetPtr = TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this) return true;
     }
     return false;
@@ -414,7 +414,7 @@ bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때
         if (TileWall(it->first[0] + dx, it->first[1] + dy, getGridZ()) != 0) return true;
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = (Vehicle*)World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).VehiclePtr;
+        Vehicle* targetPtr = TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this)
         {
             prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, targetPtr);
@@ -519,7 +519,7 @@ bool Vehicle::runAnimation(bool shutdown)
             xSpd = spd * cosVal;
             ySpd = spd * sinVal;
 
-            if (World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).VehiclePtr == this)
+            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this)
             {
                 totalMove += std::sqrt(std::pow(xSpd, 2) + std::pow(ySpd, 2));
                 int arrIndex = floor(myMin(1.0, (totalMove / totalDist)) * (float)(line.size() - 1));
@@ -613,7 +613,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getTimer() == 1)
             {
-                if(gearState==gearFlag::drive) bodyDir = singleRailMoveVec[0];
+                if (gearState == gearFlag::drive) bodyDir = singleRailMoveVec[0];
                 else if (gearState == gearFlag::reverse) bodyDir = reverse(singleRailMoveVec[0]);
             }
 
@@ -685,14 +685,14 @@ void Vehicle::drawSelf()
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //텍스쳐 투명도 설정
             SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
             int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
-            
+
             if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemVIPCode::minecart)
             {
                 if (bodyDir == dir16::dir0 || bodyDir == dir16::dir4) sprIndex += 0;
                 else sprIndex += 1;
             }
 
-            
+
             drawSpriteCenter
             (
                 spr::propset,
@@ -719,7 +719,7 @@ void Vehicle::drawSelf()
 
         ////////////////////////////////천장 차량부품////////////////////////////////////////////////////
         int propCeilAlpha = 255;
-        if (World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).VehiclePtr == this) propCeilAlpha = 50;
+        if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
 
         for (int layer = 0; layer < (it->second)->itemInfo.size(); layer++)
         {
@@ -737,7 +737,7 @@ void Vehicle::drawSelf()
     for (int i = 0; i < rotorList.size(); i++)
     {
         int propCeilAlpha = 255;
-        if (World::ins()->getTile(PlayerX(), PlayerY(), PlayerZ()).VehiclePtr == this) propCeilAlpha = 50;
+        if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
 
         int tgtX = rotorList[i].x;
         int tgtY = rotorList[i].y;

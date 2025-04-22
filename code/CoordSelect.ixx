@@ -243,7 +243,7 @@ public:
 				else
 				{
 
-					if (World::ins()->getTile(throwingX, throwingY, throwingZ).fov == fovFlag::white)
+					if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 					{
 						coAnswer = xStr + L"," + yStr + L"," + zStr;
 						prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
