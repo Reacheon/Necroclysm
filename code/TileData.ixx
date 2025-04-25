@@ -5,10 +5,11 @@ import util;
 import ItemData;
 import globalVar;
 import constVar;
+import Flame;
+import Prop;
 //__int8 : -128~127
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
-
 
 export struct TileData //총용량 29바이트
 {
@@ -42,7 +43,7 @@ export struct TileData //총용량 29바이트
     __int16 wallHP = 100;
     __int16 wallFakeHP = 100;
     __int16 wallMaxHP = 100;
-    int displayHPBarCount = 0; //양수 200으로 설정시 점점 떨어지다가 1이 되면 alpha를 대신 줄임. alpha마저 모두 줄면 0으로
+    int displayHPBarCount = 0; //양수 200으로 설정시 점점 떨어지다가 1이 되면 alpha를  대신 줄임. alpha마저 모두 줄면 0으로
     int alphaHPBar = 0;
     int alphaFakeHPBar = 0;
 
@@ -50,8 +51,8 @@ export struct TileData //총용량 29바이트
     void* ItemStackPtr = nullptr;
     void* VehiclePtr = nullptr;
     void* PropPtr = nullptr;
-    void* flamePtr = nullptr;
-    void* gasPtr = nullptr;
+    std::unique_ptr<Flame> flamePtr = nullptr;
+
 
     unsigned __int16 randomVal = 0;
 
@@ -65,7 +66,7 @@ export struct TileData //총용량 29바이트
 
     int checkGas(int inputCode)
     {
-        for (int i = 0; i < gasVec.size(); i++)
+        for (int i = 0; i < gasVec.size(); i++) 
         {
             if (gasVec[i].gasCode == inputCode) return i;
 

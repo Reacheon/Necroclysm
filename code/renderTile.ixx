@@ -126,7 +126,7 @@ __int64 analyseRender()
 			if (fpPtr != nullptr && fpPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) floorPropList.push_back({ tgtX,tgtY });
 
 			//화염
-			Flame* flamePtr = (Flame*)thisTile->flamePtr;
+			Flame* flamePtr = thisTile->flamePtr.get();
 			if (flamePtr != nullptr) flameList.push_back({ tgtX,tgtY });
 
 			//차량
@@ -510,7 +510,7 @@ __int64 drawEntities()
 	{
 		int tgtX = elem.x;
 		int tgtY = elem.y;
-		Flame* tgtFlame = (Flame*)(&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->flamePtr;
+		Flame* tgtFlame = (&World::ins()->getTile(tgtX, tgtY, PlayerZ()))->flamePtr.get();
 
 		SDL_Rect dst;
 		dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);

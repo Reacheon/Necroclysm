@@ -187,12 +187,12 @@
     <ClCompile Include="code\Equip_draw.ixx" />
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
     <ClCompile Include="code\Equip_input_mouse.ixx" />
+    <ClCompile Include="code\Flame.cpp" />
     <ClCompile Include="code\Flame.ixx" />
     <ClCompile Include="code\Footprint.ixx" />
     <ClCompile Include="code\gamepadBtnDown.ixx" />
     <ClCompile Include="code\gamepadBtnMotion.ixx" />
     <ClCompile Include="code\gamepadBtnUp.ixx" />
-    <ClCompile Include="code\Gas.ixx" />
     <ClCompile Include="code\God.ixx" />
     <ClCompile Include="code\HUD.ixx" />
     <ClCompile Include="code\HUD_draw.ixx" />

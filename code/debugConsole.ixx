@@ -138,13 +138,13 @@ export void debugConsole()
 		switch (fireSize)
 		{
 		case 1:
-			new Flame(xp + inputX, yp + inputY, zp, flameFlag::SMALL);
+			createFlame({ xp + inputX,yp + inputY,zp }, flameFlag::SMALL);
 			break;
 		case 2:
-			new Flame(xp + inputX, yp + inputY, zp, flameFlag::NORMAL);
+			createFlame({ xp + inputX,yp + inputY,zp }, flameFlag::NORMAL);
 			break;
 		case 3:
-			new Flame(xp + inputX, yp + inputY, zp, flameFlag::BIG);
+			createFlame({ xp + inputX,yp + inputY,zp }, flameFlag::BIG);
 			break;
 		}
 		updateLog(L"#FFFFFF화염을 생성했다.");

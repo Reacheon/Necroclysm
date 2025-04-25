@@ -36,6 +36,7 @@ export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)Wor
 export inline ItemStack*& TileItemStack(int x, int y, int z) { return (ItemStack*&)World::ins()->getTile(x, y, z).ItemStackPtr; }
 export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
 
+export inline void createFlame(Point3 inputCoor, flameFlag inputFlag) { World::ins()->getTile(inputCoor).flamePtr = std::make_unique<Flame>(inputCoor, inputFlag); }
 
 export inline void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
 

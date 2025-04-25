@@ -59,6 +59,11 @@ public:
 		int localY = y - (chunkY * CHUNK_SIZE_Y);
 		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(localX, localY);
 	}
+	TileData& getTile(Point3 inputCoor)
+	{
+		return getTile(inputCoor.x, inputCoor.y, inputCoor.z);
+	}
+
 	void createChunk(int chunkX, int chunkY, int chunkZ)
 	{
 		chunkFlag inputFlag = chunkFlag::seawater;

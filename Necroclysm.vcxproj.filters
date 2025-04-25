@@ -441,12 +441,6 @@
     <ClCompile Include="code\timeKeeper.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\Flame.ixx">
-      <Filter>소스 파일\05_Class</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Gas.ixx">
-      <Filter>소스 파일\05_Class</Filter>
-    </ClCompile>
     <ClCompile Include="code\drawSprite.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -560,6 +554,12 @@
     </ClCompile>
     <ClCompile Include="ItemStack.cpp">
       <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Flame.ixx">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Flame.cpp">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
