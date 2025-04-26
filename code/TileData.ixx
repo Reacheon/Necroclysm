@@ -50,7 +50,7 @@ export struct TileData //총용량 29바이트
     void* EntityPtr = nullptr;
     void* ItemStackPtr = nullptr;
     void* VehiclePtr = nullptr;
-    void* PropPtr = nullptr;
+    std::unique_ptr<Prop> PropPtr = nullptr;
     std::unique_ptr<Flame> flamePtr = nullptr;
 
 

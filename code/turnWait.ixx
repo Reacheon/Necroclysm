@@ -77,7 +77,7 @@ export void turnWait(float waitTime)
                     TileData* thisTile = &World::ins()->getTile(tgtX + dx, tgtY + dy, pz);
                     if (thisTile->wall == 0 || itemDex[thisTile->wall].checkFlag(itemFlag::WALL_GAS_PERMEABLE))
                     {
-                        Prop* pPtr = (Prop*)(thisTile->PropPtr);
+                        Prop* pPtr = thisTile->PropPtr.get();
                         if (pPtr == nullptr || pPtr->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON) == false)
                         {
                             openTileNumber++;

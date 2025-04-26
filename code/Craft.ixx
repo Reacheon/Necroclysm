@@ -1008,7 +1008,7 @@ public:
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))
 			{
 				errorBox(TileProp(buildLocation[0], buildLocation[1], buildLocation[2]) != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
-				new Prop(buildLocation[0], buildLocation[1], buildLocation[2], targetItemCode);
+				createProp({ buildLocation[0], buildLocation[1], buildLocation[2] }, targetItemCode);
 			}
 		}
 

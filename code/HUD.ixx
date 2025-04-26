@@ -690,7 +690,7 @@ public:
 								Prop* upProp = TileProp(touchX, touchY, PlayerZ());
 								if (upProp == nullptr)
 								{
-									new Prop(PlayerX(), PlayerY(), PlayerZ(), 299);//하강계단
+									createProp({ PlayerX(), PlayerY(), PlayerZ() }, 299);//하강계단
 								}
 							}
 						}
@@ -712,7 +712,7 @@ public:
 								Prop* downProp = TileProp(touchX, touchY, PlayerZ());
 								if (downProp == nullptr)
 								{
-									new Prop(PlayerX(), PlayerY(), PlayerZ(), 298);//상승계단
+									createProp({ PlayerX(), PlayerY(), PlayerZ() }, 298);//상승계단
 								}
 							}
 						}

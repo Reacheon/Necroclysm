@@ -126,7 +126,7 @@ export void startArea()
 	//집 하단 5타일
 	setWall({ -1,-2,0 }, 375);
 	setWall({ -2,-2,0 }, 375);
-	new Prop(-3, -2, 0, 291);//나무문 설치
+	createProp({ -3, -2, 0 }, 291);//나무문 설치
 	setWall({ -4,-2,0 }, 375);
 	setWall({ -5,-2,0 }, 375);
 	//집 우측 4타일
@@ -144,10 +144,10 @@ export void startArea()
 	setWall({ -3,-6,0 }, 375);
 	setWall({ -4,-6,0 }, 375);
 
-	new Prop(-4, -5, 0, 295);//책장
-	new Prop(-2, -5, 0, 294);//침대
+	createProp({ -4, -5, 0 }, 295);//책장
+	createProp({ -2, -5, 0 }, 294);//침대
 
-	new Prop(-4, -3, 0, 298);//상승계단
+	createProp({ -4, -3, 0 }, 298);//상승계단
 	for (int dx = -1; dx <= 1; dx++)
 	{
 		for (int dy = -1; dy <= 1; dy++)
@@ -156,7 +156,7 @@ export void startArea()
 		}
 	}
 
-	new Prop(-2, -3, 0, 299);//하강계단
+	createProp({ -2, -3, 0 }, 299);//하강계단
 
 
 	//철조망
@@ -179,26 +179,26 @@ export void startArea()
 	}
 
 	//철조망 우측 입구 전통등 2개
-	new Prop(12, 0, 0, 118);//볼라드등
-	new Prop(12, 4, 0, 118);//볼라드등
+	createProp({ 12, 0, 0 }, 118);//볼라드등
+	createProp({ 12, 4, 0 }, 118);//볼라드등
 
 
 	//철조망 아래 선로
 
-	new Prop(-2, 15, 0, itemVIPCode::railBR);
-	for(int i=0; i<11; i++)  new Prop(-1 + i, 15, 0, itemVIPCode::railRL);
-	new Prop(10, 15, 0, itemVIPCode::railSwitchWS);
-	for (int i = 0; i < 7; i++)  new Prop(10, 16 + i, 0, itemVIPCode::railTB);
-	new Prop(10, 23, 0, itemVIPCode::railTL);
-	for (int i = 0; i < 6; i++)  new Prop(9-i, 23, 0, itemVIPCode::railRL);
-	new Prop(3, 23, 0, itemVIPCode::railTR);
-	for (int i = 0; i < 3; i++) new Prop(3, 22 - i, 0, itemVIPCode::railTB);
-	new Prop(3, 19, 0, itemVIPCode::railBL);
-	for (int i = 0; i < 4; i++) new Prop(2 - i, 19, 0, itemVIPCode::railRL);
-	new Prop(-2, 19, 0, itemVIPCode::railTR);
-	for (int i = 0; i < 3; i++) new Prop(-2, 18 - i, 0, itemVIPCode::railTB);
+	createProp({ -2, 15, 0 }, itemVIPCode::railBR);
+	for (int i = 0; i < 11; i++)  createProp({ -1 + i, 15, 0 }, itemVIPCode::railRL);
+	createProp({ 10, 15, 0 }, itemVIPCode::railSwitchWS);
+	for (int i = 0; i < 7; i++)  createProp({ 10, 16 + i, 0 }, itemVIPCode::railTB);
+	createProp({ 10, 23, 0 }, itemVIPCode::railTL);
+	for (int i = 0; i < 6; i++)  createProp({ 9 - i, 23, 0 }, itemVIPCode::railRL);
+	createProp({ 3, 23, 0 }, itemVIPCode::railTR);
+	for (int i = 0; i < 3; i++) createProp({ 3, 22 - i, 0 }, itemVIPCode::railTB);
+	createProp({ 3, 19, 0 }, itemVIPCode::railBL);
+	for (int i = 0; i < 4; i++) createProp({ 2 - i, 19, 0 }, itemVIPCode::railRL);
+	createProp({ -2, 19, 0 }, itemVIPCode::railTR);
+	for (int i = 0; i < 3; i++) createProp({ -2, 18 - i, 0 }, itemVIPCode::railTB);
 
-	for (int i = 0; i < 5; i++)  new Prop(11 + i, 15, 0, itemVIPCode::railRL);
+	for (int i = 0; i < 5; i++)  createProp({ 11 + i, 15, 0 }, itemVIPCode::railRL);
 
 	//지하
 	{
@@ -218,16 +218,17 @@ export void startArea()
 			}
 		}
 
-		new Prop(pX - 2, pY - 5, -1, 211);//전통등
+		createProp({ pX - 2, pY - 5, -1 }, 211);//전통등
 		{
 			int cx = -1;
 			int cy = -1;
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i, -1);
-			new Prop(cx, cy + 1, -1, 291);//나무문 설치
+			createProp({ cx, cy + 1, -1 }, 291);//나무문 설치
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy, -1);
-			Prop* door2 = new Prop(cx + 1, cy, -1, 291);//나무문 설치
+			createProp({ cx + 1, cy, -1 }, 291);
+			Prop* door2 = TileProp(cx + 1, cy, -1);//나무문 설치
 			door2->leadItem.extraSprIndexSingle = 2;
 
 			int aisleEndX = cx + 8;
@@ -276,17 +277,17 @@ export void startArea()
 
 			//for (int i = 0; i <= 78; i++)
 			//{
-			//	new Prop(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
-			//	new Prop(7, 39 - i, -1, itemVIPCode::wideRailVMid);
-			//	new Prop(8, 39 - i, -1, itemVIPCode::wideRailVRight);
+			//	createProp(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
+			//	createProp(7, 39 - i, -1, itemVIPCode::wideRailVMid);
+			//	createProp(8, 39 - i, -1, itemVIPCode::wideRailVRight);
 			//	cursorY--;
 			//}
 
 			for (int i = 0; i <= 78; i++)
 			{
-				new Prop(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
-				new Prop(7, 39 - i, -1, itemVIPCode::wideRailVMid);
-				new Prop(8, 39 - i, -1, itemVIPCode::wideRailVRight);
+				createProp({ 6, 39 - i, -1 }, itemVIPCode::wideRailVLeft);
+				createProp({ 7, 39 - i, -1 }, itemVIPCode::wideRailVMid);
+				createProp({ 8, 39 - i, -1 }, itemVIPCode::wideRailVRight);
 				cursorY--;
 			}
 
@@ -450,19 +451,19 @@ export void startArea()
 
 			//for (int targetY = endY; targetY >= endY - 19; targetY--)
 			//{
-			//	new Prop(endX + 3, targetY, pZ - 1, 303);//나무문 설치
+			//	createProp(endX + 3, targetY, pZ - 1, 303);//나무문 설치
 			//}
 
-			//new Prop(endX + 3, endY - 20, pZ - 1, 317);//나무문 설치
+			//createProp(endX + 3, endY - 20, pZ - 1, 317);//나무문 설치
 
 			//for (int targetY = endY - 21; targetY >= endY - 50; targetY--)
 			//{
-			//	new Prop(endX + 3, targetY, pZ - 1, 303);//나무문 설치
+			//	createProp(endX + 3, targetY, pZ - 1, 303);//나무문 설치
 			//}
 
 			//for (int targetX = endX + 1; targetX >= endX - 30; targetX--)
 			//{
-			//	new Prop(targetX, endY - 20, pZ - 1, 303);//나무문 설치
+			//	createProp(targetX, endY - 20, pZ - 1, 303);//나무문 설치
 			//}
 		}
 	}
@@ -475,7 +476,7 @@ export void startArea()
 			setFloor({ -5 + dx, -5 + dy, 0 }, 292);
 		}
 	}
-	new Prop(2, -1, 0, 297);//표지판
+	createProp({ 2, -1, 0 }, 297);//표지판
 	//유리벽 설치
 	setWall({ 2,-4,0 }, 114);
 	setWall({ 2,-3,0 }, 114);
@@ -524,15 +525,15 @@ export void startArea()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	//new Prop(pX + 1 - 1, pY - 2, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 1, pY - 2 + 1, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 6, pY - 5, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 7, pY - 3, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 7, pY - 4, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 5, pY - 1 + 1, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 5 - 1, pY - 1, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 5 - 1, pY - 1 + 1, pZ, 234);//벚꽃낙엽 설치
-	//new Prop(pX + 7 - 1, pY + 1, pZ, 234);//벚꽃낙엽 설치
+	//createProp({pX + 1 - 1, pY - 2, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 1, pY - 2 + 1, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 6, pY - 5, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 7, pY - 3, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 7, pY - 4, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 5, pY - 1 + 1, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 5 - 1, pY - 1, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 5 - 1, pY - 1 + 1, pZ}, 234);//벚꽃낙엽 설치
+	//createProp({pX + 7 - 1, pY + 1, pZ}, 234);//벚꽃낙엽 설치
 
 
 	/*
@@ -599,44 +600,44 @@ export void startArea()
 	//for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
 
 
-	new Prop(1, -3, 0, 117);//나무 설치
+	createProp({ 1, -3, 0 }, 117);//나무 설치
 
-	new Prop(pX + 3, pY - 2, 0, 239);//나무 설치
+	createProp({ pX + 3, pY - 2, 0 }, 239);//나무 설치
 
-	new Prop(pX + 5, pY - 1, 0, 247);//나무 설치
+	createProp({ pX + 5, pY - 1, 0 }, 247);//나무 설치
 
-	new Prop(0, -5, 0, 238);//나무 설치
-
-
+	createProp({ 0, -5, 0 }, 238);//나무 설치
 
 
-	new Prop(pX + 7, pY + 1, 0, 237);//나무 설치
 
 
-	new Prop(pX + 4, pY - 5, 0, 248);//나무 설치
-
-	new Prop(pX + 9, pY - 4, 0, 237);//나무 설치
-	new Prop(pX + 10, pY - 1, 0, 244);//사과나무 설치
-
-	new Prop(pX - 2, pY + 39, 0, 242);//야자나무 설치
+	createProp({ pX + 7, pY + 1, 0 }, 237);//나무 설치
 
 
-	new Prop(pX, pY - 20, 0, 237);
+	createProp({ pX + 4, pY - 5, 0 }, 248);//나무 설치
 
-	new Prop(-4, 5, 0, 245);//사과나무 설치
+	createProp({ pX + 9, pY - 4, 0 }, 237);//나무 설치
+	createProp({ pX + 10, pY - 1, 0 }, 244);//사과나무 설치
+
+	createProp({ pX - 2, pY + 39, 0 }, 242);//야자나무 설치
 
 
-	new Prop(pX + 3, pY + 3, 0, 338);//고철 설치
-	new Prop(pX + 3 + 1, pY + 3, 0, 338);//고철 설치
-	new Prop(pX + 3 + 2, pY + 3, 0, 338);//고철 설치
-	new Prop(pX + 3 + 1, pY + 3 + 1, 0, 338);//고철 설치
+	createProp({ pX, pY - 20, 0 }, 237);
 
-	new Prop(pX + 10, pY + 11, 0, 338);//고철 설치
-	new Prop(pX + 10, pY + 11 - 1, 0, 338);//고철 설치
-	new Prop(pX + 10, pY + 11 - 2, 0, 338);//고철 설치
+	createProp({ -4, 5, 0 }, 245);//사과나무 설치
 
-	new Prop(pX + 10 - 1, pY + 11, 0, 338);//고철 설치
-	new Prop(pX + 10 - 1, pY + 11 - 1, 0, 338);//고철 설치
+
+	createProp({ pX + 3, pY + 3, 0 }, 338);//고철 설치
+	createProp({ pX + 3 + 1, pY + 3, 0 }, 338);//고철 설치
+	createProp({ pX + 3 + 2, pY + 3, 0 }, 338);//고철 설치
+	createProp({ pX + 3 + 1, pY + 3 + 1, 0 }, 338);//고철 설치
+
+	createProp({ pX + 10, pY + 11, 0 }, 338);//고철 설치
+	createProp({ pX + 10, pY + 11 - 1, 0 }, 338);//고철 설치
+	createProp({ pX + 10, pY + 11 - 2, 0 }, 338);//고철 설치
+
+	createProp({ pX + 10 - 1, pY + 11, 0 }, 338);//고철 설치
+	createProp({ pX + 10 - 1, pY + 11 - 1, 0 }, 338);//고철 설치
 
 
 
@@ -651,66 +652,66 @@ export void startArea()
 	setFloor({ pX, pY + 4, 0 }, 220);
 	setFloor({ pX + 1, pY + 4, 0 }, 220);
 
-	new Prop(pX - 2, pY + 3, 0, 270);//꽃 설치
-	new Prop(pX - 1, pY + 3, 0, 265);//꽃 설치
-	new Prop(pX, pY + 3, 0, 266);//꽃 설치
-	new Prop(pX + 1, pY + 3, 0, 267);//꽃 설치
+	createProp({ pX - 2, pY + 3, 0 }, 270);//꽃 설치
+	createProp({pX - 1, pY + 3, 0 }, 265);//꽃 설치
+	createProp({pX, pY + 3, 0 }, 266);//꽃 설치
+	createProp({pX + 1, pY + 3, 0 }, 267);//꽃 설치
 
-	new Prop(pX - 2, pY + 4, 0, 271);//꽃 설치
-	new Prop(pX - 1, pY + 4, 0, 268);//꽃 설치
-	new Prop(pX, pY + 4, 0, 269);//꽃 설치
-	new Prop(pX + 1, pY + 4, 0, 270);//꽃 설치
+	createProp({pX - 2, pY + 4, 0 }, 271);//꽃 설치
+	createProp({pX - 1, pY + 4, 0 }, 268);//꽃 설치
+	createProp({pX, pY + 4, 0 }, 269);//꽃 설치
+	createProp({pX + 1, pY + 4, 0 }, 270);//꽃 설치
 
 
-	new Prop(pX + 6, pY - 4, 0, 270);//꽃 설치
+	createProp({pX + 6, pY - 4, 0 }, 270);//꽃 설치
 
-	new Prop(0, -1, 0, 211);//전통 등 설치
-	new Prop(4, 0, 0, 211);//볼라드 등 설치
+	createProp({0, -1, 0 }, 211);//전통 등 설치
+	createProp({4, 0, 0 }, 211);//볼라드 등 설치
 
 	//울타리 설치
-	new Prop(pX - 3, pY + 2, 0, 206);
-	new Prop(pX - 2, pY + 2, 0, 206);
-	new Prop(pX - 1, pY + 2, 0, 206);
-	new Prop(pX, pY + 2, 0, 206);
-	new Prop(pX + 1, pY + 2, 0, 206);
-	new Prop(pX + 2, pY + 2, 0, 206);
-	new Prop(pX + 3, pY + 2, 0, 206);
+	createProp({pX - 3, pY + 2, 0 }, 206);
+	createProp({pX - 2, pY + 2, 0 }, 206);
+	createProp({pX - 1, pY + 2, 0 }, 206);
+	createProp({pX, pY + 2, 0 }, 206);
+	createProp({pX + 1, pY + 2, 0 }, 206);
+	createProp({pX + 2, pY + 2, 0 }, 206);
+	createProp({pX + 3, pY + 2, 0 }, 206);
 
-	new Prop(pX - 3, pY + 3, 0, 206);
-	new Prop(pX - 3, pY + 4, 0, 206);
+	createProp({pX - 3, pY + 3, 0 }, 206);
+	createProp({pX - 3, pY + 4, 0 }, 206);
 
-	new Prop(pX + 2, pY + 3, 0, 206);
-	new Prop(pX + 2, pY + 4, 0, 206);
+	createProp({pX + 2, pY + 3, 0 }, 206);
+	createProp({pX + 2, pY + 4, 0 }, 206);
 
-	new Prop(pX - 3, pY + 5, 0, 206);
-	new Prop(pX - 2, pY + 5, 0, 206);
-	new Prop(pX - 1, pY + 5, 0, 206);
-	new Prop(pX, pY + 5, 0, 206);
-	new Prop(pX + 1, pY + 5, 0, 206);
-	new Prop(pX + 2, pY + 5, 0, 206);
+	createProp({pX - 3, pY + 5, 0 }, 206);
+	createProp({pX - 2, pY + 5, 0 }, 206);
+	createProp({pX - 1, pY + 5, 0 }, 206);
+	createProp({pX, pY + 5, 0 }, 206);
+	createProp({pX + 1, pY + 5, 0 }, 206);
+	createProp({pX + 2, pY + 5, 0 }, 206);
 
 	//전선 설치
-	new Prop(pX + 8, pY + 1, 0, 143);
-	new Prop(pX + 8, pY, 0, 143);
-	new Prop(pX + 8, pY - 1, 0, 143);
-	new Prop(pX + 8, pY - 2, 0, 143);
-	new Prop(pX + 9, pY, 0, 143);
+	createProp({pX + 8, pY + 1, 0 }, 143);
+	createProp({pX + 8, pY, 0 }, 143);
+	createProp({pX + 8, pY - 1, 0 }, 143);
+	createProp({pX + 8, pY - 2, 0 }, 143);
+	createProp({pX + 9, pY, 0 }, 143);
 
 	//배관 설치
-	new Prop(pX + 3, pY + 6, 0, 144);
-	new Prop(pX + 4, pY + 6, 0, 144);
-	new Prop(pX + 5, pY + 6, 0, 144);
-	new Prop(pX + 6, pY + 6, 0, 144);
-	new Prop(pX + 5, pY + 7, 0, 144);
+	createProp({pX + 3, pY + 6, 0 }, 144);
+	createProp({pX + 4, pY + 6, 0 }, 144);
+	createProp({pX + 5, pY + 6, 0 }, 144);
+	createProp({pX + 6, pY + 6, 0 }, 144);
+	createProp({pX + 5, pY + 7, 0 }, 144);
 
 	//종교
 
-	new Prop(pX - 3, pY - 7, 0, 213);
-	new Prop(pX - 1, pY - 7, 0, 214);
-	new Prop(pX + 1, pY - 7, 0, 216);
-	new Prop(pX + 3, pY - 7, 0, 217);
-	new Prop(pX + 5, pY - 7, 0, 218);
-	new Prop(pX + 7, pY - 7, 0, 219);
+	createProp({pX - 3, pY - 7, 0 }, 213);
+	createProp({pX - 1, pY - 7, 0 }, 214);
+	createProp({pX + 1, pY - 7, 0 }, 216);
+	createProp({pX + 3, pY - 7, 0 }, 217);
+	createProp({pX + 5, pY - 7, 0 }, 218);
+	createProp({pX + 7, pY - 7, 0 }, 219);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 

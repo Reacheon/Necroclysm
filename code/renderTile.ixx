@@ -122,7 +122,7 @@ __int64 analyseRender()
 				if (TileItemStack(tgtX, tgtY, pZ) != nullptr) itemList.push_back({ tgtX,tgtY });
 			}
 			//바닥프롭
-			Prop* fpPtr = (Prop*)thisTile->PropPtr;
+			Prop* fpPtr = thisTile->PropPtr.get();
 			if (fpPtr != nullptr && fpPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) floorPropList.push_back({ tgtX,tgtY });
 
 			//화염
@@ -134,7 +134,7 @@ __int64 analyseRender()
 			if (vPtr != nullptr) renderVehList.push_back(vPtr);
 
 			//플레이어와 겹치는 일반설치물
-			Prop* pPtr = (Prop*)(thisTile->PropPtr);
+			Prop* pPtr = thisTile->PropPtr.get();
 			if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false) renderEntityList.push_back((Drawable*)pPtr);
 
 			//일반 객체

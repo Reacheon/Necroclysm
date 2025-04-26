@@ -24,7 +24,7 @@ public:
     int alphaFakeHPBar = 0;
     float treeAngle = 0.0; //벌목 때 나무들이 가지는 앵글, 0이 아닐 경우 활성화됨
 
-    Prop(int inputX, int inputY, int inputZ, int leadItemCode);
+    Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();
 

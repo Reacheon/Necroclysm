@@ -22,35 +22,25 @@ import Player;
 import Sticker;
 import Particle;
 
-Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
+Prop::Prop(Point3 inputCoor, int leadItemCode)
 {
     leadItem = itemDex[leadItemCode];
     setAniPriority(3);
-    //prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
-    setGrid(inputX, inputY, inputZ);
+    //prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
+    setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 
-    errorBox(TileProp(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
-    TileProp(inputX, inputY, inputZ) = this;
+    errorBox(TileProp(inputCoor.x, inputCoor.y, inputCoor.z) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
 
     if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
     {
-
-        myLight = new Light(inputX + leadItem.lightDelX, inputY + leadItem.lightDelY, inputZ, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
+        myLight = new Light(inputCoor.x + leadItem.lightDelX, inputCoor.y + leadItem.lightDelY, inputCoor.z, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
         //Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
     }
 
 
     deactivateAI();//차량을 제외하고 기본적으로 비활성화
 
-    //주변 타일을 분석해 extraIndex 설정
-    int dx = 0;
-    int dy = 0;
-    for (int i = 0; i < 8; i++)
-    {
-        dir2Coord(i, dx, dy);
-        Prop* targetProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
-        if (targetProp != nullptr) targetProp->updateSprIndex();
-    }
+
 
     if (leadItem.randomPropSprSize != 1)
     {
@@ -61,24 +51,13 @@ Prop::Prop(int inputX, int inputY, int inputZ, int leadItemCode)
     leadItem.propHP = leadItem.propMaxHP;
     leadItem.propFakeHP = leadItem.propMaxHP;
 
-    updateSprIndex();
+
 }
 
 Prop::~Prop()
 {
     delete myLight;
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
-
-    //주변 타일을 분석해 extraIndex 설정
-    int dx = 0;
-    int dy = 0;
-    for (int i = 0; i < 8; i++)
-    {
-        dir2Coord(i, dx, dy);
-        Prop* targetProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
-        if (targetProp != nullptr) targetProp->updateSprIndex();
-    }
-    updateSprIndex();
 }
 
 void Prop::updateSprIndex()
@@ -87,7 +66,6 @@ void Prop::updateSprIndex()
     bool botTile = false;
     bool leftTile = false;
     bool rightTile = false;
-
 
 
     if (leadItem.checkFlag(itemFlag::WIRE))//전선일 경우
@@ -203,6 +181,9 @@ void Prop::updateSprIndex()
                 }
                 else return false;
             };
+
+        int x = getGridX();
+        int y = getGridY();
 
         topTile = sameCheck(0, -1);
         botTile = sameCheck(0, 1);
