@@ -561,5 +561,8 @@
     <ClCompile Include="code\Flame.cpp">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
+    <ClCompile Include="code\ItemPocket.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

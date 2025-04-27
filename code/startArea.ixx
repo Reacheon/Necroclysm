@@ -40,7 +40,9 @@ export void startArea()
 
 	new Monster(6, 5, 0, 0);//NPC
 
-	new ItemStack(2, 1, 0, {
+
+
+	createItemStack({ 2, 1, 0 }, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
 		{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
 		{17, 1}, {18, 1}, {4, 1}, {5, 8}, {88, 1}, {89, 1000},
@@ -49,22 +51,22 @@ export void startArea()
 	);
 
 	//활과 석궁
-	new ItemStack(3, 8, 0, { {383,1} });
-	new ItemStack(4, 8, 0, { {385,30} });
-	new ItemStack(3, 9, 0, { {382,1} });
-	new ItemStack(4, 9, 0, { {384,30} });
+	createItemStack({ 3, 8, 0 }, { {383,1} });
+	createItemStack({ 4, 8, 0 }, { {385,30} });
+	createItemStack({3, 9, 0 }, { {382,1} });
+	createItemStack({4, 9, 0 }, { {384,30} });
 
 	new Monster(5, 8, 8, 0);//허수아비
 
 
 
-	new ItemStack(7, -4, 0, { {391,1} }); //벌목도끼
+	createItemStack({7, -4, 0 }, { {391,1} }); //벌목도끼
 
-	new ItemStack(-5, 1, 0, { {394,1} }); //낚시대
+	createItemStack({-5, 1, 0 }, { {394,1} }); //낚시대
 
-	new ItemStack(-3, -4, -1, { {388,1} });//곡괭이
-	new ItemStack(-2, -4, -1, { {393,1} });//광부헬멧
-	new ItemStack(-1, -4, -1, { {395,1} });//삽
+	createItemStack({-3, -4, -1 }, { {388,1} });//곡괭이
+	createItemStack({-2, -4, -1 }, { {393,1} });//광부헬멧
+	createItemStack({-1, -4, -1 }, { {395,1} });//삽
 
 
 

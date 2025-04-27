@@ -241,8 +241,7 @@ bool Prop::runAnimation(bool shutdown)
                 if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
-                itemPtr1 = new ItemStack(itemPos.x, itemPos.y, itemPos.z, { {392,1} });
-
+                createItemStack(itemPos, { {392,1} });
                 for (int i = 0; i < 8; i++)
                 {
                     new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8) , randomRange(0, 7), randomRangeFloat(-1.2,1.2), randomRangeFloat(-2.6,-3.2), 0.18, randomRange(25,35));
@@ -253,8 +252,7 @@ bool Prop::runAnimation(bool shutdown)
                 if (1/*TileWall(getGridX() - 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() - 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
-                itemPtr1 = new ItemStack(itemPos.x, itemPos.y, itemPos.z, { {392,1} });
-
+                createItemStack(itemPos, { {392,1} });
                 for (int i = 0; i < 8; i++)
                 {
                     new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
@@ -262,7 +260,7 @@ bool Prop::runAnimation(bool shutdown)
             }
             
             
-            addAniUSetPlayer(itemPtr1, aniFlag::drop);
+            addAniUSetPlayer(TileItemStack(itemPos.x, itemPos.y, itemPos.z), aniFlag::drop);
             //addAniUSetPlayer(itemPtr2, aniFlag::drop);
             treeAngle = 0;
             resetTimer();

@@ -25,6 +25,7 @@ import drawWindow;
 import CoordSelect;
 import Lst;
 import Inventory;
+import ItemData;
 
 export class Equip : public GUI
 {

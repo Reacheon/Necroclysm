@@ -582,13 +582,14 @@ void Entity::getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8&
 }
 void Entity::drop(ItemPocket* txPtr)
 {
-	ItemStack* targetStack;
+	ItemStack* targetStack = nullptr;;
 	//아이템 스택이 이미 있는 경우와 없는 경우
 
 	if (TileItemStack(getGridX(), getGridY(), getGridZ()) == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
-		targetStack = new ItemStack(getGridX(), getGridY(), getGridZ());
+		createItemStack({ getGridX(), getGridY(), getGridZ() });
+		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
 		targetStack->setPocket(txPtr);//스토리지 교체(메모리는 메소드 내부에서 해제됨)
 		targetStack->updateSprIndex();
 	}
@@ -616,7 +617,8 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 	if (TileItemStack(gridX, gridY, getGridZ()) == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
-		targetStack = new ItemStack(gridX, gridY, getGridZ());
+		createItemStack({ gridX, gridY, getGridZ() });
+		targetStack = TileItemStack(gridX, gridY, getGridZ());
 		targetStack->setPocket(txPtr);//스토리지 교체(메모리는 메소드 내부에서 해제됨)
 		targetStack->updateSprIndex();
 	}

@@ -12,19 +12,17 @@ import Ani;
 import Sprite;
 import Coord;
 
-ItemStack::ItemStack(int gridX, int gridY, int gridZ)
+ItemStack::ItemStack(Point3 inputCoor)
 {
 	storage = new ItemPocket(storageType::stack);
-	setGrid(gridX, gridY, gridZ);
-	TileItemStack(getGridX(), getGridY(), getGridZ()) = this;
+	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
 }
 
-ItemStack::ItemStack(int gridX, int gridY, int gridZ, std::vector<std::pair<int, int>> inputItems)
+ItemStack::ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
 	storage = new ItemPocket(storageType::stack);
-	setGrid(gridX, gridY, gridZ);
-	TileItemStack(getGridX(), getGridY(), getGridZ()) = this;
+	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
 
 	for (int i = 0; i < inputItems.size(); i++) getPocket()->addItemFromDex(inputItems[i].first, inputItems[i].second);
@@ -33,7 +31,6 @@ ItemStack::ItemStack(int gridX, int gridY, int gridZ, std::vector<std::pair<int,
 ItemStack::~ItemStack()
 {
 	prt(L"ItemStack : 소멸자가 호출되었습니다..\n");
-	TileItemStack(getGridX(), getGridY(), getGridZ()) = this;
 }
 Sprite* ItemStack::getSprite()
 {

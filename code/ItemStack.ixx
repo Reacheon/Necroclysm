@@ -19,8 +19,8 @@ private:
 	int sprIndex = 0;
 	int targetSprIndex = 0;//던지기 이벤트일 때 타겟의 인덱스
 public:
-	ItemStack(int gridX, int gridY, int gridZ);
-	ItemStack(int gridX, int gridY, int gridZ, std::vector<std::pair<int, int>> inputItems);
+	ItemStack(Point3 inputCoor);
+	ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems);
 	~ItemStack();
 	Sprite* getSprite(); 
 	void setSprite(Sprite* inputSprite);

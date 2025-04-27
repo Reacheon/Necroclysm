@@ -22,6 +22,7 @@ import Msg;
 import Vehicle;
 import Prop;
 import turnWait;
+import ItemData;
 
 export class Craft : public GUI
 {

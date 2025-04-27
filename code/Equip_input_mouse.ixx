@@ -5,7 +5,7 @@ import Equip;
 import checkCursor;
 import globalVar;
 import actFuncSet;
-
+import ItemData;
 
 void Equip::clickUpGUI()
 {

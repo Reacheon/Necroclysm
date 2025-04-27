@@ -139,20 +139,7 @@ public:
 		}
 		return VehicleList;
 	}
-	std::vector<ItemStack*> getActiveItemList()
-	{
-		std::vector<ItemStack*> itemList;
-		std::vector<ItemStack*> chunkItemList;
-		for (int i = 0; i < activeChunk.size(); i++)
-		{
-			chunkItemList = activeChunk[i]->getChunkItemList();
-			for (int j = 0; j < chunkItemList.size(); j++)
-			{
-				itemList.push_back(chunkItemList[j]);
-			}
-		}
-		return itemList;
-	}
+
 
 	//섹터 관련
 	std::array<int, 2> changeToSectorCoord(int inputGridX, int inputGridY)

@@ -116,9 +116,10 @@ export void debugConsole()
 	case 4: //테스트 아이템
 	{
 		updateLog(L"#FFFFFF디버그 : 테스트 아이템을 생성했다.");
-		ItemStack* item = new ItemStack(PlayerX(), PlayerY(), PlayerZ());
-		(item->getPocket())->addItemFromDex(0, 2);
-		(item->getPocket())->addItemFromDex(1, 4);
+		createItemStack({ PlayerX(), PlayerY(), PlayerZ() });
+		ItemPocket* itemPtr = TileItemStack(PlayerX(), PlayerY(), PlayerZ())->getPocket();
+		itemPtr->addItemFromDex(0, 2);
+		itemPtr->addItemFromDex(1, 4);
 		prt(L"[디버그]테스트 아이템을 생성했다!\n");
 		break;
 	}

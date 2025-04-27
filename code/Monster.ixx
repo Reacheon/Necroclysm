@@ -13,6 +13,7 @@ import log;
 import Corpse;
 import util;
 import AI;
+import ItemData;
 
 export class Monster : public Entity, public AI
 {

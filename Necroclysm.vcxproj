@@ -233,6 +233,7 @@
     <ClCompile Include="code\AI.ixx" />
     <ClCompile Include="code\Entity.ixx" />
     <ClCompile Include="code\Inventory_draw.ixx" />
+    <ClCompile Include="code\ItemPocket.cpp" />
     <ClCompile Include="code\ItemPocket.ixx" />
     <ClCompile Include="code\Light.cpp" />
     <ClCompile Include="code\Loot_draw.ixx" />

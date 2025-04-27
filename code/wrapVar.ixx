@@ -33,8 +33,18 @@ export inline void setFloor(Point3 coord, int val)
 export inline Entity*& TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
 export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
-export inline ItemStack*& TileItemStack(int x, int y, int z) { return (ItemStack*&)World::ins()->getTile(x, y, z).ItemStackPtr; }
+export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
 export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
+
+export inline void createItemStack(Point3 inputCoor)
+{
+    World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor);
+}
+
+export inline void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
+{
+    World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor, inputItems);
+}
 
 export inline void createProp(Point3 inputCoor, int inputItemCode) 
 { 
@@ -42,7 +52,7 @@ export inline void createProp(Point3 inputCoor, int inputItemCode)
 
     World::ins()->getTile(inputCoor).PropPtr->updateSprIndex();
 
-    //주변 타일을 분석해 extraIndex 설정
+    //주변 타일을 분석해 extraIndex(연결) 설정
     int dx = 0;
     int dy = 0;
     for (int i = 0; i < 8; i++)

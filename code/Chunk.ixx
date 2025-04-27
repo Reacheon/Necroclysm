@@ -109,8 +109,6 @@ public:
 		flag = input;
 	}
 
-	ItemStack* getChunkItemPos(int x, int y){return (ItemStack*)getChunkTile(x, y).ItemStackPtr;}
-	void setChunkItemPos(int x, int y, ItemStack* inputPtr){getChunkTile(x, y).ItemStackPtr = inputPtr;}
 
 	Vehicle* getChunkVehiclePos(int x, int y) { return (Vehicle*)getChunkTile(x, y).VehiclePtr; }
 	void setChunkVehiclePos(int x, int y, Vehicle* inputPtr) { prt(lowCol::green, L"Chunk : %d,%d에 Vehicle %p를 배정했다.\n",x,y,inputPtr); getChunkTile(x, y).VehiclePtr = inputPtr; }
@@ -144,18 +142,6 @@ public:
 		return VehicleList;
 	}
 
-	std::vector<ItemStack*> getChunkItemList()
-	{
-		std::vector<ItemStack*> itemList;
-		for (int x = 0; x < CHUNK_SIZE_X; x++)
-		{
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				if (getChunkTile(x, y).ItemStackPtr != nullptr) { itemList.push_back((ItemStack*)getChunkTile(x, y).ItemStackPtr); }
-			}
-		}
-		return itemList;
-	}
 
 	weatherFlag getWeather() {
 		return chunkWeather;

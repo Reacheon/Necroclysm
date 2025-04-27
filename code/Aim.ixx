@@ -18,6 +18,7 @@ import World;
 import Entity;
 import log;
 import mouseGrid;
+import ItemData;
 
 export class Aim : public GUI
 {
