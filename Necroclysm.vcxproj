@@ -183,6 +183,7 @@
     <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Entity.cpp" />
+    <ClCompile Include="code\EntityData.cpp" />
     <ClCompile Include="code\Entity_runAnimation.cpp" />
     <ClCompile Include="code\Equip_draw.ixx" />
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
@@ -233,8 +234,10 @@
     <ClCompile Include="code\AI.ixx" />
     <ClCompile Include="code\Entity.ixx" />
     <ClCompile Include="code\Inventory_draw.ixx" />
+    <ClCompile Include="code\ItemData.cpp" />
     <ClCompile Include="code\ItemPocket.cpp" />
     <ClCompile Include="code\ItemPocket.ixx" />
+    <ClCompile Include="code\ItemStack.cpp" />
     <ClCompile Include="code\Light.cpp" />
     <ClCompile Include="code\Loot_draw.ixx" />
     <ClCompile Include="code\Loot_input_gamepad.ixx" />
@@ -243,6 +246,7 @@
     <ClCompile Include="code\Maint.ixx" />
     <ClCompile Include="code\mouseGrid.ixx" />
     <ClCompile Include="code\mouseWheel.ixx" />
+    <ClCompile Include="code\sequenceCounter.ixx" />
     <ClCompile Include="code\Particle.ixx" />
     <ClCompile Include="code\Player.cpp" />
     <ClCompile Include="code\Prop.cpp" />
@@ -310,11 +314,10 @@
     <ClCompile Include="code\Vehicle.cpp" />
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\connectGroupExtraIndex.ixx" />
+    <ClCompile Include="code\Vehicle_runAI.cpp" />
     <ClCompile Include="code\World.ixx" />
     <ClCompile Include="code\wrapVar.ixx" />
     <ClCompile Include="code\wstring2Number.ixx" />
-    <ClCompile Include="ItemStack.cpp" />
-    <ClCompile Include="Vehicle_runAI.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

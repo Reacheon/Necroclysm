@@ -280,16 +280,16 @@ public:
 				if (i == 0) { return; }
 			}
 
-			ItemPocket* drop = new ItemPocket(storageType::null);
+			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--)
 			{
 				if (lootPtr->itemInfo[i].lootSelect > 0)
 				{
-					lootPtr->transferItem(drop, i, lootPtr->itemInfo[i].lootSelect);
+					lootPtr->transferItem(drop.get(), i, lootPtr->itemInfo[i].lootSelect);
 				}
 			}
 			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--) { lootPtr->itemInfo[i].lootSelect = 0; }
-			Player::ins()->drop(drop);
+			Player::ins()->drop(drop.get());
 			Player::ins()->updateStatus();
 			updateLog(col2Str(col::white) + sysStr[126]);//아이템을 버렸다.
 		}
@@ -345,7 +345,7 @@ public:
 				{
 					if (pocketCursor == pocketStack)
 					{
-						lootPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+						lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
 						break;
 					}
 					else
@@ -385,7 +385,7 @@ public:
 				{
 					if (pocketCursor == pocketStack)
 					{
-						lootPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+						lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
 						break;
 					}
 					else
@@ -411,16 +411,16 @@ public:
 
 	void executeDroping()
 	{
-		ItemPocket* drop = new ItemPocket(storageType::null);
+		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 		if (isTargetPocket == false)
 		{
-			equipPtr->transferItem(drop, equipCursor, 1);
+			equipPtr->transferItem(drop.get(), equipCursor, 1);
 		}
 		else
 		{
-			lootPtr->transferItem(drop, lootCursor, 1);
+			lootPtr->transferItem(drop.get(), lootCursor, 1);
 		}
-		Player::ins()->drop(drop);
+		Player::ins()->drop(drop.get());
 		Player::ins()->updateStatus();
 		Player::ins()->updateCustomSpriteHuman();
 		updateLog(col2Str(col::white) + sysStr[126]);
@@ -435,7 +435,7 @@ public:
 		{
 			if (equipPtr->itemInfo.size() > 0)
 			{
-				ItemData targetItem = equipPtr->itemInfo[equipCursor];
+				ItemData& targetItem = equipPtr->itemInfo[equipCursor];
 				barAct.clear();
 				if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
 				if (targetItem.pocketOnlyItem.size() > 0) { barAct.push_back(act::reload); }//전용 아이템 있을 경우 reload 추가
@@ -448,7 +448,7 @@ public:
 					//전용 아이템이 탄창일 경우(일반 소총)
 					if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 					{
-						ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
+						ItemPocket* gunPtr = targetItem.pocketPtr.get();
 
 						if (gunPtr->itemInfo.size() == 0)
 						{
@@ -462,7 +462,7 @@ public:
 					//전용 아이템이 탄일 경우(리볼버류)
 					else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 					{
-						ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
+						ItemPocket* gunPtr = targetItem.pocketPtr.get();
 						//탄환 분리
 						if (gunPtr->itemInfo.size() > 0)
 						{
@@ -488,7 +488,7 @@ public:
 					barAct.push_back(act::reloadMagazine);
 
 					//탄창 장전
-					ItemPocket* magazinePtr = ((ItemPocket*)targetItem.pocketPtr);
+					ItemPocket* magazinePtr = targetItem.pocketPtr.get();
 					if (magazinePtr->itemInfo.size() > 0)
 					{
 						barAct.push_back(act::unloadBulletFromMagazine);
@@ -520,7 +520,7 @@ public:
 		{
 			if (lootPtr->itemInfo.size() > 0)
 			{
-				ItemData targetItem = lootPtr->itemInfo[lootCursor];
+				ItemData& targetItem = lootPtr->itemInfo[lootCursor];
 				barAct.clear();
 				barAct.push_back(act::wield);
 				if (targetItem.checkFlag(itemFlag::CANEQUIP) == true) { barAct.push_back(act::equip); }
@@ -582,7 +582,7 @@ public:
 			{
 				if (pocketCursor == pocketStack)
 				{
-					lootPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+					lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
 					break;
 				}
 				else
@@ -606,17 +606,16 @@ public:
 		if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
 			bool isWield = false;
-			ItemPocket* drop = new ItemPocket(storageType::null);
+			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 			{
 				if (equipPtr->itemInfo[i].equipState == equipHandFlag::left || equipPtr->itemInfo[i].equipState == equipHandFlag::right || equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 				{
-					equipPtr->transferItem(drop, i, 1);
+					equipPtr->transferItem(drop.get(), i, 1);
 					isWield = true;
 				}
 			}
-			if (isWield == true) { Player::ins()->drop(drop); }
-			else { delete drop; }
+			if (isWield == true) { Player::ins()->drop(drop.get()); }
 			int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
@@ -667,12 +666,12 @@ public:
 				}
 
 				//왼손 아이템 떨구기
-				ItemPocket* drop = new ItemPocket(storageType::null);
+				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
 					if (equipPtr->itemInfo[i].equipState == handDir)
 					{
-						equipPtr->transferItem(drop, i, 1);
+						equipPtr->transferItem(drop.get(), i, 1);
 						break;
 					}
 				}
@@ -681,11 +680,11 @@ public:
 				{
 					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 					{
-						equipPtr->transferItem(drop, i, 1);
+						equipPtr->transferItem(drop.get(), i, 1);
 						break;
 					}
 				}
-				Player::ins()->drop(drop);
+				Player::ins()->drop(drop.get());
 
 				int returnIndex = lootPtr->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
@@ -754,7 +753,7 @@ public:
 
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)//가방은 1단계까지만 뒤져봄
 			{
-				ItemPocket* pocketPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+				ItemPocket* pocketPtr = equipPtr->itemInfo[i].pocketPtr.get();
 				for (int pocketItr = 0; pocketItr < pocketPtr->itemInfo.size(); pocketItr++)
 				{
 					//2층 : 현재 이 포켓의 아이템 중에서 넣을 수 있는 탄창이 있는지 확인
@@ -825,7 +824,7 @@ public:
 
 					equipPtr->transferItem
 					(
-						(ItemPocket*)equipPtr->itemInfo[targetEquipCursor].pocketPtr,
+						equipPtr->itemInfo[targetEquipCursor].pocketPtr.get(),
 						i,
 						equipPtr->itemInfo[i].number
 					);
@@ -837,7 +836,7 @@ public:
 
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)//가방은 1단계까지만 뒤져봄
 			{
-				ItemPocket* pocketPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+				ItemPocket* pocketPtr = equipPtr->itemInfo[i].pocketPtr.get();
 				for (int pocketItr = 0; pocketItr < pocketPtr->itemInfo.size(); pocketItr++)
 				{
 					//2층 : 현재 이 포켓의 아이템 중에서 넣을 수 있는 탄창이 있는지 확인
@@ -878,7 +877,7 @@ public:
 
 							pocketPtr->transferItem
 							(
-								(ItemPocket*)equipPtr->itemInfo[targetEquipCursor].pocketPtr,
+								equipPtr->itemInfo[targetEquipCursor].pocketPtr.get(),
 								pocketItr,
 								pocketPtr->itemInfo[pocketItr].number
 							);
@@ -912,17 +911,17 @@ public:
 
 		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ())
 		{
-			ItemPocket* drop = new ItemPocket(storageType::null);
-			inputPocket->transferItem(drop, inputIndex, 1);
-			Player::ins()->drop(drop);
+			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+			inputPocket->transferItem(drop.get(), inputIndex, 1);
+			Player::ins()->drop(drop.get());
 			updateLog(L"#FFFFFF아이템을 버렸다.");
 		}
 		else
 		{
-			ItemPocket* throwing = new ItemPocket(storageType::null);
+			std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
 			//이큅일 떄는 그렇다쳐도 가방 안에 있는 아이템을 던질 떄 원하는대로 작동하지않아 오류가 생긴다
-			inputPocket->transferItem(throwing, inputIndex, 1);
-			Player::ins()->throwing(throwing, targetX, targetY);
+			inputPocket->transferItem(throwing.get(), inputIndex, 1);
+			Player::ins()->throwing(throwing.get(), targetX, targetY);
 			updateLog(L"#FFFFFF아이템을 던졌다.");
 		}
 

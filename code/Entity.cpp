@@ -34,7 +34,7 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	setGrid(gridX, gridY, gridZ);
 	TileEntity(getGridX(), getGridY(), getGridZ()) = this;
 	updateSpriteFlash();
-	entityInfo.equipment = new ItemPocket(storageType::equip);
+	entityInfo.equipment = std::make_unique<ItemPocket>(storageType::equip);
 	entityInfo.proficFocus[0] = 1;
 
 
@@ -46,7 +46,6 @@ Entity::~Entity()//소멸자
 	TileEntity(getGridX(), getGridY(), getGridZ()) = nullptr;
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
-	delete entityInfo.equipment;
 }
 #pragma region getset method
 
@@ -82,7 +81,7 @@ void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
 }
 ItemPocket* Entity::getEquipPtr()
 {
-	return entityInfo.equipment;
+	return entityInfo.equipment.get();
 }
 
 void Entity::updateSpriteFlash()
@@ -146,7 +145,7 @@ float Entity::endAtk()
 }
 void Entity::loadDataFromDex(int index)
 {
-	entityInfo = entityDex[index];
+	entityInfo = entityDex[index].cloneForTransfer();
 	entityInfo.HP = entityInfo.maxHP;
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
@@ -590,21 +589,15 @@ void Entity::drop(ItemPocket* txPtr)
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		createItemStack({ getGridX(), getGridY(), getGridZ() });
 		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
-		targetStack->setPocket(txPtr);//스토리지 교체(메모리는 메소드 내부에서 해제됨)
+		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 		targetStack->updateSprIndex();
 	}
 	else //이미 그 자리에 아이템이 있는 경우
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
 		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
-
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
-
-		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--)
-		{
-			txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
-		}
-		delete txPtr; //잊지않고 기존의 매개변수 drop을 제거해준다.
+		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 	}
 
 	addAniUSetPlayer(targetStack, aniFlag::drop);
@@ -619,7 +612,7 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
 		createItemStack({ gridX, gridY, getGridZ() });
 		targetStack = TileItemStack(gridX, gridY, getGridZ());
-		targetStack->setPocket(txPtr);//스토리지 교체(메모리는 메소드 내부에서 해제됨)
+		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 		targetStack->updateSprIndex();
 	}
 	else //이미 그 자리에 아이템이 있는 경우
@@ -629,12 +622,7 @@ void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
 
 		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
 		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
-
-		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--)
-		{
-			txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
-		}
-		delete txPtr; //잊지않고 기존의 매개변수 drop을 제거해준다.
+		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 	}
 	addAniUSetPlayer(targetStack, aniFlag::throwing);
 
@@ -703,7 +691,7 @@ int Entity::getAimWeaponIndex()
 {
 	//현재 플레이어가 적에게 겨누는 무기의 인덱스를 반환함(-1이면 맨손)
 	equipHandFlag targetHand;
-	std::vector<ItemData> equipInfo = getEquipPtr()->itemInfo;
+	std::vector<ItemData>& equipInfo = getEquipPtr()->itemInfo;
 	if (getAimHand() == equipHandFlag::left) { targetHand = equipHandFlag::left; }
 	else { targetHand = equipHandFlag::right; }
 

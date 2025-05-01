@@ -229,11 +229,11 @@ export void debugConsole()
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
 	{
 		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		ItemPocket* txPtr = new ItemPocket(storageType::temp);
+		std::unique_ptr<ItemPocket> txPtr = std::make_unique<ItemPocket>(storageType::temp);
 		if (equipPtr->itemInfo.size() > 0)
 		{
-			equipPtr->transferItem(txPtr, 0, 1);
-			Player::ins()->drop(txPtr);
+			equipPtr->transferItem(txPtr.get(), 0, 1);
+			Player::ins()->drop(txPtr.get());
 		}
 		Player::ins()->updateCustomSpriteHuman();
 		break;

@@ -12,6 +12,7 @@ import checkCursor;
 import drawWindow;
 import drawItemList;
 import drawSprite;
+import ItemData;
 
 void Equip::drawGUI()
 {

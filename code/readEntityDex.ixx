@@ -97,7 +97,7 @@ export int readEntityDex(const wchar_t* file)
                 if (arrayCounter / csvWidth == entityDex.size() + 1) // 만약 벡터 크기(상하)가 부족하면 1칸 늘림
                 {
                     EntityData newEntity;
-                    entityDex.push_back(newEntity);
+                    entityDex.push_back(std::move(newEntity));
                 }
 
                 if (arrayCounter / (csvWidth) != 0)

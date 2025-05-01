@@ -30,3 +30,4 @@ export import ThreadPool;
 export import drawPrimitive;
 export import timeKeeper;
 export import stringToWstring;
+export import sequenceCounter;

@@ -74,14 +74,14 @@ export void startArea()
 	/////////////////////////////////////////////////▼아이템 레시피 추가////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	availableRecipe = new ItemPocket(storageType::recipe);
+	availableRecipe = std::make_unique<ItemPocket>(storageType::recipe);
 	for (int i = 1; i <= 212; i++)
 	{
 		if (itemDex[i].name != L"?")
 		{
 			if (itemDex[i].checkFlag(itemFlag::CANCRAFT))
 			{
-				((ItemPocket*)availableRecipe)->addRecipe(i);
+				availableRecipe.get()->addRecipe(i);
 			}
 		}
 	}

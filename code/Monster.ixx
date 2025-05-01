@@ -36,6 +36,7 @@ public:
 				getEquipPtr()->addItemFromDex(390);
 				getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
+
 				entityInfo.sprFlip = true;
 
 				updateStatus();
@@ -114,9 +115,9 @@ public:
 			runAnimation(true);
 		}
 		new Corpse(corpseType::bloodM, getX(), getY(), getGridZ());
-		ItemPocket* dropItem = new ItemPocket(storageType::temp);
-		dropItem->addItemFromDex(20, 1);
-		drop(dropItem);
+		std::unique_ptr<ItemPocket> dropItems = std::make_unique<ItemPocket>(storageType::temp);
+		dropItems.get()->addItemFromDex(20, 1);
+		drop(dropItems.get());
 		delete this;
 	}
 

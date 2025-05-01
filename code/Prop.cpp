@@ -24,7 +24,7 @@ import Particle;
 
 Prop::Prop(Point3 inputCoor, int leadItemCode)
 {
-    leadItem = itemDex[leadItemCode];
+    leadItem = itemDex[leadItemCode].cloneForTransfer(1);
     setAniPriority(3);
     //prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
     setGrid(inputCoor.x, inputCoor.y, inputCoor.z);

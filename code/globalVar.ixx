@@ -17,6 +17,7 @@ import EntityData;
 import SkillData;
 import Ani;
 import AlchemyData;
+import ItemPocket;
 
 /////////////////////////////////////////////////////////////////
 export namespace actSet
@@ -142,7 +143,7 @@ export std::vector<int> canBuildListFloor = { 1 }; //나무바닥
 export std::vector<int> canBuildListCeil = { 1 }; //나무천장
 export std::vector<int> canBuildListFac = { 1, 2, 3 }; //차량 철 프레임, 의자, 장롱
 
-export void* availableRecipe;
+export std::unique_ptr<ItemPocket> availableRecipe;
 
 export void* ctrlVeh = nullptr;
 export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환

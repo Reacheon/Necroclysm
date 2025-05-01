@@ -364,7 +364,7 @@ public:
 			//커서가 가리키는 포켓의 주소를 저장
 			if (bagNumber - 1 == pocketCursor)
 			{
-				bagPtr = (ItemPocket*)equipPtr->itemInfo[i].pocketPtr;
+				bagPtr = equipPtr->itemInfo[i].pocketPtr.get();
 				bagIndex = i;
 				break;
 			}
@@ -486,7 +486,7 @@ public:
 			int itemNumber = lootPocket->itemInfo[lootCursor].number;
 			lootPocket->itemInfo[lootCursor].lootSelect = itemNumber;
 			//아직 질량&부피 체크 추가하지 않았음
-			lootPocket->transferItem((ItemPocket*)equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr, lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
+			lootPocket->transferItem(equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr.get(), lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
 		}
 	}
 	void executeEquip()
@@ -503,7 +503,7 @@ public:
 	{
 		if (lootPocket->itemInfo.size() > 0)
 		{
-			ItemData targetItem = lootPocket->itemInfo[lootCursor];
+			ItemData& targetItem = lootPocket->itemInfo[lootCursor];
 			barAct.clear();
 			barAct.push_back(act::wield);
 
@@ -513,7 +513,7 @@ public:
 				//전용 아이템이 탄창일 경우(일반 소총)
 				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 				{
-					ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
 
 					if (gunPtr->itemInfo.size() == 0)
 					{
@@ -527,7 +527,7 @@ public:
 				//전용 아이템이 탄일 경우(리볼버류)
 				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 				{
-					ItemPocket* gunPtr = ((ItemPocket*)targetItem.pocketPtr);
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
 					//탄환 분리
 					if (gunPtr->itemInfo.size() > 0)
 					{
@@ -553,7 +553,7 @@ public:
 				barAct.push_back(act::reloadMagazine);
 
 				//탄창 장전
-				ItemPocket* magazinePtr = ((ItemPocket*)targetItem.pocketPtr);
+				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
 				if (magazinePtr->itemInfo.size() > 0)
 				{
 					barAct.push_back(act::unloadBulletFromMagazine);
@@ -646,17 +646,17 @@ public:
 		if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
 			bool isWield = false;
-			ItemPocket* drop = new ItemPocket(storageType::null);
+			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 			{
 				if (equipPtr->itemInfo[i].equipState == equipHandFlag::left || equipPtr->itemInfo[i].equipState == equipHandFlag::right || equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 				{
-					equipPtr->transferItem(drop, i, 1);
+					equipPtr->transferItem(drop.get(), i, 1);
 					isWield = true;
 				}
 			}
-			if (isWield == true) { Player::ins()->drop(drop); }
-			else { delete drop; }
+			if (isWield == true) { Player::ins()->drop(drop.get()); }
+			else { delete drop.get(); }
 			int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
@@ -704,12 +704,12 @@ public:
 				}
 
 				//왼손 아이템 떨구기
-				ItemPocket* drop = new ItemPocket(storageType::null);
+				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
 					if (equipPtr->itemInfo[i].equipState == handDir)
 					{
-						equipPtr->transferItem(drop, i, 1);
+						equipPtr->transferItem(drop.get(), i, 1);
 						break;
 					}
 				}
@@ -718,11 +718,11 @@ public:
 				{
 					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
 					{
-						equipPtr->transferItem(drop, i, 1);
+						equipPtr->transferItem(drop.get(), i, 1);
 						break;
 					}
 				}
-				Player::ins()->drop(drop);
+				Player::ins()->drop(drop.get());
 
 				int returnIndex = lootPocket->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
@@ -835,7 +835,7 @@ public:
 					//몇 개 넣을까?
 					lootPocket->transferItem
 					(
-						(ItemPocket*)equipPtr->itemInfo[i].pocketPtr,
+						equipPtr->itemInfo[i].pocketPtr.get(),
 						targetLootCursor,
 						transferNumber
 					);

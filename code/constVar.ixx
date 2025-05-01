@@ -1353,8 +1353,8 @@ export enum class particleFlag
 
 //전방선언
 export class ItemPocket;
-export class ItemStack;
 export struct ItemData;
+export class ItemStack;
 export class Entity;
 export class Vehicle;
 export class World;

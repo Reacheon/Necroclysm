@@ -410,9 +410,9 @@ public:
 				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)) ) { return; }
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
-				ItemPocket* drop = new ItemPocket(storageType::null);
-				Player::ins()->getEquipPtr()->transferItem(drop, Player::ins()->getAimWeaponIndex(), 1);
-				Player::ins()->throwing(drop, targetX, targetY);
+				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+				Player::ins()->getEquipPtr()->transferItem(drop.get(), Player::ins()->getAimWeaponIndex(), 1);
+				Player::ins()->throwing(drop.get(), targetX, targetY);
 				Player::ins()->updateStatus();
 				Player::ins()->updateCustomSpriteHuman();
 				updateLog(L"#FFFFFF아이템을 던졌다.");
@@ -425,7 +425,7 @@ public:
 			}
 			else if (targetAtkType == atkType::shot) //사격
 			{
-				ItemData tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
+				ItemData& tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
 				if (getBulletNumber(tmpAimWeapon) > 0) //사격인데 총알이 없을 경우
 				{
 					if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
@@ -435,12 +435,12 @@ public:
 				//직탄식 총
 				if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 				{
-					popTopBullet(((ItemPocket*)tmpAimWeapon.pocketPtr));
+					popTopBullet(tmpAimWeapon.pocketPtr.get());
 				}
 				//탄창식 총
 				else if (itemDex[tmpAimWeapon.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 				{
-					popTopBullet((ItemPocket*)((ItemPocket*)tmpAimWeapon.pocketPtr)->itemInfo[0].pocketPtr);
+					popTopBullet(tmpAimWeapon.pocketPtr.get()->itemInfo[0].pocketPtr.get());
 				}
 
 				auto pEquip = Player::ins()->getEquipPtr();

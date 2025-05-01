@@ -235,7 +235,7 @@ export int readItemDex(const wchar_t* file)
                 if (arrayCounter / csvWidth == itemDex.size() + 1) // 만약 벡터 크기(상하)가 부족하면 1칸 늘림
                 {
                     ItemData newItem;
-                    itemDex.push_back(newItem);
+                    itemDex.push_back(std::move(newItem));
                 }
 
                 if (arrayCounter / (csvWidth) != 0)

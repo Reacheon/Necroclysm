@@ -4,12 +4,13 @@ import std;
 import constVar;
 import Sprite;
 import SkillData;
+import ItemPocket;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
-export struct EntityData
+export struct EntityData_Base
 {
     std::wstring name = L"DEFAULT ENTITY";
     unsigned __int16 entityCode = 1;
@@ -44,10 +45,15 @@ export struct EntityData
 
     __int8 hpBarHeight = -12;
     __int8 partsStartIndex = 0;
-    std::unordered_map<int,std::array<int,2>> partsPosition;
+    std::unordered_map<int, std::array<int, 2>> partsPosition;
 
     relationFlag relation = relationFlag::hostile;
     bool isHumanCustomSprite = false;
+};
+
+export struct EntityData : public EntityData_Base
+{
+
     
     ////////////////////////////////csv에 없는 데이터/////////////////////////////////////
     __int16 HP = 100;
@@ -64,7 +70,7 @@ export struct EntityData
     unsigned __int8 statDex = 5;
     bool isPlayer = false;
     __int8 direction = 0;
-    ItemPocket* equipment;
+    std::unique_ptr<ItemPocket> equipment;
     std::array<int, TALENT_SIZE> proficExp = { 0, }; //경험치
     std::array<float, TALENT_SIZE> proficApt = { 2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0, }; //적성
     std::array<int, TALENT_SIZE> proficFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
@@ -82,4 +88,12 @@ export struct EntityData
 
     walkFlag walkMode = walkFlag::walk;
     double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
+
+    EntityData cloneForTransfer() const;
+    EntityData();
+    virtual ~EntityData();
+    EntityData(EntityData&&);
+    EntityData& operator=(EntityData&&) = default;
+    EntityData(const EntityData&) = delete;
+    EntityData& operator=(const EntityData&) = delete;
 };

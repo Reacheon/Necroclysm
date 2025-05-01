@@ -6,7 +6,6 @@ export module ItemPocket;
 import std;
 import util;
 import constVar;
-import ItemData;
 
 export class ItemPocket
 {
@@ -76,24 +75,21 @@ public:
 	int searchSubcategory(itemSubcategory input);
 
 	//현재 이 포켓의 하위포켓을 모두 체크해 가지고있는 아이템의 숫자 반환
-	int numberItem(int inputCode);
+	int numberItem(int inputCode, int currentDepth = 0);
 
 	//현재 이 포켓의 하위포켓을 모두 체크하여 입력한 도구기술이 존재하는지 반환
-	bool checkToolQuality(int input);
+	bool checkToolQuality(int input, int currentDepth = 0);
 
 };
 
 //현재 이 총에 장전된 모든 총알을 벡터 형태로 반환
-export ItemPocket* getBulletPocket(ItemData inputGun);
+export ItemPocket* getBulletPocket(ItemData& inputGun);
 
 //상단 총알의 데이터를 삭제
 export void popTopBullet(ItemPocket* inputPocket);
 
-//상단 총알의 데이터 복사본을 반환
-export ItemData getTopBulletData(ItemData inputGun);
-
 //이 총에 장전된 모든 총알의 갯수 반환, 탄창일 때도 할것
-export int getBulletNumber(ItemData inputGun);
+export int getBulletNumber(ItemData& inputGun);
 
 //입력한 포켓의 내부 아이템 수를 반환
 export int countPocketItemNumber(ItemPocket* inputPtr);

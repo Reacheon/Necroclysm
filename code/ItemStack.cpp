@@ -8,20 +8,21 @@ import wrapVar;
 import textureVar;
 import World;
 import ItemPocket;
+import ItemData;
 import Ani;
 import Sprite;
 import Coord;
 
 ItemStack::ItemStack(Point3 inputCoor)
 {
-	storage = new ItemPocket(storageType::stack);
+	storage = std::make_unique<ItemPocket>(storageType::stack);
 	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
 }
 
 ItemStack::ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
-	storage = new ItemPocket(storageType::stack);
+	storage = std::make_unique<ItemPocket>(storageType::stack);
 	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
 
@@ -42,7 +43,7 @@ void ItemStack::setSprite(Sprite* inputSprite)
 }
 ItemPocket* ItemStack::getPocket()
 {
-	return storage;
+	return storage.get();
 }
 
 int ItemStack::getSprIndex() { return sprIndex; }
@@ -50,11 +51,6 @@ void ItemStack::setSprIndex(int val) { sprIndex = val; }
 int ItemStack::getTargetSprIndex() { return targetSprIndex; }
 void ItemStack::setTargetSprIndex(int val) { targetSprIndex = val; }
 
-void ItemStack::setPocket(ItemPocket* inputPtr)
-{
-	delete storage;
-	storage = inputPtr;
-}
 //@brief 자기가 담당하는 storage가 사이즈가 0일 경우 스스로 제거함
 void ItemStack::checkEmpty()
 {

@@ -528,9 +528,6 @@
     <ClCompile Include="code\Vehicle.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
-    <ClCompile Include="Vehicle_runAI.cpp">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
     <ClCompile Include="code\Craft.ixx">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
@@ -552,9 +549,6 @@
     <ClCompile Include="code\Maint.ixx">
       <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
-    <ClCompile Include="ItemStack.cpp">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\Flame.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
@@ -563,6 +557,21 @@
     </ClCompile>
     <ClCompile Include="code\ItemPocket.cpp">
       <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle_runAI.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ItemStack.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ItemData.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\sequenceCounter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\EntityData.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

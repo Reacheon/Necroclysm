@@ -34,7 +34,7 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
     errorBox(TileVehicle(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 프롭이 존재한다!");
     TileVehicle(inputX, inputY, inputZ) = this;
 
-    partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
+    partInfo[{inputX, inputY}] = std::make_unique<ItemPocket>(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(leadItemCode, 1);
 
 
@@ -43,7 +43,6 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 
 Vehicle::~Vehicle()
 {
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++) delete it->second;
     prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
 }
 
@@ -51,26 +50,33 @@ Vehicle::~Vehicle()
 
 bool Vehicle::hasFrame(int inputX, int inputY)
 {
-    for (int i = 0; i < partInfo[{inputX, inputY}]->itemInfo.size(); i++)
+    auto it = partInfo.find({ inputX, inputY });
+    if (it != partInfo.end())
     {
-        if (partInfo[{inputX, inputY}]->itemInfo[i].checkFlag(itemFlag::VFRAME)) return true;
+        std::vector<ItemData>& vParts = partInfo[{inputX, inputY}]->itemInfo;
+        for (int i = 0; i < vParts.size(); i++)
+        {
+            if (vParts[i].checkFlag(itemFlag::VFRAME)) return true;
+        }
     }
     return false;
 }
 
 
 /////////////////////////////////////////※ 기존 프레임에 부품 추가////////////////////////////////////////////////////
-void Vehicle::addPart(int inputX, int inputY, ItemData inputPart) //기본 부품추가 함수, 모든 함수들이 이 함수를 기본으로 들어감, 여기에 알고리즘 넣을 것
+void Vehicle::addPart(int inputX, int inputY, int dexIndex) 
 {
     errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] 입력한 위치에 프레임이 존재하지 않는다.");
-    errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:addPart] 입력한 위치의 프레임의 itemInfo.size가 0과 같다.");
+
+    ItemData inputPart = itemDex[dexIndex].cloneForTransfer(1);
+
     if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))//타이어일 경우 맨 앞에 추가
     {
-        partInfo[{inputX, inputY}]->itemInfo.insert(partInfo[{inputX, inputY}]->itemInfo.begin(), inputPart);
+        partInfo[{inputX, inputY}]->itemInfo.insert(partInfo[{inputX, inputY}]->itemInfo.begin(), std::move(inputPart));
     }
     else//그 외 부품은 뒤에 추가
     {
-        partInfo[{inputX, inputY}]->itemInfo.push_back(inputPart);
+        partInfo[{inputX, inputY}]->itemInfo.push_back(std::move(inputPart));
     }
 
     //열차바퀴 중심 설정
@@ -79,7 +85,6 @@ void Vehicle::addPart(int inputX, int inputY, ItemData inputPart) //기본 부�
     //prt(L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
     updateSpr();
 }
-void Vehicle::addPart(int inputX, int inputY, int dexIndex) { addPart(inputX, inputY, itemDex[dexIndex]); }
 void Vehicle::addPart(int inputX, int inputY, std::vector<int> dexVec)
 {
     for (int i = 0; i < dexVec.size(); i++) addPart(inputX, inputY, dexVec[i]);
@@ -107,7 +112,7 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
     }
     errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), "[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
 
-    partInfo[{inputX, inputY}] = new ItemPocket(storageType::null);
+    partInfo[{inputX, inputY}] = std::make_unique<ItemPocket>(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
     TileVehicle(inputX, inputY, getGridZ()) = this;
 
@@ -122,11 +127,11 @@ int Vehicle::getSprIndex(int inputX, int inputY)
     return partInfo[{inputX, inputY}]->itemInfo[0].sprIndex;
 }
 
-std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> Vehicle::getRotatePartInfo(dir16 inputDir16)
+void Vehicle::getRotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> newPartInfo;
+        std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, decltype(arrayHasher2)> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
@@ -145,14 +150,52 @@ std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> Vehi
                             break;
                         }
                     }
-                    newPartInfo[{dstCoord[0] + getGridX(), dstCoord[1] + getGridY()}] = partInfo[{x, y}];
+                    newPartInfo[{dstCoord[0] + getGridX(), dstCoord[1] + getGridY()}] = std::move(partInfo[{x, y}]);
+                }
+            }
+        }
+        partInfo = std::move(newPartInfo);
+    }
+}
 
+std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> Vehicle::getRotateShadow(dir16 inputDir16)
+{
+    if (bodyDir != inputDir16)
+    {
+        std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> newPartInfo;
+        auto currentCoordTransform = coordTransform[bodyDir];
+        auto targetCoordTransform = coordTransform[inputDir16];
+        for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
+        {
+            for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
+            {
+                if (partInfo.find({ x,y }) != partInfo.end())
+                {
+                    std::array<int, 2> originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
+                    std::array<int, 2> dstCoord;
+                    for (auto it = targetCoordTransform.begin(); it != targetCoordTransform.end(); it++)
+                    {
+                        if (it->second == originCoord)
+                        {
+                            dstCoord = it->first;
+                            break;
+                        }
+                    }
+                    newPartInfo.insert({ dstCoord[0] + getGridX(), dstCoord[1] + getGridY() });
                 }
             }
         }
         return newPartInfo;
     }
-    else return partInfo;
+    else
+    {
+        std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> newPartInfo;
+        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        {
+            newPartInfo.insert({ it->first[0],it->first[1] });
+        }
+        return newPartInfo;
+    }
 }
 
 void Vehicle::rotateEntityPtr(dir16 inputDir16)
@@ -209,7 +252,7 @@ void Vehicle::rotate(dir16 inputDir16)
         }
 
         rotateEntityPtr(inputDir16);
-        partInfo = getRotatePartInfo(inputDir16);
+        getRotatePartInfo(inputDir16);
 
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
@@ -266,7 +309,7 @@ void Vehicle::updateSpr()
         int tgtY = it->first[1];
         int tgtRelX = tgtX - getGridX();
         int tgtRelY = tgtY - getGridY();
-        ItemPocket* tgtPocket = it->second;
+        ItemPocket* tgtPocket = it->second.get();
         for (int layer = 0; layer < tgtPocket->itemInfo.size(); layer++)
         {
             if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::VPART_WALL_CONNECT))
@@ -294,7 +337,7 @@ void Vehicle::updateSpr()
                         }
                         if (partInfo.find({ getGridX() + key2[0], getGridY() + key2[1] }) != partInfo.end())
                         {
-                            auto tgtItemInfo = partInfo[{getGridX() + key2[0], getGridY() + key2[1]}]->itemInfo;
+                            std::vector<ItemData>& tgtItemInfo = partInfo[{getGridX() + key2[0], getGridY() + key2[1]}]->itemInfo;
                             for (int i = 0; i < tgtItemInfo.size(); i++)
                             {
                                 if (/*tgtItemInfo[i].checkFlag(itemFlag::PROP_WALL_CONNECT) && */tgtItemInfo[i].tileConnectGroup == currentGroup)
@@ -352,12 +395,12 @@ void Vehicle::shift(int dx, int dy)
         }
     }
 
-    std::unordered_map<std::array<int, 2>, ItemPocket*, decltype(arrayHasher2)> shiftPartInfo;
+    std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, decltype(arrayHasher2)> shiftPartInfo;
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        shiftPartInfo[{it->first[0] + dx, it->first[1] + dy}] = partInfo[{it->first[0], it->first[1]}];
+        shiftPartInfo[{it->first[0] + dx, it->first[1] + dy}] = std::move(partInfo[{it->first[0], it->first[1]}]);
     }
-    partInfo = shiftPartInfo;
+    partInfo = std::move(shiftPartInfo);
 
     addGridX(dx);
     addGridY(dy);
@@ -393,14 +436,14 @@ void Vehicle::zShift(int dz)
 
 bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 {
-    auto rotatePartInfo = getRotatePartInfo(inputDir16);
+    auto rotatePartInfo = getRotateShadow(inputDir16);
     for (auto it = rotatePartInfo.begin(); it != rotatePartInfo.end(); it++)
     {
         //벽 충돌 체크
-        if (TileWall(it->first[0] + dx, it->first[1] + dy, getGridZ()) != 0) return true;
+        if (TileWall((*it)[0] + dx, (*it)[1] + dy, getGridZ()) != 0) return true;
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ());
+        Vehicle* targetPtr = TileVehicle((*it)[0] + dx, (*it)[1] + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this) return true;
     }
     return false;
@@ -653,7 +696,7 @@ void Vehicle::updateTrainCenter()
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
-        ItemPocket* pocketPtr = it->second;
+        ItemPocket* pocketPtr = it->second.get();
         for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
         {
             if (pocketPtr->itemInfo[i].checkFlag(itemFlag::TRAIN_WHEEL))
