@@ -584,6 +584,11 @@ void Entity::drop(ItemPocket* txPtr)
 	ItemStack* targetStack = nullptr;;
 	//아이템 스택이 이미 있는 경우와 없는 경우
 
+	for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--)
+	{
+		txPtr->itemInfo[i].equipState = equipHandFlag::none;
+	}
+
 	if (TileItemStack(getGridX(), getGridY(), getGridZ()) == nullptr) //그 자리에 템 없는 경우
 	{
 		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
