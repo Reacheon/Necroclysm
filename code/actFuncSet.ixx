@@ -33,7 +33,7 @@ export namespace actFunc
 		prt(L"executeReloadSelf이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 		std::vector<std::wstring> bulletList;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		std::vector<ItemPocket*> targetSearchPtr;
 
 		//탐사할 타일 추가 (장비, 주변타일 9칸)
@@ -115,7 +115,7 @@ export namespace actFunc
 		prt(L"executeReloadOther이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 		std::vector<std::wstring> pocketList;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		std::vector<ItemPocket*> targetSearchPtr;
 
 		//탐사할 타일 추가 (장비, 주변타일 9칸)
@@ -199,7 +199,7 @@ export namespace actFunc
 		ItemPocket* targetPocket = unloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get();
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 		for (int i = 0; i < targetPocket->itemInfo.size(); i++) { targetPocket->transferItem(drop.get(), i, targetPocket->itemInfo[i].number); }
-		Player::ins()->drop(drop.get());
+		PlayerPtr->drop(drop.get());
 	}
 
 	export void closeDoor(int tgtX, int tgtY, int tgtZ)
@@ -217,7 +217,7 @@ export namespace actFunc
 		tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 		tgtProp->leadItem.extraSprIndexSingle--;
-		Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+		PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 	}
 
 	export void toggle(ItemData& inputItem)
@@ -227,9 +227,9 @@ export namespace actFunc
 			inputItem.eraseFlag(itemFlag::TOGGLE_OFF);
 			inputItem.addFlag(itemFlag::TOGGLE_ON);
 
-			Player::ins()->lightList.push_back(std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 4, 80, SDL_Color{ 150, 150, 250 }));
+			PlayerPtr->lightList.push_back(std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 4, 80, SDL_Color{ 150, 150, 250 }));
 
-			Player::ins()->updateCustomSpriteHuman();
+			PlayerPtr->updateCustomSpriteHuman();
 			updateLog(L"#FFFFFF헤드랜턴의 전원을 켰다.");
 		}
 		else if (inputItem.checkFlag(itemFlag::TOGGLE_ON))
@@ -237,9 +237,9 @@ export namespace actFunc
 			inputItem.eraseFlag(itemFlag::TOGGLE_ON);
 			inputItem.addFlag(itemFlag::TOGGLE_OFF);
 
-			Player::ins()->lightList.clear();
+			PlayerPtr->lightList.clear();
 
-			Player::ins()->updateCustomSpriteHuman();
+			PlayerPtr->updateCustomSpriteHuman();
 			updateLog(L"#FFFFFF헤드랜턴의 전원을 껐다.");
 
 		}

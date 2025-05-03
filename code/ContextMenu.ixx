@@ -289,20 +289,19 @@ public:
 		}
 		else if (inputAct == act::pull)
 		{
-			if (Player::ins()->pulledCart == nullptr)
+			if (PlayerPtr->pulledCart == nullptr)
 			{
-				Player::ins()->pulledCart = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+				PlayerPtr->pulledCart = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 			}
 			else
 			{
-				Player::ins()->pulledCart = nullptr;
+				PlayerPtr->pulledCart = nullptr;
 			}
 		}
 		else if (inputAct == act::ride)
 		{
-			Player::ins()->ridingEntity = TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			TileEntity(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) = nullptr;
-			Player::ins()->ridingType = ridingFlag::horse;
+			PlayerPtr->ridingEntity = std::move(World::ins()->getTile(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()).EntityPtr);
+			PlayerPtr->ridingType = ridingFlag::horse;
 		}
 		else if (inputAct == act::vehicleRepair)
 		{

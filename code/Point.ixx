@@ -52,6 +52,13 @@ export struct Point3
     }
 
     bool operator==(const Point3& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
+
+    bool operator<(const Point3& rhs) const 
+    {
+        if (x != rhs.x) return x < rhs.x;
+        if (y != rhs.y) return y < rhs.y;
+        return z < rhs.z;
+    }
 };
 
 

@@ -20,27 +20,27 @@ export void startArea()
 	new HUD();
 	//new TitleScreen();
 
-	Player* playerPtr = Player::ins();
-	playerPtr->setGrid(0, 0, 0);
-	playerPtr->setDstGrid(0, 0);
+	World::ins()->getTile(0, 0, 0).EntityPtr = std::make_unique<Player>(0, 0, 0);
+	PlayerPtr = (Player*)TileEntity(0, 0, 0);
+	PlayerPtr->setGrid(0, 0, 0);
+	PlayerPtr->setDstGrid(0, 0);
 
-	playerPtr->updateWalkable(PlayerX() + 1, PlayerY());
-	playerPtr->updateWalkable(PlayerX() + 1, PlayerY() - 1);
-	playerPtr->updateWalkable(PlayerX(), PlayerY() - 1);
-	playerPtr->updateWalkable(PlayerX() - 1, PlayerY() - 1);
-	playerPtr->updateWalkable(PlayerX() - 1, PlayerY());
-	playerPtr->updateWalkable(PlayerX() - 1, PlayerY() + 1);
-	playerPtr->updateWalkable(PlayerX(), PlayerY() + 1);
-	playerPtr->updateWalkable(PlayerX() + 1, PlayerY() + 1);
+
+	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY());
+	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY() - 1);
+	PlayerPtr->updateWalkable(PlayerX(), PlayerY() - 1);
+	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY() - 1);
+	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY());
+	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY() + 1);
+	PlayerPtr->updateWalkable(PlayerX(), PlayerY() + 1);
+	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY() + 1);
 
 	//테스트 아이템
 	int pX = PlayerX();
 	int pY = PlayerY();
 	int pZ = PlayerZ();
 
-	new Monster(6, 5, 0, 0);//NPC
-
-
+	createMonster({ 5,0,0 }, 6);//NPC
 
 	createItemStack({ 2, 1, 0 }, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
@@ -56,9 +56,7 @@ export void startArea()
 	createItemStack({3, 9, 0 }, { {382,1} });
 	createItemStack({4, 9, 0 }, { {384,30} });
 
-	new Monster(5, 8, 8, 0);//허수아비
-
-
+	createMonster({ 8,8,0 }, 5);//허수아비
 
 	createItemStack({7, -4, 0 }, { {391,1} }); //벌목도끼
 
@@ -887,6 +885,6 @@ export void startArea()
 
 	World::ins()->createSector(0, 0, 0);
 
-	Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+	PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 	
 };

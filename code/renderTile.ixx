@@ -138,7 +138,7 @@ __int64 analyseRender()
 			if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false) renderEntityList.push_back((Drawable*)pPtr);
 
 			//일반 객체
-			Drawable* ePtr = (Drawable*)((Entity*)(thisTile->EntityPtr));
+			Drawable* ePtr = (Drawable*)(thisTile->EntityPtr.get());
 			if (ePtr != nullptr) renderEntityList.push_back(ePtr);
 
 			//가스
@@ -152,7 +152,7 @@ __int64 analyseRender()
 	}
 
 	for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.push_back((Drawable*)(Vehicle*)(*it));
-	for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)(Entity*)(*it));
+	for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)((*it)));
 
 	return getNanoTimer() - timeStampStart;
 }

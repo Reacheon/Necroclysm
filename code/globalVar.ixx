@@ -18,6 +18,7 @@ import SkillData;
 import Ani;
 import AlchemyData;
 import ItemPocket;
+import Player;
 
 /////////////////////////////////////////////////////////////////
 export namespace actSet
@@ -149,6 +150,8 @@ export void* ctrlVeh = nullptr;
 export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환
 
 export SDL_Rect quickSlotBtn[8];
+
+export Player* PlayerPtr = nullptr;
 
 export namespace dur
 {

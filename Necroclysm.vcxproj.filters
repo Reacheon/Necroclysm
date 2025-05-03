@@ -573,5 +573,8 @@
     <ClCompile Include="code\wrapVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
+    <ClCompile Include="code\Monster.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

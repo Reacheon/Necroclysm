@@ -72,7 +72,7 @@ export void debugConsole()
 		if (autoLight)
 		{
 			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), 8, 255, { 0xd8,0x56,0x00 });
-			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 		}
 		else
 		{
@@ -93,7 +93,7 @@ export void debugConsole()
 			std::cin >> lightColorB;
 
 			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
-			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 		}
 		updateLog(L"#FFFFFF디버그 : 테스트 광원을 생성했다.");
 		prt(L"[디버그]테스트 광원을 생성했다!\n");
@@ -102,8 +102,8 @@ export void debugConsole()
 	}
 	case 2: // generateEntity
 	{
-		Player* ptr = Player::ins();
-		new Monster(2, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
+		Player* ptr = PlayerPtr;
+		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, 2);
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
@@ -162,7 +162,7 @@ export void debugConsole()
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
 				if (TileEntity(x, y, zp) == nullptr) prt(L"□");
-				else if (TileEntity(x, y, zp) == Player::ins()) prt(lowCol::yellow, L"@");
+				else if (TileEntity(x, y, zp) == PlayerPtr) prt(lowCol::yellow, L"@");
 				else prt(lowCol::red, L"E");
 			}
 			prt(L"\n");
@@ -206,9 +206,9 @@ export void debugConsole()
 	case 10: // generate Sticker
 	{
 		new Sticker(true, -80, -80, L"ABCDE", nullptr, { 255,222,255 }, L"501TEXT", false, 10);
-		new Sticker(false, Player::ins()->getX(), Player::ins()->getY() - 16, spr::effectClaw1, 0, L"121DEPTHTEST", true);
-		new Sticker(false, Player::ins()->getX(), Player::ins()->getY() - 16, spr::charsetHero, 0, L"122DEPTHTEST", true);
-		//new Sticker(false, Player::ins()->getX(), Player::ins()->y - 16, spr::defaultStranger, 0, L"123DEPTHTEST", true);
+		new Sticker(false, PlayerPtr->getX(), PlayerPtr->getY() - 16, spr::effectClaw1, 0, L"121DEPTHTEST", true);
+		new Sticker(false, PlayerPtr->getX(), PlayerPtr->getY() - 16, spr::charsetHero, 0, L"122DEPTHTEST", true);
+		//new Sticker(false, PlayerPtr->getX(), PlayerPtr->y - 16, spr::defaultStranger, 0, L"123DEPTHTEST", true);
 		break;
 	}
 	case 11: // 가스 생성
@@ -228,14 +228,14 @@ export void debugConsole()
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
 	{
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		std::unique_ptr<ItemPocket> txPtr = std::make_unique<ItemPocket>(storageType::temp);
 		if (equipPtr->itemInfo.size() > 0)
 		{
 			equipPtr->transferItem(txPtr.get(), 0, 1);
-			Player::ins()->drop(txPtr.get());
+			PlayerPtr->drop(txPtr.get());
 		}
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateCustomSpriteHuman();
 		break;
 	}
 	case 13:
@@ -247,7 +247,7 @@ export void debugConsole()
 		int expVal;
 		prt(L"추가할 경험치의 양을 입력해주세요.\n");
 		std::cin >> expVal;
-		Player::ins()->addProficExp(expVal);
+		PlayerPtr->addProficExp(expVal);
 		break;
 	}
 	case 15://탑승 중인 차량 회전
@@ -336,8 +336,8 @@ export void debugConsole()
 	}
 	case 22: //말 생성
 	{
-		Player* ptr = Player::ins();
-		new Monster(4, ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ());
+		Player* ptr = PlayerPtr;
+		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, 4);
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
@@ -353,7 +353,7 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		Player::ins()->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
+		PlayerPtr->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}
@@ -373,9 +373,15 @@ export void debugConsole()
 		prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
 		std::cin >> tgtGridZ;
 
-		TileEntity(px, py, pz) = nullptr;
-		Player::ins()->setGrid(tgtGridX, tgtGridY, tgtGridZ);
-		TileEntity(tgtGridX, tgtGridY, tgtGridZ) = (Entity*)Player::ins();
+        EntityPtrMove({ px,py,pz }, { tgtGridX,tgtGridY,tgtGridZ });
+		PlayerPtr->setGrid(tgtGridX, tgtGridY, tgtGridZ);
+		for (int i = 0; i < PlayerPtr->lightList.size(); i++)
+		{
+			auto lPtr = PlayerPtr->lightList[i].get();
+			lPtr->releaseLight();
+			lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
+			lPtr->updateLight(lPtr->lightRange);
+		}
 		break;
 	}
 	case 25://청크라인 그리기

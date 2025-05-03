@@ -51,8 +51,8 @@ export Corouter useSkill(int skillCode)
 		targetStr.erase(0, targetStr.find(L",") + 1);
 		int targetZ = wtoi(targetStr.c_str());
 
-		Player::ins()->setSkillTarget(targetX, targetY, targetZ);
-		addAniUSetPlayer(Player::ins(), aniFlag::fireStorm);
+		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
+		addAniUSetPlayer(PlayerPtr, aniFlag::fireStorm);
 		break;
 	}
 	}

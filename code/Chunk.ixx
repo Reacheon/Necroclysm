@@ -120,7 +120,7 @@ public:
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
-				if (getChunkTile(x, y).EntityPtr != nullptr) { entityList.push_back((Entity*)getChunkTile(x, y).EntityPtr); }
+				if (getChunkTile(x, y).EntityPtr != nullptr) { entityList.push_back(getChunkTile(x, y).EntityPtr.get()); }
 			}
 		}
 		return entityList;

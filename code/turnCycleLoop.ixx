@@ -102,13 +102,13 @@ __int64 playerInputTurn()
 			(*coFunc).run();
 		}
 
-		if (Player::ins()->getHasAStarDst() == false) isPlayerMoving = false;
+		if (PlayerPtr->getHasAStarDst() == false) isPlayerMoving = false;
 	}
 
-	if (Player::ins()->getHasAStarDst() == true) //자동이동 기능이 활성화되었을 경우
+	if (PlayerPtr->getHasAStarDst() == true) //자동이동 기능이 활성화되었을 경우
 	{
-		int dx = Player::ins()->getAStarDstX() - PlayerX();
-		int dy = Player::ins()->getAStarDstY() - PlayerY();
+		int dx = PlayerPtr->getAStarDstX() - PlayerX();
+		int dy = PlayerPtr->getAStarDstY() - PlayerY();
 
 		if (dx != 0 || dy != 0)
 		{
@@ -123,29 +123,29 @@ __int64 playerInputTurn()
 				}
 			}
 
-			if (walkableTile.find({ Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY() }) != walkableTile.end())//목적지가 이동 가능할 경우
+			if (walkableTile.find({ PlayerPtr->getAStarDstX(), PlayerPtr->getAStarDstY() }) != walkableTile.end())//목적지가 이동 가능할 경우
 			{
-				aStarTrail = aStar(walkableTile, PlayerX(), PlayerY(), Player::ins()->getAStarDstX(), Player::ins()->getAStarDstY());
+				aStarTrail = aStar(walkableTile, PlayerX(), PlayerY(), PlayerPtr->getAStarDstX(), PlayerPtr->getAStarDstY());
 				if (aStarTrail.size() >= 2)
 				{
-					Player::ins()->startMove(coord2Dir(aStarTrail[1].x - aStarTrail[0].x, aStarTrail[1].y - aStarTrail[0].y));
+					PlayerPtr->startMove(coord2Dir(aStarTrail[1].x - aStarTrail[0].x, aStarTrail[1].y - aStarTrail[0].y));
 					aStarTrail.erase(aStarTrail.begin());
 				}
 				else
 				{
-					Player::ins()->deactAStarDst();
+					PlayerPtr->deactAStarDst();
 					isPlayerMoving = false;
 				}
 			}
 			else
 			{
-				Player::ins()->deactAStarDst();
+				PlayerPtr->deactAStarDst();
 				isPlayerMoving = false;
 			}
 		}
 		else
 		{
-			Player::ins()->deactAStarDst();
+			PlayerPtr->deactAStarDst();
 			isPlayerMoving = false;
 		}
 
@@ -340,7 +340,7 @@ __int64 animationTurn()
 			addTimeTurn(timeGift);
 			for (auto ePtr : entityList)
 			{
-				if (ePtr != (Player::ins())) ((Monster*)ePtr)->addTurnResource(timeGift);
+				if (ePtr != (PlayerPtr)) ((Monster*)ePtr)->addTurnResource(timeGift);
 			}
 			for (auto vPtr : vehList) vPtr->addTurnResource(timeGift);
 			timeGift = 0;
@@ -409,7 +409,7 @@ __int64 entityAITurn()
 
 	for (auto ePtr : entityList)
 	{
-		if (ePtr != (Player::ins()))
+		if (ePtr != (PlayerPtr))
 		{
 			if (((Monster*)ePtr)->runAI() == false) endMonsterTurn = false;
 		}

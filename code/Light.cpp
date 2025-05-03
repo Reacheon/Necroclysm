@@ -43,11 +43,11 @@ void Light::updateLight(int range)
 		}
 	}
 
-	for (auto it = innateLight.begin(); it != innateLight.end(); it++)
+	for (auto it = litTiles.begin(); it != litTiles.end(); it++)
 	{
-		int x = (*it)[axis::x];
-		int y = (*it)[axis::y];
-		int z = (*it)[axis::z];
+		int x = (*it).x;
+		int y = (*it).y;
+		int z = (*it).z;
 
 		World::ins()->getTile(x, y, z).light += 1;
 
@@ -63,11 +63,11 @@ void Light::updateLight(int range)
 
 void Light::releaseLight()
 {
-	for (auto it = innateLight.begin(); it != innateLight.end(); it++)
+	for (auto it = litTiles.begin(); it != litTiles.end(); it++)
 	{
-		int x = (*it)[axis::x];
-		int y = (*it)[axis::y];
-		int z = (*it)[axis::z];
+		int x = (*it).x;
+		int y = (*it).y;
+		int z = (*it).z;
 
 		World::ins()->getTile(x, y, z).light -= 1;
 
@@ -79,7 +79,7 @@ void Light::releaseLight()
 		World::ins()->getTile(x, y, z).greenLight -= greenLight;
 		World::ins()->getTile(x, y, z).blueLight -= blueLight;
 	}
-	innateLight.clear();
+	litTiles.clear();
 }
 
 void Light::rayCasting(int x1, int y1, int x2, int y2)
@@ -89,7 +89,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 	int delx = abs(x2 - x1);
 	int dely = abs(y2 - y1);
 	int i = 0;
-	innateLight.insert({ x1,y1,getGridZ() });
+	litTiles.insert({ x1,y1,getGridZ() });
 	if (fabs(1.0 * dely / delx) < 1)
 	{
 		int p = 2 * dely - delx;
@@ -101,7 +101,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; }
 				else if (xo > x2 && y2 > yo) { x1--; }
 				else { x1--; }
-				innateLight.insert({ x1,y1,getGridZ() });
+				litTiles.insert({ x1,y1,getGridZ() });
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely);
 			}
@@ -111,7 +111,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				innateLight.insert({ x1,y1,getGridZ() });
+				litTiles.insert({ x1,y1,getGridZ() });
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * dely) - (2 * delx);
 			}
@@ -130,7 +130,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { y1--; }
 				else if (xo > x2 && y2 > yo) { y1++; }
 				else { y1--; }
-				innateLight.insert({ x1,y1,getGridZ() });
+				litTiles.insert({ x1,y1,getGridZ() });
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx);
 			}
@@ -140,7 +140,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				innateLight.insert({ x1,y1,getGridZ() });
+				litTiles.insert({ x1,y1,getGridZ() });
 				if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 				p = p + (2 * delx) - (2 * dely);
 			}
@@ -155,7 +155,7 @@ void Light::rayCasting(int x1, int y1, int x2, int y2)
 			else if (x2 > x1 && y1 > y2) { x1++; y1--; }
 			else if (x1 > x2 && y2 > y1) { x1--; y1++; }
 			else { x1--; y1--; }
-			innateLight.insert({ x1,y1,getGridZ() });
+			litTiles.insert({ x1,y1,getGridZ() });
 			if (isRayBlocker({ x1, y1, getGridZ() })) { return; }
 			i++;
 		}

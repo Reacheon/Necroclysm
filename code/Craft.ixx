@@ -571,7 +571,7 @@ public:
 		for (int i = 0; i < recipePtr->itemInfo.size(); i++) recipePtr->itemInfo[i].addFlag(itemFlag::BLACKFILTER);
 		for (int i = 0; i < matchCount; i++) recipePtr->itemInfo[i].eraseFlag(itemFlag::BLACKFILTER);
 
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int targetCursor = 0; targetCursor < matchCount; targetCursor++)
 		{
 			if (canCraft(recipePtr->itemInfo[targetCursor].itemCode)) recipePtr->itemInfo[targetCursor].addFlag(itemFlag::WHITEFILTER);
@@ -584,12 +584,12 @@ public:
 
 	bool canCraft(int itemCode, bool exceptMaterial)
 	{
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		//조합에 필요한 플레이어 재능 체크
 		for (int i = 0; i < itemDex[itemCode].recipeProficNeed.size(); i++)
 		{
 			int needLevel = itemDex[itemCode].recipeProficNeed[i].second;
-			int playerLevel = Player::ins()->getProficLevel(itemDex[itemCode].recipeProficNeed[i].first);
+			int playerLevel = PlayerPtr->getProficLevel(itemDex[itemCode].recipeProficNeed[i].first);
 			if (playerLevel < needLevel) return false;
 		}
 
@@ -686,8 +686,8 @@ public:
 					//툴 퀄리티에 따라 적색, 녹색 변화
 					int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
 					int needNumber = itemDex[meterialItemCode].recipe[i].second;
-					Player::ins()->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
-					Player::ins()->updateCustomSpriteHuman();
+					PlayerPtr->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
+					PlayerPtr->updateCustomSpriteHuman();
 				}
 			}
 

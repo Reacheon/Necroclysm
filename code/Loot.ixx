@@ -345,7 +345,7 @@ public:
 		//나중에 가독성 및 로직 수정할것
 
 		//1. 포켓 커서가 가리키는 아이템의 Array의 잔여부피와 플레이어의 질량 한계를 참조
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		ItemPocket* bagPtr = nullptr;
 		int bagIndex = -1;
 		int bagNumber = 0;
@@ -450,7 +450,7 @@ public:
 	void executePocketRight()
 	{
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
@@ -466,7 +466,7 @@ public:
 		//pick 구현하기 전에 select 기능 먼저 구현해야됨
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
@@ -492,11 +492,11 @@ public:
 	void executeEquip()
 	{
 		updateLog(col2Str(col::white) + sysStr[125]);
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		int returnIndex = lootPocket->transferItem(Player::ins()->getEquipPtr(), lootCursor, 1);
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		int returnIndex = lootPocket->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	void updateBarAct()
@@ -642,7 +642,7 @@ public:
 
 	Corouter executeWield()
 	{
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
 			bool isWield = false;
@@ -655,8 +655,8 @@ public:
 					isWield = true;
 				}
 			}
-			if (isWield == true) { Player::ins()->drop(drop.get()); }
-			else { delete drop.get(); }
+			if (isWield == true) { PlayerPtr->drop(drop.get()); }
+
 			int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
@@ -722,7 +722,7 @@ public:
 						break;
 					}
 				}
-				Player::ins()->drop(drop.get());
+				PlayerPtr->drop(drop.get());
 
 				int returnIndex = lootPocket->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
@@ -767,15 +767,15 @@ public:
 				updateLog(L"#FFFFFF아이템을 들었다.");
 			}
 		}
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
 	{
 		int targetLootCursor = lootCursor;
 		std::vector<std::wstring> pocketList;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0 || equipPtr->itemInfo[i].pocketMaxNumber > 0)

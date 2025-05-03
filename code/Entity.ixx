@@ -4,19 +4,14 @@
 export module Entity;
 
 import std;
-import globalVar;
 import constVar;
 import textureVar;
-import log;
 import Ani;
 import Coord;
-import World;
 import Sprite;
 import Drawable;
 import ItemStack;
 import ItemPocket;
-import ItemData;
-import SkillData;
 import EntityData;
 import util;
 import Vehicle;
@@ -41,13 +36,13 @@ private:
     bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
 
 public:
-    Entity* ridingEntity = nullptr;
+    std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
     std::vector<std::unique_ptr<Light>> lightList;
 
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
-    ~Entity();
+    virtual ~Entity();
 
     Vehicle* pulledCart = nullptr;
 

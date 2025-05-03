@@ -47,15 +47,15 @@ public:
 		tabType = tabFlag::closeAim;
 
 
-		auto pEquip = Player::ins()->getEquipPtr();
-		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
-		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::AIM_RIFLE);
+		auto pEquip = PlayerPtr->getEquipPtr();
+		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
 
 		
 
 		int pX = PlayerX(), pY = PlayerY(), pZ = PlayerZ();
 		
-		if(Player::ins()->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
+		if(PlayerPtr->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
 		else  aimCoord = { pX - 1, pY, pZ };
 
 		Entity* nearTarget = nullptr;
@@ -69,7 +69,7 @@ public:
 				{
 					if (TileEntity(pX + dx, pY + dy, pZ) != nullptr)
 					{
-						if (TileEntity(pX + dx, pY + dy, pZ) != Player::ins())
+						if (TileEntity(pX + dx, pY + dy, pZ) != PlayerPtr)
 						{
 							if (std::sqrt(dx * dx + dy * dy) < hiDist)
 							{
@@ -89,7 +89,7 @@ public:
 	}
 	~Aim()
 	{
-		Player::ins()->setSpriteIndex(charSprIndex::WALK);
+		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
@@ -232,8 +232,8 @@ public:
 		fakeAimAcc = aimAcc;
 		aimStack = 0;
 
-		if (aimCoord.x < PlayerX()) Player::ins()->setDirection(4);
-		else if (aimCoord.x > PlayerX()) Player::ins()->setDirection(0);
+		if (aimCoord.x < PlayerX()) PlayerPtr->setDirection(4);
+		else if (aimCoord.x > PlayerX()) PlayerPtr->setDirection(0);
 
 		std::vector<std::array<int, 2>> lineCoord;
 		makeLine(lineCoord, aimCoord.x - PlayerX(), aimCoord.y - PlayerY());
@@ -252,7 +252,7 @@ public:
 		{
 			aimAcc += randomRangeFloat(0.03, 0.07);
 			if (aimAcc > 0.999) aimAcc = 0.999;
-			Player::ins()->setFlashType(1);
+			PlayerPtr->setFlashType(1);
 			aimStack++;
 		}
 	}
@@ -305,16 +305,16 @@ public:
 	{
 		{
 			Uint8 targetR, targetG, targetB, targetAlpha;
-			Player::ins()->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-			if (Player::ins()->getFlashType() == 1)
+			PlayerPtr->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
+			if (PlayerPtr->getFlashType() == 1)
 			{
 				if (targetAlpha > 17) { targetAlpha -= 17; }
 				else 
 				{ 
 					targetAlpha = 0; 
-					Player::ins()->setFlashType(0);
+					PlayerPtr->setFlashType(0);
 				}
-				Player::ins()->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
+				PlayerPtr->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
 			}
 		}
 
@@ -383,23 +383,23 @@ public:
 		int targetZ = aimCoord.z;
 		int weaponRange = 10;
 
-		Player::ins()->aimWeaponLeft();
+		PlayerPtr->aimWeaponLeft();
 
 		if (victimEntity == nullptr)
 		{
 			return;
 		}
 		//맨손 사거리 이탈
-		else if (Player::ins()->getAimWeaponIndex() == -1)
+		else if (PlayerPtr->getAimWeaponIndex() == -1)
 		{
 			if (1 < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY)))
 			{
 				return;
 			}
 
-			Player::ins()->startAtk(targetX, targetY, targetZ);
+			PlayerPtr->startAtk(targetX, targetY, targetZ);
 			turnWait(1.0);
-			Player::ins()->initAimStack();
+			PlayerPtr->initAimStack();
 
 		}
 		//무기 사거리 이탈
@@ -411,21 +411,21 @@ public:
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-				Player::ins()->getEquipPtr()->transferItem(drop.get(), Player::ins()->getAimWeaponIndex(), 1);
-				Player::ins()->throwing(drop.get(), targetX, targetY);
-				Player::ins()->updateStatus();
-				Player::ins()->updateCustomSpriteHuman();
+				PlayerPtr->getEquipPtr()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
+				PlayerPtr->throwing(drop.get(), targetX, targetY);
+				PlayerPtr->updateStatus();
+				PlayerPtr->updateCustomSpriteHuman();
 				updateLog(L"#FFFFFF아이템을 던졌다.");
 
 
-				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::throwing);
+				PlayerPtr->startAtk(targetX, targetY, targetZ, aniFlag::throwing);
 				turnWait(1.0);
-				Player::ins()->initAimStack();
-				Player::ins()->setNextAtkType(targetAtkType);
+				PlayerPtr->initAimStack();
+				PlayerPtr->setNextAtkType(targetAtkType);
 			}
 			else if (targetAtkType == atkType::shot) //사격
 			{
-				ItemData& tmpAimWeapon = Player::ins()->getEquipPtr()->itemInfo[Player::ins()->getAimWeaponIndex()];
+				ItemData& tmpAimWeapon = PlayerPtr->getEquipPtr()->itemInfo[PlayerPtr->getAimWeaponIndex()];
 				if (getBulletNumber(tmpAimWeapon) > 0) //사격인데 총알이 없을 경우
 				{
 					if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
@@ -443,23 +443,23 @@ public:
 					popTopBullet(tmpAimWeapon.pocketPtr.get()->itemInfo[0].pocketPtr.get());
 				}
 
-				auto pEquip = Player::ins()->getEquipPtr();
-				if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) Player::ins()->setSpriteIndex(charSprIndex::WALK);
+				auto pEquip = PlayerPtr->getEquipPtr();
+				if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 
-				Player::ins()->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);
+				PlayerPtr->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);
 				turnWait(1.0);
-				Player::ins()->initAimStack();
+				PlayerPtr->initAimStack();
 				aimAcc = 0.6;
-				Player::ins()->setNextAtkType(targetAtkType);
+				PlayerPtr->setNextAtkType(targetAtkType);
 			}
 			else//근접공격
 			{
 				if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
 
-				Player::ins()->startAtk(targetX, targetY, targetZ);
+				PlayerPtr->startAtk(targetX, targetY, targetZ);
 				turnWait(1.0);
-				Player::ins()->initAimStack();
-				Player::ins()->setNextAtkType(targetAtkType);
+				PlayerPtr->initAimStack();
+				PlayerPtr->setNextAtkType(targetAtkType);
 			}
 		}
 	}

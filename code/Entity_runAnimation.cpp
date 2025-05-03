@@ -76,9 +76,9 @@ bool Entity::runAnimation(bool shutdown)
 			setAniType(aniFlag::null);
 			setFakeX(0);
 			setFakeY(0);
-			setGrid(getDstGridX(), getDstGridY(), getGridZ());
-			turnWait(1.0);
 
+			EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getDstGridX(), getDstGridY(), getGridZ() });
+			setGrid(getDstGridX(), getDstGridY(), getGridZ());
 			for (int i = 0; i < lightList.size(); i++)
 			{
 				auto lPtr = lightList[i].get();
@@ -86,6 +86,10 @@ bool Entity::runAnimation(bool shutdown)
 				lPtr->setGrid(getGridX(), getGridY(), getGridZ());
 				lPtr->updateLight(lPtr->lightRange);
 			}
+
+			turnWait(1.0);
+
+
 
 			endMove();
 			if (entityInfo.isPlayer) cameraFix = true;
@@ -132,8 +136,8 @@ bool Entity::runAnimation(bool shutdown)
 		switch (getTimer())
 		{
 		case 1:
-			if(rightAtk) Player::ins()->setSpriteIndex(charSprIndex::RATK1);
-			else  Player::ins()->setSpriteIndex(charSprIndex::LATK1);
+			if(rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
+			else  PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -163,12 +167,12 @@ bool Entity::runAnimation(bool shutdown)
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			if (rightAtk)
 			{
-				Player::ins()->setSpriteIndex(charSprIndex::RATK2);
+				PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
 				rightAtk = false;
 			}
 			else
 			{
-				Player::ins()->setSpriteIndex(charSprIndex::LATK2);
+				PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
 				rightAtk = true;
 			}
 			break;
@@ -213,7 +217,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			Player::ins()->setSpriteIndex(charSprIndex::WALK);
+			PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
@@ -273,7 +277,7 @@ bool Entity::runAnimation(bool shutdown)
 		switch (getTimer())
 		{
 		case 1:
-			Player::ins()->setSpriteIndex(charSprIndex::MINING1);
+			PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -299,7 +303,7 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
-			Player::ins()->setSpriteIndex(charSprIndex::MINING2);
+			PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
 			address->leadItem.propHP -= 180;
 			address->displayHPBarCount = 100;
 			address->alphaHPBar = 255;
@@ -312,7 +316,7 @@ bool Entity::runAnimation(bool shutdown)
 					addAniUSetPlayer(address, aniFlag::treeFalling);
 					address->displayHPBarCount = 50;
 					address->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
-					Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 				}
 				else
 				{
@@ -363,7 +367,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			Player::ins()->setSpriteIndex(charSprIndex::WALK_2H);
+			PlayerPtr->setSpriteIndex(charSprIndex::WALK_2H);
 			if (entityInfo.isPlayer == true) { turnWait(1.0); }
 			else {  }
 			return true;
@@ -404,7 +408,7 @@ bool Entity::runAnimation(bool shutdown)
 		switch (getTimer())
 		{
 		case 1:
-			Player::ins()->setSpriteIndex(charSprIndex::MINING1);
+			PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -425,7 +429,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7:
 			setFakeX(getFakeX() + 0.5 * dx);
 			setFakeY(getFakeY() + 0.5 * dy);
-			Player::ins()->setSpriteIndex(charSprIndex::MINING2);
+			PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
 			tile.wallHP -= 40;
 			tile.displayHPBarCount = 100;
 			tile.alphaHPBar = 255;
@@ -464,7 +468,7 @@ bool Entity::runAnimation(bool shutdown)
 				if(itemPtr != nullptr) addAniUSetPlayer(itemPtr, aniFlag::drop);
 
 				DestroyWall(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 			}
 			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
 			break;
@@ -499,7 +503,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			Player::ins()->setSpriteIndex(charSprIndex::WALK_2H);
+			PlayerPtr->setSpriteIndex(charSprIndex::WALK_2H);
 			if (entityInfo.isPlayer == true) { turnWait(1.0); }
 			else {}
 			return true;

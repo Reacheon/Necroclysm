@@ -79,8 +79,8 @@ int main(int argc, char** argv)
 		
 		if (cameraFix == true)
 		{
-			cameraX = (Player::ins())->getX();
-			cameraY = (Player::ins())->getY();
+			cameraX = (PlayerPtr)->getX();
+			cameraY = (PlayerPtr)->getY();
 		}
 
 		//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 
 		if (hasInitMinimap == false)
 		{
-			Player::ins()->updateMinimap();
+			PlayerPtr->updateMinimap();
 			hasInitMinimap = true;
 		}
 	}

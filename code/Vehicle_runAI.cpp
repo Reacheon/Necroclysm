@@ -1,4 +1,4 @@
-import Vehicle;
+ï»¿import Vehicle;
 import globalVar;
 import wrapVar;
 import constVar;
@@ -10,7 +10,7 @@ bool Vehicle::runAI()
 {
     if (isAIFirstRun) isAIFirstRun = false;
 
-    //prt(L"[Vehicle:AI] ID : %pÀÇ AI¸¦ ½ÇÇà½ÃÄ×´Ù.\n", this);
+    //prt(L"[Vehicle:AI] ID : %pì˜ AIë¥¼ ì‹¤í–‰ì‹œì¼°ë‹¤.\n", this);
 
 
     if (isPowerCart)
@@ -21,7 +21,7 @@ bool Vehicle::runAI()
     while (1)
     {
 
-        //prt(L"[Vehicle:AI] ID : %pÀÇ turnResource´Â %fÀÔ´Ï´Ù.\n", this, getTurnResource());
+        //prt(L"[Vehicle:AI] ID : %pì˜ turnResourceëŠ” %fì…ë‹ˆë‹¤.\n", this, getTurnResource());
         if (getTurnResource() > 2.0)
         {
             clearTurnResource();
@@ -54,7 +54,7 @@ bool Vehicle::runAI()
             }
         }
 
-        //========================================================= ACT1 ±¤Â÷ =========================================================
+        //========================================================= ACT1 ê´‘ì°¨ =========================================================
         if (singleRailSpdVal > 0)
         {
             int trainPrevX = getX(), trainPrevY = getY(), trainPrevZ = getGridZ();
@@ -94,42 +94,42 @@ bool Vehicle::runAI()
                 }
             }
 
-            //[¹İº¹¹®] °è»êµÈ ¹æÇâ°ú ¼Óµµ°ªÀ¸·Î singleRailMoveVecÀ» ¼ø¼­´ë·Î Ã¤¿ö³ÖÀ½
+            //[ë°˜ë³µë¬¸] ê³„ì‚°ëœ ë°©í–¥ê³¼ ì†ë„ê°’ìœ¼ë¡œ singleRailMoveVecì„ ìˆœì„œëŒ€ë¡œ ì±„ì›Œë„£ìŒ
             for (int i = 0; i < singleRailSpdVal; i++)
             {
-                //1. ¿­Â÷ÀÇ ÇöÀç À§Ä¡¿¡ µû¶ó ¼ÓµµÀÇ ¹æÇâ ¼öÁ¤////////////////////////////////////////////////////////////////////
+                //1. ì—´ì°¨ì˜ í˜„ì¬ ìœ„ì¹˜ì— ë”°ë¼ ì†ë„ì˜ ë°©í–¥ ìˆ˜ì •////////////////////////////////////////////////////////////////////
                 Prop* currentRail = TileProp(trainCursorX, trainCursorY, trainCursorZ);
                 dir16 prevSpdDir = singleRailSpdDir;
                 if (currentRail != nullptr)
                 {
-                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_BUFFER))//¹öÆÛ ·¹ÀÏ °­Á¦Á¤Áö
+                    if (currentRail->leadItem.checkFlag(itemFlag::RAIL_BUFFER))//ë²„í¼ ë ˆì¼ ê°•ì œì •ì§€
                     {
-                        prt(L"¿­Â÷°¡ ¹öÆÛ ·¹ÀÏÀ» ¸¸³ª¼­ Á¤ÁöÇÏ¿´´Ù.\n");
+                        prt(L"ì—´ì°¨ê°€ ë²„í¼ ë ˆì¼ì„ ë§Œë‚˜ì„œ ì •ì§€í•˜ì˜€ë‹¤.\n");
                         singleRailSpdVal = 0;
                         break;
                     }
 
-                    if (gearState == gearFlag::drive || gearState == gearFlag::reverse)//ÁÖÇà±â¾î
+                    if (gearState == gearFlag::drive || gearState == gearFlag::reverse)//ì£¼í–‰ê¸°ì–´
                     {
-                        if (singleRailSpdDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
+                        if (singleRailSpdDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                         }
-                        else if (singleRailSpdDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
+                        else if (singleRailSpdDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
-                        else if (singleRailSpdDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
+                        else if (singleRailSpdDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                         }
-                        else if (singleRailSpdDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
+                        else if (singleRailSpdDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
@@ -139,13 +139,13 @@ bool Vehicle::runAI()
                 }
                 else
                 {
-                    prt(L"[Vehicle:train %p] ÇöÀç ÀÌ Â÷·®ÀÇ À§Ä¡¿¡ ·¹ÀÏÀÌ ¼³Ä¡µÇ¾îÀÖÁö ¾Ê´Ù.\n", this);
+                    prt(L"[Vehicle:train %p] í˜„ì¬ ì´ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ë ˆì¼ì´ ì„¤ì¹˜ë˜ì–´ìˆì§€ ì•Šë‹¤.\n", this);
                     singleRailSpdVal = 0;
                     break;
                 }
 
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //3. ¼Óµµ ¹æÇâ¿¡ µû¶ó ÁÂÈ¸Àü,¿ìÈ¸Àü,Á÷Áø ÇÃ·¡±× ¼³Á¤///////////////////////////////////////////////////////////
+                //3. ì†ë„ ë°©í–¥ì— ë”°ë¼ ì¢ŒíšŒì „,ìš°íšŒì „,ì§ì§„ í”Œë˜ê·¸ ì„¤ì •///////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 itemFlag straightFlag, leftFlag, rightFlag;
                 dir16 straightDir = singleRailSpdDir, leftDir, rightDir;
@@ -218,7 +218,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dx, trainCursorY - getGridY() + dy) == true)
                     {
-                        prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
+                        prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -234,7 +234,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxLeft, trainCursorY - getGridY() + dyLeft) == true)
                     {
-                        prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
+                        prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -250,7 +250,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxRight, trainCursorY - getGridY() + dyRight) == true)
                     {
-                        prt(L"[Vehicle:train ] %p ¿­Â÷°¡ 1Ä­ ÀÌµ¿ÇßÀ» ¶§ ´Ù¸¥ °´Ã¼¿Í Ãæµ¹ÇÏ¿© ¼Óµµ°¡ 0À¸·Î ¼³Á¤µÇ¾ú´Ù.\n", this);
+                        prt(L"[Vehicle:train ] %p ì—´ì°¨ê°€ 1ì¹¸ ì´ë™í–ˆì„ ë•Œ ë‹¤ë¥¸ ê°ì²´ì™€ ì¶©ëŒí•˜ì—¬ ì†ë„ê°€ 0ìœ¼ë¡œ ì„¤ì •ë˜ì—ˆë‹¤.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -264,7 +264,7 @@ bool Vehicle::runAI()
                 }
             }
 
-            //prt(L"[Vehicle:train] ¿­Â÷ÀÇ ÀÌµ¿ÀÌ (%d,%d)·Î ½ÇÇàµÇ¾ú´Ù. º¯À§´Â (%d,%d)ÀÌ´Ù.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
+            //prt(L"[Vehicle:train] ì—´ì°¨ì˜ ì´ë™ì´ (%d,%d)ë¡œ ì‹¤í–‰ë˜ì—ˆë‹¤. ë³€ìœ„ëŠ” (%d,%d)ì´ë‹¤.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
             singleRailSpdVal = 0;
             shift(trainCursorX - getGridX(), trainCursorY - getGridY());
 
@@ -285,7 +285,7 @@ bool Vehicle::runAI()
                     }
                 }
 
-                //prt(L"[Vehicle : train %p ] Â÷·®ÀÇ fake ÁÂÇ¥´Â (%f,%f)·Î ¼³Á¤Çß´Ù\n", this, getFakeX(), getFakeY());
+                //prt(L"[Vehicle : train %p ] ì°¨ëŸ‰ì˜ fake ì¢Œí‘œëŠ” (%f,%f)ë¡œ ì„¤ì •í–ˆë‹¤\n", this, getFakeX(), getFakeY());
 
                 //iAmDictator();
                 addAniUSetMonster(this, aniFlag::minecartRush);
@@ -297,7 +297,7 @@ bool Vehicle::runAI()
                     if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                 }
                 cameraFix = false;
-                Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, PlayerX() + (Player::ins()->getIntegerFakeX() / 16), PlayerY() + (Player::ins()->getIntegerFakeY() / 16));
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
             }
 
             if (gearState == gearFlag::drive)
@@ -315,21 +315,21 @@ bool Vehicle::runAI()
             return false;
         }
 
-        //========================================================= ACT2 ±¤Â÷ ¼Óµµ ¼³Á¤ ===============================================
+        //========================================================= ACT2 ê´‘ì°¨ ì†ë„ ì„¤ì • ===============================================
         if (getTurnResource() >= 1.0)
         {
             if (vehType == vehFlag::minecart && rpmState >= 1)
             {
                 useTurnResource(1.0);
 
-                //¿­Â÷ ¿§Áö (7,-16)
+                //ì—´ì°¨ ì—£ì§€ (7,-16)
                 int vx = getGridX();
                 int vy = getGridY();
                 int vz = getGridZ();
 
-                //1. Â÷·® ¼Óµµ°ª ¼³Á¤
+                //1. ì°¨ëŸ‰ ì†ë„ê°’ ì„¤ì •
                 singleRailSpdVal = 10;
-                if (singleRailSpdVal != 0)//¸¶Âû¿¡ ÀÇÇÑ ¼Õ½Ç
+                if (singleRailSpdVal != 0)//ë§ˆì°°ì— ì˜í•œ ì†ì‹¤
                 {
                     float massCoeff = 1.5;
                     float frictionCoeff = 1.0;
@@ -339,58 +339,58 @@ bool Vehicle::runAI()
                     else singleRailSpdVal - delSpd;
                 }
 
-                //2. ÇöÀç Â÷·®ÀÇ À§Ä¡¿¡ ÀÖ´Â ·¹ÀÏ¿¡ µû¶ó ½ÃÀÛÇÏ´Â ¼ÓµµÀÇ ¹æÇâ(singleRailSpdDir)À» Á¤ÇÑ´Ù.
+                //2. í˜„ì¬ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ìˆëŠ” ë ˆì¼ì— ë”°ë¼ ì‹œì‘í•˜ëŠ” ì†ë„ì˜ ë°©í–¥(singleRailSpdDir)ì„ ì •í•œë‹¤.
                 Prop* currentRail = TileProp(vx, vy, vz);
                 if (currentRail != nullptr)
                 {
-                    if (gearState == gearFlag::drive)//ÁÖÇà±â¾î
+                    if (gearState == gearFlag::drive)//ì£¼í–‰ê¸°ì–´
                     {
-                        if (bodyDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
+                        if (bodyDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                         }
-                        else if (bodyDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
-                        else if (bodyDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                         }
-                        else if (bodyDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
                     }
-                    else if (gearState == gearFlag::reverse)//ÈÄÁø±â¾î
+                    else if (gearState == gearFlag::reverse)//í›„ì§„ê¸°ì–´
                     {
-                        if (bodyDir == dir16::dir0)//µ¿ÂÊ ¹æÇâ ¿­Â÷
+                        if (bodyDir == dir16::dir0)//ë™ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
                         }
-                        else if (bodyDir == dir16::dir2)//ºÏÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir2)//ë¶ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
                         }
-                        else if (bodyDir == dir16::dir4)//¼­ÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir4)//ì„œìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
                         }
-                        else if (bodyDir == dir16::dir6)//³²ÂÊ ¹æÇâ ¿­Â÷
+                        else if (bodyDir == dir16::dir6)//ë‚¨ìª½ ë°©í–¥ ì—´ì°¨
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
@@ -400,14 +400,14 @@ bool Vehicle::runAI()
                 }
                 else
                 {
-                    prt(L"[Vehicle:train] ÇöÀç ÀÌ Â÷·®ÀÇ À§Ä¡¿¡ ·¹ÀÏÀÌ ¼³Ä¡µÇ¾îÀÖÁö ¾Ê´Ù.\n");
+                    prt(L"[Vehicle:train] í˜„ì¬ ì´ ì°¨ëŸ‰ì˜ ìœ„ì¹˜ì— ë ˆì¼ì´ ì„¤ì¹˜ë˜ì–´ìˆì§€ ì•Šë‹¤.\n");
                     return false;
                 }
                 return false;
             }
         }
 
-        //========================================================= ACT3 Â÷·® Çï±â ¼Óµµ ¼³Á¤ ===========================================
+        //========================================================= ACT3 ì°¨ëŸ‰ í—¬ê¸° ì†ë„ ì„¤ì • ===========================================
         if (getTurnResource() >= 1.0)
         {
             if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0) || (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
@@ -449,10 +449,10 @@ bool Vehicle::runAI()
                         }
                     }
 
-                    //°¡¼Óµµ¿¡ ÀÇÇÑ ¼Óµµ °¡°¨
+                    //ê°€ì†ë„ì— ì˜í•œ ì†ë„ ê°€ê°
                     spdVec.addVec(accVec);
                     accVec = getZeroVec();
-                    //¸¶Âû¿¡ ÀÇÇÑ ¼Õ½Ç
+                    //ë§ˆì°°ì— ì˜í•œ ì†ì‹¤
                     if (spdVec.getLength() != 0)
                     {
                         int beforeXSpdSgn = sgn(spdVec.compX);
@@ -486,7 +486,7 @@ bool Vehicle::runAI()
                         int dyFinal = 0;
                         for (int i = 1; i < path.size(); i++)
                         {
-                            if (colisionCheck(path[i][0], path[i][1]))//Ãæµ¹ÇÒ °æ¿ì
+                            if (colisionCheck(path[i][0], path[i][1]))//ì¶©ëŒí•  ê²½ìš°
                             {
                                 dxFinal = path[i - 1][0];
                                 dyFinal = path[i - 1][1];
@@ -523,7 +523,7 @@ bool Vehicle::runAI()
         }
 
 
-        //========================================================= ACT4 ¿­Â÷ ¼Óµµ ¼³Á¤ ===========================================
+        //========================================================= ACT4 ì—´ì°¨ ì†ë„ ì„¤ì • ===========================================
         if (getTurnResource() >= 1.0)
         {
             if ((spdVec.compX != 0 || spdVec.compY != 0 || spdVec.compZ != 0) || (accVec.compX != 0 || accVec.compY != 0 || accVec.compZ != 0))
@@ -532,10 +532,10 @@ bool Vehicle::runAI()
                 {
                     useTurnResource(1.0);
 
-                    //°¡¼Óµµ¿¡ ÀÇÇÑ ¼Óµµ °¡°¨
+                    //ê°€ì†ë„ì— ì˜í•œ ì†ë„ ê°€ê°
                     spdVec.addVec(accVec);
                     accVec = getZeroVec();
-                    //¸¶Âû¿¡ ÀÇÇÑ ¼Õ½Ç
+                    //ë§ˆì°°ì— ì˜í•œ ì†ì‹¤
                     if (spdVec.getLength() != 0)
                     {
                         int beforeXSpdSgn = sgn(spdVec.compX);
@@ -591,7 +591,7 @@ bool Vehicle::runAI()
                             int dyFinal = 0;
                             for (int i = 1; i < path.size(); i++)
                             {
-                                if (trainList[j]->colisionCheck(path[i][0], path[i][1]))//Ãæµ¹ÇÒ °æ¿ì
+                                if (trainList[j]->colisionCheck(path[i][0], path[i][1]))//ì¶©ëŒí•  ê²½ìš°
                                 {
                                     dxFinal = path[i - 1][0];
                                     dyFinal = path[i - 1][1];
@@ -626,8 +626,8 @@ bool Vehicle::runAI()
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        //À§ÀÇ ¸ğµç ÆĞÅÏ Á¶°ÇÀ» ¸¸Á·ÇÏÁö¾ÊÀ»½Ã return true
-        //prt(L"[Vehicle:AI] AI°¡ true¸¦ ¹İÈ¯Çß´Ù. AI¸¦ Á¾·áÇÕ´Ï´Ù.\n");
+        //ìœ„ì˜ ëª¨ë“  íŒ¨í„´ ì¡°ê±´ì„ ë§Œì¡±í•˜ì§€ì•Šì„ì‹œ return true
+        //prt(L"[Vehicle:AI] AIê°€ trueë¥¼ ë°˜í™˜í–ˆë‹¤. AIë¥¼ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
         isAIFirstRun = true;
         return true;
     }

@@ -2,15 +2,17 @@
 
 import std;
 import util;
+import globalVar;
 import Player;
 import World;
 import Entity;
+import Monster;
 import Prop;
 import ItemStack;
 
-export inline int PlayerX() { return Player::ins()->getGridX(); }
-export inline int PlayerY() { return Player::ins()->getGridY(); }
-export inline int PlayerZ() { return Player::ins()->getGridZ(); }
+export inline int PlayerX() { return PlayerPtr->getGridX(); }
+export inline int PlayerY() { return PlayerPtr->getGridY(); }
+export inline int PlayerZ() { return PlayerPtr->getGridZ(); }
 
 export inline const unsigned __int16 TileFloor(int x, int y, int z) { return World::ins()->getTile(x, y, z).floor; }
 
@@ -30,11 +32,20 @@ export inline void setFloor(Point3 coord, int val)
     World::ins()->getTile(coord.x, coord.y, coord.z).setFloor(val);
 };
 
-export inline Entity*& TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
+export inline Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
+export inline void EntityPtrMove(Point3 startCoor, Point3 endCoor)
+{
+    World::ins()->getTile(endCoor).EntityPtr = std::move(World::ins()->getTile(startCoor).EntityPtr);
+}
 export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
 export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
 export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
+
+export inline void createMonster(Point3 inputCoor, int inputEntityCode)
+{
+    World::ins()->getTile(inputCoor).EntityPtr = std::make_unique<Monster>(inputEntityCode, inputCoor.x, inputCoor.y, inputCoor.z);
+}
 
 export inline void createItemStack(Point3 inputCoor)
 {

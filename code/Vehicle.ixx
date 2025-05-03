@@ -4,7 +4,6 @@
 export module Vehicle;
 
 import std;
-import globalVar;
 import constVar;
 import ItemPocket;
 import ItemData;

@@ -31,7 +31,7 @@ export class Equip : public GUI
 {
 private:
 	inline static Equip* ptr = nullptr;
-	ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+	ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 
 	int equipScroll = 0; //좌측 장비창의 스크롤
 	int equipCursor = -1; //좌측 장비창의 커서
@@ -289,8 +289,8 @@ public:
 				}
 			}
 			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--) { lootPtr->itemInfo[i].lootSelect = 0; }
-			Player::ins()->drop(drop.get());
-			Player::ins()->updateStatus();
+			PlayerPtr->drop(drop.get());
+			PlayerPtr->updateStatus();
 			updateLog(col2Str(col::white) + sysStr[126]);//아이템을 버렸다.
 		}
 	}
@@ -361,7 +361,7 @@ public:
 	void executePocketRight()
 	{
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
@@ -402,11 +402,11 @@ public:
 	void executeEquip()
 	{
 		updateLog(col2Str(col::white) + sysStr[125]);//아이템을 장착했다.
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
-		int returnIndex = lootPtr->transferItem(Player::ins()->getEquipPtr(), lootCursor, 1);
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		int returnIndex = lootPtr->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	void executeDroping()
@@ -420,9 +420,9 @@ public:
 		{
 			lootPtr->transferItem(drop.get(), lootCursor, 1);
 		}
-		Player::ins()->drop(drop.get());
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->drop(drop.get());
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 		updateLog(col2Str(col::white) + sysStr[126]);
 	}
 	void executeOpen()
@@ -602,7 +602,7 @@ public:
 
 	Corouter executeWield()
 	{
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
 			bool isWield = false;
@@ -615,7 +615,7 @@ public:
 					isWield = true;
 				}
 			}
-			if (isWield == true) { Player::ins()->drop(drop.get()); }
+			if (isWield == true) { PlayerPtr->drop(drop.get()); }
 			int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
@@ -684,7 +684,7 @@ public:
 						break;
 					}
 				}
-				Player::ins()->drop(drop.get());
+				PlayerPtr->drop(drop.get());
 
 				int returnIndex = lootPtr->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
@@ -729,9 +729,9 @@ public:
 				updateLog(L"#FFFFFF아이템을 들었다.");
 			}
 		}
-		Player::ins()->updateStatus();
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	Corouter executeReload()//장전 : 타겟아이템(탄창이나 총)에 넣을 수 있는 탄환을 넣는다.
@@ -905,7 +905,7 @@ public:
 		targetStr.erase(0, targetStr.find(L",") + 1);
 		int targetZ = wtoi(targetStr.c_str());
 
-		Player::ins()->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
+		PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
 
 		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
 
@@ -913,7 +913,7 @@ public:
 		{
 			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 			inputPocket->transferItem(drop.get(), inputIndex, 1);
-			Player::ins()->drop(drop.get());
+			PlayerPtr->drop(drop.get());
 			updateLog(L"#FFFFFF아이템을 버렸다.");
 		}
 		else
@@ -921,12 +921,12 @@ public:
 			std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
 			//이큅일 떄는 그렇다쳐도 가방 안에 있는 아이템을 던질 떄 원하는대로 작동하지않아 오류가 생긴다
 			inputPocket->transferItem(throwing.get(), inputIndex, 1);
-			Player::ins()->throwing(throwing.get(), targetX, targetY);
+			PlayerPtr->throwing(throwing.get(), targetX, targetY);
 			updateLog(L"#FFFFFF아이템을 던졌다.");
 		}
 
-		Player::ins()->updateStatus();
-		Player::ins()->updateCustomSpriteHuman();
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
 		close(aniFlag::null);
 	}
 

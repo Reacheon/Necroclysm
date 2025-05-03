@@ -126,10 +126,10 @@ public:
 
 				std::wstring proficStr;
 
-				std::wstring levelStr = L"Lv." + std::to_wstring(static_cast<int>(Player::ins()->getProficLevel(i)));
+				std::wstring levelStr = L"Lv." + std::to_wstring(static_cast<int>(PlayerPtr->getProficLevel(i)));
 
 				std::wstring aptStr;
-				aptStr = L"x" + decimalCutter(Player::ins()->entityInfo.proficApt[i], 1);
+				aptStr = L"x" + decimalCutter(PlayerPtr->entityInfo.proficApt[i], 1);
 
 				switch (i)
 				{
@@ -196,21 +196,21 @@ public:
 
 				{
 					SDL_Color rankColor = col::white;
-					if (Player::ins()->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
+					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
 					drawText(col2Str(rankColor) + proficStr, targetX + 40, targetY + 4);
 				}
 
 				//재능 랭크와 게이지 그리기
 				{
 					SDL_Color rankColor = col::white;
-					if (Player::ins()->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
+					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
 					drawTextCenter(col2Str(rankColor) + levelStr, targetX + 136, targetY + 10);
 
 					SDL_Rect gauge = { targetX + 118, targetY + 18, 36, 3 };
 					drawRect(gauge, col::white);
-					if (Player::ins()->getProficLevel(i) < MAX_PROFIC_LEVEL)
+					if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
 					{
-						float levelPercent = (Player::ins()->getProficLevel(i) - (int)Player::ins()->getProficLevel(i));
+						float levelPercent = (PlayerPtr->getProficLevel(i) - (int)PlayerPtr->getProficLevel(i));
 						int gaugeLength = floor(34.0 * levelPercent);
 						if (gaugeLength > 0) drawLine(targetX + 118 + 1, targetY + 18 + 1, targetX + 118 + gaugeLength, targetY + 18 + 1, col::yellowGreen);
 						int q = ((int)(levelPercent * 100.0)) / 10;
@@ -238,7 +238,7 @@ public:
 
 				//재능 아이콘 그리기
 				setZoom(1.5);
-				if (Player::ins()->getProficLevel(i) < MAX_PROFIC_LEVEL)
+				if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
 				{
 					drawSprite(spr::proficIcon, i, targetX, targetY);
 				}

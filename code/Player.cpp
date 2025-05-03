@@ -19,11 +19,12 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
-	TileEntity(0, 0, 0) = this;
 
 	entityInfo.skin = humanCustom::skin::yellow;
 	entityInfo.eyes = humanCustom::eyes::blue;
 	entityInfo.hair = humanCustom::hair::bob1Black;
+
+	entityInfo.isPlayer = true;
 
 	int i = 0;
 
@@ -89,14 +90,14 @@ void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk
 
 void Player::startMove(int inputDir)
 {
-	if (Player::ins()->getAniType() == aniFlag::null)
+	if (PlayerPtr->getAniType() == aniFlag::null)
 	{
-		//errorBox(Player::ins()->getAniType() == aniFlag::null, "Player's startMove activated while player's aniFlag is not null.");
-		errorBox(((Player::ins())->getX() - 8) % 16 != 0, "This instance moved from non-integer coordinates.");
+		//errorBox(PlayerPtr->getAniType() == aniFlag::null, "Player's startMove activated while player's aniFlag is not null.");
+		errorBox(((PlayerPtr)->getX() - 8) % 16 != 0, "This instance moved from non-integer coordinates.");
 
 		int dx, dy;
 		dir2Coord(inputDir, dx, dy);
-		Player* player = Player::ins();
+		Player* player = PlayerPtr;
 		player->updateWalkable(player->getGridX() + dx, player->getGridY() + dy);
 		//걸을 수 있는 타일이면
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
@@ -116,7 +117,7 @@ void Player::startMove(int inputDir)
 			{
 				player->startAtk(player->getGridX() + dx, player->getGridY() + dy, player->getGridZ());
 				turnWait(1.0);
-				Player::ins()->deactAStarDst();
+				PlayerPtr->deactAStarDst();
 			}
 		}
 	}
@@ -294,7 +295,7 @@ void Player::updateNearbyChunk(int range)
 	{
 		for (int x = chunkX - 1; x <= chunkX + 1; x++)
 		{
-			World::ins()->activate(x, y, ins()->getGridZ());
+			World::ins()->activate(x, y, PlayerPtr->getGridZ());
 		}
 	}
 }
@@ -316,7 +317,7 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
 
-	if (Player::ins()->entityInfo.walkMode == walkFlag::run)
+	if (PlayerPtr->entityInfo.walkMode == walkFlag::run)
 	{
 		entityInfo.STA -= 7;
 		if (entityInfo.STA < 0)
@@ -347,7 +348,7 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 	{
 		if (getAStarDstX() == getGridX() && getAStarDstY() == getGridY())
 		{
-			Player::ins()->deactAStarDst();
+			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
 		}
 	}

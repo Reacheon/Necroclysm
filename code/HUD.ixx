@@ -332,7 +332,7 @@ public:
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (Player::ins()->entityInfo.proficFocus[i] > 0) { break; }
+				if (PlayerPtr->entityInfo.proficFocus[i] > 0) { break; }
 
 				if (i == TALENT_SIZE - 1)
 				{
@@ -401,10 +401,10 @@ public:
 			new Quest();
 			break;
 		case act::runMode:
-			if (Player::ins()->entityInfo.walkMode == walkFlag::walk) Player::ins()->entityInfo.walkMode = walkFlag::run;
-			else if (Player::ins()->entityInfo.walkMode == walkFlag::run) Player::ins()->entityInfo.walkMode = walkFlag::crouch;
-			else if (Player::ins()->entityInfo.walkMode == walkFlag::crouch) Player::ins()->entityInfo.walkMode = walkFlag::crawl;
-			else if (Player::ins()->entityInfo.walkMode == walkFlag::crawl) Player::ins()->entityInfo.walkMode = walkFlag::walk;
+			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->entityInfo.walkMode = walkFlag::run;
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->entityInfo.walkMode = walkFlag::crouch;
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->entityInfo.walkMode = walkFlag::crawl;
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->entityInfo.walkMode = walkFlag::walk;
 			popDownWhenEnd = false;
 			break;
 		case act::skill:
@@ -681,11 +681,19 @@ public:
 							else
 							{
 								updateLog(L"#FFFFFF계단을 올라갔다.");
-								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = nullptr;
-								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
-								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = Player::ins();
-								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-								Player::ins()->updateMinimap();
+
+								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
+								PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
+								for (int i = 0; i < PlayerPtr->lightList.size(); i++)
+								{
+									auto lPtr = PlayerPtr->lightList[i].get();
+									lPtr->releaseLight();
+									lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
+									lPtr->updateLight(lPtr->lightRange);
+								}
+
+								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+								PlayerPtr->updateMinimap();
 
 								Prop* upProp = TileProp(touchX, touchY, PlayerZ());
 								if (upProp == nullptr)
@@ -703,11 +711,19 @@ public:
 							else
 							{
 								updateLog(L"#FFFFFF계단을 내려갔다.");
-								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = nullptr;
-								Player::ins()->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
-								TileEntity(PlayerX(), PlayerY(), PlayerZ()) = Player::ins();
-								Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-								Player::ins()->updateMinimap();
+
+								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
+								PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
+								for (int i = 0; i < PlayerPtr->lightList.size(); i++)
+								{
+									auto lPtr = PlayerPtr->lightList[i].get();
+									lPtr->releaseLight();
+									lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
+									lPtr->updateLight(lPtr->lightRange);
+								}
+
+								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+								PlayerPtr->updateMinimap();
 
 								Prop* downProp = TileProp(touchX, touchY, PlayerZ());
 								if (downProp == nullptr)
@@ -723,15 +739,15 @@ public:
 			{
 				if (TileWall(touchX, touchY, PlayerZ()) != 0)
 				{
-					auto ePtr = Player::ins()->getEquipPtr();
+					auto ePtr = PlayerPtr->getEquipPtr();
 					for (int i = 0; i < ePtr->itemInfo.size(); i++)
 					{
 						if (ePtr->itemInfo[i].itemCode == itemVIPCode::pickaxe)
 						{
 							if (ePtr->itemInfo[i].equipState == equipHandFlag::both)
 							{
-								Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-								addAniUSetPlayer(Player::ins(), aniFlag::miningWall);
+								PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+								addAniUSetPlayer(PlayerPtr, aniFlag::miningWall);
 								break;
 							}
 						}
@@ -758,7 +774,7 @@ public:
 								tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 							}
 
-							Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
@@ -770,7 +786,7 @@ public:
 						else
 						{
 							updateLog(L"#FFFFFF계단을 올라갔다.");
-							Player::ins()->addGridZ(1);
+							PlayerPtr->addGridZ(1);
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
@@ -778,8 +794,8 @@ public:
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))
 					{
-						Player::ins()->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-						addAniUSetPlayer(Player::ins(), aniFlag::felling);
+						PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+						addAniUSetPlayer(PlayerPtr, aniFlag::felling);
 					}
 					else if (tgtItemCode == 213 || tgtItemCode == 218)//불교 제단
 					{
@@ -809,12 +825,12 @@ public:
 				}
 				else
 				{
-					Player::ins()->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					PlayerPtr->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 				}
 			}
 			else
 			{
-				Player::ins()->setAStarDst(touchX, touchY);
+				PlayerPtr->setAStarDst(touchX, touchY);
 			}
 		}
 		else//차량을 조종하는 상태일 경우
@@ -861,7 +877,7 @@ public:
 				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 				tgtProp->leadItem.extraSprIndexSingle--;
-				Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 			};
 
 		if (doorNumber == 1)
@@ -887,7 +903,7 @@ public:
 			tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 			tgtProp->leadItem.extraSprIndexSingle--;
-			Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 		}
 	};
 
@@ -918,7 +934,7 @@ public:
 			dir2Coord(dir, dx, dy);
 			if (TileEntity(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
 			{
-				Player::ins()->startAtk(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+				PlayerPtr->startAtk(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				turnWait(1.0);
 				break;
 			}

@@ -9,6 +9,7 @@ import constVar;
 import Flame;
 import Prop;
 import ItemStack;
+import Entity;
 //__int8 : -128~127
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
@@ -49,11 +50,11 @@ export struct TileData //총용량 29바이트
     int alphaHPBar = 0;
     int alphaFakeHPBar = 0;
 
-    void* EntityPtr = nullptr;
+    std::unique_ptr<Entity> EntityPtr = nullptr;
     std::unique_ptr<ItemStack> ItemStackPtr = nullptr;
-    void* VehiclePtr = nullptr;
     std::unique_ptr<Prop> PropPtr = nullptr;
     std::unique_ptr<Flame> flamePtr = nullptr;
+    void* VehiclePtr = nullptr;
 
 
     unsigned __int16 randomVal = 0;

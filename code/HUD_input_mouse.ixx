@@ -47,8 +47,8 @@ void HUD::clickMotionGUI(int dx, int dy)
 		cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
 		disableClickUp4Motion = true;
 
-		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
-		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+		if (std::abs(PlayerPtr->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+		if (std::abs(PlayerPtr->getY() - cameraY) > maxDist) cameraY = prevCameraY;
 	}
 }
 void HUD::clickUpGUI()
@@ -81,7 +81,7 @@ void HUD::clickUpGUI()
 				if (TileFov(i, j, playerZ) == fovFlag::white)
 				{
 					//없는 타일이거나 플레이어 개체는 제외함
-					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != Player::ins())
+					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != PlayerPtr)
 					{
 						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//갱신
 						{

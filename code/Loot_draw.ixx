@@ -81,7 +81,7 @@ void Loot::drawGUI()
 		//가방이 몇 개 있는지 체크
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)

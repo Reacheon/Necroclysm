@@ -23,7 +23,7 @@ void Equip::drawGUI()
 
 	//여기서부턴 이큅 윈도우
 	{
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		
 		//플레이어 무게 제한 게이지 그리기
 		SDL_Rect weightGaugeRect = { equipBase.x + 65,equipBase.y + 39,104,9 };
@@ -78,8 +78,8 @@ void Equip::drawGUI()
 		SDL_Rect equipScrollBox = { equipBase.x + 325, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
 		drawFillRect(equipScrollBox, { 120,120,120 });
 		SDL_Rect inScrollBox = equipScrollBox; // 내부 스크롤 커서
-		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / Player::ins()->getEquipPtr()->itemInfo.size());
-		inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)Player::ins()->getEquipPtr()->itemInfo.size());
+		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / PlayerPtr->getEquipPtr()->itemInfo.size());
+		inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)PlayerPtr->getEquipPtr()->itemInfo.size());
 		if (inScrollBox.y + inScrollBox.h > equipScrollBox.y + equipScrollBox.h) { inScrollBox.y = equipScrollBox.y + equipScrollBox.h - inScrollBox.h; }
 		drawFillRect(inScrollBox, col::white);
 
@@ -141,10 +141,10 @@ void Equip::drawGUI()
 				break;
 			}
 
-			rPierce = Player::ins()->getRPierce(targetPart);
-			rCut = Player::ins()->getRCut(targetPart);
-			rBash = Player::ins()->getRBash(targetPart);
-			enc = Player::ins()->getEnc(targetPart);
+			rPierce = PlayerPtr->getRPierce(targetPart);
+			rCut = PlayerPtr->getRCut(targetPart);
+			rBash = PlayerPtr->getRBash(targetPart);
+			enc = PlayerPtr->getEnc(targetPart);
 			maxEnc = 30;
 
 			SDL_SetRenderDrawColor(renderer, col::white.r, col::white.g, col::white.b, 0xff);
@@ -166,19 +166,19 @@ void Equip::drawGUI()
 		drawText(col2Str(col::lightGray) + sysStr[173], topWindow.x + 290, topWindow.y + 24 + 18 * 4);//피폭저항
 		drawText(col2Str(col::lightGray) + sysStr[174], topWindow.x + 290, topWindow.y + 24 + 18 * 5);//부식저항
 
-		int SH = Player::ins()->getSH();
-		int EV = Player::ins()->getEV();
+		int SH = PlayerPtr->getSH();
+		int EV = PlayerPtr->getEV();
 
 		drawTextCenter(col2Str(col::white) + std::to_wstring(SH), topWindow.x + 290 + 70 + 20, topWindow.y + 24 + 18 * -1 + 9);
 		drawTextCenter(col2Str(col::white) + std::to_wstring(EV), topWindow.x + 290 + 70 + 20, topWindow.y + 24 + 18 * 0 + 9);
 
 		SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 0xff);
 
-		int rFire = Player::ins()->entityInfo.rFire;
-		int rCold = Player::ins()->entityInfo.rCold;
-		int rElec = Player::ins()->entityInfo.rElec;
-		int rCorr = Player::ins()->entityInfo.rCorr;
-		int rRad = Player::ins()->entityInfo.rRad;
+		int rFire = PlayerPtr->entityInfo.rFire;
+		int rCold = PlayerPtr->entityInfo.rCold;
+		int rElec = PlayerPtr->entityInfo.rElec;
+		int rCorr = PlayerPtr->entityInfo.rCorr;
+		int rRad = PlayerPtr->entityInfo.rRad;
 
 		drawText(L"Lv." + std::to_wstring(rFire), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 1);
 		drawText(L"Lv." + std::to_wstring(rCold), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 2);

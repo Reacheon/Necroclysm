@@ -34,7 +34,7 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
     if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
     {
         myLight = new Light(inputCoor.x + leadItem.lightDelX, inputCoor.y + leadItem.lightDelY, inputCoor.z, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
-        //Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+        //PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
     }
 
 

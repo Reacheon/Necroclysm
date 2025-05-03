@@ -5,26 +5,13 @@ export module Player;
 import std;
 import util;
 import Entity;
-import World;
-import globalVar;
-import textureVar;
 import constVar;
-import log;
-import ItemData;
-import nanoTimer;
-import globalTime;
 
 export class Player :public Entity //플레이어는 엔티티를 상속받고 시야에 따라 미니맵을 업데이트하는 기능을 가지고 있다.
 {
 public:
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();
-	static Player* ins()//싱글톤 함수
-	{
-		static Player* ptr = new Player(0, 0, 0);
-		ptr->entityInfo.isPlayer = true;
-		return ptr;
-	}
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;
 	void startAtk(int inputGridX, int inputGridY, int inputGridZ);
 	void startMove(int inputDir);

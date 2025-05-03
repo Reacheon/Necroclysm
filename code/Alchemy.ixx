@@ -129,7 +129,7 @@ public:
 				}
 			};
 
-		ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		if(equipPtr != nullptr) pathAdder(equipPtr, {});
 
 		//플레이어 Equip의 모든 아이템에 codeID(int)를 할당(중복되지 않도록), -1은 현재타일
@@ -714,11 +714,11 @@ public:
 		//rootPathPocket->itemInfo.clear();
 
 		////생성될 때 주변 타일에 아이템이 있는지 체크
-		//if (Player::ins()->getEquipPtr()->itemInfo.size() > 0)
+		//if (PlayerPtr->getEquipPtr()->itemInfo.size() > 0)
 		//{
 		//	rootPathPocket->itemInfo.push_back(itemDex[86]);
 		//	rootPathPocket->itemInfo[0].name = L"장비";
-		//	rootPathPocket->itemInfo[0].pocketPtr = Player::ins()->getEquipPtr();
+		//	rootPathPocket->itemInfo[0].pocketPtr = PlayerPtr->getEquipPtr();
 		//}
 
 		//for (int i = 0; i < 9; i++)
@@ -767,7 +767,7 @@ public:
 	void updateTool()
 	{
 		////플레이어의 인벤토리를 뒤져서 찾음
-		//ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+		//ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		//dropDownList::itemVec.clear();
 		//for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		//{

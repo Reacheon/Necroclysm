@@ -32,18 +32,14 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
-	TileEntity(getGridX(), getGridY(), getGridZ()) = this;
 	updateSpriteFlash();
 	entityInfo.equipment = std::make_unique<ItemPocket>(storageType::equip);
 	entityInfo.proficFocus[0] = 1;
-
-
 
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
-	TileEntity(getGridX(), getGridY(), getGridZ()) = nullptr;
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
 }
@@ -309,8 +305,6 @@ void Entity::move(int dir, bool jump)
 	int dstGridX = (dstX - 8) / 16;
 	int dstGridY = (dstY - 8) / 16;
 
-	TileEntity(dstGridX, dstGridY, getGridZ()) = this;
-	TileEntity(getGridX(), getGridY(), getGridZ()) = nullptr;
 
 	if (pulledCart != nullptr)
 	{
@@ -947,7 +941,7 @@ void Entity::drawSelf()
 		else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
 		{
 			drawSpriteCenter(spr::shadow, 2, originX, originY);
-			drawSpriteCenter(ridingEntity->entityInfo.entitySpr, getSpriteIndex(), originX, originY);
+			drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex(), originX, originY);
 		}
 	}
 
@@ -1039,7 +1033,7 @@ void Entity::drawSelf()
 
 	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽
 	{
-		drawSpriteCenter(ridingEntity->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
+		drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
 	}
 
 	setZoom(1.0);

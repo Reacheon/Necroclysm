@@ -202,13 +202,12 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::map<std::array<int, 2>, Entity*> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+        std::map<std::array<int, 2>, std::unique_ptr<Entity>> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
             if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
             {
-                entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
-                TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
+                entityWormhole[{it->first[0], it->first[1]}] = std::move(World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr);
             }
         }
 
@@ -233,8 +232,8 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 
                     if (entityWormhole.find({ x, y }) != entityWormhole.end())
                     {
-                        entityWormhole[{x, y}]->setGrid(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ());
-                        TileEntity(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ()) = entityWormhole[{x, y}];
+                        World::ins()->getTile(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ()).EntityPtr = std::move(entityWormhole[{x, y}]);
+                        TileEntity(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ())->setGrid(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ());
                     }
                 }
             }
@@ -369,15 +368,14 @@ void Vehicle::updateSpr()
 
 void Vehicle::shift(int dx, int dy)
 {
-    std::map<std::array<int, 2>, Entity*> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::map<std::array<int, 2>, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
         TileVehicle(it->first[0], it->first[1], getGridZ()) = nullptr;
         if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
         {
-            entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
-            TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
+            entityWormhole[{it->first[0], it->first[1]}] = std::move(World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr);
         }
     }
 
@@ -387,11 +385,9 @@ void Vehicle::shift(int dx, int dy)
         TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ()) = this;
         if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
         {
-            Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
-            tgtEntity->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//위치 그리드 변경
-            TileEntity(it->first[0] + dx, it->first[1] + dy, getGridZ()) = tgtEntity;//포인터 변경
 
-
+            World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).EntityPtr = std::move(entityWormhole[{it->first[0], it->first[1]}]);
+            TileEntity(it->first[0] + dx, it->first[1] + dy, getGridZ())->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//위치 그리드 변경
         }
     }
 
@@ -408,15 +404,14 @@ void Vehicle::shift(int dx, int dy)
 
 void Vehicle::zShift(int dz)
 {
-    std::map<std::array<int, 2>, Entity*> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::map<std::array<int, 2>, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
         TileVehicle(it->first[0], it->first[1], getGridZ()) = nullptr;
         if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
         {
-            entityWormhole[{it->first[0], it->first[1]}] = TileEntity(it->first[0], it->first[1], getGridZ());
-            TileEntity(it->first[0], it->first[1], getGridZ()) = nullptr;
+            entityWormhole[{it->first[0], it->first[1]}] = std::move(World::ins()->getTile(it->first[0], it->first[1], getGridZ()).EntityPtr);
         }
     }
 
@@ -426,9 +421,8 @@ void Vehicle::zShift(int dz)
         TileVehicle(it->first[0], it->first[1], getGridZ() + dz) = this;
         if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
         {
-            Entity* tgtEntity = entityWormhole[{it->first[0], it->first[1]}];
-            tgtEntity->setGrid(it->first[0], it->first[1], getGridZ() + dz);//위치 그리드 변경
-            TileEntity(it->first[0], it->first[1], getGridZ() + dz) = tgtEntity;//포인터 변경
+            World::ins()->getTile(it->first[0], it->first[1], getGridZ() + dz).EntityPtr = std::move(entityWormhole[{it->first[0], it->first[1]}]);
+            TileEntity(it->first[0], it->first[1], getGridZ() + dz)->setGrid(it->first[0], it->first[1], getGridZ() + dz);//위치 그리드 변경
         }
     }
     addGridZ(dz);
@@ -571,7 +565,7 @@ bool Vehicle::runAnimation(bool shutdown)
                     std::array<int, 2> visionTarget = line[arrIndex];
                     //prt(L"시야 업데이트의 중심은 (%d,%d)이고 인덱스는 %d이며 사이즈는 %d이다.\n", PlayerX() + visionTarget[0], PlayerY() + visionTarget[1], arrIndex, line.size());
 
-                    Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, PlayerX() - getDelGridX() + visionTarget[0], PlayerY() - getDelGridY() + visionTarget[1]);
+                    PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() - getDelGridX() + visionTarget[0], PlayerY() - getDelGridY() + visionTarget[1]);
                     lineCheck++;
                 }
             }
@@ -594,8 +588,8 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
             }
 
-            cameraX = Player::ins()->getX() + Player::ins()->getIntegerFakeX();
-            cameraY = Player::ins()->getY() + Player::ins()->getIntegerFakeY();
+            cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+            cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
 
             if (getFakeX() == 0 && getFakeY() == 0)//도착
             {
@@ -617,7 +611,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
 
                 cameraFix = true;
-                Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
                 resetTimer();
                 setAniType(aniFlag::null);
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), (void*)this));
@@ -662,12 +656,12 @@ bool Vehicle::runAnimation(bool shutdown)
 
             // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
 
-            cameraX = Player::ins()->getX() + Player::ins()->getIntegerFakeX();
-            cameraY = Player::ins()->getY() + Player::ins()->getIntegerFakeY();
+            cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+            cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
 
             if (getTimer() >= 4)
             {
-                Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight, PlayerX() + (Player::ins()->getIntegerFakeX() / 16), PlayerY() + (Player::ins()->getIntegerFakeY() / 16));
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
                 //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 singleRailMoveVec.erase(singleRailMoveVec.begin());
                 resetTimer();
@@ -678,8 +672,8 @@ bool Vehicle::runAnimation(bool shutdown)
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
-            Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
-            Player::ins()->updateMinimap();
+            PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+            PlayerPtr->updateMinimap();
             cameraFix = true;
             resetTimer();
             return true;

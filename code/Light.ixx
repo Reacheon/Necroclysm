@@ -19,7 +19,7 @@ public:
 	int lightRange = 1;
 	SDL_Color lightColor = col::white;
 	Uint8 bright = 255;
-	std::set< std::array<int, 3>> innateLight;
+	std::set<Point3> litTiles;//밝혀진 타일
 
 	Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uint8 inputBright, SDL_Color inputColor);
 	~Light();

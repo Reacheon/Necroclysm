@@ -562,7 +562,7 @@ void Craft::drawGUI()
 		//아이템 디테일박스(툴팁) 그리기
 		if (aniUSet.find(this) == aniUSet.end() && (pointingCursor >= 0 || craftCursor >= 0))
 		{
-			ItemPocket* equipPtr = Player::ins()->getEquipPtr();
+			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 			bool canCraft = true; //현재 플레이어의 상태로 조합이 가능한지 체크함 
 			int targetCursor;
 			if (pointingCursor >= 0) targetCursor = pointingCursor + 6*craftScroll;
@@ -604,7 +604,7 @@ void Craft::drawGUI()
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeProficNeed.size(); i++)
 				{
 					int needLevel = recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second;
-					int playerLevel = Player::ins()->getProficLevel(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
+					int playerLevel = PlayerPtr->getProficLevel(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
 					if (playerLevel >= needLevel) proficStr += col2Str(lowCol::green);
 					else
 					{

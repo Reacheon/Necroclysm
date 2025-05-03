@@ -133,7 +133,7 @@ void HUD::gamepadStep()
 					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1칸 이내
 					{
 						cameraFix = true;
-						Player::ins()->startMove(dir);
+						PlayerPtr->startMove(dir);
 					}
 					else
 					{
@@ -160,7 +160,7 @@ void HUD::gamepadStep()
 										tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 									}
 
-									Player::ins()->updateVision(Player::ins()->entityInfo.eyeSight);
+									PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 								}
 							}
 						}
@@ -244,8 +244,8 @@ void HUD::gamepadStep()
 			cameraX += 2;
 		}
 
-		if (std::abs(Player::ins()->getX() - cameraX) > maxDist) cameraX = prevCameraX;
-		if (std::abs(Player::ins()->getY() - cameraY) > maxDist) cameraY = prevCameraY;
+		if (std::abs(PlayerPtr->getX() - cameraX) > maxDist) cameraX = prevCameraX;
+		if (std::abs(PlayerPtr->getY() - cameraY) > maxDist) cameraY = prevCameraY;
 
 
 

@@ -111,8 +111,8 @@ export void turnWait(float waitTime)
         }
     }
 
-    Player::ins()->entityInfo.STA += 2;
-    if (Player::ins()->entityInfo.STA > Player::ins()->entityInfo.maxSTA) Player::ins()->entityInfo.STA = Player::ins()->entityInfo.maxSTA;
+    PlayerPtr->entityInfo.STA += 2;
+    if (PlayerPtr->entityInfo.STA > PlayerPtr->entityInfo.maxSTA) PlayerPtr->entityInfo.STA = PlayerPtr->entityInfo.maxSTA;
 
 
     timeGift = waitTime;
