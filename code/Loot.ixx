@@ -233,7 +233,7 @@ public:
 
 		if (lootStack != nullptr && lootPocket->itemInfo.size() == 0)
 		{
-			delete lootStack;
+			destroyItemStack({ lootStack->getGridX(), lootStack->getGridY(), lootStack->getGridZ()});
 			delete this;
 			return;
 		}

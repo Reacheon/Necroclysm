@@ -32,5 +32,6 @@ public:
 	void checkEmpty();
 	void updateSprIndex();
 	void pullStackLights();
+	void pullStackLights(Point3 tgtCoor);
 	bool runAnimation(bool shutdown);
 };

@@ -60,6 +60,15 @@ public:
 		y = 16 * gridY + 8;
 	}
 
+	Point3 getClosestGridWithFake()
+	{
+		int gridOffsetX = static_cast<int>(std::round(static_cast<double>(getFakeX()) / 16.0));
+		int gridOffsetY = static_cast<int>(std::round(static_cast<double>(getFakeY()) / 16.0));
+		int fakeGridX = gridX + gridOffsetX;
+		int fakeGridY = gridY + gridOffsetY;
+		return { fakeGridX, fakeGridY, gridZ };
+	}
+
 	void addGridX(int input)
 	{
 		setGrid(getGridX() + input, getGridY(), getGridZ());

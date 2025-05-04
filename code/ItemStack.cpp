@@ -78,6 +78,18 @@ void ItemStack::pullStackLights()
 		}
 	}
 }
+
+void ItemStack::pullStackLights(Point3 tgtCoor)
+{
+	for (int i = 0; i < storage.get()->itemInfo.size(); i++)
+	{
+		if (storage.get()->itemInfo[i].lightPtr != nullptr)
+		{
+			storage.get()->itemInfo[i].lightPtr.get()->moveLight(tgtCoor.x, tgtCoor.y, tgtCoor.z);
+		}
+	}
+}
+
 bool ItemStack::runAnimation(bool shutdown)
 {
 	//prt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
@@ -143,6 +155,9 @@ bool ItemStack::runAnimation(bool shutdown)
 		if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
 		if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
 		if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
+
+		Point3 cGrid = getClosestGridWithFake();
+		pullStackLights(cGrid);
 
 		if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
 		{

@@ -65,6 +65,12 @@ export inline void createItemStack(Point3 inputCoor, std::vector<std::pair<int, 
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor, inputItems);
 }
 
+export inline void destroyItemStack(Point3 inputCoor)
+{
+    World::ins()->getTile(inputCoor).ItemStackPtr.reset();
+}
+
+
 export inline void createProp(Point3 inputCoor, int inputItemCode) 
 { 
     World::ins()->getTile(inputCoor).PropPtr = std::make_unique<Prop>(inputCoor, inputItemCode);
