@@ -232,8 +232,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 
                     if (entityWormhole.find({ x, y }) != entityWormhole.end())
                     {
-                        World::ins()->getTile(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ()).EntityPtr = std::move(entityWormhole[{x, y}]);
-                        TileEntity(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ())->setGrid(dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ());
+                        EntityPtrMove(std::move(entityWormhole[{x, y}]), { dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ() });
                     }
                 }
             }
@@ -385,9 +384,7 @@ void Vehicle::shift(int dx, int dy)
         TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ()) = this;
         if (entityWormhole.find({ it->first[0], it->first[1] }) != entityWormhole.end())
         {
-
-            World::ins()->getTile(it->first[0] + dx, it->first[1] + dy, getGridZ()).EntityPtr = std::move(entityWormhole[{it->first[0], it->first[1]}]);
-            TileEntity(it->first[0] + dx, it->first[1] + dy, getGridZ())->setGrid(it->first[0] + dx, it->first[1] + dy, getGridZ());//위치 그리드 변경
+            EntityPtrMove(std::move(entityWormhole[{it->first[0], it->first[1]}]), { it->first[0] + dx, it->first[1] + dy, getGridZ() });
         }
     }
 

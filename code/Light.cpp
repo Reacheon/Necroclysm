@@ -19,7 +19,7 @@ Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uin
 	lightColor = inputColor;
 	setLightRange(inputRange);
 	setGrid(inputGridX, inputGridY, inputGridZ);
-	updateLight(lightRange);
+	updateLight();
 }
 
 Light::~Light()
@@ -30,13 +30,13 @@ Light::~Light()
 
 void Light::setLightRange(int inputRange) { lightRange = inputRange; }
 
-void Light::updateLight(int range)
+void Light::updateLight()
 {
-	for (int i = -range; i <= range; i++)
+	for (int i = -lightRange; i <= lightRange; i++)
 	{
-		for (int j = -range; j <= range; j++)
+		for (int j = -lightRange; j <= lightRange; j++)
 		{
-			if (isCircle(range, i, j) == true)
+			if (isCircle(lightRange, i, j) == true)
 			{
 				rayCasting(getGridX(), getGridY(), getGridX() + i, getGridY() + j);
 			}
@@ -80,6 +80,13 @@ void Light::releaseLight()
 		World::ins()->getTile(x, y, z).blueLight -= blueLight;
 	}
 	litTiles.clear();
+}
+
+void Light::moveLight(int inputGridX, int inputGridY, int inputGridZ)
+{
+	releaseLight();
+	setGrid(inputGridX, inputGridY, inputGridZ);
+	updateLight();
 }
 
 void Light::rayCasting(int x1, int y1, int x2, int y2)

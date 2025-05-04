@@ -36,6 +36,14 @@ export inline Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::
 export inline void EntityPtrMove(Point3 startCoor, Point3 endCoor)
 {
     World::ins()->getTile(endCoor).EntityPtr = std::move(World::ins()->getTile(startCoor).EntityPtr);
+    World::ins()->getTile(endCoor).EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
+    World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
+}
+export inline void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
+{
+    World::ins()->getTile(endCoor).EntityPtr = std::move(inputPtr);
+    World::ins()->getTile(endCoor).EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
+    World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
 }
 export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }

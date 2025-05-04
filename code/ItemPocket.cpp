@@ -93,12 +93,14 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 	int destinationIndex = -1;
 	if (transferWholeStack) 
 	{
+		if(storagePtr->type != storageType::equip) itemInfo[index].equipState = equipHandFlag::none;
 		storagePtr->itemInfo.push_back(std::move(itemInfo[index]));
 		destinationIndex = storagePtr->itemInfo.size() - 1;
 		eraseItemInfo(index);
 	}
 	else 
 	{
+		errorBox(storagePtr->type == storageType::equip, "2개 이상의 장비가 동시에 장착되었다.");
 		ItemData newItem = itemInfo[index].cloneForTransfer(number);
 		newItem.codeID = genItemID();
 		storagePtr->itemInfo.push_back(std::move(newItem)); 

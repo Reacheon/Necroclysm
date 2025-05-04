@@ -227,7 +227,7 @@ export namespace actFunc
 			inputItem.eraseFlag(itemFlag::TOGGLE_OFF);
 			inputItem.addFlag(itemFlag::TOGGLE_ON);
 
-			PlayerPtr->lightList.push_back(std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 4, 80, SDL_Color{ 150, 150, 250 }));
+			inputItem.lightPtr = std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 4, 80, SDL_Color{ 150, 150, 250 });
 
 			PlayerPtr->updateCustomSpriteHuman();
 			updateLog(L"#FFFFFF헤드랜턴의 전원을 켰다.");
@@ -237,7 +237,7 @@ export namespace actFunc
 			inputItem.eraseFlag(itemFlag::TOGGLE_ON);
 			inputItem.addFlag(itemFlag::TOGGLE_OFF);
 
-			PlayerPtr->lightList.clear();
+			inputItem.lightPtr.reset();
 
 			PlayerPtr->updateCustomSpriteHuman();
 			updateLog(L"#FFFFFF헤드랜턴의 전원을 껐다.");

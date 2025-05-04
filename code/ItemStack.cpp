@@ -68,6 +68,16 @@ void ItemStack::updateSprIndex()
 		sprIndex = getPocket()->itemInfo[0].sprIndex;
 	}
 }
+void ItemStack::pullStackLights()
+{
+	for (int i = 0; i < storage.get()->itemInfo.size(); i++)
+	{
+		if (storage.get()->itemInfo[i].lightPtr != nullptr)
+		{
+			storage.get()->itemInfo[i].lightPtr.get()->moveLight(getGridX(), getGridY(), getGridZ());
+		}
+	}
+}
 bool ItemStack::runAnimation(bool shutdown)
 {
 	//prt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
@@ -106,6 +116,7 @@ bool ItemStack::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
+			pullStackLights();
 			return true;
 		}
 	}
@@ -150,6 +161,7 @@ bool ItemStack::runAnimation(bool shutdown)
 			prt(L"애니메이션 종료\n");
 			resetTimer();
 			setAniType(aniFlag::null);
+			pullStackLights();
 			return true;
 		}
 	}

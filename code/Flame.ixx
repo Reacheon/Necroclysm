@@ -8,7 +8,7 @@ export struct Flame
 {
     int gridX, gridY, gridZ;
     flameFlag flameType = flameFlag::NONE;
-    Light* lightPtr = nullptr;
+    std::unique_ptr<Light> flameLightPtr;
     unsigned __int8 sprInfimum = 0;
     unsigned __int8 sprRandomStart = 0;
 

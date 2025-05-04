@@ -31,5 +31,6 @@ public:
 	void setTargetSprIndex(int val);
 	void checkEmpty();
 	void updateSprIndex();
+	void pullStackLights();
 	bool runAnimation(bool shutdown);
 };

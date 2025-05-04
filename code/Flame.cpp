@@ -26,15 +26,15 @@ Flame::Flame(Point3 inputCoor, flameFlag inputFlame)
         {
         default:
         case flameFlag::SMALL:
-            lightPtr = new Light(inputCoor.x, inputCoor.y, inputCoor.z, 2, 30, lowCol::orange);
+            flameLightPtr = std::make_unique<Light>(inputCoor.x, inputCoor.y, inputCoor.z, 2, 30, lowCol::orange);
             sprInfimum = 15;
             break;
         case flameFlag::NORMAL:
-            lightPtr = new Light(inputCoor.x, inputCoor.y, inputCoor.z, 3, 50, lowCol::orange);
+            flameLightPtr = std::make_unique<Light>(inputCoor.x, inputCoor.y, inputCoor.z, 3, 50, lowCol::orange);
             sprInfimum = 10;
             break;
         case flameFlag::BIG:
-            lightPtr = new Light(inputCoor.x, inputCoor.y, inputCoor.z, 4, 70, lowCol::orange);
+            flameLightPtr = std::make_unique<Light>(inputCoor.x, inputCoor.y, inputCoor.z, 4, 70, lowCol::orange);
             sprInfimum = 5;
             break;
         }
@@ -43,7 +43,5 @@ Flame::Flame(Point3 inputCoor, flameFlag inputFlame)
 
 Flame::~Flame()
 {
-    TileData* thisTile = &World::ins()->getTile(gridX, gridY, gridZ);
-    thisTile->flamePtr = nullptr;
-    delete (Light*)(lightPtr);
+    flameLightPtr.reset();
 }

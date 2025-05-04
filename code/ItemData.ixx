@@ -3,6 +3,7 @@
 import std;
 import util;
 import constVar;
+import Light;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767
@@ -139,7 +140,7 @@ export struct ItemData : public ItemData_Base
     unsigned __int16 dirChangeItemCode = 0;
     dir16 propDir16 = dir16::dir0;
 
-    void* lightPtr = nullptr;
+    std::unique_ptr<Light> lightPtr;
     __int16 propHP = 100;
     float propFakeHP = 100.0f;
 

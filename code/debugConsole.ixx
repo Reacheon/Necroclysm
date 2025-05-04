@@ -27,7 +27,6 @@ export void debugConsole()
 	prt(L"////////////////////////////////////////\n");
 	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
 	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
-	prt(L"1.광원 생성\n");
 	prt(L"2.적 생성\n");
 	prt(L"3.테스트 로그 갱신\n");
 	prt(L"4.아이템 생성\n");
@@ -62,42 +61,6 @@ export void debugConsole()
 	default:
 	{
 		prt(L"잘못된 값을 입력하였습니다.\n");
-		break;
-	}
-	case 1:// generateLight
-	{
-		int autoLight = false;
-		prt(L"자동 조명을 생성하시겠습니까?(0 or 1)\n");
-		std::cin >> autoLight;
-		if (autoLight)
-		{
-			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), 8, 255, { 0xd8,0x56,0x00 });
-			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
-		}
-		else
-		{
-			int lightColorR;
-			int lightColorG;
-			int lightColorB;
-			int sight;
-			int bright;
-			prt(L"광원의 시야 범위를 입력해주세요(0~10).\n");
-			std::cin >> sight;
-			prt(L"광원의 밝기 입력해주세요(0~255).\n");
-			std::cin >> bright;
-			prt(L"광원의 R값을 입력해주세요(0~255).\n");
-			std::cin >> lightColorR;
-			prt(L"광원의 G값을 입력해주세요(0~255).\n");
-			std::cin >> lightColorG;
-			prt(L"광원의 B값을 입력해주세요(0~255).\n");
-			std::cin >> lightColorB;
-
-			Light* light = new Light(PlayerX(), PlayerY(), PlayerZ(), (Uint8)sight, (Uint8)bright, { (Uint8)lightColorR,(Uint8)lightColorG,(Uint8)lightColorB });
-			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
-		}
-		updateLog(L"#FFFFFF디버그 : 테스트 광원을 생성했다.");
-		prt(L"[디버그]테스트 광원을 생성했다!\n");
-
 		break;
 	}
 	case 2: // generateEntity
@@ -374,14 +337,6 @@ export void debugConsole()
 		std::cin >> tgtGridZ;
 
         EntityPtrMove({ px,py,pz }, { tgtGridX,tgtGridY,tgtGridZ });
-		PlayerPtr->setGrid(tgtGridX, tgtGridY, tgtGridZ);
-		for (int i = 0; i < PlayerPtr->lightList.size(); i++)
-		{
-			auto lPtr = PlayerPtr->lightList[i].get();
-			lPtr->releaseLight();
-			lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
-			lPtr->updateLight(lPtr->lightRange);
-		}
 		break;
 	}
 	case 25://청크라인 그리기

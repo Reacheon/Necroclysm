@@ -31,9 +31,9 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
 
     errorBox(TileProp(inputCoor.x, inputCoor.y, inputCoor.z) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
 
-    if (itemDex[leadItemCode].checkFlag(itemFlag::LIGHT_ON))
+    if (leadItem.checkFlag(itemFlag::LIGHT_ON))
     {
-        myLight = new Light(inputCoor.x + leadItem.lightDelX, inputCoor.y + leadItem.lightDelY, inputCoor.z, leadItem.lightRange, leadItem.lightIntensity, { leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
+        leadItem.lightPtr = std::make_unique<Light>(inputCoor.x + leadItem.lightDelX, inputCoor.y + leadItem.lightDelY, inputCoor.z, leadItem.lightRange, leadItem.lightIntensity, SDL_Color{ leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
         //PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
     }
 
@@ -56,7 +56,6 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
 
 Prop::~Prop()
 {
-    delete myLight;
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 }
 

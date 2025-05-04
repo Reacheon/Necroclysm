@@ -78,14 +78,6 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 
 			EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getDstGridX(), getDstGridY(), getGridZ() });
-			setGrid(getDstGridX(), getDstGridY(), getGridZ());
-			for (int i = 0; i < lightList.size(); i++)
-			{
-				auto lPtr = lightList[i].get();
-				lPtr->releaseLight();
-				lPtr->setGrid(getGridX(), getGridY(), getGridZ());
-				lPtr->updateLight(lPtr->lightRange);
-			}
 
 			turnWait(1.0);
 

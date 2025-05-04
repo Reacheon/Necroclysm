@@ -41,7 +41,6 @@ ItemData ItemData::cloneForTransfer(int transferNumber) const
     newItem.unfinishPercent = 100;
     newItem.propHP = newItem.propMaxHP;
     newItem.propFakeHP = static_cast<float>(newItem.propMaxHP);
-    newItem.lightPtr = nullptr;
 
     newItem.eraseFlag(itemFlag::GRAYFILTER);
     // if (destinationType == storageType::equip) { newItem.equipState = equipHandFlag::normal; }
@@ -52,6 +51,8 @@ ItemData ItemData::cloneForTransfer(int transferNumber) const
 bool ItemData::itemOverlay(const ItemData& tgtItem) const
 {
     if (checkFlag(itemFlag::NONSTACK) || tgtItem.checkFlag(itemFlag::NONSTACK)) { return false; }
+
+    if (lightPtr != nullptr || pocketPtr != nullptr) return false;
 
     if (name != tgtItem.name) { return false; }
     if (itemCode != tgtItem.itemCode) { return false; }

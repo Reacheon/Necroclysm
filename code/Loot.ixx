@@ -495,6 +495,7 @@ public:
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		int returnIndex = lootPocket->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
+		PlayerPtr->pullEquipLights();
 		PlayerPtr->updateStatus();
 		PlayerPtr->updateCustomSpriteHuman();
 	}
@@ -767,6 +768,14 @@ public:
 				updateLog(L"#FFFFFF아이템을 들었다.");
 			}
 		}
+		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
+		{
+			if (equipPtr->itemInfo[i].lightPtr != nullptr)
+			{
+                equipPtr->itemInfo[i].lightPtr.get()->setGrid(PlayerX(), PlayerY(), PlayerZ());
+			}
+		}
+		PlayerPtr->pullEquipLights();
 		PlayerPtr->updateStatus();
 		PlayerPtr->updateCustomSpriteHuman();
 	}

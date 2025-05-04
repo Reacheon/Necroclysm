@@ -683,14 +683,6 @@ public:
 								updateLog(L"#FFFFFF계단을 올라갔다.");
 
 								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
-								PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
-								for (int i = 0; i < PlayerPtr->lightList.size(); i++)
-								{
-									auto lPtr = PlayerPtr->lightList[i].get();
-									lPtr->releaseLight();
-									lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
-									lPtr->updateLight(lPtr->lightRange);
-								}
 
 								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 								PlayerPtr->updateMinimap();
@@ -713,14 +705,6 @@ public:
 								updateLog(L"#FFFFFF계단을 내려갔다.");
 
 								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
-								PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() - 1);
-								for (int i = 0; i < PlayerPtr->lightList.size(); i++)
-								{
-									auto lPtr = PlayerPtr->lightList[i].get();
-									lPtr->releaseLight();
-									lPtr->setGrid(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
-									lPtr->updateLight(lPtr->lightRange);
-								}
 
 								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 								PlayerPtr->updateMinimap();

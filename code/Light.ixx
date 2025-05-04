@@ -24,7 +24,8 @@ public:
 	Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uint8 inputBright, SDL_Color inputColor);
 	~Light();
 	void setLightRange(int inputRange);
-	void updateLight(int range);
+	void updateLight();
 	void releaseLight();
+    void moveLight(int inputGridX, int inputGridY, int inputGridZ);
 	void rayCasting(int x1, int y1, int x2, int y2);
 };

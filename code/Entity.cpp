@@ -334,14 +334,6 @@ void Entity::move(int dir, bool jump)
 		setDstGrid(dstGridX, dstGridY);
 		setGrid(dstGridX, dstGridY, getGridZ());
 
-		for (int i = 0; i < lightList.size(); i++)
-		{
-			auto lPtr = lightList[i].get();
-			lPtr->releaseLight();
-			lPtr->setGrid(getGridX(), getGridY(), getGridZ());
-			lPtr->updateLight(lPtr->lightRange);
-		}
-
 		if (pulledCart != nullptr)
 		{
 			pulledCart->setDstGrid(getGridX(), getGridY());
@@ -850,6 +842,18 @@ void Entity::updateCustomSpriteHuman()
 	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
 	updateSpriteFlash();
 }
+
+void Entity::pullEquipLights()
+{
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+	{
+		if (getEquipPtr()->itemInfo[i].lightPtr != nullptr)
+		{
+            getEquipPtr()->itemInfo[i].lightPtr.get()->moveLight(getGridX(), getGridY(), getGridZ());
+		}
+	}
+}
+
 
 void Entity::drawSelf()
 {

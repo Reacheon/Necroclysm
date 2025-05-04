@@ -38,7 +38,6 @@ private:
 public:
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
-    std::vector<std::unique_ptr<Light>> lightList;
 
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
@@ -116,6 +115,8 @@ public:
     int getAimWeaponIndex();
 
     void updateCustomSpriteHuman();
+
+    void pullEquipLights();
 
     virtual void drawSelf() override;
 };
