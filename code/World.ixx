@@ -24,13 +24,13 @@ public:
 	}
 	World()
 	{
-		const int baseRange = 2;
+		const int baseRange = 4;
 
 		for (int y = -baseRange; y <= baseRange; y++)
 		{
 			for (int x = -baseRange; x <= baseRange; x++)
 			{
-				chunkPtr[{x, y, 0}] = new Chunk(chunkFlag::seawater);
+				chunkPtr[{x, y, 0}] = new Chunk(chunkFlag::dirt);
 			}
 		}
 

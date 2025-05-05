@@ -89,22 +89,22 @@ export void startArea()
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			setFloor({ dx,dy,0 }, 109);
+			setFloor({ dx,dy,0 }, itemVIPCode::dirt);
 		}
 	}
 	for (int dx = -30; dx <= 30; dx++)
 	{
 		for (int dy = -30; dy <= -2; dy++)
 		{
-			setFloor({ dx,dy,0 }, 220);
+			setFloor({ dx,dy,0 }, itemVIPCode::grass);
 		}
 	}
 	for (int dx = -6; dx >= -14; dx--)
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, 377); //노랑아스팔트
-			else setFloor({ dx,dy,0 }, 296); //검정아스팔트
+			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemVIPCode::yellowAsphalt); //노랑아스팔트
+			else setFloor({ dx,dy,0 }, itemVIPCode::blackAsphalt); //검정아스팔트
 		}
 	}
 

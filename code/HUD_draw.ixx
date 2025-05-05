@@ -878,6 +878,12 @@ void HUD::drawBarAct()
 		}
 		else if (barAct[i] == act::toggleOff) setBtnLayout(sysStr[196], 162);
 		else if (barAct[i] == act::toggleOn) setBtnLayout(sysStr[196], 163);
+		else if (barAct[i] == act::headlight)
+		{
+            Vehicle* thisVeh = (Vehicle*)ctrlVeh;
+			if(thisVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
+            else setBtnLayout(sysStr[205], 164);
+		}
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기

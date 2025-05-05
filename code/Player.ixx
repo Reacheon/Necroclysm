@@ -18,6 +18,7 @@ public:
 	void updateMinimap();
 	void updateVision(int range, int cx, int cy);
 	void updateVision(int range);
+	void updateVision();
 	void updateNearbyChunk(int range);
 	void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
 	void endMove() override; //aStar로 인해 이동이 끝났을 경우

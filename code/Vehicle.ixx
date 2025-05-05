@@ -20,6 +20,8 @@ import Drawable;
 * 차량의 크기제한은 1청크를 넘지 못하게 하는게 낫지 않나 라고 생각
 * 문제는 부품이다.
 * 수리는 내구도에 따른 내림 계산으로 하면됨
+* 
+* 차량이 이동하는 경우 네가지 1.shift 2.rotation 3.플레이어에 의한 pull 4.zShift
 */
 
 
@@ -42,6 +44,10 @@ public:
     float zAcc = 0; //헬기 등에서는 사용될 수 있을 것 같다
     float rotateAcc = 0;
     Point2 trainWheelCenter = { 0,0 }; //열차의 회전중심, 열차바퀴들의 중심좌표로 정해짐
+
+    //차량용 변수
+    bool headlightOn = false;
+
     //헬기용 변수
     __int8 collectiveState = 0;
     __int8 cyclicState = -1;
@@ -74,7 +80,7 @@ public:
     //////////////////////////////////////////////※ 프레임 확장/////////////////////////////////////////////////////////
     void extendPart(int inputX, int inputY, int inputItemCode);
     int getSprIndex(int inputX, int inputY);
-    void getRotatePartInfo(dir16 inputDir16);
+    void rotatePartInfo(dir16 inputDir16);
     std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> getRotateShadow(dir16 inputDir16);
     void rotateEntityPtr(dir16 inputDir16);
     void rotate(dir16 inputDir16);
@@ -88,6 +94,8 @@ public:
     bool runAI();
     bool runAnimation(bool shutdown);
     void updateTrainCenter();
+    void updateHeadlight();
+    void updateHeadlight(Point3 fakeCoor);
     void drawSelf() override;
 };
 

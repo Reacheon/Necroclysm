@@ -22,6 +22,18 @@ Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uin
 	updateLight();
 }
 
+Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uint8 inputBright, SDL_Color inputColor, dir16 inputDir)
+{
+	dir = inputDir;
+
+	prt(L"Light : 생성자가 실행되었습니다..\n");
+	bright = inputBright;
+	lightColor = inputColor;
+	setLightRange(inputRange);
+	setGrid(inputGridX, inputGridY, inputGridZ);
+	updateLight();
+}
+
 Light::~Light()
 {
 	prt(L"Light : 소멸자가 호출되었습니다..\n");
@@ -32,14 +44,30 @@ void Light::setLightRange(int inputRange) { lightRange = inputRange; }
 
 void Light::updateLight()
 {
-	for (int i = -lightRange; i <= lightRange; i++)
+	const float coneHalf = 65.f;              
+	const float dirAngle = dir16toAngle(dir);
+
+	for (int dx = -lightRange; dx <= lightRange; ++dx)
 	{
-		for (int j = -lightRange; j <= lightRange; j++)
+		for (int dy = -lightRange; dy <= lightRange; ++dy)
 		{
-			if (isCircle(lightRange, i, j) == true)
+			if (!isCircle(lightRange, dx, dy)) continue;
+
+			if (dir != dir16::none)
 			{
-				rayCasting(getGridX(), getGridY(), getGridX() + i, getGridY() + j);
+				if (dx == 0 && dy == 0) continue;
+					
+
+				float angTo = std::atan2f(-dy, dx) * 180.f / static_cast<float>(M_PI);
+				if (angTo < 0) angTo += 360.f;
+
+				float diff = std::fabs(angTo - dirAngle);
+				if (diff > 180.f) diff = 360.f - diff;
+
+				if (diff > coneHalf) continue;
 			}
+
+			rayCasting(getGridX(), getGridY(), getGridX() + dx, getGridY() + dy);
 		}
 	}
 

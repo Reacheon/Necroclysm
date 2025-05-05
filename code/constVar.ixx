@@ -7,6 +7,8 @@ import std;
 export constexpr int DARK_VISION_HALF_W = 18; //어둠시야
 export constexpr int DARK_VISION_HALF_H = 9; //어둠시야
 
+export constexpr int DARK_VISION_RADIUS = 15;
+
 export constexpr int GRAY_VISION_HALF_W = 23; //주변 FOV 회색으로 바꾸는 최대 W
 export constexpr int GRAY_VISION_HALF_H = 23; //주변 FOV 회색으로 바꾸는 최대 H
 
@@ -184,6 +186,8 @@ export enum class act
 
     vehicleRepair,
     vehicleDetach,
+
+    headlight,
 
     //skillInfo,
 };
@@ -526,6 +530,8 @@ export enum class itemFlag
     HAS_TOGGLE_SPRITE,
 
     CANCRAFT,//조합할 수 있는 아이템인지
+
+    HEADLIGHT,
 };
 
 export enum class walkFlag
@@ -1182,6 +1188,11 @@ export enum class vehFlag
 
 export namespace itemVIPCode
 {
+    int dirt = 109;
+    int grass = 220;
+    int blackAsphalt = 296;
+    int yellowAsphalt = 377;
+
     int railRL = 320;
     int railTB = 321;
     int railBR = 322;

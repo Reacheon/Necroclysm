@@ -127,7 +127,7 @@ int Vehicle::getSprIndex(int inputX, int inputY)
     return partInfo[{inputX, inputY}]->itemInfo[0].sprIndex;
 }
 
-void Vehicle::getRotatePartInfo(dir16 inputDir16)
+void Vehicle::rotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
@@ -250,7 +250,7 @@ void Vehicle::rotate(dir16 inputDir16)
         }
 
         rotateEntityPtr(inputDir16);
-        getRotatePartInfo(inputDir16);
+        rotatePartInfo(inputDir16);
 
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
@@ -268,6 +268,8 @@ void Vehicle::rotate(dir16 inputDir16)
     }
     //else errorBox(L"[Vehicle:roate] 이미 차량이 해당 방향을 향하고 있다.");
     updateSpr();
+    updateHeadlight();
+
 }
 
 void Vehicle::updateSpr()
@@ -397,6 +399,7 @@ void Vehicle::shift(int dx, int dy)
 
     addGridX(dx);
     addGridY(dy);
+    updateHeadlight();
 }
 
 void Vehicle::zShift(int dz)
@@ -423,12 +426,14 @@ void Vehicle::zShift(int dz)
         }
     }
     addGridZ(dz);
+    updateHeadlight();
+
 };
 
 bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 {
-    auto rotatePartInfo = getRotateShadow(inputDir16);
-    for (auto it = rotatePartInfo.begin(); it != rotatePartInfo.end(); it++)
+    auto rotatedPartInfo = getRotateShadow(inputDir16);
+    for (auto it = rotatedPartInfo.begin(); it != rotatedPartInfo.end(); it++)
     {
         //벽 충돌 체크
         if (TileWall((*it)[0] + dx, (*it)[1] + dy, getGridZ()) != 0) return true;
@@ -468,24 +473,59 @@ void Vehicle::rush(int dx, int dy)
     if (dx == 0 && dy == 0) return;
     //iAmDictator();
     setDelGrid(dx, dy);
-    shift(getDelGridX(), getDelGridY());
     addAniUSetMonster(this, aniFlag::propRush);
-
     cameraFix = false;
-    setFakeX(-getDelX());
-    setFakeY(-getDelY());
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-    {
-        if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
-        {
-            TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getFakeX());
-            TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getFakeY());
-        }
-    }
 }
 
 void Vehicle::centerShift(int dx, int dy, int dz)
 {
+}
+
+void Vehicle::updateHeadlight()
+{
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        for (int i = 0; i < it->second->itemInfo.size(); i++)
+        {
+            if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+            {
+                if (headlightOn)
+                {
+                    if (it->second->itemInfo[i].lightPtr != nullptr)
+                    {
+                        Light* thisLight = it->second->itemInfo[i].lightPtr.get();
+                        thisLight->dir = bodyDir;
+                        thisLight->moveLight(it->first[0], it->first[1], getGridZ());
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Vehicle::updateHeadlight(Point3 fakeCoor) //코어가 해당 위치에 가정하고 계산합니다.
+{
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        for (int i = 0; i < it->second->itemInfo.size(); i++)
+        {
+            if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+            {
+                if (headlightOn)
+                {
+                    if (it->second->itemInfo[i].lightPtr != nullptr)
+                    {
+                        Light* thisLight = it->second->itemInfo[i].lightPtr.get();
+                        thisLight->dir = bodyDir;
+                        int revX = it->first[0] - getGridX();
+                        int revY = it->first[1] - getGridY();
+
+                        thisLight->moveLight(fakeCoor.x+ revX, fakeCoor.y + revY, getGridZ());
+                    }
+                }
+            }
+        }
+    }
 }
 
 bool Vehicle::runAnimation(bool shutdown)
@@ -517,112 +557,101 @@ bool Vehicle::runAnimation(bool shutdown)
     {
         addTimer();
 
+        static float totalDist = 0.0f;              
+        static float totalMove = 0.0f;         
+        static std::vector<std::array<int, 2>> linePath;  
+        static Point3 currentCoreGrid;
+
+        if (getTimer() == 1)
         {
-            static float totalDist = 0;
-            static float totalMove = 0;
-            static std::vector<std::array<int, 2>> line;
-            static int lineCheck = 0;
-            if (getTimer() == 1)
-            {
-                line.clear();
-                makeLine(line, getDelGridX(), getDelGridY());
-                extraRenderVehList.push_back(this);
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-                {
-                    void* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
-                    if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
-                }
-                totalDist = std::sqrt(std::pow(getDelX(), 2) + std::pow(getDelY(), 2));
-                totalMove = 0;
-                lineCheck = 0;
+            linePath.clear();
+            makeLine(linePath, getDelGridX(), getDelGridY()); // 시야 경로 계산
 
-                cameraFix = false;
-                setFakeX(-getDelX());
-                setFakeY(-getDelY());
+            extraRenderVehList.push_back(this);
+            for (auto& p : partInfo)
+                if (void* ptr = TileEntity(p.first[0], p.first[1], getGridZ()))
+                    extraRenderEntityList.push_back(ptr);
+
+            setFakeX(0);  
+            setFakeY(0);
+
+            totalDist = std::hypot(getDelX(), getDelY());
+            totalMove = 0.0f;
+
+            cameraFix = false;
+            currentCoreGrid = { getGridX(), getGridY(), getGridZ() };
+            updateHeadlight(currentCoreGrid);
+        }
+
+        const float spd = 3.0f;                        
+        int   relX = getDelX();
+        int   relY = getDelY();
+        float dist = std::hypot(relX, relY);
+        float xSpd = (dist == 0) ? 0 : spd * relX / dist;
+        float ySpd = (dist == 0) ? 0 : spd * relY / dist;
+
+        setFakeX(getFakeX() + xSpd);
+        setFakeY(getFakeY() + ySpd);
+
+        if ((relX > 0 && getFakeX() > relX) || (relX < 0 && getFakeX() < relX)) setFakeX(relX);
+        if ((relY > 0 && getFakeY() > relY) || (relY < 0 && getFakeY() < relY)) setFakeY(relY);
+            
+
+        for (auto& p : partInfo)
+        {
+            if (auto e = TileEntity(p.first[0], p.first[1], getGridZ()))
+            {
+                e->setFakeX(getFakeX());
+                e->setFakeY(getFakeY());
             }
+        }
 
 
-            float spd = 3.0;
-            float xSpd, ySpd;
-            int relX = getDelX();
-            int relY = getDelY();
-            float dist = std::sqrt(std::pow(relX, 2) + std::pow(relY, 2));
-            float cosVal = relX / dist;
-            float sinVal = relY / dist;
-
-            xSpd = spd * cosVal;
-            ySpd = spd * sinVal;
-
-            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this)
+        if (currentCoreGrid != getClosestGridWithFake())
+        {
+            currentCoreGrid = getClosestGridWithFake();
+            for (int i = 0; i < linePath.size(); i++)
             {
-                totalMove += std::sqrt(std::pow(xSpd, 2) + std::pow(ySpd, 2));
-                int arrIndex = floor(myMin(1.0, (totalMove / totalDist)) * (float)(line.size() - 1));
-                if (arrIndex >= lineCheck)
+                if (currentCoreGrid.x == getGridX()+linePath[i][0] && currentCoreGrid.y == getGridY() + linePath[i][1])
                 {
-                    std::array<int, 2> visionTarget = line[arrIndex];
-                    //prt(L"시야 업데이트의 중심은 (%d,%d)이고 인덱스는 %d이며 사이즈는 %d이다.\n", PlayerX() + visionTarget[0], PlayerY() + visionTarget[1], arrIndex, line.size());
-
-                    PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() - getDelGridX() + visionTarget[0], PlayerY() - getDelGridY() + visionTarget[1]);
-                    lineCheck++;
-                }
-            }
-
-            setFakeX(getFakeX() + xSpd);
-            setFakeY(getFakeY() + ySpd);
-            //prt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFakeX(), getFakeY());
-
-            if (xSpd > 0 && getFakeX() > 0) { setFakeX(0); }
-            if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
-            if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
-            if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
-
-            for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-            {
-                if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
-                {
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getFakeX());
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getFakeY());
-                }
-            }
-
-            cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
-            cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
-
-            if (getFakeX() == 0 && getFakeY() == 0)//도착
-            {
-                //prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
-
-                extraRenderEntityList.clear();
-                setDelGrid(0, 0);
-                setFakeX(0);
-                setFakeY(0);
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)//엔티티 페이크 설정
-                {
-                    if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
+                    for (int j = 0; j <= i; j++)
                     {
-                        Entity* tgtEntity = TileEntity(it->first[0], it->first[1], getGridZ());
-                        tgtEntity->setFakeX(0);
-                        tgtEntity->setFakeY(0);
-                        tgtEntity->setDelGrid(0, 0);
+                        updateHeadlight({ getGridX() + linePath[i][0],getGridY() + linePath[i][1],getGridZ()});
+                        if(TileVehicle(PlayerX(),PlayerY(),PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + linePath[i][0], PlayerY() + linePath[i][1]);
                     }
-                }
 
-                cameraFix = true;
-                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
-                resetTimer();
-                setAniType(aniFlag::null);
-                extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), (void*)this));
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-                {
-                    void* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
-                    if (iPtr != nullptr)
-                    {
-                        auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
-                        if (eraseIt != extraRenderEntityList.end()) extraRenderEntityList.erase(eraseIt);
-                    }
                 }
-                return true;
             }
+        }
+
+
+        cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+        cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
+
+        bool reached =(std::fabs(getFakeX()) >= std::fabs(relX) &&std::fabs(getFakeY()) >= std::fabs(relY));
+        if (reached)
+        {
+            shift(getDelGridX(), getDelGridY());
+            setDelGrid(0, 0);
+            setFakeX(0);  setFakeY(0);
+
+            for (auto& p : partInfo)
+            {
+                if (auto e = TileEntity(p.first[0], p.first[1], getGridZ()))
+                {
+                    e->setFakeX(0);  e->setFakeY(0);
+                    e->setDelGrid(0, 0);
+                }
+            }
+
+            extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), (void*)this));
+            extraRenderEntityList.clear();
+            PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+            cameraFix = true;
+
+            resetTimer();
+            setAniType(aniFlag::null);
+            return true;
         }
     }
     else if (getAniType() == aniFlag::minecartRush)

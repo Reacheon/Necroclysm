@@ -22,6 +22,7 @@ export enum class dir16
     dir6_5,
     dir7,
     dir7_5,
+    none,
 };
 
 export dir16 ACW(dir16 input)
@@ -173,3 +174,27 @@ export dir16 int8todir16(int inputDir)
     else if (inputDir == 7) return dir16::dir7;
     else errorBox(L"[utility] int8todir16에서 0~7 범위가 아닌 dir이 입력되었다.");
 }
+
+export float dir16toAngle(dir16 input)
+{
+    switch (input)
+    {
+    case dir16::dir0:   return   0.f;
+    case dir16::dir0_5: return  22.5f;
+    case dir16::dir1:   return  45.f;
+    case dir16::dir1_5: return  67.5f;
+    case dir16::dir2:   return  90.f;
+    case dir16::dir2_5: return 112.5f;
+    case dir16::dir3:   return 135.f;
+    case dir16::dir3_5: return 157.5f;
+    case dir16::dir4:   return 180.f;
+    case dir16::dir4_5: return 202.5f;
+    case dir16::dir5:   return 225.f;
+    case dir16::dir5_5: return 247.5f;
+    case dir16::dir6:   return 270.f;
+    case dir16::dir6_5: return 292.5f;
+    case dir16::dir7:   return 315.f;
+    case dir16::dir7_5: return 337.5f;
+    default:            return   0.f;
+    }
+};

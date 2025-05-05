@@ -573,11 +573,55 @@ public:
 			CORO(closeDoor(PlayerX(), PlayerY(), PlayerZ()));
 			break;
 		}
+		case act::headlight:
+		{
+			Vehicle* myCar = (Vehicle*)(ctrlVeh);
+			if (myCar->headlightOn)
+			{
+				myCar->headlightOn = false;
+
+				for (auto it = myCar->partInfo.begin(); it != myCar->partInfo.end(); it++)
+				{
+					for (int i = 0; i < it->second->itemInfo.size(); i++)
+					{
+						if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+						{
+							if (it->second->itemInfo[i].lightPtr != nullptr)
+							{
+								it->second->itemInfo[i].lightPtr.reset();
+							}
+						}
+					}
+				}
+
+			}
+			else
+			{
+				myCar->headlightOn = true;
+
+				for(auto it = myCar->partInfo.begin(); it != myCar->partInfo.end(); it++)
+				{
+					for (int i = 0; i < it->second->itemInfo.size(); i++)
+					{
+						if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+						{
+							if (it->second->itemInfo[i].lightPtr == nullptr)
+							{
+								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], myCar->getGridZ(), 14, 120, col::white, myCar->bodyDir);
+							}
+						}
+					}
+                }
+			}
+
+			PlayerPtr->updateVision();
+			break;
+		}
 		default:
 			updateLog(L"#FFFFFF알수없는 레터박스 버튼이 눌렸다.");
 		}
 
-		if (popDownWhenEnd == true)
+		if (popDownWhenEnd == true && ctrlVeh == nullptr)
 		{
 			if (y != 0) executePopDown();
 		}

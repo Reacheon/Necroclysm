@@ -191,30 +191,19 @@ void Player::updateVision(int range, int cx, int cy)
 	else correctionRange = range / 2;
 
 	//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
-	for (int i = cx - GRAY_VISION_HALF_W; i <= cx + GRAY_VISION_HALF_W; i++)
+	for (int i = cx - DARK_VISION_RADIUS; i <= cx + DARK_VISION_RADIUS; i++)
 	{
-		for (int j = cy - GRAY_VISION_HALF_H; j <= cy + GRAY_VISION_HALF_H; j++)
+		for (int j = cy - DARK_VISION_RADIUS; j <= cy + DARK_VISION_RADIUS; j++)
 		{
-			TileData* tgtTile = &World::ins()->getTile(i, j, getGridZ());
-			if (tgtTile->fov == fovFlag::white) tgtTile->fov = fovFlag::gray;
+			if (TileFov(i, j, getGridZ()) == fovFlag::white) TileFov(i, j, getGridZ()) = fovFlag::gray;
 		}
 	}
 
-	//for (int tgtX = cx - DARK_VISION_HALF_W; tgtX <= cx + DARK_VISION_HALF_W; tgtX++)
-	//{
-	//	for (int tgtY = cy - DARK_VISION_HALF_H; tgtY <= cy + DARK_VISION_HALF_H; tgtY++)
-	//	{
-	//		if (isCircle(correctionRange, tgtX, tgtY)) rayCasting(cx, cy, tgtX, tgtY);
-	//		else rayCastingDark(cx, cy, tgtX, tgtY);
-	//	}
-	//}
-
-
 	std::vector<Point2> tasksVec;
-	tasksVec.reserve((2 * DARK_VISION_HALF_W + 1) * (2 * DARK_VISION_HALF_H + 1));
-	for (int tgtX = cx - DARK_VISION_HALF_W; tgtX <= cx + DARK_VISION_HALF_W; tgtX++)
+	tasksVec.reserve((2 * DARK_VISION_RADIUS + 1) * (2 * DARK_VISION_RADIUS + 1));
+	for (int tgtX = cx - DARK_VISION_RADIUS; tgtX <= cx + DARK_VISION_RADIUS; tgtX++)
 	{
-		for (int tgtY = cy - DARK_VISION_HALF_H; tgtY <= cy + DARK_VISION_HALF_H; tgtY++)
+		for (int tgtY = cy - DARK_VISION_RADIUS; tgtY <= cy + DARK_VISION_RADIUS; tgtY++)
 		{
 			tasksVec.push_back({ tgtX,tgtY });
 		}
@@ -225,7 +214,7 @@ void Player::updateVision(int range, int cx, int cy)
 			for (const auto& point : points)
 			{
 				if (isCircle(correctionRange, point.x - cx, point.y - cy)) rayCasting(cx, cy, point.x, point.y);
-				else rayCastingDark(cx, cy, point.x, point.y);
+				else if (isCircle(DARK_VISION_RADIUS, point.x - cx, point.y - cy)) rayCastingDark(cx, cy, point.x, point.y);
 			}
 		};
 
@@ -250,6 +239,11 @@ void Player::updateVision(int range, int cx, int cy)
 
 void Player::updateVision(int range) {
 	updateVision(range, getGridX(), getGridY());
+}
+
+void Player::updateVision() 
+{
+	updateVision(entityInfo.eyeSight, getGridX(), getGridY());
 }
 
 void Player::updateNearbyChunk(int range)

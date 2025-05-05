@@ -3,12 +3,14 @@
 import ItemStack;
 import std;
 import util;
+import globalVar;
 import constVar;
 import wrapVar;
 import textureVar;
 import World;
 import ItemPocket;
 import ItemData;
+import Player;
 import Ani;
 import Sprite;
 import Coord;
@@ -156,8 +158,11 @@ bool ItemStack::runAnimation(bool shutdown)
 		if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
 		if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
 
+
+		//이 부분 최적화할것
 		Point3 cGrid = getClosestGridWithFake();
 		pullStackLights(cGrid);
+		PlayerPtr->updateVision();
 
 		if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
 		{
