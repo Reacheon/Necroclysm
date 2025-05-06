@@ -78,7 +78,7 @@ export __int64 turnCycleLoop()
 		entityAITime = entityAITurn();
 		//std::wprintf(L"[Turn:entityAI] %ls ns\n", decimalCutter(entityAITime / 1000000.0, 5).c_str());
 	}
-	else errorBox("Unknown turnCycle executed in turyCycleLoop.ixx");
+	else errorBox(L"Unknown turnCycle executed in turyCycleLoop.ixx");
 
 	return (getNanoTimer() - timeStampStart);
 };

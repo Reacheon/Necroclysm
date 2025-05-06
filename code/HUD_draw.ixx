@@ -531,7 +531,7 @@ void HUD::drawTab()
 		drawTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
 		break;
 	default:
-		errorBox("undefined tabFalg");
+		errorBox(L"undefined tabFalg");
 		break;
 	}
 

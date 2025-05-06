@@ -17,7 +17,7 @@ export void fontLoader()
         for (int i = 0; i < MAX_FONT_SIZE; i++)
         {
             mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
-            errorBox(mainFont[i] == nullptr, "Failed to open the font file.");
+            errorBox(mainFont[i] == nullptr, L"Failed to open the font file.");
         }
     }
     else if (option::language == L"English")
@@ -26,7 +26,7 @@ export void fontLoader()
         for (int i = 0; i < MAX_FONT_SIZE; i++)
         {
             mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
-            errorBox(mainFont[i] == nullptr, "Failed to open the font file.");
+            errorBox(mainFont[i] == nullptr, L"Failed to open the font file.");
         }
     }
     else

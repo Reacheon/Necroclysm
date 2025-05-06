@@ -29,7 +29,7 @@ void ItemPocket::eraseItemInfo(int index)
 void ItemPocket::subtractItemIndex(int index, int number)
 {
 	if (number <= 0) return;
-	errorBox(itemInfo[index].number < number, "The number of items to remove is greater than the number of items.");
+	errorBox(itemInfo[index].number < number, L"The number of items to remove is greater than the number of items.");
 	itemInfo[index].number -= number;
 	if (itemInfo[index].lootSelect > itemInfo[index].number) { itemInfo[index].lootSelect = itemInfo[index].number; }//셀렉트 값 조정
 	if (itemInfo[index].number == 0) { eraseItemInfo(index); }
@@ -55,7 +55,7 @@ void ItemPocket::subtractItemCode(int code, int number)
 			if (totalRemovedCount == number) return;
 		}
 
-		errorBox(totalRemovedCount > number,"Error occurs at method subtractItemCode(ItemPocket.ixx), the number of Item has been subtracted over its own number.");
+		errorBox(totalRemovedCount > number, L"Error occurs at method subtractItemCode(ItemPocket.ixx), the number of Item has been subtracted over its own number.");
 	}
 }
 
@@ -67,10 +67,11 @@ void ItemPocket::subtractItemCode(int code, int number)
 int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 {
 
-	errorBox(storagePtr == nullptr, "Destination storage pointer is null in transferItem.");
-	errorBox(number <= 0, "Number to transfer must be positive in transferItem.");
-	errorBox(index < 0 || index >= itemInfo.size(), "Source index out of bounds in transferItem.");
-	errorBox(itemInfo[index].number < number, "item number that have to transfer is not enough in transferItem function(ItemPocket.ixx)");
+	errorBox(storagePtr == nullptr, L"Destination storage pointer is null in transferItem.");
+	errorBox(number <= 0, L"Number to transfer must be positive in transferItem.");
+	errorBox(index < 0 || index >= itemInfo.size(), L"Source index out of bounds in transferItem.");
+	errorBox(itemInfo[index].number < number, L"item number that have to transfer is not enough in transferItem function(ItemPocket.ixx)");
+	errorBox(storagePtr->type == storageType::equip && number >= 2, L"2개 이상의 장비가 동시에 장착되었다.");
 
 
 	bool transferWholeStack = (itemInfo[index].number == number);
@@ -89,6 +90,7 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 		}
 	}
 
+
 	//일치하는 아이템을 찾지 못했을 경우 그 아이템을 위해 새로운 행을 추가함
 	int destinationIndex = -1;
 	if (transferWholeStack) 
@@ -100,7 +102,6 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 	}
 	else 
 	{
-		errorBox(storagePtr->type == storageType::equip, "2개 이상의 장비가 동시에 장착되었다.");
 		ItemData newItem = itemInfo[index].cloneForTransfer(number);
 		newItem.codeID = genItemID();
 		storagePtr->itemInfo.push_back(std::move(newItem)); 
@@ -115,8 +116,8 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 //@brief Dex에서 이 함수를 사용한 ItemPocket에 해당 index의 템을 number개만큼 추가함
 int ItemPocket::addItemFromDex(int index, int number)
 {
-	errorBox(index < 0 || index >= itemDex.size(), "Item index out of bounds for itemDex in addItemFromDex.");
-	errorBox(number <= 0, "Number to add must be positive in addItemFromDex.");
+	errorBox(index < 0 || index >= itemDex.size(), L"Item index out of bounds for itemDex in addItemFromDex.");
+	errorBox(number <= 0, L"Number to add must be positive in addItemFromDex.");
 
 	ItemData& itemTemplate = itemDex[index];
 
@@ -156,7 +157,7 @@ int ItemPocket::addItemFromDex(int index) { return addItemFromDex(index, 1); }
 
 void ItemPocket::addRecipe(int inputItemCode)
 {
-	errorBox(getType() != storageType::recipe, "The addRecipe function was executed while the storageType was not set to 'recipe'(ItemPocket.ixx).");
+	errorBox(getType() != storageType::recipe, L"The addRecipe function was executed while the storageType was not set to 'recipe'(ItemPocket.ixx).");
 
 	if (itemDex[inputItemCode].checkFlag(itemFlag::NOT_RECIPE)) return; //NOT_RECIPE 플래그가 있을 경우 레시피목록에 추가하지 않음
 
@@ -176,8 +177,8 @@ void ItemPocket::addRecipe(int inputItemCode)
 void ItemPocket::swap(int index1, int index2)
 {
 	if (index1 == index2) return;
-	errorBox(index1 >= itemInfo.size() || index1 < 0, "index1 is an invalid value in swap.");
-	errorBox(index2 >= itemInfo.size() || index2 < 0, "index2 is an invalid value in swap.");
+	errorBox(index1 >= itemInfo.size() || index1 < 0, L"index1 is an invalid value in swap.");
+	errorBox(index2 >= itemInfo.size() || index2 < 0, L"index2 is an invalid value in swap.");
 	std::swap(itemInfo[index1], itemInfo[index2]);
 }
 
@@ -362,7 +363,7 @@ int ItemPocket::searchSubcategory(itemSubcategory input) { return searchSubcateg
 int ItemPocket::numberItem(int inputCode, int currentDepth)
 {
 	constexpr int MAX_DEPTH = 50;
-	errorBox(currentDepth > MAX_DEPTH,"Maximum recursion depth exceeded in numberItem. Possible pocket cycle?");
+	errorBox(currentDepth > MAX_DEPTH, L"Maximum recursion depth exceeded in numberItem. Possible pocket cycle?");
 
 	int count = 0;
 	for (int i = 0; i < itemInfo.size(); i++)
@@ -382,7 +383,7 @@ int ItemPocket::numberItem(int inputCode, int currentDepth)
 bool ItemPocket::checkToolQuality(int input, int currentDepth) // 깊이 인자 추가
 {
 	constexpr int MAX_DEPTH = 50;
-	errorBox(currentDepth > MAX_DEPTH,"Maximum recursion depth exceeded in checkToolQuality. Possible pocket cycle?");
+	errorBox(currentDepth > MAX_DEPTH, L"Maximum recursion depth exceeded in checkToolQuality. Possible pocket cycle?");
 
 	for (int i = 0; i < itemInfo.size(); ++i)
 	{
@@ -427,7 +428,7 @@ ItemPocket* getBulletPocket(ItemData& inputGun)
 //상단 총알의 데이터를 삭제
 void popTopBullet(ItemPocket* inputPocket)
 {
-	errorBox(inputPocket->itemInfo.size() == 0, "function popTopBullet has executed with no bullet in ItemPocket.ixx");
+	errorBox(inputPocket->itemInfo.size() == 0, L"function popTopBullet has executed with no bullet in ItemPocket.ixx");
 	if (inputPocket->itemInfo[0].number == 1) { inputPocket->itemInfo.erase(inputPocket->itemInfo.begin()); }
 	else { inputPocket->itemInfo[0].number--; }
 };

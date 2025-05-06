@@ -92,8 +92,8 @@ void Player::startMove(int inputDir)
 {
 	if (PlayerPtr->getAniType() == aniFlag::null)
 	{
-		//errorBox(PlayerPtr->getAniType() == aniFlag::null, "Player's startMove activated while player's aniFlag is not null.");
-		errorBox(((PlayerPtr)->getX() - 8) % 16 != 0, "This instance moved from non-integer coordinates.");
+		//errorBox(PlayerPtr->getAniType() == aniFlag::null, L"Player's startMove activated while player's aniFlag is not null.");
+		errorBox(((PlayerPtr)->getX() - 8) % 16 != 0, L"This instance moved from non-integer coordinates.");
 
 		int dx, dy;
 		dir2Coord(inputDir, dx, dy);

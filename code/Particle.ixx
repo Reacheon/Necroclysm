@@ -64,7 +64,7 @@ public:
         else if (type == particleFlag::leaf)
         {
         }
-        else errorBox("알 수 없는 particleFlag가 step 이벤트에서 발생하였음");
+        else errorBox(L"알 수 없는 particleFlag가 step 이벤트에서 발생하였음");
     }
 };
 

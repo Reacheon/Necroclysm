@@ -90,7 +90,7 @@ private:
 public:
 	Equip() : GUI(false)
 	{
-		errorBox(ptr != nullptr, "More than equip instance was generated.");
+		errorBox(ptr != nullptr, L"More than equip instance was generated.");
 		ptr = this;
 
 		changeXY(0, (cameraH / 2) - 210, false);
@@ -247,7 +247,7 @@ public:
 		switch (sortType)
 		{
 			default:
-				errorBox("undefined sorting in Equip.ixx");
+				errorBox(L"undefined sorting in Equip.ixx");
 				break;
 			case sortFlag::null:
 				lootPtr->sortWeightDescend();;
@@ -529,7 +529,7 @@ public:
 		}
 		else
 		{
-			errorBox("Equip instance : updateBarAct error occurs, Both lootCursor and equipCursor have the same value -1");
+			errorBox(L"Equip instance : updateBarAct error occurs, Both lootCursor and equipCursor have the same value -1");
 		}
 	}
 

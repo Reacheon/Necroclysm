@@ -124,7 +124,7 @@ export int readEntityDex(const wchar_t* file)
                             else if (strFragment == L"human") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::human; }
                             else if (strFragment == L"zombie") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::zombie; }
                             else if (strFragment == L"robot") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::robot; }
-                            else { errorBox("error in readItemDex.ixx, csvItem::category"); }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
                             break;
                         }
                         case csvEntity::bodyTemplate:
@@ -133,7 +133,7 @@ export int readEntityDex(const wchar_t* file)
                             else if (strFragment == L"human") { entityDex[arrayCounter / (csvWidth)-1].bodyTemplate = bodyTemplateFlag::human;}
                             else if (strFragment == L"zombie") { entityDex[arrayCounter / (csvWidth)-1].bodyTemplate = bodyTemplateFlag::zombie; }
                             else if (strFragment == L"tank") { entityDex[arrayCounter / (csvWidth)-1].bodyTemplate = bodyTemplateFlag::tank; }
-                            else { errorBox("error in readItemDex.ixx, csvItem::category"); }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
                             break;
                         }
                         case csvEntity::temperature:

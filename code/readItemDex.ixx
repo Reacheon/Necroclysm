@@ -264,7 +264,7 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"BIONIC") { itemDex[arrayCounter / (csvWidth)-1].category = itemCategory::bionic; }
                             else if (strFragment == L"STRUCTURE") { itemDex[arrayCounter / (csvWidth)-1].category = itemCategory::structure; }
                             else if (strFragment == L"MATERIAL") { itemDex[arrayCounter / (csvWidth)-1].category = itemCategory::material; }       
-                            else { errorBox("error in readItemDex.ixx, csvItem::category"); }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
 
                             break;
                         case csvItem::subcategory:
@@ -275,7 +275,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"GLOVES") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::equipment_gloves; }
                                 else if (strFragment == L"SHOES") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::equipment_shoes; }
                                 else if (strFragment == L"ACCESSORY") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::equipment_accessory; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(equipment)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(equipment)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::weapon)
                             {
@@ -284,7 +284,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"BASHING") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::weapon_bashing; }
                                 else if (strFragment == L"SHOOTING") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::weapon_shooting; }
                                 else if (strFragment == L"THROWING") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::weapon_throwing; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(weapon)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(weapon)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::tool)
                             {
@@ -294,7 +294,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"DEVICE") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::tool_device; }
                                 else if (strFragment == L"DOCUMENT") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::tool_document; }
                                 else if (strFragment == L"ETC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::tool_etc; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(tool)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tool)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::consumable)
                             {
@@ -302,7 +302,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"MEDICINE") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::consumable_medicine; }
                                 else if (strFragment == L"AMMO") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::consumable_ammo; }
                                 else if (strFragment == L"FUEL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::consumable_fuel; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(consumable)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(consumable)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::vehicle)
                             {
@@ -312,7 +312,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"TRANSPORT") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::vehicle_transport; }
                                 else if (strFragment == L"ENERGY") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::vehicle_energy; }
                                 else if (strFragment == L"DEVICE") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::vehicle_device; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(container)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(container)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::bionic)
                             {
@@ -322,7 +322,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"TOGGLE") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::bionic_toggle; }
                                 else if (strFragment == L"GENERATOR") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::bionic_generator; }
                                 else if (strFragment == L"STORAGE") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::bionic_storage; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(container)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(container)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::material)
                             {
@@ -331,7 +331,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"MECHANICAL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::material_mechanical; }
                                 else if (strFragment == L"ELECTRICAL") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::material_electrical; }
                                 else if (strFragment == L"ETC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::material_etc; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(material)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(material)"); }
                             }
                             else if (itemDex[arrayCounter / (csvWidth)-1].category == itemCategory::structure)
                             {
@@ -341,9 +341,9 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment == L"PROP") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_prop; }
                                 else if (strFragment == L"ELECTRIC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_electric; }
                                 else if (strFragment == L"PNEUMATIC") { itemDex[arrayCounter / (csvWidth)-1].subcategory = itemSubcategory::structure_pneumatic; }
-                                else { errorBox("error in readItemDex.ixx, csvItem::subcategory(structure)"); }
+                                else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structure)"); }
                             }
-                            else { errorBox("error in readItemDex.ixx, itemCategory"); }
+                            else { errorBox(L"error in readItemDex.ixx, itemCategory"); }
                             break;
                         case csvItem::weight:
                             itemDex[arrayCounter / (csvWidth)-1].weight = wtoi(strFragment.c_str());
@@ -658,7 +658,7 @@ export int readItemDex(const wchar_t* file)
                             if (strFragment == L"NORMAL") { itemDex[arrayCounter / (csvWidth)-1].bulletType = bulletFlag::normal; }
                             else if (strFragment == L"TRACER") { itemDex[arrayCounter / (csvWidth)-1].bulletType = bulletFlag::tracer; }
                             else if (strFragment == L"AP") { itemDex[arrayCounter / (csvWidth)-1].bulletType = bulletFlag::ap; }
-                            else { errorBox("error in readItemDex.ixx, csvItem::bulletType"); }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::bulletType"); }
                             break;
                         case csvItem::bulletRange:
                             itemDex[arrayCounter / (csvWidth)-1].bulletRange = wtoi(strFragment.c_str());

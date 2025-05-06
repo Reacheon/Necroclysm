@@ -278,12 +278,12 @@ bool Entity::getHasAStarDst() { return hasAStarDst; }
 void Entity::deactAStarDst() { hasAStarDst = false; }
 int Entity::getAStarDstX()
 {
-	errorBox(hasAStarDst == false, "getAStarDstX activated while hasAStarDst is false");
+	errorBox(hasAStarDst == false, L"getAStarDstX activated while hasAStarDst is false");
 	return aStarDst.x;
 }
 int Entity::getAStarDstY()
 {
-	errorBox(hasAStarDst == false, "getAStarDstY activated while hasAStarDst is false");
+	errorBox(hasAStarDst == false, L"getAStarDstY activated while hasAStarDst is false");
 	return aStarDst.y;
 }
 void Entity::setAStarDst(int inputX, int inputY)
@@ -650,7 +650,7 @@ void Entity::addProficExp(int expVal)
 	{
 		divider += entityInfo.proficFocus[i];
 	}
-	errorBox(divider == 0, "You need to enable at least one profic(divider=0 at addProficExp).");
+	errorBox(divider == 0, L"You need to enable at least one profic(divider=0 at addProficExp).");
 	int frag = floor((float)(expVal) / (float)divider);
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{

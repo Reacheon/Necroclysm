@@ -69,7 +69,7 @@ public:
 		}
 		else//잘못된 창 닫기 애니메이션 입력
 		{
-			errorBox("wrong aniFlag parameter in GUI close function");
+			errorBox(L"wrong aniFlag parameter in GUI close function");
 		}
 	}
     virtual void changeXY(int inputX, int inputY, bool center) = 0;
@@ -93,7 +93,7 @@ public:
 		switch (slipDir)
 		{
 			default:
-				errorBox("Diagonal GUI movement occured");
+				errorBox(L"Diagonal GUI movement occured");
 				break;
 			case 0:
 				sgnX = 1;

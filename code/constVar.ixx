@@ -4,10 +4,7 @@ export module constVar;
 
 import std;
 
-export constexpr int DARK_VISION_HALF_W = 18; //어둠시야
-export constexpr int DARK_VISION_HALF_H = 9; //어둠시야
-
-export constexpr int DARK_VISION_RADIUS = 15;
+export constexpr int DARK_VISION_RADIUS = 13;
 
 export constexpr int GRAY_VISION_HALF_W = 23; //주변 FOV 회색으로 바꾸는 최대 W
 export constexpr int GRAY_VISION_HALF_H = 23; //주변 FOV 회색으로 바꾸는 최대 H

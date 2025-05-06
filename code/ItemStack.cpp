@@ -144,6 +144,9 @@ bool ItemStack::runAnimation(bool shutdown)
 		int relY = getIntegerFakeY();
 		float dist = sqrt(pow(relX, 2) + pow(relY, 2));
 		prt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
+		static Point3 prevCoor;
+
+		if (getTimer() == 1) prevCoor = getClosestGridWithFake();
 
 		float cosVal = -relX / dist;
 		float sinVal = -relY / dist;
@@ -159,10 +162,13 @@ bool ItemStack::runAnimation(bool shutdown)
 		if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
 
 
-		//이 부분 최적화할것
 		Point3 cGrid = getClosestGridWithFake();
-		pullStackLights(cGrid);
-		PlayerPtr->updateVision();
+		if (cGrid != prevCoor)
+		{
+			prevCoor = cGrid;
+			pullStackLights(cGrid);
+			PlayerPtr->updateVision();
+		}
 
 		if (getIntegerFakeX() == 0 && getIntegerFakeY() == 0)//도착
 		{

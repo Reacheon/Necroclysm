@@ -91,7 +91,7 @@ public:
 	{
 		prt(L"Alchemy : 생성자가 호출되었다.\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, "More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 
 		//메세지 박스 렌더링
@@ -664,7 +664,7 @@ public:
 		//						}
 		//					}
 		//				}
-		//				else errorBox("Click item select box while dropDownList::mode Var is none");
+		//				else errorBox(L"Click item select box while dropDownList::mode Var is none");
 		//			}
 		//		}
 		//	}

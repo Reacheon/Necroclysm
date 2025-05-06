@@ -20,7 +20,7 @@ private:
 public:
 	Status(int targetGridX, int targetGridY) : GUI(false)
 	{
-		errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+		errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 		ptr = this;
 
 		changeXY((cameraW / 2) + 17, (cameraH / 2) - 210, false);

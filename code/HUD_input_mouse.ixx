@@ -74,9 +74,9 @@ void HUD::clickUpGUI()
 		int playerX = PlayerX();
 		int playerY = PlayerY();
 		int playerZ = PlayerZ();
-		for (int i = playerX - DARK_VISION_HALF_W; i <= playerX + DARK_VISION_HALF_W; i++)
+		for (int i = playerX - DARK_VISION_RADIUS; i <= playerX + DARK_VISION_RADIUS; i++)
 		{
-			for (int j = playerY - DARK_VISION_HALF_H; j <= playerY + DARK_VISION_HALF_H; j++)
+			for (int j = playerY - DARK_VISION_RADIUS; j <= playerY + DARK_VISION_RADIUS; j++)
 			{
 				if (TileFov(i, j, playerZ) == fovFlag::white)
 				{

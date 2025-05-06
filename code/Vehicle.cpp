@@ -108,9 +108,9 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
         dir2Coord(dir, dx, dy);
         //존재할 경우
         if (partInfo.find({ inputX + dx, inputY + dy }) != partInfo.end()) break;
-        errorBox(i == 3, "[Vehicle:extendPart] 상하좌우에 프레임이 없는데 해당 타일로 확장을 시도했다.");
+        errorBox(i == 3, L"[Vehicle:extendPart] 상하좌우에 프레임이 없는데 해당 타일로 확장을 시도했다.");
     }
-    errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), "[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
+    errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), L"[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
 
     partInfo[{inputX, inputY}] = std::make_unique<ItemPocket>(storageType::null);
     partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
@@ -123,7 +123,7 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
 
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
-    errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, "[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
+    errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
     return partInfo[{inputX, inputY}]->itemInfo[0].sprIndex;
 }
 
@@ -559,13 +559,15 @@ bool Vehicle::runAnimation(bool shutdown)
 
         static float totalDist = 0.0f;              
         static float totalMove = 0.0f;         
-        static std::vector<std::array<int, 2>> linePath;  
+        static std::vector<std::array<int, 2>> lineRevPath; 
+        static int lineCounter = 0;
         static Point3 currentCoreGrid;
 
         if (getTimer() == 1)
         {
-            linePath.clear();
-            makeLine(linePath, getDelGridX(), getDelGridY()); // 시야 경로 계산
+            lineRevPath.clear();
+            lineCounter = 0;
+            makeLine(lineRevPath, getDelGridX(), getDelGridY()); // 시야 경로 계산
 
             extraRenderVehList.push_back(this);
             for (auto& p : partInfo)
@@ -610,16 +612,16 @@ bool Vehicle::runAnimation(bool shutdown)
         if (currentCoreGrid != getClosestGridWithFake())
         {
             currentCoreGrid = getClosestGridWithFake();
-            for (int i = 0; i < linePath.size(); i++)
+            for (int i = 0; i < lineRevPath.size(); i++)
             {
-                if (currentCoreGrid.x == getGridX()+linePath[i][0] && currentCoreGrid.y == getGridY() + linePath[i][1])
+                if (currentCoreGrid.x == getGridX()+lineRevPath[i][0] && currentCoreGrid.y == getGridY() + lineRevPath[i][1])
                 {
-                    for (int j = 0; j <= i; j++)
+                    for (int j = lineCounter; j <= i; j++)
                     {
-                        updateHeadlight({ getGridX() + linePath[i][0],getGridY() + linePath[i][1],getGridZ()});
-                        if(TileVehicle(PlayerX(),PlayerY(),PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + linePath[i][0], PlayerY() + linePath[i][1]);
+                        updateHeadlight({ getGridX() + lineRevPath[i][0],getGridY() + lineRevPath[i][1],getGridZ()});
+                        if(TileVehicle(PlayerX(),PlayerY(),PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + lineRevPath[i][0], PlayerY() + lineRevPath[i][1]);
+                        lineCounter++;
                     }
-
                 }
             }
         }

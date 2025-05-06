@@ -89,7 +89,7 @@ public:
 	HUD() : GUI(false)
 	{
 		prt(L"HUD instance was generated.\n");
-		errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+		errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 		ptr = this;
 		changeXY(0, 0, false);
 	}
@@ -607,7 +607,7 @@ public:
 						{
 							if (it->second->itemInfo[i].lightPtr == nullptr)
 							{
-								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], myCar->getGridZ(), 14, 120, col::white, myCar->bodyDir);
+								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], myCar->getGridZ(), 12, 120, col::white, myCar->bodyDir);
 							}
 						}
 					}

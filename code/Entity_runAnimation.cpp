@@ -14,6 +14,7 @@ import Prop;
 import Bullet;
 import Aim;
 import TileData;
+import ItemData;
 import ItemStack;
 import Particle;
 
@@ -95,7 +96,41 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		static bool rightAtk = true;
+		static bool dualAtk = false;
+		static bool leftAtk = false;
+		static bool rightAtk = false;
+		static bool twoHandedAtk = false;
+		static bool unarmedAtk = false;
+		static equipHandFlag prevDualAtk = equipHandFlag::right;
+		
+
+		if (getTimer() == 1)
+		{
+			dualAtk = false;
+			leftAtk = false;
+			rightAtk = false;
+			twoHandedAtk = false;
+			unarmedAtk = false;
+
+			bool findLeft = false;
+			bool findRight = false;
+			bool findTwoHanded = false;
+
+			auto& equip = PlayerPtr->getEquipPtr()->itemInfo;
+			for (int i = 0; i < equip.size(); i++)
+			{
+				if (equip[i].equipState == equipHandFlag::left) findLeft = true;
+				else if (equip[i].equipState == equipHandFlag::right) findRight = true;
+				else if (equip[i].equipState == equipHandFlag::both) findTwoHanded = true;
+			}
+
+			if(findLeft == true && findRight == true) dualAtk = true;
+			else if (findLeft == true) leftAtk = true;
+			else if (findRight == true) rightAtk = true;
+            else if (findTwoHanded == true) twoHandedAtk = true;
+            else unarmedAtk = true;
+		}
+
 
 		switch (entityInfo.direction)
 		{
@@ -128,8 +163,15 @@ bool Entity::runAnimation(bool shutdown)
 		switch (getTimer())
 		{
 		case 1:
-			if(rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
-			else  PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
+			if (dualAtk)
+			{
+				if (prevDualAtk == equipHandFlag::right) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
+				else  PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
+			}
+			else if(leftAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
+			else if (rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
+			else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
+			else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -157,16 +199,23 @@ bool Entity::runAnimation(bool shutdown)
 			}
 			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
-			if (rightAtk)
+			if (dualAtk)
 			{
-				PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
-				rightAtk = false;
+				if (prevDualAtk == equipHandFlag::right)
+				{
+					PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
+					prevDualAtk = equipHandFlag::left;
+				}
+				else
+				{
+					PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
+					prevDualAtk = equipHandFlag::right;
+				}
 			}
-			else
-			{
-				PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
-				rightAtk = true;
-			}
+			else if(leftAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
+			else if (rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
+            else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
+            else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);	
 			break;
 		case 9:
 			setFakeX(getFakeX() - 0.5 * dx);

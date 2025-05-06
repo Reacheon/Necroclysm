@@ -77,7 +77,7 @@ public:
 	{
 		prt(L"Craft : 생성자가 호출되었습니다..\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, "More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
@@ -984,7 +984,7 @@ public:
 							for (int i = 0; i < canConnect.size(); i++) vehicleNameList.push_back(canConnect[i]->name);
 							new Lst(sysStr[95], sysStr[94], vehicleNameList);//넣기, 넣을 포켓을 선택해주세요.
 							co_await std::suspend_always();
-							errorBox(wtoi(coAnswer.c_str()) >= canConnect.size() || wtoi(coAnswer.c_str()) < 0, "Lst error, unknown vehicle selected");
+							errorBox(wtoi(coAnswer.c_str()) >= canConnect.size() || wtoi(coAnswer.c_str()) < 0, L"Lst error, unknown vehicle selected");
 							targetVehicle = canConnect[wtoi(coAnswer.c_str())];
 							targetVehicle->extendPart(buildLocation[0], buildLocation[1], targetItemCode);
 						}
@@ -1002,8 +1002,8 @@ public:
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::VPART))
 			{
 				Vehicle* targetVehicle = TileVehicle(buildLocation[0], buildLocation[1], buildLocation[2]);
-				errorBox(targetVehicle == nullptr, "targetVehicle is nullptr in Craft.ixx");
-				errorBox(!targetVehicle->hasFrame(buildLocation[0], buildLocation[1]), "first part doesn't have VFRAME flag");
+				errorBox(targetVehicle == nullptr, L"targetVehicle is nullptr in Craft.ixx");
+				errorBox(!targetVehicle->hasFrame(buildLocation[0], buildLocation[1]), L"first part doesn't have VFRAME flag");
 				targetVehicle->addPart(buildLocation[0], buildLocation[1], targetItemCode);
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))

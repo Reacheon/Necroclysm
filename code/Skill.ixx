@@ -49,7 +49,7 @@ public:
 	Skill() : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, "More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 
 		//메세지 박스 렌더링

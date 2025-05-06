@@ -54,7 +54,7 @@ public:
 	{
 		prt(L"Msg : 생성자가 호출되었습니다.\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, "More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 
 

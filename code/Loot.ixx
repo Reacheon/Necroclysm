@@ -78,7 +78,7 @@ public:
 		ptr = this;
 		prt(L"Loot : 생성자가 생성되었습니다..\n");
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
-		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
@@ -104,7 +104,7 @@ public:
 		ptr = this;
 		prt(L"Loot : 생성자가 생성되었습니다..\n");
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
-		//errorBox(ptr != nullptr, "More than one Loot instance was generated.");
+		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
@@ -315,7 +315,7 @@ public:
 		switch (sortType)
 		{
 		default:
-			errorBox("undefined sorting in Loot.ixx");
+			errorBox(L"undefined sorting in Loot.ixx");
 			break;
 		case sortFlag::null:
 			lootPocket->sortWeightDescend();
