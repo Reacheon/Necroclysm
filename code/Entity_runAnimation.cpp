@@ -36,14 +36,30 @@ bool Entity::runAnimation(bool shutdown)
 		if (getTimer() == 1)
 		{
 			footChanged = false;
-			setFakeX(0);
-			setFakeY(0);
 		}
 
-		if (getX() + getIntegerFakeX() > getDstX()) addFakeX(-entityInfo.gridMoveSpd);
-		else if (getX() + getIntegerFakeX() < getDstX()) addFakeX(+entityInfo.gridMoveSpd);
-		if (getY() + getIntegerFakeY() > getDstY()) addFakeY(-entityInfo.gridMoveSpd);
-		else if (getY() + getIntegerFakeY() < getDstY()) addFakeY(+entityInfo.gridMoveSpd);
+		if (getFakeX() > 0)
+		{
+			addFakeX(-entityInfo.gridMoveSpd);
+			if (getFakeX() < 0) setFakeX(0);
+		}
+		else if (getFakeX() < 0)
+		{
+			addFakeX(+entityInfo.gridMoveSpd);
+			if (getFakeX() > 0) setFakeX(0);
+		}
+
+		if (getFakeY() > 0)
+		{
+			addFakeY(-entityInfo.gridMoveSpd);
+			if (getFakeY() < 0) setFakeY(0);
+		}
+		else if (getFakeY() < 0)
+		{
+			addFakeY(+entityInfo.gridMoveSpd);
+			if (getFakeY() > 0) setFakeY(0);
+		}
+
 
 		if (entityInfo.isPlayer)
 		{
@@ -52,7 +68,7 @@ bool Entity::runAnimation(bool shutdown)
 			cameraY = getY() + getIntegerFakeY();
 		}
 
-		if (std::abs(getIntegerFakeX()) >= 8.0 || std::abs(getIntegerFakeY()) >= 8.0)
+		if (std::abs(getIntegerFakeX()) <= 8.0 || std::abs(getIntegerFakeY()) <= 8.0)
 		{
 			if (footChanged == false)
 			{
@@ -70,7 +86,7 @@ bool Entity::runAnimation(bool shutdown)
 			}
 		}
 
-		if (std::abs(getIntegerFakeX()) >= 16.0 || std::abs(getIntegerFakeY()) >= 16.0)
+		if (std::abs(getIntegerFakeX()) == 0.0 && std::abs(getIntegerFakeY()) == 0.0)
 		{
 			setSpriteIndex(0);
 			resetTimer();
@@ -78,12 +94,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeX(0);
 			setFakeY(0);
 
-			EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getDstGridX(), getDstGridY(), getGridZ() });
-
 			turnWait(1.0);
-
-
-
 			endMove();
 			if (entityInfo.isPlayer) cameraFix = true;
 			return true;

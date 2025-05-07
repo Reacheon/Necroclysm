@@ -296,6 +296,8 @@ void Entity::setAStarDst(int inputX, int inputY)
 #pragma endregion
 void Entity::move(int dir, bool jump)
 {
+	int prevGridX = getGridX();
+	int prevGridY = getGridY();
 	int dstX = 16 * getGridX() + 8;
 	int dstY = 16 * getGridY() + 8;
 	int dGridX, dGridY;
@@ -306,12 +308,6 @@ void Entity::move(int dir, bool jump)
 	int dstGridY = (dstY - 8) / 16;
 
 
-	if (pulledCart != nullptr)
-	{
-		TileVehicle(pulledCart->getGridX(), pulledCart->getGridY(), getGridZ()) = nullptr;
-		TileVehicle(getGridX(), getGridY(), getGridZ()) = pulledCart;
-	}
-
 	if (jump == false)
 	{
 		if (entityInfo.walkMode == walkFlag::run) entityInfo.gridMoveSpd = 3.5;
@@ -320,14 +316,28 @@ void Entity::move(int dir, bool jump)
 		else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim) entityInfo.gridMoveSpd = 2.0;
 		else if (entityInfo.walkMode == walkFlag::crouch) entityInfo.gridMoveSpd = 2.0;
 
-		addAniUSet(this, aniFlag::move);
-		setDstGrid(dstGridX, dstGridY);
 		if (pulledCart != nullptr)
 		{
+			int dx = prevGridX - pulledCart->getGridX();
+			int dy = prevGridY - pulledCart->getGridY();
+			int dir = coord2Dir(dx, dy);
+			pulledCart->setFakeX(-16 * dx);
+			pulledCart->setFakeY(-16 * dy);
 			addAniUSet(pulledCart, aniFlag::move);
-			pulledCart->setDstGrid(getGridX(), getGridY());
+
+			pulledCart->shift(dx, dy);
 			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
 		}
+
+		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX()+dGridX, getGridY()+dGridY, getGridZ() });
+		setFakeX(-16*dGridX);
+		setFakeY(-16*dGridY);
+		cameraFix = false;
+		cameraX = getX() + getIntegerFakeX();
+		cameraY = getY() + getIntegerFakeY();
+		addAniUSet(this, aniFlag::move);
+
+
 	}
 	else
 	{
