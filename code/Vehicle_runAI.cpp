@@ -293,7 +293,7 @@ bool Vehicle::runAI()
                 extraRenderVehList.push_back(this);
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
-                    void* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
+                    Drawable* iPtr =TileEntity(it->first[0], it->first[1], getGridZ());
                     if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                 }
                 cameraFix = false;

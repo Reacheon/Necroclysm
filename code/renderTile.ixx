@@ -151,8 +151,16 @@ __int64 analyseRender()
 		}
 	}
 
-	for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++) renderVehList.push_back((Drawable*)(Vehicle*)(*it));
-	for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++) renderEntityList.push_back((Drawable*)((*it)));
+	for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++)
+	{
+		int exVehSize = extraRenderVehList.size(); //메모리 누수 체크용
+		renderVehList.push_back(*it);
+	}
+	for (auto it = extraRenderEntityList.begin(); it != extraRenderEntityList.end(); it++)
+	{
+		int exEntitySize =extraRenderEntityList.size(); //메모리 누수 체크용
+		renderEntityList.push_back(*it);
+	}
 
 	return getNanoTimer() - timeStampStart;
 }
@@ -564,6 +572,7 @@ __int64 drawEntities()
 			entityCache.insert(elem);
 		}
 	}
+
 
 	//헬기 로터 그리기
 	for (int i = 0; i < rotorList.size(); i++)

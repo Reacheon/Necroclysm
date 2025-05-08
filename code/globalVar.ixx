@@ -19,6 +19,7 @@ import Ani;
 import AlchemyData;
 import ItemPocket;
 import Player;
+import Drawable;
 
 /////////////////////////////////////////////////////////////////
 export namespace actSet
@@ -180,8 +181,9 @@ export int extraCameraLength = 0;
 export godFlag playerGod = godFlag::none;
 export int godPiety = 0;
 
-export std::vector<void*> extraRenderVehList;
-export std::vector<void*> extraRenderEntityList;
+//화면 내에 있지않아도 여기에 추가될 경우 반드시 그려짐
+export std::vector<Drawable*> extraRenderVehList;
+export std::vector<Drawable*> extraRenderEntityList;
 
 export std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , -1), };
 

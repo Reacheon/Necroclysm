@@ -478,14 +478,17 @@ void Vehicle::rush(int dx, int dy)
     cameraFix = false;
     setFakeX(-getDelX());
     setFakeY(-getDelY());
+    extraRenderVehList.push_back(this);
     for (auto& p : partInfo)
     {
         if (auto e = TileEntity(p.first[0], p.first[1], getGridZ()))
         {
             e->setFakeX(-getDelX());
             e->setFakeY(-getDelY());
+            extraRenderEntityList.push_back((e));
         }
     }
+
     updateHeadlight(getClosestGridWithFake());
     if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
 
@@ -601,15 +604,7 @@ bool Vehicle::runAnimation(bool shutdown)
             {
                 lineRevPath.clear();
                 makeLine(lineRevPath, getDelGridX(), getDelGridY());
-                extraRenderVehList.push_back(this);
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)
-                {
-                    void* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
-                    if (iPtr != nullptr)
-                    {
-                        extraRenderEntityList.push_back(iPtr);
-                    }
-                }
+
                 totalDist = std::sqrt(std::pow(getDelX(), 2) + std::pow(getDelY(), 2));
                 totalMove = 0;
                 lineCheck = 0;
@@ -694,10 +689,10 @@ bool Vehicle::runAnimation(bool shutdown)
                 PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
                 resetTimer();
                 setAniType(aniFlag::null);
-                extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), (void*)this));
+                extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), this));
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
-                    void* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
+                    Drawable* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
                     if (iPtr != nullptr)
                     {
                         auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
