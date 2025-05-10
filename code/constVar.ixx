@@ -1180,6 +1180,7 @@ export enum class vehFlag
     heli,
     minecart,
     train,
+    ship,
 };
 
 

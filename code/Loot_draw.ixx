@@ -45,25 +45,46 @@ void Loot::drawGUI()
 
 		setZoom(3.0);
 		int tileIndex = 140;
-		if (lootItemData != nullptr) tileIndex = lootItemData->sprIndex;
+		std::wstring tileName = L"Tile name";
+
+		if (lootItemData != nullptr)
+		{
+			tileIndex = lootItemData->sprIndex;
+			tileName = lootItemData->name;
+		}
+		else if (lootStack != nullptr)
+		{
+			Point3 targetTile = { lootStack->getGridX(), lootStack->getGridY(), lootStack->getGridZ() };
+			int floorIndex = TileFloor(targetTile.x, targetTile.y, targetTile.z);
+			tileIndex = itemDex[floorIndex].sprIndex;
+			tileName = itemDex[floorIndex].name;
+		}
 		drawSpriteCenter(spr::itemset, tileIndex, lootBase.x + 13 + 25, lootBase.y + 40 + 25);
 		setZoom(1.0);
 
 		setFontSize(16);
-		std::wstring tileName = L"Tile name";
-		if (lootItemData != nullptr) tileName = lootItemData->name;
+		
 		drawText(col2Str(col::white) + tileName, lootBase.x + 73, lootBase.y + 39);
 
 		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//회색 분리선
 
+		
 		SDL_Rect volumeGaugeRect = { lootBase.x + 123,lootBase.y + 72,104,9 };
 		drawRect(volumeGaugeRect, col::white);
-		drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,70,5 }, lowCol::yellow);
+		if(lootStack == nullptr) drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,70,5 }, lowCol::yellow);
+		
+
+
 		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 		setFontSize(10);
 		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);
 		setFontSize(8);
-		drawText(col2Str(col::white) + L"72.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
+		if (lootStack == nullptr) drawText(col2Str(col::white) + L"72.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
+		else
+		{
+			setFontSize(10);
+			drawText(col2Str(col::white) + L"∞", volumeGaugeRect.x + 110 - 64, volumeGaugeRect.y - 2);
+		}
 
 		//좌측상단 버리기 버튼
 		SDL_Rect dropBtn = { lootBase.x + 259,lootBase.y + 36,69,23 };

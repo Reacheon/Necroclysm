@@ -122,6 +122,9 @@ export void startArea()
 	setFloor({ 4,2,0 }, 293);
 	for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
 
+
+	createProp({ 10, -8, 0 }, 96);//냉장고 설치
+
 	//나무벽 설치
 	//집 하단 5타일
 	setWall({ -1,-2,0 }, 375);

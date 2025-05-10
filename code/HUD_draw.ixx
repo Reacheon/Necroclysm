@@ -405,7 +405,7 @@ void HUD::drawGUI()
 	drawBarAct();
 	drawTab();
 	drawQuickSlot();
-	drawVehiclePartInfo();
+	drawHoverItemInfo();
 }
 
 
@@ -998,7 +998,7 @@ void HUD::drawStatusEffects()
 	}
 }
 
-void HUD::drawVehiclePartInfo()
+void HUD::drawHoverItemInfo()
 {
 	if (getLastGUI() == ContextMenu::ins() || getLastGUI() == this)
 	{
@@ -1018,6 +1018,7 @@ void HUD::drawVehiclePartInfo()
 		if (tgtGrid.x > PlayerX() - tileW / 2 - 1 && tgtGrid.x < PlayerX() + tileW / 2 + 1 && tgtGrid.y > PlayerY() - tileH / 2 - 1 && tgtGrid.y < PlayerY() + tileH / 2 + 1)
 		{
 			Vehicle* vehPtr = TileVehicle(tgtGrid.x, tgtGrid.y, PlayerZ());
+			ItemStack* stackPtr = TileItemStack(tgtGrid.x, tgtGrid.y, PlayerZ());
 			if (vehPtr != nullptr)
 			{
 				int pivotX = cameraW - 200;
@@ -1027,8 +1028,14 @@ void HUD::drawVehiclePartInfo()
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
 				setSolidText();
-				drawTextCenter(col2Str(col::white) + vehPtr->name, pivotX + 96, pivotY + 9);
+				std::wstring titleName = vehPtr->name;
+				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+				if(vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+				else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+				else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+				else drawSpriteCenter(spr::icon16, 88, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 
+				
 
 				int newPivotY = pivotY + 16;
 
@@ -1056,13 +1063,52 @@ void HUD::drawVehiclePartInfo()
 					drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
 					drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
 				}
-
-
-
-
 				disableSolidText();
-
 			}
+			else if (stackPtr != nullptr)
+			{
+				int pivotX = cameraW - 200;
+				int pivotY = 148;
+
+				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
+				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
+				setFontSize(10);
+				setSolidText();
+				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
+				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].sprIndex, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
+
+
+				int newPivotY = pivotY + 16;
+
+
+				int stackSize = stackPtr->getPocket()->itemInfo.size();
+
+				drawFillRect(pivotX, newPivotY, 192, 25 + 17 * (stackSize - 1), col::black, 200);
+				drawRect(pivotX, newPivotY, 192, 25 + 17 * (stackSize - 1), col::lightGray, 255);
+
+
+				for (int i = 0; i < stackSize; i++)
+				{
+					ItemData& tgtPart = stackPtr->getPocket()->itemInfo[i];
+					//내구도
+					drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
+					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
+
+					//아이템 아이콘
+					drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+
+					//아이템 이름
+					drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+
+					//연료량
+					//drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
+					//drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
+					//drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
+				}
+				disableSolidText();
+			}
+
 		}
 	}
 }

@@ -135,7 +135,7 @@ public:
 	void drawQuickSlot();
 	void drawBarAct();
 	void drawStatusEffects();
-	void drawVehiclePartInfo();
+	void drawHoverItemInfo();
 
 	void clickDownGUI();
 	void clickMotionGUI(int dx, int dy);
