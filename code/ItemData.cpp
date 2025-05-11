@@ -48,6 +48,32 @@ ItemData ItemData::cloneForTransfer(int transferNumber) const
     return newItem;
 }
 
+ItemData cloneFromItemDex(ItemData& inputData, int transferNumber)
+{
+    ItemData newItem;
+
+    errorBox(transferNumber <= 0, L"Number to add must be positive in addItemFromDex.");
+
+    ItemData& itemTemplate = inputData;
+
+    newItem = itemTemplate.cloneForTransfer(1);
+    newItem.codeID = genItemID();
+
+    // 해당 아이템이 포켓을 가질 경우
+    if (itemTemplate.pocketMaxVolume > 0 || itemTemplate.pocketMaxNumber > 0)
+    {
+        errorBox(transferNumber >= 2, L"cloneFromItemDex에서 포켓이 있는 아이템을 2개 이상 복사하려고 하였다.");
+        newItem.pocketPtr = std::make_unique<ItemPocket>(storageType::pocket);
+    }
+
+    return newItem;
+}
+
+//ItemData ItemData::createItemFromDex(int index)
+//{
+//}
+
+
 bool ItemData::itemOverlay(const ItemData& tgtItem) const
 {
     if (checkFlag(itemFlag::NONSTACK) || tgtItem.checkFlag(itemFlag::NONSTACK)) { return false; }

@@ -405,7 +405,7 @@ void HUD::drawGUI()
 	drawBarAct();
 	drawTab();
 	drawQuickSlot();
-	drawHoverItemInfo();
+	//drawHoverItemInfo();
 }
 
 
@@ -1065,7 +1065,7 @@ void HUD::drawHoverItemInfo()
 				}
 				disableSolidText();
 			}
-			else if (stackPtr != nullptr)
+			else if (stackPtr != nullptr && false)
 			{
 				int pivotX = cameraW - 200;
 				int pivotY = 148;
@@ -1112,3 +1112,4 @@ void HUD::drawHoverItemInfo()
 		}
 	}
 }
+

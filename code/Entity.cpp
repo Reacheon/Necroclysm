@@ -24,7 +24,8 @@ import drawSprite;
 import SkillData;
 import Flame;
 import Vehicle;
-
+import drawText;
+import mouseGrid;
 
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
@@ -141,7 +142,7 @@ float Entity::endAtk()
 }
 void Entity::loadDataFromDex(int index)
 {
-	entityInfo = entityDex[index].cloneForTransfer();
+	entityInfo = entityDex[index].cloneEntity();
 	entityInfo.HP = entityInfo.maxHP;
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
@@ -992,7 +993,10 @@ void Entity::drawSelf()
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if (entityInfo.HP != entityInfo.maxHP)//개체 HP 표기
+	bool doDrawHP = false;
+    if (entityInfo.HP != entityInfo.maxHP) doDrawHP = true;
+
+	if (doDrawHP)//개체 HP 표기
 	{
 		int pivotX = drawingX - (int)(8 * zoomScale);
 		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
@@ -1032,6 +1036,40 @@ void Entity::drawSelf()
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green);
 		else drawFillRect(dst, lowCol::red);
+	}
+
+	if (0)//개체 이름 표기
+	{
+		int mouseX = getAbsMouseGrid().x;
+		int mouseY = getAbsMouseGrid().y;
+
+		if (getGridX() == mouseX && getGridY() == mouseY && entityInfo.isPlayer == false)
+		{
+			int pivotX = drawingX - (int)(8 * zoomScale);
+			int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
+
+			setSolidText();
+			if (zoomScale == 1.0) setFontSize(9);
+			else if (zoomScale == 2.0) setFontSize(10);
+			else if (zoomScale == 3.0) setFontSize(11);
+			else if (zoomScale == 4.0) setFontSize(14);
+			else if (zoomScale == 5.0) setFontSize(16);
+
+			int textX = pivotX + (int)(8 * zoomScale);
+			int textY = pivotY - (int)(3 * zoomScale);
+			if (doDrawHP == true) textY = pivotY - (int)(3 * zoomScale);
+			else textY = pivotY - (int)(0 * zoomScale);
+
+			if (zoomScale == 1.0) textY -= (int)(1 * zoomScale);
+
+			drawTextCenter(col2Str(col::black) + entityInfo.name, textX + 1, textY);
+			drawTextCenter(col2Str(col::black) + entityInfo.name, textX - 1, textY);
+			drawTextCenter(col2Str(col::black) + entityInfo.name, textX, textY + 1);
+			drawTextCenter(col2Str(col::black) + entityInfo.name, textX, textY - 1);
+
+			drawTextCenter(col2Str(col::white) + entityInfo.name, textX, textY);
+			disableSolidText();
+		}
 	}
 
 	if (getFlashType() != NULL) //엔티티에 플래시 효과가 있을 경우

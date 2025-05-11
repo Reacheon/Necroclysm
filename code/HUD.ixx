@@ -136,6 +136,7 @@ public:
 	void drawBarAct();
 	void drawStatusEffects();
 	void drawHoverItemInfo();
+	void drawHoverEntityName();
 
 	void clickDownGUI();
 	void clickMotionGUI(int dx, int dy);
@@ -1043,6 +1044,15 @@ public:
 			{
 				inputOptions.push_back(act::vehicleRepair);
 				inputOptions.push_back(act::vehicleDetach);
+			}
+		}
+
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			Prop* vPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
+			if (vPtr->leadItem.pocketPtr != nullptr)
+			{
+				inputOptions.push_back(act::unbox);
 			}
 		}
 

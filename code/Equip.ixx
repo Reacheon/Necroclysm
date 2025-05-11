@@ -38,7 +38,6 @@ private:
 	const int equipScrollSize = 8;
 
 	ItemPocket* lootPtr = nullptr;
-	const int lootScrollSize = 6; //한 스크롤에 들어가는 아이템의 수
 	int lootScroll = 0; //우측 루팅창의 스크롤
 	int lootCursor = -1; //우측 루팅창의 커서
 	int pocketCursor = -1; //우측 상단의 현재 선택된 가방, EQUIP의 가방의 위부터 순서대로 0,1,2...
@@ -74,11 +73,8 @@ private:
 	SDL_Rect lootArea;
 	SDL_Rect lootScrollBox;
 	SDL_Rect lootWindow;
-	SDL_Rect pocketWeight;
-	SDL_Rect pocektVolume;
 	SDL_Rect pocketWindow;
 	SDL_Rect pocketItem[7];
-	SDL_Rect pocketArea;
 	SDL_Rect pocketScrollBox;
 	SDL_Rect pocketLeft;
 	SDL_Rect pocketRight;

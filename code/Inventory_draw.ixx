@@ -36,14 +36,53 @@ void Inventory::drawGUI()
 
 		drawLine(inventoryBase.x + 72, inventoryBase.y + 63, inventoryBase.x + 72 + 255, inventoryBase.y + 63, col::gray);//회색 분리선
 
+
 		SDL_Rect volumeGaugeRect = { inventoryBase.x + 123,inventoryBase.y + 72,104,9 };
 		drawRect(volumeGaugeRect, col::white);
-		drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,50,5 }, lowCol::green);
 		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 		setFontSize(10);
 		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//부피
-		setFontSize(8);
-		drawText(col2Str(col::white) + L"32.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
+
+		 //Inventory에도 같은 코드가 존재
+		{
+			ItemPocket* pkPtr = inventoryItemData->pocketPtr.get();
+			if (inventoryItemData->pocketMaxVolume > 0)
+			{
+				int currentVolume = 0;
+				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+				float volumeRatio = (float)currentVolume / (float)inventoryItemData->pocketMaxVolume;
+				SDL_Color gaugeCol = lowCol::green;
+				if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+				else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+				drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+
+				std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
+				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxVolume / 1000.0, 1) + L" L";
+				setFontSize(10);
+				drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+			}
+			else if (inventoryItemData->pocketMaxNumber > 0)
+			{
+				int currentNumber = 0;
+				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentNumber += pkPtr->itemInfo[i].number;
+				float volumeRatio = (float)currentNumber / (float)inventoryItemData->pocketMaxNumber;
+				SDL_Color gaugeCol = lowCol::green;
+				if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+				else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+				drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+
+				std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
+				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxNumber / 1000.0, 1);
+				setFontSize(10);
+				drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+			}
+		}
+
+
+
+		
+
+
 
 		//좌측상단 버리기 버튼
 		SDL_Rect dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };

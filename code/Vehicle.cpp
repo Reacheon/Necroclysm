@@ -68,7 +68,7 @@ void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 {
     errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] 입력한 위치에 프레임이 존재하지 않는다.");
 
-    ItemData inputPart = itemDex[dexIndex].cloneForTransfer(1);
+    ItemData inputPart = cloneFromItemDex(itemDex[dexIndex], 1);
 
     if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))//타이어일 경우 맨 앞에 추가
     {

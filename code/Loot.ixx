@@ -37,7 +37,6 @@ private:
 	ItemData* lootItemData = nullptr;
 	ItemPocket* lootPocket = nullptr;
 
-	const int lootScrollSize = 6; //한 스크롤에 들어가는 아이템의 수
 	int lootScroll = 0; //우측 루팅창의 스크롤
 	int lootCursor = -1; //우측 루팅창의 커서
 	int pocketCursor = 0; //우측 상단의 현재 선택된 가방, EQUIP의 가방의 위부터 순서대로 0,1,2...
@@ -48,8 +47,7 @@ private:
 	Uint32 selectTouchTime = -1;
 	sortFlag sortType = sortFlag::null; //0:기본_1:무게내림_2:무게올림_3:부피내림_4:부피올림
 
-	std::wstring titleInventory = L"배낭";
-	int titleItemSprIndex = 60;
+	std::wstring titleInventory;
 
 	SDL_Rect lootBase;
 	SDL_Rect lootTitle;
@@ -60,16 +58,11 @@ private:
 	SDL_Rect lootLabelName;
 	SDL_Rect lootLabelQuantity;
 	SDL_Rect lootArea;
-	SDL_Rect lootWindow;
-	SDL_Rect pocketWeight;
-	SDL_Rect pocektVolume;
 	SDL_Rect pocketWindow;
 	SDL_Rect pocketItem[7];
-	SDL_Rect pocketArea;
 	SDL_Rect pocketLeft;
 	SDL_Rect pocketRight;
 	SDL_Rect lootBtn;
-	SDL_Rect topWindow;
 public:
 	Corouter errorFunc();
 
@@ -154,7 +147,6 @@ public:
 			lootBase.y += inputY - lootBase.h / 2;
 		}
 		lootTitle = { lootBase.x + 102, lootBase.y + 0, 130, 30 };
-		lootWindow = { lootBase.x + 0, lootBase.y + 120, 335, 300 };
 
 		lootArea = { lootBase.x + 10, lootBase.y + 125,312, 246 };
 		for (int i = 0; i < LOOT_ITEM_MAX; i++)
@@ -168,9 +160,6 @@ public:
 		lootLabelQuantity = { lootLabel.x + lootLabelName.w + lootLabelSelect.w, lootLabel.y, 71 , 26 };
 
 		pocketWindow = { lootBase.x + 0, lootBase.y + 34, 335, 70 };
-		pocketWeight = { pocketWindow.x + 12, pocketWindow.y + 64, 72, 4 };
-		pocektVolume = { pocketWindow.x + pocketWindow.w - 12 - 72, pocketWindow.h + 64, 72, 4 };
-
 
 		//pocketItem[0] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 3,pocketWindow.y + 11,32,32 };
 		//pocketItem[1] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 2,pocketWindow.y + 11,32,32 };
@@ -184,9 +173,6 @@ public:
 		pocketRight = { lootBase.x + lootBase.w - 29,lootBase.y + 32,24,44 };
 
 		lootBtn = { lootBase.x + lootBase.w / 2 - 32, lootBase.y + 67, 64, 25 };
-
-		topWindow = { 0, 0, 410,140 };
-		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
 
 		if (center == false)
 		{

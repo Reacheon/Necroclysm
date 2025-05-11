@@ -69,21 +69,54 @@ void Loot::drawGUI()
 		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//회색 분리선
 
 		
-		SDL_Rect volumeGaugeRect = { lootBase.x + 123,lootBase.y + 72,104,9 };
-		drawRect(volumeGaugeRect, col::white);
-		if(lootStack == nullptr) drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,70,5 }, lowCol::yellow);
-		
-
-
-		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
-		setFontSize(10);
-		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);
-		setFontSize(8);
-		if (lootStack == nullptr) drawText(col2Str(col::white) + L"72.5 / 92.3 L", volumeGaugeRect.x + 110, volumeGaugeRect.y - 1);
-		else
 		{
+			SDL_Rect volumeGaugeRect = { lootBase.x + 123,lootBase.y + 72,104,9 };
+			drawRect(volumeGaugeRect, col::white);
+
+			drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 			setFontSize(10);
-			drawText(col2Str(col::white) + L"∞", volumeGaugeRect.x + 110 - 64, volumeGaugeRect.y - 2);
+			drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);
+
+
+			if (lootStack == nullptr) //Inventory에도 같은 코드가 존재
+			{
+				ItemPocket* pkPtr = lootItemData->pocketPtr.get();
+				if (lootItemData->pocketMaxVolume > 0)
+				{
+					int currentVolume = 0;
+					for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+					float volumeRatio = (float)currentVolume / (float)lootItemData->pocketMaxVolume;
+					SDL_Color gaugeCol = lowCol::green;
+					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+					drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+
+					std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
+					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxVolume / 1000.0, 1) + L" L";
+					setFontSize(10);
+					drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+				}
+				else if (lootItemData->pocketMaxNumber > 0)
+				{
+					int currentNumber = 0;
+					for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentNumber += pkPtr->itemInfo[i].number;
+					float volumeRatio = (float)currentNumber / (float)lootItemData->pocketMaxNumber;
+					SDL_Color gaugeCol = lowCol::green;
+					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+					drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+
+					std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
+					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxNumber / 1000.0, 1);
+					setFontSize(10);
+					drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+				}
+			}
+			else if (lootStack != nullptr)
+			{
+				setFontSize(10);
+				drawText(col2Str(col::white) + L"∞", volumeGaugeRect.x + 110 - 64, volumeGaugeRect.y - 2);
+			}
 		}
 
 		//좌측상단 버리기 버튼
@@ -190,17 +223,23 @@ void Loot::drawGUI()
 			drawTextCenter(col2Str(col::white)+L"132.9/99.9 KG", weightBar.x + (weightBar.w / 2), weightBar.y - 8);
 
 			//루팅 주머니 부피 게이지
-			SDL_Rect volumeBar = { pocketWindow.x + pocketWindow.w - 114, pocketWindow.y + 52, 72, 4 };
-			drawRect(volumeBar, col::white);
-			SDL_Rect volumeGauge = { volumeBar.x + 1, volumeBar.y + 1, volumeBar.w - 2, 2 };
-			int maxVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketMaxVolume;
-			int currentVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketVolume;
-			volumeGauge.w = (volumeBar.w - 2) * ((float)currentVolume / (float)maxVolume);
-			drawFillRect(volumeGauge, lowCol::green);
+			{
 
-			std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
-			setFontSize(10);
-			drawTextCenter(col2Str(col::white)+volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
+				SDL_Rect volumeBar = { pocketWindow.x + pocketWindow.w - 114, pocketWindow.y + 52, 72, 4 };
+				drawRect(volumeBar, col::white);
+				SDL_Rect volumeGauge = { volumeBar.x + 1, volumeBar.y + 1, volumeBar.w - 2, 2 };
+				int maxVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketMaxVolume;
+
+				int currentVolume = 0;
+				for (int i = 0; i < equipPtr->itemInfo.size(); i++) currentVolume += (equipPtr->itemInfo[i].volume) * (equipPtr->itemInfo[i].number);
+
+				volumeGauge.w = (volumeBar.w - 2) * ((float)currentVolume / (float)maxVolume);
+				drawFillRect(volumeGauge, lowCol::green);
+
+				std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
+				setFontSize(10);
+				drawTextCenter(col2Str(col::white) + volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
+			}
 
 			//setFontSize(11);
 			//drawTextCenter(L"테스트 아이템", pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + pocketWindow.h - 10);

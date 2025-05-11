@@ -154,13 +154,6 @@ export struct ItemData : public ItemData_Base
 
     bool itemOverlay(const ItemData& tgtItem) const;
 
-    //ItemData();
-    //virtual ~ItemData();
-    //ItemData(ItemData&&);
-    //ItemData& operator=(ItemData&&) = default;
-    //ItemData(const ItemData&) = delete;
-    //ItemData& operator=(const ItemData&) = delete;
-
 
     ItemData();
     virtual ~ItemData();
@@ -170,4 +163,5 @@ export struct ItemData : public ItemData_Base
     ItemData& operator=(const ItemData&) = delete;
 };
 
+export ItemData cloneFromItemDex(ItemData& inputData, int transferNumber);
 

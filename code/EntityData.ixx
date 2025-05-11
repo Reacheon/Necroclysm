@@ -89,7 +89,7 @@ export struct EntityData : public EntityData_Base
     walkFlag walkMode = walkFlag::walk;
     double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
 
-    EntityData cloneForTransfer() const;
+    EntityData cloneEntity() const;
     EntityData();
     virtual ~EntityData();
     EntityData(EntityData&&);

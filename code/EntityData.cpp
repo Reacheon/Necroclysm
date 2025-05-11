@@ -4,7 +4,7 @@ EntityData::EntityData() = default;
 EntityData::~EntityData() = default;
 EntityData::EntityData(EntityData&&) = default;
 
-EntityData EntityData::cloneForTransfer() const
+EntityData EntityData::cloneEntity() const
 {
     EntityData newEntity;
 

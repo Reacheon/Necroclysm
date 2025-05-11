@@ -18,10 +18,13 @@ import Player;
 import Loot;
 import World;
 import Vehicle;
+import Prop;
 import Bionic;
 import log;
 import Lst;
 import Maint;
+import mouseGrid;
+import drawEpsilonText;
 
 export class ContextMenu : public GUI
 {
@@ -196,6 +199,104 @@ public:
 
 			drawFillRect(subContextMenuBase, col::black);
 
+
+
+			{
+				int mouseX = getAbsMouseGrid().x;
+				int mouseY = getAbsMouseGrid().y;
+
+				int tileW = (float)cameraW / (16.0 * zoomScale);
+				int tileH = (float)cameraH / (16.0 * zoomScale);
+
+				Point2 tgtGrid;
+
+				//컨텍스트메뉴가 열려있으면 거기로 고정
+				if (ContextMenu::ins() != nullptr)  tgtGrid = { contextMenuTargetGrid.x,contextMenuTargetGrid.y };
+				else tgtGrid = { mouseX,mouseY };
+
+				if (tgtGrid.x > PlayerX() - tileW / 2 - 1 && tgtGrid.x < PlayerX() + tileW / 2 + 1 && tgtGrid.y > PlayerY() - tileH / 2 - 1 && tgtGrid.y < PlayerY() + tileH / 2 + 1)
+				{
+					Vehicle* vehPtr = TileVehicle(tgtGrid.x, tgtGrid.y, PlayerZ());
+					ItemStack* stackPtr = TileItemStack(tgtGrid.x, tgtGrid.y, PlayerZ());
+					if (vehPtr != nullptr)
+					{
+						int pivotX = cameraW - 200;
+						int pivotY = 148;
+
+						drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
+						drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
+						setFontSize(10);
+						setSolidText();
+						std::wstring titleName = vehPtr->name;
+						drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+						if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+						else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+						else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+						else drawSpriteCenter(spr::icon16, 88, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+
+
+
+						int newPivotY = pivotY + 16;
+
+
+						int vehSize = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo.size();
+						drawFillRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::black, 200);
+						drawRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::lightGray, 255);
+
+
+						for (int i = 0; i < vehSize; i++)
+						{
+							ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo[vehSize - 1 - i];
+							//내구도
+							drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
+							drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
+
+							//아이템 아이콘
+							drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+
+							//아이템 이름
+							drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+
+							//연료량
+
+
+
+							if (tgtPart.pocketPtr != nullptr) //Inventory에도 같은 코드가 존재
+							{
+
+								ItemPocket* pkPtr = tgtPart.pocketPtr.get();
+								if (tgtPart.pocketMaxVolume > 0)
+								{
+									SDL_Rect volumeGaugeRect = { pivotX + 135, newPivotY + 7 + 17 * i, 53, 11 };
+									drawRect(volumeGaugeRect, col::white);
+									//drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
+
+									int currentVolume = 0;
+									for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+									float volumeRatio = (float)currentVolume / (float)tgtPart.pocketMaxVolume;
+									SDL_Color gaugeCol = lowCol::green;
+									if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+									else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+									drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(49.0 * volumeRatio),6 }, gaugeCol);
+
+									std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
+									std::wstring maxVolumeStr = decimalCutter((float)tgtPart.pocketMaxVolume / 1000.0, 1) + L"L";
+									drawEplsionText(currentVolumeStr + L"/" + maxVolumeStr, pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
+
+								}
+								else if (tgtPart.pocketMaxNumber > 0)
+								{
+
+								}
+							}
+
+
+
+						}
+						disableSolidText();
+					}
+				}
+			}
 		}
 		else
 		{
@@ -274,7 +375,15 @@ public:
 		}
 		else if (inputAct == act::unbox)
 		{
-			if (TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+            Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+
+
+			if (pPtr != nullptr && pPtr->leadItem.pocketPtr != nullptr)
+			{
+				new Loot(pPtr->leadItem.pocketPtr.get(), &(pPtr->leadItem));
+			}
+			else if (vPtr != nullptr)
 			{
 				Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 				for (int i = 0; i < vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo.size(); i++)

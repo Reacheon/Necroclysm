@@ -119,36 +119,26 @@ int ItemPocket::addItemFromDex(int index, int number)
 	errorBox(index < 0 || index >= itemDex.size(), L"Item index out of bounds for itemDex in addItemFromDex.");
 	errorBox(number <= 0, L"Number to add must be positive in addItemFromDex.");
 
-	ItemData& itemTemplate = itemDex[index];
+	ItemData tgtItem = std::move(cloneFromItemDex(itemDex[index], number));
 
-	if (itemTemplate.pocketMaxVolume > 0 || itemTemplate.pocketMaxNumber > 0) // 해당 아이템이 포켓을 가질 경우
-	{
-		int lastAddedIndex = -1;
-		for (int i = 0; i < number; ++i)
-		{
-			ItemData newItem = itemTemplate.cloneForTransfer(1);
-			newItem.codeID = genItemID();
-			newItem.pocketPtr = std::make_unique<ItemPocket>(storageType::pocket);
-			itemInfo.push_back(std::move(newItem));
-			lastAddedIndex = itemInfo.size() - 1;
-		}
-		return lastAddedIndex;
-	}
-	else
+	if (tgtItem.pocketMaxVolume == 0 && tgtItem.pocketMaxNumber == 0)
 	{
 		for (int i = 0; i < itemInfo.size(); ++i)
 		{
-			if (itemTemplate.itemOverlay(itemInfo[i]))
+			if (tgtItem.itemOverlay(itemInfo[i]))
 			{
 				itemInfo[i].number += number;
 				return i;
 			}
 		}
 
-		ItemData newItem = itemTemplate.cloneForTransfer(number);
-		newItem.codeID = genItemID();
-		itemInfo.push_back(std::move(newItem));
-		return itemInfo.size() - 1;
+		itemInfo.push_back(std::move(tgtItem));
+		return (itemInfo.size() - 1);
+	}
+	else
+	{
+		itemInfo.push_back(std::move(tgtItem));
+		return (itemInfo.size() - 1);
 	}
 }
 
