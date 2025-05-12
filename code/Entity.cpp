@@ -604,32 +604,43 @@ void Entity::drop(ItemPocket* txPtr)
 
 	addAniUSetPlayer(targetStack, aniFlag::drop);
 }
-void Entity::throwing(ItemPocket* txPtr, int gridX, int gridY)
+void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 {
-	ItemStack* targetStack;
 	//아이템 스택이 이미 있는 경우와 없는 경우
 
-	if (TileItemStack(gridX, gridY, getGridZ()) == nullptr) //그 자리에 템 없는 경우
-	{
-		//기존 스택이 없으면 새로 만들고 그 ptr을 전달
-		createItemStack({ gridX, gridY, getGridZ() });
-		targetStack = TileItemStack(gridX, gridY, getGridZ());
-		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
-		targetStack->updateSprIndex();
-	}
-	else //이미 그 자리에 아이템이 있는 경우
-	{
-		//기존 스택이 있으면 그 스택을 그대로 전달
-		targetStack = TileItemStack(gridX, gridY, getGridZ());
+	throwingItemPocket = std::move(txPtr);
+	throwCoord.x = gridX;
+	throwCoord.y = gridY;
+	throwCoord.z = getGridZ();
+	addAniUSetPlayer(this, aniFlag::entityThrow);
 
-		targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
-		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
-		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
-	}
-	addAniUSetPlayer(targetStack, aniFlag::throwing);
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	targetStack->setFakeX(getX() - targetStack->getX());
-	targetStack->setFakeY(getY() - targetStack->getY());
+
+	//if (TileItemStack(gridX, gridY, getGridZ()) == nullptr) //그 자리에 템 없는 경우
+	//{
+	//	//기존 스택이 없으면 새로 만들고 그 ptr을 전달
+	//	createItemStack({ gridX, gridY, getGridZ() });
+	//	targetStack = TileItemStack(gridX, gridY, getGridZ());
+	//	for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
+	//	targetStack->updateSprIndex();
+	//}
+	//else //이미 그 자리에 아이템이 있는 경우
+	//{
+	//	//기존 스택이 있으면 그 스택을 그대로 전달
+	//	targetStack = TileItemStack(gridX, gridY, getGridZ());
+
+	//	targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
+	//	targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
+	//	for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
+	//}
+	//addAniUSetPlayer(targetStack, aniFlag::throwing);
+
+	//targetStack->setFakeX(getX() - targetStack->getX());
+	//targetStack->setFakeY(getY() - targetStack->getY());
 }
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getProficLevel(int index)

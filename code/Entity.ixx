@@ -35,6 +35,8 @@ private:
     bool footChanged = false;
     bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서
 
+    std::unique_ptr<ItemPocket> throwingItemPocket;
+    Point3 throwCoord = { 0,0,0 };
 public:
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
@@ -99,7 +101,7 @@ public:
     void setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputAlpha);
     void getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha);
     void drop(ItemPocket* txPtr);
-    void throwing(ItemPocket* txPtr, int gridX, int gridY);
+    void throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY);
 
     float getProficLevel(int index);
     void addProficExp(int expVal);

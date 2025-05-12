@@ -412,7 +412,7 @@ public:
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 				PlayerPtr->getEquipPtr()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
-				PlayerPtr->throwing(drop.get(), targetX, targetY);
+				PlayerPtr->throwing(std::move(drop), targetX, targetY);
 				PlayerPtr->updateStatus();
 				PlayerPtr->updateCustomSpriteHuman();
 				updateLog(L"#FFFFFF아이템을 던졌다.");

@@ -917,7 +917,7 @@ public:
 			std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
 			//이큅일 떄는 그렇다쳐도 가방 안에 있는 아이템을 던질 떄 원하는대로 작동하지않아 오류가 생긴다
 			inputPocket->transferItem(throwing.get(), inputIndex, 1);
-			PlayerPtr->throwing(throwing.get(), targetX, targetY);
+			PlayerPtr->throwing(std::move(throwing), targetX, targetY);
 			updateLog(L"#FFFFFF아이템을 던졌다.");
 		}
 

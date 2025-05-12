@@ -624,9 +624,6 @@ bool Vehicle::runAnimation(bool shutdown)
             xSpd = spd * cosVal;
             ySpd = spd * sinVal;
 
-
-
-
             setFakeX(getFakeX() + xSpd);
             setFakeY(getFakeY() + ySpd);
             //prt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFakeX(), getFakeY());

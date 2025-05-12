@@ -660,6 +660,8 @@ export enum class aniFlag
 
 
     treeFalling,
+
+    entityThrow,
 };
 
 export enum class input

@@ -888,6 +888,64 @@ bool Entity::runAnimation(bool shutdown)
 			break;
 		}
 	}
+	else if (getAniType() == aniFlag::entityThrow)
+	{
+		addTimer();
+		
+		Point3 dstGrid = { throwCoord.x,throwCoord.y,throwCoord.z };
+
+
+		Sticker* sPtr = nullptr;
+		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
+		if (getTimer()==1)
+		{
+			new Sticker(false, getX(), getY(), spr::itemset, throwingItemPocket->itemInfo[0].sprIndex, stickerID, true);
+		}
+
+		sPtr = ((Sticker*)(StickerList.find(stickerID))->second);
+
+		float spd = 4.0;
+		float xSpd, ySpd;
+		int relX = 16 * (dstGrid.x - getGridX());
+		int relY = 16 * (dstGrid.y - getGridY());
+		float dist = std::sqrt(std::pow(relX, 2) + std::pow(relY, 2));
+		float cosVal = relX / dist;
+		float sinVal = relY / dist;
+
+		xSpd = spd * cosVal;
+		ySpd = spd * sinVal;
+
+		sPtr->addFakeX(xSpd);
+		sPtr->addFakeY(ySpd);
+
+		if (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY))
+		{
+			ItemStack* targetStack;
+			if (TileItemStack(dstGrid.x, dstGrid.y, dstGrid.z) == nullptr) //그 자리에 템 없는 경우
+			{
+				//기존 스택이 없으면 새로 만들고 그 ptr을 전달
+				createItemStack(dstGrid);
+				targetStack = TileItemStack(dstGrid);
+				for (int i = throwingItemPocket->itemInfo.size() - 1; i >= 0; i--) throwingItemPocket->transferItem(targetStack->getPocket(), i, throwingItemPocket->itemInfo[i].number);
+				targetStack->updateSprIndex();
+			}
+			else //이미 그 자리에 아이템이 있는 경우
+			{
+				//기존 스택이 있으면 그 스택을 그대로 전달
+				targetStack = TileItemStack(dstGrid);
+				targetStack->setSprIndex(throwingItemPocket->itemInfo[0].sprIndex);
+				targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
+				for (int i = throwingItemPocket->itemInfo.size() - 1; i >= 0; i--) throwingItemPocket->transferItem(targetStack->getPocket(), i, throwingItemPocket->itemInfo[i].number);
+			}
+
+			delete sPtr;
+			resetTimer();
+			setAniType(aniFlag::null);
+			addAniUSetPlayer(targetStack, aniFlag::drop);
+			return true;
+		}
+	}
+
 
 	return false;
 }

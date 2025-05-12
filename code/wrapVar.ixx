@@ -47,7 +47,10 @@ export inline void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoo
 }
 export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
+
 export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
+export inline ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
+
 export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
 
 export inline void createMonster(Point3 inputCoor, int inputEntityCode)
