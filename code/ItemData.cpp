@@ -65,6 +65,10 @@ ItemData cloneFromItemDex(ItemData& inputData, int transferNumber)
         errorBox(transferNumber >= 2, L"cloneFromItemDex에서 포켓이 있는 아이템을 2개 이상 복사하려고 하였다.");
         newItem.pocketPtr = std::make_unique<ItemPocket>(storageType::pocket);
     }
+    else
+    {
+        newItem.number = transferNumber;
+    }
 
     return newItem;
 }

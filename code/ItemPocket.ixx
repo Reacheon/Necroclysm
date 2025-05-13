@@ -80,6 +80,9 @@ public:
 	//현재 이 포켓의 하위포켓을 모두 체크하여 입력한 도구기술이 존재하는지 반환
 	bool checkToolQuality(int input, int currentDepth = 0);
 
+	int getPocketVolume();
+	int getPocketWeight();
+
 };
 
 //현재 이 총에 장전된 모든 총알을 벡터 형태로 반환

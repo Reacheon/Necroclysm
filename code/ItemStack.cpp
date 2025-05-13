@@ -102,7 +102,6 @@ bool ItemStack::runAnimation(bool shutdown)
 		int pX = getX();
 		int pY = getY();
 
-
 		switch (getTimer())
 		{
 		case 1:
@@ -130,7 +129,6 @@ bool ItemStack::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			pullStackLights();
 			return true;
 		}
 	}

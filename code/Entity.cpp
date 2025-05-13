@@ -603,6 +603,7 @@ void Entity::drop(ItemPocket* txPtr)
 	}
 
 	addAniUSetPlayer(targetStack, aniFlag::drop);
+	targetStack->pullStackLights();
 }
 void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 {

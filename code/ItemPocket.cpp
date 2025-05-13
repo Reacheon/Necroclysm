@@ -116,6 +116,7 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 //@brief Dex에서 이 함수를 사용한 ItemPocket에 해당 index의 템을 number개만큼 추가함
 int ItemPocket::addItemFromDex(int index, int number)
 {
+
 	errorBox(index < 0 || index >= itemDex.size(), L"Item index out of bounds for itemDex in addItemFromDex.");
 	errorBox(number <= 0, L"Number to add must be positive in addItemFromDex.");
 
@@ -390,6 +391,26 @@ bool ItemPocket::checkToolQuality(int input, int currentDepth) // 깊이 인자 
 	return false;
 }
 
+int ItemPocket::getPocketVolume()
+{
+	int totalVolume = 0;
+	for (int i = 0; i < itemInfo.size(); i++)
+	{
+        totalVolume += itemInfo[i].volume * itemInfo[i].number;
+	}
+	return totalVolume;
+}
+
+int ItemPocket::getPocketWeight()
+{
+	int totalWeight = 0;
+	for (int i = 0; i < itemInfo.size(); i++)
+	{
+		totalWeight += itemInfo[i].weight * itemInfo[i].number;
+	}
+    return totalWeight;
+}
+
 //@brief 현재 이 총에 장전된 모든 총알을 벡터 형태로 반환
 ItemPocket* getBulletPocket(ItemData& inputGun)
 {
@@ -414,6 +435,7 @@ ItemPocket* getBulletPocket(ItemData& inputGun)
 	}
 	return pocket;
 }
+
 
 //상단 총알의 데이터를 삭제
 void popTopBullet(ItemPocket* inputPocket)

@@ -221,6 +221,42 @@ bool Prop::runAnimation(bool shutdown)
     {
         addTimer();
     }
+    else if (getAniType() == aniFlag::drop)
+    {
+        addTimer();
+        int pX = getX();
+        int pY = getY();
+
+        switch (getTimer())
+        {
+        case 1:
+            setFakeY(-4);
+            break;
+        case 2:
+            setFakeY(-5);
+            break;
+        case 4:
+            setFakeY(-6);
+            break;
+        case 7:
+            setFakeY(-7);
+            break;
+        case 10:
+            setFakeY(-6);
+            break;
+        case 12:
+            setFakeY(-5);
+            break;
+        case 13:
+            setFakeY(-4);
+            break;
+        case 16:
+            setFakeY(0);
+            resetTimer();
+            setAniType(aniFlag::null);
+            return true;
+        }
+    }
     else if (getAniType() == aniFlag::treeFalling)
     {
         addTimer();
@@ -260,7 +296,6 @@ bool Prop::runAnimation(bool shutdown)
             
             
             addAniUSetPlayer(TileItemStack(itemPos.x, itemPos.y, itemPos.z), aniFlag::drop);
-            //addAniUSetPlayer(itemPtr2, aniFlag::drop);
             treeAngle = 0;
             resetTimer();
             setAniType(aniFlag::null);

@@ -130,8 +130,8 @@ bool Entity::runAnimation(bool shutdown)
 			auto& equip = PlayerPtr->getEquipPtr()->itemInfo;
 			for (int i = 0; i < equip.size(); i++)
 			{
-				if (equip[i].equipState == equipHandFlag::left) findLeft = true;
-				else if (equip[i].equipState == equipHandFlag::right) findRight = true;
+				if (equip[i].equipState == equipHandFlag::left && !equip[i].checkFlag(itemFlag::SHIELD)) findLeft = true;
+				else if (equip[i].equipState == equipHandFlag::right && !equip[i].checkFlag(itemFlag::SHIELD)) findRight = true;
 				else if (equip[i].equipState == equipHandFlag::both) findTwoHanded = true;
 			}
 
@@ -894,6 +894,8 @@ bool Entity::runAnimation(bool shutdown)
 		
 		Point3 dstGrid = { throwCoord.x,throwCoord.y,throwCoord.z };
 
+		errorBox(throwingItemPocket->itemInfo.size() > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
+        errorBox(throwingItemPocket->itemInfo[0].number > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
 
 		Sticker* sPtr = nullptr;
 		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
@@ -921,13 +923,26 @@ bool Entity::runAnimation(bool shutdown)
 		if (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY))
 		{
 			ItemStack* targetStack;
-			if (TileItemStack(dstGrid.x, dstGrid.y, dstGrid.z) == nullptr) //그 자리에 템 없는 경우
+
+			bool throwToProp = false;
+            Prop* propPtr = TileProp(dstGrid.x, dstGrid.y, dstGrid.z);
+			
+			if (propPtr != nullptr 
+				&& propPtr->leadItem.pocketPtr != nullptr 
+				&& propPtr->leadItem.pocketPtr->getPocketVolume() + throwingItemPocket->itemInfo[0].volume < propPtr->leadItem.pocketMaxVolume)
+			{
+				throwingItemPocket->transferItem(propPtr->leadItem.pocketPtr.get(), 0, 1);
+				addAniUSetPlayer(propPtr, aniFlag::drop);
+			}
+			else if (TileItemStack(dstGrid.x, dstGrid.y, dstGrid.z) == nullptr) //그 자리에 템 없는 경우
 			{
 				//기존 스택이 없으면 새로 만들고 그 ptr을 전달
+				
 				createItemStack(dstGrid);
 				targetStack = TileItemStack(dstGrid);
-				for (int i = throwingItemPocket->itemInfo.size() - 1; i >= 0; i--) throwingItemPocket->transferItem(targetStack->getPocket(), i, throwingItemPocket->itemInfo[i].number);
+				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
 				targetStack->updateSprIndex();
+				addAniUSetPlayer(targetStack, aniFlag::drop);
 			}
 			else //이미 그 자리에 아이템이 있는 경우
 			{
@@ -935,13 +950,13 @@ bool Entity::runAnimation(bool shutdown)
 				targetStack = TileItemStack(dstGrid);
 				targetStack->setSprIndex(throwingItemPocket->itemInfo[0].sprIndex);
 				targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
-				for (int i = throwingItemPocket->itemInfo.size() - 1; i >= 0; i--) throwingItemPocket->transferItem(targetStack->getPocket(), i, throwingItemPocket->itemInfo[i].number);
+				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
+				addAniUSetPlayer(targetStack, aniFlag::drop);
 			}
 
 			delete sPtr;
 			resetTimer();
 			setAniType(aniFlag::null);
-			addAniUSetPlayer(targetStack, aniFlag::drop);
 			return true;
 		}
 	}

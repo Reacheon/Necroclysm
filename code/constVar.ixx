@@ -529,6 +529,7 @@ export enum class itemFlag
     CANCRAFT,//조합할 수 있는 아이템인지
 
     HEADLIGHT,
+    SHIELD,
 };
 
 export enum class walkFlag
