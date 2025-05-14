@@ -810,6 +810,23 @@ void Vehicle::drawSelf()
                 dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
             );
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+
+
+            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].pocketPtr != nullptr)
+            {
+                ItemPocket* pocketPtr = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].pocketPtr.get();
+                if (pocketPtr->itemInfo.size() > 0)
+                {
+                    drawSpriteCenter
+                    (
+                        spr::itemset,
+                        pocketPtr->itemInfo[pocketPtr->itemInfo.size() - 1].sprIndex,
+                        dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
+                        dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
+                    );
+                }
+            }
+
             setZoom(1.0);
         };
 

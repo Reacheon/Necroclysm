@@ -227,34 +227,19 @@ bool Prop::runAnimation(bool shutdown)
         int pX = getX();
         int pY = getY();
 
-        switch (getTimer())
-        {
-        case 1:
-            setFakeY(-4);
-            break;
-        case 2:
-            setFakeY(-5);
-            break;
-        case 4:
-            setFakeY(-6);
-            break;
-        case 7:
-            setFakeY(-7);
-            break;
-        case 10:
-            setFakeY(-6);
-            break;
-        case 12:
-            setFakeY(-5);
-            break;
-        case 13:
-            setFakeY(-4);
-            break;
-        case 16:
-            setFakeY(0);
-            resetTimer();
-            setAniType(aniFlag::null);
-            return true;
+        if (getTimer() == 1) setFakeY(-4);
+        else if (getTimer() == 2) setFakeY(-5);
+        else if (getTimer() == 4) setFakeY(-6);
+        else if (getTimer() == 7) setFakeY(-7);
+        else if (getTimer() == 10) setFakeY(-6);
+        else if (getTimer() == 12) setFakeY(-5);
+        else if (getTimer() == 13) setFakeY(-4);
+        else if (getTimer() == 16) 
+        { 
+            setFakeY(0); 
+            resetTimer(); 
+            setAniType(aniFlag::null); 
+            return true; 
         }
     }
     else if (getAniType() == aniFlag::treeFalling)

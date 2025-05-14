@@ -264,32 +264,6 @@ public:
 		lootScroll = 0;
 	}
 
-	void executePickDrop()
-	{
-		if (lootPtr->itemInfo.size() > 0)
-		{
-			//선택된 아이템이 하나도 없으면 종료
-			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--)
-			{
-				if (lootPtr->itemInfo[i].lootSelect > 0) { break; }
-
-				if (i == 0) { return; }
-			}
-
-			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--)
-			{
-				if (lootPtr->itemInfo[i].lootSelect > 0)
-				{
-					lootPtr->transferItem(drop.get(), i, lootPtr->itemInfo[i].lootSelect);
-				}
-			}
-			for (int i = lootPtr->itemInfo.size() - 1; i >= 0; i--) { lootPtr->itemInfo[i].lootSelect = 0; }
-			PlayerPtr->drop(drop.get());
-			PlayerPtr->updateStatus();
-			updateLog(col2Str(col::white) + sysStr[126]);//아이템을 버렸다.
-		}
-	}
 	void executeSelectAll()
 	{
 		bool isSelectAll = true;
@@ -405,22 +379,7 @@ public:
 		PlayerPtr->updateCustomSpriteHuman();
 	}
 
-	void executeDroping()
-	{
-		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-		if (isTargetPocket == false)
-		{
-			equipPtr->transferItem(drop.get(), equipCursor, 1);
-		}
-		else
-		{
-			lootPtr->transferItem(drop.get(), lootCursor, 1);
-		}
-		PlayerPtr->drop(drop.get());
-		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
-		updateLog(col2Str(col::white) + sysStr[126]);
-	}
+
 	void executeOpen()
 	{
 		new Inventory(334, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
@@ -887,13 +846,26 @@ public:
 		}
 	}
 
+	void executeDroping()
+	{
+		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+		if (isTargetPocket == false) equipPtr->transferItem(drop.get(), equipCursor, 1);
+		else lootPtr->transferItem(drop.get(), lootCursor, 1);
+		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
+		PlayerPtr->updateStatus();
+		PlayerPtr->updateCustomSpriteHuman();
+		updateLog(col2Str(col::white) + sysStr[126]);
+	}
+
 	Corouter executeThrowing(ItemPocket* inputPocket, int inputIndex)//던지기
 	{
+		
 		new CoordSelect(sysStr[131]);
 		deactDraw();
 
 		co_await std::suspend_always();
 
+		updateLog(L"#FFFFFF아이템을 던졌다.");
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);
@@ -901,25 +873,14 @@ public:
 		targetStr.erase(0, targetStr.find(L",") + 1);
 		int targetZ = wtoi(targetStr.c_str());
 
-		PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
+		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ());
+		else PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
 
 		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
 
-		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ())
-		{
-			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-			inputPocket->transferItem(drop.get(), inputIndex, 1);
-			PlayerPtr->drop(drop.get());
-			updateLog(L"#FFFFFF아이템을 버렸다.");
-		}
-		else
-		{
-			std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
-			//이큅일 떄는 그렇다쳐도 가방 안에 있는 아이템을 던질 떄 원하는대로 작동하지않아 오류가 생긴다
-			inputPocket->transferItem(throwing.get(), inputIndex, 1);
-			PlayerPtr->throwing(std::move(throwing), targetX, targetY);
-			updateLog(L"#FFFFFF아이템을 던졌다.");
-		}
+		std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
+		inputPocket->transferItem(throwing.get(), inputIndex, 1);
+		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
 
 		PlayerPtr->updateStatus();
 		PlayerPtr->updateCustomSpriteHuman();
