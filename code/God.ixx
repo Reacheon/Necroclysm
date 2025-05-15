@@ -175,7 +175,7 @@ public:
 						setFontSize(14);
 						drawTextCenter(col2Str(col::white) + L"권능 이름", pivotX + 47, pivotY + 48);
 
-						setFontSize(9);
+						setFontSize(10);
 						drawTextWidth(col2Str(col::lightGray) + L"여기에 권능에 대한 설명이 들어갑니다. 권능에 대한 설명이 들어갑니다.", pivotX + 5, pivotY + 60, false, 90, 11);
 
 						drawTextCenter(col2Str(lowCol::red) + L"신앙도 -3", pivotX + 47, pivotY + 111);

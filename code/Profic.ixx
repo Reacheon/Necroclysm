@@ -232,7 +232,7 @@ public:
 					}
 				}
 
-				setFontSize(9);
+				setFontSize(10);
 				drawText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 6);
 				setFontSize(10);
 

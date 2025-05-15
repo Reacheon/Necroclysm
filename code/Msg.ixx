@@ -213,7 +213,7 @@ public:
 				setZoom(2.0);
 				drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18, pivotY + 18);
 				setZoom(1.0);
-				setFontSize(13);
+				setFontSize(12);
 				drawText(col2Str(col::white) + itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
 
 				if (lastTextStart <= msgText.size() - 1)

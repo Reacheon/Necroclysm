@@ -45,8 +45,8 @@ export void drawWindow(int x, int y, int w, int h, std::wstring titleName, int t
 	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
 	SDL_RenderDrawRect(renderer, &titleRect);
 
-	setFontSize(14);
-	drawTextCenter(col2Str(col::white)+titleName, x + w/2, y + 14);
+	setFontSize(16);
+	drawTextCenter(col2Str(col::white)+titleName, x + w/2, y + 16);
 	setZoom(1.5);
 	drawSpriteCenter(spr::icon16, titleSprIndex, x + w/2 - queryTextWidth(titleName, true) / 2 - 20, y + 14);
 	setZoom(1.0);

@@ -74,7 +74,7 @@ export void renderFPS(__int64 loopTime)
     setFontSize(12);
     drawText(col2Str(col::white) + decimalCutter(avgFPS, 2), 20, 170);
 
-    setFontSize(9);
+    setFontSize(8);
     drawText(col2Str(col::white)+L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 5) + L" ms", 20, 190);
     drawText(col2Str(col::white) + L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 1);
     drawText(col2Str(col::white) + L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 2);

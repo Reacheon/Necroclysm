@@ -64,7 +64,7 @@ void Loot::drawGUI()
 
 		setFontSize(16);
 		
-		drawText(col2Str(col::white) + tileName, lootBase.x + 73, lootBase.y + 39);
+		drawText(col2Str(col::white) + tileName, lootBase.x + 73, lootBase.y + 41);
 
 		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//회색 분리선
 
@@ -356,7 +356,7 @@ void Loot::drawGUI()
 				drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 183, 5);
 			}
 		}
-		setFontSize(13);
+		setFontSize(12);
 		drawTextCenter(col2Str(col::white)+sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //선택(상단바)
 
 		{ //이름(상단바)

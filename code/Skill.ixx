@@ -203,7 +203,7 @@ public:
 					setZoom(1.0);
 
 					disableSolidText();
-					setFontSize(14);
+					setFontSize(12);
 
 					drawText(L"#FFFFFF" + skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
 					int textWidth = queryTextWidth(skillName);

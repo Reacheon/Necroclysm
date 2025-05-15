@@ -129,7 +129,7 @@ public:
 
 		SDL_Rect dst;
 
-		setFontSize(13);
+		setFontSize(12);
 
 
 		if (aimAcc != 0 && turnCycle == turn::playerInput)

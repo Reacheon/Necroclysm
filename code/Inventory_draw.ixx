@@ -116,7 +116,7 @@ void Inventory::drawGUI()
 				drawStadium(inventoryLabelQuantity.x, inventoryLabelQuantity.y, inventoryLabelQuantity.w, inventoryLabelQuantity.h, lowCol::blue, 183, 5);
 			}
 		}
-		setFontSize(13);
+		setFontSize(12);
 		drawText(col2Str(col::white) + sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //선택(상단바)
 		drawText(col2Str(col::white) + sysStr[16], inventoryLabel.x + 140, inventoryLabel.y + 4); //이름(상단바)
 		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)

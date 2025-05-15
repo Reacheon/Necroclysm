@@ -85,9 +85,9 @@ void HUD::drawGUI()
 
 		if (1)//플레이어 이름 그리기
 		{
-			setFontSize(12);
+			setFontSize(10);
 			SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 0xff);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 3);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4);
 		}
 
 		//HP바 그리기
@@ -96,7 +96,7 @@ void HUD::drawGUI()
 			int pivotY = letterbox.y + 21;
 			drawSprite(spr::icon16, 72, pivotX, pivotY);
 
-			setFontSize(9);
+			setFontSize(10);
 			drawText(col2Str(lowCol::green) + L"HEALTH", pivotX + 16, pivotY + 1);
 
 			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
@@ -125,7 +125,7 @@ void HUD::drawGUI()
 			int pivotY = letterbox.y + 21 +15;
 			drawSprite(spr::icon16, 73, pivotX, pivotY);
 
-			setFontSize(9);
+			setFontSize(10);
 			drawText(col2Str(lowCol::blue) + L"MENTAL", pivotX + 16, pivotY + 1);
 
 			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
@@ -213,15 +213,15 @@ void HUD::drawGUI()
 				drawTextCenter(col2Str(lowCol::white) + STAStr, pivotX + 24, pivotY + 29);
 			}
 
-			setFontSize(12);
+			setFontSize(10);
 			
-			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 3 + 15 * 0 + 8);
-			drawText(col2Str(lowCol::yellow) + L"6,320", letterbox.x + 18 + 296 + 14, letterbox.y + 3 + 15 * 0);
+			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6);
+			drawText(col2Str(lowCol::yellow) + L"6,320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0);
 			
-			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 1);
-			drawText(col2Str(lowCol::green) + L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 3 + 15 * 1);
-			drawText(col2Str(col::lightGray) + L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 3 + 15 * 2);
-			drawText(col2Str(lowCol::green) + L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 3 + 15 * 2);
+			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1);
+			drawText(col2Str(lowCol::green) + L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1);
+			drawText(col2Str(col::lightGray) + L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2);
+			drawText(col2Str(lowCol::green) + L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2);
 
 			//시간 표시 기능
 			{
@@ -323,7 +323,7 @@ void HUD::drawGUI()
 			}
 
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 22);
+			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
@@ -443,10 +443,10 @@ void HUD::drawTab()
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 
-		setFontSize(13);
+		setFontSize(12);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 92);
-		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 92 + 14);
+		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
+		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
 
 		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
@@ -486,7 +486,7 @@ void HUD::drawTab()
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 
-		setFontSize(13);
+		setFontSize(12);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
 
@@ -510,7 +510,7 @@ void HUD::drawTab()
 		//창 닫기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 14, tab.x + 60, tab.y + 52);
-		setFontSize(13);
+		setFontSize(12);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
@@ -518,7 +518,7 @@ void HUD::drawTab()
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 31, tab.x + 60, tab.y + 52);
-		setFontSize(13);
+		setFontSize(12);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;
@@ -526,7 +526,7 @@ void HUD::drawTab()
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
-		setFontSize(13);
+		setFontSize(12);
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 		drawTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
 		break;
@@ -890,15 +890,10 @@ void HUD::drawBarAct()
 		drawSpriteCenter(spr::icon48, actIndex, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) - 10);
 
 		//하단 텍스트
-		int fontSize = 13;
+		int fontSize = 12;
 		setFontSize(fontSize);
-		while (queryTextWidth(actName, true) > barButton[0].w)
-		{
-			fontSize--;
-			setFontSize(fontSize);
-		}
 		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 22);
+		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
 		if (checkCursor(&barButton[i]) || barActCursor == i)
 		{
@@ -971,7 +966,7 @@ void HUD::drawStatusEffects()
 		drawCross2(pivotX, pivotY + 32, 5, 0, 0, 5);
 		drawCross2(pivotX + 32, pivotY + 32, 5, 0, 5, 0);
 
-		setFontSize(13);
+		setFontSize(12);
 		drawText(col2Str(lowCol::red) + statEfctName, pivotX + 37, pivotY + 1);
 
 		if (myEfcts[i].second > 0)

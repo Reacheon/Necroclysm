@@ -8,9 +8,9 @@ import util;
 import globalVar;
 import constVar;
 
-static int s_fontSize = 16;
+static int s_fontSize = 15;
 static int s_fontGap = 4;
-static bool solidDraw = false;
+static bool solidDraw = true;
 
 export void setSolidText()
 {
@@ -19,7 +19,7 @@ export void setSolidText()
 
 export void disableSolidText()
 {
-	solidDraw = false;
+	solidDraw = true;
 }
 
 //@brief 텍스트 스캔, 제어문자를 포함해 스캔할 경우(exConChar = true) 더 빠름
@@ -357,17 +357,3 @@ export void setFontSize(int val) { s_fontSize = val; }
 
 export void setFontGap(int val) { s_fontGap = val; }
 
-export void drawTextShadow(std::wstring text, int x, int y)
-{
-	drawText(col2Str(col::black)+text.substr(7), x + 1, y + 1);
-	drawText(text, x, y);
-}
-
-export void drawTextShadowAll(std::wstring text, int x, int y)
-{
-	drawText(col2Str(col::black) + text.substr(7), x + 1, y);
-	drawText(col2Str(col::black) + text.substr(7), x - 1, y);
-	drawText(col2Str(col::black) + text.substr(7), x, y+1);
-	drawText(col2Str(col::black) + text.substr(7), x, y-1);
-	drawText(text, x, y);
-}

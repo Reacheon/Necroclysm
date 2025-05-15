@@ -16,7 +16,7 @@ export __int64 renderLog(SDL_Renderer* renderer)
 	std::deque<std::wstring> logStrDeque = getLogStrDeque();
 	std::deque<int> logTimerDeque = getLogTimerDeque();
 
-	setFontSize(13);
+	setFontSize(12);
 	setSolidText();
 	int textHeight = queryTextHeight(L"가", true);
 

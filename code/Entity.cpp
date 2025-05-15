@@ -1034,7 +1034,7 @@ void Entity::drawSelf()
 			int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
 
 			setSolidText();
-			if (zoomScale == 1.0) setFontSize(9);
+			if (zoomScale == 1.0) setFontSize(8);
 			else if (zoomScale == 2.0) setFontSize(10);
 			else if (zoomScale == 3.0) setFontSize(11);
 			else if (zoomScale == 4.0) setFontSize(14);

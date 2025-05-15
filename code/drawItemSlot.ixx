@@ -24,7 +24,7 @@ export enum class cursorFlag
 //아이템이 들어있는 사각형을 그림, 질량과 부피는 포함하지않음
 export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputItem)
 {
-	int fontSize = 14;
+	int fontSize = 12;
 	int yCorrection = 0;
 	const int widthLimit = 162;
 	bool split = false;
@@ -129,8 +129,8 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			break;
 		}
 	}
-	if (!split) drawText(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 11 + yCorrection);
-	else drawTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 11 + yCorrection - 8, false, widthLimit, 15, 2);
+	if (!split) drawText(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
+	else drawTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
@@ -225,13 +225,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	if (hasBox1 == true)
 	{
 		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 183, 5);
-		int fontSize = 16;
-		setFontSize(fontSize);
-		while (queryTextWidth(statusStr, true) > box1.w)
-		{
-			fontSize--;
-			setFontSize(fontSize);
-		}
+		setFontSize(12);
 		drawTextCenter(col2Str(statusStrColor) + statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2);
 	}
 	else

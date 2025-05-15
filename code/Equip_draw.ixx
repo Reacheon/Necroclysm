@@ -18,7 +18,7 @@ void Equip::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
 
-	drawWindow(&equipBase, sysStr[13], 2);
+	drawWindow(&equipBase, sysStr[13], 94);
 
 
 	//여기서부턴 이큅 윈도우
@@ -39,7 +39,7 @@ void Equip::drawGUI()
 		//이큅 윈도우 본체
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(10);
-		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 6, equipWindow.y + equipWindow.h - 16);
+		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 6, equipWindow.y + equipWindow.h - 8);
 
 		//우측 아이템 상단바(선택 이름 물리량)
 		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);
@@ -59,10 +59,10 @@ void Equip::drawGUI()
 			}
 		}
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-		setFontSize(13);
+		setFontSize(12);
 		drawText(sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //선택(상단바)
 		drawText(sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //이름(상단바)
-		drawText(sysStr[24], equipLabel.x + 250, equipLabel.y + 4); //무리량(상단바)
+		drawText(sysStr[24], equipLabel.x + 260, equipLabel.y + 4); //무리량(상단바)
 
 		//개별 아이템
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
@@ -96,7 +96,7 @@ void Equip::drawGUI()
 	{
 		drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 180, 5);
 
-		setFontSize(14);
+		setFontSize(12);
 
 		SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 0xff);
 
@@ -109,7 +109,7 @@ void Equip::drawGUI()
 
 		SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 0xff);
 
-		setFontSize(11);
+		setFontSize(10);
 		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//관통저항
 		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//참격저항
 		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//타격저항
@@ -156,7 +156,7 @@ void Equip::drawGUI()
 		}
 
 
-		setFontSize(14);
+		setFontSize(12);
 		drawText(col2Str(lowCol::orange)+ sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1);//방어
 		drawText(col2Str(lowCol::orange) + sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0);//회피
 
