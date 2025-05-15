@@ -101,6 +101,17 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			}
 		}
 	}
+	else if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ))
+	{
+		int maxVol = inputItem.pocketMaxVolume;
+		int currentVol = inputItem.pocketPtr.get()->getPocketVolume();
+
+		mainName += L" (";
+		mainName += std::to_wstring(currentVol);
+		mainName += L"/";
+		mainName += std::to_wstring(maxVol);
+		mainName += L"mL)";
+	}
 
 
 	setFontSize(fontSize);

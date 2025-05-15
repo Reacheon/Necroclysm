@@ -25,6 +25,7 @@ import Lst;
 import Maint;
 import mouseGrid;
 import drawEpsilonText;
+import ItemData;
 
 export class ContextMenu : public GUI
 {
@@ -158,6 +159,11 @@ public:
 				{
 					optionText = sysStr[204];//탈착
 					iconIndex = 85;
+				}
+				else if (actOptions[i] == act::drawLiquid)
+				{
+					optionText = sysStr[206];//담기
+					iconIndex = 93;
 				}
 				else optionText = L"???";
 
@@ -439,6 +445,42 @@ public:
 
 			new Maint(L"탈착", L"차량에서 분리할 부품을 선택해주세요.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() },maintFlag::detach);
 			co_await std::suspend_always();
+		}
+		else if (inputAct == act::drawLiquid)
+		{
+			ItemPocket* targetBottle = nullptr;
+			int maxVolume = 0;
+			for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
+			{
+				if (PlayerPtr->getEquipPtr()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
+				{
+					targetBottle = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get();
+					maxVolume = PlayerPtr->getEquipPtr()->itemInfo[i].pocketMaxVolume;
+					break;
+				}
+
+				if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr != nullptr &&
+					PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size() > 0)
+				{
+					for (int j = 0; j < PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
+					{
+						if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
+						{
+							targetBottle = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketPtr.get();
+							maxVolume = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketMaxVolume;
+							i = PlayerPtr->getEquipPtr()->itemInfo.size();//이중루프 탈출
+							break;
+						}
+					}
+				}
+			}
+
+			if (targetBottle != nullptr)
+			{
+				targetBottle->itemInfo.clear();
+				targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemVIPCode::blackAsphalt], maxVolume)));
+				
+			}
 		}
 	}
 };

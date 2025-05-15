@@ -186,6 +186,8 @@ export enum class act
 
     headlight,
 
+    drawLiquid,
+
     //skillInfo,
 };
 
@@ -530,6 +532,7 @@ export enum class itemFlag
 
     HEADLIGHT,
     SHIELD,
+    CONTAINER_LIQ,
 };
 
 export enum class walkFlag
@@ -1219,7 +1222,11 @@ export namespace itemVIPCode
     int wideRailVMid = 403;
     int wideRailVRight = 404;
 
+    int shallowFreshWater = 225;
+    int deepFreshWater = 226;
 
+    int shallowSeaWater = 231;
+    int deepSeaWater = 232;
 
     int sandFloor = 381;
 

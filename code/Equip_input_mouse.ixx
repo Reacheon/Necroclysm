@@ -49,12 +49,6 @@ void Equip::clickUpGUI()
 			{
 				switch (barAct[i])
 				{
-				case act::equip://장비
-					executeEquip();
-					break;
-				case act::wield://들기
-					CORO(executeWield());
-					break;
 				case act::droping:
 				{
 					executeDroping();

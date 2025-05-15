@@ -1056,6 +1056,35 @@ public:
 			}
 		}
 
+		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::shallowFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::deepFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::shallowSeaWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::deepSeaWater)
+		{
+			for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
+			{
+				if (PlayerPtr->getEquipPtr()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
+				{
+					inputOptions.push_back(act::drawLiquid);
+					break;
+                }
+
+				if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr != nullptr && 
+					PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size()>0)
+				{
+					for (int j = 0; j < PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
+					{
+						if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
+						{
+							inputOptions.push_back(act::drawLiquid);
+							i = PlayerPtr->getEquipPtr()->itemInfo.size();//이중루프 탈출
+							break;
+                        }
+					}
+				}
+			}
+		}
+
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 };

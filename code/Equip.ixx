@@ -37,18 +37,6 @@ private:
 	int equipCursor = -1; //좌측 장비창의 커서
 	const int equipScrollSize = 8;
 
-	ItemPocket* lootPtr = nullptr;
-	int lootScroll = 0; //우측 루팅창의 스크롤
-	int lootCursor = -1; //우측 루팅창의 커서
-	int pocketCursor = -1; //우측 상단의 현재 선택된 가방, EQUIP의 가방의 위부터 순서대로 0,1,2...
-	//모션 스크롤 이벤트에서 기준으로 잡는 최초 터치 당시의 스크롤
-	int initLootScroll = 0;
-	int initPocketCursor = 0;
-	int labelCursor = -1; //상단 라벨 커서, 0부터 2까지 기능, -1이면 비활성화
-	Uint32 selectTouchTime = -1;
-
-	sortFlag sortType = sortFlag::null; //0:기본_1:무게내림_2:무게올림_3:부피내림_4:부피올림
-
 	bool isTargetPocket = false; //우측의 포켓창이 조작 타겟일 경우
 
 	SDL_Rect equipBase;
@@ -61,24 +49,6 @@ private:
 	SDL_Rect equipLabelQuantity;
 	SDL_Rect equipArea;
 	SDL_Rect equipWindow;
-
-	SDL_Rect lootBase;
-	SDL_Rect lootTitle;
-	SDL_Rect lootItem[30];
-	SDL_Rect lootItemSelect[30];
-	SDL_Rect lootLabel;
-	SDL_Rect lootLabelSelect;
-	SDL_Rect lootLabelName;
-	SDL_Rect lootLabelQuantity;
-	SDL_Rect lootArea;
-	SDL_Rect lootScrollBox;
-	SDL_Rect lootWindow;
-	SDL_Rect pocketWindow;
-	SDL_Rect pocketItem[7];
-	SDL_Rect pocketScrollBox;
-	SDL_Rect pocketLeft;
-	SDL_Rect pocketRight;
-	SDL_Rect lootBtn;
 
 	SDL_Rect topWindow;//상단에 표시되는 저항이나 방어 상성, 아이템의 설명
 
@@ -179,204 +149,24 @@ public:
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
-	void step()
-	{
-		//셀렉트 홀드 이벤트
-		if (coFunc == nullptr)
-		{
-			if (selectTouchTime != -1)
-			{
-				//아이템 좌측 셀렉트 클릭
-				for (int i = 0; i < LOOT_ITEM_MAX; i++)
-				{
-					if (checkCursor(&lootItemSelect[i]))
-					{
-						if (lootPtr->itemInfo.size() - 1 >= i)
-						{
-							if (SDL_GetTicks() - selectTouchTime > 800)
-							{
-								selectTouchTime = -1;
-								CORO(executeSelectItemEx(pocketCursor, i + lootScroll));
-							}
-						}
-						break;
-					}
+	void step() {};
 
-					if (i == LOOT_ITEM_MAX - 1)
-					{
-						selectTouchTime = -1;
-					}
-				}
-			}
-		}
-	}
-	sortFlag getSortType() { return sortType; }
 
 	void executeTab()
 	{
-		if (pocketCursor == -1)
+		if (equipCursor == -1) //아이템을 선택 중이지 않을 경우
 		{
-			if (equipCursor == -1) //아이템을 선택 중이지 않을 경우
-			{
-				close(aniFlag::winSlipClose);
-			}
-			else
-			{
-				//select 아이템이 하나라도 있을 경우 전부 제거
-				equipScroll = 0;
-				equipCursor = -1;
-				for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
-				barAct = actSet::null;
-				tabType = tabFlag::closeWin;
-			}
-		}
-		else//가방 닫기
-		{
-			isTargetPocket = false;
-			labelCursor = -1;
-			pocketCursor = -1;
-		}
-	}
-	//탭 키를 눌렀을 때의 연산
-	void executeSort()
-	{
-		switch (sortType)
-		{
-			default:
-				errorBox(L"undefined sorting in Equip.ixx");
-				break;
-			case sortFlag::null:
-				lootPtr->sortWeightDescend();;
-				break;
-			case sortFlag::weightDescend:
-				lootPtr->sortWeightDescend();
-				break;
-			case sortFlag::weightAscend:
-				lootPtr->sortWeightAscend();
-				break;
-			case sortFlag::volumeDescend:
-				lootPtr->sortVolumeDescend();
-				break;
-			case sortFlag::volumeAscend:
-				lootPtr->sortVolumeAscend();
-				break;
-		}
-		lootScroll = 0;
-	}
-
-	void executeSelectAll()
-	{
-		bool isSelectAll = true;
-		for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-		{
-			if (lootPtr->itemInfo[i].lootSelect != lootPtr->itemInfo[i].number)
-			{
-				isSelectAll = false;
-				break;
-			}
-		}
-
-		if (isSelectAll == false)
-		{
-			for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-			{
-				lootPtr->itemInfo[i].lootSelect = lootPtr->itemInfo[i].number;
-			}
+			close(aniFlag::winSlipClose);
 		}
 		else
 		{
-			for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-			{
-				lootPtr->itemInfo[i].lootSelect = 0;
-			}
+			//select 아이템이 하나라도 있을 경우 전부 제거
+			equipScroll = 0;
+			equipCursor = -1;
+			for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
+			barAct = actSet::null;
+			tabType = tabFlag::closeWin;
 		}
-	}
-	void executeSelectItem(int index)
-	{
-		int itemNumber = lootPtr->itemInfo[index].number;
-		lootPtr->itemInfo[index].lootSelect = itemNumber;
-	}
-
-	void executePocketLeft()
-	{
-		if (pocketCursor != 0)
-		{
-			pocketCursor--;
-
-			lootCursor = 0;
-			lootScroll = 0;
-			labelCursor = -1;
-
-			//포켓커서 변경에 따른 pocketPtr 변경
-			int pocketStack = 0;
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-				{
-					if (pocketCursor == pocketStack)
-					{
-						lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
-						break;
-					}
-					else
-					{
-						pocketStack++;
-					}
-				}
-			}
-		}
-
-
-	}
-	void executePocketRight()
-	{
-		int numberOfBag = 0;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-			{
-				numberOfBag++;
-			}
-		}
-		if (pocketCursor != numberOfBag - 1)
-		{
-			pocketCursor++;
-
-			lootCursor = 0;
-			lootScroll = 0;
-			labelCursor = -1;
-
-			//포켓커서 변경에 따른 pocketPtr 변경
-			int pocketStack = 0;
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-				{
-					if (pocketCursor == pocketStack)
-					{
-						lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
-						break;
-					}
-					else
-					{
-						pocketStack++;
-					}
-				}
-			}
-		}
-
-
-	}
-	//act
-	void executeEquip()
-	{
-		updateLog(col2Str(col::white) + sysStr[125]);//아이템을 장착했다.
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		int returnIndex = lootPtr->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
-		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
-		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 
@@ -386,307 +176,88 @@ public:
 	}
 	void updateBarAct()
 	{
-		if (equipCursor != -1)
+		if (equipPtr->itemInfo.size() > 0)
 		{
-			if (equipPtr->itemInfo.size() > 0)
+			ItemData& targetItem = equipPtr->itemInfo[equipCursor];
+			barAct.clear();
+			if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
+			if (targetItem.pocketOnlyItem.size() > 0) { barAct.push_back(act::reload); }//전용 아이템 있을 경우 reload 추가
+			barAct.push_back(act::droping);//droping은 항상 추가
+			barAct.push_back(act::throwing);//throwing도 항상 추가
+
+			//업데이트할 아이템이 총일 경우
+			if (targetItem.checkFlag(itemFlag::GUN))
 			{
-				ItemData& targetItem = equipPtr->itemInfo[equipCursor];
-				barAct.clear();
-				if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
-				if (targetItem.pocketOnlyItem.size() > 0) { barAct.push_back(act::reload); }//전용 아이템 있을 경우 reload 추가
-				barAct.push_back(act::droping);//droping은 항상 추가
-				barAct.push_back(act::throwing);//throwing도 항상 추가
-
-				//업데이트할 아이템이 총일 경우
-				if (targetItem.checkFlag(itemFlag::GUN))
+				//전용 아이템이 탄창일 경우(일반 소총)
+				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
 				{
-					//전용 아이템이 탄창일 경우(일반 소총)
-					if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
-					{
-						ItemPocket* gunPtr = targetItem.pocketPtr.get();
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
 
-						if (gunPtr->itemInfo.size() == 0)
-						{
-							barAct.push_back(act::reloadMagazine);
-						}
-						else
-						{
-							barAct.push_back(act::unloadMagazine);
-						}
+					if (gunPtr->itemInfo.size() == 0)
+					{
+						barAct.push_back(act::reloadMagazine);
 					}
-					//전용 아이템이 탄일 경우(리볼버류)
-					else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
+					else
 					{
-						ItemPocket* gunPtr = targetItem.pocketPtr.get();
-						//탄환 분리
-						if (gunPtr->itemInfo.size() > 0)
-						{
-							barAct.push_back(act::unloadBulletFromGun);
-						}
-
-						//탄환 장전
-						int bulletNumber = 0;
-						for (int i = 0; i < gunPtr->itemInfo.size(); i++)
-						{
-							bulletNumber += gunPtr->itemInfo[i].number;
-						}
-
-						if (bulletNumber < targetItem.pocketMaxNumber)
-						{
-							barAct.push_back(act::reloadBulletToGun);
-						}
+						barAct.push_back(act::unloadMagazine);
 					}
 				}
-				//업데이트할 아이템이 탄창일 경우
-				else if (targetItem.checkFlag(itemFlag::MAGAZINE))
+				//전용 아이템이 탄일 경우(리볼버류)
+				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
 				{
-					barAct.push_back(act::reloadMagazine);
-
-					//탄창 장전
-					ItemPocket* magazinePtr = targetItem.pocketPtr.get();
-					if (magazinePtr->itemInfo.size() > 0)
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
+					//탄환 분리
+					if (gunPtr->itemInfo.size() > 0)
 					{
-						barAct.push_back(act::unloadBulletFromMagazine);
+						barAct.push_back(act::unloadBulletFromGun);
 					}
 
-					//총알 장전
+					//탄환 장전
 					int bulletNumber = 0;
-					for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
+					for (int i = 0; i < gunPtr->itemInfo.size(); i++)
 					{
-						bulletNumber += magazinePtr->itemInfo[i].number;
+						bulletNumber += gunPtr->itemInfo[i].number;
 					}
 
 					if (bulletNumber < targetItem.pocketMaxNumber)
 					{
-						barAct.push_back(act::reloadBulletToMagazine);
+						barAct.push_back(act::reloadBulletToGun);
 					}
 				}
-				//업데이트할 아이템이 탄환일 경우
-				else if (targetItem.checkFlag(itemFlag::AMMO))
+			}
+			//업데이트할 아이템이 탄창일 경우
+			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
+			{
+				barAct.push_back(act::reloadMagazine);
+
+				//탄창 장전
+				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
+				if (magazinePtr->itemInfo.size() > 0)
 				{
-					barAct.push_back(act::reloadBulletToGun);
+					barAct.push_back(act::unloadBulletFromMagazine);
 				}
 
-				if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
-				else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
+				//총알 장전
+				int bulletNumber = 0;
+				for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
+				{
+					bulletNumber += magazinePtr->itemInfo[i].number;
+				}
+
+				if (bulletNumber < targetItem.pocketMaxNumber)
+				{
+					barAct.push_back(act::reloadBulletToMagazine);
+				}
 			}
+			//업데이트할 아이템이 탄환일 경우
+			else if (targetItem.checkFlag(itemFlag::AMMO))
+			{
+				barAct.push_back(act::reloadBulletToGun);
+			}
+
+			if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
+			else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
 		}
-		else if (lootCursor != -1)
-		{
-			if (lootPtr->itemInfo.size() > 0)
-			{
-				ItemData& targetItem = lootPtr->itemInfo[lootCursor];
-				barAct.clear();
-				barAct.push_back(act::wield);
-				if (targetItem.checkFlag(itemFlag::CANEQUIP) == true) { barAct.push_back(act::equip); }
-				barAct.push_back(act::throwing);//throwing도 항상 추가
-			}
-		}
-		else
-		{
-			errorBox(L"Equip instance : updateBarAct error occurs, Both lootCursor and equipCursor have the same value -1");
-		}
-	}
-
-	Corouter executeSearch()
-	{
-		//이미 검색 중인지 체크
-		for (int i = 0; i < lootPtr->itemInfo.size(); i++)
-		{
-			if (lootPtr->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))//이미 검색 중일 경우 검색 상태를 해제함
-			{
-				for (int j = 0; j < lootPtr->itemInfo.size(); j++)
-				{
-					lootPtr->itemInfo[j].eraseFlag(itemFlag::GRAYFILTER);
-				}
-				lootPtr->sortByUnicode();
-				updateLog(col2Str(col::white) + sysStr[86]);//검색 상태를 해제했다.
-				co_return;
-			}
-
-			if (i == lootPtr->itemInfo.size() - 1)//검색 중이 아닐 경우
-			{
-				std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
-				new Msg(msgFlag::input, sysStr[27], sysStr[97], choiceVec);//검색, 검색할 키워드를 입력해주세요
-				lootScroll = 0;
-				co_await std::suspend_always();
-				if (coAnswer == sysStr[38]) //검색 후 확인 버튼
-				{
-					int matchCount = lootPtr->searchTxt(exInputText);
-					for (int i = 0; i < lootPtr->itemInfo.size(); i++) lootPtr->itemInfo[i].addFlag(itemFlag::GRAYFILTER);
-					for (int i = 0; i < matchCount; i++) lootPtr->itemInfo[i].eraseFlag(itemFlag::GRAYFILTER);
-				}
-				else {}
-			}
-		}
-	}
-
-	Corouter executeSelectItemEx(int pocketCursor, int lootCursor)
-	{
-		//입력형 메시지 박스 열기
-		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
-		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//아이템 선택, 얼마나?
-		co_await std::suspend_always();
-
-		//포켓커서에 따른 pocketPtr 변경
-		ItemPocket* lootPtr = nullptr;
-		int pocketStack = 0;
-		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
-			{
-				if (pocketCursor == pocketStack)
-				{
-					lootPtr = equipPtr->itemInfo[i].pocketPtr.get();
-					break;
-				}
-				else
-				{
-					pocketStack++;
-				}
-			}
-		}
-
-		int inputSelectNumber = wtoi(exInputText.c_str()); // 셀렉트 박스에 넣어질 숫자(플레이어가 입력한 값)
-		if (inputSelectNumber > lootPtr->itemInfo[lootCursor].number) //만약 실제 있는 숫자보다 많은 값을 입력했을 경우
-		{
-			inputSelectNumber = lootPtr->itemInfo[lootCursor].number; //Select의 값을 최댓값으로 맞춤
-		}
-		lootPtr->itemInfo[lootCursor].lootSelect = inputSelectNumber;
-	}
-
-	Corouter executeWield()
-	{
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		if (lootPtr->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
-		{
-			bool isWield = false;
-			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
-			{
-				if (equipPtr->itemInfo[i].equipState == equipHandFlag::left || equipPtr->itemInfo[i].equipState == equipHandFlag::right || equipPtr->itemInfo[i].equipState == equipHandFlag::both)
-				{
-					equipPtr->transferItem(drop.get(), i, 1);
-					isWield = true;
-				}
-			}
-			if (isWield == true) { PlayerPtr->drop(drop.get()); }
-			int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
-			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
-			equipPtr->sortEquip();
-
-			updateLog(L"#FFFFFF아이템을 들었다.");
-		}
-		else
-		{
-
-			bool hasLeft = false;
-			bool hasRight = false;
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-			{
-				switch (equipPtr->itemInfo[i].equipState)
-				{
-					case equipHandFlag::left:
-						hasLeft = true;
-						break;
-					case equipHandFlag::right:
-						hasRight = true;
-						break;
-					case equipHandFlag::both:
-						hasLeft = true;
-						hasRight = true;
-						break;
-				}
-			}
-
-			if (hasLeft == true && hasRight == true)
-			{
-				int fixedLootCursor = lootCursor;//Msg가 켜지면 lootCursor가 -1로 초기화되기에 미리 지역변수로 저장
-
-				//왼손, 오른손
-				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
-				//선택, 어느 손에 들까?
-				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
-				co_await std::suspend_always();
-
-				equipHandFlag handDir = equipHandFlag::none;
-				switch (wtoi(coAnswer.c_str()))
-				{
-					case 0:
-						handDir = equipHandFlag::left;
-						break;
-					case 1:
-						handDir = equipHandFlag::right;
-						break;
-				}
-
-				//왼손 아이템 떨구기
-				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
-				{
-					if (equipPtr->itemInfo[i].equipState == handDir)
-					{
-						equipPtr->transferItem(drop.get(), i, 1);
-						break;
-					}
-				}
-				//양손 아이템 떨구기
-				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
-				{
-					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
-					{
-						equipPtr->transferItem(drop.get(), i, 1);
-						break;
-					}
-				}
-				PlayerPtr->drop(drop.get());
-
-				int returnIndex = lootPtr->transferItem(equipPtr, fixedLootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = handDir;
-				equipPtr->sortEquip();
-			}
-			else if (hasLeft == false && hasRight == false)
-			{
-				int fixedLootCursor = lootCursor;//Msg가 켜지면 lootCursor가 -1로 초기화되기에 미리 지역변수로 저장
-
-				//왼손, 오른손
-				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
-				//선택, 어느 손에 들까?
-				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
-				co_await std::suspend_always();
-
-				equipHandFlag handDir = equipHandFlag::none;
-				switch (wtoi(coAnswer.c_str()))
-				{
-					case 0:
-						handDir = equipHandFlag::left;
-						break;
-					case 1:
-						handDir = equipHandFlag::right;
-						break;
-				}
-				int returnIndex = lootPtr->transferItem(equipPtr, fixedLootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = handDir;
-				equipPtr->sortEquip();
-			}
-			else if (hasLeft == false && hasRight == true)//왼손에 들기
-			{
-				int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
-				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF아이템을 들었다.");
-			}
-			else//오른손에 들기
-			{
-				int returnIndex = lootPtr->transferItem(equipPtr, lootCursor, 1);
-				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
-				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF아이템을 들었다.");
-			}
-		}
-		PlayerPtr->updateStatus();
-		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	Corouter executeReload()//장전 : 타겟아이템(탄창이나 총)에 넣을 수 있는 탄환을 넣는다.
@@ -849,11 +420,11 @@ public:
 	void executeDroping()
 	{
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-		if (isTargetPocket == false) equipPtr->transferItem(drop.get(), equipCursor, 1);
-		else lootPtr->transferItem(drop.get(), lootCursor, 1);
+		equipPtr->transferItem(drop.get(), equipCursor, 1);
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
 		PlayerPtr->updateCustomSpriteHuman();
+
 		updateLog(col2Str(col::white) + sysStr[126]);
 	}
 
@@ -865,7 +436,6 @@ public:
 
 		co_await std::suspend_always();
 
-		updateLog(L"#FFFFFF아이템을 던졌다.");
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);
@@ -881,9 +451,10 @@ public:
 		std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
 		inputPocket->transferItem(throwing.get(), inputIndex, 1);
 		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
-
 		PlayerPtr->updateStatus();
 		PlayerPtr->updateCustomSpriteHuman();
+
+		updateLog(L"#FFFFFF아이템을 던졌다.");
 		close(aniFlag::null);
 	}
 

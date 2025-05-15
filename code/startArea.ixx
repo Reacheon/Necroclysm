@@ -50,6 +50,12 @@ export void startArea()
 		}
 	);
 
+
+	createItemStack({ -5, 2, 0 }, {
+		{373, 1}
+		}
+	);
+
 	//활과 석궁
 	createItemStack({ 3, 8, 0 }, { {383,1} });
 	createItemStack({ 4, 8, 0 }, { {385,30} });
