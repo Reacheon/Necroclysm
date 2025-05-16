@@ -484,12 +484,16 @@ bool Vehicle::runAI()
 
                         int dxFinal = 0;
                         int dyFinal = 0;
+
+
+
                         for (int i = 1; i < path.size(); i++)
                         {
                             if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
                             {
                                 dxFinal = path[i - 1][0];
                                 dyFinal = path[i - 1][1];
+                                prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
                                 break;
                             }
 
@@ -500,16 +504,18 @@ bool Vehicle::runAI()
                             }
                         }
 
+
+
                         if (dxFinal != 0 || dyFinal != 0)
                         {
                             rush(dxFinal, dyFinal);
                             if (bodyDir != wheelDir)
                             {
                                 rotateAcc += std::abs(dxFinal) + std::abs(dyFinal);
-                                if (wheelDir == ACW2(bodyDir) && rotateAcc > 7)  rotate(ACW2(bodyDir));
-                                else if (wheelDir == ACW(bodyDir) && rotateAcc > 11)  rotate(ACW(bodyDir));
-                                else if (wheelDir == CW(bodyDir) && rotateAcc > 11) rotate(CW(bodyDir));
-                                else if (wheelDir == CW2(bodyDir) && rotateAcc > 7) rotate(CW2(bodyDir));
+                                if (wheelDir == ACW2(bodyDir) && rotateAcc > 7 && colisionCheck(ACW2(bodyDir), 0, 0) == false) rotate(ACW2(bodyDir));
+                                else if (wheelDir == ACW(bodyDir) && rotateAcc > 11 && colisionCheck(ACW(bodyDir), 0, 0) == false) rotate(ACW(bodyDir));
+                                else if (wheelDir == CW(bodyDir) && rotateAcc > 11 && colisionCheck(CW(bodyDir), 0, 0) == false) rotate(CW(bodyDir));
+                                else if (wheelDir == CW2(bodyDir) && rotateAcc > 7 && colisionCheck(CW2(bodyDir), 0, 0) == false) rotate(CW2(bodyDir));
                             }
                             xAcc -= std::floor(xAcc);
                             yAcc -= std::floor(yAcc);

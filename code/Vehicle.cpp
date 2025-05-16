@@ -64,7 +64,7 @@ bool Vehicle::hasFrame(int inputX, int inputY)
 
 
 /////////////////////////////////////////※ 기존 프레임에 부품 추가////////////////////////////////////////////////////
-void Vehicle::addPart(int inputX, int inputY, int dexIndex) 
+void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 {
     errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] 입력한 위치에 프레임이 존재하지 않는다.");
 
@@ -438,6 +438,14 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         //벽 충돌 체크
         if (TileWall((*it)[0] + dx, (*it)[1] + dy, getGridZ()) != 0) return true;
 
+        if (TileProp((*it)[0] + dx, (*it)[1] + dy, getGridZ()) != nullptr)
+        {
+            if (TileProp((*it)[0] + dx, (*it)[1] + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            {
+                return true;
+            }
+        }
+
         //프롭 충돌 체크
         Vehicle* targetPtr = TileVehicle((*it)[0] + dx, (*it)[1] + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this) return true;
@@ -451,6 +459,14 @@ bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때
     {
         //벽 충돌 체크
         if (TileWall(it->first[0] + dx, it->first[1] + dy, getGridZ()) != 0) return true;
+
+        if(TileProp(it->first[0] + dx, it->first[1] + dy, getGridZ()) != nullptr)
+        {
+            if (TileProp(it->first[0] + dx, it->first[1] + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)==false)
+            {
+                return true;
+            }
+        }   
 
         //프롭 충돌 체크
         Vehicle* targetPtr = TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ());
@@ -538,7 +554,7 @@ void Vehicle::updateHeadlight(Point3 fakeCoor) //코어가 해당 위치에 가�
                         int revX = it->first[0] - getGridX();
                         int revY = it->first[1] - getGridY();
 
-                        thisLight->moveLight(fakeCoor.x+ revX, fakeCoor.y + revY, getGridZ());
+                        thisLight->moveLight(fakeCoor.x + revX, fakeCoor.y + revY, getGridZ());
                     }
                 }
             }
@@ -599,7 +615,7 @@ bool Vehicle::runAnimation(bool shutdown)
             static Point3 startPoint;
             static int lineCheck = 0;
             static Point3 currentCoreGrid;
-            
+
             if (getTimer() == 1)
             {
                 lineRevPath.clear();

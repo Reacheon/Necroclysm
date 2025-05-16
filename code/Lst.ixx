@@ -135,7 +135,7 @@ public:
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-			setFontSize(14);
+			setFontSize(12);
 			drawTextCenter(col2Str(col::white) + lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22);
 
 			//선택지 버튼 그리기
@@ -158,8 +158,8 @@ public:
 
 					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
 
-					setFontSize(14);
-					drawText(col2Str(col::white) + lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 5);
+					setFontSize(16);
+					drawText(col2Str(col::white) + lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 6);
 				}
 			}
 

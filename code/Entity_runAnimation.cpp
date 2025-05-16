@@ -895,6 +895,7 @@ bool Entity::runAnimation(bool shutdown)
 		static int arriveTimer = 0;
 
 		Point3 dstGrid = { throwCoord.x,throwCoord.y,throwCoord.z };
+		static Point3 prevCoor;
 
 		errorBox(throwingItemPocket->itemInfo.size() > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
         errorBox(throwingItemPocket->itemInfo[0].number > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
@@ -905,6 +906,7 @@ bool Entity::runAnimation(bool shutdown)
 		{
 			new Sticker(false, getX(), getY(), spr::itemset, throwingItemPocket->itemInfo[0].sprIndex, stickerID, true);
 			arriveTimer = 0;
+			prevCoor = { getGridX(),getGridY(),getGridZ() };
 
 		}
 		
@@ -926,6 +928,17 @@ bool Entity::runAnimation(bool shutdown)
 			sPtr->addFakeX(xSpd);
 			sPtr->addFakeY(ySpd);
         }
+
+		Point3 cGrid = sPtr->getClosestGridWithFake();
+		if (cGrid != prevCoor)
+		{
+			prevCoor = cGrid;
+			if (throwingItemPocket->itemInfo[0].lightPtr != nullptr)
+			{
+				throwingItemPocket->itemInfo[0].lightPtr.get()->moveLight(cGrid.x, cGrid.y, getGridZ());
+				PlayerPtr->updateVision();
+			}
+		}
 
 		if (arriveTimer != 0 || sPtr == nullptr || (relX==0 && relY == 0)|| (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY)))
 		{

@@ -143,7 +143,6 @@ bool ItemStack::runAnimation(bool shutdown)
 		float dist = sqrt(pow(relX, 2) + pow(relY, 2));
 		prt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
 		static Point3 prevCoor;
-
 		if (getTimer() == 1) prevCoor = getClosestGridWithFake();
 
 		float cosVal = -relX / dist;
