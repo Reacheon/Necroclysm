@@ -463,7 +463,7 @@ void HUD::drawTab()
 		}
 		break;
 	}
-	case tabFlag::closeAim:
+	case tabFlag::aim:
 	{
 		if (option::inputMethod == input::gamepad)
 		{
@@ -475,27 +475,46 @@ void HUD::drawTab()
 		{
 			if (checkCursor(&tabSmallBox))
 			{
-				if (click == false) { drawSprite(spr::tab, 3, tab.x, tab.y - 2); }
-				else { drawSprite(spr::tab, 4, tab.x, tab.y - 2); }
+				if (click == false) { drawSprite(spr::tabBoxAim, 5, tab.x, tab.y - 2); }
+				else { drawSprite(spr::tabBoxAim, 6, tab.x, tab.y - 2); }
 			}
 			else if (checkCursor(&tab))
 			{
-				if (click == false) { drawSprite(spr::tab, 1, tab.x, tab.y - 2); }
-				else { drawSprite(spr::tab, 2, tab.x, tab.y - 2); }
+				Point2 mPoint = getMouseXY();
+				drawLine(tab.x + 0, tab.y + 119, tab.x + 121, tab.y - 2, lowCol::red, 200);
+				if ((mPoint.x - tab.x + mPoint.y - tab.y - 119) < 0)
+				{
+					if (click == false) { drawSprite(spr::tabBoxAim, 1, tab.x, tab.y - 2); }
+					else { drawSprite(spr::tabBoxAim, 2, tab.x, tab.y - 2); }
+				}
+				else // 마우스 커서가 직선 위에 있거나(경계 포함) 아래에 있는 경우
+				{
+					if (click == false) { drawSprite(spr::tabBoxAim, 3, tab.x, tab.y - 2); }
+					else { drawSprite(spr::tabBoxAim, 4, tab.x, tab.y - 2); }
+				}
 			}
-			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+			else drawSprite(spr::tabBoxAim, 0, tab.x, tab.y - 2);
 		}
 
+        
+
+
+
 		setFontSize(12);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(col2Str(col::white)+sysStr[195], tab.x + 62, tab.y + 9);
+		drawTextCenter(col2Str(col::white) + sysStr[207], tab.x + 104, tab.y + 52);
+		//drawTextCenter(col2Str(col::white) + sysStr[195], tab.x + 60, tab.y + 92 + 7);
 
 
-		drawSpriteCenter(spr::icon48, 158, tab.x + 99, tab.y + 18);
 
 		setZoom(1.5);
-		drawSpriteCenter(spr::icon48, 42, tab.x + 60, tab.y + 55);
+		drawSpriteCenter(spr::icon48, 169, tab.x + 38, tab.y + 52);
 		setZoom(1.0);
+		drawSpriteCenter(spr::icon48, 170, tab.x + 80, tab.y + 85);
+
+		drawSpriteCenter(spr::icon48, 158, tab.x + 100, tab.y + 21);
+
+
 
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)

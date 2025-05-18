@@ -146,4 +146,5 @@ export namespace spr
 	Sprite* msgBox = nullptr;
 	Sprite* skillRect = nullptr;
 	Sprite* gridMarker = nullptr;
+	Sprite* tabBoxAim = nullptr;
 }

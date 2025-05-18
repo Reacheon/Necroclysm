@@ -491,6 +491,8 @@ bool Vehicle::runAI()
                                 dxFinal = path[i - 1][0];
                                 dyFinal = path[i - 1][1];
                                 prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
+                                accVec = getZeroVec();
+                                spdVec = getZeroVec();
                                 break;
                             }
 

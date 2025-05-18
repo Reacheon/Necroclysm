@@ -692,7 +692,7 @@ export enum class tabFlag
     closeWin,
     back,
     confirm,
-    closeAim,
+    aim,
   
 };
 

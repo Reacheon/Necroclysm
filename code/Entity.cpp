@@ -333,9 +333,12 @@ void Entity::move(int dir, bool jump)
 		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX()+dGridX, getGridY()+dGridY, getGridZ() });
 		setFakeX(-16*dGridX);
 		setFakeY(-16*dGridY);
-		cameraFix = false;
-		cameraX = getX() + getIntegerFakeX();
-		cameraY = getY() + getIntegerFakeY();
+		if (entityInfo.isPlayer)
+		{
+			cameraFix = false;
+			cameraX = getX() + getIntegerFakeX();
+			cameraY = getY() + getIntegerFakeY();
+		}
 		addAniUSet(this, aniFlag::move);
 
 

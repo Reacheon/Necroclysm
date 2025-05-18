@@ -44,7 +44,7 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::closeAim;
+		tabType = tabFlag::aim;
 
 
 		auto pEquip = PlayerPtr->getEquipPtr();
@@ -218,8 +218,8 @@ public:
 		}
 
 
-		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 52);
-		drawTextCenter(L"#FFFFFF사격할 위치를 선택해주세요.", cameraW / 2, 52);
+		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 72);
+		drawTextCenter(L"#FFFFFF사격할 위치를 선택해주세요.", cameraW / 2, 72);
 	}
 
 	void changeAimTarget(int tgtX, int tgtY)
@@ -267,7 +267,17 @@ public:
 		}
 		else if (checkCursor(&tab))
 		{
-			executeTab();
+			Point2 mPoint = getMouseXY();
+			if ((mPoint.x - tab.x + mPoint.y - tab.y - 119) < 0)
+			{
+				executeTabShot();
+			}
+			else // 마우스 커서가 직선 위에 있거나(경계 포함) 아래에 있는 경우
+			{
+				close(aniFlag::null);
+			}
+
+			
 		}
 	}
 	void clickMotionGUI(int dx, int dy) {}
@@ -337,7 +347,7 @@ public:
 			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
 			{
 				prt(L"탭이 실행되었다.\n");
-				executeTab();
+				executeTabShot();
 				delayR2 = 20;
 			}
 			else delayR2--;
@@ -373,9 +383,8 @@ public:
 		}
 	}
 
-	
 
-	void executeTab()
+	void executeTabShot()
 	{
 		Entity* victimEntity = TileEntity(aimCoord.x, aimCoord.y, aimCoord.z);
 		int targetX = aimCoord.x;

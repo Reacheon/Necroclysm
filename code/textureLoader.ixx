@@ -168,4 +168,6 @@ export void textureLoader()
 	spr::skillRect = new Sprite(renderer, "image/UI/GUI/Skill/skillRect.png", 250, 34);
 
 	spr::gridMarker = new Sprite(renderer, "image/UI/gridMarker.png", 16, 16);
+
+    spr::tabBoxAim = new Sprite(renderer, "image/UI/tabBoxAim.png", 122, 122);
 }

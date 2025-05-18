@@ -51,33 +51,33 @@ export void displayLoader()
     }
 
     ///////////PC 테스트용 강제 해상도 조정////////
-    //if(option::fixScreenRatio)
-    //{
-    //    int resolution = 0;
-    //    switch (resolution)
-    //    {
-    //    default://1:1
-    //        cameraW = 720;
-    //        cameraH = 720;
-    //        break;
-    //    case 1://9:16
-    //        cameraW = 720;
-    //        cameraH = 1280;
-    //        break;
-    //    case 2://4:3
-    //        cameraW = 960;
-    //        cameraH = 720;
-    //        break;
-    //    case 3://1:2
-    //        cameraW = 720;
-    //        cameraH = 1440;
-    //        break;
-    //    case 4://16:9
-    //        cameraW = 1280;
-    //        cameraH = 720;
-    //        break;
-    //    }
-    //}
+    if(option::fixScreenRatio)
+    {
+        int resolution = 0;
+        switch (resolution)
+        {
+        default://1:1
+            cameraW = 720;
+            cameraH = 720;
+            break;
+        case 1://9:16
+            cameraW = 720;
+            cameraH = 1280;
+            break;
+        case 2://4:3
+            cameraW = 960;
+            cameraH = 720;
+            break;
+        case 3://1:2
+            cameraW = 720;
+            cameraH = 1440;
+            break;
+        case 4://16:9
+            cameraW = 1280;
+            cameraH = 720;
+            break;
+        }
+    }
 
 
     SDL_SetWindowSize(window, cameraW, cameraH);
