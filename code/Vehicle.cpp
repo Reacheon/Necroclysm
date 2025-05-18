@@ -1,6 +1,5 @@
 ﻿#include <SDL.h>
-#define AI_TURN_END return true;
-#define AI_TURN_CONTINUE return false;
+
 
 import Vehicle;
 import std;

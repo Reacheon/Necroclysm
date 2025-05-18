@@ -749,7 +749,9 @@ void Entity::updateCustomSpriteHuman()
 		bool noHair = false;
 		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 		{
-			if (getEquipPtr()->itemInfo[i].checkFlag(itemFlag::NO_HAIR_HELMET) == true)
+            ItemData& tgtItem = getEquipPtr()->itemInfo[i];
+			if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true 
+				&& tgtItem.equipState == equipHandFlag::normal)
 			{
 				noHair = true;
 				break;

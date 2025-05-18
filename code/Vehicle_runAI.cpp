@@ -1,4 +1,7 @@
-﻿import Vehicle;
+﻿#define AI_TURN_END return true;
+#define AI_TURN_CONTINUE return false;
+
+import Vehicle;
 import globalVar;
 import wrapVar;
 import constVar;
@@ -11,12 +14,6 @@ bool Vehicle::runAI()
     if (isAIFirstRun) isAIFirstRun = false;
 
     //prt(L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
-
-
-    if (isPowerCart)
-    {
-        int a = 2;
-    }
 
     while (1)
     {
@@ -312,7 +309,7 @@ bool Vehicle::runAI()
                 }
             }
 
-            return false;
+            AI_TURN_CONTINUE;
         }
 
         //========================================================= ACT2 광차 속도 설정 ===============================================
@@ -401,9 +398,9 @@ bool Vehicle::runAI()
                 else
                 {
                     prt(L"[Vehicle:train] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n");
-                    return false;
+                    AI_TURN_CONTINUE;
                 }
-                return false;
+                AI_TURN_CONTINUE;
             }
         }
 
@@ -521,7 +518,7 @@ bool Vehicle::runAI()
                             yAcc -= std::floor(yAcc);
                         }
                         updateSpr();
-                        return false;
+                        AI_TURN_CONTINUE;
                     }
                 }
                 
@@ -621,8 +618,7 @@ bool Vehicle::runAI()
                         }
 
 
-
-                        return false;
+                        AI_TURN_CONTINUE;
                     }
                 }
 
@@ -635,6 +631,6 @@ bool Vehicle::runAI()
         //위의 모든 패턴 조건을 만족하지않을시 return true
         //prt(L"[Vehicle:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
         isAIFirstRun = true;
-        return true;
+        AI_TURN_END;
     }
 }

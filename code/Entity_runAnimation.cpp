@@ -904,7 +904,11 @@ bool Entity::runAnimation(bool shutdown)
 		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
 		if (getTimer()==1)
 		{
-			new Sticker(false, getX(), getY(), spr::itemset, throwingItemPocket->itemInfo[0].sprIndex, stickerID, true);
+			int gX = getGridX();
+            int gY = getGridY();
+            int gZ = getGridZ();
+
+			Sticker* sPtr = new Sticker(false, getX(), getY(), spr::itemset, throwingItemPocket->itemInfo[0].sprIndex, stickerID, true);
 			arriveTimer = 0;
 			prevCoor = { getGridX(),getGridY(),getGridZ() };
 
@@ -919,7 +923,7 @@ bool Entity::runAnimation(bool shutdown)
 		if (StickerList.find(stickerID) != StickerList.end()) sPtr = ((Sticker*)(StickerList.find(stickerID))->second);
 		else sPtr = nullptr;
 		
-		if (sPtr != nullptr && arriveTimer == 0)
+		if (sPtr != nullptr && arriveTimer == 0 && (relX != 0 || relY != 0))
 		{
 			float cosVal = relX / dist;
 			float sinVal = relY / dist;
@@ -927,18 +931,20 @@ bool Entity::runAnimation(bool shutdown)
 			ySpd = spd * sinVal;
 			sPtr->addFakeX(xSpd);
 			sPtr->addFakeY(ySpd);
+
+			Point3 cGrid = sPtr->getClosestGridWithFake();
+			if (cGrid != prevCoor)
+			{
+				prevCoor = cGrid;
+				if (throwingItemPocket->itemInfo[0].lightPtr != nullptr)
+				{
+					throwingItemPocket->itemInfo[0].lightPtr.get()->moveLight(cGrid.x, cGrid.y, getGridZ());
+					PlayerPtr->updateVision();
+				}
+			}
         }
 
-		Point3 cGrid = sPtr->getClosestGridWithFake();
-		if (cGrid != prevCoor)
-		{
-			prevCoor = cGrid;
-			if (throwingItemPocket->itemInfo[0].lightPtr != nullptr)
-			{
-				throwingItemPocket->itemInfo[0].lightPtr.get()->moveLight(cGrid.x, cGrid.y, getGridZ());
-				PlayerPtr->updateVision();
-			}
-		}
+
 
 		if (arriveTimer != 0 || sPtr == nullptr || (relX==0 && relY == 0)|| (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY)))
 		{
