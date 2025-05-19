@@ -82,6 +82,8 @@ public:
 
 	int getPocketVolume();
 	int getPocketWeight();
+	int getPocketNumber();
+
 
 };
 

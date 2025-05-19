@@ -189,7 +189,28 @@ public:
 	void clickUpGUI();
 	void clickMotionGUI(int dx, int dy);
 	void clickDownGUI();
-	void clickRightGUI() { }
+	void clickRightGUI() 
+	{
+
+		//아이템 좌측 셀렉트 우클릭
+		for (int i = 0; i < LOOT_ITEM_MAX; i++)
+		{
+			if (checkCursor(&lootItemSelectRect[i]))
+			{
+				if (lootPocket->itemInfo.size() - 1 >= i)
+				{
+					if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
+					{
+						CORO(executeSelectItemEx(i + lootScroll));
+					}
+					else
+					{
+						lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
+					}
+				}
+			}
+		}
+	}
 	void clickHoldGUI() { }
 	void mouseWheel() 
 	{
@@ -224,34 +245,6 @@ public:
 			return;
 		}
 
-		//셀렉트 홀드 이벤트
-		if (coFunc == nullptr)
-		{
-			if (selectTouchTime != -1)
-			{
-				//아이템 좌측 셀렉트 클릭
-				for (int i = 0; i < LOOT_ITEM_MAX; i++)
-				{
-					if (checkCursor(&lootItemSelectRect[i]))
-					{
-						if (lootPocket->itemInfo.size() - 1 >= i)
-						{
-							if (SDL_GetTicks() - selectTouchTime > 800)
-							{
-								selectTouchTime = -1;
-								CORO(executeSelectItemEx(i + lootScroll));
-							}
-						}
-						break;
-					}
-
-					if (i == LOOT_ITEM_MAX - 1)
-					{
-						selectTouchTime = -1;
-					}
-				}
-			}
-		}
 
 		//잘못된 커서 위치 조정
 		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1)) 
@@ -338,14 +331,14 @@ public:
 
 		if (equipPtr->itemInfo.size() == 0)
 		{
-			updateLog(col2Str(col::white) + sysStr[123]);
+			updateLog(col2Str(col::white) + sysStr[123]);//소지한 가방이 하나도 없다
 			return;
 		}
 
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			//가방일 경우
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0) { bagNumber++; }
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr) { bagNumber++; }
 
 			//커서가 가리키는 포켓의 주소를 저장
 			if (bagNumber - 1 == pocketCursor)
@@ -358,43 +351,129 @@ public:
 			//가방을 찾지 못했을 경우
 			if (i == equipPtr->itemInfo.size() - 1 && bagPtr == nullptr)
 			{
-				updateLog(col2Str(col::white) + sysStr[123]);
+				updateLog(col2Str(col::white) + sysStr[123]);//소지한 가방이 하나도 없다
 				return;
 			}
 		}
 
-		int currentVol = equipPtr->itemInfo[bagIndex].pocketVolume;
-		int maxVol = equipPtr->itemInfo[bagIndex].pocketMaxVolume;
-
-		int itemsVol = 0;
-		for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+		//--------------------------------------------------------------------
+		// 가방이 부피로 제한되는 경우 ----------------------------------------
+		//--------------------------------------------------------------------
+		if (equipPtr->itemInfo[bagIndex].pocketMaxVolume != 0)
 		{
-			if (lootPocket->itemInfo[i].lootSelect > 0)
+			int currentVol = equipPtr->itemInfo[bagIndex].pocketPtr.get()->getPocketVolume();
+			int maxVol = equipPtr->itemInfo[bagIndex].pocketMaxVolume;
+			int itemsVol = 0;
+			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
 			{
-				itemsVol += lootPocket->itemInfo[i].lootSelect * lootPocket->itemInfo[i].volume;
+				if (lootPocket->itemInfo[i].lootSelect > 0)
+				{
+					itemsVol += lootPocket->itemInfo[i].lootSelect * lootPocket->itemInfo[i].volume;
+				}
 			}
-		}
 
-		if (maxVol < itemsVol + currentVol)
-		{
-			updateLog(col2Str(col::white) + sysStr[124]);
-			return;
-		}
-		else
-		{
-			int fixedLootSize = lootPocket->itemInfo.size();
+			if (maxVol < itemsVol + currentVol)
+			{
+				updateLog(col2Str(col::white) + sysStr[124]);
+				return;
+			}
+
+			bool moved = false; //실제로 옮긴 아이템이 있는지 체크
 			for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--)
 			{
 				if (lootPocket->itemInfo[i].lootSelect > 0)
 				{
 					lootPocket->transferItem(bagPtr, i, lootPocket->itemInfo[i].lootSelect);
+					moved = true;
 				}
 			}
-			for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
 
-			updateLog(col2Str(col::white) + L"아이템을 가방에 집어 넣었다.");
+			if (moved)
+				updateLog(col2Str(col::white) + L"아이템을 포켓에 집어 넣었다.");
+
+			for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
+			return;
+		}
+		//--------------------------------------------------------------------
+		// 가방이 갯수로 제한되는 경우 ----------------------------------------
+		//--------------------------------------------------------------------
+		else
+		{
+			int currentNumber = equipPtr->itemInfo[bagIndex].pocketPtr.get()->getPocketNumber();
+			int maxNumber = equipPtr->itemInfo[bagIndex].pocketMaxNumber;
+			int itemNumber = 0;
+			bool hasIllegal = false; // ★ 선택된 아이템 가운데 가방이 허용하지 않는 것이 있는가?
+
+			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+			{
+				if (lootPocket->itemInfo[i].lootSelect > 0)
+				{
+					if (equipPtr->itemInfo[bagIndex].isPocketOnlyItem(lootPocket->itemInfo[i].itemCode)) itemNumber += lootPocket->itemInfo[i].lootSelect;
+					else hasIllegal = true; //넣을 수 없는 아이템을 발견
+				}
+			}
+
+			//공간이 충분할 때 --------------------------------------------------
+			if (maxNumber >= itemNumber + currentNumber)
+			{
+				bool moved = false;
+				for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--)
+				{
+					if (lootPocket->itemInfo[i].lootSelect > 0 &&
+						equipPtr->itemInfo[bagIndex].isPocketOnlyItem(lootPocket->itemInfo[i].itemCode))
+					{
+						lootPocket->transferItem(bagPtr, i, lootPocket->itemInfo[i].lootSelect);
+						moved = true;
+					}
+				}
+
+				if (moved) updateLog(col2Str(col::white) + L"아이템을 포켓에 집어 넣었다.");
+				if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+
+				for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
+				return;
+			}
+			//공간이 부족하지만 약간은 남았을 때 ------------------------------
+			else
+			{
+				int remainingSpace = maxNumber - currentNumber;
+				if (remainingSpace > 0)
+				{
+					bool moved = false;
+					for (int i = lootPocket->itemInfo.size() - 1; i >= 0 && remainingSpace > 0; i--)
+					{
+						if (lootPocket->itemInfo[i].lootSelect > 0 &&
+							equipPtr->itemInfo[bagIndex].isPocketOnlyItem(lootPocket->itemInfo[i].itemCode))
+						{
+							int transferAmount = myMin(remainingSpace, lootPocket->itemInfo[i].lootSelect);
+							lootPocket->transferItem(bagPtr, i, transferAmount);
+							remainingSpace -= transferAmount;
+							moved = true;
+						}
+						else if (lootPocket->itemInfo[i].lootSelect > 0)
+						{
+							hasIllegal = true;
+						}
+					}
+
+					for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) lootPocket->itemInfo[i].lootSelect = 0;
+
+					if (moved)updateLog(col2Str(col::white) + L"한계치까지 아이템을 포켓에 집어 넣었다.");
+					if (hasIllegal)updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+					return;
+				}
+				//완전히 가득 찬 경우 ----------------------------------------
+				else
+				{
+					updateLog(col2Str(col::white) + L"가방이 가득 차서 더 이상 넣을 수 없다.");
+					if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+					return;
+				}
+			}
 		}
 	}
+
+
 	void executeSelectAll()
 	{
 		bool isSelectAll = true;
@@ -439,7 +518,7 @@ public:
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
 				numberOfBag++;
 			}
@@ -455,7 +534,7 @@ public:
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
 				pocketList.push_back(i);
 				numberOfBag++;
@@ -537,7 +616,7 @@ public:
 			//업데이트할 아이템이 탄창일 경우
 			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
 			{
-				barAct.push_back(act::reloadMagazine);
+				if(targetItem.itemCode != itemRefCode::arrowQuiver && targetItem.itemCode != itemRefCode::boltQuiver) barAct.push_back(act::reloadMagazine);
 
 				//탄창 장전
 				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
@@ -773,7 +852,7 @@ public:
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0 || equipPtr->itemInfo[i].pocketMaxNumber > 0)
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
 				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //전용 아이템이 있을 경우
 				{
@@ -805,7 +884,7 @@ public:
 		int counter = 0;
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0 || equipPtr->itemInfo[i].pocketMaxNumber > 0)
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
 				if (equipPtr->itemInfo[i].pocketMaxNumber > 0) //전용 아이템이 있을 경우
 				{

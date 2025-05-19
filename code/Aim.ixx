@@ -135,15 +135,218 @@ public:
 		if (aimAcc != 0 && turnCycle == turn::playerInput)
 		{
 			std::wstring accStr = decimalCutter(fakeAimAcc * 100.0, 1);
+
+			int iconIndex = 0;
+			int currentBullet = 0;
+			int maxBullet = 0;
+			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			//손에 든 장비 찾기
+			int weaponIdx = -1;
+			for (int i = 0; i < equipInfo.size(); ++i)
+			{
+				if (equipInfo[i].equipState == equipHandFlag::none) continue;
+				weaponIdx = i;                                   
+
+				if (equipInfo[i].checkFlag(itemFlag::BOW))      iconIndex = 95;
+				else if (equipInfo[i].checkFlag(itemFlag::CROSSBOW)) iconIndex = 96;
+				else if (equipInfo[i].checkFlag(itemFlag::GUN))      iconIndex = 97;
+				break;                                              
+			}
+
+
+			if (weaponIdx != -1)
+			{
+				//무기 내부의 탄 계산
+				ItemData& weapon = equipInfo[weaponIdx];
+				currentBullet += getBulletNumber(weapon);
+				for (unsigned short code : weapon.pocketOnlyItem)
+				{
+					if (itemDex[code].checkFlag(itemFlag::AMMO)) maxBullet += weapon.pocketMaxNumber;
+					else if (itemDex[code].checkFlag(itemFlag::MAGAZINE)) 
+					{
+						if (weapon.pocketPtr && !weapon.pocketPtr->itemInfo.empty()) maxBullet += weapon.pocketPtr->itemInfo[0].pocketMaxNumber;
+						else maxBullet += itemDex[code].pocketMaxNumber;
+					}
+				}
+
+				//무기를 제외한 장비들의 탄 계산
+				for (int j = 0; j < equipInfo.size(); ++j)
+				{
+					if (j == weaponIdx)                    continue;
+					ItemData& itm = equipInfo[j];
+
+					if (!itm.checkFlag(itemFlag::MAGAZINE)) continue;
+					if (itm.pocketOnlyItem.empty())        continue;
+
+					bool sameAmmo = std::any_of(
+						weapon.pocketOnlyItem.begin(), weapon.pocketOnlyItem.end(),
+						[&](unsigned short c) { return c == itm.pocketOnlyItem[0]; });
+
+					if (!sameAmmo) continue;
+
+					currentBullet += getBulletNumber(itm);
+					maxBullet += itm.pocketMaxNumber;
+				}
+			}
+
+			std::wstring bulletStr = std::to_wstring(currentBullet)+L"/" + std::to_wstring(maxBullet);
 			accStr += L"%";
 			//if(aimStack>0) accStr += L" (" + std::to_wstring(aimStack) + L")";
 
-			drawTextCenter(col2Str(col::black) + accStr, cameraW / 2 + 2, cameraH / 2 - 20 * zoomScale);
-			drawTextCenter(col2Str(col::black) + accStr, cameraW / 2 - 2, cameraH / 2 - 20 * zoomScale);
-			drawTextCenter(col2Str(col::black) + accStr, cameraW / 2, cameraH / 2 + 2 - 20 * zoomScale);
-			drawTextCenter(col2Str(col::black) + accStr, cameraW / 2, cameraH / 2 - 2 - 20 * zoomScale);
+			setSolidText();
+			if (zoomScale == 1.0)
+			{
+				setFontSize(10);
+				int textX = cameraW / 2;
+				int textY = cameraH / 2 - 22;
 
-			drawTextCenter(col2Str(col::white) + accStr, cameraW / 2, cameraH / 2 - 20 * zoomScale);
+				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
+
+				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+
+				setFontSize(8);
+				int textX2 = cameraW / 2;
+				int textY2 = cameraH / 2 - 32;
+
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
+
+				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr)/2.0 - 5, textY2-1);
+
+			}
+			else if (zoomScale == 2.0)
+			{
+				setFontSize(10);
+				int textX = cameraW / 2;
+				int textY = cameraH / 2 - 40;
+
+				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
+
+				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+
+				setFontSize(8);
+				int textX2 = cameraW / 2;
+				int textY2 = cameraH / 2 - 50;
+
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
+
+				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2-1);
+			}
+			else if (zoomScale == 3.0)
+			{
+				setFontSize(12);
+				int textX = cameraW / 2;
+				int textY = cameraH / 2 - 58;
+
+				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
+
+				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+
+				setFontSize(10);
+				int textX2 = textX+5;
+				int textY2 = textY - 15;
+
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
+
+				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+
+				setZoom(2.0);
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2-1);
+				setZoom(1.0);
+			}
+			else if (zoomScale == 4.0)
+			{
+				setFontSize(12);
+				int textX = cameraW / 2;
+				int textY = cameraH / 2 - 58 - 15;
+
+				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
+
+				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+
+				setFontSize(10);
+				int textX2 = textX + 5;
+				int textY2 = textY - 15;
+
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
+
+				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+
+				setZoom(2.0);
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
+				setZoom(1.0);
+			}
+			else if (zoomScale == 5.0)
+			{
+				setFontSize(12);
+				int textX = cameraW / 2;
+				int textY = cameraH / 2 - 58 - 34;
+
+				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
+				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
+
+				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+
+				setFontSize(10);
+				int textX2 = textX + 5;
+				int textY2 = textY - 15;
+
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
+				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
+
+				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+
+				setZoom(2.0);
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
+				setZoom(1.0);
+			}
+
+
+
+
+			//setFontSize(10);
+
+			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2 + 1, cameraH / 2 - 25 * zoomScale);
+			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2 - 1, cameraH / 2 - 25 * zoomScale);
+			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale + 1);
+			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale - 1);
+			//drawTextCenter(col2Str(col::white) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale);
+
+			//setZoom(1.5);
+			//drawSpriteCenter(spr::icon16,95, cameraW / 2 - 5 * zoomScale, cameraH / 2 - 25 * zoomScale);
+			//setZoom(1.0);
+
 		}
 
 
@@ -218,6 +421,7 @@ public:
 		}
 
 
+		setFontSize(12);
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 72);
 		drawTextCenter(L"#FFFFFF사격할 위치를 선택해주세요.", cameraW / 2, 72);
 	}

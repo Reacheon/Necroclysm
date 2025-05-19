@@ -810,7 +810,7 @@ void Vehicle::drawSelf()
             SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
             int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
 
-            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemVIPCode::minecart)
+            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemRefCode::minecart)
             {
                 if (bodyDir == dir16::dir0 || bodyDir == dir16::dir4) sprIndex += 0;
                 else sprIndex += 1;

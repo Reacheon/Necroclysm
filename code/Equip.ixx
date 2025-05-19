@@ -228,7 +228,7 @@ public:
 			//업데이트할 아이템이 탄창일 경우
 			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
 			{
-				barAct.push_back(act::reloadMagazine);
+				if (targetItem.itemCode != itemRefCode::arrowQuiver && targetItem.itemCode != itemRefCode::boltQuiver) barAct.push_back(act::reloadMagazine);
 
 				//탄창 장전
 				ItemPocket* magazinePtr = targetItem.pocketPtr.get();

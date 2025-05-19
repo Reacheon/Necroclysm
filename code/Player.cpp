@@ -103,7 +103,7 @@ void Player::startMove(int inputDir)
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{
 			player->setDirection(inputDir);
-			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemVIPCode::sandFloor)
+			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemRefCode::sandFloor)
 			{
 				new Footprint(getGridX(), getGridY(), entityInfo.direction);
 			}

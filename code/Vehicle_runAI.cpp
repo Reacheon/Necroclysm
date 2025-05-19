@@ -31,7 +31,7 @@ bool Vehicle::runAI()
             {
                 if (bodyDir == dir16::dir0 || bodyDir == dir16::dir4)
                 {
-                    if (TileProp(getGridX(), getGridY(), getGridZ())->leadItem.itemCode == itemVIPCode::wideRailHMid)
+                    if (TileProp(getGridX(), getGridY(), getGridZ())->leadItem.itemCode == itemRefCode::wideRailHMid)
                     {
                         if (gearState == gearFlag::drive) spdVec = scalarMultiple(dir16ToVec(bodyDir), (float)rpmState);
                         else if (gearState == gearFlag::reverse) spdVec = scalarMultiple(dir16ToVec(reverse(bodyDir)), (float)rpmState);
@@ -41,7 +41,7 @@ bool Vehicle::runAI()
                 }
                 else if (bodyDir == dir16::dir2 || bodyDir == dir16::dir6)
                 {
-                    if (TileProp(getGridX(), getGridY(), getGridZ())->leadItem.itemCode == itemVIPCode::wideRailVMid)
+                    if (TileProp(getGridX(), getGridY(), getGridZ())->leadItem.itemCode == itemRefCode::wideRailVMid)
                     {
                         if (gearState == gearFlag::drive) spdVec = scalarMultiple(dir16ToVec(bodyDir), (float)rpmState);
                         else if (gearState == gearFlag::reverse) spdVec = scalarMultiple(dir16ToVec(reverse(bodyDir)), (float)rpmState);

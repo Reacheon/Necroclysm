@@ -19,6 +19,8 @@ import mouseGrid;
 import Entity;
 import Aim;
 import useSkill;
+import ItemData;
+import ItemPocket;
 
 
 void HUD::clickDownGUI()
@@ -98,7 +100,56 @@ void HUD::clickUpGUI()
 		}
 		else//찾았을 경우
 		{
-			new Aim();
+			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			for (int i = 0; i < equipInfo.size(); i++)
+			{
+				if (equipInfo[i].equipState != equipHandFlag::none)
+				{
+					if (equipInfo[i].checkFlag(itemFlag::BOW))
+					{
+						if (equipInfo[i].pocketPtr.get()->getPocketNumber() > 0) new Aim();
+						else
+						{
+							for (int j = 0; j < equipInfo.size(); j++)
+							{
+								if(equipInfo[j].itemCode == itemRefCode::arrowQuiver)
+								{
+									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+									{
+										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0,1);
+										updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+										new Aim();
+										break;
+									}
+                                }
+								if(j== equipInfo.size()-1) updateLog(col2Str(col::white) + L"현재 가지고 있는 화살이 없다.");
+							}
+						}
+					}
+					else if (equipInfo[i].checkFlag(itemFlag::CROSSBOW))
+					{
+						if(equipInfo[i].pocketPtr.get()->getPocketNumber() > 0) new Aim();
+						else
+						{
+							for (int j = 0; j < equipInfo.size(); j++)
+							{
+								if (equipInfo[j].itemCode == itemRefCode::boltQuiver)
+								{
+									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+									{
+										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
+										updateLog(col2Str(col::white) + L"당신은 석궁에 볼트를 장전했다.");
+										new Aim();
+										break;
+									}
+								}
+								if (j == equipInfo.size() - 1) updateLog(col2Str(col::white) + L"현재 가지고 있는 볼트가 없다.");
+							}
+						}
+					}
+				}
+			}
+			
 		}
 	}
 	else if (checkCursor(&tab) == true) executeTab();

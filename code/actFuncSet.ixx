@@ -35,6 +35,38 @@ export namespace actFunc
 		std::vector<std::wstring> bulletList;
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		std::vector<ItemPocket*> targetSearchPtr;
+		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+
+		if (reloadItemPocket->itemInfo[targetLootCursor].checkFlag(itemFlag::BOW))
+		{
+			for (int j = 0; j < equipInfo.size(); j++)
+			{
+				if (equipInfo[j].itemCode == itemRefCode::arrowQuiver)
+				{
+					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+					{
+						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
+						updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+						co_return;
+					}
+				}
+			}
+		}
+		else if (reloadItemPocket->itemInfo[targetLootCursor].checkFlag(itemFlag::CROSSBOW))
+		{
+			for (int j = 0; j < equipInfo.size(); j++)
+			{
+				if (equipInfo[j].itemCode == itemRefCode::boltQuiver)
+				{
+					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+					{
+						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
+						updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+						co_return;
+					}
+				}
+			}
+		}
 
 		//탐사할 타일 추가 (장비, 주변타일 9칸)
 		{

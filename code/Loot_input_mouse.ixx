@@ -46,7 +46,7 @@ void Loot::clickUpGUI()
 			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 			{
-				if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
+				if (equipPtr->itemInfo[i].pocketPtr !=nullptr)
 				{
 					numberOfBag++;
 				}

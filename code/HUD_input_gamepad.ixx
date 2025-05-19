@@ -83,7 +83,6 @@ void HUD::gamepadBtnUp()
 		}
 		break;
 	case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-		new Aim();
 		break;
 	case SDL_CONTROLLER_BUTTON_START:
 		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);

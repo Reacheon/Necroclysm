@@ -56,6 +56,9 @@ export void startArea()
 		}
 	);
 
+	createItemStack({ 2, 8, 0 }, { {408,1} });//화살통
+	createItemStack({ 2, 9, 0 }, { {409,1} });//볼트통
+
 	//활과 석궁
 	createItemStack({ 3, 8, 0 }, { {383,1} });
 	createItemStack({ 4, 8, 0 }, { {385,30} });
@@ -95,22 +98,22 @@ export void startArea()
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			setFloor({ dx,dy,0 }, itemVIPCode::dirt);
+			setFloor({ dx,dy,0 }, itemRefCode::dirt);
 		}
 	}
 	for (int dx = -30; dx <= 30; dx++)
 	{
 		for (int dy = -30; dy <= -2; dy++)
 		{
-			setFloor({ dx,dy,0 }, itemVIPCode::grass);
+			setFloor({ dx,dy,0 }, itemRefCode::grass);
 		}
 	}
 	for (int dx = -6; dx >= -14; dx--)
 	{
 		for (int dy = -30; dy <= 30; dy++)
 		{
-			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemVIPCode::yellowAsphalt); //노랑아스팔트
-			else setFloor({ dx,dy,0 }, itemVIPCode::blackAsphalt); //검정아스팔트
+			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemRefCode::yellowAsphalt); //노랑아스팔트
+			else setFloor({ dx,dy,0 }, itemRefCode::blackAsphalt); //검정아스팔트
 		}
 	}
 
@@ -194,20 +197,20 @@ export void startArea()
 
 	//철조망 아래 선로
 
-	createProp({ -2, 15, 0 }, itemVIPCode::railBR);
-	for (int i = 0; i < 11; i++)  createProp({ -1 + i, 15, 0 }, itemVIPCode::railRL);
-	createProp({ 10, 15, 0 }, itemVIPCode::railSwitchWS);
-	for (int i = 0; i < 7; i++)  createProp({ 10, 16 + i, 0 }, itemVIPCode::railTB);
-	createProp({ 10, 23, 0 }, itemVIPCode::railTL);
-	for (int i = 0; i < 6; i++)  createProp({ 9 - i, 23, 0 }, itemVIPCode::railRL);
-	createProp({ 3, 23, 0 }, itemVIPCode::railTR);
-	for (int i = 0; i < 3; i++) createProp({ 3, 22 - i, 0 }, itemVIPCode::railTB);
-	createProp({ 3, 19, 0 }, itemVIPCode::railBL);
-	for (int i = 0; i < 4; i++) createProp({ 2 - i, 19, 0 }, itemVIPCode::railRL);
-	createProp({ -2, 19, 0 }, itemVIPCode::railTR);
-	for (int i = 0; i < 3; i++) createProp({ -2, 18 - i, 0 }, itemVIPCode::railTB);
+	createProp({ -2, 15, 0 }, itemRefCode::railBR);
+	for (int i = 0; i < 11; i++)  createProp({ -1 + i, 15, 0 }, itemRefCode::railRL);
+	createProp({ 10, 15, 0 }, itemRefCode::railSwitchWS);
+	for (int i = 0; i < 7; i++)  createProp({ 10, 16 + i, 0 }, itemRefCode::railTB);
+	createProp({ 10, 23, 0 }, itemRefCode::railTL);
+	for (int i = 0; i < 6; i++)  createProp({ 9 - i, 23, 0 }, itemRefCode::railRL);
+	createProp({ 3, 23, 0 }, itemRefCode::railTR);
+	for (int i = 0; i < 3; i++) createProp({ 3, 22 - i, 0 }, itemRefCode::railTB);
+	createProp({ 3, 19, 0 }, itemRefCode::railBL);
+	for (int i = 0; i < 4; i++) createProp({ 2 - i, 19, 0 }, itemRefCode::railRL);
+	createProp({ -2, 19, 0 }, itemRefCode::railTR);
+	for (int i = 0; i < 3; i++) createProp({ -2, 18 - i, 0 }, itemRefCode::railTB);
 
-	for (int i = 0; i < 5; i++)  createProp({ 11 + i, 15, 0 }, itemVIPCode::railRL);
+	for (int i = 0; i < 5; i++)  createProp({ 11 + i, 15, 0 }, itemRefCode::railRL);
 
 	//지하
 	{
@@ -286,17 +289,17 @@ export void startArea()
 
 			//for (int i = 0; i <= 78; i++)
 			//{
-			//	createProp(6, 39 - i, -1, itemVIPCode::wideRailVLeft);
-			//	createProp(7, 39 - i, -1, itemVIPCode::wideRailVMid);
-			//	createProp(8, 39 - i, -1, itemVIPCode::wideRailVRight);
+			//	createProp(6, 39 - i, -1, itemRefCode::wideRailVLeft);
+			//	createProp(7, 39 - i, -1, itemRefCode::wideRailVMid);
+			//	createProp(8, 39 - i, -1, itemRefCode::wideRailVRight);
 			//	cursorY--;
 			//}
 
 			for (int i = 0; i <= 78; i++)
 			{
-				createProp({ 6, 39 - i, -1 }, itemVIPCode::wideRailVLeft);
-				createProp({ 7, 39 - i, -1 }, itemVIPCode::wideRailVMid);
-				createProp({ 8, 39 - i, -1 }, itemVIPCode::wideRailVRight);
+				createProp({ 6, 39 - i, -1 }, itemRefCode::wideRailVLeft);
+				createProp({ 7, 39 - i, -1 }, itemRefCode::wideRailVMid);
+				createProp({ 8, 39 - i, -1 }, itemRefCode::wideRailVRight);
 				cursorY--;
 			}
 
@@ -874,7 +877,7 @@ export void startArea()
 	//광차
 	Vehicle* minecart1 = new Vehicle(3, 15, 0, 405);
 	minecart1->vehType = vehFlag::minecart;
-	minecart1->addPart(3, 15, { itemVIPCode::minecartController });
+	minecart1->addPart(3, 15, { itemRefCode::minecartController });
 	minecart1->bodyDir = dir16::dir0;
 	minecart1->isPowerCart = true;
 

@@ -694,7 +694,7 @@ public:
 								typeHUD = vehFlag::none;;
 							}
 						}
-						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemVIPCode::minecartController) //열차 조종장치
+						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemRefCode::minecartController) //열차 조종장치
 						{
 							if (ctrlVeh == nullptr)
 							{
@@ -771,7 +771,7 @@ public:
 					auto ePtr = PlayerPtr->getEquipPtr();
 					for (int i = 0; i < ePtr->itemInfo.size(); i++)
 					{
-						if (ePtr->itemInfo[i].itemCode == itemVIPCode::pickaxe)
+						if (ePtr->itemInfo[i].itemCode == itemRefCode::pickaxe)
 						{
 							if (ePtr->itemInfo[i].equipState == equipHandFlag::both)
 							{
@@ -1056,10 +1056,10 @@ public:
 			}
 		}
 
-		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::shallowFreshWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::deepFreshWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::shallowSeaWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemVIPCode::deepSeaWater)
+		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::shallowFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::deepFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::deepSeaWater)
 		{
 			for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
 			{

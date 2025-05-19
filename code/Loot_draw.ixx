@@ -35,7 +35,26 @@ void Loot::drawGUI()
 		}
 	}
 
-	drawWindow(&lootBase, sysStr[10], 1);
+	std::wstring windowTitle = sysStr[10];
+
+	if (hasSelect == true) 
+	{
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		std::vector<int> pocketList;
+		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
+		{
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr) pocketList.push_back(i);
+		}
+		int numberOfBag = pocketList.size();
+
+		if (numberOfBag > 0 && pocketCursor >= 0 && pocketCursor < numberOfBag)
+		{
+			std::wstring pocketName = equipPtr->itemInfo[pocketList[pocketCursor]].name;
+			windowTitle = sysStr[10] + L" ▶ " + pocketName;
+		}
+	}
+	drawWindow(&lootBase, windowTitle, 1);
+
 
 	//포켓
 	if (hasSelect == false)
@@ -138,7 +157,7 @@ void Loot::drawGUI()
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (equipPtr->itemInfo[i].pocketMaxVolume > 0)
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
 				pocketList.push_back(i);
 				numberOfBag++;
@@ -148,8 +167,8 @@ void Loot::drawGUI()
 		if (numberOfBag == 0)
 		{
 			//가방을 가지고 있지 않다.
-			setFontSize(16);
-			drawTextCenter(col2Str(col::white)+sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 35);
+			setFontSize(12);
+			drawTextCenter(col2Str(col::lightGray)+sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 15);
 		}
 		else
 		{
@@ -231,10 +250,10 @@ void Loot::drawGUI()
 				int maxVolume = equipPtr->itemInfo[pocketList[pocketCursor]].pocketMaxVolume;
 
 				int currentVolume = 0;
-				for (int i = 0; i < equipPtr->itemInfo.size(); i++) currentVolume += (equipPtr->itemInfo[i].volume) * (equipPtr->itemInfo[i].number);
+				//for (int i = 0; i < equipPtr->itemInfo.size(); i++) currentVolume += (equipPtr->itemInfo[i].volume) * (equipPtr->itemInfo[i].number);
 
 				volumeGauge.w = (volumeBar.w - 2) * ((float)currentVolume / (float)maxVolume);
-				drawFillRect(volumeGauge, lowCol::green);
+				//drawFillRect(volumeGauge, lowCol::green);
 
 				std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
 				setFontSize(10);

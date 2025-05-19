@@ -1190,7 +1190,7 @@ export enum class vehFlag
 };
 
 
-export namespace itemVIPCode
+export namespace itemRefCode
 {
     int dirt = 109;
     int grass = 220;
@@ -1238,6 +1238,9 @@ export namespace itemVIPCode
 
     int minecart = 405;
     int minecartController = 406;
+
+    int arrowQuiver = 408;
+    int boltQuiver = 409;
 };
 
 export enum class skillSrc

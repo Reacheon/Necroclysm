@@ -411,6 +411,18 @@ int ItemPocket::getPocketWeight()
     return totalWeight;
 }
 
+int ItemPocket::getPocketNumber()
+{
+	int totalNumber = 0;
+	for (int i = 0; i < itemInfo.size(); i++)
+	{
+		totalNumber += itemInfo[i].number;
+	}
+    return totalNumber;
+}
+
+
+
 //@brief 현재 이 총에 장전된 모든 총알을 벡터 형태로 반환
 ItemPocket* getBulletPocket(ItemData& inputGun)
 {

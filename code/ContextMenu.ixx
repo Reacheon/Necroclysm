@@ -478,7 +478,7 @@ public:
 			if (targetBottle != nullptr)
 			{
 				targetBottle->itemInfo.clear();
-				targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemVIPCode::blackAsphalt], maxVolume)));
+				targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemRefCode::blackAsphalt], maxVolume)));
 				
 			}
 		}

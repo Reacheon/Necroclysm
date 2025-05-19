@@ -161,6 +161,8 @@ export struct ItemData : public ItemData_Base
     ItemData& operator=(ItemData&&) noexcept = default;
     ItemData(const ItemData&) = delete;
     ItemData& operator=(const ItemData&) = delete;
+
+    bool isPocketOnlyItem(int inputCode);
 };
 
 export ItemData cloneFromItemDex(ItemData& inputData, int transferNumber);

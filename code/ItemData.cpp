@@ -73,9 +73,14 @@ ItemData cloneFromItemDex(ItemData& inputData, int transferNumber)
     return newItem;
 }
 
-//ItemData ItemData::createItemFromDex(int index)
-//{
-//}
+bool ItemData::isPocketOnlyItem(int inputCode)
+{
+    for (int i = 0; i < pocketOnlyItem.size(); i++)
+    {
+        if (pocketOnlyItem[i] == inputCode) return true;
+    }
+    return false;
+}
 
 
 bool ItemData::itemOverlay(const ItemData& tgtItem) const
