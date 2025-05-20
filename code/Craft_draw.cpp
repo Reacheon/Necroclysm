@@ -495,7 +495,6 @@ void Craft::drawGUI()
 
 
 					setFontSize(10);
-					setSolidText();
 
 					if (queryTextWidth(iPtr->name) > 63)
 					{
@@ -514,9 +513,6 @@ void Craft::drawGUI()
 						drawTextCenter(col2Str(col::white) + iPtr->name, pivotX + 28, pivotY + 47);
 
 					}
-
-					disableSolidText();
-
 
 
 					if (craftCursor == i + 6 * craftScroll)

@@ -431,7 +431,7 @@ public:
 				if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
 
 				for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
-				return;
+				
 			}
 			//공간이 부족하지만 약간은 남았을 때 ------------------------------
 			else
@@ -460,16 +460,16 @@ public:
 
 					if (moved)updateLog(col2Str(col::white) + L"한계치까지 아이템을 포켓에 집어 넣었다.");
 					if (hasIllegal)updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
-					return;
 				}
 				//완전히 가득 찬 경우 ----------------------------------------
 				else
 				{
 					updateLog(col2Str(col::white) + L"가방이 가득 차서 더 이상 넣을 수 없다.");
 					if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
-					return;
 				}
 			}
+			updateQuiverSpr(PlayerPtr->getEquipPtr());
+
 		}
 	}
 

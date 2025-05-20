@@ -232,7 +232,6 @@ public:
 						drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
 						drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 						setFontSize(10);
-						setSolidText();
 						std::wstring titleName = vehPtr->name;
 						drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
 						if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -299,7 +298,6 @@ public:
 
 
 						}
-						disableSolidText();
 					}
 				}
 			}

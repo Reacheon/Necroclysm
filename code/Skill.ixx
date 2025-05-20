@@ -116,7 +116,6 @@ public:
 
 		if (getFoldRatio() == 1.0)
 		{
-			setSolidText();
 			drawWindow(&skillBase, sysStr[197], 5);
 
 
@@ -202,7 +201,6 @@ public:
 					skillName = tgtData.name;
 					setZoom(1.0);
 
-					disableSolidText();
 					setFontSize(12);
 
 					drawText(L"#FFFFFF" + skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
@@ -215,11 +213,8 @@ public:
 					
 					setFontSize(12);
 					drawText(L"#FFFFFF" + lvStr, skillBtn[i].x + 43 + textWidth + 12, skillBtn[i].y + 5);
-					setSolidText();
 
-					disableSolidText();
 					drawText(col2Str(lowCol::green) + tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3);
-					setSolidText();
 
 
 
@@ -250,7 +245,6 @@ public:
 				setZoom(1.0);
 			}
 
-			disableSolidText();
 		}
 		else
 		{

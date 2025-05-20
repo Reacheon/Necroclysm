@@ -9,6 +9,7 @@ import Entity;
 import Monster;
 import Prop;
 import ItemStack;
+import ItemPocket;
 
 export inline int PlayerX() { return PlayerPtr->getGridX(); }
 export inline int PlayerY() { return PlayerPtr->getGridY(); }
@@ -109,10 +110,21 @@ export inline bool isRayBlocker(Point3 coord)
     else return false;
 };
 
+export int updateQuiverSpr(ItemData& inputData)
+{
+    if (inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver)
+    {
+        std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
+        int num = inputData.pocketPtr.get()->getPocketNumber();
+        if (num == 0) inputData.sprIndex = itemDex[inputData.itemCode].sprIndex;
+        else if (num == 1) inputData.sprIndex = itemDex[inputData.itemCode].sprIndex + 1;
+        else inputData.sprIndex = itemDex[inputData.itemCode].sprIndex + 2;
 
+        return num;
+    }
+}
 
-
-
-
-
-
+export void updateQuiverSpr(ItemPocket* inputPocket)
+{
+    for (int i = 0; i < inputPocket->itemInfo.size(); i++) updateQuiverSpr(inputPocket->itemInfo[i]);
+}

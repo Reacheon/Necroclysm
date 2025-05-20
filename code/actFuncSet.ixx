@@ -138,6 +138,8 @@ export namespace actFunc
 				}
 			}
 		}
+		updateQuiverSpr(PlayerPtr->getEquipPtr());
+
 	}
 
 	export Corouter reloadOther(actEnv envType, ItemPocket* reloadItemPocket, int reloadItemCursor)//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
@@ -222,6 +224,8 @@ export namespace actFunc
 				}
 			}
 		}
+
+		updateQuiverSpr(PlayerPtr->getEquipPtr());
 	}
 
 
@@ -232,6 +236,7 @@ export namespace actFunc
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 		for (int i = 0; i < targetPocket->itemInfo.size(); i++) { targetPocket->transferItem(drop.get(), i, targetPocket->itemInfo[i].number); }
 		PlayerPtr->drop(drop.get());
+		updateQuiverSpr(PlayerPtr->getEquipPtr());
 	}
 
 	export void closeDoor(int tgtX, int tgtY, int tgtZ)

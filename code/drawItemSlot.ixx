@@ -135,7 +135,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
 	//아이템 아이콘 그리기
-	setZoom(2.5);
+	setZoom(2.0);
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER))
 	{
 		SDL_SetTextureBlendMode(spr::itemset->getTexture(), SDL_BLENDMODE_BLEND);
@@ -289,8 +289,6 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(8);
-		setSolidText();
-
 
 		if (inputItem.weight > 1000)
 		{
@@ -314,8 +312,6 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 			drawText(volStr + L" mL", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
 		}
 		
-		disableSolidText();
-
 	}
 
 	if (whiteCursor == true)

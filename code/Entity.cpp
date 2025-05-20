@@ -1038,7 +1038,6 @@ void Entity::drawSelf()
 			int pivotX = drawingX - (int)(8 * zoomScale);
 			int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
 
-			setSolidText();
 			if (zoomScale == 1.0) setFontSize(8);
 			else if (zoomScale == 2.0) setFontSize(10);
 			else if (zoomScale == 3.0) setFontSize(11);
@@ -1058,7 +1057,6 @@ void Entity::drawSelf()
 			drawTextCenter(col2Str(col::black) + entityInfo.name, textX, textY - 1);
 
 			drawTextCenter(col2Str(col::white) + entityInfo.name, textX, textY);
-			disableSolidText();
 		}
 	}
 

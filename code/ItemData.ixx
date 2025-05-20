@@ -154,7 +154,6 @@ export struct ItemData : public ItemData_Base
 
     bool itemOverlay(const ItemData& tgtItem) const;
 
-
     ItemData();
     virtual ~ItemData();
     ItemData(ItemData&&) noexcept;

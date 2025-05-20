@@ -570,8 +570,6 @@ void HUD::drawQuickSlot()
 
 	//drawRect({ pivotX,pivotY,180,358, }, lowCol::skyBlue);
 
-	setSolidText();
-
 
 	//개별 스킬창 그리기 1번부터 8번까지
 	for (int i = 0; i < 8; i++)
@@ -644,8 +642,6 @@ void HUD::drawQuickSlot()
 			setZoom(1.0);
 		}
 	}
-
-	disableSolidText();
 }
 
 void HUD::drawBarAct()
@@ -1041,7 +1037,6 @@ void HUD::drawHoverItemInfo()
 				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
-				setSolidText();
 				std::wstring titleName = vehPtr->name;
 				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
 				if(vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -1077,7 +1072,6 @@ void HUD::drawHoverItemInfo()
 					drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
 					drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
 				}
-				disableSolidText();
 			}
 			else if (stackPtr != nullptr && false)
 			{
@@ -1087,7 +1081,6 @@ void HUD::drawHoverItemInfo()
 				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
-				setSolidText();
 				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
 				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
 				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].sprIndex, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
@@ -1120,7 +1113,6 @@ void HUD::drawHoverItemInfo()
 					//drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
 					//drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
 				}
-				disableSolidText();
 			}
 
 		}

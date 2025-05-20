@@ -147,6 +147,43 @@ void HUD::clickUpGUI()
 							}
 						}
 					}
+					else if (equipInfo[i].checkFlag(itemFlag::GUN))
+					{
+						if (equipInfo[i].pocketOnlyItem.empty())
+						{
+							updateLog(col2Str(col::white) + L"이 총은 탄 정보를 찾을 수 없습니다.");
+							break;
+						}
+
+						unsigned short onlyCode = equipInfo[i].pocketOnlyItem[0];
+						/* ① 리볼버·산탄총처럼 ‘직장전식’  ------------------------------------ */
+						if (itemDex[onlyCode].checkFlag(itemFlag::AMMO))
+						{
+							if (getBulletNumber(equipInfo[i]) > 0) new Aim();
+							else updateLog(col2Str(col::white) + L"현재 장전된 탄이 없습니다.");
+
+						}
+						/* ② 탄창식( MAGAZINE )  ------------------------------------------------ */
+						else if (itemDex[onlyCode].checkFlag(itemFlag::MAGAZINE))
+						{
+							ItemPocket* gunPocket = equipInfo[i].pocketPtr.get();
+
+							if (gunPocket && !gunPocket->itemInfo.empty())
+							{
+								ItemData& magazine = gunPocket->itemInfo[0];
+
+								if (getBulletNumber(magazine) > 0)
+								{
+									new Aim();
+								}
+								else updateLog(col2Str(col::white) + L"탄창에 탄이 없습니다.");
+							}
+							else updateLog(col2Str(col::white) + L"총에 탄창이 장착돼 있지 않습니다.");
+						}
+						/* ③ 그밖의 예외적인 경우(확장성을 위해) ------------------------------- */
+                        else errorBox(L"이 총은 탄 정보를 찾을 수 없습니다.");
+						break;
+					}
 				}
 			}
 			

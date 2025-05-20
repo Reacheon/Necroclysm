@@ -145,7 +145,6 @@ public:
 	}
 	void drawGUI()
 	{
-		setSolidText();
 		if (getStateDraw() == false) { return; }
 
 		const Uint8* state = SDL_GetKeyboardState(NULL);
@@ -302,7 +301,6 @@ public:
 			drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
 		}
 
-		disableSolidText();
 	}
 	void clickUpGUI()
 	{

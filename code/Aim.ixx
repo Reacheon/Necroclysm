@@ -193,7 +193,6 @@ public:
 			accStr += L"%";
 			//if(aimStack>0) accStr += L" (" + std::to_wstring(aimStack) + L")";
 
-			setSolidText();
 			if (zoomScale == 1.0)
 			{
 				setFontSize(10);
@@ -664,6 +663,7 @@ public:
 				PlayerPtr->initAimStack();
 				aimAcc = 0.6;
 				PlayerPtr->setNextAtkType(targetAtkType);
+				updateQuiverSpr(PlayerPtr->getEquipPtr());
 			}
 			else//근접공격
 			{
