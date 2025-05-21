@@ -46,8 +46,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	std::wstring mainName = L"";
 
-	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
-	if (inputItem.equipState == equipHandFlag::none && inputItem.number > 1) { mainName += std::to_wstring(inputItem.number) + L" "; }
+
 
 	//아이템 이름
 	mainName += inputItem.name;
@@ -147,6 +146,16 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		drawSpriteCenter(spr::itemset, inputItem.sprIndex, itemBox.x + 15, itemBox.y + itemBox.h / 2);
 	}
+
+	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
+	if (inputItem.equipState == equipHandFlag::none && inputItem.number > 1)
+	{
+		setFontSize(10);
+		std::wstring numberStr = L"x" + std::to_wstring(inputItem.number);
+		drawText(col2Str(col::white) + numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
+		//mainName += std::to_wstring(inputItem.number) + L" "; 
+	}
+
 	setZoom(1.0);
 }
 

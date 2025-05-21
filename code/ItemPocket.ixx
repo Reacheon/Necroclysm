@@ -37,6 +37,8 @@ public:
 	int addItemFromDex(int index, int number);
 	int addItemFromDex(int index);
 
+	void addItemFromDex(std::vector<std::array<int, 2>> inputVec);
+
 	void addRecipe(int inputItemCode);
 
 	void swap(int index1, int index2);

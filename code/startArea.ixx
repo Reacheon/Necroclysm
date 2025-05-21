@@ -8,6 +8,7 @@ import wrapVar;
 import HUD;
 import Player;
 import ItemData;
+import ItemPocket;
 import ItemStack;
 import World;
 import Vehicle;
@@ -133,6 +134,10 @@ export void startArea()
 
 
 	createProp({ 10, -8, 0 }, 96);//냉장고 설치
+	ItemPocket* refri = TileProp(10, -8, 0)->leadItem.pocketPtr.get();
+	refri->addItemFromDex({ { 4, 1 },{ 12, 1 },{ 410, 1 },{ 414, 1 },{ 415, 1 },{ 417, 1 } });
+	createProp({ 9, -8, 0 }, 427);//탄통 설치
+	TileProp(9, -8, 0)->leadItem.pocketPtr->addItemFromDex({ { 5,99},{ 15,99},{ 16,99},{ 17,99} ,{ 411,99},{ 412,99},{ 413,99},{ 416,99} ,{ 418,99 },{ 419,99 },{ 420,99 },{ 421,99 },{ 422,99 },{ 423,99 },{ 424,30 },{ 425,30 },{ 426,30 } });
 
 	//나무벽 설치
 	//집 하단 5타일
@@ -718,12 +723,6 @@ export void startArea()
 
 	//종교
 
-	createProp({pX - 3, pY - 7, 0 }, 213);
-	createProp({pX - 1, pY - 7, 0 }, 214);
-	createProp({pX + 1, pY - 7, 0 }, 216);
-	createProp({pX + 3, pY - 7, 0 }, 217);
-	createProp({pX + 5, pY - 7, 0 }, 218);
-	createProp({pX + 7, pY - 7, 0 }, 219);
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 

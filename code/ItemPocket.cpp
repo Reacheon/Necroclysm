@@ -146,10 +146,18 @@ int ItemPocket::addItemFromDex(int index, int number)
 
 int ItemPocket::addItemFromDex(int index) { return addItemFromDex(index, 1); }
 
+void ItemPocket::addItemFromDex(std::vector<std::array<int, 2>> inputVec)
+{
+	for (int i = 0; i < inputVec.size(); i++)
+	{
+		addItemFromDex(inputVec[i][0], inputVec[i][1]);
+	}
+}
+
+
 void ItemPocket::addRecipe(int inputItemCode)
 {
 	errorBox(getType() != storageType::recipe, L"The addRecipe function was executed while the storageType was not set to 'recipe'(ItemPocket.ixx).");
-
 	if (itemDex[inputItemCode].checkFlag(itemFlag::NOT_RECIPE)) return; //NOT_RECIPE 플래그가 있을 경우 레시피목록에 추가하지 않음
 
 	if (itemInfo.size() == 0) { addItemFromDex(inputItemCode, 1); }
