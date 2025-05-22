@@ -14,7 +14,7 @@ export Point2 getMouseXY()
 {
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	return {x, y };
+	return { x, y };
 }
 
 export Point2 getTouchXY()
