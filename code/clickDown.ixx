@@ -18,7 +18,7 @@ export void clickDown()
 	switch (option::inputMethod)
 	{
 		case input::mouse:
-			clickDownPoint = { event.motion.x, event.motion.y };
+			clickDownPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
 			break;
 		case input::touch:
 			clickDownPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };

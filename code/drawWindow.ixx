@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module drawWindow;
 
@@ -15,154 +15,185 @@ static unsigned __int8 windowAlpha = 180;
 export void setWindowAlpha(int val) { windowAlpha = val; }
 export void resetWindowAlpha() { windowAlpha = 180; }
 
-//입력한 해당 위치에 윈도우를 그린다. 만약 뒤에 인자가 더 올 경우 타이틀도 그린다
+static inline SDL_FRect makeFRect(int x, int y, int w, int h)
+{
+    return { static_cast<float>(x),
+             static_cast<float>(y),
+             static_cast<float>(w),
+             static_cast<float>(h) };
+}
+
+static inline void renderFillRect(int x, int y, int w, int h)
+{
+    SDL_FRect r = makeFRect(x, y, w, h);
+    SDL_RenderFillRect(renderer, &r);
+}
+
+static inline void renderRect(int x, int y, int w, int h)
+{
+    SDL_FRect r = makeFRect(x, y, w, h);
+    SDL_RenderRect(renderer, &r);
+}
+
+//─────────────────────────────────────────────────────────────
+//  기본 창
+//─────────────────────────────────────────────────────────────
 export void drawWindow(int x, int y, int w, int h)
 {
-	//윈도우 박스 그리기
-	SDL_Rect windowRect = { x,y,w,h };
-	//기본 사각형 
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
-	SDL_RenderFillRect(renderer, &windowRect);
-	//회색 테두리
-	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
-	SDL_RenderDrawRect(renderer, &windowRect);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
+    renderFillRect(x, y, w, h);
+
+    SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
+    renderRect(x, y, w, h);
 }
 
-export void drawWindow(const SDL_Rect* rect)
+export void drawWindow(const SDL_Rect* r)
 {
-	drawWindow(rect->x, rect->y, rect->w, rect->h);
+    drawWindow(r->x, r->y, r->w, r->h);
 }
 
-export void drawWindow(int x, int y, int w, int h, std::wstring titleName, int titleSprIndex)
+//─────────────────────────────────────────────────────────────
+//  제목이 있는 창 (아이콘 없음/아이템셋 아님)
+//─────────────────────────────────────────────────────────────
+export void drawWindow(int x, int y, int w, int h, std::wstring title, int titleSprIndex)
 {
-	drawWindow(x,y,w,h);
+    drawWindow(x, y, w, h);
 
-	//제목 부분
-	SDL_Rect windowRect = { x,y,w,h };
-	SDL_Rect titleRect = { windowRect.x, windowRect.y, windowRect.w, 30 };
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
-	SDL_RenderFillRect(renderer, &titleRect);
-	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
-	SDL_RenderDrawRect(renderer, &titleRect);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
+    renderFillRect(x, y, w, 30);
 
-	setFontSize(16);
-	drawTextCenter(col2Str(col::white)+titleName, x + w/2, y + 16);
-	setZoom(1.5);
-	drawSpriteCenter(spr::icon16, titleSprIndex, x + w/2 - queryTextWidth(titleName, true) / 2 - 20, y + 14);
-	setZoom(1.0);
+    SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
+    renderRect(x, y, w, 30);
+
+    setFontSize(16);
+    drawTextCenter(col2Str(col::white) + title, x + w / 2, y + 16);
+
+    setZoom(1.5f);
+    drawSpriteCenter(spr::icon16, titleSprIndex,
+        x + w / 2 - queryTextWidth(title, true) / 2 - 20,
+        y + 14);
+    setZoom(1.0f);
 }
 
-export void drawWindow(const SDL_Rect* rect, std::wstring titleName, int titleSprIndex)
+export void drawWindow(const SDL_Rect* r, std::wstring title, int sprIndex)
 {
-	drawWindow(rect->x, rect->y, rect->w, rect->h,titleName, titleSprIndex);
+    drawWindow(r->x, r->y, r->w, r->h, std::move(title), sprIndex);
 }
 
-export void drawWindowItemset(int x, int y, int w, int h, std::wstring titleName, int titleSprIndex)
+//─────────────────────────────────────────────────────────────
+//  아이템셋 창
+//─────────────────────────────────────────────────────────────
+export void drawWindowItemset(int x, int y, int w, int h,
+    std::wstring title, int titleSprIndex)
 {
-	drawWindow(x, y, w, h);
+    drawWindow(x, y, w, h);
 
-	//제목 부분
-	SDL_Rect windowRect = { x,y,w,h };
-	SDL_Rect titleRect = { windowRect.x, windowRect.y, windowRect.w, 30 };
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
-	SDL_RenderFillRect(renderer, &titleRect);
-	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
-	SDL_RenderDrawRect(renderer, &titleRect);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
+    renderFillRect(x, y, w, 30);
 
-	setFontSize(14);
-	drawTextCenter(col2Str(col::white) + titleName, x + w / 2, y + 14);
-	setZoom(1.5);
-	drawSpriteCenter(spr::itemset, titleSprIndex, x + w / 2 - queryTextWidth(titleName, true) / 2 - 20, y + 14);
-	setZoom(1.0);
+    SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
+    renderRect(x, y, w, 30);
+
+    setFontSize(14);
+    drawTextCenter(col2Str(col::white) + title, x + w / 2, y + 14);
+
+    setZoom(1.5f);
+    drawSpriteCenter(spr::itemset, titleSprIndex,
+        x + w / 2 - queryTextWidth(title, true) / 2 - 20,
+        y + 14);
+    setZoom(1.0f);
 }
 
-export void drawWindowItemset(const SDL_Rect* rect, std::wstring titleName, int titleSprIndex)
+export void drawWindowItemset(const SDL_Rect* r, std::wstring title, int sprIndex)
 {
-	drawWindowItemset(rect->x, rect->y, rect->w, rect->h, titleName, titleSprIndex);
+    drawWindowItemset(r->x, r->y, r->w, r->h, std::move(title), sprIndex);
 }
 
-export void drawEdgeWindow(int x, int y, int w, int h, int edgeWidth, dir16 arrowDir)
+//─────────────────────────────────────────────────────────────
+//  화살표가 달린 모서리 창
+//─────────────────────────────────────────────────────────────
+static inline void renderLine(int x1, int y1, int x2, int y2)
 {
-	//윈도우 박스 그리기
-	SDL_Rect windowRect = { x,y,w,h };
-	//기본 사각형 
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
-	SDL_RenderFillRect(renderer, &windowRect);
-
-
-	int leftTopX = x;
-	int leftTopY = y;
-	int rightTopX = x + w - 1;
-	int rightTopY = y;
-	int leftBotX = x;
-	int leftBotY = y + h - 1;
-	int rightBotX = x + w - 1;
-	int rightBotY = y + h - 1;
-
-	//회색 테두리
-	SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
-	if(arrowDir != dir16::dir2) SDL_RenderDrawLine(renderer, leftTopX, leftTopY, rightTopX, rightTopY);
-	else
-	{
-		int topPivotX = x + w / 2;
-		int topPivotY = y;
-		SDL_RenderDrawLine(renderer, leftTopX, leftTopY, topPivotX - 10, topPivotY);
-		SDL_RenderDrawLine(renderer, rightTopX, rightTopY, topPivotX + 10, topPivotY);
-		drawSprite(spr::windowArrow2, 1, topPivotX - 11, topPivotY - 10);
-	}
-	if (arrowDir != dir16::dir4) SDL_RenderDrawLine(renderer, leftTopX, leftTopY, leftBotX, leftBotY);
-	else
-	{
-		int leftPivotX = x;
-		int leftPivotY = y + h / 2;
-		SDL_RenderDrawLine(renderer, leftTopX, leftTopY, leftPivotX, leftPivotY - 10);
-		SDL_RenderDrawLine(renderer, leftBotX, leftBotY, leftPivotX, leftPivotY + 10);
-		drawSprite(spr::windowArrow2, 2, leftPivotX - 11, leftPivotY - 11);
-
-	}
-	if (arrowDir != dir16::dir0) SDL_RenderDrawLine(renderer, rightBotX, rightBotY, rightTopX, rightTopY);
-	else
-	{
-		int rightPivotX = x + w - 1;
-		int rightPivotY = y + h / 2;
-		SDL_RenderDrawLine(renderer, rightTopX, rightTopY, rightPivotX, rightPivotY - 10);
-		SDL_RenderDrawLine(renderer, rightBotX, rightBotY, rightPivotX, rightPivotY + 10);
-		drawSprite(spr::windowArrow2, 0, rightPivotX + 1, rightPivotY - 11);
-	}
-	if (arrowDir != dir16::dir6) SDL_RenderDrawLine(renderer, rightBotX, rightBotY, leftBotX, leftBotY);
-	else
-	{
-		int botPivotX = x + w / 2;
-		int botPivotY = y + h - 1;
-		SDL_RenderDrawLine(renderer, leftBotX, leftBotY, botPivotX - 10, botPivotY);
-		SDL_RenderDrawLine(renderer, rightBotX, rightBotY, botPivotX + 10, botPivotY);
-		drawSprite(spr::windowArrow2, 3, botPivotX - 11, botPivotY + 1);
-	}
-
-
-	SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 255);
-	SDL_RenderDrawLine(renderer, leftTopX, leftTopY, leftTopX + (edgeWidth-1), leftTopY);
-	SDL_RenderDrawLine(renderer, leftTopX, leftTopY + 1, leftTopX + (edgeWidth - 1), leftTopY + 1);
-	SDL_RenderDrawLine(renderer, leftTopX, leftTopY, leftTopX, leftTopY + (edgeWidth - 1));
-	SDL_RenderDrawLine(renderer, leftTopX + 1, leftTopY, leftTopX + 1, leftTopY + (edgeWidth - 1));
-
-	SDL_RenderDrawLine(renderer, rightTopX, rightTopY, rightTopX - (edgeWidth - 1), rightTopY);
-	SDL_RenderDrawLine(renderer, rightTopX, rightTopY + 1, rightTopX - (edgeWidth - 1), rightTopY + 1);
-	SDL_RenderDrawLine(renderer, rightTopX, rightTopY, rightTopX, rightTopY + (edgeWidth - 1));
-	SDL_RenderDrawLine(renderer, rightTopX-1, rightTopY, rightTopX-1, rightTopY + (edgeWidth - 1));
-
-	SDL_RenderDrawLine(renderer, leftBotX, leftBotY, leftBotX + (edgeWidth - 1), leftBotY);
-	SDL_RenderDrawLine(renderer, leftBotX, leftBotY - 1, leftBotX + (edgeWidth - 1), leftBotY - 1);
-	SDL_RenderDrawLine(renderer, leftBotX, leftBotY, leftBotX, leftBotY - (edgeWidth - 1));
-	SDL_RenderDrawLine(renderer, leftBotX + 1, leftBotY, leftBotX + 1, leftBotY - (edgeWidth - 1));
-
-	SDL_RenderDrawLine(renderer, rightBotX, rightBotY, rightBotX - (edgeWidth - 1), rightBotY);
-	SDL_RenderDrawLine(renderer, rightBotX, rightBotY - 1, rightBotX - (edgeWidth - 1), rightBotY - 1);
-	SDL_RenderDrawLine(renderer, rightBotX, rightBotY, rightBotX, rightBotY - (edgeWidth - 1));
-	SDL_RenderDrawLine(renderer, rightBotX - 1, rightBotY, rightBotX - 1, rightBotY - (edgeWidth - 1));
+    SDL_RenderLine(renderer,
+        static_cast<float>(x1), static_cast<float>(y1),
+        static_cast<float>(x2), static_cast<float>(y2));
 }
 
-export void drawEdgeWindow(int x, int y, int w, int h, int edgeWidth)
+export void drawEdgeWindow(int x, int y, int w, int h,
+    int edgeWidth,
+    dir16 arrowDir)
 {
-	drawEdgeWindow(x, y, w, h, edgeWidth, dir16::dir0_5);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
+    renderFillRect(x, y, w, h);
+
+    int l = x, t = y;
+    int r = x + w - 1, b = y + h - 1;
+    int cx = x + w / 2, cy = y + h / 2;
+
+    SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 255);
+
+    // 상단
+    if (arrowDir != dir16::dir2) renderLine(l, t, r, t);
+    else {
+        renderLine(l, t, cx - 10, t);
+        renderLine(r, t, cx + 10, t);
+        drawSprite(spr::windowArrow2, 1, cx - 11, t - 10);
+    }
+
+    // 좌측
+    if (arrowDir != dir16::dir4) renderLine(l, t, l, b);
+    else {
+        renderLine(l, t, l, cy - 10);
+        renderLine(l, b, l, cy + 10);
+        drawSprite(spr::windowArrow2, 2, l - 11, cy - 11);
+    }
+
+    // 우측
+    if (arrowDir != dir16::dir0) renderLine(r, b, r, t);
+    else {
+        renderLine(r, t, r, cy - 10);
+        renderLine(r, b, r, cy + 10);
+        drawSprite(spr::windowArrow2, 0, r + 1, cy - 11);
+    }
+
+    // 하단
+    if (arrowDir != dir16::dir6) renderLine(r, b, l, b);
+    else {
+        renderLine(l, b, cx - 10, b);
+        renderLine(r, b, cx + 10, b);
+        drawSprite(spr::windowArrow2, 3, cx - 11, b + 1);
+    }
+
+    SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 255);
+
+    // 네 귀퉁이 밝은 강조선
+    auto light = [&](int sx, int sy, int dx, int dy) {
+        renderLine(sx, sy, dx, dy);
+        };
+
+    light(l, t, l + edgeWidth - 1, t);
+    light(l, t + 1, l + edgeWidth - 1, t + 1);
+    light(l, t, l, t + edgeWidth - 1);
+    light(l + 1, t, l + 1, t + edgeWidth - 1);
+
+    light(r, t, r - edgeWidth + 1, t);
+    light(r, t + 1, r - edgeWidth + 1, t + 1);
+    light(r, t, r, t + edgeWidth - 1);
+    light(r - 1, t, r - 1, t + edgeWidth - 1);
+
+    light(l, b, l + edgeWidth - 1, b);
+    light(l, b - 1, l + edgeWidth - 1, b - 1);
+    light(l, b, l, b - edgeWidth + 1);
+    light(l + 1, b, l + 1, b - edgeWidth + 1);
+
+    light(r, b, r - edgeWidth + 1, b);
+    light(r, b - 1, r - edgeWidth + 1, b - 1);
+    light(r, b, r, b - edgeWidth + 1);
+    light(r - 1, b, r - 1, b - edgeWidth + 1);
+}
+
+export void drawEdgeWindow(int x, int y, int w, int h,
+    int edgeWidth)           // ← 5개
+{
+    drawEdgeWindow(x, y, w, h, edgeWidth, dir16::dir0_5);
 }

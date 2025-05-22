@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import std;
@@ -11,36 +11,36 @@ void Loot::gamepadBtnDown()
 { 
 	if (labelCursor != -1)//라벨 커서 조작 중
 	{
-		switch (event.cbutton.button)
+		switch (event.gbutton.button)
 		{
-		case SDL_CONTROLLER_BUTTON_DPAD_UP:
+		case SDL_GAMEPAD_BUTTON_DPAD_UP:
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+		case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 			lootCursor = 0;
 			labelCursor = -1;
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 			if (labelCursor != 0) labelCursor--;
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 			if (labelCursor < 2) labelCursor++;
 			break;
-		case SDL_CONTROLLER_BUTTON_B:
+		case SDL_GAMEPAD_BUTTON_EAST:
 			executeTab();
 			break;
-		case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
 			executePocketLeft();
 			break;
-		case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 			executePocketRight();
 			break;
 		}
 	}
 	else if (barActCursor == -1)//일반 루팅 아이템 상하 조작 중
 	{
-		switch (event.cbutton.button)
+		switch (event.gbutton.button)
 		{
-		case SDL_CONTROLLER_BUTTON_DPAD_UP:
+		case SDL_GAMEPAD_BUTTON_DPAD_UP:
 			if (lootCursor > 0)
 			{
 				if (lootCursor % LOOT_ITEM_MAX == 0)//스크롤 변경
@@ -56,7 +56,7 @@ void Loot::gamepadBtnDown()
 				labelCursor = 1;
 			}
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+		case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 			if (lootCursor < lootPocket->itemInfo.size() - 1)
 			{
 				if (lootCursor % LOOT_ITEM_MAX == 5 && lootCursor != lootPocket->itemInfo.size() - 1)
@@ -66,7 +66,7 @@ void Loot::gamepadBtnDown()
 				lootCursor++;
 			}
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		{
 			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
 			if (currentNumber > 0)
@@ -75,7 +75,7 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		{
 			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
 			if (currentNumber < lootPocket->itemInfo[lootCursor].number)
@@ -84,18 +84,18 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_B://취소
+		case SDL_GAMEPAD_BUTTON_EAST://취소
 		{
 			executeTab();
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_A://아이템 상세 행동
+		case SDL_GAMEPAD_BUTTON_SOUTH://아이템 상세 행동
 		{
 			updateBarAct();
 			barActCursor = 0;
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_X://아이템 선택
+		case SDL_GAMEPAD_BUTTON_WEST://아이템 선택
 		{
 			if (lootPocket->itemInfo[lootCursor].lootSelect == 0)
 			{
@@ -107,33 +107,33 @@ void Loot::gamepadBtnDown()
 			}
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_Y://아이템 줍기
+		case SDL_GAMEPAD_BUTTON_NORTH://아이템 줍기
 		{
 			executePickSelect();
 			break;
 		}
-		case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
 			executePocketLeft();
 			break;
-		case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 			executePocketRight();
 			break;
 		}
 	}
 	else //루팅 아이템 상세 바액트 조작
 	{
-		switch (event.cbutton.button)
+		switch (event.gbutton.button)
 		{
-		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 			if (barActCursor != 0) { barActCursor--; }
 			break;
-		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 			if (barActCursor != 6 && barActCursor < barAct.size() - 1)
 			{
 				barActCursor++;
 			}
 			break;
-		case SDL_CONTROLLER_BUTTON_A:
+		case SDL_GAMEPAD_BUTTON_SOUTH:
 			switch (barAct[barActCursor])
 			{
 			case act::pick://넣기
@@ -149,15 +149,15 @@ void Loot::gamepadBtnDown()
 				CORO(executeInsert());
 			}
 			break;
-		case SDL_CONTROLLER_BUTTON_B:
+		case SDL_GAMEPAD_BUTTON_EAST:
 		{
 			barActCursor = -1;
 			barAct = actSet::null;
 		}
-		case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
 			executePocketLeft();
 			break;
-		case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+		case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 			executePocketRight();
 			break;
 		}
@@ -172,9 +172,9 @@ void Loot::gamepadBtnUp()
 	//키다운에서 처리하면 exText에 열 때 사용된 문자가 들어가는 버그 발생해서 키업에 넣음
 	if (labelCursor != -1)//라벨 커서 조작 중
 	{
-		switch (event.cbutton.button)
+		switch (event.gbutton.button)
 		{
-		case SDL_CONTROLLER_BUTTON_A://확인
+		case SDL_GAMEPAD_BUTTON_SOUTH://확인
 		{
 			if (labelCursor == 0)
 			{

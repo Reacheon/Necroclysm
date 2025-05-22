@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -229,7 +229,7 @@ public:
 
 		if (option::inputMethod == input::gamepad)
 		{
-			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
 				prt(L"탭이 실행되었다.\n");
 				executeTab();

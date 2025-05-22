@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_image.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 export module Sprite;
 
@@ -18,6 +18,8 @@ public:
         texturePtr = IMG_LoadTexture(renderer, adr.c_str());
         w = inputW;
         h = inputH;
+        SDL_SetTextureScaleMode(texturePtr, SDL_SCALEMODE_NEAREST);
+
     }
     Sprite(SDL_Renderer* renderer, SDL_Texture* inputTexture, int inputW, int inputH)
     {

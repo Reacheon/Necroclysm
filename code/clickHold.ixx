@@ -15,7 +15,7 @@ export void clickHold()
 	switch (option::inputMethod)
 	{
 	case input::mouse:
-		clickHoldPoint = { event.motion.x, event.motion.y };
+		clickHoldPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
 		break;
 	case input::touch:
 		clickHoldPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };

@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_ttf.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <sol/sol.hpp>
 
 
@@ -60,7 +60,7 @@ export namespace timer
 /////////////////////////////////////////////////////////////////
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
-export SDL_GameController* controller; //메인컨트롤러
+export SDL_Gamepad* controller; //메인컨트롤러
 export sol::state lua; //루아스크립트
 
 export turn turnCycle = turn::playerInput;//0:플레이어 입력_1:플레이어 애니메이션 재생_2:모든 엔티티 AI 작동(하나라도 false 반환시 3으로, 없으면 0으로)_3:엔티티 애니메이션 재생
@@ -232,7 +232,7 @@ public:
     int dstY = 0;
     int alpha = 255;
     double length = 20.0;
-    double angle = 82.0*(M_PI/180.0);
+    double angle = 82.0*(3.141592/180.0);
     double velocity = 20.0;
 
     Raindrop(int inputDstX, int inputDstY)

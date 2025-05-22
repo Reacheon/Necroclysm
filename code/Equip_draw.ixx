@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 import Equip;
 import util;
@@ -28,7 +28,7 @@ void Equip::drawGUI()
 		//플레이어 무게 제한 게이지 그리기
 		SDL_Rect weightGaugeRect = { equipBase.x + 65,equipBase.y + 39,104,9 };
 		drawRect(weightGaugeRect, col::white);
-		drawFillRect({ weightGaugeRect.x + 2,weightGaugeRect.y + 2,50,5 }, lowCol::green);
+		drawFillRect(SDL_Rect{ weightGaugeRect.x + 2,weightGaugeRect.y + 2,50,5 }, lowCol::green);
 		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 47, weightGaugeRect.y + 4);
 		setFontSize(10);
 		drawText(col2Str(col::white)+ sysStr[163], weightGaugeRect.x - 38, weightGaugeRect.y - 2);//무게

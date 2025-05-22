@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module God;
 
@@ -244,11 +244,12 @@ public:
 	void step() 
 	{
 		std::wprintf(L"delayR2의 값은 %d이다.\n", delayR2);
-		if (SDL_NumJoysticks() > 0)
+		
+		if (option::inputMethod == input::gamepad)
 		{
 			if (GUI::getLastGUI() == this)
 			{
-				if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 10000)
+				if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 10000)
 				{
 					prt(L"탭이 실행되었다.\n");
 					close(aniFlag::winUnfoldClose);

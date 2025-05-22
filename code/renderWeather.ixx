@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 
 export module renderWeather;
@@ -67,7 +67,8 @@ export __int64 renderWeather()
 
 	for (int i = 0; i < snowflakes.size(); i++)
 	{
-		drawFillRect({ (snowflakes[i].get())->x, (snowflakes[i].get())->y,(snowflakes[i].get())->size,(snowflakes[i].get())->size }, { 0xff, 0xff, 0xff }, (Uint8)(snowflakes[i].get())->alpha);
+		
+		drawFillRect(SDL_Rect{ (snowflakes[i].get())->x, (snowflakes[i].get())->y,(snowflakes[i].get())->size,(snowflakes[i].get())->size }, { 0xff, 0xff, 0xff }, (Uint8)(snowflakes[i].get())->alpha);
 		//drawPoint((snowflakes[i].get())->x, (snowflakes[i].get())->y, { 0xff, 0xff, 0xff });
 	}
 

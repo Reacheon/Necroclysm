@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 #define DEC_SPR(name) Sprite* name = nullptr;
 #define DEC_TXT(name) SDL_Texture* name = nullptr;
 

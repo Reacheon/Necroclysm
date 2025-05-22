@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 import Player;
 import std;
@@ -175,7 +175,7 @@ void Player::updateMinimap()
 	}
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderDrawPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
+	SDL_RenderPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
 
 	SDL_SetRenderTarget(renderer, nullptr);
 }

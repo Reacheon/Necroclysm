@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 
 export module Maint;
@@ -191,7 +191,7 @@ public:
 					drawText(col2Str(col::white) + items[currentItemIndex].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
 
 					drawRect({ maintBtn[i].x + 230, maintBtn[i].y + 3, 7, 23 }, col::lightGray);
-					drawFillRect({ maintBtn[i].x + 230 + 2, maintBtn[i].y + 3 + 2, 3, 19 }, lowCol::green);
+					drawFillRect(SDL_Rect{ maintBtn[i].x + 230 + 2, maintBtn[i].y + 3 + 2, 3, 19 }, lowCol::green);
 				}
 			}
 

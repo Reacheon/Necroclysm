@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module TitleScreen;
 
@@ -45,7 +45,7 @@ public:
 	{
 		if (getStateDraw() == false) { return; }
 
-		drawFillRect({ 0,0,cameraW,cameraH }, col::black);
+		drawFillRect(SDL_Rect{ 0,0,cameraW,cameraH }, col::black);
 
 		setFontSize(30);
 		drawTextCenter(col2Str(col::white) + L"▶ New game",cameraW/2 + 212 ,cameraH - 380 + 40*0);

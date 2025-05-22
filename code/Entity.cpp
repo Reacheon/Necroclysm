@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_image.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 import Entity;
 import std;
@@ -83,26 +83,40 @@ ItemPocket* Entity::getEquipPtr()
 
 void Entity::updateSpriteFlash()
 {
-	int textureW, textureH;
-	if (customSprite == nullptr) SDL_QueryTexture(entityInfo.entitySpr->getTexture(), NULL, NULL, &textureW, &textureH);
-	else  SDL_QueryTexture(customSprite->getTexture(), NULL, NULL, &textureW, &textureH);
+	float textureW, textureH;
 
-	SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
+	if (customSprite == nullptr)
+		SDL_GetTextureSize(entityInfo.entitySpr->getTexture(), &textureW, &textureH);
+	else
+		SDL_GetTextureSize(customSprite->getTexture(), &textureW, &textureH);
+
+	// SDL3: format + access + w + h
+	SDL_Texture* drawingTexture = SDL_CreateTexture(
+		renderer,
+		SDL_PIXELFORMAT_RGBA8888,
+		SDL_TEXTUREACCESS_TARGET,                      // ← 반드시 명시
+		static_cast<int>(textureW),
+		static_cast<int>(textureH)
+	);
+	if (!drawingTexture) return;   // 실패 시 조용히 넘어가거나 에러 처리
+
 	SDL_SetRenderTarget(renderer, drawingTexture);
 	SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
-	SDL_Rect src = { 0, 0, textureW, textureH };
-	SDL_Rect dst = src;
-	//하얗게 만들 텍스쳐를 그려넣음
 
-	if (customSprite == nullptr) SDL_RenderCopy(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
-	else SDL_RenderCopy(renderer, customSprite->getTexture(), &src, &dst);
+	SDL_FRect src = { 0.f, 0.f, textureW, textureH };
+	SDL_FRect dst = src;           // 크기가 동일하므로 그대로 복사
 
-	//텍스쳐에 흰색으로 가산 블렌딩을 사용해 하얗게 만듬
+	if (customSprite == nullptr)
+		SDL_RenderTexture(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+	else
+		SDL_RenderTexture(renderer, customSprite->getTexture(), &src, &dst);
+
+	// 텍스처를 희게 만드는 가산 블렌딩
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_Rect dstWhite = { 0, 0, textureW, textureH };
-	drawFillRect(dstWhite, col::white);
-	SDL_SetRenderTarget(renderer, nullptr);
+	drawFillRect(dst, col::white); // dst 전체를 흰색으로 채우기
+
+	SDL_SetRenderTarget(renderer, nullptr); // 렌더 타깃 복원
 
 	spriteFlash = std::make_unique<Sprite>(renderer, drawingTexture, 48, 48);
 }
@@ -722,6 +736,8 @@ int Entity::getAimWeaponIndex()
 void Entity::updateCustomSpriteHuman()
 {
 	SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
+	SDL_SetTextureScaleMode(targetTexture, SDL_SCALEMODE_NEAREST);
+
 
 	SDL_SetRenderTarget(renderer, targetTexture);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);

@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 import HUD;
 import std;
@@ -14,17 +14,17 @@ import Aim;
 
 void HUD::gamepadBtnDown()
 {
-	switch (event.cbutton.button)
+	switch (event.gbutton.button)
 	{
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+	case SDL_GAMEPAD_BUTTON_DPAD_UP:
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+	case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+	case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+	case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		break;
-	case SDL_CONTROLLER_BUTTON_Y:
+	case SDL_GAMEPAD_BUTTON_NORTH:
 		if (y == 0)
 		{
 			executePopUp();
@@ -36,12 +36,12 @@ void HUD::gamepadBtnDown()
 			barActCursor = -1;
 		}
 		break;
-	case SDL_CONTROLLER_BUTTON_X:
+	case SDL_GAMEPAD_BUTTON_WEST:
 		quickSlotToggle();
 		if (isQuickSlotPop) quickSlotCursor = 0;
 		else quickSlotCursor = -1;
 		break;
-	case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
+	case SDL_GAMEPAD_BUTTON_RIGHT_STICK:
 		zoomScale += 1;
 		if (zoomScale > 5.0) zoomScale = 1.0;
 		break;
@@ -52,24 +52,24 @@ void HUD::gamepadBtnDown()
 void HUD::gamepadBtnMotion() { }
 void HUD::gamepadBtnUp()
 {
-	switch (event.cbutton.button)
+	switch (event.gbutton.button)
 	{
-	case SDL_CONTROLLER_BUTTON_DPAD_UP:
+	case SDL_GAMEPAD_BUTTON_DPAD_UP:
 		if (isQuickSlotPop && quickSlotCursor > 0) quickSlotCursor--;
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+	case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
 		if (isQuickSlotPop && quickSlotCursor < 7) quickSlotCursor++;
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+	case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		break;
-	case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+	case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		break;
-	case SDL_CONTROLLER_BUTTON_A:
+	case SDL_GAMEPAD_BUTTON_SOUTH:
 		if (barActCursor != -1) clickLetterboxBtn(barAct[barActCursor]);
 		else
 		{
-			__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-			__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+			__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
+			__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
 
 			int tgtX = PlayerX();
 			int tgtY = PlayerY();
@@ -82,11 +82,11 @@ void HUD::gamepadBtnUp()
 			tileTouch(tgtX, tgtY);
 		}
 		break;
-	case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+	case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 		break;
-	case SDL_CONTROLLER_BUTTON_START:
-		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+	case SDL_GAMEPAD_BUTTON_START:
+		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
+		__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
 
 		int tgtX = PlayerX();
 		int tgtY = PlayerY();
@@ -109,10 +109,10 @@ void HUD::gamepadStep()
 			dpadDelay = 6;
 			int dir = -1;
 			SDL_PollEvent(&event);
-			bool dpadUpPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP);
-			bool dpadDownPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-			bool dpadLeftPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-			bool dpadRightPressed = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+			bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
+			bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+			bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+			bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 
 			if (dpadUpPressed && dpadLeftPressed) dir = 3;
 			else if (dpadUpPressed && dpadRightPressed) dir = 1;
@@ -205,7 +205,7 @@ void HUD::gamepadStep()
 
 		if (GUI::getLastGUI() == this)
 		{
-			if (delayR2 <= 0 && SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000)
+			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
 				prt(L"[HUD:STEP] 탭이 실행되었다.\n");
 				executeTab();
@@ -217,8 +217,8 @@ void HUD::gamepadStep()
 			}
 		}
 
-		__int16 rightX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTX); // -32768 ~ 32767
-		__int16 rightY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_RIGHTY); // -32768 ~ 32767
+		__int16 rightX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHTX); // -32768 ~ 32767
+		__int16 rightY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHTY); // -32768 ~ 32767
 		const int maxDist = 160;
 		int prevCameraX = cameraX, prevCameraY = cameraY;
 		if (rightY < -8000)
@@ -249,8 +249,8 @@ void HUD::gamepadStep()
 
 
 
-		__int16 leftX = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTX);
-		__int16 leftY = SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_LEFTY);
+		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
+		__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
 		int tgtX = PlayerX();
 		int tgtY = PlayerY();
 		if (leftX > TOLERANCE_LSTICK) tgtX += 1;

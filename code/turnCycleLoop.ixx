@@ -1,8 +1,7 @@
 ﻿
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 export module turnCycleLoop;
 
@@ -156,7 +155,7 @@ __int64 playerInputTurn()
 		{
 			switch (event.type)
 			{
-			case SDL_CONTROLLERBUTTONDOWN:
+			case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 				if (option::inputMethod != input::gamepad)
 				{
 					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
@@ -164,7 +163,7 @@ __int64 playerInputTurn()
 				}
 				gamepadBtnDown();
 				break;
-			case SDL_CONTROLLERBUTTONUP:
+			case SDL_EVENT_GAMEPAD_BUTTON_UP:
 				if (option::inputMethod != input::gamepad)
 				{
 					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
@@ -172,25 +171,21 @@ __int64 playerInputTurn()
 				}
 				gamepadBtnUp();
 				break;
-			case SDL_CONTROLLERAXISMOTION:
+			case SDL_EVENT_GAMEPAD_AXIS_MOTION:
 				gamepadBtnMotion();
+			case SDL_EVENT_WINDOW_RESIZED:
+				SDL_SetRenderLogicalPresentation(renderer,
+					434,
+					244,
+					SDL_LOGICAL_PRESENTATION_LETTERBOX);
 				break;
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-				case SDL_WINDOWEVENT_RESIZED:
-					SDL_RenderSetLogicalSize(renderer, 434, 244);
-					break;
-				}
-				break;
-			case SDL_QUIT:
-				Mix_CloseAudio();
-				IMG_Quit();
+			case SDL_EVENT_QUIT:
+				//IMG_Quit();
 				TTF_Quit();
 				SDL_Quit();
 				exit(0);
 				break;
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
@@ -199,10 +194,10 @@ __int64 playerInputTurn()
 
 				if (option::inputMethod == input::mouse) { clickDown(); }
 				break;
-			case SDL_FINGERDOWN:
+			case SDL_EVENT_FINGER_DOWN:
 				if (option::inputMethod == input::touch) { clickDown(); }
 				break;
-			case SDL_MOUSEMOTION:
+			case SDL_EVENT_MOUSE_MOTION:
 				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
@@ -211,13 +206,13 @@ __int64 playerInputTurn()
 
 				if (option::inputMethod == input::mouse) { clickMotion(); }
 				break;
-			case SDL_FINGERMOTION:
+			case SDL_EVENT_FINGER_MOTION:
 				if (option::inputMethod == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
 				{
 					clickMotion();
 				}
 				break;
-			case SDL_MOUSEBUTTONUP:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
 				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
@@ -230,10 +225,10 @@ __int64 playerInputTurn()
 					else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
 				}
 				break;
-			case SDL_FINGERUP:
+			case SDL_EVENT_FINGER_UP:
 				if (option::inputMethod == input::touch) { clickUp(); }
 				break;
-			case SDL_MOUSEWHEEL:
+			case SDL_EVENT_MOUSE_WHEEL:
 				if (option::inputMethod != input::mouse)
 				{
 					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
@@ -242,18 +237,18 @@ __int64 playerInputTurn()
 				mouseWheel();
 		
 				break;
-			case SDL_KEYDOWN:
-				if (exInput == true && event.key.keysym.sym == UNI::BACKSPACE)
+			case SDL_EVENT_KEY_DOWN:
+				if (exInput == true && event.key.key == UNI::BACKSPACE)
 				{
 					prt(L"백스페이스 키 입력됨\n");
-					if (exInputEditing == false)
+					if (!exInputEditing)
 					{
-						if (exInputCursor != 0) { exInputCursor--; }
+						if (exInputCursor != 0) { --exInputCursor; }
 						exInputText.erase(exInputCursor, 1);
 					}
 				}
 				break;
-			case SDL_TEXTINPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
+			case SDL_EVENT_TEXT_INPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
 			{
 				if (exInput == true)
 				{
@@ -271,7 +266,7 @@ __int64 playerInputTurn()
 				}
 				break;
 			}
-			case SDL_TEXTEDITING: //텍스트가 입력 되었을 때의 이벤트(미완성도 실행됨, TEXTINPUT보다 더 큰 개념)
+			case SDL_EVENT_TEXT_EDITING: //텍스트가 입력 되었을 때의 이벤트(미완성도 실행됨, TEXTINPUT보다 더 큰 개념)
 			{
 				if (exInput == true)
 				{

@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 import HUD;
 import std;
@@ -42,7 +42,7 @@ namespace segmentIndex
 
 void HUD::drawGUI()
 {
-	const Uint8* state = SDL_GetKeyboardState(NULL);
+	const bool* state = SDL_GetKeyboardState(nullptr);
 	Sprite* targetBtnSpr = nullptr;
 
 
@@ -70,7 +70,7 @@ void HUD::drawGUI()
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
 			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
 		}
@@ -199,7 +199,8 @@ void HUD::drawGUI()
 				}
 
 
-				drawTextCenter(col2Str(lowCol::yellow) + L"STA", pivotX + 24, pivotY + 16);
+				setFontSize(10);
+				drawTextCenter(col2Str(lowCol::white) + L"STA", pivotX + 24, pivotY + 16);
 
 
 
@@ -351,7 +352,7 @@ void HUD::drawGUI()
 
 			if (option::inputMethod == input::gamepad)
 			{
-				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
+				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
 				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 			}
@@ -385,7 +386,7 @@ void HUD::drawGUI()
 		const Uint8 minAlpha = 100;
 		const Uint8 maxAlpha = 255;
 		double timeRatio = fmod((double)currentTime / pulsationPeriodMs, 1.0);
-		double normalizedAlpha = (sin(timeRatio * 2.0 * M_PI) + 1.0) / 2.0;
+		double normalizedAlpha = (sin(timeRatio * 2.0 * 3.141592) + 1.0) / 2.0;
 		Uint8 alpha = static_cast<Uint8>(minAlpha + normalizedAlpha * (maxAlpha - minAlpha));
 		SDL_GetTicks();
 		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), alpha); //텍스쳐 투명도 설정
@@ -424,8 +425,8 @@ void HUD::drawTab()
 	{
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
-			else if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 		else
@@ -457,7 +458,7 @@ void HUD::drawTab()
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
 			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
 		}
@@ -467,8 +468,8 @@ void HUD::drawTab()
 	{
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
-			else if(SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+			else if(SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 		else
@@ -519,7 +520,7 @@ void HUD::drawTab()
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 			else { targetBtnSpr = spr::buttons; }
 			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
 		}
@@ -557,7 +558,7 @@ void HUD::drawTab()
 	Sprite* targetBtnSpr;
 	if (option::inputMethod == input::gamepad)
 	{
-		if (SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 0) { targetBtnSpr = spr::buttonsPressed; }
+		if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 0) { targetBtnSpr = spr::buttonsPressed; }
 		else { targetBtnSpr = spr::buttons; }
 		drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R2, tab.x + 4, tab.y + 4);
 	}
@@ -594,7 +595,7 @@ void HUD::drawQuickSlot()
 			drawTextCenter(col2Str(col::white) + skillName, 374, 57);
 		}
 
-		drawFillRect({ pivotX,pivotY,44,39 }, btnCol, 200);
+		drawFillRect(SDL_Rect{ pivotX,pivotY,44,39 }, btnCol, 200);
 		drawLine(pivotX + 1, pivotY + 39, pivotX + 42, pivotY + 39, btnCol, 200);
 		drawLine(pivotX + 2, pivotY + 39 + 1, pivotX + 41, pivotY + 39 + 1, btnCol, 200);
 		drawLine(pivotX + 3, pivotY + 39 + 2, pivotX + 40, pivotY + 39 + 2, btnCol, 200);
@@ -609,7 +610,7 @@ void HUD::drawQuickSlot()
 			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
 			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
 			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
-			drawFillRect({ pivotX + 5, pivotY ,34,34 }, col::black, 180);
+			drawFillRect(SDL_Rect{ pivotX + 5, pivotY ,34,34 }, col::black, 180);
 		}
 		else
 		{

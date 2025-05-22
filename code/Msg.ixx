@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 
 export module Msg;
@@ -147,7 +147,7 @@ public:
 	{
 		if (getStateDraw() == false) { return; }
 
-		const Uint8* state = SDL_GetKeyboardState(NULL);
+		const bool* state = SDL_GetKeyboardState(nullptr);
 		if (getFoldRatio() == 1.0)
 		{
 			setWindowAlpha(230);

@@ -23,7 +23,7 @@ export void clickUp()
 	{
 		case input::mouse:
 			//prt(L"마우스 Up 입력 (%d,%d)\n", event.motion.x, event.motion.y);
-			clickUpPoint = { event.motion.x, event.motion.y };
+			clickUpPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
 			break;
 		case input::touch:
 			//prt(L"터치 Up 입력 (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));

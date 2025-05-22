@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 #include <cmath>
 #include <cstdlib>
 #include <set>
@@ -58,7 +58,7 @@ void Light::updateLight()
 				if (dx == 0 && dy == 0) continue;
 					
 
-				float angTo = std::atan2f(-dy, dx) * 180.f / static_cast<float>(M_PI);
+				float angTo = std::atan2f(-dy, dx) * 180.f / static_cast<float>(3.141592);
 				if (angTo < 0) angTo += 360.f;
 
 				float diff = std::fabs(angTo - dirAngle);

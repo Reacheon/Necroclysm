@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_image.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 export module Map;
 
@@ -95,7 +95,7 @@ public:
 			//SDL_Rect dst = { 0,0, 700, 350 };
 			//dst.x = mapBase.x + 1;
 			//dst.y = mapBase.y + 30;
-			//SDL_RenderCopy(renderer, mapTexture, &src, &dst);
+			//SDL_RenderTexture(renderer, mapTexture, &src, &dst);
 
 
 
@@ -110,10 +110,10 @@ public:
 
 					if (tgtChunk == chunkFlag::seawater)
 					{
-						drawFillRect({ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::blue);
-						drawRect({ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::black);
+						drawFillRect(SDL_Rect{ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::blue);
+						drawRect(SDL_Rect{ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::black);
 					}
-					else drawFillRect({ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::green);
+					else drawFillRect(SDL_Rect{ mapBase.x + 7 + 16 * x,mapBase.y + 90 + 16 * y,16,16 }, col::green);
 					
 					if (x == 21 && y == 10)
 					{

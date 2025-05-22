@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module stepEvent;
 
@@ -25,30 +25,39 @@ export __int64 stepEvent()
     __int64 timeStampStart = getNanoTimer();
 
 	//게임패드 감지
+	int numJoy = 0;
+	SDL_JoystickID* list = SDL_GetJoysticks(&numJoy);
 
-	if (SDL_NumJoysticks() > 0)
+	if (numJoy > 0 && list)
 	{
 		if (controller == nullptr)
 		{
-			for (int i = 0; i < SDL_NumJoysticks(); ++i)
+			for (int i = 0; i < numJoy; ++i)
 			{
-				if (SDL_IsGameController(i))
+				SDL_JoystickID jid = list[i];
+				if (SDL_IsGamepad(jid))
 				{
-					controller = SDL_GameControllerOpen(i);
+					controller = SDL_OpenGamepad(jid);
 					if (controller)
 					{
 						std::wstring str = L"다음 게임패드가 감지되었다. : ";
-						str += stringToWstring(SDL_GameControllerName(controller));
+						str += stringToWstring(SDL_GetGamepadName(controller));
 						updateLog(col2Str(col::white) + str);
 						option::inputMethod = input::gamepad;
 						break;
 					}
-					else errorBox(L"게임패드를 열 수가 없다.");
+					else
+					{
+						errorBox(L"게임패드를 열 수가 없다.");
+					}
 				}
 			}
 		}
 	}
-	else controller = nullptr;
+	else
+	{
+		controller = nullptr;
+	}
 
 
 

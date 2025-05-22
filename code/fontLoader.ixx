@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_ttf.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 export module fontLoader;
 
@@ -14,7 +14,7 @@ export void fontLoader()
     if (option::language == L"Korean")
     {
         //한국어일 경우에는 갈무리 폰트
-        for (int i = 0; i < MAX_FONT_SIZE; i++)
+        for (int i = 8; i < MAX_FONT_SIZE; i++)
         {
             if(i==8) mainFont[i] = TTF_OpenFont("font/Galmuri7.ttf", i);
             else if (i == 10) mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
@@ -23,7 +23,10 @@ export void fontLoader()
             else if (i >= 16)  mainFont[i] = TTF_OpenFont("font/neodgm.ttf", i);
             else mainFont[i] = TTF_OpenFont("font/Galmuri9.ttf", i);
 
-            errorBox(mainFont[i] == nullptr, L"Failed to open the font file.");
+            if (mainFont[i] == nullptr)
+            {
+                errorBox(L"Failed to open the font file.");
+            }
         }
     }
     else if (option::language == L"English")

@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module ContextMenu;
@@ -282,7 +282,7 @@ public:
 									SDL_Color gaugeCol = lowCol::green;
 									if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
 									else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-									drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(49.0 * volumeRatio),6 }, gaugeCol);
+									drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(49.0 * volumeRatio),6 }, gaugeCol);
 
 									std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 									std::wstring maxVolumeStr = decimalCutter((float)tgtPart.pocketMaxVolume / 1000.0, 1) + L"L";

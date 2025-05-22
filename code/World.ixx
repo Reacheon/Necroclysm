@@ -1,4 +1,4 @@
-﻿#include <SDL_image.h>
+﻿#include <SDL3_image/SDL_image.h>
 
 export module World;
 
@@ -187,6 +187,24 @@ public:
 				std::wstring wPath(filePath.begin(), filePath.end());
 				//std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
 				SDL_Surface* refSector = IMG_Load(filePath.c_str());
+
+				if (!refSector)   // 디버깅: 로드 실패 이유 출력
+				{
+					// SDL_GetError() → std::string → std::wstring
+					std::wstring sdlErr = stringToWstring(std::string(SDL_GetError()));
+
+					// 실행 중의 작업 디렉터리 (char→wstring)
+					std::wstring cwd = std::filesystem::current_path().wstring();
+
+					std::wstring msg =
+						L"IMG_Load 실패\n"
+						L"  SDL_GetError : " + sdlErr +
+						L"\n  시도한 경로   : " + wPath +
+						L"\n  현재 CWD      : " + cwd + L'\n';
+
+					prt(L"%ls", msg.c_str());               // 콘솔/디버그 출력
+				}
+
 				errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
 				Uint32* pixels = (Uint32*)refSector->pixels;
 
@@ -199,7 +217,10 @@ public:
 
 						Uint32 pixel = pixels[(y * refSector->w) + x];
 						SDL_Color pixelCol;
-						SDL_GetRGB(pixel, refSector->format, &pixelCol.r, &pixelCol.g, &pixelCol.b);
+						SDL_GetRGB(pixel,
+							SDL_GetPixelFormatDetails(refSector->format),
+							SDL_GetSurfacePalette(refSector),
+							&pixelCol.r, &pixelCol.g, &pixelCol.b);
 
 						auto isSameCol = [](SDL_Color col1, SDL_Color col2)->bool
 							{
@@ -231,7 +252,7 @@ public:
 					}
 				}
 
-				SDL_FreeSurface(refSector);
+				SDL_DestroySurface(refSector);
 			}
 		}
 

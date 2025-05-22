@@ -1,5 +1,5 @@
 ﻿#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 export module Skill;
 
@@ -225,7 +225,7 @@ public:
 					drawText(col2Str(col::white) + expStr + L"/100.0", skillBtn[i].x + 182, skillBtn[i].y + 20);
 
 					drawRect({ skillBtn[i].x + 41,skillBtn[i].y + 23, 134,7 }, col::gray);
-					drawFillRect({ skillBtn[i].x + 41 + 2,skillBtn[i].y + 23 + 2, int(42.0* (myMin(1.0,tgtData.skillExp/100.0))),3 }, col::white);
+					drawFillRect(SDL_Rect{ skillBtn[i].x + 41 + 2,skillBtn[i].y + 23 + 2, int(42.0* (myMin(1.0,tgtData.skillExp/100.0))),3 }, col::white);
 
 					drawCross2(skillBtn[i].x, skillBtn[i].y, 0, 5, 0, 5);
 					drawCross2(skillBtn[i].x + 32, skillBtn[i].y, 0, 5, 5, 0);

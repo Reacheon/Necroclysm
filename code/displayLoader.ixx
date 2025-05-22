@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module displayLoader;
 
@@ -7,91 +7,64 @@ export import globalVar;
 import util;
 import constVar;
 
-/*
- 실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
- 기본 개발은 720*720 정사각 해상도에서 진행됩니다.
-기기가 가로가 더 길 경우 세로가 720으로 고정되고 가로로 길어집니다.
-기기가 세로로 더 길 경우 가로가 720으로 고정되고 세로로 길어집니다.
-*/
 export void displayLoader()
 {
-    bool debugSquare = true;
-
+    /* ────────────────────── 게임 논리 해상도 ────────────────────── */
     cameraW = 720;
-    cameraH = 720;
+    cameraH = 720;           // 1:1 픽셀아트 좌표계는 항상 720×720
 
-    //창을 최소화하면 커스텀스프라이트들이 사라지는 버그가 이 라인들이 있으면 안 일어남.. 왜일까?
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-    //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    SDL_DisplayMode displayMode;
-    if (SDL_GetDesktopDisplayMode(0, &displayMode) != 0) errorBox(L"0번 디스플레이가 존재하지 않는다.");
-    else prt(L"0번 디스플레이 (%d Hz) : %d×%d\n", displayMode.refresh_rate, displayMode.w, displayMode.h);
+    /* ───────────── 실제 창(모니터) 해상도 결정 ───────────── */
+    SDL_DisplayID disp = SDL_GetPrimaryDisplay();
+    const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
+    if (!mode) errorBox(L"디스플레이 정보를 읽을 수 없습니다.");
 
-    cameraW = displayMode.w;
-    cameraH = displayMode.h;
+    int winW = mode->w;
+    int winH = mode->h;
 
-    window = SDL_CreateWindow("Necroclysm", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, cameraW, cameraH, 0);
-    if(option::fullScreen) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    renderer = SDL_CreateRenderer(window, -1, 0);
-    setPrimitiveRenderer(renderer);
-
-
-    if (cameraW > cameraH)
+    if (option::fixScreenRatio)
     {
-        cameraW = ((float)cameraW / (float)cameraH) * (float)720;
-        cameraH = 720;
-    }
-    else if (cameraH > cameraW)
-    {
-        cameraH = ((float)cameraH / (float)cameraW) * (float)720;
-        cameraW = 720;
-    }
-
-    ///////////PC 테스트용 강제 해상도 조정////////
-    if(option::fixScreenRatio)
-    {
-        int resolution = 0;
-        switch (resolution)
+        switch (0)          // 필요 시 프리셋 변경
         {
-        default://1:1
-            cameraW = 720;
-            cameraH = 720;
-            break;
-        case 1://9:16
-            cameraW = 720;
-            cameraH = 1280;
-            break;
-        case 2://4:3
-            cameraW = 960;
-            cameraH = 720;
-            break;
-        case 3://1:2
-            cameraW = 720;
-            cameraH = 1440;
-            break;
-        case 4://16:9
-            cameraW = 1280;
-            cameraH = 720;
-            break;
+        default:  winW = 720;   winH = 720;   break;  // 1:1
+        case 1:   winW = 720;   winH = 1280;  break;  // 9:16
+        case 2:   winW = 960;   winH = 720;   break;  // 4:3
+        case 3:   winW = 720;   winH = 1440;  break;  // 1:2
+        case 4:   winW = 1280;  winH = 720;   break;  // 16:9
         }
     }
 
+    /* ───────────── 창·렌더러 생성 ───────────── */
+    if (!SDL_CreateWindowAndRenderer("Necroclysm", winW, winH,
+        option::fullScreen ? SDL_WINDOW_FULLSCREEN : 0,
+        &window, &renderer))
+        errorBox(L"창·렌더러 생성 실패");
 
-    SDL_SetWindowSize(window, cameraW, cameraH);
-    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    SDL_RenderSetLogicalSize(renderer, cameraW, cameraH);
+    setPrimitiveRenderer(renderer);   // (기존 코드)
 
-    // 이 아래로 HUD 관련 변수
+    /* ───────────── 논리 프레젠테이션 설정 ─────────────
+       720×720 좌표계를 창 크기에 맞게 **늘이기(STRETCH)**.
+       픽셀 아트를 보존하려면 STRETCH 대신 LETTERBOX + SDL_RenderSetIntegerScale()
+       를 쓰면 됩니다. */
+    SDL_SetRenderLogicalPresentation(renderer,
+        cameraW,          // 논리 폭
+        cameraH,          // 논리 높이
+        SDL_LOGICAL_PRESENTATION_STRETCH);
+
+    // 필요 시 정수배 스케일 고정
+    // SDL_RenderSetIntegerScale(renderer, true);
+
+    /* ───────────── HUD 좌표 등 초기화 ───────────── */
     letterbox = { 0, 0, 630, 140 };
     letterbox.x = (cameraW - letterbox.w) / 2;
     letterbox.y = cameraH - letterbox.h + 6;
-    for (int i = 0; i < 7; i++)
-    {
-        barButton[i] = { cameraW / 2 - 300 + (88 * i), cameraH - 80, 72,72 };
-    }
-    
-    letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
+
+    for (int i = 0; i < 7; ++i)
+        barButton[i] = { cameraW / 2 - 300 + 88 * i, cameraH - 80, 72, 72 };
+
+    letterboxPopUpButton = { letterbox.x + letterbox.w - 39,
+                             letterbox.y - 33,
+                             29, 29 };
 }

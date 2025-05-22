@@ -1,4 +1,4 @@
-﻿#include <SDL.h>
+﻿#include <SDL3/SDL.h>
 
 import Loot;
 import globalVar;
@@ -18,7 +18,7 @@ void Loot::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
 
-	const Uint8* state = SDL_GetKeyboardState(NULL);
+	const bool* state = SDL_GetKeyboardState(nullptr);
 	Sprite* targetBtnSpr = nullptr;
 
 	bool hasSelect = false; //아이템에 셀렉트가 하나라도 있을 경우
@@ -108,7 +108,7 @@ void Loot::drawGUI()
 					SDL_Color gaugeCol = lowCol::green;
 					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
 					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-					drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+					drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
 
 					std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxVolume / 1000.0, 1) + L" L";
@@ -123,7 +123,7 @@ void Loot::drawGUI()
 					SDL_Color gaugeCol = lowCol::green;
 					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
 					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-					drawFillRect({ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
+					drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2,volumeGaugeRect.y + 2,static_cast<int>(100.0 * volumeRatio),5 }, gaugeCol);
 
 					std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxNumber / 1000.0, 1);
@@ -277,7 +277,7 @@ void Loot::drawGUI()
 
 				if (option::inputMethod == input::gamepad)
 				{
-					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_LEFTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+					if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
 					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, pocketLeft.x + pocketLeft.w / 2, pocketLeft.y + pocketRight.h / 2);
 				}
@@ -303,7 +303,7 @@ void Loot::drawGUI()
 
 				if (option::inputMethod == input::gamepad)
 				{
-					if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+					if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 					else { targetBtnSpr = spr::buttons; }
 					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, pocketRight.x + pocketRight.w / 2, pocketRight.y + pocketRight.h / 2);
 				}
@@ -332,7 +332,7 @@ void Loot::drawGUI()
 
 			if (option::inputMethod == input::gamepad)
 			{
-				if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y)) { targetBtnSpr = spr::buttonsPressed; }
+				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
 				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, lootBtn.x + lootBtn.w / 2, lootBtn.y + lootBtn.h / 2);
 			}

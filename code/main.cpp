@@ -1,8 +1,6 @@
-﻿#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
-
+﻿#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 import std;
 import util;
@@ -32,16 +30,14 @@ int main(int argc, char** argv)
 {
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	std::locale::global(std::locale("korean"));
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
 	TTF_Init();
-	IMG_Init(IMG_INIT_PNG);
-	Mix_OpenAudio(22050, AUDIO_S16, 2, 4096);
 
 	int numThreads = std::thread::hardware_concurrency();
 	if (numThreads == 0) numThreads = 4;
 	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
 	threadPoolPtr = new ThreadPool(numThreads);
-	SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
+	SDL_AddGamepadMappingsFromFile("gamecontrollerdb.txt");
 
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
@@ -59,7 +55,7 @@ int main(int argc, char** argv)
 	//SDL_GetWindowSize(window, &currentWidth, &currentHeight); // 현재 윈도우 크기를 가져옵니다.
 	//// 윈도우 크기를 2배로 설정합니다.
 	//SDL_SetWindowSize(window, currentWidth * 0.5, currentHeight * 0.5);
-	//SDL_RenderSetScale(renderer, 0.5f, 0.5f);
+	//SDL_SetRenderScale(renderer, 0.5f, 0.5f);
 	int fpsTimeStack = 0;
 	int fpsFrame = 0;
 	int fps = 60;
@@ -118,8 +114,6 @@ int main(int argc, char** argv)
 
 
 	delete threadPoolPtr;
-	Mix_CloseAudio();
-	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
 	//_CrtDumpMemoryLeaks();

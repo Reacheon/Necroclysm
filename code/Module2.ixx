@@ -1,5 +1,5 @@
-﻿#include <SDL.h>
-#include <SDL_ttf.h>
+﻿#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #define 낮 { 0xFF,0xF8,0xED }
 #define 황혼 { 0x79,0x87,0xff}

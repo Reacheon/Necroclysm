@@ -1,6 +1,6 @@
 ﻿#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 import HUD;
 
