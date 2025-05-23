@@ -98,6 +98,7 @@ void Entity::updateSpriteFlash()
 		static_cast<int>(textureW),
 		static_cast<int>(textureH)
 	);
+	SDL_SetTextureScaleMode(drawingTexture, SDL_SCALEMODE_NEAREST);
 	if (!drawingTexture) return;   // 실패 시 조용히 넘어가거나 에러 처리
 
 	SDL_SetRenderTarget(renderer, drawingTexture);

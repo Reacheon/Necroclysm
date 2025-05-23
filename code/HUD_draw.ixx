@@ -86,8 +86,7 @@ void HUD::drawGUI()
 		if (1)//플레이어 이름 그리기
 		{
 			setFontSize(10);
-			SDL_SetRenderDrawColor(renderer, lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b, 0xff);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4);
+			drawText(col2Str(lowCol::yellow)+L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4);
 		}
 
 		//HP바 그리기
@@ -323,8 +322,7 @@ void HUD::drawGUI()
 				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 19);
 			}
 
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
+			drawTextCenter(col2Str(col::white)+L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
@@ -407,6 +405,9 @@ void HUD::drawGUI()
 	drawTab();
 	drawQuickSlot();
 	//drawHoverItemInfo();
+
+	setFontSize(12);
+	drawText(col2Str(col::white) + std::to_wstring(getMouseX()) +L"/" + std::to_wstring(getMouseY()), 10, 10);
 }
 
 
@@ -445,9 +446,8 @@ void HUD::drawTab()
 		}
 
 		setFontSize(12);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
-		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
+		drawTextCenter(col2Str(col::white)+sysStr[1], tab.x + 60, tab.y + 94);
+		drawTextCenter(col2Str(col::white) + sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
 
 		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
@@ -481,9 +481,8 @@ void HUD::drawTab()
 			}
 			else if (checkCursor(&tab))
 			{
-				Point2 mPoint = getMouseXY();
 				drawLine(tab.x + 0, tab.y + 119, tab.x + 121, tab.y - 2, lowCol::red, 200);
-				if ((mPoint.x - tab.x + mPoint.y - tab.y - 119) < 0)
+				if ((getMouseX() - tab.x + getMouseY() - tab.y - 119) < 0)
 				{
 					if (click == false) { drawSprite(spr::tabBoxAim, 1, tab.x, tab.y - 2); }
 					else { drawSprite(spr::tabBoxAim, 2, tab.x, tab.y - 2); }
@@ -531,24 +530,21 @@ void HUD::drawTab()
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 14, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(col2Str(col::white)+sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::back:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 31, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(col2Str(col::white) + sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::confirm:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(col2Str(col::white) + sysStr[91], tab.x + 60, tab.y + 92 + 7);
 		break;
 	default:
 		errorBox(L"undefined tabFalg");
@@ -638,7 +634,7 @@ void HUD::drawQuickSlot()
 			setZoom(2.0);
 			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //텍스쳐 투명도 설정
 			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, event.motion.x, event.motion.y);
+			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, getMouseX(), getMouseY());
 			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //텍스쳐 투명도 설정
 			setZoom(1.0);
 		}
@@ -908,8 +904,7 @@ void HUD::drawBarAct()
 		//하단 텍스트
 		int fontSize = 12;
 		setFontSize(fontSize);
-		SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
+		drawTextCenter(col2Str(col::white)+actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
 		if (checkCursor(&barButton[i]) || barActCursor == i)
 		{

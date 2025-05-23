@@ -1,4 +1,6 @@
-﻿export module wrapVar;
+﻿#include <SDL3/SDL.h>
+
+export module wrapVar;
 
 import std;
 import util;
@@ -127,4 +129,44 @@ export int updateQuiverSpr(ItemData& inputData)
 export void updateQuiverSpr(ItemPocket* inputPocket)
 {
     for (int i = 0; i < inputPocket->itemInfo.size(); i++) updateQuiverSpr(inputPocket->itemInfo[i]);
+}
+
+//export float getMouseX()
+//{
+//    float mouseX;
+//    SDL_GetMouseState(&mouseX, nullptr);
+//    return mouseX;
+//}
+//
+//export float getMouseY()
+//{
+//    float mouseY;
+//    SDL_GetMouseState(nullptr, &mouseY);
+//    return mouseY;
+//}   
+
+
+
+export float getMouseX()
+{
+    float px, py;
+    SDL_GetMouseState(&px, &py);
+
+    int winW, winH;
+    SDL_GetWindowSize(window, &winW, &winH);
+
+    float scaleX = (float)cameraW / (float)winW;
+    return px * scaleX;
+}
+
+export float getMouseY()
+{
+    float px, py;
+    SDL_GetMouseState(&px, &py);
+
+    int winW, winH;
+    SDL_GetWindowSize(window, &winW, &winH);
+
+    float scaleY = (float)cameraH / (float)winH;
+    return py * scaleY;
 }

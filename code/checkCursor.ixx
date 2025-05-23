@@ -3,14 +3,8 @@
 export module checkCursor;
 
 import globalVar;
+import wrapVar;
 import util;
-
-export Point2 getMouseXY()
-{
-    float x, y;
-    SDL_GetMouseState(&x, &y);
-    return { static_cast<int>(x), static_cast<int>(y) };
-}
 
 export Point2 getTouchXY()
 {
@@ -24,7 +18,7 @@ export bool checkCursor(const SDL_Rect* rect)
     {
     case input::mouse:
     {
-        Point2 mouseCoord = getMouseXY();
+        Point2 mouseCoord = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
         if (mouseCoord.x >= rect->x && mouseCoord.x <= rect->x + rect->w &&
             mouseCoord.y >= rect->y && mouseCoord.y <= rect->y + rect->h)
         {

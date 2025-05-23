@@ -103,8 +103,8 @@ public:
 				}
 				else
 				{
-					revX = event.motion.x - (cameraW / 2);
-					revY = event.motion.y - (cameraH / 2);
+					revX = getMouseX() - (cameraW / 2);
+					revY = getMouseY() - (cameraH / 2);
 				}
 				revX += sgn(revX) * (8 * zoomScale);
 				revGridX = revX / (16 * zoomScale);
@@ -209,8 +209,8 @@ public:
 					}
 					else
 					{
-						revX = event.motion.x - (cameraW / 2);
-						revY = event.motion.y - (cameraH / 2);
+						revX = getMouseX() - (cameraW / 2);
+						revY = getMouseY() - (cameraH / 2);
 					}
 					revX += sgn(revX) * (8 * zoomScale);
 					revGridX = revX / (16 * zoomScale);

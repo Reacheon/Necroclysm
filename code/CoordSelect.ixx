@@ -72,13 +72,11 @@ public:
 		bool displaySelectableCursor = true;
 		bool yellowFullRectCursor = false;
 
-
 		if (type == CoordSelectFlag::FIRESTORM)
 		{
 			displaySelectableCursor = false;
 			yellowFullRectCursor = true;
 		}
-
 
 		int markerIndex = 0;
 		if (timer::timer600 % 30 < 5) { markerIndex = 0; }
@@ -118,8 +116,8 @@ public:
 			}
 			else
 			{
-				revX = event.motion.x - (cameraW / 2);
-				revY = event.motion.y - (cameraH / 2);
+				revX = getMouseX() - (cameraW / 2);
+				revY = getMouseY() - (cameraH / 2);
 			}
 			revX += sgn(revX) * (8 * zoomScale);
 			revGridX = revX / (16 * zoomScale);
@@ -154,7 +152,7 @@ public:
 			{
 				drawSpriteCenter
 				(
-					spr::cursorMarker,
+					spr::whiteMarker,
 					markerIndex,
 					(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
 					(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
@@ -167,7 +165,7 @@ public:
 
 		//사념파
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
-		drawTextCenter(L"#FFFFFF" + telepathyStr, cameraW / 2, 165);
+		drawTextCenter(col2Str(col::white) + telepathyStr, cameraW / 2, 165);
 	}
 	void clickUpGUI()
 	{
@@ -199,8 +197,8 @@ public:
 				}
 				else
 				{
-					revX = event.motion.x - (cameraW / 2);
-					revY = event.motion.y - (cameraH / 2);
+					revX = getMouseX() - (cameraW / 2);
+					revY = getMouseY() - (cameraH / 2);
 				}
 				revX += sgn(revX) * (8 * zoomScale) + camDelX;
 				revGridX = revX / (16 * zoomScale);

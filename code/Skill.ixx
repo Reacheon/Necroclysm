@@ -15,6 +15,7 @@ import drawWindow;
 import Player;
 import SkillData;
 import useSkill;
+import wrapVar;
 
 enum class skillCategory
 {
@@ -240,7 +241,7 @@ public:
 				setZoom(2.0);
 				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //텍스쳐 투명도 설정
 				SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-				drawSpriteCenter(spr::skillSet, skillDex[dragSkillTarget].iconIndex, event.motion.x, event.motion.y);
+				drawSpriteCenter(spr::skillSet, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
 				SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //텍스쳐 투명도 설정
 				setZoom(1.0);
 			}

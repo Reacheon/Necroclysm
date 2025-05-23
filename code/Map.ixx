@@ -119,7 +119,7 @@ public:
 					{
 						if (SDL_GetTicks() % 600 < 300)
 						{
-							drawSprite(spr::cursorMarker, mapBase.x + 7 + 16 * x, mapBase.y + 90 + 16 * y);
+							drawSprite(spr::whiteMarker, mapBase.x + 7 + 16 * x, mapBase.y + 90 + 16 * y);
 						}
 					}
 					

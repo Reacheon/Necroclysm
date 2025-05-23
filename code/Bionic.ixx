@@ -81,9 +81,6 @@ public:
 		{
 			drawWindow(&bionicBase, sysStr[6], 8);
 
-
-			SDL_SetRenderDrawColor(renderer, col::gray.r, col::gray.g, col::gray.b, 0xff);
-
 			SDL_Rect whiteRectData = { bionicBase.x, bionicBase.y + 30 - 1 , 220 , bionicBase.h - 30 + 1 };
 			drawRect(whiteRectData, col::gray);
 

@@ -470,8 +470,7 @@ public:
 		}
 		else if (checkCursor(&tab))
 		{
-			Point2 mPoint = getMouseXY();
-			if ((mPoint.x - tab.x + mPoint.y - tab.y - 119) < 0)
+			if ((getMouseX() - tab.x + getMouseY() - tab.y - 119) < 0)
 			{
 				executeTabShot();
 			}

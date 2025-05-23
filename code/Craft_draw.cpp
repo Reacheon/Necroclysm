@@ -108,7 +108,6 @@ void Craft::drawGUI()
 				outlineColor = { 0xa6, 0xa6, 0xa6 };
 			}
 			drawStadium(bookmarkCategory.x, bookmarkCategory.y, bookmarkCategory.w, bookmarkCategory.h, btnColor, 200, 5);
-			SDL_SetRenderDrawColor(renderer, outlineColor.r, outlineColor.g, outlineColor.b, 255);
 			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 3,  bookmarkCategory.y + 3, bookmarkCategory.w - 6, bookmarkCategory.h - 6 };
 			drawRect(bookmarkInCategory, outlineColor);
 			setFontSize(12);
@@ -188,8 +187,7 @@ void Craft::drawGUI()
 				fontSize--;
 				setFontSize(fontSize);
 			}
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
-			drawTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
+			drawTextCenter(col2Str(col::white)+categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
 
 			if (checkCursor(&craftCategory[i]) && deactColorChange == false)
 			{

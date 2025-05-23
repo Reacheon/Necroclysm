@@ -163,6 +163,8 @@ export void drawTextEx(std::wstring text, int x, int y, bool center)
             TTF_RenderText_Solid(mainFont[s_fontSize], utf8.c_str(), 0, renderCol) :
             TTF_RenderText_Blended(mainFont[s_fontSize], utf8.c_str(), 0, renderCol);
         SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+        SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+
         SDL_DestroySurface(surf);
 
         float w, h; SDL_GetTextureSize(tex, &w, &h);
@@ -197,3 +199,5 @@ export int drawTextWidth(std::wstring text, int x, int y, bool center, int width
 
 export void setFontSize(int v) { s_fontSize = v; }
 export void setFontGap(int v) { s_fontGap = v; }
+
+//-----------------------------------------------------------

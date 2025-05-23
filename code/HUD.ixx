@@ -1009,7 +1009,7 @@ public:
 		Point2 windowCoord;
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
-			windowCoord = { getMouseXY().x, getMouseXY().y };
+			windowCoord = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 		}
 		else if (option::inputMethod == input::gamepad)
 		{

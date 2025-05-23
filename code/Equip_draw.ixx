@@ -37,7 +37,6 @@ void Equip::drawGUI()
 
 
 		//이큅 윈도우 본체
-		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(10);
 		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 6, equipWindow.y + equipWindow.h - 8);
 
@@ -58,11 +57,10 @@ void Equip::drawGUI()
 				drawStadium(equipLabelQuantity.x, equipLabelQuantity.y, equipLabelQuantity.w, equipLabelQuantity.h, lowCol::blue, 183, 5);
 			}
 		}
-		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(12);
-		drawText(sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //선택(상단바)
-		drawText(sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //이름(상단바)
-		drawText(sysStr[24], equipLabel.x + 260, equipLabel.y + 4); //무리량(상단바)
+		drawText(col2Str(col::white)+sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //선택(상단바)
+		drawText(col2Str(col::white) + sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //이름(상단바)
+		drawText(col2Str(col::white) + sysStr[24], equipLabel.x + 260, equipLabel.y + 4); //무리량(상단바)
 
 		//개별 아이템
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
@@ -98,7 +96,6 @@ void Equip::drawGUI()
 
 		setFontSize(12);
 
-		SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 0xff);
 
 		drawText(col2Str(col::lightGray) + sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0);//머리
 		drawText(col2Str(col::lightGray) + sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1);//몸통
@@ -107,13 +104,12 @@ void Equip::drawGUI()
 		drawText(col2Str(col::lightGray) + sysStr[110], topWindow.x + 10, topWindow.y + 24 + 18 * 4);//왼다리
 		drawText(col2Str(col::lightGray) + sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5);//오른다리
 
-		SDL_SetRenderDrawColor(renderer, lowCol::orange.r, lowCol::orange.g, lowCol::orange.b, 0xff);
 
 		setFontSize(10);
-		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//관통저항
-		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//참격저항
-		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//타격저항
-		drawTextCenter(sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);//방해도
+		drawTextCenter(col2Str(lowCol::orange)+sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9);//관통저항
+		drawTextCenter(col2Str(lowCol::orange) + sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9);//참격저항
+		drawTextCenter(col2Str(lowCol::orange) + sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9);//타격저항
+		drawTextCenter(col2Str(lowCol::orange) + sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9);//방해도
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -147,12 +143,10 @@ void Equip::drawGUI()
 			enc = PlayerPtr->getEnc(targetPart);
 			maxEnc = 30;
 
-			SDL_SetRenderDrawColor(renderer, col::white.r, col::white.g, col::white.b, 0xff);
-			drawTextCenter(std::to_wstring(rPierce), topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * i + 9);
-			drawTextCenter(std::to_wstring(rCut), topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * i + 9);
-			drawTextCenter(std::to_wstring(rBash), topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * i + 9);
-			SDL_SetRenderDrawColor(renderer, col::lightGray.r, col::lightGray.g, col::lightGray.b, 0xff);
-			drawTextCenter(std::to_wstring(enc) + L"/" + std::to_wstring(maxEnc), topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * i + 9);
+			drawTextCenter(col2Str(col::white) + std::to_wstring(rPierce), topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * i + 9);
+			drawTextCenter(col2Str(col::white) + std::to_wstring(rCut), topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * i + 9);
+			drawTextCenter(col2Str(col::white) + std::to_wstring(rBash), topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * i + 9);
+			drawTextCenter(col2Str(col::lightGray)+std::to_wstring(enc) + L"/" + std::to_wstring(maxEnc), topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * i + 9);
 		}
 
 
@@ -172,19 +166,17 @@ void Equip::drawGUI()
 		drawTextCenter(col2Str(col::white) + std::to_wstring(SH), topWindow.x + 290 + 70 + 20, topWindow.y + 24 + 18 * -1 + 9);
 		drawTextCenter(col2Str(col::white) + std::to_wstring(EV), topWindow.x + 290 + 70 + 20, topWindow.y + 24 + 18 * 0 + 9);
 
-		SDL_SetRenderDrawColor(renderer, lowCol::green.r, lowCol::green.g, lowCol::green.b, 0xff);
-
 		int rFire = PlayerPtr->entityInfo.rFire;
 		int rCold = PlayerPtr->entityInfo.rCold;
 		int rElec = PlayerPtr->entityInfo.rElec;
 		int rCorr = PlayerPtr->entityInfo.rCorr;
 		int rRad = PlayerPtr->entityInfo.rRad;
 
-		drawText(L"Lv." + std::to_wstring(rFire), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 1);
-		drawText(L"Lv." + std::to_wstring(rCold), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 2);
-		drawText(L"Lv." + std::to_wstring(rElec), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 3);
-		drawText(L"Lv." + std::to_wstring(rCorr), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 4);
-		drawText(L"Lv." + std::to_wstring(rRad), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 5);
+		drawText(col2Str(lowCol::green)+L"Lv." + std::to_wstring(rFire), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 1);
+		drawText(col2Str(lowCol::green) + L"Lv." + std::to_wstring(rCold), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 2);
+		drawText(col2Str(lowCol::green) + L"Lv." + std::to_wstring(rElec), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 3);
+		drawText(col2Str(lowCol::green) + L"Lv." + std::to_wstring(rCorr), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 4);
+		drawText(col2Str(lowCol::green) + L"Lv." + std::to_wstring(rRad), topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 5);
 	}
 
 }

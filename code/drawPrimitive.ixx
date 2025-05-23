@@ -12,6 +12,7 @@ export void drawPoint(int x1, int y1, const SDL_Color& col, Uint8 alpha)
 {
 	SDL_SetRenderDrawColor(localRenderer, col.r, col.g, col.b, alpha);
 	SDL_RenderPoint(localRenderer, x1, y1);
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
 };
 export void drawPoint(int x1, int y1, const SDL_Color& col) { drawPoint(x1, y1, col, 255);}
 
@@ -20,6 +21,7 @@ export void drawLine(int x1, int y1, int x2, int y2, SDL_Color col, Uint8 alpha)
 {
     SDL_SetRenderDrawColor(localRenderer, col.r, col.g, col.b, alpha);
     SDL_RenderLine(localRenderer, x1, y1, x2, y2);
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
 };
 export void drawLine(int x1, int y1, int x2, int y2, SDL_Color col){ drawLine(x1, y1, x2, y2, col, 255); };
 export void drawLine(int x1, int y1, int x2, int y2) { drawLine(x1, y1, x2, y2, { 255,255,255 }, 255); }
@@ -31,6 +33,7 @@ export void drawFillRect(const SDL_FRect& rect, const SDL_Color& col, Uint8 alph
 {
 	SDL_SetRenderDrawColor(localRenderer, col.r, col.g, col.b, alpha);
 	SDL_RenderFillRect(localRenderer, &rect);
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
 }
 export void drawFillRect(const SDL_FRect& rect, const SDL_Color& col)
 {

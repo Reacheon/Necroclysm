@@ -4,6 +4,7 @@ import std;
 import util;
 import globalVar;
 import GUI;
+import wrapVar;
 
 export void clickHold()
 {
@@ -15,7 +16,7 @@ export void clickHold()
 	switch (option::inputMethod)
 	{
 	case input::mouse:
-		clickHoldPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
+		clickHoldPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 		break;
 	case input::touch:
 		clickHoldPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };

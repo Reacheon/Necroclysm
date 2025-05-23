@@ -4,6 +4,7 @@ import std;
 import util;
 import globalVar;
 import GUI;
+import wrapVar;
 
 export void clickDown()
 {
@@ -18,7 +19,7 @@ export void clickDown()
 	switch (option::inputMethod)
 	{
 		case input::mouse:
-			clickDownPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
+			clickDownPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 			break;
 		case input::touch:
 			clickDownPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };

@@ -38,6 +38,7 @@ public:
         int textureW = queryTextWidth(letters, false) + 2;
         int textureH = queryTextHeight(letters, false) + 2;
         SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
+        SDL_SetTextureScaleMode(drawingTexture, SDL_SCALEMODE_NEAREST);
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -66,15 +67,17 @@ public:
         int textureW = queryTextWidth(letters, false) + 2;
         int textureH = queryTextHeight(letters, false) + 2;
         SDL_Texture* drawingTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, textureW, textureH);
+        SDL_SetTextureScaleMode(drawingTexture, SDL_SCALEMODE_NEAREST);
+
         SDL_SetRenderTarget(renderer, drawingTexture);
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
-        setFontSize(8);
-        drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선
-        drawTextCenter(col2Str(col::black) + letters, textureW / 2 - 1, textureH / 2);//외곽선
-        drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 + 1);//외곽선
-        drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 - 1);//외곽선
+        setFontSize(9);
+        //drawTextCenter(col2Str(col::black) + letters, textureW / 2 + 1, textureH / 2);//외곽선
+        //drawTextCenter(col2Str(col::black) + letters, textureW / 2 - 1, textureH / 2);//외곽선
+        //drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 + 1);//외곽선
+        //drawTextCenter(col2Str(col::black) + letters, textureW / 2, textureH / 2 - 1);//외곽선
         drawTextCenter(col2Str(inputCol) + letters, textureW / 2, textureH / 2);
         SDL_SetRenderTarget(renderer, nullptr);
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);

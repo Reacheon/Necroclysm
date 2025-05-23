@@ -45,8 +45,8 @@ void HUD::clickMotionGUI(int dx, int dy)
 		const int maxDist = 160;
 		int prevCameraX = cameraX, prevCameraY = cameraY;
 		cameraFix = false;
-		cameraX -= ((event.motion.x - prevMouseX4Motion) / 2);
-		cameraY -= ((event.motion.y - prevMouseY4Motion) / 2);
+		cameraX -= ((getMouseX() - prevMouseX4Motion) / 2);
+		cameraY -= ((getMouseY() - prevMouseY4Motion) / 2);
 		disableClickUp4Motion = true;
 
 		if (std::abs(PlayerPtr->getX() - cameraX) > maxDist) cameraX = prevCameraX;
@@ -235,8 +235,8 @@ void HUD::clickUpGUI()
 			}
 			else
 			{
-				revX = event.motion.x - (cameraW / 2);
-				revY = event.motion.y - (cameraH / 2);
+				revX = getMouseX() - (cameraW / 2);
+				revY = getMouseY() - (cameraH / 2);
 			}
 			revX += sgn(revX) * (8 * zoomScale) + camDelX;
 			revGridX = revX / (16 * zoomScale);

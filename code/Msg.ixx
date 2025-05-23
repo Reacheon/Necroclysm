@@ -245,12 +245,10 @@ public:
 			}
 
 			//버튼 글자들
-			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(16);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
-				
-				drawTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
+				drawTextCenter(col2Str(col::white) + msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
 			}
 
 			if (exInput == true)

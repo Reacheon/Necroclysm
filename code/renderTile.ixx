@@ -930,6 +930,7 @@ __int64 drawMarkers()
 				{
 					int tgtX = getAbsMouseGrid().x;
 					int tgtY = getAbsMouseGrid().y;
+
 					dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
 					dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
 					dst.w = tileSize;
@@ -937,7 +938,7 @@ __int64 drawMarkers()
 					setZoom(zoomScale);
 					drawSpriteCenter
 					(
-						spr::cursorMarker,
+						spr::whiteMarker,
 						0,
 						dst.x + dst.w / 2,
 						dst.y + dst.h / 2
@@ -986,7 +987,7 @@ __int64 drawMarkers()
 					setZoom(zoomScale);
 					drawSpriteCenter
 					(
-						spr::cursorMarker,
+						spr::whiteMarker,
 						0,
 						dst.x + dst.w / 2,
 						dst.y + dst.h / 2

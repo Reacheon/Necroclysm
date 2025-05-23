@@ -1,6 +1,9 @@
-﻿export module mouseGrid;
+﻿#include <SDL3/SDL.h>
+
+export module mouseGrid;
 
 import globalVar;
+import wrapVar;
 import util;
 import std;
 
@@ -15,8 +18,8 @@ export std::array<int,2> getRevMouseGrid()
 	}
 	else
 	{
-		revX = event.motion.x - (cameraW / 2);
-		revY = event.motion.y - (cameraH / 2);
+		revX = getMouseX() - (cameraW / 2);
+		revY = getMouseY() - (cameraH / 2);
 	}
 	revX += sgn(revX) * (8 * zoomScale);
 	revGridX = revX / (16 * zoomScale);
@@ -35,6 +38,7 @@ export Point2 getAbsMouseGrid()
 	if (cameraY >= 0) cameraGridY = cameraY / 16;
 	else cameraGridY = -1 + cameraY / 16;
 
+
 	int camDelX = cameraX - (16 * cameraGridX + 8);
 	int camDelY = cameraY - (16 * cameraGridY + 8);
 
@@ -46,8 +50,8 @@ export Point2 getAbsMouseGrid()
 	}
 	else
 	{
-		revX = event.motion.x - (cameraW / 2);
-		revY = event.motion.y - (cameraH / 2);
+		revX = getMouseX() - (cameraW / 2);
+		revY = getMouseY() - (cameraH / 2);
 	}
 	revX += sgn(revX) * (8 * zoomScale) + camDelX;
 	revGridX = revX / (16 * zoomScale);

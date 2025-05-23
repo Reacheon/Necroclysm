@@ -21,8 +21,8 @@ export void clickRight()
 	switch (option::inputMethod)
 	{
 	case input::mouse:
-		prt(L"마우스 클릭라이트 Up 입력 (%d,%d)\n", static_cast<int>(event.motion.x), static_cast<int>(event.motion.y));
-		clickUpPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
+		prt(L"마우스 클릭라이트 Up 입력 (%d,%d)\n", static_cast<int>(getMouseX()), static_cast<int>(getMouseY()));
+		clickUpPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 		break;
 	case input::touch:
 		prt(L"터치 클릭라이트 Up 입력 (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));

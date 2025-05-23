@@ -22,8 +22,8 @@ export void clickUp()
 	switch (option::inputMethod)
 	{
 		case input::mouse:
-			//prt(L"마우스 Up 입력 (%d,%d)\n", event.motion.x, event.motion.y);
-			clickUpPoint = { static_cast<int>(event.motion.x), static_cast<int>(event.motion.y) };
+			//prt(L"마우스 Up 입력 (%d,%d)\n", getMouseX(), getMouseY());
+			clickUpPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 			break;
 		case input::touch:
 			//prt(L"터치 Up 입력 (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));
