@@ -32,7 +32,7 @@ void Inventory::drawGUI()
 		setZoom(1.0);
 
 		setFontSize(16);
-		drawText(col2Str(col::white) + inventoryItemData->name, inventoryBase.x + 73, inventoryBase.y + 39);
+		renderText(inventoryItemData->name, inventoryBase.x + 73, inventoryBase.y + 39);
 
 		drawLine(inventoryBase.x + 72, inventoryBase.y + 63, inventoryBase.x + 72 + 255, inventoryBase.y + 63, col::gray);//회색 분리선
 
@@ -41,7 +41,7 @@ void Inventory::drawGUI()
 		drawRect(volumeGaugeRect, col::white);
 		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 		setFontSize(10);
-		drawText(col2Str(col::white) + sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//부피
+		renderText(sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);//부피
 
 		 //Inventory에도 같은 코드가 존재
 		{
@@ -59,7 +59,7 @@ void Inventory::drawGUI()
 				std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxVolume / 1000.0, 1) + L" L";
 				setFontSize(10);
-				drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+				renderText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
 			}
 			else if (inventoryItemData->pocketMaxNumber > 0)
 			{
@@ -74,7 +74,7 @@ void Inventory::drawGUI()
 				std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxNumber / 1000.0, 1);
 				setFontSize(10);
-				drawText(col2Str(col::white) + currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+				renderText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
 			}
 		}
 
@@ -90,7 +90,7 @@ void Inventory::drawGUI()
 		drawRect(dropBtn, col::gray);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 11, dropBtn.y + 12);
 		setFontSize(10);
-		drawTextCenter(col2Str(col::white) + sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//버리기
+		renderTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//버리기
 		drawFillRect(dropBtn, col::black, 150);
 
 
@@ -117,9 +117,9 @@ void Inventory::drawGUI()
 			}
 		}
 		setFontSize(12);
-		drawText(col2Str(col::white) + sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //선택(상단바)
-		drawText(col2Str(col::white) + sysStr[16], inventoryLabel.x + 140, inventoryLabel.y + 4); //이름(상단바)
-		drawText(col2Str(col::white) + sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)
+		renderText(sysStr[15], inventoryLabel.x + 10, inventoryLabel.y + 4); //선택(상단바)
+		renderText(sysStr[16], inventoryLabel.x + 140, inventoryLabel.y + 4); //이름(상단바)
+		renderText(sysStr[24], inventoryLabel.x + 250, inventoryLabel.y + 4); //무리량(상단바)
 
 		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 30, 315, 200 };
 
@@ -130,7 +130,7 @@ void Inventory::drawGUI()
 		if (inventoryPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
-			drawTextCenter(col2Str(col::lightGray) + sysStr[162], inventoryBase.x + 162, inventoryBase.y + 140); //가방 안에 아이템이 없다
+			renderTextCenter(sysStr[162], inventoryBase.x + 162, inventoryBase.y + 140, col::lightGray); //가방 안에 아이템이 없다
 		}
 
 	}

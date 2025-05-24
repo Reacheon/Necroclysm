@@ -86,7 +86,7 @@ void HUD::drawGUI()
 		if (1)//플레이어 이름 그리기
 		{
 			setFontSize(10);
-			drawText(col2Str(lowCol::yellow)+L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4);
+			renderText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4, lowCol::yellow);
 		}
 
 		//HP바 그리기
@@ -96,7 +96,7 @@ void HUD::drawGUI()
 			drawSprite(spr::icon16, 72, pivotX, pivotY);
 
 			setFontSize(10);
-			drawText(col2Str(lowCol::green) + L"HEALTH", pivotX + 16, pivotY + 1);
+			renderText(L"HEALTH", pivotX + 16, pivotY + 1, lowCol::green);
 
 			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
 
@@ -111,11 +111,7 @@ void HUD::drawGUI()
 
 			std::wstring hpStr = std::to_wstring(PlayerPtr->entityInfo.HP) + L" / " + std::to_wstring(PlayerPtr->entityInfo.maxHP);
 			setFontSize(8);
-			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142 + 1, pivotY + 7);
-			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142 - 1, pivotY + 7);
-			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142, pivotY + 7 + 1);
-			drawTextCenter(col2Str(lowCol::black) + hpStr, pivotX + 142, pivotY + 7 - 1);
-			drawTextCenter(col2Str(lowCol::white) + hpStr, pivotX + 142, pivotY + 7);
+			renderTextOutlineCenter(hpStr, pivotX + 142, pivotY + 7);
 		}
 
 		//MP바 그리기
@@ -125,7 +121,7 @@ void HUD::drawGUI()
 			drawSprite(spr::icon16, 73, pivotX, pivotY);
 
 			setFontSize(10);
-			drawText(col2Str(lowCol::blue) + L"MENTAL", pivotX + 16, pivotY + 1);
+			renderText(L"MENTAL", pivotX + 16, pivotY + 1, lowCol::blue);
 
 			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
 			
@@ -139,11 +135,7 @@ void HUD::drawGUI()
 
 			std::wstring mpStr = std::to_wstring(PlayerPtr->entityInfo.MP) + L" / " + std::to_wstring(PlayerPtr->entityInfo.maxMP);
 			setFontSize(8);
-			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142 + 1, pivotY + 7);
-			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142 - 1, pivotY + 7);
-			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142, pivotY + 7 + 1);
-			drawTextCenter(col2Str(lowCol::black) + mpStr, pivotX + 142, pivotY + 7 - 1);
-			drawTextCenter(col2Str(lowCol::white) + mpStr, pivotX + 142, pivotY + 7);
+            renderTextOutlineCenter(mpStr, pivotX + 142, pivotY + 7);
 		}
 
 
@@ -199,29 +191,26 @@ void HUD::drawGUI()
 
 
 				setFontSize(10);
-				drawTextCenter(col2Str(lowCol::white) + L"STA", pivotX + 24, pivotY + 16);
+				renderTextCenter(L"STA", pivotX + 24, pivotY + 16);
 
 
 
 
 				std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
 				setFontSize(8);
-				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24 + 1, pivotY + 29);
-				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24 - 1, pivotY + 29);
-				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24, pivotY + 29 + 1);
-				drawTextCenter(col2Str(lowCol::black) + STAStr, pivotX + 24, pivotY + 29 - 1);
-				drawTextCenter(col2Str(lowCol::white) + STAStr, pivotX + 24, pivotY + 29);
+                renderTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);	
 			}
 
 			setFontSize(10);
 			
 			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6);
-			drawText(col2Str(lowCol::yellow) + L"6,320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0);
-			
-			drawText(col2Str(col::lightGray) + L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1);
-			drawText(col2Str(lowCol::green) + L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1);
-			drawText(col2Str(col::lightGray) + L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2);
-			drawText(col2Str(lowCol::green) + L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2);
+			renderText(L"6,320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0, lowCol::yellow);
+
+			renderText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1, col::lightGray);
+			renderText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1, lowCol::green);
+			renderText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
+			renderText(L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::green);
+
 
 			//시간 표시 기능
 			{
@@ -322,16 +311,12 @@ void HUD::drawGUI()
 				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 19);
 			}
 
-			drawTextCenter(col2Str(col::white)+L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
+			renderTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
 
-			drawTextCenter(col2Str(lowCol::black) + L"72%", letterbox.x + 18 + 562 + 16 + 1, letterbox.y + 3 + 24);
-			drawTextCenter(col2Str(lowCol::black) + L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24 - 1);
-			drawTextCenter(col2Str(lowCol::black) + L"72%", letterbox.x + 18 + 562 + 16 - 1, letterbox.y + 3 + 24);
-			drawTextCenter(col2Str(lowCol::black) + L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24 + 1);
-			drawTextCenter(col2Str(lowCol::white) + L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
+			renderTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
 		}
 
 		//팝업 버튼
@@ -406,8 +391,6 @@ void HUD::drawGUI()
 	drawQuickSlot();
 	//drawHoverItemInfo();
 
-	setFontSize(12);
-	drawText(col2Str(col::white) + std::to_wstring(getMouseX()) +L"/" + std::to_wstring(getMouseY()), 10, 10);
 }
 
 
@@ -446,8 +429,8 @@ void HUD::drawTab()
 		}
 
 		setFontSize(12);
-		drawTextCenter(col2Str(col::white)+sysStr[1], tab.x + 60, tab.y + 94);
-		drawTextCenter(col2Str(col::white) + sysStr[2], tab.x + 60, tab.y + 94 + 14);
+		renderTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
+		renderTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
 
 		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
@@ -501,9 +484,9 @@ void HUD::drawTab()
 
 
 		setFontSize(12);
-		drawTextCenter(col2Str(col::white)+sysStr[195], tab.x + 62, tab.y + 9);
-		drawTextCenter(col2Str(col::white) + sysStr[207], tab.x + 104, tab.y + 52);
-		//drawTextCenter(col2Str(col::white) + sysStr[195], tab.x + 60, tab.y + 92 + 7);
+		renderTextCenter(sysStr[195], tab.x + 62, tab.y + 9);
+		renderTextCenter(sysStr[207], tab.x + 104, tab.y + 52);
+		//renderTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
 
 
 
@@ -530,21 +513,21 @@ void HUD::drawTab()
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 14, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		drawTextCenter(col2Str(col::white)+sysStr[14], tab.x + 60, tab.y + 92 + 7);
+		renderTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::back:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 31, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		drawTextCenter(col2Str(col::white) + sysStr[31], tab.x + 60, tab.y + 92 + 7);
+		renderTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::confirm:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		drawTextCenter(col2Str(col::white) + sysStr[91], tab.x + 60, tab.y + 92 + 7);
+		renderTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
 		break;
 	default:
 		errorBox(L"undefined tabFalg");
@@ -584,11 +567,7 @@ void HUD::drawQuickSlot()
 			std::wstring skillName = L"";
 			skillName = skillDex[quickSlot[i].second].name;
 
-			drawTextCenter(col2Str(col::black) + skillName, 374 + 1, 57);
-			drawTextCenter(col2Str(col::black) + skillName, 374 - 1, 57);
-			drawTextCenter(col2Str(col::black) + skillName, 374, 57 + 1);
-			drawTextCenter(col2Str(col::black) + skillName, 374, 57 - 1);
-			drawTextCenter(col2Str(col::white) + skillName, 374, 57);
+			renderTextOutlineCenter(skillName, 374, 57);
 		}
 
 		drawFillRect(SDL_Rect{ pivotX,pivotY,44,39 }, btnCol, 200);
@@ -622,7 +601,7 @@ void HUD::drawQuickSlot()
 			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
 		}
 		setFontSize(10);
-		drawText(col2Str(col::white) + std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+		renderText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
 
 
 	}
@@ -904,7 +883,7 @@ void HUD::drawBarAct()
 		//하단 텍스트
 		int fontSize = 12;
 		setFontSize(fontSize);
-		drawTextCenter(col2Str(col::white)+actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
+		renderTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
 		if (checkCursor(&barButton[i]) || barActCursor == i)
 		{
@@ -978,7 +957,7 @@ void HUD::drawStatusEffects()
 		drawCross2(pivotX + 32, pivotY + 32, 5, 0, 5, 0);
 
 		setFontSize(12);
-		drawText(col2Str(lowCol::red) + statEfctName, pivotX + 37, pivotY + 1);
+		renderText(statEfctName, pivotX + 37, pivotY + 1, lowCol::red);
 
 		if (myEfcts[i].second > 0)
 		{
@@ -1034,7 +1013,7 @@ void HUD::drawHoverItemInfo()
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
 				std::wstring titleName = vehPtr->name;
-				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
 				if(vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -1061,7 +1040,7 @@ void HUD::drawHoverItemInfo()
 					drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
-					drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
 
 					//연료량
 					drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
@@ -1078,7 +1057,7 @@ void HUD::drawHoverItemInfo()
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
 				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
-				drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
 				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].sprIndex, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
 
 
@@ -1102,7 +1081,7 @@ void HUD::drawHoverItemInfo()
 					drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
-					drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
 
 					//연료량
 					//drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);

@@ -1068,12 +1068,7 @@ void Entity::drawSelf()
 
 			if (zoomScale == 1.0) textY -= (int)(1 * zoomScale);
 
-			drawTextCenter(col2Str(col::black) + entityInfo.name, textX + 1, textY);
-			drawTextCenter(col2Str(col::black) + entityInfo.name, textX - 1, textY);
-			drawTextCenter(col2Str(col::black) + entityInfo.name, textX, textY + 1);
-			drawTextCenter(col2Str(col::black) + entityInfo.name, textX, textY - 1);
-
-			drawTextCenter(col2Str(col::white) + entityInfo.name, textX, textY);
+			renderTextOutlineCenter(entityInfo.name, textX, textY);
 		}
 	}
 

@@ -171,9 +171,6 @@
     <ClCompile Include="code\isCircle.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\Bionic.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\Profic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
@@ -197,9 +194,6 @@
     </ClCompile>
     <ClCompile Include="code\readItemDex.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Mutation.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\dataLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
@@ -326,9 +320,6 @@
     </ClCompile>
     <ClCompile Include="code\CoordSelectCraft.ixx">
       <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\God.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\Sticker.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -488,9 +479,6 @@
     </ClCompile>
     <ClCompile Include="code\drawEpsilonText.ixx">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="code\TitleScreen.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\Aim.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>

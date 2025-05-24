@@ -136,7 +136,7 @@ public:
 			drawFillRect(botWindow, col::black, 180);
 
 			setFontSize(12);
-			drawTextCenter(col2Str(col::white) + lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22);
+			renderTextCenter(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -159,14 +159,14 @@ public:
 					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
 
 					setFontSize(16);
-					drawText(col2Str(col::white) + lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 6);
+					renderText(lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 6);
 				}
 			}
 
 			setFontSize(10);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
-			drawTextCenter(col2Str(col::white) + hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstBase.y + lstBase.h - 17 + 8);
+			renderTextCenter(hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstBase.y + lstBase.h - 17 + 8);
 
 			// 아이템 스크롤 그리기
 			if (lstOptionVec.size() > MAX_BTN)

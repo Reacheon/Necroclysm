@@ -128,8 +128,8 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			break;
 		}
 	}
-	if (!split) drawText(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
-	else drawTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
+	if (!split) renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
+	else renderTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
@@ -152,7 +152,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		setFontSize(10);
 		std::wstring numberStr = L"x" + std::to_wstring(inputItem.number);
-		drawText(col2Str(col::white) + numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
+		renderText(numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
 		//mainName += std::to_wstring(inputItem.number) + L" "; 
 	}
 
@@ -235,7 +235,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	{
 		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 183, 5);
 		setFontSize(12);
-		drawTextCenter(col2Str(statusStrColor) + statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2);
+		renderTextCenter(statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2, statusStrColor);
 	}
 	else
 	{
@@ -302,23 +302,23 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		if (inputItem.weight > 1000)
 		{
 			std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
-			drawText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			renderText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
 		}
 		else
 		{
 			std::wstring kgStr = std::to_wstring(inputItem.weight);
-			drawText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			renderText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
 		}
 
 		if (inputItem.volume > 1000)
 		{
 			std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
-			drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+			renderText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
 		}
 		else
 		{
 			std::wstring volStr = std::to_wstring(inputItem.volume);
-			drawText(volStr + L" mL", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+			renderText(volStr + L" mL", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
 		}
 		
 	}
@@ -373,20 +373,8 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, int iconInd
 	setFontSize(16);
 	std::wstring mainName = text;
 
-	//사각형에 맞지않으면 폰트를 점차 줄임(최대 5까지)
 	setFontSize(fontSize);
-	while (queryTextWidthColorCode(mainName) > widthLimit)
-	{
-		if (fontSize > 6)
-		{
-			fontSize -= 1;
-			yCorrection += 1;
-			setFontSize(fontSize);
-		}
-		else break;
-	}
-
-	drawText(mainName, itemBox.x + 34, itemBox.y + 1 + yCorrection);
+	renderText(mainName, itemBox.x + 34, itemBox.y + 1 + yCorrection);
 
 	if (gray)
 	{

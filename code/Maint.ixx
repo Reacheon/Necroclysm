@@ -161,7 +161,7 @@ public:
 			drawFillRect(botWindow, col::black, 180);
 
 			setFontSize(14);
-			drawTextCenter(col2Str(col::white) + maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 30 + 22);
+			renderTextCenter(maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 30 + 22);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -188,7 +188,7 @@ public:
 					setZoom(1.0);
 
 					setFontSize(14);
-					drawText(col2Str(col::white) + items[currentItemIndex].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
+					renderText(items[currentItemIndex].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
 
 					drawRect({ maintBtn[i].x + 230, maintBtn[i].y + 3, 7, 23 }, col::lightGray);
 					drawFillRect(SDL_Rect{ maintBtn[i].x + 230 + 2, maintBtn[i].y + 3 + 2, 3, 19 }, lowCol::green);
@@ -198,7 +198,7 @@ public:
 			setFontSize(10);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
-			drawTextCenter(col2Str(col::white) + hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintBase.y + maintBase.h - 17 + 8);
+			renderTextCenter(hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintBase.y + maintBase.h - 17 + 8);
 
 			// 아이템 스크롤 그리기
 			if (items.size() > MAX_BTN)

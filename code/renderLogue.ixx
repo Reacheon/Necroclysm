@@ -25,8 +25,8 @@ export __int64 renderLog(SDL_Renderer* renderer)
 		{
 			//prt(L"그림자 문자는 %ws 이다.\n", excludeControlChar(logStrDeque[i]).c_str());
 			//prt(L"일반 문자는 %ws 이다.\n", logStrDeque[i].c_str());
-			drawText(L"#000000" + eraseColorCodeText(logStrDeque[i]), 5 + 2, cameraH - 158 - textHeight * i + 2);
-			drawText(logStrDeque[i], 5, cameraH - 158 - textHeight * i);
+			//renderText(L"#000000" + eraseColorCodeText(logStrDeque[i]), 5 + 2, cameraH - 158 - textHeight * i + 2);
+			renderText(logStrDeque[i], 5, cameraH - 158 - textHeight * i);
 			if (stopLog == false) 
 			{ 
 				minusLogTimerDeque(i);

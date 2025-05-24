@@ -155,7 +155,7 @@ public:
 			drawSprite(spr::msgBox, msgBase.x, msgBase.y);
 
 			setFontSize(22);
-			drawTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
+			renderTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
 
 			drawSpriteCenter(spr::icon32, 1,msgBase.x + 150- queryTextWidth(msgTitleText) / 2.0 -24, msgBase.y + 34);
 			
@@ -194,10 +194,10 @@ public:
 			}
 		loopEnd:
 
-			if (exInput == true) drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 240, -1);
+			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 240, -1);
 			else if (targetItemCode != 0)
 			{
-				drawTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 240, -1);
+				renderTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 240, -1);
 
 
 
@@ -213,17 +213,17 @@ public:
 				drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18, pivotY + 18);
 				setZoom(1.0);
 				setFontSize(12);
-				drawText(col2Str(col::white) + itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
+				renderText(itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
 
 				if (lastTextStart <= msgText.size() - 1)
 				{
 					setFontSize(16);
-					drawTextWidth(msgText.substr(lastTextStart), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 83, true, 240, -1);
+					renderTextWidth(msgText.substr(lastTextStart), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 83, true, 240, -1);
 				}
 			}
 			else
 			{
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 240, -1);
+				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 240, -1);
 			}
 
 
@@ -248,7 +248,7 @@ public:
 			setFontSize(16);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
-				drawTextCenter(col2Str(col::white) + msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
+				renderTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
 			}
 
 			if (exInput == true)
@@ -269,7 +269,7 @@ public:
 				{
 					exInputTextCut = exInputTextCut.substr(1);
 				}
-				drawText(col2Str(col::white) + exInputTextCut, inputTextPoint.x, inputTextPoint.y);
+				renderText(exInputTextCut, inputTextPoint.x, inputTextPoint.y);
 				std::wstring cursorText = exInputTextCut.substr(0, exInputCursor + exInputEditing);
 				if (timer::timer600 % 30 <= 15 && exInput == true)
 				{

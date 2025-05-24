@@ -14,12 +14,10 @@ import World;
 import Vehicle;
 import Prop;
 import Monster;
-import TitleScreen;
 
 export void startArea()
 {
 	new HUD();
-	//new TitleScreen();
 
 	World::ins()->getTile(0, 0, 0).EntityPtr = std::make_unique<Player>(0, 0, 0);
 	PlayerPtr = (Player*)TileEntity(0, 0, 0);

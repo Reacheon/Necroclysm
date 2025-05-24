@@ -103,9 +103,10 @@ public:
 				setFontSize(10);
 				int targetX = pivotX + 10;
 				int targetY = pivotY + (28 * (-1)) + 20;
-				drawTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY + 1); //재능
-				drawTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY + 1); //랭크
-				drawTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY + 1); //적성
+				SDL_Color col = { 0x23, 0x4a, 0x63 };
+				renderTextCenter( sysStr[182], targetX + 54 + (210 * i), targetY + 1, col); //재능
+				renderTextCenter(sysStr[183], targetX + 125 + (210 * i), targetY + 1, col); //랭크
+				renderTextCenter( sysStr[184], targetX + 174 + (210 * i), targetY + 1, col); //적성
 			}
 
 
@@ -197,14 +198,14 @@ public:
 				{
 					SDL_Color rankColor = col::white;
 					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
-					drawText(col2Str(rankColor) + proficStr, targetX + 40, targetY + 4);
+					renderText(proficStr, targetX + 40, targetY + 4, rankColor);
 				}
 
 				//재능 랭크와 게이지 그리기
 				{
 					SDL_Color rankColor = col::white;
 					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
-					drawTextCenter(col2Str(rankColor) + levelStr, targetX + 136, targetY + 10);
+					renderTextCenter(levelStr, targetX + 136, targetY + 10, rankColor);
 
 					SDL_Rect gauge = { targetX + 118, targetY + 18, 36, 3 };
 					drawRect(gauge, col::white);
@@ -233,7 +234,7 @@ public:
 				}
 
 				setFontSize(10);
-				drawText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 6);
+				renderText(aptStr, targetX + 175, targetY + 6);
 				setFontSize(10);
 
 				//재능 아이콘 그리기
@@ -247,11 +248,11 @@ public:
 			}
 			setZoom(1.0);
 
-			if (warningIndex > 0) { drawText(L"#FF0000" + sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70); }
+			if (warningIndex > 0) { renderText(sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70, lowCol::red); }
 			//클릭하여 재능포인트의 분배 우선 순위를 결정합니다. 예로 3개의 재능을 우선분배하면 각 재능 당 경험치가 33%씩 쌓입니다.
-			drawText(col2Str(col::white) + sysStr[180], proficBase.x + 20, proficBase.y + proficBase.h - 50);
+			renderText(sysStr[180], proficBase.x + 20, proficBase.y + proficBase.h - 50);
 			//적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능은 최대 S랭크까지 올릴 수 있습니다.
-			drawText(col2Str(col::white) + sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
+			renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
 		}
 		else
 		{

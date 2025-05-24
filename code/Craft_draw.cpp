@@ -49,7 +49,7 @@ void Craft::drawGUI()
 
 
 		setFontSize(12);
-		drawText(col2Str(col::white) + L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
+		renderText(L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
 
 		//아이템 아이콘 그리기
 
@@ -61,7 +61,7 @@ void Craft::drawGUI()
 		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18, pivotY + 18);
 		setZoom(1.0);
 		setFontSize(12);
-		drawText(col2Str(col::white) + itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
+		renderText(itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
 
 
 
@@ -79,7 +79,7 @@ void Craft::drawGUI()
 		topText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
 		topText += L"% )";
 
-		drawTextCenter(col2Str(col::white) + topText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y - 10);
+		renderTextCenter(topText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y - 10);
 
 	}
 
@@ -111,7 +111,7 @@ void Craft::drawGUI()
 			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 3,  bookmarkCategory.y + 3, bookmarkCategory.w - 6, bookmarkCategory.h - 6 };
 			drawRect(bookmarkInCategory, outlineColor);
 			setFontSize(12);
-			drawTextCenter(col2Str(col::white) + L"★ " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
+			renderTextCenter(L"★ " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
 		}
 
 		//좌측 카테고리 분류 기능 만들기
@@ -187,7 +187,7 @@ void Craft::drawGUI()
 				fontSize--;
 				setFontSize(fontSize);
 			}
-			drawTextCenter(col2Str(col::white)+categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
+			renderTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
 
 			if (checkCursor(&craftCategory[i]) && deactColorChange == false)
 			{
@@ -261,7 +261,7 @@ void Craft::drawGUI()
 					{
 						exInputTextCut = exInputTextCut.substr(1);
 					}
-					drawText(col2Str(col::white) + exInputTextCut, inputTextPoint.x, inputTextPoint.y);
+					renderText(exInputTextCut, inputTextPoint.x, inputTextPoint.y);
 					std::wstring cursorText = exInputTextCut.substr(0, exInputCursor + exInputEditing);
 					if (timer::timer600 % 30 <= 15 && exInput == true)
 					{
@@ -289,7 +289,7 @@ void Craft::drawGUI()
 				drawRect(searchBtnInRect, outlineColor);
 
 				setFontSize(12);
-				drawTextCenter(L"#FFFFFF" + sysStr[27], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 1);
+				renderTextCenter(sysStr[27], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 1);
 			}
 		}
 
@@ -332,7 +332,7 @@ void Craft::drawGUI()
 					}
 
 					setFontSize(10);
-					drawTextCenter(col2Str(letterColor) + boxStr, box.x + box.w / 2, box.y + box.h / 2);
+					renderTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2, letterColor);
 				};
 
 			std::vector<std::wstring> subcategoryList;
@@ -500,15 +500,15 @@ void Craft::drawGUI()
 						{
 							if (queryTextWidth(iPtr->name.substr(0, i + 1)) <= 63)
 							{
-								drawTextCenter(col2Str(col::white) + iPtr->name.substr(0, i + 1), pivotX + 28, pivotY + 42);
-								drawTextCenter(col2Str(col::white) + iPtr->name.substr(i+1), pivotX + 28, pivotY + 54);
+								renderTextCenter(iPtr->name.substr(0, i + 1), pivotX + 28, pivotY + 42);
+								renderTextCenter(iPtr->name.substr(i+1), pivotX + 28, pivotY + 54);
 								break;
 							}
 						}
 					}
 					else
 					{
-						drawTextCenter(col2Str(col::white) + iPtr->name, pivotX + 28, pivotY + 47);
+						renderTextCenter(iPtr->name, pivotX + 28, pivotY + 47);
 
 					}
 
@@ -532,7 +532,7 @@ void Craft::drawGUI()
 		if (numNoneBlackFilter == 0) // 만약 아이템이 없을 경우
 		{
 			setFontSize(12);
-			drawTextCenter(col2Str(col::white) + sysStr[127], craftBase.x + craftBase.w / 2 + 90, craftBase.y + craftBase.h / 2 + 40);
+			renderTextCenter(sysStr[127], craftBase.x + craftBase.w / 2 + 90, craftBase.y + craftBase.h / 2 + 40);
 		}
 
 		// 스크롤 그리기
@@ -550,7 +550,7 @@ void Craft::drawGUI()
 		setFontSize(10);
 		std::wstring whiteNumber = std::to_wstring(numNoneBlackFilter);
 		std::wstring totalNumber = std::to_wstring(recipePtr->itemInfo.size());
-		drawText(col2Str(col::white) + whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 382);
+		renderText(whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 382);
 
 
 		//아이템 디테일박스(툴팁) 그리기
@@ -574,22 +574,22 @@ void Craft::drawGUI()
 				drawSpriteCenter(spr::itemset, recipePtr->itemInfo[targetCursor].sprIndex, topWindow.x + 36, topWindow.y + 36);
 				setZoom(1.0);
 				setFontSize(16);
-				drawText(col2Str(col::white) + recipePtr->itemInfo[targetCursor].name, topWindow.x + 68, topWindow.y + 12);
+				renderText(recipePtr->itemInfo[targetCursor].name, topWindow.x + 68, topWindow.y + 12);
 
 				setFontSize(10);
 				std::wstring categoryStr = itemCategory2String(recipePtr->itemInfo[targetCursor].category) + L"-" + itemSubcategory2String(recipePtr->itemInfo[targetCursor].subcategory);
 
-				drawText(col2Str(col::lightGray) + categoryStr, topWindow.x + 68, topWindow.y + 12 + 18);
+				renderText(categoryStr, topWindow.x + 68, topWindow.y + 12 + 18, col::lightGray);
 
 				std::wstring weightStr = L"무게 : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
 				weightStr += L"KG";
-				drawText(col2Str(col::white) + weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
+				renderText(weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
 
 				std::wstring volumeStr = L"부피 : ";
 				volumeStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].volume)) / 1000.0, 3);
 				volumeStr += L"L";
-				drawText(col2Str(col::white) + volumeStr, topWindow.x + 168, topWindow.y + 12 + 32);
+				renderText(volumeStr, topWindow.x + 168, topWindow.y + 12 + 32);
 
 				std::wstring tooltipText;
 
@@ -667,8 +667,8 @@ void Craft::drawGUI()
 				tooltipText += itemTooltip[recipePtr->itemInfo[targetCursor].tooltipIndex];
 
 				setFontSize(10);
-				if (!tooltipUnfold) drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12, 6);
-				else drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12);
+				if (!tooltipUnfold) renderTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12, 6);
+				else renderTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12);
 
 				//접기-펼치기 버튼
 				{
@@ -707,9 +707,9 @@ void Craft::drawGUI()
 					drawRect(tooltipCraftBtn, outlineColor);
 					setFontSize(12);
 
-					drawTextCenter(col2Str(col::white) + L"조합하기", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);
+					renderTextCenter(L"조합하기", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);
 					setFontSize(10);
-					drawTextCenter(col2Str(col::white) + L"1시간 3분", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
+					renderTextCenter(L"1시간 3분", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
 					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 14, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
 
 					if (canCraft == false) drawFillRect(tooltipCraftBtn, col::black, 100);
@@ -740,7 +740,7 @@ void Craft::drawGUI()
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
 					setFontSize(12);
-					drawTextCenter(col2Str(textColor) + L"즐겨찾기", tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2);
+					renderTextCenter(L"즐겨찾기", tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2, textColor);
 					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 14, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 
 					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1));

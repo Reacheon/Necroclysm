@@ -1112,7 +1112,7 @@ __int64 drawDebug()
 				setFontSize(20);
 
 
-				drawTextCenter(col2Str(col::red) + L"CHUNK", dst.x + dst.w / 2, dst.y + dst.h / 2-12);
+				renderTextCenter(L"CHUNK", dst.x + dst.w / 2, dst.y + dst.h / 2-12, col::red);
 
 				int cx, cy;
 				World::ins()->changeToChunkCoord(tgtX, tgtY, cx, cy);
@@ -1122,7 +1122,7 @@ __int64 drawDebug()
 				chunkName += std::to_wstring(cy);
 				chunkName += L",";
 				chunkName += std::to_wstring(PlayerZ());
-				drawTextCenter(col2Str(col::red) + chunkName, dst.x + dst.w/2, dst.y + dst.h/2+12);
+				renderTextCenter(chunkName, dst.x + dst.w/2, dst.y + dst.h/2+12, col::red);
 			}
 
 		}

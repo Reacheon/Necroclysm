@@ -198,80 +198,43 @@ public:
 				setFontSize(10);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 22;
-
-				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
-
-				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+				renderTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(8);
 				int textX2 = cameraW / 2;
 				int textY2 = cameraH / 2 - 32;
+				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
-
-				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
-
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr)/2.0 - 5, textY2-1);
-
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
 			}
 			else if (zoomScale == 2.0)
 			{
 				setFontSize(10);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 40;
-
-				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
-
-				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+				renderTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(8);
 				int textX2 = cameraW / 2;
 				int textY2 = cameraH / 2 - 50;
+				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
-
-				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
-
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2-1);
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
 			}
 			else if (zoomScale == 3.0)
 			{
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58;
-
-				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
-
-				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+				renderTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
-				int textX2 = textX+5;
+				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
-
-				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2-1);
+				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
 				setZoom(1.0);
 			}
 			else if (zoomScale == 4.0)
@@ -279,24 +242,12 @@ public:
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58 - 15;
-
-				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
-
-				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+				renderTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
 				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
-
-				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
@@ -307,45 +258,17 @@ public:
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58 - 34;
-
-				drawTextCenter(col2Str(col::black) + accStr, textX + 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX - 1, textY);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY + 1);
-				drawTextCenter(col2Str(col::black) + accStr, textX, textY - 1);
-
-				drawTextCenter(col2Str(col::white) + accStr, textX, textY);
+				renderTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
 				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 + 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2 - 1, textY2);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 + 1);
-				drawTextCenter(col2Str(col::black) + bulletStr, textX2, textY2 - 1);
-
-				drawTextCenter(col2Str(col::white) + bulletStr, textX2, textY2);
+				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
 				setZoom(1.0);
 			}
-
-
-
-
-			//setFontSize(10);
-
-			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2 + 1, cameraH / 2 - 25 * zoomScale);
-			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2 - 1, cameraH / 2 - 25 * zoomScale);
-			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale + 1);
-			//drawTextCenter(col2Str(col::black) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale - 1);
-			//drawTextCenter(col2Str(col::white) + L"1/41", cameraW / 2, cameraH / 2 - 25 * zoomScale);
-
-			//setZoom(1.5);
-			//drawSpriteCenter(spr::icon16,95, cameraW / 2 - 5 * zoomScale, cameraH / 2 - 25 * zoomScale);
-			//setZoom(1.0);
-
 		}
 
 
@@ -422,7 +345,7 @@ public:
 
 		setFontSize(12);
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 72);
-		drawTextCenter(L"#FFFFFF사격할 위치를 선택해주세요.", cameraW / 2, 72);
+		renderTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 72);
 	}
 
 	void changeAimTarget(int tgtX, int tgtY)
@@ -676,3 +599,6 @@ public:
 		}
 	}
 };
+
+
+

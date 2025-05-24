@@ -37,9 +37,11 @@ private:
 
     std::unique_ptr<ItemPocket> throwingItemPocket;
     Point3 throwCoord = { 0,0,0 };
+
 public:
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
+    std::vector<Point2> aStarData;
 
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);

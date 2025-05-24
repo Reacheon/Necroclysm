@@ -19,7 +19,6 @@ import Loot;
 import World;
 import Vehicle;
 import Prop;
-import Bionic;
 import log;
 import Lst;
 import Maint;
@@ -174,7 +173,7 @@ public:
 				}
 				else drawFillRect(optionRect[i], lowCol::black);
 				setFontSize(16);
-				drawTextCenter(col2Str(col::white) + optionText, optionRect[i].x + optionRect[i].w / 2 + 16, optionRect[i].y + optionRect[i].h / 2 + 1);
+				renderTextCenter(optionText, optionRect[i].x + optionRect[i].w / 2 + 16, optionRect[i].y + optionRect[i].h / 2 + 1);
 				drawSpriteCenter(spr::icon16, iconIndex, optionRect[i].x + 10, optionRect[i].y + 10);
 			}
 			
@@ -233,7 +232,7 @@ public:
 						drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 						setFontSize(10);
 						std::wstring titleName = vehPtr->name;
-						drawTextCenter(col2Str(col::white) + titleName, pivotX + 96, pivotY + 9);
+						renderTextCenter(titleName, pivotX + 96, pivotY + 9);
 						if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 						else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 						else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -260,10 +259,7 @@ public:
 							drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
 
 							//아이템 이름
-							drawText(col2Str(col::white) + tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
-
-							//연료량
-
+                            renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i, col::white);
 
 
 							if (tgtPart.pocketPtr != nullptr) //Inventory에도 같은 코드가 존재

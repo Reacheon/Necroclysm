@@ -103,7 +103,8 @@ export __int64 renderSticker(int cameraX, int cameraY)
 			if (address->getFont() != nullptr)
 			{
 				setFontSize(address->getFontSize());
-				drawTextEx(col2Str(address->getColor())+address->getString(), cameraW / 2 + address->getX() - cameraX, cameraH / 2 + address->getY() - cameraY, address->getIsCenter());
+				if (address->getIsCenter()) renderTextCenter(address->getString(), cameraW / 2 + address->getX() - cameraX, cameraH / 2 + address->getY() - cameraY);
+				else  renderText(address->getString(), cameraW / 2 + address->getX() - cameraX, cameraH / 2 + address->getY() - cameraY);
 			}
 		}
 	}

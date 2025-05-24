@@ -72,20 +72,20 @@ export void renderFPS(__int64 loopTime)
 
 
     setFontSize(12);
-    drawText(col2Str(col::white) + decimalCutter(avgFPS, 2), 20, 170);
+    renderTextDirect(decimalCutter(avgFPS, 2), 20, 170);
 
     setFontSize(8);
-    drawText(col2Str(col::white)+L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 5) + L" ms", 20, 190);
-    drawText(col2Str(col::white) + L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 1);
-    drawText(col2Str(col::white) + L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 2);
-    drawText(col2Str(col::white) + L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 3);
-    drawText(col2Str(col::white) + L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 4);
-    drawText(col2Str(col::white) + L">tile : " + decimalCutter(tileAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 5);
-    drawText(col2Str(col::white) + L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 6);
-    drawText(col2Str(col::white) + L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 7);
-    drawText(col2Str(col::white) + L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 8);
-    drawText(col2Str(col::white) + L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 9);
-    drawText(col2Str(col::white) + L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 10);
-    drawText(col2Str(col::white) + L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 5) + L" ms", 30, 190 + 12 * 11);
-    drawText(col2Str(col::white) + L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 5) + L" ms", 20, 190 + 12 * 12);
+    renderTextDirect(L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 2) + L" ms", 20, 190);
+    renderTextDirect(L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 2) + L" ms", 20, 190 + 12 * 1);
+    renderTextDirect(L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 2) + L" ms", 20, 190 + 12 * 2);
+    renderTextDirect(L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 2) + L" ms", 20, 190 + 12 * 3);
+    renderTextDirect(L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 4);
+    renderTextDirect( L">tile : " + decimalCutter(tileAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 5);
+    renderTextDirect( L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 6);
+    renderTextDirect( L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 7);
+    renderTextDirect(L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 8);
+    renderTextDirect(L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 9);
+    renderTextDirect(L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 10);
+    renderTextDirect(L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 2) + L" ms", 30, 190 + 12 * 11);
+    renderTextDirect(L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 2) + L" ms", 20, 190 + 12 * 12);
 }

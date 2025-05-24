@@ -66,7 +66,7 @@ export void drawWindow(int x, int y, int w, int h, std::wstring title, int title
     renderRect(x, y, w, 30);
 
     setFontSize(16);
-    drawTextCenter(col2Str(col::white) + title, x + w / 2, y + 16);
+    renderTextCenter(title, x + w / 2, y + 16);
 
     setZoom(1.5f);
     drawSpriteCenter(spr::icon16, titleSprIndex,
@@ -95,7 +95,7 @@ export void drawWindowItemset(int x, int y, int w, int h,
     renderRect(x, y, w, 30);
 
     setFontSize(14);
-    drawTextCenter(col2Str(col::white) + title, x + w / 2, y + 14);
+    renderTextCenter(title, x + w / 2, y + 14);
 
     setZoom(1.5f);
     drawSpriteCenter(spr::itemset, titleSprIndex,

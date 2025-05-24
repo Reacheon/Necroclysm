@@ -215,7 +215,7 @@ public:
 		//	}
 		//	drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 78, tooltipBox.y + 6);
 		//	setFontSize(13);
-		//	drawText(col2Str(col::white) + L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
+		//	renderText(L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
 
 		//	std::wstring reactStr = col2Str(lowCol::yellow) + L"반응물 : ";
 		//	reactStr += col2Str(col::white);
@@ -257,7 +257,7 @@ public:
 		//	topText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)targetCraftingTime)));
 		//	topText += L"% )";
 
-		//	drawTextCenter(col2Str(col::white) + topText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y - 10);
+		//	renderTextCenter(topText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y - 10);
 		//}
 
 		//if (getStateDraw() == false) { return; }
@@ -287,7 +287,7 @@ public:
 		//	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//	Point2 reactPivot = { alchemyBase.x + 10, alchemyBase.y + 59 };
 		//	setFontSize(11);
-		//	drawTextCenter(col2Str(col::white) + L"반응물", reactPivot.x + 109, reactPivot.y - 9);
+		//	renderTextCenter(L"반응물", reactPivot.x + 109, reactPivot.y - 9);
 		//	drawSprite(spr::alchemyMaterialEdge, 0, reactPivot.x - 1, reactPivot.y - 1);
 		//	for (int i = 0; i < myMin(reactPtrVec.size(), reactantMaxSize); i++)
 		//	{
@@ -312,7 +312,7 @@ public:
 		//	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//	Point2 prodPivot = { alchemyBase.x + 476, alchemyBase.y + 59 };
 		//	setFontSize(11);
-		//	drawTextCenter(col2Str(col::white) + L"생성물", prodPivot.x + 109, prodPivot.y - 9);
+		//	renderTextCenter(L"생성물", prodPivot.x + 109, prodPivot.y - 9);
 		//	drawSprite(spr::alchemyMaterialEdge, 0, prodPivot.x - 1, prodPivot.y - 1);
 		//	
 		//	for (int i = 0; i < myMin(prodPocket->itemInfo.size(), reactantMaxSize); i++)
@@ -334,7 +334,7 @@ public:
 		//	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//	SDL_Point toolPivot = { alchemyBase.x + 248, alchemyBase.y + 89 };
 		//	setFontSize(11);
-		//	drawTextCenter(col2Str(col::white) + L"도구", alchemyBase.x + 350, alchemyBase.y + 182);
+		//	renderTextCenter(L"도구", alchemyBase.x + 350, alchemyBase.y + 182);
 
 
 
@@ -473,7 +473,7 @@ public:
 		//				else break;
 		//			}
 
-		//			drawText(col2Str(col::white) + indivItemName, dropDownList::rect.x + 34, dropDownList::rect.y + 1 + yCorrection + 17 * i);
+		//			renderText(indivItemName, dropDownList::rect.x + 34, dropDownList::rect.y + 1 + yCorrection + 17 * i);
 		//		}
 
 		//		for (int i = 0; i < myMin(10, dropDownList::itemVec.size()); i++)

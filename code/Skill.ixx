@@ -154,7 +154,7 @@ public:
 					}
 
 					setFontSize(10);
-					drawTextCenter(col2Str(letterColor) + boxStr, box.x + box.w / 2, box.y + box.h / 2);
+					renderTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2, letterColor);
 				};
 
 			drawLine(skillBase.x+1, skillBase.y+87, skillBase.x + 1+278, skillBase.y + 87, col::lightGray);
@@ -177,7 +177,7 @@ public:
 			}
 
 			setFontSize(10);
-			drawText(L"#FFFFFF습득한 스킬 : 13개", skillBase.x + 190, skillBase.y +34);
+			renderText(L"습득한 스킬 : 13개", skillBase.x + 190, skillBase.y +34);
 
 			for (int i = 0; i < 7; i++)
 			{
@@ -204,7 +204,7 @@ public:
 
 					setFontSize(12);
 
-					drawText(L"#FFFFFF" + skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
+					renderText(skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
 					int textWidth = queryTextWidth(skillName);
 
 					std::wstring lvStr;
@@ -213,9 +213,9 @@ public:
 					else lvStr = L"Lv.MAX";
 					
 					setFontSize(12);
-					drawText(L"#FFFFFF" + lvStr, skillBtn[i].x + 43 + textWidth + 12, skillBtn[i].y + 5);
+					renderText(lvStr, skillBtn[i].x + 43 + textWidth + 12, skillBtn[i].y + 5);
 
-					drawText(col2Str(lowCol::green) + tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3);
+					renderText(tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3, lowCol::green);
 
 
 
@@ -223,7 +223,7 @@ public:
 					setFontSize(10);
 					
 					std::wstring expStr = decimalCutter(tgtData.skillExp,1);
-					drawText(col2Str(col::white) + expStr + L"/100.0", skillBtn[i].x + 182, skillBtn[i].y + 20);
+					renderText(expStr + L"/100.0", skillBtn[i].x + 182, skillBtn[i].y + 20);
 
 					drawRect({ skillBtn[i].x + 41,skillBtn[i].y + 23, 134,7 }, col::gray);
 					drawFillRect(SDL_Rect{ skillBtn[i].x + 41 + 2,skillBtn[i].y + 23 + 2, int(42.0* (myMin(1.0,tgtData.skillExp/100.0))),3 }, col::white);

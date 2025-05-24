@@ -165,7 +165,7 @@ public:
 
 		//사념파
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
-		drawTextCenter(col2Str(col::white) + telepathyStr, cameraW / 2, 165);
+		renderTextCenter(telepathyStr, cameraW / 2, 165);
 	}
 	void clickUpGUI()
 	{

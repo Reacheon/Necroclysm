@@ -22,8 +22,6 @@ import World;
 import log;
 import Equip;
 import Profic;
-import Mutation;
-import Bionic;
 import Craft;
 import Light;
 import Sticker;
@@ -33,7 +31,6 @@ import CoordSelect;
 import Alchemy;
 import turnWait;
 import Vehicle;
-import God;
 import Prop;
 import Map;
 import globalTime;
@@ -392,11 +389,8 @@ public:
 			break;
 		case act::mutation:
 			updateLog(L"#FFFFFF돌연변이 창을 열었다.");
-			new Mutation();
 			break;
 		case act::bionic:
-			updateLog(L"#FFFFFF바이오닉 창을 열었다.");
-			new Bionic();
 			break;
 		case act::quest:
 			new Quest();
@@ -522,7 +516,6 @@ public:
 		}
 		case act::god:
 			updateLog(L"#FFFFFF신앙 창을 열었다.");
-			new God(playerGod);
 			break;
 		case act::map:
 			updateLog(L"#FFFFFF지도 창을 열었다.");
@@ -825,26 +818,6 @@ public:
 					{
 						PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 						addAniUSetPlayer(PlayerPtr, aniFlag::felling);
-					}
-					else if (tgtItemCode == 213 || tgtItemCode == 218)//불교 제단
-					{
-						new God(godFlag::buddha);
-					}
-					else if (tgtItemCode == 214)//천공로
-					{
-						new God(godFlag::yudi);
-					}
-					else if (tgtItemCode == 216)//십자가
-					{
-						new God(godFlag::jesus);
-					}
-					else if (tgtItemCode == 217)//토리이
-					{
-						new God(godFlag::amaterasu);
-					}
-					else if (tgtItemCode == 219)//석판
-					{
-						new God(godFlag::ra);
 					}
 				}
 				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)

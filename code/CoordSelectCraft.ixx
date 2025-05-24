@@ -67,7 +67,7 @@ public:
 	{
 		//사념파
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
-		drawTextCenter(L"#FFFFFF" + telepathyStr, cameraW / 2, 165);
+		renderTextCenter(telepathyStr, cameraW / 2, 165);
 
 		if (targetSelect == false)
 		{
