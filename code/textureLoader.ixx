@@ -90,6 +90,7 @@ export void textureLoader()
 	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
 	spr::eyesBlue = new Sprite(renderer, "image/charset/body/eyesBlue.png", 48, 48);
 	spr::eyesRed = new Sprite(renderer, "image/charset/body/eyesRed.png", 48, 48);
+	spr::eyesClosed = new Sprite(renderer, "image/charset/body/eyesClosed.png", 48, 48);
 	spr::beardMustacheBlack = new Sprite(renderer, "image/charset/body/beardMustacheBlack.png", 48, 48);
 
 	spr::hairCommaBlack = new Sprite(renderer, "image/charset/body/hairCommaBlack.png", 48, 48);
@@ -172,4 +173,9 @@ export void textureLoader()
 	spr::gridMarker = new Sprite(renderer, "image/UI/gridMarker.png", 16, 16);
 
     spr::tabBoxAim = new Sprite(renderer, "image/UI/tabBoxAim.png", 122, 122);
+
+	spr::youDied = new Sprite(renderer, "image/UI/youDied.png", 1440, 184);
+
+	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
+	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 }

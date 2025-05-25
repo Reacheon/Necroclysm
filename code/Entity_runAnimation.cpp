@@ -1074,6 +1074,45 @@ bool Entity::runAnimation(bool shutdown)
 			}
 		}
 	}
+	else if (getAniType() == aniFlag::faint)
+	{
+		addTimer();
+		int pX = getX();
+		int pY = getY();
+
+		switch (getTimer())
+		{
+		case 1:
+			PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
+			PlayerPtr->entityInfo.eyes = humanCustom::eyes::closed;
+			PlayerPtr->updateCustomSpriteHuman();
+			setFakeY(-4);
+			break;
+		case 2:
+			setFakeY(-5);
+			break;
+		case 4:
+			setFakeY(-6);
+			break;
+		case 7:
+			setFakeY(-7);
+			break;
+		case 10:
+			setFakeY(-6);
+			break;
+		case 12:
+			setFakeY(-5);
+			break;
+		case 13:
+			setFakeY(-4);
+			break;
+		case 16:
+			setFakeY(0);
+			resetTimer();
+			setAniType(aniFlag::null);
+			return true;
+		}
+	}
 
 
 	return false;

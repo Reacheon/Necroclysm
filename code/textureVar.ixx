@@ -94,6 +94,7 @@ export namespace spr
 	Sprite* skinYellow = nullptr;
 	Sprite* eyesBlue = nullptr;
 	Sprite* eyesRed = nullptr;
+	Sprite* eyesClosed = nullptr;
 	Sprite* beardMustacheBlack = nullptr;
 	Sprite* hairCommaBlack = nullptr;
 	Sprite* hairBob1Black = nullptr;
@@ -147,4 +148,8 @@ export namespace spr
 	Sprite* skillRect = nullptr;
 	Sprite* gridMarker = nullptr;
 	Sprite* tabBoxAim = nullptr;
+
+	Sprite* youDied = nullptr;
+	Sprite* gameOverOptionRect = nullptr;
+	Sprite* gameOverOptionMarker = nullptr;
 }

@@ -24,7 +24,7 @@ import Drawable;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::inventory, act::profic, act::skill, act::runMode, act::craft, act::quest, act::mutation, act::test, act::identify, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
+    std::vector<act> null = { act::status, act::inventory, act::profic, act::skill, act::runMode, act::craft, act::test, act::quest, act::mutation, act::alchemy, act::god, act::map, act::phone, act::message, act::camera, act::internet, act::settings, act::saveAndQuit };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
@@ -39,8 +39,8 @@ export namespace actSet
 export namespace option
 {
     std::wstring language = L"Korean";// 또는 "English"
-    bool fullScreen = true;
-    bool fixScreenRatio = false;
+    bool fullScreen = false;
+    bool fixScreenRatio = true;
     input inputMethod = input::mouse; //조작방식 설정
 };
 
@@ -201,6 +201,8 @@ export int dpadDelay = 0; //상하좌우키 연속입력 딜레이(꾹 누르는
 export int delayR2 = 0;
 
 export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을때 커서위치(컨메뉴가 존재하는지 확인하고 쓸 것)
+
+export bool drawHUD = true;
 
 export class Snowflake
 {

@@ -564,5 +564,8 @@
     <ClCompile Include="code\Monster.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
+    <ClCompile Include="code\GameOver.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

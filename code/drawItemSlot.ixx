@@ -113,23 +113,34 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	}
 
 
-	setFontSize(fontSize);
-	while (queryTextWidth(mainName) > widthLimit)
+	if (queryTextWidth(mainName) > widthLimit)
 	{
-		if (fontSize >= 14)
-		{
-			fontSize -= 1;
-			yCorrection += 1;
-			setFontSize(fontSize);
-		}
-		else
-		{
-			split = true;
-			break;
-		}
+		setFontSize(10);
+		renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
 	}
-	if (!split) renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
-	else renderTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
+	else
+	{
+		setFontSize(12);
+		renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
+	}
+
+
+	//while (queryTextWidth(mainName) > widthLimit)
+	//{
+	//	if (fontSize >= 14)
+	//	{
+	//		fontSize -= 1;
+	//		yCorrection += 1;
+	//		setFontSize(fontSize);
+	//	}
+	//	else
+	//	{
+	//		split = true;
+	//		break;
+	//	}
+	//}
+	//if (!split) renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
+	//else renderTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 

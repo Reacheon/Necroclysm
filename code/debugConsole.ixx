@@ -16,6 +16,7 @@ import Sticker;
 import Light;
 import Flame;
 import ItemStack;
+import GameOver;
 
 export void debugConsole()
 {
@@ -23,7 +24,7 @@ export void debugConsole()
 	int yp = PlayerY();
 	int zp = PlayerZ();
 
-	updateLog(L"#FFFFFF디버그 테스트 기능을 실행했다.");
+	//updateLog(L"#FFFFFF디버그 테스트 기능을 실행했다.");
 	prt(L"////////////////////////////////////////\n");
 	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
 	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
@@ -53,6 +54,7 @@ export void debugConsole()
 	prt(L"25. 청크 라인 표시\n");
 	prt(L"26. 청크 덮어쓰기\n");
 	prt(L"27. Lua 스크립트 실행\n");
+	prt(L"28. 게임오버\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
@@ -387,7 +389,11 @@ export void debugConsole()
 		}
 		break;
 	}
-
+	case 28://Lua 스크립트 실행
+	{
+		new GameOver();
+		break;
+	}
 
 	}
 }

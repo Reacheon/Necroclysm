@@ -753,6 +753,7 @@ void Entity::updateCustomSpriteHuman()
 	{
 		if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
 		else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+		else if (entityInfo.eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
 	}
 
 	if (entityInfo.scar != humanCustom::scar::null)

@@ -42,9 +42,10 @@ namespace segmentIndex
 
 void HUD::drawGUI()
 {
+	if (!drawHUD) return;
+
 	const bool* state = SDL_GetKeyboardState(nullptr);
 	Sprite* targetBtnSpr = nullptr;
-
 
 	drawStatusEffects();
 

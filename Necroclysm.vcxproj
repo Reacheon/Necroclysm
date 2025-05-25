@@ -190,6 +190,7 @@
     <ClCompile Include="code\Flame.cpp" />
     <ClCompile Include="code\Flame.ixx" />
     <ClCompile Include="code\Footprint.ixx" />
+    <ClCompile Include="code\GameOver.ixx" />
     <ClCompile Include="code\gamepadBtnDown.ixx" />
     <ClCompile Include="code\gamepadBtnMotion.ixx" />
     <ClCompile Include="code\gamepadBtnUp.ixx" />

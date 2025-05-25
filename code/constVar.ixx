@@ -199,13 +199,14 @@ export namespace humanCustom
         white,
         yellow,
         brown,
-        black
+        black,
+        closed,
     };
 
     enum class eyes
     {
         null,
-        close,
+        closed,
         red,
         blue,
         black,
@@ -666,6 +667,8 @@ export enum class aniFlag
     treeFalling,
 
     entityThrow,
+
+    faint,
 };
 
 export enum class input

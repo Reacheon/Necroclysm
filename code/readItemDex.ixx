@@ -179,7 +179,7 @@ export int readItemDex(const wchar_t* file)
             int val;
             for (int j = 0; j < strFragment.size(); j++)
             {
-                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                 {
                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -207,7 +207,7 @@ export int readItemDex(const wchar_t* file)
                     j = 0;
                 }
 
-                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                 {
                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -356,7 +356,7 @@ export int readItemDex(const wchar_t* file)
                         case csvItem::flag:
                             for (int j = 0; j < strFragment.size(); j++)
                             {
-                                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                                 {
                                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -483,7 +483,7 @@ export int readItemDex(const wchar_t* file)
                         {
                             for (int j = 0; j < strFragment.size(); j++)
                             {
-                                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                                 {
                                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -513,7 +513,7 @@ export int readItemDex(const wchar_t* file)
                         {
                             for (int j = 0; j < strFragment.size(); j++)
                             {
-                                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                                 {
                                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -538,7 +538,7 @@ export int readItemDex(const wchar_t* file)
                         {
                             for (int j = 0; j < strFragment.size(); j++)
                             {
-                                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                                 {
                                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
@@ -563,7 +563,7 @@ export int readItemDex(const wchar_t* file)
                         {
                             for (int j = 0; j < strFragment.size(); j++)
                             {
-                                if (strFragment[j] == UNI::COMMA || j == strFragment.size() - 1)
+                                if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
                                 {
                                     if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
 
