@@ -825,6 +825,29 @@ public:
 					new Dialogue();
 
 				}
+				else if (TileVehicle(touchX, touchY, PlayerZ()) != nullptr)
+				{
+                    ItemPocket* tgtPocket = TileVehicle(touchX, touchY, PlayerZ())->partInfo[{touchX, touchY }].get();	
+					for (int i = 0; i < tgtPocket->itemInfo.size(); i++)
+					{
+						if (tgtPocket->itemInfo[i].checkFlag(itemFlag::VPART_DOOR_CLOSE))
+						{
+                            tgtPocket->itemInfo[i].eraseFlag(itemFlag::VPART_DOOR_CLOSE);	
+                            tgtPocket->itemInfo[i].addFlag(itemFlag::VPART_DOOR_OPEN);
+
+							tgtPocket->itemInfo[i].eraseFlag(itemFlag::VPART_NOT_WALKABLE);
+
+							if (tgtPocket->itemInfo[i].checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+							{
+								tgtPocket->itemInfo[i].eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+								tgtPocket->itemInfo[i].addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+							}
+
+							tgtPocket->itemInfo[i].propSprIndex += 16;
+							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+						}
+					}
+				}
 				else
 				{
 					PlayerPtr->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
@@ -1013,11 +1036,21 @@ public:
 		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			Vehicle* vPtr = TileVehicle(targetGrid.x, targetGrid.y, PlayerZ());
-			if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size()>0)
+			std::vector<ItemData>& tgtPocket = vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo;
+			if (tgtPocket.size()>0)
 			{
 				inputOptions.push_back(act::vehicleRepair);
 				inputOptions.push_back(act::vehicleDetach);
 			}
+
+			for(int i=0; i<tgtPocket.size(); i++)
+			{
+				if (tgtPocket[i].checkFlag(itemFlag::VPART_DOOR_OPEN))
+				{
+					inputOptions.push_back(act::closeDoor);
+					break;
+				}
+            }
 		}
 
 		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)

@@ -257,6 +257,30 @@ export namespace actFunc
 		PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 	}
 
+	export void closeVDoor(int tgtX, int tgtY, int tgtZ)
+	{
+		ItemPocket* tgtPocket = TileVehicle(tgtX, tgtY, PlayerZ())->partInfo[{tgtX, tgtY }].get();
+		for (int i = 0; i < tgtPocket->itemInfo.size(); i++)
+		{
+			if (tgtPocket->itemInfo[i].checkFlag(itemFlag::VPART_DOOR_OPEN))
+			{
+				tgtPocket->itemInfo[i].eraseFlag(itemFlag::VPART_DOOR_OPEN);
+				tgtPocket->itemInfo[i].addFlag(itemFlag::VPART_DOOR_CLOSE);
+
+				tgtPocket->itemInfo[i].addFlag(itemFlag::VPART_NOT_WALKABLE);
+
+				if (tgtPocket->itemInfo[i].checkFlag(itemFlag::PROP_GAS_OBSTACLE_OFF))
+				{
+					tgtPocket->itemInfo[i].eraseFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+					tgtPocket->itemInfo[i].addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+				}
+				tgtPocket->itemInfo[i].propSprIndex -= 16;
+				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+			}
+		}
+
+    }
+
 	export void toggle(ItemData& inputItem)
 	{
 		if (inputItem.checkFlag(itemFlag::TOGGLE_OFF))

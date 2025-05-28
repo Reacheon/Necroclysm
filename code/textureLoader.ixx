@@ -153,7 +153,7 @@ export void textureLoader()
 
 	spr::statusEffectRect = new Sprite(renderer, "image/UI/GUI/HUD//statusEffectRect.png", 130, 34);
 	spr::statusIcon = new Sprite(renderer, "image/UI/statusIcon.png", 16, 16);
-	spr::hpBlankGauge = new Sprite(renderer, "image/UI/hpGauge.png", 182, 11);
+	spr::hpBlankGauge = new Sprite(renderer, "image/UI/hpGauge.png", 44, 11);
 
 	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 160, 160);
 

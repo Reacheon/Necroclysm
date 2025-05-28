@@ -371,7 +371,14 @@ public:
 	{
 		if (inputAct == act::closeDoor)
 		{
-			actFunc::closeDoor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			if(TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			{
+				actFunc::closeVDoor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			}
+			else if(TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			{
+				actFunc::closeDoor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			}
 		}
 		else if (inputAct == act::unbox)
 		{

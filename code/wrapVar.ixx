@@ -102,7 +102,16 @@ export inline bool isWalkable(Point3 coord)
     if (TileWall(coord.x, coord.y, coord.z) != 0) return false;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false) return false;
     else if (TileEntity(coord.x, coord.y, coord.z) != nullptr) return false;
-    else return true;
+    else if (TileVehicle(coord.x, coord.y, coord.z) != nullptr)
+    {
+        ItemPocket* targetPocket = TileVehicle(coord.x, coord.y, coord.z)->partInfo[{coord.x, coord.y}].get();
+        for (int i = 0; i < targetPocket->itemInfo.size(); i++)
+        {
+            if (targetPocket->itemInfo[i].checkFlag(itemFlag::VPART_NOT_WALKABLE)) return false;
+        }
+    }
+
+    return true;
 };
 
 export inline bool isRayBlocker(Point3 coord)

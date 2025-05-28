@@ -10,6 +10,7 @@ import constVar;
 export class Player :public Entity //플레이어는 엔티티를 상속받고 시야에 따라 미니맵을 업데이트하는 기능을 가지고 있다.
 {
 public:
+
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;

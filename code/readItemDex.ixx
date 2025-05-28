@@ -469,6 +469,10 @@ export int readItemDex(const wchar_t* file)
                                     else if (strFragment.substr(0, j) == L"HEADLIGHT") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::HEADLIGHT);
                                     else if (strFragment.substr(0, j) == L"SHIELD") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::SHIELD);
                                     else if (strFragment.substr(0, j) == L"CONTAINER_LIQ") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::CONTAINER_LIQ);
+                                    else if (strFragment.substr(0, j) == L"VPART_NOT_WALKABLE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::VPART_NOT_WALKABLE);
+                                    else if (strFragment.substr(0, j) == L"ENGINE_GASOLINE") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::ENGINE_GASOLINE);
+                                    else if (strFragment.substr(0, j) == L"ENGINE_DISEL") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::ENGINE_DISEL);
+                                    else if (strFragment.substr(0, j) == L"ENGINE_ELECTRIC") itemDex[arrayCounter / (csvWidth)-1].flag.push_back(itemFlag::ENGINE_ELECTRIC);
                                     else
                                     {
                                         errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

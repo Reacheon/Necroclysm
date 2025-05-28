@@ -82,63 +82,74 @@ void HUD::drawGUI()
 		}
 
 
-		int vShift = 384 * (ctrlVeh != nullptr);
+		int vShift = 396 * (ctrlVeh != nullptr);
 
 		if (1)//플레이어 이름 그리기
 		{
 			setFontSize(10);
-			renderText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 18 + vShift, letterbox.y + 4, lowCol::yellow);
+			renderText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 29 + vShift, letterbox.y + 5, lowCol::yellow);
 		}
 
-		//HP바 그리기
+		setFontSize(10);
+
 		{
-			int pivotX = letterbox.x + 11 + 1.02*vShift;
-			int pivotY = letterbox.y + 21;
-			drawSprite(spr::icon16, 72, pivotX, pivotY);
+			int pivotX = letterbox.x + 36+ vShift;
+			int pivotY = letterbox.y + 22;
+			renderTextCenter(L"왼팔", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
+		}
 
-			setFontSize(10);
-			renderText(L"HEALTH", pivotX + 16, pivotY + 1, lowCol::green);
+		{
+			int pivotX = letterbox.x + 36+ vShift;
+			int pivotY = letterbox.y + 22 + 15;
+			renderTextCenter(L"좌다리", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
+		}
 
-			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
 
-			//페이크 HP
+		{
+			int pivotX = letterbox.x + 36 + 83+ vShift;
+			int pivotY = letterbox.y + 22;
+			renderTextCenter(L"머리", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
+		}
+
+		{
+			int pivotX = letterbox.x + 36 + 83+ vShift;
+			int pivotY = letterbox.y + 22 + 15;
+			renderTextCenter(L"몸통", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+			// 페이크 HP
 			float ratioFakeHP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeHP) / (float)(PlayerPtr->entityInfo.maxHP));
-			SDL_Rect fakeRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioFakeHP, 5 };
+			SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
 			drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeHPAlpha);
+
+			// 실제 HP
 			float ratioHP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.HP) / (float)(PlayerPtr->entityInfo.maxHP));
-			SDL_Rect realRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioHP, 5 };
+			SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
 			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
 			drawFillRect(realRect, lowCol::green);
-
-			std::wstring hpStr = std::to_wstring(PlayerPtr->entityInfo.HP) + L" / " + std::to_wstring(PlayerPtr->entityInfo.maxHP);
-			setFontSize(8);
-			renderTextOutlineCenter(hpStr, pivotX + 142, pivotY + 7);
 		}
 
-		//MP바 그리기
 		{
-			int pivotX = letterbox.x + 11 + 1.02 * vShift;
-			int pivotY = letterbox.y + 21 +15;
-			drawSprite(spr::icon16, 73, pivotX, pivotY);
-
-			setFontSize(10);
-			renderText(L"MENTAL", pivotX + 16, pivotY + 1, lowCol::blue);
-
-			drawSprite(spr::hpBlankGauge, pivotX + 55, pivotY + 1);
-			
-			float ratioFakeMP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeMP) / (float)(PlayerPtr->entityInfo.maxMP));
-			SDL_Rect fakeRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioFakeMP, 5 };
-			drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeMPAlpha);
-			float ratioMP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.MP) / (float)(PlayerPtr->entityInfo.maxMP));
-			SDL_Rect realRect = { pivotX + 55 + 3, pivotY + 1 + 3, 176 * ratioMP, 5 };
-			if (ratioMP > 0 && realRect.w == 0) { realRect.w = 1; }
-			drawFillRect(pivotX + 55 + 3, pivotY + 1 + 3, 176* ratioMP, 5, lowCol::blue);
-
-			std::wstring mpStr = std::to_wstring(PlayerPtr->entityInfo.MP) + L" / " + std::to_wstring(PlayerPtr->entityInfo.maxMP);
-			setFontSize(8);
-            renderTextOutlineCenter(mpStr, pivotX + 142, pivotY + 7);
+			int pivotX = letterbox.x + 36 + 83*2+ vShift;
+			int pivotY = letterbox.y + 22;
+			renderTextCenter(L"오른팔", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
 		}
 
+		{
+			int pivotX = letterbox.x + 36 + 83*2 + vShift;
+			int pivotY = letterbox.y + 22 + 15;
+			renderTextCenter(L"우다리", pivotX - 16, pivotY + 5, col::lightGray);
+			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
+		}
 
 		if (ctrlVeh == nullptr)
 		{
@@ -209,8 +220,8 @@ void HUD::drawGUI()
 
 			renderText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1, col::lightGray);
 			renderText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1, lowCol::green);
-			renderText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
-			renderText(L"XD", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::green);
+			renderText(L"STRESS", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
+			renderText(L"79", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::red);
 
 
 			//시간 표시 기능

@@ -534,6 +534,12 @@ export enum class itemFlag
     HEADLIGHT,
     SHIELD,
     CONTAINER_LIQ,
+
+    VPART_NOT_WALKABLE,
+
+    ENGINE_GASOLINE,
+    ENGINE_DISEL,
+    ENGINE_ELECTRIC,
 };
 
 export enum class walkFlag
@@ -1238,6 +1244,8 @@ export namespace itemRefCode
 
     int dirtWall = 302;
     int stoneWall = 397;
+    int glassWall = 114;
+    int wireFence = 376;
 
     int minecart = 405;
     int minecartController = 406;

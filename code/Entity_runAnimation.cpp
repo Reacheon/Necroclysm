@@ -526,6 +526,20 @@ bool Entity::runAnimation(bool shutdown)
 						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(8, 15), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
 					}
 				}
+				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::glassWall)
+				{
+					for (int i = 0; i < 8; i++)
+					{
+						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(32, 39), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
+					}
+				}
+				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::wireFence)
+				{
+					for (int i = 0; i < 8; i++)
+					{
+						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(40, 47), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
+					}
+				}
 				else
 				{
 					for (int i = 0; i < 8; i++)
