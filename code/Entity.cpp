@@ -734,133 +734,6 @@ int Entity::getAimWeaponIndex()
 //bool Entity::hasPulledVehicle() { return (pulledCart != nullptr); }
 //Vehicle* Entity::getPulledVehicle() { return pulledCart; }
 
-void Entity::updateCustomSpriteHuman()
-{
-	SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
-	SDL_SetTextureScaleMode(targetTexture, SDL_SCALEMODE_NEAREST);
-
-
-	SDL_SetRenderTarget(renderer, targetTexture);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_RenderClear(renderer);
-
-	if (entityInfo.skin != humanCustom::skin::null)
-	{
-		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
-	}
-
-	if (entityInfo.eyes != humanCustom::eyes::null)
-	{
-		if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-		else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
-		else if (entityInfo.eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
-	}
-
-	if (entityInfo.scar != humanCustom::scar::null)
-	{
-	}
-
-	if (entityInfo.beard != humanCustom::beard::null)
-	{
-		if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
-	}
-
-	if (entityInfo.hair != humanCustom::hair::null)
-	{
-		bool noHair = false;
-		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
-		{
-            ItemData& tgtItem = getEquipPtr()->itemInfo[i];
-			if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true 
-				&& tgtItem.equipState == equipHandFlag::normal)
-			{
-				noHair = true;
-				break;
-			}
-		}
-
-		if (noHair == false)
-		{
-			switch (entityInfo.hair)
-			{
-			case humanCustom::hair::commaBlack:
-				drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::bob1Black:
-				drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::ponytail:
-				drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::middlePart:
-				drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
-				break;
-			}
-		}
-	}
-
-	if (entityInfo.horn != humanCustom::horn::null)
-	{
-		switch (entityInfo.horn)
-		{
-		case humanCustom::horn::coverRed:
-			drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
-			break;
-
-		}
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//캐릭터 장비 그리기
-	if (getEquipPtr()->itemInfo.size() > 0)
-	{
-		std::map<int, Sprite*, std::less<int>> drawOrder;
-
-		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
-		{
-			int priority = 0;
-			Sprite* tgtSpr = nullptr;
-			ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
-			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
-			{
-			case equipHandFlag::left:
-			case equipHandFlag::both:
-				priority = tgtItem.leftWieldPriority;
-				tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
-				break;
-			case equipHandFlag::right:
-				priority = tgtItem.rightWieldPriority;
-				tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
-				break;
-			case equipHandFlag::normal:
-				priority = tgtItem.equipPriority;
-				tgtSpr = (Sprite*)tgtItem.equipSpr;
-				if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE)&& tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
-				
-				break;
-			default:
-				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
-				break;
-			}
-			//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
-			drawOrder[priority] = tgtSpr;
-		}
-
-		for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
-		{
-			if (it->second != nullptr)
-			{
-				drawTexture(it->second->getTexture(), 0, 0);
-			}
-		}
-
-	}
-
-	SDL_SetRenderTarget(renderer, nullptr);
-	customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
-	updateSpriteFlash();
-}
 
 void Entity::pullEquipLights()
 {
@@ -873,17 +746,174 @@ void Entity::pullEquipLights()
 	}
 }
 
-
 void Entity::drawSelf()
 {
 	stepEvent();
+	
+	if (entityInfo.isPlayer)
+	{
+		SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
+		SDL_SetTextureScaleMode(targetTexture, SDL_SCALEMODE_NEAREST);
+
+		SDL_SetRenderTarget(renderer, targetTexture);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+
+		if (entityInfo.skin != humanCustom::skin::null)
+		{
+			if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
+		}
+
+		if (entityInfo.eyes != humanCustom::eyes::null)
+		{
+			if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+			else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+			else if (entityInfo.eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
+		}
+
+		if (entityInfo.scar != humanCustom::scar::null)
+		{
+		}
+
+		if (entityInfo.beard != humanCustom::beard::null)
+		{
+			if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
+		}
+
+		if (entityInfo.hair != humanCustom::hair::null)
+		{
+			bool noHair = false;
+			for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+			{
+				ItemData& tgtItem = getEquipPtr()->itemInfo[i];
+				if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true
+					&& tgtItem.equipState == equipHandFlag::normal)
+				{
+					noHair = true;
+					break;
+				}
+			}
+
+			if (noHair == false)
+			{
+				switch (entityInfo.hair)
+				{
+				case humanCustom::hair::commaBlack:
+					drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
+					break;
+				case humanCustom::hair::bob1Black:
+					drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
+					break;
+				case humanCustom::hair::ponytail:
+					drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
+					break;
+				case humanCustom::hair::middlePart:
+					drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
+					break;
+				}
+			}
+		}
+
+		if (entityInfo.horn != humanCustom::horn::null)
+		{
+			switch (entityInfo.horn)
+			{
+			case humanCustom::horn::coverRed:
+				drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
+				break;
+			}
+		}
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		//캐릭터 장비 그리기
+		if (getEquipPtr()->itemInfo.size() > 0)
+		{
+			std::map<int, Sprite*, std::less<int>> drawOrder;
+
+			for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
+			{
+				int priority = 0;
+				Sprite* tgtSpr = nullptr;
+				ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
+				switch (getEquipPtr()->itemInfo[equipCounter].equipState)
+				{
+				case equipHandFlag::left:
+				case equipHandFlag::both:
+					if (entityInfo.sprFlip == false)
+					{
+						priority = tgtItem.leftWieldPriority;
+						tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
+					}
+					else
+					{
+						priority = tgtItem.rightWieldPriority;
+						tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
+					}
+
+					break;
+				case equipHandFlag::right:
+					if(entityInfo.sprFlip == false)
+					{
+						priority = tgtItem.rightWieldPriority;
+						tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
+					}
+					else
+					{
+						priority = tgtItem.leftWieldPriority;
+						tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
+                    }
+					break;
+				case equipHandFlag::normal:
+					if (entityInfo.sprFlip == false)
+					{
+						priority = tgtItem.equipPriority;
+						tgtSpr = (Sprite*)tgtItem.equipSpr;
+						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
+					}
+					else
+					{
+						priority = tgtItem.flipEquipPriority;
+						tgtSpr = (Sprite*)tgtItem.flipEquipSpr;
+						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.flipEquipSprToggleOn;
+					}
+					break;
+				default:
+					errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
+					break;
+				}
+				//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
+				drawOrder[priority] = tgtSpr;
+			}
+
+			for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
+			{
+				if (it->second != nullptr)
+				{
+					drawTexture(it->second->getTexture(), 0, 0);
+				}
+			}
+
+		}
+
+		SDL_SetRenderTarget(renderer, nullptr);
+		customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
+	}
+	
+	
+	
+	
+	
 	setZoom(zoomScale);
 	if (entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
 	else setFlip(SDL_FLIP_HORIZONTAL);
 
 
 	int localSprIndex = getSpriteIndex();
-	if (entityInfo.isHumanCustomSprite == true)
+	int offsetX = 0;
+	int offsetY = 0;
+
+	if (entityInfo.isPlayer)
 	{
 		if (getSpriteIndex() >= 0 && getSpriteIndex() <= 2)
 		{
@@ -919,33 +949,30 @@ void Entity::drawSelf()
 				}
 			}
 		}
-	}
 
-	int offsetX = 0;
-	int offsetY = 0;
-	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
-	{
-		offsetX = 0;
-		offsetY = -9;
+		if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
+		{
+			offsetX = 0;
+			offsetY = -9;
 
-		if (entityInfo.walkMode == walkFlag::walk)
-		{
-			if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+			if (entityInfo.walkMode == walkFlag::walk)
 			{
-				offsetY += 1;
+				if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+				{
+					offsetY += 1;
+				}
+				localSprIndex = 0;
 			}
-			localSprIndex = 0;
-		}
-		else if (entityInfo.walkMode == walkFlag::run)
-		{
-			if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+			else if (entityInfo.walkMode == walkFlag::run)
 			{
-				offsetY += 1;
+				if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
+				{
+					offsetY += 1;
+				}
+				localSprIndex = 6;
 			}
-			localSprIndex = 6;
 		}
 	}
-
 
 	int originX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
 	int originY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
@@ -970,7 +997,7 @@ void Entity::drawSelf()
 
 
 	//캐릭터 커스타미이징 그리기
-	if (customSprite != nullptr)
+	if (entityInfo.isPlayer)
 	{
 		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 

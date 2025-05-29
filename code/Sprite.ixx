@@ -29,7 +29,7 @@ public:
     }
     ~Sprite()
     {
-        prt(L"Sprite : 소멸자가 호출되었습니다..\n");
+        //prt(L"Sprite : 소멸자가 호출되었습니다..\n");
         SDL_DestroyTexture(texturePtr);
     }
     SDL_Texture* getTexture() { return texturePtr; }

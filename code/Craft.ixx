@@ -687,7 +687,6 @@ public:
 					int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
 					int needNumber = itemDex[meterialItemCode].recipe[i].second;
 					PlayerPtr->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
-					PlayerPtr->updateCustomSpriteHuman();
 				}
 			}
 

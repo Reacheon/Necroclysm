@@ -562,7 +562,6 @@ public:
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 		PlayerPtr->pullEquipLights();
 		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	void updateBarAct()
@@ -842,7 +841,6 @@ public:
 		}
 		PlayerPtr->pullEquipLights();
 		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 	}
 
 	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음

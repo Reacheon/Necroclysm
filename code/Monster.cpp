@@ -34,7 +34,6 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 			entityInfo.sprFlip = true;
 
 			updateStatus();
-			updateCustomSpriteHuman();
 		}
 	}
 

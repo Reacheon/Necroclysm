@@ -107,7 +107,6 @@ public:
 
     float getProficLevel(int index);
     void addProficExp(int expVal);
-
     virtual void endMove() = 0;
     bool runAnimation(bool shutdown);
 
@@ -117,8 +116,6 @@ public:
     void aimWeaponLeft();
     equipHandFlag getAimHand();
     int getAimWeaponIndex();
-
-    void updateCustomSpriteHuman();
 
     void pullEquipLights();
 

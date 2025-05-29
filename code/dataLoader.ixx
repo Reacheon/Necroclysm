@@ -16,23 +16,23 @@ export void dataLoader()
 	lua.open_libraries(sol::lib::base, sol::lib::math);
 
 	//아이템 데이터 로드
-	std::wstring itemPath = L"language/" + option::language + L"/itemDex.tsv";
+	std::wstring itemPath = L"language/" + option::language + L"/itemDex.csv";
 	readItemDex(itemPath.c_str());
 
 	//엔티티 데이터 로드
-	std::wstring entityPath = L"language/" + option::language + L"/entityDex.tsv";
+	std::wstring entityPath = L"language/" + option::language + L"/entityDex.csv";
 	readEntityDex(entityPath.c_str());
 
 	//연금술 조합법 로드
-	std::wstring alchemyPath = L"language/" + option::language + L"/alchemyDex.tsv";
+	std::wstring alchemyPath = L"language/" + option::language + L"/alchemyDex.csv";
 	readAlchemyDex(alchemyPath.c_str());
 
 	//스킬 데이터 로드
-	std::wstring skillPath = L"language/" + option::language + L"/skillDex.tsv";
+	std::wstring skillPath = L"language/" + option::language + L"/skillDex.csv";
 	readSkillDex(skillPath.c_str());
 
 	//시스템(UI) 문자열 로드
-	std::wstring systemPath = L"language/" + option::language + L"/sysStr.tsv";
+	std::wstring systemPath = L"language/" + option::language + L"/sysStr.csv";
 	std::vector<std::array<std::wstring, 4>> tempSysStr(1, { L" ", L" ", L" " });
 	readCSV(systemPath.c_str(), tempSysStr);
 	systemPath.clear();

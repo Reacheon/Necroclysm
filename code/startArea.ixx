@@ -39,7 +39,6 @@ export void startArea()
 	int pY = PlayerY();
 	int pZ = PlayerZ();
 
-	createMonster({ 5,0,0 }, 6);//NPC
 
 	createItemStack({ 2, 1, 0 }, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},

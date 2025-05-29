@@ -85,7 +85,10 @@ export struct ItemData_Base
     unsigned __int16 propSprIndex = 0; //아이템아이콘 말고 실제 Vehicle로 설치되었을 때의 이미지 인덱스
     void* equipSpr = nullptr;
     void* equipSprToggleOn = nullptr;
+    void* flipEquipSpr = nullptr;
+    void* flipEquipSprToggleOn = nullptr;
     unsigned __int32 equipPriority = 0;
+    unsigned __int32 flipEquipPriority = 0;
     void* leftWieldSpr = nullptr;
     unsigned __int32 leftWieldPriority = 0;
     void* rightWieldSpr = nullptr;

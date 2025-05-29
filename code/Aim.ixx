@@ -549,7 +549,6 @@ public:
 				PlayerPtr->getEquipPtr()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
 				PlayerPtr->throwing(std::move(drop), targetX, targetY);
 				PlayerPtr->updateStatus();
-				PlayerPtr->updateCustomSpriteHuman();
 				updateLog(L"#FFFFFF아이템을 던졌다.");
 
 

@@ -43,7 +43,7 @@ int readCSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
         int csvWidth = 0;
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == SDLK_TAB || str[i] == 10)//해당 문자가 쉼표(44)거나 라인피드(10)일 경우
+            if (str[i] == SDLK_COMMA || str[i] == 10)//해당 문자가 쉼표(44)거나 라인피드(10)일 경우
             {
                 csvWidth++;
                 if (str[i] == 10)
@@ -60,7 +60,7 @@ int readCSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
 
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == SDLK_TAB || str[i] == 10)//ASCII로 44(,)와 또는 라인피드(\n)와 같을 때
+            if (str[i] == SDLK_COMMA || str[i] == 10)//ASCII로 44(,)와 또는 라인피드(\n)와 같을 때
             {
                 if (i == str.size() - 1) { i++; }//마지막 문자면 endP-startP 보정을 위해 i를 1 더함.
                 endPoint = i;
@@ -95,7 +95,7 @@ int readCSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
 
                 if (i != str.size() - 1)//만약 다음 글자가 연속으로 쉼표면 여백이므로 건너뜀
                 {
-                    while (str[i + 1] == SDLK_TAB || str[i + 1] == 10)
+                    while (str[i + 1] == SDLK_COMMA || str[i + 1] == 10)
                     {
                         if constexpr (isSame<T, std::wstring>::value == true)
                         {
@@ -103,7 +103,7 @@ int readCSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
                         }
                         else
                         {
-                            arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = 0;//빈칸은ㅇ 0으로
+                            arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = 0;//빈칸은 0으로
                         }
 
                         arrayCounter++;

@@ -423,7 +423,6 @@ public:
 		equipPtr->transferItem(drop.get(), equipCursor, 1);
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 
 		updateLog(col2Str(col::white) + sysStr[126]);
 	}
@@ -452,7 +451,6 @@ public:
 		inputPocket->transferItem(throwing.get(), inputIndex, 1);
 		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
 		PlayerPtr->updateStatus();
-		PlayerPtr->updateCustomSpriteHuman();
 
 		updateLog(L"#FFFFFF아이템을 던졌다.");
 		close(aniFlag::null);

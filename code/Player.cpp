@@ -47,7 +47,6 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	updateStatus();
-	updateCustomSpriteHuman();
 
 	//방독면
 	//getEquipPtr()->addItemFromDex(374);

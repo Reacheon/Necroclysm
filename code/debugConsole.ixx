@@ -200,7 +200,6 @@ export void debugConsole()
 			equipPtr->transferItem(txPtr.get(), 0, 1);
 			PlayerPtr->drop(txPtr.get());
 		}
-		PlayerPtr->updateCustomSpriteHuman();
 		break;
 	}
 	case 13:
