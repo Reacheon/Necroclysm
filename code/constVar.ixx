@@ -1252,6 +1252,10 @@ export namespace itemRefCode
 
     int arrowQuiver = 408;
     int boltQuiver = 409;
+
+    int gasoline = 433;
+    int disel = 434;
+    int electricity = 45;
 };
 
 export enum class skillSrc

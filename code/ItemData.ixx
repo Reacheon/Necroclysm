@@ -114,6 +114,7 @@ export struct ItemData_Base
     __int8 propRPierce = 0;
     __int8 propRCut = 0;
     __int8 propRBash = 0;
+    __int16 propDrawPriority = 0;
 
     __int32 codeID = 0; //랜덤으로 결정되는 ID값, Alchemy가 열릴 때 등... 일시적임(0인 경우 미할당)
 };

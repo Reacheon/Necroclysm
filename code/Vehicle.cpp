@@ -69,19 +69,36 @@ void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 
     ItemData inputPart = cloneFromItemDex(itemDex[dexIndex], 1);
 
-    if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))//타이어일 경우 맨 앞에 추가
+    // 타이어의 경우 맨 앞에 추가 (기존 로직 유지)
+    if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))
     {
         partInfo[{inputX, inputY}]->itemInfo.insert(partInfo[{inputX, inputY}]->itemInfo.begin(), std::move(inputPart));
     }
-    else//그 외 부품은 뒤에 추가
+    else
     {
-        partInfo[{inputX, inputY}]->itemInfo.push_back(std::move(inputPart));
+        // 새로운 부품의 priority
+        int newPriority = inputPart.propDrawPriority;
+
+        // priority에 따른 삽입 위치 찾기
+        auto& itemVec = partInfo[{inputX, inputY}]->itemInfo;
+        auto insertPos = itemVec.end();
+
+        // 뒤에서부터 탐색하여 새 부품보다 낮거나 같은 priority를 가진 위치 찾기
+        for (auto it = itemVec.rbegin(); it != itemVec.rend(); ++it)
+        {
+            if (it->propDrawPriority <= newPriority)
+            {
+                insertPos = it.base(); // reverse_iterator를 forward_iterator로 변환
+                break;
+            }
+        }
+
+        itemVec.insert(insertPos, std::move(inputPart));
     }
 
-    //열차바퀴 중심 설정
+    // 열차바퀴 중심 설정
     if (inputPart.checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
 
-    //prt(L"[Vehicle:addPart] (%d,%d)에 새로운 부품 %ls를 추가하였다.\n", inputX, inputY, inputPart.name.c_str());
     updateSpr();
 }
 void Vehicle::addPart(int inputX, int inputY, std::vector<int> dexVec)
@@ -791,6 +808,156 @@ void Vehicle::updateTrainCenter()
     }
     //trainWheelList의 중간좌표를 구함
     trainWheelCenter = calcMidpoint(trainWheelList);
+}
+
+int Vehicle::getGasolineFuel()
+{
+    int gasolineNumber = 0;
+    for(auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        ItemPocket* partPtr = it->second.get();
+        for (int i = 0; i < partPtr->itemInfo.size(); i++)
+        {
+            ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
+            if (tankPtr != nullptr)
+            {
+                for(int j=0; j < tankPtr->itemInfo.size(); j++)
+                {
+                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::gasoline)
+                    {
+                        gasolineNumber += tankPtr->itemInfo[j].number;
+                    }
+                }
+            }
+        }
+    }
+    return gasolineNumber;
+}
+
+int Vehicle::getDiselFuel()
+{
+    int diselNumber = 0;
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        ItemPocket* partPtr = it->second.get();
+        for (int i = 0; i < partPtr->itemInfo.size(); i++)
+        {
+            ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
+            if (tankPtr != nullptr)
+            {
+                for (int j = 0; j < tankPtr->itemInfo.size(); j++)
+                {
+                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::disel)
+                    {
+                        diselNumber += tankPtr->itemInfo[j].number;
+                    }
+                }
+            }
+        }
+    }
+    return diselNumber;
+}
+
+int Vehicle::getElectricityFuel()
+{
+    int electricityNumber = 0;
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        ItemPocket* partPtr = it->second.get();
+        for (int i = 0; i < partPtr->itemInfo.size(); i++)
+        {
+            ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
+            if (tankPtr != nullptr)
+            {
+                for (int j = 0; j < tankPtr->itemInfo.size(); j++)
+                {
+                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::electricity)
+                    {
+                        electricityNumber += tankPtr->itemInfo[j].number;
+                    }
+                }
+            }
+        }
+    }
+    return electricityNumber;
+}
+
+ItemData* Vehicle::getMainEngine()
+{
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        ItemPocket* pocketPtr = it->second.get();
+        for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
+        {
+            if(pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_GASOLINE)) return &pocketPtr->itemInfo[i];
+            else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_DISEL)) return &pocketPtr->itemInfo[i];
+            else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_ELECTRIC)) return &pocketPtr->itemInfo[i];
+        }
+    }
+    return nullptr;
+}
+
+int Vehicle::getEngineFuel()
+{
+    int fuelNumber = 0;
+
+    if (getMainEngine() == nullptr) return 0;
+    else
+    {
+        if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) fuelNumber = getGasolineFuel();
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DISEL)) fuelNumber = getDiselFuel();
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) fuelNumber = getElectricityFuel();
+    }
+    return fuelNumber;
+}
+
+
+void Vehicle::useEngineFuel(int fuelAmount)
+{
+    int fuelNumber = 0;
+    int targetFuelCode = 0;
+
+    if (getMainEngine() == nullptr) return;
+    else
+    {
+        if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) targetFuelCode = itemRefCode::gasoline;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DISEL)) targetFuelCode = itemRefCode::disel;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemRefCode::electricity;
+    }
+
+    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    {
+        int eraseNumber = 0;
+        ItemPocket* partPtr = it->second.get();
+        for (int i = 0; i < partPtr->itemInfo.size(); i++)
+        {
+            ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
+            if (tankPtr != nullptr)
+            {
+                for (int j = 0; j < tankPtr->itemInfo.size(); j++)
+                {
+                    if (tankPtr->itemInfo[j].itemCode == targetFuelCode)
+                    {
+                        if (eraseNumber < fuelAmount)
+                        {
+                            if(tankPtr->itemInfo[j].number > fuelAmount - eraseNumber)
+                            {
+                                tankPtr->itemInfo[j].number -= fuelAmount - eraseNumber;
+                                eraseNumber = fuelAmount;
+                            }
+                            else
+                            {
+                                eraseNumber += tankPtr->itemInfo[j].number;
+                                tankPtr->itemInfo.erase(tankPtr->itemInfo.begin() + j);
+                                j--;
+                            }
+                        }
+                        else break;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Vehicle::drawSelf()

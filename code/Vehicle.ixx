@@ -68,6 +68,7 @@ public:
     std::vector<dir16> wideRailMoveVec;
     bool isPowerTrain = false;
     Vehicle* rearTrain = nullptr;
+    ItemData* mainEngine = nullptr;
 
     Vehicle(int inputX, int inputY, int inputZ, int leadItemCode);
     ~Vehicle();
@@ -96,6 +97,12 @@ public:
     void updateTrainCenter();
     void updateHeadlight();
     void updateHeadlight(Point3 fakeCoor);
+    int getGasolineFuel();
+    int getDiselFuel();
+    int getElectricityFuel();
+    ItemData* getMainEngine();
+    int getEngineFuel();
+    void useEngineFuel(int fuelAmount);
     void drawSelf() override;
 };
 

@@ -766,7 +766,7 @@ export void startArea()
 	myCar->addPart(vX + 2, vY - 2, { 142,119,126 });
 	//////////////////////////▼중상단 4타일////////////////////////////////////
 	myCar->addPart(vX - 1, vY - 1, 121);
-	myCar->addPart(vX, vY - 1, 121);
+	myCar->addPart(vX, vY - 1, {121,100});
 	myCar->addPart(vX + 1, vY - 1, 121);
 	myCar->addPart(vX + 2, vY - 1, 121);
 	////////////////////////////////▼운전석 4타일///////////////////////////////
@@ -780,7 +780,17 @@ export void startArea()
 	myCar->addPart(vX + 1, vY + 1, { 122, 128,129 });
 	myCar->addPart(vX + 2, vY + 1, { 119 });
 	///////////////////////////////▼뒷자석 4타일/////////////////////
-	myCar->addPart(vX - 1, vY + 2, { 120 });
+	myCar->addPart(vX - 1, vY + 2, { 120, 101 });
+	{
+		ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2}].get();
+		for (int i = 0; i < partPocket->itemInfo.size(); i++)
+		{
+			if (partPocket->itemInfo[i].itemCode == 101)
+			{
+				partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemRefCode::gasoline, 90);
+			}
+		}
+	}
 	myCar->addPart(vX, vY + 2, { 122, 123, 128 });
 	myCar->addPart(vX + 1, vY + 2, { 122, 123, 128 });
 	myCar->addPart(vX + 2, vY + 2, { 120 });

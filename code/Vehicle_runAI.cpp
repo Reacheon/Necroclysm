@@ -8,6 +8,7 @@ import constVar;
 import util;
 import Entity;
 import Player;
+import log;
 
 bool Vehicle::runAI()
 {
@@ -411,116 +412,132 @@ bool Vehicle::runAI()
             {
                 if (vehType == vehFlag::car || vehType == vehFlag::heli)
                 {
-                    useTurnResource(1.0);
-
-                    if (spdVec.compZ != 0)
+                    if (getMainEngine() == nullptr)
                     {
-                        zShift(spdVec.compZ);
+                        if(ctrlVeh==this) updateLog(L"차량에 엔진이 장착되어 있지 않다.");
+                        useTurnResource(1.0);
+                        spdVec = getZeroVec();
+                        accVec = getZeroVec();
                     }
-
-                    if (bodyDir != wheelDir)
+                    else if (getEngineFuel() >= 5)
                     {
-                        Vec3 wheelDirSpd = getDefaultVec(dir16toInt16(wheelDir));
-                        int sgn = 1;
-                        if (gearState == gearFlag::reverse) sgn = -1;
+                        useEngineFuel(5);
+                        useTurnResource(1.0);
 
-                        if (wheelDir == ACW2(bodyDir))
+                        if (spdVec.compZ != 0)
                         {
-                            spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                            //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
+                            zShift(spdVec.compZ);
                         }
-                        else if (wheelDir == ACW(bodyDir))
+
+                        if (bodyDir != wheelDir)
                         {
-                            spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                            //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
-                        }
-                        else if (wheelDir == CW(bodyDir))
-                        {
-                            spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                            //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
-                        }
-                        else if (wheelDir == CW2(bodyDir))
-                        {
-                            spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
-                            //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
-                        }
-                    }
+                            Vec3 wheelDirSpd = getDefaultVec(dir16toInt16(wheelDir));
+                            int sgn = 1;
+                            if (gearState == gearFlag::reverse) sgn = -1;
 
-                    //가속도에 의한 속도 가감
-                    spdVec.addVec(accVec);
-                    accVec = getZeroVec();
-                    //마찰에 의한 손실
-                    if (spdVec.getLength() != 0)
-                    {
-                        int beforeXSpdSgn = sgn(spdVec.compX);
-                        int beforeYSpdSgn = sgn(spdVec.compY);
-                        float massCoeff = 1.5;
-                        float frictionCoeff = 1.0;
-                        float delSpd = frictionCoeff / massCoeff;
-                        Vec3 brakeDirVec = scalarMultiple(spdVec, -1.0);
-                        Vec3 brakeDirNormVec = brakeDirVec.getNormDirVec();
-                        Vec3 brakeVec = scalarMultiple(brakeDirNormVec, delSpd);
-
-                        if (spdVec.getLength() < brakeVec.getLength())
-                        {
-                            spdVec = getZeroVec();
-                            continue;
-                        }
-                        else spdVec.addVec(brakeVec);
-                    }
-                    xAcc += spdVec.compX;
-                    yAcc += spdVec.compY;
-
-                    int dstX = std::floor(xAcc);
-                    int dstY = std::floor(yAcc);
-
-                    if (dstX != 0 || dstY != 0)
-                    {
-                        std::vector<std::array<int, 2>> path;
-                        makeLine(path, dstX, dstY);
-
-                        int dxFinal = 0;
-                        int dyFinal = 0;
-
-
-
-                        for (int i = 1; i < path.size(); i++)
-                        {
-                            if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
+                            if (wheelDir == ACW2(bodyDir))
                             {
-                                dxFinal = path[i - 1][0];
-                                dyFinal = path[i - 1][1];
-                                prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
-                                accVec = getZeroVec();
+                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
+                            }
+                            else if (wheelDir == ACW(bodyDir))
+                            {
+                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
+                            }
+                            else if (wheelDir == CW(bodyDir))
+                            {
+                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                //spdVec = scalarMultiple(wheelDirSpd, 0.87330464009 * spdVec.getLength() / 2.0);
+                            }
+                            else if (wheelDir == CW2(bodyDir))
+                            {
+                                spdVec = scalarMultiple(wheelDirSpd, sgn * spdVec.getLength());
+                                //spdVec = scalarMultiple(wheelDirSpd, 1.0 * spdVec.getLength() / 1.414);
+                            }
+                        }
+
+                        //가속도에 의한 속도 가감
+                        spdVec.addVec(accVec);
+                        accVec = getZeroVec();
+                        //마찰에 의한 손실
+                        if (spdVec.getLength() != 0)
+                        {
+                            int beforeXSpdSgn = sgn(spdVec.compX);
+                            int beforeYSpdSgn = sgn(spdVec.compY);
+                            float massCoeff = 1.5;
+                            float frictionCoeff = 1.0;
+                            float delSpd = frictionCoeff / massCoeff;
+                            Vec3 brakeDirVec = scalarMultiple(spdVec, -1.0);
+                            Vec3 brakeDirNormVec = brakeDirVec.getNormDirVec();
+                            Vec3 brakeVec = scalarMultiple(brakeDirNormVec, delSpd);
+
+                            if (spdVec.getLength() < brakeVec.getLength())
+                            {
                                 spdVec = getZeroVec();
-                                break;
+                                continue;
                             }
-
-                            if (i == path.size() - 1)
-                            {
-                                dxFinal = dstX;
-                                dyFinal = dstY;
-                            }
+                            else spdVec.addVec(brakeVec);
                         }
+                        xAcc += spdVec.compX;
+                        yAcc += spdVec.compY;
 
+                        int dstX = std::floor(xAcc);
+                        int dstY = std::floor(yAcc);
 
-
-                        if (dxFinal != 0 || dyFinal != 0)
+                        if (dstX != 0 || dstY != 0)
                         {
-                            rush(dxFinal, dyFinal);
-                            if (bodyDir != wheelDir)
+                            std::vector<std::array<int, 2>> path;
+                            makeLine(path, dstX, dstY);
+
+                            int dxFinal = 0;
+                            int dyFinal = 0;
+
+
+
+                            for (int i = 1; i < path.size(); i++)
                             {
-                                rotateAcc += std::abs(dxFinal) + std::abs(dyFinal);
-                                if (wheelDir == ACW2(bodyDir) && rotateAcc > 7 && colisionCheck(ACW2(bodyDir), 0, 0) == false) rotate(ACW2(bodyDir));
-                                else if (wheelDir == ACW(bodyDir) && rotateAcc > 11 && colisionCheck(ACW(bodyDir), 0, 0) == false) rotate(ACW(bodyDir));
-                                else if (wheelDir == CW(bodyDir) && rotateAcc > 11 && colisionCheck(CW(bodyDir), 0, 0) == false) rotate(CW(bodyDir));
-                                else if (wheelDir == CW2(bodyDir) && rotateAcc > 7 && colisionCheck(CW2(bodyDir), 0, 0) == false) rotate(CW2(bodyDir));
+                                if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
+                                {
+                                    dxFinal = path[i - 1][0];
+                                    dyFinal = path[i - 1][1];
+                                    prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
+                                    accVec = getZeroVec();
+                                    spdVec = getZeroVec();
+                                    break;
+                                }
+
+                                if (i == path.size() - 1)
+                                {
+                                    dxFinal = dstX;
+                                    dyFinal = dstY;
+                                }
                             }
-                            xAcc -= std::floor(xAcc);
-                            yAcc -= std::floor(yAcc);
+
+
+
+                            if (dxFinal != 0 || dyFinal != 0)
+                            {
+                                rush(dxFinal, dyFinal);
+                                if (bodyDir != wheelDir)
+                                {
+                                    rotateAcc += std::abs(dxFinal) + std::abs(dyFinal);
+                                    if (wheelDir == ACW2(bodyDir) && rotateAcc > 7 && colisionCheck(ACW2(bodyDir), 0, 0) == false) rotate(ACW2(bodyDir));
+                                    else if (wheelDir == ACW(bodyDir) && rotateAcc > 11 && colisionCheck(ACW(bodyDir), 0, 0) == false) rotate(ACW(bodyDir));
+                                    else if (wheelDir == CW(bodyDir) && rotateAcc > 11 && colisionCheck(CW(bodyDir), 0, 0) == false) rotate(CW(bodyDir));
+                                    else if (wheelDir == CW2(bodyDir) && rotateAcc > 7 && colisionCheck(CW2(bodyDir), 0, 0) == false) rotate(CW2(bodyDir));
+                                }
+                                xAcc -= std::floor(xAcc);
+                                yAcc -= std::floor(yAcc);
+                            }
+                            updateSpr();
+                            AI_TURN_CONTINUE;
                         }
-                        updateSpr();
-                        AI_TURN_CONTINUE;
+                    }
+                    else
+                    {
+                        if (ctrlVeh == this) updateLog(L"차량에 연료가 부족하다.\n");
+                        useTurnResource(1.0);
                     }
                 }
                 
