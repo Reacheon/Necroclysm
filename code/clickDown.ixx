@@ -25,8 +25,8 @@ export void clickDown()
 			clickDownPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };
 			break;
 	}
-	prevMouseX4Motion = event.button.x;
-	prevMouseY4Motion = event.button.y;
+	prevMouseX4Motion = getMouseX();
+	prevMouseY4Motion = getMouseY();
 
 	GUI::getActiveGUIList()[GUI::getActiveGUIList().size() - 1]->clickDownGUI();
 }
