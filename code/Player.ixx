@@ -11,6 +11,7 @@ export class Player :public Entity //플레이어는 엔티티를 상속받고 �
 {
 public:
 
+
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;
@@ -27,4 +28,6 @@ public:
 	int checkItemSur(int index);//주변에 있는 타일을 포함해 아이템을 가지고 있는지 조사
 	void eraseItemSur(int index, int number); //주변객체를 중심으로 총 9칸
 	int checkToolQualitySur(int index); //없으면 0 반환, 있으면 공구레벨 반환
+
+    virtual void drawSelf() override; //플레이어를 그리는 함수입니다.	
 };

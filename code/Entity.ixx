@@ -32,10 +32,7 @@ export struct PartData
 export class Entity : public Ani, public Coord, public Drawable 
 {
 private:
-    std::unique_ptr<Sprite> customSprite = nullptr;
-    std::unique_ptr<Sprite> spriteFlash = nullptr; //플래시용 흰색 마스킹 스프라이트
-    SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
-    int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
+
     bool hasAStarDst = false;
     Point2 aStarDst = { 0, 0 };
     Point3 atkTarget = { 0,0,0 };
@@ -50,11 +47,9 @@ private:
     std::unique_ptr<ItemPocket> throwingItemPocket;
     Point3 throwCoord = { 0,0,0 };
 
-
-
 public:
     std::wstring name = L"DEFAULT ENTITY";
-    unsigned __int16 entityCode = 1;
+    int entityCode = entityRefCode::none;
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
     std::vector<Point2> aStarData;
@@ -66,6 +61,7 @@ public:
     std::array<int, TALENT_SIZE> proficFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
     int eyeSight = 8; //기본 시야 범위
     std::vector<std::pair<statEfctFlag, int>> statusEffects;
+    std::unique_ptr<Sprite> customSprite = nullptr;
 
     __int16 sh = 0;
     __int16 ev = 0;
@@ -100,6 +96,11 @@ public:
     std::unique_ptr<ItemPocket> equipment;
     __int16 sprIndex = 0;
     __int16 sprIndexInfimum = 0;
+
+    Sprite* entitySpr = nullptr;
+    double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
+    __int8 hpBarHeight = -12;
+
     humanCustom::skin skin = humanCustom::skin::null;
     humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;
@@ -107,10 +108,8 @@ public:
     humanCustom::hair hair = humanCustom::hair::null;
     humanCustom::horn horn = humanCustom::horn::null;
 
-    Sprite* entitySpr = nullptr;
-    double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
-    __int8 hpBarHeight = -12;
-
+    SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
+    int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     //////////////////////////////////////////////////
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     virtual ~Entity();
@@ -132,8 +131,6 @@ public:
     void setAtkTarget(int inputX, int inputY, int inputZ);
     ItemPocket* getEquipPtr();
     //void addEquipFromDex(int index, equip inputState);
-    void updateSpriteFlash();
-    Sprite* getSpriteFlash();
     void setFlashType(int inputType);
     int getFlashType();
     bool getLeftFoot();
@@ -186,5 +183,5 @@ public:
 
     void pullEquipLights();
 
-    virtual void drawSelf() override;
+    virtual void drawSelf() = 0;
 };

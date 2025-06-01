@@ -1139,61 +1139,68 @@ export enum class vehFlag
 
 export namespace itemRefCode
 {
-    int dirt = 109;
-    int grass = 220;
-    int blackAsphalt = 296;
-    int yellowAsphalt = 377;
+    constexpr int dirt = 109;
+    constexpr int grass = 220;
+    constexpr int blackAsphalt = 296;
+    constexpr int yellowAsphalt = 377;
 
-    int railRL = 320;
-    int railTB = 321;
-    int railBR = 322;
-    int railTR = 323;
-    int railTL = 324;
-    int railBL = 325;
+    constexpr int railRL = 320;
+    constexpr int railTB = 321;
+    constexpr int railBR = 322;
+    constexpr int railTR = 323;
+    constexpr int railTL = 324;
+    constexpr int railBL = 325;
 
 
-    int railSwitchEN = 326;
-    int railSwitchES = 327;
-    int railSwitchNW = 328;
-    int railSwitchNE = 329;
-    int railSwitchWN = 330;
-    int railSwitchWS = 331;
-    int railSwitchSW = 332;
-    int railSwitchSE = 333;
+    constexpr int railSwitchEN = 326;
+    constexpr int railSwitchES = 327;
+    constexpr int railSwitchNW = 328;
+    constexpr int railSwitchNE = 329;
+    constexpr int railSwitchWN = 330;
+    constexpr int railSwitchWS = 331;
+    constexpr int railSwitchSW = 332;
+    constexpr int railSwitchSE = 333;
 
-    int wideRailHTop = 399;
-    int wideRailHMid = 400;
-    int wideRailHBot = 401;
+    constexpr int wideRailHTop = 399;
+    constexpr int wideRailHMid = 400;
+    constexpr int wideRailHBot = 401;
 
-    int wideRailVLeft = 402;
-    int wideRailVMid = 403;
-    int wideRailVRight = 404;
+    constexpr int wideRailVLeft = 402;
+    constexpr int wideRailVMid = 403;
+    constexpr int wideRailVRight = 404;
 
-    int shallowFreshWater = 225;
-    int deepFreshWater = 226;
+    constexpr int shallowFreshWater = 225;
+    constexpr int deepFreshWater = 226;
 
-    int shallowSeaWater = 231;
-    int deepSeaWater = 232;
+    constexpr int shallowSeaWater = 231;
+    constexpr int deepSeaWater = 232;
 
-    int sandFloor = 381;
+    constexpr int sandFloor = 381;
 
-    int pickaxe = 388;
-    int fellingAxe = 391;
+    constexpr int pickaxe = 388;
+    constexpr int fellingAxe = 391;
 
-    int dirtWall = 302;
-    int stoneWall = 397;
-    int glassWall = 114;
-    int wireFence = 376;
+    constexpr int dirtWall = 302;
+    constexpr int stoneWall = 397;
+    constexpr int glassWall = 114;
+    constexpr int wireFence = 376;
 
-    int minecart = 405;
-    int minecartController = 406;
+    constexpr int minecart = 405;
+    constexpr int minecartController = 406;
 
-    int arrowQuiver = 408;
-    int boltQuiver = 409;
+    constexpr int arrowQuiver = 408;
+    constexpr int boltQuiver = 409;
 
-    int gasoline = 433;
-    int disel = 434;
-    int electricity = 45;
+    constexpr int gasoline = 433;
+    constexpr int disel = 434;
+    constexpr int electricity = 45;
+};
+
+export namespace entityRefCode
+{
+    constexpr int none = 0;
+    constexpr int player = 1;
+    constexpr int zombieA = 2;
 };
 
 export enum class skillSrc
@@ -1317,6 +1324,7 @@ export enum class particleFlag
     parabolic,
     leaf,
 };
+
 
 //export enum class projFlag
 //{

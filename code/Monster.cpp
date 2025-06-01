@@ -18,22 +18,9 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 {
 	if (isPlayer == false)
 	{
-		if (entityCode == 6)
+		if (entityCode == entityRefCode::zombieA)
 		{
-
-			skin = humanCustom::skin::yellow;
-			eyes = humanCustom::eyes::red;
-			hair = humanCustom::hair::ponytail;
-			horn = humanCustom::horn::coverRed;
-
-			int i = 0;
-			getEquipPtr()->addItemFromDex(390);
-			getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
-
-
 			entityFlip = true;
-
-			updateStatus();
 		}
 	}
 
@@ -112,4 +99,11 @@ void Monster::death()
 	dropItems.get()->addItemFromDex(20, 1);
 	drop(dropItems.get());
 	World::ins()->getTile({ getGridX(),getGridY(),getGridZ() }).EntityPtr.reset();
+}
+
+void Monster::drawSelf()
+{
+	if (entityCode == entityRefCode::zombieA)
+	{
+	}
 }

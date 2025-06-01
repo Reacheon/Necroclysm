@@ -19,4 +19,6 @@ public:
 	void endMove();
 	bool runAI();
 	void death();
+
+	virtual void drawSelf() override;
 };

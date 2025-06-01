@@ -10,6 +10,7 @@ import World;
 import Entity;
 import Monster;
 import Prop;
+import ItemData
 import ItemStack;
 import ItemPocket;
 
