@@ -27,7 +27,6 @@ import globalTime;
 import Drawable;
 import TileData;
 import Flame;
-import mouseGrid;
 import HUD;
 import Bullet;
 import Particle;

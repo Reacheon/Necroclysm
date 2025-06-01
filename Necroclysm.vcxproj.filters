@@ -462,9 +462,6 @@
     <ClCompile Include="code\clickHold.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
-    <ClCompile Include="code\mouseGrid.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\Entity_runAnimation.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>

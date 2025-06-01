@@ -15,7 +15,6 @@ import drawText;
 import globalTime;
 import checkCursor;
 import Vehicle;
-import mouseGrid;
 import drawWindow;
 import drawEpsilonText;
 import ContextMenu;

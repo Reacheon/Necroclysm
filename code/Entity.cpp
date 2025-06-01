@@ -25,7 +25,6 @@ import SkillData;
 import Flame;
 import Vehicle;
 import drawText;
-import mouseGrid;
 
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {

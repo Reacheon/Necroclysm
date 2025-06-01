@@ -38,7 +38,6 @@ import debugConsole;
 import CoordSelect;
 import SkillData;
 import ContextMenu;
-import mouseGrid;
 import ItemPocket;
 import ItemStack;
 import Dialogue;
@@ -142,16 +141,27 @@ public:
 	void clickHoldGUI();
 	void mouseWheel() 
 	{
-		//줌인 줌아웃
-		if (event.wheel.y > 0)
+		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr 
+			&& (std::abs(getAbsMouseGrid().x-PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
+			
+
+		if (partSelect==false)
 		{
-			zoomScale += 1;
-			if (zoomScale > 5.0) zoomScale = 5;
+			//줌인 줌아웃
+			if (event.wheel.y > 0)
+			{
+				zoomScale += 1;
+				if (zoomScale > 5.0) zoomScale = 5;
+			}
+			else if (event.wheel.y < 0)
+			{
+				zoomScale -= 1;
+				if (zoomScale < 1.0) zoomScale = 1;
+			}
 		}
-		else if (event.wheel.y < 0)
+		else
 		{
-			zoomScale -= 1;
-			if (zoomScale < 1.0) zoomScale = 1;
+
 		}
 	}
 	void mouseStep();

@@ -63,8 +63,6 @@ export void startArea()
 	createItemStack({3, 9, 0 }, { {382,1} });
 	createItemStack({4, 9, 0 }, { {384,30} });
 
-	createMonster({ 8,8,0 }, 5);//허수아비
-
 	createItemStack({7, -4, 0 }, { {391,1} }); //벌목도끼
 
 	createItemStack({-5, 1, 0 }, { {394,1} }); //낚시대

@@ -244,7 +244,6 @@
     <ClCompile Include="code\Inventory.ixx" />
     <ClCompile Include="code\Maint.ixx" />
     <ClCompile Include="code\Monster.cpp" />
-    <ClCompile Include="code\mouseGrid.ixx" />
     <ClCompile Include="code\mouseWheel.ixx" />
     <ClCompile Include="code\sequenceCounter.ixx" />
     <ClCompile Include="code\Particle.ixx" />

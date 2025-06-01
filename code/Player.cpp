@@ -395,3 +395,4 @@ int Player::checkToolQualitySur(int index) //없으면 0 반환, 있으면 공�
 	}
 	return itemNumber;
 }
+

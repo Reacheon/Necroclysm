@@ -10,6 +10,17 @@ import ItemPocket;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
+export struct PartData
+{
+    std::wstring partName = L"머리";
+    float accRate = 0.2f;
+    int maxHP = 100;
+    int currentHP = 100;
+    int resCut = 0.0f; //절단 저항
+    int resBash = 0.0f; //타격 저항
+    int resPierce = 0.0f; //관통 저항
+};
+
 export struct EntityData_Base
 {
     std::wstring name = L"DEFAULT ENTITY";
@@ -49,6 +60,8 @@ export struct EntityData_Base
 
     relationFlag relation = relationFlag::hostile;
     bool isHumanCustomSprite = false;
+
+    std::vector<PartData> partList;
 };
 
 export struct EntityData : public EntityData_Base

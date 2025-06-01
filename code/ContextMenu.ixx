@@ -22,7 +22,6 @@ import Prop;
 import log;
 import Lst;
 import Maint;
-import mouseGrid;
 import drawEpsilonText;
 import ItemData;
 
