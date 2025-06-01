@@ -40,7 +40,7 @@ public:
 			{
 				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
-					singleTile[x][y].floor = tileFloorFlag::seawater;
+					singleTile[x][y].floor = itemRefCode::deepSeaWater;
 				}
 			}
 		}
@@ -93,7 +93,7 @@ public:
 			{
 				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
-					singleTile[x][y].floor = tileFloorFlag::grass;
+					singleTile[x][y].floor = itemRefCode::grass;
 				}
 			}
 		}

@@ -146,7 +146,7 @@ export std::vector<int> canBuildListFac = { 1, 2, 3 }; //차량 철 프레임, �
 export std::unique_ptr<ItemPocket> availableRecipe;
 
 export void* ctrlVeh = nullptr;
-export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, decltype(arrayHasher2)>> coordTransform;//좌표변환
+export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, arrayHasher2>> coordTransform;//좌표변환
 
 export SDL_Rect quickSlotBtn[8];
 

@@ -5,14 +5,17 @@ export module wrapVar;
 import std;
 import util;
 import globalVar;
-import Player;
+import constVar;
+import ItemData;
+import ItemPocket;
+import ItemStack;
 import World;
+import Prop;
+import Vehicle;
 import Entity;
 import Monster;
-import Prop;
-import ItemData
-import ItemStack;
-import ItemPocket;
+import Player;
+
 
 export inline int PlayerX() { return PlayerPtr->getGridX(); }
 export inline int PlayerY() { return PlayerPtr->getGridY(); }
@@ -55,7 +58,7 @@ export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)Wor
 export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
 export inline ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
 
-export inline fovFlag& TileFov(int x, int y, int z) { return (fovFlag&)World::ins()->getTile(x, y, z).fov; }
+export inline fovFlag& TileFov(int x, int y, int z) { return static_cast<fovFlag&>(World::ins()->getTile(x, y, z).fov);}
 
 export inline void createMonster(Point3 inputCoor, int inputEntityCode)
 {
@@ -165,7 +168,7 @@ export float getMouseX()
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
 
-    float scaleX = (float)cameraW / (float)winW;
+    float scaleX = static_cast<float>(cameraW) / static_cast<float>(winW);
     return px * scaleX;
 }
 
@@ -177,7 +180,7 @@ export float getMouseY()
     int winW, winH;
     SDL_GetWindowSize(window, &winW, &winH);
 
-    float scaleY = (float)cameraH / (float)winH;
+    float scaleY = static_cast<float>(cameraH) / static_cast<float>(winH);
     return py * scaleY;
 }
 
@@ -189,20 +192,19 @@ export Point2 getAbsMouseGrid()
     if (cameraY >= 0) cameraGridY = cameraY / 16;
     else cameraGridY = -1 + cameraY / 16;
 
-
     int camDelX = cameraX - (16 * cameraGridX + 8);
     int camDelY = cameraY - (16 * cameraGridY + 8);
 
     int revX, revY, revGridX, revGridY;
     if (option::inputMethod == input::touch)
     {
-        revX = event.tfinger.x * cameraW - (cameraW / 2);
-        revY = event.tfinger.y * cameraH - (cameraH / 2);
+        revX = static_cast<int>(event.tfinger.x * cameraW) - (cameraW / 2);
+        revY = static_cast<int>(event.tfinger.y * cameraH) - (cameraH / 2);
     }
     else
     {
-        revX = getMouseX() - (cameraW / 2);
-        revY = getMouseY() - (cameraH / 2);
+        revX = static_cast<int>(getMouseX()) - (cameraW / 2);
+        revY = static_cast<int>(getMouseY()) - (cameraH / 2);
     }
     revX += sgn(revX) * (8 * zoomScale) + camDelX;
     revGridX = revX / (16 * zoomScale);

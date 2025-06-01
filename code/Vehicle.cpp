@@ -147,7 +147,7 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, decltype(arrayHasher2)> newPartInfo;
+        std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, arrayHasher2> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
@@ -174,11 +174,11 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
     }
 }
 
-std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> Vehicle::getRotateShadow(dir16 inputDir16)
+std::unordered_set<std::array<int, 2>, arrayHasher2> Vehicle::getRotateShadow(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> newPartInfo;
+        std::unordered_set<std::array<int, 2>, arrayHasher2> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
@@ -205,7 +205,7 @@ std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> Vehicle::getRotat
     }
     else
     {
-        std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> newPartInfo;
+        std::unordered_set<std::array<int, 2>, arrayHasher2> newPartInfo;
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
             newPartInfo.insert({ it->first[0],it->first[1] });
@@ -406,7 +406,7 @@ void Vehicle::shift(int dx, int dy)
         }
     }
 
-    std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, decltype(arrayHasher2)> shiftPartInfo;
+    std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, arrayHasher2> shiftPartInfo;
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
         shiftPartInfo[{it->first[0] + dx, it->first[1] + dy}] = std::move(partInfo[{it->first[0], it->first[1]}]);

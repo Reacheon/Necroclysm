@@ -30,7 +30,7 @@ export class Vehicle : public Ani, public AI, public Coord, public Drawable
 public:
     std::wstring name = L"Vehicle";
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도
-    std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, decltype(arrayHasher2)> partInfo;
+    std::unordered_map<std::array<int, 2>, std::unique_ptr<ItemPocket>, arrayHasher2> partInfo;
     vehFlag vehType = vehFlag::none;
     dir16 bodyDir = dir16::dir2;
     dir16 wheelDir = dir16::dir2;
@@ -82,7 +82,7 @@ public:
     void extendPart(int inputX, int inputY, int inputItemCode);
     int getSprIndex(int inputX, int inputY);
     void rotatePartInfo(dir16 inputDir16);
-    std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> getRotateShadow(dir16 inputDir16);
+    std::unordered_set<std::array<int, 2>, arrayHasher2> getRotateShadow(dir16 inputDir16);
     void rotateEntityPtr(dir16 inputDir16);
     void rotate(dir16 inputDir16);
     void updateSpr();

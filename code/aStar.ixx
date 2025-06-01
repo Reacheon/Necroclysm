@@ -25,13 +25,13 @@ export std::vector<Point2> aStar(std::set<std::array<int, 2>> walkableTile, int 
 
 	walkableTile.insert({ playerX,playerY });
 
-	std::unordered_map<std::array<int, 2>, int, decltype(arrayHasher2)> valG;
-	std::unordered_map<std::array<int, 2>, int, decltype(arrayHasher2)> valH;
-	std::unordered_map<std::array<int, 2>, int, decltype(arrayHasher2)> valF;
-	std::unordered_map<std::array<int, 2>, int, decltype(arrayHasher2)> valDir;
+	std::unordered_map<std::array<int, 2>, int, arrayHasher2> valG;
+	std::unordered_map<std::array<int, 2>, int, arrayHasher2> valH;
+	std::unordered_map<std::array<int, 2>, int, arrayHasher2> valF;
+	std::unordered_map<std::array<int, 2>, int, arrayHasher2> valDir;
 
-	std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> openSet;
-	std::unordered_set<std::array<int, 2>, decltype(arrayHasher2)> closeSet;
+	std::unordered_set<std::array<int, 2>, arrayHasher2> openSet;
+	std::unordered_set<std::array<int, 2>, arrayHasher2> closeSet;
 
 	//시작점을 오픈리스트에 넣음
 	int pivotX = dstX;

@@ -14,7 +14,7 @@ import constVar;
 export class Mapmaker
 {
 private:
-	std::unordered_map<std::array<int, 3>, chunkFlag, decltype(arrayHasher3)> prophecy;
+	std::unordered_map<std::array<int, 3>, chunkFlag, arrayHasher3> prophecy;
 public:
 	static Mapmaker* ins()//싱글톤 함수
 	{
