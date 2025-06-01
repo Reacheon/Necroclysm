@@ -11,6 +11,7 @@ import Coord;
 import log;
 import ItemData;
 
+
 ItemPocket::ItemPocket(storageType inputType) { type = inputType; }
 
 ItemPocket::~ItemPocket() { prt(L"ItemPocket : 소멸자가 호출되었습니다..\n"); }

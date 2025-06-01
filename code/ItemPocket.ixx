@@ -6,6 +6,7 @@ export module ItemPocket;
 import std;
 import util;
 import constVar;
+import ItemData;
 
 export class ItemPocket
 {

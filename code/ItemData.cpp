@@ -29,7 +29,7 @@ ItemData ItemData::cloneForTransfer(int transferNumber) const
 {
     ItemData newItem;
 
-    static_cast<ItemData_Base&>(newItem) = static_cast<const ItemData_Base&>(*this);
+    static_cast<ItemDataBase&>(newItem) = static_cast<const ItemDataBase&>(*this);
 
     newItem.number = transferNumber;
     newItem.lootSelect = 0;
