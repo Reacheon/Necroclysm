@@ -207,17 +207,11 @@
     <ClCompile Include="code\textureLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
     </ClCompile>
-    <ClCompile Include="code\EntityData.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
     <ClCompile Include="code\nanoTimer.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\TileData.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\readEntityDex.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\Alchemy.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
@@ -551,9 +545,6 @@
     </ClCompile>
     <ClCompile Include="code\sequenceCounter.ixx">
       <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\EntityData.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\wrapVar.ixx">
       <Filter>소스 파일\00_var</Filter>

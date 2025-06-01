@@ -340,7 +340,7 @@ public:
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (PlayerPtr->entityInfo.proficFocus[i] > 0) { break; }
+				if (PlayerPtr->proficFocus[i] > 0) { break; }
 
 				if (i == TALENT_SIZE - 1)
 				{
@@ -406,10 +406,10 @@ public:
 			new Quest();
 			break;
 		case act::runMode:
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->entityInfo.walkMode = walkFlag::run;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->entityInfo.walkMode = walkFlag::crouch;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->entityInfo.walkMode = walkFlag::crawl;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->entityInfo.walkMode = walkFlag::walk;
+			if (PlayerPtr->walkMode == walkFlag::walk) PlayerPtr->walkMode = walkFlag::run;
+			else if (PlayerPtr->walkMode == walkFlag::run) PlayerPtr->walkMode = walkFlag::crouch;
+			else if (PlayerPtr->walkMode == walkFlag::crouch) PlayerPtr->walkMode = walkFlag::crawl;
+			else if (PlayerPtr->walkMode == walkFlag::crawl) PlayerPtr->walkMode = walkFlag::walk;
 			popDownWhenEnd = false;
 			break;
 		case act::skill:
@@ -732,7 +732,7 @@ public:
 
 								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
 
-								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+								PlayerPtr->updateVision(PlayerPtr->eyeSight);
 								PlayerPtr->updateMinimap();
 
 								Prop* upProp = TileProp(touchX, touchY, PlayerZ());
@@ -754,7 +754,7 @@ public:
 
 								EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
 
-								PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+								PlayerPtr->updateVision(PlayerPtr->eyeSight);
 								PlayerPtr->updateMinimap();
 
 								Prop* downProp = TileProp(touchX, touchY, PlayerZ());
@@ -806,7 +806,7 @@ public:
 								tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 							}
 
-							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+							PlayerPtr->updateVision(PlayerPtr->eyeSight);
 						}
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
@@ -830,7 +830,7 @@ public:
 						addAniUSetPlayer(PlayerPtr, aniFlag::felling);
 					}
 				}
-				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
+				else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->relation == relationFlag::friendly)
 				{
 					new Dialogue();
 
@@ -854,7 +854,7 @@ public:
 							}
 
 							tgtPocket->itemInfo[i].propSprIndex += 16;
-							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+							PlayerPtr->updateVision(PlayerPtr->eyeSight);
 						}
 					}
 				}
@@ -912,7 +912,7 @@ public:
 				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 				tgtProp->leadItem.extraSprIndexSingle--;
-				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerPtr->eyeSight);
 			};
 
 		if (doorNumber == 1)
@@ -938,7 +938,7 @@ public:
 			tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 			tgtProp->leadItem.extraSprIndexSingle--;
-			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+			PlayerPtr->updateVision(PlayerPtr->eyeSight);
 		}
 	};
 

@@ -182,7 +182,6 @@
     <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Entity.cpp" />
-    <ClCompile Include="code\EntityData.cpp" />
     <ClCompile Include="code\Entity_runAnimation.cpp" />
     <ClCompile Include="code\Equip_draw.ixx" />
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
@@ -223,7 +222,6 @@
     <ClCompile Include="code\drawText.ixx" />
     <ClCompile Include="code\drawWindow.ixx" />
     <ClCompile Include="code\drawWindowArrow.ixx" />
-    <ClCompile Include="code\EntityData.ixx" />
     <ClCompile Include="code\Equip.ixx" />
     <ClCompile Include="code\errorBox.ixx" />
     <ClCompile Include="code\extremum.ixx" />
@@ -289,7 +287,6 @@
     <ClCompile Include="code\randomRange.ixx" />
     <ClCompile Include="code\readAlchemyDex.ixx" />
     <ClCompile Include="code\readCSV.ixx" />
-    <ClCompile Include="code\readEntityDex.ixx" />
     <ClCompile Include="code\readItemDex.ixx" />
     <ClCompile Include="code\renderLogue.ixx" />
     <ClCompile Include="code\renderTile.ixx" />

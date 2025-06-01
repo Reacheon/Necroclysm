@@ -15,7 +15,6 @@ import Coord;
 import World;
 import Sticker;
 import ItemStack;
-import EntityData;
 import ItemData;
 import Damage;
 import util;
@@ -29,14 +28,13 @@ import drawText;
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
 	prt(L"Entity : 생성자가 호출되었습니다!\n");
-	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
 	updateSpriteFlash();
-	entityInfo.equipment = std::make_unique<ItemPocket>(storageType::equip);
-	entityInfo.proficFocus[0] = 1;
+	equipment = std::make_unique<ItemPocket>(storageType::equip);
+	proficFocus[0] = 1;
 
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) proficApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
@@ -55,7 +53,7 @@ Point3 Entity::getSkillTarget() { return skillTarget; }
 void Entity::addSkill(int index)
 {
 	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
-	entityInfo.skillList.push_back(skillDex[index]);
+	skillList.push_back(skillDex[index]);
 }
 
 
@@ -77,7 +75,7 @@ void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
 }
 ItemPocket* Entity::getEquipPtr()
 {
-	return entityInfo.equipment.get();
+	return equipment.get();
 }
 
 void Entity::updateSpriteFlash()
@@ -85,7 +83,7 @@ void Entity::updateSpriteFlash()
 	float textureW, textureH;
 
 	if (customSprite == nullptr)
-		SDL_GetTextureSize(entityInfo.entitySpr->getTexture(), &textureW, &textureH);
+		SDL_GetTextureSize(entitySpr->getTexture(), &textureW, &textureH);
 	else
 		SDL_GetTextureSize(customSprite->getTexture(), &textureW, &textureH);
 
@@ -107,7 +105,7 @@ void Entity::updateSpriteFlash()
 	SDL_FRect dst = src;           // 크기가 동일하므로 그대로 복사
 
 	if (customSprite == nullptr)
-		SDL_RenderTexture(renderer, entityInfo.entitySpr->getTexture(), &src, &dst);
+		SDL_RenderTexture(renderer, entitySpr->getTexture(), &src, &dst);
 	else
 		SDL_RenderTexture(renderer, customSprite->getTexture(), &src, &dst);
 
@@ -133,16 +131,16 @@ void Entity::setFlashType(int inputType)
 int Entity::getFlashType() { return flashType; }
 bool Entity::getLeftFoot() { return leftFoot; }
 void Entity::setLeftFoot(bool input) { leftFoot = input; }
-void Entity::setSpriteInfimum(int inputVal) { entityInfo.sprIndexInfimum = inputVal; }
-int Entity::getSpriteInfimum() { return entityInfo.sprIndexInfimum; }
-void Entity::setSpriteIndex(int index) { entityInfo.sprIndex = index; }
-int Entity::getSpriteIndex() { return entityInfo.sprIndex; }
+void Entity::setSpriteInfimum(int inputVal) { sprIndexInfimum = inputVal; }
+int Entity::getSpriteInfimum() { return sprIndexInfimum; }
+void Entity::setSpriteIndex(int index) { sprIndex = index; }
+int Entity::getSpriteIndex() { return sprIndex; }
 void Entity::setDirection(int dir)
 {
-	entityInfo.direction = dir;
+	direction = dir;
 	if (dir == 2 || dir == 6) {}
-	else if (dir == 0 || (dir == 1 || dir == 7)) { entityInfo.sprFlip = false; }
-	else { entityInfo.sprFlip = true; }
+	else if (dir == 0 || (dir == 1 || dir == 7)) { entityFlip = false; }
+	else { entityFlip = true; }
 }
 void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
@@ -154,18 +152,12 @@ float Entity::endAtk()
 	setAniType(aniFlag::null);
 	return 1 / 0.8; //원래 여기에 공격속도가 들어가야함
 }
-void Entity::loadDataFromDex(int index)
-{
-	entityInfo = entityDex[index].cloneEntity();
-	entityInfo.HP = entityInfo.maxHP;
-	entityInfo.fakeHP = entityInfo.maxHP;
-}
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
 void Entity::addDmg(int inputDmg)
 {
 	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
-	entityInfo.HP -= inputDmg;
-	if (entityInfo.HP <= 0)//HP 0, 사망
+	HP -= inputDmg;
+	if (HP <= 0)//HP 0, 사망
 	{
 		death();
 		return;
@@ -177,52 +169,52 @@ void Entity::updateStatus()
 	//rPCB rFCECR SH EV 등을 업데이트함
 
 	//sh
-	entityInfo.sh = entityDex[entityInfo.entityCode].sh;//기본 개체값으로 재설정
+	sh =shRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.sh += getEquipPtr()->itemInfo[i].sh;
+		sh += getEquipPtr()->itemInfo[i].sh;
 	}
 
 	//ev
-	entityInfo.ev = entityDex[entityInfo.entityCode].ev;//기본 개체값으로 재설정
+	ev = evRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.ev += getEquipPtr()->itemInfo[i].ev;
+		ev += getEquipPtr()->itemInfo[i].ev;
 	}
 
 	//rFire
-	entityInfo.rFire = entityDex[entityInfo.entityCode].rFire;//기본 개체값으로 재설정
+	rFire = rFireRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rFire += getEquipPtr()->itemInfo[i].rFire;
+		rFire += getEquipPtr()->itemInfo[i].rFire;
 	}
 
 	//rCold
-	entityInfo.rCold = entityDex[entityInfo.entityCode].rCold;//기본 개체값으로 재설정
+	rCold = rColdRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rCold += getEquipPtr()->itemInfo[i].rCold;
+		rCold += getEquipPtr()->itemInfo[i].rCold;
 	}
 
 	//rElec
-	entityInfo.rElec = entityDex[entityInfo.entityCode].rElec;//기본 개체값으로 재설정
+	rElec = rElecRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rElec += getEquipPtr()->itemInfo[i].rElec;
+		rElec += getEquipPtr()->itemInfo[i].rElec;
 	}
 
 	//rCorr
-	entityInfo.rCorr = entityDex[entityInfo.entityCode].rCorr;//기본 개체값으로 재설정
+	rCorr = rCorrRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rCorr += getEquipPtr()->itemInfo[i].rCorr;
+		rCorr += getEquipPtr()->itemInfo[i].rCorr;
 	}
 
 	//rRad
-	entityInfo.rRad = entityDex[entityInfo.entityCode].rRad;//기본 개체값으로 재설정
+	rRad = rRadRef;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		entityInfo.rRad += getEquipPtr()->itemInfo[i].rRad;
+		rRad += getEquipPtr()->itemInfo[i].rRad;
 	}
 }
 //입력한 파츠 인덱스의 rPierce를 반환
@@ -249,7 +241,7 @@ int Entity::getSH()
 	int totalSH = 0;
 
 	//기본 개체값 더하기
-	totalSH += entityInfo.sh;
+	totalSH += sh;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
@@ -263,7 +255,7 @@ int Entity::getEV()
 	int totalEV = 0;
 
 	//기본 개체값 더하기
-	totalEV += entityInfo.ev;
+	totalEV += ev;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
@@ -325,11 +317,11 @@ void Entity::move(int dir, bool jump)
 
 	if (jump == false)
 	{
-		if (entityInfo.walkMode == walkFlag::run) entityInfo.gridMoveSpd = 3.5;
-		else if (entityInfo.walkMode == walkFlag::wade) entityInfo.gridMoveSpd = 1.8;
-		else if (entityInfo.walkMode == walkFlag::walk) entityInfo.gridMoveSpd = 3.0;
-		else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim) entityInfo.gridMoveSpd = 2.0;
-		else if (entityInfo.walkMode == walkFlag::crouch) entityInfo.gridMoveSpd = 2.0;
+		if (walkMode == walkFlag::run) gridMoveSpd = 3.5;
+		else if (walkMode == walkFlag::wade) gridMoveSpd = 1.8;
+		else if (walkMode == walkFlag::walk) gridMoveSpd = 3.0;
+		else if (walkMode == walkFlag::crawl || walkMode == walkFlag::swim) gridMoveSpd = 2.0;
+		else if (walkMode == walkFlag::crouch) gridMoveSpd = 2.0;
 
 		if (pulledCart != nullptr)
 		{
@@ -341,13 +333,13 @@ void Entity::move(int dir, bool jump)
 			addAniUSet(pulledCart, aniFlag::move);
 
 			pulledCart->shift(dx, dy);
-			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
+			pulledCart->pullMoveSpd = gridMoveSpd;
 		}
 
 		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX()+dGridX, getGridY()+dGridY, getGridZ() });
 		setFakeX(-16*dGridX);
 		setFakeY(-16*dGridY);
-		if (entityInfo.isPlayer)
+		if (isPlayer)
 		{
 			cameraFix = false;
 			cameraX = getX() + getIntegerFakeX();
@@ -636,7 +628,7 @@ void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getProficLevel(int index)
 {
-	float exp = entityInfo.proficExp[index];
+	float exp = proficExp[index];
 
 	if (exp < expTable[0]) return 1.0f + exp / expTable[0];
 
@@ -661,22 +653,22 @@ void Entity::addProficExp(int expVal)
 	int divider = 0;
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		divider += entityInfo.proficFocus[i];
+		divider += proficFocus[i];
 	}
 	errorBox(divider == 0, L"You need to enable at least one profic(divider=0 at addProficExp).");
 	int frag = floor((float)(expVal) / (float)divider);
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		entityInfo.proficExp[i] += (frag * entityInfo.proficFocus[i]);
+		proficExp[i] += (frag * proficFocus[i]);
 	}
 	//만렙이 된 재능의 포커스 해제
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		if (entityInfo.proficFocus[i] > 0)
+		if (proficFocus[i] > 0)
 		{
 			if (getProficLevel(i) >= 18)
 			{
-				entityInfo.proficFocus[i] = 0;
+				proficFocus[i] = 0;
 			}
 		}
 	}
@@ -749,7 +741,7 @@ void Entity::drawSelf()
 {
 	stepEvent();
 	
-	if (entityInfo.isPlayer)
+	if (isPlayer)
 	{
 		SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
 		SDL_SetTextureScaleMode(targetTexture, SDL_SCALEMODE_NEAREST);
@@ -758,28 +750,28 @@ void Entity::drawSelf()
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
-		if (entityInfo.skin != humanCustom::skin::null)
+		if (skin != humanCustom::skin::null)
 		{
-			if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
+			if (skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
 		}
 
-		if (entityInfo.eyes != humanCustom::eyes::null)
+		if (eyes != humanCustom::eyes::null)
 		{
-			if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
+			if (eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+			else if (eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+			else if (eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
 		}
 
-		if (entityInfo.scar != humanCustom::scar::null)
+		if (scar != humanCustom::scar::null)
 		{
 		}
 
-		if (entityInfo.beard != humanCustom::beard::null)
+		if (beard != humanCustom::beard::null)
 		{
-			if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
+			if (beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
 		}
 
-		if (entityInfo.hair != humanCustom::hair::null)
+		if (hair != humanCustom::hair::null)
 		{
 			bool noHair = false;
 			for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
@@ -795,7 +787,7 @@ void Entity::drawSelf()
 
 			if (noHair == false)
 			{
-				switch (entityInfo.hair)
+				switch (hair)
 				{
 				case humanCustom::hair::commaBlack:
 					drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
@@ -813,9 +805,9 @@ void Entity::drawSelf()
 			}
 		}
 
-		if (entityInfo.horn != humanCustom::horn::null)
+		if (horn != humanCustom::horn::null)
 		{
-			switch (entityInfo.horn)
+			switch (horn)
 			{
 			case humanCustom::horn::coverRed:
 				drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
@@ -839,7 +831,7 @@ void Entity::drawSelf()
 				{
 				case equipHandFlag::left:
 				case equipHandFlag::both:
-					if (entityInfo.sprFlip == false)
+					if (entityFlip == false)
 					{
 						priority = tgtItem.leftWieldPriority;
 						tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
@@ -852,7 +844,7 @@ void Entity::drawSelf()
 
 					break;
 				case equipHandFlag::right:
-					if(entityInfo.sprFlip == false)
+					if(entityFlip == false)
 					{
 						priority = tgtItem.rightWieldPriority;
 						tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
@@ -864,7 +856,7 @@ void Entity::drawSelf()
                     }
 					break;
 				case equipHandFlag::normal:
-					if (entityInfo.sprFlip == false)
+					if (entityFlip == false)
 					{
 						priority = tgtItem.equipPriority;
 						tgtSpr = (Sprite*)tgtItem.equipSpr;
@@ -904,7 +896,7 @@ void Entity::drawSelf()
 	
 	
 	setZoom(zoomScale);
-	if (entityInfo.sprFlip == false) setFlip(SDL_FLIP_NONE);
+	if (entityFlip == false) setFlip(SDL_FLIP_NONE);
 	else setFlip(SDL_FLIP_HORIZONTAL);
 
 
@@ -912,28 +904,28 @@ void Entity::drawSelf()
 	int offsetX = 0;
 	int offsetY = 0;
 
-	if (entityInfo.isPlayer)
+	if (isPlayer)
 	{
 		if (getSpriteIndex() >= 0 && getSpriteIndex() <= 2)
 		{
-			if (entityInfo.walkMode == walkFlag::walk || entityInfo.walkMode == walkFlag::wade)
+			if (walkMode == walkFlag::walk || walkMode == walkFlag::wade)
 			{
 			}
-			else if (entityInfo.walkMode == walkFlag::run)
+			else if (walkMode == walkFlag::run)
 			{
 				localSprIndex += 6;
 			}
-			else if (entityInfo.walkMode == walkFlag::crouch)
+			else if (walkMode == walkFlag::crouch)
 			{
 				localSprIndex += 12;
 			}
-			else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim)
+			else if (walkMode == walkFlag::crawl || walkMode == walkFlag::swim)
 			{
 				localSprIndex += 18;
 			}
 
 
-			if (entityInfo.walkMode != walkFlag::crawl && entityInfo.walkMode != walkFlag::swim)
+			if (walkMode != walkFlag::crawl && walkMode != walkFlag::swim)
 			{
 				for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 				{
@@ -954,7 +946,7 @@ void Entity::drawSelf()
 			offsetX = 0;
 			offsetY = -9;
 
-			if (entityInfo.walkMode == walkFlag::walk)
+			if (walkMode == walkFlag::walk)
 			{
 				if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
 				{
@@ -962,7 +954,7 @@ void Entity::drawSelf()
 				}
 				localSprIndex = 0;
 			}
-			else if (entityInfo.walkMode == walkFlag::run)
+			else if (walkMode == walkFlag::run)
 			{
 				if (localSprIndex % 3 == 1 || localSprIndex % 3 == 2)
 				{
@@ -990,13 +982,13 @@ void Entity::drawSelf()
 		else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
 		{
 			drawSpriteCenter(spr::shadow, 2, originX, originY);
-			drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex(), originX, originY);
+			drawSpriteCenter(ridingEntity.get()->entitySpr, getSpriteIndex(), originX, originY);
 		}
 	}
 
 
 	//캐릭터 커스타미이징 그리기
-	if (entityInfo.isPlayer)
+	if (isPlayer)
 	{
 		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 
@@ -1023,52 +1015,52 @@ void Entity::drawSelf()
 	}
 	else
 	{
-		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+		drawSpriteCenter(entitySpr, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool doDrawHP = false;
-    if (entityInfo.HP != entityInfo.maxHP) doDrawHP = true;
+    if (HP != maxHP) doDrawHP = true;
 
 	if (doDrawHP)//개체 HP 표기
 	{
 		int pivotX = drawingX - (int)(8 * zoomScale);
-		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
+		int pivotY = drawingY + (int)((-8 + hpBarHeight) * zoomScale);
 		SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		drawFillRect(dst, col::black);
 
 		//페이크 HP
-		if (entityInfo.fakeHP > entityInfo.HP) { entityInfo.fakeHP--; }
-		else if (entityInfo.fakeHP < entityInfo.HP) entityInfo.fakeHP = entityInfo.HP;
-		if (entityInfo.fakeHP != entityInfo.HP)
+		if (fakeHP > HP) { fakeHP--; }
+		else if (fakeHP < HP) fakeHP = HP;
+		if (fakeHP != HP)
 		{
-			if (entityInfo.fakeHPAlpha > 30) { entityInfo.fakeHPAlpha -= 30; }
-			else { entityInfo.fakeHPAlpha = 0; }
+			if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
+			else { fakeHPAlpha = 0; }
 		}
-		else { entityInfo.fakeHPAlpha = 255; }
+		else { fakeHPAlpha = 255; }
 
 		//페이크 MP
-		if (entityInfo.fakeMP > entityInfo.MP) { entityInfo.fakeMP--; }
-		else if (entityInfo.fakeMP < entityInfo.MP) entityInfo.fakeMP = entityInfo.MP;
-		if (entityInfo.fakeMP != entityInfo.MP)
+		if (fakeMP > MP) { fakeMP--; }
+		else if (fakeMP < MP) fakeMP = MP;
+		if (fakeMP != MP)
 		{
-			if (entityInfo.fakeMPAlpha > 30) { entityInfo.fakeMPAlpha -= 30; }
-			else { entityInfo.fakeMPAlpha = 0; }
+			if (fakeMPAlpha > 30) { fakeMPAlpha -= 30; }
+			else { fakeMPAlpha = 0; }
 		}
-		else { entityInfo.fakeMPAlpha = 255; }
+		else { fakeMPAlpha = 255; }
 
 
-		float ratioFakeHP = myMax((float)0.0, (entityInfo.fakeHP) / (float)(entityInfo.maxHP));
+		float ratioFakeHP = myMax((float)0.0, (fakeHP) / (float)(maxHP));
 		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		drawFillRect(dst, col::white, entityInfo.fakeHPAlpha);
+		drawFillRect(dst, col::white, fakeHPAlpha);
 
-		float ratioHP = myMax((float)0.0, (float)(entityInfo.HP) / (float)(entityInfo.maxHP));
+		float ratioHP = myMax((float)0.0, (float)(HP) / (float)(maxHP));
 		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 		if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green);
+		if (isPlayer) drawFillRect(dst, lowCol::green);
 		else drawFillRect(dst, lowCol::red);
 	}
 
@@ -1077,10 +1069,10 @@ void Entity::drawSelf()
 		int mouseX = getAbsMouseGrid().x;
 		int mouseY = getAbsMouseGrid().y;
 
-		if (getGridX() == mouseX && getGridY() == mouseY && entityInfo.isPlayer == false)
+		if (getGridX() == mouseX && getGridY() == mouseY && isPlayer == false)
 		{
 			int pivotX = drawingX - (int)(8 * zoomScale);
-			int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
+			int pivotY = drawingY + (int)((-8 + hpBarHeight) * zoomScale);
 
 			if (zoomScale == 1.0) setFontSize(8);
 			else if (zoomScale == 2.0) setFontSize(10);
@@ -1095,7 +1087,7 @@ void Entity::drawSelf()
 
 			if (zoomScale == 1.0) textY -= (int)(1 * zoomScale);
 
-			renderTextOutlineCenter(entityInfo.name, textX, textY);
+			renderTextOutlineCenter(name, textX, textY);
 		}
 	}
 
@@ -1112,7 +1104,7 @@ void Entity::drawSelf()
 
 	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽
 	{
-		drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
+		drawSpriteCenter(ridingEntity.get()->entitySpr, getSpriteIndex() + 4, originX, originY);
 	}
 
 	setZoom(1.0);

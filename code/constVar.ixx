@@ -283,53 +283,6 @@ export enum class weatherFlag
 };
 
 
-export namespace entityFlag
-{
-    constexpr int name = 0;
-    constexpr int index = 1;
-    constexpr int nameIndex = 2;
-    constexpr int sprIndex = 3;
-    constexpr int category = 4;
-    constexpr int temperature = 5;
-    constexpr int weight = 6;
-    constexpr int volume = 7;
-    constexpr int HD = 8;
-    constexpr int SH = 9;
-    constexpr int EV = 10;
-    constexpr int rFire = 11;
-    constexpr int rCold = 12;
-    constexpr int rElec = 13;
-    constexpr int rCorr = 14;
-    constexpr int rRad = 15;
-    constexpr int maxHP = 16;
-
-    constexpr std::array<int, 10> indexPart = { 17, 23, 29, 35, 41, 47, 53, 59, 65, 71 };
-    constexpr std::array<int, 10> rPiercePart = { 18, 24, 30, 36, 42, 48, 54, 60, 66, 72 };
-    constexpr std::array<int, 10> rCutPart = { 19, 25, 31, 37, 43, 49, 55, 61, 67, 73 };
-    constexpr std::array<int, 10> rBashPart = { 20, 26, 32, 38, 44, 50, 56, 62, 68, 74 };
-    constexpr std::array<int, 10> encMaxPart = { 21, 27, 33, 39, 45, 51, 57, 63, 69, 75 };
-    constexpr std::array<int, 10> accPart = { 22, 28, 34, 40, 46, 52, 58, 64, 70, 76 };
-
-    constexpr int strength = 77;
-    constexpr int intelligence = 78;
-    constexpr int dexterity = 79;
-    constexpr int corpseItemIndex = 80;
-    constexpr int downImageIndex = 81;
-    constexpr int corpseImageIndex = 82;
-    constexpr int portraitImageIndex = 83;
-    constexpr int atk = 84;
-    constexpr int atkType = 85;
-    constexpr int atkSpd = 86;
-    constexpr int movSpd = 87;
-    constexpr int flySpd = 88;
-    constexpr int swimSpd = 89;
-    constexpr int unique = 90;
-    constexpr int regen = 91;
-    constexpr int blood = 92;
-    constexpr int sight = 93;
-    constexpr int smell = 94;
-};
-
 export namespace dmgFlag
 {
     constexpr int partIndex = 0;
@@ -950,21 +903,6 @@ export namespace entityCategory
     constexpr int human = 1;
     constexpr int zombie = 2;
     constexpr int robot = 3;
-};
-
-export namespace bodyTemplateFlag
-{
-    constexpr int none = 0;
-    //모든 부위가 파괴되면 사망
-    constexpr int human = 1;
-    //머리 몸통 왼팔 오른팔 왼다리 오른다리
-    //머리나 몸통 터지면 즉사, 팔 터지면 공격력 30% 감소, 다리 터지면 이속 30% 감소
-    constexpr int zombie = 2;
-    //머리 몸통 왼팔 오른팔 왼다리 오른다리
-    //몸통 터지면 즉사, 팔 터지면 공격력 30% 감소, 다리 터지면 이속 30% 감소, 머리 터지면 시야 0
-    constexpr int tank = 3;
-    //포탑 차체 좌무한궤도 우무한궤도
-    //차체 터지면 즉사, 포탑 터지면 사격불가, 궤도 터지면 각각 이동속도 30% 감소
 };
 
 export namespace partsFlag

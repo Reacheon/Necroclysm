@@ -159,7 +159,7 @@ void HUD::gamepadStep()
 										tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 									}
 
-									PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+									PlayerPtr->updateVision(PlayerPtr->eyeSight);
 								}
 							}
 						}

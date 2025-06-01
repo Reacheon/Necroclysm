@@ -130,7 +130,7 @@ public:
 				std::wstring levelStr = L"Lv." + std::to_wstring(static_cast<int>(PlayerPtr->getProficLevel(i)));
 
 				std::wstring aptStr;
-				aptStr = L"x" + decimalCutter(PlayerPtr->entityInfo.proficApt[i], 1);
+				aptStr = L"x" + decimalCutter(PlayerPtr->proficApt[i], 1);
 
 				switch (i)
 				{

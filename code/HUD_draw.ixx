@@ -123,12 +123,12 @@ void HUD::drawGUI()
 			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 			// 페이크 HP
-			float ratioFakeHP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeHP) / (float)(PlayerPtr->entityInfo.maxHP));
+			float ratioFakeHP = myMax((float)0.0, (PlayerPtr->fakeHP) / (float)(PlayerPtr->maxHP));
 			SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-			drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeHPAlpha);
+			drawFillRect(fakeRect, lowCol::white, PlayerPtr->fakeHPAlpha);
 
 			// 실제 HP
-			float ratioHP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.HP) / (float)(PlayerPtr->entityInfo.maxHP));
+			float ratioHP = myMax((float)0.0, (float)(PlayerPtr->HP) / (float)(PlayerPtr->maxHP));
 			SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
 			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
 			drawFillRect(realRect, lowCol::green);
@@ -158,8 +158,8 @@ void HUD::drawGUI()
 				int pivotY = letterbox.y + 4;
 				setFontSize(10);
 
-				int pSTA = PlayerPtr->entityInfo.STA;
-				int pSTAMax = PlayerPtr->entityInfo.maxSTA;
+				int pSTA = PlayerPtr->stamina;
+				int pSTAMax = PlayerPtr->maxStamina;
 
 
 				if (fakeSTA > pSTA)
@@ -207,7 +207,7 @@ void HUD::drawGUI()
 
 
 
-				std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
+				std::wstring STAStr = std::to_wstring(PlayerPtr->stamina) + L"/" + std::to_wstring(PlayerPtr->maxStamina);
 				setFontSize(8);
                 renderTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);	
 			}
@@ -782,16 +782,16 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::runMode)
 		{
 
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) setBtnLayout(sysStr[8], 9);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) setBtnLayout(sysStr[8], 10);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) setBtnLayout(sysStr[8], 12);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) setBtnLayout(sysStr[8], 11);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::wade)
+			if (PlayerPtr->walkMode == walkFlag::walk) setBtnLayout(sysStr[8], 9);
+			else if (PlayerPtr->walkMode == walkFlag::run) setBtnLayout(sysStr[8], 10);
+			else if (PlayerPtr->walkMode == walkFlag::crouch) setBtnLayout(sysStr[8], 12);
+			else if (PlayerPtr->walkMode == walkFlag::crawl) setBtnLayout(sysStr[8], 11);
+			else if (PlayerPtr->walkMode == walkFlag::wade)
 			{
 				setBtnLayout(sysStr[8], 161);
 				deactRect = true;
 			}
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::swim)
+			else if (PlayerPtr->walkMode == walkFlag::swim)
 			{
 				setBtnLayout(sysStr[8], 160);
 				deactRect = true;
@@ -924,7 +924,7 @@ void HUD::drawBarAct()
 
 void HUD::drawStatusEffects()
 {
-	std::vector<std::pair<statEfctFlag, int>>& myEfcts = PlayerPtr->entityInfo.statusEffects;
+	std::vector<std::pair<statEfctFlag, int>>& myEfcts = PlayerPtr->statusEffects;
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
 		int pivotX = 10;

@@ -34,7 +34,7 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
     if (leadItem.checkFlag(itemFlag::LIGHT_ON))
     {
         leadItem.lightPtr = std::make_unique<Light>(inputCoor.x + leadItem.lightDelX, inputCoor.y + leadItem.lightDelY, inputCoor.z, leadItem.lightRange, leadItem.lightIntensity, SDL_Color{ leadItem.lightR,leadItem.lightG,leadItem.lightB });//임시로 이렇게 만들어놨음
-        //PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+        //PlayerPtr->updateVision(PlayerPtr->eyeSight);
     }
 
 

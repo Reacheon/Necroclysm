@@ -16,22 +16,22 @@ import ItemData;
 
 Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 {
-	if (entityInfo.isHumanCustomSprite == true && entityInfo.isPlayer == false)
+	if (isPlayer == false)
 	{
-		if (entityInfo.entityCode == 6)
+		if (entityCode == 6)
 		{
 
-			entityInfo.skin = humanCustom::skin::yellow;
-			entityInfo.eyes = humanCustom::eyes::red;
-			entityInfo.hair = humanCustom::hair::ponytail;
-			entityInfo.horn = humanCustom::horn::coverRed;
+			skin = humanCustom::skin::yellow;
+			eyes = humanCustom::eyes::red;
+			hair = humanCustom::hair::ponytail;
+			horn = humanCustom::horn::coverRed;
 
 			int i = 0;
 			getEquipPtr()->addItemFromDex(390);
 			getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 
-			entityInfo.sprFlip = true;
+			entityFlip = true;
 
 			updateStatus();
 		}
@@ -48,7 +48,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 		scriptAI = buffer.str();
 	}
 
-	prt(entityInfo.name.c_str());
+	prt(name.c_str());
 	prt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
 }
 Monster::~Monster()
@@ -79,8 +79,8 @@ bool Monster::runAI()
 	lua["clearMyTurn"] = [this]()->void { this->clearTurnResource(); };
 	lua["useMyTurn"] = [this](double val)->void { this->useTurnResource(val); };
 
-	lua["isHostile"] = [this]()->bool { return this->entityInfo.relation == relationFlag::hostile; };
-	lua["getEntityCode"] = [this]()->int { return this->entityInfo.entityCode; };
+	lua["isHostile"] = [this]()->bool { return this->relation == relationFlag::hostile; };
+	lua["getEntityCode"] = [this]()->int { return this->entityCode; };
 	lua["updateWalkable"] = [this](int x, int y)->void { updateWalkable(x, y); };
 
 

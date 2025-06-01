@@ -174,11 +174,11 @@ void Equip::drawGUI()
 			topWindow.y + 24 + 18 * 0 + 9,
 			col::white);
 
-		int rFire = PlayerPtr->entityInfo.rFire;
-		int rCold = PlayerPtr->entityInfo.rCold;
-		int rElec = PlayerPtr->entityInfo.rElec;
-		int rCorr = PlayerPtr->entityInfo.rCorr;
-		int rRad = PlayerPtr->entityInfo.rRad;
+		int rFire = PlayerPtr->rFire;
+		int rCold = PlayerPtr->rCold;
+		int rElec = PlayerPtr->rElec;
+		int rCorr = PlayerPtr->rCorr;
+		int rRad = PlayerPtr->rRad;
 
 		renderText(L"Lv." + std::to_wstring(rFire),
 			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 1, lowCol::green);

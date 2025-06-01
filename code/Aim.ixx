@@ -55,7 +55,7 @@ public:
 
 		int pX = PlayerX(), pY = PlayerY(), pZ = PlayerZ();
 		
-		if(PlayerPtr->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
+		if(PlayerPtr->entityFlip == false) aimCoord = { pX + 1, pY, pZ };
 		else  aimCoord = { pX - 1, pY, pZ };
 
 		Entity* nearTarget = nullptr;

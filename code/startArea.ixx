@@ -901,6 +901,6 @@ export void startArea()
 
 	World::ins()->createSector(0, 0, 0);
 
-	PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+	PlayerPtr->updateVision(PlayerPtr->eyeSight);
 	
 };

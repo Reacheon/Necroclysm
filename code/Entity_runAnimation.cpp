@@ -40,28 +40,28 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getFakeX() > 0)
 		{
-			addFakeX(-entityInfo.gridMoveSpd);
+			addFakeX(-gridMoveSpd);
 			if (getFakeX() < 0) setFakeX(0);
 		}
 		else if (getFakeX() < 0)
 		{
-			addFakeX(+entityInfo.gridMoveSpd);
+			addFakeX(+gridMoveSpd);
 			if (getFakeX() > 0) setFakeX(0);
 		}
 
 		if (getFakeY() > 0)
 		{
-			addFakeY(-entityInfo.gridMoveSpd);
+			addFakeY(-gridMoveSpd);
 			if (getFakeY() < 0) setFakeY(0);
 		}
 		else if (getFakeY() < 0)
 		{
-			addFakeY(+entityInfo.gridMoveSpd);
+			addFakeY(+gridMoveSpd);
 			if (getFakeY() > 0) setFakeY(0);
 		}
 
 
-		if (entityInfo.isPlayer)
+		if (isPlayer)
 		{
 			cameraFix = false;
 			cameraX = getX() + getIntegerFakeX();
@@ -96,7 +96,7 @@ bool Entity::runAnimation(bool shutdown)
 
 			turnWait(1.0);
 			endMove();
-			if (entityInfo.isPlayer) cameraFix = true;
+			if (isPlayer) cameraFix = true;
 			return true;
 		}
 	}
@@ -117,7 +117,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() == 1)
 		{
-			if (entityInfo.isPlayer)
+			if (isPlayer)
 			{
 				dualAtk = false;
 				leftAtk = false;
@@ -146,7 +146,7 @@ bool Entity::runAnimation(bool shutdown)
 		}
 
 
-		switch (entityInfo.direction)
+		switch (direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -177,7 +177,7 @@ bool Entity::runAnimation(bool shutdown)
 		switch (getTimer())
 		{
 		case 1:
-			if (entityInfo.isPlayer)
+			if (isPlayer)
 			{
 				if (dualAtk)
 				{
@@ -216,7 +216,7 @@ bool Entity::runAnimation(bool shutdown)
 			}
 			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
-			if (entityInfo.isPlayer)
+			if (isPlayer)
 			{
 				if (dualAtk)
 				{
@@ -284,11 +284,11 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			if (entityInfo.isPlayer)
+			if (isPlayer)
 			{
 				PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 			}
-			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
+			if (isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
 		}
@@ -320,7 +320,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (entityInfo.direction)
+		switch (direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -386,7 +386,7 @@ bool Entity::runAnimation(bool shutdown)
 					addAniUSetPlayer(address, aniFlag::treeFalling);
 					address->displayHPBarCount = 50;
 					address->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
-					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+					PlayerPtr->updateVision(PlayerPtr->eyeSight);
 				}
 				else
 				{
@@ -438,7 +438,7 @@ bool Entity::runAnimation(bool shutdown)
 			resetTimer();
 			setAniType(aniFlag::null);
 			PlayerPtr->setSpriteIndex(charSprIndex::WALK_2H);
-			if (entityInfo.isPlayer == true) { turnWait(1.0); }
+			if (isPlayer == true) { turnWait(1.0); }
 			else {  }
 			return true;
 		}
@@ -450,7 +450,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (entityInfo.direction)
+		switch (direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -552,7 +552,7 @@ bool Entity::runAnimation(bool shutdown)
 				if(itemPtr != nullptr) addAniUSetPlayer(itemPtr, aniFlag::drop);
 
 				DestroyWall(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerPtr->eyeSight);
 			}
 			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
 			break;
@@ -588,7 +588,7 @@ bool Entity::runAnimation(bool shutdown)
 			resetTimer();
 			setAniType(aniFlag::null);
 			PlayerPtr->setSpriteIndex(charSprIndex::WALK_2H);
-			if (entityInfo.isPlayer == true) { turnWait(1.0); }
+			if (isPlayer == true) { turnWait(1.0); }
 			else {}
 			return true;
 		}
@@ -601,7 +601,7 @@ bool Entity::runAnimation(bool shutdown)
 		char dx;
 		char dy;
 
-		switch (entityInfo.direction)
+		switch (direction)
 		{
 		case 0: dx = 1; dy = 0; break;
 		case 1: dx = 1; dy = -1; break;
@@ -684,7 +684,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			resetTimer();
 			setAniType(aniFlag::null);
-			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
+			if (isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
 		}
@@ -715,7 +715,7 @@ bool Entity::runAnimation(bool shutdown)
 		static Bullet* bulletPtr = nullptr;
 
 		int dx, dy;
-		dir2Coord(entityInfo.direction, dx, dy);
+		dir2Coord(direction, dx, dy);
 
 		Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
 		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
@@ -832,7 +832,7 @@ bool Entity::runAnimation(bool shutdown)
 					Aim::ins()->close(aniFlag::null);
 				}
 
-				if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
+				if (isPlayer == true) { turnWait(endAtk()); }
 				else { endAtk(); }
 				return true;
 			}
@@ -1098,7 +1098,7 @@ bool Entity::runAnimation(bool shutdown)
 		{
 		case 1:
 			PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
-			PlayerPtr->entityInfo.eyes = humanCustom::eyes::closed;
+			PlayerPtr->eyes = humanCustom::eyes::closed;
 			setFakeY(-4);
 			break;
 		case 2:

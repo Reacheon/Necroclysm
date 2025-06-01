@@ -13,7 +13,6 @@ import std;
 import util;
 import constVar;
 import ItemData;
-import EntityData;
 import SkillData;
 import Ani;
 import AlchemyData;
@@ -68,7 +67,6 @@ export bool quit = false;// true일 경우 게임을 종료시킴
 export bool stopLog = false; // 로그를 멈춘다. 시간이 지나도 사라지지 않음
 export float timeGift = 0; // 유저의 행동에 의해 엔티티들에게 주어지는 시간
 
-export std::vector<EntityData> entityDex; // Entity DB
 export std::vector<ItemData> itemDex;// 아이템 DB
 export std::vector<AlchemyData> alchemyDex; //연금술 조합 DB
 export std::vector<SkillData> skillDex; //스킬 DB

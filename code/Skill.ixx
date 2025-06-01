@@ -62,7 +62,7 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
-		filteredSkills = PlayerPtr->entityInfo.skillList;
+		filteredSkills = PlayerPtr->skillList;
 	}
 	~Skill()
 	{
@@ -325,42 +325,42 @@ public:
 		}
 
 
-		if (categoryCursor == skillCategory::all) filteredSkills = PlayerPtr->entityInfo.skillList;
+		if (categoryCursor == skillCategory::all) filteredSkills = PlayerPtr->skillList;
 		else if (categoryCursor == skillCategory::general)
 		{
 			filteredSkills.clear();
-			for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+			for (int i = 0; i < PlayerPtr->skillList.size(); i++)
 			{
-				if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::GENERAL) filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+				if (PlayerPtr->skillList[i].src == skillSrc::GENERAL) filteredSkills.push_back(PlayerPtr->skillList[i]);
 			}
 		}
 		else if (categoryCursor == skillCategory::mutation)
 		{
 			filteredSkills.clear();
-			for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+			for (int i = 0; i < PlayerPtr->skillList.size(); i++)
 			{
-				if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::MUTATION) filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+				if (PlayerPtr->skillList[i].src == skillSrc::MUTATION) filteredSkills.push_back(PlayerPtr->skillList[i]);
 			}
 		}
 		else if (categoryCursor == skillCategory::bionic)
 		{
 			filteredSkills.clear();
-			for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+			for (int i = 0; i < PlayerPtr->skillList.size(); i++)
 			{
-				if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::BIONIC)
+				if (PlayerPtr->skillList[i].src == skillSrc::BIONIC)
 				{
-					filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+					filteredSkills.push_back(PlayerPtr->skillList[i]);
 				}
 			}
 		}
 		else if (categoryCursor == skillCategory::magic)
 		{
 			filteredSkills.clear();
-			for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+			for (int i = 0; i < PlayerPtr->skillList.size(); i++)
 			{
-				if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::MAGIC)
+				if (PlayerPtr->skillList[i].src == skillSrc::MAGIC)
 				{
-					filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+					filteredSkills.push_back(PlayerPtr->skillList[i]);
 				}
 			}
 		}

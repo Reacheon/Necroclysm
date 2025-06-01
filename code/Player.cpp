@@ -20,11 +20,12 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
 
-	entityInfo.skin = humanCustom::skin::yellow;
-	entityInfo.eyes = humanCustom::eyes::blue;
-	entityInfo.hair = humanCustom::hair::bob1Black;
+	entitySpr = spr::charsetHero;
+	skin = humanCustom::skin::yellow;
+	eyes = humanCustom::eyes::blue;
+	hair = humanCustom::hair::bob1Black;
 
-	entityInfo.isPlayer = true;
+	isPlayer = true;
 
 	int i = 0;
 
@@ -70,7 +71,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	addSkill(1);
 	quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) proficApt[i] = 2.0;
 }
 Player::~Player()
 {
@@ -104,7 +105,7 @@ void Player::startMove(int inputDir)
 			player->setDirection(inputDir);
 			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemRefCode::sandFloor)
 			{
-				new Footprint(getGridX(), getGridY(), entityInfo.direction);
+				new Footprint(getGridX(), getGridY(), direction);
 			}
 			player->move(inputDir, false);
 			turnCycle = turn::playerAnime;
@@ -242,7 +243,7 @@ void Player::updateVision(int range) {
 
 void Player::updateVision() 
 {
-	updateVision(entityInfo.eyeSight, getGridX(), getGridY());
+	updateVision(eyeSight, getGridX(), getGridY());
 }
 
 void Player::updateNearbyChunk(int range)
@@ -310,32 +311,32 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
 
-	if (PlayerPtr->entityInfo.walkMode == walkFlag::run)
+	if (PlayerPtr->walkMode == walkFlag::run)
 	{
-		entityInfo.STA -= 7;
-		if (entityInfo.STA < 0)
+		stamina -= 7;
+		if (stamina < 0)
 		{
-			entityInfo.STA = 0;
-			entityInfo.walkMode = walkFlag::walk;
+			stamina = 0;
+			walkMode = walkFlag::walk;
 		}
 	}
 
 
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 	{
-		entityInfo.walkMode = walkFlag::wade;
+		walkMode = walkFlag::wade;
 	}
 	else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 	{
-		entityInfo.walkMode = walkFlag::swim;
+		walkMode = walkFlag::swim;
 	}
-	else if (entityInfo.walkMode == walkFlag::swim || entityInfo.walkMode == walkFlag::wade)
+	else if (walkMode == walkFlag::swim || walkMode == walkFlag::wade)
 	{
-		entityInfo.walkMode = walkFlag::walk;
+		walkMode = walkFlag::walk;
 	}
 
 	
-	updateVision(entityInfo.eyeSight);
+	updateVision(eyeSight);
 	updateMinimap();
 	if (getHasAStarDst())
 	{

@@ -6,7 +6,6 @@ import std;
 import util;
 import globalVar;
 import readItemDex;
-import readEntityDex;
 import readAlchemyDex;
 import readSkillDex;
 
@@ -19,9 +18,6 @@ export void dataLoader()
 	std::wstring itemPath = L"language/" + option::language + L"/itemDex.csv";
 	readItemDex(itemPath.c_str());
 
-	//엔티티 데이터 로드
-	std::wstring entityPath = L"language/" + option::language + L"/entityDex.csv";
-	readEntityDex(entityPath.c_str());
 
 	//연금술 조합법 로드
 	std::wstring alchemyPath = L"language/" + option::language + L"/alchemyDex.csv";

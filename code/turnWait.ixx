@@ -111,8 +111,8 @@ export void turnWait(float waitTime)
         }
     }
 
-    PlayerPtr->entityInfo.STA += 2;
-    if (PlayerPtr->entityInfo.STA > PlayerPtr->entityInfo.maxSTA) PlayerPtr->entityInfo.STA = PlayerPtr->entityInfo.maxSTA;
+    PlayerPtr->stamina += 2;
+    if (PlayerPtr->stamina > PlayerPtr->maxStamina) PlayerPtr->stamina = PlayerPtr->maxStamina;
 
 
     timeGift = waitTime;
