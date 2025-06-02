@@ -127,12 +127,18 @@ export void textureLoader()
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset/equip"))
 	{
-		spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+		if (entry.is_regular_file() && entry.path().extension() == ".png")
+		{
+			spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+		}
 	}
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset"))
 	{
-		spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+		if (entry.is_regular_file() && entry.path().extension() == ".png")
+		{
+			spr::spriteMapper[entry.path().stem()] = new Sprite(renderer, entry.path().string(), 48, 48);
+		}
 	}
 
 	spr::singleQuickSlot = new Sprite(renderer, "image/UI/GUI/HUD/singleQuickSlot.png", 180, 38);
@@ -178,19 +184,22 @@ export void textureLoader()
 	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 
-	spr::zombieA::whole = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_whole", 144, 144);
-	spr::zombieA::torso = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_torso", 144, 144);
-	spr::zombieA::rLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rLeg", 144, 144);
-	spr::zombieA::lLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lLeg", 144, 144);
-	spr::zombieA::lArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lArm", 144, 144);
-	spr::zombieA::rArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rArm", 144, 144);
-	spr::zombieA::head = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_head", 144, 144);
+	
 
-	spr::humanFlash::whole = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_whole", 288, 384);
-	spr::humanFlash::torso = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_torso", 288, 384);
-	spr::humanFlash::rLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rLeg", 288, 384);
-	spr::humanFlash::lLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lLeg", 288, 384);
-	spr::humanFlash::lArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lArm", 288, 384);
-	spr::humanFlash::rArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rArm", 288, 384);
-	spr::humanFlash::head = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_head", 288, 384);
+
+	spr::humanFlash::whole = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_whole.png", 48, 48);
+	spr::humanFlash::torso = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_torso.png", 48, 48);
+	spr::humanFlash::rLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rLeg.png", 48, 48);
+	spr::humanFlash::lLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lLeg.png", 48, 48);
+	spr::humanFlash::lArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lArm.png", 48, 48);
+	spr::humanFlash::rArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rArm.png", 48, 48);
+	spr::humanFlash::head = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_head.png", 48, 48);
+
+	spr::zombieA::whole = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_whole.png", 48, 48);
+	spr::zombieA::torso = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_torso.png", 48, 48);
+	spr::zombieA::rLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rLeg.png", 48, 48);
+	spr::zombieA::lLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lLeg.png", 48, 48);
+	spr::zombieA::lArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lArm.png", 48, 48);
+	spr::zombieA::rArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rArm.png", 48, 48);
+	spr::zombieA::head = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_head.png", 48, 48);
 }

@@ -8,6 +8,7 @@ import constVar;
 import drawText;
 import Sprite;
 import util;
+import drawEpsilonText;
 
 export class Damage
 {
@@ -43,9 +44,7 @@ public:
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
-        setFontSize(inputSize);
-
-        renderTextOutlineCenter(letters, textureW / 2, textureH / 2, inputCol);//외곽선
+        drawEplsionText(letters, textureW / 2, textureH / 2, col::white, col::black);
         SDL_SetRenderTarget(renderer, nullptr);
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);
     }
@@ -70,8 +69,11 @@ public:
         SDL_SetTextureBlendMode(drawingTexture, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderClear(renderer);
-        setFontSize(9);
-        renderTextOutlineCenter(letters, textureW / 2, textureH / 2, inputCol);
+        int epsilonW = getEpsilonTextWidth(letters);
+        int epsilonH = getEpsilonTextHeight();
+        drawEplsionText(letters, textureW / 2 - epsilonW/2, textureH / 2 - epsilonH/2, inputCol, col::black);
+
+
         SDL_SetRenderTarget(renderer, nullptr);
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);
     }

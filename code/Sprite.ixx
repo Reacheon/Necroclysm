@@ -16,10 +16,15 @@ public:
     Sprite(SDL_Renderer* renderer, std::string adr, int inputW, int inputH)
     {
         texturePtr = IMG_LoadTexture(renderer, adr.c_str());
+        if (texturePtr == nullptr)
+        {
+            std::wstring errorMsg = L"이미지 로드 실패: " + std::wstring(adr.begin(), adr.end());
+            errorBox(true, errorMsg.c_str());
+            return;
+        }
         w = inputW;
         h = inputH;
         SDL_SetTextureScaleMode(texturePtr, SDL_SCALEMODE_NEAREST);
-
     }
     Sprite(SDL_Renderer* renderer, SDL_Texture* inputTexture, int inputW, int inputH)
     {

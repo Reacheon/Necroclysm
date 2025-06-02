@@ -337,7 +337,7 @@ void Entity::attack(int gridX, int gridY)
 		}
 		else
 		{
-			new Damage(L"dodged", col::yellow, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
+			new Damage(L"MISS", col::yellow, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
 			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}

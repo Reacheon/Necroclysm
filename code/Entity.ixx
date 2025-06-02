@@ -112,6 +112,8 @@ public:
     bool useWalkLeftSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 왼발을 내딛는 스프라이트를 그림
     bool useWalkRightSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 오른발을 내딛는 스프라이트를 그림
 
+    sprFlag sprState = sprFlag::stand;
+
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     //////////////////////////////////////////////////

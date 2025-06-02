@@ -78,3 +78,20 @@ export void drawEplsionText(auto* spr, int spriteIndex, int x, int y, SDL_Color 
 	drawSprite(spr, spriteIndex, x, y);
 	SDL_SetTextureColorMod(spr->getTexture(), 255, 255, 255);
 };
+
+
+export int getEpsilonTextWidth(std::wstring inputStr)
+{
+	int width = 0;
+	for (int i = 0; i < inputStr.size(); i++)
+	{
+		width += 4; // 기본 글자 간격
+		if (inputStr[i] == UNI::PERIOD) width -= 2; // 마침표는 2픽셀 좁게
+	}
+	return width - 1; // 마지막 글자 뒤 여백 제거
+}
+
+export int getEpsilonTextHeight()
+{
+	return 5;
+}

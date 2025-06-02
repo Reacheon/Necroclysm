@@ -940,6 +940,15 @@ export enum class atkType
     throwing,
 };
 
+export enum class sprFlag
+{
+    stand,
+    walkLeft,
+    walkRight,
+    attack1,
+    attack2,
+};
+
 export namespace UNI
 {
     constexpr int NUL = 0;   // Null char

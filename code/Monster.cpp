@@ -20,6 +20,7 @@ import drawPrimitive;
 
 Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 {
+	entityCode = index;
 	if (entityCode == entityRefCode::zombieA)
 	{
 		entityFlip = true;
@@ -122,14 +123,17 @@ void Monster::drawSelf()
 		int sprIndex = 0;
 		if (entityFlip == false)
 		{
-			if (useWalkLeftSpr && !useWalkRightSpr) sprIndex = 2;
-			else if (!useWalkLeftSpr && useWalkRightSpr) sprIndex = 1;
+			if (sprState==sprFlag::walkRight) sprIndex = 2;
+			else if (sprState == sprFlag::walkLeft) sprIndex = 1;
 		}
 		else
 		{
-			if (useWalkLeftSpr && !useWalkRightSpr) sprIndex = 1;
-			else if (!useWalkLeftSpr && useWalkRightSpr) sprIndex = 2;
+			if (sprState == sprFlag::walkRight) sprIndex = 1;
+			else if (sprState == sprFlag::walkLeft) sprIndex = 2;
 		}
+
+		if (sprState == sprFlag::attack1) sprIndex = 7;
+		else if (sprState == sprFlag::attack2) sprIndex = 8;
 
 		drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
 

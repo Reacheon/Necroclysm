@@ -74,15 +74,13 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				if (getLeftFoot() == true)
 				{
-					useWalkLeftSpr = true;
-					useWalkRightSpr = false;
+					sprState = sprFlag::walkLeft;
 					setSpriteIndex(1);
 					setLeftFoot(false);
 				}
 				else
 				{
-					useWalkLeftSpr = false;
-					useWalkRightSpr = true;
+					sprState = sprFlag::walkRight;
 					setSpriteIndex(2);
 					setLeftFoot(true);
 				}
@@ -98,9 +96,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeX(0);
 			setFakeY(0);
 
-			useWalkLeftSpr = false;
-			useWalkRightSpr = false;
-
+			sprState = sprFlag::stand;
 			turnWait(1.0);
 			endMove();
 			if (isPlayer) cameraFix = true;
@@ -196,6 +192,7 @@ bool Entity::runAnimation(bool shutdown)
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
 				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
 			}
+			else sprState = sprFlag::attack1;
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -243,6 +240,7 @@ bool Entity::runAnimation(bool shutdown)
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
 				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
 			}
+			else sprState = sprFlag::attack2;
 			break;
 		case 9:
 			setFakeX(getFakeX() - 0.5 * dx);
@@ -295,6 +293,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 			}
+			else sprState = sprFlag::stand;
 			if (isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;
