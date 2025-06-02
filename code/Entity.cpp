@@ -520,9 +520,6 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 		}
 	}
 }
-void Entity::stepEvent()
-{
-}
 void Entity::startFlash(int inputFlashType)
 {
 	flashType = inputFlashType;
@@ -677,6 +674,16 @@ int Entity::getAimWeaponIndex()
 //void Entity::releasePulledVehicle() { pulledCart = nullptr; }
 //bool Entity::hasPulledVehicle() { return (pulledCart != nullptr); }
 //Vehicle* Entity::getPulledVehicle() { return pulledCart; }
+
+PartData* Entity::getPart(const std::wstring& partName)
+{
+	for (int i = 0; i < parts.size(); i++)
+	{
+		if (parts[i].partName == partName) return &(parts[i]);
+
+		if (i == parts.size() - 1) return nullptr;
+	}
+}
 
 
 void Entity::pullEquipLights()

@@ -74,11 +74,15 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				if (getLeftFoot() == true)
 				{
+					useWalkLeftSpr = true;
+					useWalkRightSpr = false;
 					setSpriteIndex(1);
 					setLeftFoot(false);
 				}
 				else
 				{
+					useWalkLeftSpr = false;
+					useWalkRightSpr = true;
 					setSpriteIndex(2);
 					setLeftFoot(true);
 				}
@@ -93,6 +97,9 @@ bool Entity::runAnimation(bool shutdown)
 			setAniType(aniFlag::null);
 			setFakeX(0);
 			setFakeY(0);
+
+			useWalkLeftSpr = false;
+			useWalkRightSpr = false;
 
 			turnWait(1.0);
 			endMove();

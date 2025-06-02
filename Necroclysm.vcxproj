@@ -244,6 +244,7 @@
     <ClCompile Include="code\Maint.ixx" />
     <ClCompile Include="code\Monster.cpp" />
     <ClCompile Include="code\mouseWheel.ixx" />
+    <ClCompile Include="code\Player_drawSelf.ixx" />
     <ClCompile Include="code\sequenceCounter.ixx" />
     <ClCompile Include="code\Particle.ixx" />
     <ClCompile Include="code\Player.cpp" />

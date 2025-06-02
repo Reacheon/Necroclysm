@@ -905,14 +905,6 @@ export namespace entityCategory
     constexpr int robot = 3;
 };
 
-export namespace partsFlag
-{
-    constexpr int index = 0;
-    constexpr int hp = 1;
-    constexpr int acc = 2;
-    constexpr int maxHP = 3;
-};
-
 export namespace bulletFlag
 {
     constexpr int normal = 0;
@@ -1178,6 +1170,8 @@ export namespace itemRefCode
     constexpr int stoneWall = 397;
     constexpr int glassWall = 114;
     constexpr int wireFence = 376;
+
+    constexpr int katana = 103;
 
     constexpr int minecart = 405;
     constexpr int minecartController = 406;

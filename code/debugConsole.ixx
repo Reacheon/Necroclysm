@@ -68,7 +68,7 @@ export void debugConsole()
 	case 2: // generateEntity
 	{
 		Player* ptr = PlayerPtr;
-		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, 2);
+		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, entityRefCode::zombieA);
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}

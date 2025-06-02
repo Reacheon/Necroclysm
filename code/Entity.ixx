@@ -24,9 +24,9 @@ export struct PartData
     float accRate = 0.2f;
     int maxHP = 100;
     int currentHP = 100;
-    int resCut = 0.0f; //절단 저항
-    int resBash = 0.0f; //타격 저항
-    int resPierce = 0.0f; //관통 저항
+    int resPierce = 0; //관통 저항
+    int resCut = 0; //절단 저항
+    int resBash = 0; //타격 저항
 };
 
 export class Entity : public Ani, public Coord, public Drawable 
@@ -49,6 +49,7 @@ private:
 
 public:
     std::wstring name = L"DEFAULT ENTITY";
+    std::vector<PartData> parts;
     int entityCode = entityRefCode::none;
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
@@ -108,6 +109,9 @@ public:
     humanCustom::hair hair = humanCustom::hair::null;
     humanCustom::horn horn = humanCustom::horn::null;
 
+    bool useWalkLeftSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 왼발을 내딛는 스프라이트를 그림
+    bool useWalkRightSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 오른발을 내딛는 스프라이트를 그림
+
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
     int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
     //////////////////////////////////////////////////
@@ -162,7 +166,6 @@ public:
     void updateWalkable(int gridX, int gridY);
     void rayCasting(int x1, int y1, int x2, int y2);
     void rayCastingDark(int x1, int y1, int x2, int y2);
-    void stepEvent();
     void startFlash(int inputFlashType);
     void setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputAlpha);
     void getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha);
@@ -182,6 +185,7 @@ public:
     int getAimWeaponIndex();
 
     void pullEquipLights();
-
+    PartData* getPart(const std::wstring& partName);
     virtual void drawSelf() = 0;
+
 };

@@ -14,14 +14,22 @@ import util;
 import AI;
 import ItemData;
 
+import drawSprite;
+import drawText;
+import drawPrimitive;
+
 Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 {
-	if (isPlayer == false)
+	if (entityCode == entityRefCode::zombieA)
 	{
-		if (entityCode == entityRefCode::zombieA)
-		{
-			entityFlip = true;
-		}
+		entityFlip = true;
+
+		parts.emplace_back(PartData{ .partName = L"몸통", .accRate = 1.0f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.3f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"왼팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"오른팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"왼다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"오른다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 	}
 
 
@@ -103,7 +111,47 @@ void Monster::death()
 
 void Monster::drawSelf()
 {
+	setZoom(zoomScale);
+	if (entityFlip == false) setFlip(SDL_FLIP_NONE);
+	else setFlip(SDL_FLIP_HORIZONTAL);
+	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
+	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
+
 	if (entityCode == entityRefCode::zombieA)
 	{
+		int sprIndex = 0;
+		if (entityFlip == false)
+		{
+			if (useWalkLeftSpr && !useWalkRightSpr) sprIndex = 2;
+			else if (!useWalkLeftSpr && useWalkRightSpr) sprIndex = 1;
+		}
+		else
+		{
+			if (useWalkLeftSpr && !useWalkRightSpr) sprIndex = 1;
+			else if (!useWalkLeftSpr && useWalkRightSpr) sprIndex = 2;
+		}
+
+		drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
+
+		drawSpriteCenter(spr::zombieA::torso, sprIndex, drawingX, drawingY);
+		if (getPart(L"머리")->currentHP > 0) drawSpriteCenter(spr::zombieA::head, sprIndex, drawingX, drawingY);
+
+		if (entityFlip == false)
+		{
+			if (getPart(L"왼다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::lLeg, sprIndex, drawingX, drawingY);
+			if (getPart(L"오른다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::rLeg, sprIndex, drawingX, drawingY);
+			if (getPart(L"왼팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::lArm, sprIndex, drawingX, drawingY);
+			if (getPart(L"오른팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::rArm, sprIndex, drawingX, drawingY);
+		}
+		else
+		{
+			if (getPart(L"왼다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::rLeg, sprIndex, drawingX, drawingY);
+			if (getPart(L"오른다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::lLeg, sprIndex, drawingX, drawingY);
+			if (getPart(L"왼팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::rArm, sprIndex, drawingX, drawingY);
+			if (getPart(L"오른팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::lArm, sprIndex, drawingX, drawingY);
+		}
 	}
+
+	setZoom(1.0);
+	setFlip(SDL_FLIP_NONE);
 }

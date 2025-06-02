@@ -74,7 +74,6 @@ export namespace spr
 	Sprite* aimMarkerTmp = nullptr;
 	Sprite* aimAtkTypeMarker = nullptr;
 	Sprite* bodyTmpHuman = nullptr;
-	Sprite* partsSlotGauge = nullptr;
 	Sprite* tab = nullptr;
 	Sprite* aimLRChange = nullptr;
 	Sprite* floatWarning = nullptr;
@@ -152,4 +151,28 @@ export namespace spr
 	Sprite* youDied = nullptr;
 	Sprite* gameOverOptionRect = nullptr;
 	Sprite* gameOverOptionMarker = nullptr;
+
+
 }
+
+export namespace spr::zombieA
+{
+	Sprite* whole = nullptr;
+	Sprite* torso = nullptr;
+	Sprite* rLeg = nullptr;
+	Sprite* lLeg = nullptr;
+	Sprite* lArm = nullptr;
+	Sprite* rArm = nullptr;
+	Sprite* head = nullptr;
+};
+
+export namespace spr::humanFlash
+{
+	Sprite* whole = nullptr;
+	Sprite* torso = nullptr;
+	Sprite* rLeg = nullptr;
+	Sprite* lLeg = nullptr;
+	Sprite* lArm = nullptr;
+	Sprite* rArm = nullptr;
+	Sprite* head = nullptr;
+};

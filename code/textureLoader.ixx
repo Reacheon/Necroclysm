@@ -67,7 +67,6 @@ export void textureLoader()
 
 	spr::aimAtkTypeMarker = new Sprite(renderer, "image/UI/aimAtkTypeMarker.png", 64, 64);
 	spr::bodyTmpHuman = new Sprite(renderer, "image/charFrame/bodyTmpHuman.png", 240, 128);
-	spr::partsSlotGauge = new Sprite(renderer, "image/UI/partsSlotGauge.png", 64,10);
 	spr::tab = new Sprite(renderer, "image/UI/tabBox.png", 122, 122);
 	spr::aimLRChange = new Sprite(renderer, "image/UI/aimLRChange.png", 18, 18);
 	spr::floatWarning = new Sprite(renderer, "image/UI/floatWarning.png", 128, 24);
@@ -178,4 +177,20 @@ export void textureLoader()
 
 	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
+
+	spr::zombieA::whole = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_whole", 144, 144);
+	spr::zombieA::torso = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_torso", 144, 144);
+	spr::zombieA::rLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rLeg", 144, 144);
+	spr::zombieA::lLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lLeg", 144, 144);
+	spr::zombieA::lArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lArm", 144, 144);
+	spr::zombieA::rArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rArm", 144, 144);
+	spr::zombieA::head = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_head", 144, 144);
+
+	spr::humanFlash::whole = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_whole", 288, 384);
+	spr::humanFlash::torso = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_torso", 288, 384);
+	spr::humanFlash::rLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rLeg", 288, 384);
+	spr::humanFlash::lLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lLeg", 288, 384);
+	spr::humanFlash::lArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lArm", 288, 384);
+	spr::humanFlash::rArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rArm", 288, 384);
+	spr::humanFlash::head = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_head", 288, 384);
 }

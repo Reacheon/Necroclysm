@@ -97,6 +97,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\CRAFT">
       <UniqueIdentifier>{9d79e804-c248-4c63-a091-579272003866}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\01_Entity\Player">
+      <UniqueIdentifier>{42a05489-af19-4e10-b10d-88a1dd761f42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -226,9 +229,6 @@
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\Entity.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Player.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\AI.ixx">
@@ -462,9 +462,6 @@
     <ClCompile Include="code\Entity.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
-    <ClCompile Include="code\Player.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
     <ClCompile Include="code\ItemPocket.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
@@ -557,6 +554,15 @@
     </ClCompile>
     <ClCompile Include="code\ItemDataBase.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Player.ixx">
+      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Player.cpp">
+      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Player_drawSelf.ixx">
+      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
