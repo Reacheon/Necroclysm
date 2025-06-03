@@ -359,11 +359,15 @@ void Player::drawSelf()
 	if (flash.a > 0)
 	{
 		drawFlashEffectCenter(customSprite.get(), localSprIndex, drawingX, drawingY, flash);
-		std::wprintf(L"col={%d,%d,%d,%d}\n", flash.r, flash.g, flash.b, flash.a);
-
-		//flash.a = (Uint8)(flash.a * 0.92f);
+		SDL_Color tgtCol = { 255, 0, 0, flash.a };
+		float speed = 0.15f;
+		flash.r = flash.r + (tgtCol.r - flash.r) * speed;
+		flash.g = flash.g + (tgtCol.g - flash.g) * speed;
+		flash.b = flash.b + (tgtCol.b - flash.b) * speed;
+		flash.a = (Uint8)(flash.a * 0.91f);
 		if (flash.a < 5) flash.a = 0;
 	}
+
 
 	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽
 	{

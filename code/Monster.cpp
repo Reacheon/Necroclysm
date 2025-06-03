@@ -120,7 +120,6 @@ void Monster::drawSelf()
 	else setFlip(SDL_FLIP_HORIZONTAL);
 	int drawingX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
 	int drawingY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
-
 	if (entityCode == entityRefCode::zombieA)
 	{
 		int sprIndex = 0;
@@ -134,43 +133,47 @@ void Monster::drawSelf()
 			if (sprState == sprFlag::walkRight) sprIndex = 1;
 			else if (sprState == sprFlag::walkLeft) sprIndex = 2;
 		}
-
 		if (sprState == sprFlag::attack1) sprIndex = 7;
 		else if (sprState == sprFlag::attack2) sprIndex = 8;
 
-		// 플래시 효과 계산
-		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr
-			&& (std::abs(getAbsMouseGrid().x - PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
-
+		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr&& (std::abs(getAbsMouseGrid().x - PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
 		static Uint64 flashStartTime = 0;
 		static bool wasFlashing = false;
+		static Uint64 flashEndTime = 0;
+		static bool flashJustEnded = false;
 
-		SDL_Color flashColor = { 255, 255, 255, 255 };
-		if (partSelect && selectedPart != -1 && turnCycle == turn::playerInput)
+		if (flash.a > 0) {
+			flashJustEnded = true;
+		}
+		else if (flashJustEnded) {
+			flashEndTime = SDL_GetTicks();
+			flashJustEnded = false;
+		}
+
+		SDL_Color targetFlashColor = { 255, 255, 255, 0 };
+		Uint64 currentTime = SDL_GetTicks();
+		if (partSelect && selectedPart != -1 && turnCycle == turn::playerInput && flash.a == 0 && (currentTime - flashEndTime) > 500)
 		{
-			if (!wasFlashing) flashStartTime = SDL_GetTicks();
+			if (!wasFlashing) flashStartTime = currentTime;
 			wasFlashing = true;
-			Uint64 elapsedTime = SDL_GetTicks() - flashStartTime;
-			float pulseSpeed = 0.005f;
+			Uint64 elapsedTime = currentTime - flashStartTime;
+			float pulseSpeed = 0.0025f;
 			float pulse = (sin(elapsedTime * pulseSpeed) + 1.0f) * 0.5f;
 			Uint8 alpha = (Uint8)(0 + pulse * 120);
-			flashColor = { 255, 255, 255, alpha };
+			targetFlashColor = { 255, 255, 255, alpha };
 		}
 		else wasFlashing = false;
 
-		// 부위별 플래시 그리기 함수 (선택된 부위만)
 		auto drawPartWithFlash = [&](auto sprite, const std::wstring& partName) {
 			if (selectedPart != -1 && parts[selectedPart].partName == partName)
 			{
-
 				if (flash.a > 0)
 					drawFlashEffectCenter(sprite, sprIndex, drawingX, drawingY, flash);
 				else if (partSelect && turnCycle == turn::playerInput)
-					drawFlashEffectCenter(sprite, sprIndex, drawingX, drawingY, flashColor);
+					drawFlashEffectCenter(sprite, sprIndex, drawingX, drawingY, targetFlashColor);
 			}
 			};
 
-		// 팔다리 그리기 함수
 		auto drawLimbWithFlash = [&](const std::wstring& partName, auto normalSprite, auto flippedSprite) {
 			if (getPart(partName)->currentHP > 0)
 			{
@@ -180,21 +183,16 @@ void Monster::drawSelf()
 			}
 			};
 
-		// 그림자
 		drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
 
-		// 몸통 + 몸통 플래시
 		drawSpriteCenter(spr::zombieA::torso, sprIndex, drawingX, drawingY);
 		drawPartWithFlash(spr::zombieA::torso, L"몸통");
 
-		// 머리 + 머리 플래시
 		if (getPart(L"머리")->currentHP > 0)
 		{
 			drawSpriteCenter(spr::zombieA::head, sprIndex, drawingX, drawingY);
 			drawPartWithFlash(spr::zombieA::head, L"머리");
 		}
-
-		// 팔다리들
 		drawLimbWithFlash(L"왼다리", spr::zombieA::lLeg, spr::zombieA::rLeg);
 		drawLimbWithFlash(L"오른다리", spr::zombieA::rLeg, spr::zombieA::lLeg);
 		drawLimbWithFlash(L"왼팔", spr::zombieA::lArm, spr::zombieA::rArm);
@@ -202,17 +200,16 @@ void Monster::drawSelf()
 
 		if (flash.a > 0)
 		{
-			if(selectedPart==-1) drawFlashEffectCenter(spr::zombieA::whole, sprIndex, drawingX, drawingY, flash);
-			SDL_Color tgtCol = { 68, 0, 0, 0 };
-			float lerpSpeed = 0.5f;
-			flash.r = (Uint8)(flash.r + (tgtCol.r - flash.r) * lerpSpeed);
-			flash.g = (Uint8)(flash.g + (tgtCol.g - flash.g) * lerpSpeed);
-			flash.b = (Uint8)(flash.b + (tgtCol.b - flash.b) * lerpSpeed);
-			flash.a = (Uint8)(flash.a * 0.92f);
+			if (selectedPart == -1) drawFlashEffectCenter(spr::zombieA::whole, sprIndex, drawingX, drawingY, flash);
+			SDL_Color tgtCol = { 255, 0, 0, flash.a };
+			float speed = 0.15f;
+			flash.r = flash.r + (tgtCol.r - flash.r) * speed;
+			flash.g = flash.g + (tgtCol.g - flash.g) * speed;
+			flash.b = flash.b + (tgtCol.b - flash.b) * speed;
+			flash.a = (Uint8)(flash.a * 0.91f);
 			if (flash.a < 5) flash.a = 0;
 		}
 	}
-
 	setZoom(1.0);
 	setFlip(SDL_FLIP_NONE);
 }

@@ -53,6 +53,7 @@ public:
 
     std::vector<PartData> parts;
     SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
+    SDL_Color partFlash = { 0,0,0,0 }; //플래시 컬러
     int selectedPart = -1;
 
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티

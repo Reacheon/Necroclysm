@@ -328,7 +328,7 @@ void Entity::attack(int gridX, int gridY)
 		//명중률 계산
 		if (totalAcc * 100.0 > randomRange(0, 100))
 		{
-			victimEntity->flash = { 68, 0, 0, 255 };
+			victimEntity->flash = { 255, 255, 255, 220 };
 			victimEntity->addDmg(randomRange(6, 10));
 		}
 		else
