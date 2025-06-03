@@ -1,4 +1,5 @@
-﻿#include <sol/sol.hpp>
+﻿#include <SDL3/SDL.h>
+#include <sol/sol.hpp>
 
 import Monster;
 import std;
@@ -18,6 +19,7 @@ import drawSprite;
 import drawText;
 import drawPrimitive;
 
+
 Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 {
 	entityCode = index;
@@ -26,7 +28,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 		entityFlip = true;
 
 		parts.emplace_back(PartData{ .partName = L"몸통", .accRate = 1.0f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-		parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.3f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+		parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.6f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 		parts.emplace_back(PartData{ .partName = L"왼팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 		parts.emplace_back(PartData{ .partName = L"오른팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 		parts.emplace_back(PartData{ .partName = L"왼다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
@@ -110,6 +112,7 @@ void Monster::death()
 	World::ins()->getTile({ getGridX(),getGridY(),getGridZ() }).EntityPtr.reset();
 }
 
+
 void Monster::drawSelf()
 {
 	setZoom(zoomScale);
@@ -123,7 +126,7 @@ void Monster::drawSelf()
 		int sprIndex = 0;
 		if (entityFlip == false)
 		{
-			if (sprState==sprFlag::walkRight) sprIndex = 2;
+			if (sprState == sprFlag::walkRight) sprIndex = 2;
 			else if (sprState == sprFlag::walkLeft) sprIndex = 1;
 		}
 		else
@@ -135,24 +138,78 @@ void Monster::drawSelf()
 		if (sprState == sprFlag::attack1) sprIndex = 7;
 		else if (sprState == sprFlag::attack2) sprIndex = 8;
 
+		// 플래시 효과 계산
+		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr
+			&& (std::abs(getAbsMouseGrid().x - PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
+
+		static Uint64 flashStartTime = 0;
+		static bool wasFlashing = false;
+
+		SDL_Color flashColor = { 255, 255, 255, 255 };
+		if (partSelect && selectedPart != -1 && turnCycle == turn::playerInput)
+		{
+			if (!wasFlashing) flashStartTime = SDL_GetTicks();
+			wasFlashing = true;
+			Uint64 elapsedTime = SDL_GetTicks() - flashStartTime;
+			float pulseSpeed = 0.005f;
+			float pulse = (sin(elapsedTime * pulseSpeed) + 1.0f) * 0.5f;
+			Uint8 alpha = (Uint8)(0 + pulse * 120);
+			flashColor = { 255, 255, 255, alpha };
+		}
+		else wasFlashing = false;
+
+		// 부위별 플래시 그리기 함수 (선택된 부위만)
+		auto drawPartWithFlash = [&](auto sprite, const std::wstring& partName) {
+			if (selectedPart != -1 && parts[selectedPart].partName == partName)
+			{
+
+				if (flash.a > 0)
+					drawFlashEffectCenter(sprite, sprIndex, drawingX, drawingY, flash);
+				else if (partSelect && turnCycle == turn::playerInput)
+					drawFlashEffectCenter(sprite, sprIndex, drawingX, drawingY, flashColor);
+			}
+			};
+
+		// 팔다리 그리기 함수
+		auto drawLimbWithFlash = [&](const std::wstring& partName, auto normalSprite, auto flippedSprite) {
+			if (getPart(partName)->currentHP > 0)
+			{
+				auto spriteToUse = entityFlip ? flippedSprite : normalSprite;
+				drawSpriteCenter(spriteToUse, sprIndex, drawingX, drawingY);
+				drawPartWithFlash(spriteToUse, partName);
+			}
+			};
+
+		// 그림자
 		drawSpriteCenter(spr::shadow, 1, drawingX, drawingY);
 
+		// 몸통 + 몸통 플래시
 		drawSpriteCenter(spr::zombieA::torso, sprIndex, drawingX, drawingY);
-		if (getPart(L"머리")->currentHP > 0) drawSpriteCenter(spr::zombieA::head, sprIndex, drawingX, drawingY);
+		drawPartWithFlash(spr::zombieA::torso, L"몸통");
 
-		if (entityFlip == false)
+		// 머리 + 머리 플래시
+		if (getPart(L"머리")->currentHP > 0)
 		{
-			if (getPart(L"왼다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::lLeg, sprIndex, drawingX, drawingY);
-			if (getPart(L"오른다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::rLeg, sprIndex, drawingX, drawingY);
-			if (getPart(L"왼팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::lArm, sprIndex, drawingX, drawingY);
-			if (getPart(L"오른팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::rArm, sprIndex, drawingX, drawingY);
+			drawSpriteCenter(spr::zombieA::head, sprIndex, drawingX, drawingY);
+			drawPartWithFlash(spr::zombieA::head, L"머리");
 		}
-		else
+
+		// 팔다리들
+		drawLimbWithFlash(L"왼다리", spr::zombieA::lLeg, spr::zombieA::rLeg);
+		drawLimbWithFlash(L"오른다리", spr::zombieA::rLeg, spr::zombieA::lLeg);
+		drawLimbWithFlash(L"왼팔", spr::zombieA::lArm, spr::zombieA::rArm);
+		drawLimbWithFlash(L"오른팔", spr::zombieA::rArm, spr::zombieA::lArm);
+
+		if (flash.a > 0)
 		{
-			if (getPart(L"왼다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::rLeg, sprIndex, drawingX, drawingY);
-			if (getPart(L"오른다리")->currentHP > 0) drawSpriteCenter(spr::zombieA::lLeg, sprIndex, drawingX, drawingY);
-			if (getPart(L"왼팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::rArm, sprIndex, drawingX, drawingY);
-			if (getPart(L"오른팔")->currentHP > 0) drawSpriteCenter(spr::zombieA::lArm, sprIndex, drawingX, drawingY);
+			if(selectedPart==-1) drawFlashEffectCenter(spr::zombieA::whole, sprIndex, drawingX, drawingY, flash);
+			SDL_Color tgtCol = { 68, 0, 0, 0 };
+			float lerpSpeed = 0.5f;
+			flash.r = (Uint8)(flash.r + (tgtCol.r - flash.r) * lerpSpeed);
+			flash.g = (Uint8)(flash.g + (tgtCol.g - flash.g) * lerpSpeed);
+			flash.b = (Uint8)(flash.b + (tgtCol.b - flash.b) * lerpSpeed);
+			flash.a = (Uint8)(flash.a * 0.92f);
+			if (flash.a < 5) flash.a = 0;
 		}
 	}
 

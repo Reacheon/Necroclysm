@@ -355,34 +355,14 @@ void Player::drawSelf()
 		}
 	}
 
-	auto drawFlashEffect = [this](Sprite* sprite, int sprIndex, int x, int y)
-		{
-			if (flashType == 0 || flash.a == 0) return; // 플래시 효과 없음
 
-			// 원본 블렌드 모드와 컬러 저장
-			SDL_BlendMode originalBlend;
-			Uint8 originalR, originalG, originalB, originalA;
-			SDL_GetTextureBlendMode(sprite->getTexture(), &originalBlend);
-			SDL_GetTextureColorMod(sprite->getTexture(), &originalR, &originalG, &originalB);
-			SDL_GetTextureAlphaMod(sprite->getTexture(), &originalA);
-
-			// 플래시 효과 설정
-			SDL_SetTextureBlendMode(sprite->getTexture(), SDL_BLENDMODE_ADD);
-			SDL_SetTextureColorMod(sprite->getTexture(), flash.r, flash.g, flash.b);
-			SDL_SetTextureAlphaMod(sprite->getTexture(), flash.a);
-
-			// 플래시 효과로 그리기
-			drawSpriteCenter(sprite, sprIndex, x, y);
-
-			// 원본 설정 복원
-			SDL_SetTextureBlendMode(sprite->getTexture(), originalBlend);
-			SDL_SetTextureColorMod(sprite->getTexture(), originalR, originalG, originalB);
-			SDL_SetTextureAlphaMod(sprite->getTexture(), originalA);
-		};
-
-	if (getFlashType() != 0)
+	if (flash.a > 0)
 	{
-		drawFlashEffect(entitySpr, localSprIndex, drawingX, drawingY);
+		drawFlashEffectCenter(customSprite.get(), localSprIndex, drawingX, drawingY, flash);
+		std::wprintf(L"col={%d,%d,%d,%d}\n", flash.r, flash.g, flash.b, flash.a);
+
+		//flash.a = (Uint8)(flash.a * 0.92f);
+		if (flash.a < 5) flash.a = 0;
 	}
 
 	if (ridingEntity != nullptr && ridingType == ridingFlag::horse)//말 앞쪽

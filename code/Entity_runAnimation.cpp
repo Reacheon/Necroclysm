@@ -166,10 +166,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			if (address != nullptr)
-			{
-				address->setFlashRGBA(0, 0, 0, 0);
-			}
+			if (address != nullptr) address->flash.a = 0;
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
@@ -279,12 +276,6 @@ bool Entity::runAnimation(bool shutdown)
 		case 17:
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 		case 19:
-			Entity * address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-			if (address)
-			{
-				address->setFlashType(0);
-				address->setFlashRGBA(0, 0, 0, 0);
-			}
 			setFakeX(0);
 			setFakeY(0);
 			resetTimer();
@@ -299,25 +290,6 @@ bool Entity::runAnimation(bool shutdown)
 			return true;
 		}
 
-		if (getTimer() >= 5)
-		{
-			Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-			if (address != nullptr)
-			{
-				Uint8 targetR, targetG, targetB, targetAlpha;
-				address->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-				if (address->getFlashType() == 1)
-				{
-					if (targetG > 51) { targetG -= 51; }
-					else { targetG = 0; }
-					if (targetB > 51) { targetB -= 51; }
-					else { targetB = 0; }
-					if (targetAlpha > 51) { targetAlpha -= 51; }
-					else { targetAlpha = 0; }
-					address->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
-				}
-			}
-		}
 	}
 	else if (getAniType() == aniFlag::felling)
 	{
@@ -624,10 +596,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			if (address != nullptr)
-			{
-				address->setFlashRGBA(0, 0, 0, 0);
-			}
+			if (address != nullptr) address->flash.a = 0;
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
@@ -695,25 +664,7 @@ bool Entity::runAnimation(bool shutdown)
 			return true;
 		}
 
-		if (getTimer() >= 5)
-		{
-			Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-			if (address != nullptr)
-			{
-				Uint8 targetR, targetG, targetB, targetAlpha;
-				address->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-				if (address->getFlashType() == 1)
-				{
-					if (targetG > 51) { targetG -= 51; }
-					else { targetG = 0; }
-					if (targetB > 51) { targetB -= 51; }
-					else { targetB = 0; }
-					if (targetAlpha > 51) { targetAlpha -= 51; }
-					else { targetAlpha = 0; }
-					address->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
-				}
-			}
-		}
+
 	}
 	else if (getAniType() == aniFlag::shotSingle)
 	{
@@ -728,7 +679,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			if (ePtr != nullptr) ePtr->setFlashRGBA(0, 0, 0, 0);
+			if (ePtr != nullptr) ePtr->flash.a = 0;
 			aniUSet.erase(aniUSet.find(this));
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
@@ -843,26 +794,6 @@ bool Entity::runAnimation(bool shutdown)
 				return true;
 			}
 
-
-			if (getTimer() >= hitTimer)
-			{
-				Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-				if (ePtr != nullptr)
-				{
-					Uint8 targetR, targetG, targetB, targetAlpha;
-					ePtr->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-					if (ePtr->getFlashType() == 1)
-					{
-						if (targetG > 51) { targetG -= 51; }
-						else { targetG = 0; }
-						if (targetB > 51) { targetB -= 51; }
-						else { targetB = 0; }
-						if (targetAlpha > 51) { targetAlpha -= 51; }
-						else { targetAlpha = 0; }
-						ePtr->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
-					}
-				}
-			}
 		}
 	}
 	else if (getAniType() == aniFlag::fireStorm)

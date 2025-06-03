@@ -339,3 +339,38 @@ void HUD::clickHoldGUI()
 		openContextMenu(getAbsMouseGrid());
 	}
 }
+
+void HUD::mouseWheel()
+{
+	bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr
+		&& (std::abs(getAbsMouseGrid().x - PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
+
+	if (partSelect == false)
+	{
+		//줌인 줌아웃
+		if (event.wheel.y > 0)
+		{
+			zoomScale += 1;
+			if (zoomScale > 5.0) zoomScale = 5;
+		}
+		else if (event.wheel.y < 0)
+		{
+			zoomScale -= 1;
+			if (zoomScale < 1.0) zoomScale = 1;
+		}
+	}
+	else
+	{
+		Entity* victimEntity = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ());
+		if (event.wheel.y > 0)
+		{
+			victimEntity->selectedPart++;
+			if(victimEntity->selectedPart >= victimEntity->parts.size()) victimEntity->selectedPart = -1;
+		}
+		else if (event.wheel.y < 0)
+		{
+			victimEntity->selectedPart--;
+			if (victimEntity->selectedPart <= -2) victimEntity->selectedPart = victimEntity->parts.size() - 1;
+		}
+	}
+}

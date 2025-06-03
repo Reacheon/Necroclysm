@@ -77,14 +77,6 @@ ItemPocket* Entity::getEquipPtr()
 	return equipment.get();
 }
 
-
-void Entity::setFlashType(int inputType)
-{
-	flashType = inputType;
-	if (inputType == 1) setFlashRGBA(255, 255, 255, 255);
-	else setFlashRGBA(0, 0, 0, 0);
-}
-int Entity::getFlashType() { return flashType; }
 bool Entity::getLeftFoot() { return leftFoot; }
 void Entity::setLeftFoot(bool input) { leftFoot = input; }
 void Entity::setSpriteInfimum(int inputVal) { sprIndexInfimum = inputVal; }
@@ -326,13 +318,17 @@ void Entity::attack(int gridX, int gridY)
 	}
 	else
 	{
-		//명중률 계산
-		float aimAcc;
-		aimAcc = 0.98;
-
-		if (aimAcc * 100.0 > randomRange(0, 100))
+		float totalAcc = 1.0f;
+		for (int i = 0; i < victimEntity->parts.size(); i++)
 		{
-			victimEntity->setFlashType(1);
+			totalAcc += victimEntity->parts[i].accRate;
+		}
+		totalAcc /= (float)victimEntity->parts.size();
+
+		//명중률 계산
+		if (totalAcc * 100.0 > randomRange(0, 100))
+		{
+			victimEntity->flash = { 68, 0, 0, 255 };
 			victimEntity->addDmg(randomRange(6, 10));
 		}
 		else
@@ -520,21 +516,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 		}
 	}
 }
-void Entity::startFlash(int inputFlashType)
-{
-	flashType = inputFlashType;
-}
-void Entity::setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputAlpha)
-{
-	flash = { inputR, inputG, inputB, inputAlpha };
-}
-void Entity::getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha)
-{
-	if (targetR != NULL) { targetR = flash.r; }
-	if (targetG != NULL) { targetG = flash.g; }
-	if (targetB != NULL) { targetB = flash.b; }
-	if (targetAlpha != NULL) { targetAlpha = flash.a; }
-}
+
 void Entity::drop(ItemPocket* txPtr)
 {
 	ItemStack* targetStack = nullptr;;

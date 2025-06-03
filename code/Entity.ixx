@@ -49,8 +49,12 @@ private:
 
 public:
     std::wstring name = L"DEFAULT ENTITY";
-    std::vector<PartData> parts;
     int entityCode = entityRefCode::none;
+
+    std::vector<PartData> parts;
+    SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
+    int selectedPart = -1;
+
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
     std::vector<Point2> aStarData;
@@ -114,8 +118,9 @@ public:
 
     sprFlag sprState = sprFlag::stand;
 
-    SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
-    int flashType = 0; // 0 : NULL, 1 : white, 2 : white->red
+
+
+
     //////////////////////////////////////////////////
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     virtual ~Entity();
@@ -137,8 +142,6 @@ public:
     void setAtkTarget(int inputX, int inputY, int inputZ);
     ItemPocket* getEquipPtr();
     //void addEquipFromDex(int index, equip inputState);
-    void setFlashType(int inputType);
-    int getFlashType();
     bool getLeftFoot();
     void setLeftFoot(bool input);
     void setSpriteInfimum(int inputVal);
@@ -169,8 +172,6 @@ public:
     void rayCasting(int x1, int y1, int x2, int y2);
     void rayCastingDark(int x1, int y1, int x2, int y2);
     void startFlash(int inputFlashType);
-    void setFlashRGBA(Uint8 inputR, Uint8 inputG, Uint8 inputB, Uint8 inputAlpha);
-    void getFlashRGBA(Uint8& targetR, Uint8& targetG, Uint8& targetB, Uint8& targetAlpha);
     void drop(ItemPocket* txPtr);
     void throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY);
 

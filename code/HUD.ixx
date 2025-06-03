@@ -139,31 +139,7 @@ public:
 	void clickUpGUI();
 	void clickRightGUI();
 	void clickHoldGUI();
-	void mouseWheel() 
-	{
-		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr 
-			&& (std::abs(getAbsMouseGrid().x-PlayerX()) == 1 || std::abs(getAbsMouseGrid().y - PlayerY()) == 1);
-			
-
-		if (partSelect==false)
-		{
-			//줌인 줌아웃
-			if (event.wheel.y > 0)
-			{
-				zoomScale += 1;
-				if (zoomScale > 5.0) zoomScale = 5;
-			}
-			else if (event.wheel.y < 0)
-			{
-				zoomScale -= 1;
-				if (zoomScale < 1.0) zoomScale = 1;
-			}
-		}
-		else
-		{
-
-		}
-	}
+	void mouseWheel();
 	void mouseStep();
 
 	void gamepadBtnDown();

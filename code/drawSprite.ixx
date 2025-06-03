@@ -181,3 +181,81 @@ export void drawSpriteCenterF(Sprite* spr, int index, double x, double y)
 
     SDL_RenderTextureRotated(renderer, spr->getTexture(), &src, &dst, 0, nullptr, s_flip);
 }
+
+
+export void drawFlashEffect(Sprite* spr, int index, int x, int y, SDL_Color flash)
+{
+    if (flash.a == 0) return;
+        
+    struct TexCache { SDL_Texture* flashTex{}; int w{}, h{}; };
+    static std::unordered_map<SDL_Texture*, TexCache> s_cache;
+    static std::deque<SDL_Texture*>                   s_order;
+    static constexpr std::size_t                      MAX_CACHE = 4000;
+
+    SDL_Texture* srcTex = spr->getTexture();
+    int w = spr->getW();
+    int h = spr->getH();
+
+    SDL_Texture* flashTex;
+    auto it = s_cache.find(srcTex);
+
+    if (it == s_cache.end()) 
+    {
+        flashTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_TARGET, w, h);
+        if (!flashTex) return;
+        SDL_SetTextureScaleMode(flashTex, SDL_SCALEMODE_NEAREST);
+
+        s_cache[srcTex] = { flashTex, w, h };
+        s_order.push_back(srcTex);
+
+        if (s_order.size() > MAX_CACHE) 
+        {
+            SDL_Texture* victim = s_order.front();
+            s_order.pop_front();
+            auto vit = s_cache.find(victim);
+            if (vit != s_cache.end()) 
+            {
+                SDL_DestroyTexture(vit->second.flashTex);
+                s_cache.erase(vit);
+            }
+        }
+    }
+    else flashTex = it->second.flashTex;
+
+    SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
+    SDL_BlendMode prevBlend;
+    SDL_GetRenderDrawBlendMode(renderer, &prevBlend);
+    SDL_FlipMode prevFlip = s_flip;
+    float prevZoom = s_zoomScale;
+
+    SDL_SetRenderTarget(renderer, flashTex);
+    SDL_SetTextureBlendMode(flashTex, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+
+    setZoom(1.0f);
+    setFlip(SDL_FLIP_NONE);
+    drawSprite(spr, index, 0, 0);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+    SDL_SetRenderDrawColor(renderer, flash.r, flash.g, flash.b, flash.a);
+    SDL_FRect full = { 0, 0, static_cast<float>(w), static_cast<float>(h) };
+    SDL_RenderFillRect(renderer, &full);
+
+    SDL_SetRenderTarget(renderer, prevTarget);
+    setZoom(prevZoom);
+    setFlip(prevFlip);
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    drawTexture(flashTex, x+48, y);
+}
+
+export void drawFlashEffectCenter(Sprite* spr, int index, int x, int y, SDL_Color flash)
+{
+    float dstW = spr->getW() * s_zoomScale;
+    float dstH = spr->getH() * s_zoomScale;
+    int left = static_cast<int>(x - dstW * 0.5f);
+    int top = static_cast<int>(y - dstH * 0.5f);
+
+    drawFlashEffect(spr, index, left, top, flash);
+}

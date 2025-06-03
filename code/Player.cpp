@@ -28,7 +28,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	hair = humanCustom::hair::bob1Black;
 
 	parts.emplace_back(PartData{ .partName = L"몸통", .accRate = 1.0f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.3f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
+	parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.6f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 	parts.emplace_back(PartData{ .partName = L"왼팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 	parts.emplace_back(PartData{ .partName = L"오른팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
 	parts.emplace_back(PartData{ .partName = L"왼다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
@@ -38,7 +38,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	int i = 0;
 
-	getEquipPtr()->addItemFromDex(383);
+	getEquipPtr()->addItemFromDex(itemRefCode::katana);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
 
 	getEquipPtr()->addItemFromDex(2);

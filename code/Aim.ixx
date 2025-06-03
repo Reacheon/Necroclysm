@@ -378,7 +378,7 @@ public:
 		{
 			aimAcc += randomRangeFloat(0.03, 0.07);
 			if (aimAcc > 0.999) aimAcc = 0.999;
-			PlayerPtr->setFlashType(1);
+			PlayerPtr->flash = { 255, 255, 255, 255 };
 			aimStack++;
 		}
 	}
@@ -439,17 +439,10 @@ public:
 	void step() 
 	{
 		{
-			Uint8 targetR, targetG, targetB, targetAlpha;
-			PlayerPtr->getFlashRGBA(targetR, targetG, targetB, targetAlpha);
-			if (PlayerPtr->getFlashType() == 1)
+			if (PlayerPtr->flash.a > 0)
 			{
-				if (targetAlpha > 17) { targetAlpha -= 17; }
-				else 
-				{ 
-					targetAlpha = 0; 
-					PlayerPtr->setFlashType(0);
-				}
-				PlayerPtr->setFlashRGBA(targetR, targetG, targetB, targetAlpha);
+				if (PlayerPtr->flash.a > 17) { PlayerPtr->flash.a -= 17; }
+				else PlayerPtr->flash.a = 0;
 			}
 		}
 
