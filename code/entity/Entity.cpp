@@ -602,7 +602,7 @@ void Entity::addProficExp(int expVal)
 	{
 		if (entityInfo.proficFocus[i] > 0)
 		{
-			if (getProficLevel(i) >= 18)
+			if (getProficLevel(i) >= MAX_PROFIC_LEVEL)
 			{
 				entityInfo.proficFocus[i] = 0;
 			}

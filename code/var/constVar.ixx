@@ -30,7 +30,7 @@ export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경�
 
 export constexpr int MARKER_LIMIT_DIST = 100; //플레이어로부터 100칸 이상 떨어지면 마커가 그려지지 않음
 
-export constexpr int MAX_PROFIC_LEVEL = 99;
+export constexpr int MAX_PROFIC_LEVEL = 7;
 
 export constexpr int SKILL_GUI_MAX = 7;
 export constexpr int QUICK_SLOT_MAX = 8;

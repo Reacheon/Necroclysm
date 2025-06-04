@@ -1,6 +1,5 @@
 ﻿#include <SDL3/SDL.h>
 
-
 export module Profic;
 
 import std;
@@ -89,12 +88,12 @@ public:
 
 		if (getFoldRatio() == 1.0)
 		{
-			
+
 			drawWindow(&proficBase, sysStr[7], 6);
 
 			///////////////////////////////////////////////////////////////////////////
 
-			
+
 			int pivotX = proficBase.x + 20;
 			int pivotY = proficBase.y + 56;
 
@@ -103,10 +102,9 @@ public:
 				setFontSize(10);
 				int targetX = pivotX + 10;
 				int targetY = pivotY + (28 * (-1)) + 20;
-				SDL_Color col = { 0x23, 0x4a, 0x63 };
-				renderTextCenter( sysStr[182], targetX + 54 + (210 * i), targetY + 1, col); //재능
-				renderTextCenter(sysStr[183], targetX + 125 + (210 * i), targetY + 1, col); //랭크
-				renderTextCenter( sysStr[184], targetX + 174 + (210 * i), targetY + 1, col); //적성
+				renderTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //재능
+				renderTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY - 7); //랭크
+				renderTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY - 7); //적성
 			}
 
 
@@ -125,12 +123,41 @@ public:
 				int targetX = pivotX + 210 * (i / 8);
 				int targetY = pivotY + (28 * (i % 8));
 
+				std::wstring focusStr;
+				std::wstring colorStr;
 				std::wstring proficStr;
+				std::wstring levelStr = L"Rank ";
+				float lv = PlayerPtr->getProficLevel(i);
 
-				std::wstring levelStr = L"Lv." + std::to_wstring(static_cast<int>(PlayerPtr->getProficLevel(i)));
+				if (PlayerPtr->getProficLevel(i) < 1.0) levelStr += L"F";
+				else if (PlayerPtr->getProficLevel(i) < 2.0) levelStr += L"E";
+				else if (PlayerPtr->getProficLevel(i) < 3.0) levelStr += L"D";
+				else if (PlayerPtr->getProficLevel(i) < 4.0) levelStr += L"C";
+				else if (PlayerPtr->getProficLevel(i) < 5.0) levelStr += L"B";
+				else if (PlayerPtr->getProficLevel(i) < 6.0) levelStr += L"A";
+				else if (PlayerPtr->getProficLevel(i) <= 7.0) levelStr += L"S";
+				else if (PlayerPtr->getProficLevel(i) < 8.0) levelStr += L"SS";
+				else levelStr += L"SSS";
 
 				std::wstring aptStr;
 				aptStr = L"x" + decimalCutter(PlayerPtr->entityInfo.proficApt[i], 1);
+
+				switch (PlayerPtr->entityInfo.proficFocus[i])
+				{
+				case 1:
+					focusStr = L"+";
+					break;
+				case 2:
+					focusStr = L"*";
+
+					break;
+				default:
+					focusStr = L"-";
+					break;
+				}
+
+				
+				if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) focusStr = L" ";
 
 				switch (i)
 				{
@@ -194,18 +221,19 @@ public:
 				}
 
 				setFontSize(10);
+				renderText(focusStr, targetX + 30, targetY + 4);
 
 				{
 					SDL_Color rankColor = col::white;
 					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
-					renderText(proficStr, targetX + 40, targetY + 4, rankColor);
+					renderText(col2Str(rankColor) + proficStr, targetX + 40, targetY + 4);
 				}
 
 				//재능 랭크와 게이지 그리기
 				{
 					SDL_Color rankColor = col::white;
 					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
-					renderTextCenter(levelStr, targetX + 136, targetY + 10, rankColor);
+					renderText(col2Str(rankColor) + levelStr, targetX + 120, targetY + 4);
 
 					SDL_Rect gauge = { targetX + 118, targetY + 18, 36, 3 };
 					drawRect(gauge, col::white);
@@ -222,6 +250,8 @@ public:
 						if (q > 0) drawSprite(spr::epsilonFont, qIndex, targetX + 118 + 37, targetY + 18 - 1);
 						drawSprite(spr::epsilonFont, rIndex, targetX + 118 + 37 + 4, targetY + 18 - 1);
 						drawSprite(spr::epsilonFont, 43, targetX + 118 + 37 + 8, targetY + 18 - 1); //%
+
+
 					}
 					else
 					{
@@ -233,26 +263,41 @@ public:
 					}
 				}
 
-				setFontSize(10);
-				renderText(aptStr, targetX + 175, targetY + 6);
-				setFontSize(10);
+				renderText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 4);
+
+				//회색 필터
+				if (PlayerPtr->entityInfo.proficFocus[i] == 0 && PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
+				{
+					drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 150, 5);
+				}
 
 				//재능 아이콘 그리기
 				setZoom(1.5);
 				if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
 				{
 					drawSprite(spr::proficIcon, i, targetX, targetY);
+					if (PlayerPtr->entityInfo.proficFocus[i] == 0)
+					{
+						SDL_Rect rect = { targetX,targetY,24,24 };
+						drawFillRect(rect, col::black, 150);
+					}
 				}
 				else { drawSprite(spr::proficIconGold, i, targetX, targetY); }
 				setZoom(1.0);
+
+
+
 			}
 			setZoom(1.0);
 
-			if (warningIndex > 0) { renderText(sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70, lowCol::red); }
+			if (warningIndex > 0) { renderText(L"#FF0000" + sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70); }
 			//클릭하여 재능포인트의 분배 우선 순위를 결정합니다. 예로 3개의 재능을 우선분배하면 각 재능 당 경험치가 33%씩 쌓입니다.
-			renderText(sysStr[180], proficBase.x + 20, proficBase.y + proficBase.h - 50);
+			//renderText(sysStr[180], proficBase.x + 20, proficBase.y + proficBase.h - 50);
 			//적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능은 최대 S랭크까지 올릴 수 있습니다.
-			renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
+			//renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
+
+			renderTextWidth(L"행동으로 특정 재능의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 수련 재능들에 추가로 분배됩니다." , proficBase.x + 20, proficBase.y + proficBase.h - 30, false, 600, 14);
+			
 		}
 		else
 		{
@@ -260,14 +305,14 @@ public:
 			int type = 1;
 			switch (type)
 			{
-				case 0:
-					vRect.w = vRect.w * getFoldRatio();
-					vRect.h = vRect.h * getFoldRatio();
-					break;
-				case 1:
-					vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
-					vRect.w = vRect.w * getFoldRatio();
-					break;
+			case 0:
+				vRect.w = vRect.w * getFoldRatio();
+				vRect.h = vRect.h * getFoldRatio();
+				break;
+			case 1:
+				vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
+				vRect.w = vRect.w * getFoldRatio();
+				break;
 			}
 			drawWindow(&vRect);
 		}
@@ -278,18 +323,58 @@ public:
 
 		if (checkCursor(&tab))
 		{
-			close(aniFlag::winUnfoldClose);
+			for (int i = 0; i < TALENT_SIZE; i++)
+			{
+				if (PlayerPtr->entityInfo.proficFocus[i] > 0) //수련 중인 재능을 1개라도 발견했을 경우
+				{
+					close(aniFlag::winUnfoldClose);
+					return;
+				}
+
+				if (i == TALENT_SIZE - 1) //만약 수련 중인 재능이 없으면
+				{
+					warningIndex = 1;
+					return;
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < TALENT_SIZE; i++)
+			{
+				if (checkCursor(&proficButton[i]))
+				{
+					if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
+					{
+						switch (PlayerPtr->entityInfo.proficFocus[i])
+						{
+						case 0:
+							PlayerPtr->entityInfo.proficFocus[i] = 1;
+							break;
+						case 1:
+							PlayerPtr->entityInfo.proficFocus[i] = 2;
+							break;
+						case 2:
+							PlayerPtr->entityInfo.proficFocus[i] = 0;
+							break;
+						default:
+							errorBox(L"Unvalid profic focus point");
+							break;
+						}
+					}
+				}
+			}
 		}
 	}
-	void clickMotionGUI(int dx, int dy) { }
-	void clickDownGUI() { }
-	void clickRightGUI() { }
-	void clickHoldGUI() { }
-	void mouseWheel() {}
-	void gamepadBtnDown() { }
-	void gamepadBtnMotion() { }
-	void gamepadBtnUp() { }
-	void step() { }
+	void clickMotionGUI(int dx, int dy) {}
+	void clickDownGUI() {}
+	void clickRightGUI() {}
+	void clickHoldGUI() {}
+	void mouseWheel() {};
+	void gamepadBtnDown() {}
+	void gamepadBtnMotion() {}
+	void gamepadBtnUp() {}
+	void step() {}
 
 	void setWarningIndex(int inputVal) { warningIndex = inputVal; }
 };
