@@ -99,12 +99,6 @@
     <ClCompile Include="code\const2Str.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
-    <ClCompile Include="code\globalVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
-    <ClCompile Include="code\textureVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
     <ClCompile Include="code\dataLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
     </ClCompile>
@@ -284,12 +278,6 @@
     </ClCompile>
     <ClCompile Include="code\Vehicle_runAI.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
-    </ClCompile>
-    <ClCompile Include="code\wrapVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
-    <ClCompile Include="code\constVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\actFuncSet.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
@@ -566,6 +554,18 @@
     </ClCompile>
     <ClCompile Include="code\world\Mapmaker.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\textureVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\wrapVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\globalVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

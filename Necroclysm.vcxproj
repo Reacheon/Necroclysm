@@ -167,7 +167,6 @@
     <ClCompile Include="code\camera.ixx" />
     <ClCompile Include="code\clickHold.ixx" />
     <ClCompile Include="code\clickRight.ixx" />
-    <ClCompile Include="code\constVar.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawEpsilonText.ixx" />
@@ -262,7 +261,6 @@
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\useSkill.ixx" />
     <ClCompile Include="code\globalTime.ixx" />
-    <ClCompile Include="code\globalVar.ixx" />
     <ClCompile Include="code\Light.ixx" />
     <ClCompile Include="code\log.ixx" />
     <ClCompile Include="code\main.cpp" />
@@ -274,7 +272,6 @@
     <ClCompile Include="code\startArea.ixx" />
     <ClCompile Include="code\stepEvent.ixx" />
     <ClCompile Include="code\textureLoader.ixx" />
-    <ClCompile Include="code\textureVar.ixx" />
     <ClCompile Include="code\turnCycleLoop.ixx" />
     <ClCompile Include="code\turnWait.ixx" />
     <ClCompile Include="code\util\aStar.ixx" />
@@ -309,6 +306,10 @@
     <ClCompile Include="code\util\util.ixx" />
     <ClCompile Include="code\util\Vec3.ixx" />
     <ClCompile Include="code\util\wstring2Number.ixx" />
+    <ClCompile Include="code\var\constVar.ixx" />
+    <ClCompile Include="code\var\globalVar.ixx" />
+    <ClCompile Include="code\var\textureVar.ixx" />
+    <ClCompile Include="code\var\wrapVar.ixx" />
     <ClCompile Include="code\Vehicle.cpp" />
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\Vehicle_runAI.cpp" />
@@ -316,7 +317,6 @@
     <ClCompile Include="code\world\Mapmaker.ixx" />
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
-    <ClCompile Include="code\wrapVar.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
