@@ -67,9 +67,6 @@
     <Filter Include="소스 파일\03_renderer\draw">
       <UniqueIdentifier>{dfeeca0d-7e6b-4718-8319-60817a10bd9f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\act">
-      <UniqueIdentifier>{c8bc05cc-ad20-49cd-b2a2-7d26a971aff6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\00_var">
       <UniqueIdentifier>{5b0409cc-011d-4af5-be1f-689b3989bd07}</UniqueIdentifier>
     </Filter>
@@ -91,14 +88,11 @@
     <Filter Include="소스 파일\01_system\04_GUI\INVENTORY">
       <UniqueIdentifier>{3d8fab15-a267-4023-b6cb-b5868c2a8072}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\05_Class\07_Vehicle">
-      <UniqueIdentifier>{6f6cbb85-1d23-42d6-9843-603bea97363e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\CRAFT">
       <UniqueIdentifier>{9d79e804-c248-4c63-a091-579272003866}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\05_Class\01_Entity\Player">
-      <UniqueIdentifier>{42a05489-af19-4e10-b10d-88a1dd761f42}</UniqueIdentifier>
+    <Filter Include="소스 파일\05_Class\07_Vehicle&amp;Prop">
+      <UniqueIdentifier>{6f6cbb85-1d23-42d6-9843-603bea97363e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -110,90 +104,6 @@
     </ClCompile>
     <ClCompile Include="code\textureVar.ixx">
       <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\wstring2Number.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\aStar.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\calc.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\col2Str.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Corouter.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\decimalCutter.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\dirToXY.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\errorBox.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\extremum.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\floodFill.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\getDegree.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\utf8Decoder.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\hasher.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\HSVConverter.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\prt.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\randomRange.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\readCSV.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\replaceStr.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\sgn.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\isCircle.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Profic.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ItemStack.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
-    <ClCompile Include="code\World.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Chunk.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Status.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\readItemDex.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
     <ClCompile Include="code\dataLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
@@ -207,26 +117,11 @@
     <ClCompile Include="code\textureLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
     </ClCompile>
-    <ClCompile Include="code\nanoTimer.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\TileData.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Alchemy.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\turnCycleLoop.ixx">
       <Filter>소스 파일\01_system\02_turn</Filter>
     </ClCompile>
     <ClCompile Include="code\turnWait.ixx">
       <Filter>소스 파일\01_system\02_turn</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Monster.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Entity.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\AI.ixx">
       <Filter>소스 파일\05_Class\04_Interface</Filter>
@@ -240,15 +135,6 @@
     <ClCompile Include="code\stepEvent.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
-    <ClCompile Include="code\Point.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lst.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\CoordSelect.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\readAlchemyDex.ixx">
       <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
@@ -258,17 +144,8 @@
     <ClCompile Include="code\startArea.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
-    <ClCompile Include="code\Vec3.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\dir16.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\initCoordTransform.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="code\connectGroupExtraIndex.ixx">
-      <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\Light.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -297,35 +174,17 @@
     <ClCompile Include="code\checkCursor.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
-    <ClCompile Include="code\lineMaker.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\log.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
     <ClCompile Include="code\camera.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
-    <ClCompile Include="code\Prop.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\CoordSelectCraft.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\Sticker.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
-    <ClCompile Include="code\Mapmaker.ixx">
-      <Filter>소스 파일\05_Class\03_World</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Map.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\globalTime.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Msg.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
     <ClCompile Include="code\debugConsole.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
@@ -366,9 +225,6 @@
     <ClCompile Include="code\drawWindowArrow.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
-    <ClCompile Include="code\actFuncSet.ixx">
-      <Filter>소스 파일\01_system\04_GUI\act</Filter>
-    </ClCompile>
     <ClCompile Include="code\Drawable.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
@@ -377,12 +233,6 @@
     </ClCompile>
     <ClCompile Include="code\readSkillDex.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ThreadPool.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\drawPrimitive.ixx">
-      <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\gamepadBtnDown.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
@@ -393,92 +243,20 @@
     <ClCompile Include="code\gamepadBtnUp.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
-    <ClCompile Include="code\HUD.ixx">
-      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="code\HUD_draw.ixx">
-      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="code\HUD_input_gamepad.ixx">
-      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="code\HUD_input_mouse.ixx">
-      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Loot.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Loot_draw.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Loot_input_gamepad.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Loot_input_mouse.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\timeKeeper.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\drawSprite.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Equip.ixx">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Equip_draw.ixx">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Equip_input_mouse.ixx">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Equip_input_gamepad.ixx">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Inventory.ixx">
-      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Inventory_draw.ixx">
-      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ContextMenu.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\clickRight.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
     <ClCompile Include="code\clickHold.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
-    <ClCompile Include="code\Entity_runAnimation.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Entity.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ItemPocket.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\drawEpsilonText.ixx">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Aim.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\stringToWstring.ixx">
-      <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
     <ClCompile Include="code\scriptLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Dialogue.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Prop.cpp">
-      <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\Light.cpp">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -490,31 +268,13 @@
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
     <ClCompile Include="code\Vehicle.ixx">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
     </ClCompile>
     <ClCompile Include="code\Vehicle.cpp">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Craft.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Craft_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Skill.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\useSkill.ixx">
-      <Filter>소스 파일\01_system\04_GUI\act</Filter>
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
     </ClCompile>
     <ClCompile Include="code\mouseWheel.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Quest.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Maint.ixx">
-      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
     <ClCompile Include="code\Flame.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -522,41 +282,8 @@
     <ClCompile Include="code\Flame.cpp">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemPocket.cpp">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\Vehicle_runAI.cpp">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ItemStack.cpp">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
-    <ClCompile Include="code\sequenceCounter.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Monster.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GameOver.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Player.ixx">
-      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Player.cpp">
-      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="code\ItemData_base.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
-    <ClCompile Include="code\EntityData.cpp">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\EntityData.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\readEntityDex.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
     </ClCompile>
     <ClCompile Include="code\wrapVar.ixx">
       <Filter>소스 파일\00_var</Filter>
@@ -564,14 +291,281 @@
     <ClCompile Include="code\constVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemData.ixx">
+    <ClCompile Include="code\actFuncSet.ixx">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\useSkill.ixx">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Aim.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Alchemy.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\ContextMenu.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Dialogue.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\GameOver.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\GUI.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Map.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Profic.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Quest.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Skill.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Status.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\drawSprite.ixx">
+      <Filter>소스 파일\03_renderer\draw</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\getDegree.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\hasher.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\HSVConverter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\isCircle.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\lineMaker.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\nanoTimer.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\Point.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\prt.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\randomRange.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\readCSV.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\replaceStr.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\sequenceCounter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\sgn.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\stringToWstring.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\ThreadPool.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\timeKeeper.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\utf8Decoder.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\util.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\Vec3.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\wstring2Number.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\aStar.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\calc.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\col2Str.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\connectGroupExtraIndex.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\Corouter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\decimalCutter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\dir16.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\dirToXY.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\drawPrimitive.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\errorBox.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\extremum.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\floodFill.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\Maint.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\Msg.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\CoordSelect.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\CoordSelectCraft.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\Lst.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CRAFT\Craft_draw.cpp">
+      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CRAFT\Craft.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\EQUIP\Equip.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\EQUIP\Equip_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx">
+      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LOOT\Loot.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LOOT\Loot_draw.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\readItemDex.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemData.cpp">
+    <ClCompile Include="code\item\ItemData.cpp">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
-    <ClCompile Include="code\Entity_drawSelf.ixx">
+    <ClCompile Include="code\item\ItemData.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\ItemData_base.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\ItemPocket.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\ItemPocket.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\ItemStack.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\item\ItemStack.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Entity_runAnimation.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\EntityData.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\EntityData.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Monster.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Monster.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Player.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Player.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\readEntityDex.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Entity.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Entity.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\entity\Entity_drawSelf.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Prop.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Prop.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\TileData.ixx">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\World.ixx">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\Chunk.ixx">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\Mapmaker.ixx">
+      <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
