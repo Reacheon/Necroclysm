@@ -74,7 +74,7 @@ export void textureLoader()
 	spr::loadingAnime = new Sprite(renderer, "image/UI/loadingAnime.png", 32, 32);
 	spr::buildCursor = new Sprite(renderer, "image/UI/buildCursor.png", 48, 48);
 	spr::propset = new Sprite(renderer, "image/tileset/propset.png", 48, 48);
-	spr::msgChoiceBtn = new Sprite(renderer, "image/UI/msgChoiceBtn.png",  90, 46);
+	spr::msgChoiceBtn = new Sprite(renderer, "image/UI/msgChoiceBtn.png", 90, 46);
 
 	spr::itemSlotBtn = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 210, 18);
 	spr::itemSlotPocketArrow = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 8, 40);
@@ -109,15 +109,15 @@ export void textureLoader()
 	spr::windowArrow2 = new Sprite(renderer, "image/UI/GUI/windowArrow2.png", 48, 48);
 	spr::mapHereMarker = new Sprite(renderer, "image/UI/GUI/Map/mapHereMarker.png", 23, 23);
 
-	spr::screenRain = new Sprite(renderer, "image/weather/screenRain.png",720,720);
-	spr::screenSnow = new Sprite(renderer, "image/weather/screenSnow.png",720,720);
+	spr::screenRain = new Sprite(renderer, "image/weather/screenRain.png", 720, 720);
+	spr::screenSnow = new Sprite(renderer, "image/weather/screenSnow.png", 720, 720);
 
-	spr::symbolSunny = new Sprite(renderer, "image/UI/GUI/HUD/symbolSunny.png",48,48);
-	spr::symbolCloudy = new Sprite(renderer, "image/UI/GUI/HUD/symbolCloudy.png",48,48);
-	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png",48,48);
-	spr::symbolRain = new Sprite(renderer, "image/UI/GUI/HUD/symbolRain.png",48,48);
-	spr::symbolStorm = new Sprite(renderer, "image/UI/GUI/HUD/symbolStorm.png",48,48);
-	spr::symbolSnow = new Sprite(renderer, "image/UI/GUI/HUD/symbolSnow.png",48,48);
+	spr::symbolSunny = new Sprite(renderer, "image/UI/GUI/HUD/symbolSunny.png", 48, 48);
+	spr::symbolCloudy = new Sprite(renderer, "image/UI/GUI/HUD/symbolCloudy.png", 48, 48);
+	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png", 48, 48);
+	spr::symbolRain = new Sprite(renderer, "image/UI/GUI/HUD/symbolRain.png", 48, 48);
+	spr::symbolStorm = new Sprite(renderer, "image/UI/GUI/HUD/symbolStorm.png", 48, 48);
+	spr::symbolSnow = new Sprite(renderer, "image/UI/GUI/HUD/symbolSnow.png", 48, 48);
 
 	spr::tailPedalL = new Sprite(renderer, "image/UI/GUI/HUD/tailPedalL.png", 64, 64);
 	spr::tailPedalR = new Sprite(renderer, "image/UI/GUI/HUD/tailPedalR.png", 64, 64);
@@ -177,29 +177,12 @@ export void textureLoader()
 
 	spr::gridMarker = new Sprite(renderer, "image/UI/gridMarker.png", 16, 16);
 
-    spr::tabBoxAim = new Sprite(renderer, "image/UI/tabBoxAim.png", 122, 122);
+	spr::tabBoxAim = new Sprite(renderer, "image/UI/tabBoxAim.png", 122, 122);
 
 	spr::youDied = new Sprite(renderer, "image/UI/youDied.png", 1440, 184);
 
 	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 
-	
 
-
-	spr::humanFlash::whole = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_whole.png", 48, 48);
-	spr::humanFlash::torso = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_torso.png", 48, 48);
-	spr::humanFlash::rLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rLeg.png", 48, 48);
-	spr::humanFlash::lLeg = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lLeg.png", 48, 48);
-	spr::humanFlash::lArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_lArm.png", 48, 48);
-	spr::humanFlash::rArm = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_rArm.png", 48, 48);
-	spr::humanFlash::head = new Sprite(renderer, "image/charset/monster/humanFlash/humanFlash_head.png", 48, 48);
-
-	spr::zombieA::whole = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_whole.png", 48, 48);
-	spr::zombieA::torso = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_torso.png", 48, 48);
-	spr::zombieA::rLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rLeg.png", 48, 48);
-	spr::zombieA::lLeg = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lLeg.png", 48, 48);
-	spr::zombieA::lArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_lArm.png", 48, 48);
-	spr::zombieA::rArm = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_rArm.png", 48, 48);
-	spr::zombieA::head = new Sprite(renderer, "image/charset/monster/zombieA/zombieA_head.png", 48, 48);
 }

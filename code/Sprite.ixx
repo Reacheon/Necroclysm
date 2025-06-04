@@ -12,7 +12,7 @@ private:
     SDL_Texture* texturePtr;
     int w;
     int h;
-    bool notOwned = false; 
+    bool notOwned = false;
 public:
     Sprite(SDL_Renderer* renderer, std::string adr, int inputW, int inputH)
     {
@@ -37,7 +37,7 @@ public:
     ~Sprite()
     {
         //prt(L"Sprite : 소멸자가 호출되었습니다..\n");
-        if(notOwned==false) SDL_DestroyTexture(texturePtr);
+        if (notOwned == false) SDL_DestroyTexture(texturePtr);
     }
     SDL_Texture* getTexture() { return texturePtr; }
     int getW() { return w; }

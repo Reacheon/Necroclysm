@@ -254,7 +254,7 @@ export namespace actFunc
 		tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 		tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 		tgtProp->leadItem.extraSprIndexSingle--;
-		PlayerPtr->updateVision(PlayerPtr->eyeSight);
+		PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 	}
 
 	export void closeVDoor(int tgtX, int tgtY, int tgtZ)
@@ -275,7 +275,7 @@ export namespace actFunc
 					tgtPocket->itemInfo[i].addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
 				}
 				tgtPocket->itemInfo[i].propSprIndex -= 16;
-				PlayerPtr->updateVision(PlayerPtr->eyeSight);
+				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 			}
 		}
 

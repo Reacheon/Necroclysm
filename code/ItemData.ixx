@@ -11,7 +11,6 @@ import ItemDataBase;
 //__int32 : –2,147,483,648 ~2,147,483,647
 
 
-
 export struct ItemData : public ItemDataBase
 {
     ///////////////////비데이터베이스 변수////////////////////
@@ -58,4 +57,3 @@ export struct ItemData : public ItemDataBase
 };
 
 export ItemData cloneFromItemDex(ItemData& inputData, int transferNumber);
-

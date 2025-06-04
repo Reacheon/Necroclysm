@@ -1,38 +1,22 @@
 ﻿#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
 
 export module Entity;
 
 import std;
+import util;
 import constVar;
-import textureVar;
 import Ani;
 import Coord;
+import Drawable;
 import Sprite;
 import Drawable;
-import ItemStack;
-import ItemPocket;
-import util;
+import EntityData;
 import Vehicle;
-import Light;
-import SkillData;
-
-
-export struct PartData
-{
-    std::wstring partName = L"머리";
-    float accRate = 0.2f;
-    int maxHP = 100;
-    int currentHP = 100;
-    int resPierce = 0; //관통 저항
-    int resCut = 0; //절단 저항
-    int resBash = 0; //타격 저항
-};
 
 export class Entity : public Ani, public Coord, public Drawable 
 {
 private:
-
+    std::unique_ptr<Sprite> customSprite = nullptr;
     bool hasAStarDst = false;
     Point2 aStarDst = { 0, 0 };
     Point3 atkTarget = { 0,0,0 };
@@ -48,81 +32,11 @@ private:
     Point3 throwCoord = { 0,0,0 };
 
 public:
-    std::wstring name = L"DEFAULT ENTITY";
-    int entityCode = entityRefCode::none;
-
-    std::vector<PartData> parts;
-    SDL_Color flash = { 0,0,0,0 }; //플래시 컬러
-    SDL_Color partFlash = { 0,0,0,0 }; //플래시 컬러
-    int selectedPart = -1;
-
     std::unique_ptr<Entity> ridingEntity = nullptr; //탑승중인 엔티티
     ridingFlag ridingType = ridingFlag::none;
     std::vector<Point2> aStarData;
-    bool entityFlip = false; //현재 이 객체의 좌우반전 여부
-    int stamina = 100; //기력
-    int maxStamina = 100; //최대 기력   
-    std::array<int, TALENT_SIZE> proficExp = { 0, }; //경험치
-    std::array<float, TALENT_SIZE> proficApt = { 2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0, }; //적성
-    std::array<int, TALENT_SIZE> proficFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
-    int eyeSight = 8; //기본 시야 범위
-    std::vector<std::pair<statEfctFlag, int>> statusEffects;
-    std::unique_ptr<Sprite> customSprite = nullptr;
-
-    __int16 sh = 0;
-    __int16 ev = 0;
-    __int16 rFire = 0;
-    __int16 rCold = 0;
-    __int16 rElec = 0;
-    __int16 rCorr = 0;
-    __int16 rRad = 0;
-
-    __int16 shRef = 0;
-    __int16 evRef = 0;
-    __int16 rFireRef = 0;
-    __int16 rColdRef = 0;
-    __int16 rElecRef = 0;
-    __int16 rCorrRef = 0;
-    __int16 rRadRef = 0;
-
-    std::vector<SkillData> skillList;
-    walkFlag walkMode = walkFlag::walk;
-    relationFlag relation = relationFlag::hostile;
-    __int16 HP = 100;
-    __int16 MP = 100;
-    __int16 maxHP = 100;
-    __int16 maxMP = 100;
-    __int16 fakeHP = 100;
-    unsigned __int8 fakeHPAlpha = 255;
-    __int16 fakeMP = 100;
-    unsigned __int8 fakeMPAlpha = 255;
-
-    bool isPlayer = false;
-    __int8 direction = 0;
-    std::unique_ptr<ItemPocket> equipment;
-    __int16 sprIndex = 0;
-    __int16 sprIndexInfimum = 0;
-
-    Sprite* entitySpr = nullptr;
-    double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
-    __int8 hpBarHeight = -12;
-
-    humanCustom::skin skin = humanCustom::skin::null;
-    humanCustom::eyes eyes = humanCustom::eyes::null;
-    humanCustom::scar scar = humanCustom::scar::null;
-    humanCustom::beard beard = humanCustom::beard::null;
-    humanCustom::hair hair = humanCustom::hair::null;
-    humanCustom::horn horn = humanCustom::horn::null;
-
-    bool useWalkLeftSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 왼발을 내딛는 스프라이트를 그림
-    bool useWalkRightSpr = false;//좀비나 플레이어가 걸을때, 이게 활성화되면 오른발을 내딛는 스프라이트를 그림
-
-    sprFlag sprState = sprFlag::stand;
-
-
-
-
-    //////////////////////////////////////////////////
+    SDL_Color flash = { 0,0,0,0 };
+    EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     virtual ~Entity();
 
@@ -142,7 +56,6 @@ public:
     void setAtkTarget(int inputX, int inputY, int inputZ, int inputPart);
     void setAtkTarget(int inputX, int inputY, int inputZ);
     ItemPocket* getEquipPtr();
-    //void addEquipFromDex(int index, equip inputState);
     bool getLeftFoot();
     void setLeftFoot(bool input);
     void setSpriteInfimum(int inputVal);
@@ -153,6 +66,7 @@ public:
 
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType);
     float endAtk();
+    void loadDataFromDex(int index);
     void addDmg(int inputDmg);
     void updateStatus();
     int getRPierce(int inputPartIndex);
@@ -172,7 +86,7 @@ public:
     void updateWalkable(int gridX, int gridY);
     void rayCasting(int x1, int y1, int x2, int y2);
     void rayCastingDark(int x1, int y1, int x2, int y2);
-    void startFlash(int inputFlashType);
+    void stepEvent();
     void drop(ItemPocket* txPtr);
     void throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY);
 
@@ -189,7 +103,6 @@ public:
     int getAimWeaponIndex();
 
     void pullEquipLights();
-    PartData* getPart(const std::wstring& partName);
-    virtual void drawSelf() = 0;
 
+    virtual void drawSelf() override;
 };

@@ -49,7 +49,7 @@ public:
         sprite = new Sprite(renderer, drawingTexture, textureW, textureH);
     }
 
-    Damage(std::wstring inputStr, SDL_Color inputCol, int gridX, int gridY, dmgAniFlag inputFlag )
+    Damage(std::wstring inputStr, SDL_Color inputCol, int gridX, int gridY, dmgAniFlag inputFlag)
     {
         myDmgAniFlag = inputFlag;
 
@@ -71,7 +71,7 @@ public:
         SDL_RenderClear(renderer);
         int epsilonW = getEpsilonTextWidth(letters);
         int epsilonH = getEpsilonTextHeight();
-        drawEplsionText(letters, textureW / 2 - epsilonW/2, textureH / 2 - epsilonH/2, inputCol, col::black);
+        drawEplsionText(letters, textureW / 2 - epsilonW / 2, textureH / 2 - epsilonH / 2, inputCol, col::black);
 
 
         SDL_SetRenderTarget(renderer, nullptr);

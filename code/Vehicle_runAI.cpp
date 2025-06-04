@@ -295,7 +295,7 @@ bool Vehicle::runAI()
                     if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                 }
                 cameraFix = false;
-                PlayerPtr->updateVision(PlayerPtr->eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
             }
 
             if (gearState == gearFlag::drive)

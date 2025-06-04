@@ -1,6 +1,6 @@
-﻿#include <SDL3/SDL.h>
+﻿import Craft;
 
-import Craft;
+#include <SDL3/SDL.h>
 
 import globalVar;
 import wrapVar;

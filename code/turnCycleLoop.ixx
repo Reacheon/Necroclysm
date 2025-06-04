@@ -51,14 +51,14 @@ export __int64 turnCycleLoop()
 
 	//for (auto* ePtr : entityList)
 	//{
-	//	if (ePtr->fakeHP > ePtr->HP) { ePtr->fakeHP--; }
+	//	if (ePtr->entityInfo.fakeHP > ePtr->entityInfo.HP) { ePtr->entityInfo.fakeHP--; }
 
-	//	if (ePtr->fakeHP != ePtr->HP)
+	//	if (ePtr->entityInfo.fakeHP != ePtr->entityInfo.HP)
 	//	{
-	//		if (ePtr->fakeHPAlpha > 30) { ePtr->fakeHPAlpha -= 30; }
-	//		else { ePtr->fakeHPAlpha = 0; }
+	//		if (ePtr->entityInfo.fakeHPAlpha > 30) { ePtr->entityInfo.fakeHPAlpha -= 30; }
+	//		else { ePtr->entityInfo.fakeHPAlpha = 0; }
 	//	}
-	//	else { ePtr->fakeHPAlpha = 255; }
+	//	else { ePtr->entityInfo.fakeHPAlpha = 255; }
 	//}
 
 	__int64 playerInputTime = 0, animationTime = 0, entityAITime = 0;
@@ -420,11 +420,11 @@ __int64 entityAITurn()
 		//턴사이클 모두 종료
 		for (auto ePtr : entityList)
 		{
-			for (auto it = ePtr->statusEffects.begin(); it != ePtr->statusEffects.end();)
+			for (auto it = ePtr->entityInfo.statusEffects.begin(); it != ePtr->entityInfo.statusEffects.end();)
 			{
 				if (it->second > 0) it->second--;
 
-				if (it->second == 0) it = ePtr->statusEffects.erase(it);
+				if (it->second == 0) it = ePtr->entityInfo.statusEffects.erase(it);
 				else it++;
 			}
 		}

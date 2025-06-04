@@ -68,7 +68,10 @@ export void debugConsole()
 	case 2: // generateEntity
 	{
 		Player* ptr = PlayerPtr;
-		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, entityRefCode::zombieA);
+		int inputEntityCode;
+		prt(L"생성할 몬스터의 코드를 입력해주세요.\n");
+		std::cin >> inputEntityCode;
+		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, inputEntityCode);
 		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
@@ -317,7 +320,7 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		PlayerPtr->statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
+		PlayerPtr->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}

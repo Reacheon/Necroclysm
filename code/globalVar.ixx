@@ -1,7 +1,8 @@
-﻿#include <SDL3/SDL.h>
+﻿module;
+
+#include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <sol/sol.hpp>
-
 
 #define 낮 { 0xFF,0xF8,0xED }
 #define 황혼 { 0x79,0x87,0xff}
@@ -13,6 +14,7 @@ import std;
 import util;
 import constVar;
 import ItemData;
+import EntityData;
 import SkillData;
 import Ani;
 import AlchemyData;
@@ -29,7 +31,7 @@ export namespace actSet
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
     std::vector<act> train = { act::rpmLever, act::wait, act::brake, act::startEngine, act::shiftGear, act::blank,act::blank };
 
-    std::vector<act> bionicActive= {act::skillActive, act::quickSlot};
+    std::vector<act> bionicActive = { act::skillActive, act::quickSlot };
     std::vector<act> bionicToggle = { act::skillToggle, act::quickSlot };
 
     std::vector<act> mutationActive = { act::skillActive, act::quickSlot };
@@ -67,6 +69,7 @@ export bool quit = false;// true일 경우 게임을 종료시킴
 export bool stopLog = false; // 로그를 멈춘다. 시간이 지나도 사라지지 않음
 export float timeGift = 0; // 유저의 행동에 의해 엔티티들에게 주어지는 시간
 
+export std::vector<EntityData> entityDex; // Entity DB
 export std::vector<ItemData> itemDex;// 아이템 DB
 export std::vector<AlchemyData> alchemyDex; //연금술 조합 DB
 export std::vector<SkillData> skillDex; //스킬 DB
@@ -154,13 +157,13 @@ export Player* PlayerPtr = nullptr;
 
 export namespace dur
 {
-	__int64 turnCycle = 0;
-	__int64 stepEvent = 0;
-	__int64 renderTile = 0;
+    __int64 turnCycle = 0;
+    __int64 stepEvent = 0;
+    __int64 renderTile = 0;
     __int64 renderWeather = 0;
-	__int64 renderSticker = 0;
-	__int64 renderUI = 0;
-	__int64 renderLog = 0;
+    __int64 renderSticker = 0;
+    __int64 renderUI = 0;
+    __int64 renderLog = 0;
 
     __int64 analysis = 0;
     __int64 tile = 0;
@@ -232,7 +235,7 @@ public:
     int dstY = 0;
     int alpha = 255;
     double length = 20.0;
-    double angle = 82.0*(3.141592/180.0);
+    double angle = 82.0 * (3.141592 / 180.0);
     double velocity = 20.0;
 
     Raindrop(int inputDstX, int inputDstY)
@@ -316,4 +319,3 @@ namespace std
         }
     };
 }
-

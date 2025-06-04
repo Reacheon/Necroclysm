@@ -1,39 +1,37 @@
-﻿#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
+﻿import Entity;
 
-import Entity;
+#include <SDL3/SDL.h>
+
 import std;
+import util;
 import globalVar;
 import wrapVar;
 import constVar;
-import textureVar;
 import log;
 import Sprite;
 import Ani;
-import constVar;
 import Coord;
 import World;
-import Sticker;
 import ItemStack;
+import EntityData;
 import ItemData;
 import Damage;
-import util;
-import Drawable;
-import drawSprite;
 import SkillData;
 import Flame;
 import Vehicle;
-import drawText;
+
+
 
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
 	prt(L"Entity : 생성자가 호출되었습니다!\n");
+	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
-	equipment = std::make_unique<ItemPocket>(storageType::equip);
-	proficFocus[0] = 1;
+	entityInfo.equipment = std::make_unique<ItemPocket>(storageType::equip);
+	entityInfo.proficFocus[0] = 1;
 
-	for (int i = 0; i < TALENT_SIZE; i++) proficApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
@@ -52,7 +50,7 @@ Point3 Entity::getSkillTarget() { return skillTarget; }
 void Entity::addSkill(int index)
 {
 	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
-	skillList.push_back(skillDex[index]);
+	entityInfo.skillList.push_back(skillDex[index]);
 }
 
 
@@ -74,21 +72,20 @@ void Entity::setAtkTarget(int inputX, int inputY, int inputZ)
 }
 ItemPocket* Entity::getEquipPtr()
 {
-	return equipment.get();
+	return entityInfo.equipment.get();
 }
-
 bool Entity::getLeftFoot() { return leftFoot; }
 void Entity::setLeftFoot(bool input) { leftFoot = input; }
-void Entity::setSpriteInfimum(int inputVal) { sprIndexInfimum = inputVal; }
-int Entity::getSpriteInfimum() { return sprIndexInfimum; }
-void Entity::setSpriteIndex(int index) { sprIndex = index; }
-int Entity::getSpriteIndex() { return sprIndex; }
+void Entity::setSpriteInfimum(int inputVal) { entityInfo.sprIndexInfimum = inputVal; }
+int Entity::getSpriteInfimum() { return entityInfo.sprIndexInfimum; }
+void Entity::setSpriteIndex(int index) { entityInfo.sprIndex = index; }
+int Entity::getSpriteIndex() { return entityInfo.sprIndex; }
 void Entity::setDirection(int dir)
 {
-	direction = dir;
+	entityInfo.direction = dir;
 	if (dir == 2 || dir == 6) {}
-	else if (dir == 0 || (dir == 1 || dir == 7)) { entityFlip = false; }
-	else { entityFlip = true; }
+	else if (dir == 0 || (dir == 1 || dir == 7)) { entityInfo.sprFlip = false; }
+	else { entityInfo.sprFlip = true; }
 }
 void Entity::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
@@ -100,12 +97,18 @@ float Entity::endAtk()
 	setAniType(aniFlag::null);
 	return 1 / 0.8; //원래 여기에 공격속도가 들어가야함
 }
+void Entity::loadDataFromDex(int index)
+{
+	entityInfo = entityDex[index].cloneEntity();
+	entityInfo.HP = entityInfo.maxHP;
+	entityInfo.fakeHP = entityInfo.maxHP;
+}
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
 void Entity::addDmg(int inputDmg)
 {
 	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
-	HP -= inputDmg;
-	if (HP <= 0)//HP 0, 사망
+	entityInfo.HP -= inputDmg;
+	if (entityInfo.HP <= 0)//HP 0, 사망
 	{
 		death();
 		return;
@@ -117,52 +120,52 @@ void Entity::updateStatus()
 	//rPCB rFCECR SH EV 등을 업데이트함
 
 	//sh
-	sh =shRef;//기본 개체값으로 재설정
+	entityInfo.sh = entityDex[entityInfo.entityCode].sh;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		sh += getEquipPtr()->itemInfo[i].sh;
+		entityInfo.sh += getEquipPtr()->itemInfo[i].sh;
 	}
 
 	//ev
-	ev = evRef;//기본 개체값으로 재설정
+	entityInfo.ev = entityDex[entityInfo.entityCode].ev;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		ev += getEquipPtr()->itemInfo[i].ev;
+		entityInfo.ev += getEquipPtr()->itemInfo[i].ev;
 	}
 
 	//rFire
-	rFire = rFireRef;//기본 개체값으로 재설정
+	entityInfo.rFire = entityDex[entityInfo.entityCode].rFire;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		rFire += getEquipPtr()->itemInfo[i].rFire;
+		entityInfo.rFire += getEquipPtr()->itemInfo[i].rFire;
 	}
 
 	//rCold
-	rCold = rColdRef;//기본 개체값으로 재설정
+	entityInfo.rCold = entityDex[entityInfo.entityCode].rCold;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		rCold += getEquipPtr()->itemInfo[i].rCold;
+		entityInfo.rCold += getEquipPtr()->itemInfo[i].rCold;
 	}
 
 	//rElec
-	rElec = rElecRef;//기본 개체값으로 재설정
+	entityInfo.rElec = entityDex[entityInfo.entityCode].rElec;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		rElec += getEquipPtr()->itemInfo[i].rElec;
+		entityInfo.rElec += getEquipPtr()->itemInfo[i].rElec;
 	}
 
 	//rCorr
-	rCorr = rCorrRef;//기본 개체값으로 재설정
+	entityInfo.rCorr = entityDex[entityInfo.entityCode].rCorr;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		rCorr += getEquipPtr()->itemInfo[i].rCorr;
+		entityInfo.rCorr += getEquipPtr()->itemInfo[i].rCorr;
 	}
 
 	//rRad
-	rRad = rRadRef;//기본 개체값으로 재설정
+	entityInfo.rRad = entityDex[entityInfo.entityCode].rRad;//기본 개체값으로 재설정
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)//장비를 기준으로 값 업데이트
 	{
-		rRad += getEquipPtr()->itemInfo[i].rRad;
+		entityInfo.rRad += getEquipPtr()->itemInfo[i].rRad;
 	}
 }
 //입력한 파츠 인덱스의 rPierce를 반환
@@ -189,7 +192,7 @@ int Entity::getSH()
 	int totalSH = 0;
 
 	//기본 개체값 더하기
-	totalSH += sh;
+	totalSH += entityInfo.sh;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
@@ -203,7 +206,7 @@ int Entity::getEV()
 	int totalEV = 0;
 
 	//기본 개체값 더하기
-	totalEV += ev;
+	totalEV += entityInfo.ev;
 
 	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
 	{
@@ -262,14 +265,16 @@ void Entity::move(int dir, bool jump)
 	int dstGridX = (dstX - 8) / 16;
 	int dstGridY = (dstY - 8) / 16;
 
+	errorBox(dGridX == 0 && dGridY == 0, L"Entity::move에서 같은 좌표로 이동했다.");
+
 
 	if (jump == false)
 	{
-		if (walkMode == walkFlag::run) gridMoveSpd = 3.5;
-		else if (walkMode == walkFlag::wade) gridMoveSpd = 1.8;
-		else if (walkMode == walkFlag::walk) gridMoveSpd = 3.0;
-		else if (walkMode == walkFlag::crawl || walkMode == walkFlag::swim) gridMoveSpd = 2.0;
-		else if (walkMode == walkFlag::crouch) gridMoveSpd = 2.0;
+		if (entityInfo.walkMode == walkFlag::run) entityInfo.gridMoveSpd = 3.5;
+		else if (entityInfo.walkMode == walkFlag::wade) entityInfo.gridMoveSpd = 1.8;
+		else if (entityInfo.walkMode == walkFlag::walk) entityInfo.gridMoveSpd = 3.0;
+		else if (entityInfo.walkMode == walkFlag::crawl || entityInfo.walkMode == walkFlag::swim) entityInfo.gridMoveSpd = 2.0;
+		else if (entityInfo.walkMode == walkFlag::crouch) entityInfo.gridMoveSpd = 2.0;
 
 		if (pulledCart != nullptr)
 		{
@@ -281,13 +286,13 @@ void Entity::move(int dir, bool jump)
 			addAniUSet(pulledCart, aniFlag::move);
 
 			pulledCart->shift(dx, dy);
-			pulledCart->pullMoveSpd = gridMoveSpd;
+			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
 		}
 
-		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX()+dGridX, getGridY()+dGridY, getGridZ() });
-		setFakeX(-16*dGridX);
-		setFakeY(-16*dGridY);
-		if (isPlayer)
+		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX() + dGridX, getGridY() + dGridY, getGridZ() });
+		setFakeX(-16 * dGridX);
+		setFakeY(-16 * dGridY);
+		if (entityInfo.isPlayer)
 		{
 			cameraFix = false;
 			cameraX = getX() + getIntegerFakeX();
@@ -318,17 +323,13 @@ void Entity::attack(int gridX, int gridY)
 	}
 	else
 	{
-		float totalAcc = 1.0f;
-		for (int i = 0; i < victimEntity->parts.size(); i++)
-		{
-			totalAcc += victimEntity->parts[i].accRate;
-		}
-		totalAcc /= (float)victimEntity->parts.size();
-
 		//명중률 계산
-		if (totalAcc * 100.0 > randomRange(0, 100))
+		float aimAcc;
+		aimAcc = 0.98;
+
+		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
-			victimEntity->flash = { 255, 255, 255, 220 };
+			victimEntity->flash = { 255, 0, 0, 120 };
 			victimEntity->addDmg(randomRange(6, 10));
 		}
 		else
@@ -516,6 +517,9 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 		}
 	}
 }
+void Entity::stepEvent()
+{
+}
 
 void Entity::drop(ItemPocket* txPtr)
 {
@@ -560,7 +564,7 @@ void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getProficLevel(int index)
 {
-	float exp = proficExp[index];
+	float exp = entityInfo.proficExp[index];
 
 	if (exp < expTable[0]) return 1.0f + exp / expTable[0];
 
@@ -585,22 +589,22 @@ void Entity::addProficExp(int expVal)
 	int divider = 0;
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		divider += proficFocus[i];
+		divider += entityInfo.proficFocus[i];
 	}
 	errorBox(divider == 0, L"You need to enable at least one profic(divider=0 at addProficExp).");
 	int frag = floor((float)(expVal) / (float)divider);
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		proficExp[i] += (frag * proficFocus[i]);
+		entityInfo.proficExp[i] += (frag * entityInfo.proficFocus[i]);
 	}
 	//만렙이 된 재능의 포커스 해제
 	for (int i = 0; i < TALENT_SIZE; i++)
 	{
-		if (proficFocus[i] > 0)
+		if (entityInfo.proficFocus[i] > 0)
 		{
 			if (getProficLevel(i) >= 18)
 			{
-				proficFocus[i] = 0;
+				entityInfo.proficFocus[i] = 0;
 			}
 		}
 	}
@@ -652,21 +656,6 @@ int Entity::getAimWeaponIndex()
 	}
 }
 
-//void Entity::setPulledVehicle(Vehicle* inputVeh) { pulledCart = inputVeh; }
-//void Entity::releasePulledVehicle() { pulledCart = nullptr; }
-//bool Entity::hasPulledVehicle() { return (pulledCart != nullptr); }
-//Vehicle* Entity::getPulledVehicle() { return pulledCart; }
-
-PartData* Entity::getPart(const std::wstring& partName)
-{
-	for (int i = 0; i < parts.size(); i++)
-	{
-		if (parts[i].partName == partName) return &(parts[i]);
-
-		if (i == parts.size() - 1) return nullptr;
-	}
-}
-
 
 void Entity::pullEquipLights()
 {
@@ -674,7 +663,7 @@ void Entity::pullEquipLights()
 	{
 		if (getEquipPtr()->itemInfo[i].lightPtr != nullptr)
 		{
-            getEquipPtr()->itemInfo[i].lightPtr.get()->moveLight(getGridX(), getGridY(), getGridZ());
+			getEquipPtr()->itemInfo[i].lightPtr.get()->moveLight(getGridX(), getGridY(), getGridZ());
 		}
 	}
 }

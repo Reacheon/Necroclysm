@@ -1,6 +1,7 @@
-﻿#include <SDL3/SDL.h>
+﻿import HUD;
 
-import HUD;
+#include <SDL3/SDL.h>
+
 import std;
 import util;
 import globalVar;
@@ -159,7 +160,7 @@ void HUD::gamepadStep()
 										tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 									}
 
-									PlayerPtr->updateVision(PlayerPtr->eyeSight);
+									PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 								}
 							}
 						}

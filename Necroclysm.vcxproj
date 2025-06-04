@@ -182,6 +182,9 @@
     <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\drawPrimitive.ixx" />
     <ClCompile Include="code\Entity.cpp" />
+    <ClCompile Include="code\EntityData.cpp" />
+    <ClCompile Include="code\EntityData.ixx" />
+    <ClCompile Include="code\Entity_drawSelf.ixx" />
     <ClCompile Include="code\Entity_runAnimation.cpp" />
     <ClCompile Include="code\Equip_draw.ixx" />
     <ClCompile Include="code\Equip_input_gamepad.ixx" />
@@ -232,7 +235,8 @@
     <ClCompile Include="code\Entity.ixx" />
     <ClCompile Include="code\Inventory_draw.ixx" />
     <ClCompile Include="code\ItemData.cpp" />
-    <ClCompile Include="code\ItemDataBase.ixx" />
+    <ClCompile Include="code\ItemData.ixx" />
+    <ClCompile Include="code\ItemData_base.ixx" />
     <ClCompile Include="code\ItemPocket.cpp" />
     <ClCompile Include="code\ItemPocket.ixx" />
     <ClCompile Include="code\ItemStack.cpp" />
@@ -244,7 +248,7 @@
     <ClCompile Include="code\Maint.ixx" />
     <ClCompile Include="code\Monster.cpp" />
     <ClCompile Include="code\mouseWheel.ixx" />
-    <ClCompile Include="code\Player_drawSelf.ixx" />
+    <ClCompile Include="code\readEntityDex.ixx" />
     <ClCompile Include="code\sequenceCounter.ixx" />
     <ClCompile Include="code\Particle.ixx" />
     <ClCompile Include="code\Player.cpp" />
@@ -278,7 +282,6 @@
     <ClCompile Include="code\hasher.ixx" />
     <ClCompile Include="code\HSVConverter.ixx" />
     <ClCompile Include="code\isCircle.ixx" />
-    <ClCompile Include="code\ItemData.ixx" />
     <ClCompile Include="code\ItemStack.ixx" />
     <ClCompile Include="code\Light.ixx" />
     <ClCompile Include="code\log.ixx" />

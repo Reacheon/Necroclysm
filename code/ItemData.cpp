@@ -131,4 +131,3 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
 
     return true;
 }
-

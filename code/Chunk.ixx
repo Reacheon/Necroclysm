@@ -21,7 +21,7 @@ public:
 	{
 		//prt(lowCol::green, L"Chunk : 소멸자가 호출되었습니다..\n");
 	}
-	TileData& getChunkTile(int x, int y){return singleTile[y][x];}
+	TileData& getChunkTile(int x, int y) { return singleTile[y][x]; }
 
 	void chunkLoad(chunkFlag inputChunk)
 	{
@@ -111,8 +111,8 @@ public:
 
 
 	Vehicle* getChunkVehiclePos(int x, int y) { return (Vehicle*)getChunkTile(x, y).VehiclePtr; }
-	void setChunkVehiclePos(int x, int y, Vehicle* inputPtr) { prt(lowCol::green, L"Chunk : %d,%d에 Vehicle %p를 배정했다.\n",x,y,inputPtr); getChunkTile(x, y).VehiclePtr = inputPtr; }
-	
+	void setChunkVehiclePos(int x, int y, Vehicle* inputPtr) { prt(lowCol::green, L"Chunk : %d,%d에 Vehicle %p를 배정했다.\n", x, y, inputPtr); getChunkTile(x, y).VehiclePtr = inputPtr; }
+
 	std::vector<Entity*> getChunkEntityList()
 	{
 		std::vector<Entity*> entityList;

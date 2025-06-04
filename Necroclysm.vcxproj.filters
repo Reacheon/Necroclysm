@@ -180,9 +180,6 @@
     <ClCompile Include="code\GUI.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemData.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\ItemStack.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
@@ -369,9 +366,6 @@
     <ClCompile Include="code\drawWindowArrow.ixx">
       <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
-    <ClCompile Include="code\constVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
     <ClCompile Include="code\actFuncSet.ixx">
       <Filter>소스 파일\01_system\04_GUI\act</Filter>
     </ClCompile>
@@ -537,14 +531,8 @@
     <ClCompile Include="code\ItemStack.cpp">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemData.cpp">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\sequenceCounter.ixx">
       <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\wrapVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\Monster.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
@@ -552,17 +540,38 @@
     <ClCompile Include="code\GameOver.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\ItemDataBase.ixx">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
     <ClCompile Include="code\Player.ixx">
       <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
     </ClCompile>
     <ClCompile Include="code\Player.cpp">
       <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
     </ClCompile>
-    <ClCompile Include="code\Player_drawSelf.ixx">
-      <Filter>소스 파일\05_Class\01_Entity\Player</Filter>
+    <ClCompile Include="code\ItemData_base.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\EntityData.cpp">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\EntityData.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\readEntityDex.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="code\wrapVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\constVar.ixx">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ItemData.ixx">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\ItemData.cpp">
+      <Filter>소스 파일\05_Class\02_Item</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Entity_drawSelf.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

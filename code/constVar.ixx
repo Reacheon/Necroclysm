@@ -1,4 +1,6 @@
-﻿#include <SDL3/SDL.h>
+﻿module;
+
+#include <SDL3/SDL.h>
 
 export module constVar;
 
@@ -614,7 +616,7 @@ export enum class aniFlag
     popUpSingleLetterbox,
 
     shotSingle,
-    
+
     shotBurst,
     shotAuto,
     shotArrow,
@@ -657,7 +659,7 @@ export enum class tabFlag
     back,
     confirm,
     aim,
-  
+
 };
 
 export enum class sortFlag
@@ -781,7 +783,7 @@ export namespace keyIcon
     constexpr int duelSense_TRI = 87;
     constexpr int duelSense_LStick = 88;
     constexpr int duelSense_RStick = 89;
-  
+
     constexpr int duelSense_RIGHT = 90;
     constexpr int duelSense_TOP = 91;
     constexpr int duelSense_LEFT = 92;
@@ -810,7 +812,7 @@ export namespace keyIcon
     constexpr int joyCon_PLUS = 110;
     constexpr int joycon_MINUS = 111;
 
-    
+
 };
 
 export namespace sprInf
@@ -905,6 +907,7 @@ export namespace entityCategory
     constexpr int human = 1;
     constexpr int zombie = 2;
     constexpr int robot = 3;
+    constexpr int animal = 4;
 };
 
 export namespace bulletFlag
@@ -1250,11 +1253,11 @@ export enum class gasFlag
 
 export enum statEfctFlag
 {
-    confusion=0,
-    bleeding=1,
-    hunger=2,
-    dehydration=3,
-    blindness=4,
+    confusion = 0,
+    bleeding = 1,
+    hunger = 2,
+    dehydration = 3,
+    blindness = 4,
 };
 
 export enum charSprIndex

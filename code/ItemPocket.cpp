@@ -1,7 +1,7 @@
-﻿#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
+﻿import ItemPocket;
 
-import ItemPocket;
+#include <SDL3/SDL.h>
+
 import std;
 import util;
 import World;
@@ -47,7 +47,7 @@ void ItemPocket::subtractItemCode(int code, int number)
 		{
 			int amountToRemove = myMin(number - totalRemovedCount, itemInfo[i].number);
 
-			if (amountToRemove > 0) 
+			if (amountToRemove > 0)
 			{
 				subtractItemIndex(i, amountToRemove);
 				totalRemovedCount += amountToRemove;
@@ -94,18 +94,18 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 
 	//일치하는 아이템을 찾지 못했을 경우 그 아이템을 위해 새로운 행을 추가함
 	int destinationIndex = -1;
-	if (transferWholeStack) 
+	if (transferWholeStack)
 	{
-		if(storagePtr->type != storageType::equip) itemInfo[index].equipState = equipHandFlag::none;
+		if (storagePtr->type != storageType::equip) itemInfo[index].equipState = equipHandFlag::none;
 		storagePtr->itemInfo.push_back(std::move(itemInfo[index]));
 		destinationIndex = storagePtr->itemInfo.size() - 1;
 		eraseItemInfo(index);
 	}
-	else 
+	else
 	{
 		ItemData newItem = itemInfo[index].cloneForTransfer(number);
 		newItem.codeID = genItemID();
-		storagePtr->itemInfo.push_back(std::move(newItem)); 
+		storagePtr->itemInfo.push_back(std::move(newItem));
 		destinationIndex = storagePtr->itemInfo.size() - 1;
 		subtractItemIndex(index, number);
 	}
@@ -370,7 +370,7 @@ int ItemPocket::numberItem(int inputCode, int currentDepth)
 	{
 		if (itemInfo[i].itemCode == inputCode) count += itemInfo[i].number;
 
-		if (itemInfo[i].pocketPtr != nullptr) 
+		if (itemInfo[i].pocketPtr != nullptr)
 		{
 			int subCount = itemInfo[i].pocketPtr->numberItem(inputCode, currentDepth + 1);
 			count += subCount;
@@ -405,7 +405,7 @@ int ItemPocket::getPocketVolume()
 	int totalVolume = 0;
 	for (int i = 0; i < itemInfo.size(); i++)
 	{
-        totalVolume += itemInfo[i].volume * itemInfo[i].number;
+		totalVolume += itemInfo[i].volume * itemInfo[i].number;
 	}
 	return totalVolume;
 }
@@ -417,7 +417,7 @@ int ItemPocket::getPocketWeight()
 	{
 		totalWeight += itemInfo[i].weight * itemInfo[i].number;
 	}
-    return totalWeight;
+	return totalWeight;
 }
 
 int ItemPocket::getPocketNumber()
@@ -427,7 +427,7 @@ int ItemPocket::getPocketNumber()
 	{
 		totalNumber += itemInfo[i].number;
 	}
-    return totalNumber;
+	return totalNumber;
 }
 
 
@@ -493,7 +493,6 @@ int countPocketItemNumber(ItemPocket* inputPtr)
 	}
 	return number;
 };
-
 
 
 

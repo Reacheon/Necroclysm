@@ -1,6 +1,7 @@
-﻿#include <SDL3/SDL.h>
+﻿import ItemStack;
 
-import ItemStack;
+#include <SDL3/SDL.h>
+
 import std;
 import util;
 import globalVar;

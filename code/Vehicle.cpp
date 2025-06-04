@@ -1,7 +1,7 @@
-﻿#include <SDL3/SDL.h>
+﻿import Vehicle;
 
+#include <SDL3/SDL.h>
 
-import Vehicle;
 import std;
 import globalVar;
 import wrapVar;
@@ -522,7 +522,7 @@ void Vehicle::rush(int dx, int dy)
     }
 
     updateHeadlight(getClosestGridWithFake());
-    if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
+    if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
 
     addAniUSetMonster(this, aniFlag::propRush);
 }
@@ -685,7 +685,7 @@ bool Vehicle::runAnimation(bool shutdown)
                         for (int j = lineCheck; j <= i; j++)
                         {
                             updateHeadlight({ startPoint.x + lineRevPath[i][0],startPoint.y + lineRevPath[i][1],getGridZ() });
-                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i][0], startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i][1]);
+                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i][0], startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i][1]);
                             lineCheck++;
                         }
                     }
@@ -715,7 +715,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
 
                 cameraFix = true;
-                PlayerPtr->updateVision(PlayerPtr->eyeSight);
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
                 resetTimer();
                 setAniType(aniFlag::null);
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), this));
@@ -765,7 +765,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getTimer() >= 4)
             {
-                PlayerPtr->updateVision(PlayerPtr->eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
+                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
                 //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 singleRailMoveVec.erase(singleRailMoveVec.begin());
                 resetTimer();
@@ -776,7 +776,7 @@ bool Vehicle::runAnimation(bool shutdown)
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
-            PlayerPtr->updateVision(PlayerPtr->eyeSight);
+            PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
             PlayerPtr->updateMinimap();
             cameraFix = true;
             resetTimer();

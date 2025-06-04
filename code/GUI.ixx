@@ -7,7 +7,6 @@ import util;
 import Ani;
 import Coord;
 import globalVar;
-import wrapVar;
 import Player;
 
 

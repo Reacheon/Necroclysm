@@ -1,6 +1,7 @@
-﻿#include <SDL3/SDL.h>
+﻿import Loot;
 
-import Loot;
+#include <SDL3/SDL.h>
+
 import globalVar;
 import wrapVar;
 import constVar;

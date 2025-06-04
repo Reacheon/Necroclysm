@@ -1,12 +1,8 @@
-﻿#include <SDL3/SDL.h>
-#include <SDL3_image/SDL_image.h>
-
-export module ItemPocket;
+﻿export module ItemPocket;
 
 import std;
 import util;
 import constVar;
-import ItemData;
 
 export class ItemPocket
 {
@@ -101,5 +97,4 @@ export int getBulletNumber(ItemData& inputGun);
 
 //입력한 포켓의 내부 아이템 수를 반환
 export int countPocketItemNumber(ItemPocket* inputPtr);
-
 

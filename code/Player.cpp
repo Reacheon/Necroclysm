@@ -1,6 +1,7 @@
-﻿#include <SDL3/SDL.h>
+﻿import Player;
 
-import Player;
+#include <SDL3/SDL.h>
+
 import std;
 import util;
 import Entity;
@@ -14,27 +15,17 @@ import ItemData;
 import nanoTimer;
 import globalTime;
 import Footprint;
-import TileData;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
 
-	entityCode = entityRefCode::player;
-	entitySpr = spr::charsetHero;
-	skin = humanCustom::skin::yellow;
-	eyes = humanCustom::eyes::blue;
-	hair = humanCustom::hair::bob1Black;
+	entityInfo.skin = humanCustom::skin::yellow;
+	entityInfo.eyes = humanCustom::eyes::blue;
+	entityInfo.hair = humanCustom::hair::bob1Black;
 
-	parts.emplace_back(PartData{ .partName = L"몸통", .accRate = 1.0f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"머리", .accRate = 0.6f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"왼팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"오른팔", .accRate = 0.9f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"왼다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-	parts.emplace_back(PartData{ .partName = L"오른다리", .accRate = 0.7f, .maxHP = 100, .currentHP = 100, .resPierce = 0, .resCut = 0, .resBash = 0 });
-
-	isPlayer = true;
+	entityInfo.isPlayer = true;
 
 	int i = 0;
 
@@ -80,7 +71,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	addSkill(1);
 	quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 
-	for (int i = 0; i < TALENT_SIZE; i++) proficApt[i] = 2.0;
+	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Player::~Player()
 {
@@ -114,7 +105,7 @@ void Player::startMove(int inputDir)
 			player->setDirection(inputDir);
 			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemRefCode::sandFloor)
 			{
-				new Footprint(getGridX(), getGridY(), direction);
+				new Footprint(getGridX(), getGridY(), entityInfo.direction);
 			}
 			player->move(inputDir, false);
 			turnCycle = turn::playerAnime;
@@ -252,7 +243,7 @@ void Player::updateVision(int range) {
 
 void Player::updateVision() 
 {
-	updateVision(eyeSight, getGridX(), getGridY());
+	updateVision(entityInfo.eyeSight, getGridX(), getGridY());
 }
 
 void Player::updateNearbyChunk(int range)
@@ -320,32 +311,32 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
 
-	if (PlayerPtr->walkMode == walkFlag::run)
+	if (PlayerPtr->entityInfo.walkMode == walkFlag::run)
 	{
-		stamina -= 7;
-		if (stamina < 0)
+		entityInfo.STA -= 7;
+		if (entityInfo.STA < 0)
 		{
-			stamina = 0;
-			walkMode = walkFlag::walk;
+			entityInfo.STA = 0;
+			entityInfo.walkMode = walkFlag::walk;
 		}
 	}
 
 
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 	{
-		walkMode = walkFlag::wade;
+		entityInfo.walkMode = walkFlag::wade;
 	}
 	else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 	{
-		walkMode = walkFlag::swim;
+		entityInfo.walkMode = walkFlag::swim;
 	}
-	else if (walkMode == walkFlag::swim || walkMode == walkFlag::wade)
+	else if (entityInfo.walkMode == walkFlag::swim || entityInfo.walkMode == walkFlag::wade)
 	{
-		walkMode = walkFlag::walk;
+		entityInfo.walkMode = walkFlag::walk;
 	}
 
 	
-	updateVision(eyeSight);
+	updateVision(entityInfo.eyeSight);
 	updateMinimap();
 	if (getHasAStarDst())
 	{

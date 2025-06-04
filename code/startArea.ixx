@@ -42,7 +42,7 @@ export void startArea()
 
 	createItemStack({ 2, 1, 0 }, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
-		{itemRefCode::katana, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
+		{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
 		{17, 1}, {18, 1}, {4, 1}, {5, 8}, {88, 1}, {89, 1000},
 		{91, 1000}, {82, 1},{389,1}, {386,2}, {387,1}
 		}
@@ -60,16 +60,18 @@ export void startArea()
 	//활과 석궁
 	createItemStack({ 3, 8, 0 }, { {383,1} });
 	createItemStack({ 4, 8, 0 }, { {385,30} });
-	createItemStack({3, 9, 0 }, { {382,1} });
-	createItemStack({4, 9, 0 }, { {384,30} });
+	createItemStack({ 3, 9, 0 }, { {382,1} });
+	createItemStack({ 4, 9, 0 }, { {384,30} });
 
-	createItemStack({7, -4, 0 }, { {391,1} }); //벌목도끼
+	createMonster({ 8,8,0 }, 5);//허수아비
 
-	createItemStack({-5, 1, 0 }, { {394,1} }); //낚시대
+	createItemStack({ 7, -4, 0 }, { {391,1} }); //벌목도끼
 
-	createItemStack({-3, -4, -1 }, { {388,1} });//곡괭이
-	createItemStack({-2, -4, -1 }, { {393,1} });//광부헬멧
-	createItemStack({-1, -4, -1 }, { {395,1} });//삽
+	createItemStack({ -5, 1, 0 }, { {394,1} }); //낚시대
+
+	createItemStack({ -3, -4, -1 }, { {388,1} });//곡괭이
+	createItemStack({ -2, -4, -1 }, { {393,1} });//광부헬멧
+	createItemStack({ -1, -4, -1 }, { {395,1} });//삽
 
 
 
@@ -226,7 +228,7 @@ export void startArea()
 		{
 			for (int dy = -6; dy <= 20; dy++)
 			{
-				setWall({ dx, dy, -1 },397);
+				setWall({ dx, dy, -1 }, 397);
 			}
 		}
 
@@ -665,56 +667,56 @@ export void startArea()
 	setFloor({ pX + 1, pY + 4, 0 }, 220);
 
 	createProp({ pX - 2, pY + 3, 0 }, 270);//꽃 설치
-	createProp({pX - 1, pY + 3, 0 }, 265);//꽃 설치
-	createProp({pX, pY + 3, 0 }, 266);//꽃 설치
-	createProp({pX + 1, pY + 3, 0 }, 267);//꽃 설치
+	createProp({ pX - 1, pY + 3, 0 }, 265);//꽃 설치
+	createProp({ pX, pY + 3, 0 }, 266);//꽃 설치
+	createProp({ pX + 1, pY + 3, 0 }, 267);//꽃 설치
 
-	createProp({pX - 2, pY + 4, 0 }, 271);//꽃 설치
-	createProp({pX - 1, pY + 4, 0 }, 268);//꽃 설치
-	createProp({pX, pY + 4, 0 }, 269);//꽃 설치
-	createProp({pX + 1, pY + 4, 0 }, 270);//꽃 설치
+	createProp({ pX - 2, pY + 4, 0 }, 271);//꽃 설치
+	createProp({ pX - 1, pY + 4, 0 }, 268);//꽃 설치
+	createProp({ pX, pY + 4, 0 }, 269);//꽃 설치
+	createProp({ pX + 1, pY + 4, 0 }, 270);//꽃 설치
 
 
-	createProp({pX + 6, pY - 4, 0 }, 270);//꽃 설치
+	createProp({ pX + 6, pY - 4, 0 }, 270);//꽃 설치
 
-	createProp({0, -1, 0 }, 211);//전통 등 설치
-	createProp({4, 0, 0 }, 211);//볼라드 등 설치
+	createProp({ 0, -1, 0 }, 211);//전통 등 설치
+	createProp({ 4, 0, 0 }, 211);//볼라드 등 설치
 
 	//울타리 설치
-	createProp({pX - 3, pY + 2, 0 }, 206);
-	createProp({pX - 2, pY + 2, 0 }, 206);
-	createProp({pX - 1, pY + 2, 0 }, 206);
-	createProp({pX, pY + 2, 0 }, 206);
-	createProp({pX + 1, pY + 2, 0 }, 206);
-	createProp({pX + 2, pY + 2, 0 }, 206);
-	createProp({pX + 3, pY + 2, 0 }, 206);
+	createProp({ pX - 3, pY + 2, 0 }, 206);
+	createProp({ pX - 2, pY + 2, 0 }, 206);
+	createProp({ pX - 1, pY + 2, 0 }, 206);
+	createProp({ pX, pY + 2, 0 }, 206);
+	createProp({ pX + 1, pY + 2, 0 }, 206);
+	createProp({ pX + 2, pY + 2, 0 }, 206);
+	createProp({ pX + 3, pY + 2, 0 }, 206);
 
-	createProp({pX - 3, pY + 3, 0 }, 206);
-	createProp({pX - 3, pY + 4, 0 }, 206);
+	createProp({ pX - 3, pY + 3, 0 }, 206);
+	createProp({ pX - 3, pY + 4, 0 }, 206);
 
-	createProp({pX + 2, pY + 3, 0 }, 206);
-	createProp({pX + 2, pY + 4, 0 }, 206);
+	createProp({ pX + 2, pY + 3, 0 }, 206);
+	createProp({ pX + 2, pY + 4, 0 }, 206);
 
-	createProp({pX - 3, pY + 5, 0 }, 206);
-	createProp({pX - 2, pY + 5, 0 }, 206);
-	createProp({pX - 1, pY + 5, 0 }, 206);
-	createProp({pX, pY + 5, 0 }, 206);
-	createProp({pX + 1, pY + 5, 0 }, 206);
-	createProp({pX + 2, pY + 5, 0 }, 206);
+	createProp({ pX - 3, pY + 5, 0 }, 206);
+	createProp({ pX - 2, pY + 5, 0 }, 206);
+	createProp({ pX - 1, pY + 5, 0 }, 206);
+	createProp({ pX, pY + 5, 0 }, 206);
+	createProp({ pX + 1, pY + 5, 0 }, 206);
+	createProp({ pX + 2, pY + 5, 0 }, 206);
 
 	//전선 설치
-	createProp({pX + 8, pY + 1, 0 }, 143);
-	createProp({pX + 8, pY, 0 }, 143);
-	createProp({pX + 8, pY - 1, 0 }, 143);
-	createProp({pX + 8, pY - 2, 0 }, 143);
-	createProp({pX + 9, pY, 0 }, 143);
+	createProp({ pX + 8, pY + 1, 0 }, 143);
+	createProp({ pX + 8, pY, 0 }, 143);
+	createProp({ pX + 8, pY - 1, 0 }, 143);
+	createProp({ pX + 8, pY - 2, 0 }, 143);
+	createProp({ pX + 9, pY, 0 }, 143);
 
 	//배관 설치
-	createProp({pX + 3, pY + 6, 0 }, 144);
-	createProp({pX + 4, pY + 6, 0 }, 144);
-	createProp({pX + 5, pY + 6, 0 }, 144);
-	createProp({pX + 6, pY + 6, 0 }, 144);
-	createProp({pX + 5, pY + 7, 0 }, 144);
+	createProp({ pX + 3, pY + 6, 0 }, 144);
+	createProp({ pX + 4, pY + 6, 0 }, 144);
+	createProp({ pX + 5, pY + 6, 0 }, 144);
+	createProp({ pX + 6, pY + 6, 0 }, 144);
+	createProp({ pX + 5, pY + 7, 0 }, 144);
 
 	//종교
 
@@ -763,7 +765,7 @@ export void startArea()
 	myCar->addPart(vX + 2, vY - 2, { 142,119,126 });
 	//////////////////////////▼중상단 4타일////////////////////////////////////
 	myCar->addPart(vX - 1, vY - 1, 121);
-	myCar->addPart(vX, vY - 1, {121,100});
+	myCar->addPart(vX, vY - 1, { 121,100 });
 	myCar->addPart(vX + 1, vY - 1, 121);
 	myCar->addPart(vX + 2, vY - 1, 121);
 	////////////////////////////////▼운전석 4타일///////////////////////////////
@@ -901,6 +903,6 @@ export void startArea()
 
 	World::ins()->createSector(0, 0, 0);
 
-	PlayerPtr->updateVision(PlayerPtr->eyeSight);
-	
+	PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+
 };

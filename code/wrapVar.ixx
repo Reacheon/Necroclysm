@@ -1,4 +1,6 @@
-﻿#include <SDL3/SDL.h>
+﻿module;
+
+#include <SDL3/SDL.h>
 
 export module wrapVar;
 
@@ -25,7 +27,7 @@ export inline const unsigned __int16 TileFloor(int x, int y, int z) { return Wor
 
 export inline const bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
 
-export inline const unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall;}
+export inline const unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }
 
 export inline const bool ExistWall(int x, int y, int z) { return (World::ins()->getTile(x, y, z).wall != 0); }
 
@@ -42,9 +44,29 @@ export inline void setFloor(Point3 coord, int val)
 export inline Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
 export inline void EntityPtrMove(Point3 startCoor, Point3 endCoor)
 {
-    World::ins()->getTile(endCoor).EntityPtr = std::move(World::ins()->getTile(startCoor).EntityPtr);
-    World::ins()->getTile(endCoor).EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
-    World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
+    // 1단계: 시작 좌표의 EntityPtr 존재 확인
+    auto& startTile = World::ins()->getTile(startCoor);
+    errorBox(startTile.EntityPtr == nullptr,
+        L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" +
+        std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
+
+    // 2단계: 목적지 좌표의 EntityPtr이 비어있는지 확인
+    auto& endTile = World::ins()->getTile(endCoor);
+    errorBox(endTile.EntityPtr != nullptr,
+        L"EntityPtrMove: 목적지에 이미 EntityPtr이 있습니다. endCoor=(" +
+        std::to_wstring(endCoor.x) + L"," + std::to_wstring(endCoor.y) + L"," + std::to_wstring(endCoor.z) + L")");
+
+    // 3단계: 이동 실행
+    endTile.EntityPtr = std::move(startTile.EntityPtr);
+
+    // 4단계: 이동 후 EntityPtr 존재 확인
+    errorBox(endTile.EntityPtr == nullptr,
+        L"EntityPtrMove: 이동 후 EntityPtr이 nullptr입니다. endCoor=(" +
+        std::to_wstring(endCoor.x) + L"," + std::to_wstring(endCoor.y) + L"," + std::to_wstring(endCoor.z) + L")");
+
+    // 5단계: setGrid 호출
+    endTile.EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
+    endTile.EntityPtr->pullEquipLights();
 }
 export inline void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
 {
@@ -58,7 +80,7 @@ export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)Wor
 export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
 export inline ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
 
-export inline fovFlag& TileFov(int x, int y, int z) { return static_cast<fovFlag&>(World::ins()->getTile(x, y, z).fov);}
+export inline fovFlag& TileFov(int x, int y, int z) { return static_cast<fovFlag&>(World::ins()->getTile(x, y, z).fov); }
 
 export inline void createMonster(Point3 inputCoor, int inputEntityCode)
 {
@@ -81,8 +103,8 @@ export inline void destroyItemStack(Point3 inputCoor)
 }
 
 
-export inline void createProp(Point3 inputCoor, int inputItemCode) 
-{ 
+export inline void createProp(Point3 inputCoor, int inputItemCode)
+{
     World::ins()->getTile(inputCoor).PropPtr = std::make_unique<Prop>(inputCoor, inputItemCode);
 
     World::ins()->getTile(inputCoor).PropPtr->updateSprIndex();
@@ -143,21 +165,6 @@ export void updateQuiverSpr(ItemPocket* inputPocket)
 {
     for (int i = 0; i < inputPocket->itemInfo.size(); i++) updateQuiverSpr(inputPocket->itemInfo[i]);
 }
-
-//export float getMouseX()
-//{
-//    float mouseX;
-//    SDL_GetMouseState(&mouseX, nullptr);
-//    return mouseX;
-//}
-//
-//export float getMouseY()
-//{
-//    float mouseY;
-//    SDL_GetMouseState(nullptr, &mouseY);
-//    return mouseY;
-//}   
-
 
 
 export float getMouseX()
