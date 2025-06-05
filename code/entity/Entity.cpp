@@ -104,7 +104,7 @@ void Entity::loadDataFromDex(int index)
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
-void Entity::addDmg(int inputDmg)
+void Entity::takeDamage(int inputDmg, dmgFlag inputType)
 {
 	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
 	entityInfo.HP -= inputDmg;
@@ -289,7 +289,7 @@ void Entity::move(int dir, bool jump)
 			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
 		}
 
-		EntityPtrMove({ getGridX(),getGridY(), getGridZ() }, { getGridX() + dGridX, getGridY() + dGridY, getGridZ() });
+		EntityPtrMove({ prevGridX,prevGridY, getGridZ() }, { prevGridX + dGridX, prevGridY + dGridY, getGridZ() });
 		setFakeX(-16 * dGridX);
 		setFakeY(-16 * dGridY);
 		if (entityInfo.isPlayer)
@@ -330,7 +330,7 @@ void Entity::attack(int gridX, int gridY)
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			victimEntity->flash = { 255, 0, 0, 120 };
-			victimEntity->addDmg(randomRange(6, 10));
+			victimEntity->takeDamage(randomRange(6, 10), dmgFlag::none);
 		}
 		else
 		{

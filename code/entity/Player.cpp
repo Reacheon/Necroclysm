@@ -11,10 +11,13 @@ import wrapVar;
 import textureVar;
 import constVar;
 import log;
+import TileData;
+import ItemPocket;
 import ItemData;
 import nanoTimer;
 import globalTime;
 import Footprint;
+import GameOver;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -350,7 +353,7 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 
 void Player::death()
 {
-	updateLog(L"#FFFFFF죽어버렸다~~!!!!.");
+	new GameOver();
 }
 
 int Player::checkItemSur(int index)//주변에 있는 타일을 포함해 아이템을 가지고 있는지 조사
@@ -395,5 +398,269 @@ int Player::checkToolQualitySur(int index) //없으면 0 반환, 있으면 공�
 		itemNumber++;
 	}
 	return itemNumber;
+}
+
+
+
+// Torso (몸통) 저항
+int Player::getResPierceTorso()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceTorso;
+	return totalVal;
+}
+
+int Player::getResCutTorso()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutTorso;
+	return totalVal;
+}
+
+int Player::getResBashTorso()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashTorso;
+	return totalVal;
+}
+
+// Head (머리) 저항
+int Player::getResPierceHead()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceHead;
+	return totalVal;
+}
+
+int Player::getResCutHead()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutHead;
+	return totalVal;
+}
+
+int Player::getResBashHead()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashHead;
+	return totalVal;
+}
+
+// Left Arm (왼팔) 저항
+int Player::getResPierceLArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceLArm;
+	return totalVal;
+}
+
+int Player::getResCutLArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutLArm;
+	return totalVal;
+}
+
+int Player::getResBashLArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashLArm;
+	return totalVal;
+}
+
+// Right Arm (오른팔) 저항
+int Player::getResPierceRArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceRArm;
+	return totalVal;
+}
+
+int Player::getResCutRArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutRArm;
+	return totalVal;
+}
+
+int Player::getResBashRArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashRArm;
+	return totalVal;
+}
+
+// Left Leg (왼다리) 저항
+int Player::getResPierceLLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceLLeg;
+	return totalVal;
+}
+
+int Player::getResCutLLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutLLeg;
+	return totalVal;
+}
+
+int Player::getResBashLLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashLLeg;
+	return totalVal;
+}
+
+// Right Leg (오른다리) 저항
+int Player::getResPierceRLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rPierceRLeg;
+	return totalVal;
+}
+
+int Player::getResCutRLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCutRLeg;
+	return totalVal;
+}
+
+int Player::getResBashRLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rBashRLeg;
+	return totalVal;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+int Player::getSH()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].sh;
+	return totalVal;
+}
+
+int Player::getEV()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].ev;
+	return totalVal;
+}
+
+int Player::getResFire()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rFire;
+	return totalVal;
+}
+
+int Player::getResCold()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCold;
+	return totalVal;
+}
+
+int Player::getResElec()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rElec;
+	return totalVal;
+}
+
+int Player::getResCorr()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rCorr;
+	return totalVal;
+}
+
+int Player::getResRad()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].rRad;
+	return totalVal;
+}
+
+// Torso (몸통) 방해도
+int Player::getEncTorso()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encTorso;
+	return totalVal;
+}
+
+// Head (머리) 방해도
+int Player::getEncHead()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encHead;
+	return totalVal;
+}
+
+// Left Arm (왼팔) 방해도
+int Player::getEncLArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encLArm;
+	return totalVal;
+}
+
+// Right Arm (오른팔) 방해도
+int Player::getEncRArm()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encRArm;
+	return totalVal;
+}
+
+// Left Leg (왼다리) 방해도
+int Player::getEncLLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encLLeg;
+	return totalVal;
+}
+
+// Right Leg (오른다리) 방해도
+int Player::getEncRLeg()
+{
+	std::vector<ItemData>& equip = entityInfo.equipment.get()->itemInfo;
+	int totalVal = 0;
+	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encRLeg;
+	return totalVal;
 }
 

@@ -570,7 +570,7 @@ void HUD::drawQuickSlot()
 		int pivotY = 0;
 
 		SDL_Color btnCol = col::black;
-		if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE)
+		if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE && getLastGUI() == this)
 		{
 			if (click) btnCol = lowCol::deepBlue;
 			else btnCol = lowCol::blue;

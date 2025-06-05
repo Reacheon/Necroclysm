@@ -435,6 +435,13 @@ public:
 
 		co_await std::suspend_always();
 
+		if (coAnswer.empty())
+		{
+			actDraw();
+			tabType = tabFlag::closeWin;
+			co_return;
+		}
+
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);

@@ -67,7 +67,7 @@ public:
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType);
     float endAtk();
     void loadDataFromDex(int index);
-    void addDmg(int inputDmg);
+    void takeDamage(int inputDmg, dmgFlag inputType);
     void updateStatus();
     int getRPierce(int inputPartIndex);
     int getRCut(int inputPartIndex);

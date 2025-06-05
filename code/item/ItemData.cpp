@@ -111,9 +111,25 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
     if (pocketOnlyItem != tgtItem.pocketOnlyItem) { return false; }
 
     //방어 계열 변수
-    if (rPierce != tgtItem.rPierce) { return false; }
-    if (rCut != tgtItem.rCut) { return false; }
-    if (rBash != tgtItem.rBash) { return false; }
+    if (rPierceTorso != tgtItem.rPierceTorso) { return false; }
+    if (rCutTorso != tgtItem.rCutTorso) { return false; }
+    if (rBashTorso != tgtItem.rBashTorso) { return false; }
+    if (rPierceHead != tgtItem.rPierceHead) { return false; }
+    if (rCutHead != tgtItem.rCutHead) { return false; }
+    if (rBashHead != tgtItem.rBashHead) { return false; }
+    if (rPierceLArm != tgtItem.rPierceLArm) { return false; }
+    if (rCutLArm != tgtItem.rCutLArm) { return false; }
+    if (rBashLArm != tgtItem.rBashLArm) { return false; }
+    if (rPierceRArm != tgtItem.rPierceRArm) { return false; }
+    if (rCutRArm != tgtItem.rCutRArm) { return false; }
+    if (rBashRArm != tgtItem.rBashRArm) { return false; }
+    if (rPierceLLeg != tgtItem.rPierceLLeg) { return false; }
+    if (rCutLLeg != tgtItem.rCutLLeg) { return false; }
+    if (rBashLLeg != tgtItem.rBashLLeg) { return false; }
+    if (rPierceRLeg != tgtItem.rPierceRLeg) { return false; }
+    if (rCutRLeg != tgtItem.rCutRLeg) { return false; }
+    if (rBashRLeg != tgtItem.rBashRLeg) { return false; }
+
     if (enc != tgtItem.enc) { return false; }
     if (sh != tgtItem.sh) { return false; }
     if (ev != tgtItem.ev) { return false; }

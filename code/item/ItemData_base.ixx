@@ -31,9 +31,41 @@ export struct ItemDataBase
     unsigned __int32 pocketMaxVolume = 0;
     unsigned __int32 pocketMaxNumber = 0;
     std::vector<unsigned __int16> pocketOnlyItem;
-    __int16 rPierce = 0;
-    __int16 rCut = 0;
-    __int16 rBash = 0;
+    // Torso (몸통)
+    __int16 rPierceTorso = 0;
+    __int16 rCutTorso = 0;
+    __int16 rBashTorso = 0;
+    __int8 encTorso = 0;
+
+    // Head (머리)
+    __int16 rPierceHead = 0;
+    __int16 rCutHead = 0;
+    __int16 rBashHead = 0;
+    __int8 encHead = 0;
+
+    // Left Arm (왼팔)
+    __int16 rPierceLArm = 0;
+    __int16 rCutLArm = 0;
+    __int16 rBashLArm = 0;
+    __int8 encLArm = 0;
+
+    // Right Arm (오른팔)
+    __int16 rPierceRArm = 0;
+    __int16 rCutRArm = 0;
+    __int16 rBashRArm = 0;
+    __int8 encRArm = 0;
+
+    // Left Leg (왼다리)
+    __int16 rPierceLLeg = 0;
+    __int16 rCutLLeg = 0;
+    __int16 rBashLLeg = 0;
+    __int8 encLLeg = 0;
+
+    // Right Leg (오른다리)
+    __int16 rPierceRLeg = 0;
+    __int16 rCutRLeg = 0;
+    __int16 rBashRLeg = 0;
+    __int8 encRLeg = 0;
     std::vector<std::pair<unsigned __int8, __int16>> enc;
     __int16 sh = 0;
     __int16 ev = 0;

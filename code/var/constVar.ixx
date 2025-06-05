@@ -37,6 +37,8 @@ export constexpr int QUICK_SLOT_MAX = 8;
 
 export constexpr int CRAFT_MAX_ROW = 4;
 
+export constexpr int MAX_ENC = 10; //최대 방해도
+
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
@@ -286,13 +288,6 @@ export enum class weatherFlag
     snow,
 };
 
-
-export namespace dmgFlag
-{
-    constexpr int partIndex = 0;
-    constexpr int dmg = 1;
-    constexpr int type = 2;
-};
 
 
 /*
@@ -927,12 +922,17 @@ export namespace weaponMode
 };
 
 //입은 데미지의 종류
-export namespace dmgType
+export enum class dmgFlag
 {
-    constexpr int none = 0; //무속성 공격
-    constexpr int pierce = 1;//관통(물리)
-    constexpr int cut = 2;//절단(물리)
-    constexpr int bash = 3;//타격(물리)
+    none,
+    pierce,
+    cut,
+    bash,
+    fire,
+    ice,
+    elec,
+    corr,
+    rad
 };
 
 //플레이어가 취할 수 있는 공격의 타입, Aim의 5가지 종류(관통, 절단, 타격, 사격, 투척)

@@ -114,39 +114,64 @@ void Equip::drawGUI()
 		for (int i = 0; i < 6; i++)
 		{
 			int rPierce, rCut, rBash, enc, maxEnc;
-			int targetPart = partType::head;
-			switch (i)
+			enum class BodyPart
+			{
+				Head = 0,
+				Torso = 1,
+				LeftArm = 2,
+				RightArm = 3,
+				LeftLeg = 4,
+				RightLeg = 5
+			};
+
+			switch (static_cast<BodyPart>(i))
 			{
 			default:
-				targetPart = partType::head;
+			case BodyPart::Head:
+				rPierce = PlayerPtr->getResPierceHead();
+				rCut = PlayerPtr->getResCutHead();
+				rBash = PlayerPtr->getResBashHead();
+				enc = PlayerPtr->getEncHead();
 				break;
-			case 1:
-				targetPart = partType::torso;
+			case BodyPart::Torso:
+				rPierce = PlayerPtr->getResPierceTorso();
+				rCut = PlayerPtr->getResCutTorso();
+				rBash = PlayerPtr->getResBashTorso();
+				enc = PlayerPtr->getEncTorso();
 				break;
-			case 2:
-				targetPart = partType::larm;
+			case BodyPart::LeftArm:
+				rPierce = PlayerPtr->getResPierceLArm();
+				rCut = PlayerPtr->getResCutLArm();
+				rBash = PlayerPtr->getResBashLArm();
+				enc = PlayerPtr->getEncLArm();
 				break;
-			case 3:
-				targetPart = partType::rarm;
+			case BodyPart::RightArm:
+				rPierce = PlayerPtr->getResPierceRArm();
+				rCut = PlayerPtr->getResCutRArm();
+				rBash = PlayerPtr->getResBashRArm();
+				enc = PlayerPtr->getEncRArm();
 				break;
-			case 4:
-				targetPart = partType::lleg;
+			case BodyPart::LeftLeg:
+				rPierce = PlayerPtr->getResPierceLLeg();
+				rCut = PlayerPtr->getResCutLLeg();
+				rBash = PlayerPtr->getResBashLLeg();
+				enc = PlayerPtr->getEncLLeg();
 				break;
-			case 5:
-				targetPart = partType::rleg;
+			case BodyPart::RightLeg:
+				rPierce = PlayerPtr->getResPierceRLeg();
+				rCut = PlayerPtr->getResCutRLeg();
+				rBash = PlayerPtr->getResBashRLeg();
+				enc = PlayerPtr->getEncRLeg();
 				break;
 			}
 
-			rPierce = PlayerPtr->getRPierce(targetPart);
-			rCut = PlayerPtr->getRCut(targetPart);
-			rBash = PlayerPtr->getRBash(targetPart);
-			enc = PlayerPtr->getEnc(targetPart);
-			maxEnc = 30;
+
+			maxEnc = MAX_ENC;
 
 			renderTextCenter(std::to_wstring(rPierce), topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * i + 9);
 			renderTextCenter(std::to_wstring(rCut), topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * i + 9);
 			renderTextCenter(std::to_wstring(rBash), topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * i + 9);
-			renderTextCenter(std::to_wstring(enc) + L"/" + std::to_wstring(maxEnc), topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * i + 9, col::lightGray);
+			renderTextCenter(std::to_wstring(enc) + L" / " + std::to_wstring(maxEnc), topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * i + 9, col::lightGray);
 
 			
 		}
