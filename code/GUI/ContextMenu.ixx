@@ -1,5 +1,5 @@
-﻿#include <SDL3/SDL.h>
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
+﻿#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
+#include <SDL3/SDL.h>
 
 export module ContextMenu;
 

@@ -67,7 +67,7 @@ public:
     virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType);
     float endAtk();
     void loadDataFromDex(int index);
-    void takeDamage(int inputDmg, dmgFlag inputType);
+    void takeDamage(int inputDmg, dmgFlag inputType, humanPartFlag inputPart = humanPartFlag::torso);
     void updateStatus();
     int getRPierce(int inputPartIndex);
     int getRCut(int inputPartIndex);

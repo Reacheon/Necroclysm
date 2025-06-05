@@ -53,6 +53,13 @@ void HUD::drawGUI()
 	if (ctrlVeh != nullptr)
 	{
 		drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73 + y);
+		if (ctrlVeh->isEngineOn)
+		{
+			drawSpriteCenter(spr::dashboard, 0, cameraW / 2, cameraH + 73 + y);
+			setZoom(2.0);
+			drawTextureCenter(texture::navimap, cameraW / 2, cameraH - 132 + y);
+			setZoom(1.0);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,25 +67,28 @@ void HUD::drawGUI()
 	if (isAdvancedMode == false)
 	{
 
-		SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureAlphaMod(texture::minimap, 160);
-		setZoom(4.0);
-		drawTextureCenter(texture::minimap, 94, 94);
-		setZoom(1.0);
+		if (ctrlVeh == nullptr)
+		{
+			SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
+			SDL_SetTextureAlphaMod(texture::minimap, 160);
+			setZoom(4.0);
+			drawTextureCenter(texture::minimap, 94, 94);
+			setZoom(1.0);
 
 
-		drawSprite(spr::minimapEdge, 1, 14, 14);
-		Sprite* targetBtnSpr;
-		if (option::inputMethod == input::gamepad)
-		{
-			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
-			else { targetBtnSpr = spr::buttons; }
-			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
-		}
-		else if (option::inputMethod == input::mouse)
-		{
-			targetBtnSpr = spr::buttons;
-			drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, 14 + 15, 14 + 15);
+			drawSprite(spr::minimapEdge, 1, 14, 14);
+			Sprite* targetBtnSpr;
+			if (option::inputMethod == input::gamepad)
+			{
+				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
+				else { targetBtnSpr = spr::buttons; }
+				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
+			}
+			else if (option::inputMethod == input::mouse)
+			{
+				targetBtnSpr = spr::buttons;
+				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, 14 + 15, 14 + 15);
+			}
 		}
 
 
@@ -92,64 +102,176 @@ void HUD::drawGUI()
 
 		setFontSize(10);
 
-		{
-			int pivotX = letterbox.x + 36+ vShift;
-			int pivotY = letterbox.y + 22;
-			renderTextCenter(L"왼팔", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
-		}
 
 		{
-			int pivotX = letterbox.x + 36+ vShift;
-			int pivotY = letterbox.y + 22 + 15;
-			renderTextCenter(L"좌다리", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
+			// 왼팔
+			{
+				//페이크 HP
+				if (PlayerPtr->lArmFakeHP > PlayerPtr->lArmHP) { PlayerPtr->lArmFakeHP--; }
+				else if (PlayerPtr->lArmFakeHP < PlayerPtr->lArmHP) PlayerPtr->lArmFakeHP = PlayerPtr->lArmHP;
+				if (PlayerPtr->lArmFakeHP != PlayerPtr->lArmHP)
+				{
+					if (PlayerPtr->lArmFakeHPAlpha > 30) { PlayerPtr->lArmFakeHPAlpha -= 30; }
+					else { PlayerPtr->lArmFakeHPAlpha = 0; }
+				}
+				else { PlayerPtr->lArmFakeHPAlpha = 255; }
+
+				int pivotX = letterbox.x + 36 + vShift;
+				int pivotY = letterbox.y + 22;
+				renderTextCenter(L"왼팔", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->lArmFakeHP) / (float)(PART_MAX_HP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->lArmFakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->lArmHP) / (float)(PART_MAX_HP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
+
+			// 좌다리
+			{
+				//페이크 HP
+				if (PlayerPtr->lLegFakeHP > PlayerPtr->lLegHP) { PlayerPtr->lLegFakeHP--; }
+				else if (PlayerPtr->lLegFakeHP < PlayerPtr->lLegHP) PlayerPtr->lLegFakeHP = PlayerPtr->lLegHP;
+				if (PlayerPtr->lLegFakeHP != PlayerPtr->lLegHP)
+				{
+					if (PlayerPtr->lLegFakeHPAlpha > 30) { PlayerPtr->lLegFakeHPAlpha -= 30; }
+					else { PlayerPtr->lLegFakeHPAlpha = 0; }
+				}
+				else { PlayerPtr->lLegFakeHPAlpha = 255; }
+
+				int pivotX = letterbox.x + 36 + vShift;
+				int pivotY = letterbox.y + 22 + 15;
+				renderTextCenter(L"좌다리", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->lLegFakeHP) / (float)(PART_MAX_HP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->lLegFakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->lLegHP) / (float)(PART_MAX_HP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
+
+			// 머리
+			{
+				//페이크 HP
+				if (PlayerPtr->headFakeHP > PlayerPtr->headHP) { PlayerPtr->headFakeHP--; }
+				else if (PlayerPtr->headFakeHP < PlayerPtr->headHP) PlayerPtr->headFakeHP = PlayerPtr->headHP;
+				if (PlayerPtr->headFakeHP != PlayerPtr->headHP)
+				{
+					if (PlayerPtr->headFakeHPAlpha > 30) { PlayerPtr->headFakeHPAlpha -= 30; }
+					else { PlayerPtr->headFakeHPAlpha = 0; }
+				}
+				else { PlayerPtr->headFakeHPAlpha = 255; }
+
+				int pivotX = letterbox.x + 36 + 83 + vShift;
+				int pivotY = letterbox.y + 22;
+				renderTextCenter(L"머리", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->headFakeHP) / (float)(PART_MAX_HP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->headFakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->headHP) / (float)(PART_MAX_HP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
+
+			// 몸통 (기존 코드 유지)
+			{
+				int pivotX = letterbox.x + 36 + 83 + vShift;
+				int pivotY = letterbox.y + 22 + 15;
+				renderTextCenter(L"몸통", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeHP) / (float)(PlayerPtr->entityInfo.maxHP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.HP) / (float)(PlayerPtr->entityInfo.maxHP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
+
+			// 오른팔
+			{
+				//페이크 HP
+				if (PlayerPtr->rArmFakeHP > PlayerPtr->rArmHP) { PlayerPtr->rArmFakeHP--; }
+				else if (PlayerPtr->rArmFakeHP < PlayerPtr->rArmHP) PlayerPtr->rArmFakeHP = PlayerPtr->rArmHP;
+				if (PlayerPtr->rArmFakeHP != PlayerPtr->rArmHP)
+				{
+					if (PlayerPtr->rArmFakeHPAlpha > 30) { PlayerPtr->rArmFakeHPAlpha -= 30; }
+					else { PlayerPtr->rArmFakeHPAlpha = 0; }
+				}
+				else { PlayerPtr->rArmFakeHPAlpha = 255; }
+
+				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
+				int pivotY = letterbox.y + 22;
+				renderTextCenter(L"오른팔", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->rArmFakeHP) / (float)(PART_MAX_HP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->rArmFakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->rArmHP) / (float)(PART_MAX_HP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
+
+			// 우다리
+			{
+				//페이크 HP
+				if (PlayerPtr->rLegFakeHP > PlayerPtr->rLegHP) { PlayerPtr->rLegFakeHP--; }
+				else if (PlayerPtr->rLegFakeHP < PlayerPtr->rLegHP) PlayerPtr->rLegFakeHP = PlayerPtr->rLegHP;
+				if (PlayerPtr->rLegFakeHP != PlayerPtr->rLegHP)
+				{
+					if (PlayerPtr->rLegFakeHPAlpha > 30) { PlayerPtr->rLegFakeHPAlpha -= 30; }
+					else { PlayerPtr->rLegFakeHPAlpha = 0; }
+				}
+				else { PlayerPtr->rLegFakeHPAlpha = 255; }
+
+				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
+				int pivotY = letterbox.y + 22 + 15;
+				renderTextCenter(L"우다리", pivotX - 16, pivotY + 5, col::lightGray);
+				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
+
+				// 페이크 HP
+				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->rLegFakeHP) / (float)(PART_MAX_HP));
+				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
+				drawFillRect(fakeRect, lowCol::white, PlayerPtr->rLegFakeHPAlpha);
+
+				// 실제 HP
+				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->rLegHP) / (float)(PART_MAX_HP));
+				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
+				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+				drawFillRect(realRect, lowCol::green);
+			}
 		}
 
 
-		{
-			int pivotX = letterbox.x + 36 + 83+ vShift;
-			int pivotY = letterbox.y + 22;
-			renderTextCenter(L"머리", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
-		}
-
-		{
-			int pivotX = letterbox.x + 36 + 83+ vShift;
-			int pivotY = letterbox.y + 22 + 15;
-			renderTextCenter(L"몸통", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-			// 페이크 HP
-			float ratioFakeHP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeHP) / (float)(PlayerPtr->entityInfo.maxHP));
-			SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-			drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeHPAlpha);
-
-			// 실제 HP
-			float ratioHP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.HP) / (float)(PlayerPtr->entityInfo.maxHP));
-			SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-			drawFillRect(realRect, lowCol::green);
-		}
-
-		{
-			int pivotX = letterbox.x + 36 + 83*2+ vShift;
-			int pivotY = letterbox.y + 22;
-			renderTextCenter(L"오른팔", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
-		}
-
-		{
-			int pivotX = letterbox.x + 36 + 83*2 + vShift;
-			int pivotY = letterbox.y + 22 + 15;
-			renderTextCenter(L"우다리", pivotX - 16, pivotY + 5, col::lightGray);
-			drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-			drawFillRect(SDL_Rect{ pivotX + 3, pivotY + 3,38,5 }, lowCol::green);
-		}
 
 		if (ctrlVeh == nullptr)
 		{
@@ -654,13 +776,16 @@ void HUD::drawBarAct()
 			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1턴 대기
 			drawSpriteCenter(spr::vehicleHUDParts, 17, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2); //우회전 마크
 
-			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
+
+			if(ctrlVeh->isEngineOn) drawSpriteCenter(spr::vehicleHUDParts, 2 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
+			else  drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
+			
 
 			//기어(PRND) 그리기
 			int gearSprIndex = 0;
-			if (((Vehicle*)ctrlVeh)->gearState == gearFlag::park) gearSprIndex = 0;
-			else if (((Vehicle*)ctrlVeh)->gearState == gearFlag::reverse) gearSprIndex = 1;
-			else if (((Vehicle*)ctrlVeh)->gearState == gearFlag::neutral) gearSprIndex = 2;
+			if (ctrlVeh->gearState == gearFlag::park) gearSprIndex = 0;
+			else if (ctrlVeh->gearState == gearFlag::reverse) gearSprIndex = 1;
+			else if (ctrlVeh->gearState == gearFlag::neutral) gearSprIndex = 2;
 			else gearSprIndex = 3;
 			drawSpriteCenter(spr::vehicleHUDParts, 5 + gearSprIndex, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 12);
 
@@ -669,13 +794,12 @@ void HUD::drawBarAct()
 		}
 		else if (typeHUD == vehFlag::heli)
 		{
-			Vehicle* myHeli = ((Vehicle*)ctrlVeh);
 
 			setZoom(1.5);
 			//drawSpriteCenter(spr::collectiveLever, myHeli->collectiveState + 1, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 16); //콜렉티브 레버
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
-			drawSpriteCenter(spr::icon48, 88 + myHeli->collectiveState, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
+			drawSpriteCenter(spr::icon48, 88 + ctrlVeh->collectiveState, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1턴 대기
@@ -684,7 +808,7 @@ void HUD::drawBarAct()
 			//drawSpriteCenter(spr::cyclicLever, myHeli->cyclicState + 1, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 16); //사이클릭 레버
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
-			drawSpriteCenter(spr::icon48, myHeli->cyclicState + 1 + 110, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 8);
+			drawSpriteCenter(spr::icon48, ctrlVeh->cyclicState + 1 + 110, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 
@@ -694,7 +818,7 @@ void HUD::drawBarAct()
 			//drawSpriteCenter(spr::rpmLever, myHeli->rpmState, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 + 9); //RPM 레버
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
-			drawSpriteCenter(spr::icon48, myHeli->rpmState + 100, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 8);
+			drawSpriteCenter(spr::icon48, ctrlVeh->rpmState + 100, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 
@@ -703,13 +827,9 @@ void HUD::drawBarAct()
 		}
 		else if (typeHUD == vehFlag::minecart)
 		{
-			// std::vector<act> train = { act::rpmLever, act::wait, act::brake, act::startEngine, act::blank,act::blank,act::blank };
-
-			Vehicle* myTrain = ((Vehicle*)ctrlVeh);
-
 			setZoom(1);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 160);
-			drawSpriteCenter(spr::icon48, myTrain->rpmState + 100, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
+			drawSpriteCenter(spr::icon48, ctrlVeh->rpmState + 100, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2 - 8);
 			SDL_SetTextureAlphaMod(spr::icon48->getTexture(), 255);
 
 			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1턴 대기
@@ -719,9 +839,9 @@ void HUD::drawBarAct()
 			drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
 
 			int gearSprIndex = 0;
-			if (((Vehicle*)ctrlVeh)->gearState == gearFlag::park) gearSprIndex = 0;
-			else if (((Vehicle*)ctrlVeh)->gearState == gearFlag::reverse) gearSprIndex = 1;
-			else if (((Vehicle*)ctrlVeh)->gearState == gearFlag::neutral) gearSprIndex = 2;
+			if (ctrlVeh->gearState == gearFlag::park) gearSprIndex = 0;
+			else if (ctrlVeh->gearState == gearFlag::reverse) gearSprIndex = 1;
+			else if (ctrlVeh->gearState == gearFlag::neutral) gearSprIndex = 2;
 			else gearSprIndex = 3;
 			drawSpriteCenter(spr::vehicleHUDParts, 5 + gearSprIndex, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 12);
 
@@ -883,8 +1003,7 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::toggleOn) setBtnLayout(sysStr[196], 163);
 		else if (barAct[i] == act::headlight)
 		{
-            Vehicle* thisVeh = (Vehicle*)ctrlVeh;
-			if(thisVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
+			if(ctrlVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
             else setBtnLayout(sysStr[205], 164);
 		}
 		else setBtnLayout(L" ", 0);

@@ -428,97 +428,105 @@ public:
 			break;
 		case act::turnLeft:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			if (myCar->wheelDir == ACW(myCar->bodyDir)) myCar->wheelDir = ACW2(myCar->bodyDir);
-			else if (myCar->wheelDir == myCar->bodyDir) myCar->wheelDir = ACW(myCar->bodyDir);
-			else if (myCar->wheelDir == CW(myCar->bodyDir)) myCar->wheelDir = myCar->bodyDir;
-			else if (myCar->wheelDir == CW2(myCar->bodyDir)) myCar->wheelDir = CW(myCar->bodyDir);
+			if (ctrlVeh->wheelDir == ACW(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = ACW2(ctrlVeh->bodyDir);
+			else if (ctrlVeh->wheelDir == ctrlVeh->bodyDir) ctrlVeh->wheelDir = ACW(ctrlVeh->bodyDir);
+			else if (ctrlVeh->wheelDir == CW(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = ctrlVeh->bodyDir;
+			else if (ctrlVeh->wheelDir == CW2(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = CW(ctrlVeh->bodyDir);
 			else
 			{
-				myCar->wheelDir = ACW2(myCar->bodyDir);
+				ctrlVeh->wheelDir = ACW2(ctrlVeh->bodyDir);
 			}
 			turnWait(1.0);
-			myCar->updateSpr();
+			ctrlVeh->updateSpr();
 			break;
 		}
 		case act::turnRight:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			if (myCar->wheelDir == ACW2(myCar->bodyDir)) myCar->wheelDir = ACW(myCar->bodyDir);
-			else if (myCar->wheelDir == ACW(myCar->bodyDir)) myCar->wheelDir = myCar->bodyDir;
-			else if (myCar->wheelDir == myCar->bodyDir) myCar->wheelDir = CW(myCar->bodyDir);
-			else if (myCar->wheelDir == CW(myCar->bodyDir)) myCar->wheelDir = CW2(myCar->bodyDir);
+			if (ctrlVeh->wheelDir == ACW2(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = ACW(ctrlVeh->bodyDir);
+			else if (ctrlVeh->wheelDir == ACW(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = ctrlVeh->bodyDir;
+			else if (ctrlVeh->wheelDir == ctrlVeh->bodyDir) ctrlVeh->wheelDir = CW(ctrlVeh->bodyDir);
+			else if (ctrlVeh->wheelDir == CW(ctrlVeh->bodyDir)) ctrlVeh->wheelDir = CW2(ctrlVeh->bodyDir);
 			else
 			{
-				myCar->wheelDir = CW2(myCar->bodyDir);
+				ctrlVeh->wheelDir = CW2(ctrlVeh->bodyDir);
 			}
 			turnWait(1.0);
-			myCar->updateSpr();
+			ctrlVeh->updateSpr();
 			break;
 		}
 		case act::wait:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
 			turnWait(1.0);
 			break;
 		}
 		case act::startEngine:
+		{
+			ctrlVeh->isEngineOn = true;
+			auto it = std::find(barAct.begin(), barAct.end(), act::startEngine);
+			if (it != barAct.end()) *it = act::stopEngine;
 			break;
+		}
 		case act::stopEngine:
+		{
+			ctrlVeh->isEngineOn = false;
+			auto it = std::find(barAct.begin(), barAct.end(), act::stopEngine);
+			if (it != barAct.end()) *it = act::startEngine;
 			break;
+		}
 		case act::shiftGear:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			if (myCar->vehType == vehFlag::car)
+			if (ctrlVeh->vehType == vehFlag::car)
 			{
-				if (myCar->gearState == gearFlag::park) myCar->gearState = gearFlag::reverse;
-				else if (myCar->gearState == gearFlag::reverse) myCar->gearState = gearFlag::neutral;
-				else if (myCar->gearState == gearFlag::neutral) myCar->gearState = gearFlag::drive;
-				else myCar->gearState = gearFlag::park;
+				if (ctrlVeh->gearState == gearFlag::park) ctrlVeh->gearState = gearFlag::reverse;
+				else if (ctrlVeh->gearState == gearFlag::reverse) ctrlVeh->gearState = gearFlag::neutral;
+				else if (ctrlVeh->gearState == gearFlag::neutral) ctrlVeh->gearState = gearFlag::drive;
+				else ctrlVeh->gearState = gearFlag::park;
 			}
 			else
 			{
-				if (myCar->gearState == gearFlag::park) myCar->gearState = gearFlag::drive;
-				else if (myCar->gearState == gearFlag::reverse) myCar->gearState = gearFlag::drive;
-				else if (myCar->gearState == gearFlag::neutral) myCar->gearState = gearFlag::drive;
-				else myCar->gearState = gearFlag::reverse;
+				if (ctrlVeh->gearState == gearFlag::park) ctrlVeh->gearState = gearFlag::drive;
+				else if (ctrlVeh->gearState == gearFlag::reverse) ctrlVeh->gearState = gearFlag::drive;
+				else if (ctrlVeh->gearState == gearFlag::neutral) ctrlVeh->gearState = gearFlag::drive;
+				else ctrlVeh->gearState = gearFlag::reverse;
 			}
 			turnWait(1.0);
 			break;
 		}
 		case act::accel:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			if (myCar->gearState == gearFlag::drive) myCar->accVec = scalarMultiple(dir16ToVec(myCar->wheelDir), 7.0);
-			else if (myCar->gearState == gearFlag::reverse) myCar->accVec = scalarMultiple(dir16ToVec(reverse(myCar->wheelDir)), 7.0);
-			turnWait(1.0);
+			if (ctrlVeh->isEngineOn)
+			{
+				if (ctrlVeh->gearState == gearFlag::drive) ctrlVeh->accVec = scalarMultiple(dir16ToVec(ctrlVeh->wheelDir), 7.0);
+				else if (ctrlVeh->gearState == gearFlag::reverse) ctrlVeh->accVec = scalarMultiple(dir16ToVec(reverse(ctrlVeh->wheelDir)), 7.0);
+				turnWait(1.0);
+			}
+			else updateLog(L"차량에 시동이 걸리지 않은 상태다.");
 			break;
 		}
 		case act::brake:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			myCar->rpmState = 0;
-			myCar->singleRailMoveCounter = 0;
-			myCar->singleRailSpdVal = 0;
+			ctrlVeh->rpmState = 0;
+			ctrlVeh->singleRailMoveCounter = 0;
+			ctrlVeh->singleRailSpdVal = 0;
 
-			if (myCar->spdVec.getLength() != 0)
+			if (ctrlVeh->spdVec.getLength() != 0)
 			{
-				myCar->accVec = getZeroVec();
-				myCar->turnOnBrake = true;
+				ctrlVeh->accVec = getZeroVec();
+				ctrlVeh->turnOnBrake = true;
 				float delSpd = 1.0;
 				float massCoeff = 1.0;
 				float frictionCoeff = 10.0;
 				delSpd = frictionCoeff / massCoeff;
-				Vec3 brakeNormDirVec = scalarMultiple(myCar->spdVec, -1).getNormDirVec();
+				Vec3 brakeNormDirVec = scalarMultiple(ctrlVeh->spdVec, -1).getNormDirVec();
 				Vec3 brakeVec = scalarMultiple(brakeNormDirVec, delSpd);
 
-				if (myCar->spdVec.getLength() < brakeVec.getLength())
+				if (ctrlVeh->spdVec.getLength() < brakeVec.getLength())
 				{
-					myCar->spdVec = getZeroVec();
+					ctrlVeh->spdVec = getZeroVec();
 				}
 				else
 				{
-					myCar->spdVec.addVec(brakeVec);
+					ctrlVeh->spdVec.addVec(brakeVec);
 				}
 			}
 			turnWait(1.0);
@@ -536,40 +544,35 @@ public:
 			break;
 		case act::collectiveLever:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			myCar->collectiveState++;
-			if (myCar->collectiveState >= 2) myCar->collectiveState = -1;
+			ctrlVeh->collectiveState++;
+			if (ctrlVeh->collectiveState >= 2) ctrlVeh->collectiveState = -1;
 
-			if (myCar->collectiveState == 1) myCar->spdVec.compZ = 1;
-			else if (myCar->collectiveState == -1) myCar->spdVec.compZ = -1;
-			else myCar->spdVec.compZ = 0;
+			if (ctrlVeh->collectiveState == 1) ctrlVeh->spdVec.compZ = 1;
+			else if (ctrlVeh->collectiveState == -1) ctrlVeh->spdVec.compZ = -1;
+			else ctrlVeh->spdVec.compZ = 0;
 
 			break;
 		}
 		case act::cyclicLever:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			myCar->cyclicState++;
-			if (myCar->cyclicState >= 8) myCar->cyclicState = -1;
+			ctrlVeh->cyclicState++;
+			if (ctrlVeh->cyclicState >= 8) ctrlVeh->cyclicState = -1;
 			break;
 		}
 		case act::rpmLever:
 		{
-			Vehicle* myCar = (Vehicle*)ctrlVeh;
-			myCar->rpmState++;
-			if (myCar->rpmState >= 7) myCar->rpmState = 0;
+			ctrlVeh->rpmState++;
+			if (ctrlVeh->rpmState >= 7) ctrlVeh->rpmState = 0;
 			break;
 		}
 		case act::tailRotorPedalL:
 		{
-			Vehicle* myHeli = (Vehicle*)(ctrlVeh);
-			myHeli->rotate(ACW(myHeli->bodyDir));
+			ctrlVeh->rotate(ACW(ctrlVeh->bodyDir));
 			break;
 		}
 		case act::tailRotorPedalR:
 		{
-			Vehicle* myHeli = (Vehicle*)(ctrlVeh);
-			myHeli->rotate(CW(myHeli->bodyDir));
+			ctrlVeh->rotate(CW(ctrlVeh->bodyDir));
 			break;
 		}
 		case act::closeDoor:
@@ -579,12 +582,11 @@ public:
 		}
 		case act::headlight:
 		{
-			Vehicle* myCar = (Vehicle*)(ctrlVeh);
-			if (myCar->headlightOn)
+			if (ctrlVeh->headlightOn)
 			{
-				myCar->headlightOn = false;
+				ctrlVeh->headlightOn = false;
 
-				for (auto it = myCar->partInfo.begin(); it != myCar->partInfo.end(); it++)
+				for (auto it = ctrlVeh->partInfo.begin(); it != ctrlVeh->partInfo.end(); it++)
 				{
 					for (int i = 0; i < it->second->itemInfo.size(); i++)
 					{
@@ -597,13 +599,12 @@ public:
 						}
 					}
 				}
-
 			}
 			else
 			{
-				myCar->headlightOn = true;
+				ctrlVeh->headlightOn = true;
 
-				for(auto it = myCar->partInfo.begin(); it != myCar->partInfo.end(); it++)
+				for(auto it = ctrlVeh->partInfo.begin(); it != ctrlVeh->partInfo.end(); it++)
 				{
 					for (int i = 0; i < it->second->itemInfo.size(); i++)
 					{
@@ -611,7 +612,7 @@ public:
 						{
 							if (it->second->itemInfo[i].lightPtr == nullptr)
 							{
-								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], myCar->getGridZ(), 12, 120, col::white, myCar->bodyDir);
+								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], ctrlVeh->getGridZ(), 12, 120, col::white, ctrlVeh->bodyDir);
 							}
 						}
 					}
@@ -619,10 +620,12 @@ public:
 			}
 
 			PlayerPtr->updateVision();
+			PlayerPtr->updateMinimap();
 			break;
 		}
 		default:
 			updateLog(L"#FFFFFF알수없는 레터박스 버튼이 눌렸다.");
+			break;
 		}
 
 		if (popDownWhenEnd == true && ctrlVeh == nullptr)
@@ -659,12 +662,16 @@ public:
 								ctrlVeh = belowVehicle;
 								barAct = actSet::vehicle;
 								typeHUD = vehFlag::car;
+								PlayerPtr->updateVision();
+								PlayerPtr->updateMinimap();
 							}
 							else
 							{
 								ctrlVeh = nullptr;
 								barAct = actSet::null;
 								typeHUD = vehFlag::none;
+								PlayerPtr->updateVision();
+								PlayerPtr->updateMinimap();
 							}
 						}
 						else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 311)//헬기 조종장치

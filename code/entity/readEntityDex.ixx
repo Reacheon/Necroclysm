@@ -44,6 +44,8 @@ namespace csvEntity
     constexpr int partsSprIndexStart = 28;
     constexpr int relation = 29;
     constexpr int isHumanCustomSprite = 30;
+    constexpr int atkSpr1 = 31;
+    constexpr int atkSpr2 = 32;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -99,40 +101,43 @@ export int readEntityDex(const wchar_t* file)
 
                 if (arrayCounter / (csvWidth) != 0)
                 {
-                    switch (arrayCounter % (csvWidth))
+                    const int tgtIndex = arrayCounter / (csvWidth)-1;
+                    const int columnIndex = arrayCounter % csvWidth;
+
+                    switch (columnIndex)
                     {
                         case csvEntity::name:
-                            entityDex[arrayCounter / (csvWidth)-1].name = strFragment;
+                            entityDex[tgtIndex].name = strFragment;
                             break;
                         case csvEntity::entityCode:
-                            entityDex[arrayCounter / (csvWidth)-1].entityCode = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].entityCode = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::sprFileName:
                             errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
-                            entityDex[arrayCounter / (csvWidth)-1].entitySpr = spr::spriteMapper[strFragment.c_str()];
+                            entityDex[tgtIndex].entitySpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvEntity::tooltip:
                             entityTooltip.push_back(strFragment);
-                            entityDex[arrayCounter / (csvWidth)-1].tooltipIndex = arrayCounter / (csvWidth)-1;
+                            entityDex[tgtIndex].tooltipIndex = tgtIndex;
                             break;
                         case csvEntity::category:
                         {
-                            if (strFragment == L"none") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::none; }
-                            else if (strFragment == L"human") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::human; }
-                            else if (strFragment == L"zombie") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::zombie; }
-                            else if (strFragment == L"robot") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::robot; }
-                            else if (strFragment == L"animal") { entityDex[arrayCounter / (csvWidth)-1].category = entityCategory::animal; }
+                            if (strFragment == L"none") { entityDex[tgtIndex].category = entityCategory::none; }
+                            else if (strFragment == L"human") { entityDex[tgtIndex].category = entityCategory::human; }
+                            else if (strFragment == L"zombie") { entityDex[tgtIndex].category = entityCategory::zombie; }
+                            else if (strFragment == L"robot") { entityDex[tgtIndex].category = entityCategory::robot; }
+                            else if (strFragment == L"animal") { entityDex[tgtIndex].category = entityCategory::animal; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
                             break;
                         }
                         case csvEntity::temperature:
-                            entityDex[arrayCounter / (csvWidth)-1].temparature = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].temparature = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::weight:
-                            entityDex[arrayCounter / (csvWidth)-1].weight = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].weight = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::volume:
-                            entityDex[arrayCounter / (csvWidth)-1].volume = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].volume = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::material:
                             int val;
@@ -146,48 +151,45 @@ export int readEntityDex(const wchar_t* file)
                                     strFragment.erase(0, j + 1);
                                     j = 0;
 
-                                    entityDex[arrayCounter / (csvWidth)-1].material.push_back(val);
+                                    entityDex[tgtIndex].material.push_back(val);
                                 }
                             }
                             break;
                         case csvEntity::HD:
-                            entityDex[arrayCounter / (csvWidth)-1].HD = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].HD = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::maxHP:
-                            entityDex[arrayCounter / (csvWidth)-1].maxHP = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].maxHP = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rPierce:
-                        {
+                            entityDex[tgtIndex].rPierce = wtoi(strFragment.c_str());
                             break;
-                        }
                         case csvEntity::rCut:
-                        {
+                            entityDex[tgtIndex].rCut = wtoi(strFragment.c_str());
                             break;
-                        }
                         case csvEntity::rBash:
-                        {
+                            entityDex[tgtIndex].rBash = wtoi(strFragment.c_str());
                             break;
-                        }
                         case csvEntity::SH:
-                            entityDex[arrayCounter / (csvWidth)-1].sh = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].sh = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::EV:
-                            entityDex[arrayCounter / (csvWidth)-1].ev = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].ev = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rFire:
-                            entityDex[arrayCounter / (csvWidth)-1].rFire = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].rFire = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rCold:
-                            entityDex[arrayCounter / (csvWidth)-1].rCold = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].rCold = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rElec:
-                            entityDex[arrayCounter / (csvWidth)-1].rElec = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].rElec = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rCorr:
-                            entityDex[arrayCounter / (csvWidth)-1].rCorr = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].rCorr = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::rRad:
-                            entityDex[arrayCounter / (csvWidth)-1].rRad = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].rRad = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::bionicList:
                         {
@@ -202,29 +204,29 @@ export int readEntityDex(const wchar_t* file)
                                     strFragment.erase(0, j + 1);
                                     j = 0;
 
-                                    entityDex[arrayCounter / (csvWidth)-1].bionicList.push_back(val);
+                                    entityDex[tgtIndex].bionicList.push_back(val);
                                 }
                             }
                             break;
                         }
                         case csvEntity::corpseItemCode:
-                            entityDex[arrayCounter / (csvWidth)-1].corpseItemCode = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].corpseItemCode = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::statStr:
-                            entityDex[arrayCounter / (csvWidth)-1].statStr = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].statStr = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::statInt:
-                            entityDex[arrayCounter / (csvWidth)-1].statInt = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].statInt = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::statDex:
-                            entityDex[arrayCounter / (csvWidth)-1].statDex = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].statDex = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::hpBarHeight:
-                            entityDex[arrayCounter / (csvWidth)-1].hpBarHeight = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].hpBarHeight = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::partsPosition:
                         {
-                            entityDex[arrayCounter / (csvWidth)-1].partsPosition.clear();
+                            entityDex[tgtIndex].partsPosition.clear();
                             std::array<int, 3> val;
                             int counter = 0;
                             for (int j = 0; j < strFragment.size(); j++)
@@ -245,28 +247,34 @@ export int readEntityDex(const wchar_t* file)
                                     counter = 0;
                                     strFragment.erase(0, j + 1);
                                     j = 0;
-                                    entityDex[arrayCounter / (csvWidth)-1].partsPosition[val[0]] = { val[1], val[2] };
+                                    entityDex[tgtIndex].partsPosition[val[0]] = { val[1], val[2] };
                                 }
                             }
                             break;
                         }
                         case csvEntity::partsSprIndexStart:
-                            entityDex[arrayCounter / (csvWidth)-1].partsStartIndex = wtoi(strFragment.c_str());
+                            entityDex[tgtIndex].partsStartIndex = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::relation:
                         {
-                            if (strFragment == L"NEUTRAL") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::neutral; }
-                            else if (strFragment == L"HOSTILE") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::hostile; }
-                            else if (strFragment == L"FRIENDLY") { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::friendly; }
-                            else { entityDex[arrayCounter / (csvWidth)-1].relation = relationFlag::neutral; }
+                            if (strFragment == L"NEUTRAL") { entityDex[tgtIndex].relation = relationFlag::neutral; }
+                            else if (strFragment == L"HOSTILE") { entityDex[tgtIndex].relation = relationFlag::hostile; }
+                            else if (strFragment == L"FRIENDLY") { entityDex[tgtIndex].relation = relationFlag::friendly; }
+                            else { entityDex[tgtIndex].relation = relationFlag::neutral; }
                             break;
                         }
                         case csvEntity::isHumanCustomSprite:
                         {
-                            if (strFragment == L"TRUE") { entityDex[arrayCounter / (csvWidth)-1].isHumanCustomSprite = true; }
-                            else { entityDex[arrayCounter / (csvWidth)-1].isHumanCustomSprite = false; }
+                            if (strFragment == L"TRUE") { entityDex[tgtIndex].isHumanCustomSprite = true; }
+                            else { entityDex[tgtIndex].isHumanCustomSprite = false; }
                             break;
                         }
+                        case csvEntity::atkSpr1:
+                            entityDex[tgtIndex].atkSpr1 = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::atkSpr2:
+                            entityDex[tgtIndex].atkSpr2 = wtoi(strFragment.c_str());
+                            break;
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
                             break;

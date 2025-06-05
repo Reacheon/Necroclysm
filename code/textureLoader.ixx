@@ -14,6 +14,8 @@ export void textureLoader()
 	//load texture
 	texture::minimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, MINIMAP_DIAMETER, MINIMAP_DIAMETER);
 	SDL_SetTextureScaleMode(texture::minimap, SDL_SCALEMODE_NEAREST);
+	texture::navimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, NAVIMAP_WIDTH, NAVIMAP_HEIGHT);
+	SDL_SetTextureScaleMode(texture::navimap, SDL_SCALEMODE_NEAREST);
 	texture::worldmap = IMG_LoadTexture(renderer, "image/worldmap.png");
 	SDL_SetTextureScaleMode(texture::worldmap, SDL_SCALEMODE_NEAREST);
 
@@ -101,6 +103,7 @@ export void textureLoader()
 	spr::shadow = new Sprite(renderer, "image/charset/shadow.png", 48, 48);
 
 	spr::vehicleHUD = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUD.png", 720, 580);
+	spr::dashboard = new Sprite(renderer, "image/UI/GUI/Vehicle/dashboard.png", 720, 580);
 	spr::vehicleHUDParts = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUDParts.png", 64, 64);
 	spr::vehicleHUDSteeringWheel = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUDSteeringWheel.png", 256, 256);
 	spr::vehicleActCursor = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleActCursor.png", 72, 72);

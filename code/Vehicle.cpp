@@ -716,6 +716,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
                 cameraFix = true;
                 PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+                PlayerPtr->updateMinimap();
                 resetTimer();
                 setAniType(aniFlag::null);
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), this));

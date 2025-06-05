@@ -607,7 +607,7 @@ __int64 drawEntities()
 	//조종 중인 차량의 마커 그리기
 	if (ctrlVeh != nullptr)
 	{
-		Vehicle* vPtr = (Vehicle*)ctrlVeh;
+		Vehicle* vPtr = ctrlVeh;
 		for (auto it = vPtr->partInfo.begin(); it != vPtr->partInfo.end(); it++)
 		{
 			int tgtX = it->first[0];

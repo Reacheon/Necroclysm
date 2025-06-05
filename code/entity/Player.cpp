@@ -129,18 +129,74 @@ void Player::startMove(int inputDir)
 void Player::updateMinimap()
 {
 	auto timeStampStart = getNanoTimer();
-	SDL_SetRenderTarget(renderer, texture::minimap);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_RenderClear(renderer);
 
-	for (int dx = -(MINIMAP_DIAMETER / 2); dx <= (MINIMAP_DIAMETER / 2); dx++)
+
+	// 현재 플레이어가 있는 청크 좌표 계산
+	int playerChunkX, playerChunkY;
+	World::ins()->changeToChunkCoord(getGridX(), getGridY(), playerChunkX, playerChunkY);
+
+	if (ctrlVeh == nullptr)
 	{
-		for (int dy = -(MINIMAP_DIAMETER / 2); dy <= (MINIMAP_DIAMETER / 2); dy++)
+		SDL_SetRenderTarget(renderer, texture::minimap);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+
+		for (int dx = -(MINIMAP_DIAMETER / 2); dx <= (MINIMAP_DIAMETER / 2); dx++)
 		{
-			if (isCircle(MINIMAP_DIAMETER / 2, dx, dy))
+			for (int dy = -(MINIMAP_DIAMETER / 2); dy <= (MINIMAP_DIAMETER / 2); dy++)
+			{
+				if (isCircle(MINIMAP_DIAMETER / 2, dx, dy))
+				{
+					SDL_Color ptCol;
+					const TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
+					if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
+					{
+						//floor
+						switch (tgtTile->floor)
+						{
+						case 0:
+							break;
+						default:
+							ptCol = { 112,112, 112 };
+							break;
+						}
+						//wall
+						switch (tgtTile->wall)
+						{
+						case 0:
+							break;
+						default:
+							ptCol = { 29,29, 29 };
+							break;
+						}
+						//prop
+						if (tgtTile->PropPtr != nullptr) ptCol = lowCol::yellow;
+						//vehicle
+						if (tgtTile->VehiclePtr != nullptr) ptCol = lowCol::orange;
+						drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), ptCol);
+						if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black, 100);
+					}
+					else drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black);
+				}
+			}
+		}
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		SDL_RenderPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
+	}
+	else
+	{
+		SDL_SetRenderTarget(renderer, texture::navimap);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+
+		for (int dx = -(NAVIMAP_WIDTH / 2); dx <= (NAVIMAP_WIDTH / 2); dx++)
+		{
+			for (int dy = -(NAVIMAP_HEIGHT / 2); dy <= (NAVIMAP_HEIGHT / 2); dy++)
 			{
 				SDL_Color ptCol;
 				const TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
+				ptCol = { 255,255, 255 };
+				drawPoint(dx + (NAVIMAP_WIDTH / 2), dy + (NAVIMAP_HEIGHT / 2), ptCol);
 				if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 				{
 					//floor
@@ -152,7 +208,6 @@ void Player::updateMinimap()
 						ptCol = { 112,112, 112 };
 						break;
 					}
-
 					//wall
 					switch (tgtTile->wall)
 					{
@@ -162,26 +217,23 @@ void Player::updateMinimap()
 						ptCol = { 29,29, 29 };
 						break;
 					}
-
 					//prop
 					if (tgtTile->PropPtr != nullptr) ptCol = lowCol::yellow;
 					//vehicle
 					if (tgtTile->VehiclePtr != nullptr) ptCol = lowCol::orange;
-
-					drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), ptCol);
-
-					if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black, 100);
+					drawPoint(dx + (NAVIMAP_WIDTH / 2), dy + (NAVIMAP_HEIGHT / 2), ptCol);
+					if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (NAVIMAP_WIDTH / 2), dy + (NAVIMAP_HEIGHT / 2), col::black, 100);
 				}
-				else drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black);
+				else drawPoint(dx + (NAVIMAP_WIDTH / 2), dy + (NAVIMAP_HEIGHT / 2), col::black);
 			}
 		}
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		SDL_RenderPoint(renderer, (NAVIMAP_WIDTH / 2), (NAVIMAP_HEIGHT / 2));
 	}
-
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_RenderPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_SetRenderTarget(renderer, nullptr);
 }
+
 
 
 void Player::updateVision(int range, int cx, int cy)

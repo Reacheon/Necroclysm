@@ -16,6 +16,18 @@ public:
 	int lLegHP = 100;
 	int rLegHP = 100;
 
+	int headFakeHP = 100;
+	int lArmFakeHP = 100;
+	int rArmFakeHP = 100;
+	int lLegFakeHP = 100;
+	int rLegFakeHP = 100;
+
+	int headFakeHPAlpha = 255;
+	int lArmFakeHPAlpha = 255;
+	int rArmFakeHPAlpha = 255;
+	int lLegFakeHPAlpha = 255;
+	int rLegFakeHPAlpha = 255;
+
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;

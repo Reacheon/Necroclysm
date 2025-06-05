@@ -103,18 +103,166 @@ void Entity::loadDataFromDex(int index)
 	entityInfo.HP = entityInfo.maxHP;
 	entityInfo.fakeHP = entityInfo.maxHP;
 }
-//@brief 해당 파츠에 데미지를 추가하고 메인 HP도 그만큼 뺍니다.
-void Entity::takeDamage(int inputDmg, dmgFlag inputType)
+
+//@brief 해당 파츠에 데미지를 추가하고 메인 HP에는 절반만 전달합니다.
+void Entity::takeDamage(int inputDmg, dmgFlag inputType, humanPartFlag inputPart)
 {
-	new Damage(std::to_wstring(inputDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
-	entityInfo.HP -= inputDmg;
+	int calcDmg = inputDmg;
+	int partDmg = 0;
+
+	if (inputType == dmgFlag::pierce)
+	{
+		if (entityInfo.isPlayer)
+		{
+			if (inputPart == humanPartFlag::head)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceHead()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceLArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceRArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceLLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceRLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else // torso 직접 공격
+			{
+				calcDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResPierceTorso()));
+			}
+		}
+		else calcDmg = myMax(0, inputDmg - randomRange(0, entityInfo.rPierce));
+	}
+	else if (inputType == dmgFlag::cut)
+	{
+		if (entityInfo.isPlayer)
+		{
+			if (inputPart == humanPartFlag::head)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutHead()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutLArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutRArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutLLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutRLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else // torso 직접 공격
+			{
+				calcDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResCutTorso()));
+			}
+		}
+		else calcDmg = myMax(0, inputDmg - randomRange(0, entityInfo.rCut));
+	}
+	else if (inputType == dmgFlag::bash)
+	{
+		if (entityInfo.isPlayer)
+		{
+			if (inputPart == humanPartFlag::head)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashHead()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashLArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rArm)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashRArm()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::lLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashLLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else if (inputPart == humanPartFlag::rLeg)
+			{
+				partDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashRLeg()));
+				calcDmg = partDmg / 2; // 부위 데미지의 절반만 몸통으로
+			}
+			else // torso 직접 공격
+			{
+				calcDmg = myMax(0, inputDmg - randomRange(0, PlayerPtr->getResBashTorso()));
+			}
+		}
+		else calcDmg = myMax(0, inputDmg - randomRange(0, entityInfo.rBash));
+	}
+	else if (inputType == dmgFlag::fire)
+	{
+		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResFire(), 99))) / 100.0f)));
+		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rFire, 99))) / 100.0f)));
+	}
+	else if (inputType == dmgFlag::ice)
+	{
+		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResCold(), 99))) / 100.0f)));
+		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rCold, 99))) / 100.0f)));
+	}
+	else if (inputType == dmgFlag::elec)
+	{
+		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResElec(), 99))) / 100.0f)));
+		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rElec, 99))) / 100.0f)));
+	}
+	else if (inputType == dmgFlag::corr)
+	{
+		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResCorr(), 99))) / 100.0f)));
+		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rCorr, 99))) / 100.0f)));
+	}
+	else if (inputType == dmgFlag::rad)
+	{
+		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResRad(), 99))) / 100.0f)));
+		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rRad, 99))) / 100.0f)));
+	}
+
+	new Damage(std::to_wstring(calcDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
+
+	if (entityInfo.isPlayer)
+	{
+		if (inputPart == humanPartFlag::head) PlayerPtr->headHP -= partDmg;
+		else if (inputPart == humanPartFlag::lArm) PlayerPtr->lArmHP -= partDmg;
+		else if (inputPart == humanPartFlag::rArm) PlayerPtr->rArmHP -= partDmg;
+		else if (inputPart == humanPartFlag::lLeg) PlayerPtr->lLegHP -= partDmg;
+		else if (inputPart == humanPartFlag::rLeg) PlayerPtr->rLegHP -= partDmg;
+	}
+
+	entityInfo.HP -= calcDmg;
 	if (entityInfo.HP <= 0)//HP 0, 사망
 	{
 		death();
 		return;
 	}
-
 }
+
 void Entity::updateStatus()
 {
 	//rPCB rFCECR SH EV 등을 업데이트함
@@ -304,8 +452,8 @@ void Entity::move(int dir, bool jump)
 	}
 	else
 	{
+		EntityPtrMove({ prevGridX,prevGridY, getGridZ() }, { prevGridX + dGridX, prevGridY + dGridY, getGridZ() });
 		setDstGrid(dstGridX, dstGridY);
-		setGrid(dstGridX, dstGridY, getGridZ());
 
 		if (pulledCart != nullptr)
 		{
@@ -330,7 +478,23 @@ void Entity::attack(int gridX, int gridY)
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			victimEntity->flash = { 255, 0, 0, 120 };
-			victimEntity->takeDamage(randomRange(6, 10), dmgFlag::none);
+			if (victimEntity->entityInfo.isPlayer)
+			{
+                int prob = randomRange(0, 100);	
+                humanPartFlag part = humanPartFlag::torso;
+
+				if (prob <= 10) part = humanPartFlag::head;
+				else if(prob <= 20) part = humanPartFlag::lArm;
+				else if (prob <= 30) part = humanPartFlag::rArm;
+				else if (prob <= 40) part = humanPartFlag::lLeg;
+                else if (prob <= 50) part = humanPartFlag::rLeg;	
+
+				victimEntity->takeDamage(randomRange(6, 10), dmgFlag::pierce, part);
+			}
+			else
+			{
+				victimEntity->takeDamage(randomRange(6, 10), dmgFlag::pierce);
+			}
 		}
 		else
 		{

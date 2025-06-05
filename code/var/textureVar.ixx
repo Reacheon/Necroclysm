@@ -13,6 +13,7 @@ export namespace texture
 {
 	SDL_Texture* minimap = nullptr;
 	SDL_Texture* worldmap = nullptr;
+	SDL_Texture* navimap = nullptr;
 }
 
 export namespace spr
@@ -104,6 +105,7 @@ export namespace spr
 	Sprite* hairMiddlePart = nullptr;
 	Sprite* shadow = nullptr;
 	Sprite* vehicleHUD = nullptr;
+	Sprite* dashboard = nullptr;
 	Sprite* vehicleHUDParts = nullptr;
 	Sprite* vehicleHUDSteeringWheel = nullptr;
 	Sprite* vehicleActCursor = nullptr;
@@ -154,4 +156,5 @@ export namespace spr
 	Sprite* youDied = nullptr;
 	Sprite* gameOverOptionRect = nullptr;
 	Sprite* gameOverOptionMarker = nullptr;
+
 }

@@ -189,6 +189,10 @@ bool Entity::runAnimation(bool shutdown)
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
 				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
 			}
+			else
+			{
+				if(entityInfo.atkSpr1 != -1) setSpriteIndex(entityInfo.atkSpr1);
+			}
 			break;
 		case 3:
 			setFakeX(getFakeX() + 2.5 * dx);
@@ -236,6 +240,10 @@ bool Entity::runAnimation(bool shutdown)
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
 				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
 			}
+			else
+			{
+				if (entityInfo.atkSpr2 != -1) setSpriteIndex(entityInfo.atkSpr2);
+			}
 			break;
 		case 9:
 			setFakeX(getFakeX() - 0.5 * dx);
@@ -282,6 +290,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 			}
+			else setSpriteIndex(0);
 			if (entityInfo.isPlayer == true) { turnWait(endAtk()); }
 			else { endAtk(); }
 			return true;

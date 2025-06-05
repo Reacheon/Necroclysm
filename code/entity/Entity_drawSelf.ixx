@@ -298,7 +298,7 @@ void Entity::drawSelf()
 	bool doDrawHP = false;
 	if (entityInfo.HP != entityInfo.maxHP) doDrawHP = true;
 
-	if (doDrawHP)//개체 HP 표기
+	if (doDrawHP && entityInfo.HP>0)//개체 HP 표기
 	{
 		int pivotX = drawingX - (int)(8 * zoomScale);
 		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);

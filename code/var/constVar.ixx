@@ -24,6 +24,8 @@ export constexpr int TALENT_SIZE = 19;
 export constexpr int MAX_VEHICLE_SIZE = 31;
 export constexpr int CHUNK_LOADING_RANGE = 5;
 export constexpr int MINIMAP_DIAMETER = 41; //미니맵의 지름 (홀수)
+export constexpr int NAVIMAP_WIDTH = 83;//167;
+export constexpr int NAVIMAP_HEIGHT = 48;//99;
 export constexpr int SECTOR_SIZE = 400; // 절차적 맵 생성할 때 작용하는 범위
 export constexpr int TOLERANCE_LSTICK = 10000; //LStick이 이 값을 넘어야 판정이 일어남
 export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 이벤트가 일어나지 않음
@@ -38,6 +40,7 @@ export constexpr int QUICK_SLOT_MAX = 8;
 export constexpr int CRAFT_MAX_ROW = 4;
 
 export constexpr int MAX_ENC = 10; //최대 방해도
+export constexpr int PART_MAX_HP = 100;
 
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
@@ -933,6 +936,16 @@ export enum class dmgFlag
     elec,
     corr,
     rad
+};
+
+export enum class humanPartFlag
+{
+    head,
+    torso,
+    lArm,
+    rArm,
+    lLeg,
+    rLeg,
 };
 
 //플레이어가 취할 수 있는 공격의 타입, Aim의 5가지 종류(관통, 절단, 타격, 사격, 투척)

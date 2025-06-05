@@ -219,30 +219,27 @@ export void debugConsole()
 	}
 	case 15://탑승 중인 차량 회전
 	{
-		Vehicle* myCar = (Vehicle*)(ctrlVeh);
-		myCar->rotate(ACW(myCar->bodyDir));
+		ctrlVeh->rotate(ACW(ctrlVeh->bodyDir));
 		break;
 	}
 	case 16://탑승 중인 차량 순간이동
 	{
-		Vehicle* myCar = (Vehicle*)(ctrlVeh);
 		int dx, dy;
 		prt(L"이동할 거리 dx를 입력해주세요.\n");
 		std::cin >> dx;
 		prt(L"이동할 거리 dy를 입력해주세요.\n");
 		std::cin >> dy;
-		myCar->shift(dx, dy);
+		ctrlVeh->shift(dx, dy);
 		break;
 	}
 	case 17://탑승 중인 차량 이동
 	{
-		Vehicle* myCar = (Vehicle*)(ctrlVeh);
 		int dx, dy;
 		prt(L"이동할 거리 dx를 입력해주세요.\n");
 		std::cin >> dx;
 		prt(L"이동할 거리 dy를 입력해주세요.\n");
 		std::cin >> dy;
-		myCar->rush(dx, dy);
+		ctrlVeh->rush(dx, dy);
 		break;
 	}
 	case 18: //fov 출력
