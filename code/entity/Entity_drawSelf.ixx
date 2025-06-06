@@ -295,16 +295,15 @@ void Entity::drawSelf()
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	bool doDrawHP = false;
-	if (entityInfo.HP != entityInfo.maxHP) doDrawHP = true;
 
-	if (doDrawHP && entityInfo.HP>0)//개체 HP 표기
+	if (entityInfo.displayHPBarCount > 0 && entityInfo.HP>0)//개체 HP 표기
 	{
+
 		int pivotX = drawingX - (int)(8 * zoomScale);
 		int pivotY = drawingY + (int)((-8 + entityInfo.hpBarHeight) * zoomScale);
 		SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		drawFillRect(dst, col::black);
+		drawFillRect(dst, col::black, entityInfo.alphaHPBar);
 
 		//페이크 HP
 		if (entityInfo.fakeHP > entityInfo.HP) { entityInfo.fakeHP--; }
@@ -314,18 +313,7 @@ void Entity::drawSelf()
 			if (entityInfo.fakeHPAlpha > 30) { entityInfo.fakeHPAlpha -= 30; }
 			else { entityInfo.fakeHPAlpha = 0; }
 		}
-		else { entityInfo.fakeHPAlpha = 255; }
-
-		//페이크 MP
-		if (entityInfo.fakeMP > entityInfo.MP) { entityInfo.fakeMP--; }
-		else if (entityInfo.fakeMP < entityInfo.MP) entityInfo.fakeMP = entityInfo.MP;
-		if (entityInfo.fakeMP != entityInfo.MP)
-		{
-			if (entityInfo.fakeMPAlpha > 30) { entityInfo.fakeMPAlpha -= 30; }
-			else { entityInfo.fakeMPAlpha = 0; }
-		}
-		else { entityInfo.fakeMPAlpha = 255; }
-
+		else { entityInfo.fakeHPAlpha = 0; }
 
 		float ratioFakeHP = myMax((float)0.0, (entityInfo.fakeHP) / (float)(entityInfo.maxHP));
 		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
@@ -336,8 +324,20 @@ void Entity::drawSelf()
 		dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
 		if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green);
-		else drawFillRect(dst, lowCol::red);
+		if (entityInfo.isPlayer) drawFillRect(dst, lowCol::green, entityInfo.alphaHPBar);
+		else drawFillRect(dst, lowCol::red, entityInfo.alphaHPBar);
+
+
+		if (entityInfo.displayHPBarCount > 1) entityInfo.displayHPBarCount--;
+		else if (entityInfo.displayHPBarCount == 1)
+		{
+			entityInfo.alphaHPBar -= 10;
+			if (entityInfo.alphaHPBar <= 0)
+			{
+				entityInfo.alphaHPBar = 0;
+				entityInfo.displayHPBarCount = 0;
+			}
+		}
 	}
 
 	if (0)//개체 이름 표기
@@ -358,8 +358,6 @@ void Entity::drawSelf()
 
 			int textX = pivotX + (int)(8 * zoomScale);
 			int textY = pivotY - (int)(3 * zoomScale);
-			if (doDrawHP == true) textY = pivotY - (int)(3 * zoomScale);
-			else textY = pivotY - (int)(0 * zoomScale);
 
 			if (zoomScale == 1.0) textY -= (int)(1 * zoomScale);
 

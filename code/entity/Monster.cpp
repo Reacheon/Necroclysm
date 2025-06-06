@@ -213,6 +213,7 @@ void Monster::death()
 	new Corpse(corpseType::bloodM, getX(), getY(), getGridZ());
 	std::unique_ptr<ItemPocket> dropItems = std::make_unique<ItemPocket>(storageType::temp);
 	dropItems.get()->addItemFromDex(entityInfo.corpseItemCode, 1);
+	if(entityInfo.sprFlip) dropItems->itemInfo[0].sprIndex++;
 	drop(dropItems.get());
 	World::ins()->getTile({ getGridX(),getGridY(),getGridZ() }).EntityPtr.reset();
 }

@@ -83,9 +83,4 @@ public:
 	int getEncRArm();
 	int getEncLLeg();
 	int getEncRLeg();
-
-	void takeDamageHead(int val, dmgFlag inputType)
-	{
-		takeDamage(val, inputType);
-	}
 };

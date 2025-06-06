@@ -64,10 +64,13 @@ export struct EntityData : public EntityData_Base
     
     ////////////////////////////////csv에 없는 데이터/////////////////////////////////////
     __int16 HP = 100;
-    __int16 MP = 100;
-    __int16 STA = 60;
     __int16 fakeHP = 100;
     unsigned __int8 fakeHPAlpha = 255;
+    __int16 displayHPBarCount = 0;
+    __int16 alphaHPBar = 0;
+
+    __int16 MP = 100;
+    __int16 STA = 60;
     __int16 fakeMP = 100;
     unsigned __int8 fakeMPAlpha = 255;
     __int16 recentDmg = 0;

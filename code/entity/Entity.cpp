@@ -107,6 +107,8 @@ void Entity::loadDataFromDex(int index)
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP에는 절반만 전달합니다.
 void Entity::takeDamage(int inputDmg, dmgFlag inputType, humanPartFlag inputPart)
 {
+	entityInfo.displayHPBarCount = 600;//100초
+	entityInfo.alphaHPBar = 255;
 	int calcDmg = inputDmg;
 	int partDmg = 0;
 
