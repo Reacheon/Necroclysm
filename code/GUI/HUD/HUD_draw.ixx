@@ -21,6 +21,7 @@ import drawEpsilonText;
 import ContextMenu;
 import Maint;
 
+
 namespace segmentIndex
 {
 	int zero = 0;
@@ -523,6 +524,7 @@ void HUD::drawGUI()
 	drawBarAct();
 	drawTab();
 	drawQuickSlot();
+	drawQuest();
 	//drawHoverItemInfo();
 
 }
@@ -1047,69 +1049,112 @@ void HUD::drawStatusEffects()
 	std::vector<std::pair<statEfctFlag, int>>& myEfcts = PlayerPtr->entityInfo.statusEffects;
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
-		int pivotX = 10;
-		int pivotY = 185 + 38*i;
+		int pivotX = 5;
+		int pivotY = 250 + 20*i;
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
+        SDL_Color textColor = col::white;
 
 		switch (myEfcts[i].first)
 		{
 		case statEfctFlag::confusion:
-			statEfctName = L"Confusion";
+			statEfctName = L"혼란";
 			statEfctIcon = 1;
 			break;
 		case statEfctFlag::bleeding:
-			statEfctName = L"Bleeding";
+			statEfctName = L"출혈";
 			statEfctIcon = 2;
 			break;
-		case statEfctFlag::hunger:
-			statEfctName = L"Hunger";
+		case statEfctFlag::hungry:
+			if (hunger < 14400)
+			{
+				statEfctName = L"영양실조";
+				textColor = lowCol::red;
+			}
+			else if (hunger < 14400 * 2)
+			{
+				statEfctName = L"매우 배고픔";
+				textColor = lowCol::orange;
+			}
+			else if (hunger < 14400 * 3)
+			{
+				statEfctName = L"배고픔";
+				textColor = lowCol::yellow;
+			}
 			statEfctIcon = 3;
 			break;
 		case statEfctFlag::dehydration:
-			statEfctName = L"Dehydration";
+			if(thirst < 7200)
+			{
+				statEfctName = L"탈수증";
+				textColor = lowCol::red;
+			}
+			else if (thirst < 7200 * 2)
+			{
+				statEfctName = L"매우 목마름";
+				textColor = lowCol::orange;
+			}
+			else if (thirst < 7200 * 3)
+			{
+				statEfctName = L"목마름";
+				textColor = lowCol::yellow;
+            }	
+
 			statEfctIcon = 4;
 			break;
 		case statEfctFlag::blindness:
-			statEfctName = L"Blindness";
+			statEfctName = L"실명";
 			statEfctIcon = 15;
 			break;
 		}
 
-		drawSprite(spr::statusEffectRect, pivotX, pivotY);
+		setFontSize(10);
 
-		setZoom(2.0);
-		drawSprite(spr::statusIcon, statEfctIcon, pivotX + 1, pivotY + 1);
+		setZoom(1.0);
+		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
-		drawCross2(pivotX, pivotY, 0, 5, 0, 5);
-		drawCross2(pivotX + 32, pivotY, 0, 5, 5, 0);
-		drawCross2(pivotX, pivotY + 32, 5, 0, 0, 5);
-		drawCross2(pivotX + 32, pivotY + 32, 5, 0, 5, 0);
+		
+		int textWidth = queryTextWidth(statEfctName)+15;
 
-		setFontSize(12);
-		renderText(statEfctName, pivotX + 37, pivotY + 1, lowCol::red);
+		drawFillRect(SDL_Rect{ pivotX + 16, pivotY, textWidth, 16 }, col::black, 85);
+		int lineStartX = pivotX + textWidth + 16;
+		for (int i = 0; i < 8; i++)
+		{
+			drawLine(lineStartX + i, pivotY + 1 + i, lineStartX + i, pivotY + 15, col::black, 85);
+		}
+
+
+		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1, lowCol::red);
 
 		if (myEfcts[i].second > 0)
 		{
-			setZoom(0.7);
-			int seg1 = myEfcts[i].second / 100;
-			int seg2 = (myEfcts[i].second % 100) / 10;
-			int seg3 = myEfcts[i].second % 10;
+			//setZoom(0.7);
+			//int seg1 = myEfcts[i].second / 100;
+			//int seg2 = (myEfcts[i].second % 100) / 10;
+			//int seg3 = myEfcts[i].second % 10;
+
+			int xCorrection = 0;
+			if (myEfcts[i].second > 999) xCorrection = -8;
+			else if (myEfcts[i].second > 99) xCorrection = -4;
+			else if (myEfcts[i].second < 10) xCorrection = +4;
+
+
+			drawEplsionText(std::to_wstring(myEfcts[i].second), lineStartX + xCorrection, pivotY + 10, col::white);
 			
-			if (seg1 > 0) drawSprite(spr::segment, myEfcts[i].second / 100, pivotX + 97, pivotY + 20);
-			if (seg2 > 0 || seg1 > 0) drawSprite(spr::segment, (myEfcts[i].second % 100)/10, pivotX + 97 + 11, pivotY + 20);
-			if (seg3 > 0 || seg2 > 0 || seg3 > 0) drawSprite(spr::segment, myEfcts[i].second % 10, pivotX + 97 + 22, pivotY + 20);
-			setZoom(1.0);
+			//if (seg1 > 0) drawSprite(spr::segment, myEfcts[i].second / 100, pivotX + 97, pivotY + 20);
+			//if (seg2 > 0 || seg1 > 0) drawSprite(spr::segment, (myEfcts[i].second % 100)/10, pivotX + 97 + 11, pivotY + 20);
+			//if (seg3 > 0 || seg2 > 0 || seg3 > 0) drawSprite(spr::segment, myEfcts[i].second % 10, pivotX + 97 + 22, pivotY + 20);
+			//setZoom(1.0);
 		}
 		else
 		{
-			if (myEfcts[i].first == statEfctFlag::bleeding)
-			{
-				//게이지
-				drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
-				drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
-			}
+			//if (myEfcts[i].first == statEfctFlag::bleeding)
+			//{
+			//	//게이지
+			//	drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
+			//	drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
+			//}
 		}
 	}
 }
@@ -1225,3 +1270,23 @@ void HUD::drawHoverItemInfo()
 	}
 }
 
+void HUD::drawQuest()
+{
+	setFontSize(16);
+	renderText(L"죽음을 거스르는 희망", 8, 182);
+
+	drawLine(8, 200, 118, 200);
+	for (int i = 0; i < 60; i++)
+	{
+		drawPoint(119 + i, 200, col::white, 255 - 4 * i);
+	}
+
+
+	drawRect({ 9, 206,9,9 }, col::white);
+	setFontSize(10);
+	int elapsedDay = getElapsedDays();
+	std::wstring questStr = L"100일 동안 생존  (";
+	questStr += std::to_wstring(elapsedDay);
+	questStr += L"/100)";
+	renderText(questStr, 21, 204);
+}

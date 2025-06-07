@@ -20,6 +20,8 @@ private:
 	int gameOverCursor = -1;
 	int gameOverScroll = 0;
 	float alpha = -100;
+	
+	std::wstring gameOverText = L"사망했다...";
 
 	SDL_Rect optionRect;
 	SDL_Rect newGameBtn;
@@ -29,7 +31,7 @@ private:
 
 	int prevBtn = -1;
 public:
-	GameOver() : GUI(false)
+	GameOver(std::wstring inputText) : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
 		errorBox(ptr != nullptr, L"More than one message instance was generated.");
@@ -44,6 +46,8 @@ public:
 		deactDraw();
 
 		drawHUD = false;
+
+        gameOverText = inputText;	
 
 
 		addAniUSetPlayer(PlayerPtr, aniFlag::faint);
@@ -108,7 +112,7 @@ public:
 			else { markerIndex = 0; }
 
 			setFontSize(12);
-			renderTextOutlineCenter(L"HP가 0이 되어 사망했다.", cameraW / 2, 100 + 155);
+			renderTextOutlineCenter(gameOverText, cameraW / 2, 100 + 155);
 
 			drawSpriteCenter(spr::gameOverOptionRect, 0, optionRect.x + optionRect.w / 2, optionRect.y + optionRect.h / 2);
 

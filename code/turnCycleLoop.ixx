@@ -27,6 +27,7 @@ import turnWait;
 import dirToXY;
 import globalTime;
 import log;
+import GameOver;
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
@@ -85,6 +86,55 @@ export __int64 turnCycleLoop()
 __int64 playerInputTurn()
 {
 	__int64 timeStampStart = getNanoTimer();
+
+	//턴 시작
+	{
+		if (hunger <= 0)
+		{
+			if (GameOver::ins() == nullptr) new GameOver(L"극심한 영양실조로 사망했다.");
+			PlayerPtr->deactAStarDst();
+			aStarTrail.clear();
+		}
+
+		if (thirst <= 0)
+		{
+			if (GameOver::ins() == nullptr) new GameOver(L"극심한 탈수 증세로 사망했다.");
+			PlayerPtr->deactAStarDst();
+			aStarTrail.clear();
+		}
+
+		if (hunger < 300)
+		{
+			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
+			if(statEffects.size()==0)  statEffects.push_back({ statEfctFlag::hungry, -1 });
+			else
+			{
+				for (int i = 0; i < statEffects.size(); i++)
+				{
+					if (statEffects[i].first == statEfctFlag::hungry) break;
+
+					if (i == statEffects.size() - 1) statEffects.push_back({ statEfctFlag::hungry, -1 });
+				}
+			}
+		}
+
+		if (thirst < 300)
+		{
+			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
+			if (statEffects.size() == 0) statEffects.push_back({ statEfctFlag::dehydration, -1 });
+			else
+			{
+				for (int i = 0; i < statEffects.size(); i++)
+				{
+					if (statEffects[i].first == statEfctFlag::dehydration) break;
+
+					if (i == statEffects.size() - 1) statEffects.push_back({ statEfctFlag::dehydration, -1 });
+				}
+			}
+		}
+	}
+
+
 	if (firstPlayerInput)
 	{
 		firstPlayerInput = false;

@@ -42,6 +42,12 @@ export constexpr int CRAFT_MAX_ROW = 4;
 export constexpr int MAX_ENC = 10; //최대 방해도
 export constexpr int PART_MAX_HP = 100;
 
+export constexpr int START_YEAR = 2099;
+export constexpr int START_MONTH = 4;
+export constexpr int START_DAY = 15;
+export constexpr int START_HOUR = 12;
+export constexpr int START_MINUTE = 0;
+
 export constexpr std::array<int, 27> expTable =
 { 50, 100, 150, 200, 250, 300, 350, 400, 450,
 550, 650, 750, 850, 950, 1050, 1150, 1250, 1350,
@@ -1164,6 +1170,8 @@ export namespace itemRefCode
     constexpr int railTL = 324;
     constexpr int railBL = 325;
 
+    constexpr int water = 71;
+
 
     constexpr int railSwitchEN = 326;
     constexpr int railSwitchES = 327;
@@ -1268,7 +1276,7 @@ export enum statEfctFlag
 {
     confusion = 0,
     bleeding = 1,
-    hunger = 2,
+    hungry = 2,
     dehydration = 3,
     blindness = 4,
 };

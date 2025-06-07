@@ -8,7 +8,6 @@ import util;
 import globalVar;
 import wrapVar;
 import constVar;
-import errorBox;
 import textureVar;
 import drawText;
 import checkCursor;

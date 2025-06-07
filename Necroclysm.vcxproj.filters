@@ -567,5 +567,8 @@
     <ClCompile Include="code\var\globalVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

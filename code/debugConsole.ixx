@@ -390,7 +390,7 @@ export void debugConsole()
 	}
 	case 28://Lua 스크립트 실행
 	{
-		new GameOver();
+		new GameOver(L"테스트 사망 문구입니다.");
 		break;
 	}
 

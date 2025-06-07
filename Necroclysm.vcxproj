@@ -208,6 +208,7 @@
     <ClCompile Include="code\GUI\HUD\HUD_draw.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_input_mouse.ixx" />
+    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx" />
     <ClCompile Include="code\GUI\LOOT\Loot.ixx" />

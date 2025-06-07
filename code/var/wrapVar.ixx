@@ -136,6 +136,7 @@ export inline bool isWalkable(Point3 coord)
             if (targetPocket->itemInfo[i].checkFlag(itemFlag::VPART_NOT_WALKABLE)) return false;
         }
     }
+    else if (TileFloor(coord.x, coord.y, coord.z) == 0) return false; //바닥이 없는 경우
 
     return true;
 };
