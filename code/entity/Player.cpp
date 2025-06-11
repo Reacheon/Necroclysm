@@ -101,7 +101,6 @@ void Player::startMove(int inputDir)
 		int dx, dy;
 		dir2Coord(inputDir, dx, dy);
 		Player* player = PlayerPtr;
-		player->updateWalkable(player->getGridX() + dx, player->getGridY() + dy);
 		//걸을 수 있는 타일이면
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{

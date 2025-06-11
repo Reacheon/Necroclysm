@@ -111,8 +111,13 @@ void Equip::clickUpGUI()
 				case act::drink:
 					actFunc::drinkBottle(equipPtr->itemInfo[equipCursor]);
 					updateBarAct();
-					return;
+					break;
+				case act::eat:
+					actFunc::eatFood(equipPtr,equipCursor);
+					updateBarAct();
+					break;
 				}
+
 
 				if (equipPtr->itemInfo.size() == 0)
 				{

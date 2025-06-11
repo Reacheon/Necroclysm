@@ -156,9 +156,9 @@ bool Monster::runAI()
 				else if (dx == 0 && dy == 1) { toDir = 6; }
 				else { toDir = 7; }
 
+				
 
-				updateWalkable(getGridX() + dx, getGridY() + dy);
-				if (World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).walkable)//이동하려는 위치에 장애물이 없을 경우
+				if (isWalkable({ getGridX() + dx, getGridY() + dy, getGridZ() }))//이동하려는 위치에 장애물이 없을 경우
 				{
 					if (World::ins()->getTile(getGridX(), getGridY(), getGridZ()).fov == fovFlag::white || World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ()).fov == fovFlag::white)//P가 보고있으면
 					{

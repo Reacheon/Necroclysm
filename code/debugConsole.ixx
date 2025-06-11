@@ -317,7 +317,7 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		PlayerPtr->entityInfo.statusEffects.push_back({ (statEfctFlag)tgtEfctIndex,tgtEfctDur });
+		PlayerPtr->entityInfo.statusEffects.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}

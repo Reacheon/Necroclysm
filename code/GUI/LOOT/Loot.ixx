@@ -646,6 +646,25 @@ public:
 
 			if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
 			else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
+
+			if (targetItem.checkFlag(itemFlag::CAN_EAT))
+			{
+				barAct.push_back(act::eat);
+			}
+
+			if (targetItem.pocketMaxVolume > 0)
+			{
+				ItemPocket* pocketPtr = targetItem.pocketPtr.get();
+				// 포켓 내부에 CAN_DRINK 플래그가 있는 아이템이 있는지 확인
+				for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
+				{
+					if (pocketPtr->itemInfo[i].checkFlag(itemFlag::CAN_DRINK))
+					{
+						barAct.push_back(act::drink);
+						break; // 하나라도 찾으면 중단
+					}
+				}
+			}
 		}
 	}
 

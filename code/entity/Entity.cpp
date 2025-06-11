@@ -505,9 +505,6 @@ void Entity::attack(int gridX, int gridY)
 		}
 	}
 }
-void Entity::updateWalkable(int gridX, int gridY)//만약 다를 경우 개체에서 오버라이드해서 쓰시오
-{
-}
 void Entity::rayCasting(int x1, int y1, int x2, int y2)
 {
 	int xo = x1;

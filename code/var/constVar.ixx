@@ -1288,7 +1288,7 @@ export enum class gasFlag
     BIG,
 };
 
-export enum statEfctFlag
+export enum statusEffectFlag
 {
     confusion = 0,
     bleeding = 1,

@@ -1047,7 +1047,7 @@ void HUD::drawBarAct()
 
 void HUD::drawStatusEffects()
 {
-	std::vector<std::pair<statEfctFlag, int>>& myEfcts = PlayerPtr->entityInfo.statusEffects;
+	std::vector<std::pair<statusEffectFlag, int>>& myEfcts = PlayerPtr->entityInfo.statusEffects;
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
 		int pivotX = 5;
@@ -1055,55 +1055,69 @@ void HUD::drawStatusEffects()
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
         SDL_Color textColor = col::white;
+		int textOffsetY = 0;
 
 		switch (myEfcts[i].first)
 		{
-		case statEfctFlag::confusion:
+		case statusEffectFlag::confusion:
 			statEfctName = L"혼란";
 			statEfctIcon = 1;
 			break;
-		case statEfctFlag::bleeding:
+		case statusEffectFlag::bleeding:
 			statEfctName = L"출혈";
 			statEfctIcon = 2;
+			textColor = lowCol::red;
 			break;
-		case statEfctFlag::hungry:
-			if (hunger < 14400)
+		case statusEffectFlag::hungry:
+			if (hunger < PLAYER_STARVE_CALORIE)
 			{
 				statEfctName = L"영양실조";
 				textColor = lowCol::red;
 			}
-			else if (hunger < 14400 * 2)
+			else if (hunger < PLAYER_VERY_HUNGRY_CALORIE)
 			{
 				statEfctName = L"매우 배고픔";
 				textColor = lowCol::orange;
 			}
-			else if (hunger < 14400 * 3)
+			else if (hunger < PLAYER_HUNGRY_CALORIE)
 			{
 				statEfctName = L"배고픔";
 				textColor = lowCol::yellow;
 			}
+			else
+			{
+				statEfctName = L"배부름";
+				textColor = col::green;
+			}
 			statEfctIcon = 3;
+			textOffsetY = -1;
 			break;
-		case statEfctFlag::dehydration:
-			if(thirst < 7200)
+		case statusEffectFlag::dehydration:
+			if(thirst < PLAYER_DEHYDRATION_HYDRATION)
 			{
 				statEfctName = L"탈수증";
 				textColor = lowCol::red;
 			}
-			else if (thirst < 7200 * 2)
+			else if (thirst < PLAYER_VERY_THIRSTY_HYDRATION)
 			{
 				statEfctName = L"매우 목마름";
 				textColor = lowCol::orange;
 			}
-			else if (thirst < 7200 * 3)
+			else if (thirst < PLAYER_THIRSTY_HYDRATION)
 			{
 				statEfctName = L"목마름";
 				textColor = lowCol::yellow;
             }	
+			else
+			{
+				statEfctName = L"해갈";
+				textColor = col::green;
+			}
 
 			statEfctIcon = 4;
+			textOffsetY = -1;
 			break;
-		case statEfctFlag::blindness:
+		case statusEffectFlag::blindness:
 			statEfctName = L"실명";
 			statEfctIcon = 15;
 			break;
@@ -1123,10 +1137,13 @@ void HUD::drawStatusEffects()
 		for (int i = 0; i < 8; i++)
 		{
 			drawLine(lineStartX + i, pivotY + 1 + i, lineStartX + i, pivotY + 15, col::black, 85);
+			textWidth++;
 		}
 
+		
 
-		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1, lowCol::red);
+
+		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
 
 		if (myEfcts[i].second > 0)
 		{
@@ -1150,12 +1167,37 @@ void HUD::drawStatusEffects()
 		}
 		else
 		{
-			//if (myEfcts[i].first == statEfctFlag::bleeding)
+			//if (myEfcts[i].first == statusEffectFlag::bleeding)
 			//{
 			//	//게이지
 			//	drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
 			//	drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
 			//}
+		}
+
+		if (myEfcts[i].first == statusEffectFlag::hungry)
+		{
+			float gaugeRatio = hunger / static_cast<float>(PLAYER_MAX_CALORIE);
+			drawFillRect(SDL_Rect{ pivotX + 16,pivotY + 13,textWidth,3 }, col::black);
+			SDL_Color gaugeCol = col::white;
+			if (hunger < PLAYER_STARVE_CALORIE) gaugeCol = lowCol::red;
+			else if (hunger < PLAYER_VERY_HUNGRY_CALORIE) gaugeCol = lowCol::orange;
+			else if (hunger < PLAYER_HUNGRY_CALORIE)  gaugeCol = lowCol::yellow;
+			else gaugeCol = col::green;
+			int gaugeLength = static_cast<int>((textWidth - 3) * gaugeRatio);
+			if (gaugeLength > 0) { drawLine(pivotX + 17, pivotY + 14, pivotX + 17 + gaugeLength, pivotY + 14, gaugeCol); }
+		}
+		else if (myEfcts[i].first == statusEffectFlag::dehydration)
+		{
+			float gaugeRatio = thirst / static_cast<float>(PLAYER_MAX_HYDRATION); // hunger -> thirst로 수정
+			drawFillRect(SDL_Rect{ pivotX + 16,pivotY + 13,textWidth,3 }, col::black);
+			SDL_Color gaugeCol = col::white;
+			if (thirst < PLAYER_DEHYDRATION_HYDRATION) gaugeCol = lowCol::red;
+			else if (thirst < PLAYER_VERY_THIRSTY_HYDRATION) gaugeCol = lowCol::orange;
+			else if (thirst < PLAYER_THIRSTY_HYDRATION) gaugeCol = lowCol::yellow;
+			else gaugeCol = lowCol::skyBlue;
+			int gaugeLength = static_cast<int>((textWidth - 3) * gaugeRatio);
+			if (gaugeLength > 0) { drawLine(pivotX + 17, pivotY + 14, pivotX + 17 + gaugeLength, pivotY + 14, gaugeCol); }
 		}
 	}
 }

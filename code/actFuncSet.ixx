@@ -342,4 +342,36 @@ export namespace actFunc
 
 		updateLog(col2Str(col::white) + L"물병에 물이 없다.");
 	}
+
+	export void eatFood(ItemPocket* inputPocket, int inputCursor)
+	{
+		errorBox(inputPocket == nullptr, L"eatFood: inputPocket is nullptr.");
+		errorBox(inputCursor < 0 || inputCursor >= inputPocket->itemInfo.size(), L"eatFood: inputCursor is out of bounds.");
+
+		ItemData& targetItem = inputPocket->itemInfo[inputCursor];
+
+		// 아이템의 칼로리 확인
+		int itemCalorie = targetItem.calorie;
+
+		// 현재 허기 상태와 최대 허기 수치 확인
+		int needCalorie = PLAYER_MAX_CALORIE - hunger;
+
+		if (needCalorie <= 0)
+		{
+			updateLog(col2Str(col::white) + L"배가 불러서 더 이상 먹을 수 없다.");
+			return;
+		}
+
+		// 칼로리 회복
+		hunger += itemCalorie;
+		if (hunger > PLAYER_MAX_CALORIE)
+		{
+			hunger = PLAYER_MAX_CALORIE;
+		}
+
+		// 아이템 1개 제거
+		inputPocket->subtractItemIndex(inputCursor, 1);
+
+		updateLog(col2Str(col::white) + L"음식을 먹었다. 허기가 해소되었다.");
+	}
 };

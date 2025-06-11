@@ -176,6 +176,14 @@ void Loot::clickUpGUI()
 					actFunc::toggle(lootPocket->itemInfo[lootCursor]);
 					updateBarAct();
 					return;
+				case act::drink:
+					actFunc::drinkBottle(lootPocket->itemInfo[lootCursor]);
+					updateBarAct();
+					break;
+				case act::eat:
+					actFunc::eatFood(lootPocket, lootCursor);
+					updateBarAct();
+					break;
 				}
 			}
 		}

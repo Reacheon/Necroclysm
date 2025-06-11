@@ -83,7 +83,6 @@ public:
 
     void move(int dir, bool jump);
     void attack(int gridX, int gridY);
-    void updateWalkable(int gridX, int gridY);
     void rayCasting(int x1, int y1, int x2, int y2);
     void rayCastingDark(int x1, int y1, int x2, int y2);
     void stepEvent();

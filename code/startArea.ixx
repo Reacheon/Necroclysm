@@ -24,15 +24,9 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
+    PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::hungry, -1 });
+	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::dehydration, -1 });
 
-	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY());
-	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY() - 1);
-	PlayerPtr->updateWalkable(PlayerX(), PlayerY() - 1);
-	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY() - 1);
-	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY());
-	PlayerPtr->updateWalkable(PlayerX() - 1, PlayerY() + 1);
-	PlayerPtr->updateWalkable(PlayerX(), PlayerY() + 1);
-	PlayerPtr->updateWalkable(PlayerX() + 1, PlayerY() + 1);
 
 	//테스트 아이템
 	int pX = PlayerX();

@@ -479,6 +479,7 @@ public:
 			{
 				targetBottle->itemInfo.clear();
 				targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemRefCode::water], maxVolume)));
+				updateLog(col2Str(col::white)+L"당신은 물을 병에 길었다.");
 				
 			}
 		}
