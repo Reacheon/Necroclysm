@@ -16,13 +16,15 @@ import drawPrimitive;
 void Entity::drawSelf()
 {
 	stepEvent();
+	std::unique_ptr<Sprite> playerSprite = nullptr;
+	SDL_Texture* playerTexture = nullptr;
 
 	if (entityInfo.isPlayer)
 	{
-		SDL_Texture* targetTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
-		SDL_SetTextureScaleMode(targetTexture, SDL_SCALEMODE_NEAREST);
+		playerTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
+		SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
 
-		SDL_SetRenderTarget(renderer, targetTexture);
+		SDL_SetRenderTarget(renderer, playerTexture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
@@ -164,7 +166,7 @@ void Entity::drawSelf()
 		}
 
 		SDL_SetRenderTarget(renderer, nullptr);
-		customSprite = std::make_unique<Sprite>(renderer, targetTexture, 48, 48);
+		playerSprite = std::make_unique<Sprite>(renderer, playerTexture, 48, 48);
 	}
 
 
@@ -266,27 +268,27 @@ void Entity::drawSelf()
 	//캐릭터 커스타미이징 그리기
 	if (entityInfo.isPlayer)
 	{
-		SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
+		SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 
 		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 		{
-			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,24 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
+			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,24 });
+			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
+			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
 		else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 		{
-			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 80); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(customSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenterExSrc(customSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,21 });
-			SDL_SetTextureAlphaMod(customSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
+			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
+			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 80); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,21 });
+			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
 		else
 		{
-			drawSpriteCenter(customSprite.get(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+			drawSpriteCenter(playerSprite.get(), localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
 		}
 	}
 	else
@@ -367,7 +369,7 @@ void Entity::drawSelf()
 
 	if (flash.a > 0)
 	{
-		if(customSprite!=nullptr) drawFlashEffectBlendCenter(customSprite.get(), localSprIndex, drawingX, drawingY, flash);
+		if(playerSprite !=nullptr) drawFlashEffectBlendCenter(playerSprite.get(), localSprIndex, drawingX, drawingY, flash);
 		else  drawFlashEffectBlendCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY, flash);
 		
 		SDL_Color tgtCol = { 0, 0, 0, flash.a };
@@ -387,4 +389,6 @@ void Entity::drawSelf()
 
 	setZoom(1.0);
 	setFlip(SDL_FLIP_NONE);
+
+	SDL_DestroyTexture(playerTexture);
 };
