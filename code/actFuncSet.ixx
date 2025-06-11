@@ -306,4 +306,40 @@ export namespace actFunc
 
 		}
 	}
+
+	export void drinkBottle(ItemData& inputData)
+	{
+		errorBox(inputData.pocketPtr == nullptr, L"drinkBottle: inputData.pocketPtr is nullptr.");
+		errorBox(inputData.pocketPtr->itemInfo.size() == 0, L"drinkBottle: inputData.pocketPtr->itemInfo.size() is 0.");
+
+		int needHydration = PLAYER_MAX_HYDRATION - thirst;
+
+		if (needHydration <= 0)
+		{
+			updateLog(col2Str(col::white) + L"더 이상 마실 필요가 없다.");
+			return;
+		}
+
+		for (int i = 0; i < inputData.pocketPtr->itemInfo.size(); i++)
+		{
+			if (inputData.pocketPtr->itemInfo[i].itemCode == itemRefCode::water)
+			{
+				int hydrationPerWater = inputData.pocketPtr->itemInfo[i].hydrationPerML;
+				int waterCount = inputData.pocketPtr->itemInfo[i].number;
+				int waterNeeded = (needHydration + hydrationPerWater - 1) / hydrationPerWater;
+				int waterToConsume = myMin(waterNeeded, waterCount);
+				int actualHydration = waterToConsume * hydrationPerWater;
+				actualHydration = myMin(actualHydration, needHydration);
+
+				thirst += actualHydration;
+				if (thirst > PLAYER_MAX_HYDRATION) thirst = PLAYER_MAX_HYDRATION;
+
+				inputData.pocketPtr->subtractItemIndex(i, waterToConsume);
+				updateLog(col2Str(col::white) + L"아이템을 마셨다. 갈증이 해소되었다.");
+				return;
+			}
+		}
+
+		updateLog(col2Str(col::white) + L"물병에 물이 없다.");
+	}
 };

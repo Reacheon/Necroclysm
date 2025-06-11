@@ -16,6 +16,11 @@ export struct ItemDataBase
     unsigned __int32 volume = 1000;
     std::vector<unsigned __int16> material;
     std::vector<itemFlag> flag;
+
+    unsigned __int32 calorie = 0;
+    unsigned __int32 hydration = 0;
+    float hydrationPerML = 1.0f;
+
     std::vector<unsigned __int8> toolQuality;
     unsigned __int8 craftMinUnit = 1;
     unsigned __int16 craftTime = 2;

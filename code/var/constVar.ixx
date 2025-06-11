@@ -56,6 +56,18 @@ export constexpr std::array<int, 27> expTable =
 export constexpr int CHAR_TEXTURE_WIDTH = 288;
 export constexpr int CHAR_TEXTURE_HEIGHT = 384;
 
+export constexpr int PLAYER_MAX_CALORIE = 17280;//10일 버팀
+export constexpr int PLAYER_MAX_HYDRATION = 8640;//4일 버팀
+
+export constexpr int PLAYER_HUNGRY_CALORIE = 4320 * 3;
+export constexpr int PLAYER_VERY_HUNGRY_CALORIE = 4320 * 2;
+export constexpr int PLAYER_STARVE_CALORIE = 4320;
+
+
+export constexpr int PLAYER_THIRSTY_HYDRATION= 2160*3;
+export constexpr int PLAYER_VERY_THIRSTY_HYDRATION = 2160 * 2;
+export constexpr int PLAYER_DEHYDRATION_HYDRATION = 2160 * 1;
+
 export namespace col
 {
     constexpr SDL_Color black = { 0x00, 0x00, 0x00 };
@@ -131,6 +143,7 @@ export enum class act
     sorting,    //정렬
     select,     //선택
     eat,        //먹기
+    drink,     //마시기
     apply,      //사용
     selectMode, //선택 모드
     droping,    //버리기
@@ -501,6 +514,9 @@ export enum class itemFlag
     ENGINE_GASOLINE,
     ENGINE_DISEL,
     ENGINE_ELECTRIC,
+
+    CAN_EAT,
+    CAN_DRINK,
 };
 
 export enum class walkFlag

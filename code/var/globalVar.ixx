@@ -154,8 +154,8 @@ export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 
 export SDL_Rect quickSlotBtn[8];
 
 export Player* PlayerPtr = nullptr;
-export int hunger = 500000;
-export int thirst = 2000;
+export float hunger = PLAYER_MAX_CALORIE;
+export float thirst = PLAYER_MAX_HYDRATION;
 
 
 export namespace dur

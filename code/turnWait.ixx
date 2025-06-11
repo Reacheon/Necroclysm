@@ -115,8 +115,8 @@ export void turnWait(float waitTime)
     PlayerPtr->entityInfo.STA += 2;
     if (PlayerPtr->entityInfo.STA > PlayerPtr->entityInfo.maxSTA) PlayerPtr->entityInfo.STA = PlayerPtr->entityInfo.maxSTA;
 
-    hunger -= static_cast<int>(waitTime * 10.0);
-    thirst -= static_cast<int>(waitTime * 10.0);
+    hunger -= static_cast<int>(waitTime * 1.2);
+    thirst -= static_cast<int>(waitTime * 1.5);
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;

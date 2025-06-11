@@ -1008,6 +1008,7 @@ void HUD::drawBarAct()
 			if(ctrlVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
             else setBtnLayout(sysStr[205], 164);
 		}
+		else if (barAct[i] == act::drink) setBtnLayout(sysStr[210], 37);
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기

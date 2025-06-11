@@ -108,6 +108,10 @@ void Equip::clickUpGUI()
 					actFunc::toggle(equipPtr->itemInfo[equipCursor]);
 					updateBarAct();
 					return;
+				case act::drink:
+					actFunc::drinkBottle(equipPtr->itemInfo[equipCursor]);
+					updateBarAct();
+					return;
 				}
 
 				if (equipPtr->itemInfo.size() == 0)

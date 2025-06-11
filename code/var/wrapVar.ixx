@@ -17,7 +17,7 @@ import Vehicle;
 import Entity;
 import Monster;
 import Player;
-
+import log;
 
 export inline int PlayerX() { return PlayerPtr->getGridX(); }
 export inline int PlayerY() { return PlayerPtr->getGridY(); }
@@ -221,3 +221,4 @@ export Point2 getAbsMouseGrid()
 
     return { cameraGridX + revGridX, cameraGridY + revGridY };
 }
+
