@@ -156,7 +156,7 @@ export SDL_Rect quickSlotBtn[8];
 export Player* PlayerPtr = nullptr;
 export float hunger = PLAYER_MAX_CALORIE/2;
 export float thirst = PLAYER_MAX_HYDRATION/2+1000;
-
+export float fatigue = PLAYER_MAX_FATIGUE / 2;
 
 export namespace dur
 {

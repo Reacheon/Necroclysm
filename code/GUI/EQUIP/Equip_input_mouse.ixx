@@ -103,6 +103,7 @@ void Equip::clickUpGUI()
 				{
 					actFunc::unload(equipPtr, equipCursor);
 				}
+				break;
 				case act::toggleOff:
 				case act::toggleOn:
 					actFunc::toggle(equipPtr->itemInfo[equipCursor]);
@@ -111,11 +112,13 @@ void Equip::clickUpGUI()
 				case act::drink:
 					actFunc::drinkBottle(equipPtr->itemInfo[equipCursor]);
 					updateBarAct();
-					break;
+					close(aniFlag::null);
+					return;
 				case act::eat:
 					actFunc::eatFood(equipPtr,equipCursor);
 					updateBarAct();
-					break;
+					close(aniFlag::null);
+					return;
 				}
 
 

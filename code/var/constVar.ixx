@@ -56,17 +56,23 @@ export constexpr std::array<int, 27> expTable =
 export constexpr int CHAR_TEXTURE_WIDTH = 288;
 export constexpr int CHAR_TEXTURE_HEIGHT = 384;
 
-export constexpr int PLAYER_MAX_CALORIE = 17280;//10일 버팀
-export constexpr int PLAYER_MAX_HYDRATION = 8640;//4일 버팀
 
+export constexpr int PLAYER_MAX_CALORIE = 17280;//10일 버팀
 export constexpr int PLAYER_HUNGRY_CALORIE = 4320 * 3;
 export constexpr int PLAYER_VERY_HUNGRY_CALORIE = 4320 * 2;
 export constexpr int PLAYER_STARVE_CALORIE = 4320;
 
 
+export constexpr int PLAYER_MAX_HYDRATION = 8640;//4일 버팀
 export constexpr int PLAYER_THIRSTY_HYDRATION= 2160*3;
 export constexpr int PLAYER_VERY_THIRSTY_HYDRATION = 2160 * 2;
 export constexpr int PLAYER_DEHYDRATION_HYDRATION = 2160 * 1;
+
+
+export constexpr int PLAYER_MAX_FATIGUE = 4320;//최대 3일 안 자고 버팀
+export constexpr int PLAYER_TIRED_FATIGUE = 3360;//16시간 지나면 피곤해짐
+export constexpr int PLAYER_VERY_TIRED_FATIGUE = 2400;
+export constexpr int PLAYER_EXHAUSTED_FATIGUE = 1440;
 
 export namespace col
 {
@@ -1290,11 +1296,13 @@ export enum class gasFlag
 
 export enum statusEffectFlag
 {
-    confusion = 0,
+    confused = 0,
     bleeding = 1,
     hungry = 2,
-    dehydration = 3,
-    blindness = 4,
+    dehydrated = 3,
+    blind = 4,
+    tired = 5,
+    exhausted = 6,
 };
 
 export enum charSprIndex

@@ -121,14 +121,14 @@ __int64 playerInputTurn()
 		if (thirst < 300)
 		{
 			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
-			if (statEffects.size() == 0) statEffects.push_back({ statusEffectFlag::dehydration, -1 });
+			if (statEffects.size() == 0) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
 			else
 			{
 				for (int i = 0; i < statEffects.size(); i++)
 				{
-					if (statEffects[i].first == statusEffectFlag::dehydration) break;
+					if (statEffects[i].first == statusEffectFlag::dehydrated) break;
 
-					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::dehydration, -1 });
+					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
 				}
 			}
 		}

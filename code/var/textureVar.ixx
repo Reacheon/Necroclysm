@@ -157,4 +157,6 @@ export namespace spr
 	Sprite* gameOverOptionRect = nullptr;
 	Sprite* gameOverOptionMarker = nullptr;
 
+	Sprite* statusEffectGaugeCircle = nullptr;
+
 }

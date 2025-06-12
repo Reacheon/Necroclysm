@@ -11,7 +11,6 @@ import globalVar;
 import wrapVar;
 import constVar;
 import checkCursor;
-import ItemPocket;
 import Lst;
 import Player;
 import World;
@@ -23,6 +22,7 @@ import Vehicle;
 import Prop;
 import turnWait;
 import ItemData;
+import ItemPocket;
 
 export class Craft : public GUI
 {

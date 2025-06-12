@@ -25,7 +25,8 @@ export void startArea()
 	PlayerPtr->setDstGrid(0, 0);
 
     PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::hungry, -1 });
-	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::dehydration, -1 });
+	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::dehydrated, -1 });
+	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::tired, -1 });
 
 
 	//테스트 아이템

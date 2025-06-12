@@ -117,6 +117,7 @@ export void turnWait(float waitTime)
 
     hunger -= static_cast<int>(waitTime * 1.2);
     thirst -= static_cast<int>(waitTime * 1.5);
+    fatigue -= static_cast<int>(waitTime);
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;
