@@ -91,6 +91,7 @@ export void textureLoader()
 	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
 	spr::eyesBlue = new Sprite(renderer, "image/charset/body/eyesBlue.png", 48, 48);
 	spr::eyesRed = new Sprite(renderer, "image/charset/body/eyesRed.png", 48, 48);
+	spr::eyesHalf = new Sprite(renderer, "image/charset/body/eyesHalf.png", 48, 48);
 	spr::eyesClosed = new Sprite(renderer, "image/charset/body/eyesClosed.png", 48, 48);
 	spr::beardMustacheBlack = new Sprite(renderer, "image/charset/body/beardMustacheBlack.png", 48, 48);
 
@@ -188,5 +189,6 @@ export void textureLoader()
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 
 	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/statusEffectGaugeCircle.png", 14, 14);
+	spr::thoughtBubble = new Sprite(renderer, "image/thoughtBubble.png", 16, 16);
 
 }

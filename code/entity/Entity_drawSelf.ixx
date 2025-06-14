@@ -35,9 +35,15 @@ void Entity::drawSelf()
 
 		if (entityInfo.eyes != humanCustom::eyes::null)
 		{
-			if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::closed) drawTexture(spr::eyesClosed->getTexture(), 0, 0);
+			if (entityInfo.isEyesClose == false)
+			{
+				if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+				else if (entityInfo.eyes == humanCustom::eyes::blueHalf) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+				else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+
+				if(entityInfo.isEyesHalf)  drawTexture(spr::eyesHalf->getTexture(), 0, 0);
+			}
+			else drawTexture(spr::eyesClosed->getTexture(), 0, 0);
 		}
 
 		if (entityInfo.scar != humanCustom::scar::null)

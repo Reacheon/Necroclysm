@@ -119,7 +119,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(L"왼팔", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[108], pivotX - 16, pivotY + 5, col::lightGray);//왼팔
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 
@@ -150,7 +150,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(L"좌다리", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[110], pivotX - 16, pivotY + 5, col::lightGray);//좌다리
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -179,7 +179,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(L"머리", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[107], pivotX - 16, pivotY + 5, col::lightGray);//머리
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -198,7 +198,7 @@ void HUD::drawGUI()
 			{
 				int pivotX = letterbox.x + 36 + 83 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(L"몸통", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[106], pivotX - 16, pivotY + 5, col::lightGray);//몸통
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -227,7 +227,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(L"오른팔", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[109], pivotX - 16, pivotY + 5, col::lightGray);
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -256,7 +256,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(L"우다리", pivotX - 16, pivotY + 5, col::lightGray);
+				renderTextCenter(sysStr[111], pivotX - 16, pivotY + 5, col::lightGray);
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -564,7 +564,9 @@ void HUD::drawTab()
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 
-		setFontSize(12);
+		if(option::language ==L"Korean") setFontSize(12);
+		else  setFontSize(10);
+		
 		renderTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
 		renderTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
@@ -1016,7 +1018,10 @@ void HUD::drawBarAct()
 		drawSpriteCenter(spr::icon48, actIndex, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) - 10);
 
 		//하단 텍스트
+
 		int fontSize = 12;
+		if(option::language == L"Korean") fontSize = 12;
+		else fontSize = 10;
 		setFontSize(fontSize);
 		renderTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
@@ -1052,10 +1057,10 @@ void HUD::drawStatusEffects()
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
 		int pivotX = 5;
-		int pivotY = 250 + 20*i;
+		int pivotY = 250 + 20 * i;
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
-        SDL_Color textColor = col::white;
+		SDL_Color textColor = col::white;
 		int textOffsetY = 0;
 
 		static float fakeHunger = hunger;
@@ -1065,7 +1070,8 @@ void HUD::drawStatusEffects()
 		static float fakeThirst = thirst;
 		if (fakeThirst < thirst) fakeThirst += 1.0f;
 		else if (fakeThirst > thirst) fakeThirst -= 1.0f;
-
+		
+		int f = fatigue;
 		static float fakeFatigue = fatigue;
 		if (fakeFatigue < fatigue) fakeFatigue += 1.0f;
 		else if (fakeFatigue > fatigue) fakeFatigue -= 1.0f;
@@ -1077,56 +1083,64 @@ void HUD::drawStatusEffects()
 			statEfctName = L"혼란";
 			statEfctIcon = 1;
 			break;
+
 		case statusEffectFlag::bleeding:
 			statEfctName = L"출혈";
 			statEfctIcon = 2;
 			textColor = lowCol::red;
 			break;
+
+			// ────────────────────────────────
+			//  Hunger / 배고픔 · 굶주림 · 영양실조 · 배부름
+			// ────────────────────────────────
 		case statusEffectFlag::hungry:
 			if (fakeHunger < PLAYER_STARVE_CALORIE)
 			{
-				statEfctName = L"영양실조";
+				statEfctName = sysStr[220]; // 영양실조 (Starving)
 				textColor = lowCol::red;
 			}
 			else if (fakeHunger < PLAYER_VERY_HUNGRY_CALORIE)
 			{
-				statEfctName = L"매우 배고픔";
+				statEfctName = sysStr[219]; // 굶주림 (Famished)
 				textColor = lowCol::orange;
 			}
 			else if (fakeHunger < PLAYER_HUNGRY_CALORIE)
 			{
-				statEfctName = L"배고픔";
+				statEfctName = sysStr[218]; // 배고픔 (Hungry)
 				textColor = lowCol::yellow;
 			}
 			else
 			{
-				statEfctName = L"배부름";
+				statEfctName = sysStr[217]; // 배부름 (Full)
 				textColor = col::green;
 			}
 			statEfctIcon = 3;
 			break;
+
+			// ────────────────────────────────
+			//  Dehydration / 목마름 · 심한 갈증 · 탈수 상태 · 해갈
+			// ────────────────────────────────
 		case statusEffectFlag::dehydrated:
-			if(fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
+			if (fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
 			{
-				statEfctName = L"탈수증";
+				statEfctName = sysStr[224]; // 탈수 상태 (Dehydrated)
 				textColor = lowCol::red;
 			}
-			else if (fakeThirst < PLAYER_VERY_TIRED_FATIGUE)
+			else if (fakeThirst < PLAYER_VERY_THIRSTY_HYDRATION)
 			{
-				statEfctName = L"매우 목마름";
+				statEfctName = sysStr[223]; // 심한 갈증 (Parched)
 				textColor = lowCol::orange;
 			}
 			else if (fakeThirst < PLAYER_THIRSTY_HYDRATION)
 			{
-				statEfctName = L"목마름";
+				statEfctName = sysStr[222]; // 목마름 (Thirsty)
 				textColor = lowCol::yellow;
-            }	
+			}
 			else
 			{
-				statEfctName = L"해갈";
+				statEfctName = sysStr[221]; // 해갈 (Hydrated)
 				textColor = col::green;
 			}
-
 			statEfctIcon = 4;
 			break;
 
@@ -1134,33 +1148,36 @@ void HUD::drawStatusEffects()
 			statEfctName = L"실명";
 			statEfctIcon = 15;
 			break;
+
+			// ────────────────────────────────
+			//  Fatigue / 피곤함 · 심한 피로 · 탈진 상태 · 개운함
+			// ────────────────────────────────
 		case statusEffectFlag::tired:
 			statEfctIcon = 11;
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
 			{
-				statEfctName = L"탈진";
+				statEfctName = sysStr[228]; // 탈진 상태 (Exhausted)
 				textColor = lowCol::red;
 			}
 			else if (fakeFatigue < PLAYER_VERY_TIRED_FATIGUE)
 			{
-				statEfctName = L"매우 피곤함";
+				statEfctName = sysStr[227]; // 심한 피로 (Weary)
 				textColor = lowCol::orange;
 			}
 			else if (fakeFatigue < PLAYER_TIRED_FATIGUE)
 			{
-				statEfctName = L"피곤함";
+				statEfctName = sysStr[226]; // 피곤함 (Tired)
 				textColor = lowCol::yellow;
 			}
 			else
 			{
-				statEfctName = L"개운함";
+				statEfctName = sysStr[225]; // 개운함 (Refreshed)
 				textColor = col::green;
 				statEfctIcon = 58;
-
 			}
-
 			break;
 		}
+
 
 		setFontSize(10);
 
@@ -1168,8 +1185,8 @@ void HUD::drawStatusEffects()
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
-		
-		int textWidth = queryTextWidth(statEfctName)+15;
+
+		int textWidth = queryTextWidth(statEfctName) + 15;
 
 		drawFillRect(SDL_Rect{ pivotX + 16, pivotY, textWidth, 16 }, col::black, 85);
 		int lineStartX = pivotX + textWidth + 16;
@@ -1179,10 +1196,10 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-		
 
 
-		renderTextOutline(statEfctName, pivotX +19, pivotY + 1 + textOffsetY, textColor);
+
+		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
 
 		if (myEfcts[i].second > 0)
 		{
@@ -1198,7 +1215,7 @@ void HUD::drawStatusEffects()
 
 
 			drawEplsionText(std::to_wstring(myEfcts[i].second), lineStartX + xCorrection, pivotY + 10, col::white);
-			
+
 			//if (seg1 > 0) drawSprite(spr::segment, myEfcts[i].second / 100, pivotX + 97, pivotY + 20);
 			//if (seg2 > 0 || seg1 > 0) drawSprite(spr::segment, (myEfcts[i].second % 100)/10, pivotX + 97 + 11, pivotY + 20);
 			//if (seg3 > 0 || seg2 > 0 || seg3 > 0) drawSprite(spr::segment, myEfcts[i].second % 10, pivotX + 97 + 22, pivotY + 20);
@@ -1267,17 +1284,17 @@ void HUD::drawStatusEffects()
 				// 탈수증 구간: 0 ~ PLAYER_DEHYDRATION_HYDRATION
 				gaugeRatio = fakeThirst / static_cast<float>(PLAYER_DEHYDRATION_HYDRATION);
 			}
-			else if (fakeThirst < PLAYER_VERY_TIRED_FATIGUE)
+			else if (fakeThirst < PLAYER_VERY_THIRSTY_HYDRATION)
 			{
 				gaugeCol = lowCol::orange;
-				// 매우 목마름 구간: PLAYER_DEHYDRATION_HYDRATION ~ PLAYER_VERY_TIRED_FATIGUE
-				gaugeRatio = (fakeThirst - PLAYER_DEHYDRATION_HYDRATION) / static_cast<float>(PLAYER_VERY_TIRED_FATIGUE - PLAYER_DEHYDRATION_HYDRATION);
+				// 매우 목마름 구간: PLAYER_DEHYDRATION_HYDRATION ~ PLAYER_VERY_THIRSTY_HYDRATION
+				gaugeRatio = (fakeThirst - PLAYER_DEHYDRATION_HYDRATION) / static_cast<float>(PLAYER_VERY_THIRSTY_HYDRATION - PLAYER_DEHYDRATION_HYDRATION);
 			}
 			else if (fakeThirst < PLAYER_THIRSTY_HYDRATION)
 			{
 				gaugeCol = lowCol::yellow;
-				// 목마름 구간: PLAYER_VERY_TIRED_FATIGUE ~ PLAYER_THIRSTY_HYDRATION
-				gaugeRatio = (fakeThirst - PLAYER_VERY_TIRED_FATIGUE) / static_cast<float>(PLAYER_THIRSTY_HYDRATION - PLAYER_VERY_TIRED_FATIGUE);
+				// 목마름 구간: PLAYER_VERY_THIRSTY_HYDRATION ~ PLAYER_THIRSTY_HYDRATION
+				gaugeRatio = (fakeThirst - PLAYER_VERY_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_THIRSTY_HYDRATION - PLAYER_VERY_THIRSTY_HYDRATION);
 			}
 			else
 			{
@@ -1295,34 +1312,32 @@ void HUD::drawStatusEffects()
 		}
 		else if (myEfcts[i].first == statusEffectFlag::tired)
 		{
-
-
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
 			{
 				gaugeCol = lowCol::red;
-				// 탈수증 구간: 0 ~ PLAYER_EXHAUSTED_FATIGUE
+				// 탈진 구간: 0 ~ PLAYER_EXHAUSTED_FATIGUE
 				gaugeRatio = fakeFatigue / static_cast<float>(PLAYER_EXHAUSTED_FATIGUE);
 			}
 			else if (fakeFatigue < PLAYER_VERY_TIRED_FATIGUE)
 			{
 				gaugeCol = lowCol::orange;
-				// 매우 목마름 구간: PLAYER_EXHAUSTED_FATIGUE ~ PLAYER_VERY_TIRED_FATIGUE
+				// 매우 피곤함 구간: PLAYER_EXHAUSTED_FATIGUE ~ PLAYER_VERY_TIRED_FATIGUE
 				gaugeRatio = (fakeFatigue - PLAYER_EXHAUSTED_FATIGUE) / static_cast<float>(PLAYER_VERY_TIRED_FATIGUE - PLAYER_EXHAUSTED_FATIGUE);
 			}
 			else if (fakeFatigue < PLAYER_TIRED_FATIGUE)
 			{
 				gaugeCol = lowCol::yellow;
-				// 목마름 구간: PLAYER_VERY_TIRED_FATIGUE ~ PLAYER_TIRED_FATIGUE
+				// 피곤함 구간: PLAYER_VERY_TIRED_FATIGUE ~ PLAYER_TIRED_FATIGUE
 				gaugeRatio = (fakeFatigue - PLAYER_VERY_TIRED_FATIGUE) / static_cast<float>(PLAYER_TIRED_FATIGUE - PLAYER_VERY_TIRED_FATIGUE);
 			}
 			else
 			{
 				gaugeCol = lowCol::green;
-				// 해갈 구간: PLAYER_TIRED_FATIGUE ~ PLAYER_MAX_HYDRATION
-				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_HYDRATION - PLAYER_TIRED_FATIGUE);
+				// 개운함 구간: PLAYER_TIRED_FATIGUE ~ PLAYER_MAX_FATIGUE
+				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_FATIGUE - PLAYER_TIRED_FATIGUE);
 			}
 
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 32);
@@ -1449,7 +1464,7 @@ void HUD::drawHoverItemInfo()
 void HUD::drawQuest()
 {
 	setFontSize(16);
-	renderText(L"죽음을 거스르는 희망", 8, 182);
+	renderText(sysStr[212], 8, 182);
 
 	drawLine(8, 200, 118, 200);
 	for (int i = 0; i < 60; i++)
@@ -1461,7 +1476,7 @@ void HUD::drawQuest()
 	drawRect({ 9, 206,9,9 }, col::white);
 	setFontSize(10);
 	int elapsedDay = getElapsedDays();
-	std::wstring questStr = L"100일 동안 생존  (";
+	std::wstring questStr = sysStr[213]+L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
 	renderText(questStr, 21, 204);

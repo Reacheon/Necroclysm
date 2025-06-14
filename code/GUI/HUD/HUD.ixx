@@ -38,6 +38,7 @@ import ItemStack;
 import Dialogue;
 import Skill;
 import Quest;
+import Sleep;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -617,6 +618,11 @@ public:
 
 			PlayerPtr->updateVision();
 			PlayerPtr->updateMinimap();
+			break;
+		}
+		case act::sleep:
+		{
+			new Sleep();
 			break;
 		}
 		default:

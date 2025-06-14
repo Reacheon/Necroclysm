@@ -13,6 +13,7 @@ import TileData;
 import Prop;
 import GameOver;
 
+
 //globalVar에 전방선언됨
 
 //@brief 플레이어의 턴일 때 입력한 수치만큼 턴을 기다립니다.
@@ -115,9 +116,9 @@ export void turnWait(float waitTime)
     PlayerPtr->entityInfo.STA += 2;
     if (PlayerPtr->entityInfo.STA > PlayerPtr->entityInfo.maxSTA) PlayerPtr->entityInfo.STA = PlayerPtr->entityInfo.maxSTA;
 
-    hunger -= static_cast<int>(waitTime * 1.2);
-    thirst -= static_cast<int>(waitTime * 1.5);
-    fatigue -= static_cast<int>(waitTime);
+    hunger -= waitTime * HUNGRY_SPPED;
+    thirst -= waitTime * THIRST_SPEED;
+    fatigue -= waitTime * FATIGUE_SPEED;
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;

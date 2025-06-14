@@ -1041,7 +1041,7 @@ bool Entity::runAnimation(bool shutdown)
 		{
 		case 1:
 			PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
-			PlayerPtr->entityInfo.eyes = humanCustom::eyes::closed;
+			PlayerPtr->entityInfo.isEyesClose = true;
 			setFakeY(-4);
 			break;
 		case 2:

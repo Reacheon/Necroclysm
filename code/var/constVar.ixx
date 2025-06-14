@@ -62,17 +62,23 @@ export constexpr int PLAYER_HUNGRY_CALORIE = 4320 * 3;
 export constexpr int PLAYER_VERY_HUNGRY_CALORIE = 4320 * 2;
 export constexpr int PLAYER_STARVE_CALORIE = 4320;
 
+export constexpr float HUNGRY_SPPED = 1.2;
+
 
 export constexpr int PLAYER_MAX_HYDRATION = 8640;//4일 버팀
 export constexpr int PLAYER_THIRSTY_HYDRATION= 2160*3;
 export constexpr int PLAYER_VERY_THIRSTY_HYDRATION = 2160 * 2;
 export constexpr int PLAYER_DEHYDRATION_HYDRATION = 2160 * 1;
 
+export constexpr float THIRST_SPEED = 1.5;
+
 
 export constexpr int PLAYER_MAX_FATIGUE = 4320;//최대 3일 안 자고 버팀
 export constexpr int PLAYER_TIRED_FATIGUE = 3360;//16시간 지나면 피곤해짐
 export constexpr int PLAYER_VERY_TIRED_FATIGUE = 2400;
 export constexpr int PLAYER_EXHAUSTED_FATIGUE = 1440;
+
+export constexpr float FATIGUE_SPEED = 1.0;
 
 export namespace col
 {
@@ -242,8 +248,12 @@ export namespace humanCustom
         null,
         closed,
         red,
+        redHalf,
         blue,
+        blueHalf,
         black,
+        blackHalf,
+        
     };
 
 

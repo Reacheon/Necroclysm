@@ -37,6 +37,8 @@ public:
 		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 
+
+
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 

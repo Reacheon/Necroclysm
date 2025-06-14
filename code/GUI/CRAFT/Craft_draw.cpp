@@ -27,26 +27,9 @@ void Craft::drawGUI()
 		setZoom(1.0);
 
 		int markerIndex = 0;
-		if (Msg::ins() == nullptr)
-		{
-			if (timer::timer600 % 25 < 2) { markerIndex = 0; }
-			else if (timer::timer600 % 25 < 4) { markerIndex = 1; }
-			else if (timer::timer600 % 25 < 6) { markerIndex = 2; }
-			else if (timer::timer600 % 25 < 8) { markerIndex = 3; }
-			else if (timer::timer600 % 25 < 10) { markerIndex = 4; }
-			else if (timer::timer600 % 25 < 12) { markerIndex = 5; }
-			else if (timer::timer600 % 25 < 14) { markerIndex = 6; }
-			else if (timer::timer600 % 25 < 16) { markerIndex = 7; }
-			else if (timer::timer600 % 25 < 18) { markerIndex = 8; }
-			else if (timer::timer600 % 25 < 20) { markerIndex = 9; }
-			else if (timer::timer600 % 25 < 22) { markerIndex = 10; }
-			else if (timer::timer600 % 25 < 24) { markerIndex = 11; }
-			else { markerIndex = 0; }
-		}
+		if (Msg::ins() == nullptr) markerIndex = (SDL_GetTicks() / 32) % 12;
 
 		drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 78, tooltipBox.y + 6);
-
-
 
 		setFontSize(12);
 		renderText(L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);

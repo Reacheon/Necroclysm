@@ -99,6 +99,9 @@ export struct EntityData : public EntityData_Base
     walkFlag walkMode = walkFlag::walk;
     double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도
 
+    bool isEyesHalf = false; //눈을 반쯤 뜬 상태
+    bool isEyesClose = false; //눈을 감은 상태
+
     EntityData cloneEntity() const;
     EntityData();
     virtual ~EntityData();

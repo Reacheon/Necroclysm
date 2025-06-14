@@ -1,132 +1,91 @@
 ﻿#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <SDL3/SDL.h>
+#include <codecvt>  // for std::codecvt_utf8
 
 export module readCSV;
 
-import std;
-import wstring2Number;
+import std;               // C++23 standard library module
+import wstring2Number;    // provides wtoi / wstod etc.
+
+//------------------------------------------------------------
+// Helper meta‑function: compile‑time type comparison
+//------------------------------------------------------------
 
 template <typename T1, typename T2>
-struct isSame
-{
-    enum { value = false };
-};
+struct isSame { enum { value = false }; };
 
 template <typename T0>
-struct isSame<T0, T0>
-{
-    enum { value = true };
-};
+struct isSame<T0, T0> { enum { value = true }; };
+
+//------------------------------------------------------------
+// readCSV
+//   ‑ SIZEW : number of columns per row (compile‑time)
+//   ‑ T     : element type (std::wstring or numeric)
+//            if T == std::wstring  → 문자열로 저장
+//            else                 → wtoi 로 정수 변환 후 저장
+//------------------------------------------------------------
 
 export template<std::size_t SIZEW, typename T>
 int readCSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
 {
-    int a = 3;
-    //prt(L"\nreadCSV.h가 실행되었다.\n");
-    std::wifstream in(file);
-    std::wstring str;
-    std::wstring strFragment;//표 한 칸의 문자열이 저장되는 객체, 매번 초기화됨
+    //--------------------------------------------------------
+    // 1) 파일 열기 (UTF‑8 BOM 허용)
+    //--------------------------------------------------------
+    std::wifstream fin(file);
+    if (!fin.is_open())
+        return 0;                               // 실패
 
-    if (in.is_open())
+    // UTF‑8 to UTF‑16 변환용 locale 적용
+    fin.imbue(std::locale(fin.getloc(),
+        new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
+
+    //--------------------------------------------------------
+    // 2) 라인 단위로 읽으면서 쉼표(,) 파싱
+    //--------------------------------------------------------
+    std::wstring line;          // 한 줄 전체
+    std::size_t  row = 0;       // 현재 행 인덱스
+
+    auto ensure_row = [&]() {
+        if (row == arr.size())
+            arr.emplace_back(); // 필요 시 새 행 추가 (디폴트 초기화)
+        };
+
+    while (std::getline(fin, line))
     {
-        in.imbue(std::locale(in.getloc(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
-        in.seekg(0, std::ios::end);
-        long long size = in.tellg();
-        str.resize(size);
-        in.seekg(0, std::ios::beg);
-        in.read(&str[0], size);
-        in.close();
-        //읽기 종료
+        // Windows CRLF(\r\n) 처리: \r 제거
+        if (!line.empty() && line.back() == L'\r')
+            line.pop_back();
 
-        //배열의 가로 사이즈를 구한다.
-        int csvWidth = 0;
-        for (int i = 0; i < str.size(); i++)
+        std::wstringstream ss(line);
+        std::wstring cell;
+        std::size_t col = 0;
+
+        ensure_row();
+
+        //----------------------------------------------------
+        // 셀 단위 파싱 (쉼표 기준)
+        //----------------------------------------------------
+        while (std::getline(ss, cell, L','))
         {
-            if (str[i] == SDLK_COMMA || str[i] == 10)//해당 문자가 쉼표(44)거나 라인피드(10)일 경우
-            {
-                csvWidth++;
-                if (str[i] == 10)
-                {
-                    //prt(L"이 csv 파일의 가로사이즈는 %d이다!\n", csvWidth);
-                    break;
-                }
+            if (col >= SIZEW) {
+                // 열 개수 초과 → 무시하거나 필요 시 오류 처리
+                ++col;
+                continue;
             }
+
+            if constexpr (isSame<T, std::wstring>::value) {
+                // 문자열 배열일 때: 빈칸은 스페이스 한 칸으로 채워 구분
+                arr[row][col] = cell.empty() ? L" " : std::move(cell);
+            }
+            else {
+                // 숫자 배열일 때: 빈칸은 0
+                arr[row][col] = cell.empty() ? 0 : wtoi(cell.c_str());
+            }
+            ++col;
         }
-
-        int startPoint = -1;
-        int endPoint = -1;
-        int arrayCounter = 0;
-
-        for (int i = 0; i < str.size(); i++)
-        {
-            if (str[i] == SDLK_COMMA || str[i] == 10)//ASCII로 44(,)와 또는 라인피드(\n)와 같을 때
-            {
-                if (i == str.size() - 1) { i++; }//마지막 문자면 endP-startP 보정을 위해 i를 1 더함.
-                endPoint = i;
-
-                strFragment = str.substr(startPoint, endPoint - startPoint);
-
-                if (arrayCounter / csvWidth == arr.size()) // 만약 벡터 크기(상하)가 부족하면 1칸 늘림
-                {
-                    std::array<T, SIZEW> singleArr;
-                    arr.push_back(singleArr);
-                    //prt(L"새로운 배열을 추가했다. 현재 세로 사이즈는 %d\n", (int)arr.size());
-                }
-
-                if constexpr (isSame<T, std::wstring>::value == true) //입력할 배열이 문자열 배열이면
-                {
-                    //prt(L"[문자열] %ws ", strFragment.c_str());
-                    arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = strFragment;
-                }
-                else //그외의 경우(정수 배열)
-                {
-                    //prt(L"[정수] %d ", wtoi(strFragment.c_str()));
-                    arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = wtoi(strFragment.c_str());
-                }
-
-                // prt(L"를 (%d,%d)에 입력했다.\n", arrayCounter / (csvWidth), arrayCounter % (csvWidth));
-
-                arrayCounter++;
-
-                startPoint = -1;
-                endPoint = -1;
-                strFragment.clear();
-
-                if (i != str.size() - 1)//만약 다음 글자가 연속으로 쉼표면 여백이므로 건너뜀
-                {
-                    while (str[i + 1] == SDLK_COMMA || str[i + 1] == 10)
-                    {
-                        if constexpr (isSame<T, std::wstring>::value == true)
-                        {
-                            arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = L" ";//빈칸은 항상 스페이스바!
-                        }
-                        else
-                        {
-                            arr[arrayCounter / (csvWidth)][arrayCounter % (csvWidth)] = 0;//빈칸은 0으로
-                        }
-
-                        arrayCounter++;
-                        i++;
-                    }
-                }
-            }
-            else
-            {
-                if (startPoint == -1)
-                {
-                    startPoint = i;
-                }
-            }
-        }
-        return 1;
+        ++row; // 다음 행으로
     }
-    else//읽기 실패
-    {
 
-        return 0;
-    }
+    return 1; // 성공
 }
-
-
-

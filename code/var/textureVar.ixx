@@ -98,6 +98,7 @@ export namespace spr
 	Sprite* eyesBlue = nullptr;
 	Sprite* eyesRed = nullptr;
 	Sprite* eyesClosed = nullptr;
+	Sprite* eyesHalf = nullptr;
 	Sprite* beardMustacheBlack = nullptr;
 	Sprite* hairCommaBlack = nullptr;
 	Sprite* hairBob1Black = nullptr;
@@ -159,4 +160,5 @@ export namespace spr
 
 	Sprite* statusEffectGaugeCircle = nullptr;
 
+	Sprite* thoughtBubble = nullptr;
 }

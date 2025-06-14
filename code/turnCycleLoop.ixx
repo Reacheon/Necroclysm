@@ -28,6 +28,8 @@ import dirToXY;
 import globalTime;
 import log;
 import GameOver;
+import GUI;
+import Sleep;
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
@@ -91,6 +93,11 @@ __int64 playerInputTurn()
 	{
 		if (hunger <= 0)
 		{
+			if (GUI::getLastGUI() == Sleep::ins())
+			{
+				coTurnSkip = false;
+				delete Sleep::ins();
+			}
 			if (GameOver::ins() == nullptr) new GameOver(L"극심한 영양실조로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
@@ -98,6 +105,11 @@ __int64 playerInputTurn()
 
 		if (thirst <= 0)
 		{
+			if (GUI::getLastGUI() == Sleep::ins())
+			{
+				coTurnSkip = false;
+				delete Sleep::ins();
+			}
 			if (GameOver::ins() == nullptr) new GameOver(L"극심한 탈수 증세로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
@@ -146,7 +158,7 @@ __int64 playerInputTurn()
 
 		if (coTurnSkip)
 		{
-			prt(L"메인 함수 코루틴 재실행\n");
+			//prt(L"메인 함수 코루틴 재실행\n");
 			coTurnSkip = false;
 			(*coFunc).run();
 		}
@@ -394,6 +406,21 @@ __int64 animationTurn()
 		else if (turnCycle == turn::monsterAnime) turnCycle = turn::monsterAI;
 		};
 
+
+	if (coTurnSkip) 
+	{
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) 
+		{
+			if (event.type == SDL_EVENT_KEY_DOWN &&(event.key.key == SDLK_ESCAPE || event.key.key == SDLK_TAB)) 
+			{
+
+				// 즉시 취소 처리
+				//coTurnSkip = false;
+                std::wprintf(L"코루틴이 즉시 취소되었습니다.\n");
+			}
+		}
+	}
 
 	int aniSize = aniUSet.size();
 	if (aniUSet.size() > 0)
