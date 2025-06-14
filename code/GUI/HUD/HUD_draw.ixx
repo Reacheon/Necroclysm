@@ -970,6 +970,7 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::camera) setBtnLayout(sysStr[191], 152);
 		else if (barAct[i] == act::internet) setBtnLayout(sysStr[192], 154);
 		else if (barAct[i] == act::settings) setBtnLayout(sysStr[193], 155);
+		else if (barAct[i] == act::sleep) setBtnLayout(sysStr[211], 172);
 		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[194], 156);
 		else if (barAct[i] == act::skillActive)
 		{

@@ -218,6 +218,7 @@
     <ClCompile Include="code\GUI\Map.ixx" />
     <ClCompile Include="code\GUI\Profic.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />
+    <ClCompile Include="code\GUI\Sample.ixx" />
     <ClCompile Include="code\GUI\Skill.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
     <ClCompile Include="code\initCoordTransform.ixx" />

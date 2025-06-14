@@ -220,6 +220,8 @@ export enum class act
 
     drawLiquid,
 
+    sleep,
+
     //skillInfo,
 };
 
