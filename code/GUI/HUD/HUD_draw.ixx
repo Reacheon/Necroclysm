@@ -385,21 +385,104 @@ void HUD::drawGUI()
 				setZoom(1.0);
 			}
 
-			drawSprite(spr::ecliptic, 2, letterbox.x + 18 + 374, letterbox.y);
+			{
+				int eclipticIndex = 0;
+				if (getHour() >= 6 && getHour() < 18)
+				{
+					// 낮 시간: 6시~18시 (12시간 = 720분)
+					int currentHour = getHour();
+					int currentMin = getMin();
+					int minutesSince6AM = (currentHour - 6) * 60 + currentMin;
+
+					// 720분을 74~1 인덱스에 역순 매핑 (동쪽→서쪽)
+					eclipticIndex = 74 - (minutesSince6AM * 73) / 719;
+
+					// 안전 범위 체크
+					if (eclipticIndex < 1) eclipticIndex = 1;
+					if (eclipticIndex > 74) eclipticIndex = 74;
+				}
+				else
+				{
+					// 밤 시간: 해 없음
+					eclipticIndex = 76;
+				}
+
+				// 그리기
+				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 374, letterbox.y);
+			}
 
 			int cx, cy;
 			int pz = PlayerZ();
 			World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 			if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::sunny)
 			{
-				static int index = 0;
-				int sprSize = 6;
-				if (timer::timer600 % 12 == 0)
+				if (getHour() >= 6 && getHour() < 18)
 				{
-					index++;
-					if (index == sprSize) index = 0;
+					static int index = 0;
+					int sprSize = 6;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index == sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 19);
 				}
-				drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 19);
+				else
+				{
+					// 달 애니메이션 - 밝기 변화 효과
+					static int moonBrightnessTimer = 0;
+					moonBrightnessTimer++;
+
+					// 호흡하듯이 밝아졌다 어두워지는 효과 (약 4초 주기)
+					float breatheCycle = 300.0f; // 4초 * 60fps
+					float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
+
+					// 밝기를 128~255 범위로 설정 (완전히 어두워지지 않도록)
+					Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
+
+					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
+					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
+
+					drawSpriteCenter(spr::symbolMoon, 0, letterbox.x + 426, letterbox.y + 19);
+
+					// 투명도 원래대로 복원
+					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
+
+					SDL_Color centerLight = { 0xf7,0xf3,0xce };
+					SDL_Color outerLight = { 0xd0,0xc3,0x3f };
+					int lightPivotX = letterbox.x + 426 - 25;
+					int lightPivotY = letterbox.y + 19 - 5;
+
+					drawPoint(lightPivotX, lightPivotY, centerLight);
+					drawPoint(lightPivotX  + 1, lightPivotY, outerLight);
+					drawPoint(lightPivotX  - 1, lightPivotY, outerLight);
+					drawPoint(lightPivotX , lightPivotY + 1, outerLight);
+					drawPoint(lightPivotX , lightPivotY - 1, outerLight);
+				
+					drawPoint(lightPivotX + 2, lightPivotY - 10, outerLight);
+
+					drawPoint(lightPivotX + 8, lightPivotY - 6, outerLight);
+
+					drawPoint(lightPivotX + 12, lightPivotY - 13, centerLight);
+
+					drawPoint(lightPivotX+19, lightPivotY-12, centerLight);
+					drawPoint(lightPivotX + 19 + 1, lightPivotY - 12, outerLight);
+					drawPoint(lightPivotX + 19 - 1, lightPivotY - 12, outerLight);
+					drawPoint(lightPivotX + 19, lightPivotY - 12 + 1, outerLight);
+					drawPoint(lightPivotX + 19, lightPivotY - 12 - 1, outerLight);
+
+					drawPoint(lightPivotX + 32, lightPivotY - 11, centerLight);
+
+					drawPoint(lightPivotX + 40, lightPivotY - 13, outerLight);
+
+					drawPoint(lightPivotX + 47, lightPivotY-9, centerLight);
+					drawPoint(lightPivotX + 47 + 1, lightPivotY - 9, outerLight);
+					drawPoint(lightPivotX + 47 - 1, lightPivotY - 9, outerLight);
+					drawPoint(lightPivotX + 47, lightPivotY - 9 + 1, outerLight);
+					drawPoint(lightPivotX + 47, lightPivotY - 9 - 1, outerLight);
+
+					drawPoint(lightPivotX + 53, lightPivotY - 1, outerLight);
+				}
 			}
 			else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::cloudy)
 			{
