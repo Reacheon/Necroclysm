@@ -32,7 +32,7 @@ export void textureLoader()
 	spr::icon13 = new Sprite(renderer, "image/UI/icon13.png", 13, 13);
 	spr::icon48 = new Sprite(renderer, "image/UI/icon48.png", 48, 48);
 	spr::batteryGauge = new Sprite(renderer, "image/UI/batteryGauge.png", 32, 46);
-	spr::ecliptic = new Sprite(renderer, "image/UI/ecliptic.png", 72, 35);
+	spr::ecliptic = new Sprite(renderer, "image/UI/ecliptic.png", 64, 32);
 	spr::weather = new Sprite(renderer, "image/UI/weather.png", 72, 35);
 	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 72, 35);
 	spr::itemset = new Sprite(renderer, "image/item/itemset.png", 48, 48);

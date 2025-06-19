@@ -385,36 +385,156 @@ void HUD::drawGUI()
 				setZoom(1.0);
 			}
 
-			{
-				int eclipticIndex = 0;
-				if (getHour() >= 6 && getHour() < 18)
-				{
-					// 낮 시간: 6시~18시 (12시간 = 720분)
-					int currentHour = getHour();
-					int currentMin = getMin();
-					int minutesSince6AM = (currentHour - 6) * 60 + currentMin;
-
-					// 720분을 74~1 인덱스에 역순 매핑 (동쪽→서쪽)
-					eclipticIndex = 74 - (minutesSince6AM * 73) / 719;
-
-					// 안전 범위 체크
-					if (eclipticIndex < 1) eclipticIndex = 1;
-					if (eclipticIndex > 74) eclipticIndex = 74;
-				}
-				else
-				{
-					// 밤 시간: 해 없음
-					eclipticIndex = 76;
-				}
-
-				// 그리기
-				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 374, letterbox.y);
-			}
 
 			int cx, cy;
 			int pz = PlayerZ();
 			World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
-			if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::sunny)
+            weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
+
+
+			{
+				// 하늘 배경 그리기 (기존 코드)
+				int eclipticIndex = 0;
+				if (getHour() >= 7 && getHour() < 17)
+				{
+					eclipticIndex = 2; // 낮 하늘
+				}
+				else if (getHour() >= 17 && getHour() < 18)
+				{
+					eclipticIndex = 3; // 노을
+				}
+				else if (getHour() >= 6 && getHour() < 7)
+				{
+					eclipticIndex = 1; // 새벽
+				}
+				else
+				{
+					eclipticIndex = 4; // 밤
+				}
+
+				if (getHour() >= 6 && getHour() < 18)
+				{
+					if (currentWeather == weatherFlag::cloudy || currentWeather == weatherFlag::rain ||
+						currentWeather == weatherFlag::snow || currentWeather == weatherFlag::storm)
+					{
+						eclipticIndex = 5; // 회색 하늘
+					}
+				}
+
+				// 이클립스 배경 이미지 그리기
+				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 2);
+
+				static const std::vector<std::pair<int, int>> celestialPath = {
+					// 동쪽에서 시작하여 서쪽으로
+					{57, 0}, {57, -1}, {57, -2}, {57, -3}, {57, -4},
+					{56, -5}, {56, -6}, {56, -7},
+					{55, -8}, {55, -9},
+					{54, -10},
+					{53, -11},
+					{52, -12}, {52, -13},
+					{51, -14},
+					{50, -15}, {49, -15},
+					{48, -16},
+					{47, -17}, {46, -17},
+					{45, -18},
+					{44, -19}, {43, -19}, {42, -19},
+					{41, -20}, {40, -20},
+					{39, -21}, {38, -21}, {37, -21}, {36, -21}, {35, -21},
+					{34, -22}, {33, -22}, {32, -22}, {31, -22}, {30, -22}, {29, -22},
+					{28, -22}, {27, -22}, {26, -22}, {25, -22}, {24, -22}, {23, -22},
+					{22, -21}, {21, -21}, {20, -21}, {19, -21}, {18, -21},
+					{17, -20}, {16, -20},
+					{15, -19}, {14, -19}, {13, -19},
+					{12, -18},
+					{11, -17}, {10, -17},
+					{9, -16},
+					{8, -15}, {7, -15},
+					{6, -14},
+					{5, -13}, {5, -12},
+					{4, -11},
+					{3, -10},
+					{2, -9}, {2, -8},
+					{1, -7}, {1, -6}, {1, -5},
+					{0, -4}, {0, -3}, {0, -2}, {0, -1}, {0, 0}
+				};
+
+				// 낮 시간 (6시~18시)에 태양 표시
+				if (getHour() >= 6 && getHour() < 18)
+				{
+					// 현재 시간에 따른 인덱스 계산 (6시부터 18시까지 12시간)
+					int minutesSince6AM = (getHour() - 6) * 60 + getMin();
+					float progress = (float)minutesSince6AM / 720.0f; // 0.0 ~ 1.0 (12시간 = 720분)
+					int pathIndex = (int)(progress * (celestialPath.size() - 1));
+
+					// 범위 체크
+					if (pathIndex >= 0 && pathIndex < celestialPath.size())
+					{
+						// 태양 위치 계산 (이미지 왼쪽 아래가 (0,0), Y는 이제 위쪽이 양수)
+						int sunX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
+						int sunY = letterbox.y + 2 + 28 + celestialPath[pathIndex].second;
+
+						// 태양 점 그리기 (3x3 빨간점)
+						SDL_Color sunColor = { 255, 100, 100 }; // 밝은 빨간색
+						for (int dx = -1; dx <= 1; dx++)
+						{
+							for (int dy = -1; dy <= 1; dy++)
+							{
+								drawPoint(sunX + dx, sunY + dy, sunColor);
+							}
+						}
+
+						// 중심에 더 밝은 점
+						SDL_Color brightSun = { 255, 200, 100 }; // 노란빛
+						drawPoint(sunX, sunY, brightSun);
+					}
+				}
+				// 밤 시간 (18시~06시)에 달 표시
+				else
+				{
+					// 밤 시간 계산 (18시~다음날 6시까지 12시간)
+					int nightMinutes;
+					if (getHour() >= 18)
+					{
+						// 18시 이후 (18시~23시59분)
+						nightMinutes = (getHour() - 18) * 60 + getMin();
+					}
+					else
+					{
+						// 다음날 0시~6시
+						nightMinutes = (getHour() + 6) * 60 + getMin(); // 6시간 오프셋 추가
+					}
+
+					float progress = (float)nightMinutes / 720.0f; // 0.0 ~ 1.0 (12시간 = 720분)
+					int pathIndex = (int)(progress * (celestialPath.size() - 1));
+
+					// 범위 체크
+					if (pathIndex >= 0 && pathIndex < celestialPath.size())
+					{
+						// 달 위치 계산
+						int moonX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
+						int moonY = letterbox.y + 2 + 28 + celestialPath[pathIndex].second;
+
+						// 달 점 그리기 (3x3 하얀점)
+						SDL_Color moonColor = { 220, 220, 255 }; // 연한 파란빛 하얀색
+						for (int dx = -1; dx <= 1; dx++)
+						{
+							for (int dy = -1; dy <= 1; dy++)
+							{
+								drawPoint(moonX + dx, moonY + dy, moonColor);
+							}
+						}
+
+						// 중심에 더 밝은 점
+						SDL_Color brightMoon = { 255, 255, 255 }; // 순수한 하얀색
+						drawPoint(moonX, moonY, brightMoon);
+					}
+				}
+			}
+
+
+
+
+			if (currentWeather == weatherFlag::sunny)
 			{
 				if (getHour() >= 6 && getHour() < 18)
 				{
@@ -425,7 +545,7 @@ void HUD::drawGUI()
 						index++;
 						if (index == sprSize) index = 0;
 					}
-					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 19);
+					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 21);
 				}
 				else
 				{
@@ -434,7 +554,7 @@ void HUD::drawGUI()
 					moonBrightnessTimer++;
 
 					// 호흡하듯이 밝아졌다 어두워지는 효과 (약 4초 주기)
-					float breatheCycle = 300.0f; // 4초 * 60fps
+					float breatheCycle = 240.0f; // 4초 * 60fps
 					float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
 
 					// 밝기를 128~255 범위로 설정 (완전히 어두워지지 않도록)
@@ -443,14 +563,14 @@ void HUD::drawGUI()
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
 					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
 
-					drawSpriteCenter(spr::symbolMoon, 0, letterbox.x + 426, letterbox.y + 19);
+					drawSpriteCenter(spr::symbolMoon, 0, letterbox.x + 426, letterbox.y + 21);
 
 					// 투명도 원래대로 복원
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
 
 					SDL_Color centerLight = { 0xf7,0xf3,0xce };
 					SDL_Color outerLight = { 0xd0,0xc3,0x3f };
-					int lightPivotX = letterbox.x + 426 - 25;
+					int lightPivotX = letterbox.x + 426 - 27;
 					int lightPivotY = letterbox.y + 19 - 5;
 
 					drawPoint(lightPivotX, lightPivotY, centerLight);
@@ -484,7 +604,7 @@ void HUD::drawGUI()
 					drawPoint(lightPivotX + 53, lightPivotY - 1, outerLight);
 				}
 			}
-			else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::cloudy)
+			else if (currentWeather == weatherFlag::cloudy)
 			{
 				static int index = 0;
 				int sprSize = 9;
@@ -493,9 +613,9 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 19);
+				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 21);
 			}
-			else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::rain)
+			else if (currentWeather == weatherFlag::rain)
 			{
 				static int index = 0;
 				int sprSize = 3;
@@ -504,9 +624,9 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 19);
+				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 21);
 			}
-			else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::storm)
+			else if (currentWeather == weatherFlag::storm)
 			{
 				static int index = 0;
 				int sprSize = 3;
@@ -515,9 +635,9 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 19);
+				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 21);
 			}
-			else if (World::ins()->getChunkWeather(cx, cy, pz) == weatherFlag::snow)
+			else if (currentWeather == weatherFlag::snow)
 			{
 				static int index = 0;
 				int sprSize = 15;
@@ -526,7 +646,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 19);
+				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 21);
 			}
 
 			renderTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
