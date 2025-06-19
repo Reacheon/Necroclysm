@@ -1,4 +1,5 @@
 ﻿export module globalTime;
+import std;
 import constVar;
 static int year = START_YEAR;
 static int month = START_MONTH;
@@ -151,3 +152,21 @@ export int getElapsedDays()
 
     return totalDays;
 }
+
+// index 0 : new moon (신월)
+// index 1 : waxing crescent (초승달)
+// index 2 : first quarter (상현달)
+// index 3 : waxing gibbous (상현망)
+// index 4 : full moon (보름달)
+// index 5 : waning gibbous (하현망)
+// index 6 : third quarter (하현달)
+// index 7 : waning crescent (그믐달)
+export int calculateMoonPhase()
+{
+    const double LUNAR_CYCLE_DAYS = 29.53058867;
+    double totalTime = getElapsedDays();
+    totalTime += (getHour() * 60.0 + getMin()) / (24.0 * 60.0);
+    double cycleProgress = fmod(totalTime, LUNAR_CYCLE_DAYS) / LUNAR_CYCLE_DAYS;
+    int phaseIndex = (int)(cycleProgress * 8.0);
+    return std::max(0, std::min(7, phaseIndex)); 
+};

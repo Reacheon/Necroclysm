@@ -335,11 +335,11 @@ void HUD::drawGUI()
 
 				std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
 				setFontSize(8);
-                renderTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);	
+				renderTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
 			}
 
 			setFontSize(10);
-			
+
 			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6);
 			renderText(L"6,320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0, lowCol::yellow);
 
@@ -391,7 +391,7 @@ void HUD::drawGUI()
 			int cx, cy;
 			int pz = PlayerZ();
 			World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
-            weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
+			weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
 
 
 			{
@@ -460,23 +460,18 @@ void HUD::drawGUI()
 					{0, -4}, {0, -3}, {0, -2}, {0, -1}, {0, 0}
 				};
 
-				// 낮 시간 (6시~18시)에 태양 표시
 				if (getHour() >= 6 && getHour() < 18)
 				{
-					// 현재 시간에 따른 인덱스 계산 (6시부터 18시까지 12시간)
 					int minutesSince6AM = (getHour() - 6) * 60 + getMin();
-					float progress = (float)minutesSince6AM / 720.0f; // 0.0 ~ 1.0 (12시간 = 720분)
+					float progress = (float)minutesSince6AM / 720.0f; 
 					int pathIndex = (int)(progress * (celestialPath.size() - 1));
 
-					// 범위 체크
 					if (pathIndex >= 0 && pathIndex < celestialPath.size())
 					{
-						// 태양 위치 계산 (이미지 왼쪽 아래가 (0,0), Y는 이제 위쪽이 양수)
 						int sunX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
 						int sunY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second;
 
-						// 태양 점 그리기 (3x3 빨간점)
-						SDL_Color sunColor = { 255, 100, 100 }; // 밝은 빨간색
+						SDL_Color sunColor = { 255, 100, 100 }; 
 						for (int dx = -1; dx <= 1; dx++)
 						{
 							for (int dy = -1; dy <= 1; dy++)
@@ -485,50 +480,8 @@ void HUD::drawGUI()
 							}
 						}
 
-						// 중심에 더 밝은 점
-						SDL_Color brightSun = { 255, 200, 100 }; // 노란빛
+						SDL_Color brightSun = { 255, 200, 100 };
 						drawPoint(sunX, sunY, brightSun);
-					}
-				}
-				// 밤 시간 (18시~06시)에 달 표시
-				else
-				{
-					// 밤 시간 계산 (18시~다음날 6시까지 12시간)
-					int nightMinutes;
-					if (getHour() >= 18)
-					{
-						// 18시 이후 (18시~23시59분)
-						nightMinutes = (getHour() - 18) * 60 + getMin();
-					}
-					else
-					{
-						// 다음날 0시~6시
-						nightMinutes = (getHour() + 6) * 60 + getMin(); // 6시간 오프셋 추가
-					}
-
-					float progress = (float)nightMinutes / 720.0f; // 0.0 ~ 1.0 (12시간 = 720분)
-					int pathIndex = (int)(progress * (celestialPath.size() - 1));
-
-					// 범위 체크
-					if (pathIndex >= 0 && pathIndex < celestialPath.size())
-					{
-						// 달 위치 계산
-						int moonX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
-						int moonY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second;
-
-						// 달 점 그리기 (3x3 하얀점)
-						SDL_Color moonColor = { 220, 220, 255 }; // 연한 파란빛 하얀색
-						for (int dx = -1; dx <= 1; dx++)
-						{
-							for (int dy = -1; dy <= 1; dy++)
-							{
-								drawPoint(moonX + dx, moonY + dy, moonColor);
-							}
-						}
-
-						// 중심에 더 밝은 점
-						SDL_Color brightMoon = { 255, 255, 255 }; // 순수한 하얀색
-						drawPoint(moonX, moonY, brightMoon);
 					}
 				}
 			}
@@ -551,60 +504,22 @@ void HUD::drawGUI()
 				}
 				else
 				{
-					// 달 애니메이션 - 밝기 변화 효과 + 위상 변화
 					static int moonBrightnessTimer = 0;
 					moonBrightnessTimer++;
 
-					// 호흡하듯이 밝아졌다 어두워지는 효과 (약 4초 주기)
-					float breatheCycle = 240.0f; // 4초 * 60fps
+					float breatheCycle = 240.0f;
 					float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
 
-					// 밝기를 128~255 범위로 설정 (완전히 어두워지지 않도록)
 					Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
 
-					// 달의 위상 계산 (람다 함수)
-					auto calculateMoonPhase = []() -> int {
-						// 게임 시작일을 기준으로 경과 일수 계산
-						int totalDays = getElapsedDays();
-
-						// 달의 주기는 약 29.5일 (실제로는 29.53059일)
-						// 게임에서는 정확히 30일로 단순화
-						const int LUNAR_CYCLE = 30;
-
-						// 경과 일수를 30일 주기로 나눈 나머지
-						int dayInCycle = totalDays % LUNAR_CYCLE;
-
-						// 달의 위상 인덱스 계산 (0~17)
-						// 0: 보름달, 15: 신월, 18단계로 나누어짐
-						int phaseIndex;
-
-						if (dayInCycle <= 15) {
-							// 보름달 → 신월 (0일차~15일차)
-							phaseIndex = dayInCycle;
-						}
-						else {
-							// 신월 → 보름달 (16일차~29일차)
-							phaseIndex = 30 - dayInCycle;
-						}
-
-						// 17단계로 제한 (이미지에서 0~16 또는 0~17 인덱스)
-						if (phaseIndex > 17) phaseIndex = 17;
-
-						return phaseIndex;
-						};
 
 					int moonPhaseIndex = calculateMoonPhase();
-
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
 					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
 
-					// 위상에 따른 달 모양 표시
 					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 25);
-
-					// 투명도 원래대로 복원
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
 
-					// 달빛 효과 - 모든 달 위상에서 표시 (신월일 때는 매우 약하게)
 					SDL_Color centerLight = { 0xf7,0xf3,0xce };
 					SDL_Color outerLight = { 0xd0,0xc3,0x3f };
 					int lightPivotX = letterbox.x + 426 - 27;
@@ -803,9 +718,9 @@ void HUD::drawTab()
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 
-		if(option::language ==L"Korean") setFontSize(12);
+		if (option::language == L"Korean") setFontSize(12);
 		else  setFontSize(10);
-		
+
 		renderTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
 		renderTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
@@ -829,7 +744,7 @@ void HUD::drawTab()
 		if (option::inputMethod == input::gamepad)
 		{
 			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
-			else if(SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
+			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
 			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
 		}
 		else
@@ -856,7 +771,7 @@ void HUD::drawTab()
 			else drawSprite(spr::tabBoxAim, 0, tab.x, tab.y - 2);
 		}
 
-        
+
 
 
 
@@ -1020,9 +935,9 @@ void HUD::drawBarAct()
 			drawSpriteCenter(spr::vehicleHUDParts, 17, barButton[2].x + barButton[2].w / 2, barButton[2].y + barButton[2].h / 2); //우회전 마크
 
 
-			if(ctrlVeh->isEngineOn) drawSpriteCenter(spr::vehicleHUDParts, 2 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
+			if (ctrlVeh->isEngineOn) drawSpriteCenter(spr::vehicleHUDParts, 2 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
 			else  drawSpriteCenter(spr::vehicleHUDParts, 0 + (checkCursor(&barButton[3]) && click), barButton[3].x + barButton[3].w / 2, barButton[3].y + barButton[3].h / 2); //엔진 스타트
-			
+
 
 			//기어(PRND) 그리기
 			int gearSprIndex = 0;
@@ -1247,8 +1162,8 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::toggleOn) setBtnLayout(sysStr[196], 163);
 		else if (barAct[i] == act::headlight)
 		{
-			if(ctrlVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
-            else setBtnLayout(sysStr[205], 164);
+			if (ctrlVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
+			else setBtnLayout(sysStr[205], 164);
 		}
 		else if (barAct[i] == act::drink) setBtnLayout(sysStr[210], 37);
 		else setBtnLayout(L" ", 0);
@@ -1259,7 +1174,7 @@ void HUD::drawBarAct()
 		//하단 텍스트
 
 		int fontSize = 12;
-		if(option::language == L"Korean") fontSize = 12;
+		if (option::language == L"Korean") fontSize = 12;
 		else fontSize = 10;
 		setFontSize(fontSize);
 		renderTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
@@ -1309,7 +1224,7 @@ void HUD::drawStatusEffects()
 		static float fakeThirst = thirst;
 		if (fakeThirst < thirst) fakeThirst += 1.0f;
 		else if (fakeThirst > thirst) fakeThirst -= 1.0f;
-		
+
 		int f = fatigue;
 		static float fakeFatigue = fatigue;
 		if (fakeFatigue < fatigue) fakeFatigue += 1.0f;
@@ -1620,12 +1535,12 @@ void HUD::drawHoverItemInfo()
 				setFontSize(10);
 				std::wstring titleName = vehPtr->name;
 				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
-				if(vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
+				if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else drawSpriteCenter(spr::icon16, 88, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 
-				
+
 
 				int newPivotY = pivotY + 16;
 
@@ -1715,7 +1630,7 @@ void HUD::drawQuest()
 	drawRect({ 9, 206,9,9 }, col::white);
 	setFontSize(10);
 	int elapsedDay = getElapsedDays();
-	std::wstring questStr = sysStr[213]+L"  (";
+	std::wstring questStr = sysStr[213] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
 	renderText(questStr, 21, 204);
