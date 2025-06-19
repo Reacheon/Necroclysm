@@ -39,6 +39,7 @@ import Dialogue;
 import Skill;
 import Quest;
 import Sleep;
+import Aim;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -636,6 +637,128 @@ public:
 		}
 	}
 	void tileTouch(int touchX, int touchY); //일반 타일 터치
+
+	void findAndOpenAim()
+	{
+		//플레이어의 시야에 있는 모든 객체들을 체크
+		std::array<int, 2> nearCoord = { 0,0 };//상대좌표
+		int playerX = PlayerX();
+		int playerY = PlayerY();
+		int playerZ = PlayerZ();
+		for (int i = playerX - DARK_VISION_RADIUS; i <= playerX + DARK_VISION_RADIUS; i++)
+		{
+			for (int j = playerY - DARK_VISION_RADIUS; j <= playerY + DARK_VISION_RADIUS; j++)
+			{
+				if (TileFov(i, j, playerZ) == fovFlag::white)
+				{
+					//없는 타일이거나 플레이어 개체는 제외함
+					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != PlayerPtr)
+					{
+						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//갱신
+						{
+							nearCoord = { i - playerX, j - playerY };
+						}
+					}
+				}
+			}
+		}
+
+		if (nearCoord[0] == 0 && nearCoord[1] == 0)//찾지 못했을 경우
+		{
+			updateLog(col2Str(col::white) + sysStr[105]);
+		}
+		else//찾았을 경우
+		{
+			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			for (int i = 0; i < equipInfo.size(); i++)
+			{
+				if (equipInfo[i].equipState != equipHandFlag::none)
+				{
+					if (equipInfo[i].checkFlag(itemFlag::BOW))
+					{
+						if (equipInfo[i].pocketPtr.get()->getPocketNumber() > 0) new Aim();
+						else
+						{
+							for (int j = 0; j < equipInfo.size(); j++)
+							{
+								if (equipInfo[j].itemCode == itemRefCode::arrowQuiver)
+								{
+									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+									{
+										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
+										updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+										new Aim();
+										break;
+									}
+								}
+								if (j == equipInfo.size() - 1) updateLog(col2Str(col::white) + L"현재 가지고 있는 화살이 없다.");
+							}
+						}
+					}
+					else if (equipInfo[i].checkFlag(itemFlag::CROSSBOW))
+					{
+						if (equipInfo[i].pocketPtr.get()->getPocketNumber() > 0) new Aim();
+						else
+						{
+							for (int j = 0; j < equipInfo.size(); j++)
+							{
+								if (equipInfo[j].itemCode == itemRefCode::boltQuiver)
+								{
+									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
+									{
+										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
+										updateLog(col2Str(col::white) + L"당신은 석궁에 볼트를 장전했다.");
+										new Aim();
+										break;
+									}
+								}
+								if (j == equipInfo.size() - 1) updateLog(col2Str(col::white) + L"현재 가지고 있는 볼트가 없다.");
+							}
+						}
+					}
+					else if (equipInfo[i].checkFlag(itemFlag::GUN))
+					{
+						if (equipInfo[i].pocketOnlyItem.empty())
+						{
+							updateLog(col2Str(col::white) + L"이 총은 탄 정보를 찾을 수 없습니다.");
+							break;
+						}
+
+						unsigned short onlyCode = equipInfo[i].pocketOnlyItem[0];
+						/* ① 리볼버·산탄총처럼 ‘직장전식’  ------------------------------------ */
+						if (itemDex[onlyCode].checkFlag(itemFlag::AMMO))
+						{
+							if (getBulletNumber(equipInfo[i]) > 0) new Aim();
+							else updateLog(col2Str(col::white) + L"현재 장전된 탄이 없습니다.");
+
+						}
+						/* ② 탄창식( MAGAZINE )  ------------------------------------------------ */
+						else if (itemDex[onlyCode].checkFlag(itemFlag::MAGAZINE))
+						{
+							ItemPocket* gunPocket = equipInfo[i].pocketPtr.get();
+
+							if (gunPocket && !gunPocket->itemInfo.empty())
+							{
+								ItemData& magazine = gunPocket->itemInfo[0];
+
+								if (getBulletNumber(magazine) > 0)
+								{
+									new Aim();
+								}
+								else updateLog(col2Str(col::white) + L"탄창에 탄이 없습니다.");
+							}
+							else updateLog(col2Str(col::white) + L"총에 탄창이 장착돼 있지 않습니다.");
+						}
+						/* ③ 그밖의 예외적인 경우(확장성을 위해) ------------------------------- */
+						else errorBox(L"이 총은 탄 정보를 찾을 수 없습니다.");
+						break;
+					}
+				}
+			}
+
+		}
+	};
+
 	Corouter closeDoor(int cx, int cy, int cz)
 	{
 		int doorNumber = 0;
@@ -862,4 +985,5 @@ public:
 
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
+
 };
