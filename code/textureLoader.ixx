@@ -118,7 +118,7 @@ export void textureLoader()
 
 	spr::symbolSunny = new Sprite(renderer, "image/UI/GUI/HUD/symbolSunny.png", 48, 48);
 	spr::symbolCloudy = new Sprite(renderer, "image/UI/GUI/HUD/symbolCloudy.png", 48, 48);
-	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png", 48, 48);
+	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png", 16, 16);
 	spr::symbolRain = new Sprite(renderer, "image/UI/GUI/HUD/symbolRain.png", 48, 48);
 	spr::symbolStorm = new Sprite(renderer, "image/UI/GUI/HUD/symbolStorm.png", 48, 48);
 	spr::symbolSnow = new Sprite(renderer, "image/UI/GUI/HUD/symbolSnow.png", 48, 48);

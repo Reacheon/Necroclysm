@@ -424,7 +424,7 @@ void HUD::drawGUI()
 				}
 
 				// 이클립스 배경 이미지 그리기
-				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 4);
+				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 2);
 
 				static const std::vector<std::pair<int, int>> celestialPath = {
 					// 동쪽에서 시작하여 서쪽으로
@@ -473,7 +473,7 @@ void HUD::drawGUI()
 					{
 						// 태양 위치 계산 (이미지 왼쪽 아래가 (0,0), Y는 이제 위쪽이 양수)
 						int sunX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
-						int sunY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second;
+						int sunY = letterbox.y + 2 + 28 + celestialPath[pathIndex].second;
 
 						// 태양 점 그리기 (3x3 빨간점)
 						SDL_Color sunColor = { 255, 100, 100 }; // 밝은 빨간색
@@ -514,7 +514,7 @@ void HUD::drawGUI()
 					{
 						// 달 위치 계산
 						int moonX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
-						int moonY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second;
+						int moonY = letterbox.y + 2 + 28 + celestialPath[pathIndex].second;
 
 						// 달 점 그리기 (3x3 하얀점)
 						SDL_Color moonColor = { 220, 220, 255 }; // 연한 파란빛 하얀색
@@ -547,7 +547,7 @@ void HUD::drawGUI()
 						index++;
 						if (index == sprSize) index = 0;
 					}
-					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 25);
+					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 21);
 				}
 				else
 				{
@@ -599,43 +599,55 @@ void HUD::drawGUI()
 					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
 
 					// 위상에 따른 달 모양 표시
-					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 25);
+					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 21);
 
 					// 투명도 원래대로 복원
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
 
-					// 달빛 효과 - 모든 달 위상에서 표시 (신월일 때는 매우 약하게)
-					SDL_Color centerLight = { 0xf7,0xf3,0xce };
-					SDL_Color outerLight = { 0xd0,0xc3,0x3f };
-					int lightPivotX = letterbox.x + 426 - 27;
-					int lightPivotY = letterbox.y + 19 - 2;
+					// 달빛 효과는 보름달에 가까울 때만 표시
+					if (moonPhaseIndex <= 3) // 보름달 근처 (0~3번 인덱스)
+					{
+						SDL_Color centerLight = { 0xf7,0xf3,0xce };
+						SDL_Color outerLight = { 0xd0,0xc3,0x3f };
+						int lightPivotX = letterbox.x + 426 - 27;
+						int lightPivotY = letterbox.y + 19 - 5;
 
-					drawPoint(lightPivotX, lightPivotY, centerLight);
-					drawPoint(lightPivotX + 1, lightPivotY, outerLight);
-					drawPoint(lightPivotX - 1, lightPivotY, outerLight);
-					drawPoint(lightPivotX, lightPivotY + 1, outerLight);
-					drawPoint(lightPivotX, lightPivotY - 1, outerLight);
+						// 달빛 강도를 위상에 따라 조절
+						float lightIntensity = (4 - moonPhaseIndex) / 4.0f; // 0~1
+						centerLight.r = static_cast<Uint8>(centerLight.r * lightIntensity);
+						centerLight.g = static_cast<Uint8>(centerLight.g * lightIntensity);
+						centerLight.b = static_cast<Uint8>(centerLight.b * lightIntensity);
+						outerLight.r = static_cast<Uint8>(outerLight.r * lightIntensity);
+						outerLight.g = static_cast<Uint8>(outerLight.g * lightIntensity);
+						outerLight.b = static_cast<Uint8>(outerLight.b * lightIntensity);
 
-					drawPoint(lightPivotX + 2, lightPivotY - 10, outerLight);
-					drawPoint(lightPivotX + 8, lightPivotY - 6, outerLight);
-					drawPoint(lightPivotX + 12, lightPivotY - 13, centerLight);
+						drawPoint(lightPivotX, lightPivotY, centerLight);
+						drawPoint(lightPivotX + 1, lightPivotY, outerLight);
+						drawPoint(lightPivotX - 1, lightPivotY, outerLight);
+						drawPoint(lightPivotX, lightPivotY + 1, outerLight);
+						drawPoint(lightPivotX, lightPivotY - 1, outerLight);
 
-					drawPoint(lightPivotX + 19, lightPivotY - 12, centerLight);
-					drawPoint(lightPivotX + 19 + 1, lightPivotY - 12, outerLight);
-					drawPoint(lightPivotX + 19 - 1, lightPivotY - 12, outerLight);
-					drawPoint(lightPivotX + 19, lightPivotY - 12 + 1, outerLight);
-					drawPoint(lightPivotX + 19, lightPivotY - 12 - 1, outerLight);
+						drawPoint(lightPivotX + 2, lightPivotY - 10, outerLight);
+						drawPoint(lightPivotX + 8, lightPivotY - 6, outerLight);
+						drawPoint(lightPivotX + 12, lightPivotY - 13, centerLight);
 
-					drawPoint(lightPivotX + 32, lightPivotY - 11, centerLight);
-					drawPoint(lightPivotX + 40, lightPivotY - 13, outerLight);
+						drawPoint(lightPivotX + 19, lightPivotY - 12, centerLight);
+						drawPoint(lightPivotX + 19 + 1, lightPivotY - 12, outerLight);
+						drawPoint(lightPivotX + 19 - 1, lightPivotY - 12, outerLight);
+						drawPoint(lightPivotX + 19, lightPivotY - 12 + 1, outerLight);
+						drawPoint(lightPivotX + 19, lightPivotY - 12 - 1, outerLight);
 
-					drawPoint(lightPivotX + 47, lightPivotY - 9, centerLight);
-					drawPoint(lightPivotX + 47 + 1, lightPivotY - 9, outerLight);
-					drawPoint(lightPivotX + 47 - 1, lightPivotY - 9, outerLight);
-					drawPoint(lightPivotX + 47, lightPivotY - 9 + 1, outerLight);
-					drawPoint(lightPivotX + 47, lightPivotY - 9 - 1, outerLight);
+						drawPoint(lightPivotX + 32, lightPivotY - 11, centerLight);
+						drawPoint(lightPivotX + 40, lightPivotY - 13, outerLight);
 
-					drawPoint(lightPivotX + 53, lightPivotY - 1, outerLight);
+						drawPoint(lightPivotX + 47, lightPivotY - 9, centerLight);
+						drawPoint(lightPivotX + 47 + 1, lightPivotY - 9, outerLight);
+						drawPoint(lightPivotX + 47 - 1, lightPivotY - 9, outerLight);
+						drawPoint(lightPivotX + 47, lightPivotY - 9 + 1, outerLight);
+						drawPoint(lightPivotX + 47, lightPivotY - 9 - 1, outerLight);
+
+						drawPoint(lightPivotX + 53, lightPivotY - 1, outerLight);
+					}
 				}
 			}
 			else if (currentWeather == weatherFlag::cloudy)
@@ -647,7 +659,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 21);
 			}
 			else if (currentWeather == weatherFlag::rain)
 			{
@@ -658,7 +670,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 21);
 			}
 			else if (currentWeather == weatherFlag::storm)
 			{
@@ -669,7 +681,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 21);
 			}
 			else if (currentWeather == weatherFlag::snow)
 			{
@@ -680,12 +692,10 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 21);
 			}
 
-
-			setFontSize(8);
-			renderTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 25);
+			renderTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 24);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
