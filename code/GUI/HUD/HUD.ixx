@@ -920,9 +920,15 @@ public:
 		}
 
 		//승마 추가
-		if (TileEntity(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		if (TileEntity(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr && TileEntity(targetGrid.x, targetGrid.y, PlayerZ())->entityInfo.entityCode == entityRefCode::horse)
 		{
 			inputOptions.push_back(act::ride);
+		}
+
+		//수면 추가
+		if (TileEntity(targetGrid.x, targetGrid.y, PlayerZ()) == PlayerPtr)
+		{
+			inputOptions.push_back(act::sleep);
 		}
 
 		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
@@ -959,6 +965,9 @@ public:
 			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::shallowSeaWater ||
 			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::deepSeaWater)
 		{
+
+			inputOptions.push_back(act::drinkFloorWater);
+
 			for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
 			{
 				if (PlayerPtr->getEquipPtr()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
@@ -982,6 +991,8 @@ public:
 				}
 			}
 		}
+
+
 
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}

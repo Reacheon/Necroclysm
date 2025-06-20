@@ -1218,17 +1218,35 @@ void HUD::drawStatusEffects()
 		int textOffsetY = 0;
 
 		static float fakeHunger = hunger;
-		if (fakeHunger < hunger) fakeHunger += 1.0f;
-		else if (fakeHunger > hunger) fakeHunger -= 1.0f;
+		float hungerDiff = std::abs(fakeHunger - hunger);
+		float hungerSpeed = 1.0f;
+		if (hungerDiff > 100.0f) hungerSpeed = 8.0f; 
+		else if (hungerDiff > 50.0f) hungerSpeed = 4.0f;
+		else if (hungerDiff > 20.0f) hungerSpeed = 2.0f;
+		else hungerSpeed = 1.0f;
+		if (fakeHunger < hunger) fakeHunger += hungerSpeed;
+		else if (fakeHunger > hunger) fakeHunger -= hungerSpeed;
 
 		static float fakeThirst = thirst;
-		if (fakeThirst < thirst) fakeThirst += 1.0f;
-		else if (fakeThirst > thirst) fakeThirst -= 1.0f;
+		float thirstDiff = std::abs(fakeThirst - thirst);
+		float thirstSpeed = 1.0f;
+		if (thirstDiff > 100.0f) thirstSpeed = 8.0f;
+		else if (thirstDiff > 50.0f) thirstSpeed = 4.0f;
+		else if (thirstDiff > 20.0f) thirstSpeed = 2.0f;
+		else thirstSpeed = 1.0f;
+		if (fakeThirst < thirst) fakeThirst += thirstSpeed;
+		else if (fakeThirst > thirst) fakeThirst -= thirstSpeed;
 
 		int f = fatigue;
 		static float fakeFatigue = fatigue;
-		if (fakeFatigue < fatigue) fakeFatigue += 1.0f;
-		else if (fakeFatigue > fatigue) fakeFatigue -= 1.0f;
+		float fatigueDiff = std::abs(fakeFatigue - fatigue);
+		float fatigueSpeed = 1.0f;
+		if (fatigueDiff > 100.0f) fatigueSpeed = 8.0f;
+		else if (fatigueDiff > 50.0f) fatigueSpeed = 4.0f;
+		else if (fatigueDiff > 20.0f) fatigueSpeed = 2.0f;
+		else fatigueSpeed = 1.0f;
+		if (fakeFatigue < fatigue) fakeFatigue += fatigueSpeed;
+		else if (fakeFatigue > fatigue) fakeFatigue -= fatigueSpeed;
 
 
 		switch (myEfcts[i].first)

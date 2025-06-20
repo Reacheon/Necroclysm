@@ -248,10 +248,9 @@ __int64 drawTiles()
 				{
 					sprIndex += 16;
 				}
-				else if (getSeason() == seasonFlag::winter)
+				else if (getSeason() == seasonFlag::summer)
 				{
 					sprIndex += 32;
-
 				}
 			}
 

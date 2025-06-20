@@ -193,10 +193,10 @@ public:
 			}
 		loopEnd:
 
-			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 240, -1);
+			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 280, -1);
 			else if (targetItemCode != 0)
 			{
-				renderTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 240, -1);
+				renderTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 280, -1);
 
 
 
@@ -217,12 +217,12 @@ public:
 				if (lastTextStart <= msgText.size() - 1)
 				{
 					setFontSize(16);
-					renderTextWidth(msgText.substr(lastTextStart), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 83, true, 240, -1);
+					renderTextWidth(msgText.substr(lastTextStart), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 83, true, 280, -1);
 				}
 			}
 			else
 			{
-				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 240, -1);
+				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 280, -1);
 			}
 
 

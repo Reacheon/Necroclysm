@@ -102,7 +102,7 @@ public:
 				setFontSize(10);
 				int targetX = pivotX + 10;
 				int targetY = pivotY + (28 * (-1)) + 20;
-				renderTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //재능
+				renderTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //이름
 				renderTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY - 7); //랭크
 				renderTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY - 7); //적성
 			}
@@ -223,12 +223,19 @@ public:
 				setFontSize(10);
 				renderText(focusStr, targetX + 30, targetY + 4);
 
+				int yOffset = 0;
 				{
 					SDL_Color rankColor = col::white;
 					if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) rankColor = col::yellow;
-					renderText(col2Str(rankColor) + proficStr, targetX + 40, targetY + 4);
+					if (queryTextWidth(proficStr) > 70)
+					{
+						setFontSize(8);
+						yOffset = 2;
+					}
+					renderText(col2Str(rankColor) + proficStr, targetX + 40, targetY + 4 + yOffset);
 				}
 
+				setFontSize(10);
 				//재능 랭크와 게이지 그리기
 				{
 					SDL_Color rankColor = col::white;
@@ -296,7 +303,8 @@ public:
 			//적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능은 최대 S랭크까지 올릴 수 있습니다.
 			//renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
 
-			renderTextWidth(L"행동으로 특정 재능의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 수련 재능들에 추가로 분배됩니다." , proficBase.x + 20, proficBase.y + proficBase.h - 30, false, 600, 14);
+			//행동으로 특정 숙련도의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 숙련도들에 추가로 분배됩니다.
+			renderTextWidth(sysStr[230] , proficBase.x + 20, proficBase.y + proficBase.h - 30, false, 600, 14);
 			
 		}
 		else

@@ -24,6 +24,7 @@ import Lst;
 import Maint;
 import drawEpsilonText;
 import ItemData;
+import Sleep;
 
 export class ContextMenu : public GUI
 {
@@ -162,6 +163,16 @@ public:
 				{
 					optionText = sysStr[206];//담기
 					iconIndex = 93;
+				}
+				else if (actOptions[i] == act::sleep)
+				{
+					optionText = sysStr[211];//수면
+					iconIndex = 98;
+				}
+				else if (actOptions[i] == act::drinkFloorWater)
+				{
+					optionText = sysStr[232];//마시기(바닥물마시기)
+					iconIndex = 99;
 				}
 				else optionText = L"???";
 
@@ -482,6 +493,23 @@ public:
 				updateLog(col2Str(col::white)+L"당신은 물을 병에 길었다.");
 				
 			}
+		}
+		else if (inputAct == act::sleep)
+		{
+			new Sleep();
+		}
+		else if (inputAct == act::drinkFloorWater)
+		{
+			int floorCode = TileFloor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			if (floorCode == itemRefCode::shallowFreshWater || floorCode == itemRefCode::deepFreshWater)
+			{
+				thirst = PLAYER_MAX_HYDRATION;
+			}
+			else if (floorCode == itemRefCode::shallowSeaWater || floorCode == itemRefCode::deepSeaWater)
+			{
+				thirst -= 100;
+			}
+			
 		}
 	}
 };

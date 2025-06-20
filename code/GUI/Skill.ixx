@@ -88,10 +88,10 @@ public:
 			skillBase.y += inputY - skillBase.h / 2;
 		}
 
-		generalBox = { skillBase.x,skillBase.y + 68,60,20 };
-		mutationBox = { skillBase.x + 60,skillBase.y + 68,60,20 };
-		bionicBox = { skillBase.x + 120,skillBase.y + 68,60,20 };
-		magicBox = { skillBase.x + 180,skillBase.y + 68,60,20 };
+		generalBox = { skillBase.x,skillBase.y + 68,66,20 };
+		mutationBox = { skillBase.x + 66,skillBase.y + 68,66,20 };
+		bionicBox = { skillBase.x + 132,skillBase.y + 68,66,20 };
+		magicBox = { skillBase.x + 198,skillBase.y + 68,66,20 };
 
 		for (int i = 0; i < 7; i++)
 		{
@@ -177,7 +177,8 @@ public:
 			}
 
 			setFontSize(10);
-			renderText(L"습득한 스킬 : 13개", skillBase.x + 190, skillBase.y +34);
+			std::wstring aquiredSkillText = sysStr[231] + L" : 13";
+			renderText(aquiredSkillText, skillBase.x + 272 - queryTextWidth(aquiredSkillText), skillBase.y +34);//습득한 스킬
 
 			for (int i = 0; i < 7; i++)
 			{

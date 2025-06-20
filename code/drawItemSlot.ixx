@@ -184,6 +184,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	SDL_Color statusColor;
 	SDL_Color statusStrColor;
 	std::wstring statusStr = L"-";
+	setFontSize(12);
 
 	if (inputItem.equipState == equipHandFlag::normal)
 	{
@@ -196,12 +197,14 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		statusColor = col::black;
 		statusStr = sysStr[49];//왼손
 		statusStrColor = lowCol::yellow;
+		setFontSize(10);
 	}
 	else if (inputItem.equipState == equipHandFlag::right)
 	{
 		statusColor = col::black;
 		statusStr = sysStr[50];
 		statusStrColor = lowCol::yellow;
+		setFontSize(10);
 	}
 	else if (inputItem.equipState == equipHandFlag::both)
 	{
@@ -245,7 +248,6 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	if (hasBox1 == true)
 	{
 		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 183, 5);
-		setFontSize(12);
 		renderTextCenter(statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2, statusStrColor);
 	}
 	else

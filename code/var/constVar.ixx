@@ -43,7 +43,7 @@ export constexpr int MAX_ENC = 10; //최대 방해도
 export constexpr int PART_MAX_HP = 100;
 
 export constexpr int START_YEAR = 2099;
-export constexpr int START_MONTH = 4;
+export constexpr int START_MONTH = 7;
 export constexpr int START_DAY = 15;
 export constexpr int START_HOUR = 12;
 export constexpr int START_MINUTE = 0;
@@ -227,6 +227,8 @@ export enum class act
     drawLiquid,
 
     sleep,
+
+    drinkFloorWater, //바닥물 마시기
 
     //skillInfo,
 };
@@ -1259,6 +1261,7 @@ export namespace entityRefCode
     constexpr int none = 0;
     constexpr int player = 1;
     constexpr int zombieA = 2;
+    constexpr int horse = 3;
 };
 
 export enum class skillSrc
