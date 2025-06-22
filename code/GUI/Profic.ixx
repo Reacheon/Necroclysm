@@ -303,8 +303,9 @@ public:
 			//적성이 높을 경우 레벨업에 필요한 경험치가 줄어들며 재능은 최대 S랭크까지 올릴 수 있습니다.
 			//renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
 
-			//행동으로 특정 숙련도의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 숙련도들에 추가로 분배됩니다.
-			renderTextWidth(L"#FFFFFF"+sysStr[230] , proficBase.x + 20, proficBase.y + proficBase.h - 30, false,600, 14);
+			//downText = L"#FFFFFF가나다라 #FF00FF양념치킨 치킨갈비 불고기버거 세트 주세요 #00FFFF바르바라바라바라바라라 #0000FF행동으로 특정 숙련도의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 숙련도들에 추가로 분배됩니다.";
+			renderTextWidth(sysStr[230], proficBase.x + 20, proficBase.y + proficBase.h - 40, false, 600, 14);
+			//renderTextWidth(L"#FFFFFF"+sysStr[230] , proficBase.x + 20, proficBase.y + proficBase.h - 30, false,600, 14);
 			
 		}
 		else

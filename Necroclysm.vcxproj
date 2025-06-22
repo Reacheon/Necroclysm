@@ -298,7 +298,7 @@
     <ClCompile Include="code\util\Point.ixx" />
     <ClCompile Include="code\util\prt.ixx" />
     <ClCompile Include="code\util\randomRange.ixx" />
-    <ClCompile Include="code\util\readCSV.ixx" />
+    <ClCompile Include="code\util\readTSV.ixx" />
     <ClCompile Include="code\util\replaceStr.ixx" />
     <ClCompile Include="code\util\sequenceCounter.ixx" />
     <ClCompile Include="code\util\sgn.ixx" />

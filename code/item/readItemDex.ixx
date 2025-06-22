@@ -179,7 +179,7 @@ export int readItemDex(const wchar_t* file)
         int csvWidth = 0;
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == UNI::COMMA || str[i] == UNI::LF)//해당 문자가 쉼표(44)거나 라인피드(10)일 경우
+            if (str[i] == UNI::TAB || str[i] == UNI::LF)//해당 문자가 쉼표(44)거나 라인피드(10)일 경우
             {
                 csvWidth++;
                 if (str[i] == UNI::LF)
@@ -241,7 +241,7 @@ export int readItemDex(const wchar_t* file)
 
         for (int i = 0; i < str.size(); i++)
         {
-            if (str[i] == UNI::COMMA || str[i] == 10)//ASCII로 44(,)와 또는 라인피드(\n)와 같을 때
+            if (str[i] == UNI::TAB || str[i] == 10)//ASCII로 44(,)와 또는 라인피드(\n)와 같을 때
             {
                 if (i == str.size() - 1) { i++; }//마지막 문자면 endP-startP 보정을 위해 i를 1 더함.
                 endPoint = i;
@@ -1029,7 +1029,7 @@ export int readItemDex(const wchar_t* file)
 
                 if (i != str.size() - 1)//만약 다음 글자가 연속으로 쉼표면 여백이므로 건너뜀
                 {
-                    while (str[i + 1] == UNI::COMMA || str[i + 1] == 10)
+                    while (str[i + 1] == UNI::TAB || str[i + 1] == 10)
                     {
                         arrayCounter++;
                         i++;

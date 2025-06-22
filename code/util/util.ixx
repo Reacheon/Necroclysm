@@ -16,7 +16,7 @@ export import isCircle;
 export import nanoTimer;
 export import prt;
 export import randomRange;
-export import readCSV;
+export import readTSV;
 export import replaceStr;
 export import sgn;
 export import utf8Decoder;
