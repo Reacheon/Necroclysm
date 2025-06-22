@@ -406,97 +406,47 @@ void Craft::drawGUI()
 			}
 		}
 
-		//가능한 조합 아이템들 그리기
-		//for (int i = 0; i < 12; i++)
-		//{
-		//	if (i + 2 * craftScroll < recipePtr->itemInfo.size())
-		//	{
-		//		if (recipePtr->itemInfo[i + 2 * craftScroll].checkFlag(itemFlag::BLACKFILTER) == false)
-		//		{
-		//			if (checkCursor(&itemBox[i]) && deactColorChange == false)
-		//			{
-		//				if (click == false) { drawItemRect(cursorFlag::hover, itemBox[i].x, itemBox[i].y, recipePtr->itemInfo[i + 2 * craftScroll]); }
-		//				else { drawItemRect(cursorFlag::click, itemBox[i].x, itemBox[i].y, recipePtr->itemInfo[i + 2 * craftScroll]); }
-		//			}
-		//			else if (craftCursor == i + 2 * craftScroll)
-		//			{
-		//				drawItemRect(cursorFlag::hover, itemBox[i].x, itemBox[i].y, recipePtr->itemInfo[i + 2 * craftScroll]);
-		//			}
-		//			else
-		//			{
-		//				drawItemRect(cursorFlag::none, itemBox[i].x, itemBox[i].y, recipePtr->itemInfo[i + 2 * craftScroll]);
-		//			}
-
-		//			if (craftCursor == i + 2 * craftScroll)
-		//			{
-		//				int cursorIndex = 0;
-		//				{
-		//					if (timer::timer600 % 30 < 5) { cursorIndex = 0; }
-		//					else if (timer::timer600 % 30 < 10) { cursorIndex = 1; }
-		//					else if (timer::timer600 % 30 < 15) { cursorIndex = 2; }
-		//					else if (timer::timer600 % 30 < 20) { cursorIndex = 3; }
-		//					else { cursorIndex = 0; }
-		//				}
-		//				drawSprite(spr::itemCursorShort, cursorIndex, itemBox[i].x - 16, itemBox[i].y - 16);
-		//			}
-		//		}
-		//	}
-		//}
-
 		for (int i = 0; i < 24; i++)
 		{
 			
 
-			if (i + 6 * craftScroll < recipePtr->itemInfo.size())
+			if (i + CRAFT_MAX_COLUMN * craftScroll < recipePtr->itemInfo.size())
 			{
-				if (recipePtr->itemInfo[i + 6 * craftScroll].checkFlag(itemFlag::BLACKFILTER) == false)
+				if (recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll].checkFlag(itemFlag::BLACKFILTER) == false)
 				{
-					int pivotX = craftBase.x + 183 + (73 * i) % (73 * 6);
-					int pivotY = craftBase.y + 122 + 70 * ((73 * i) / (73 * 6));
+					int pivotX = itemBox[i].x;
+					int pivotY = itemBox[i].y;
+
+					drawRect(itemBox[i], col::gray);
 
 					if (checkCursor(&itemBox[i]) && deactColorChange == false)
 					{
-						if (click == false) { drawSprite(spr::craftItemRect, 1, pivotX, pivotY); }
-						else { drawSprite(spr::craftItemRect, 2, pivotX, pivotY); }
+						if (click == false) drawFillRect(itemBox[i], lowCol::blue);
+						else drawFillRect(itemBox[i], lowCol::deepBlue);
 					}
-					else if (craftCursor == i + 6 * craftScroll)
+					else if (craftCursor == i + CRAFT_MAX_COLUMN * craftScroll)
 					{
-						drawSprite(spr::craftItemRect, 1, pivotX, pivotY);
+						drawFillRect(itemBox[i], lowCol::blue);
 					}
 					else
 					{
-						drawSprite(spr::craftItemRect, 0, pivotX, pivotY);
+
 					}
 
-					ItemData* iPtr = &(recipePtr->itemInfo[i + 6 * craftScroll]);
+					ItemData* iPtr = &(recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll]);
 					setZoom(2.0); 
-					drawSpriteCenter(spr::itemset, iPtr->sprIndex, pivotX + 29, pivotY + 18);
+					drawSpriteCenter(spr::itemset, iPtr->sprIndex, pivotX + 16, pivotY + 12);
 					setZoom(1.0);
 
 
 
 					setFontSize(10);
-
-					if (queryTextWidth(iPtr->name) > 63)
-					{
-						for (int i = iPtr->name.size()-1; i >= 0; i--)
-						{
-							if (queryTextWidth(iPtr->name.substr(0, i + 1)) <= 63)
-							{
-								renderTextCenter(iPtr->name.substr(0, i + 1), pivotX + 28, pivotY + 42);
-								renderTextCenter(iPtr->name.substr(i+1), pivotX + 28, pivotY + 54);
-								break;
-							}
-						}
-					}
-					else
-					{
-						renderTextCenter(iPtr->name, pivotX + 28, pivotY + 47);
-
-					}
+					renderText(iPtr->name, pivotX + 34, pivotY + 7);
 
 
-					if (craftCursor == i + 6 * craftScroll)
+
+
+					if (craftCursor == i + CRAFT_MAX_COLUMN * craftScroll)
 					{
 						//int cursorIndex = 0;
 						//{
@@ -525,15 +475,15 @@ void Craft::drawGUI()
 
 			SDL_Rect inScrollBox = { craftBase.x + craftBase.w - 18, craftBase.y + 36 + 95 - 6, 2, 252 };
 			inScrollBox.h = craftScrollBox.h * myMin(1.0, (double)24 / numNoneBlackFilter);
-			inScrollBox.y = craftScrollBox.y + craftScrollBox.h * ((float)6.0 * craftScroll / (float)numNoneBlackFilter);
+			inScrollBox.y = craftScrollBox.y + craftScrollBox.h * ((float)CRAFT_MAX_COLUMN * craftScroll / (float)numNoneBlackFilter);
 			if (inScrollBox.y + inScrollBox.h > craftScrollBox.y + craftScrollBox.h) { inScrollBox.y = craftScrollBox.y + craftScrollBox.h - inScrollBox.h; }
 			drawFillRect(inScrollBox, col::white);
 		}
 
-		setFontSize(10);
+		setFontSize(8);
 		std::wstring whiteNumber = std::to_wstring(numNoneBlackFilter);
 		std::wstring totalNumber = std::to_wstring(recipePtr->itemInfo.size());
-		renderText(whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 382);
+		renderText(whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 385);
 
 
 		//아이템 디테일박스(툴팁) 그리기
@@ -542,7 +492,7 @@ void Craft::drawGUI()
 			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 			bool canCraft = true; //현재 플레이어의 상태로 조합이 가능한지 체크함 
 			int targetCursor;
-			if (pointingCursor >= 0) targetCursor = pointingCursor + 6*craftScroll;
+			if (pointingCursor >= 0) targetCursor = pointingCursor + CRAFT_MAX_COLUMN *craftScroll;
 			else targetCursor = craftCursor;
 
 			if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BLACKFILTER) == false)
@@ -564,12 +514,12 @@ void Craft::drawGUI()
 
 				renderText(categoryStr, topWindow.x + 68, topWindow.y + 12 + 18, col::lightGray);
 
-				std::wstring weightStr = L"무게 : ";
+				std::wstring weightStr = sysStr[17]+L" : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
 				weightStr += L"KG";
 				renderText(weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
 
-				std::wstring volumeStr = L"부피 : ";
+				std::wstring volumeStr = sysStr[18] + L" : ";
 				volumeStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].volume)) / 1000.0, 3);
 				volumeStr += L"L";
 				renderText(volumeStr, topWindow.x + 168, topWindow.y + 12 + 32);
@@ -577,7 +527,7 @@ void Craft::drawGUI()
 				std::wstring tooltipText;
 
 				//조합에 필요한 플레이어 재능
-				std::wstring proficStr = col2Str(col::gray) + L"필요 기술 : ";
+				std::wstring proficStr = col2Str(col::gray) + sysStr[233] + L" : ";//필요 기술
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeProficNeed.size(); i++)
 				{
 					int needLevel = recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second;
@@ -595,12 +545,12 @@ void Craft::drawGUI()
 					proficStr += L"레벨";
 					if (i != recipePtr->itemInfo[targetCursor].recipeProficNeed.size() - 1) proficStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + L"없음";
+				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + sysStr[236];
 
 				tooltipText += proficStr + L"\n";
 
 				//조합에 필요한 기술(툴 퀄리티)
-				std::wstring qualityStr = col2Str(col::gray) + L"필요 도구기술 : ";
+				std::wstring qualityStr = col2Str(col::gray) + sysStr[234]+L" : ";//필요 공구
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeQualityNeed.size(); i++)
 				{
 					if (equipPtr->checkToolQuality(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]))
@@ -616,11 +566,11 @@ void Craft::drawGUI()
 					qualityStr += toolQuality2String(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]);
 					if (i != recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() - 1) qualityStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + L"없음";
+				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + sysStr[236];
 				tooltipText += qualityStr + L"\n";
 
 				//조합에 필요한 재료
-				std::wstring materialStr = col2Str(col::gray) + L"필요 재료 : ";
+				std::wstring materialStr = col2Str(col::gray) + sysStr[235]+L" : ";//필요 재료
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipe.size(); i++)
 				{
 					//툴 퀄리티에 따라 적색, 녹색 변화
@@ -642,7 +592,7 @@ void Craft::drawGUI()
 					materialStr += L")";
 					if (i != recipePtr->itemInfo[targetCursor].recipe.size() - 1) materialStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + L"없음";
+				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + sysStr[236];
 				tooltipText += materialStr + L"\n";
 
 				//아이템 설명
@@ -690,9 +640,11 @@ void Craft::drawGUI()
 					drawRect(tooltipCraftBtn, outlineColor);
 					setFontSize(12);
 
-					renderTextCenter(L"조합하기", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);
+					renderTextCenter(sysStr[237], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);//조합하기
 					setFontSize(10);
-					renderTextCenter(L"1시간 3분", tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
+					
+					std::wstring remainStr = replaceStr(replaceStr(sysStr[238], L"(%hour)", L"1"), L"(%min)",L"34");
+					renderTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
 					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 14, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
 
 					if (canCraft == false) drawFillRect(tooltipCraftBtn, col::black, 100);
@@ -723,7 +675,7 @@ void Craft::drawGUI()
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
 					setFontSize(12);
-					renderTextCenter(L"즐겨찾기", tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2, textColor);
+					renderTextCenter(sysStr[239], tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2, textColor);//즐겨찾기
 					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 14, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 
 					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1));

@@ -304,7 +304,7 @@ public:
 			//renderText(sysStr[181], proficBase.x + 20, proficBase.y + proficBase.h - 30);
 
 			//행동으로 특정 숙련도의 경험치 획득 시 동일한 양의 보너스 경험치가 선택한 숙련도들에 추가로 분배됩니다.
-			renderTextWidth(sysStr[230] , proficBase.x + 20, proficBase.y + proficBase.h - 30, false, 600, 14);
+			renderTextWidth(L"#FFFFFF"+sysStr[230] , proficBase.x + 20, proficBase.y + proficBase.h - 30, false,600, 14);
 			
 		}
 		else

@@ -340,7 +340,7 @@ public:
 			{
 				if (checkCursor(&optionRect[i]))
 				{
-					CORO(executeContextAct(actOptions[i]));
+					executeContextAct(actOptions[i]);
 				}
 
 			}
@@ -377,7 +377,7 @@ public:
 		//if(openSub==false) subContextMenuBase = { -1, -1, -1,-1 };
 	}
 
-	Corouter executeContextAct(act inputAct)
+	void executeContextAct(act inputAct)
 	{
 		if (inputAct == act::closeDoor)
 		{
@@ -440,7 +440,6 @@ public:
 			}
 
 			new Maint(L"수리", L"수리할 부품을 선택해주세요.", {contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ()},maintFlag::repair);
-			co_await std::suspend_always();
 		}
 		else if (inputAct == act::vehicleDetach)
 		{
@@ -455,7 +454,6 @@ public:
 			}
 
 			new Maint(L"탈착", L"차량에서 분리할 부품을 선택해주세요.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() },maintFlag::detach);
-			co_await std::suspend_always();
 		}
 		else if (inputAct == act::drawLiquid)
 		{

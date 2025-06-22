@@ -13,7 +13,7 @@ static constexpr size_t MAX_CACHE_SIZE = 5000;
 export void setFontSize(int val) { s_fontSize = val; }
 export void setFontGap(int val) { s_fontGap = val; }
 
-struct TextCacheKey 
+struct TextCacheKey
 {
     std::wstring text;
     int fontSize;
@@ -25,9 +25,9 @@ struct TextCacheKey
     }
 };
 
-struct TextCacheKeyHasher 
+struct TextCacheKeyHasher
 {
-    size_t operator()(const TextCacheKey& key) const 
+    size_t operator()(const TextCacheKey& key) const
     {
         size_t h1 = std::hash<std::wstring>{}(key.text);
         size_t h2 = std::hash<int>{}(key.fontSize);
@@ -44,7 +44,7 @@ struct TextCacheKeyHasher
     }
 };
 
-struct CachedTexture 
+struct CachedTexture
 {
     SDL_Texture* texture;
     float width, height;
@@ -455,7 +455,7 @@ export int queryTextHeight(const std::wstring& text, bool hasColor = false) {
 }
 
 //@brief 캐시없이 바로 텍스트를 출력하는 함수, 프레임이나 디버깅 시간 표시 용도로 쓸 것
-export void renderTextDirect(const std::wstring& text, int x, int y, SDL_Color col = col::white) 
+export void renderTextDirect(const std::wstring& text, int x, int y, SDL_Color col = col::white)
 {
     std::string utf8 = toUTF8(text);
     SDL_Surface* surf = TTF_RenderText_Solid(mainFont[s_fontSize], utf8.c_str(), 0, col);
@@ -468,4 +468,3 @@ export void renderTextDirect(const std::wstring& text, int x, int y, SDL_Color c
     SDL_RenderTexture(renderer, tex, nullptr, &dst);
     SDL_DestroyTexture(tex);
 }
-

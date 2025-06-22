@@ -1,6 +1,5 @@
 ﻿#include <SDL3/SDL.h>
 
-
 export module Maint;
 
 import std;
@@ -24,9 +23,6 @@ export enum class maintFlag
 	detach,
 };
 
-
-//Maint는 Msg랑 다르게 coAnswer로 문자열이 아니라 선택한 입력지의 인덱스를 반환할것
-//coAnswer 반환형 : 현재 선택한 목록의 인덱스 숫자 정수형, 예로 0번째 선택지를 고르면 L"0" 반환
 export class Maint : public GUI
 {
 private:
@@ -54,7 +50,7 @@ private:
 	Point3 maintCoor;
 
 public:
-	Maint(std::wstring inputTitle, std::wstring inputText, Point3 inputCoor, maintFlag inputMode) : GUI(true)
+	Maint(std::wstring inputTitle, std::wstring inputText, Point3 inputCoor, maintFlag inputMode) : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
 		prt(L"Maint 객체가 생성되었다.\n");
@@ -76,7 +72,6 @@ public:
 
 		prevTabType = tabType;
 		tabType = tabFlag::back;
-
 	}
 
 	~Maint()
@@ -90,9 +85,10 @@ public:
 		exInputIndex = -1;
 
 		tabType = tabFlag::autoAtk;
-
 	}
+
 	static Maint* ins() { return ptr; }
+
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		maintBase = { 0, 0, 280, 393 };
@@ -126,7 +122,6 @@ public:
 		}
 
 		maintInputBox = { maintWindow.x + 50,maintWindow.y + 60, 200, 40 };
-
 		maintScrollBox = { maintWindow.x + 271,maintWindow.y + 48, 2, 285 };
 
 		if (center == false)
@@ -140,6 +135,7 @@ public:
 			y = inputY - maintBase.h / 2;
 		}
 	}
+
 	void drawGUI()
 	{
 		if (getStateDraw() == false) return;
@@ -233,38 +229,67 @@ public:
 				vRect.w = vRect.w * getFoldRatio();
 				break;
 			}
-			// drawStadium(vRect.x, vRect.y, vRect.w, vRect.h, { 0,0,0 }, 230, 5);
 			drawWindow(&vRect);
 		}
 	}
+
 	void clickUpGUI()
 	{
 		if (getStateInput() == false) { return; }
+
+		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
+		if (!vPtr) return;
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
+		std::vector<ItemData>& items = partIter->second->itemInfo;
 
 		for (int i = 0; i < maintBtn.size(); i++)
 		{
 			if (checkCursor(&maintBtn[i]))
 			{
-				coAnswer = std::to_wstring(maintScroll + i);
-				close(aniFlag::null);
+				int selectedIndex = maintScroll + i;
+
+				if (selectedIndex >= 0 && selectedIndex < items.size())
+				{
+					// 선택된 아이템으로 실제 작업 수행
+					if (maintMode == maintFlag::repair)
+					{
+						// 수리 로직 수행
+						// 예: items[selectedIndex]를 수리
+						prt(L"수리 실행: %ls\n", items[selectedIndex].name.c_str());
+					}
+					else if (maintMode == maintFlag::detach)
+					{
+						// 탈착 로직 수행
+						// 예: items[selectedIndex]를 분리
+						prt(L"탈착 실행: %ls\n", items[selectedIndex].name.c_str());
+					}
+
+					close(aniFlag::null);
+					return;
+				}
 			}
 		}
 
 		if (checkCursor(&tab))
 		{
-			coAnswer = std::to_wstring(-1);
 			close(aniFlag::null);
 			return;
 		}
 	}
+
 	void clickMotionGUI(int dx, int dy) {}
 	void clickDownGUI() {}
 	void clickRightGUI() {}
 	void clickHoldGUI() {}
-	void mouseWheel() 
+
+	void mouseWheel()
 	{
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
-		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
+		if (!vPtr) return;
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
+		std::vector<ItemData>& items = partIter->second->itemInfo;
 
 		if (checkCursor(&maintBase))
 		{
@@ -272,13 +297,18 @@ public:
 			else if (event.wheel.y < 0 && maintScroll + MAX_BTN < items.size()) maintScroll += 1;
 		}
 	}
+
 	void gamepadBtnDown() {}
 	void gamepadBtnMotion() {}
 	void gamepadBtnUp() {}
-	void step() 
+
+	void step()
 	{
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
-		std::vector<ItemData>& items = vPtr->partInfo[{maintCoor.x, maintCoor.y}]->itemInfo;
+		if (!vPtr) return;
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
+		std::vector<ItemData>& items = partIter->second->itemInfo;
 
 		if (items.empty() || items.size() <= MAX_BTN) maintScroll = 0;
 		else
@@ -289,4 +319,3 @@ public:
 		}
 	}
 };
-

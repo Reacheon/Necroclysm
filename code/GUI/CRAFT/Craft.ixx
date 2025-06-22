@@ -24,10 +24,15 @@ import turnWait;
 import ItemData;
 import ItemPocket;
 
+
+
 export class Craft : public GUI
 {
 private:
 	inline static Craft* ptr = nullptr;
+
+	int CRAFT_MAX_COLUMN = 3; //아이템 박스의 최대 열
+	int CRAFT_MAX_ROW = 8; //아이템 박스의 최대 행
 
 	SDL_Rect craftBase;
 	SDL_Rect topWindow;
@@ -71,6 +76,7 @@ private:
 
 	inline static int ongoingTargetCodeStructure = -1; //제작 중인 건축물
 	inline static int ongoingElapsedTimeStructure = -1; //제작 경과 시간 건축물
+
 
 public:
 	Craft() : GUI(false)
@@ -157,10 +163,10 @@ public:
 
 		for (int i = 0; i < 24; i++)
 		{
-			itemBox[i].x = craftBase.x + 183 + (73 * i) % (73 * 6);
-			itemBox[i].y = craftBase.y + 122 + 70 * ((73 * i) / (73 * 6));
-			itemBox[i].w = 58;
-			itemBox[i].h = 58;
+			itemBox[i].x = craftBase.x + 177 + (152 * i) % (152 * 3);
+			itemBox[i].y = craftBase.y + 127 + 33 * ((152 * i) / (152 * 3));
+			itemBox[i].w = 145;
+			itemBox[i].h = 27;
 		}
 
 		tooltipCraftBtn = { topWindow.x + 310,topWindow.y + 10,90,26 };
@@ -305,6 +311,7 @@ public:
 						selectCategory = -1;
 						selectSubcategory = 0;
 						for (int i = 0; i < recipePtr->itemInfo.size(); i++) recipePtr->itemInfo[i].eraseFlag(itemFlag::BLACKFILTER);
+						numNoneBlackFilter = recipePtr->itemInfo.size();
 						recipePtr->sortByUnicode();
 					}
 					break;
@@ -489,9 +496,9 @@ public:
 			{
 				if (checkCursor(&itemBox[i]))
 				{
-					if (craftCursor != i + 6 * craftScroll && i + 6 * craftScroll < numNoneBlackFilter)
+					if (craftCursor != i + CRAFT_MAX_COLUMN * craftScroll && i + CRAFT_MAX_COLUMN * craftScroll < numNoneBlackFilter)
 					{
-						craftCursor = i + 6 * craftScroll;
+						craftCursor = i + CRAFT_MAX_COLUMN * craftScroll;
 					}
 					else
 					{
@@ -510,9 +517,9 @@ public:
 			{
 				if (checkCursor(&itemBox[i]))
 				{
-					if (i + 6 * craftScroll < recipePtr->itemInfo.size())
+					if (i + CRAFT_MAX_COLUMN * craftScroll < recipePtr->itemInfo.size())
 					{
-						if (recipePtr->itemInfo[i + 6 * craftScroll].checkFlag(itemFlag::BLACKFILTER) == false) pointingCursor = i;
+						if (recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll].checkFlag(itemFlag::BLACKFILTER) == false) pointingCursor = i;
 					}
 				}
 			}
@@ -542,7 +549,7 @@ public:
 	{
 		if (checkCursor(&craftBase))
 		{
-			int maxScroll = (numNoneBlackFilter - 1) / 6 - (CRAFT_MAX_ROW - 1);
+			int maxScroll = (numNoneBlackFilter - 1) / CRAFT_MAX_COLUMN - (CRAFT_MAX_ROW - 1);
 			if (maxScroll < 0) maxScroll = 0;
 
 			if (event.wheel.y > 0 && craftScroll > 0) craftScroll -= 1;
@@ -554,8 +561,7 @@ public:
 	void gamepadBtnUp() { }
 	void step()
 	{
-		int maxScroll = myMax(0, (numNoneBlackFilter - 1) / 6 - (CRAFT_MAX_ROW - 1));
-
+		int maxScroll = myMax(0, (numNoneBlackFilter - 1) / CRAFT_MAX_COLUMN - (CRAFT_MAX_ROW - 1));
 		if (craftScroll > maxScroll) { craftScroll = maxScroll; }
 		else if (craftScroll < 0) { craftScroll = 0; }
 	}
