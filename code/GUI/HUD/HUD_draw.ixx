@@ -611,20 +611,23 @@ void HUD::drawGUI()
 		//팝업 버튼
 		drawSprite(spr::menuPopUp, 0, letterbox.x + letterbox.w - 42, letterbox.y - 36);
 		{
-			SDL_Color popUpBtnColor;
-			if (checkCursor(&letterboxPopUpButton))
+			SDL_Color popUpBtnColor = lowCol::black;
+			if (getLastGUI() == this)
 			{
-				if (click == true) { popUpBtnColor = lowCol::deepBlue; }
-				else { popUpBtnColor = lowCol::blue; }
+				if (checkCursor(&letterboxPopUpButton))
+				{
+					if (click == true) { popUpBtnColor = lowCol::deepBlue; }
+					else { popUpBtnColor = lowCol::blue; }
+				}
+				else if (state[SDL_SCANCODE_RETURN]) { popUpBtnColor = lowCol::blue; }
+				else { popUpBtnColor = lowCol::black; }
 			}
-			else if (state[SDL_SCANCODE_RETURN]) { popUpBtnColor = lowCol::blue; }
-			else { popUpBtnColor = lowCol::black; }
 
 			drawStadium(letterboxPopUpButton.x, letterboxPopUpButton.y, letterboxPopUpButton.w, letterboxPopUpButton.h, popUpBtnColor, 200, 5);
 
 			if (option::inputMethod == input::gamepad)
 			{
-				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH)) { targetBtnSpr = spr::buttonsPressed; }
+				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH) && getLastGUI() == this) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
 				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 			}

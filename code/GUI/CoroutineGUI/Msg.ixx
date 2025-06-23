@@ -76,6 +76,8 @@ public:
 			exInputCursor = 0;
 			exInputIndex = 0;
 			exInputEditing = false;
+
+			SDL_StartTextInput(window);
 		}
 
 
@@ -97,6 +99,8 @@ public:
 			exInputCursor = 0;
 			exInputEditing = false;
 			exInputIndex = -1;
+
+			SDL_StopTextInput(window);
 		}
 
 		tabType = prevTabType;
@@ -273,7 +277,7 @@ public:
 				if (timer::timer600 % 30 <= 15 && exInput == true)
 				{
 					int textWidth = queryTextWidth(cursorText, false);
-					int textHeight = queryTextHeight(cursorText, false);
+					int textHeight = queryTextHeight(L"B", false);
 					drawLine(inputTextPoint.x + textWidth - 1, inputTextPoint.y, inputTextPoint.x + textWidth - 1, inputTextPoint.y + textHeight, col::white);
 				}
 

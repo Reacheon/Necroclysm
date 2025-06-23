@@ -43,12 +43,12 @@ export __int64 turnCycleLoop()
 	{
 		switch (option::inputMethod)
 		{
-			case input::mouse:
-				dtClickStack = SDL_GetTicks() - dtClickStackStart;
-				break;
-			case input::touch:
-				dtClickStack = SDL_GetTicks() - dtClickStackStart;
-				break;
+		case input::mouse:
+			dtClickStack = SDL_GetTicks() - dtClickStackStart;
+			break;
+		case input::touch:
+			dtClickStack = SDL_GetTicks() - dtClickStackStart;
+			break;
 		}
 	}
 
@@ -118,7 +118,7 @@ __int64 playerInputTurn()
 		if (hunger < 300)
 		{
 			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
-			if(statEffects.size()==0)  statEffects.push_back({ statusEffectFlag::hungry, -1 });
+			if (statEffects.size() == 0)  statEffects.push_back({ statusEffectFlag::hungry, -1 });
 			else
 			{
 				for (int i = 0; i < statEffects.size(); i++)
@@ -281,8 +281,8 @@ __int64 playerInputTurn()
 					option::inputMethod = input::mouse;
 				}
 
-				if (option::inputMethod == input::mouse) 
-				{ 
+				if (option::inputMethod == input::mouse)
+				{
 					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
 					else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
 				}
@@ -297,7 +297,7 @@ __int64 playerInputTurn()
 					option::inputMethod = input::mouse;
 				}
 				mouseWheel();
-		
+
 				break;
 			case SDL_EVENT_KEY_DOWN:
 				if (exInput == true && event.key.key == UNI::BACKSPACE)
@@ -317,8 +317,12 @@ __int64 playerInputTurn()
 					prt(L"완성 이벤트 실행됨\n");
 					std::wstring singleChar = L"";
 					singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
-					exInputText.insert(exInputCursor, singleChar);
-					exInputCursor++;
+					if (exInputCursor > exInputText.size()) exInputCursor = exInputText.size();
+					if (!singleChar.empty() && singleChar[0] != L'\0')
+					{
+						exInputText.insert(exInputCursor, singleChar);
+						exInputCursor += singleChar.length();
+					}
 					exInputEditing = false;
 					if (exInputText.size() > EX_INPUT_TEXT_MAX)
 					{
@@ -388,36 +392,36 @@ __int64 animationTurn()
 		}
 	}
 
-	auto endAnimeTurn = [=]() 
+	auto endAnimeTurn = [=]()
 		{
-		if (turnCycle == turn::playerAnime)
-		{
-			std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
-			std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
-			addTimeTurn(timeGift);
-			for (auto ePtr : entityList)
+			if (turnCycle == turn::playerAnime)
 			{
-				if (ePtr != (PlayerPtr)) ((Monster*)ePtr)->addTurnResource(timeGift);
+				std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
+				std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
+				addTimeTurn(timeGift);
+				for (auto ePtr : entityList)
+				{
+					if (ePtr != (PlayerPtr)) ((Monster*)ePtr)->addTurnResource(timeGift);
+				}
+				for (auto vPtr : vehList) vPtr->addTurnResource(timeGift);
+				timeGift = 0;
+				turnCycle = turn::monsterAI;
 			}
-			for (auto vPtr : vehList) vPtr->addTurnResource(timeGift);
-			timeGift = 0;
-			turnCycle = turn::monsterAI;
-		}
-		else if (turnCycle == turn::monsterAnime) turnCycle = turn::monsterAI;
+			else if (turnCycle == turn::monsterAnime) turnCycle = turn::monsterAI;
 		};
 
 
-	if (coTurnSkip) 
+	if (coTurnSkip)
 	{
 		SDL_Event event;
-		while (SDL_PollEvent(&event)) 
+		while (SDL_PollEvent(&event))
 		{
-			if (event.type == SDL_EVENT_KEY_DOWN &&(event.key.key == SDLK_ESCAPE || event.key.key == SDLK_TAB)) 
+			if (event.type == SDL_EVENT_KEY_DOWN && (event.key.key == SDLK_ESCAPE || event.key.key == SDLK_TAB))
 			{
 
 				// 즉시 취소 처리
 				//coTurnSkip = false;
-                std::wprintf(L"코루틴이 즉시 취소되었습니다.\n");
+				std::wprintf(L"코루틴이 즉시 취소되었습니다.\n");
 			}
 		}
 	}
@@ -487,9 +491,9 @@ __int64 entityAITurn()
 		}
 	}
 
-	if (endMonsterTurn == true) 
-	{ 
-		turnCycle = turn::playerInput; 
+	if (endMonsterTurn == true)
+	{
+		turnCycle = turn::playerInput;
 
 		//플레이어 스테미나 회복
 

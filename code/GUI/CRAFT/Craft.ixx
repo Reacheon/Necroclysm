@@ -252,8 +252,16 @@ public:
 		}
 		else if (checkCursor(&searchTextRect))
 		{
-			if (exInput == false) exInput = true;
-			else exInput = false;
+			if (exInput == false)
+			{
+				exInput = true;
+				SDL_StartTextInput(window);  // 추가
+			}
+			else
+			{
+				exInput = false;
+				SDL_StopTextInput(window);  // 추가
+			}
 		}
 		else if (checkCursor(&searchBtnRect))
 		{

@@ -374,8 +374,8 @@ void Loot::drawGUI()
 				drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 183, 5);
 			}
 		}
-		setFontSize(12);
-		renderTextCenter(sysStr[15], lootLabel.x + 32, lootLabel.y + 12); //선택(상단바)
+		setFontSize(10);
+		renderTextCenter(sysStr[15], lootLabel.x + 25, lootLabel.y + 12); //선택(상단바)
 
 		{ //이름(상단바)
 			std::wstring tailStr = L"";
@@ -393,7 +393,7 @@ void Loot::drawGUI()
 			if (grayNumber > 0)
 			{
 				whiteNumber = lootPocket->itemInfo.size() - grayNumber;
-				tailStr = L"(" + std::to_wstring(whiteNumber) + sysStr[87] + L")";// n개 아이템 검색됨
+				tailStr = L" (" + std::to_wstring(whiteNumber) + L" "+sysStr[87] + L")";// n개 아이템 검색됨
 			}
 
 			renderTextCenter(sysStr[16] + tailStr, lootLabel.x + 152, lootLabel.y + 12);

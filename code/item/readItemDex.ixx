@@ -12,150 +12,152 @@ import textureVar;
 
 namespace csvItem
 {
-    constexpr int name = 0;
-    constexpr int itemCode = 1;
-    constexpr int sprIndex = 2;
-    constexpr int tooltip = 3;
-    constexpr int category = 4;
-    constexpr int subcategory = 5;
-    constexpr int flag = 6;
-    constexpr int weight = 7;
-    constexpr int volume = 8;
-    constexpr int material = 9;
-    constexpr int tileSprIndex = 10;
-    constexpr int fixtureSprIndex = 11;
-    constexpr int calorie = 12;
-    constexpr int hydration = 13;
-    constexpr int hydrationPerML = 14;
+    constexpr int nativeName = 0;
 
-    constexpr int toolQuality = 15; // A_X 여기서 X는 레벨, 즉 1_3은 망치질 3단계
-    constexpr int craftMinUnit = 16;
-    constexpr int craftTime = 17;
-    constexpr int recipe = 18;
-    constexpr int recipeQualityNeed = 19;
-    constexpr int recipeProficNeed = 20;
-    constexpr int disassy = 21;
-    constexpr int disassyQualityNeed = 22;
-    constexpr int disassyProficNeed = 23;
-    constexpr int repair = 24;
-    constexpr int repairQualityNeed = 25;
-    constexpr int repairProficNeed = 26;
-    constexpr int pocketMaxVolume = 27;
-    constexpr int pocketMaxNumber = 28;
-    constexpr int pocketOnlyItem = 29;
+    constexpr int name = 1;
+    constexpr int itemCode = 2;
+    constexpr int sprIndex = 3;
+    constexpr int tooltip = 4;
+    constexpr int category = 5;
+    constexpr int subcategory = 6;
+    constexpr int flag = 7;
+    constexpr int weight = 8;
+    constexpr int volume = 9;
+    constexpr int material = 10;
+    constexpr int tileSprIndex = 11;
+    constexpr int fixtureSprIndex = 12;
+    constexpr int calorie = 13;
+    constexpr int hydration = 14;
+    constexpr int hydrationPerML = 15;
+
+    constexpr int toolQuality = 16; // A_X 여기서 X는 레벨, 즉 1_3은 망치질 3단계
+    constexpr int craftMinUnit = 17;
+    constexpr int craftTime = 18;
+    constexpr int recipe = 19;
+    constexpr int recipeQualityNeed = 20;
+    constexpr int recipeProficNeed = 21;
+    constexpr int disassy = 22;
+    constexpr int disassyQualityNeed = 23;
+    constexpr int disassyProficNeed = 24;
+    constexpr int repair = 25;
+    constexpr int repairQualityNeed = 26;
+    constexpr int repairProficNeed = 27;
+    constexpr int pocketMaxVolume = 28;
+    constexpr int pocketMaxNumber = 29;
+    constexpr int pocketOnlyItem = 30;
 
     // Torso (몸통)
-    constexpr int rPierceTorso = 30;
-    constexpr int rCutTorso = 31;
-    constexpr int rBashTorso = 32;
-    constexpr int encTorso = 33;
+    constexpr int rPierceTorso = 31;
+    constexpr int rCutTorso = 32;
+    constexpr int rBashTorso = 33;
+    constexpr int encTorso = 34;
 
     // Head (머리)
-    constexpr int rPierceHead = 34;
-    constexpr int rCutHead = 35;
-    constexpr int rBashHead = 36;
-    constexpr int encHead = 37;
+    constexpr int rPierceHead = 35;
+    constexpr int rCutHead = 36;
+    constexpr int rBashHead = 37;
+    constexpr int encHead = 38;
 
     // Left Arm (왼팔)
-    constexpr int rPierceLArm = 38;
-    constexpr int rCutLArm = 39;
-    constexpr int rBashLArm = 40;
-    constexpr int encLArm = 41;
+    constexpr int rPierceLArm = 39;
+    constexpr int rCutLArm = 40;
+    constexpr int rBashLArm = 41;
+    constexpr int encLArm = 42;
 
     // Right Arm (오른팔)
-    constexpr int rPierceRArm = 42;
-    constexpr int rCutRArm = 43;
-    constexpr int rBashRArm = 44;
-    constexpr int encRArm = 45;
+    constexpr int rPierceRArm = 43;
+    constexpr int rCutRArm = 44;
+    constexpr int rBashRArm = 45;
+    constexpr int encRArm = 46;
 
     // Left Leg (왼다리)
-    constexpr int rPierceLLeg = 46;
-    constexpr int rCutLLeg = 47;
-    constexpr int rBashLLeg = 48;
-    constexpr int encLLeg = 49;
+    constexpr int rPierceLLeg = 47;
+    constexpr int rCutLLeg = 48;
+    constexpr int rBashLLeg = 49;
+    constexpr int encLLeg = 50;
 
     // Right Leg (오른다리)
-    constexpr int rPierceRLeg = 50;
-    constexpr int rCutRLeg = 51;
-    constexpr int rBashRLeg = 52;
-    constexpr int encRLeg = 53;
+    constexpr int rPierceRLeg = 51;
+    constexpr int rCutRLeg = 52;
+    constexpr int rBashRLeg = 53;
+    constexpr int encRLeg = 54;
 
-    constexpr int SH = 54;
-    constexpr int EV = 55;
-    constexpr int rFire = 56;
-    constexpr int rCold = 57;
-    constexpr int rElec = 58;
-    constexpr int rCorr = 59;
-    constexpr int rRad = 60;
-    constexpr int bionicIndex = 61;
-    constexpr int durability = 62;
-    constexpr int pierce = 63;
-    constexpr int cut = 64;
-    constexpr int bash = 65;
-    constexpr int bulletPierce = 66;
-    constexpr int bulletCut = 67;
-    constexpr int bulletBash = 68;
-    constexpr int bulletStoppingPower = 69;
-    constexpr int bulletJam = 70;
-    constexpr int bulletType = 71;
-    constexpr int bulletRange = 72;
-    constexpr int gunDmg = 73;
-    constexpr int gunAccInit = 74;
-    constexpr int gunAccSpd = 75;
-    constexpr int gunAccMax = 76;
-    constexpr int gunRebound = 77;
-    constexpr int gunShotSpd = 78;
-    constexpr int gunReloadSpd = 79;
-    constexpr int gunJam = 80;
-    constexpr int gunMod = 81;
-    constexpr int gunBalance = 82;
-    constexpr int gunRange = 83;
-    constexpr int meleeAtkSpd = 84;
-    constexpr int meleeAtkAcc = 85;
-    constexpr int meleeBalance = 86;
-    constexpr int meleeRange = 87;
-    constexpr int modeTemplate = 88;
-    constexpr int throwAtk = 89;
-    constexpr int throwType = 90;
-    constexpr int throwAtkAcc = 91;
-    constexpr int throwBalance = 92;
-    constexpr int throwRange = 93;
-    constexpr int throwStoppingPower = 94;
-    constexpr int bookIndex = 95;
-    constexpr int equipSpr = 96;
-    constexpr int equipPriority = 97;
-    constexpr int flipEquipSpr = 98;
-    constexpr int flipEquipPriority = 99;
-    constexpr int leftWieldSpr = 100;
-    constexpr int leftWieldPriority = 101;
-    constexpr int rightWieldSpr = 102;
-    constexpr int rightWieldPriority = 103;
-    constexpr int tileConnectGroup = 104;
-    constexpr int dirChangeItemCode = 105;
-    constexpr int lightRange = 106;
-    constexpr int lightIntensity = 107;
-    constexpr int lightR = 108;
-    constexpr int lightG = 109;
-    constexpr int lightB = 110;
-    constexpr int lightDelX = 111;
-    constexpr int lightDelY = 112;
-    constexpr int animeSize = 113;
-    constexpr int animeFPS = 114;
-    constexpr int randomPropSprSize = 115;
-    constexpr int growthThreshold = 116;
-    constexpr int molecularWeight = 117;
-    constexpr int liqColorR = 118;
-    constexpr int liqColorG = 119;
-    constexpr int liqColorB = 120;
-    constexpr int gasColorR = 121;
-    constexpr int gasColorG = 122;
-    constexpr int gasColorB = 123;
-    constexpr int gasAlphaMax = 124;
-    constexpr int propMaxHP = 125;
-    constexpr int propRPierce = 126;
-    constexpr int propRCut = 127;
-    constexpr int propRBash = 128;
-    constexpr int propDrawPriority = 129;
+    constexpr int SH = 55;
+    constexpr int EV = 56;
+    constexpr int rFire = 57;
+    constexpr int rCold = 58;
+    constexpr int rElec = 59;
+    constexpr int rCorr = 60;
+    constexpr int rRad = 61;
+    constexpr int bionicIndex = 62;
+    constexpr int durability = 63;
+    constexpr int pierce = 64;
+    constexpr int cut = 65;
+    constexpr int bash = 66;
+    constexpr int bulletPierce = 67;
+    constexpr int bulletCut = 68;
+    constexpr int bulletBash = 69;
+    constexpr int bulletStoppingPower = 70;
+    constexpr int bulletJam = 71;
+    constexpr int bulletType = 72;
+    constexpr int bulletRange = 73;
+    constexpr int gunDmg = 74;
+    constexpr int gunAccInit = 75;
+    constexpr int gunAccSpd = 76;
+    constexpr int gunAccMax = 77;
+    constexpr int gunRebound = 78;
+    constexpr int gunShotSpd = 79;
+    constexpr int gunReloadSpd = 80;
+    constexpr int gunJam = 81;
+    constexpr int gunMod = 82;
+    constexpr int gunBalance = 83;
+    constexpr int gunRange = 84;
+    constexpr int meleeAtkSpd = 85;
+    constexpr int meleeAtkAcc = 86;
+    constexpr int meleeBalance = 87;
+    constexpr int meleeRange = 88;
+    constexpr int modeTemplate = 89;
+    constexpr int throwAtk = 90;
+    constexpr int throwType = 91;
+    constexpr int throwAtkAcc = 92;
+    constexpr int throwBalance = 93;
+    constexpr int throwRange = 94;
+    constexpr int throwStoppingPower = 95;
+    constexpr int bookIndex = 96;
+    constexpr int equipSpr = 97;
+    constexpr int equipPriority = 98;
+    constexpr int flipEquipSpr = 99;
+    constexpr int flipEquipPriority = 100;
+    constexpr int leftWieldSpr = 101;
+    constexpr int leftWieldPriority = 102;
+    constexpr int rightWieldSpr = 103;
+    constexpr int rightWieldPriority = 104;
+    constexpr int tileConnectGroup = 105;
+    constexpr int dirChangeItemCode = 106;
+    constexpr int lightRange = 107;
+    constexpr int lightIntensity = 108;
+    constexpr int lightR = 109;
+    constexpr int lightG = 110;
+    constexpr int lightB = 111;
+    constexpr int lightDelX = 112;
+    constexpr int lightDelY = 113;
+    constexpr int animeSize = 114;
+    constexpr int animeFPS = 115;
+    constexpr int randomPropSprSize = 116;
+    constexpr int growthThreshold = 117;
+    constexpr int molecularWeight = 118;
+    constexpr int liqColorR = 119;
+    constexpr int liqColorG = 120;
+    constexpr int liqColorB = 121;
+    constexpr int gasColorR = 122;
+    constexpr int gasColorG = 123;
+    constexpr int gasColorB = 124;
+    constexpr int gasAlphaMax = 125;
+    constexpr int propMaxHP = 126;
+    constexpr int propRPierce = 127;
+    constexpr int propRCut = 128;
+    constexpr int propRBash = 129;
+    constexpr int propDrawPriority = 130;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -261,6 +263,8 @@ export int readItemDex(const wchar_t* file)
 
                     switch (columnIndex)
                     {
+                    case csvItem::nativeName:
+                        break;
                     case csvItem::name:
                         itemDex[tgtIndex].name = strFragment;
                         break;
@@ -1013,7 +1017,7 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].propDrawPriority = wtoi(strFragment.c_str());
                         break;
                     default:
-                        prt(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
+                        errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");
                         break;
                     }
 

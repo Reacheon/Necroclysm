@@ -123,3 +123,43 @@ export unsigned long utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 	//prt(L"디코딩 결과값은 %d이다.\n", number);
 	return unicode;
 }
+
+
+// 기존 함수는 그대로 두고, 문자열을 받는 오버로드 추가
+export std::wstring utf8Decoder(const char* utf8Str)
+{
+	if (!utf8Str) return L"";
+
+	std::wstring result;
+	size_t len = std::strlen(utf8Str);
+
+	for (size_t i = 0; i < len; )
+	{
+		char byte1 = utf8Str[i];
+		char byte2 = (i + 1 < len) ? utf8Str[i + 1] : 0;
+		char byte3 = (i + 2 < len) ? utf8Str[i + 2] : 0;
+		char byte4 = (i + 3 < len) ? utf8Str[i + 3] : 0;
+
+		unsigned long unicode = utf8Decoder(byte1, byte2, byte3, byte4);
+
+		if (unicode != 0)
+		{
+			result += static_cast<wchar_t>(unicode);
+		}
+
+		// UTF-8 바이트 수만큼 인덱스 증가
+		if ((byte1 & 0x80) == 0) i += 1;      // ASCII (0xxxxxxx)
+		else if ((byte1 & 0xE0) == 0xC0) i += 2; // 2바이트 (110xxxxx)
+		else if ((byte1 & 0xF0) == 0xE0) i += 3; // 3바이트 (1110xxxx)
+		else if ((byte1 & 0xF8) == 0xF0) i += 4; // 4바이트 (11110xxx)
+		else i += 1; // 오류 시 1바이트만 건너뛰기
+	}
+
+	return result;
+}
+
+// std::string을 받는 버전도 추가
+export std::wstring utf8Decoder(const std::string& utf8Str)
+{
+	return utf8Decoder(utf8Str.c_str());
+}

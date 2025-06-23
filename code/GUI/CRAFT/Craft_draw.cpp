@@ -19,6 +19,8 @@ import Player;
 
 void Craft::drawGUI()
 {
+	const bool* state = SDL_GetKeyboardState(nullptr);
+
 	if (showCraftingTooltip)
 	{
 		SDL_Rect tooltipBox = { cameraW / 2 - 140, 0, 280,130 };
@@ -227,7 +229,7 @@ void Craft::drawGUI()
 					outlineColor = { 0xa6, 0xa6, 0xa6 };
 				}
 
-				drawStadium(searchTextRect.x, searchTextRect.y, searchTextRect.w, searchTextRect.h, btnColor, 120, 5);
+				drawStadium(searchTextRect.x, searchTextRect.y, searchTextRect.w, searchTextRect.h, btnColor, 255, 5);
 
 				SDL_Rect searchInRect = { searchTextRect.x + 2, searchTextRect.y + 2, searchTextRect.w - 4, searchTextRect.h - 4 };
 				drawRect(searchInRect, outlineColor);
@@ -249,7 +251,7 @@ void Craft::drawGUI()
 					if (timer::timer600 % 30 <= 15 && exInput == true)
 					{
 						int textWidth = queryTextWidth(cursorText, false);
-						int textHeight = queryTextHeight(cursorText, false);
+						int textHeight = 15;
 						drawLine(inputTextPoint.x + textWidth - 1, inputTextPoint.y, inputTextPoint.x + textWidth - 1, inputTextPoint.y + textHeight, col::white);
 					}
 				}
@@ -259,14 +261,22 @@ void Craft::drawGUI()
 			{
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 				SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
-				if (checkCursor(&searchBtnRect) && deactColorChange == false)
+				if (deactColorChange == false)
 				{
-					if (click == false) { btnColor = lowCol::blue; }
-					else { btnColor = lowCol::deepBlue; }
-					outlineColor = { 0xa6, 0xa6, 0xa6 };
+					if (checkCursor(&searchBtnRect))
+					{
+						if (click == false) { btnColor = lowCol::blue; }
+						else { btnColor = lowCol::deepBlue; }
+						outlineColor = { 0xa6, 0xa6, 0xa6 };
+					}
+					else if(state[SDL_SCANCODE_RETURN])
+					{
+						btnColor = lowCol::deepBlue;
+						outlineColor = { 0xa6, 0xa6, 0xa6 };
+					}
 				}
 
-				drawStadium(searchBtnRect.x, searchBtnRect.y, searchBtnRect.w, searchBtnRect.h, btnColor, 120, 5);
+				drawStadium(searchBtnRect.x, searchBtnRect.y, searchBtnRect.w, searchBtnRect.h, btnColor, 255, 5);
 
 				SDL_Rect searchBtnInRect = { searchBtnRect.x + 2, searchBtnRect.y + 2, searchBtnRect.w - 4, searchBtnRect.h - 4 };
 				drawRect(searchBtnInRect, outlineColor);
