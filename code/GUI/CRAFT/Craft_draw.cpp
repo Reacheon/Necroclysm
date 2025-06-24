@@ -129,47 +129,47 @@ void Craft::drawGUI()
 				categoryName = sysStr[76];
 				categoryIndex = 36;
 				break;
-			case 0://무기
-				categoryName = sysStr[78];
-				categoryIndex = 1;
-				break;
-			case 1://방어구
+			case 0://장비
 				categoryName = sysStr[77];
 				categoryIndex = 50;
 				break;
+			case 1://음식
+				categoryName = sysStr[78];
+				categoryIndex = 173;
+				break;
 			case 2://도구
-				categoryName = sysStr[83];
+				categoryName = sysStr[79];
 				categoryIndex = 15;
 				break;
-			case 3://소모품
+			case 3://기술
+				categoryName = sysStr[80];
+				categoryIndex = 47;
+				break;
+			case 4://소모품
 				categoryName = sysStr[81];
 				categoryIndex = 35;
 				break;
-			case 4://차량
-				categoryName = sysStr[136];
+			case 5://차량
+				categoryName = sysStr[82];
 				categoryIndex = 48;
 				break;
-			case 5://바이오닉
-				categoryName = sysStr[6];
-				categoryIndex = 47;
-				break;
 			case 6://건축물
-				categoryName = sysStr[121];
+				categoryName = sysStr[83];
 				categoryIndex = 20;
 				break;
 			case 7://재료
-				categoryName = sysStr[79];
+				categoryName = sysStr[84];
 				categoryIndex = 6;
 				break;
 
 			}
 			drawSpriteCenter(spr::icon48, categoryIndex, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) - 10);
 
-			int fontSize = 12;
+			int fontSize = 10;
 			setFontSize(fontSize);
-			while (queryTextWidth(categoryName, true) > craftCategory[0].w)
+			if (queryTextWidth(categoryName, true) > craftCategory[0].w - 10)
 			{
-				fontSize--;
+				fontSize = 8;
 				setFontSize(fontSize);
 			}
 			renderTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
@@ -320,7 +320,7 @@ void Craft::drawGUI()
 
 					if (pressed)
 					{
-						SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 42,2 };
+						SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 52, 2 }; // 42 → 52로 변경
 						drawRect(bottomWhiteRect, col::white);
 					}
 
@@ -334,7 +334,7 @@ void Craft::drawGUI()
 			switch (selectCategory)
 			{
 			default://전체
-				drawSubcategoryBox(L"전체", subcategoryBox[0], true, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], true, deactColorChange);
 				break;
 			case -2://즐겨찾기
 				drawSubcategoryBox(L"1", subcategoryBox[0], selectSubcategory == 0, deactColorChange);
@@ -344,40 +344,41 @@ void Craft::drawGUI()
 				drawSubcategoryBox(L"5", subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				drawSubcategoryBox(L"6", subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
-			case 0://무기
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_piercing), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_cutting), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_bashing), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_shooting), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::weapon_throwing), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+			case 0://장비
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_melee), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_ranged), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_firearms), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_throwing), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
-			case 1://방어구
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_hat), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_gloves), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_shoes), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_accessory), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+			case 1://음식
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_cooked), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_processed), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_preserved), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_drinks), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_ingredients), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
 			case 2://도구
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_hand), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_power), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_container), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_device), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_document), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tool_etc), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_hand), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_power), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_containers), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_etc), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 				break;
 
-			case 3://소모품
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_food), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_fuel), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_etc), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+			case 3://기술
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_bionics), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_powerArmor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				break;
 
+			case 4://소모품
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_fuel), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_etc), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				break;
 
-			case 4://차량
+			case 5://차량
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_frame), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_engine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_exterior), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -386,16 +387,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_device), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
-			case 5://바이오닉
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_core), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_active), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_passive), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_toggle), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_generator), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::bionic_storage), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
-				break;
-
-			case 6://구조물
+			case 6://건축물
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
@@ -405,13 +397,12 @@ void Craft::drawGUI()
 				break;
 
 			case 7://재료
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_chemical), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_biological), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_mechanical), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_electrical), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_metals), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_organic), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_components), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_chemicals), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_etc), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
-
 
 			}
 		}
@@ -450,7 +441,9 @@ void Craft::drawGUI()
 
 
 
-					setFontSize(10);
+					if(queryTextWidth(iPtr->name)<110)setFontSize(10);
+					else setFontSize(8);
+					
 					renderText(iPtr->name, pivotX + 34, pivotY + 7);
 
 
@@ -526,7 +519,7 @@ void Craft::drawGUI()
 
 				std::wstring weightStr = sysStr[17]+L" : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
-				weightStr += L"KG";
+				weightStr += L"kg";
 				renderText(weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
 
 				std::wstring volumeStr = sysStr[18] + L" : ";

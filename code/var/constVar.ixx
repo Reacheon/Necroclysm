@@ -865,42 +865,42 @@ export namespace sprInf
 
 export enum class itemCategory
 {
-    weapon,
     equipment,
-    tool,
-    consumable,
-    bionic,
-    vehicle,
-    structure,
-    material,
+    foods,
+    tools,
+    tech,
+    consumables,
+    vehicles,
+    structures,
+    materials,
 };
 
 export enum class itemSubcategory
 {
-    weapon_piercing,
-    weapon_cutting,
-    weapon_bashing,
-    weapon_shooting,
-    weapon_throwing,
-
+    equipment_melee,
+    equipment_ranged,
+    equipment_firearms,
+    equipment_throwing,
     equipment_clothing,
-    equipment_hat,
-    equipment_gloves,
-    equipment_shoes,
-    equipment_accessory,
 
-    tool_hand,
-    tool_power,
-    tool_container,
-    tool_device,
-    tool_document,
-    tool_etc,
+    foods_cooked,       // 요리 (김치찌개, 스테이크, 스파게티, 케밥 등)
+    foods_processed,    // 가공식품 (편의점 샌드위치, 빵 등)
+    foods_preserved,    // 보존식품 (갈치통조림, 건빵 등)
+    foods_drinks,       // 음료 (물, 콜라)
+    foods_ingredients,  // 재료 (달걀, 식용유, 소금 등)
 
-    consumable_food,
     consumable_medicine,
     consumable_ammo,
     consumable_fuel,
     consumable_etc,
+
+    tools_hand,          // 수공구 (망치, 톱 등)
+    tools_power,         // 전동공구 (전동드릴, 그라인더 등)
+    tools_containers,    // 컨테이너 (배낭, 비커 등)
+    tools_etc,          // 기타 도구 (나침반, 지도 등)
+
+    tech_bionics,        // 바이오닉
+    tech_powerArmor,    // 파워아머
 
     vehicle_frame,//프레임
     vehicle_engine,//엔진 : 가솔린, 디젤, 전기모터
@@ -909,13 +909,6 @@ export enum class itemSubcategory
     vehicle_energy,//에너지 : 배터리, 발전기
     vehicle_device,//장치 : 오디오, 조종장치 등
 
-    bionic_core,//코어
-    bionic_active,//발동계
-    bionic_passive,//지속계
-    bionic_toggle,//전환계
-    bionic_generator,//생산계
-    bionic_storage,//저장계
-
     structure_wall,
     structure_floor,
     structure_ceil,
@@ -923,10 +916,10 @@ export enum class itemSubcategory
     structure_electric,
     structure_pneumatic,
 
-    material_chemical,
-    material_biological,
-    material_mechanical,
-    material_electrical,
+    material_metals,       // 금속류 (철, 납, 아연 등)
+    material_organic,      // 유기물 (가죽, 나무, 시체 등)
+    material_components,   // 부품류 (파이프, 전선, 회로 등)
+    material_chemicals,    // 화학물질 (산, 연료, 화약 등)
     material_etc,
 };
 

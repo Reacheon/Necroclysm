@@ -280,91 +280,85 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::category:
                         if (strFragment == L"EQUIPMENT") { itemDex[tgtIndex].category = itemCategory::equipment; }
-                        else if (strFragment == L"WEAPON") { itemDex[tgtIndex].category = itemCategory::weapon; }
-                        else if (strFragment == L"TOOL") { itemDex[tgtIndex].category = itemCategory::tool; }
-                        else if (strFragment == L"CONSUMABLE") { itemDex[tgtIndex].category = itemCategory::consumable; }
-                        else if (strFragment == L"VEHICLE") { itemDex[tgtIndex].category = itemCategory::vehicle; }
-                        else if (strFragment == L"BIONIC") { itemDex[tgtIndex].category = itemCategory::bionic; }
-                        else if (strFragment == L"STRUCTURE") { itemDex[tgtIndex].category = itemCategory::structure; }
-                        else if (strFragment == L"MATERIAL") { itemDex[tgtIndex].category = itemCategory::material; }
+                        else if (strFragment == L"FOODS") { itemDex[tgtIndex].category = itemCategory::foods; }
+                        else if (strFragment == L"TOOLS") { itemDex[tgtIndex].category = itemCategory::tools; }
+                        else if (strFragment == L"TECH") { itemDex[tgtIndex].category = itemCategory::tech; }
+                        else if (strFragment == L"CONSUMABLES") { itemDex[tgtIndex].category = itemCategory::consumables; }
+                        else if (strFragment == L"VEHICLES") { itemDex[tgtIndex].category = itemCategory::vehicles; }
+                        else if (strFragment == L"STRUCTURES") { itemDex[tgtIndex].category = itemCategory::structures; }
+                        else if (strFragment == L"MATERIALS") { itemDex[tgtIndex].category = itemCategory::materials; }
                         else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
 
                         break;
                     case csvItem::subcategory:
                         if (itemDex[tgtIndex].category == itemCategory::equipment)
                         {
-                            if (strFragment == L"CLOTHING") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_clothing; }
-                            else if (strFragment == L"HAT") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_hat; }
-                            else if (strFragment == L"GLOVES") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_gloves; }
-                            else if (strFragment == L"SHOES") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_shoes; }
-                            else if (strFragment == L"ACCESSORY") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_accessory; }
+                            if (strFragment == L"EQUIPMENT_MELEE") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_melee; }
+                            else if (strFragment == L"EQUIPMENT_RANGED") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_ranged; }
+                            else if (strFragment == L"EQUIPMENT_FIREARMS") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_firearms; }
+                            else if (strFragment == L"EQUIPMENT_THROWING") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_throwing; }
+                            else if (strFragment == L"EQUIPMENT_CLOTHING") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_clothing; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(equipment)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::weapon)
+                        else if (itemDex[tgtIndex].category == itemCategory::foods)
                         {
-                            if (strFragment == L"PIERCING") { itemDex[tgtIndex].subcategory = itemSubcategory::weapon_piercing; }
-                            else if (strFragment == L"CUTTING") { itemDex[tgtIndex].subcategory = itemSubcategory::weapon_cutting; }
-                            else if (strFragment == L"BASHING") { itemDex[tgtIndex].subcategory = itemSubcategory::weapon_bashing; }
-                            else if (strFragment == L"SHOOTING") { itemDex[tgtIndex].subcategory = itemSubcategory::weapon_shooting; }
-                            else if (strFragment == L"THROWING") { itemDex[tgtIndex].subcategory = itemSubcategory::weapon_throwing; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(weapon)"); }
+                            if (strFragment == L"FOODS_COOKED") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_cooked; }
+                            else if (strFragment == L"FOODS_PROCESSED") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_processed; }
+                            else if (strFragment == L"FOODS_PRESERVED") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_preserved; }
+                            else if (strFragment == L"FOODS_DRINKS") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_drinks; }
+                            else if (strFragment == L"FOODS_INGREDIENTS") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_ingredients; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(foods)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::tool)
+                        else if (itemDex[tgtIndex].category == itemCategory::tools)
                         {
-                            if (strFragment == L"HAND") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_hand; }
-                            else if (strFragment == L"POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_power; }
-                            else if (strFragment == L"CONTAINER") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_container; }
-                            else if (strFragment == L"DEVICE") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_device; }
-                            else if (strFragment == L"DOCUMENT") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_document; }
-                            else if (strFragment == L"ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::tool_etc; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tool)"); }
+                            if (strFragment == L"TOOLS_HAND") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_hand; }
+                            else if (strFragment == L"TOOLS_POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_power; }
+                            else if (strFragment == L"TOOLS_CONTAINERS") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_containers; }
+                            else if (strFragment == L"TOOLS_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_etc; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tools)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::consumable)
+                        else if (itemDex[tgtIndex].category == itemCategory::tech)
                         {
-                            if (strFragment == L"FOOD") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_food; }
-                            else if (strFragment == L"MEDICINE") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_medicine; }
-                            else if (strFragment == L"AMMO") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_ammo; }
-                            else if (strFragment == L"FUEL") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_fuel; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(consumable)"); }
+                            if (strFragment == L"TECH_BIONICS") { itemDex[tgtIndex].subcategory = itemSubcategory::tech_bionics; }
+                            else if (strFragment == L"TECH_POWERARMOR") { itemDex[tgtIndex].subcategory = itemSubcategory::tech_powerArmor; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tech)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::vehicle)
+                        else if (itemDex[tgtIndex].category == itemCategory::consumables)
                         {
-                            if (strFragment == L"FRAME") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_frame; }
-                            else if (strFragment == L"ENGINE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_engine; }
-                            else if (strFragment == L"EXTERIOR") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exterior; }
-                            else if (strFragment == L"TRANSPORT") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_transport; }
-                            else if (strFragment == L"ENERGY") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_energy; }
-                            else if (strFragment == L"DEVICE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_device; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(container)"); }
+                            if (strFragment == L"CONSUMABLE_MEDICINE") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_medicine; }
+                            else if (strFragment == L"CONSUMABLE_AMMO") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_ammo; }
+                            else if (strFragment == L"CONSUMABLE_FUEL") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_fuel; }
+                            else if (strFragment == L"CONSUMABLE_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_etc; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(consumables)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::bionic)
+                        else if (itemDex[tgtIndex].category == itemCategory::vehicles)
                         {
-                            if (strFragment == L"CORE") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_core; }
-                            else if (strFragment == L"ACTIVE") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_active; }
-                            else if (strFragment == L"PASSIVE") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_passive; }
-                            else if (strFragment == L"TOGGLE") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_toggle; }
-                            else if (strFragment == L"GENERATOR") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_generator; }
-                            else if (strFragment == L"STORAGE") { itemDex[tgtIndex].subcategory = itemSubcategory::bionic_storage; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(container)"); }
+                            if (strFragment == L"VEHICLE_FRAME") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_frame; }
+                            else if (strFragment == L"VEHICLE_ENGINE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_engine; }
+                            else if (strFragment == L"VEHICLE_EXTERIOR") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exterior; }
+                            else if (strFragment == L"VEHICLE_TRANSPORT") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_transport; }
+                            else if (strFragment == L"VEHICLE_ENERGY") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_energy; }
+                            else if (strFragment == L"VEHICLE_DEVICE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_device; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(vehicles)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::material)
+                        else if (itemDex[tgtIndex].category == itemCategory::structures)
                         {
-                            if (strFragment == L"CHEMICAL") { itemDex[tgtIndex].subcategory = itemSubcategory::material_chemical; }
-                            else if (strFragment == L"BIOLOGICAL") { itemDex[tgtIndex].subcategory = itemSubcategory::material_biological; }
-                            else if (strFragment == L"MECHANICAL") { itemDex[tgtIndex].subcategory = itemSubcategory::material_mechanical; }
-                            else if (strFragment == L"ELECTRICAL") { itemDex[tgtIndex].subcategory = itemSubcategory::material_electrical; }
-                            else if (strFragment == L"ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::material_etc; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(material)"); }
+                            if (strFragment == L"STRUCTURE_WALL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_wall; }
+                            else if (strFragment == L"STRUCTURE_FLOOR") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floor; }
+                            else if (strFragment == L"STRUCTURE_CEIL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceil; }
+                            else if (strFragment == L"STRUCTURE_PROP") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_prop; }
+                            else if (strFragment == L"STRUCTURE_ELECTRIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_electric; }
+                            else if (strFragment == L"STRUCTURE_PNEUMATIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_pneumatic; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structures)"); }
                         }
-                        else if (itemDex[tgtIndex].category == itemCategory::structure)
+                        else if (itemDex[tgtIndex].category == itemCategory::materials)
                         {
-                            if (strFragment == L"WALL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_wall; }
-                            else if (strFragment == L"FLOOR") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floor; }
-                            else if (strFragment == L"CEIL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceil; }
-                            else if (strFragment == L"PROP") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_prop; }
-                            else if (strFragment == L"ELECTRIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_electric; }
-                            else if (strFragment == L"PNEUMATIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_pneumatic; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structure)"); }
+                            if (strFragment == L"MATERIAL_METALS") { itemDex[tgtIndex].subcategory = itemSubcategory::material_metals; }
+                            else if (strFragment == L"MATERIAL_ORGANIC") { itemDex[tgtIndex].subcategory = itemSubcategory::material_organic; }
+                            else if (strFragment == L"MATERIAL_COMPONENTS") { itemDex[tgtIndex].subcategory = itemSubcategory::material_components; }
+                            else if (strFragment == L"MATERIAL_CHEMICALS") { itemDex[tgtIndex].subcategory = itemSubcategory::material_chemicals; }
+                            else if (strFragment == L"MATERIAL_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::material_etc; }
+                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(materials)"); }
                         }
                         else { errorBox(L"error in readItemDex.ixx, itemCategory"); }
                         break;

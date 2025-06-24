@@ -10,7 +10,7 @@ export struct ItemDataBase
     unsigned __int16 itemCode = 1;
     unsigned __int16 sprIndex = 1;
     unsigned __int16 tooltipIndex = 0;
-    itemCategory category = itemCategory::material;
+    itemCategory category = itemCategory::materials;
     itemSubcategory subcategory = itemSubcategory::material_etc;
     unsigned __int32 weight = 1000;
     unsigned __int32 volume = 1000;

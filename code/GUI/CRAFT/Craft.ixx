@@ -155,7 +155,7 @@ public:
 
 		for (int i = 0; i < 8; i++)
 		{
-			subcategoryBox[i] = { craftBase.x + 169 + 60 * i, craftBase.y + 93, 60, 20 };
+			subcategoryBox[i] = { craftBase.x + 169 + 70 * i, craftBase.y + 93, 70, 20 }; 
 		}
 
 		searchTextRect = { craftBase.x + craftBase.w - 224, craftBase.y + 46, 150, 30 };
@@ -287,28 +287,28 @@ public:
 						switch (selectCategory)
 						{
 						case 0:
-							targetCategory = itemCategory::weapon;
-							break;
-						case 1:
 							targetCategory = itemCategory::equipment;
 							break;
+						case 1:
+							targetCategory = itemCategory::foods;
+							break;
 						case 2:
-							targetCategory = itemCategory::tool;
+							targetCategory = itemCategory::tools;
 							break;
 						case 3:
-							targetCategory = itemCategory::consumable;
+							targetCategory = itemCategory::tech;
 							break;
 						case 4:
-							targetCategory = itemCategory::vehicle;
+							targetCategory = itemCategory::consumables;
 							break;
 						case 5:
-							targetCategory = itemCategory::bionic;
+							targetCategory = itemCategory::vehicles;
 							break;
 						case 6:
-							targetCategory = itemCategory::structure;
+							targetCategory = itemCategory::structures;
 							break;
 						case 7:
-							targetCategory = itemCategory::material;
+							targetCategory = itemCategory::materials;
 							break;
 						}
 						int matchCount = recipePtr->searchCategory(targetCategory);
@@ -337,22 +337,22 @@ public:
 				case -1://전체
 					maxSubcategorySize = 1;
 					break;
-				case 0://무기
+				case 0://장비
 					maxSubcategorySize = 5;
 					break;
-				case 1://방어구
+				case 1://음식
 					maxSubcategorySize = 5;
 					break;
 				case 2://도구
-					maxSubcategorySize = 6;
+					maxSubcategorySize = 4;
 					break;
-				case 3://식량
-					maxSubcategorySize = 6;
+				case 3://기술
+					maxSubcategorySize = 2;
 					break;
 				case 4://소모품
-					maxSubcategorySize = 5;
+					maxSubcategorySize = 4;
 					break;
-				case 5://바이오닉
+				case 5://차량
 					maxSubcategorySize = 6;
 					break;
 				case 6://건축물
@@ -385,40 +385,42 @@ public:
 								else if (selectSubcategory == 5) { targetFlag = itemFlag::BOOKMARK6; }
 								matchCount = recipePtr->searchFlag(targetFlag);
 								break;
-							case 0:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::weapon_piercing; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::weapon_cutting; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::weapon_bashing; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::weapon_shooting; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::weapon_throwing; }
+							case 0://장비
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::equipment_melee; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::equipment_ranged; }
+								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::equipment_firearms; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::equipment_throwing; }
+								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::equipment_clothing; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 1:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::equipment_clothing; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::equipment_hat; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::equipment_gloves; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::equipment_shoes; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::equipment_accessory; }
+							case 1://음식
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::foods_cooked; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::foods_processed; }
+								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::foods_preserved; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::foods_drinks; }
+								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::foods_ingredients; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 2:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::tool_hand; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::tool_power; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::tool_container; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::tool_device; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::tool_document; }
-								else if (selectSubcategory == 5) { targetSubcategory = itemSubcategory::tool_etc; }
+							case 2://도구
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::tools_hand; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::tools_power; }
+								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::tools_containers; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::tools_etc; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 3:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::consumable_food; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::consumable_medicine; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::consumable_ammo; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::consumable_fuel; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::consumable_etc; }
+							case 3://기술
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::tech_bionics; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::tech_powerArmor; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 4:
+							case 4://소모품
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::consumable_medicine; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::consumable_ammo; }
+								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::consumable_fuel; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::consumable_etc; }
+								matchCount = recipePtr->searchSubcategory(targetSubcategory);
+								break;
+							case 5://차량
 								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::vehicle_frame; }
 								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::vehicle_engine; }
 								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::vehicle_exterior; }
@@ -427,16 +429,7 @@ public:
 								else if (selectSubcategory == 5) { targetSubcategory = itemSubcategory::vehicle_device; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 5:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::bionic_core; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::bionic_active; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::bionic_passive; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::bionic_toggle; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::bionic_generator; }
-								else if (selectSubcategory == 5) { targetSubcategory = itemSubcategory::bionic_storage; }
-								matchCount = recipePtr->searchSubcategory(targetSubcategory);
-								break;
-							case 6:
+							case 6://건축물
 								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::structure_wall; }
 								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::structure_floor; }
 								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::structure_ceil; }
@@ -445,11 +438,11 @@ public:
 								else if (selectSubcategory == 5) { targetSubcategory = itemSubcategory::structure_pneumatic; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
-							case 7:
-								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::material_chemical; }
-								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::material_biological; }
-								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::material_mechanical; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::material_electrical; }
+							case 7://재료
+								if (selectSubcategory == 0) { targetSubcategory = itemSubcategory::material_metals; }
+								else if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::material_organic; }
+								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::material_components; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::material_chemicals; }
 								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::material_etc; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								break;
@@ -465,28 +458,28 @@ public:
 								switch (selectCategory)
 								{
 								case 0:
-									targetCategory = itemCategory::weapon;
-									break;
-								case 1:
 									targetCategory = itemCategory::equipment;
 									break;
+								case 1:
+									targetCategory = itemCategory::foods;
+									break;
 								case 2:
-									targetCategory = itemCategory::tool;
+									targetCategory = itemCategory::tools;
 									break;
 								case 3:
-									targetCategory = itemCategory::consumable;
+									targetCategory = itemCategory::tech;
 									break;
 								case 4:
-									targetCategory = itemCategory::vehicle;
+									targetCategory = itemCategory::consumables;
 									break;
 								case 5:
-									targetCategory = itemCategory::bionic;
+									targetCategory = itemCategory::vehicles;
 									break;
 								case 6:
-									targetCategory = itemCategory::structure;
+									targetCategory = itemCategory::structures;
 									break;
 								case 7:
-									targetCategory = itemCategory::material;
+									targetCategory = itemCategory::materials;
 									break;
 								}
 								int matchCount = recipePtr->searchCategory(targetCategory);
@@ -499,7 +492,6 @@ public:
 			}
 
 			//아이템박스 클릭
-
 			for (int i = 0; i < 24; i++)
 			{
 				if (checkCursor(&itemBox[i]))
