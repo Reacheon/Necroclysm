@@ -729,23 +729,27 @@ float Entity::getProficLevel(int index)
 {
 	float exp = entityInfo.proficExp[index];
 
-	if (exp < expTable[0]) return 1.0f + exp / expTable[0];
+	// 경험치가 0이면 레벨 0.0 반환
+	if (exp <= 0) return 0.0f;
 
+	// 첫 번째 레벨업 전까지는 0.X 레벨
+	if (exp < expTable[0]) return exp / expTable[0];
+
+	// 각 레벨 구간에서 정확한 레벨 계산
 	for (int i = 0; i < MAX_PROFIC_LEVEL - 1; i++)
 	{
 		float currentExp = expTable[i];
 		float nextExp = expTable[i + 1];
-
 		if (exp >= currentExp && exp < nextExp)
 		{
 			float partial = (exp - currentExp) / (nextExp - currentExp);
-			return static_cast<float>(i + 2) + partial;
+			return static_cast<float>(i + 1) + partial;  // i+1로 변경 (0부터 시작)
 		}
 	}
 
+	// 최대 레벨 도달
 	return static_cast<float>(MAX_PROFIC_LEVEL);
 }
-
 
 void Entity::addProficExp(int expVal)
 {
