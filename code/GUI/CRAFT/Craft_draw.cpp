@@ -345,65 +345,68 @@ void Craft::drawGUI()
 				drawSubcategoryBox(L"6", subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 			case 0://장비
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_melee), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_ranged), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_firearms), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_throwing), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_melee), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_ranged), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_firearms), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_throwing), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 			case 1://음식
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_cooked), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_processed), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_preserved), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_drinks), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_ingredients), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_cooked), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_processed), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_preserved), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_drinks), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_ingredients), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 
 			case 2://도구
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_hand), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_power), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_containers), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_etc), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_hand), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_power), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_containers), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_etc), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
 			case 3://기술
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_bionics), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_powerArmor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_bionics), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_powerArmor), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				break;
 
 			case 4://소모품
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_fuel), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_etc), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_fuel), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_etc), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
 			case 5://차량
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_frame), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_engine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_exterior), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_transport), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_energy), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::vehicle_device), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[260], subcategoryBox[1], selectSubcategory == 1, deactColorChange); //프레임
+				drawSubcategoryBox(sysStr[261], subcategoryBox[2], selectSubcategory == 2, deactColorChange); //파워
+				drawSubcategoryBox(sysStr[262], subcategoryBox[3], selectSubcategory == 3, deactColorChange); //외장
+				drawSubcategoryBox(sysStr[263], subcategoryBox[4], selectSubcategory == 4, deactColorChange); //부품
 				break;
 
 			case 6://건축물
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_prop), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_electric), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_pneumatic), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_prop), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
 			case 7://재료
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_metals), subcategoryBox[0], selectSubcategory == 0, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_organic), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_components), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_chemicals), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_etc), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_metals), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_organic), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_components), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_chemicals), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_etc), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
-
 			}
 		}
 

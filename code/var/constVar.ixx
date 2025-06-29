@@ -904,18 +904,14 @@ export enum class itemSubcategory
     tech_powerArmor,    // 파워아머
 
     vehicle_frame,//프레임
-    vehicle_engine,//엔진 : 가솔린, 디젤, 전기모터
+    vehicle_power,//파워 : 가솔린, 디젤, 전기모터
     vehicle_exterior,//외장 : 바퀴, 차문, 트렁크문
-    vehicle_transport,//수송 : 트렁크, 의자
-    vehicle_energy,//에너지 : 배터리, 발전기
-    vehicle_device,//장치 : 오디오, 조종장치 등
+    vehicle_parts,//부품 : 기타
 
     structure_wall,
     structure_floor,
     structure_ceil,
     structure_prop,
-    structure_electric,
-    structure_pneumatic,
 
     material_metals,       // 금속류 (철, 납, 아연 등)
     material_organic,      // 유기물 (가죽, 나무, 시체 등)

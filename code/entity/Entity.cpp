@@ -20,8 +20,6 @@ import SkillData;
 import Flame;
 import Vehicle;
 
-
-
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
 	prt(L"Entity : 생성자가 호출되었습니다!\n");

@@ -39,7 +39,7 @@ private:
 	int skillScroll = 0;
 	int initSkillScroll = 0; //모션스크롤이 시작되기 직전의 스크롤
 
-	skillCategory categoryCursor = skillCategory::all; //0일반, 1돌연변이, 2바이오닉, 3마법
+	skillCategory categoryCursor = skillCategory::general; //0일반, 1돌연변이, 2바이오닉, 3마법
 
 	std::array<SDL_Rect,7> skillBtn;
 
@@ -62,7 +62,12 @@ public:
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
-		filteredSkills = PlayerPtr->entityInfo.skillList;
+		filteredSkills.clear();
+		for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+		{
+			if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::GENERAL)
+				filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+		}
 	}
 	~Skill()
 	{
@@ -195,8 +200,6 @@ public:
 					}
 					drawSprite(spr::skillRect, btnIndex, skillBtn[i].x, skillBtn[i].y);
 
-					
-
 					setZoom(2.0);
 					std::wstring skillName = L"";
 					drawSprite(spr::skillSet, tgtData.iconIndex, skillBtn[i].x + 1, skillBtn[i].y + 1);
@@ -217,9 +220,6 @@ public:
 					renderText(lvStr, skillBtn[i].x + 43 + textWidth + 12, skillBtn[i].y + 5);
 
 					renderText(tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3, lowCol::green);
-
-
-
 
 					setFontSize(10);
 					
@@ -277,22 +277,18 @@ public:
 		else if (checkCursor(&generalBox))
 		{
 			if (categoryCursor != skillCategory::general) categoryCursor = skillCategory::general;
-			else categoryCursor = skillCategory::all;
 		}
 		else if (checkCursor(&mutationBox))
 		{
 			if (categoryCursor != skillCategory::mutation) categoryCursor = skillCategory::mutation;
-			else categoryCursor = skillCategory::all;
 		}
 		else if (checkCursor(&bionicBox))
 		{
 			if (categoryCursor != skillCategory::bionic) categoryCursor = skillCategory::bionic;
-			else categoryCursor = skillCategory::all;
 		}
 		else if (checkCursor(&magicBox))
 		{
 			if (categoryCursor != skillCategory::magic) categoryCursor = skillCategory::magic;
-			else categoryCursor = skillCategory::all;
 		}
 		else
 		{

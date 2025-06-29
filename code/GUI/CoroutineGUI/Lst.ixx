@@ -135,8 +135,8 @@ public:
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-			setFontSize(12);
-			renderTextCenter(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22);
+			setFontSize(10);
+			renderTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22, true, 270, -1);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;

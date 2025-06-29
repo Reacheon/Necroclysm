@@ -334,11 +334,9 @@ export int readItemDex(const wchar_t* file)
                         else if (itemDex[tgtIndex].category == itemCategory::vehicles)
                         {
                             if (strFragment == L"VEHICLE_FRAME") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_frame; }
-                            else if (strFragment == L"VEHICLE_ENGINE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_engine; }
+                            else if (strFragment == L"VEHICLE_POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_power; }
                             else if (strFragment == L"VEHICLE_EXTERIOR") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exterior; }
-                            else if (strFragment == L"VEHICLE_TRANSPORT") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_transport; }
-                            else if (strFragment == L"VEHICLE_ENERGY") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_energy; }
-                            else if (strFragment == L"VEHICLE_DEVICE") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_device; }
+                            else if (strFragment == L"VEHICLE_PARTS") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_parts; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(vehicles)"); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::structures)
@@ -347,8 +345,6 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"STRUCTURE_FLOOR") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floor; }
                             else if (strFragment == L"STRUCTURE_CEIL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceil; }
                             else if (strFragment == L"STRUCTURE_PROP") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_prop; }
-                            else if (strFragment == L"STRUCTURE_ELECTRIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_electric; }
-                            else if (strFragment == L"STRUCTURE_PNEUMATIC") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_pneumatic; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structures)"); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::materials)

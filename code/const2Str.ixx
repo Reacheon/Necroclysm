@@ -51,19 +51,16 @@ export std::wstring itemSubcategory2String(itemSubcategory input)
 
 	// 차량
 	else if (input == itemSubcategory::vehicle_frame) return sysStr[260]; // 프레임
-	else if (input == itemSubcategory::vehicle_engine) return sysStr[261]; // 엔진
+	else if (input == itemSubcategory::vehicle_power) return sysStr[261]; // 동력
 	else if (input == itemSubcategory::vehicle_exterior) return sysStr[262]; // 외장
-	else if (input == itemSubcategory::vehicle_transport) return sysStr[263]; // 수송
-	else if (input == itemSubcategory::vehicle_energy) return sysStr[264]; // 에너지
-	else if (input == itemSubcategory::vehicle_device) return sysStr[265]; // 장치
+	else if (input == itemSubcategory::vehicle_parts) return sysStr[263]; // 부품
+
 
 	// 구조물
 	else if (input == itemSubcategory::structure_wall) return sysStr[266]; // 벽
 	else if (input == itemSubcategory::structure_floor) return sysStr[267]; // 바닥
 	else if (input == itemSubcategory::structure_ceil) return sysStr[268]; // 천장
 	else if (input == itemSubcategory::structure_prop) return sysStr[269]; // 설치물
-	else if (input == itemSubcategory::structure_electric) return sysStr[270]; // 전기
-	else if (input == itemSubcategory::structure_pneumatic) return sysStr[271]; // 유압
 
 	// 재료
 	else if (input == itemSubcategory::material_metals) return sysStr[272]; // 금속
