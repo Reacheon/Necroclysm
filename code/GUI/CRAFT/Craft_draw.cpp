@@ -393,10 +393,10 @@ void Craft::drawGUI()
 
 			case 6://건축물
 				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_wall), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floor), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceil), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
-				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_prop), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_walls), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floors), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_ceilings), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
+				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_props), subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 
 			case 7://재료

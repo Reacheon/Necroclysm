@@ -469,9 +469,9 @@ public:
 								}
 								else
 								{
-									if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::vehicle_frame; }
+									if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::vehicle_frames; }
 									else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::vehicle_power; }
-									else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::vehicle_exterior; }
+									else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::vehicle_exteriors; }
 									else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::vehicle_parts; }
 									matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								}
@@ -484,10 +484,10 @@ public:
 								}
 								else
 								{
-									if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::structure_wall; }
-									else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::structure_floor; }
-									else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_ceil; }
-									else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::structure_prop; }
+									if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::structure_walls; }
+									else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::structure_floors; }
+									else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_ceilings; }
+									else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::structure_props; }
 									matchCount = recipePtr->searchSubcategory(targetSubcategory);
 								}
 								break;

@@ -16,6 +16,10 @@ export struct SkillData
     float energyPerAct = 0.0;
     float energyPerTurn = 0.0;
     float energyPerDay = 0.0;
+
+    std::wstring reqStat = L"";
+    std::vector<int> reqProfic;
+
     //비데이터베이스 변수
     bool isLearned = false;
     bool isQuickSlot = false;

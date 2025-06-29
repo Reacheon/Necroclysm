@@ -211,13 +211,6 @@ public:
 					renderText(skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
 					int textWidth = queryTextWidth(skillName);
 
-					std::wstring lvStr;
-
-					if (tgtData.skillLevel < tgtData.maxSkillLevel) lvStr = L"Lv." + std::to_wstring(tgtData.skillLevel);
-					else lvStr = L"Lv.MAX";
-					
-					setFontSize(12);
-					renderText(lvStr, skillBtn[i].x + 43 + textWidth + 12, skillBtn[i].y + 5);
 
 					renderText(tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3, lowCol::green);
 
@@ -229,10 +222,12 @@ public:
 					drawRect({ skillBtn[i].x + 41,skillBtn[i].y + 23, 134,7 }, col::gray);
 					drawFillRect(SDL_Rect{ skillBtn[i].x + 41 + 2,skillBtn[i].y + 23 + 2, int(42.0* (myMin(1.0,tgtData.skillExp/100.0))),3 }, col::white);
 
-					drawCross2(skillBtn[i].x, skillBtn[i].y, 0, 5, 0, 5);
-					drawCross2(skillBtn[i].x + 32, skillBtn[i].y, 0, 5, 5, 0);
-					drawCross2(skillBtn[i].x, skillBtn[i].y + 32, 5, 0, 0, 5);
-					drawCross2(skillBtn[i].x + 32, skillBtn[i].y + 32, 5, 0, 5, 0);
+					drawLine(skillBtn[i].x + 33, skillBtn[i].y + 1, skillBtn[i].x + 33, skillBtn[i].y + 32, { 0x80,0x80,0x80 });
+
+					//drawCross2(skillBtn[i].x, skillBtn[i].y, 0, 5, 0, 5);
+					//drawCross2(skillBtn[i].x + 32, skillBtn[i].y, 0, 5, 5, 0);
+					//drawCross2(skillBtn[i].x, skillBtn[i].y + 32, 5, 0, 0, 5);
+					//drawCross2(skillBtn[i].x + 32, skillBtn[i].y + 32, 5, 0, 5, 0);
 				}
 			}
 

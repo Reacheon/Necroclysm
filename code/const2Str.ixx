@@ -50,17 +50,17 @@ export std::wstring itemSubcategory2String(itemSubcategory input)
 	else if (input == itemSubcategory::consumable_etc) return sysStr[254]; // 기타
 
 	// 차량
-	else if (input == itemSubcategory::vehicle_frame) return sysStr[260]; // 프레임
+	else if (input == itemSubcategory::vehicle_frames) return sysStr[260]; // 프레임
 	else if (input == itemSubcategory::vehicle_power) return sysStr[261]; // 동력
-	else if (input == itemSubcategory::vehicle_exterior) return sysStr[262]; // 외장
+	else if (input == itemSubcategory::vehicle_exteriors) return sysStr[262]; // 외장
 	else if (input == itemSubcategory::vehicle_parts) return sysStr[263]; // 부품
 
 
 	// 구조물
-	else if (input == itemSubcategory::structure_wall) return sysStr[266]; // 벽
-	else if (input == itemSubcategory::structure_floor) return sysStr[267]; // 바닥
-	else if (input == itemSubcategory::structure_ceil) return sysStr[268]; // 천장
-	else if (input == itemSubcategory::structure_prop) return sysStr[269]; // 설치물
+	else if (input == itemSubcategory::structure_walls) return sysStr[266]; // 벽
+	else if (input == itemSubcategory::structure_floors) return sysStr[267]; // 바닥
+	else if (input == itemSubcategory::structure_ceilings) return sysStr[268]; // 천장
+	else if (input == itemSubcategory::structure_props) return sysStr[269]; // 설치물
 
 	// 재료
 	else if (input == itemSubcategory::material_metals) return sysStr[272]; // 금속

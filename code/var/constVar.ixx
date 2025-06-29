@@ -903,15 +903,15 @@ export enum class itemSubcategory
     tech_bionics,        // 바이오닉
     tech_powerArmor,    // 파워아머
 
-    vehicle_frame,//프레임
+    vehicle_frames,//프레임
     vehicle_power,//파워 : 가솔린, 디젤, 전기모터
-    vehicle_exterior,//외장 : 바퀴, 차문, 트렁크문
+    vehicle_exteriors,//외장 : 바퀴, 차문, 트렁크문
     vehicle_parts,//부품 : 기타
 
-    structure_wall,
-    structure_floor,
-    structure_ceil,
-    structure_prop,
+    structure_walls,
+    structure_floors,
+    structure_ceilings,
+    structure_props,
 
     material_metals,       // 금속류 (철, 납, 아연 등)
     material_organic,      // 유기물 (가죽, 나무, 시체 등)

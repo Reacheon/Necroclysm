@@ -11,27 +11,29 @@ import SkillData;
 
 namespace csvSkill
 {
-    constexpr int name = 0;
-    constexpr int code = 1;
-    constexpr int iconIndex = 2;
-    constexpr int descript = 3;
-    constexpr int abstract = 4;
-    constexpr int src = 5;
-    constexpr int type = 6;
-    constexpr int flag = 7;
-    constexpr int energyPerAct = 8;
-    constexpr int energyPerTurn = 9;
-    constexpr int energyPerDay = 10;
-
-    constexpr int pietyPerAct = 11;
-    constexpr int pietyPerTurn = 12;
-    constexpr int pietyPerDay = 13;
-
-    constexpr int mentalPerAct = 14;
-    constexpr int mentalPerTurn = 15;
-    constexpr int mentalPerDay = 16;
-
-    constexpr int skillRank = 17;
+    constexpr int nativeName = 0;
+    constexpr int name = 1;
+    constexpr int code = 2;
+    constexpr int iconIndex = 3;
+    constexpr int nativeDescript = 4;
+    constexpr int descript = 5;
+    constexpr int src = 6;
+    constexpr int type = 7;
+    constexpr int flag = 8;
+    constexpr int reqStat = 9;
+    constexpr int reqProfic = 10;
+    constexpr int sta = 11;
+    constexpr int staPerTurn = 12;
+    constexpr int energyPerAct = 13;
+    constexpr int energyPerTurn = 14;
+    constexpr int energyPerDay = 15;
+    constexpr int pietyPerAct = 16;
+    constexpr int pietyPerTurn = 17;
+    constexpr int pietyPerDay = 18;
+    constexpr int mentalPerAct = 19;
+    constexpr int mentalPerTurn = 20;
+    constexpr int mentalPerDay = 21;
+    constexpr int skillRank = 22;
 };
 
 export int readSkillDex(const wchar_t* file)
@@ -131,46 +133,72 @@ export int readSkillDex(const wchar_t* file)
 
                 if (arrayCounter / (csvWidth) != 0)
                 {
-                    switch (arrayCounter % (csvWidth))
+                    const int tgtIndex = arrayCounter / (csvWidth)-1;
+                    const int columnIndex = arrayCounter % csvWidth;
+
+                    switch (columnIndex)
                     {
+                    case csvSkill::nativeName:
+                        break;
                     case csvSkill::name:
-                        skillDex[arrayCounter / (csvWidth)-1].name = strFragment;
+                        skillDex[tgtIndex].name = strFragment;
                         break;
                     case csvSkill::code:
-                        skillDex[arrayCounter / (csvWidth)-1].skillCode = wtoi(strFragment);
+                        skillDex[tgtIndex].skillCode = wtoi(strFragment);
                         break;
                     case csvSkill::iconIndex:
-                        skillDex[arrayCounter / (csvWidth)-1].iconIndex = wtoi(strFragment);
+                        skillDex[tgtIndex].iconIndex = wtoi(strFragment);
+                        break;
+                    case csvSkill::nativeDescript:
                         break;
                     case csvSkill::descript:
-                        skillDex[arrayCounter / (csvWidth)-1].descript = strFragment;
-                        break;
-                    case csvSkill::abstract:
-                        skillDex[arrayCounter / (csvWidth)-1].abstract = strFragment;
+                        skillDex[tgtIndex].descript = strFragment;
                         break;
                     case csvSkill::src:
-                        if (strFragment == L"GENERAL") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::GENERAL;
-                        else if (strFragment == L"BIONIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::BIONIC;
-                        else if (strFragment == L"MUTATION") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MUTATION;
-                        else if (strFragment == L"MAGIC") skillDex[arrayCounter / (csvWidth)-1].src = skillSrc::MAGIC;
+                        if (strFragment == L"GENERAL") skillDex[tgtIndex].src = skillSrc::GENERAL;
+                        else if (strFragment == L"BIONIC") skillDex[tgtIndex].src = skillSrc::BIONIC;
+                        else if (strFragment == L"MUTATION") skillDex[tgtIndex].src = skillSrc::MUTATION;
+                        else if (strFragment == L"MAGIC") skillDex[tgtIndex].src = skillSrc::MAGIC;
                         else errorBox(L"잘못된 스킬 소스 %ls를 발견했다.",strFragment.c_str());
                         break;
                     case csvSkill::type:
-                        if (strFragment == L"ACTIVE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::ACTIVE;
-                        else if (strFragment == L"PASSIVE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::PASSIVE;
-                        else if (strFragment == L"TOGGLE") skillDex[arrayCounter / (csvWidth)-1].type = skillType::TOGGLE;
+                        if (strFragment == L"ACTIVE") skillDex[tgtIndex].type = skillType::ACTIVE;
+                        else if (strFragment == L"PASSIVE") skillDex[tgtIndex].type = skillType::PASSIVE;
+                        else if (strFragment == L"TOGGLE") skillDex[tgtIndex].type = skillType::TOGGLE;
                         else errorBox(L"잘못된 스킬 타입 %ls를 발견했다.", strFragment.c_str()); 
                         break;
+                    case csvSkill::sta:
+                        break;
+                    case csvSkill::staPerTurn:
+                        break;
                     case csvSkill::energyPerAct:
-                        skillDex[arrayCounter / (csvWidth)-1].energyPerAct = wtof(strFragment);
+                        skillDex[tgtIndex].energyPerAct = wtof(strFragment);
                         break;
                     case csvSkill::energyPerTurn:
-                        skillDex[arrayCounter / (csvWidth)-1].energyPerTurn = wtof(strFragment);
+                        skillDex[tgtIndex].energyPerTurn = wtof(strFragment);
                         break;
                     case csvSkill::energyPerDay:
-                        skillDex[arrayCounter / (csvWidth)-1].energyPerDay = wtof(strFragment);
+                        skillDex[tgtIndex].energyPerDay = wtof(strFragment);
                         break;
                     case csvSkill::flag:
+                        break;
+                    case csvSkill::reqStat:
+                        if (strFragment == L"STR") skillDex[tgtIndex].reqStat = L"STR";
+                        else if (strFragment == L"INT") skillDex[tgtIndex].reqStat = L"INT";
+                        else if (strFragment == L"DEX") skillDex[tgtIndex].reqStat = L"DEX";
+                        break;
+                    case csvSkill::reqProfic:
+                        for (int j = 0; j < strFragment.size(); j++)
+                        {
+                            if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
+                            {
+                                if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
+
+                                skillDex[tgtIndex].reqProfic.push_back(wtoi(strFragment.substr(0, j).c_str()));
+                                strFragment.erase(0, j + 1);
+                                j = 0;
+                            }
+                        }
                         break;
                     case csvSkill::pietyPerAct:
                         break;
@@ -185,7 +213,7 @@ export int readSkillDex(const wchar_t* file)
                     case csvSkill::mentalPerDay:
                         break;
                     case csvSkill::skillRank:
-                        skillDex[arrayCounter / (csvWidth)-1].skillRank = strFragment;
+                        skillDex[tgtIndex].skillRank = strFragment;
                         break;
                     default:
                         prt(L"readSkillDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

@@ -333,18 +333,18 @@ export int readItemDex(const wchar_t* file)
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::vehicles)
                         {
-                            if (strFragment == L"VEHICLE_FRAME") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_frame; }
+                            if (strFragment == L"VEHICLE_FRAMES") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_frames; }
                             else if (strFragment == L"VEHICLE_POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_power; }
-                            else if (strFragment == L"VEHICLE_EXTERIOR") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exterior; }
+                            else if (strFragment == L"VEHICLE_EXTERIORS") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exteriors; }
                             else if (strFragment == L"VEHICLE_PARTS") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_parts; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(vehicles)"); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::structures)
                         {
-                            if (strFragment == L"STRUCTURE_WALL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_wall; }
-                            else if (strFragment == L"STRUCTURE_FLOOR") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floor; }
-                            else if (strFragment == L"STRUCTURE_CEIL") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceil; }
-                            else if (strFragment == L"STRUCTURE_PROP") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_prop; }
+                            if (strFragment == L"STRUCTURE_WALLS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_walls; }
+                            else if (strFragment == L"STRUCTURE_FLOORS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floors; }
+                            else if (strFragment == L"STRUCTURE_CEILINGS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceilings; }
+                            else if (strFragment == L"STRUCTURE_PROPS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_props; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structures)"); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::materials)
