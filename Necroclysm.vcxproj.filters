@@ -558,5 +558,8 @@
     <ClCompile Include="code\mouseInput.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
+    <ClCompile Include="code\SystemMenu.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

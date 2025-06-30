@@ -18,6 +18,7 @@ import CoordSelect;
 export Corouter useSkill(int skillCode)
 {
 	const int SKILL_MAX_RANGE = 30;
+	currentUsingSkill = skillCode;
 	switch (skillCode)
 	{
 	default:
@@ -29,7 +30,6 @@ export Corouter useSkill(int skillCode)
 		break;
 	case 30://화염폭풍
 	{
-		currentUsingSkill = skillCode;
 		std::vector<std::array<int, 2>> coordList;
 		for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
 		{
@@ -44,7 +44,6 @@ export Corouter useSkill(int skillCode)
 		}
 		new CoordSelect(CoordSelectFlag::FIRESTORM, L"화염폭풍을 시전할 위치를 입력해주세요.", coordList);
 		co_await std::suspend_always();
-		currentUsingSkill = -1;
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);
@@ -56,5 +55,30 @@ export Corouter useSkill(int skillCode)
 		addAniUSetPlayer(PlayerPtr, aniFlag::fireStorm);
 		break;
 	}
+	case 32://구르기
+	{
+		std::vector<std::array<int, 2>> coordList;
+		for (int i = 0; i < 8; i++)
+		{
+			int dx , dy;
+			dir2Coord(i, dx, dy);
+			if (TileFov(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == fovFlag::white)
+			{
+				coordList.push_back({ PlayerX() + dx, PlayerY() + dy });
+            }
+		}
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"구르기를 시전할 위치를 입력해주세요.", coordList);
+		co_await std::suspend_always();
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetZ = wtoi(targetStr.c_str());
+		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
+
+		break;
 	}
+	}
+	currentUsingSkill = -1;
 }

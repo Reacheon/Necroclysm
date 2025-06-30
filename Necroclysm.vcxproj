@@ -256,6 +256,7 @@
     <ClCompile Include="code\scriptLoader.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
+    <ClCompile Include="code\SystemMenu.ixx" />
     <ClCompile Include="code\useSkill.ixx" />
     <ClCompile Include="code\globalTime.ixx" />
     <ClCompile Include="code\Light.ixx" />
