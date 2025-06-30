@@ -29,6 +29,7 @@ export Corouter useSkill(int skillCode)
 		break;
 	case 30://화염폭풍
 	{
+		currentUsingSkill = skillCode;
 		std::vector<std::array<int, 2>> coordList;
 		for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
 		{
@@ -43,6 +44,7 @@ export Corouter useSkill(int skillCode)
 		}
 		new CoordSelect(CoordSelectFlag::FIRESTORM, L"화염폭풍을 시전할 위치를 입력해주세요.", coordList);
 		co_await std::suspend_always();
+		currentUsingSkill = -1;
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);

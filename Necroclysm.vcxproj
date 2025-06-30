@@ -165,8 +165,6 @@
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
     <ClCompile Include="code\camera.ixx" />
-    <ClCompile Include="code\clickHold.ixx" />
-    <ClCompile Include="code\clickRight.ixx" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawEpsilonText.ixx" />
@@ -184,9 +182,7 @@
     <ClCompile Include="code\Flame.cpp" />
     <ClCompile Include="code\Flame.ixx" />
     <ClCompile Include="code\Footprint.ixx" />
-    <ClCompile Include="code\gamepadBtnDown.ixx" />
-    <ClCompile Include="code\gamepadBtnMotion.ixx" />
-    <ClCompile Include="code\gamepadBtnUp.ixx" />
+    <ClCompile Include="code\gamepadInput.ixx" />
     <ClCompile Include="code\GUI\Aim.ixx" />
     <ClCompile Include="code\GUI\Alchemy.ixx" />
     <ClCompile Include="code\GUI\ContextMenu.ixx" />
@@ -207,7 +203,7 @@
     <ClCompile Include="code\GUI\HUD\HUD.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_draw.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_input_mouse.ixx" />
+    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_tileTouch.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx" />
@@ -224,9 +220,6 @@
     <ClCompile Include="code\GUI\Status.ixx" />
     <ClCompile Include="code\initCoordTransform.ixx" />
     <ClCompile Include="code\checkCursor.ixx" />
-    <ClCompile Include="code\clickDown.ixx" />
-    <ClCompile Include="code\clickMotion.ixx" />
-    <ClCompile Include="code\clickUp.ixx" />
     <ClCompile Include="code\const2Str.ixx" />
     <ClCompile Include="code\Coord.ixx" />
     <ClCompile Include="code\Corpse.ixx" />
@@ -250,8 +243,9 @@
     <ClCompile Include="code\item\ItemStack.cpp" />
     <ClCompile Include="code\item\ItemStack.ixx" />
     <ClCompile Include="code\item\readItemDex.ixx" />
+    <ClCompile Include="code\keyboardInput.ixx" />
     <ClCompile Include="code\Light.cpp" />
-    <ClCompile Include="code\mouseWheel.ixx" />
+    <ClCompile Include="code\mouseInput.ixx" />
     <ClCompile Include="code\Particle.ixx" />
     <ClCompile Include="code\Prop.cpp" />
     <ClCompile Include="code\Prop.ixx" />

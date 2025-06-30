@@ -73,16 +73,19 @@ public:
 	}
     virtual void changeXY(int inputX, int inputY, bool center) = 0;
     virtual void drawGUI() = 0;
-    virtual void clickUpGUI() = 0;
-	virtual void clickMotionGUI(int dx, int dy) = 0;
-	virtual void clickDownGUI() = 0;
-	virtual void clickRightGUI() = 0;
-	virtual void clickHoldGUI() = 0;
-	virtual void mouseWheel() = 0;
-	virtual void gamepadBtnDown() = 0;
-	virtual void gamepadBtnMotion() = 0;
-	virtual void gamepadBtnUp() = 0;
-	virtual void step() = 0;
+
+	virtual void clickUpGUI() {};
+	virtual void clickMotionGUI(int dx, int dy) {};
+	virtual void clickDownGUI() {};
+	virtual void clickRightGUI() {};
+	virtual void clickHoldGUI() {};
+	virtual void keyDownGUI() {};
+	virtual void keyUpGUI() {};
+	virtual void mouseWheel() {};
+	virtual void gamepadBtnDown() {};
+	virtual void gamepadBtnMotion() {};
+	virtual void gamepadBtnUp() {};
+	virtual void step() {};
     virtual bool runAnimation(bool shutdown)
 	{
 		const int acc = 20;

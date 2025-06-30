@@ -208,6 +208,8 @@ export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을
 
 export bool drawHUD = true;
 
+export int currentUsingSkill = -1;
+
 export class Snowflake
 {
 public:

@@ -837,31 +837,43 @@ void HUD::drawTab()
 		drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R2, tab.x + 4, tab.y + 4);
 	}
 }
-
 void HUD::drawQuickSlot()
 {
+	const bool* state = SDL_GetKeyboardState(nullptr);
 	int pivotX = quickSlotRegion.x;
 	int pivotY = quickSlotRegion.y;
+	const SDL_Scancode quickSlotKeys[8] = { SDL_SCANCODE_1, SDL_SCANCODE_2, SDL_SCANCODE_3, SDL_SCANCODE_4, SDL_SCANCODE_5, SDL_SCANCODE_6, SDL_SCANCODE_7, SDL_SCANCODE_8 };
 
-	//drawRect({ pivotX,pivotY,180,358, }, lowCol::skyBlue);
+	bool currentSkillFoundInQuickSlot = false;
 
-
-	//개별 스킬창 그리기 1번부터 8번까지
 	for (int i = 0; i < 8; i++)
 	{
 		int pivotX = 185 + 48 * i;
 		int pivotY = 0;
-
 		SDL_Color btnCol = col::black;
-		if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE && getLastGUI() == this)
+		bool keyPressed = state[quickSlotKeys[i]];
+		bool showSkillName = (checkCursor(&quickSlotBtn[i]) && getLastGUI() == this) || keyPressed;
+
+		if (currentUsingSkill == -1)
 		{
-			if (click) btnCol = lowCol::deepBlue;
-			else btnCol = lowCol::blue;
+			if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE && getLastGUI() == this)
+			{
+				if (click) btnCol = lowCol::deepBlue;
+				else btnCol = lowCol::blue;
+			}
+			else if (keyPressed) btnCol = lowCol::deepBlue;
+		}
+		else if (quickSlot[i].first != quickSlotFlag::NONE && currentUsingSkill == quickSlot[i].second)
+		{
+			btnCol = lowCol::blue;
+			showSkillName = true;
+			currentSkillFoundInQuickSlot = true;
+		}
 
+		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE)
+		{
 			setFontSize(10);
-			std::wstring skillName = L"";
-			skillName = skillDex[quickSlot[i].second].name;
-
+			std::wstring skillName = skillDex[quickSlot[i].second].name;
 			renderTextOutlineCenter(skillName, 374, 57);
 		}
 
@@ -872,7 +884,6 @@ void HUD::drawQuickSlot()
 		drawLine(pivotX + 4, pivotY + 39 + 3, pivotX + 39, pivotY + 39 + 3, btnCol, 200);
 		drawLine(pivotX + 5, pivotY + 39 + 4, pivotX + 38, pivotY + 39 + 4, btnCol, 200);
 		drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, btnCol, 200);
-
 
 		if (quickSlot[i].first == quickSlotFlag::NONE)
 		{
@@ -885,11 +896,8 @@ void HUD::drawQuickSlot()
 		else
 		{
 			setZoom(2.0);
-			std::wstring skillName = L"";
 			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
-			skillName = skillDex[quickSlot[i].second].name;
 			setZoom(1.0);
-
 			drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
 			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
 			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
@@ -897,8 +905,14 @@ void HUD::drawQuickSlot()
 		}
 		setFontSize(10);
 		renderText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+	}
 
-
+	//스킬 이름 표시
+	if (currentUsingSkill != -1 && !currentSkillFoundInQuickSlot)
+	{
+		setFontSize(10);
+		std::wstring skillName = skillDex[currentUsingSkill].name;
+		renderTextOutlineCenter(skillName, 374, 57);
 	}
 
 	if (dragQuickSlotTarget != -1)
@@ -906,10 +920,10 @@ void HUD::drawQuickSlot()
 		if (quickSlot[dragQuickSlotTarget].first == quickSlotFlag::SKILL)
 		{
 			setZoom(2.0);
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180);
+			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND);
 			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, getMouseX(), getMouseY());
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //텍스쳐 투명도 설정
+			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255);
 			setZoom(1.0);
 		}
 	}

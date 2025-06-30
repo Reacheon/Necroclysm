@@ -137,6 +137,8 @@ public:
 	void clickUpGUI();
 	void clickRightGUI();
 	void clickHoldGUI();
+	void keyUpGUI();
+
 	void mouseWheel() 
 	{
 		bool partSelect = TileEntity(getAbsMouseGrid().x, getAbsMouseGrid().y, PlayerZ()) != nullptr 

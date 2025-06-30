@@ -11,7 +11,7 @@ import Corpse;
 import Particle;
 import Footprint;
 import GUI;
-import clickHold;
+import mouseInput;
 import log;
 import Player;
 import World;

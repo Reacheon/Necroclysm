@@ -156,15 +156,6 @@
     <ClCompile Include="code\Sprite.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
-    <ClCompile Include="code\clickUp.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\clickDown.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\clickMotion.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
     <ClCompile Include="code\checkCursor.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
@@ -228,21 +219,6 @@
     <ClCompile Include="code\readSkillDex.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="code\gamepadBtnDown.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\gamepadBtnMotion.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\gamepadBtnUp.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\clickRight.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="code\clickHold.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
-    </ClCompile>
     <ClCompile Include="code\drawEpsilonText.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -266,9 +242,6 @@
     </ClCompile>
     <ClCompile Include="code\Vehicle.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
-    </ClCompile>
-    <ClCompile Include="code\mouseWheel.ixx">
-      <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
     <ClCompile Include="code\Flame.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -453,7 +426,7 @@
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_input_mouse.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.ixx">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\HUD\HUD.ixx">
@@ -575,6 +548,15 @@
     </ClCompile>
     <ClCompile Include="code\GUI\Sleep.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\keyboardInput.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\gamepadInput.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="code\mouseInput.ixx">
+      <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

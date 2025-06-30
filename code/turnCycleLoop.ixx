@@ -1,5 +1,4 @@
-﻿
-#include <SDL3/SDL.h>
+﻿#include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
@@ -14,14 +13,9 @@ import World;
 import Player;
 import Monster;
 import Vehicle;
-import clickUp;
-import clickDown;
-import clickMotion;
-import clickRight;
-import mouseWheel;
-import gamepadBtnDown;
-import gamepadBtnMotion;
-import gamepadBtnUp;
+import mouseInput;
+import keyboardInput;
+import gamepadInput;
 import AI;
 import turnWait;
 import dirToXY;
@@ -309,6 +303,23 @@ __int64 playerInputTurn()
 						exInputText.erase(exInputCursor, 1);
 					}
 				}
+				else
+				{
+					if (option::inputMethod != input::mouse)
+					{
+						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						option::inputMethod = input::mouse;
+					}
+					keyboardBtnDown();
+				}
+				break;
+			case SDL_EVENT_KEY_UP:
+				if (option::inputMethod != input::mouse)
+				{
+					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+					option::inputMethod = input::mouse;
+				}
+				keyboardBtnUp();
 				break;
 			case SDL_EVENT_TEXT_INPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
 			{
