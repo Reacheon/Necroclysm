@@ -181,39 +181,9 @@ public:
 		{
 			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&quickSlotRegion) == false)
 			{
-				//터치한 좌표를 얻어내는 부분
-				int cameraGridX, cameraGridY;
-				if (cameraX >= 0) cameraGridX = cameraX / 16;
-				else cameraGridX = -1 + cameraX / 16;
-				if (cameraY >= 0) cameraGridY = cameraY / 16;
-				else cameraGridY = -1 + cameraY / 16;
-
-				int camDelX = cameraX - (16 * cameraGridX + 8);
-				int camDelY = cameraY - (16 * cameraGridY + 8);
-
-				int revX, revY, revGridX, revGridY;
-				if (option::inputMethod == input::touch)
-				{
-					revX = event.tfinger.x * cameraW - (cameraW / 2);
-					revY = event.tfinger.y * cameraH - (cameraH / 2);
-				}
-				else
-				{
-					revX = getMouseX() - (cameraW / 2);
-					revY = getMouseY() - (cameraH / 2);
-				}
-				revX += sgn(revX) * (8 * zoomScale) + camDelX;
-				revGridX = revX / (16 * zoomScale);
-				revY += sgn(revY) * (8 * zoomScale) + camDelY;
-				revGridY = revY / (16 * zoomScale);
-
 				//상대좌표를 절대좌표로 변환
-				clickTile.x = cameraGridX + revGridX;
-				clickTile.y = cameraGridY + revGridY;
-
-				//상대좌표를 절대좌표로 변환
-				int throwingX = clickTile.x;
-				int throwingY = clickTile.y;
+				int throwingX = getAbsMouseGrid().x;
+				int throwingY = getAbsMouseGrid().y;
 				int throwingZ = PlayerZ();
 				std::wstring xStr = std::to_wstring(throwingX);
 				std::wstring yStr = std::to_wstring(throwingY);
@@ -221,8 +191,21 @@ public:
 
 				prt(L"[CoordSelect] 절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
 
-
-				if (selectableCoord.size() > 0)
+				if (rangeSet.size() > 0)
+				{
+					Point2 targetPoint(throwingX, throwingY);
+					if (rangeSet.find(targetPoint) != rangeSet.end())
+					{
+						coAnswer = xStr + L"," + yStr + L"," + zStr;
+						prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+						delete this;
+					}
+					else
+					{
+						prt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
+					}
+				}
+				else if (selectableCoord.size() > 0)
 				{
 					for (int i = 0; i < selectableCoord.size(); i++)
 					{

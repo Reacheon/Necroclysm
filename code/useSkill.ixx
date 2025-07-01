@@ -57,17 +57,17 @@ export Corouter useSkill(int skillCode)
 	}
 	case 32://구르기
 	{
-		std::vector<std::array<int, 2>> coordList;
+		rangeSet.clear();
 		for (int i = 0; i < 8; i++)
 		{
 			int dx , dy;
 			dir2Coord(i, dx, dy);
 			if (TileFov(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == fovFlag::white)
 			{
-				coordList.push_back({ PlayerX() + dx, PlayerY() + dy });
+				rangeSet.insert({ PlayerX() + dx, PlayerY() + dy });
             }
 		}
-		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"구르기를 시전할 위치를 입력해주세요.", coordList);
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"구르기를 시전할 위치를 입력해주세요.");
 		co_await std::suspend_always();
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
@@ -76,7 +76,7 @@ export Corouter useSkill(int skillCode)
 		targetStr.erase(0, targetStr.find(L",") + 1);
 		int targetZ = wtoi(targetStr.c_str());
 		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
-
+		rangeSet.clear();
 		break;
 	}
 	}
