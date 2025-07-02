@@ -88,6 +88,7 @@ export struct EntityData : public EntityData_Base
     __int16 sprIndexInfimum = 0;
     bool sprFlip = false;
     float sprAngle = 0.0f; //스프라이트의 회전각도
+    int jumpOffsetY = 0;
     humanCustom::skin skin = humanCustom::skin::null;
     humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;

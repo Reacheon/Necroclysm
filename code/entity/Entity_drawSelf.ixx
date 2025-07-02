@@ -294,12 +294,12 @@ void Entity::drawSelf()
 		}
 		else
 		{
-			drawSpriteCenter(playerSprite.get(), localSprIndex, drawingX, drawingY, PlayerPtr->entityInfo.sprAngle);//캐릭터 본체 그리기
+			drawSpriteCenter(playerSprite.get(), localSprIndex, drawingX, drawingY + zoomScale*entityInfo.jumpOffsetY, PlayerPtr->entityInfo.sprAngle);//캐릭터 본체 그리기
 		}
 	}
 	else
 	{
-		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY);//캐릭터 본체 그리기
+		drawSpriteCenter(entityInfo.entitySpr, localSprIndex, drawingX, drawingY + zoomScale * entityInfo.jumpOffsetY);//캐릭터 본체 그리기
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

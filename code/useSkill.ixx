@@ -64,8 +64,11 @@ export Corouter useSkill(int skillCode)
 			dir2Coord(i, dx, dy);
 			if (TileFov(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == fovFlag::white)
 			{
-				rangeSet.insert({ PlayerX() + dx, PlayerY() + dy });
-            }
+				if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
+				{
+					rangeSet.insert({ PlayerX() + dx, PlayerY() + dy });
+				}
+			}
 		}
 		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"Choose where to roll.");
 		co_await std::suspend_always();
@@ -131,6 +134,7 @@ export Corouter useSkill(int skillCode)
 			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 			targetStr.erase(0, targetStr.find(L",") + 1);
 			int targetZ = wtoi(targetStr.c_str());
+			PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
 
 			int prevGridX = PlayerPtr->getGridX();
 			int prevGridY = PlayerPtr->getGridY();
