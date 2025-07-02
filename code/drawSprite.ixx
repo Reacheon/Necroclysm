@@ -105,6 +105,28 @@ export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
     SDL_RenderTextureRotated(renderer, spr->getTexture(), &src, &dst, 0, nullptr, s_flip);
 }
 
+
+export void drawSpriteCenter(Sprite* spr, int index, int x, int y, float angle)
+{
+    float textureW, textureH;
+    SDL_GetTextureSize(spr->getTexture(), &textureW, &textureH);
+
+    SDL_FRect src = { (spr->getW() * index) % static_cast<int>(textureW),
+                     spr->getH() * ((spr->getW() * index) / static_cast<int>(textureW)),
+                     spr->getW(),
+                     spr->getH() };
+
+    float dstW = src.w * s_zoomScale;
+    float dstH = src.h * s_zoomScale;
+
+    SDL_FRect dst = { static_cast<float>(x) - dstW * 0.5f,
+                      static_cast<float>(y) - dstH * 0.5f,
+                      dstW,
+                      dstH };
+
+    SDL_RenderTextureRotated(renderer, spr->getTexture(), &src, &dst, angle, nullptr, s_flip);
+}
+
 export void drawSpriteCenterRotate(Sprite* spr, int index, int x, int y, double rotateAngle, SDL_Point* rotateCenter)
 {
     float textureW, textureH;

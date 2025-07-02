@@ -41,6 +41,7 @@ public:
 		telepathyStr = inputTelepathyStr;
 		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
 		ptr = this;
+		tabType = tabFlag::closeWin;
 	}
 	CoordSelect(std::wstring inputTelepathyStr) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr) { }
 
@@ -166,16 +167,15 @@ public:
 		}
 
 		//사념파
-		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
-		renderTextCenter(telepathyStr, cameraW / 2, 165);
+		drawSpriteCenter(spr::floatLog, 0, cameraW / 2 + 20, 105);
+		renderTextCenter(telepathyStr, cameraW / 2 + 20, 105);
 	}
 	void clickUpGUI()
 	{
 		if (checkCursor(&tab) == true)
 		{
-			UIType = act::null;
 			tabType = tabFlag::autoAtk;
-			delete this;
+			close(aniFlag::null);
 		}
 		else
 		{

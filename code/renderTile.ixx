@@ -405,6 +405,47 @@ __int64 drawTiles()
 		}
 
 
+		//스킬 범위 그리기
+		if(rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
+		{
+			setZoom(zoomScale);
+			int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
+			int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
+
+			//8방향 조건 체크
+			bool rightCheck = rangeSet.find({ tgtX + 1, tgtY }) != rangeSet.end();
+			bool topCheck = rangeSet.find({ tgtX, tgtY - 1 }) != rangeSet.end();
+			bool leftCheck = rangeSet.find({ tgtX - 1, tgtY }) != rangeSet.end();
+			bool botCheck = rangeSet.find({ tgtX, tgtY + 1 }) != rangeSet.end();
+			int dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+
+			drawSpriteCenter
+			(
+				spr::tileset,
+				1440 + dirCorrection,
+				cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
+				cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
+			);
+			//1440
+			setZoom(1.0);
+        }
+
+		if (rangeSet.size() > 0 && rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
+		{
+			if (getAbsMouseGrid().x == tgtX && getAbsMouseGrid().y == tgtY)
+			{
+				setZoom(zoomScale);
+				int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
+				int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
+				drawFillRect
+				(
+					SDL_Rect{ drawingX - (int)(8 * zoomScale), drawingY - (int)(8 * zoomScale), (int)(16 * zoomScale), (int)(16 * zoomScale) },
+					rangeColor, 150
+				);
+				setZoom(1.0);
+			}
+		}
+
 
 	}
 

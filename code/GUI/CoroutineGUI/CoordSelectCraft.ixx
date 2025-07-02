@@ -52,6 +52,7 @@ public:
 		rotatedItemCode = tgtItemCode;
 		prt(L"CoordSelectCraft : 생성자가 호출되었습니다..\n");
 		ptr = this;
+		tabType = tabFlag::closeWin;
 	}
 
 	~CoordSelectCraft()

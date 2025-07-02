@@ -665,8 +665,10 @@ export enum class aniFlag
     minecartRush,
     quickSlotPopLeft,
     quickSlotPopRight,
-    fireStorm,
 
+    fireStorm,
+    roll,
+    leap,
 
     treeFalling,
 
