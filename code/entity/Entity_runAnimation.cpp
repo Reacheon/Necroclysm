@@ -1139,7 +1139,60 @@ bool Entity::runAnimation(bool shutdown)
 			return true;
 		}
 	}
+	else if (getAniType() == aniFlag::leap)
+	{
 
+		addTimer();
+
+
+		if (getTimer() == 1) entityInfo.walkMode = walkFlag::crouch;
+
+
+		if (getFakeX() > 0)
+		{
+			addFakeX(-entityInfo.gridMoveSpd);
+			if (getFakeX() < 0) setFakeX(0);
+		}
+		else if (getFakeX() < 0)
+		{
+			addFakeX(+entityInfo.gridMoveSpd);
+			if (getFakeX() > 0) setFakeX(0);
+		}
+
+		if (getFakeY() > 0)
+		{
+			addFakeY(-entityInfo.gridMoveSpd);
+			if (getFakeY() < 0) setFakeY(0);
+		}
+		else if (getFakeY() < 0)
+		{
+			addFakeY(+entityInfo.gridMoveSpd);
+			if (getFakeY() > 0) setFakeY(0);
+		}
+
+
+		if (entityInfo.isPlayer)
+		{
+			cameraFix = false;
+			cameraX = getX() + getIntegerFakeX();
+			cameraY = getY() + getIntegerFakeY();
+		}
+
+		if (std::abs(getIntegerFakeX()) == 0.0 && std::abs(getIntegerFakeY()) == 0.0)
+		{
+			setSpriteIndex(0);
+			resetTimer();
+			setAniType(aniFlag::null);
+			setFakeX(0);
+			setFakeY(0);
+
+			turnWait(1.0);
+			endMove();
+			entityInfo.walkMode = walkFlag::walk;
+			if (entityInfo.isPlayer) cameraFix = true;
+			return true;
+		}
+	}
 
 	return false;
 }

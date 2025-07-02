@@ -102,20 +102,24 @@ export Corouter useSkill(int skillCode)
 		rangeSet.clear();
 		break;
 	}
+
 	case 33://점프
 	{
 		rangeSet.clear();
-		for(int dx=-2; dx<=2; dx++)
+		for (int dx = -2; dx <= 2; dx++)
 		{
-			for(int dy=-2; dy <= 2; dy++)
+			for (int dy = -2; dy <= 2; dy++)
 			{
 				if (dx == 0 && dy == 0) continue;
 				if (TileFov(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == fovFlag::white)
 				{
-					rangeSet.insert({ PlayerX() + dx, PlayerY() + dy });
+					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
+					{
+						rangeSet.insert({ PlayerX() + dx, PlayerY() + dy });
+					}
 				}
 			}
-        }
+		}
 
 		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"Choose where to leap.");
 		co_await std::suspend_always();
@@ -127,7 +131,24 @@ export Corouter useSkill(int skillCode)
 			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 			targetStr.erase(0, targetStr.find(L",") + 1);
 			int targetZ = wtoi(targetStr.c_str());
-			PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
+
+			int prevGridX = PlayerPtr->getGridX();
+			int prevGridY = PlayerPtr->getGridY();
+			int dstGridX = targetX;
+			int dstGridY = targetY;
+			int dGridX = dstGridX - prevGridX;
+			int dGridY = dstGridY - prevGridY;
+
+			if (dGridX > 0) PlayerPtr->setDirection(0);
+			else if (dGridX < 0) PlayerPtr->setDirection(4);
+
+			PlayerPtr->entityInfo.gridMoveSpd = 1.0;
+			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { targetX, targetY, PlayerPtr->getGridZ() });
+			PlayerPtr->setFakeX(-16 * dGridX);
+			PlayerPtr->setFakeY(-16 * dGridY);
+			cameraFix = false;
+			cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+			cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
 			addAniUSetPlayer(PlayerPtr, aniFlag::leap);
 		}
 		rangeSet.clear();
