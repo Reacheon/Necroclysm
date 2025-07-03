@@ -43,6 +43,30 @@ export void startArea()
 		}
 	);
 
+	createItemStack({ 0, -19, 0 }, {
+	{442, 1}, {443, 1}, {446, 4}, {447, 10}, {449, 1}
+		}
+	);
+	{
+		ItemStack* targetStack = TileItemStack({ 0, -19, 0 });
+        std::vector<ItemData>& targetItemInfo = targetStack->getPocket()->itemInfo;
+		for (int i = 0; i < targetItemInfo.size(); i++)
+		{
+			if (targetItemInfo[i].itemCode == 442)
+			{
+				targetItemInfo[i].pocketPtr->addItemFromDex(444, 9);
+			}
+			else if (targetItemInfo[i].itemCode == 443)
+			{
+				targetItemInfo[i].pocketPtr->addItemFromDex(445, 100);
+			}
+			else if (targetItemInfo[i].itemCode == 449)
+			{
+				targetItemInfo[i].pocketPtr->addItemFromDex(450, 30);
+			}
+		}
+	}
+
 
 	createItemStack({ -5, 2, 0 }, {
 		{373, 1}
