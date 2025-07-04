@@ -484,16 +484,12 @@ __int64 drawItems()
 		int tgtY = elem.y;
 
 		ItemStack* address = TileItemStack(tgtX, tgtY, pZ);
-
-		int itemSprIndex = 0;
-		if (address->getTargetSprIndex() != 0) itemSprIndex = address->getTargetSprIndex();
-		else itemSprIndex = address->getPocket()->itemInfo[0].sprIndex;
-
+		std::vector<ItemData>& pocketInfo = address->getPocket()->itemInfo;
 		setZoom(zoomScale);
 		drawSpriteCenter
 		(
 			spr::itemset,
-			itemSprIndex,
+			pocketInfo[pocketInfo.size()-1].sprIndex,
 			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
 			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 		);

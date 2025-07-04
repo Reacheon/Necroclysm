@@ -704,7 +704,6 @@ void Entity::drop(ItemPocket* txPtr)
 	{
 		//기존 스택이 있으면 그 스택을 그대로 전달
 		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
-		targetStack->setSprIndex(txPtr->itemInfo[0].sprIndex);
 		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 	}
 

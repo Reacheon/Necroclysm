@@ -25,10 +25,6 @@ public:
 	Sprite* getSprite(); 
 	void setSprite(Sprite* inputSprite);
 	ItemPocket* getPocket();
-	int getSprIndex();
-	void setSprIndex(int val);
-	int getTargetSprIndex();
-	void setTargetSprIndex(int val);
 	void checkEmpty();
 	void updateSprIndex();
 	void pullStackLights();

@@ -49,10 +49,6 @@ ItemPocket* ItemStack::getPocket()
 	return storage.get();
 }
 
-int ItemStack::getSprIndex() { return sprIndex; }
-void ItemStack::setSprIndex(int val) { sprIndex = val; }
-int ItemStack::getTargetSprIndex() { return targetSprIndex; }
-void ItemStack::setTargetSprIndex(int val) { targetSprIndex = val; }
 
 //@brief 자기가 담당하는 storage가 사이즈가 0일 경우 스스로 제거함
 void ItemStack::checkEmpty()

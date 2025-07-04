@@ -1019,8 +1019,6 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				//기존 스택이 있으면 그 스택을 그대로 전달
 				targetStack = TileItemStack(dstGrid);
-				targetStack->setSprIndex(throwingItemPocket->itemInfo[0].sprIndex);
-				targetStack->setTargetSprIndex(targetStack->getSprIndex()); //원래 위치에 가짜 아이템 이미지
 				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
 				addAniUSetPlayer(targetStack, aniFlag::drop);
 
