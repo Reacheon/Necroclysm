@@ -150,6 +150,12 @@ __int64 playerInputTurn()
 
 		//prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
 
+		SDL_Event tempEvent;
+		while (SDL_PollEvent(&tempEvent))
+		{
+			// 다른 턴에 쌓인 큐에 있는 모든 이벤트를 읽어서 버림
+		}
+
 		if (coTurnSkip)
 		{
 			//prt(L"메인 함수 코루틴 재실행\n");

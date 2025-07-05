@@ -81,7 +81,6 @@ public:
 
 		lootPocket = inputPocket;
 		lootItemData = inputData;
-		if(lootPocket->itemInfo.size()>=2) lootPocket->sortByUnicode();
 
 		deactInput();
 		deactDraw();
@@ -108,7 +107,6 @@ public:
 		lootStack = inputStack;
 		lootPocket = inputStack->getPocket();
 		lootItemData = nullptr;
-		if (lootPocket->itemInfo.size() >= 2) lootPocket->sortByUnicode();
 
 		deactInput();
 		deactDraw();

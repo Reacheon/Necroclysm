@@ -11,7 +11,9 @@ import Loot;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
-	if (ctrlVeh == nullptr)//차량 조종 중이 아닐 경우
+
+
+	if (ctrlVeh == nullptr && currentUsingSkill ==-1)//차량 조종 중이 아닐 경우
 	{
 		//화면에 있는 아이템 터치
 		if (touchX == PlayerX() && touchY == PlayerY()) //자신 위치 터치
