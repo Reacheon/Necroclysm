@@ -1256,6 +1256,12 @@ export namespace entityRefCode
     constexpr int horse = 3;
 };
 
+export namespace skillRefCode
+{
+    constexpr int roll = 32;
+    constexpr int leap = 33;
+}
+
 export enum class skillSrc
 {
     GENERAL,

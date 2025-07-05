@@ -853,6 +853,17 @@ void HUD::drawQuickSlot()
 		SDL_Color btnCol = col::black;
 		bool keyPressed = state[quickSlotKeys[i]];
 		bool showSkillName = (checkCursor(&quickSlotBtn[i]) && getLastGUI() == this) || keyPressed;
+		bool deact = false; //현재 사용이 불가능한 스킬
+
+		if (quickSlot[i].first == quickSlotFlag::SKILL && (quickSlot[i].second == skillRefCode::roll || quickSlot[i].second == skillRefCode::leap))
+		{
+			if (itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_DEEP))
+			{
+				deact = true;
+			}
+		}
+
+
 
 		if (currentUsingSkill == -1)
 		{
@@ -870,11 +881,15 @@ void HUD::drawQuickSlot()
 			currentSkillFoundInQuickSlot = true;
 		}
 
-		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE)
+
+		if (deact) btnCol = col::black;
+
+		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact==false)
 		{
 			setFontSize(10);
 			std::wstring skillName = skillDex[quickSlot[i].second].name;
 			renderTextOutlineCenter(skillName, 374, 57);
+			
 		}
 
 		drawFillRect(SDL_Rect{ pivotX,pivotY,44,39 }, btnCol, 200);
@@ -905,6 +920,19 @@ void HUD::drawQuickSlot()
 		}
 		setFontSize(10);
 		renderText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+
+		if (deact)
+		{
+			drawFillRect(SDL_Rect{ pivotX,pivotY,44,39 }, col::black, 120);
+			drawLine(pivotX + 1, pivotY + 39, pivotX + 42, pivotY + 39, col::black, 120);
+			drawLine(pivotX + 2, pivotY + 39 + 1, pivotX + 41, pivotY + 39 + 1, col::black, 120);
+			drawLine(pivotX + 3, pivotY + 39 + 2, pivotX + 40, pivotY + 39 + 2, col::black, 120);
+			drawLine(pivotX + 4, pivotY + 39 + 3, pivotX + 39, pivotY + 39 + 3, col::black, 120);
+			drawLine(pivotX + 5, pivotY + 39 + 4, pivotX + 38, pivotY + 39 + 4, col::black, 120);
+			drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, col::black, 120);
+			drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, col::black, 120);
+		}
+		
 	}
 
 	//스킬 이름 표시

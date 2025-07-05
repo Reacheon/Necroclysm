@@ -57,6 +57,13 @@ export Corouter useSkill(int skillCode)
 	}
 	case 32://구르기
 	{
+		if (itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_DEEP))
+		{
+			updateLog(L"You cannot roll in water.");
+			currentUsingSkill = -1;
+			co_return;
+		}
+
 		rangeSet.clear();
 		for (int i = 0; i < 8; i++)
 		{
@@ -108,6 +115,13 @@ export Corouter useSkill(int skillCode)
 
 	case 33://점프
 	{
+		if (itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[TileFloor(PlayerX(), PlayerY(), PlayerZ())].checkFlag(itemFlag::WATER_DEEP))
+		{
+			updateLog(L"You cannot leap in water.");
+			currentUsingSkill = -1;
+			co_return;
+		}
+
 		rangeSet.clear();
 		for (int dx = -2; dx <= 2; dx++)
 		{

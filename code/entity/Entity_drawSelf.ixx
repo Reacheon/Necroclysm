@@ -276,7 +276,9 @@ void Entity::drawSelf()
 	{
 		SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
 
-		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
+		
+		
+		if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW) && entityInfo.jumpOffsetY == 0 && getAniType() != aniFlag::roll)
 		{
 			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,24 });
 			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 130); //텍스쳐 투명도 설정
@@ -284,7 +286,7 @@ void Entity::drawSelf()
 			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,24,48,24 });
 			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 255); //텍스쳐 투명도 설정
 		}
-		else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
+		else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP) && entityInfo.jumpOffsetY == 0 && getAniType() != aniFlag::roll)
 		{
 			drawSpriteCenterExSrc(playerSprite.get(), localSprIndex, drawingX, drawingY, { 0,0,48,27 });
 			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 80); //텍스쳐 투명도 설정
