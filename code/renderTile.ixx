@@ -52,6 +52,7 @@ __int64 drawDebug();
 //차량과 엔티티는 중복을 허용하면 안됨
 std::list<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList,allTileList;
 std::list<Drawable*> renderVehList, renderEntityList;
+std::unordered_set<Point2, Point2::Hash> raySet;
 
 export __int64 renderTile()
 {
@@ -75,6 +76,12 @@ export __int64 renderTile()
 	grayFogList.clear();
 	lightFogList.clear();
 	flameList.clear();
+
+	if (rangeRay)
+	{
+		raySet.clear();
+		makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+	}
 
 	dur::analysis = analyseRender();
 	dur::tile = drawTiles();
@@ -429,6 +436,20 @@ __int64 drawTiles()
 			//1440
 			setZoom(1.0);
         }
+
+		if (rangeRay && raySet.find({tgtX - PlayerX(),tgtY - PlayerY() }) != raySet.end())
+		{
+			setZoom(zoomScale);
+			int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
+			int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
+			drawFillRect
+			(
+				SDL_Rect{ drawingX - (int)(8 * zoomScale), drawingY - (int)(8 * zoomScale), (int)(16 * zoomScale), (int)(16 * zoomScale) },
+				rangeColor, 150
+			);
+			setZoom(1.0);
+        }
+
 
 		if (rangeSet.size() > 0 && rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
 		{

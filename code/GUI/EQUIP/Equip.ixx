@@ -465,11 +465,13 @@ public:
 		
 		new CoordSelect(sysStr[131]);
 		deactDraw();
+		rangeRay = true;
 
 		co_await std::suspend_always();
 
 		if (coAnswer.empty())
 		{
+			rangeRay = false;
 			actDraw();
 			tabType = tabFlag::closeWin;
 			co_return;
@@ -494,6 +496,7 @@ public:
 
 		updateLog(L"#FFFFFF아이템을 던졌다.");
 		close(aniFlag::null);
+		rangeRay = false;
 	}
 
 };

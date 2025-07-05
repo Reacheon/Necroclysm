@@ -4,14 +4,15 @@ export module drawItemSlot;
 
 import std;
 import util;
+import ItemData;
+import ItemPocket;
 import globalVar;
 import drawText;
 import constVar;
 import checkCursor;
 import drawSprite;
 import textureVar;
-import ItemPocket;
-import ItemData;
+
 
 export enum class cursorFlag
 {
@@ -26,7 +27,6 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 {
 	int fontSize = 12;
 	int yCorrection = 0;
-	const int widthLimit = 162;
 	bool split = false;
 	SDL_Rect itemBox = { x, y, 210, 26 };
 	SDL_Color stadiumColor = { 0,0,0 };
@@ -54,13 +54,14 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	//후열 탄창이랑 탄환수 텍스트
 	if (inputItem.checkFlag(itemFlag::GUN) || inputItem.checkFlag(itemFlag::MAGAZINE))
 	{
-		if (inputItem.pocketPtr.get()->itemInfo.size() > 0)
+        ItemPocket* pocketPtr = inputItem.pocketPtr.get();
+		if (pocketPtr->itemInfo.size() > 0)
 		{
 			//리볼버
-			if (inputItem.pocketPtr.get()->itemInfo[0].checkFlag(itemFlag::AMMO))
+			if (pocketPtr->itemInfo[0].checkFlag(itemFlag::AMMO))
 			{
 				int bulletNumber = 0;
-				ItemPocket* gunInside = inputItem.pocketPtr.get();
+				ItemPocket* gunInside = pocketPtr;
 				for (int i = 0; i < gunInside->itemInfo.size(); i++)
 				{
 					bulletNumber += gunInside->itemInfo[i].number;
@@ -72,10 +73,10 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 				mainName += std::to_wstring(inputItem.pocketMaxNumber);
 				mainName += L")";
 			}
-			else if (inputItem.pocketPtr.get()->itemInfo[0].checkFlag(itemFlag::MAGAZINE))//탄창
+			else if (pocketPtr->itemInfo[0].checkFlag(itemFlag::MAGAZINE))//탄창
 			{
 				int bulletNumber = 0;
-				ItemPocket* magazineInside = inputItem.pocketPtr.get()->itemInfo[0].pocketPtr.get();
+				ItemPocket* magazineInside = pocketPtr->itemInfo[0].pocketPtr.get();
 				for (int i = 0; i < magazineInside->itemInfo.size(); i++)
 				{
 					bulletNumber += magazineInside->itemInfo[i].number;
@@ -83,7 +84,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 				mainName += L" (";
 				mainName += std::to_wstring(bulletNumber);
 				mainName += L"/";
-				mainName += std::to_wstring(inputItem.pocketPtr.get()->itemInfo[0].pocketMaxNumber);
+				mainName += std::to_wstring(pocketPtr->itemInfo[0].pocketMaxNumber);
 				mainName += L")";
 			}
 		}
@@ -102,21 +103,60 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	}
 	else if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ))
 	{
-		int maxVol = inputItem.pocketMaxVolume;
-		int currentVol = inputItem.pocketPtr.get()->getPocketVolume();
+		ItemPocket* pocketPtr = inputItem.pocketPtr.get();
+		if (pocketPtr->itemInfo.size() > 0)
+		{
+			mainName += L" (";
 
-		mainName += L" (";
-		mainName += std::to_wstring(currentVol);
-		mainName += L"/";
-		mainName += std::to_wstring(maxVol);
-		mainName += L"mL)";
+			if (pocketPtr->itemInfo.size() == 1)
+			{
+				mainName += pocketPtr->itemInfo[0].name;
+			}
+
+			mainName += L")";
+		}
+	}
+	else if (inputItem.pocketMaxVolume > 0)
+	{
+		ItemPocket* pocketPtr = inputItem.pocketPtr.get();
+		if (pocketPtr->itemInfo.size() == 1)
+		{
+			mainName += L" (";
+
+			if (pocketPtr->itemInfo.size() > 0)
+			{
+				mainName += pocketPtr->itemInfo[0].name;
+			}
+
+			mainName += L")";
+		}
+		else if (pocketPtr->itemInfo.size() > 1)
+		{
+			mainName += L" (";
+
+			if (pocketPtr->itemInfo.size() > 0)
+			{
+				int itemNumber = pocketPtr->itemInfo.size();
+                mainName += std::to_wstring(itemNumber) + L" items";
+			}
+
+			mainName += L")";
+		}
 	}
 
 
+	const int widthLimit = 168;
 	if (queryTextWidth(mainName) > widthLimit)
 	{
 		setFontSize(10);
-		renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+
+		if (queryTextWidth(mainName) > widthLimit)
+		{
+			setFontSize(8);
+			renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+		}
+		else renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+		
 	}
 	else
 	{
@@ -428,13 +468,15 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData& i
 	//후열 탄창이랑 탄환수 텍스트
 	if (inputItem.checkFlag(itemFlag::GUN) || inputItem.checkFlag(itemFlag::MAGAZINE))
 	{
-		if (inputItem.pocketPtr.get()->itemInfo.size() > 0)
+        ItemPocket* pocketPtr = inputItem.pocketPtr.get();
+
+		if (pocketPtr->itemInfo.size() > 0)
 		{
 			//리볼버
-			if (inputItem.pocketPtr.get()->itemInfo[0].checkFlag(itemFlag::AMMO))
+			if (pocketPtr->itemInfo[0].checkFlag(itemFlag::AMMO))
 			{
 				int bulletNumber = 0;
-				ItemPocket* gunInside = inputItem.pocketPtr.get();
+				ItemPocket* gunInside = pocketPtr;
 				for (int i = 0; i < gunInside->itemInfo.size(); i++)
 				{
 					bulletNumber += gunInside->itemInfo[i].number;
@@ -446,10 +488,10 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData& i
 				mainName += std::to_wstring(inputItem.pocketMaxNumber);
 				mainName += L")";
 			}
-			else if (inputItem.pocketPtr.get()->itemInfo[0].checkFlag(itemFlag::MAGAZINE))//탄창
+			else if (pocketPtr->itemInfo[0].checkFlag(itemFlag::MAGAZINE))//탄창
 			{
 				int bulletNumber = 0;
-				ItemPocket* magazineInside = (inputItem.pocketPtr.get()->itemInfo[0].pocketPtr).get();
+				ItemPocket* magazineInside = (pocketPtr->itemInfo[0].pocketPtr).get();
 				for (int i = 0; i < magazineInside->itemInfo.size(); i++)
 				{
 					bulletNumber += magazineInside->itemInfo[i].number;
@@ -457,7 +499,7 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData& i
 				mainName += L" (";
 				mainName += std::to_wstring(bulletNumber);
 				mainName += L"/";
-				mainName += std::to_wstring(inputItem.pocketPtr.get()->itemInfo[0].pocketMaxNumber);
+				mainName += std::to_wstring(pocketPtr->itemInfo[0].pocketMaxNumber);
 				mainName += L")";
 			}
 		}
