@@ -101,86 +101,95 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			}
 		}
 	}
-	else if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ))
-	{
-		ItemPocket* pocketPtr = inputItem.pocketPtr.get();
-		if (pocketPtr->itemInfo.size() > 0)
-		{
-			mainName += L" (";
-
-			if (pocketPtr->itemInfo.size() == 1)
-			{
-				mainName += pocketPtr->itemInfo[0].name;
-			}
-
-			mainName += L")";
-		}
-	}
-	else if (inputItem.pocketMaxVolume > 0)
-	{
-		ItemPocket* pocketPtr = inputItem.pocketPtr.get();
-		if (pocketPtr->itemInfo.size() == 1)
-		{
-			mainName += L" (";
-
-			if (pocketPtr->itemInfo.size() > 0)
-			{
-				mainName += pocketPtr->itemInfo[0].name;
-			}
-
-			mainName += L")";
-		}
-		else if (pocketPtr->itemInfo.size() > 1)
-		{
-			mainName += L" (";
-
-			if (pocketPtr->itemInfo.size() > 0)
-			{
-				int itemNumber = pocketPtr->itemInfo.size();
-                mainName += std::to_wstring(itemNumber) + L" items";
-			}
-
-			mainName += L")";
-		}
-	}
-
-
+	
+	
 	const int widthLimit = 168;
-	if (queryTextWidth(mainName) > widthLimit)
-	{
-		setFontSize(10);
+	ItemPocket* pocketPtr = inputItem.pocketPtr.get();
 
-		if (queryTextWidth(mainName) > widthLimit)
+	auto drawVolumeGauge = [&](int currentVol, int maxVol) 
+		{
+		drawRect(itemBox.x + 201, itemBox.y + 2, 5, 22, col::white);
+		int gaugeHeight = 18;
+		int currentGaugeHeight = 0;
+
+		if (maxVol > 0 && currentVol > 0) 
+		{
+			currentGaugeHeight = (currentVol * gaugeHeight) / maxVol;
+			if (currentGaugeHeight > gaugeHeight) currentGaugeHeight = gaugeHeight;
+			if (currentGaugeHeight == 0) currentGaugeHeight = 1; // 최소 1픽셀 보장
+		}
+
+		if (currentGaugeHeight > 0) 
+		{
+			// drawLine으로 세로 라인들을 그려서 게이지 채우기
+			for (int i = 0; i < currentGaugeHeight; i++) {
+				drawLine(itemBox.x + 203, itemBox.y + 4 + (gaugeHeight - currentGaugeHeight) + i,
+					itemBox.x + 203, itemBox.y + 4 + (gaugeHeight - currentGaugeHeight) + i, col::white);
+			}
+		}
+		};
+
+
+	auto renderTextsWithSubInfo = [&](const std::wstring& mainText, const std::wstring& subText) {
+		setFontSize(10);
+		yCorrection = -4;
+		if (queryTextWidth(mainText) > widthLimit) 
 		{
 			setFontSize(8);
-			renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+			renderText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
 		}
-		else renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
-		
-	}
-	else
+		else  renderText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+		setFontSize(8);
+		renderText(subText, itemBox.x + 42, itemBox.y + itemBox.h / 2 + 1);
+		};
+
+	if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ) && pocketPtr->itemInfo.size() > 0) 
 	{
-		setFontSize(12);
-		renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
+		std::wstring insideStr = L"(";
+		insideStr += pocketPtr->itemInfo[0].name + L" ";
+		int maxVol = inputItem.pocketMaxVolume;
+		int currentVol = pocketPtr->getPocketVolume();
+		insideStr += std::to_wstring(currentVol);
+		insideStr += L"/";
+		insideStr += std::to_wstring(maxVol);
+		insideStr += L"mL)";
+
+		renderTextsWithSubInfo(mainName, insideStr);
+		drawVolumeGauge(currentVol, maxVol);
+	}
+	else if (inputItem.pocketMaxVolume > 0 && pocketPtr->itemInfo.size() > 0) 
+	{
+		std::wstring insideStr = L"(";
+		if (pocketPtr->itemInfo.size() == 1) insideStr += pocketPtr->itemInfo[0].name + L")";
+		else if (pocketPtr->itemInfo.size() > 1) insideStr += std::to_wstring(pocketPtr->itemInfo.size()) + L" items)";
+		int maxVol = inputItem.pocketMaxVolume;
+		int currentVol = pocketPtr->getPocketVolume();
+
+		renderTextsWithSubInfo(mainName, insideStr);
+		drawVolumeGauge(currentVol, maxVol);
+	}
+	else 
+	{
+		if (queryTextWidth(mainName) > widthLimit) 
+		{
+			setFontSize(10);
+			if (queryTextWidth(mainName) > widthLimit) 
+			{
+				setFontSize(8);
+				renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+			}
+			else renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+		}
+		else 
+		{
+			setFontSize(12);
+			renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
+		}
 	}
 
 
-	//while (queryTextWidth(mainName) > widthLimit)
-	//{
-	//	if (fontSize >= 14)
-	//	{
-	//		fontSize -= 1;
-	//		yCorrection += 1;
-	//		setFontSize(fontSize);
-	//	}
-	//	else
-	//	{
-	//		split = true;
-	//		break;
-	//	}
-	//}
-	//if (!split) renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h/2 - 9 + yCorrection);
-	//else renderTextWidth(col2Str(col::white) + mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection - 8, false, widthLimit, 15, 2);
+
+
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
