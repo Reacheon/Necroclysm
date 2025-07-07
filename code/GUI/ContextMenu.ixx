@@ -283,7 +283,10 @@ public:
 									//drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
 
 									int currentVolume = 0;
-									for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+									for (int i = 0; i < pkPtr->itemInfo.size(); i++)
+									{
+										currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+									}
 									float volumeRatio = (float)currentVolume / (float)tgtPart.pocketMaxVolume;
 									SDL_Color gaugeCol = lowCol::green;
 									if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;

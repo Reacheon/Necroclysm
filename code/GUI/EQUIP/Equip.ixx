@@ -294,7 +294,7 @@ public:
 			//쏟기 추가
 			if (targetItem.pocketMaxVolume > 0 && targetItem.pocketPtr.get()->itemInfo.size() > 0)
 			{
-				barAct.push_back(act::spill);
+				barAct.push_back(act::dump);
 			}
 		}
 	}

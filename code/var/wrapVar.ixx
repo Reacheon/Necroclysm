@@ -222,3 +222,17 @@ export Point2 getAbsMouseGrid()
     return { cameraGridX + revGridX, cameraGridY + revGridY };
 }
 
+export int getVolume(const ItemData& inputData)
+{
+    int baseVolume = inputData.volume;
+
+    if (inputData.checkFlag(itemFlag::CONTAINER_FLEX) && inputData.pocketPtr != nullptr)
+    {
+        for (const auto& item : inputData.pocketPtr->itemInfo)
+        {
+            baseVolume += getVolume(item) * item.number;
+        }
+    }
+
+    return baseVolume;
+}

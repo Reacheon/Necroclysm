@@ -230,7 +230,7 @@ export enum class act
 
     drinkFloorWater, //바닥물 마시기
 
-    spill, //쏟기 (포켓 내부에 있는 아이템을 바닥에 쏟음)
+    dump, //쏟기 (포켓 내부에 있는 아이템을 바닥에 쏟음)
 
     //skillInfo,
 };
@@ -540,6 +540,8 @@ export enum class itemFlag
 
     CAN_EAT,
     CAN_DRINK,
+
+    CONTAINER_FLEX, //내부에 들어있는 아이템에 따라 부피가 더해짐
 };
 
 export enum class walkFlag

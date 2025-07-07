@@ -148,7 +148,7 @@ __int64 playerInputTurn()
 		firstMonsterAI = true;
 		firstMonsterAnime = true;
 
-		prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
+		//prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
 
 		//플레이어턴에 이전에 사용된 큐들 지우는 코드, 활성화하면 버그는 줄어들지만 조작감이 나빠진다...
 		//SDL_Event tempEvent;
@@ -213,164 +213,171 @@ __int64 playerInputTurn()
 	}
 	else
 	{
+		bool first = true;
 		while (SDL_PollEvent(&event))
 		{
-			switch (event.type)
+			if (first)
 			{
-			case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-				if (option::inputMethod != input::gamepad)
+				switch (event.type)
 				{
-					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
-					option::inputMethod = input::gamepad;
-				}
-				gamepadBtnDown();
-				break;
-			case SDL_EVENT_GAMEPAD_BUTTON_UP:
-				if (option::inputMethod != input::gamepad)
-				{
-					updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
-					option::inputMethod = input::gamepad;
-				}
-				gamepadBtnUp();
-				break;
-			case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-				gamepadBtnMotion();
-			case SDL_EVENT_WINDOW_RESIZED:
-				SDL_SetRenderLogicalPresentation(renderer,
-					434,
-					244,
-					SDL_LOGICAL_PRESENTATION_LETTERBOX);
-				break;
-			case SDL_EVENT_QUIT:
-				//IMG_Quit();
-				TTF_Quit();
-				SDL_Quit();
-				exit(0);
-				break;
-			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				if (option::inputMethod != input::mouse)
-				{
-					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					option::inputMethod = input::mouse;
-				}
-
-				if (option::inputMethod == input::mouse) { clickDown(); }
-				break;
-			case SDL_EVENT_FINGER_DOWN:
-				if (option::inputMethod == input::touch) { clickDown(); }
-				break;
-			case SDL_EVENT_MOUSE_MOTION:
-				if (option::inputMethod != input::mouse)
-				{
-					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					option::inputMethod = input::mouse;
-				}
-
-				if (option::inputMethod == input::mouse) { clickMotion(); }
-				break;
-			case SDL_EVENT_FINGER_MOTION:
-				if (option::inputMethod == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
-				{
-					clickMotion();
-				}
-				break;
-			case SDL_EVENT_MOUSE_BUTTON_UP:
-				if (option::inputMethod != input::mouse)
-				{
-					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					option::inputMethod = input::mouse;
-				}
-
-				if (option::inputMethod == input::mouse)
-				{
-					if (event.button.button == SDL_BUTTON_LEFT) clickUp();
-					else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
-				}
-				break;
-			case SDL_EVENT_FINGER_UP:
-				if (option::inputMethod == input::touch) { clickUp(); }
-				break;
-			case SDL_EVENT_MOUSE_WHEEL:
-				if (option::inputMethod != input::mouse)
-				{
-					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					option::inputMethod = input::mouse;
-				}
-				mouseWheel();
-
-				break;
-			case SDL_EVENT_KEY_DOWN:
-				if (exInput == true && event.key.key == UNI::BACKSPACE)
-				{
-					prt(L"백스페이스 키 입력됨\n");
-					if (!exInputEditing)
+				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+					if (option::inputMethod != input::gamepad)
 					{
-						if (exInputCursor != 0) { --exInputCursor; }
-						exInputText.erase(exInputCursor, 1);
+						updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+						option::inputMethod = input::gamepad;
 					}
-				}
-				else
-				{
+					gamepadBtnDown();
+					break;
+				case SDL_EVENT_GAMEPAD_BUTTON_UP:
+					if (option::inputMethod != input::gamepad)
+					{
+						updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+						option::inputMethod = input::gamepad;
+					}
+					gamepadBtnUp();
+					break;
+				case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+					gamepadBtnMotion();
+				case SDL_EVENT_WINDOW_RESIZED:
+					SDL_SetRenderLogicalPresentation(renderer,
+						434,
+						244,
+						SDL_LOGICAL_PRESENTATION_LETTERBOX);
+					break;
+				case SDL_EVENT_QUIT:
+					//IMG_Quit();
+					TTF_Quit();
+					SDL_Quit();
+					exit(0);
+					break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					if (option::inputMethod != input::mouse)
 					{
 						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
 						option::inputMethod = input::mouse;
 					}
-					keyboardBtnDown();
-				}
-				break;
-			case SDL_EVENT_KEY_UP:
-				if (option::inputMethod != input::mouse)
-				{
-					updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
-					option::inputMethod = input::mouse;
-				}
-				keyboardBtnUp();
-				break;
-			case SDL_EVENT_TEXT_INPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
-			{
-				if (exInput == true)
-				{
-					prt(L"완성 이벤트 실행됨\n");
-					std::wstring singleChar = L"";
-					singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
-					if (exInputCursor > exInputText.size()) exInputCursor = exInputText.size();
-					if (!singleChar.empty() && singleChar[0] != L'\0')
+
+					if (option::inputMethod == input::mouse) { clickDown(); }
+					break;
+				case SDL_EVENT_FINGER_DOWN:
+					if (option::inputMethod == input::touch) { clickDown(); }
+					break;
+				case SDL_EVENT_MOUSE_MOTION:
+					if (option::inputMethod != input::mouse)
 					{
-						exInputText.insert(exInputCursor, singleChar);
-						exInputCursor += singleChar.length();
+						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						option::inputMethod = input::mouse;
 					}
-					exInputEditing = false;
-					if (exInputText.size() > EX_INPUT_TEXT_MAX)
+
+					if (option::inputMethod == input::mouse) { clickMotion(); }
+					break;
+				case SDL_EVENT_FINGER_MOTION:
+					if (option::inputMethod == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
 					{
-						exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
-						exInputCursor = EX_INPUT_TEXT_MAX;
+						clickMotion();
 					}
-				}
-				break;
-			}
-			case SDL_EVENT_TEXT_EDITING: //텍스트가 입력 되었을 때의 이벤트(미완성도 실행됨, TEXTINPUT보다 더 큰 개념)
-			{
-				if (exInput == true)
+					break;
+				case SDL_EVENT_MOUSE_BUTTON_UP:
+					if (option::inputMethod != input::mouse)
+					{
+						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						option::inputMethod = input::mouse;
+					}
+
+					if (option::inputMethod == input::mouse)
+					{
+						if (event.button.button == SDL_BUTTON_LEFT) clickUp();
+						else if (event.button.button == SDL_BUTTON_RIGHT) clickRight();
+					}
+					break;
+				case SDL_EVENT_FINGER_UP:
+					if (option::inputMethod == input::touch) { clickUp(); }
+					break;
+				case SDL_EVENT_MOUSE_WHEEL:
+					if (option::inputMethod != input::mouse)
+					{
+						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						option::inputMethod = input::mouse;
+					}
+					mouseWheel();
+
+					break;
+				case SDL_EVENT_KEY_DOWN:
+					if (exInput == true && event.key.key == UNI::BACKSPACE)
+					{
+						prt(L"백스페이스 키 입력됨\n");
+						if (!exInputEditing)
+						{
+							if (exInputCursor != 0) { --exInputCursor; }
+							exInputText.erase(exInputCursor, 1);
+						}
+					}
+					else
+					{
+						if (option::inputMethod != input::mouse)
+						{
+							updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+							option::inputMethod = input::mouse;
+						}
+						keyboardBtnDown();
+					}
+					break;
+				case SDL_EVENT_KEY_UP:
+					if (option::inputMethod != input::mouse)
+					{
+						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						option::inputMethod = input::mouse;
+					}
+					keyboardBtnUp();
+					break;
+				case SDL_EVENT_TEXT_INPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
 				{
-					prt(L"편집 이벤트 입력됨\n");
-					std::wstring singleChar = L"";
-					singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
-					exInputText.replace(exInputCursor, 1, singleChar);
-					if (exInputText[exInputCursor] == 0) { exInputEditing = false; }
-					else { exInputEditing = true; }
-					if (exInputText.size() > EX_INPUT_TEXT_MAX)
+					if (exInput == true)
 					{
-						exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
-						exInputCursor = EX_INPUT_TEXT_MAX;
+						prt(L"완성 이벤트 실행됨\n");
+						std::wstring singleChar = L"";
+						singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
+						if (exInputCursor > exInputText.size()) exInputCursor = exInputText.size();
+						if (!singleChar.empty() && singleChar[0] != L'\0')
+						{
+							exInputText.insert(exInputCursor, singleChar);
+							exInputCursor += singleChar.length();
+						}
+						exInputEditing = false;
+						if (exInputText.size() > EX_INPUT_TEXT_MAX)
+						{
+							exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
+							exInputCursor = EX_INPUT_TEXT_MAX;
+						}
 					}
+					break;
 				}
-				break;
-			}
+				case SDL_EVENT_TEXT_EDITING: //텍스트가 입력 되었을 때의 이벤트(미완성도 실행됨, TEXTINPUT보다 더 큰 개념)
+				{
+					if (exInput == true)
+					{
+						prt(L"편집 이벤트 입력됨\n");
+						std::wstring singleChar = L"";
+						singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
+						exInputText.replace(exInputCursor, 1, singleChar);
+						if (exInputText[exInputCursor] == 0) { exInputEditing = false; }
+						else { exInputEditing = true; }
+						if (exInputText.size() > EX_INPUT_TEXT_MAX)
+						{
+							exInputText = exInputText.substr(0, EX_INPUT_TEXT_MAX);
+							exInputCursor = EX_INPUT_TEXT_MAX;
+						}
+					}
+					break;
+				}
 
 
 
+				}
+
+				first = true;
 			}
+			
 		}
 
 	}

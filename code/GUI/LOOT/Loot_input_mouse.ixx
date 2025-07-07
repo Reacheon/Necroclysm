@@ -186,7 +186,7 @@ void Loot::clickUpGUI()
 					updateBarAct();
 					close(aniFlag::null);
 					return;
-				case act::spill:
+				case act::dump:
 					actFunc::spillPocket(lootPocket->itemInfo[lootCursor]);
 					updateBarAct();
 					return;

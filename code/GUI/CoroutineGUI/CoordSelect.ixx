@@ -28,7 +28,7 @@ private:
 	std::wstring parameter = L"";
 	std::vector<std::array<int, 2>> selectableCoord;
 	
-	bool advance = false; //좌표를 선택하고 확인 버튼을 한번 더 눌러야 진행되는 옵션
+	bool advance = false; //좌표를 선택하고 확인 버튼을 한번 더 눌러야 진행되는 옵션2
 	int advanceIconIndex = -1;
 
 	CoordSelectFlag type = CoordSelectFlag::NONE;
@@ -36,7 +36,6 @@ private:
 public:
 	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr) : GUI(true)
 	{
-		PlayerPtr->deactAStarDst();//임시
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
@@ -50,7 +49,6 @@ public:
 	//셀렉터블 코드는 상대좌표 기준
 	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
 	{
-		PlayerPtr->deactAStarDst();
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;

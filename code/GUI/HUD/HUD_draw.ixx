@@ -1211,7 +1211,7 @@ void HUD::drawBarAct()
 			else setBtnLayout(sysStr[205], 164);
 		}
 		else if (barAct[i] == act::drink) setBtnLayout(sysStr[210], 37);
-		else if (barAct[i] == act::spill ) setBtnLayout(sysStr[296], 174);
+		else if (barAct[i] == act::dump ) setBtnLayout(sysStr[296], 174);
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기

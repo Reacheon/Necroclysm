@@ -488,6 +488,7 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"ENGINE_ELECTRIC") itemDex[tgtIndex].flag.push_back(itemFlag::ENGINE_ELECTRIC);
                                 else if (strFragment.substr(0, j) == L"CAN_EAT") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_EAT);
                                 else if (strFragment.substr(0, j) == L"CAN_DRINK") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_DRINK);
+                                else if (strFragment.substr(0, j) == L"CONTAINER_FLEX") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_FLEX);
                                 else
                                 {
                                     errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

@@ -119,7 +119,7 @@ void Equip::clickUpGUI()
 					updateBarAct();
 					close(aniFlag::null);
 					return;
-				case act::spill:
+				case act::dump:
 					actFunc::spillPocket(equipPtr->itemInfo[equipCursor]);
 					updateBarAct();
 					return;
