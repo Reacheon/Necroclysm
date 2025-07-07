@@ -355,8 +355,8 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 
 
 
-		drawSpriteCenter(spr::icon13, 29, box3.x + 10, box2.y + 9 - 4);
-		drawSpriteCenter(spr::icon13, 30, box3.x + 10, box2.y + 9 + 16 - 7);
+		drawSpriteCenter(spr::icon13, 39, box3.x + 10, box2.y + 12 - 4);
+		drawSpriteCenter(spr::icon13, 40, box3.x + 10, box2.y + 10 + 16 - 7);
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		setFontSize(8);
@@ -375,12 +375,12 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		if (inputItem.volume > 1000)
 		{
 			std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
-			renderText(volStr + L" L", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+			renderText(volStr + L" L", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		else
 		{
 			std::wstring volStr = std::to_wstring(inputItem.volume);
-			renderText(volStr + L" mL", box3.x + 10 + 9, box2.y + 13 + 16 - 7 - 7);
+			renderText(volStr + L" mL", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		
 	}

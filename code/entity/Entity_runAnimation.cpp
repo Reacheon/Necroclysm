@@ -1007,7 +1007,6 @@ bool Entity::runAnimation(bool shutdown)
 				createItemStack(dstGrid);
 				targetStack = TileItemStack(dstGrid);
 				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
-				targetStack->updateSprIndex();
 				addAniUSetPlayer(targetStack, aniFlag::drop);
 
 				delete sPtr;

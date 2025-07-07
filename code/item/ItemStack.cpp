@@ -18,6 +18,7 @@ import Coord;
 
 ItemStack::ItemStack(Point3 inputCoor)
 {
+    errorBox(TileItemStack(inputCoor) != nullptr, L"ItemStack : 이미 해당 좌표에 스택이 존재합니다.");
 	storage = std::make_unique<ItemPocket>(storageType::stack);
 	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
@@ -25,6 +26,7 @@ ItemStack::ItemStack(Point3 inputCoor)
 
 ItemStack::ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
+	errorBox(TileItemStack(inputCoor) != nullptr, L"ItemStack : 이미 해당 좌표에 스택이 존재합니다.");
 	storage = std::make_unique<ItemPocket>(storageType::stack);
 	setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 	setSprite(spr::itemset);
@@ -56,15 +58,6 @@ void ItemStack::checkEmpty()
 	if (storage->itemInfo.size() == 0)
 	{
 		delete this;
-	}
-}
-//@brief 현재 가지고 있는 스토리지에서 대표 sprIndex를 결정함
-void ItemStack::updateSprIndex()
-{
-	//일단 0번째 아이템을 대표로 하도록 설정(임시)
-	if (getPocket()->itemInfo.size() > 0)
-	{
-		sprIndex = getPocket()->itemInfo[0].sprIndex;
 	}
 }
 void ItemStack::pullStackLights()
@@ -172,7 +165,6 @@ bool ItemStack::runAnimation(bool shutdown)
 				{
 					storage->eraseItemInfo(i);
 					storage->addItemFromDex(11, 1);
-					updateSprIndex();
 				}
 			}
 

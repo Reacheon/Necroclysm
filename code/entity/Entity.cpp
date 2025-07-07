@@ -698,7 +698,6 @@ void Entity::drop(ItemPocket* txPtr)
 		createItemStack({ getGridX(), getGridY(), getGridZ() });
 		targetStack = TileItemStack(getGridX(), getGridY(), getGridZ());
 		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
-		targetStack->updateSprIndex();
 	}
 	else //이미 그 자리에 아이템이 있는 경우
 	{

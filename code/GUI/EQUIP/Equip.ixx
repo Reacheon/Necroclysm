@@ -290,6 +290,12 @@ public:
 
 			if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
 			else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
+
+			//쏟기 추가
+			if (targetItem.pocketMaxVolume > 0 && targetItem.pocketPtr.get()->itemInfo.size() > 0)
+			{
+				barAct.push_back(act::spill);
+			}
 		}
 	}
 

@@ -186,6 +186,10 @@ void Loot::clickUpGUI()
 					updateBarAct();
 					close(aniFlag::null);
 					return;
+				case act::spill:
+					actFunc::spillPocket(lootPocket->itemInfo[lootCursor]);
+					updateBarAct();
+					return;
 				}
 			}
 		}

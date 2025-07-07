@@ -230,6 +230,8 @@ export enum class act
 
     drinkFloorWater, //바닥물 마시기
 
+    spill, //쏟기 (포켓 내부에 있는 아이템을 바닥에 쏟음)
+
     //skillInfo,
 };
 

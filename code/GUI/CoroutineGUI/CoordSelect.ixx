@@ -36,6 +36,7 @@ private:
 public:
 	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr) : GUI(true)
 	{
+		PlayerPtr->deactAStarDst();//임시
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
@@ -49,6 +50,7 @@ public:
 	//셀렉터블 코드는 상대좌표 기준
 	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
 	{
+		PlayerPtr->deactAStarDst();
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;

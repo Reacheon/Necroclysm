@@ -43,13 +43,13 @@ export void startArea()
 		}
 	);
 
-	createItemStack({ 0, -19, 0 }, {
-	{442, 1}, {443, 1}, {446, 4}, {447, 10}, {449, 1}, {451, 20}
-		}
-	);
+
+	//의약품 상자
 	{
-		ItemStack* targetStack = TileItemStack({ 0, -19, 0 });
-        std::vector<ItemData>& targetItemInfo = targetStack->getPocket()->itemInfo;
+		createItemStack({ 0, -19, 0 }, { { 452,1 } });
+		ItemPocket* aidKitInside = TileItemStack({ 0, -19, 0 })->getPocket()->itemInfo[0].pocketPtr.get();
+		aidKitInside->addItemFromDex({ { 442, 1 }, { 443, 1 }, { 446, 4 }, { 447, 10 }, { 449, 1 }, { 451, 20 } });
+		std::vector<ItemData>& targetItemInfo = aidKitInside->itemInfo;
 		for (int i = 0; i < targetItemInfo.size(); i++)
 		{
 			if (targetItemInfo[i].itemCode == 442)

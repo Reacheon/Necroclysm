@@ -148,13 +148,14 @@ __int64 playerInputTurn()
 		firstMonsterAI = true;
 		firstMonsterAnime = true;
 
-		//prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
+		prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
 
-		SDL_Event tempEvent;
-		while (SDL_PollEvent(&tempEvent))
-		{
-			// 다른 턴에 쌓인 큐에 있는 모든 이벤트를 읽어서 버림
-		}
+		//플레이어턴에 이전에 사용된 큐들 지우는 코드, 활성화하면 버그는 줄어들지만 조작감이 나빠진다...
+		//SDL_Event tempEvent;
+		//while (SDL_PollEvent(&tempEvent))
+		//{
+		//	// 다른 턴에 쌓인 큐에 있는 모든 이벤트를 읽어서 버림
+		//}
 
 		if (coTurnSkip)
 		{
@@ -209,7 +210,6 @@ __int64 playerInputTurn()
 			PlayerPtr->deactAStarDst();
 			isPlayerMoving = false;
 		}
-
 	}
 	else
 	{
@@ -372,6 +372,7 @@ __int64 playerInputTurn()
 
 			}
 		}
+
 	}
 
 	return (getNanoTimer() - timeStampStart);

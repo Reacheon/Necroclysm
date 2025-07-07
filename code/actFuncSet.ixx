@@ -374,4 +374,38 @@ export namespace actFunc
 
 		updateLog(col2Str(col::white) + L"음식을 먹었다. 허기가 해소되었다.");
 	}
+
+	export void spillPocket(ItemData& inputData)
+	{
+		ItemPocket* pPtr = inputData.pocketPtr.get();
+		errorBox(pPtr == nullptr, L"spillPocket: inputData.pocketPtr is nullptr.");
+		errorBox(pPtr->itemInfo.size() == 0, L"spillPocket: inputData.pocketPtr->itemInfo.size() is 0.");
+
+		std::wstring itemName = inputData.name;
+		Point3 playerPos = { PlayerX(), PlayerY(), PlayerZ() };
+
+		// 플레이어 위치에 ItemStack이 있는지 확인
+		ItemStack* existingStack = TileItemStack(playerPos.x, playerPos.y, playerPos.z);
+
+		if (existingStack == nullptr)
+		{
+			// ItemStack이 없으면 새로 생성
+			createItemStack(playerPos);
+			existingStack = TileItemStack(playerPos.x, playerPos.y, playerPos.z);
+			errorBox(existingStack == nullptr, L"spillPocket: Failed to create ItemStack.");
+		}
+
+		ItemPocket* targetPocket = existingStack->getPocket();
+
+		// 포켓의 모든 아이템을 바닥의 ItemStack으로 이동
+		while (pPtr->itemInfo.size() > 0)
+		{
+			// 첫 번째 아이템의 전체 수량을 이동
+			int itemCount = pPtr->itemInfo[0].number;
+			pPtr->transferItem(targetPocket, 0, itemCount);
+		}
+
+		std::wstring logText = replaceStr(sysStr[297],L"(%container)" , itemName);
+		updateLog(col2Str(col::white) + logText);
+	}
 };
