@@ -303,11 +303,11 @@ public:
 			sortType = sortFlag::weightAscend;
 			break;
 		case sortFlag::weightAscend:
-			lootPocket->sortVolumeDescend();
+			sortVolumeDescend(lootPocket->itemInfo);
 			sortType = sortFlag::volumeDescend;
 			break;
 		case sortFlag::volumeDescend:
-			lootPocket->sortVolumeAscend();
+			sortVolumeAscend(lootPocket->itemInfo);
 			sortType = sortFlag::volumeAscend;
 			break;
 		case sortFlag::volumeAscend:
@@ -366,7 +366,7 @@ public:
 			{
 				if (lootPocket->itemInfo[i].lootSelect > 0)
 				{
-					itemsVol += lootPocket->itemInfo[i].lootSelect * lootPocket->itemInfo[i].volume;
+					itemsVol += lootPocket->itemInfo[i].lootSelect * getVolume(lootPocket->itemInfo[i]);
 				}
 			}
 

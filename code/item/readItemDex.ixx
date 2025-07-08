@@ -362,7 +362,7 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].weight = wtoi(strFragment.c_str());
                         break;
                     case csvItem::volume:
-                        itemDex[tgtIndex].volume = wtoi(strFragment.c_str());
+                        itemDex[tgtIndex].originalVolume = wtoi(strFragment.c_str());
                         break;
                     case csvItem::material:
                         break;

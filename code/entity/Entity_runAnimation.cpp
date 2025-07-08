@@ -931,7 +931,7 @@ bool Entity::runAnimation(bool shutdown)
             Prop* propPtr = TileProp(dstGrid.x, dstGrid.y, dstGrid.z);
 			throwToProp = propPtr != nullptr
 				&& propPtr->leadItem.pocketPtr != nullptr
-				&& propPtr->leadItem.pocketPtr->getPocketVolume() + throwingItemPocket->itemInfo[0].volume < propPtr->leadItem.pocketMaxVolume;
+				&& propPtr->leadItem.pocketPtr->getPocketVolume() + getVolume(throwingItemPocket->itemInfo[0]) < propPtr->leadItem.pocketMaxVolume;
             
 			Vehicle* vPtr = TileVehicle(dstGrid.x, dstGrid.y, dstGrid.z);
 			bool throwToVehicle = false;
@@ -941,7 +941,7 @@ bool Entity::runAnimation(bool shutdown)
 				ItemPocket* vParts = vPtr->partInfo[{ dstGrid.x, dstGrid.y }].get();
 				for (int i = vParts->itemInfo.size()-1; i >= 0; i--)
 				{
-					if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + throwingItemPocket->itemInfo[0].volume)
+					if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + getVolume(throwingItemPocket->itemInfo[0]))
 					{
 						throwToVehicle = true;
 						throwTargetPocket = vParts->itemInfo[i].pocketPtr.get();
@@ -1150,6 +1150,9 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (getTimer() == 1)
 		{
+			
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			entityInfo.walkMode = walkFlag::crouch;
 			int skillX = getSkillTarget().x;
 			int skillY = getSkillTarget().y;
@@ -1218,7 +1221,12 @@ bool Entity::runAnimation(bool shutdown)
 			turnWait(1.0);
 			entityInfo.walkMode = walkFlag::walk;
 			endMove();
-			if (entityInfo.isPlayer) cameraFix = true;
+			if (entityInfo.isPlayer)
+			{
+				cameraFix = true;
+				cameraX = getX();
+				cameraY = getY();
+			}
 			return true;
 		}
 	}

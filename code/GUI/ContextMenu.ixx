@@ -285,7 +285,7 @@ public:
 									int currentVolume = 0;
 									for (int i = 0; i < pkPtr->itemInfo.size(); i++)
 									{
-										currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+										currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
 									}
 									float volumeRatio = (float)currentVolume / (float)tgtPart.pocketMaxVolume;
 									SDL_Color gaugeCol = lowCol::green;

@@ -526,7 +526,7 @@ void Craft::drawGUI()
 				renderText(weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
 
 				std::wstring volumeStr = sysStr[18] + L" : ";
-				volumeStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].volume)) / 1000.0, 3);
+				volumeStr += decimalCutter(((float)getVolume(recipePtr->itemInfo[targetCursor])) / 1000.0, 3);
 				volumeStr += L"L";
 				renderText(volumeStr, topWindow.x + 168, topWindow.y + 12 + 32);
 

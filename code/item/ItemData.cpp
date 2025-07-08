@@ -96,7 +96,7 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
     if (category != tgtItem.category) { return false; }
     if (subcategory != tgtItem.subcategory) { return false; }
     if (weight != tgtItem.weight) { return false; }
-    if (volume != tgtItem.volume) { return false; }
+    if (originalVolume != tgtItem.originalVolume) { return false; }
     if (material != tgtItem.material) { return false; }
     if (toolQuality != tgtItem.toolQuality) { return false; }
     if (recipe != tgtItem.recipe) { return false; }

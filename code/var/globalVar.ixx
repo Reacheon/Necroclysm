@@ -78,11 +78,19 @@ export std::vector<std::wstring> itemTooltip;
 export std::vector<std::wstring> entityTooltip;
 
 export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; // 화면에 고정되는 텍스처 객체에 대한 맵
+
+/*******************************************************************************
+* 카메라 관련 변수들
+* 부피는 CONTAINER_FLEX로 인해 가변적이므로 반드시 래퍼 함수를 거쳐야 함
+* ItemData의 originalVolume을 사용하는 코드가 이 래퍼함수 이외에 존재하면 제거할 것
+ *******************************************************************************/
 export int cameraW = 304; // 카메라의 Width
 export int cameraH = 244; // 카메라의 Height
 export bool cameraFix = true; //카메라를 플레이어에 고정
 export int cameraX = 0; // 카메라의 X 좌표(좌측상단)
 export int cameraY = 0; // 카메라의 Y 좌표(좌측상단)
+/*******************************************************************************/
+
 //여기가 체크포인트
 export float zoomScale = 3.0; // 줌 배율, 2.0부터 시작
 export SDL_Event event; // SDL 이벤트

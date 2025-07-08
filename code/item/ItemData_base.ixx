@@ -13,7 +13,7 @@ export struct ItemDataBase
     itemCategory category = itemCategory::materials;
     itemSubcategory subcategory = itemSubcategory::material_etc;
     unsigned __int32 weight = 1000;
-    unsigned __int32 volume = 1000;
+    unsigned __int32 originalVolume = 1000;
     std::vector<unsigned __int16> material;
     std::vector<itemFlag> flag;
 

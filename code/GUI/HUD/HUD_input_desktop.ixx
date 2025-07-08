@@ -100,9 +100,8 @@ void HUD::clickUpGUI()
 	{
 		if (dragQuickSlotTarget == -1)
 		{
-			cameraFix = true;
-			clickTile = { getAbsMouseGrid().x,getAbsMouseGrid().y };
 			prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
+			clickTile = { getAbsMouseGrid().x,getAbsMouseGrid().y };
 			tileTouch(clickTile.x, clickTile.y);
 		}
 	}

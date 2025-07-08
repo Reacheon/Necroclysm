@@ -17,6 +17,9 @@ import CoordSelect;
 
 export Corouter useSkill(int skillCode)
 {
+	PlayerPtr->deactAStarDst();
+	if (turnCycle != turn::playerInput) co_return;
+
 	const int SKILL_MAX_RANGE = 30;
 	currentUsingSkill = skillCode;
 	switch (skillCode)
@@ -89,11 +92,10 @@ export Corouter useSkill(int skillCode)
 			int targetZ = wtoi(targetStr.c_str());
 			PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
 
-
 			int prevGridX = PlayerPtr->getGridX();
 			int prevGridY = PlayerPtr->getGridY();
-			int dstGridX = targetX;
-			int dstGridY = targetY;
+			int dstGridX = PlayerPtr->getSkillTarget().x;
+			int dstGridY = PlayerPtr->getSkillTarget().y;
 			int dGridX = dstGridX - prevGridX;
 			int dGridY = dstGridY - prevGridY;
 
@@ -101,12 +103,14 @@ export Corouter useSkill(int skillCode)
 			else if (dGridX < 0) PlayerPtr->setDirection(4);
 
 			PlayerPtr->entityInfo.gridMoveSpd = 1.0;
-			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { targetX, targetY, PlayerPtr->getGridZ() });
+			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
 			PlayerPtr->setFakeX(-16 * dGridX);
 			PlayerPtr->setFakeY(-16 * dGridY);
+
 			cameraFix = false;
 			cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
 			cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
+			
 			addAniUSetPlayer(PlayerPtr, aniFlag::roll);
 		}
 		rangeSet.clear();
@@ -152,8 +156,8 @@ export Corouter useSkill(int skillCode)
 
 			int prevGridX = PlayerPtr->getGridX();
 			int prevGridY = PlayerPtr->getGridY();
-			int dstGridX = targetX;
-			int dstGridY = targetY;
+			int dstGridX = PlayerPtr->getSkillTarget().x;
+			int dstGridY = PlayerPtr->getSkillTarget().y;
 			int dGridX = dstGridX - prevGridX;
 			int dGridY = dstGridY - prevGridY;
 
@@ -161,12 +165,14 @@ export Corouter useSkill(int skillCode)
 			else if (dGridX < 0) PlayerPtr->setDirection(4);
 
 			PlayerPtr->entityInfo.gridMoveSpd = 1.0;
-			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { targetX, targetY, PlayerPtr->getGridZ() });
+			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
 			PlayerPtr->setFakeX(-16 * dGridX);
 			PlayerPtr->setFakeY(-16 * dGridY);
+
 			cameraFix = false;
 			cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
 			cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
+
 			addAniUSetPlayer(PlayerPtr, aniFlag::leap);
 		}
 		rangeSet.clear();

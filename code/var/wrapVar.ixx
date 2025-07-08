@@ -222,9 +222,15 @@ export Point2 getAbsMouseGrid()
     return { cameraGridX + revGridX, cameraGridY + revGridY };
 }
 
+/*******************************************************************************
+* 부피 관련 변수들
+* 부피는 CONTAINER_FLEX로 인해 가변적이므로 반드시 래퍼 함수를 거쳐야 함
+* ItemData의 originalVolume을 사용하는 코드가 이 래퍼함수 이외에 존재하면 제거할 것
+ *******************************************************************************/
+
 export int getVolume(const ItemData& inputData)
 {
-    int baseVolume = inputData.volume;
+    int baseVolume = inputData.originalVolume;
 
     if (inputData.checkFlag(itemFlag::CONTAINER_FLEX) && inputData.pocketPtr != nullptr)
     {
@@ -236,3 +242,25 @@ export int getVolume(const ItemData& inputData)
 
     return baseVolume;
 }
+
+export void sortVolumeDescend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
+{
+    std::sort(inputInfo.begin() + startIndex, inputInfo.begin() + endIndex + 1,
+        [](ItemData& a, ItemData& b)
+        {
+            return (getVolume(a) > getVolume(b));
+        }
+    );
+}
+export void sortVolumeDescend(std::vector<ItemData>& inputInfo) { sortVolumeDescend(inputInfo, 0, inputInfo.size() - 1); }
+
+export void sortVolumeAscend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
+{
+    std::sort(inputInfo.begin() + startIndex, inputInfo.begin() + endIndex + 1,
+        [](ItemData& a, ItemData& b)
+        {
+            return (getVolume(a) < getVolume(b));
+        }
+    );
+}
+export void sortVolumeAscend(std::vector<ItemData>& inputInfo) { sortVolumeAscend(inputInfo, 0, inputInfo.size() - 1); }

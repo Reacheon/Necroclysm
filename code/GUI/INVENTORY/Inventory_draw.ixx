@@ -49,7 +49,7 @@ void Inventory::drawGUI()
 			if (inventoryItemData->pocketMaxVolume > 0)
 			{
 				int currentVolume = 0;
-				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += (pkPtr->itemInfo[i].volume) * (pkPtr->itemInfo[i].number);
+				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
 				float volumeRatio = (float)currentVolume / (float)inventoryItemData->pocketMaxVolume;
 				SDL_Color gaugeCol = lowCol::green;
 				if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;

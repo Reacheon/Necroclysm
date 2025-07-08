@@ -9,6 +9,7 @@ import ItemPocket;
 import globalVar;
 import drawText;
 import constVar;
+import wrapVar;
 import checkCursor;
 import drawSprite;
 import textureVar;
@@ -372,14 +373,14 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 			renderText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
 		}
 
-		if (inputItem.volume > 1000)
+		if (getVolume(inputItem) > 1000)
 		{
-			std::wstring volStr = decimalCutter(inputItem.volume / 1000.0, 2);
+			std::wstring volStr = decimalCutter(getVolume(inputItem) / 1000.0, 2);
 			renderText(volStr + L" L", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		else
 		{
-			std::wstring volStr = std::to_wstring(inputItem.volume);
+			std::wstring volStr = std::to_wstring(getVolume(inputItem));
 			renderText(volStr + L" mL", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		
