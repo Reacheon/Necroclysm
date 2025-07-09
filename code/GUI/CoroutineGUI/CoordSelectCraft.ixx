@@ -67,31 +67,11 @@ public:
 	void drawGUI()
 	{
 		//사념파
-		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 165);
-		renderTextCenter(telepathyStr, cameraW / 2, 165);
+		drawSpriteCenter(spr::floatLog, 0, cameraW / 2 + 20, 105);
+		renderTextCenter(telepathyStr, cameraW / 2 + 20, 105);
 
 		if (targetSelect == false)
 		{
-
-
-			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 표시
-			for (int i = 0; i < selectableCoord.size(); i++)
-			{
-				int revX = PlayerX() + selectableCoord[i][axis::x];
-				int revY = PlayerY() + selectableCoord[i][axis::y];
-
-				setZoom(zoomScale);
-				SDL_SetTextureAlphaMod(spr::yellowMarker->getTexture(), 150);
-				drawSpriteCenter
-				(
-					spr::yellowMarker,
-					0,
-					cameraW / 2 + zoomScale * ((16 * selectableCoord[i][axis::x] + 8) - cameraX),
-					cameraH / 2 + zoomScale * ((16 * selectableCoord[i][axis::y] + 8) - cameraY)
-				);
-				SDL_SetTextureAlphaMod(spr::yellowMarker->getTexture(), 255);
-				setZoom(1.0);
-			}
 
 
 			if (checkCursor(&letterbox) == false && checkCursor(&tab) == false)
@@ -112,11 +92,27 @@ public:
 				revY += sgn(revY) * (8 * zoomScale);
 				revGridY = revY / (16 * zoomScale);
 
+				setZoom(zoomScale);
+				//drawSpriteCenter
+				//(
+				//	spr::whiteMarker,
+				//	0,
+				//	(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
+				//	(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
+				//);
+
 				if (itemDex[rotatedItemCode].checkFlag(itemFlag::PROP_BIG)) revGridY -= 1;
 
-				setZoom(zoomScale);
-				SDL_SetTextureColorMod(spr::propset->getTexture(), 0, 255, 0);
-				SDL_SetTextureAlphaMod(spr::propset->getTexture(), 120);
+				if (rangeSet.find(getAbsMouseGrid()) != rangeSet.end())
+				{
+					SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
+					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+				}
+				else
+				{
+					SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 0, 0);
+					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+				}
 				drawSpriteCenter
 				(
 					spr::propset,
@@ -127,6 +123,10 @@ public:
 				SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
 				SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
 				setZoom(1.0);
+
+
+
+
 			}
 
 

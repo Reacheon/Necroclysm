@@ -72,6 +72,10 @@ public:
 	void changeXY(int inputX, int inputY, bool center) {}
 	void drawGUI()
 	{
+		//사념파
+		drawSpriteCenter(spr::floatLog, 0, cameraW / 2 + 20, 105);
+		renderTextCenter(telepathyStr, cameraW / 2 + 20, 105);
+
 		bool displaySelectableCursor = true;
 		bool yellowFullRectCursor = false;
 
@@ -166,9 +170,7 @@ public:
 			setZoom(1.0);
 		}
 
-		//사념파
-		drawSpriteCenter(spr::floatLog, 0, cameraW / 2 + 20, 105);
-		renderTextCenter(telepathyStr, cameraW / 2 + 20, 105);
+
 	}
 	void clickUpGUI()
 	{

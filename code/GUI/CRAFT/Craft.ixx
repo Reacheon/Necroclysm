@@ -23,7 +23,7 @@ import Prop;
 import turnWait;
 import ItemData;
 import ItemPocket;
-
+import GameOver;
 
 
 export class Craft : public GUI
@@ -814,18 +814,27 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
+						for (int i = 0; i < selectableTile.size(); i++)
+						{
+							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						}
+
 						new CoordSelectCraft(targetItemCode, L"조합한 아이템을 설치할 위치를 선택해주세요.", selectableTile);
 						co_await std::suspend_always();
+						rangeSet.clear();
 						actDraw();
 
-						std::wstring targetStr = coAnswer;
-						int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						targetItemCode = wtoi(targetStr.c_str());
+						if (coAnswer.empty()==false)
+						{
+							std::wstring targetStr = coAnswer;
+							int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							targetItemCode = wtoi(targetStr.c_str());
 
-						buildLocation = { targetX,targetY,PlayerZ() };
+							buildLocation = { targetX,targetY,PlayerZ() };
+						}
 
 					}
 					else
@@ -841,14 +850,19 @@ public:
 			if (existCraftData())
 			{
 				int percent = (int)(100.0 * (float)ongoingElapsedTime / (float)itemDex[ongoingTargetCode].craftTime);
-				new Msg(msgFlag::normal, L"제작", std::to_wstring(percent) + L"%에서 조합을 중단한 아이템이 존재합니다.(%item3)계속 조합하시겠습니까?", { L"네",L"아니오" });
+				new Msg(msgFlag::normal, L"제작", std::to_wstring(percent) + L"%에서 조합을 중단한 아이템이 존재합니다.계속 조합하시겠습니까?", { L"계속",L"아니오",L"파기" }, ongoingTargetCode);
 				deactColorChange = true;
 				co_await std::suspend_always();
 				deactColorChange = false;
 
-				if (coAnswer == L"네")
+				if (coAnswer == L"계속")
 				{
 					loadCraftData(targetItemCode, elapsedTime);
+				}
+				else if (coAnswer == L"아니오")
+				{
+					delete this;
+					co_return;
 				}
 				else
 				{
@@ -864,14 +878,19 @@ public:
 
 				if (dx <= 1 && dy <= 1 && dz == 0)
 				{
-					new Msg(msgFlag::normal, L"제작", L"주변에 조합 중인 건축물이 존재합니다. (%item3) 건축물의 조합을 계속하시겠습니까?", { L"네",L"파기" });
+					new Msg(msgFlag::normal, L"제작", L"조합 중인 아이템이 주변에 있습니다.조합을 계속하시겠습니까?", { L"계속",L"아니오",L"파기" }, ongoingTargetCodeStructure);
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == L"네")
+					if (coAnswer == L"계속")
 					{
 						loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
 						prt(L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation[0], buildLocation[1], buildLocation[2]);
+					}
+					else if (coAnswer == L"아니오")
+					{
+						delete this;
+						co_return;
 					}
 					else
 					{
@@ -881,8 +900,8 @@ public:
 				}
 				else
 				{
-					std::wstring text = replaceStr(L"떨어진 좌표 (▲,▲,▲)에 조합 중인 건축물이 존재합니다. (%item3) 파기하고 새로운 아이템을 제작하시겠습니까?", L"▲", { std::to_wstring(buildLocation[0]),std::to_wstring(buildLocation[1]),std::to_wstring(buildLocation[2]) });
-					new Msg(msgFlag::normal, L"제작", text, { L"네",L"아니오" });
+					std::wstring text = replaceStr(L"떨어진 좌표 (▲,▲,▲)에 조합 중인 아이템이 존재합니다. 파기하고 새로운 아이템을 제작하시겠습니까?", L"▲", { std::to_wstring(buildLocation[0]),std::to_wstring(buildLocation[1]),std::to_wstring(buildLocation[2]) });
+					new Msg(msgFlag::normal, L"제작", text, { L"네",L"아니오" }, ongoingTargetCodeStructure);
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;

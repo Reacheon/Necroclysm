@@ -23,49 +23,44 @@ void Craft::drawGUI()
 
 	if (showCraftingTooltip)
 	{
-		SDL_Rect tooltipBox = { cameraW / 2 - 140, 0, 280,130 };
+		SDL_Rect tooltipBox = { cameraW / 2 - 75, 50, 180, 46 };
 		drawWindow(&tooltipBox);
-
 		setZoom(1.0);
 
-		int markerIndex = 0;
-		if (Msg::ins() == nullptr) markerIndex = (SDL_GetTicks() / 32) % 12;
-
-		drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 78, tooltipBox.y + 6);
-
-		setFontSize(12);
-		renderText(L"아이템 조합 중...", tooltipBox.x + tooltipBox.w / 2 - 40, tooltipBox.y + 14);
-
-		//아이템 아이콘 그리기
-
+		// 아이템 아이콘 (로딩 아이콘 대신)
 		int pivotX = tooltipBox.x + 18;
 		int pivotY = tooltipBox.y + 42;
-		SDL_Rect iconBox = { tooltipBox.x + 36 - 18,tooltipBox.y + 60 - 18,36,36 };
+		SDL_Rect iconBox = { tooltipBox.x + 36 - 18 - 10, tooltipBox.y + 60 - 18 - 37, 36, 36 };
 		drawWindow(&iconBox);
 		setZoom(2.0);
-		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18, pivotY + 18);
+		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18 - 10, pivotY + 18 - 37);
 		setZoom(1.0);
+
+		// 제작 중 텍스트 (점 애니메이션 추가)
+		int dotCount = (SDL_GetTicks() / 800) % 4;
+		std::wstring craftText = L"아이템 조합 중";
+		for (int i = 0; i < dotCount; i++) craftText += L".";
 		setFontSize(12);
-		renderText(itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
+		renderTextCenter(craftText, tooltipBox.x + 113, tooltipBox.y + 12);
 
-
-
-
-		SDL_Rect tooltipGauge = { cameraW / 2 - 130, 100, 260,16 };
+		// 진행 바
+		SDL_Rect tooltipGauge = { tooltipBox.x + 51, tooltipBox.y + 23, 125, 7 };
 		drawRect(tooltipGauge, col::white);
 
-		SDL_Rect tooltipInGauge = { cameraW / 2 - 130 + 4, 100 + 4, 252,8 };
-		tooltipInGauge.w = 252.0 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
+		SDL_Rect tooltipInGauge = { tooltipGauge.x + 2, tooltipGauge.y + 2, 121, 3 };
+		tooltipInGauge.w = 121 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
 		drawFillRect(tooltipInGauge, col::white);
 
-		setFontSize(11);
-		std::wstring topText = std::to_wstring(itemDex[targetItemCode].craftTime - elapsedTime);
-		topText += L" 분 남음 ( ";
-		topText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
-		topText += L"% )";
+		// 남은 시간 텍스트
+		setFontSize(8);
+		int remainingMinutes = itemDex[targetItemCode].craftTime - elapsedTime;
+		std::wstring progressText = std::to_wstring(remainingMinutes) + L" 분 남음 ( ";
+		progressText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
+		progressText += L"% )";
+		renderTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 7);
 
-		renderTextCenter(topText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y - 10);
-
+		setFontSize(10);
+		renderTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + tooltipBox.h + 7);
 	}
 
 

@@ -111,7 +111,6 @@ public:
 			else
 			{
 				// 수면 중일 때는 큰 박스 (게이지 표시용)
-				tooltipBox = { cameraW / 2 - 140, 50, 280, 100 };
 				tooltipBox = { cameraW / 2 - 75, 50, 180, 46 };
 			}
 			drawWindow(&tooltipBox);

@@ -962,14 +962,16 @@ __int64 drawMarkers()
 
 	auto drawEplsionText = [](auto* spr, int spriteIndex, int x, int y) {
 		SDL_SetTextureBlendMode(spr->getTexture(), SDL_BLENDMODE_BLEND);
-		SDL_SetTextureColorMod(spr->getTexture(), 78, 115, 70);
+		SDL_SetTextureColorMod(spr->getTexture(), 255, 255, 255);
+		SDL_SetTextureAlphaMod(spr->getTexture(), 0);
 
 		drawSprite(spr, spriteIndex, x + zoomScale, y);
 		drawSprite(spr, spriteIndex, x, y - zoomScale);
 		drawSprite(spr, spriteIndex, x - zoomScale, y);
 		drawSprite(spr, spriteIndex, x, y + zoomScale);
 
-		SDL_SetTextureColorMod(spr->getTexture(), 138, 175, 130);
+		SDL_SetTextureColorMod(spr->getTexture(), 255, 255, 255);
+		SDL_SetTextureAlphaMod(spr->getTexture(), 255);
 		drawSprite(spr, spriteIndex, x, y);
 		SDL_SetTextureColorMod(spr->getTexture(), 255, 255, 255);
 		};
@@ -1069,11 +1071,16 @@ __int64 drawMarkers()
 				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
 				dst.w = tileSize;
 				dst.h = tileSize;
+
+				int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };
+				int animIndex = (SDL_GetTicks() / 250) % 8;   // 250ms마다 한 스텝 → 1.2초에 한 주기
+				int yOffset = yOffsetSeq[animIndex];
+
 				setZoom(zoomScale);
 				drawSpriteCenter
 				(
 					spr::buildCursor,
-					0,
+					yOffset,
 					dst.x + dst.w / 2,
 					dst.y + dst.h / 2
 				);

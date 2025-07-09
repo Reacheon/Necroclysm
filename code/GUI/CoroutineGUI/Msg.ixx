@@ -22,6 +22,7 @@ import GUI;
 import ItemStack;
 import ItemPocket;
 import drawWindow;
+import ItemData;
 
 //이 msg 클래스는 처음 만들어진 기초 GUI이며 모든 GUI들은 msg를 기반으로 만들어짐
 //msgIndex
@@ -48,8 +49,10 @@ private:
 
 	tabFlag prevTabType;//메시지 창을 열기 전의 탭 타입(닫을 때 원래대로 돌아감)
 
+    int msgItemCode = -1; //메시지 박스에 표시되는 아이템 데이터
+
 public:
-	Msg(msgFlag type, std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option) : GUI(true)
+	Msg(msgFlag type, std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option, int inputMsgItemCode = -1) : GUI(true)
 	{
 		prt(L"Msg : 생성자가 호출되었습니다.\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
@@ -84,6 +87,8 @@ public:
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+
+		msgItemCode = inputMsgItemCode;
 
 		prevTabType = tabType;
 		tabType = tabFlag::closeWin;
@@ -198,14 +203,14 @@ public:
 		loopEnd:
 
 			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 280, -1);
-			else if (targetItemCode != 0)
+			else if (msgItemCode != -1)
 			{
-				renderTextWidth(msgText.substr(0, firstTextEnd + 1), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47, true, 280, -1);
+				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 23, true, 280, -1);
 
-
-
+				
+				
 				int pivotX = msgBase.x + 22;
-				int pivotY = msgBase.y + 86;
+				int pivotY = msgBase.y + 116;
 				SDL_Rect background = { pivotX - 11, pivotY - 4,275,44 };
 				drawStadium(background.x, background.y, background.w, background.h, col::white, 20, 5);
 
@@ -213,16 +218,12 @@ public:
 				SDL_Rect iconBox = { pivotX,pivotY,36,36 };
 				drawWindow(&iconBox);
 				setZoom(2.0);
-				drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18, pivotY + 18);
+				drawSpriteCenter(spr::itemset, itemDex[msgItemCode].sprIndex, pivotX + 18, pivotY + 18);
 				setZoom(1.0);
 				setFontSize(12);
-				renderText(itemDex[targetItemCode].name, pivotX + 50, pivotY + 6);
+				renderText(itemDex[msgItemCode].name, pivotX + 50, pivotY + 7);
 
-				if (lastTextStart <= msgText.size() - 1)
-				{
-					setFontSize(16);
-					renderTextWidth(msgText.substr(lastTextStart), msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 83, true, 280, -1);
-				}
+
 			}
 			else
 			{
