@@ -1253,7 +1253,27 @@ void HUD::drawBarAct()
 
 void HUD::drawStatusEffects()
 {
-	std::vector<std::pair<statusEffectFlag, int>>& myEfcts = PlayerPtr->entityInfo.statusEffects;
+	std::vector<statusEffect>& myEfcts = PlayerPtr->entityInfo.statusEffectVec;
+
+	// 페이크값 업데이트 람다 함수
+	auto updateFakeValue = [](int& fakeValue, int realValue) {
+		int diff = std::abs(fakeValue - realValue);
+		if (diff == 0) return;
+
+		int speed = 1;
+		if (diff > 100) speed = 8;
+		else if (diff > 50) speed = 4;
+		else if (diff > 20) speed = 2;
+
+		if (fakeValue < realValue) fakeValue += std::min(speed, realValue - fakeValue);
+		else if (fakeValue > realValue) fakeValue -= std::min(speed, fakeValue - realValue);
+		};
+
+	// 페이크값들 업데이트
+	updateFakeValue(fakeHunger, hunger);
+	updateFakeValue(fakeThirst, thirst);
+	updateFakeValue(fakeFatigue, fatigue);
+
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
 		int pivotX = 5;
@@ -1263,39 +1283,7 @@ void HUD::drawStatusEffects()
 		SDL_Color textColor = col::white;
 		int textOffsetY = 0;
 
-		static float fakeHunger = hunger;
-		float hungerDiff = std::abs(fakeHunger - hunger);
-		float hungerSpeed = 1.0f;
-		if (hungerDiff > 100.0f) hungerSpeed = 8.0f; 
-		else if (hungerDiff > 50.0f) hungerSpeed = 4.0f;
-		else if (hungerDiff > 20.0f) hungerSpeed = 2.0f;
-		else hungerSpeed = 1.0f;
-		if (fakeHunger < hunger) fakeHunger += hungerSpeed;
-		else if (fakeHunger > hunger) fakeHunger -= hungerSpeed;
-
-		static float fakeThirst = thirst;
-		float thirstDiff = std::abs(fakeThirst - thirst);
-		float thirstSpeed = 1.0f;
-		if (thirstDiff > 100.0f) thirstSpeed = 8.0f;
-		else if (thirstDiff > 50.0f) thirstSpeed = 4.0f;
-		else if (thirstDiff > 20.0f) thirstSpeed = 2.0f;
-		else thirstSpeed = 1.0f;
-		if (fakeThirst < thirst) fakeThirst += thirstSpeed;
-		else if (fakeThirst > thirst) fakeThirst -= thirstSpeed;
-
-		int f = fatigue;
-		static float fakeFatigue = fatigue;
-		float fatigueDiff = std::abs(fakeFatigue - fatigue);
-		float fatigueSpeed = 1.0f;
-		if (fatigueDiff > 100.0f) fatigueSpeed = 8.0f;
-		else if (fatigueDiff > 50.0f) fatigueSpeed = 4.0f;
-		else if (fatigueDiff > 20.0f) fatigueSpeed = 2.0f;
-		else fatigueSpeed = 1.0f;
-		if (fakeFatigue < fatigue) fakeFatigue += fatigueSpeed;
-		else if (fakeFatigue > fatigue) fakeFatigue -= fatigueSpeed;
-
-
-		switch (myEfcts[i].first)
+		switch (myEfcts[i].effectType)
 		{
 		case statusEffectFlag::confused:
 			statEfctName = L"혼란";
@@ -1396,13 +1384,11 @@ void HUD::drawStatusEffects()
 			break;
 		}
 
-
 		setFontSize(10);
 
 		setZoom(1.0);
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
-
 
 		int textWidth = queryTextWidth(statEfctName) + 15;
 
@@ -1414,46 +1400,21 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-
-
-
 		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
 
-		if (myEfcts[i].second > 0)
+        int intDuration = std::ceil(myEfcts[i].duration);
+		
+		if (intDuration > 0)
 		{
-			//setZoom(0.7);
-			//int seg1 = myEfcts[i].second / 100;
-			//int seg2 = (myEfcts[i].second % 100) / 10;
-			//int seg3 = myEfcts[i].second % 10;
-
 			int xCorrection = 0;
-			if (myEfcts[i].second > 999) xCorrection = -8;
-			else if (myEfcts[i].second > 99) xCorrection = -4;
-			else if (myEfcts[i].second < 10) xCorrection = +4;
-
-
-			drawEplsionText(std::to_wstring(myEfcts[i].second), lineStartX + xCorrection, pivotY + 10, col::white);
-
-			//if (seg1 > 0) drawSprite(spr::segment, myEfcts[i].second / 100, pivotX + 97, pivotY + 20);
-			//if (seg2 > 0 || seg1 > 0) drawSprite(spr::segment, (myEfcts[i].second % 100)/10, pivotX + 97 + 11, pivotY + 20);
-			//if (seg3 > 0 || seg2 > 0 || seg3 > 0) drawSprite(spr::segment, myEfcts[i].second % 10, pivotX + 97 + 22, pivotY + 20);
-			//setZoom(1.0);
-		}
-		else
-		{
-			//if (myEfcts[i].first == statusEffectFlag::bleeding)
-			//{
-			//	//게이지
-			//	drawRect(pivotX + 37, pivotY + 20, 61, 11, col::gray);
-			//	drawFillRect(pivotX + 37 + 2, pivotY + 20 + 2, 61 - 4 - 20, 11 - 4, lowCol::red);
-			//}
+			if (intDuration > 999) xCorrection = -8;
+			else if (intDuration > 99) xCorrection = -4;
+			else if (intDuration < 10) xCorrection = +4;
+			drawEplsionText(std::to_wstring(intDuration), lineStartX + xCorrection, pivotY + 10, col::white);
 		}
 
-
-		if (myEfcts[i].first == statusEffectFlag::hungry)
+		if (myEfcts[i].effectType == statusEffectFlag::hungry)
 		{
-
-
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
@@ -1489,10 +1450,8 @@ void HUD::drawStatusEffects()
 			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 2, pivotY + 1);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
-		else if (myEfcts[i].first == statusEffectFlag::dehydrated)
+		else if (myEfcts[i].effectType == statusEffectFlag::dehydrated)
 		{
-
-
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
@@ -1528,7 +1487,7 @@ void HUD::drawStatusEffects()
 			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 2, pivotY + 1);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
-		else if (myEfcts[i].first == statusEffectFlag::tired)
+		else if (myEfcts[i].effectType == statusEffectFlag::tired)
 		{
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;

@@ -117,7 +117,6 @@ void Equip::clickUpGUI()
 				case act::eat:
 					actFunc::eatFood(equipPtr,equipCursor);
 					updateBarAct();
-					close(aniFlag::null);
 					return;
 				case act::dump:
 					actFunc::spillPocket(equipPtr->itemInfo[equipCursor]);

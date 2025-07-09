@@ -77,6 +77,10 @@ private:
 
 	int dragQuickSlotTarget = -1;//HUD에서 스킬창 옮길 때 용도(Skill GUI랑 기능 동일)
 
+	int fakeHunger = hunger;
+	int fakeThirst = thirst;
+	int fakeFatigue = fatigue;
+
 public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
@@ -327,40 +331,7 @@ public:
 		return false;
 	}
 
-	void step()
-	{
-		if (GUI::getLastGUI() == this)
-		{
-			gamepadStep();
-			mouseStep();
-		}
-
-		//현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
-		if (Profic::ins() == nullptr)
-		{
-			for (int i = 0; i < TALENT_SIZE; i++)
-			{
-				if (PlayerPtr->entityInfo.proficFocus[i] > 0) { break; }
-
-				if (i == TALENT_SIZE - 1)
-				{
-					new Profic();
-					Profic::ins()->setWarningIndex(1);
-				}
-			}
-		}
-
-		if (doPopUpSingleHUD == true)
-		{
-			executePopUpSingle();
-			doPopUpSingleHUD = false;
-		}
-		else if (doPopDownHUD == true)
-		{
-			executePopDown();
-			doPopDownHUD = false;
-		}
-	}
+	void step();
 
 	/////////////////////////////////////////////////////////////////////////////////////
 

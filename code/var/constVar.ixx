@@ -1313,6 +1313,7 @@ export enum class gasFlag
 
 export enum statusEffectFlag
 {
+    none = -1,
     confused = 0,
     bleeding = 1,
     hungry = 2,
@@ -1409,6 +1410,13 @@ export class World;
 export class Chunk;
 export class Loot;
 export class LIght;
+
+export class statusEffect
+{
+public:
+    statusEffectFlag effectType = statusEffectFlag::none;
+    float duration = 0;
+};
 
 
 export void turnWait(float waitTime);

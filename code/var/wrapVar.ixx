@@ -264,3 +264,28 @@ export void sortVolumeAscend(std::vector<ItemData>& inputInfo, int startIndex, i
     );
 }
 export void sortVolumeAscend(std::vector<ItemData>& inputInfo) { sortVolumeAscend(inputInfo, 0, inputInfo.size() - 1); }
+
+
+export bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+{
+    for (const auto& effect : inputStatus)
+    {
+        if (effect.effectType == inputFlag) return true;
+    }
+    return false;
+}
+
+export void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+{
+    for (auto it = inputStatus.begin(); it != inputStatus.end();)
+    {
+        if (it->effectType == inputFlag)
+        {
+            it = inputStatus.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}

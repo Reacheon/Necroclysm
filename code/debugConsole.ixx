@@ -308,7 +308,7 @@ export void debugConsole()
 	case 23: //상태이상 생성
 	{
 		int tgtEfctIndex = 0;
-		int tgtEfctDur = 1;
+		float tgtEfctDur = 1.0f;
 
 		prt(L"[1/2] 추가할 상태이상의 인덱스를 입력해주세요.\n");
 		std::cin >> tgtEfctIndex;
@@ -317,7 +317,7 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		PlayerPtr->entityInfo.statusEffects.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
+		PlayerPtr->entityInfo.statusEffectVec.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}

@@ -81,8 +81,6 @@ export std::map<std::wstring, void*, std::greater<std::wstring>> StickerList; //
 
 /*******************************************************************************
 * 카메라 관련 변수들
-* 부피는 CONTAINER_FLEX로 인해 가변적이므로 반드시 래퍼 함수를 거쳐야 함
-* ItemData의 originalVolume을 사용하는 코드가 이 래퍼함수 이외에 존재하면 제거할 것
  *******************************************************************************/
 export int cameraW = 304; // 카메라의 Width
 export int cameraH = 244; // 카메라의 Height

@@ -24,9 +24,9 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
-    PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::hungry, -1 });
-	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::dehydrated, -1 });
-	PlayerPtr->entityInfo.statusEffects.push_back({ statusEffectFlag::tired, -1 });
+    PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
+	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });
+	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::tired, -1 });
 
 
 	//테스트 아이템
@@ -39,7 +39,7 @@ export void startArea()
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
 		{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
 		{17, 1}, {18, 1}, {4, 1}, {5, 8}, {88, 1}, {89, 1000},
-		{91, 1000}, {82, 1},{389,1}, {386,2}, {387,1},{441,3}
+		{91, 1000}, {82, 1},{389,1}, {386,2}, {387,1},{441,99}
 		}
 	);
 

@@ -561,5 +561,8 @@
     <ClCompile Include="code\SystemMenu.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\HUD\HUD_step.ixx">
+      <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

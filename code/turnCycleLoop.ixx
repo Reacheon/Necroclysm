@@ -111,13 +111,13 @@ __int64 playerInputTurn()
 
 		if (hunger < 300)
 		{
-			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
+			auto& statEffects = PlayerPtr->entityInfo.statusEffectVec;
 			if (statEffects.size() == 0)  statEffects.push_back({ statusEffectFlag::hungry, -1 });
 			else
 			{
 				for (int i = 0; i < statEffects.size(); i++)
 				{
-					if (statEffects[i].first == statusEffectFlag::hungry) break;
+					if (statEffects[i].effectType == statusEffectFlag::hungry) break;
 
 					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::hungry, -1 });
 				}
@@ -126,13 +126,13 @@ __int64 playerInputTurn()
 
 		if (thirst < 300)
 		{
-			auto& statEffects = PlayerPtr->entityInfo.statusEffects;
+			auto& statEffects = PlayerPtr->entityInfo.statusEffectVec;
 			if (statEffects.size() == 0) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
 			else
 			{
 				for (int i = 0; i < statEffects.size(); i++)
 				{
-					if (statEffects[i].first == statusEffectFlag::dehydrated) break;
+					if (statEffects[i].effectType == statusEffectFlag::dehydrated) break;
 
 					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
 				}
@@ -526,11 +526,11 @@ __int64 entityAITurn()
 		//턴사이클 모두 종료
 		for (auto ePtr : entityList)
 		{
-			for (auto it = ePtr->entityInfo.statusEffects.begin(); it != ePtr->entityInfo.statusEffects.end();)
+			for (auto it = ePtr->entityInfo.statusEffectVec.begin(); it != ePtr->entityInfo.statusEffectVec.end();)
 			{
-				if (it->second > 0) it->second--;
+				if (it->duration > 0) it->duration--;
 
-				if (it->second == 0) it = ePtr->entityInfo.statusEffects.erase(it);
+				if (it->duration == 0) it = ePtr->entityInfo.statusEffectVec.erase(it);
 				else it++;
 			}
 		}

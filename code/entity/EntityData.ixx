@@ -96,7 +96,7 @@ export struct EntityData : public EntityData_Base
     humanCustom::hair hair = humanCustom::hair::null;
     humanCustom::horn horn = humanCustom::horn::null;
 
-    std::vector<std::pair<statusEffectFlag, int>> statusEffects;
+    std::vector<statusEffect> statusEffectVec;
 
     walkFlag walkMode = walkFlag::walk;
     double gridMoveSpd = 3.0;//그리드와 그리드 사이를 넘어갈 때의 속도

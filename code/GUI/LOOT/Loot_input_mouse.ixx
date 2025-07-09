@@ -178,13 +178,11 @@ void Loot::clickUpGUI()
 					return;
 				case act::drink:
 					actFunc::drinkBottle(lootPocket->itemInfo[lootCursor]);
-					updateBarAct();
 					close(aniFlag::null);
 					return;
 				case act::eat:
 					actFunc::eatFood(lootPocket, lootCursor);
 					updateBarAct();
-					close(aniFlag::null);
 					return;
 				case act::dump:
 					actFunc::spillPocket(lootPocket->itemInfo[lootCursor]);
