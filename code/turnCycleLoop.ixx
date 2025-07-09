@@ -92,7 +92,7 @@ __int64 playerInputTurn()
 				coTurnSkip = false;
 				delete Sleep::ins();
 			}
-			if (GameOver::ins() == nullptr) new GameOver(L"극심한 영양실조로 사망했다.");
+			if (GameOver::ins() == nullptr) GameOver::create(L"극심한 영양실조로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
 		}
@@ -104,7 +104,7 @@ __int64 playerInputTurn()
 				coTurnSkip = false;
 				delete Sleep::ins();
 			}
-			if (GameOver::ins() == nullptr) new GameOver(L"극심한 탈수 증세로 사망했다.");
+			if (GameOver::ins() == nullptr) GameOver::create(L"극심한 탈수 증세로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
 		}
@@ -157,7 +157,7 @@ __int64 playerInputTurn()
 		//	// 다른 턴에 쌓인 큐에 있는 모든 이벤트를 읽어서 버림
 		//}
 
-		if (coTurnSkip)
+		if (coTurnSkip&&GameOver::ins()==nullptr)
 		{
 			//prt(L"메인 함수 코루틴 재실행\n");
 			coTurnSkip = false;

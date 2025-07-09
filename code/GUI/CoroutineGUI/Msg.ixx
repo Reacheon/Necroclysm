@@ -205,8 +205,8 @@ public:
 			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 280, -1);
 			else if (msgItemCode != -1)
 			{
-				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 23, true, 280, -1);
-
+				setFontSize(16);
+				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 20, true, 280, 14);
 				
 				
 				int pivotX = msgBase.x + 22;

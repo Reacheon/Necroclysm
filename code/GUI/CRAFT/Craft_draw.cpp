@@ -15,36 +15,37 @@ import Msg;
 import const2Str;
 import drawItemSlot;
 import Player;
+import GameOver;
 
 
 void Craft::drawGUI()
 {
 	const bool* state = SDL_GetKeyboardState(nullptr);
 
-	if (showCraftingTooltip)
+	if (showCraftingTooltip && GameOver::ins()==nullptr)
 	{
-		SDL_Rect tooltipBox = { cameraW / 2 - 75, 50, 180, 46 };
+		SDL_Rect tooltipBox = { cameraW / 2 - 75, 50, 180, 58 };
 		drawWindow(&tooltipBox);
 		setZoom(1.0);
 
+		int yOffset = 12;
+
 		// 아이템 아이콘 (로딩 아이콘 대신)
-		int pivotX = tooltipBox.x + 18;
-		int pivotY = tooltipBox.y + 42;
-		SDL_Rect iconBox = { tooltipBox.x + 36 - 18 - 10, tooltipBox.y + 60 - 18 - 37, 36, 36 };
+		SDL_Rect iconBox = { tooltipBox.x + 36 - 18 - 10, tooltipBox.y + 60 - 18 - 37 + yOffset, 36, 36 };
 		drawWindow(&iconBox);
 		setZoom(2.0);
-		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, pivotX + 18 - 10, pivotY + 18 - 37);
+		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, iconBox.x + 18, iconBox.y + 18);
 		setZoom(1.0);
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
 		int dotCount = (SDL_GetTicks() / 800) % 4;
-		std::wstring craftText = L"아이템 조합 중";
+		std::wstring craftText = L"Crafting";
 		for (int i = 0; i < dotCount; i++) craftText += L".";
 		setFontSize(12);
-		renderTextCenter(craftText, tooltipBox.x + 113, tooltipBox.y + 12);
+		renderTextCenter(craftText, tooltipBox.x + 113, tooltipBox.y + 12+ yOffset);
 
 		// 진행 바
-		SDL_Rect tooltipGauge = { tooltipBox.x + 51, tooltipBox.y + 23, 125, 7 };
+		SDL_Rect tooltipGauge = { tooltipBox.x + 51, tooltipBox.y + 23 + yOffset, 125, 7 };
 		drawRect(tooltipGauge, col::white);
 
 		SDL_Rect tooltipInGauge = { tooltipGauge.x + 2, tooltipGauge.y + 2, 121, 3 };
@@ -54,13 +55,13 @@ void Craft::drawGUI()
 		// 남은 시간 텍스트
 		setFontSize(8);
 		int remainingMinutes = itemDex[targetItemCode].craftTime - elapsedTime;
-		std::wstring progressText = std::to_wstring(remainingMinutes) + L" 분 남음 ( ";
+		std::wstring progressText = std::to_wstring(remainingMinutes) + L" m left ( ";
 		progressText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
 		progressText += L"% )";
 		renderTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 7);
 
 		setFontSize(10);
-		renderTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + tooltipBox.h + 7);
+		renderTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 7);
 	}
 
 

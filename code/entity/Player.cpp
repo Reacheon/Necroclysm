@@ -408,7 +408,7 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 
 void Player::death()
 {
-	new GameOver(L"HP가 0이 되어 사망했다.");
+	GameOver::create(L"HP가 0이 되어 사망했다.");
 }
 
 int Player::checkItemSur(int index)//주변에 있는 타일을 포함해 아이템을 가지고 있는지 조사

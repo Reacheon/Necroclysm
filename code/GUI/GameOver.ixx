@@ -31,6 +31,15 @@ private:
 
 	int prevBtn = -1;
 public:
+	static GameOver* create(std::wstring inputText)
+	{
+		if (ptr == nullptr)
+		{
+			ptr = new GameOver(inputText);
+		}
+		return ptr;
+	}
+
 	GameOver(std::wstring inputText) : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
