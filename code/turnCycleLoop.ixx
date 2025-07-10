@@ -92,7 +92,7 @@ __int64 playerInputTurn()
 				coTurnSkip = false;
 				delete Sleep::ins();
 			}
-			if (GameOver::ins() == nullptr) GameOver::create(L"극심한 영양실조로 사망했다.");
+			GameOver::create(L"극심한 영양실조로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
 		}
@@ -104,39 +104,16 @@ __int64 playerInputTurn()
 				coTurnSkip = false;
 				delete Sleep::ins();
 			}
-			if (GameOver::ins() == nullptr) GameOver::create(L"극심한 탈수 증세로 사망했다.");
+			GameOver::create(L"극심한 탈수 증세로 사망했다.");
 			PlayerPtr->deactAStarDst();
 			aStarTrail.clear();
 		}
 
-		if (hunger < 300)
+		if (fatigue <= 0)
 		{
-			auto& statEffects = PlayerPtr->entityInfo.statusEffectVec;
-			if (statEffects.size() == 0)  statEffects.push_back({ statusEffectFlag::hungry, -1 });
-			else
-			{
-				for (int i = 0; i < statEffects.size(); i++)
-				{
-					if (statEffects[i].effectType == statusEffectFlag::hungry) break;
-
-					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::hungry, -1 });
-				}
-			}
-		}
-
-		if (thirst < 300)
-		{
-			auto& statEffects = PlayerPtr->entityInfo.statusEffectVec;
-			if (statEffects.size() == 0) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
-			else
-			{
-				for (int i = 0; i < statEffects.size(); i++)
-				{
-					if (statEffects[i].effectType == statusEffectFlag::dehydrated) break;
-
-					if (i == statEffects.size() - 1) statEffects.push_back({ statusEffectFlag::dehydrated, -1 });
-				}
-			}
+			GameOver::create(L"극심한 피로로 사망했다.");
+			PlayerPtr->deactAStarDst();
+			aStarTrail.clear();
 		}
 	}
 

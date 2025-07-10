@@ -1362,6 +1362,9 @@ export enum charSprIndex
     AIM_PISTOL = 43,
     AIM_PISTOL_CROUCH = 44,
     AIM_PISTOL_CRAWL = 45,
+
+    CRAFT1 = 46,
+    CRAFT2 = 47,
 };
 
 export enum class dmgAniFlag

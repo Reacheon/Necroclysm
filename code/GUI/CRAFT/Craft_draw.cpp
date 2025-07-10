@@ -62,6 +62,15 @@ void Craft::drawGUI()
 
 		setFontSize(10);
 		renderTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 7);
+
+		if(SDL_GetTicks() % 1000 < 500)
+		{
+			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT1;
+        }
+		else
+		{
+			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT2;
+		}
 	}
 
 
