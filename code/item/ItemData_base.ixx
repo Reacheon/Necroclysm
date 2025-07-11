@@ -23,7 +23,7 @@ export struct ItemDataBase
 
     std::vector<unsigned __int8> toolQuality;
     unsigned __int8 craftMinUnit = 1;
-    unsigned __int16 craftTime = 100;
+    unsigned __int16 craftTime = 50;
     std::vector<std::pair<unsigned __int16, unsigned __int32>> recipe;
     std::vector<unsigned __int8> recipeQualityNeed;
     std::vector<std::pair<unsigned __int8, unsigned __int8>> recipeProficNeed;
@@ -152,4 +152,6 @@ export struct ItemDataBase
     __int16 propDrawPriority = 0;
 
     __int32 codeID = 0; //랜덤으로 결정되는 ID값, Alchemy가 열릴 때 등... 일시적임(0인 경우 미할당)
+
+    __int32 propWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
 };

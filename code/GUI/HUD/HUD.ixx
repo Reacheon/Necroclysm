@@ -387,7 +387,6 @@ public:
 			new Skill();
 			break;
 		case act::craft:
-			updateLog(L"#FFFFFF조합 창을 열었다.");
 			new Craft();
 			break;
 		case act::construct:

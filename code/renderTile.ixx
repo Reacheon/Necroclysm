@@ -1057,91 +1057,91 @@ __int64 drawMarkers()
 	}
 	whiteMarkerEnd:
 
-	if (Craft::ins() != nullptr && Craft::ins()->getIsNowBuilding())
-	{
-		std::array<int, 3> nowBuildLocation = Craft::ins()->getBuildLocation();
-		if (pZ == nowBuildLocation[2])
-		{
-			SDL_Point pt = { nowBuildLocation[0], nowBuildLocation[1] };
-			if (SDL_PointInRect(&pt, &renderRegion))
-			{
-				int tgtX = nowBuildLocation[0];
-				int tgtY = nowBuildLocation[1];
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
+	//if (Craft::ins() != nullptr && Craft::ins()->getIsNowBuilding())
+	//{
+	//	Point3 nowbuildLocation = Craft::ins()->getBuildLocation();
+	//	if (pZ == nowbuildLocation.z)
+	//	{
+	//		SDL_Point pt = { nowbuildLocation.x, nowbuildLocation.y };
+	//		if (SDL_PointInRect(&pt, &renderRegion))
+	//		{
+	//			int tgtX = nowbuildLocation.x;
+	//			int tgtY = nowbuildLocation.y;
+	//			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+	//			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+	//			dst.w = tileSize;
+	//			dst.h = tileSize;
 
-				int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };
-				int animIndex = (SDL_GetTicks() / 250) % 8;   // 250ms마다 한 스텝 → 1.2초에 한 주기
-				int yOffset = yOffsetSeq[animIndex];
+	//			int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };
+	//			int animIndex = (SDL_GetTicks() / 250) % 8;   // 250ms마다 한 스텝 → 1.2초에 한 주기
+	//			int yOffset = yOffsetSeq[animIndex];
 
-				setZoom(zoomScale);
-				drawSpriteCenter
-				(
-					spr::buildCursor,
-					yOffset,
-					dst.x + dst.w / 2,
-					dst.y + dst.h / 2
-				);
+	//			setZoom(zoomScale);
+	//			drawSpriteCenter
+	//			(
+	//				spr::buildCursor,
+	//				yOffset,
+	//				dst.x + dst.w / 2,
+	//				dst.y + dst.h / 2
+	//			);
 
-				int percent = Craft::ins()->getProcessPercent();
-				if (percent < 10)
-				{
-					drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 5 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 43, dst.x + 9 * zoomScale, dst.y + 11 * zoomScale);
+	//			int percent = Craft::ins()->getProcessPercent();
+	//			if (percent < 10)
+	//			{
+	//				drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 5 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 43, dst.x + 9 * zoomScale, dst.y + 11 * zoomScale);
 
-				}
-				else
-				{
-					drawEplsionText(spr::epsilonFont, 27 + percent / 10, dst.x + 3 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 7 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 43, dst.x + 11 * zoomScale, dst.y + 11 * zoomScale);
-				}
-				setZoom(1.0);
-			}
-		}
-	}
-	else if (Craft::ins() == nullptr && Craft::ins()->existCraftDataStructure())
-	{
-		if (pZ == Craft::getBuildLocation()[2])
-		{
-			SDL_Point pt = { Craft::getBuildLocation()[0], Craft::getBuildLocation()[1] };
-			if (SDL_PointInRect(&pt, &renderRegion))
-			{
-				int tgtX = Craft::getBuildLocation()[0];
-				int tgtY = Craft::getBuildLocation()[1];
-				dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-				dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-				dst.w = tileSize;
-				dst.h = tileSize;
-				setZoom(zoomScale);
-				drawSpriteCenter
-				(
-					spr::buildCursor,
-					0,
-					dst.x + dst.w / 2,
-					dst.y + dst.h / 2
-				);
+	//			}
+	//			else
+	//			{
+	//				drawEplsionText(spr::epsilonFont, 27 + percent / 10, dst.x + 3 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 7 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 43, dst.x + 11 * zoomScale, dst.y + 11 * zoomScale);
+	//			}
+	//			setZoom(1.0);
+	//		}
+	//	}
+	//}
+	//else if (Craft::ins() == nullptr && Craft::ins()->existCraftDataStructure())
+	//{
+	//	if (pZ == Craft::getBuildLocation().z)
+	//	{
+	//		SDL_Point pt = { Craft::getBuildLocation().x, Craft::getBuildLocation().y };
+	//		if (SDL_PointInRect(&pt, &renderRegion))
+	//		{
+	//			int tgtX = Craft::getBuildLocation().x;
+	//			int tgtY = Craft::getBuildLocation().y;
+	//			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+	//			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+	//			dst.w = tileSize;
+	//			dst.h = tileSize;
+	//			setZoom(zoomScale);
+	//			drawSpriteCenter
+	//			(
+	//				spr::buildCursor,
+	//				0,
+	//				dst.x + dst.w / 2,
+	//				dst.y + dst.h / 2
+	//			);
 
 
-				int percent = Craft::ins()->getProcessPercentOngoingStructure();
-				if (percent < 10)
-				{
-					drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 5 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 43, dst.x + 9 * zoomScale, dst.y + 11 * zoomScale);
+	//			int percent = Craft::ins()->getProcessPercentOngoingStructure();
+	//			if (percent < 10)
+	//			{
+	//				drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 5 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 43, dst.x + 9 * zoomScale, dst.y + 11 * zoomScale);
 
-				}
-				else
-				{
-					drawEplsionText(spr::epsilonFont, 27 + percent / 10, dst.x + 3 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 7 * zoomScale, dst.y + 11 * zoomScale);
-					drawEplsionText(spr::epsilonFont, 43, dst.x + 11 * zoomScale, dst.y + 11 * zoomScale);
-				}
-				setZoom(1.0);
-			}
-		}
-	}
+	//			}
+	//			else
+	//			{
+	//				drawEplsionText(spr::epsilonFont, 27 + percent / 10, dst.x + 3 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 27 + percent % 10, dst.x + 7 * zoomScale, dst.y + 11 * zoomScale);
+	//				drawEplsionText(spr::epsilonFont, 43, dst.x + 11 * zoomScale, dst.y + 11 * zoomScale);
+	//			}
+	//			setZoom(1.0);
+	//		}
+	//	}
+	//}
 
 
 

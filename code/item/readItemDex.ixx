@@ -158,6 +158,7 @@ namespace csvItem
     constexpr int propRCut = 128;
     constexpr int propRBash = 129;
     constexpr int propDrawPriority = 130;
+    constexpr int propWIPSprIndex = 131;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -1006,6 +1007,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::propDrawPriority:
                         itemDex[tgtIndex].propDrawPriority = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::propWIPSprIndex:
+                        itemDex[tgtIndex].propWIPSprIndex = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");

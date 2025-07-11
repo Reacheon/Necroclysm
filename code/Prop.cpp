@@ -402,10 +402,15 @@ void Prop::drawSelf()
         drawFillRect(dst, col::white, alphaFakeHPBar);
 
         float ratioHP = myMax((float)0.0, (float)(leadItem.propHP) / (float)(leadItem.propMaxHP));
+
+        SDL_Color gaugeCol = lowCol::green;
+        if (ratioHP < 0.25) gaugeCol=lowCol::red;
+        else if (ratioHP < 0.5) gaugeCol = lowCol::yellow;
+
         dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
         if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        drawFillRect(dst, lowCol::green, alphaHPBar);
+        drawFillRect(dst, gaugeCol, alphaHPBar);
 
         if (displayHPBarCount > 1) displayHPBarCount--;
         else if (displayHPBarCount == 1)

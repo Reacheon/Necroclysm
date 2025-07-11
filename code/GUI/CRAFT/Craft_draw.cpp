@@ -63,6 +63,33 @@ void Craft::drawGUI()
 		setFontSize(10);
 		renderTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 7);
 
+		if(itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
+		{
+			int pivotX = cameraW/2 - (int)(8 * zoomScale) + 16 * (buildLocation.x - PlayerX()) * zoomScale;
+			int pivotY = cameraH / 2 + (int)(8 * zoomScale) + 16 * (buildLocation.y - PlayerY()) * zoomScale;
+
+			if (buildLocation.x == PlayerX() && buildLocation.y == PlayerY() - 1)
+			{
+				pivotY -= 20 * zoomScale;
+			}
+
+			SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+			drawFillRect(dst, col::black, 200);
+
+			float ratioHP = ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
+
+			SDL_Color gaugeCol = lowCol::green;
+			if (ratioHP < 0.25) gaugeCol = lowCol::red;
+			else if (ratioHP < 0.5) gaugeCol = lowCol::yellow;
+
+			dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
+			if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+			drawFillRect(dst, gaugeCol, 200);
+		}
+
+
 		if(SDL_GetTicks() % 1000 < 500)
 		{
 			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT1;
