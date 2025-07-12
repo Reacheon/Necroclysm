@@ -48,6 +48,7 @@ export namespace option
 export namespace debug
 {
     bool chunkLineDraw = false;
+    bool noCraftMaterialNeed = true; //활성화할 경우 CRAFT에서 재료없이 조합 ㅇ가능
 };
 
 export std::vector<std::wstring> sysStr;

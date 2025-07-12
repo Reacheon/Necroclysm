@@ -704,19 +704,22 @@ public:
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//////////////////////////////////////////1-1.재료,도구,재능 체크 및 제거///////////////////////////////////////////
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			if (canCraft(targetItemCode) == false)//재료,도구,재능을 만족하는지 체크
+			if (debug::noCraftMaterialNeed == false)
 			{
-				updateLog(L"#FFFFFF재료가 부족하다.");
-				co_return;
-			}
-			else//조합에 필요한 재료 제거
-			{
-				for (int i = 0; i < itemDex[targetItemCode].recipe.size(); i++)
+				if (canCraft(targetItemCode) == false)//재료,도구,재능을 만족하는지 체크
 				{
-					//툴 퀄리티에 따라 적색, 녹색 변화
-					int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
-					int needNumber = itemDex[meterialItemCode].recipe[i].second;
-					PlayerPtr->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
+					updateLog(L"#FFFFFF재료가 부족하다.");
+					co_return;
+				}
+				else//조합에 필요한 재료 제거
+				{
+					for (int i = 0; i < itemDex[targetItemCode].recipe.size(); i++)
+					{
+						//툴 퀄리티에 따라 적색, 녹색 변화
+						int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
+						int needNumber = itemDex[meterialItemCode].recipe[i].second;
+						PlayerPtr->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
+					}
 				}
 			}
 
@@ -739,19 +742,35 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
+						for (int i = 0; i < selectableTile.size(); i++)
+						{
+							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						}
+
 						new CoordSelect(L"차량 프레임을 설치할 위치를 선택해주세요.");
 						co_await std::suspend_always();
+						rangeSet.clear();
 						actDraw();
 
-						std::wstring targetStr = coAnswer;
-						int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						int targetZ = wtoi(targetStr.c_str());
+						if (coAnswer.empty() == false)
+						{
+							std::wstring targetStr = coAnswer;
+							int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							int targetZ = wtoi(targetStr.c_str());
 
-						buildLocation = { targetX,targetY,targetZ };
+							buildLocation = { targetX,targetY,PlayerZ() };
 
+							createProp(buildLocation, 453);
+
+							TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].propWIPSprIndex;
+
+							PlayerPtr->setFakeX(3 * (buildLocation.x - PlayerX()));
+							PlayerPtr->setFakeY(3 * (buildLocation.y - PlayerY()));
+							PlayerPtr->setDirection(coord2Dir(buildLocation.x - PlayerX(), buildLocation.y - PlayerY()));
+						}
 					}
 					else
 					{
@@ -780,18 +799,27 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
+						for (int i = 0; i < selectableTile.size(); i++)
+						{
+							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						}
+
 						new CoordSelect(L"차량 부품을 설치할 프레임을 선택해주세요.");
 						co_await std::suspend_always();
+						rangeSet.clear();
 						actDraw();
 
-						std::wstring targetStr = coAnswer;
-						int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-						targetStr.erase(0, targetStr.find(L",") + 1);
-						int targetZ = wtoi(targetStr.c_str());
 
-						buildLocation = { targetX,targetY,targetZ };
+						if (coAnswer.empty() == false)
+						{
+							std::wstring targetStr = coAnswer;
+							int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+							targetStr.erase(0, targetStr.find(L",") + 1);
+							int targetZ = wtoi(targetStr.c_str());
+							buildLocation = { targetX,targetY,targetZ };
+						}
 
 					}
 					else
@@ -819,7 +847,7 @@ public:
 							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
 						}
 
-						new CoordSelectCraft(targetItemCode, L"조합한 아이템을 설치할 위치를 선택해주세요.", selectableTile);
+						new CoordSelectCraft(targetItemCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 						co_await std::suspend_always();
 						rangeSet.clear();
 						actDraw();
@@ -975,35 +1003,21 @@ public:
 			}
 
 		loopEnd:
-
-			if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
+			if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT) && itemDex[targetItemCode].checkFlag(itemFlag::VPART) == false)
 			{
 				int pSprIndex = TileProp(buildLocation)->leadItem.propSprIndex;
-                float ratio = (float)elapsedTime / (float)itemDex[targetItemCode].craftTime;
+				float ratio = (float)elapsedTime / (float)itemDex[targetItemCode].craftTime;
 
-				if(pSprIndex >= 80 && pSprIndex <= 83)
-				{
-					if(ratio<0.25) TileProp(buildLocation)->leadItem.propSprIndex = 80;
-					else if(ratio<0.5) TileProp(buildLocation)->leadItem.propSprIndex = 81;
-					else if(ratio<0.75) TileProp(buildLocation)->leadItem.propSprIndex = 82;
-                    else TileProp(buildLocation)->leadItem.propSprIndex = 83;
-				}
-				else if (pSprIndex >= 84 && pSprIndex <= 87)
-				{
-                    if (ratio < 0.25) TileProp(buildLocation)->leadItem.propSprIndex = 84;
-                    else if (ratio < 0.5) TileProp(buildLocation)->leadItem.propSprIndex = 85;
-					else if (ratio < 0.75) TileProp(buildLocation)->leadItem.propSprIndex = 86;
-                    else TileProp(buildLocation)->leadItem.propSprIndex = 87;
-                }
-				else if (pSprIndex >= 88 && pSprIndex <= 91)
-				{
-					if(ratio < 0.25) TileProp(buildLocation)->leadItem.propSprIndex = 88;
-					else if (ratio < 0.5) TileProp(buildLocation)->leadItem.propSprIndex = 89;
-					else if (ratio < 0.75) TileProp(buildLocation)->leadItem.propSprIndex = 90;
-                    else TileProp(buildLocation)->leadItem.propSprIndex = 91;
-				}
+				// 4단위로 진행 스프라이트 계산
+				int baseIndex = (pSprIndex / 4) * 4; // 4의 배수로 내림 (80, 84, 88, 92, 96, ...)
+				int progressIndex;
 
+				if (ratio < 0.25) progressIndex = 0;
+				else if (ratio < 0.5) progressIndex = 1;
+				else if (ratio < 0.75) progressIndex = 2;
+				else progressIndex = 3;
 
+				TileProp(buildLocation)->leadItem.propSprIndex = baseIndex + progressIndex;
 			}
 			
 
@@ -1019,7 +1033,7 @@ public:
 			elapsedTime++;
 			if (elapsedTime >= itemDex[targetItemCode].craftTime)
 			{
-				destroyProp(buildLocation);
+				if(TileProp(buildLocation)!=nullptr) destroyProp(buildLocation);
 				PlayerPtr->setFakeX(0);
 				PlayerPtr->setFakeY(0);
 				break;
@@ -1104,6 +1118,15 @@ public:
 			{
 				errorBox(TileProp(buildLocation.x, buildLocation.y, buildLocation.z) != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
 				createProp({ buildLocation.x, buildLocation.y, buildLocation.z }, targetItemCode);
+			}
+			else if (itemDex[targetItemCode].checkFlag(itemFlag::WALL))
+			{
+				int a = targetItemCode;
+				setWall(buildLocation, targetItemCode);
+			}
+			else if (itemDex[targetItemCode].checkFlag(itemFlag::FLOOR))
+			{
+				setFloor(buildLocation, targetItemCode);
 			}
 		}
 
