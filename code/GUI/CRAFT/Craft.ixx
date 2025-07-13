@@ -112,6 +112,12 @@ public:
 	~Craft()
 	{
 		prt(L"Craft : 소멸자가 호출되었습니다..\n");
+
+		PlayerPtr->setFakeX(0);
+		PlayerPtr->setFakeY(0);
+		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
+		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
+
 		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
@@ -195,7 +201,7 @@ public:
 			if (showCraftingTooltip == false) close(aniFlag::winUnfoldClose);
 			else
 			{
-				updateLog(L"#FFFFFF아이템 조합을 취소했다.");
+				updateLog(sysStr[317]);//아이템 조합을 취소했다.
 
 				//조합 데이터 저장
 				if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
@@ -688,27 +694,25 @@ public:
 
 	Corouter executeCraft()
 	{
-		prt(L"executeCraft 실행됨\n");
-
 		bool negateMonster = false;
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////1.조합 좌표 및 아이템 설정///////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ============================================================
+		// 1. 조합 좌표 및 아이템 설정
+		// ============================================================
 
 		if (craftCursor != -1)//최초 조합일 때
 		{
 			targetItemCode = recipePtr->itemInfo[craftCursor].itemCode;
 			elapsedTime = 0;
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//////////////////////////////////////////1-1.재료,도구,재능 체크 및 제거///////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// ============================================================
+			// 1-1. 재료, 도구, 재능 체크 및 제거
+			// ============================================================
 			if (debug::noCraftMaterialNeed == false)
 			{
 				if (canCraft(targetItemCode) == false)//재료,도구,재능을 만족하는지 체크
 				{
-					updateLog(L"#FFFFFF재료가 부족하다.");
+					updateLog(sysStr[318]);//재료가 부족하다.
 					co_return;
 				}
 				else//조합에 필요한 재료 제거
@@ -716,16 +720,16 @@ public:
 					for (int i = 0; i < itemDex[targetItemCode].recipe.size(); i++)
 					{
 						//툴 퀄리티에 따라 적색, 녹색 변화
-						int meterialItemCode = itemDex[meterialItemCode].recipe[i].first;
-						int needNumber = itemDex[meterialItemCode].recipe[i].second;
-						PlayerPtr->getEquipPtr()->subtractItemCode(meterialItemCode, needNumber);
+						int materialItemCode = itemDex[targetItemCode].recipe[i].first;
+						int needNumber = itemDex[targetItemCode].recipe[i].second;
+						PlayerPtr->getEquipPtr()->subtractItemCode(materialItemCode, needNumber);
 					}
 				}
 			}
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//////////////////////////////////////////1-2.좌표 선택///////////////////////////////////////////
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// ============================================================
+			// 1-2. 좌표 선택
+			// ============================================================
 			if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 			{
 				if (itemDex[targetItemCode].checkFlag(itemFlag::VFRAME))
@@ -742,12 +746,9 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++)
-						{
-							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
-						}
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
 
-						new CoordSelect(L"차량 프레임을 설치할 위치를 선택해주세요.");
+						new CoordSelect(sysStr[303]);//차량 프레임을 설치할 위치를 선택해주세요.
 						co_await std::suspend_always();
 						rangeSet.clear();
 						actDraw();
@@ -774,7 +775,7 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFF주변에 차량 프레임을 설치할만한 공간이 없다.");
+						updateLog(sysStr[300]);//주변에 차량 프레임을 설치할만한 공간이 없다.
 						co_return;
 					}
 				}
@@ -785,8 +786,7 @@ public:
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						//차량부품이므로 이미 있는 프레임 위에 건설되어야 함
-						Vehicle* targetVehicle = TileVehicle(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+						Vehicle* targetVehicle = TileVehicle(PlayerX() + dx, PlayerY() + dy, PlayerZ()); //차량부품이므로 이미 있는 프레임 위에 건설되어야 함
 						if (targetVehicle != nullptr)
 						{
 							if (targetVehicle->hasFrame(PlayerX() + dx, PlayerY() + dy))
@@ -799,12 +799,9 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++)
-						{
-							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
-						}
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
 
-						new CoordSelect(L"차량 부품을 설치할 프레임을 선택해주세요.");
+						new CoordSelect(sysStr[304]);//차량 부품을 설치할 프레임을 선택해주세요. 
 						co_await std::suspend_always();
 						rangeSet.clear();
 						actDraw();
@@ -824,7 +821,7 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFF주변에 차량 부품을 설치할만한 프레임이 없다.");
+						updateLog(sysStr[301]);//주변에 차량 부품을 설치할만한 프레임이 없다. 
 						co_return;
 					}
 				}
@@ -842,24 +839,21 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++)
-						{
-							rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
-						}
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
 
 						new CoordSelectCraft(targetItemCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 						co_await std::suspend_always();
 						rangeSet.clear();
 						actDraw();
 
-						if (coAnswer.empty()==false)
+						if (coAnswer.empty() == false)
 						{
 							std::wstring targetStr = coAnswer;
 							int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 							targetStr.erase(0, targetStr.find(L",") + 1);
 							int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 							targetStr.erase(0, targetStr.find(L",") + 1);
-							targetItemCode = wtoi(targetStr.c_str());
+							int targetItemCode = wtoi(targetStr.c_str());
 
 							buildLocation = { targetX,targetY,PlayerZ() };
 
@@ -875,7 +869,7 @@ public:
 					}
 					else
 					{
-						updateLog(L"#FFFFFF주변에 해당 아이템을 설치할만한 공간이 없다.");
+						updateLog(sysStr[302]);//주변에 해당 아이템을 설치할만한 공간이 없다.
 						co_return;
 					}
 				}
@@ -885,19 +879,23 @@ public:
 		{
 			if (existCraftData())
 			{
+				
+				
+
 				int percent = (int)(100.0 * (float)ongoingElapsedTime / (float)itemDex[ongoingTargetCode].craftTime);
-				new Msg(msgFlag::normal, L"제작", std::to_wstring(percent) + L"%에서 조합을 중단한 아이템이 존재합니다.계속 조합하시겠습니까?", { L"계속",L"아니오",L"파기" }, ongoingTargetCode);
+				//알림, (%number)%에서 조합을 중단한 아이템이 존재합니다.계속 조합하시겠습니까?, 계속, 아니오, 파기
+				new Msg(msgFlag::normal, sysStr[307], replaceStr(sysStr[313], L"(%number)", std::to_wstring(percent)), { sysStr[312],sysStr[37],sysStr[314] }, ongoingTargetCode);
 				deactColorChange = true;
 				co_await std::suspend_always();
 				deactColorChange = false;
 
-				if (coAnswer == L"계속")
+				if (coAnswer == sysStr[312])//계속
 				{
 					loadCraftData(targetItemCode, elapsedTime);
 				}
-				else if (coAnswer == L"아니오")
+				else if (coAnswer == sysStr[37])//아니오
 				{
-					delete this;
+                    close(aniFlag::null);
 					co_return;
 				}
 				else
@@ -914,18 +912,19 @@ public:
 
 				if (dx <= 1 && dy <= 1 && dz == 0)
 				{
-					new Msg(msgFlag::normal, L"제작", L"조합 중인 아이템이 주변에 있습니다.조합을 계속하시겠습니까?", { L"계속",L"아니오",L"파기" }, ongoingTargetCodeStructure);
+					//알림,조합 중인 아이템이 주변에 있습니다.조합을 계속하시겠습니까? ,계속,아니오,파기
+					new Msg(msgFlag::normal, sysStr[307], sysStr[315], { sysStr[312],sysStr[37],sysStr[314] }, ongoingTargetCodeStructure);
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == L"계속")
+					if (coAnswer == sysStr[312])//계속
 					{
 						loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
 						prt(L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation.x, buildLocation.y, buildLocation.z);
 					}
-					else if (coAnswer == L"아니오")
+					else if (coAnswer == sysStr[37])//아니오
 					{
-						delete this;
+						close(aniFlag::null);
 						co_return;
 					}
 					else
@@ -936,19 +935,21 @@ public:
 				}
 				else
 				{
-					std::wstring text = replaceStr(L"떨어진 좌표 (▲,▲,▲)에 조합 중인 아이템이 존재합니다. 파기하고 새로운 아이템을 제작하시겠습니까?", L"▲", { std::to_wstring(buildLocation.x),std::to_wstring(buildLocation.y),std::to_wstring(buildLocation.z) });
-					new Msg(msgFlag::normal, L"제작", text, { L"네",L"아니오" }, ongoingTargetCodeStructure);
+					//떨어진 좌표 (▲,▲,▲)에 조합 중인 아이템이 존재합니다. 파기하고 새로운 아이템을 제작하시겠습니까?
+					std::wstring text = replaceStr(sysStr[316], L"▲", { std::to_wstring(buildLocation.x),std::to_wstring(buildLocation.y),std::to_wstring(buildLocation.z) });
+					//알림,네, 아니오
+					new Msg(msgFlag::normal, sysStr[307], text, { sysStr[36],sysStr[37] }, ongoingTargetCodeStructure);
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == L"네")
+					if (coAnswer == sysStr[36])//네
 					{
 						deleteCraftDataStructure();
 						co_return;
 					}
-					else
+					else//아니오
 					{
-						delete this;
+                        close(aniFlag::null);
 						co_return;
 					}
 				}
@@ -956,15 +957,14 @@ public:
 			}
 		}
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////2.좌표 선정 완료 후 조합 루프///////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ============================================================
+		// 2. 좌표 선정 완료 후 조합 루프
+		// ============================================================
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT)) isNowBuilding = true;
 		deactDraw();
 		showCraftingTooltip = true;
 		while (1)
 		{
-			prt(L"Craft While 루프 실행됨\n");
 			if (negateMonster == false)
 			{
 				for (int x = PlayerX() - 1; x <= PlayerX() + 1; x++)
@@ -975,11 +975,12 @@ public:
 							if (TileFov(x, y, PlayerZ()) == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
-									new Msg(msgFlag::normal, L"경고", L"주변에 적이 있습니다. 계속 조합하시겠습니까?", { L"네",L"아니오",L"무시하기" });
+									//경고, 
+									new Msg(msgFlag::normal, sysStr[306], sysStr[310], { sysStr[36],sysStr[37],sysStr[311] });
 									deactColorChange = true;
 									co_await std::suspend_always();
-									if (coAnswer == L"네") goto loopEnd;
-									else if (coAnswer == L"무시하기")
+									if (coAnswer == sysStr[36]) goto loopEnd;//네
+									else if (coAnswer == sysStr[311])//무시하기
 									{
 										negateMonster = true;
 										goto loopEnd;
@@ -1008,8 +1009,7 @@ public:
 				int pSprIndex = TileProp(buildLocation)->leadItem.propSprIndex;
 				float ratio = (float)elapsedTime / (float)itemDex[targetItemCode].craftTime;
 
-				// 4단위로 진행 스프라이트 계산
-				int baseIndex = (pSprIndex / 4) * 4; // 4의 배수로 내림 (80, 84, 88, 92, 96, ...)
+				int baseIndex = (pSprIndex / 4) * 4;
 				int progressIndex;
 
 				if (ratio < 0.25) progressIndex = 0;
@@ -1019,31 +1019,25 @@ public:
 
 				TileProp(buildLocation)->leadItem.propSprIndex = baseIndex + progressIndex;
 			}
-			
+
 
 			turnWait(1.0);
 			coTurnSkip = true;
 
-			prt(L"exeCraft 코루틴 실행 전\n");
-
 			co_await std::suspend_always();
-
-			prt(L"exeCraft 코루틴 실행 후\n");
 
 			elapsedTime++;
 			if (elapsedTime >= itemDex[targetItemCode].craftTime)
 			{
-				if(TileProp(buildLocation)!=nullptr) destroyProp(buildLocation);
-				PlayerPtr->setFakeX(0);
-				PlayerPtr->setFakeY(0);
+				if (TileProp(buildLocation) != nullptr) destroyProp(buildLocation);
 				break;
 			}
 		}
 
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////3.조합 종료 : 아이템 생성///////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ============================================================
+		// 3. 조합 종료 : 아이템 생성
+		// ============================================================
 
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 		{
@@ -1072,13 +1066,14 @@ public:
 					new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//새로운 차량의 이름을 입력해주세요. 결정, 취소
 					co_await std::suspend_always();
 					if (coAnswer == sysStr[139]) newVehicle->name = exInputText;
-					else newVehicle->name = L"차량 " + std::to_wstring(randomRange(1, 9999999));
+					else newVehicle->name = sysStr[305]+L" " + std::to_wstring(randomRange(1, 9999999));//차량+번호
 				}
 				else
 				{
-					new Msg(msgFlag::normal, L"경고", L"설치한 프레임을 주변 차량에 연결하시겠습니까?", { L"네",L"아니오" });
+					//확인, 설치한 프레임을 주변 차량에 연결하시겠습니까?, 네, 아니오
+					new Msg(msgFlag::normal, sysStr[308], sysStr[309], { sysStr[36],sysStr[37] });
 					co_await std::suspend_always();
-					if (coAnswer == L"네")
+					if (coAnswer == sysStr[36])//네
 					{
 						Vehicle* targetVehicle;
 						if (canConnect.size() == 1)
@@ -1103,7 +1098,7 @@ public:
 						new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//새로운 차량의 이름을 입력해주세요. 결정, 취소
 						co_await std::suspend_always();
 						if (coAnswer == sysStr[139]) newVehicle->name = exInputText;
-						else newVehicle->name = L"차량 " + std::to_wstring(randomRange(1, 9999999));
+						else newVehicle->name = sysStr[305] + L" " + std::to_wstring(randomRange(1, 9999999));//차량+번호
 					}
 				}
 			}
@@ -1116,7 +1111,7 @@ public:
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::PROP))
 			{
-				errorBox(TileProp(buildLocation.x, buildLocation.y, buildLocation.z) != nullptr, L"이미 해당 좌표에 설치물이 존재하여 새로운 설치물을 설치할 수 없다.");
+				errorBox(TileProp(buildLocation.x, buildLocation.y, buildLocation.z) != nullptr, L"Cannot install new structure because one already exists at this location.");
 				createProp({ buildLocation.x, buildLocation.y, buildLocation.z }, targetItemCode);
 			}
 			else if (itemDex[targetItemCode].checkFlag(itemFlag::WALL))
@@ -1130,14 +1125,15 @@ public:
 			}
 		}
 
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		////////////////////////////////////////////4.조합 데이터 초기화///////////////////////////////////////////
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		updateLog(replaceStr(sysStr[298], L"(%item)", itemDex[targetItemCode].name));
+		// ============================================================
+		// 4. 조합 데이터 초기화
+		// ============================================================
+		updateLog(replaceStr(sysStr[298], L"(%item)", itemDex[targetItemCode].name)); //(%item) 설치를 완료하였다.
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT)) deleteCraftDataStructure();
 		else deleteCraftData();
-		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
-		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
+
+
+		
 		isNowBuilding = false;
 		close(aniFlag::null);
 	}
@@ -1146,7 +1142,6 @@ public:
 	{
 		ongoingTargetCode = code;
 		ongoingElapsedTime = time;
-		prt(L"저장이 이루어졌다. 코드는 %d 시간은 %d이다.\n", ongoingTargetCode, ongoingElapsedTime);
 	}
 
 	void loadCraftData(int& code, int& time)
@@ -1173,7 +1168,6 @@ public:
 		ongoingTargetCodeStructure = code;
 		ongoingElapsedTimeStructure = time;
 		buildLocation = coord;
-		prt(L"저장이 이루어졌다. 코드는 %d 시간은 %d이다. 좌표는 %d,%d,%d이다.\n", ongoingTargetCode, ongoingElapsedTime, buildLocation.x, buildLocation.y, buildLocation.z);
 	}
 
 	void loadCraftDataStructure(int& code, int& time, Point3 coord)

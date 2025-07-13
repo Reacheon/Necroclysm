@@ -103,25 +103,82 @@ public:
 
 				if (itemDex[rotatedItemCode].checkFlag(itemFlag::PROP_BIG)) revGridY -= 1;
 
-				if (rangeSet.find(getAbsMouseGrid()) != rangeSet.end())
+
+
+				if (itemDex[rotatedItemCode].checkFlag(itemFlag::PROP))
 				{
+					if (rangeSet.find(getAbsMouseGrid()) != rangeSet.end())
+					{
+						SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
+						SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+					}
+					else
+					{
+						SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 0, 0);
+						SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+					}
+
+					drawSpriteCenter
+					(
+						spr::propset,
+						itemDex[rotatedItemCode].propSprIndex,
+						(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
+						(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
+					);
+
 					SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
-					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
 				}
-				else
+				else if (itemDex[rotatedItemCode].checkFlag(itemFlag::WALL))
 				{
-					SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 0, 0);
-					SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+					if (rangeSet.find(getAbsMouseGrid()) != rangeSet.end())
+					{
+						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
+						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+					}
+					else
+					{
+						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 0, 0);
+						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+					}
+
+					drawSpriteCenter
+					(
+						spr::tileset,
+						itemDex[rotatedItemCode].tileSprIndex + 1,
+						(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
+						(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
+					);
+
+					SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
+					SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 255);
 				}
-				drawSpriteCenter
-				(
-					spr::propset,
-					itemDex[rotatedItemCode].propSprIndex,
-					(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
-					(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
-				);
-				SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
-				SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
+				else if (itemDex[rotatedItemCode].checkFlag(itemFlag::FLOOR))
+				{
+					if (rangeSet.find(getAbsMouseGrid()) != rangeSet.end())
+					{
+						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
+						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+					}
+					else
+					{
+						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 0, 0);
+						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+					}
+
+					drawSpriteCenter
+					(
+						spr::tileset,
+						itemDex[rotatedItemCode].tileSprIndex,
+						(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
+						(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
+					);
+
+					SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
+					SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 255);
+				}
+
+
 				setZoom(1.0);
 
 
