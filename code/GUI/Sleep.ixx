@@ -218,17 +218,18 @@ public:
 							if (TileFov(x, y, PlayerZ()) == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
-									new Msg(msgFlag::normal, L"Warning", L"There are enemies nearby. Do you want to continue trying to sleep?", { L"Yes",L"No",L"Ignore" });
+									//경고, 주변에 적이 있습니다. 계속 수면을 시도하시겠습니까?, 네,아니오,무시
+									new Msg(msgFlag::normal, sysStr[306],sysStr[323], { sysStr[36],sysStr[37],sysStr[311] });
 									co_await std::suspend_always();
-									if (coAnswer == L"Yes") goto sleepTryLoopEnd;
-									else if (coAnswer == L"Ignore")
+									if (coAnswer == sysStr[36]) goto sleepTryLoopEnd;
+									else if (coAnswer == sysStr[311])
 									{
 										negateMonster = true;
 										goto sleepTryLoopEnd;
 									}
 									else
 									{
-										updateLog(L"#FFFFFFSleep attempt cancelled.");
+										updateLog(sysStr[324]);//수면 시도를 취소하였다.
 										coTurnSkip = false;
 										close(aniFlag::null);
 										co_return;
@@ -251,7 +252,6 @@ public:
 
 			if (roll < sleepChance)
 			{
-				// 잠에 성공!
 				updateLog(L"#FFFFFFYou fell asleep.");
 				isTryingToSleep = false;
 				isAsleep = true;
@@ -272,8 +272,6 @@ public:
 		while (sleepTime < sleepDuration && isAsleep)
 		{
 
-			// 잠든 상태에서는 적이 와도 깨지 않음 (선택사항: 깨우는 로직 추가 가능)
-
 			turnWait(1.0);
 			coTurnSkip = true;
 
@@ -281,7 +279,6 @@ public:
 
 			sleepTime++;
 
-			// 매 분마다 피로도 야금야금 회복
 			fatigue += FATIGUE_SPEED;
 			fatigue += fatigueRecoveryPerMinute;
 			if (fatigue > PLAYER_MAX_FATIGUE) fatigue = PLAYER_MAX_FATIGUE;
@@ -291,7 +288,7 @@ public:
 		// 수면 완료
 		if (isAsleep)
 		{
-			updateLog(L"#FFFFFFYou had a good night's sleep. Your fatigue has been completely recovered.");
+			updateLog(sysStr[322]);//숙면을 취했습니다. 피로가 완전히 회복되었습니다. 
 		}
 
 		isAsleep = false;

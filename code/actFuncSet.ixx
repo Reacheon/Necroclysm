@@ -113,32 +113,34 @@ export namespace actFunc
 		co_await std::suspend_always();
 
 		////////////////////////////////////////////////////////////////////
-
-		int counter = 0;
-		for (int j = 0; j < targetSearchPtr.size(); j++)
+		if (coAnswer.empty() == false)
 		{
-			for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
+			int counter = 0;
+			for (int j = 0; j < targetSearchPtr.size(); j++)
 			{
-				//만약 이 아이템에 넣을 수 있는 아이템코드가 equip에 있는 아이템과 같으면
-				if (std::find(reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.begin(), reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end(), targetSearchPtr[j]->itemInfo[i].itemCode) != reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end())
+				for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 				{
-					if (counter == wtoi(coAnswer.c_str()))
+					//만약 이 아이템에 넣을 수 있는 아이템코드가 equip에 있는 아이템과 같으면
+					if (std::find(reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.begin(), reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end(), targetSearchPtr[j]->itemInfo[i].itemCode) != reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end())
 					{
-						//넣을 수 있는만큼 가득 넣음
-						targetSearchPtr[j]->transferItem
-						(
-							reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(),
-							i,
-							1//일단은 전부 넣는걸로
-						);
+						if (counter == wtoi(coAnswer.c_str()))
+						{
+							//넣을 수 있는만큼 가득 넣음
+							targetSearchPtr[j]->transferItem
+							(
+								reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(),
+								i,
+								1//일단은 전부 넣는걸로
+							);
 
-						co_return;
+							co_return;
+						}
+						counter++;
 					}
-					counter++;
 				}
 			}
+			updateQuiverSpr(PlayerPtr->getEquipPtr());
 		}
-		updateQuiverSpr(PlayerPtr->getEquipPtr());
 
 	}
 
@@ -197,35 +199,37 @@ export namespace actFunc
 		co_await std::suspend_always();
 
 		////////////////////////////////////////////////////////////////////
-
-		int counter = 0;
-		for (int j = 0; j < targetSearchPtr.size(); j++)
+		if (coAnswer.empty() == false)
 		{
-			for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
+			int counter = 0;
+			for (int j = 0; j < targetSearchPtr.size(); j++)
 			{
-				if (targetSearchPtr[j]->itemInfo[i].pocketMaxNumber > 0 && countPocketItemNumber(targetSearchPtr[j]->itemInfo[i].pocketPtr.get()) < targetSearchPtr[j]->itemInfo[i].pocketMaxNumber)
+				for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 				{
-					if (std::find(targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.begin(), targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.end(), reloadItemPocket->itemInfo[targetLootCursor].itemCode) != targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.end())
+					if (targetSearchPtr[j]->itemInfo[i].pocketMaxNumber > 0 && countPocketItemNumber(targetSearchPtr[j]->itemInfo[i].pocketPtr.get()) < targetSearchPtr[j]->itemInfo[i].pocketMaxNumber)
 					{
-						if (counter == wtoi(coAnswer.c_str()))
+						if (std::find(targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.begin(), targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.end(), reloadItemPocket->itemInfo[targetLootCursor].itemCode) != targetSearchPtr[j]->itemInfo[i].pocketOnlyItem.end())
 						{
-							reloadItemPocket->transferItem
-							(
-								targetSearchPtr[j]->itemInfo[i].pocketPtr.get(),
-								targetLootCursor,
-								1
-							);
+							if (counter == wtoi(coAnswer.c_str()))
+							{
+								reloadItemPocket->transferItem
+								(
+									targetSearchPtr[j]->itemInfo[i].pocketPtr.get(),
+									targetLootCursor,
+									1
+								);
 
-							co_return;
+								co_return;
+							}
+
+							counter++;
 						}
-
-						counter++;
 					}
 				}
 			}
-		}
 
-		updateQuiverSpr(PlayerPtr->getEquipPtr());
+			updateQuiverSpr(PlayerPtr->getEquipPtr());
+		}
 	}
 
 

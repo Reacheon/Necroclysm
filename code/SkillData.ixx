@@ -5,7 +5,7 @@ import constVar;
 
 export struct SkillData
 {
-    std::wstring name = L"DEFAULT ALCHEMY RECIPE";
+    std::wstring name = L"DEFAULT SKILL NAME";
     int skillCode = 0;
     int iconIndex = 0;
     std::wstring descript = L"TEST_DESCRIPTION";

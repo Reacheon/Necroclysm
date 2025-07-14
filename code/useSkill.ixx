@@ -25,8 +25,11 @@ export Corouter useSkill(int skillCode)
 	switch (skillCode)
 	{
 	default:
-		prt(L"[Entity:useSkill] 플레이어가 알 수 없는 스킬을 시전하였다.\n");
+	{
+		std::wstring errorMsg = replaceStr(L"Player used an unknown skill: %d", L"%d", std::to_wstring(skillCode));
+		errorBox(errorMsg);
 		break;
+	}
 	case 0:
 		break;
 	case 1:
@@ -45,8 +48,9 @@ export Corouter useSkill(int skillCode)
 				}
 			}
 		}
-		new CoordSelect(CoordSelectFlag::FIRESTORM, L"화염폭풍을 시전할 위치를 입력해주세요.", coordList);
+		new CoordSelect(CoordSelectFlag::FIRESTORM, sysStr[321], coordList);
 		co_await std::suspend_always();
+		if (coAnswer.empty()) co_return;
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 		targetStr.erase(0, targetStr.find(L",") + 1);
@@ -80,40 +84,39 @@ export Corouter useSkill(int skillCode)
 				}
 			}
 		}
-		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"Choose where to roll.");
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[319]);//구를 타일을 선택해주세요.
 		co_await std::suspend_always();
-		if (coAnswer.empty() == false)
-		{
-			std::wstring targetStr = coAnswer;
-			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetZ = wtoi(targetStr.c_str());
-			PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
-
-			int prevGridX = PlayerPtr->getGridX();
-			int prevGridY = PlayerPtr->getGridY();
-			int dstGridX = PlayerPtr->getSkillTarget().x;
-			int dstGridY = PlayerPtr->getSkillTarget().y;
-			int dGridX = dstGridX - prevGridX;
-			int dGridY = dstGridY - prevGridY;
-
-			if (dGridX > 0) PlayerPtr->setDirection(0);
-			else if (dGridX < 0) PlayerPtr->setDirection(4);
-
-			PlayerPtr->entityInfo.gridMoveSpd = 1.0;
-			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
-			PlayerPtr->setFakeX(-16 * dGridX);
-			PlayerPtr->setFakeY(-16 * dGridY);
-
-			cameraFix = false;
-			cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
-			cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
-			
-			addAniUSetPlayer(PlayerPtr, aniFlag::roll);
-		}
 		rangeSet.clear();
+		if (coAnswer.empty()) co_return;
+
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetZ = wtoi(targetStr.c_str());
+		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
+
+		int prevGridX = PlayerPtr->getGridX();
+		int prevGridY = PlayerPtr->getGridY();
+		int dstGridX = PlayerPtr->getSkillTarget().x;
+		int dstGridY = PlayerPtr->getSkillTarget().y;
+		int dGridX = dstGridX - prevGridX;
+		int dGridY = dstGridY - prevGridY;
+
+		if (dGridX > 0) PlayerPtr->setDirection(0);
+		else if (dGridX < 0) PlayerPtr->setDirection(4);
+
+		PlayerPtr->entityInfo.gridMoveSpd = 1.0;
+		EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
+		PlayerPtr->setFakeX(-16 * dGridX);
+		PlayerPtr->setFakeY(-16 * dGridY);
+
+		cameraFix = false;
+		cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+		cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
+
+		addAniUSetPlayer(PlayerPtr, aniFlag::roll);
 		break;
 	}
 
@@ -142,40 +145,39 @@ export Corouter useSkill(int skillCode)
 			}
 		}
 
-		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"Choose where to leap.");
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[320]);//도약할 타일을 선택해주세요.
 		co_await std::suspend_always();
-		if (coAnswer.empty() == false)
-		{
-			std::wstring targetStr = coAnswer;
-			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-			targetStr.erase(0, targetStr.find(L",") + 1);
-			int targetZ = wtoi(targetStr.c_str());
-			PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
-
-			int prevGridX = PlayerPtr->getGridX();
-			int prevGridY = PlayerPtr->getGridY();
-			int dstGridX = PlayerPtr->getSkillTarget().x;
-			int dstGridY = PlayerPtr->getSkillTarget().y;
-			int dGridX = dstGridX - prevGridX;
-			int dGridY = dstGridY - prevGridY;
-
-			if (dGridX > 0) PlayerPtr->setDirection(0);
-			else if (dGridX < 0) PlayerPtr->setDirection(4);
-
-			PlayerPtr->entityInfo.gridMoveSpd = 1.0;
-			EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
-			PlayerPtr->setFakeX(-16 * dGridX);
-			PlayerPtr->setFakeY(-16 * dGridY);
-
-			cameraFix = false;
-			cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
-			cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
-
-			addAniUSetPlayer(PlayerPtr, aniFlag::leap);
-		}
 		rangeSet.clear();
+		if (coAnswer.empty()) co_return;
+
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetZ = wtoi(targetStr.c_str());
+		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
+
+		int prevGridX = PlayerPtr->getGridX();
+		int prevGridY = PlayerPtr->getGridY();
+		int dstGridX = PlayerPtr->getSkillTarget().x;
+		int dstGridY = PlayerPtr->getSkillTarget().y;
+		int dGridX = dstGridX - prevGridX;
+		int dGridY = dstGridY - prevGridY;
+
+		if (dGridX > 0) PlayerPtr->setDirection(0);
+		else if (dGridX < 0) PlayerPtr->setDirection(4);
+
+		PlayerPtr->entityInfo.gridMoveSpd = 1.0;
+		EntityPtrMove({ prevGridX,prevGridY, PlayerPtr->getGridZ() }, { dstGridX, dstGridY, PlayerPtr->getGridZ() });
+		PlayerPtr->setFakeX(-16 * dGridX);
+		PlayerPtr->setFakeY(-16 * dGridY);
+
+		cameraFix = false;
+		cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
+		cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
+
+		addAniUSetPlayer(PlayerPtr, aniFlag::leap);
 		break;
 	}
 	}

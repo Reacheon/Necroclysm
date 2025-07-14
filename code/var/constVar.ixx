@@ -136,7 +136,6 @@ export enum class act
 
     identify,   //감정
     vehicle,    //차량
-    alchemy,    //연금술
     god, //신앙
     map, //지도
 
@@ -419,8 +418,6 @@ export enum class itemFlag
     GRAYFILTER,//검색 및 조합 GUI에서 아이템을 회색으로 표시하게 만듬
     BLACKFILTER,//조합 GUI에서 미해당 아이템을 검은색으로 표시하게 만듬(미표시)
     COORDCRAFT,//좌표조합, 건축물이나 차량 등
-    ALCHEMYTOOL,//연금술에서 사용 가능한 도구
-    ALCHEMYMATERIAL, //연금술에 사용 가능한 재료
     LIQUID, //액체 상
     GAS, // 기체 상
     VPART, //차량부품

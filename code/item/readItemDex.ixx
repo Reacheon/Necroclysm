@@ -384,8 +384,6 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"RAIDARMOR") itemDex[tgtIndex].flag.push_back(itemFlag::RAIDARMOR);
                                 else if (strFragment.substr(0, j) == L"COORDCRAFT") itemDex[tgtIndex].flag.push_back(itemFlag::COORDCRAFT);
                                 else if (strFragment.substr(0, j) == L"VFRAME") itemDex[tgtIndex].flag.push_back(itemFlag::VFRAME);
-                                else if (strFragment.substr(0, j) == L"ALCHEMYTOOL") itemDex[tgtIndex].flag.push_back(itemFlag::ALCHEMYTOOL);
-                                else if (strFragment.substr(0, j) == L"ALCHEMYMATERIAL") itemDex[tgtIndex].flag.push_back(itemFlag::ALCHEMYMATERIAL);
                                 else if (strFragment.substr(0, j) == L"LIQUID") itemDex[tgtIndex].flag.push_back(itemFlag::LIQUID);
                                 else if (strFragment.substr(0, j) == L"GAS") itemDex[tgtIndex].flag.push_back(itemFlag::GAS);
                                 else if (strFragment.substr(0, j) == L"VPART") itemDex[tgtIndex].flag.push_back(itemFlag::VPART);

@@ -1123,7 +1123,6 @@ void HUD::drawBarAct()
 		}
 		else if (barAct[i] == act::identify) setBtnLayout(sysStr[135], 52);
 		else if (barAct[i] == act::vehicle) setBtnLayout(sysStr[128], 48);
-		else if (barAct[i] == act::alchemy) setBtnLayout(sysStr[134], 51);
 		else if (barAct[i] == act::armor) setBtnLayout(sysStr[129], 16);
 		else if (barAct[i] == act::cooking) setBtnLayout(sysStr[130], 49);
 		else if (barAct[i] == act::menu) setBtnLayout(sysStr[9], 13);

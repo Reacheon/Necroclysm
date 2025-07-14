@@ -780,6 +780,7 @@ public:
 				//선택, 어느 손에 들까?
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
+				if (coAnswer.empty()) co_return;
 
 				equipHandFlag handDir = equipHandFlag::none;
 				if (coAnswer == sysStr[49])//왼손
@@ -825,6 +826,7 @@ public:
 				//선택, 어느 손에 들까?
 				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
 				co_await std::suspend_always();
+				if (coAnswer.empty()) co_return;
 
 				equipHandFlag handDir = equipHandFlag::none;
 				if (coAnswer == sysStr[49])//왼손
@@ -899,6 +901,7 @@ public:
 
 		new Lst(sysStr[95], sysStr[94], pocketList);//넣기, 넣을 포켓을 선택해주세요.
 		co_await std::suspend_always();
+		if (coAnswer.empty()) co_return;
 
 		////////////////////////////////////////////////////////////////////
 

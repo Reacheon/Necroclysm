@@ -47,6 +47,7 @@ public:
 
 	CoordSelectCraft(int tgtItemCode, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
 	{
+		coAnswer.clear();
 		selectableCoord = inputSelectableCoord;
 		telepathyStr = inputTelepathyStr;
 		rotatedItemCode = tgtItemCode;

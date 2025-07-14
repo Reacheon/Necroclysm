@@ -17,7 +17,6 @@ import ItemData;
 import EntityData;
 import SkillData;
 import Ani;
-import AlchemyData;
 import ItemPocket;
 import Player;
 import Drawable;
@@ -72,7 +71,6 @@ export float timeGift = 0; // 유저의 행동에 의해 엔티티들에게 주�
 
 export std::vector<EntityData> entityDex; // Entity DB
 export std::vector<ItemData> itemDex;// 아이템 DB
-export std::vector<AlchemyData> alchemyDex; //연금술 조합 DB
 export std::vector<SkillData> skillDex; //스킬 DB
 
 export std::vector<std::wstring> itemTooltip;

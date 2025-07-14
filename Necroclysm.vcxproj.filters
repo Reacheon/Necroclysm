@@ -70,9 +70,6 @@
     <Filter Include="소스 파일\00_var">
       <UniqueIdentifier>{5b0409cc-011d-4af5-be1f-689b3989bd07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\00_var\Alchemy">
-      <UniqueIdentifier>{4cffd73c-02c1-4857-9de8-924576165909}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\00_var\Skill">
       <UniqueIdentifier>{5f5a64ad-856a-41c1-88c7-ce014c9be36c}</UniqueIdentifier>
     </Filter>
@@ -128,12 +125,6 @@
     </ClCompile>
     <ClCompile Include="code\stepEvent.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
-    </ClCompile>
-    <ClCompile Include="code\readAlchemyDex.ixx">
-      <Filter>소스 파일\00_var\Alchemy</Filter>
-    </ClCompile>
-    <ClCompile Include="code\AlchemyData.ixx">
-      <Filter>소스 파일\00_var\Alchemy</Filter>
     </ClCompile>
     <ClCompile Include="code\startArea.ixx">
       <Filter>소스 파일\01_system\01_main</Filter>
@@ -259,9 +250,6 @@
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Aim.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\Alchemy.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\ContextMenu.ixx">

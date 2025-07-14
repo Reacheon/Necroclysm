@@ -83,10 +83,6 @@ export void textureLoader()
 	spr::vehicleTemplate = new Sprite(renderer, "image/UI/GUI/vehicleTemplate.png", 710, 376);
 	spr::vehicleCenterCursor = new Sprite(renderer, "image/UI/GUI/vehicleCenterCursor.png", 16, 16);
 	spr::lstSelectBox = new Sprite(renderer, "image/UI/GUI/lstSelectBox.png", 240, 29);
-	spr::alchemyArrow = new Sprite(renderer, "image/UI/GUI/Alchemy/alchemyArrow.png", 228, 52);
-	spr::alchemyPicture = new Sprite(renderer, "image/UI/GUI/Alchemy/alchemyPicture.png", 200, 100);
-	spr::alchemyStart = new Sprite(renderer, "image/UI/GUI/Alchemy/alchemyStart.png", 202, 74);
-	spr::alchemyMaterialEdge = new Sprite(renderer, "image/UI/GUI/Alchemy/alchemyMaterialEdge.png", 226, 290);
 
 	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
 	spr::eyesBlue = new Sprite(renderer, "image/charset/body/eyesBlue.png", 48, 48);

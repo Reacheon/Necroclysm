@@ -43,6 +43,7 @@ private:
 public:
 	Lst(std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option) : GUI(true)
 	{
+		coAnswer.clear();
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
 		prt(L"Lst 객체가 생성되었다.\n");
 		errorBox(ptr != nullptr, L"More than one message instance was generated.");
@@ -228,7 +229,6 @@ public:
 
 		if (checkCursor(&tab))
 		{
-			coAnswer = std::to_wstring(-1);
 			close(aniFlag::null);
 			return;
 		}

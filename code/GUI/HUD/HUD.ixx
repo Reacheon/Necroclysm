@@ -23,7 +23,6 @@ import Light;
 import Sticker;
 import Lst;
 import CoordSelect;
-import Alchemy;
 import turnWait;
 import Vehicle;
 import Prop;
@@ -391,10 +390,6 @@ public:
 			break;
 		case act::construct:
 			updateLog(L"#FFFFFF삭제된 GUI이다.");
-			break;
-		case act::alchemy:
-			updateLog(L"#FFFFFF연금술 창을 열었다.");
-			new Alchemy();
 			break;
 		case act::turnLeft:
 		{
@@ -777,6 +772,8 @@ public:
 		{
 			new CoordSelect(L"닫을 문을 선택해주세요.", doorList);
 			co_await std::suspend_always();
+
+			if (coAnswer.empty()) co_return;
 
 			std::wstring targetStr = coAnswer;
 			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());

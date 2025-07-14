@@ -345,6 +345,7 @@ public:
 		new Lst(sysStr[95], sysStr[94], bulletList);//넣기, 넣을 포켓을 선택해주세요.
 		co_await std::suspend_always();
 
+		if (coAnswer.empty() == true) co_return;
 		////////////////////////////////////////////////////////////////////
 
 		int counter = 0;

@@ -90,10 +90,6 @@ export namespace spr
 	Sprite* vehicleTemplate = nullptr;
 	Sprite* vehicleCenterCursor = nullptr;
 	Sprite* lstSelectBox = nullptr;
-	Sprite* alchemyArrow = nullptr;
-	Sprite* alchemyPicture = nullptr;
-	Sprite* alchemyStart = nullptr;
-	Sprite* alchemyMaterialEdge = nullptr;
 	Sprite* skinYellow = nullptr;
 	Sprite* eyesBlue = nullptr;
 	Sprite* eyesRed = nullptr;

@@ -46,7 +46,7 @@ public:
 		tabType = tabFlag::aim;
 
 
-		auto pEquip = PlayerPtr->getEquipPtr();
+		ItemPocket* pEquip = PlayerPtr->getEquipPtr();
 		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
 		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
 		else if (pEquip->itemInfo[0].checkFlag(itemFlag::GUN) && pEquip->itemInfo[0].checkFlag(itemFlag::SPR_TH_WEAPON)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);

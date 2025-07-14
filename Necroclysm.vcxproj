@@ -161,7 +161,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="code\actFuncSet.ixx" />
-    <ClCompile Include="code\AlchemyData.ixx" />
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
     <ClCompile Include="code\camera.ixx" />
@@ -184,7 +183,6 @@
     <ClCompile Include="code\Footprint.ixx" />
     <ClCompile Include="code\gamepadInput.ixx" />
     <ClCompile Include="code\GUI\Aim.ixx" />
-    <ClCompile Include="code\GUI\Alchemy.ixx" />
     <ClCompile Include="code\GUI\ContextMenu.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelect.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelectCraft.ixx" />
@@ -263,7 +261,6 @@
     <ClCompile Include="code\Light.ixx" />
     <ClCompile Include="code\log.ixx" />
     <ClCompile Include="code\main.cpp" />
-    <ClCompile Include="code\readAlchemyDex.ixx" />
     <ClCompile Include="code\renderLogue.ixx" />
     <ClCompile Include="code\renderTile.ixx" />
     <ClCompile Include="code\renderUI.ixx" />

@@ -667,27 +667,30 @@ public:
 			new Lst(sysStr[95], sysStr[94], numList);//넣기, 넣을 포켓을 선택해주세요.
 			deactColorChange = true;
 			co_await std::suspend_always();
-			deactColorChange = false;
-			switch (wtoi(coAnswer.c_str()))
+			if (coAnswer.empty() == false)
 			{
-			case 0:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK1);
-				break;
-			case 1:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK2);
-				break;
-			case 2:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK3);
-				break;
-			case 3:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK4);
-				break;
-			case 4:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK5);
-				break;
-			case 5:
-				recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK6);
-				break;
+				deactColorChange = false;
+				switch (wtoi(coAnswer.c_str()))
+				{
+				case 0:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK1);
+					break;
+				case 1:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK2);
+					break;
+				case 2:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK3);
+					break;
+				case 3:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK4);
+					break;
+				case 4:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK5);
+					break;
+				case 5:
+					recipePtr->itemInfo[craftCursor].addFlag(itemFlag::BOOKMARK6);
+					break;
+				}
 			}
 		}
 	}
@@ -772,6 +775,7 @@ public:
 							PlayerPtr->setFakeY(3 * (buildLocation.y - PlayerY()));
 							PlayerPtr->setDirection(coord2Dir(buildLocation.x - PlayerX(), buildLocation.y - PlayerY()));
 						}
+						else co_return;
 					}
 					else
 					{
@@ -806,7 +810,6 @@ public:
 						rangeSet.clear();
 						actDraw();
 
-
 						if (coAnswer.empty() == false)
 						{
 							std::wstring targetStr = coAnswer;
@@ -817,6 +820,7 @@ public:
 							int targetZ = wtoi(targetStr.c_str());
 							buildLocation = { targetX,targetY,targetZ };
 						}
+						else co_return;
 
 					}
 					else
@@ -865,6 +869,7 @@ public:
 							PlayerPtr->setFakeY(3 * (buildLocation.y - PlayerY()));
 							PlayerPtr->setDirection(coord2Dir(buildLocation.x - PlayerX(), buildLocation.y - PlayerY()));
 						}
+						else co_return;
 
 					}
 					else
@@ -889,18 +894,26 @@ public:
 				co_await std::suspend_always();
 				deactColorChange = false;
 
-				if (coAnswer == sysStr[312])//계속
+				if (coAnswer.empty() == false)
 				{
-					loadCraftData(targetItemCode, elapsedTime);
-				}
-				else if (coAnswer == sysStr[37])//아니오
-				{
-                    close(aniFlag::null);
-					co_return;
+					if (coAnswer == sysStr[312])//계속
+					{
+						loadCraftData(targetItemCode, elapsedTime);
+					}
+					else if (coAnswer == sysStr[37])//아니오
+					{
+						close(aniFlag::null);
+						co_return;
+					}
+					else
+					{
+						deleteCraftData();
+						co_return;
+					}
 				}
 				else
 				{
-					deleteCraftData();
+					close(aniFlag::null);
 					co_return;
 				}
 			}
@@ -917,19 +930,27 @@ public:
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == sysStr[312])//계속
+					if (coAnswer.empty() == false)
 					{
-						loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
-						prt(L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation.x, buildLocation.y, buildLocation.z);
-					}
-					else if (coAnswer == sysStr[37])//아니오
-					{
-						close(aniFlag::null);
-						co_return;
+						if (coAnswer == sysStr[312])//계속
+						{
+							loadCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
+							prt(L"현재 빌드 로케이션의 좌표는 %d,%d,%d이다\n", buildLocation.x, buildLocation.y, buildLocation.z);
+						}
+						else if (coAnswer == sysStr[37])//아니오
+						{
+							close(aniFlag::null);
+							co_return;
+						}
+						else
+						{
+							deleteCraftDataStructure();
+							co_return;
+						}
 					}
 					else
 					{
-						deleteCraftDataStructure();
+						close(aniFlag::null);
 						co_return;
 					}
 				}
@@ -942,14 +963,23 @@ public:
 					deactColorChange = true;
 					co_await std::suspend_always();
 					deactColorChange = false;
-					if (coAnswer == sysStr[36])//네
+
+					if (coAnswer.empty() == false)
 					{
-						deleteCraftDataStructure();
-						co_return;
+						if (coAnswer == sysStr[36])//네
+						{
+							deleteCraftDataStructure();
+							co_return;
+						}
+						else//아니오
+						{
+							close(aniFlag::null);
+							co_return;
+						}
 					}
-					else//아니오
+					else
 					{
-                        close(aniFlag::null);
+						close(aniFlag::null);
 						co_return;
 					}
 				}
@@ -975,29 +1005,33 @@ public:
 							if (TileFov(x, y, PlayerZ()) == fovFlag::white)
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
-									//경고, 
+									//경고, 주변에 적이 있습니다. 계속 조합하시겠습니까?
 									new Msg(msgFlag::normal, sysStr[306], sysStr[310], { sysStr[36],sysStr[37],sysStr[311] });
 									deactColorChange = true;
 									co_await std::suspend_always();
-									if (coAnswer == sysStr[36]) goto loopEnd;//네
-									else if (coAnswer == sysStr[311])//무시하기
+									if (coAnswer.empty() == false)
 									{
-										negateMonster = true;
-										goto loopEnd;
-									}
-									else
-									{
-										//조합 데이터 저장
-										if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
+										if (coAnswer == sysStr[36]) goto loopEnd;//네
+										else if (coAnswer == sysStr[311])//무시하기
 										{
-											saveCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
-											isNowBuilding = false;
+											negateMonster = true;
+											goto loopEnd;
 										}
-										else saveCraftData(targetItemCode, elapsedTime);
-										coTurnSkip = false;
-										close(aniFlag::null);
-										co_return;
+										else//아니오
+										{
+											//조합 데이터 저장
+											if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
+											{
+												saveCraftDataStructure(targetItemCode, elapsedTime, buildLocation);
+												isNowBuilding = false;
+											}
+											else saveCraftData(targetItemCode, elapsedTime);
+											coTurnSkip = false;
+											close(aniFlag::null);
+											co_return;
+										}
 									}
+									else goto loopEnd; //탭 누르면 계속하는걸로 간주
 								}
 					}
 				}
@@ -1073,6 +1107,7 @@ public:
 					//확인, 설치한 프레임을 주변 차량에 연결하시겠습니까?, 네, 아니오
 					new Msg(msgFlag::normal, sysStr[308], sysStr[309], { sysStr[36],sysStr[37] });
 					co_await std::suspend_always();
+					
 					if (coAnswer == sysStr[36])//네
 					{
 						Vehicle* targetVehicle;
@@ -1085,10 +1120,13 @@ public:
 						{
 							std::vector<std::wstring> vehicleNameList;
 							for (int i = 0; i < canConnect.size(); i++) vehicleNameList.push_back(canConnect[i]->name);
-							new Lst(sysStr[95], sysStr[94], vehicleNameList);//넣기, 넣을 포켓을 선택해주세요.
+							new Lst(sysStr[95], sysStr[94], vehicleNameList);//넣기, 아이템을 넣을 포켓을 골라주세요.
 							co_await std::suspend_always();
-							errorBox(wtoi(coAnswer.c_str()) >= canConnect.size() || wtoi(coAnswer.c_str()) < 0, L"Lst error, unknown vehicle selected");
-							targetVehicle = canConnect[wtoi(coAnswer.c_str())];
+							
+							int targetNumber = 0;
+                            if (coAnswer.empty() == false) targetNumber = wtoi(coAnswer.c_str());
+							errorBox(targetNumber >= canConnect.size() || targetNumber < 0, L"Lst error, unknown vehicle selected");
+							targetVehicle = canConnect[targetNumber];
 							targetVehicle->extendPart(buildLocation.x, buildLocation.y, targetItemCode);
 						}
 					}
