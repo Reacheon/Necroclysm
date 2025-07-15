@@ -26,7 +26,7 @@ private:
 	std::wstring telepathyStr = sysStr[175];
 	int index = -1;
 	std::wstring parameter = L"";
-	std::vector<std::array<int, 2>> selectableCoord;
+	std::vector<Point2> selectableCoord;
 	
 	bool advance = false; //좌표를 선택하고 확인 버튼을 한번 더 눌러야 진행되는 옵션2
 	int advanceIconIndex = -1;
@@ -47,7 +47,7 @@ public:
 
 
 	//셀렉터블 코드는 상대좌표 기준
-	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
+	CoordSelect(CoordSelectFlag inputType, std::wstring inputTelepathyStr, std::vector<Point2> inputSelectableCoord) : GUI(true)
 	{
 		coAnswer.clear();
 		type = inputType;
@@ -57,7 +57,7 @@ public:
 
 		selectableCoord = inputSelectableCoord;
 	}
-	CoordSelect(std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr, inputSelectableCoord) { }
+	CoordSelect(std::wstring inputTelepathyStr, std::vector<Point2> inputSelectableCoord) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr, inputSelectableCoord) { }
 
 	~CoordSelect()
 	{
@@ -97,8 +97,8 @@ public:
 			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 옐로커서로 표시
 			for (int i = 0; i < selectableCoord.size(); i++)
 			{
-				int revX = PlayerX() - selectableCoord[i][axis::x];
-				int revY = PlayerY() - selectableCoord[i][axis::y];
+				int revX = PlayerX() - selectableCoord[i].x;
+				int revY = PlayerY() - selectableCoord[i].y;
 
 				setZoom(zoomScale);
 				drawSpriteCenter
@@ -211,7 +211,7 @@ public:
 				{
 					for (int i = 0; i < selectableCoord.size(); i++)
 					{
-						if (selectableCoord[i][axis::x] == throwingX && selectableCoord[i][axis::y] == throwingY)
+						if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 						{
 							coAnswer = xStr + L"," + yStr + L"," + zStr;
 							prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());

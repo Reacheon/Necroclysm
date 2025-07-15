@@ -24,7 +24,7 @@ export void turnWait(float waitTime)
 
     //prt(L"[대기] %f분을 대기했다.\n", waitTime);
     const int GAS_UPDATE_RANGE = 29;
-    std::unordered_map<std::array<int, 2>, std::vector<gasData>> tempGas;
+    std::unordered_map<Point2, std::vector<gasData>> tempGas;
     int px = PlayerX();
     int py = PlayerY();
     int pz = PlayerZ();
@@ -48,8 +48,8 @@ export void turnWait(float waitTime)
     {
         for (int i = 0; i < it->second.size(); i++)
         {
-            int tgtX = it->first[0];
-            int tgtY = it->first[1];
+            int tgtX = it->first.x;
+            int tgtY = it->first.y;
             int tgtGasCode = it->second[i].gasCode;
 
             if (allowGasList.find(tgtGasCode) == allowGasList.end())

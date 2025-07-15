@@ -24,7 +24,7 @@ export class Aim : public GUI
 private:
 	inline static Aim* ptr = nullptr;
 	SDL_Rect aimBase;
-	std::vector<std::array<int, 3>> aimTrailRev;
+	std::vector<Point3> aimTrailRev;
 	Point3 aimCoord = { 0,0,0 };
 
 	double aimAcc = 0;
@@ -325,8 +325,8 @@ public:
 
 		for (int i = 0; i < aimTrailRev.size(); i++)
 		{
-			int tgtX = aimTrailRev[i][0];
-			int tgtY = aimTrailRev[i][1];
+			int tgtX = aimTrailRev[i].x;
+			int tgtY = aimTrailRev[i].y;
 			dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
 			dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
 			dst.w = 16.0 * zoomScale;
@@ -361,14 +361,14 @@ public:
 		if (aimCoord.x < PlayerX()) PlayerPtr->setDirection(4);
 		else if (aimCoord.x > PlayerX()) PlayerPtr->setDirection(0);
 
-		std::vector<std::array<int, 2>> lineCoord;
+		std::vector<Point2> lineCoord;
 		makeLine(lineCoord, aimCoord.x - PlayerX(), aimCoord.y - PlayerY());
 		aimTrailRev.clear();
 		for (int i = 0; i < lineCoord.size(); i++)
 		{
-			if (lineCoord[i][0] != 0 || lineCoord[i][1] != 0)
+			if (lineCoord[i].x != 0 || lineCoord[i].y != 0)
 			{
-				aimTrailRev.push_back({ PlayerX() + lineCoord[i][0],PlayerY() + lineCoord[i][1],PlayerZ() });
+				aimTrailRev.push_back({ PlayerX() + lineCoord[i].x,PlayerY() + lineCoord[i].y,PlayerZ() });
 			}
 		}
 	}

@@ -144,13 +144,6 @@ export std::wstring coAnswer = L"";
 export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴, 즉 코루틴함수 도중에 턴을 스킵하는 기능을 할 수 있음
 /////////////////////////////////////////////////////////////////
 
-
-//fac, tile, wall, ceil(따로 추가적으로 객체없음)
-export std::vector<int> canBuildListWall = { 1, 2 }; //나무벽, 흙벽
-export std::vector<int> canBuildListFloor = { 1 }; //나무바닥
-export std::vector<int> canBuildListCeil = { 1 }; //나무천장
-export std::vector<int> canBuildListFac = { 1, 2, 3 }; //차량 철 프레임, 의자, 장롱
-
 export std::unique_ptr<ItemPocket> availableRecipe;
 
 export Vehicle* ctrlVeh = nullptr;

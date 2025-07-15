@@ -608,7 +608,7 @@ public:
 	void findAndOpenAim()
 	{
 		//플레이어의 시야에 있는 모든 객체들을 체크
-		std::array<int, 2> nearCoord = { 0,0 };//상대좌표
+		Point2 nearCoord = { 0,0 };//상대좌표
 		int playerX = PlayerX();
 		int playerY = PlayerY();
 		int playerZ = PlayerZ();
@@ -621,7 +621,7 @@ public:
 					//없는 타일이거나 플레이어 개체는 제외함
 					if (TileEntity(i, j, playerZ) != nullptr && TileEntity(i, j, playerZ) != PlayerPtr)
 					{
-						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord[0], 2) + pow(nearCoord[1], 2)) || (nearCoord[0] == 0 && nearCoord[1] == 0))//갱신
+						if (std::sqrt(pow(i - playerX, 2) + pow(j - playerY, 2)) < std::sqrt(pow(nearCoord.x, 2) + pow(nearCoord.y, 2)) || (nearCoord.x == 0 && nearCoord.y == 0))//갱신
 						{
 							nearCoord = { i - playerX, j - playerY };
 						}
@@ -729,7 +729,7 @@ public:
 	Corouter closeDoor(int cx, int cy, int cz)
 	{
 		int doorNumber = 0;
-		std::vector<std::array<int, 2>> doorList;
+		std::vector<Point2> doorList;
 
 		for (int dir = 0; dir <= 7; dir++)
 		{
@@ -766,7 +766,7 @@ public:
 
 		if (doorNumber == 1)
 		{
-			closeDoorCoord(doorList[0][0], doorList[0][1], cz);
+			closeDoorCoord(doorList[0].x, doorList[0].y, cz);
 		}
 		else //문이 2개 이상일 경우
 		{

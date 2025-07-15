@@ -40,12 +40,10 @@ namespace csvEntity
     constexpr int statInt = 24;
     constexpr int statDex = 25;
     constexpr int hpBarHeight = 26;
-    constexpr int partsPosition = 27;
-    constexpr int partsSprIndexStart = 28;
-    constexpr int relation = 29;
-    constexpr int isHumanCustomSprite = 30;
-    constexpr int atkSpr1 = 31;
-    constexpr int atkSpr2 = 32;
+    constexpr int relation = 27;
+    constexpr int isHumanCustomSprite = 28;
+    constexpr int atkSpr1 = 29;
+    constexpr int atkSpr2 = 30;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -223,37 +221,6 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::hpBarHeight:
                             entityDex[tgtIndex].hpBarHeight = wtoi(strFragment.c_str());
-                            break;
-                        case csvEntity::partsPosition:
-                        {
-                            entityDex[tgtIndex].partsPosition.clear();
-                            std::array<int, 3> val;
-                            int counter = 0;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == SDLK_PERIOD)
-                                {
-                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
-                                    counter++;
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                }
-
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    val[counter] = wtoi(strFragment.substr(0, j).c_str());
-                                    counter = 0;
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-                                    entityDex[tgtIndex].partsPosition[val[0]] = { val[1], val[2] };
-                                }
-                            }
-                            break;
-                        }
-                        case csvEntity::partsSprIndexStart:
-                            entityDex[tgtIndex].partsStartIndex = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::relation:
                         {

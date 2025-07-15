@@ -607,7 +607,7 @@ __int64 drawEntities()
 	}
 
 
-	std::vector<std::array<int, 2>> rotorList;
+	std::vector<Point2> rotorList;
 	//차량그리기
 	std::unordered_set<Drawable*> vehCache;
 	for (const auto& elem : renderVehList)
@@ -633,8 +633,8 @@ __int64 drawEntities()
 	//헬기 로터 그리기
 	for (int i = 0; i < rotorList.size(); i++)
 	{
-		int tgtX = rotorList[i][0];
-		int tgtY = rotorList[i][1];
+		int tgtX = rotorList[i].x;
+		int tgtY = rotorList[i].y;
 		Vehicle* vPtr = TileVehicle(tgtX, tgtY, PlayerZ());
 
 		SDL_Rect dst;

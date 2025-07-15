@@ -147,11 +147,11 @@ int ItemPocket::addItemFromDex(int index, int number)
 
 int ItemPocket::addItemFromDex(int index) { return addItemFromDex(index, 1); }
 
-void ItemPocket::addItemFromDex(std::vector<std::array<int, 2>> inputVec)
+void ItemPocket::addItemFromDex(std::vector<Point2> inputVec)
 {
 	for (int i = 0; i < inputVec.size(); i++)
 	{
-		addItemFromDex(inputVec[i][0], inputVec[i][1]);
+		addItemFromDex(inputVec[i].x, inputVec[i].y);
 	}
 }
 

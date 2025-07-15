@@ -12,9 +12,9 @@ import TileData;
 export class World
 {
 private:
-	std::unordered_map<std::array<int, 3>, Chunk*, arrayHasher3> chunkPtr;
+	std::unordered_map<Point3, Chunk*, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk;
-	std::unordered_set<std::array<int, 3>, arrayHasher3> isSectorCreated;
+	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
 
 public:
 	static World* ins()//싱글톤 함수

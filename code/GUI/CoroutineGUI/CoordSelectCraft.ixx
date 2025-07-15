@@ -28,7 +28,7 @@ private:
 	std::wstring telepathyStr = sysStr[175];
 	int index = -1;
 	std::wstring parameter = L"";
-	std::vector<std::array<int, 2>> selectableCoord;
+	std::vector<Point2> selectableCoord;
 
 	bool advance = false; //좌표를 선택하고 확인 버튼을 한번 더 눌러야 진행되는 옵션
 	int advanceIconIndex = -1;
@@ -45,7 +45,7 @@ private:
 
 public:
 
-	CoordSelectCraft(int tgtItemCode, std::wstring inputTelepathyStr, std::vector<std::array<int, 2>> inputSelectableCoord) : GUI(true)
+	CoordSelectCraft(int tgtItemCode, std::wstring inputTelepathyStr, std::vector<Point2> inputSelectableCoord) : GUI(true)
 	{
 		coAnswer.clear();
 		selectableCoord = inputSelectableCoord;
@@ -291,7 +291,7 @@ public:
 					{
 						for (int i = 0; i < selectableCoord.size(); i++)
 						{
-							if (selectableCoord[i][axis::x] == throwingX && selectableCoord[i][axis::y] == throwingY)
+							if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 							{
 								if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
 								{

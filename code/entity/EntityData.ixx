@@ -48,8 +48,6 @@ export struct EntityData_Base
     std::vector<SkillData> skillList;
 
     __int8 hpBarHeight = -12;
-    __int8 partsStartIndex = 0;
-    std::unordered_map<int, std::array<int, 2>> partsPosition;
 
     relationFlag relation = relationFlag::hostile;
     bool isHumanCustomSprite = false;

@@ -738,7 +738,7 @@ public:
 				if (itemDex[targetItemCode].checkFlag(itemFlag::VFRAME))
 				{
 					//새로운 차량을 설치하시겠습니까?
-					std::vector<std::array<int, 2>> selectableTile;
+					std::vector<Point2> selectableTile;
 					for (int dir = -1; dir < 8; dir++)
 					{
 						int dx, dy;
@@ -749,7 +749,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 
 						new CoordSelect(sysStr[303]);//차량 프레임을 설치할 위치를 선택해주세요.
 						co_await std::suspend_always();
@@ -785,7 +785,7 @@ public:
 				}
 				else if (itemDex[targetItemCode].checkFlag(itemFlag::VPART))
 				{
-					std::vector<std::array<int, 2>> selectableTile;
+					std::vector<Point2> selectableTile;
 					for (int dir = -1; dir < 8; dir++)
 					{
 						int dx, dy;
@@ -832,7 +832,7 @@ public:
 				else
 				{
 					//새로운 차량을 설치하시겠습니까?
-					std::vector<std::array<int, 2>> selectableTile;
+					std::vector<Point2> selectableTile;
 					for (int dir = 0; dir < 8; dir++)
 					{
 						int dx, dy;
@@ -843,7 +843,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 
 						new CoordSelectCraft(targetItemCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 						co_await std::suspend_always();

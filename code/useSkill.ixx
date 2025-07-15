@@ -36,7 +36,7 @@ export Corouter useSkill(int skillCode)
 		break;
 	case 30://화염폭풍
 	{
-		std::vector<std::array<int, 2>> coordList;
+		std::vector<Point2> coordList;
 		for (int tgtY = -SKILL_MAX_RANGE; tgtY <= SKILL_MAX_RANGE; tgtY++)
 		{
 			for (int tgtX = -SKILL_MAX_RANGE; tgtX <= SKILL_MAX_RANGE; tgtX++)
