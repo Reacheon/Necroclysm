@@ -11,22 +11,22 @@ export void initCoordTransform()
 
     auto xShiftLeft = [=](dir16 dir, int y) {
         for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2 - 1; x++) coordTransform[dir][{x, y}] = coordTransform[dir][{x + 1, y}];
-        coordTransform[dir][{MAX_VEHICLE_SIZE / 2, y}][0]++;
+        coordTransform[dir][{MAX_VEHICLE_SIZE / 2, y}].x++;
         };
 
     auto xShiftRight = [=](dir16 dir, int y) {
         for (int x = MAX_VEHICLE_SIZE / 2; x >= -MAX_VEHICLE_SIZE / 2 + 1; x--) coordTransform[dir][{x, y}] = coordTransform[dir][{x - 1, y}];
-        coordTransform[dir][{-MAX_VEHICLE_SIZE / 2, y}][0]--;
+        coordTransform[dir][{-MAX_VEHICLE_SIZE / 2, y}].x--;
         };
 
     auto yShiftUp = [=](dir16 dir, int x) {
         for (int y = -MAX_VEHICLE_SIZE / 2; y < MAX_VEHICLE_SIZE / 2 - 1; y++) coordTransform[dir][{x, y}] = coordTransform[dir][{x, y + 1}];
-        coordTransform[dir][{x, MAX_VEHICLE_SIZE / 2}][1]++;
+        coordTransform[dir][{x, MAX_VEHICLE_SIZE / 2}].y++;
         };
 
     auto yShiftDown = [=](dir16 dir, int x) {
         for (int y = MAX_VEHICLE_SIZE / 2; y >= -MAX_VEHICLE_SIZE / 2 + 1; y--) coordTransform[dir][{x, y}] = coordTransform[dir][{x, y - 1}];
-        coordTransform[dir][{x, -MAX_VEHICLE_SIZE / 2}][1]--;
+        coordTransform[dir][{x, -MAX_VEHICLE_SIZE / 2}].y--;
         };
 
     //★방향 0도
@@ -234,21 +234,21 @@ export void initCoordTransform()
                     for (int x = -MAX_VEHICLE_SIZE / 2; x <= MAX_VEHICLE_SIZE / 2; x++)
                     {
 
-                        if (std::abs(coordTransform[input][{x, y}][1]) <= 2 && coordTransform[input][{x, y}][0] <= 14 && coordTransform[input][{x, y}][0] >= -4) std::printf("\033[38;5;214m");
-                        if (coordTransform[input][{x, y}][0] == 0 && coordTransform[input][{x, y}][1] == 0) std::printf("\033[31m");
+                        if (std::abs(coordTransform[input][{x, y}].y) <= 2 && coordTransform[input][{x, y}].x <= 14 && coordTransform[input][{x, y}].x >= -4) std::printf("\033[38;5;214m");
+                        if (coordTransform[input][{x, y}].x == 0 && coordTransform[input][{x, y}].y == 0) std::printf("\033[31m");
                         if (indicateCoord)
                         {
                             std::cout << "("
-                                << std::setw(3) << std::setfill(' ') << coordTransform[input][{x, y}][0] << ","
-                                << std::setw(3) << std::setfill(' ') << coordTransform[input][{x, y}][1]
+                                << std::setw(3) << std::setfill(' ') << coordTransform[input][{x, y}].x << ","
+                                << std::setw(3) << std::setfill(' ') << coordTransform[input][{x, y}].y
                                 << ")";
                         }
                         else
                         {
                             std::printf("■");
                         }
-                        if (coordTransform[input][{x, y}][0] == 0 && coordTransform[input][{x, y}][1] == 0) std::printf("\033[0m");
-                        if (std::abs(coordTransform[input][{x, y}][1]) <= 2 && coordTransform[input][{x, y}][0] <= 14 && coordTransform[input][{x, y}][0] >= -4) std::printf("\033[0m");
+                        if (coordTransform[input][{x, y}].x == 0 && coordTransform[input][{x, y}].y == 0) std::printf("\033[0m");
+                        if (std::abs(coordTransform[input][{x, y}].y) <= 2 && coordTransform[input][{x, y}].x <= 14 && coordTransform[input][{x, y}].x >= -4) std::printf("\033[0m");
                         if (x == MAX_VEHICLE_SIZE / 2) std::cout << "\n";
                     }
                 }

@@ -142,7 +142,7 @@ public:
 
 
 	//섹터 관련
-	std::array<int, 2> changeToSectorCoord(int inputGridX, int inputGridY)
+	Point2 changeToSectorCoord(int inputGridX, int inputGridY)
 	{
 		//-1200 ~ -801 : -3
 		//-800 ~ -401 : -2

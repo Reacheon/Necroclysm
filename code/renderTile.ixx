@@ -667,8 +667,8 @@ __int64 drawEntities()
 		Vehicle* vPtr = ctrlVeh;
 		for (auto it = vPtr->partInfo.begin(); it != vPtr->partInfo.end(); it++)
 		{
-			int tgtX = it->first[0];
-			int tgtY = it->first[1];
+			int tgtX = it->first.x;
+			int tgtY = it->first.y;
 
 			for (int layer = 0; layer < vPtr->partInfo[{tgtX, tgtY}]->itemInfo.size(); layer++)
 			{

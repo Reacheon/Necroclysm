@@ -276,10 +276,10 @@ bool Vehicle::runAI()
                 setFakeY(trainPrevY - getY());
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
-                    if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
+                    if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
                     {
-                        TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getIntegerFakeX());
-                        TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getIntegerFakeY());
+                        TileEntity(it->first.x, it->first.y, getGridZ())->setFakeX(getIntegerFakeX());
+                        TileEntity(it->first.x, it->first.y, getGridZ())->setFakeY(getIntegerFakeY());
                     }
                 }
 
@@ -291,7 +291,7 @@ bool Vehicle::runAI()
                 extraRenderVehList.push_back(this);
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
-                    Drawable* iPtr =TileEntity(it->first[0], it->first[1], getGridZ());
+                    Drawable* iPtr =TileEntity(it->first.x, it->first.y, getGridZ());
                     if (iPtr != nullptr) extraRenderEntityList.push_back(iPtr);
                 }
                 cameraFix = false;
@@ -487,7 +487,7 @@ bool Vehicle::runAI()
 
                         if (dstX != 0 || dstY != 0)
                         {
-                            std::vector<std::array<int, 2>> path;
+                            std::vector<Point2> path;
                             makeLine(path, dstX, dstY);
 
                             int dxFinal = 0;
@@ -497,10 +497,10 @@ bool Vehicle::runAI()
 
                             for (int i = 1; i < path.size(); i++)
                             {
-                                if (colisionCheck(path[i][0], path[i][1]))//충돌할 경우
+                                if (colisionCheck(path[i].x, path[i].y))//충돌할 경우
                                 {
-                                    dxFinal = path[i - 1][0];
-                                    dyFinal = path[i - 1][1];
+                                    dxFinal = path[i - 1].x;
+                                    dyFinal = path[i - 1].y;
                                     prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
                                     accVec = getZeroVec();
                                     spdVec = getZeroVec();
@@ -606,17 +606,17 @@ bool Vehicle::runAI()
                         
                         for (int j = 0; j < trainList.size(); j++)
                         {
-                            std::vector<std::array<int, 2>> path;
+                            std::vector<Point2> path;
                             makeLine(path, dstX, dstY);
 
                             int dxFinal = 0;
                             int dyFinal = 0;
                             for (int i = 1; i < path.size(); i++)
                             {
-                                if (trainList[j]->colisionCheck(path[i][0], path[i][1]))//충돌할 경우
+                                if (trainList[j]->colisionCheck(path[i].x, path[i].y))//충돌할 경우
                                 {
-                                    dxFinal = path[i - 1][0];
-                                    dyFinal = path[i - 1][1];
+                                    dxFinal = path[i - 1].x;
+                                    dyFinal = path[i - 1].y;
                                     break;
                                 }
 

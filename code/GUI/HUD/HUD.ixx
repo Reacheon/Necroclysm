@@ -577,7 +577,7 @@ public:
 						{
 							if (it->second->itemInfo[i].lightPtr == nullptr)
 							{
-								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first[0], it->first[1], ctrlVeh->getGridZ(), 12, 120, col::white, ctrlVeh->bodyDir);
+								it->second->itemInfo[i].lightPtr = std::make_unique<Light>(it->first.x, it->first.y, ctrlVeh->getGridZ(), 12, 120, col::white, ctrlVeh->bodyDir);
 							}
 						}
 					}
@@ -630,7 +630,7 @@ public:
 			}
 		}
 
-		if (nearCoord[0] == 0 && nearCoord[1] == 0)//찾지 못했을 경우
+		if (nearCoord.x == 0 && nearCoord.y == 0)//찾지 못했을 경우
 		{
 			updateLog(col2Str(col::white) + sysStr[105]);
 		}

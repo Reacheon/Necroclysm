@@ -218,7 +218,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::map<Point2, std::unique_ptr<Entity>> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+        std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
         for (auto it = partInfo.begin(); it != partInfo.end(); it++)
         {
             if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
@@ -235,8 +235,8 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
             {
                 if (partInfo.find({ x,y }) != partInfo.end())
                 {
-                    std::array<int, 2> originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
-                    std::array<int, 2> dstCoord;
+                    Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
+                    Point2 dstCoord;
                     for (auto it = targetCoordTransform.begin(); it != targetCoordTransform.end(); it++)
                     {
                         if (it->second == originCoord)
@@ -248,7 +248,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 
                     if (entityWormhole.find({ x, y }) != entityWormhole.end())
                     {
-                        EntityPtrMove(std::move(entityWormhole[{x, y}]), { dstCoord[0] + getGridX(), dstCoord[1] + getGridY(), getGridZ() });
+                        EntityPtrMove(std::move(entityWormhole[{x, y}]), { dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ() });
                     }
                 }
             }
@@ -333,8 +333,8 @@ void Vehicle::updateSpr()
                 auto checkWallGroup = [=](int dx, int dy)->bool
                     {
                         int currentGroup = tgtPocket->itemInfo[layer].tileConnectGroup;
-                        std::array<int, 2> value1 = coordTransform[bodyDir][{tgtRelX, tgtRelY}];
-                        std::array<int, 2> key1;
+                        Point2 value1 = coordTransform[bodyDir][{tgtRelX, tgtRelY}];
+                        Point2 key1;
                         for (auto it = coordTransform[refDir].begin(); it != coordTransform[refDir].end(); it++)
                         {
                             if (it->second == value1)
@@ -342,8 +342,8 @@ void Vehicle::updateSpr()
                                 key1 = it->first;
                             }
                         }
-                        std::array<int, 2> value2 = coordTransform[refDir][{key1[0] + dx, key1[1] + dy}];
-                        std::array<int, 2> key2;
+                        Point2 value2 = coordTransform[refDir][{key1.x + dx, key1.y + dy}];
+                        Point2 key2;
                         for (auto it = coordTransform[bodyDir].begin(); it != coordTransform[bodyDir].end(); it++)
                         {
                             if (it->second == value2)
@@ -351,9 +351,9 @@ void Vehicle::updateSpr()
                                 key2 = it->first;
                             }
                         }
-                        if (partInfo.find({ getGridX() + key2[0], getGridY() + key2[1] }) != partInfo.end())
+                        if (partInfo.find({ getGridX() + key2.x, getGridY() + key2.y }) != partInfo.end())
                         {
-                            std::vector<ItemData>& tgtItemInfo = partInfo[{getGridX() + key2[0], getGridY() + key2[1]}]->itemInfo;
+                            std::vector<ItemData>& tgtItemInfo = partInfo[{getGridX() + key2.x, getGridY() + key2.y}]->itemInfo;
                             for (int i = 0; i < tgtItemInfo.size(); i++)
                             {
                                 if (/*tgtItemInfo[i].checkFlag(itemFlag::PROP_WALL_CONNECT) && */tgtItemInfo[i].tileConnectGroup == currentGroup)
@@ -385,7 +385,7 @@ void Vehicle::updateSpr()
 
 void Vehicle::shift(int dx, int dy)
 {
-    std::map<Point2, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
@@ -420,7 +420,7 @@ void Vehicle::shift(int dx, int dy)
 
 void Vehicle::zShift(int dz)
 {
-    std::map<Point2, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
@@ -474,18 +474,18 @@ bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때
     for (auto it = partInfo.begin(); it != partInfo.end(); it++)
     {
         //벽 충돌 체크
-        if (TileWall(it->first[0] + dx, it->first[1] + dy, getGridZ()) != 0) return true;
+        if (TileWall(it->first.x + dx, it->first.y + dy, getGridZ()) != 0) return true;
 
-        if(TileProp(it->first[0] + dx, it->first[1] + dy, getGridZ()) != nullptr)
+        if(TileProp(it->first.x + dx, it->first.y + dy, getGridZ()) != nullptr)
         {
-            if (TileProp(it->first[0] + dx, it->first[1] + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)==false)
+            if (TileProp(it->first.x + dx, it->first.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)==false)
             {
                 return true;
             }
         }   
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle(it->first[0] + dx, it->first[1] + dy, getGridZ());
+        Vehicle* targetPtr = TileVehicle(it->first.x + dx, it->first.y + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this)
         {
             prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, targetPtr);
@@ -513,7 +513,7 @@ void Vehicle::rush(int dx, int dy)
     extraRenderVehList.push_back(this);
     for (auto& p : partInfo)
     {
-        if (auto e = TileEntity(p.first[0], p.first[1], getGridZ()))
+        if (auto e = TileEntity(p.first.x, p.first.y, getGridZ()))
         {
             e->setFakeX(-getDelX());
             e->setFakeY(-getDelY());
@@ -545,7 +545,7 @@ void Vehicle::updateHeadlight()
                     {
                         Light* thisLight = it->second->itemInfo[i].lightPtr.get();
                         thisLight->dir = bodyDir;
-                        thisLight->moveLight(it->first[0], it->first[1], getGridZ());
+                        thisLight->moveLight(it->first.x, it->first.y, getGridZ());
                     }
                 }
             }
@@ -567,8 +567,8 @@ void Vehicle::updateHeadlight(Point3 fakeCoor) //코어가 해당 위치에 가�
                     {
                         Light* thisLight = it->second->itemInfo[i].lightPtr.get();
                         thisLight->dir = bodyDir;
-                        int revX = it->first[0] - getGridX();
-                        int revY = it->first[1] - getGridY();
+                        int revX = it->first.x - getGridX();
+                        int revY = it->first.y - getGridY();
 
                         thisLight->moveLight(fakeCoor.x + revX, fakeCoor.y + revY, getGridZ());
                     }
@@ -627,7 +627,7 @@ bool Vehicle::runAnimation(bool shutdown)
         {
             static float totalDist = 0;
             static float totalMove = 0;
-            static std::vector<std::array<int, 2>> lineRevPath;
+            static std::vector<Point2> lineRevPath;
             static Point3 startPoint;
             static int lineCheck = 0;
             static Point3 currentCoreGrid;
@@ -667,10 +667,10 @@ bool Vehicle::runAnimation(bool shutdown)
 
             for (auto it = partInfo.begin(); it != partInfo.end(); it++)
             {
-                if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
+                if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
                 {
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getFakeX());
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getFakeY());
+                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeX(getFakeX());
+                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeY(getFakeY());
                 }
             }
 
@@ -680,12 +680,12 @@ bool Vehicle::runAnimation(bool shutdown)
                 currentCoreGrid = getClosestGridWithFake();
                 for (int i = 0; i < lineRevPath.size(); i++)
                 {
-                    if (currentCoreGrid.x == startPoint.x + lineRevPath[i][0] && currentCoreGrid.y == startPoint.y + lineRevPath[i][1])
+                    if (currentCoreGrid.x == startPoint.x + lineRevPath[i].x && currentCoreGrid.y == startPoint.y + lineRevPath[i].y)
                     {
                         for (int j = lineCheck; j <= i; j++)
                         {
-                            updateHeadlight({ startPoint.x + lineRevPath[i][0],startPoint.y + lineRevPath[i][1],getGridZ() });
-                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i][0], startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i][1]);
+                            updateHeadlight({ startPoint.x + lineRevPath[i].x,startPoint.y + lineRevPath[i].y,getGridZ() });
+                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i].x, startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i].y);
                             lineCheck++;
                         }
                     }
@@ -705,9 +705,9 @@ bool Vehicle::runAnimation(bool shutdown)
                 setFakeY(0);
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)//엔티티 페이크 설정
                 {
-                    if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
+                    if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
                     {
-                        Entity* tgtEntity = TileEntity(it->first[0], it->first[1], getGridZ());
+                        Entity* tgtEntity = TileEntity(it->first.x, it->first.y, getGridZ());
                         tgtEntity->setFakeX(0);
                         tgtEntity->setFakeY(0);
                         tgtEntity->setDelGrid(0, 0);
@@ -722,7 +722,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), this));
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)
                 {
-                    Drawable* iPtr = TileEntity(it->first[0], it->first[1], getGridZ());
+                    Drawable* iPtr = TileEntity(it->first.x, it->first.y, getGridZ());
                     if (iPtr != nullptr)
                     {
                         auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
@@ -746,10 +746,10 @@ bool Vehicle::runAnimation(bool shutdown)
 
             for (auto it = partInfo.begin(); it != partInfo.end(); it++)
             {
-                if (TileEntity(it->first[0], it->first[1], getGridZ()) != nullptr)
+                if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
                 {
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeX(getIntegerFakeX());
-                    TileEntity(it->first[0], it->first[1], getGridZ())->setFakeY(getIntegerFakeY());
+                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeX(getIntegerFakeX());
+                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeY(getIntegerFakeY());
                 }
             }
 
@@ -802,7 +802,7 @@ void Vehicle::updateTrainCenter()
             {
                 if (std::find(trainWheelList.begin(), trainWheelList.end(), it->first) == trainWheelList.end()) //열차 바퀴 좌표가 중복된 값이 없으면
                 {
-                    trainWheelList.push_back({ it->first[0],it->first[1] });
+                    trainWheelList.push_back({ it->first.x,it->first.y });
                 }
             }
         }
@@ -1022,7 +1022,7 @@ void Vehicle::drawSelf()
             //바닥프롭,천장프롭 플래그가 없는 일반 프롭일 경우
             if (!(it->second)->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
             {
-                drawVehicleComponent(this, (it->first)[0], (it->first)[1], layer, 255);
+                drawVehicleComponent(this, (it->first).x, (it->first).y, layer, 255);
             }
         }
 
@@ -1036,9 +1036,9 @@ void Vehicle::drawSelf()
             {
                 if ((it->second)->itemInfo[layer].itemCode == 314)
                 {
-                    rotorList.push_back({ it->first[0],it->first[1] });
+                    rotorList.push_back({ it->first.x,it->first.y });
                 }
-                else drawVehicleComponent(this, it->first[0], it->first[1], layer, propCeilAlpha);
+                else drawVehicleComponent(this, it->first.x, it->first.y, layer, propCeilAlpha);
             }
         }
     }

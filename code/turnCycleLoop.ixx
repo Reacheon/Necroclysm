@@ -152,7 +152,7 @@ __int64 playerInputTurn()
 		if (dx != 0 || dy != 0)
 		{
 			//주변 10칸으로 이동 가능한 타일 배열 계산
-			std::set<std::array<int, 2>> walkableTile;
+			std::unordered_set<Point2,Point2::Hash> walkableTile;
 			for (int i = PlayerX() - 20; i <= PlayerX() + 20; i++)
 			{
 				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)

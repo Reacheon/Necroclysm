@@ -4,7 +4,7 @@ import std;
 import Point;
 
 //@brief 좌표들을 저장하는inputPath 벡터에 srcXY부터 delXY까지의 선을 긋고 해당하는 좌표들을 순서대로 벡터에 쌓는 함수 
-export void makeLine(std::vector<std::array<int, 2>>& inputPath, int delX, int delY)
+export void makeLine(std::vector<Point2>& inputPath, int delX, int delY)
 {
     int cursorX = 0;
     int cursorY = 0;

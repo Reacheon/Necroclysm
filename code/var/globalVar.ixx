@@ -147,7 +147,7 @@ export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 c
 export std::unique_ptr<ItemPocket> availableRecipe;
 
 export Vehicle* ctrlVeh = nullptr;
-export std::map < dir16, std::unordered_map<std::array<int, 2>, std::array<int, 2>, arrayHasher2>> coordTransform;//좌표변환
+export std::map < dir16, std::unordered_map<Point2, Point2, Point2::Hash>> coordTransform;//좌표변환
 
 export SDL_Rect quickSlotBtn[8];
 

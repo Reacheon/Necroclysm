@@ -803,7 +803,7 @@ public:
 					if (selectableTile.size() > 0)
 					{
 						deactDraw();
-						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i][0],selectableTile[i][1] });
+						for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 
 						new CoordSelect(sysStr[304]);//차량 부품을 설치할 프레임을 선택해주세요. 
 						co_await std::suspend_always();
