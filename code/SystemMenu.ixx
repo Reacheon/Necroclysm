@@ -68,14 +68,7 @@ public:
 	{
 		if (getStateInput() == false) { return; }
 	}
-	void clickMotionGUI(int dx, int dy) {}
-	void clickDownGUI() {}
-	void clickRightGUI() {}
-	void clickHoldGUI() {}
-	void mouseWheel() {}
-	void gamepadBtnDown() {}
-	void gamepadBtnMotion() {}
-	void gamepadBtnUp() {}
+
 	void keyUpGUI()
 	{
 		switch (event.key.key)
@@ -88,5 +81,4 @@ public:
 
         
 	}
-	void step() {}
 };

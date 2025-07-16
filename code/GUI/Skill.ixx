@@ -360,10 +360,7 @@ public:
 		dragSkillTarget = -1;
 
 	}
-	void clickMotionGUI(int dx, int dy) 
-	{
 
-	}
 	void clickDownGUI() 
 	{
 		for (int i = 0; i < SKILL_GUI_MAX; i++)
@@ -389,7 +386,7 @@ public:
 			}
 		}
 	}
-	void clickHoldGUI() {}
+
 	void mouseWheel() 
 	{
 		if (checkCursor(&skillBase))
@@ -398,9 +395,7 @@ public:
 			else if (event.wheel.y < 0 && skillScroll + SKILL_GUI_MAX < filteredSkills.size()) skillScroll += 1;
 		}
 	}
-	void gamepadBtnDown() {}
-	void gamepadBtnMotion() {}
-	void gamepadBtnUp() {}
+
 	void step() 
 	{
 		//잘못된 스크롤 위치 조정

@@ -242,13 +242,4 @@ public:
 			}
 		}
 	}
-	void clickMotionGUI(int dx, int dy) { }
-	void clickDownGUI() { }
-	void clickRightGUI() { }
-	void clickHoldGUI() { }
-	void mouseWheel() {}
-	void gamepadBtnDown() { }
-	void gamepadBtnMotion() { }
-	void gamepadBtnUp() { }
-	void step() { }
 };

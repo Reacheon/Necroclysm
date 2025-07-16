@@ -352,14 +352,6 @@ public:
 		}
 		else close(aniFlag::winUnfoldClose);
 	}
-	void clickMotionGUI(int dx, int dy) { }
-	void clickDownGUI() { }
-	void clickRightGUI() { }
-	void clickHoldGUI() { }
-	void mouseWheel() {}
-	void gamepadBtnDown() { }
-	void gamepadBtnMotion() { }
-	void gamepadBtnUp() { }
 	void step() 
 	{
 		contextMenuBase.h = 6 + 22 * (int)actOptions.size();

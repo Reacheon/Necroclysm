@@ -279,11 +279,6 @@ public:
 		}
 	}
 
-	void clickMotionGUI(int dx, int dy) {}
-	void clickDownGUI() {}
-	void clickRightGUI() {}
-	void clickHoldGUI() {}
-
 	void mouseWheel()
 	{
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
@@ -298,10 +293,6 @@ public:
 			else if (event.wheel.y < 0 && maintScroll + MAX_BTN < items.size()) maintScroll += 1;
 		}
 	}
-
-	void gamepadBtnDown() {}
-	void gamepadBtnMotion() {}
-	void gamepadBtnUp() {}
 
 	void step()
 	{

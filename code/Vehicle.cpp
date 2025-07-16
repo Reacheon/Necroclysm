@@ -158,11 +158,11 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
-                    for (auto it = targetCoordTransform.begin(); it != targetCoordTransform.end(); it++)
+                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
                     {
-                        if (it->second == originCoord)
+                        if (transformedCoord == originCoord)
                         {
-                            dstCoord = it->first;
+                            dstCoord = coord;
                             break;
                         }
                     }
@@ -189,11 +189,11 @@ std::unordered_set<Point2, Point2::Hash> Vehicle::getRotateShadow(dir16 inputDir
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
-                    for (auto it = targetCoordTransform.begin(); it != targetCoordTransform.end(); it++)
+                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
                     {
-                        if (it->second == originCoord)
+                        if (transformedCoord == originCoord)
                         {
-                            dstCoord = it->first;
+                            dstCoord = coord;
                             break;
                         }
                     }
@@ -206,9 +206,9 @@ std::unordered_set<Point2, Point2::Hash> Vehicle::getRotateShadow(dir16 inputDir
     else
     {
         std::unordered_set<Point2, Point2::Hash> newPartInfo;
-        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            newPartInfo.insert({ it->first.x,it->first.y });
+            newPartInfo.insert({ pos.x, pos.y });
         }
         return newPartInfo;
     }
@@ -219,11 +219,11 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
     if (bodyDir != inputDir16)
     {
         std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
-        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+            if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
             {
-                entityWormhole[{it->first.x, it->first.y}] = std::move(World::ins()->getTile(it->first.x, it->first.y, getGridZ()).EntityPtr);
+                entityWormhole[{pos.x, pos.y}] = std::move(World::ins()->getTile(pos.x, pos.y, getGridZ()).EntityPtr);
             }
         }
 
@@ -237,11 +237,11 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
-                    for (auto it = targetCoordTransform.begin(); it != targetCoordTransform.end(); it++)
+                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
                     {
-                        if (it->second == originCoord)
+                        if (transformedCoord == originCoord)
                         {
-                            dstCoord = it->first;
+                            dstCoord = coord;
                             break;
                         }
                     }
@@ -260,17 +260,17 @@ void Vehicle::rotate(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            TileVehicle(it->first.x, it->first.y, getGridZ()) = nullptr;
+            TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
         }
 
         rotateEntityPtr(inputDir16);
         rotatePartInfo(inputDir16);
 
-        for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            TileVehicle(it->first.x, it->first.y, getGridZ()) = this;
+            TileVehicle(pos.x, pos.y, getGridZ()) = this;
         }
 
         //회전하는 방향에 대해 바퀴 방향 재설정
@@ -319,13 +319,13 @@ void Vehicle::updateSpr()
         break;
     }
 
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        int tgtX = it->first.x;
-        int tgtY = it->first.y;
+        int tgtX = pos.x;
+        int tgtY = pos.y;
         int tgtRelX = tgtX - getGridX();
         int tgtRelY = tgtY - getGridY();
-        ItemPocket* tgtPocket = it->second.get();
+        ItemPocket* tgtPocket = pocket.get();
         for (int layer = 0; layer < tgtPocket->itemInfo.size(); layer++)
         {
             if (tgtPocket->itemInfo[layer].checkFlag(itemFlag::VPART_WALL_CONNECT))
@@ -335,20 +335,20 @@ void Vehicle::updateSpr()
                         int currentGroup = tgtPocket->itemInfo[layer].tileConnectGroup;
                         Point2 value1 = coordTransform[bodyDir][{tgtRelX, tgtRelY}];
                         Point2 key1;
-                        for (auto it = coordTransform[refDir].begin(); it != coordTransform[refDir].end(); it++)
+                        for (const auto& [coord, transformedCoord] : coordTransform[refDir])
                         {
-                            if (it->second == value1)
+                            if (transformedCoord == value1)
                             {
-                                key1 = it->first;
+                                key1 = coord;
                             }
                         }
                         Point2 value2 = coordTransform[refDir][{key1.x + dx, key1.y + dy}];
                         Point2 key2;
-                        for (auto it = coordTransform[bodyDir].begin(); it != coordTransform[bodyDir].end(); it++)
+                        for (const auto& [coord, transformedCoord] : coordTransform[bodyDir])
                         {
-                            if (it->second == value2)
+                            if (transformedCoord == value2)
                             {
-                                key2 = it->first;
+                                key2 = coord;
                             }
                         }
                         if (partInfo.find({ getGridX() + key2.x, getGridY() + key2.y }) != partInfo.end())
@@ -387,29 +387,29 @@ void Vehicle::shift(int dx, int dy)
 {
     std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        TileVehicle(it->first.x, it->first.y, getGridZ()) = nullptr;
-        if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+        TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
+        if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
         {
-            entityWormhole[{it->first.x, it->first.y}] = std::move(World::ins()->getTile(it->first.x, it->first.y, getGridZ()).EntityPtr);
+            entityWormhole[{pos.x, pos.y}] = std::move(World::ins()->getTile(pos.x, pos.y, getGridZ()).EntityPtr);
         }
     }
 
     //엔티티 옮기기
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        TileVehicle(it->first.x + dx, it->first.y + dy, getGridZ()) = this;
-        if (entityWormhole.find({ it->first.x, it->first.y }) != entityWormhole.end())
+        TileVehicle(pos.x + dx, pos.y + dy, getGridZ()) = this;
+        if (entityWormhole.find({ pos.x, pos.y }) != entityWormhole.end())
         {
-            EntityPtrMove(std::move(entityWormhole[{it->first.x, it->first.y}]), { it->first.x + dx, it->first.y + dy, getGridZ() });
+            EntityPtrMove(std::move(entityWormhole[{pos.x, pos.y}]), { pos.x + dx, pos.y + dy, getGridZ() });
         }
     }
 
     std::unordered_map<Point2, std::unique_ptr<ItemPocket>, Point2::Hash> shiftPartInfo;
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (auto& [pos, pocket] : partInfo)
     {
-        shiftPartInfo[{it->first.x + dx, it->first.y + dy}] = std::move(partInfo[{it->first.x, it->first.y}]);
+        shiftPartInfo[{pos.x + dx, pos.y + dy}] = std::move(pocket);
     }
     partInfo = std::move(shiftPartInfo);
 
@@ -422,23 +422,23 @@ void Vehicle::zShift(int dz)
 {
     std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        TileVehicle(it->first.x, it->first.y, getGridZ()) = nullptr;
-        if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+        TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
+        if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
         {
-            entityWormhole[{it->first.x, it->first.y}] = std::move(World::ins()->getTile(it->first.x, it->first.y, getGridZ()).EntityPtr);
+            entityWormhole[{pos.x, pos.y}] = std::move(World::ins()->getTile(pos.x, pos.y, getGridZ()).EntityPtr);
         }
     }
 
     //엔티티 옮기기
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        TileVehicle(it->first.x, it->first.y, getGridZ() + dz) = this;
-        if (entityWormhole.find({ it->first.x, it->first.y }) != entityWormhole.end())
+        TileVehicle(pos.x, pos.y, getGridZ() + dz) = this;
+        if (entityWormhole.find({ pos.x, pos.y }) != entityWormhole.end())
         {
-            World::ins()->getTile(it->first.x, it->first.y, getGridZ() + dz).EntityPtr = std::move(entityWormhole[{it->first.x, it->first.y}]);
-            TileEntity(it->first.x, it->first.y, getGridZ() + dz)->setGrid(it->first.x, it->first.y, getGridZ() + dz);//위치 그리드 변경
+            World::ins()->getTile(pos.x, pos.y, getGridZ() + dz).EntityPtr = std::move(entityWormhole[{pos.x, pos.y}]);
+            TileEntity(pos.x, pos.y, getGridZ() + dz)->setGrid(pos.x, pos.y, getGridZ() + dz);//위치 그리드 변경
         }
     }
     addGridZ(dz);
@@ -449,21 +449,21 @@ void Vehicle::zShift(int dz)
 bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 {
     auto rotatedPartInfo = getRotateShadow(inputDir16);
-    for (auto it = rotatedPartInfo.begin(); it != rotatedPartInfo.end(); it++)
+    for (const auto& pos : rotatedPartInfo)
     {
         //벽 충돌 체크
-        if (TileWall((*it).x + dx, (*it).y + dy, getGridZ()) != 0) return true;
+        if (TileWall(pos.x + dx, pos.y + dy, getGridZ()) != 0) return true;
 
-        if (TileProp((*it).x + dx, (*it).y + dy, getGridZ()) != nullptr)
+        if (TileProp(pos.x + dx, pos.y + dy, getGridZ()) != nullptr)
         {
-            if (TileProp((*it).x + dx, (*it).y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            if (TileProp(pos.x + dx, pos.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
             {
                 return true;
             }
         }
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle((*it).x + dx, (*it).y + dy, getGridZ());
+        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this) return true;
     }
     return false;
@@ -471,21 +471,21 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 
 bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때 prop이 벽 또는 기존의 Vehicle과 충돌하는지
 {
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
         //벽 충돌 체크
-        if (TileWall(it->first.x + dx, it->first.y + dy, getGridZ()) != 0) return true;
+        if (TileWall(pos.x + dx, pos.y + dy, getGridZ()) != 0) return true;
 
-        if(TileProp(it->first.x + dx, it->first.y + dy, getGridZ()) != nullptr)
+        if (TileProp(pos.x + dx, pos.y + dy, getGridZ()) != nullptr)
         {
-            if (TileProp(it->first.x + dx, it->first.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)==false)
+            if (TileProp(pos.x + dx, pos.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
             {
                 return true;
             }
-        }   
+        }
 
         //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle(it->first.x + dx, it->first.y + dy, getGridZ());
+        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, getGridZ());
         if (targetPtr != nullptr && targetPtr != this)
         {
             prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, targetPtr);
@@ -511,9 +511,9 @@ void Vehicle::rush(int dx, int dy)
     setFakeX(-getDelX());
     setFakeY(-getDelY());
     extraRenderVehList.push_back(this);
-    for (auto& p : partInfo)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        if (auto e = TileEntity(p.first.x, p.first.y, getGridZ()))
+        if (auto e = TileEntity(pos.x, pos.y, getGridZ()))
         {
             e->setFakeX(-getDelX());
             e->setFakeY(-getDelY());
@@ -533,19 +533,19 @@ void Vehicle::centerShift(int dx, int dy, int dz)
 
 void Vehicle::updateHeadlight()
 {
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        for (int i = 0; i < it->second->itemInfo.size(); i++)
+        for (int i = 0; i < pocket->itemInfo.size(); i++)
         {
-            if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+            if (pocket->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
             {
                 if (headlightOn)
                 {
-                    if (it->second->itemInfo[i].lightPtr != nullptr)
+                    if (pocket->itemInfo[i].lightPtr != nullptr)
                     {
-                        Light* thisLight = it->second->itemInfo[i].lightPtr.get();
+                        Light* thisLight = pocket->itemInfo[i].lightPtr.get();
                         thisLight->dir = bodyDir;
-                        thisLight->moveLight(it->first.x, it->first.y, getGridZ());
+                        thisLight->moveLight(pos.x, pos.y, getGridZ());
                     }
                 }
             }
@@ -555,20 +555,20 @@ void Vehicle::updateHeadlight()
 
 void Vehicle::updateHeadlight(Point3 fakeCoor) //코어가 해당 위치에 가정하고 계산합니다.
 {
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        for (int i = 0; i < it->second->itemInfo.size(); i++)
+        for (int i = 0; i < pocket->itemInfo.size(); i++)
         {
-            if (it->second->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
+            if (pocket->itemInfo[i].checkFlag(itemFlag::HEADLIGHT))
             {
                 if (headlightOn)
                 {
-                    if (it->second->itemInfo[i].lightPtr != nullptr)
+                    if (pocket->itemInfo[i].lightPtr != nullptr)
                     {
-                        Light* thisLight = it->second->itemInfo[i].lightPtr.get();
+                        Light* thisLight = pocket->itemInfo[i].lightPtr.get();
                         thisLight->dir = bodyDir;
-                        int revX = it->first.x - getGridX();
-                        int revY = it->first.y - getGridY();
+                        int revX = pos.x - getGridX();
+                        int revY = pos.y - getGridY();
 
                         thisLight->moveLight(fakeCoor.x + revX, fakeCoor.y + revY, getGridZ());
                     }
@@ -665,12 +665,12 @@ bool Vehicle::runAnimation(bool shutdown)
             if (ySpd > 0 && getFakeY() > 0) { setFakeY(0); }
             if (ySpd < 0 && getFakeY() < 0) { setFakeY(0); }
 
-            for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+            for (const auto& [pos, pocket] : partInfo)
             {
-                if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+                if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
                 {
-                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeX(getFakeX());
-                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeY(getFakeY());
+                    TileEntity(pos.x, pos.y, getGridZ())->setFakeX(getFakeX());
+                    TileEntity(pos.x, pos.y, getGridZ())->setFakeY(getFakeY());
                 }
             }
 
@@ -685,7 +685,8 @@ bool Vehicle::runAnimation(bool shutdown)
                         for (int j = lineCheck; j <= i; j++)
                         {
                             updateHeadlight({ startPoint.x + lineRevPath[i].x,startPoint.y + lineRevPath[i].y,getGridZ() });
-                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i].x, startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i].y);
+                            if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this)
+                                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i].x, startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i].y);
                             lineCheck++;
                         }
                     }
@@ -703,11 +704,11 @@ bool Vehicle::runAnimation(bool shutdown)
                 setDelGrid(0, 0);
                 setFakeX(0);
                 setFakeY(0);
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)//엔티티 페이크 설정
+                for (const auto& [pos, pocket] : partInfo)//엔티티 페이크 설정
                 {
-                    if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+                    if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
                     {
-                        Entity* tgtEntity = TileEntity(it->first.x, it->first.y, getGridZ());
+                        Entity* tgtEntity = TileEntity(pos.x, pos.y, getGridZ());
                         tgtEntity->setFakeX(0);
                         tgtEntity->setFakeY(0);
                         tgtEntity->setDelGrid(0, 0);
@@ -720,9 +721,9 @@ bool Vehicle::runAnimation(bool shutdown)
                 resetTimer();
                 setAniType(aniFlag::null);
                 extraRenderVehList.erase(std::find(extraRenderVehList.begin(), extraRenderVehList.end(), this));
-                for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+                for (const auto& [pos, pocket] : partInfo)
                 {
-                    Drawable* iPtr = TileEntity(it->first.x, it->first.y, getGridZ());
+                    Drawable* iPtr = TileEntity(pos.x, pos.y, getGridZ());
                     if (iPtr != nullptr)
                     {
                         auto eraseIt = std::find(extraRenderEntityList.begin(), extraRenderEntityList.end(), iPtr);
@@ -744,12 +745,12 @@ bool Vehicle::runAnimation(bool shutdown)
             else if (singleRailMoveVec[0] == dir16::dir4) setFakeX(getIntegerFakeX() - 4.0);
             else if (singleRailMoveVec[0] == dir16::dir6) setFakeY(getIntegerFakeY() + 4.0);
 
-            for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+            for (const auto& [pos, pocket] : partInfo)
             {
-                if (TileEntity(it->first.x, it->first.y, getGridZ()) != nullptr)
+                if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
                 {
-                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeX(getIntegerFakeX());
-                    TileEntity(it->first.x, it->first.y, getGridZ())->setFakeY(getIntegerFakeY());
+                    TileEntity(pos.x, pos.y, getGridZ())->setFakeX(getIntegerFakeX());
+                    TileEntity(pos.x, pos.y, getGridZ())->setFakeY(getIntegerFakeY());
                 }
             }
 
@@ -793,16 +794,16 @@ void Vehicle::updateTrainCenter()
 {
     std::vector<Point2> trainWheelList;
 
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        ItemPocket* pocketPtr = it->second.get();
+        ItemPocket* pocketPtr = pocket.get();
         for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
         {
             if (pocketPtr->itemInfo[i].checkFlag(itemFlag::TRAIN_WHEEL))
             {
-                if (std::find(trainWheelList.begin(), trainWheelList.end(), it->first) == trainWheelList.end()) //열차 바퀴 좌표가 중복된 값이 없으면
+                if (std::find(trainWheelList.begin(), trainWheelList.end(), pos) == trainWheelList.end()) //열차 바퀴 좌표가 중복된 값이 없으면
                 {
-                    trainWheelList.push_back({ it->first.x,it->first.y });
+                    trainWheelList.push_back({ pos.x, pos.y });
                 }
             }
         }
@@ -814,15 +815,15 @@ void Vehicle::updateTrainCenter()
 int Vehicle::getGasolineFuel()
 {
     int gasolineNumber = 0;
-    for(auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        ItemPocket* partPtr = it->second.get();
+        ItemPocket* partPtr = pocket.get();
         for (int i = 0; i < partPtr->itemInfo.size(); i++)
         {
             ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
             if (tankPtr != nullptr)
             {
-                for(int j=0; j < tankPtr->itemInfo.size(); j++)
+                for (int j = 0; j < tankPtr->itemInfo.size(); j++)
                 {
                     if (tankPtr->itemInfo[j].itemCode == itemRefCode::gasoline)
                     {
@@ -838,9 +839,9 @@ int Vehicle::getGasolineFuel()
 int Vehicle::getDiselFuel()
 {
     int diselNumber = 0;
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        ItemPocket* partPtr = it->second.get();
+        ItemPocket* partPtr = pocket.get();
         for (int i = 0; i < partPtr->itemInfo.size(); i++)
         {
             ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
@@ -862,9 +863,9 @@ int Vehicle::getDiselFuel()
 int Vehicle::getElectricityFuel()
 {
     int electricityNumber = 0;
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        ItemPocket* partPtr = it->second.get();
+        ItemPocket* partPtr = pocket.get();
         for (int i = 0; i < partPtr->itemInfo.size(); i++)
         {
             ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
@@ -885,12 +886,12 @@ int Vehicle::getElectricityFuel()
 
 ItemData* Vehicle::getMainEngine()
 {
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
-        ItemPocket* pocketPtr = it->second.get();
+        ItemPocket* pocketPtr = pocket.get();
         for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
         {
-            if(pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_GASOLINE)) return &pocketPtr->itemInfo[i];
+            if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_GASOLINE)) return &pocketPtr->itemInfo[i];
             else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_DISEL)) return &pocketPtr->itemInfo[i];
             else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_ELECTRIC)) return &pocketPtr->itemInfo[i];
         }
@@ -926,10 +927,10 @@ void Vehicle::useEngineFuel(int fuelAmount)
         else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemRefCode::electricity;
     }
 
-    for (auto it = partInfo.begin(); it != partInfo.end(); it++)
+    for (const auto& [pos, pocket] : partInfo)
     {
         int eraseNumber = 0;
-        ItemPocket* partPtr = it->second.get();
+        ItemPocket* partPtr = pocket.get();
         for (int i = 0; i < partPtr->itemInfo.size(); i++)
         {
             ItemPocket* tankPtr = partPtr->itemInfo[i].pocketPtr.get();
@@ -941,7 +942,7 @@ void Vehicle::useEngineFuel(int fuelAmount)
                     {
                         if (eraseNumber < fuelAmount)
                         {
-                            if(tankPtr->itemInfo[j].number > fuelAmount - eraseNumber)
+                            if (tankPtr->itemInfo[j].number > fuelAmount - eraseNumber)
                             {
                                 tankPtr->itemInfo[j].number -= fuelAmount - eraseNumber;
                                 eraseNumber = fuelAmount;
@@ -1014,15 +1015,15 @@ void Vehicle::drawSelf()
         };
 
 
-    for (auto it = this->partInfo.begin(); it != this->partInfo.end(); it++)
+    for (const auto& [pos, pocket] : this->partInfo)
     {
         ////////////////////////////////일반 차량부품/////////////////////////////////////////////////
-        for (int layer = 0; layer < (it->second)->itemInfo.size(); layer++)
+        for (int layer = 0; layer < pocket->itemInfo.size(); layer++)
         {
             //바닥프롭,천장프롭 플래그가 없는 일반 프롭일 경우
-            if (!(it->second)->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
+            if (!pocket->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
             {
-                drawVehicleComponent(this, (it->first).x, (it->first).y, layer, 255);
+                drawVehicleComponent(this, pos.x, pos.y, layer, 255);
             }
         }
 
@@ -1030,15 +1031,15 @@ void Vehicle::drawSelf()
         int propCeilAlpha = 255;
         if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
 
-        for (int layer = 0; layer < (it->second)->itemInfo.size(); layer++)
+        for (int layer = 0; layer < pocket->itemInfo.size(); layer++)
         {
-            if ((it->second)->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
+            if (pocket->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
             {
-                if ((it->second)->itemInfo[layer].itemCode == 314)
+                if (pocket->itemInfo[layer].itemCode == 314)
                 {
-                    rotorList.push_back({ it->first.x,it->first.y });
+                    rotorList.push_back({ pos.x, pos.y });
                 }
-                else drawVehicleComponent(this, it->first.x, it->first.y, layer, propCeilAlpha);
+                else drawVehicleComponent(this, pos.x, pos.y, layer, propCeilAlpha);
             }
         }
     }
