@@ -245,6 +245,8 @@ __int64 drawTiles()
 				}
 			}
 
+
+
 			int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
 			sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
 			if (thisTile->floor == 0) sprIndex = 506;
@@ -261,13 +263,194 @@ __int64 drawTiles()
 				}
 			}
 
+			int drawX = cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX));
+			int drawY = cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY));
 			drawSpriteCenter
 			(
 				spr::tileset,
 				sprIndex + dirCorrection,
-				cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-				cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+				drawX,
+				drawY
 			);
+
+			SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 200);
+			if(thisTile->floor != itemRefCode::shallowSeaWater && thisTile->floor != itemRefCode::deepSeaWater)
+			{
+				int shallowCorrection = 112;
+				int currentTileFloor = thisTile->floor;
+				int	topTileFloor = topTile->floor;
+				int	botTileFloor = botTile->floor;
+				int	leftTileFloor = leftTile->floor;
+				int	rightTileFloor = rightTile->floor;
+
+				bool topCheck = topTileFloor == itemRefCode::shallowSeaWater;
+				bool botCheck = botTileFloor == itemRefCode::shallowSeaWater;
+				bool leftCheck = leftTileFloor == itemRefCode::shallowSeaWater;
+				bool rightCheck = rightTileFloor == itemRefCode::shallowSeaWater;
+
+				Uint32 currentTime = SDL_GetTicks();
+				int animeExtraIndex = 16*((currentTime / 300) % 7);
+
+				//1488 시작
+				if (topCheck && botCheck && leftCheck && rightCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,8,8,8 });
+				}
+				else if (topCheck && botCheck && rightCheck)// →
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (leftCheck && botCheck && rightCheck)//↑
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,16 });
+				}
+				else if (botCheck && rightCheck && topCheck)//←
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && topCheck && leftCheck)// ↓
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,16 });
+				}
+				else if (topCheck && botCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && leftCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && topCheck) drawSpriteCenter(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (topCheck && leftCheck) drawSpriteCenter(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (leftCheck && botCheck) drawSpriteCenter(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (botCheck && rightCheck) drawSpriteCenter(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (topCheck) drawSpriteCenter(spr::tileset, 1490 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (botCheck) drawSpriteCenter(spr::tileset, 1494 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else if (leftCheck) drawSpriteCenter(spr::tileset, 1492 + animeExtraIndex+shallowCorrection, drawX, drawY);
+                else if (rightCheck) drawSpriteCenter(spr::tileset, 1488 + animeExtraIndex+shallowCorrection, drawX, drawY);
+				else
+				{
+					const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
+                    const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
+                    const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
+                    const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+
+                    int topRightFloor = topRightTile->floor;
+                    int topLeftFloor = topLeftTile->floor;
+                    int botLeftFloor = botLeftTile->floor;
+                    int botRightFloor = botRightTile->floor;
+
+                    bool topRightCheck = topRightFloor == itemRefCode::shallowSeaWater;
+                    bool topLeftCheck = topLeftFloor == itemRefCode::shallowSeaWater;
+                    bool botLeftCheck = botLeftFloor == itemRefCode::shallowSeaWater;
+                    bool botRightCheck = botRightFloor == itemRefCode::shallowSeaWater;
+
+					if (topRightCheck) drawSpriteCenter(spr::tileset, 1498 + animeExtraIndex+shallowCorrection, drawX, drawY);
+                    if (topLeftCheck) drawSpriteCenter(spr::tileset, 1499 + animeExtraIndex+shallowCorrection, drawX, drawY);
+					if( botLeftCheck) drawSpriteCenter(spr::tileset, 1496 + animeExtraIndex+shallowCorrection, drawX, drawY);
+                    if (botRightCheck) drawSpriteCenter(spr::tileset, 1497 + animeExtraIndex+shallowCorrection, drawX, drawY);
+					
+				}
+			}
+
+			if (thisTile->floor != itemRefCode::shallowSeaWater && thisTile->floor != itemRefCode::deepSeaWater)
+			{
+				int shallowCorrection = 0;
+				int currentTileFloor = thisTile->floor;
+				int	topTileFloor = topTile->floor;
+				int	botTileFloor = botTile->floor;
+				int	leftTileFloor = leftTile->floor;
+				int	rightTileFloor = rightTile->floor;
+
+				bool topCheck = topTileFloor == itemRefCode::deepSeaWater;
+				bool botCheck = botTileFloor == itemRefCode::deepSeaWater;
+				bool leftCheck = leftTileFloor == itemRefCode::deepSeaWater;
+				bool rightCheck = rightTileFloor == itemRefCode::deepSeaWater;
+
+				Uint32 currentTime = SDL_GetTicks();
+				int animeExtraIndex = 16 * ((currentTime / 300) % 7);
+
+				//1488 시작
+				if (topCheck && botCheck && leftCheck && rightCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,8,8,8 });
+				}
+				else if (topCheck && botCheck && rightCheck)// →
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (leftCheck && botCheck && rightCheck)//↑
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
+				}
+				else if (botCheck && rightCheck && topCheck)//←
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && topCheck && leftCheck)// ↓
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
+				}
+				else if (topCheck && botCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && leftCheck)
+				{
+					drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
+				}
+				else if (rightCheck && topCheck) drawSpriteCenter(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (topCheck && leftCheck) drawSpriteCenter(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (leftCheck && botCheck) drawSpriteCenter(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (botCheck && rightCheck) drawSpriteCenter(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (topCheck) drawSpriteCenter(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (botCheck) drawSpriteCenter(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (leftCheck) drawSpriteCenter(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else if (rightCheck) drawSpriteCenter(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY);
+				else
+				{
+					const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
+					const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
+					const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
+					const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+
+					int topRightFloor = topRightTile->floor;
+					int topLeftFloor = topLeftTile->floor;
+					int botLeftFloor = botLeftTile->floor;
+					int botRightFloor = botRightTile->floor;
+
+					bool topRightCheck = topRightFloor == itemRefCode::deepSeaWater;
+					bool topLeftCheck = topLeftFloor == itemRefCode::deepSeaWater;
+					bool botLeftCheck = botLeftFloor == itemRefCode::deepSeaWater;
+					bool botRightCheck = botRightFloor == itemRefCode::deepSeaWater;
+
+					if (topRightCheck) drawSpriteCenter(spr::tileset, 1498 + animeExtraIndex + shallowCorrection, drawX, drawY);
+					if (topLeftCheck) drawSpriteCenter(spr::tileset, 1499 + animeExtraIndex + shallowCorrection, drawX, drawY);
+					if (botLeftCheck) drawSpriteCenter(spr::tileset, 1496 + animeExtraIndex + shallowCorrection, drawX, drawY);
+					if (botRightCheck) drawSpriteCenter(spr::tileset, 1497 + animeExtraIndex + shallowCorrection, drawX, drawY);
+
+				}
+			}
+			SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 255);
+
 
 			setZoom(1.0);
 
