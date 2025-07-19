@@ -68,13 +68,11 @@ export void startArea()
 	}
 
 
-	createItemStack({ -5, 2, 0 }, {
-		{373, 1}
-		}
-	);
+	createItemStack({ -5, 2, 0 }, { {373, 1} });//페트병
+	
 
-	createItemStack({ 2, 8, 0 }, { {408,1} });//화살통
-	createItemStack({ 2, 9, 0 }, { {409,1} });//볼트통
+	createItemStack({ 2, 8, 0 }, { {itemRefCode::arrowQuiver,1} });//화살통
+	createItemStack({ 2, 9, 0 }, { {itemRefCode::boltQuiver,1} });//볼트통
 
 	//활과 석궁
 	createItemStack({ 3, 8, 0 }, { {383,1} });
@@ -88,7 +86,7 @@ export void startArea()
 
 	createItemStack({ -5, 1, 0 }, { {394,1} }); //낚시대
 
-	createItemStack({ -3, -4, -1 }, { {388,1} });//곡괭이
+	createItemStack({ -3, -4, -1 }, { {itemRefCode::pickaxe,1} });//곡괭이
 	createItemStack({ -2, -4, -1 }, { {393,1} });//광부헬멧
 	createItemStack({ -1, -4, -1 }, { {395,1} });//삽
 
@@ -111,43 +109,97 @@ export void startArea()
 	}
 
 	//타일 세팅
-	for (int dx = -30; dx <= 30; dx++)
 	{
-		for (int dy = -30; dy <= 30; dy++)
+		for (int dx = -30; dx <= 30; dx++)
 		{
-			setFloor({ dx,dy,0 }, itemRefCode::dirt);
+			for (int dy = -30; dy <= 30; dy++)
+			{
+				setFloor({ dx,dy,0 }, itemRefCode::dirt);
+			}
 		}
-	}
-	for (int dx = -30; dx <= 30; dx++)
-	{
-		for (int dy = -30; dy <= -2; dy++)
+		for (int dx = -30; dx <= 30; dx++)
 		{
-			setFloor({ dx,dy,0 }, itemRefCode::grass);
+			for (int dy = -30; dy <= -2; dy++)
+			{
+				setFloor({ dx,dy,0 }, itemRefCode::grass);
+			}
 		}
-	}
-	for (int dx = -6; dx >= -14; dx--)
-	{
-		for (int dy = -30; dy <= 30; dy++)
+		for (int dx = -6; dx >= -14; dx--)
 		{
-			if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemRefCode::yellowAsphalt); //노랑아스팔트
-			else setFloor({ dx,dy,0 }, itemRefCode::blackAsphalt); //검정아스팔트
+			for (int dy = -30; dy <= 30; dy++)
+			{
+				if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemRefCode::yellowAsphalt); //노랑아스팔트
+				else setFloor({ dx,dy,0 }, itemRefCode::blackAsphalt); //검정아스팔트
+			}
 		}
-	}
 
-	//오솔길
-	setFloor({ -3,-1,0 }, 293);
-	setFloor({ -2,-1,0 }, 293);
-	setFloor({ -2,0,0 }, 293);
-	setFloor({ -1,0,0 }, 293);
-	setFloor({ 0,0,0 }, 293);
-	setFloor({ 1,0,0 }, 293);
-	setFloor({ 2,0,0 }, 293);
-	setFloor({ 2,1,0 }, 293);
-	setFloor({ 3,1,0 }, 293);
-	setFloor({ 4,1,0 }, 293);
-	setFloor({ 4,2,0 }, 293);
-	for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
+		//집 바닥 타일
+		for (int dx = 0; dx < 5; dx++)
+		{
+			for (int dy = 0; dy < 4; dy++)
+			{
+				setFloor({ -5 + dx, -5 + dy, 0 }, 292);
+			}
+		}
+		createProp({ 2, -1, 0 }, 297);//표지판
+		//유리벽 설치
+		setWall({ 2,-4,0 }, 114);
+		setWall({ 2,-3,0 }, 114);
+		setWall({ 2,-2,0 }, 114);
+		setWall({ 4,-4,0 }, 114);
+		setWall({ 4,-3,0 }, 114);
+		//얕은 물 타일(연못)
+		setFloor({ -3,0,0 }, itemRefCode::shallowFreshWater);
+		setFloor({ -4,0,0 }, itemRefCode::deepFreshWater);
+		setFloor({ -3,1,0 }, itemRefCode::shallowFreshWater);
+		setFloor({ -4,1,0 }, itemRefCode::deepFreshWater);
+		setFloor({ -4,2,0 }, itemRefCode::shallowFreshWater);
+		int startX = -33;
+		int startY = 36;
+		for (int dy = 0; dy <= 30; dy++)
+		{
+			for (int dx = 0; dx <= 60; dx++)
+			{
+				itemRefCode::sandFloor;
+				if (dy <= 1) setFloor({ startX + dx, startY + dy, 0 }, itemRefCode::shallowSeaWater);//얕은해수
+				else if (dy <= 5) setFloor({ startX + dx, startY + dy, 0 }, itemRefCode::sandFloor);//모래
+				else if (dy <= 7) setFloor({ startX + dx, startY + dy, 0 }, itemRefCode::shallowSeaWater);//얕은해수
+				else setFloor({ startX + dx, startY + dy, 0 }, itemRefCode::deepSeaWater);//깊은해수
+			}
+		}
 
+		setFloor({ -7,41,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 0,38,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 1,38,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 1,36,0 }, itemRefCode::deepSeaWater);
+		setFloor({ 4,41,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 5,41,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 6,41,0 }, itemRefCode::shallowSeaWater);
+		setFloor({ 5,43,0 }, itemRefCode::deepSeaWater);
+		setFloor({ 6,43,0 }, itemRefCode::deepSeaWater);
+		//하단연못
+		setFloor({ 5,8,0 }, itemRefCode::shallowFreshWater);
+		setFloor({ 5,9,0 }, itemRefCode::shallowFreshWater);
+		for (int dx = -3; dx <= 2; dx++)
+		{
+			setFloor({ 5 + dx,10,0 }, itemRefCode::shallowFreshWater);
+			setFloor({ 5 + dx,11,0 }, itemRefCode::shallowFreshWater);
+		}
+
+		//오솔길
+		setFloor({ -3,-1,0 }, 293);
+		setFloor({ -2,-1,0 }, 293);
+		setFloor({ -2,0,0 }, 293);
+		setFloor({ -1,0,0 }, 293);
+		setFloor({ 0,0,0 }, 293);
+		setFloor({ 1,0,0 }, 293);
+		setFloor({ 2,0,0 }, 293);
+		setFloor({ 2,1,0 }, 293);
+		setFloor({ 3,1,0 }, 293);
+		setFloor({ 4,1,0 }, 293);
+		setFloor({ 4,2,0 }, 293);
+		for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
+	}
 
 	createProp({ 10, -8, 0 }, 96);//냉장고 설치
 	ItemPocket* refri = TileProp(10, -8, 0)->leadItem.pocketPtr.get();
@@ -328,43 +380,43 @@ export void startArea()
 			//지하철 설치
 			int vX = 7;
 			int vY = -1;
-			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, 48);//차량 설치
+			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, itemRefCode::metalFrame);//차량 설치
 			{
 				myTrainPower->name = L"동력차";
 				myTrainPower->vehType = vehFlag::train;
 				myTrainPower->isPowerTrain = true;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
-				myTrainPower->extendPart(vX, vY - 1, 48);
-				myTrainPower->extendPart(vX - 1, vY - 1, 48);
-				myTrainPower->extendPart(vX + 1, vY - 1, 48);
-				myTrainPower->extendPart(vX + 2, vY - 1, 48);
-				myTrainPower->extendPart(vX - 2, vY - 1, 48);
+				myTrainPower->extendPart(vX, vY - 1, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX - 1, vY - 1, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 1, vY - 1, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 2, vY - 1, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX - 2, vY - 1, itemRefCode::metalFrame);
 
-				myTrainPower->extendPart(vX - 1, vY - 2, 48);
-				myTrainPower->extendPart(vX, vY - 2, 48);
-				myTrainPower->extendPart(vX + 1, vY - 2, 48);
-				myTrainPower->extendPart(vX + 2, vY - 2, 48);
-				myTrainPower->extendPart(vX - 2, vY - 2, 48);
+				myTrainPower->extendPart(vX - 1, vY - 2, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX, vY - 2, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 1, vY - 2, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 2, vY - 2, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX - 2, vY - 2, itemRefCode::metalFrame);
 
-				myTrainPower->extendPart(vX - 1, vY - 3, 48);
-				myTrainPower->extendPart(vX, vY - 3, 48);
-				myTrainPower->extendPart(vX + 1, vY - 3, 48);
-				myTrainPower->extendPart(vX + 2, vY - 3, 48);
-				myTrainPower->extendPart(vX - 2, vY - 3, 48);
+				myTrainPower->extendPart(vX - 1, vY - 3, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX, vY - 3, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 1, vY - 3, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 2, vY - 3, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX - 2, vY - 3, itemRefCode::metalFrame);
 
-				myTrainPower->extendPart(vX - 1, vY, 48);
-				myTrainPower->extendPart(vX + 1, vY, 48);
-				myTrainPower->extendPart(vX + 2, vY, 48);
-				myTrainPower->extendPart(vX - 2, vY, 48);
+				myTrainPower->extendPart(vX - 1, vY, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 1, vY, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX + 2, vY, itemRefCode::metalFrame);
+				myTrainPower->extendPart(vX - 2, vY, itemRefCode::metalFrame);
 
 				for (int i = 1; i < 5; i++)
 				{
-					myTrainPower->extendPart(vX - 1, vY + i, 48);
-					myTrainPower->extendPart(vX, vY + i, 48);
-					myTrainPower->extendPart(vX + 1, vY + i, 48);
-					myTrainPower->extendPart(vX + 2, vY + i, 48);
-					myTrainPower->extendPart(vX - 2, vY + i, 48);
+					myTrainPower->extendPart(vX - 1, vY + i, itemRefCode::metalFrame);
+					myTrainPower->extendPart(vX, vY + i, itemRefCode::metalFrame);
+					myTrainPower->extendPart(vX + 1, vY + i, itemRefCode::metalFrame);
+					myTrainPower->extendPart(vX + 2, vY + i, itemRefCode::metalFrame);
+					myTrainPower->extendPart(vX - 2, vY + i, itemRefCode::metalFrame);
 				}
 
 				int topLeftX = vX - 2;
@@ -407,7 +459,7 @@ export void startArea()
 
 			//지하철(화물칸) 설치
 
-			Vehicle* myTrain = new Vehicle(7, 7, -1, 48);//차량 설치
+			Vehicle* myTrain = new Vehicle(7, 7, -1, itemRefCode::metalFrame);//차량 설치
 
 			{
 				int vX = 7;
@@ -415,36 +467,36 @@ export void startArea()
 				myTrain->vehType = vehFlag::train;
 
 				///////////////////////차량 기초 프레임//////////////////////////////////////
-				myTrain->extendPart(vX, vY - 1, 48);
-				myTrain->extendPart(vX - 1, vY - 1, 48);
-				myTrain->extendPart(vX + 1, vY - 1, 48);
-				myTrain->extendPart(vX + 2, vY - 1, 48);
-				myTrain->extendPart(vX - 2, vY - 1, 48);
+				myTrain->extendPart(vX, vY - 1, itemRefCode::metalFrame);
+				myTrain->extendPart(vX - 1, vY - 1, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 1, vY - 1, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 2, vY - 1, itemRefCode::metalFrame);
+				myTrain->extendPart(vX - 2, vY - 1, itemRefCode::metalFrame);
 
-				myTrain->extendPart(vX - 1, vY - 2, 48);
-				myTrain->extendPart(vX, vY - 2, 48);
-				myTrain->extendPart(vX + 1, vY - 2, 48);
-				myTrain->extendPart(vX + 2, vY - 2, 48);
-				myTrain->extendPart(vX - 2, vY - 2, 48);
+				myTrain->extendPart(vX - 1, vY - 2, itemRefCode::metalFrame);
+				myTrain->extendPart(vX, vY - 2, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 1, vY - 2, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 2, vY - 2, itemRefCode::metalFrame);
+				myTrain->extendPart(vX - 2, vY - 2, itemRefCode::metalFrame);
 
-				myTrain->extendPart(vX - 1, vY - 3, 48);
-				myTrain->extendPart(vX, vY - 3, 48);
-				myTrain->extendPart(vX + 1, vY - 3, 48);
-				myTrain->extendPart(vX + 2, vY - 3, 48);
-				myTrain->extendPart(vX - 2, vY - 3, 48);
+				myTrain->extendPart(vX - 1, vY - 3, itemRefCode::metalFrame);
+				myTrain->extendPart(vX, vY - 3, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 1, vY - 3, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 2, vY - 3, itemRefCode::metalFrame);
+				myTrain->extendPart(vX - 2, vY - 3, itemRefCode::metalFrame);
 
-				myTrain->extendPart(vX - 1, vY, 48);
-				myTrain->extendPart(vX + 1, vY, 48);
-				myTrain->extendPart(vX + 2, vY, 48);
-				myTrain->extendPart(vX - 2, vY, 48);
+				myTrain->extendPart(vX - 1, vY, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 1, vY, itemRefCode::metalFrame);
+				myTrain->extendPart(vX + 2, vY, itemRefCode::metalFrame);
+				myTrain->extendPart(vX - 2, vY, itemRefCode::metalFrame);
 
 				for (int i = 1; i < 5; i++)
 				{
-					myTrain->extendPart(vX - 1, vY + i, 48);
-					myTrain->extendPart(vX, vY + i, 48);
-					myTrain->extendPart(vX + 1, vY + i, 48);
-					myTrain->extendPart(vX + 2, vY + i, 48);
-					myTrain->extendPart(vX - 2, vY + i, 48);
+					myTrain->extendPart(vX - 1, vY + i, itemRefCode::metalFrame);
+					myTrain->extendPart(vX, vY + i, itemRefCode::metalFrame);
+					myTrain->extendPart(vX + 1, vY + i, itemRefCode::metalFrame);
+					myTrain->extendPart(vX + 2, vY + i, itemRefCode::metalFrame);
+					myTrain->extendPart(vX - 2, vY + i, itemRefCode::metalFrame);
 				}
 
 				int topLeftX = vX - 2;
@@ -501,56 +553,7 @@ export void startArea()
 		}
 	}
 
-	//집 바닥 타일
-	for (int dx = 0; dx < 5; dx++)
-	{
-		for (int dy = 0; dy < 4; dy++)
-		{
-			setFloor({ -5 + dx, -5 + dy, 0 }, 292);
-		}
-	}
-	createProp({ 2, -1, 0 }, 297);//표지판
-	//유리벽 설치
-	setWall({ 2,-4,0 }, 114);
-	setWall({ 2,-3,0 }, 114);
-	setWall({ 2,-2,0 }, 114);
-	setWall({ 4,-4,0 }, 114);
-	setWall({ 4,-3,0 }, 114);
-	//얕은 물 타일(연못)
-	setFloor({ -3,0,0 }, 225);
-	setFloor({ -4,0,0 }, 226);
-	setFloor({ -3,1,0 }, 225);
-	setFloor({ -4,1,0 }, 226);
-	setFloor({ -4,2,0 }, 225);
-	int startX = -33;
-	int startY = 36;
-	for (int dy = 0; dy <= 30; dy++)
-	{
-		for (int dx = 0; dx <= 60; dx++)
-		{
-			if (dy <= 1) setFloor({ startX + dx, startY + dy, 0 }, 231);//얕은해수
-			else if (dy <= 5) setFloor({ startX + dx, startY + dy, 0 }, 381);//모래
-			else if (dy <= 7) setFloor({ startX + dx, startY + dy, 0 }, 231);//얕은해수
-			else setFloor({ startX + dx, startY + dy, 0 }, 232);//깊은해수
-		}
-	}
-	setFloor({ -7,41,0 }, 231);
-	setFloor({ 0,38,0 }, 231);
-	setFloor({ 1,38,0 }, 231);
-	setFloor({ 1,36,0 }, 232);
-	setFloor({ 4,41,0 }, 231);
-	setFloor({ 5,41,0 }, 231);
-	setFloor({ 6,41,0 }, 231);
-	setFloor({ 5,43,0 }, 232);
-	setFloor({ 6,43,0 }, 232);
-	//하단연못
-	setFloor({ 5,8,0 }, 225);
-	setFloor({ 5,9,0 }, 225);
-	for (int dx = -3; dx <= 2; dx++)
-	{
-		setFloor({ 5 + dx,10,0 }, 225);
-		setFloor({ 5 + dx,11,0 }, 225);
-	}
+
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -655,7 +658,7 @@ export void startArea()
 	createProp({ pX - 2, pY + 39, 0 }, 242);//야자나무 설치
 
 
-	createProp({ pX, pY - 20, 0 }, 237);
+	createProp({ pX, pY - 20, 0 }, 237);//나무 설치
 
 	createProp({ -4, 5, 0 }, 245);//사과나무 설치
 
@@ -675,15 +678,16 @@ export void startArea()
 
 
 	//잔디
-	setFloor({ pX - 2, pY + 3, 0 }, 220);
-	setFloor({ pX - 1, pY + 3, 0 }, 220);
-	setFloor({ pX, pY + 3, 0 }, 220);
-	setFloor({ pX + 1, pY + 3, 0 }, 220);
+	
+	setFloor({ pX - 2, pY + 3, 0 }, itemRefCode::grass);
+	setFloor({ pX - 1, pY + 3, 0 }, itemRefCode::grass);
+	setFloor({ pX, pY + 3, 0 }, itemRefCode::grass);
+	setFloor({ pX + 1, pY + 3, 0 }, itemRefCode::grass);
 
-	setFloor({ pX - 2, pY + 4, 0 }, 220);
-	setFloor({ pX - 1, pY + 4, 0 }, 220);
-	setFloor({ pX, pY + 4, 0 }, 220);
-	setFloor({ pX + 1, pY + 4, 0 }, 220);
+	setFloor({ pX - 2, pY + 4, 0 }, itemRefCode::grass);
+	setFloor({ pX - 1, pY + 4, 0 }, itemRefCode::grass);
+	setFloor({ pX, pY + 4, 0 }, itemRefCode::grass);
+	setFloor({ pX + 1, pY + 4, 0 }, itemRefCode::grass);
 
 	createProp({ pX - 2, pY + 3, 0 }, 270);//꽃 설치
 	createProp({ pX - 1, pY + 3, 0 }, 265);//꽃 설치
@@ -744,34 +748,34 @@ export void startArea()
 
 	int vX = pY - 8;
 	int vY = pY + 3;
-	Vehicle* myCar = new Vehicle(vX, vY, 0, 48);//차량 설치
+	Vehicle* myCar = new Vehicle(vX, vY, 0, itemRefCode::metalFrame);//차량 설치
 	myCar->name = L"SUV";
 	myCar->vehType = vehFlag::car;
 
 	///////////////////////차량 기초 프레임//////////////////////////////////////
-	myCar->extendPart(vX, vY - 1, 48);
-	myCar->extendPart(vX - 1, vY - 1, 48);
-	myCar->extendPart(vX + 1, vY - 1, 48);
-	myCar->extendPart(vX + 2, vY - 1, 48);
-	myCar->extendPart(vX - 1, vY - 2, 48);
-	myCar->extendPart(vX, vY - 2, 48);
-	myCar->extendPart(vX + 1, vY - 2, 48);
-	myCar->extendPart(vX + 2, vY - 2, 48);
-	myCar->extendPart(vX - 1, vY, 48);
-	myCar->extendPart(vX + 1, vY, 48);
-	myCar->extendPart(vX + 2, vY, 48);
-	myCar->extendPart(vX - 1, vY + 1, 48);
-	myCar->extendPart(vX, vY + 1, 48);
-	myCar->extendPart(vX + 1, vY + 1, 48);
-	myCar->extendPart(vX + 2, vY + 1, 48);
-	myCar->extendPart(vX - 1, vY + 2, 48);
-	myCar->extendPart(vX, vY + 2, 48);
-	myCar->extendPart(vX + 1, vY + 2, 48);
-	myCar->extendPart(vX + 2, vY + 2, 48);
-	myCar->extendPart(vX - 1, vY + 3, 48);
-	myCar->extendPart(vX, vY + 3, 48);
-	myCar->extendPart(vX + 1, vY + 3, 48);
-	myCar->extendPart(vX + 2, vY + 3, 48);
+	myCar->extendPart(vX, vY - 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY - 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY - 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY - 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY - 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX, vY - 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY - 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY - 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY + 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX, vY + 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY + 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY + 1, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY + 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX, vY + 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY + 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY + 2, itemRefCode::metalFrame);
+	myCar->extendPart(vX - 1, vY + 3, itemRefCode::metalFrame);
+	myCar->extendPart(vX, vY + 3, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 1, vY + 3, itemRefCode::metalFrame);
+	myCar->extendPart(vX + 2, vY + 3, itemRefCode::metalFrame);
 
 	myCar->extendPart(vX - 1, vY - 3, 130);
 	myCar->extendPart(vX, vY - 3, 130);
@@ -821,18 +825,18 @@ export void startArea()
 
 
 	///////////////////오토바이///////////////////////////////////////////
-	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, 48);
-	myMoto->extendPart(vX + 6, vY + 4, 48);
-	myMoto->extendPart(vX + 6, vY + 6, 48);
+	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, itemRefCode::metalFrame);
+	myMoto->extendPart(vX + 6, vY + 4, itemRefCode::metalFrame);
+	myMoto->extendPart(vX + 6, vY + 6, itemRefCode::metalFrame);
 
 	myMoto->addPart(vX + 6, vY + 4, { 102,134 });
 	myMoto->addPart(vX + 6, vY + 5, 132);
 	myMoto->addPart(vX + 6, vY + 6, 102);
 
 	////////////////////자전거////////////////////////////////////////////
-	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, 48);
-	myBike->extendPart(vX + 9, vY + 3, 48);
-	myBike->extendPart(vX + 9, vY + 5, 48);
+	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, itemRefCode::metalFrame);
+	myBike->extendPart(vX + 9, vY + 3, itemRefCode::metalFrame);
+	myBike->extendPart(vX + 9, vY + 5, itemRefCode::metalFrame);
 
 	myBike->addPart(vX + 9, vY + 3, { 102,133 });
 	myBike->addPart(vX + 9, vY + 4, { 135, 132 });
@@ -843,27 +847,27 @@ export void startArea()
 	{
 		int cx = 15;
 		int cy = 0;
-		Vehicle* myHeli = new Vehicle(cx, cy, 0, 48);
+		Vehicle* myHeli = new Vehicle(cx, cy, 0, itemRefCode::metalFrame);
 		myHeli->name = L"헬기";
 		myHeli->vehType = vehFlag::heli;
 		myHeli->addPart(cx, cy, { 311 });
 
-		myHeli->extendPart(cx, cy - 1, 48);
-		myHeli->extendPart(cx, cy + 1, 48);
-		myHeli->extendPart(cx, cy + 2, 48);
-		myHeli->extendPart(cx, cy + 3, 48);
-		myHeli->extendPart(cx, cy + 4, 48);
-		myHeli->extendPart(cx, cy + 5, 48);
+		myHeli->extendPart(cx, cy - 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx, cy + 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx, cy + 2, itemRefCode::metalFrame);
+		myHeli->extendPart(cx, cy + 3, itemRefCode::metalFrame);
+		myHeli->extendPart(cx, cy + 4, itemRefCode::metalFrame);
+		myHeli->extendPart(cx, cy + 5, itemRefCode::metalFrame);
 
-		myHeli->extendPart(cx + 1, cy - 1, 48);
-		myHeli->extendPart(cx + 1, cy, 48);
-		myHeli->extendPart(cx + 1, cy + 1, 48);
-		myHeli->extendPart(cx + 1, cy + 2, 48);
+		myHeli->extendPart(cx + 1, cy - 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx + 1, cy, itemRefCode::metalFrame);
+		myHeli->extendPart(cx + 1, cy + 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx + 1, cy + 2, itemRefCode::metalFrame);
 
-		myHeli->extendPart(cx - 1, cy - 1, 48);
-		myHeli->extendPart(cx - 1, cy, 48);
-		myHeli->extendPart(cx - 1, cy + 1, 48);
-		myHeli->extendPart(cx - 1, cy + 2, 48);
+		myHeli->extendPart(cx - 1, cy - 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx - 1, cy, itemRefCode::metalFrame);
+		myHeli->extendPart(cx - 1, cy + 1, itemRefCode::metalFrame);
+		myHeli->extendPart(cx - 1, cy + 2, itemRefCode::metalFrame);
 
 		myHeli->addPart(cx + 1, cy - 1, { 121 });
 		myHeli->addPart(cx, cy - 1, { 121 });
@@ -918,7 +922,149 @@ export void startArea()
 	minecart2->rearCart = minecart3;
 
 
+
 	///////////////////////////////////////////////////////////////
+
+
+//타일 세팅 - 섬 모양
+//타일 세팅 - 섬 모양
+//타일 세팅 - 섬 모양
+	{
+		// 더 넓은 범위로 타일 설정
+		for (int dx = -60; dx <= 60; dx++)
+		{
+			for (int dy = -60; dy <= 60; dy++)
+			{
+				float distance = sqrt(dx * dx + dy * dy);
+
+				// 여러 노이즈를 조합해서 더 자연스러운 해안선 만들기
+				float noise1 = sin(dx * 0.08f) * cos(dy * 0.12f) * 4.0f;
+				float noise2 = sin(dx * 0.15f + dy * 0.1f) * 2.5f;
+				float noise3 = cos(dx * 0.05f) * sin(dy * 0.07f) * 3.0f;
+				float totalNoise = noise1 + noise2 + noise3;
+
+				// 타원형 기본 모양 (가로세로 비율 조정)
+				float ellipseX = dx / 1.4f;
+				float ellipseY = dy / 1.1f;
+				float ellipseDistance = sqrt(ellipseX * ellipseX + ellipseY * ellipseY);
+
+				// 최종 거리 계산
+				float finalDistance = ellipseDistance + totalNoise;
+
+				if (finalDistance <= 30) // 중심부 - 땅/잔디
+				{
+					if (finalDistance <= 20)
+					{
+						setFloor({ dx, dy, 0 }, itemRefCode::grass);
+					}
+					else
+					{
+						setFloor({ dx, dy, 0 }, itemRefCode::dirt);
+					}
+				}
+				else if (finalDistance <= 38) // 해변 - 모래
+				{
+					setFloor({ dx, dy, 0 }, itemRefCode::sandFloor);
+				}
+				else if (finalDistance <= 45) // 얕은 바다
+				{
+					setFloor({ dx, dy, 0 }, itemRefCode::shallowSeaWater);
+				}
+				else // 깊은 바다
+				{
+					setFloor({ dx, dy, 0 }, itemRefCode::deepSeaWater);
+				}
+			}
+		}
+
+		// 철조망 내부 지역을 예전처럼 흙으로 다시 설정
+		for (int dx = -30; dx <= 30; dx++)
+		{
+			for (int dy = -30; dy <= 30; dy++)
+			{
+				// 철조망 내부 범위 (대략적으로)
+				if (dx >= -5 && dx <= 11 && dy >= -9 && dy <= 12)
+				{
+					setFloor({ dx, dy, 0 }, itemRefCode::dirt);
+				}
+			}
+		}
+
+		// 철조망 내부에서 북쪽 부분만 잔디로 (예전처럼)
+		for (int dx = -30; dx <= 30; dx++)
+		{
+			for (int dy = -30; dy <= -2; dy++)
+			{
+				// 철조망 내부의 북쪽 부분
+				if (dx >= -5 && dx <= 11 && dy >= -9 && dy <= -2)
+				{
+					setFloor({ dx, dy, 0 }, itemRefCode::grass);
+				}
+			}
+		}
+
+		// 도로 다시 설정 (기존 도로 유지)
+		for (int dx = -6; dx >= -14; dx--)
+		{
+			for (int dy = -31; dy <= 29; dy++) // dy 범위를 -31 ~ 29로 변경 (1칸 위로)
+			{
+				if (dx == -10 && ((dy + 31) % 6 < 3)) setFloor({ dx, dy, 0 }, itemRefCode::yellowAsphalt); // dy + 31로 변경
+				else setFloor({ dx, dy, 0 }, itemRefCode::blackAsphalt);
+			}
+		}
+
+		// 집 바닥 타일 (기존 유지)
+		for (int dx = 0; dx < 5; dx++)
+		{
+			for (int dy = 0; dy < 4; dy++)
+			{
+				setFloor({ -5 + dx, -5 + dy, 0 }, 292);
+			}
+		}
+
+		// 레일 구간을 확실히 땅으로 설정 (더 부드럽게)
+		for (int x = -5; x <= 20; x++)
+		{
+			for (int y = 12; y <= 26; y++)
+			{
+				float distFromRail = abs(y - 19) + abs(x - 7.5f) * 0.5f;
+				if (distFromRail <= 8)
+				{
+					setFloor({ x, y, 0 }, itemRefCode::dirt);
+				}
+			}
+		}
+
+		// 기존 연못 유지
+		setFloor({ -3, 0, 0 }, itemRefCode::shallowFreshWater);
+		setFloor({ -4, 0, 0 }, itemRefCode::deepFreshWater);
+		setFloor({ -3, 1, 0 }, itemRefCode::shallowFreshWater);
+		setFloor({ -4, 1, 0 }, itemRefCode::deepFreshWater);
+		setFloor({ -4, 2, 0 }, itemRefCode::shallowFreshWater);
+
+		// 하단연못 유지
+		setFloor({ 5, 8, 0 }, itemRefCode::shallowFreshWater);
+		setFloor({ 5, 9, 0 }, itemRefCode::shallowFreshWater);
+		for (int dx = -3; dx <= 2; dx++)
+		{
+			setFloor({ 5 + dx, 10, 0 }, itemRefCode::shallowFreshWater);
+			setFloor({ 5 + dx, 11, 0 }, itemRefCode::shallowFreshWater);
+		}
+
+		// 오솔길 유지
+		setFloor({ -3, -1, 0 }, 293);
+		setFloor({ -2, -1, 0 }, 293);
+		setFloor({ -2, 0, 0 }, 293);
+		setFloor({ -1, 0, 0 }, 293);
+		setFloor({ 0, 0, 0 }, 293);
+		setFloor({ 1, 0, 0 }, 293);
+		setFloor({ 2, 0, 0 }, 293);
+		setFloor({ 2, 1, 0 }, 293);
+		setFloor({ 3, 1, 0 }, 293);
+		setFloor({ 4, 1, 0 }, 293);
+		setFloor({ 4, 2, 0 }, 293);
+		for (int i = 0; i < 9; i++) setFloor({ 5 + i, 2, 0 }, 293);
+	}
 
 	World::ins()->createSector(0, 0, 0);
 

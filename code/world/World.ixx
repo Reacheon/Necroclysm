@@ -30,7 +30,7 @@ public:
 		{
 			for (int x = -baseRange; x <= baseRange; x++)
 			{
-				chunkPtr[{x, y, 0}] = new Chunk(chunkFlag::dirt);
+				chunkPtr[{x, y, 0}] = new Chunk(chunkFlag::seawater);
 			}
 		}
 

@@ -1187,6 +1187,7 @@ export enum class vehFlag
 
 export namespace itemRefCode
 {
+    constexpr int metalFrame = 48;
     constexpr int dirt = 109;
     constexpr int grass = 220;
     constexpr int blackAsphalt = 296;

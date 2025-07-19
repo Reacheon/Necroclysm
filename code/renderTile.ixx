@@ -1,6 +1,8 @@
 ﻿//타일캐시 없는 버전
 #include <SDL3/SDL.h>
-
+#define 낮 { 0xFF,0xF8,0xED }
+#define 황혼 { 0x79,0x87,0xff}
+#define 노을 { 0xFF,0xB6,0x76 }
 
 export module renderTile;
 
@@ -92,9 +94,16 @@ export __int64 renderTile()
 	dur::damage = drawDamages();
 	drawBullets();
 	drawParticles();
+
+
+
 	dur::fog = drawFogs();
 	dur::marker = drawMarkers();
 	drawDebug();
+
+
+
+
 
 	//전체광
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
@@ -294,40 +303,40 @@ __int64 drawTiles()
 				//1488 시작
 				if (topCheck && botCheck && leftCheck && rightCheck)
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,8,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,8,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,8,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,8,8,8 });
 				}
 				else if (topCheck && botCheck && rightCheck)// →
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
 				}
 				else if (leftCheck && botCheck && rightCheck)//↑
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,16 });
-					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
 				}
 				else if (botCheck && rightCheck && topCheck)//←
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
 				}
 				else if (rightCheck && topCheck && leftCheck)// ↓
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,8,16 });
-					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex+shallowCorrection, drawX, drawY, { 8,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
 				}
 				else if (topCheck && botCheck)
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
 				}
 				else if (rightCheck && leftCheck)
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,0,16,8 });
-					drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex+shallowCorrection, drawX, drawY, { 0,8,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
+					drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
 				}
 				else if (rightCheck && topCheck) drawSpriteCenter(spr::tileset, 1489 + animeExtraIndex+shallowCorrection, drawX, drawY);
 				else if (topCheck && leftCheck) drawSpriteCenter(spr::tileset, 1491 + animeExtraIndex+shallowCorrection, drawX, drawY);
@@ -394,8 +403,8 @@ __int64 drawTiles()
 				}
 				else if (leftCheck && botCheck && rightCheck)//↑
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
 				}
 				else if (botCheck && rightCheck && topCheck)//←
 				{
@@ -404,8 +413,8 @@ __int64 drawTiles()
 				}
 				else if (rightCheck && topCheck && leftCheck)// ↓
 				{
-					drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-					drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
+					drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
 				}
 				else if (topCheck && botCheck)
 				{

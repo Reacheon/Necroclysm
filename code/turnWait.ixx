@@ -1,4 +1,8 @@
-﻿
+﻿#include <SDL3/SDL.h>
+
+#define 낮 { 0xFF,0xF8,0xED }
+#define 새벽 { 0x79,0x87,0xff}
+#define 노을 { 0xFF,0xB6,0x76 }
 
 export module turnWait;
 
@@ -12,10 +16,11 @@ import World;
 import TileData;
 import Prop;
 import GameOver;
+import globalTime;
+
 
 
 //globalVar에 전방선언됨
-
 //@brief 플레이어의 턴일 때 입력한 수치만큼 턴을 기다립니다.
 //@param waitTime 기다린 턴(분), 예로 1.5를 입력하면 1.5턴(분)
 export void turnWait(float waitTime)
@@ -119,6 +124,10 @@ export void turnWait(float waitTime)
     hunger -= waitTime * HUNGRY_SPPED;
     thirst -= waitTime * THIRST_SPEED;
     fatigue -= waitTime * FATIGUE_SPEED;
+
+    // 낮 { 0xFF,0xF8,0xED } 밝기 30
+    // 황혼 { 0x79,0x87,0xff} 밝기 20
+    // 노을 { 0xFF,0xB6,0x76 } 밝기 20
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;
