@@ -164,6 +164,7 @@ __int64 analyseRender()
 		}
 	}
 
+
 	for (auto it = extraRenderVehList.begin(); it != extraRenderVehList.end(); it++)
 	{
 		int exVehSize = extraRenderVehList.size(); //메모리 누수 체크용
@@ -280,7 +281,30 @@ __int64 drawTiles()
 				drawY
 			);
 
+
+			//발자국
+			if (Footprint::map.find({ tgtX,tgtY,PlayerZ() }) != Footprint::map.end())
+			{
+				for (const auto& address : Footprint::map[{tgtX, tgtY, PlayerZ()}])
+				{
+					int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
+					int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
+					setZoom(zoomScale);
+					SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
+					drawSprite
+					(
+						address->sprite,
+						address->sprIndex,
+						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+					);
+					SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
+					setZoom(1.0);
+				}
+			}
+
 			SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 200);
+			setZoom(zoomScale);
 			if(thisTile->floor != itemRefCode::shallowSeaWater && thisTile->floor != itemRefCode::deepSeaWater)
 			{
 				int shallowCorrection = 112;
@@ -457,7 +481,6 @@ __int64 drawTiles()
 				}
 			}
 			SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 255);
-
 
 			setZoom(1.0);
 
@@ -1026,23 +1049,23 @@ __int64 drawFootprints()
 {
 	__int64 timeStampStart = getNanoTimer();
 
-	for (int i = 0; i < Footprint::list.size(); i++)
-	{
-		Footprint* address = Footprint::list[i];
-		int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
-		int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
-		setZoom(zoomScale);
-		SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
-		drawSprite
-		(
-			address->sprite,
-			address->sprIndex,
-			(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
-			(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
-		);
-		SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
-		setZoom(1.0);
-	}
+	//for (int i = 0; i < Footprint::list.size(); i++)
+	//{
+	//	Footprint* address = Footprint::list[i];
+	//	int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
+	//	int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
+	//	setZoom(zoomScale);
+	//	SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
+	//	drawSprite
+	//	(
+	//		address->sprite,
+	//		address->sprIndex,
+	//		(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+	//		(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+	//	);
+	//	SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
+	//	setZoom(1.0);
+	//}
 
 	return getNanoTimer() - timeStampStart;
 }

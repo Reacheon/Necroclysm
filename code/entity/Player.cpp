@@ -111,7 +111,7 @@ void Player::startMove(int inputDir)
 			player->setDirection(inputDir);
 			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemRefCode::sandFloor)
 			{
-				new Footprint(getGridX(), getGridY(), entityInfo.direction);
+				new Footprint(getGridX(), getGridY(), getGridZ(), entityInfo.direction);
 			}
 			player->move(inputDir, false);
 			turnCycle = turn::playerAnime;

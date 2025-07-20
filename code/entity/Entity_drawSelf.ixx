@@ -269,6 +269,16 @@ void Entity::drawSelf()
 			drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex(), originX, originY);
 		}
 	}
+	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
+	{
+		if (ridingEntity == nullptr)
+		{
+			SDL_SetTextureAlphaMod(spr::shadow->getTexture(), 130); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(spr::shadow->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenter(spr::shadow, 1, originX, originY);
+			SDL_SetTextureAlphaMod(spr::shadow->getTexture(), 255); //텍스쳐 투명도 설정
+		}
+	}
 
 
 	//캐릭터 커스타미이징 그리기
