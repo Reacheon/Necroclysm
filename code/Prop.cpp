@@ -303,7 +303,7 @@ void Prop::drawSelf()
 
 
     setZoom(zoomScale);
-    if (leadItem.checkFlag(itemFlag::TREE) && getGridX() == PlayerX() && getGridY() - 1 == PlayerY() && getGridZ() == PlayerZ())
+    if (leadItem.checkFlag(itemFlag::TREE) && getGridX() == PlayerX() && getGridY() - 1 == PlayerY() && getGridZ() == PlayerZ() && !leadItem.checkFlag(itemFlag::STUMP))
     {
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100); //텍스쳐 투명도 설정
     }
@@ -404,8 +404,6 @@ void Prop::drawSelf()
         float ratioHP = myMax((float)0.0, (float)(leadItem.propHP) / (float)(leadItem.propMaxHP));
 
         SDL_Color gaugeCol = lowCol::green;
-        if (ratioHP < 0.25) gaugeCol=lowCol::red;
-        else if (ratioHP < 0.5) gaugeCol = lowCol::yellow;
 
         dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
         if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }

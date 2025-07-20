@@ -929,6 +929,7 @@ export void startArea()
 //타일 세팅 - 섬 모양
 //타일 세팅 - 섬 모양
 //타일 세팅 - 섬 모양
+//타일 세팅 - 섬 모양
 	{
 		// 더 넓은 범위로 타일 설정
 		for (int dx = -60; dx <= 60; dx++)
@@ -966,7 +967,7 @@ export void startArea()
 				{
 					setFloor({ dx, dy, 0 }, itemRefCode::sandFloor);
 				}
-				else if (finalDistance <= 45) // 얕은 바다
+				else if (finalDistance <= 41) // 얕은 바다 (범위 축소: 38~41, 약 3타일)
 				{
 					setFloor({ dx, dy, 0 }, itemRefCode::shallowSeaWater);
 				}
@@ -1003,12 +1004,12 @@ export void startArea()
 			}
 		}
 
-		// 도로 다시 설정 (기존 도로 유지)
+		// 도로 다시 설정 (기존 도로를 위로 1칸 이동)
 		for (int dx = -6; dx >= -14; dx--)
 		{
-			for (int dy = -31; dy <= 29; dy++) // dy 범위를 -31 ~ 29로 변경 (1칸 위로)
+			for (int dy = -31; dy <= 29; dy++)
 			{
-				if (dx == -10 && ((dy + 31) % 6 < 3)) setFloor({ dx, dy, 0 }, itemRefCode::yellowAsphalt); // dy + 31로 변경
+				if (dx == -10 && ((dy + 31) % 6 < 3)) setFloor({ dx, dy, 0 }, itemRefCode::yellowAsphalt);
 				else setFloor({ dx, dy, 0 }, itemRefCode::blackAsphalt);
 			}
 		}
