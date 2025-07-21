@@ -187,4 +187,6 @@ export void textureLoader()
 	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/statusEffectGaugeCircle.png", 14, 14);
 	spr::thoughtBubble = new Sprite(renderer, "image/thoughtBubble.png", 16, 16);
 	spr::waveFoam = new Sprite(renderer, "image/waveFoam.png", 16, 16);
+	spr::seaFoam = new Sprite(renderer, "image/seaFoam.png", 16, 16);
+	spr::waterFoam = new Sprite(renderer, "image/waterFoam.png", 16, 16);
 }

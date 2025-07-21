@@ -158,4 +158,7 @@ export namespace spr
 
 	Sprite* thoughtBubble = nullptr;
 	Sprite* waveFoam = nullptr;
+	
+	Sprite* seaFoam = nullptr;
+	Sprite* waterFoam = nullptr;
 }

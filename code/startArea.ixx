@@ -809,7 +809,7 @@ export void startArea()
 		{
 			if (partPocket->itemInfo[i].itemCode == 101)
 			{
-				partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemRefCode::gasoline, 90);
+				partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemRefCode::gasoline, 900);
 			}
 		}
 	}
