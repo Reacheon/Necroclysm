@@ -261,7 +261,36 @@ void Entity::drawSelf()
 	{
 		if (ridingEntity == nullptr)
 		{
+
+			SDL_SetTextureAlphaMod(spr::shadow->getTexture(), 170); //텍스쳐 투명도 설정
+
+			if (TileFloor(PlayerX(), PlayerY(), PlayerZ()) != itemRefCode::shallowSeaWater &&
+				TileFloor(PlayerX(), PlayerY(), PlayerZ()) != itemRefCode::deepSeaWater &&
+				entityInfo.jumpOffsetY == 0)
+			{
+				if (TileFloor(PlayerX() + 1, PlayerY(), PlayerZ()) == itemRefCode::shallowSeaWater ||
+					TileFloor(PlayerX() - 1, PlayerY(), PlayerZ()) == itemRefCode::shallowSeaWater ||
+					TileFloor(PlayerX(), PlayerY() + 1, PlayerZ()) == itemRefCode::shallowSeaWater ||
+					TileFloor(PlayerX(), PlayerY() - 1, PlayerZ()) == itemRefCode::shallowSeaWater ||
+					TileFloor(PlayerX() + 1, PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater ||
+					TileFloor(PlayerX() - 1, PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater ||
+					TileFloor(PlayerX(), PlayerY() + 1, PlayerZ()) == itemRefCode::deepSeaWater ||
+					TileFloor(PlayerX(), PlayerY() - 1, PlayerZ()) == itemRefCode::deepSeaWater
+					)
+				{
+					int waveExtraIndex = 16 * ((SDL_GetTicks() / 300) % 7);
+					if (waveExtraIndex / 16 == 2 || waveExtraIndex / 16 == 3 || waveExtraIndex / 16 == 4)
+					{
+						SDL_SetTextureAlphaMod(spr::shadow->getTexture(), 60); //텍스쳐 투명도 설정
+
+					}
+				}
+			}
+
+
+			SDL_SetTextureBlendMode(spr::shadow->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
 			drawSpriteCenter(spr::shadow, 1, originX, originY);
+			SDL_SetTextureAlphaMod(spr::shadow->getTexture(), 255); //텍스쳐 투명도 설정
 		}
 		else if (ridingEntity != nullptr && ridingType == ridingFlag::horse)
 		{
@@ -404,6 +433,29 @@ void Entity::drawSelf()
 		drawSpriteCenter(ridingEntity.get()->entityInfo.entitySpr, getSpriteIndex() + 4, originX, originY);
 	}
 
+	if (TileFloor(PlayerX(), PlayerY(), PlayerZ()) != itemRefCode::shallowSeaWater&& 
+		TileFloor(PlayerX(), PlayerY(), PlayerZ()) != itemRefCode::deepSeaWater&&
+		entityInfo.jumpOffsetY == 0)
+	{
+		if (TileFloor(PlayerX() + 1, PlayerY(), PlayerZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(PlayerX() - 1, PlayerY(), PlayerZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(PlayerX(), PlayerY() + 1, PlayerZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(PlayerX(), PlayerY() - 1, PlayerZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(PlayerX() + 1, PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater ||
+			TileFloor(PlayerX() - 1, PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater ||
+			TileFloor(PlayerX(), PlayerY() + 1, PlayerZ()) == itemRefCode::deepSeaWater ||
+			TileFloor(PlayerX(), PlayerY() - 1, PlayerZ()) == itemRefCode::deepSeaWater
+			)
+		{
+			int waveExtraIndex = 16 * ((SDL_GetTicks() / 300) % 7);
+			if (waveExtraIndex / 16 == 2 || waveExtraIndex / 16 == 3 || waveExtraIndex / 16 == 4)
+			{
+				SDL_SetTextureAlphaMod(spr::waveFoam->getTexture(), 200);
+				drawSpriteCenter(spr::waveFoam, waveExtraIndex / 16 - 2, originX, originY);
+				SDL_SetTextureAlphaMod(spr::waveFoam->getTexture(), 255);
+			}
+		}
+	}
 
 	setZoom(1.0);
 	setFlip(SDL_FLIP_NONE);

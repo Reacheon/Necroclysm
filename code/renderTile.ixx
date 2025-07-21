@@ -282,6 +282,7 @@ __int64 drawTiles()
 			);
 
 
+
 			//발자국
 			if (Footprint::map.find({ tgtX,tgtY,PlayerZ() }) != Footprint::map.end())
 			{

@@ -157,4 +157,5 @@ export namespace spr
 	Sprite* statusEffectGaugeCircle = nullptr;
 
 	Sprite* thoughtBubble = nullptr;
+	Sprite* waveFoam = nullptr;
 }
