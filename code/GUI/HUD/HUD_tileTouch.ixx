@@ -109,11 +109,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					{
 						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 						{
-							updateLog(L"#FFFFFF이 계단의 위층에 바닥이 존재하지 않는다.");
+							updateLog(L"There is no floor above these stairs.");
 						}
 						else
 						{
-							updateLog(L"#FFFFFF계단을 올라갔다.");
+							updateLog(L"You go up the stairs.");
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
 
@@ -131,11 +131,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					{
 						if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != 0)
 						{
-							updateLog(L"#FFFFFF내려가는 계단이 벽으로 막혀있다.");
+							updateLog(L"The stairs going down are blocked by a wall.");
 						}
 						else
 						{
-							updateLog(L"#FFFFFF계단을 내려갔다.");
+							updateLog(L"You go down the stairs.");
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
 
@@ -221,11 +221,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				{
 					if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
 					{
-						updateLog(L"#FFFFFF이 계단의 위층에 바닥이 존재하지 않는다.");
+						updateLog(L"There is no floor above these stairs.");
 					}
 					else
 					{
-						updateLog(L"#FFFFFF계단을 올라갔다.");
+						updateLog(L"You go up the stairs.");
 						PlayerPtr->addGridZ(1);
 					}
 				}

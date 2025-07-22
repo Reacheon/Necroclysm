@@ -167,7 +167,7 @@ void HUD::mouseStep()
 
 void HUD::clickRightGUI()
 {
-	updateLog(L"#FFFFFF[HUD] Right click event triggered.");
+	updateLog(L"[HUD] Right click event triggered.");
 
 	if (checkCursor(&quickSlotRegion) == true)
 	{
@@ -191,7 +191,7 @@ void HUD::clickHoldGUI()
 {
 	if (option::inputMethod == input::touch)
 	{
-		updateLog(L"#FFFFFF[HUD] Touch hold event triggered.");
+		updateLog(L"[HUD] Touch hold event triggered.");
 		openContextMenu(getAbsMouseGrid());
 	}
 }

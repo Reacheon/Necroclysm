@@ -18,6 +18,7 @@ import World;
 import Entity;
 import log;
 import ItemData;
+import replaceStr;
 
 export class Aim : public GUI
 {
@@ -538,10 +539,10 @@ public:
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+				updateLog(replaceStr(L"You throw the (%item).", L"(%item)", PlayerPtr->getEquipPtr()->itemInfo[PlayerPtr->getAimWeaponIndex()].name));
 				PlayerPtr->getEquipPtr()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
 				PlayerPtr->throwing(std::move(drop), targetX, targetY);
 				PlayerPtr->updateStatus();
-				updateLog(L"#FFFFFF아이템을 던졌다.");
 
 
 				PlayerPtr->startAtk(targetX, targetY, targetZ, aniFlag::throwing);

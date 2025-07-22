@@ -414,7 +414,7 @@ bool Vehicle::runAI()
                 {
                     if (getMainEngine() == nullptr)
                     {
-                        if(ctrlVeh==this) updateLog(L"차량에 엔진이 장착되어 있지 않다.");
+                        if(ctrlVeh==this) updateLog(L"The vehicle has no engine installed.");
                         useTurnResource(1.0);
                         spdVec = getZeroVec();
                         accVec = getZeroVec();
@@ -536,7 +536,7 @@ bool Vehicle::runAI()
                     }
                     else
                     {
-                        if (ctrlVeh == this) updateLog(L"차량에 연료가 부족하다.\n");
+                        if (ctrlVeh == this) updateLog(L"The vehicle is low on fuel.\n");
                         useTurnResource(1.0);
                     }
                 }

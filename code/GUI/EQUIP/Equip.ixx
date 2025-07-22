@@ -335,8 +335,7 @@ public:
 
 		if (bulletList.size() == 0) //넣을만한 포켓을 찾지 못했을 경우
 		{
-			//이 아이템을 넣을만한 포켓이 없다.
-			updateLog(col2Str(col::white) + sysStr[96]);
+			updateLog(sysStr[96]);//이 아이템을 넣을만한 포켓이 없다.
 			co_return;
 		}
 
@@ -369,14 +368,14 @@ public:
 							std::wstring str1 = replaceStr(sysStr[103], L"(%bullet)", equipPtr->itemInfo[i].name);
 							std::wstring str2 = replaceStr(str1, L"(%number)", std::to_wstring(equipPtr->itemInfo[i].number));
 							std::wstring str3 = replaceStr(str2, L"(%gun)", equipPtr->itemInfo[targetEquipCursor].name);
-							updateLog(col2Str(col::white) + str3);
+							updateLog(str3);
 						}
 						else
 						{
 							//(%magazine)를(을) (%gun)에 장전했다!
 							std::wstring str1 = replaceStr(sysStr[101], L"(%magazine)", equipPtr->itemInfo[i].name);
 							std::wstring str2 = replaceStr(str1, L"(%gun)", equipPtr->itemInfo[targetEquipCursor].name);
-							updateLog(col2Str(col::white) + str2);
+							updateLog(str2);
 						}
 					}
 					else
@@ -385,7 +384,7 @@ public:
 						std::wstring str1 = replaceStr(sysStr[102], L"(%bullet)", equipPtr->itemInfo[i].name);
 						std::wstring str2 = replaceStr(str1, L"(%number)", std::to_wstring(equipPtr->itemInfo[i].number));
 						std::wstring str3 = replaceStr(str2, L"(%magazine)", equipPtr->itemInfo[targetEquipCursor].name);
-						updateLog(col2Str(col::white) + str3);
+						updateLog(str3);
 					}
 
 					equipPtr->transferItem
@@ -421,14 +420,14 @@ public:
 									std::wstring str1 = replaceStr(sysStr[103], L"(%bullet)", pocketPtr->itemInfo[pocketItr].name);
 									std::wstring str2 = replaceStr(str1, L"(%number)", std::to_wstring(pocketPtr->itemInfo[pocketItr].number));
 									std::wstring str3 = replaceStr(str2, L"(%gun)", equipPtr->itemInfo[targetEquipCursor].name);
-									updateLog(col2Str(col::white) + str3);
+									updateLog(str3);
 								}
 								else
 								{
 									//(%magazine)를(을) (%gun)에 장전했다!
 									std::wstring str1 = replaceStr(sysStr[101], L"(%magazine)", pocketPtr->itemInfo[pocketItr].name);
 									std::wstring str2 = replaceStr(str1, L"(%gun)", equipPtr->itemInfo[targetEquipCursor].name);
-									updateLog(col2Str(col::white) + str2);
+									updateLog(str2);
 								}
 							}
 							else
@@ -437,7 +436,7 @@ public:
 								std::wstring str1 = replaceStr(sysStr[102], L"(%bullet)", pocketPtr->itemInfo[pocketItr].name);
 								std::wstring str2 = replaceStr(str1, L"(%number)", std::to_wstring(pocketPtr->itemInfo[pocketItr].number));
 								std::wstring str3 = replaceStr(str2, L"(%magazine)", equipPtr->itemInfo[targetEquipCursor].name);
-								updateLog(col2Str(col::white) + str3);
+								updateLog(str3);
 							}
 
 
@@ -464,7 +463,7 @@ public:
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
 
-		updateLog(col2Str(col::white) + sysStr[126]);
+		updateLog(sysStr[126]);
 	}
 
 	Corouter executeThrowing(ItemPocket* inputPocket, int inputIndex)//던지기
@@ -497,11 +496,12 @@ public:
 		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
 
 		std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
+        std::wstring logStr = replaceStr(L"You throw the (%item).", L"(%item)", inputPocket->itemInfo[inputIndex].name);
+		updateLog(logStr);
 		inputPocket->transferItem(throwing.get(), inputIndex, 1);
 		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
 		PlayerPtr->updateStatus();
 
-		updateLog(L"#FFFFFF아이템을 던졌다.");
 		close(aniFlag::null);
 		rangeRay = false;
 	}

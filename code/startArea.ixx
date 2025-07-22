@@ -29,12 +29,6 @@ export void startArea()
 	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::tired, -1 });
 
 
-	//테스트 아이템
-	int pX = PlayerX();
-	int pY = PlayerY();
-	int pZ = PlayerZ();
-
-
 	createItemStack({ 2, 1, 0 }, {
 		{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
 		{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
@@ -303,7 +297,7 @@ export void startArea()
 			}
 		}
 
-		createProp({ pX - 2, pY - 5, -1 }, 211);//전통등
+		createProp({ - 2, - 5, -1 }, 211);//전통등
 		{
 			int cx = -1;
 			int cy = -1;
@@ -637,117 +631,87 @@ export void startArea()
 
 
 	createProp({ 1, -3, 0 }, 117);//나무 설치
-
-	createProp({ pX + 3, pY - 2, 0 }, 239);//나무 설치
-
-	createProp({ pX + 5, pY - 1, 0 }, 247);//나무 설치
-
+	createProp({ 3, -2, 0 }, 239);//나무 설치
+	createProp({ 5, -1, 0 }, 247);//나무 설치
 	createProp({ 0, -5, 0 }, 238);//나무 설치
-
-
-
-
-	createProp({ pX + 7, pY + 1, 0 }, 237);//나무 설치
-
-
-	createProp({ pX + 4, pY - 5, 0 }, 248);//나무 설치
-
-	createProp({ pX + 9, pY - 4, 0 }, 237);//나무 설치
-	createProp({ pX + 10, pY - 1, 0 }, 244);//사과나무 설치
-
-	createProp({ pX - 2, pY + 39, 0 }, 242);//야자나무 설치
-
-
-	createProp({ pX, pY - 20, 0 }, 237);//나무 설치
-
+	createProp({ 7, 1, 0 }, 237);//나무 설치
+	createProp({ 4, -5, 0 }, 248);//나무 설치
+	createProp({ 9, -4, 0 }, 237);//나무 설치
+	createProp({ 10, -1, 0 }, 244);//사과나무 설치
+	createProp({ -2, 39, 0 }, 242);//야자나무 설치
+	createProp({ 0, -20, 0 }, 237);//나무 설치
 	createProp({ -4, 5, 0 }, 245);//사과나무 설치
-
-
-	createProp({ pX + 3, pY + 3, 0 }, 338);//고철 설치
-	createProp({ pX + 3 + 1, pY + 3, 0 }, 338);//고철 설치
-	createProp({ pX + 3 + 2, pY + 3, 0 }, 338);//고철 설치
-	createProp({ pX + 3 + 1, pY + 3 + 1, 0 }, 338);//고철 설치
-
-	createProp({ pX + 10, pY + 11, 0 }, 338);//고철 설치
-	createProp({ pX + 10, pY + 11 - 1, 0 }, 338);//고철 설치
-	createProp({ pX + 10, pY + 11 - 2, 0 }, 338);//고철 설치
-
-	createProp({ pX + 10 - 1, pY + 11, 0 }, 338);//고철 설치
-	createProp({ pX + 10 - 1, pY + 11 - 1, 0 }, 338);//고철 설치
-
-
-
+	createProp({ 3, 3, 0 }, 338);//고철 설치
+	createProp({ 4, 3, 0 }, 338);//고철 설치
+	createProp({ 5, 3, 0 }, 338);//고철 설치
+	createProp({ 4, 4, 0 }, 338);//고철 설치
+	createProp({ 10, 11, 0 }, 338);//고철 설치
+	createProp({ 10, 10, 0 }, 338);//고철 설치
+	createProp({ 10, 9, 0 }, 338);//고철 설치
+	createProp({ 9, 11, 0 }, 338);//고철 설치
+	createProp({ 9, 10, 0 }, 338);//고철 설치
 	//잔디
-	
-	setFloor({ pX - 2, pY + 3, 0 }, itemRefCode::grass);
-	setFloor({ pX - 1, pY + 3, 0 }, itemRefCode::grass);
-	setFloor({ pX, pY + 3, 0 }, itemRefCode::grass);
-	setFloor({ pX + 1, pY + 3, 0 }, itemRefCode::grass);
 
-	setFloor({ pX - 2, pY + 4, 0 }, itemRefCode::grass);
-	setFloor({ pX - 1, pY + 4, 0 }, itemRefCode::grass);
-	setFloor({ pX, pY + 4, 0 }, itemRefCode::grass);
-	setFloor({ pX + 1, pY + 4, 0 }, itemRefCode::grass);
-
-	createProp({ pX - 2, pY + 3, 0 }, 270);//꽃 설치
-	createProp({ pX - 1, pY + 3, 0 }, 265);//꽃 설치
-	createProp({ pX, pY + 3, 0 }, 266);//꽃 설치
-	createProp({ pX + 1, pY + 3, 0 }, 267);//꽃 설치
-
-	createProp({ pX - 2, pY + 4, 0 }, 271);//꽃 설치
-	createProp({ pX - 1, pY + 4, 0 }, 268);//꽃 설치
-	createProp({ pX, pY + 4, 0 }, 269);//꽃 설치
-	createProp({ pX + 1, pY + 4, 0 }, 270);//꽃 설치
-
-
-	createProp({ pX + 6, pY - 4, 0 }, 270);//꽃 설치
-
+	setFloor({ -2, 3, 0 }, itemRefCode::grass);
+	setFloor({ -1, 3, 0 }, itemRefCode::grass);
+	setFloor({ 0, 3, 0 }, itemRefCode::grass);
+	setFloor({ 1, 3, 0 }, itemRefCode::grass);
+	setFloor({ -2, 4, 0 }, itemRefCode::grass);
+	setFloor({ -1, 4, 0 }, itemRefCode::grass);
+	setFloor({ 0, 4, 0 }, itemRefCode::grass);
+	setFloor({ 1, 4, 0 }, itemRefCode::grass);
+	createProp({ -2, 3, 0 }, 270);//꽃 설치
+	createProp({ -1, 3, 0 }, 265);//꽃 설치
+	createProp({ 0, 3, 0 }, 266);//꽃 설치
+	createProp({ 1, 3, 0 }, 267);//꽃 설치
+	createProp({ -2, 4, 0 }, 271);//꽃 설치
+	createProp({ -1, 4, 0 }, 268);//꽃 설치
+	createProp({ 0, 4, 0 }, 269);//꽃 설치
+	createProp({ 1, 4, 0 }, 270);//꽃 설치
+	createProp({ 6, -4, 0 }, 270);//꽃 설치
 	createProp({ 0, -1, 0 }, 211);//전통 등 설치
 	createProp({ 4, 0, 0 }, 211);//볼라드 등 설치
 
 	//울타리 설치
-	createProp({ pX - 3, pY + 2, 0 }, 206);
-	createProp({ pX - 2, pY + 2, 0 }, 206);
-	createProp({ pX - 1, pY + 2, 0 }, 206);
-	createProp({ pX, pY + 2, 0 }, 206);
-	createProp({ pX + 1, pY + 2, 0 }, 206);
-	createProp({ pX + 2, pY + 2, 0 }, 206);
-	createProp({ pX + 3, pY + 2, 0 }, 206);
-
-	createProp({ pX - 3, pY + 3, 0 }, 206);
-	createProp({ pX - 3, pY + 4, 0 }, 206);
-
-	createProp({ pX + 2, pY + 3, 0 }, 206);
-	createProp({ pX + 2, pY + 4, 0 }, 206);
-
-	createProp({ pX - 3, pY + 5, 0 }, 206);
-	createProp({ pX - 2, pY + 5, 0 }, 206);
-	createProp({ pX - 1, pY + 5, 0 }, 206);
-	createProp({ pX, pY + 5, 0 }, 206);
-	createProp({ pX + 1, pY + 5, 0 }, 206);
-	createProp({ pX + 2, pY + 5, 0 }, 206);
+	createProp({ -3, 2, 0 }, 206);
+	createProp({ -2, 2, 0 }, 206);
+	createProp({ -1, 2, 0 }, 206);
+	createProp({ 0, 2, 0 }, 206);
+	createProp({ 1, 2, 0 }, 206);
+	createProp({ 2, 2, 0 }, 206);
+	createProp({ 3, 2, 0 }, 206);
+	createProp({ -3, 3, 0 }, 206);
+	createProp({ -3, 4, 0 }, 206);
+	createProp({ 2, 3, 0 }, 206);
+	createProp({ 2, 4, 0 }, 206);
+	createProp({ -3, 5, 0 }, 206);
+	createProp({ -2, 5, 0 }, 206);
+	createProp({ -1, 5, 0 }, 206);
+	createProp({ 0, 5, 0 }, 206);
+	createProp({ 1, 5, 0 }, 206);
+	createProp({ 2, 5, 0 }, 206);
 
 	//전선 설치
-	createProp({ pX + 8, pY + 1, 0 }, 143);
-	createProp({ pX + 8, pY, 0 }, 143);
-	createProp({ pX + 8, pY - 1, 0 }, 143);
-	createProp({ pX + 8, pY - 2, 0 }, 143);
-	createProp({ pX + 9, pY, 0 }, 143);
+	createProp({ 8, 1, 0 }, 143);
+	createProp({ 8, 0, 0 }, 143);
+	createProp({ 8, -1, 0 }, 143);
+	createProp({ 8, -2, 0 }, 143);
+	createProp({ 9, 0, 0 }, 143);
 
 	//배관 설치
-	createProp({ pX + 3, pY + 6, 0 }, 144);
-	createProp({ pX + 4, pY + 6, 0 }, 144);
-	createProp({ pX + 5, pY + 6, 0 }, 144);
-	createProp({ pX + 6, pY + 6, 0 }, 144);
-	createProp({ pX + 5, pY + 7, 0 }, 144);
+	createProp({ 3, 6, 0 }, 144);
+	createProp({ 4, 6, 0 }, 144);
+	createProp({ 5, 6, 0 }, 144);
+	createProp({ 6, 6, 0 }, 144);
+	createProp({ 5, 7, 0 }, 144);
 
 	//종교
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	int vX = pY - 8;
-	int vY = pY + 3;
+	int vX = -8;
+	int vY = +3;
 	Vehicle* myCar = new Vehicle(vX, vY, 0, itemRefCode::metalFrame);//차량 설치
 	myCar->name = L"SUV";
 	myCar->vehType = vehFlag::car;

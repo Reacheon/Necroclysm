@@ -46,7 +46,7 @@ export namespace actFunc
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
 						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
-						updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+						updateLog(sysStr[325]);//화살을 시위에 걸었다.
 						co_return;
 					}
 				}
@@ -61,7 +61,7 @@ export namespace actFunc
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
 						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
-						updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+						updateLog(sysStr[326]);//볼트를 장전했다.
 						co_return;
 					}
 				}
@@ -102,8 +102,7 @@ export namespace actFunc
 
 		if (bulletList.size() == 0) //넣을만한 포켓을 찾지 못했을 경우
 		{
-			//이 아이템을 넣을만한 포켓이 없다.
-			updateLog(col2Str(col::white) + sysStr[96]);
+			updateLog(sysStr[96]);//이 아이템을 넣을만한 포켓이 없다.
 			co_return;
 		}
 
@@ -189,7 +188,7 @@ export namespace actFunc
 		if (pocketList.size() == 0) //넣을만한 포켓을 찾지 못했을 경우
 		{
 			//이 아이템을 넣을만한 포켓이 없다.
-			updateLog(col2Str(col::white) + sysStr[96]);
+			updateLog(sysStr[96]);
 			co_return;
 		}
 
@@ -295,7 +294,7 @@ export namespace actFunc
 			inputItem.lightPtr = std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 6, 80, SDL_Color{ 150, 150, 250 });
 			inputItem.sprIndex += 1;
 			PlayerPtr->updateVision();
-			updateLog(L"#FFFFFF헤드랜턴의 전원을 켰다.");
+			updateLog(L"You turn on the headlamp.");
 		}
 		else if (inputItem.checkFlag(itemFlag::TOGGLE_ON))
 		{
@@ -306,7 +305,7 @@ export namespace actFunc
 			inputItem.sprIndex -= 1;
 
 			PlayerPtr->updateVision();
-			updateLog(L"#FFFFFF헤드랜턴의 전원을 껐다.");
+			updateLog(L"You turn off the headlamp.");
 
 		}
 	}
@@ -320,7 +319,7 @@ export namespace actFunc
 
 		if (needHydration <= 0)
 		{
-			updateLog(col2Str(col::white) + L"더 이상 마실 필요가 없다.");
+			updateLog(L"You're not thirsty.");
 			return;
 		}
 
@@ -339,12 +338,12 @@ export namespace actFunc
 				if (thirst > PLAYER_MAX_HYDRATION) thirst = PLAYER_MAX_HYDRATION;
 
 				inputData.pocketPtr->subtractItemIndex(i, waterToConsume);
-				updateLog(col2Str(col::white) + L"아이템을 마셨다. 갈증이 해소되었다.");
+				updateLog(L"You drink from the bottle. Your thirst is quenched.");
 				return;
 			}
 		}
 
-		updateLog(col2Str(col::white) + L"물병에 물이 없다.");
+		updateLog(L"The bottle is empty.");
 	}
 
 	export void eatFood(ItemPocket* inputPocket, int inputCursor)
@@ -362,7 +361,7 @@ export namespace actFunc
 
 		if (needCalorie <= 0)
 		{
-			updateLog(col2Str(col::white) + L"배가 불러서 더 이상 먹을 수 없다.");
+			updateLog(L"You're too full to eat anymore.");
 			return;
 		}
 
@@ -376,7 +375,7 @@ export namespace actFunc
 		// 아이템 1개 제거
 		inputPocket->subtractItemIndex(inputCursor, 1);
 
-		updateLog(col2Str(col::white) + L"음식을 먹었다. 허기가 해소되었다.");
+		updateLog(L"You eat the food. Your hunger is satisfied.");
 	}
 
 	export void spillPocket(ItemData& inputData)
@@ -410,6 +409,6 @@ export namespace actFunc
 		}
 
 		std::wstring logText = replaceStr(sysStr[297],L"(%container)" , itemName);
-		updateLog(col2Str(col::white) + logText);
+		updateLog(logText);
 	}
 };

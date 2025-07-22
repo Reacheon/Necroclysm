@@ -364,11 +364,9 @@ public:
 			new Equip();
 			break;
 		case act::profic:
-			updateLog(L"#FFFFFF재능 창을 열었다.");
 			new Profic();
 			break;
 		case act::mutation:
-			updateLog(L"#FFFFFF돌연변이 창을 열었다.");
 			break;
 		case act::bionic:
 			break;
@@ -389,7 +387,6 @@ public:
 			new Craft();
 			break;
 		case act::construct:
-			updateLog(L"#FFFFFF삭제된 GUI이다.");
 			break;
 		case act::turnLeft:
 		{
@@ -465,7 +462,7 @@ public:
 				else if (ctrlVeh->gearState == gearFlag::reverse) ctrlVeh->accVec = scalarMultiple(dir16ToVec(reverse(ctrlVeh->wheelDir)), 7.0);
 				turnWait(1.0);
 			}
-			else updateLog(L"차량에 시동이 걸리지 않은 상태다.");
+			else updateLog(L"The engine is not running.");
 			break;
 		}
 		case act::brake:
@@ -498,10 +495,8 @@ public:
 			break;
 		}
 		case act::god:
-			updateLog(L"#FFFFFF신앙 창을 열었다.");
 			break;
 		case act::map:
-			updateLog(L"#FFFFFF지도 창을 열었다.");
 			new Map();
 			break;
 		case act::test:
@@ -594,7 +589,7 @@ public:
 			break;
 		}
 		default:
-			updateLog(L"#FFFFFF알수없는 레터박스 버튼이 눌렸다.");
+			updateLog(L"Unknown letterbox button was pressed.");
 			break;
 		}
 
@@ -629,10 +624,9 @@ public:
 				}
 			}
 		}
-
 		if (nearCoord.x == 0 && nearCoord.y == 0)//찾지 못했을 경우
 		{
-			updateLog(col2Str(col::white) + sysStr[105]);
+			updateLog(sysStr[105]);
 		}
 		else//찾았을 경우
 		{
@@ -653,12 +647,12 @@ public:
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
 										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
-										updateLog(col2Str(col::white) + L"당신은 화살을 시위에 걸었다.");
+										updateLog(L"You nock an arrow.");
 										new Aim();
 										break;
 									}
 								}
-								if (j == equipInfo.size() - 1) updateLog(col2Str(col::white) + L"현재 가지고 있는 화살이 없다.");
+								if (j == equipInfo.size() - 1) updateLog(L"You have no arrows.");
 							}
 						}
 					}
@@ -674,12 +668,12 @@ public:
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
 										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
-										updateLog(col2Str(col::white) + L"당신은 석궁에 볼트를 장전했다.");
+										updateLog(L"You load a bolt into the crossbow.");
 										new Aim();
 										break;
 									}
 								}
-								if (j == equipInfo.size() - 1) updateLog(col2Str(col::white) + L"현재 가지고 있는 볼트가 없다.");
+								if (j == equipInfo.size() - 1) updateLog(L"You have no bolts.");
 							}
 						}
 					}
@@ -687,42 +681,37 @@ public:
 					{
 						if (equipInfo[i].pocketOnlyItem.empty())
 						{
-							updateLog(col2Str(col::white) + L"이 총은 탄 정보를 찾을 수 없습니다.");
+							updateLog(L"This gun has no ammo information available.");
 							break;
 						}
-
 						unsigned short onlyCode = equipInfo[i].pocketOnlyItem[0];
-						/* ① 리볼버·산탄총처럼 ‘직장전식’  ------------------------------------ */
+						/* ① 리볼버·산탄총처럼 '직장전식'  ------------------------------------ */
 						if (itemDex[onlyCode].checkFlag(itemFlag::AMMO))
 						{
 							if (getBulletNumber(equipInfo[i]) > 0) new Aim();
-							else updateLog(col2Str(col::white) + L"현재 장전된 탄이 없습니다.");
-
+							else updateLog(L"No ammunition is loaded.");
 						}
 						/* ② 탄창식( MAGAZINE )  ------------------------------------------------ */
 						else if (itemDex[onlyCode].checkFlag(itemFlag::MAGAZINE))
 						{
 							ItemPocket* gunPocket = equipInfo[i].pocketPtr.get();
-
 							if (gunPocket && !gunPocket->itemInfo.empty())
 							{
 								ItemData& magazine = gunPocket->itemInfo[0];
-
 								if (getBulletNumber(magazine) > 0)
 								{
 									new Aim();
 								}
-								else updateLog(col2Str(col::white) + L"탄창에 탄이 없습니다.");
+								else updateLog(L"The magazine is empty.");
 							}
-							else updateLog(col2Str(col::white) + L"총에 탄창이 장착돼 있지 않습니다.");
+							else updateLog(L"No magazine is loaded in the gun.");
 						}
 						/* ③ 그밖의 예외적인 경우(확장성을 위해) ------------------------------- */
-						else errorBox(L"이 총은 탄 정보를 찾을 수 없습니다.");
+						else errorBox(L"This gun has no ammo information available.");
 						break;
 					}
 				}
 			}
-
 		}
 	};
 

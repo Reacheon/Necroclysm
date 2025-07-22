@@ -24,7 +24,6 @@ export void debugConsole()
 	int yp = PlayerY();
 	int zp = PlayerZ();
 
-	//updateLog(L"#FFFFFF디버그 테스트 기능을 실행했다.");
 	prt(L"////////////////////////////////////////\n");
 	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
 	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
@@ -77,13 +76,12 @@ export void debugConsole()
 	}
 	case 3: //로그 업데이트
 	{
-		updateLog(L"#FFFFFF디버그 : #FF0000Fire#2ECCFA얼음");
+		updateLog(L"#FFFFFFDEBUG : #FF0000Fire#2ECCFAICE");
 		prt(L"[디버그]테스트로그를 갱신했다!\n");
 		break;
 	}
 	case 4: //테스트 아이템
 	{
-		updateLog(L"#FFFFFF디버그 : 테스트 아이템을 생성했다.");
 		createItemStack({ PlayerX(), PlayerY(), PlayerZ() });
 		ItemPocket* itemPtr = TileItemStack(PlayerX(), PlayerY(), PlayerZ())->getPocket();
 		itemPtr->addItemFromDex(0, 2);
@@ -116,7 +114,6 @@ export void debugConsole()
 			createFlame({ xp + inputX,yp + inputY,zp }, flameFlag::BIG);
 			break;
 		}
-		updateLog(L"#FFFFFF화염을 생성했다.");
 		prt(L"[디버그]화염을 생성했다.\n");
 		break;
 	}

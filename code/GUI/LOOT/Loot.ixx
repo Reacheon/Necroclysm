@@ -329,7 +329,7 @@ public:
 
 		if (equipPtr->itemInfo.size() == 0)
 		{
-			updateLog(col2Str(col::white) + sysStr[123]);//소지한 가방이 하나도 없다
+			updateLog(sysStr[123]);//소지한 가방이 하나도 없다
 			return;
 		}
 
@@ -349,7 +349,7 @@ public:
 			//가방을 찾지 못했을 경우
 			if (i == equipPtr->itemInfo.size() - 1 && bagPtr == nullptr)
 			{
-				updateLog(col2Str(col::white) + sysStr[123]);//소지한 가방이 하나도 없다
+				updateLog(sysStr[123]);//소지한 가방이 하나도 없다
 				return;
 			}
 		}
@@ -372,7 +372,7 @@ public:
 
 			if (maxVol < itemsVol + currentVol)
 			{
-				updateLog(col2Str(col::white) + sysStr[124]);
+				updateLog(sysStr[124]);
 				return;
 			}
 
@@ -386,8 +386,7 @@ public:
 				}
 			}
 
-			if (moved)
-				updateLog(col2Str(col::white) + L"아이템을 포켓에 집어 넣었다.");
+			if (moved)updateLog(L"You put the items into the pocket.");
 
 			for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
 			return;
@@ -425,8 +424,8 @@ public:
 					}
 				}
 
-				if (moved) updateLog(col2Str(col::white) + L"아이템을 포켓에 집어 넣었다.");
-				if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+				if (moved) updateLog(L"You put the items into the pocket.");
+				if (hasIllegal) updateLog(L"Some selected items cannot be put into this pocket.");
 
 				for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) { lootPocket->itemInfo[i].lootSelect = 0; }
 				
@@ -456,14 +455,14 @@ public:
 
 					for (int i = lootPocket->itemInfo.size() - 1; i >= 0; i--) lootPocket->itemInfo[i].lootSelect = 0;
 
-					if (moved)updateLog(col2Str(col::white) + L"한계치까지 아이템을 포켓에 집어 넣었다.");
-					if (hasIllegal)updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+					if (moved)updateLog(L"You put items into the pocket up to the limit.");
+					if (hasIllegal)updateLog(L"Some selected items cannot be put into this pocket.");
 				}
 				//완전히 가득 찬 경우 ----------------------------------------
 				else
 				{
-					updateLog(col2Str(col::white) + L"가방이 가득 차서 더 이상 넣을 수 없다.");
-					if (hasIllegal) updateLog(col2Str(col::white) + L"선택한 아이템 중에 이 포켓에 넣을 수 없는 것이 있다.");
+					updateLog(L"The bag is full and cannot hold any more items.");
+					if (hasIllegal) updateLog(L"Some selected items cannot be put into this pocket.");
 				}
 			}
 			updateQuiverSpr(PlayerPtr->getEquipPtr());
@@ -540,7 +539,7 @@ public:
 		}
 		if (numberOfBag == 0)
 		{
-			updateLog(col2Str(col::white) + sysStr[123]);
+			updateLog(sysStr[123]);
 			return;
 		}
 		else
@@ -554,7 +553,7 @@ public:
 	}
 	void executeEquip()
 	{
-		updateLog(col2Str(col::white) + sysStr[125]);
+		updateLog(sysStr[125]);
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		int returnIndex = lootPocket->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
@@ -685,7 +684,7 @@ public:
 					lootPocket->itemInfo[j].eraseFlag(itemFlag::GRAYFILTER);
 				}
 				lootPocket->sortByUnicode();
-				updateLog(col2Str(col::white) + sysStr[86]);//검색 상태를 해제했다.
+				updateLog(sysStr[86]);//검색 상태를 해제했다.
 				co_return;
 			}
 
@@ -733,6 +732,8 @@ public:
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		if (lootPocket->itemInfo[lootCursor].checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
+			std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", lootPocket->itemInfo[lootCursor].name);
+			updateLog(logStr);
 			bool isWield = false;
 			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
@@ -748,7 +749,6 @@ public:
 			int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
 			equipPtr->sortEquip();
-			updateLog(L"#FFFFFF아이템을 들었다.");
 		}
 		else
 		{
@@ -816,6 +816,9 @@ public:
 				int returnIndex = lootPocket->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
 				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
 			}
 			else if (hasLeft == false && hasRight == false)
 			{
@@ -841,27 +844,34 @@ public:
 				int returnIndex = lootPocket->transferItem(equipPtr, fixedLootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
 				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
 			}
 			else if (hasLeft == false && hasRight == true)//왼손에 들기
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
 				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF아이템을 들었다.");
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
 			}
 			else//오른손에 들기
 			{
 				int returnIndex = lootPocket->transferItem(equipPtr, lootCursor, 1);
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
 				equipPtr->sortEquip();
-				updateLog(L"#FFFFFF아이템을 들었다.");
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
 			}
 		}
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].lightPtr != nullptr)
 			{
-                equipPtr->itemInfo[i].lightPtr.get()->setGrid(PlayerX(), PlayerY(), PlayerZ());
+				equipPtr->itemInfo[i].lightPtr.get()->setGrid(PlayerX(), PlayerY(), PlayerZ());
 			}
 		}
 		PlayerPtr->pullEquipLights();
@@ -893,7 +903,7 @@ public:
 		if (pocketList.size() == 0) //넣을만한 포켓을 찾지 못했을 경우
 		{
 			//이 아이템을 넣을만한 포켓이 없다.
-			updateLog(col2Str(col::white) + sysStr[96]);
+			updateLog(sysStr[96]);
 			co_return;
 		}
 

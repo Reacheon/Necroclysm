@@ -188,7 +188,7 @@ public:
 			// 수면 시도 중에만 중단 가능
 			if (isTryingToSleep)
 			{
-				updateLog(L"#FFFFFFSleep attempt cancelled.");
+				updateLog(L"Sleep attempt cancelled.");
 				coTurnSkip = false;
 				close(aniFlag::null);
 			}
@@ -252,7 +252,7 @@ public:
 
 			if (roll < sleepChance)
 			{
-				updateLog(L"#FFFFFFYou fell asleep.");
+				updateLog(L"You fell asleep.");
 				isTryingToSleep = false;
 				isAsleep = true;
 				PlayerPtr->entityInfo.isEyesClose = true; // 눈을 감음

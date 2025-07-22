@@ -200,7 +200,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 					if (option::inputMethod != input::gamepad)
 					{
-						updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+						updateLog(L"Switched to gamepad mode.");
 						option::inputMethod = input::gamepad;
 					}
 					gamepadBtnDown();
@@ -208,7 +208,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_GAMEPAD_BUTTON_UP:
 					if (option::inputMethod != input::gamepad)
 					{
-						updateLog(col2Str(col::white) + L"게임패드 모드로 변경하였다.\n");
+						updateLog(L"Switched to gamepad mode.");
 						option::inputMethod = input::gamepad;
 					}
 					gamepadBtnUp();
@@ -230,7 +230,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					if (option::inputMethod != input::mouse)
 					{
-						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						updateLog(L"Switched to mouse mode.");
 						option::inputMethod = input::mouse;
 					}
 
@@ -242,7 +242,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_MOUSE_MOTION:
 					if (option::inputMethod != input::mouse)
 					{
-						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						updateLog(L"Switched to mouse mode.");
 						option::inputMethod = input::mouse;
 					}
 
@@ -257,7 +257,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_MOUSE_BUTTON_UP:
 					if (option::inputMethod != input::mouse)
 					{
-						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						updateLog(L"Switched to mouse mode.");
 						option::inputMethod = input::mouse;
 					}
 
@@ -273,7 +273,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_MOUSE_WHEEL:
 					if (option::inputMethod != input::mouse)
 					{
-						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						updateLog(L"Switched to mouse mode.");
 						option::inputMethod = input::mouse;
 					}
 					mouseWheel();
@@ -293,7 +293,7 @@ __int64 playerInputTurn()
 					{
 						if (option::inputMethod != input::mouse)
 						{
-							updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+							updateLog(L"Switched to mouse mode.");
 							option::inputMethod = input::mouse;
 						}
 						keyboardBtnDown();
@@ -302,7 +302,7 @@ __int64 playerInputTurn()
 				case SDL_EVENT_KEY_UP:
 					if (option::inputMethod != input::mouse)
 					{
-						updateLog(col2Str(col::white) + L"마우스 모드로 변경하였다.\n");
+						updateLog(L"Switched to mouse mode.");
 						option::inputMethod = input::mouse;
 					}
 					keyboardBtnUp();

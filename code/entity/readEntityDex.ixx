@@ -13,37 +13,39 @@ import textureVar;
 
 namespace csvEntity
 {
-    constexpr int name = 0;
-    constexpr int entityCode = 1;
-    constexpr int sprFileName = 2;
-    constexpr int tooltip = 3;
-    constexpr int category = 4;
-    constexpr int temperature = 5;
-    constexpr int weight = 6;
-    constexpr int volume = 7;
-    constexpr int material = 8;
-    constexpr int HD = 9;
-    constexpr int maxHP = 10;
-    constexpr int rPierce = 11;
-    constexpr int rCut = 12;
-    constexpr int rBash = 13;
-    constexpr int SH = 14;
-    constexpr int EV = 15;
-    constexpr int rFire = 16;
-    constexpr int rCold = 17;
-    constexpr int rElec = 18;
-    constexpr int rCorr = 19;
-    constexpr int rRad = 20;
-    constexpr int bionicList = 21;
-    constexpr int corpseItemCode = 22;
-    constexpr int statStr = 23;
-    constexpr int statInt = 24;
-    constexpr int statDex = 25;
-    constexpr int hpBarHeight = 26;
-    constexpr int relation = 27;
-    constexpr int isHumanCustomSprite = 28;
-    constexpr int atkSpr1 = 29;
-    constexpr int atkSpr2 = 30;
+    constexpr int nativeName = 0;
+    constexpr int name = 1;
+    constexpr int entityCode = 2;
+    constexpr int sprFileName = 3;
+    constexpr int nativeDescript = 4;
+    constexpr int descript = 5;
+    constexpr int category = 6;
+    constexpr int temperature = 7;
+    constexpr int weight = 8;
+    constexpr int volume = 9;
+    constexpr int material = 10;
+    constexpr int HD = 11;
+    constexpr int maxHP = 12;
+    constexpr int rPierce = 13;
+    constexpr int rCut = 14;
+    constexpr int rBash = 15;
+    constexpr int SH = 16;
+    constexpr int EV = 17;
+    constexpr int rFire = 18;
+    constexpr int rCold = 19;
+    constexpr int rElec = 20;
+    constexpr int rCorr = 21;
+    constexpr int rRad = 22;
+    constexpr int bionicList = 23;
+    constexpr int corpseItemCode = 24;
+    constexpr int statStr = 25;
+    constexpr int statInt = 26;
+    constexpr int statDex = 27;
+    constexpr int hpBarHeight = 28;
+    constexpr int relation = 29;
+    constexpr int isHumanCustomSprite = 30;
+    constexpr int atkSpr1 = 31;
+    constexpr int atkSpr2 = 32;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -104,6 +106,8 @@ export int readEntityDex(const wchar_t* file)
 
                     switch (columnIndex)
                     {
+                        case csvEntity::nativeName:
+                            break;
                         case csvEntity::name:
                             entityDex[tgtIndex].name = strFragment;
                             break;
@@ -114,7 +118,9 @@ export int readEntityDex(const wchar_t* file)
                             errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
                             entityDex[tgtIndex].entitySpr = spr::spriteMapper[strFragment.c_str()];
                             break;
-                        case csvEntity::tooltip:
+                        case csvEntity::nativeDescript:
+                            break;
+                        case csvEntity::descript:
                             entityTooltip.push_back(strFragment);
                             entityDex[tgtIndex].tooltipIndex = tgtIndex;
                             break;

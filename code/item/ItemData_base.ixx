@@ -126,7 +126,7 @@ export struct ItemDataBase
     void* rightWieldSpr = nullptr;
     unsigned __int32 rightWieldPriority = 0;
     unsigned __int16 tileSprIndex = 0;
-    __int8 tileConnectGroup = -1; //타일이 그려질 때 주변과 연결 여부 -1:비활성, 0:자신하고만, 1:자연벽, 2:인공벽
+    __int8 tileConnectGroup = -1; //타일이 그려질 때 주변과 연결 여부 (-1:미할당, 0:only자신, 1:자연벽, 2:인공벽, 3:차벽, 4:전선, 5:배관, 6:컨베이어, 7:울타리, 8:물)
     unsigned __int8 lightRange = 0;
     unsigned __int8 lightIntensity = 0;
     unsigned __int8 lightR = 0;
