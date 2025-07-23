@@ -246,7 +246,7 @@ void Player::updateVision(int range, int cx, int cy)
 
 	int correctionRange = range;
 	if (getHour() >= 6 && getHour() < 18) correctionRange = range;
-	else correctionRange = range / 2;
+	else correctionRange = myMax(1,range - 2);
 
 	//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
 	for (int i = cx - DARK_VISION_RADIUS; i <= cx + DARK_VISION_RADIUS; i++)
