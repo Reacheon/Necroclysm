@@ -24,9 +24,10 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
-    PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
+	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
 	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });
 	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::tired, -1 });
+
 
 
 	createItemStack({ 2, 1, 0 }, {

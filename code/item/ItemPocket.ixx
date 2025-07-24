@@ -7,7 +7,7 @@ import constVar;
 export class ItemPocket
 {
 private:
-	storageType type = storageType::null;//스토리지의 타입, 0:일반_1:장비
+	storageType type;//스토리지의 타입, 0:일반_1:장비
 public:
 	std::vector<ItemData> itemInfo;
 

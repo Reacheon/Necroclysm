@@ -11,9 +11,9 @@ export class Light : public Coord
 {
 private:
 public:
-	int lightRange = 1;
-	SDL_Color lightColor = col::white;
-	Uint8 bright = 255;
+	int lightRange;
+	SDL_Color lightColor;
+	Uint8 bright;
 	std::set<Point3> litTiles;//밝혀진 타일
 
 	dir16 dir = dir16::none;

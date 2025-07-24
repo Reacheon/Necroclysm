@@ -37,7 +37,6 @@ int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
 
 void analyseRender();
 void drawTiles();
-void drawFootprints();   // 선언만 유지 (본문 없음?)
 void drawCorpses();
 void drawItems();
 void drawEntities();
@@ -119,7 +118,31 @@ export __int64 renderTile()
 
 void drawMulFogs()
 {
-    // lightFogList를 빠른 검색을 위해 set으로 변환
+    static SDL_Color mulLightColor = { 0, 0, 0 };
+    static int mulLightBright = 0;
+
+    SDL_Color targetColor;
+    int hour = getHour();
+
+    if (hour >= 6 && hour < 7) targetColor = mulCol::dawn;
+    else if (hour >= 17 && hour < 18) targetColor = mulCol::sunfall;
+    else if (hour >= 18 || hour < 6) targetColor = mulCol::night;
+    else targetColor = mulCol::day;
+
+    if (mulLightColor.r < targetColor.r) mulLightColor.r++;
+    else if (mulLightColor.r > targetColor.r) mulLightColor.r--;
+
+    if (mulLightColor.g < targetColor.g) mulLightColor.g++;
+    else if (mulLightColor.g > targetColor.g) mulLightColor.g--;
+
+    if (mulLightColor.b < targetColor.b) mulLightColor.b++;
+    else if (mulLightColor.b > targetColor.b) mulLightColor.b--;
+
+    if (mulLightColor.a < targetColor.a) mulLightColor.a++;
+    else if (mulLightColor.a > targetColor.a) mulLightColor.a--;
+
+    mulLightBright = mulLightColor.a;
+
 
     for (const auto& elem : mulFogList)
     {
@@ -130,8 +153,10 @@ void drawMulFogs()
         dst.w = tileSize;
         dst.h = tileSize;
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
-        drawFillRect(dst, { 255,150,72 }, 200);
-        //drawFillRect(dst, { 0,0,100 }, 100);
+
+        SDL_Color col = mulLightColor;
+        Uint8 bright = mulLightBright;
+        drawFillRect(dst, mulLightColor,mulLightBright);//밤
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     }
 }

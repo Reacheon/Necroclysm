@@ -19,6 +19,7 @@ import Entity;
 import log;
 import ItemData;
 import replaceStr;
+import turnWait;
 
 export class Aim : public GUI
 {

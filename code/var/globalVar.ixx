@@ -4,10 +4,6 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <sol/sol.hpp>
 
-#define 낮 { 0xFF,0xF8,0xED }
-#define 황혼 { 0x79,0x87,0xff}
-#define 노을 { 0xFF,0xB6,0x76 }
-
 export module globalVar;
 
 import std;
@@ -134,9 +130,10 @@ export bool doPopDownHUD = false;
 
 export int barActCursor = -1; //키보드 입력 시에 사용되는 레터박스 커서, 비활성은 -1
 
-export SDL_Color mainLightColor = 낮;
+export SDL_Color mainLightColor = { 0xff,0xff,0xff };
 export int mainLightBright = 20;
 export int mainLightSight = 0;
+
 
 /////////////////////코루틴 관련 변수///////////////////////////////
 export Corouter* coFunc;
@@ -211,7 +208,7 @@ export bool drawHUD = true;
 
 export int currentUsingSkill = -1;
 
-export std::unordered_set<Point2,Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위)
+export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위)
 export SDL_Color rangeColor = { 0xff, 0xff, 0xff }; //선택 범위를 나타내는 색상
 export bool rangeRay = false;
 
@@ -307,25 +304,3 @@ export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, an
     };
 
 
-export class gasData
-{
-public:
-    int gasCode = 0;
-    int gasVol = 0;
-    bool operator==(const gasData& other) const
-    {
-        return gasCode == other.gasCode && gasVol == other.gasVol;
-    }
-};
-//▼ 해시함수 모음
-namespace std
-{
-    template<>
-    struct hash<gasData>
-    {
-        std::size_t operator()(const gasData& g) const
-        {
-            return std::hash<int>()(g.gasCode);
-        }
-    };
-}

@@ -80,6 +80,14 @@ export constexpr int PLAYER_EXHAUSTED_FATIGUE = 1440;
 
 export constexpr float FATIGUE_SPEED = 1.0;
 
+export namespace mulCol
+{
+    constexpr SDL_Color day = { 255,255,255,255 };
+    constexpr SDL_Color dawn = { 0,0,100,30 };
+    constexpr SDL_Color sunfall = { 121,78,59,100 };
+    constexpr SDL_Color night = { 0,0,100,100 };
+}
+
 export namespace col
 {
     constexpr SDL_Color black = { 0x00, 0x00, 0x00 };
@@ -1393,14 +1401,6 @@ export enum class particleFlag
 };
 
 
-//export enum class projFlag
-//{
-//    arrow,
-//    bolt,
-//    whiteBullet,
-//    yellowBullet,
-//};
-
 //전방선언
 export struct ItemData;
 export class ItemPocket;
@@ -1415,9 +1415,31 @@ export class LIght;
 export class statusEffect
 {
 public:
-    statusEffectFlag effectType = statusEffectFlag::none;
-    float duration = 0;
+    statusEffectFlag effectType;
+    float duration;
 };
 
+export class gasData
+{
+public:
+    int gasCode = 0;
+    int gasVol = 0;
+    bool operator==(const gasData& other) const
+    {
+        return gasCode == other.gasCode && gasVol == other.gasVol;
+    }
+};
 
-export void turnWait(float waitTime);
+namespace std
+{
+    template<>
+    struct hash<gasData>
+    {
+        std::size_t operator()(const gasData& g) const
+        {
+            return std::hash<int>()(g.gasCode);
+        }
+    };
+}
+
+

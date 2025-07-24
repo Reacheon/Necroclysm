@@ -16,6 +16,7 @@ import log;
 import Player;
 import World;
 import textureVar;
+import globalTime;
 
 
 //GUI의 스텝이벤트를 실행시키는 함수
@@ -54,6 +55,9 @@ export __int64 stepEvent()
 	//	}
 	//}
 	//else controller = nullptr;
+
+
+
 
 
 

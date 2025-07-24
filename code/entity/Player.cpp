@@ -18,6 +18,7 @@ import nanoTimer;
 import globalTime;
 import Footprint;
 import GameOver;
+import turnWait;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
