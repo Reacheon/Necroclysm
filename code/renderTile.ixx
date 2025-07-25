@@ -1,5 +1,4 @@
-﻿// 타일캐시 없는 버전
-#include <SDL3/SDL.h>
+﻿#include <SDL3/SDL.h>
 
 export module renderTile;
 
@@ -34,6 +33,11 @@ import Footprint;
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
 
+Point2 vertices[MAX_BATCH];
+int indices[MAX_BATCH];
+SDL_Color rectColors[MAX_BATCH];
+Uint8 batchAlphas[MAX_BATCH];
+std::unordered_set<Point2,Point2::Hash> waveTiles;
 
 void analyseRender();
 void drawTiles();
@@ -50,8 +54,8 @@ void drawDebug();
 
 
 // 차량과 엔티티는 중복을 허용하면 안됨
-std::list<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList;
-std::list<Drawable*> renderVehList, renderEntityList;
+std::vector<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList;
+std::vector<Drawable*> renderVehList, renderEntityList;
 std::unordered_set<Point2, Point2::Hash> raySet;
 
 export __int64 renderTile()
@@ -77,6 +81,7 @@ export __int64 renderTile()
     lightFogList.clear();
     flameList.clear();
     mulFogList.clear();
+    waveTiles.clear();
 
     if (rangeRay)
     {
@@ -106,6 +111,20 @@ export __int64 renderTile()
     dur::marker = PROFILE([] { drawMarkers(); });
     dur::debug = PROFILE([] { drawDebug(); });
 
+
+    vertices[0] = { 300,300 };
+    vertices[1] = { 400,400 };
+
+    indices[0] = 17;
+    indices[1] = 33;
+
+    rectColors[0] = { 255, 0, 0, 255 };
+    rectColors[1] = { 0, 255, 0, 255 };
+
+    //setZoom(2.0);
+    //drawSpriteBatch(spr::tileset, vertices, indices,2);
+    //drawRectBatch(16, 16, rectColors, vertices, 2, zoomScale);
+    //setZoom(1.0);
 
     // 전체광
     //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
@@ -143,22 +162,26 @@ void drawMulFogs()
 
     mulLightBright = mulLightColor.a;
 
-
+    int mulFogCounter = 0;
     for (const auto& elem : mulFogList)
     {
         int tgtX = elem.x;
         int tgtY = elem.y;
         dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
         dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-        dst.w = tileSize;
-        dst.h = tileSize;
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
 
-        SDL_Color col = mulLightColor;
-        Uint8 bright = mulLightBright;
-        drawFillRect(dst, mulLightColor,mulLightBright);//밤
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        vertices[mulFogCounter] =
+        {
+            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2),
+            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2)
+        };
+        rectColors[mulFogCounter] = { mulLightColor.r, mulLightColor.g, mulLightColor.b, mulLightColor.a };
+        mulFogCounter++;
     }
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+    drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
 void analyseRender()
@@ -175,7 +198,24 @@ void analyseRender()
             if (tgtY < renderRegion.y || tgtY >= renderRegion.y + renderRegion.h) continue;
 
             // 바닥과 벽
-            if (thisTile->fov != fovFlag::black) tileList.push_back({ tgtX, tgtY });
+            if (thisTile->fov != fovFlag::black)
+            {
+                tileList.push_back({ tgtX, tgtY });
+
+                if (thisTile->floor == itemRefCode::shallowSeaWater || thisTile->floor == itemRefCode::deepSeaWater)
+                {
+                    for (int dir = 0; dir < 8; dir++)
+                    {
+                        int dx, dy;
+                        dir2Coord(dir, dx, dy);
+                        if(World::ins()->getTile( tgtX + dx, tgtY + dy, pZ ).floor != itemRefCode::shallowSeaWater &&
+                            World::ins()->getTile(tgtX + dx, tgtY + dy, pZ).floor != itemRefCode::deepSeaWater)
+                        {
+                            waveTiles.insert({ tgtX + dx, tgtY + dy });
+                        }
+                    }
+                }
+            }
 
             // 아이템
             if (thisTile->fov == fovFlag::white && TileItemStack(tgtX, tgtY, pZ) != nullptr) itemList.push_back({ tgtX, tgtY });
@@ -216,8 +256,6 @@ void analyseRender()
                 }
             }
 
-
-
             
         }
     }
@@ -238,6 +276,13 @@ void analyseRender()
 
 void drawTiles()
 {
+    SDL_Texture* tileTexture = spr::tileset->getTexture();
+    int tileTextureW = spr::tileset->getW();
+    int tileTextureH = spr::tileset->getH();
+
+    
+    int tileCounter = 0;
+
     for (const auto& elem : tileList)
     {
         int tgtX = elem.x;
@@ -248,291 +293,83 @@ void drawTiles()
         const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
         const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
 
-        switch (thisTile->floor) // 바닥 타일 그리기 
+        setZoom(zoomScale);
+
+        int dirCorrection = 0;
+        int tileAniExtraIndex16 = 0;
+        int tileAniExtraIndexSingle = 0;
+        if (itemDex[thisTile->floor].tileConnectGroup != -1)
         {
-        default:
-            setZoom(zoomScale);
-
-            int dirCorrection = 0;
-            int tileAniExtraIndex16 = 0;
-            int tileAniExtraIndexSingle = 0;
-            if (itemDex[thisTile->floor].tileConnectGroup != -1)
+            bool topCheck, botCheck, leftCheck, rightCheck;
+            if (itemDex[thisTile->floor].tileConnectGroup == 0)
             {
-                bool topCheck, botCheck, leftCheck, rightCheck;
-                if (itemDex[thisTile->floor].tileConnectGroup == 0)
-                {
-                    int currentTileFloor = thisTile->floor;
-                    int topTileFloor = topTile->floor;
-                    int botTileFloor = botTile->floor;
-                    int leftTileFloor = leftTile->floor;
-                    int rightTileFloor = rightTile->floor;
+                int currentTileFloor = thisTile->floor;
+                int topTileFloor = topTile->floor;
+                int botTileFloor = botTile->floor;
+                int leftTileFloor = leftTile->floor;
+                int rightTileFloor = rightTile->floor;
 
-                    topCheck = currentTileFloor == topTileFloor;
-                    botCheck = currentTileFloor == botTileFloor;
-                    leftCheck = currentTileFloor == leftTileFloor;
-                    rightCheck = currentTileFloor == rightTileFloor;
-                }
-                else
-                {
-                    int currentTileGroup = itemDex[thisTile->floor].tileConnectGroup;
-                    int topTileGroup = itemDex[topTile->floor].tileConnectGroup;
-                    int botTileGroup = itemDex[botTile->floor].tileConnectGroup;
-                    int leftTileGroup = itemDex[leftTile->floor].tileConnectGroup;
-                    int rightTileGroup = itemDex[rightTile->floor].tileConnectGroup;
-
-                    topCheck = currentTileGroup == topTileGroup;
-                    botCheck = currentTileGroup == botTileGroup;
-                    leftCheck = currentTileGroup == leftTileGroup;
-                    rightCheck = currentTileGroup == rightTileGroup;
-                }
-
-                dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
-
-                if (itemDex[thisTile->floor].animeSize > 1)
-                {
-                    int animeFPS = itemDex[thisTile->floor].animeFPS;
-                    int animeSize = itemDex[thisTile->floor].animeSize;
-                    tileAniExtraIndex16 = getMilliTimer() / animeFPS % animeSize;
-                }
+                topCheck = currentTileFloor == topTileFloor;
+                botCheck = currentTileFloor == botTileFloor;
+                leftCheck = currentTileFloor == leftTileFloor;
+                rightCheck = currentTileFloor == rightTileFloor;
             }
             else
             {
-                if (itemDex[thisTile->floor].animeSize > 1)
-                {
-                    int animeFPS = itemDex[thisTile->floor].animeFPS;
-                    int animeSize = itemDex[thisTile->floor].animeSize;
-                    tileAniExtraIndexSingle = getMilliTimer() / animeFPS % animeSize;
-                }
+                int currentTileGroup = itemDex[thisTile->floor].tileConnectGroup;
+                int topTileGroup = itemDex[topTile->floor].tileConnectGroup;
+                int botTileGroup = itemDex[botTile->floor].tileConnectGroup;
+                int leftTileGroup = itemDex[leftTile->floor].tileConnectGroup;
+                int rightTileGroup = itemDex[rightTile->floor].tileConnectGroup;
+
+                topCheck = currentTileGroup == topTileGroup;
+                botCheck = currentTileGroup == botTileGroup;
+                leftCheck = currentTileGroup == leftTileGroup;
+                rightCheck = currentTileGroup == rightTileGroup;
             }
 
-            int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
-            sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
-            if (thisTile->floor == 0) sprIndex = 506;
+            dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
 
-            if (thisTile->floor == 220)
+            if (itemDex[thisTile->floor].animeSize > 1)
             {
-                if (getSeason() == seasonFlag::winter)
-                {
-                    sprIndex += 16;
-                }
-                else if (getSeason() == seasonFlag::summer)
-                {
-                    sprIndex += 32;
-                }
+                int animeFPS = itemDex[thisTile->floor].animeFPS;
+                int animeSize = itemDex[thisTile->floor].animeSize;
+                tileAniExtraIndex16 = getMilliTimer() / animeFPS % animeSize;
             }
-
-            int drawX = cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX));
-            int drawY = cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY));
-            drawSpriteCenter
-            (
-                spr::tileset,
-                sprIndex + dirCorrection,
-                drawX,
-                drawY
-            );
-
-            // 발자국
-            if (Footprint::map.find({ tgtX, tgtY, PlayerZ() }) != Footprint::map.end())
+        }
+        else
+        {
+            if (itemDex[thisTile->floor].animeSize > 1)
             {
-                for (const auto& address : Footprint::map[{tgtX, tgtY, PlayerZ()}])
-                {
-                    int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
-                    int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
-                    setZoom(zoomScale);
-                    SDL_SetTextureAlphaMod(address->sprite->getTexture(), address->alpha);
-                    drawSprite
-                    (
-                        address->sprite,
-                        address->sprIndex,
-                        (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
-                        (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
-                    );
-                    SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
-                    setZoom(1.0);
-                }
+                int animeFPS = itemDex[thisTile->floor].animeFPS;
+                int animeSize = itemDex[thisTile->floor].animeSize;
+                tileAniExtraIndexSingle = getMilliTimer() / animeFPS % animeSize;
             }
-
-            SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 200);
-            setZoom(zoomScale);
-            if (thisTile->floor != itemRefCode::shallowSeaWater && thisTile->floor != itemRefCode::deepSeaWater)
-            {
-                int shallowCorrection = 112;
-                int currentTileFloor = thisTile->floor;
-                int topTileFloor = topTile->floor;
-                int botTileFloor = botTile->floor;
-                int leftTileFloor = leftTile->floor;
-                int rightTileFloor = rightTile->floor;
-
-                bool topCheck = topTileFloor == itemRefCode::shallowSeaWater;
-                bool botCheck = botTileFloor == itemRefCode::shallowSeaWater;
-                bool leftCheck = leftTileFloor == itemRefCode::shallowSeaWater;
-                bool rightCheck = rightTileFloor == itemRefCode::shallowSeaWater;
-
-                Uint32 currentTime = SDL_GetTicks();
-                int animeExtraIndex = 16 * ((currentTime / 300) % 7);
-
-                // 1488 시작
-                if (topCheck && botCheck && leftCheck && rightCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,8,8,8 });
-                }
-                else if (topCheck && botCheck && rightCheck)// →
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (leftCheck && botCheck && rightCheck)//↑
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
-                }
-                else if (botCheck && rightCheck && topCheck)//←
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && topCheck && leftCheck)// ↓
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
-                }
-                else if (topCheck && botCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && leftCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && topCheck) drawSpriteCenter(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (topCheck && leftCheck)  drawSpriteCenter(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (leftCheck && botCheck)  drawSpriteCenter(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (botCheck && rightCheck) drawSpriteCenter(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (topCheck)  drawSpriteCenter(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (botCheck)  drawSpriteCenter(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (leftCheck) drawSpriteCenter(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (rightCheck)drawSpriteCenter(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else
-                {
-                    const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
-                    const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
-                    const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
-                    const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
-
-                    int topRightFloor = topRightTile->floor;
-                    int topLeftFloor = topLeftTile->floor;
-                    int botLeftFloor = botLeftTile->floor;
-                    int botRightFloor = botRightTile->floor;
-
-                    bool topRightCheck = topRightFloor == itemRefCode::shallowSeaWater;
-                    bool topLeftCheck = topLeftFloor == itemRefCode::shallowSeaWater;
-                    bool botLeftCheck = botLeftFloor == itemRefCode::shallowSeaWater;
-                    bool botRightCheck = botRightFloor == itemRefCode::shallowSeaWater;
-
-                    if (topRightCheck) drawSpriteCenter(spr::tileset, 1498 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (topLeftCheck)  drawSpriteCenter(spr::tileset, 1499 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (botLeftCheck)  drawSpriteCenter(spr::tileset, 1496 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (botRightCheck) drawSpriteCenter(spr::tileset, 1497 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                }
-            }
-
-            if (thisTile->floor != itemRefCode::shallowSeaWater && thisTile->floor != itemRefCode::deepSeaWater)
-            {
-                int shallowCorrection = 0;
-                int currentTileFloor = thisTile->floor;
-                int topTileFloor = topTile->floor;
-                int botTileFloor = botTile->floor;
-                int leftTileFloor = leftTile->floor;
-                int rightTileFloor = rightTile->floor;
-
-                bool topCheck = topTileFloor == itemRefCode::deepSeaWater;
-                bool botCheck = botTileFloor == itemRefCode::deepSeaWater;
-                bool leftCheck = leftTileFloor == itemRefCode::deepSeaWater;
-                bool rightCheck = rightTileFloor == itemRefCode::deepSeaWater;
-
-                Uint32 currentTime = SDL_GetTicks();
-                int animeExtraIndex = 16 * ((currentTime / 300) % 7);
-
-                // 1488 시작
-                if (topCheck && botCheck && leftCheck && rightCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,8,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,8,8,8 });
-                }
-                else if (topCheck && botCheck && rightCheck)// →
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (leftCheck && botCheck && rightCheck)//↑
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-                    drawSpriteCenterExSrc(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
-                }
-                else if (botCheck && rightCheck && topCheck)//←
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && topCheck && leftCheck)// ↓
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,8,16 });
-                    drawSpriteCenterExSrc(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY, { 8,0,8,16 });
-                }
-                else if (topCheck && botCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && leftCheck)
-                {
-                    drawSpriteCenterExSrc(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,0,16,8 });
-                    drawSpriteCenterExSrc(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY, { 0,8,16,8 });
-                }
-                else if (rightCheck && topCheck) drawSpriteCenter(spr::tileset, 1489 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (topCheck && leftCheck)  drawSpriteCenter(spr::tileset, 1491 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (leftCheck && botCheck)  drawSpriteCenter(spr::tileset, 1493 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (botCheck && rightCheck) drawSpriteCenter(spr::tileset, 1495 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (topCheck)  drawSpriteCenter(spr::tileset, 1490 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (botCheck)  drawSpriteCenter(spr::tileset, 1494 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (leftCheck) drawSpriteCenter(spr::tileset, 1492 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else if (rightCheck)drawSpriteCenter(spr::tileset, 1488 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                else
-                {
-                    const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
-                    const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
-                    const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
-                    const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
-
-                    int topRightFloor = topRightTile->floor;
-                    int topLeftFloor = topLeftTile->floor;
-                    int botLeftFloor = botLeftTile->floor;
-                    int botRightFloor = botRightTile->floor;
-
-                    bool topRightCheck = topRightFloor == itemRefCode::deepSeaWater;
-                    bool topLeftCheck = topLeftFloor == itemRefCode::deepSeaWater;
-                    bool botLeftCheck = botLeftFloor == itemRefCode::deepSeaWater;
-                    bool botRightCheck = botRightFloor == itemRefCode::deepSeaWater;
-
-                    if (topRightCheck) drawSpriteCenter(spr::tileset, 1498 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (topLeftCheck)  drawSpriteCenter(spr::tileset, 1499 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (botLeftCheck)  drawSpriteCenter(spr::tileset, 1496 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                    if (botRightCheck) drawSpriteCenter(spr::tileset, 1497 + animeExtraIndex + shallowCorrection, drawX, drawY);
-                }
-            }
-            SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 255);
-            setZoom(1.0);
-
-            break;
         }
 
+        int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
+        sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
+        if (thisTile->floor == 0) sprIndex = 506;
+
+        if (thisTile->floor == 220)
+        {
+            if (getSeason() == seasonFlag::winter) sprIndex += 16;
+            else if (getSeason() == seasonFlag::summer) sprIndex += 32;
+        }
+
+
+        vertices[tileCounter] = 
+        { 
+            cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)), 
+            cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY)) 
+        };
+        indices[tileCounter] = sprIndex + dirCorrection;
+        batchAlphas[tileCounter] = 255;
+        tileCounter++;
+
+
+
+        // 눈
         if (thisTile->hasSnow == true)
         {
             setZoom(zoomScale);
@@ -554,24 +391,143 @@ void drawTiles()
 
             dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
 
-            int sprIndex = 848;
-            drawSpriteCenter
-            (
-                spr::tileset,
-                sprIndex + dirCorrection,
-                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
-            );
-
-            setZoom(1.0);
+            vertices[tileCounter] = 
+            { 
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)), 
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY)) 
+            };
+            indices[tileCounter] = 1712 + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
         }
 
-        switch (thisTile->wall)// 벽 그리기
-        {
-        case 0:
-            break;
-        default:
 
+        // 발자국
+        if (Footprint::map.find({ tgtX, tgtY, PlayerZ() }) != Footprint::map.end())
+        {
+            for (const auto& address : Footprint::map[{tgtX, tgtY, PlayerZ()}])
+            {
+                vertices[tileCounter] =
+                {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+                };
+                indices[tileCounter] = 1952 + address->sprIndex;
+                batchAlphas[tileCounter] = address->alpha;
+                tileCounter++;
+            }
+        }
+
+        if (waveTiles.find({ tgtX, tgtY }) != waveTiles.end())
+        {
+            int animeExtraIndex = 32 * ((SDL_GetTicks() / 300) % 7);
+
+            {
+                bool topCheck = topTile->floor == itemRefCode::shallowSeaWater;
+                bool botCheck = botTile->floor == itemRefCode::shallowSeaWater;
+                bool leftCheck = leftTile->floor == itemRefCode::shallowSeaWater;
+                bool rightCheck = rightTile->floor == itemRefCode::shallowSeaWater;
+                auto addWave = [&](int inputIndex)
+                    {
+                        vertices[tileCounter] =
+                        {
+                            cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                            cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+                        };
+                        indices[tileCounter] = inputIndex + animeExtraIndex + 224;
+                        batchAlphas[tileCounter] = 200;
+                        tileCounter++;
+                    };
+
+                if (topCheck && botCheck && leftCheck && rightCheck) addWave(1526);
+                else if (topCheck && botCheck && rightCheck) addWave(1520); // →
+                else if (leftCheck && botCheck && rightCheck) addWave(1523); //↑
+                else if (botCheck && rightCheck && topCheck) addWave(1522); //←
+                else if (rightCheck && topCheck && leftCheck) addWave(1521); // ↓
+                else if (topCheck && botCheck) addWave(1524);
+                else if (rightCheck && leftCheck) addWave(1525);
+                else if (rightCheck && topCheck) addWave(1505);
+                else if (topCheck && leftCheck)  addWave(1507);
+                else if (leftCheck && botCheck)  addWave(1509);
+                else if (botCheck && rightCheck) addWave(1511);
+                else if (topCheck)  addWave(1506);
+                else if (botCheck)  addWave(1510);
+                else if (leftCheck) addWave(1508);
+                else if (rightCheck)addWave(1504);
+                else
+                {
+                    const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
+                    const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
+                    const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
+                    const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+
+                    bool topRightCheck = topRightTile->floor == itemRefCode::shallowSeaWater;
+                    bool topLeftCheck = topLeftTile->floor == itemRefCode::shallowSeaWater;
+                    bool botLeftCheck = botLeftTile->floor == itemRefCode::shallowSeaWater;
+                    bool botRightCheck = botRightTile->floor == itemRefCode::shallowSeaWater;
+
+                    if (topRightCheck) addWave(1514);
+                    if (topLeftCheck) addWave(1515);
+                    if (botLeftCheck) addWave(1512);
+                    if (botRightCheck) addWave(1513);
+                }
+            }
+        
+            {
+                bool topCheck = topTile->floor == itemRefCode::deepSeaWater;
+                bool botCheck = botTile->floor == itemRefCode::deepSeaWater;
+                bool leftCheck = leftTile->floor == itemRefCode::deepSeaWater;
+                bool rightCheck = rightTile->floor == itemRefCode::deepSeaWater;
+                auto addWave = [&](int inputIndex)
+                    {
+                        vertices[tileCounter] =
+                        {
+                            cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                            cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+                        };
+                        indices[tileCounter] = inputIndex + animeExtraIndex;
+                        batchAlphas[tileCounter] = 200;
+                        tileCounter++;
+                    };
+
+                if (topCheck && botCheck && leftCheck && rightCheck) addWave(1526);
+                else if (topCheck && botCheck && rightCheck) addWave(1520); // →
+                else if (leftCheck && botCheck && rightCheck) addWave(1523); //↑
+                else if (botCheck && rightCheck && topCheck) addWave(1522); //←
+                else if (rightCheck && topCheck && leftCheck) addWave(1521); // ↓
+                else if (topCheck && botCheck) addWave(1524);
+                else if (rightCheck && leftCheck) addWave(1525);
+                else if (rightCheck && topCheck) addWave(1505);
+                else if (topCheck && leftCheck)  addWave(1507);
+                else if (leftCheck && botCheck)  addWave(1509);
+                else if (botCheck && rightCheck) addWave(1511);
+                else if (topCheck)  addWave(1506);
+                else if (botCheck)  addWave(1510);
+                else if (leftCheck) addWave(1508);
+                else if (rightCheck)addWave(1504);
+                else
+                {
+                    const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
+                    const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
+                    const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
+                    const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+
+                    bool topRightCheck = topRightTile->floor == itemRefCode::deepSeaWater;
+                    bool topLeftCheck = topLeftTile->floor == itemRefCode::deepSeaWater;
+                    bool botLeftCheck = botLeftTile->floor == itemRefCode::deepSeaWater;
+                    bool botRightCheck = botRightTile->floor == itemRefCode::deepSeaWater;
+
+                    if (topRightCheck) addWave(1514);
+                    if (topLeftCheck) addWave(1515);
+                    if (botLeftCheck) addWave(1512);
+                    if (botRightCheck) addWave(1513);
+                }
+            }
+
+        }
+
+        if(thisTile->wall!=0)
+        {
             setZoom(zoomScale);
             int dirCorrection = 0;
             if (itemDex[thisTile->wall].tileConnectGroup != -1)
@@ -607,14 +563,14 @@ void drawTiles()
                 dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
             }
 
-            drawSpriteCenter
-            (
-                spr::tileset,
-                itemDex[thisTile->wall].tileSprIndex + dirCorrection,
-                cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-                cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-            );
-            setZoom(1.0);
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = itemDex[thisTile->wall].tileSprIndex + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
 
             if (thisTile->displayHPBarCount > 0)// 개체 HP 표기
             {
@@ -669,56 +625,52 @@ void drawTiles()
         // 스킬 범위 그리기
         if (rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
         {
-            setZoom(zoomScale);
-            int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
-            int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
-
-            // 8방향 조건 체크
             bool rightCheck = rangeSet.find({ tgtX + 1, tgtY }) != rangeSet.end();
             bool topCheck = rangeSet.find({ tgtX, tgtY - 1 }) != rangeSet.end();
             bool leftCheck = rangeSet.find({ tgtX - 1, tgtY }) != rangeSet.end();
             bool botCheck = rangeSet.find({ tgtX, tgtY + 1 }) != rangeSet.end();
             int dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
 
-            drawSpriteCenter
-            (
-                spr::tileset,
-                1440 + dirCorrection,
-                cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX),
-                cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY)
-            );
-            setZoom(1.0);
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = 1440 + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
         }
 
         if (rangeRay && raySet.find({ tgtX - PlayerX(),tgtY - PlayerY() }) != raySet.end())
         {
-            setZoom(zoomScale);
-            int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
-            int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
-            drawFillRect
-            (
-                SDL_Rect{ drawingX - (int)(8 * zoomScale), drawingY - (int)(8 * zoomScale), (int)(16 * zoomScale), (int)(16 * zoomScale) },
-                rangeColor, 150
-            );
-            setZoom(1.0);
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = 0;
+            batchAlphas[tileCounter] = 150;
+            tileCounter++;
         }
 
         if (rangeSet.size() > 0 && rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
         {
             if (getAbsMouseGrid().x == tgtX && getAbsMouseGrid().y == tgtY)
             {
-                setZoom(zoomScale);
-                int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
-                int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
-                drawFillRect
-                (
-                    SDL_Rect{ drawingX - (int)(8 * zoomScale), drawingY - (int)(8 * zoomScale), (int)(16 * zoomScale), (int)(16 * zoomScale) },
-                    rangeColor, 150
-                );
-                setZoom(1.0);
+                vertices[tileCounter] =
+                {
+                    cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                    cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+                };
+                indices[tileCounter] = 0;
+                batchAlphas[tileCounter] = 150;
+                tileCounter++;
             }
         }
     }
+
+    drawSpriteBatchCenter(spr::tileset, vertices, indices, batchAlphas, tileCounter);
+    setZoom(1.0);
 }
 
 void drawCorpses()
@@ -1084,54 +1036,53 @@ void drawFogs()
         setZoom(1.0);
     }
 
+    int fogCounter = 0;
     for (const auto& elem : blackFogList)
     {
-        int tgtX = elem.x;
-        int tgtY = elem.y;
+        vertices[fogCounter] = {
+            cameraW / 2 + static_cast<int>(zoomScale * ((16 * elem.x + 8) - cameraX) - ((16 * zoomScale) / 2)),
+            cameraH / 2 + static_cast<int>(zoomScale * ((16 * elem.y + 8) - cameraY) - ((16 * zoomScale) / 2))
+        };
+        rectColors[fogCounter] = { 0x16, 0x16, 0x16, 255 };
+        fogCounter++;
 
-        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-        dst.w = tileSize;
-        dst.h = tileSize;
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-        drawFillRect(dst, { 0x16,0x16,0x16 }, 255);
     }
 
     for (const auto& elem : grayFogList)
     {
-        int tgtX = elem.x;
-        int tgtY = elem.y;
-
-        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-        dst.w = tileSize;
-        dst.h = tileSize;
-
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        drawFillRect(dst, { 0x16,0x16,0x16 }, 185);
+        vertices[fogCounter] = {
+            cameraW / 2 + static_cast<int>(zoomScale * ((16 * elem.x + 8) - cameraX) - ((16 * zoomScale) / 2)),
+            cameraH / 2 + static_cast<int>(zoomScale * ((16 * elem.y + 8) - cameraY) - ((16 * zoomScale) / 2))
+        };
+        rectColors[fogCounter] = { 0x16, 0x16, 0x16, 185 };
+        fogCounter++;
     }
 
+    drawRectBatch(16, 16, rectColors, vertices, fogCounter, zoomScale);
+
+    int lightCounter = 0;
     for (const auto& elem : lightFogList)
     {
-        int tgtX = elem.x;
-        int tgtY = elem.y;
-        TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
+        TileData* thisTile = &World::ins()->getTile(elem.x, elem.y, PlayerZ());
 
-        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-        dst.w = tileSize;
-        dst.h = tileSize;
+        int posX = cameraW / 2 + static_cast<int>(zoomScale * ((16 * elem.x + 8) - cameraX) - ((16 * zoomScale) / 2));
+        int posY = cameraH / 2 + static_cast<int>(zoomScale * ((16 * elem.y + 8) - cameraY) - ((16 * zoomScale) / 2));
 
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
-        drawFillRect(dst, { 0x16,0x16,0x16 }, 200);
+        vertices[lightCounter] = { posX, posY };
+        rectColors[lightCounter] = { 0x16, 0x16, 0x16, 200 };
+        lightCounter++;
 
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+        vertices[lightCounter] = { posX, posY };
         Uint8 targetR = myMin(255, thisTile->redLight);
         Uint8 targetG = myMin(255, thisTile->greenLight);
         Uint8 targetB = myMin(255, thisTile->blueLight);
-        drawFillRect(dst, { targetR,targetG,targetB }, 200);
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        rectColors[lightCounter] = { targetR, targetG, targetB, 200 };
+        lightCounter++;
     }
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+    drawRectBatch(16, 16, rectColors, vertices, lightCounter, zoomScale);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
 void drawMarkers()

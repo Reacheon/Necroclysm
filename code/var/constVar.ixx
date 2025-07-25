@@ -80,6 +80,8 @@ export constexpr int PLAYER_EXHAUSTED_FATIGUE = 1440;
 
 export constexpr float FATIGUE_SPEED = 1.0;
 
+export constexpr int MAX_BATCH = 4096;
+
 export namespace mulCol
 {
     constexpr SDL_Color day = { 255,255,255,255 };

@@ -4,7 +4,9 @@
 export module drawSprite;
 
 import Sprite;
+import util;
 import globalVar;
+import constVar;
 
 static float s_zoomScale = 1.0f;
 static SDL_FlipMode s_flip = SDL_FLIP_NONE;
@@ -384,3 +386,98 @@ export void drawFlashEffectBlendCenter(Sprite* spr, int index, int x, int y, SDL
 
     drawFlashEffectBlend(spr, index, left, top, flash);
 }
+
+export void drawSpriteBatch(Sprite* spr, const Point2* pts, const int* indexes, const Uint8* alphas, size_t count)
+{
+    if (!pts || !indexes || !alphas || count == 0) return;
+
+    float textureW, textureH;
+    SDL_GetTextureSize(spr->getTexture(), &textureW, &textureH);
+    float tileW = spr->getW() / textureW;
+    float tileH = spr->getH() / textureH;
+
+    const float spriteW = s_zoomScale * (float)spr->getW();
+    const float spriteH = s_zoomScale * (float)spr->getH();
+    constexpr int MAX_SPRITE = 4096;
+
+    static SDL_Vertex vertices[MAX_SPRITE * 4];
+    static int indices[MAX_SPRITE * 6];
+
+    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatch: count exceeds MAX_SPRITE limit(>4096)");
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        const float srcX = (float)((spr->getW() * indexes[i]) % static_cast<int>(textureW)) / textureW;
+        const float srcY = (float)(spr->getH() * ((spr->getW() * indexes[i]) / static_cast<int>(textureW))) / textureH;
+
+        const float x = pts[i].x;
+        const float y = pts[i].y;
+        const float alpha = alphas[i] / 255.0f;
+
+        const size_t vIdx = i * 4;
+        vertices[vIdx] = { { x, y }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX, srcY } };
+        vertices[vIdx + 1] = { { x + spriteW, y }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX + tileW, srcY } };
+        vertices[vIdx + 2] = { { x + spriteW, y + spriteH }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX + tileW, srcY + tileH } };
+        vertices[vIdx + 3] = { { x, y + spriteH }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX, srcY + tileH } };
+
+        const int baseIdx = static_cast<int>(i * 4);
+        const size_t iIdx = i * 6;
+        indices[iIdx] = baseIdx;
+        indices[iIdx + 1] = baseIdx + 1;
+        indices[iIdx + 2] = baseIdx + 2;
+        indices[iIdx + 3] = baseIdx;
+        indices[iIdx + 4] = baseIdx + 2;
+        indices[iIdx + 5] = baseIdx + 3;
+    }
+
+    SDL_RenderGeometry(renderer, spr->getTexture(), vertices, count * 4, indices, count * 6);
+}
+
+export void drawSpriteBatchCenter(Sprite* spr, const Point2* pts, const int* indexes, const Uint8* alphas, size_t count)
+{
+    if (!pts || !indexes || !alphas || count == 0) return;
+
+    float textureW, textureH;
+    SDL_GetTextureSize(spr->getTexture(), &textureW, &textureH);
+    float tileW = spr->getW() / textureW;
+    float tileH = spr->getH() / textureH;
+
+    const float spriteW = s_zoomScale * (float)spr->getW();
+    const float spriteH = s_zoomScale * (float)spr->getH();
+    const float halfW = spriteW * 0.5f;
+    const float halfH = spriteH * 0.5f;
+    constexpr int MAX_SPRITE = 4096;
+
+    static SDL_Vertex vertices[MAX_SPRITE * 4];
+    static int indices[MAX_SPRITE * 6];
+
+    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatchCenter: count exceeds MAX_SPRITE limit(>4096)");
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        const float srcX = (float)((spr->getW() * indexes[i]) % static_cast<int>(textureW)) / textureW;
+        const float srcY = (float)(spr->getH() * ((spr->getW() * indexes[i]) / static_cast<int>(textureW))) / textureH;
+
+        const float centerX = pts[i].x - halfW;
+        const float centerY = pts[i].y - halfH;
+        const float alpha = alphas[i] / 255.0f;
+
+        const size_t vIdx = i * 4;
+        vertices[vIdx] = { { centerX, centerY }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX, srcY } };
+        vertices[vIdx + 1] = { { centerX + spriteW, centerY }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX + tileW, srcY } };
+        vertices[vIdx + 2] = { { centerX + spriteW, centerY + spriteH }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX + tileW, srcY + tileH } };
+        vertices[vIdx + 3] = { { centerX, centerY + spriteH }, { 1.0f, 1.0f, 1.0f, alpha }, { srcX, srcY + tileH } };
+
+        const int baseIdx = static_cast<int>(i * 4);
+        const size_t iIdx = i * 6;
+        indices[iIdx] = baseIdx;
+        indices[iIdx + 1] = baseIdx + 1;
+        indices[iIdx + 2] = baseIdx + 2;
+        indices[iIdx + 3] = baseIdx;
+        indices[iIdx + 4] = baseIdx + 2;
+        indices[iIdx + 5] = baseIdx + 3;
+    }
+
+    SDL_RenderGeometry(renderer, spr->getTexture(), vertices, count * 4, indices, count * 6);
+}
+

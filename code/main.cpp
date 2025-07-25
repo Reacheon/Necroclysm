@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 			delayTime = 0;
 		}
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
-		renderFPS(getNanoTimer() - loopStart);
+		//renderFPS(getNanoTimer() - loopStart);
 		SDL_RenderPresent(renderer);
 
 		if (hasInitMinimap == false)

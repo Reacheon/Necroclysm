@@ -3,6 +3,8 @@
 export module drawPrimitive;
 
 import std;
+import Point;
+import errorBox;
 
 static SDL_Renderer* localRenderer;
 export void setPrimitiveRenderer(SDL_Renderer* inputRenderer) { localRenderer = inputRenderer; }
@@ -246,4 +248,48 @@ export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, 
 		break;
 	}
 	}
+}
+
+export void drawRectBatch(int rectW, int rectH, SDL_Color* cols, const Point2* pts, size_t count, float inputZoomScale)
+{
+	if (!cols || !pts || !cols || count == 0) return;
+
+	constexpr int MAX_RECT = 4096;
+
+	static SDL_Vertex vertices[MAX_RECT * 4];
+	static int indices[MAX_RECT * 6];
+
+	if (count > MAX_RECT) errorBox(L"drawRectBatch: count exceeds MAX_RECT limit(>4096)");
+
+	const float rectWf = static_cast<float>(rectW) * inputZoomScale;
+	const float rectHf = static_cast<float>(rectH) * inputZoomScale;
+
+	for (size_t i = 0; i < count; ++i)
+	{
+		const SDL_Color& color = cols[i];
+		const float normalizedR = color.r / 255.0f;
+		const float normalizedG = color.g / 255.0f;
+		const float normalizedB = color.b / 255.0f;
+		const float normalizedA = color.a / 255.0f;
+
+		const float x = pts[i].x;
+		const float y = pts[i].y;
+
+		const size_t vIdx = i * 4;
+		vertices[vIdx] = { { x,         y },         { normalizedR, normalizedG, normalizedB, normalizedA }, { 0.0f, 0.0f } };
+		vertices[vIdx + 1] = { { x + rectWf, y },         { normalizedR, normalizedG, normalizedB, normalizedA }, { 1.0f, 0.0f } };
+		vertices[vIdx + 2] = { { x + rectWf, y + rectHf }, { normalizedR, normalizedG, normalizedB, normalizedA }, { 1.0f, 1.0f } };
+		vertices[vIdx + 3] = { { x,         y + rectHf }, { normalizedR, normalizedG, normalizedB, normalizedA }, { 0.0f, 1.0f } };
+
+		const int baseIdx = static_cast<int>(i * 4);
+		const size_t iIdx = i * 6;
+		indices[iIdx] = baseIdx;
+		indices[iIdx + 1] = baseIdx + 1;
+		indices[iIdx + 2] = baseIdx + 2;
+		indices[iIdx + 3] = baseIdx;
+		indices[iIdx + 4] = baseIdx + 2;
+		indices[iIdx + 5] = baseIdx + 3;
+	}
+
+	SDL_RenderGeometry(localRenderer, nullptr, vertices, count * 4, indices, count * 6);
 }
