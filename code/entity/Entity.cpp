@@ -2,19 +2,20 @@
 
 #include <SDL3/SDL.h>
 
+
 import std;
 import util;
 import globalVar;
+import ItemData;
+import ItemPocket;
+import ItemStack;
 import wrapVar;
-import constVar;
 import log;
 import Sprite;
 import Ani;
 import Coord;
 import World;
-import ItemStack;
 import EntityData;
-import ItemData;
 import Damage;
 import SkillData;
 import Flame;
@@ -678,6 +679,8 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 		}
 	}
 }
+
+
 void Entity::stepEvent()
 {
 }

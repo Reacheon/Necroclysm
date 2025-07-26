@@ -6,13 +6,13 @@ import globalVar;
 import wrapVar;
 import World;
 import Entity;
+import ItemData;
 import ItemStack;
 import ItemPocket;
 import log;
 import Lst;
 import Player;
 import Prop;
-import ItemData;
 
 //액트가 실행되는 환경은 3가지 경우가 가능
 // 0:기본 HUD, 1:Loot, 2:Equip 

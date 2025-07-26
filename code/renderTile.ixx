@@ -135,46 +135,140 @@ export __int64 renderTile()
     return (getNanoTimer() - timeStampStart);
 }
 
+//void drawMulFogs()
+//{
+//    static SDL_Color mulLightColor = { 0, 0, 0 };
+//    auto lerpColor = [](SDL_Color a, SDL_Color b, float t) -> SDL_Color
+//    {
+//        return {
+//            (Uint8)(a.r + (b.r - a.r) * t),
+//            (Uint8)(a.g + (b.g - a.g) * t),
+//            (Uint8)(a.b + (b.b - a.b) * t),
+//            (Uint8)(a.a + (b.a - a.a) * t)
+//        };
+//        };
+//
+//
+//    int hour = getHour();
+//    int min = getMin();
+//
+//    constexpr SDL_Color day7 = { 0,0,0,0 };
+//    constexpr SDL_Color day16 = { 0,0,0,0 };
+//    constexpr SDL_Color day17 = { 121,78,59,130 };
+//    constexpr SDL_Color night18 = { 0,0,59,150 };
+//    constexpr SDL_Color night6 = { 0,0,59,150 };
+//
+//    SDL_Color prevColor, nextColor;
+//    float ratio;
+//    if (hour >= 7 && hour < 16)
+//    {
+//        prevColor = day7;
+//        nextColor = day16;
+//        ratio = (hour - 7 + min / 60.0f) / 9.0f; // 7시~16시 (9시간)
+//    }
+//    else if (hour == 16)
+//    {
+//        prevColor = day16;
+//        nextColor = day17;
+//        ratio = min / 60.0f; // 16시~17시 (1시간)
+//    }
+//    else if (hour == 17)
+//    {
+//        prevColor = day17;
+//        nextColor = night18;
+//        ratio = min / 60.0f; // 17시~18시 (1시간)
+//    }
+//    else if (hour >= 18 || hour < 6)
+//    {
+//        prevColor = night18;
+//        nextColor = night6;
+//        // 18시~6시 (12시간)
+//        if (hour >= 18) ratio = (hour - 18 + min / 60.0f) / 12.0f;
+//        else ratio = (hour + 6 + min / 60.0f) / 12.0f;
+//    }
+//    else // hour == 6
+//    {
+//        prevColor = night6;
+//        nextColor = day7;
+//        ratio = min / 60.0f; // 6시~7시 (1시간)
+//    }
+//
+//    mulLightColor = lerpColor(prevColor, nextColor, ratio);
+//
+//    int mulFogCounter = 0;
+//    for (const auto& elem : mulFogList)
+//    {
+//        int tgtX = elem.x;
+//        int tgtY = elem.y;
+//        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+//        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+//
+//        vertices[mulFogCounter] =
+//        {
+//            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2),
+//            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2)
+//        };
+//        rectColors[mulFogCounter] = { mulLightColor.r, mulLightColor.g, mulLightColor.b, mulLightColor.a };
+//        mulFogCounter++;
+//    }
+//
+//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+//    drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
+//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+//}
+
 void drawMulFogs()
 {
-    static SDL_Color mulLightColor = { 0, 0, 0 };
+    struct TimeColor 
+    {
+        float time;
+        SDL_Color color;
+    };
 
-    SDL_Color targetColor;
-    int hour = getHour();
+    static const std::vector<TimeColor> timeColors =
+    {
+        {0.0f,  {0, 0, 59, 150}},
+        {6.0f,  {0, 0, 59, 150}},
+        {8.0f,  { 0,0,49,50}},
+        {10.0f, {0, 0, 0, 0}},
+        {17.0f, {0, 0, 0, 0}},
+        {18.0f, {121, 78, 59, 130}},
+        {18.5f, {0, 0, 59, 150}},
+        {24.0f, {0, 0, 59, 150}}
+    };
 
-    if (hour >= 6 && hour < 7) targetColor = mulCol::dawn;
-    else if (hour >= 17 && hour < 18) targetColor = mulCol::sunfall;
-    else if (hour >= 18 || hour < 6) targetColor = mulCol::night;
-    else targetColor = mulCol::day;
+    float currentTime = getHour() + getMin() / 60.0f;
 
-    if (mulLightColor.r < targetColor.r) mulLightColor.r++;
-    else if (mulLightColor.r > targetColor.r) mulLightColor.r--;
+    SDL_Color mulLightColor = { 0, 0, 0, 0 };
+    for (size_t i = 0; i < timeColors.size() - 1; ++i) 
+    {
+        if (currentTime >= timeColors[i].time && currentTime < timeColors[i + 1].time) 
+        {
+            float t1 = timeColors[i].time;
+            float t2 = timeColors[i + 1].time;
+            float ratio = (currentTime - t1) / (t2 - t1);
 
-    if (mulLightColor.g < targetColor.g) mulLightColor.g++;
-    else if (mulLightColor.g > targetColor.g) mulLightColor.g--;
+            const SDL_Color& c1 = timeColors[i].color;
+            const SDL_Color& c2 = timeColors[i + 1].color;
 
-    if (mulLightColor.b < targetColor.b) mulLightColor.b++;
-    else if (mulLightColor.b > targetColor.b) mulLightColor.b--;
-
-    if (mulLightColor.a < targetColor.a) mulLightColor.a++;
-    else if (mulLightColor.a > targetColor.a) mulLightColor.a--;
-
-    mulLightBright = mulLightColor.a;
+            mulLightColor = 
+            {
+                (Uint8)(c1.r + (c2.r - c1.r) * ratio),
+                (Uint8)(c1.g + (c2.g - c1.g) * ratio),
+                (Uint8)(c1.b + (c2.b - c1.b) * ratio),
+                (Uint8)(c1.a + (c2.a - c1.a) * ratio)
+            };
+            break;
+        }
+    }
 
     int mulFogCounter = 0;
-    for (const auto& elem : mulFogList)
+    for (const auto& fog : mulFogList) 
     {
-        int tgtX = elem.x;
-        int tgtY = elem.y;
-        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-
-        vertices[mulFogCounter] =
-        {
-            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2),
-            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2)
-        };
-        rectColors[mulFogCounter] = { mulLightColor.r, mulLightColor.g, mulLightColor.b, mulLightColor.a };
+        int screenX = cameraW / 2 + zoomScale * ((16 * fog.x + 8) - cameraX) - (8 * zoomScale);
+        int screenY = cameraH / 2 + zoomScale * ((16 * fog.y + 8) - cameraY) - (8 * zoomScale);
+        vertices[mulFogCounter] = { screenX, screenY };
+        rectColors[mulFogCounter] = mulLightColor;
         mulFogCounter++;
     }
 
@@ -182,6 +276,7 @@ void drawMulFogs()
     drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
+
 
 void analyseRender()
 {

@@ -293,6 +293,8 @@ void Player::updateVision(int range, int cx, int cy)
 	}
 
 	threadPoolPtr->waitForThreads();
+
+    //std::wprintf(L"[updateVision] %d,%d에서 시야업데이트가 완료되었다. 소요시간 : %lf ms\n", cx, cy, (getNanoTimer() - timeStampStart) / 1000000.0);
 }
 
 
