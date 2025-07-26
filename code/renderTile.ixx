@@ -138,7 +138,6 @@ export __int64 renderTile()
 void drawMulFogs()
 {
     static SDL_Color mulLightColor = { 0, 0, 0 };
-    static int mulLightBright = 0;
 
     SDL_Color targetColor;
     int hour = getHour();
