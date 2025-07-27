@@ -291,7 +291,7 @@ export namespace actFunc
 			inputItem.eraseFlag(itemFlag::TOGGLE_OFF);
 			inputItem.addFlag(itemFlag::TOGGLE_ON);
 
-			inputItem.lightPtr = std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 6, 110, SDL_Color{ 150, 150, 250 });
+			inputItem.lightPtr = std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 8, 110, SDL_Color{ 150, 150, 250 });
 			inputItem.sprIndex += 1;
 			PlayerPtr->updateVision();
 			updateLog(L"You turn on the headlamp.");

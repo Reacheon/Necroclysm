@@ -80,6 +80,7 @@ export __int64 renderTile()
     blackFogList.clear();
     grayFogList.clear();
     lightFogList.clear();
+    lightFogSet.clear();
     flameList.clear();
     mulFogList.clear();
     waveTiles.clear();
@@ -374,7 +375,7 @@ void drawTiles()
                             cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
                         };
                         indices[tileCounter] = inputIndex + animeExtraIndex + 224;
-                        batchAlphas[tileCounter] = 200;
+                        batchAlphas[tileCounter] = 120;
                         tileCounter++;
                     };
 
@@ -977,6 +978,8 @@ void drawMulFogs()
     int mulFogCounter = 0;
     for (const auto& fog : mulFogList)
     {
+        if (lightFogSet.find({ fog.x,fog.y }) != lightFogSet.end()) continue;
+
         int screenX = cameraW / 2 + zoomScale * ((16 * fog.x + 8) - cameraX) - (8 * zoomScale);
         int screenY = cameraH / 2 + zoomScale * ((16 * fog.y + 8) - cameraY) - (8 * zoomScale);
         vertices[mulFogCounter] = { screenX, screenY };
@@ -985,10 +988,6 @@ void drawMulFogs()
         rectColors[mulFogCounter] = mulLightColor;
 
 
-        if (lightFogSet.find({ fog.x,fog.y }) != lightFogSet.end())
-        {
-            //rectColors[mulFogCounter].a = mulLightColor.a - ;
-        }
 
         mulFogCounter++;
     }

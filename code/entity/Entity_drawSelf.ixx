@@ -271,11 +271,9 @@ void Entity::drawSelf()
 				if (TileFloor(getGridX() + 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
 					TileFloor(getGridX() - 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
 					TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::shallowSeaWater ||
-					TileFloor(getGridX(), getGridY() - 1, getGridZ()) == itemRefCode::shallowSeaWater ||
 					TileFloor(getGridX() + 1, getGridY(), getGridZ()) == itemRefCode::deepSeaWater ||
 					TileFloor(getGridX() - 1, getGridY(), getGridZ()) == itemRefCode::deepSeaWater ||
-					TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::deepSeaWater ||
-					TileFloor(getGridX(), getGridY() - 1, getGridZ()) == itemRefCode::deepSeaWater
+					TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::deepSeaWater
 					)
 				{
 					int waveExtraIndex = 16 * ((SDL_GetTicks() / 300) % 7);
@@ -437,14 +435,23 @@ void Entity::drawSelf()
 		TileFloor(getGridX(), getGridY(), getGridZ()) != itemRefCode::deepSeaWater&&
 		entityInfo.jumpOffsetY == 0)
 	{
-		if (TileFloor(getGridX() + 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
-			TileFloor(getGridX() - 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
-			TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::shallowSeaWater ||
-			TileFloor(getGridX(), getGridY() - 1, getGridZ()) == itemRefCode::shallowSeaWater ||
+		if (
 			TileFloor(getGridX() + 1, getGridY(), getGridZ()) == itemRefCode::deepSeaWater ||
 			TileFloor(getGridX() - 1, getGridY(), getGridZ()) == itemRefCode::deepSeaWater ||
-			TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::deepSeaWater ||
-			TileFloor(getGridX(), getGridY() - 1, getGridZ()) == itemRefCode::deepSeaWater
+			TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::deepSeaWater
+			)
+		{
+			int waveExtraIndex = 16 * ((SDL_GetTicks() / 300) % 7);
+			if (waveExtraIndex / 16 == 2 || waveExtraIndex / 16 == 3 || waveExtraIndex / 16 == 4)
+			{
+				SDL_SetTextureAlphaMod(spr::waveFoam->getTexture(), 200);
+				drawSpriteCenter(spr::waveFoam, waveExtraIndex / 16 - 2 + 4, originX, originY);
+				SDL_SetTextureAlphaMod(spr::waveFoam->getTexture(), 255);
+			}
+		}
+		else if (TileFloor(getGridX() + 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(getGridX() - 1, getGridY(), getGridZ()) == itemRefCode::shallowSeaWater ||
+			TileFloor(getGridX(), getGridY() + 1, getGridZ()) == itemRefCode::shallowSeaWater
 			)
 		{
 			int waveExtraIndex = 16 * ((SDL_GetTicks() / 300) % 7);
