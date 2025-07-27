@@ -604,7 +604,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; }
 				else if (xo > x2 && y2 > yo) { x1--; }
 				else { x1--; }
-				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
+				if (World::ins()->getTile(x1, y1, getGridZ()).lightVec.size() > 0)
 				{
 					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
@@ -617,7 +617,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
+				if (World::ins()->getTile(x1, y1, getGridZ()).lightVec.size() > 0)
 				{
 					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
@@ -639,7 +639,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { y1--; }
 				else if (xo > x2 && y2 > yo) { y1++; }
 				else { y1--; }
-				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
+				if (World::ins()->getTile(x1, y1, getGridZ()).lightVec.size() > 0)
 				{
 					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
@@ -652,7 +652,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 				else if (x2 > xo && yo > y2) { x1++; y1--; }
 				else if (xo > x2 && y2 > yo) { x1--; y1++; }
 				else { x1--; y1--; }
-				if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
+				if (World::ins()->getTile(x1, y1, getGridZ()).lightVec.size() > 0)
 				{
 					TileFov(x1, y1, getGridZ()) = fovFlag::white;
 				}
@@ -670,7 +670,7 @@ void Entity::rayCastingDark(int x1, int y1, int x2, int y2)
 			else if (x2 > x1 && y1 > y2) { x1++; y1--; }
 			else if (x1 > x2 && y2 > y1) { x1--; y1++; }
 			else { x1--; y1--; }
-			if (World::ins()->getTile(x1, y1, getGridZ()).light > 0)
+			if (World::ins()->getTile(x1, y1, getGridZ()).lightVec.size() > 0)
 			{
 				TileFov(x1, y1, getGridZ()) = fovFlag::white;
 			}

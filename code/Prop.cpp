@@ -378,38 +378,18 @@ void Prop::drawSelf()
     {
         int pivotX = dst.x + dst.w / 2 - (int)(8 * zoomScale);
         int pivotY = dst.y + dst.h / 2 + (int)(16 * zoomScale);
-        SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        drawFillRect(dst, col::black, alphaHPBar);
-
-        if (leadItem.propFakeHP > leadItem.propHP) { leadItem.propFakeHP-=((float)leadItem.propMaxHP/100.0); }
+        if (leadItem.propFakeHP > leadItem.propHP) leadItem.propFakeHP -= ((float)leadItem.propMaxHP / 100.0);
         else if (leadItem.propFakeHP < leadItem.propHP) leadItem.propFakeHP = leadItem.propHP;
-
         if (leadItem.propFakeHP != leadItem.propHP)
         {
-            if (alphaFakeHPBar > 20) { alphaFakeHPBar -= 20; }
-            else 
-            { 
+            if (alphaFakeHPBar > 20) alphaFakeHPBar -= 20;
+            else
+            {
                 alphaFakeHPBar = 0;
                 leadItem.propFakeHP = leadItem.propHP;
             }
         }
-        else { alphaFakeHPBar = 0; }
-
-        float ratioFakeHP = myMax((float)0.0, (leadItem.propFakeHP) / (float)(leadItem.propMaxHP));
-        dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        drawFillRect(dst, col::white, alphaFakeHPBar);
-
-        float ratioHP = myMax((float)0.0, (float)(leadItem.propHP) / (float)(leadItem.propMaxHP));
-
-        SDL_Color gaugeCol = lowCol::green;
-
-        dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
-        if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        drawFillRect(dst, gaugeCol, alphaHPBar);
-
+        else alphaFakeHPBar = 0;
         if (displayHPBarCount > 1) displayHPBarCount--;
         else if (displayHPBarCount == 1)
         {
@@ -420,6 +400,16 @@ void Prop::drawSelf()
                 displayHPBarCount = 0;
             }
         }
+        draw3pxGauge(
+            pivotX,
+            pivotY,
+            zoomScale,
+            (float)leadItem.propHP / (float)leadItem.propMaxHP,
+            alphaHPBar,
+            lowCol::green,
+            (float)leadItem.propFakeHP / (float)leadItem.propMaxHP,
+            alphaFakeHPBar
+        );
     }
 
     SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정

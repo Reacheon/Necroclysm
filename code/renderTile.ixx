@@ -54,7 +54,8 @@ void drawDebug();
 
 
 // 차량과 엔티티는 중복을 허용하면 안됨
-std::vector<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList;
+std::vector<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList, wallHPList;
+std::unordered_set<Point2, Point2::Hash> lightFogSet;
 std::vector<Drawable*> renderVehList, renderEntityList;
 std::unordered_set<Point2, Point2::Hash> raySet;
 
@@ -82,6 +83,7 @@ export __int64 renderTile()
     flameList.clear();
     mulFogList.clear();
     waveTiles.clear();
+    wallHPList.clear();
 
     if (rangeRay)
     {
@@ -104,178 +106,15 @@ export __int64 renderTile()
     dur::damage = PROFILE([] { drawDamages(); });
     dur::bullet = PROFILE([] { drawBullets(); });
     dur::particle = PROFILE([] { drawParticles(); });
-
-    PROFILE([] { drawMulFogs(); });
-
+    dur::mulFog = PROFILE([] { drawMulFogs(); });
     dur::fog = PROFILE([] { drawFogs(); });
     dur::marker = PROFILE([] { drawMarkers(); });
     dur::debug = PROFILE([] { drawDebug(); });
 
-
-    vertices[0] = { 300,300 };
-    vertices[1] = { 400,400 };
-
-    indices[0] = 17;
-    indices[1] = 33;
-
-    rectColors[0] = { 255, 0, 0, 255 };
-    rectColors[1] = { 0, 255, 0, 255 };
-
-    //setZoom(2.0);
-    //drawSpriteBatch(spr::tileset, vertices, indices,2);
-    //drawRectBatch(16, 16, rectColors, vertices, 2, zoomScale);
-    //setZoom(1.0);
-
-    // 전체광
-    //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
-    //SDL_Rect screenRect = { 0, 0, cameraW, cameraH };
-    //drawFillRect(screenRect, mainLightColor, mainLightBright);
-    //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-
     return (getNanoTimer() - timeStampStart);
 }
 
-//void drawMulFogs()
-//{
-//    static SDL_Color mulLightColor = { 0, 0, 0 };
-//    auto lerpColor = [](SDL_Color a, SDL_Color b, float t) -> SDL_Color
-//    {
-//        return {
-//            (Uint8)(a.r + (b.r - a.r) * t),
-//            (Uint8)(a.g + (b.g - a.g) * t),
-//            (Uint8)(a.b + (b.b - a.b) * t),
-//            (Uint8)(a.a + (b.a - a.a) * t)
-//        };
-//        };
-//
-//
-//    int hour = getHour();
-//    int min = getMin();
-//
-//    constexpr SDL_Color day7 = { 0,0,0,0 };
-//    constexpr SDL_Color day16 = { 0,0,0,0 };
-//    constexpr SDL_Color day17 = { 121,78,59,130 };
-//    constexpr SDL_Color night18 = { 0,0,59,150 };
-//    constexpr SDL_Color night6 = { 0,0,59,150 };
-//
-//    SDL_Color prevColor, nextColor;
-//    float ratio;
-//    if (hour >= 7 && hour < 16)
-//    {
-//        prevColor = day7;
-//        nextColor = day16;
-//        ratio = (hour - 7 + min / 60.0f) / 9.0f; // 7시~16시 (9시간)
-//    }
-//    else if (hour == 16)
-//    {
-//        prevColor = day16;
-//        nextColor = day17;
-//        ratio = min / 60.0f; // 16시~17시 (1시간)
-//    }
-//    else if (hour == 17)
-//    {
-//        prevColor = day17;
-//        nextColor = night18;
-//        ratio = min / 60.0f; // 17시~18시 (1시간)
-//    }
-//    else if (hour >= 18 || hour < 6)
-//    {
-//        prevColor = night18;
-//        nextColor = night6;
-//        // 18시~6시 (12시간)
-//        if (hour >= 18) ratio = (hour - 18 + min / 60.0f) / 12.0f;
-//        else ratio = (hour + 6 + min / 60.0f) / 12.0f;
-//    }
-//    else // hour == 6
-//    {
-//        prevColor = night6;
-//        nextColor = day7;
-//        ratio = min / 60.0f; // 6시~7시 (1시간)
-//    }
-//
-//    mulLightColor = lerpColor(prevColor, nextColor, ratio);
-//
-//    int mulFogCounter = 0;
-//    for (const auto& elem : mulFogList)
-//    {
-//        int tgtX = elem.x;
-//        int tgtY = elem.y;
-//        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-//        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-//
-//        vertices[mulFogCounter] =
-//        {
-//            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2),
-//            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2)
-//        };
-//        rectColors[mulFogCounter] = { mulLightColor.r, mulLightColor.g, mulLightColor.b, mulLightColor.a };
-//        mulFogCounter++;
-//    }
-//
-//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
-//    drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
-//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-//}
 
-void drawMulFogs()
-{
-    struct TimeColor 
-    {
-        float time;
-        SDL_Color color;
-    };
-
-    static const std::vector<TimeColor> timeColors =
-    {
-        {0.0f,  {0, 0, 59, 150}},
-        {6.0f,  {0, 0, 59, 150}},
-        {8.0f,  { 0,0,49,50}},
-        {10.0f, {0, 0, 0, 0}},
-        {17.0f, {0, 0, 0, 0}},
-        {18.0f, {121, 78, 59, 130}},
-        {18.5f, {0, 0, 59, 150}},
-        {24.0f, {0, 0, 59, 150}}
-    };
-
-    float currentTime = getHour() + getMin() / 60.0f;
-
-    SDL_Color mulLightColor = { 0, 0, 0, 0 };
-    for (size_t i = 0; i < timeColors.size() - 1; ++i) 
-    {
-        if (currentTime >= timeColors[i].time && currentTime < timeColors[i + 1].time) 
-        {
-            float t1 = timeColors[i].time;
-            float t2 = timeColors[i + 1].time;
-            float ratio = (currentTime - t1) / (t2 - t1);
-
-            const SDL_Color& c1 = timeColors[i].color;
-            const SDL_Color& c2 = timeColors[i + 1].color;
-
-            mulLightColor = 
-            {
-                (Uint8)(c1.r + (c2.r - c1.r) * ratio),
-                (Uint8)(c1.g + (c2.g - c1.g) * ratio),
-                (Uint8)(c1.b + (c2.b - c1.b) * ratio),
-                (Uint8)(c1.a + (c2.a - c1.a) * ratio)
-            };
-            break;
-        }
-    }
-
-    int mulFogCounter = 0;
-    for (const auto& fog : mulFogList) 
-    {
-        int screenX = cameraW / 2 + zoomScale * ((16 * fog.x + 8) - cameraX) - (8 * zoomScale);
-        int screenY = cameraH / 2 + zoomScale * ((16 * fog.y + 8) - cameraY) - (8 * zoomScale);
-        vertices[mulFogCounter] = { screenX, screenY };
-        rectColors[mulFogCounter] = mulLightColor;
-        mulFogCounter++;
-    }
-
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
-    drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-}
 
 
 void analyseRender()
@@ -295,6 +134,10 @@ void analyseRender()
             if (thisTile->fov != fovFlag::black)
             {
                 tileList.push_back({ tgtX, tgtY });
+                if (thisTile->wall != 0 && thisTile->displayHPBarCount>0)
+                {
+                    wallHPList.push_back({ tgtX, tgtY });
+                }
 
                 if (thisTile->floor == itemRefCode::shallowSeaWater || thisTile->floor == itemRefCode::deepSeaWater)
                 {
@@ -344,13 +187,15 @@ void analyseRender()
                 mulFogList.push_back({ tgtX,tgtY });
 
                 if (thisTile->fov == fovFlag::gray) grayFogList.push_back({ tgtX, tgtY });
-                else if (thisTile->redLight > 0 || thisTile->greenLight > 0 || thisTile->blueLight > 0)
+                else
                 {
-                    lightFogList.push_back({ tgtX, tgtY });
+                    if (thisTile->lightVec.size() > 0)
+                    {
+                        lightFogList.push_back({ tgtX, tgtY });
+                        lightFogSet.insert({ tgtX, tgtY });
+                    }
                 }
             }
-
-            
         }
     }
 
@@ -666,54 +511,7 @@ void drawTiles()
             batchAlphas[tileCounter] = 255;
             tileCounter++;
 
-            if (thisTile->displayHPBarCount > 0)// 개체 HP 표기
-            {
-                int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
-                int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
 
-                TileData& t = World::ins()->getTile(tgtX, tgtY, PlayerZ());
-                int pivotX = drawingX - (int)(8 * zoomScale);
-                int pivotY = drawingY;
-                SDL_Rect dst = { pivotX, pivotY, (int)(16 * zoomScale),(int)(3 * zoomScale) };
-                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-                drawFillRect(dst, col::black, t.alphaHPBar);
-
-                if (t.wallFakeHP > t.wallHP) { t.wallFakeHP -= ((float)t.wallMaxHP / 100.0); }
-                else if (t.wallFakeHP < t.wallHP) t.wallFakeHP = t.wallHP;
-
-                if (t.wallFakeHP != t.wallHP)
-                {
-                    if (t.alphaFakeHPBar > 20) { t.alphaFakeHPBar -= 20; }
-                    else
-                    {
-                        t.alphaFakeHPBar = 0;
-                        t.wallFakeHP = t.wallHP;
-                    }
-                }
-                else { t.alphaFakeHPBar = 0; }
-
-                float ratioFakeHP = myMax((float)0.0, (t.wallFakeHP) / (float)(t.wallMaxHP));
-                dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioFakeHP),(int)(1 * zoomScale) };
-                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-                drawFillRect(dst, col::white, t.alphaFakeHPBar);
-
-                float ratioHP = myMax((float)0.0, (float)(t.wallHP) / (float)(t.wallMaxHP));
-                dst = { pivotX + (int)(1.0 * zoomScale), pivotY + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratioHP),(int)(1 * zoomScale) };
-                if (ratioHP > 0 && dst.w == 0) { dst.w = 1; }
-                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-                drawFillRect(dst, lowCol::red, t.alphaHPBar);
-
-                if (t.displayHPBarCount > 1) t.displayHPBarCount--;
-                else if (t.displayHPBarCount == 1)
-                {
-                    t.alphaHPBar -= 10;
-                    if (t.alphaHPBar <= 0)
-                    {
-                        t.alphaHPBar = 0;
-                        t.displayHPBarCount = 0;
-                    }
-                }
-            }
         }
 
         // 스킬 범위 그리기
@@ -764,6 +562,54 @@ void drawTiles()
     }
 
     drawSpriteBatchCenter(spr::tileset, vertices, indices, batchAlphas, tileCounter);
+    
+    
+    for (const auto& elem : wallHPList)// 벽 HP 표기
+    {
+        int tgtX = elem.x;
+        int tgtY = elem.y;
+        TileData& t = World::ins()->getTile(tgtX, tgtY, PlayerZ());
+
+        if (t.wallFakeHP > t.wallHP) t.wallFakeHP -= ((float)t.wallMaxHP / 100.0);
+        else if (t.wallFakeHP < t.wallHP) t.wallFakeHP = t.wallHP;
+
+        if (t.wallFakeHP != t.wallHP)
+        {
+            if (t.alphaFakeHPBar > 20) t.alphaFakeHPBar -= 20;
+            else
+            {
+                t.alphaFakeHPBar = 0;
+                t.wallFakeHP = t.wallHP;
+            }
+        }
+        else t.alphaFakeHPBar = 0;
+
+        if (t.displayHPBarCount > 1) t.displayHPBarCount--;
+        else if (t.displayHPBarCount == 1)
+        {
+            t.alphaHPBar -= 10;
+            if (t.alphaHPBar <= 0)
+            {
+                t.alphaHPBar = 0;
+                t.displayHPBarCount = 0;
+            }
+        }
+
+        int drawingX = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX);
+        int drawingY = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY);
+        draw3pxGauge(
+            drawingX - (int)(8 * zoomScale),
+            drawingY,
+            zoomScale,
+            (float)t.wallHP / (float)t.wallMaxHP,
+            t.alphaHPBar,
+            lowCol::red,
+            (float)t.wallFakeHP / (float)t.wallMaxHP,
+            t.alphaFakeHPBar
+        );
+    }
+    
+    
     setZoom(1.0);
 }
 
@@ -1083,6 +929,75 @@ void drawParticles()
     }
 }
 
+void drawMulFogs()
+{
+    struct TimeColor
+    {
+        float time;
+        SDL_Color color;
+    };
+
+    static const std::vector<TimeColor> timeColors =
+    {
+        {0.0f,  {0, 0, 59, 150}},
+        {6.0f,  {0, 0, 59, 150}},
+        {8.0f,  { 0,0,49,50}},
+        {10.0f, {0, 0, 0, 0}},
+        {17.0f, {0, 0, 0, 0}},
+        {18.0f, {121, 78, 59, 130}},
+        {18.5f, {0, 0, 59, 150}},
+        {24.0f, {0, 0, 59, 150}}
+    };
+
+    float currentTime = getHour() + getMin() / 60.0f;
+
+    SDL_Color mulLightColor = { 0, 0, 0, 0 };
+    for (size_t i = 0; i < timeColors.size() - 1; ++i)
+    {
+        if (currentTime >= timeColors[i].time && currentTime < timeColors[i + 1].time)
+        {
+            float t1 = timeColors[i].time;
+            float t2 = timeColors[i + 1].time;
+            float ratio = (currentTime - t1) / (t2 - t1);
+
+            const SDL_Color& c1 = timeColors[i].color;
+            const SDL_Color& c2 = timeColors[i + 1].color;
+
+            mulLightColor =
+            {
+                (Uint8)(c1.r + (c2.r - c1.r) * ratio),
+                (Uint8)(c1.g + (c2.g - c1.g) * ratio),
+                (Uint8)(c1.b + (c2.b - c1.b) * ratio),
+                (Uint8)(c1.a + (c2.a - c1.a) * ratio)
+            };
+            break;
+        }
+    }
+
+    int mulFogCounter = 0;
+    for (const auto& fog : mulFogList)
+    {
+        int screenX = cameraW / 2 + zoomScale * ((16 * fog.x + 8) - cameraX) - (8 * zoomScale);
+        int screenY = cameraH / 2 + zoomScale * ((16 * fog.y + 8) - cameraY) - (8 * zoomScale);
+        vertices[mulFogCounter] = { screenX, screenY };
+
+
+        rectColors[mulFogCounter] = mulLightColor;
+
+
+        if (lightFogSet.find({ fog.x,fog.y }) != lightFogSet.end())
+        {
+            //rectColors[mulFogCounter].a = mulLightColor.a - ;
+        }
+
+        mulFogCounter++;
+    }
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+    drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+}
+
 void drawFogs()
 {
     for (const auto& elem : gasList)
@@ -1157,21 +1072,21 @@ void drawFogs()
     int lightCounter = 0;
     for (const auto& elem : lightFogList)
     {
-        TileData* thisTile = &World::ins()->getTile(elem.x, elem.y, PlayerZ());
-
+        int tgtX = elem.x;
+        int tgtY = elem.y;
         int posX = cameraW / 2 + static_cast<int>(zoomScale * ((16 * elem.x + 8) - cameraX) - ((16 * zoomScale) / 2));
         int posY = cameraH / 2 + static_cast<int>(zoomScale * ((16 * elem.y + 8) - cameraY) - ((16 * zoomScale) / 2));
+        TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
+        for (int i = 0; i < thisTile->lightVec.size(); i++)
+        {
+            //vertices[lightCounter] = { posX, posY };
+            //rectColors[lightCounter] = { 0x16, 0x16, 0x16, 200 };
+            //lightCounter++;
 
-        vertices[lightCounter] = { posX, posY };
-        rectColors[lightCounter] = { 0x16, 0x16, 0x16, 200 };
-        lightCounter++;
-
-        vertices[lightCounter] = { posX, posY };
-        Uint8 targetR = myMin(255, thisTile->redLight);
-        Uint8 targetG = myMin(255, thisTile->greenLight);
-        Uint8 targetB = myMin(255, thisTile->blueLight);
-        rectColors[lightCounter] = { targetR, targetG, targetB, 200 };
-        lightCounter++;
+            vertices[lightCounter] = { posX, posY };
+            rectColors[lightCounter] = { thisTile->lightVec[i].r, thisTile->lightVec[i].g, thisTile->lightVec[i].b, thisTile->lightVec[i].a };
+            lightCounter++;
+        }
     }
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);

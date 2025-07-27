@@ -171,6 +171,7 @@ export namespace dur
     __int64 damage = 0;
     __int64 bullet = 0;
     __int64 particle = 0;
+    __int64 mulFog = 0;
     __int64 fog = 0;
     __int64 marker = 0;
     __int64 debug = 0;

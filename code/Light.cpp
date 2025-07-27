@@ -77,16 +77,9 @@ void Light::updateLight()
 		int x = (*it).x;
 		int y = (*it).y;
 		int z = (*it).z;
-
-		World::ins()->getTile(x, y, z).light += 1;
-
 		float dist = sqrt(pow(x - getGridX(), 2) + pow(y - getGridY(), 2) + pow(z - getGridZ(), 2));
-		int redLight = (float)lightColor.r * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		int greenLight = (float)lightColor.g * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		int blueLight = (float)lightColor.b * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		World::ins()->getTile(x, y, z).redLight += redLight;
-		World::ins()->getTile(x, y, z).greenLight += greenLight;
-		World::ins()->getTile(x, y, z).blueLight += blueLight;
+        Uint8 brightness = (float)bright * pow(1 - ((dist) / (float)lightRange), 2);
+		World::ins()->getTile(x, y, z).lightVec.push_back({ lightColor.r ,lightColor.g,lightColor.b, brightness});
 	}
 }
 
@@ -97,16 +90,21 @@ void Light::releaseLight()
 		int x = (*it).x;
 		int y = (*it).y;
 		int z = (*it).z;
-
-		World::ins()->getTile(x, y, z).light -= 1;
-
 		float dist = sqrt(pow(x - getGridX(), 2) + pow(y - getGridY(), 2) + pow(z - getGridZ(), 2));
-		int redLight = (float)lightColor.r * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		int greenLight = (float)lightColor.g * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		int blueLight = (float)lightColor.b * ((float)bright / 255.0) * pow(1 - ((dist) / (float)lightRange), 2);
-		World::ins()->getTile(x, y, z).redLight -= redLight;
-		World::ins()->getTile(x, y, z).greenLight -= greenLight;
-		World::ins()->getTile(x, y, z).blueLight -= blueLight;
+		Uint8 brightness = (float)bright * pow(1 - ((dist) / (float)lightRange), 2);
+
+		auto& lightVec = World::ins()->getTile(x, y, z).lightVec;
+		for (int i = 0; i < lightVec.size(); i++)
+		{
+			if (lightVec[i].r == lightColor.r &&
+				lightVec[i].g == lightColor.g &&
+				lightVec[i].b == lightColor.b &&
+				lightVec[i].a == brightness)
+			{
+				lightVec.erase(lightVec.begin() + i);
+				break;
+			}
+		}
 	}
 	litTiles.clear();
 }

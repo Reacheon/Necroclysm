@@ -1,4 +1,6 @@
-﻿export module TileData;
+﻿#include <SDL3/sdl.h>
+
+export module TileData;
 
 import std;
 import util;
@@ -36,13 +38,6 @@ export struct TileData //총용량 29바이트
     //이동 관련
     bool walkable = true;
 
-    //광원 관련
-    unsigned __int8 light = 0; //이 타일에 영향을 주는 광원의 단순 갯수 
-    unsigned __int16 redLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
-    unsigned __int16 greenLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
-    unsigned __int16 blueLight = 0; //255 초과 가능(넘어도 실제 적용은 255)
-    //식물의 광원으로 계산할 땐 각각이 최댓값 255에 3값의 평균으로 광량 설정
-
     __int16 wallHP = 100;
     __int16 wallFakeHP = 100;
     __int16 wallMaxHP = 100;
@@ -56,6 +51,7 @@ export struct TileData //총용량 29바이트
     std::unique_ptr<Flame> flamePtr = nullptr;
     void* VehiclePtr = nullptr;
 
+    std::vector<SDL_Color> lightVec;
 
     unsigned __int16 randomVal = 0;
 

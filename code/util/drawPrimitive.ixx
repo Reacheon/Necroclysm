@@ -293,3 +293,38 @@ export void drawRectBatch(int rectW, int rectH, SDL_Color* cols, const Point2* p
 
 	SDL_RenderGeometry(localRenderer, nullptr, vertices, count * 4, indices, count * 6);
 }
+
+export void draw3pxGauge(int x, int y, float zoomScale, float ratio, float alpha, SDL_Color inputGaugeCol = { 0,0,0 }, float fakeRatio = 0, float alphaFake = 0)
+{
+	SDL_Rect dst = { x, y, (int)(16 * zoomScale),(int)(3 * zoomScale) };
+
+	SDL_SetRenderDrawBlendMode(localRenderer, SDL_BLENDMODE_BLEND);
+	drawFillRect(dst, { 0,0,0 }, alpha);
+
+	if (alphaFake != 0)
+	{
+		SDL_Rect fakeGauge = { x + (int)(1.0 * zoomScale), y + (int)(1.0 * zoomScale), (int)(14 * zoomScale * fakeRatio),(int)(1 * zoomScale) };
+		if (fakeRatio > 0 && fakeGauge.w == 0) { fakeGauge.w = 1; }
+		SDL_SetRenderDrawBlendMode(localRenderer, SDL_BLENDMODE_BLEND);
+		drawFillRect(fakeGauge, { 0xff,0xff,0xff }, alphaFake);
+	}
+
+	SDL_Color gaugeCol = inputGaugeCol;
+	if(gaugeCol.r == 0 && gaugeCol.g == 0 && gaugeCol.b == 0)
+	{
+		constexpr SDL_Color red = { 0xd0,0x3f,0x3f };
+		constexpr SDL_Color yellow = { 0xd0,0xc3,0x3f };
+		constexpr SDL_Color green = { 0x75,0xd0,0x3f };
+		if (ratio < 0.2f) gaugeCol = red; //red
+		else if (ratio < 0.5f) gaugeCol = yellow; //yellow
+		else gaugeCol = green; //green
+    }
+
+	if (ratio > 0)
+	{
+		SDL_Rect valGauge = { x + (int)(1.0 * zoomScale), y + (int)(1.0 * zoomScale), (int)(14 * zoomScale * ratio),(int)(1 * zoomScale) };
+		if (valGauge.w == 0) { valGauge.w = 1; }
+		SDL_SetRenderDrawBlendMode(localRenderer, SDL_BLENDMODE_BLEND);
+		drawFillRect(valGauge, gaugeCol, alpha);
+	}
+}
