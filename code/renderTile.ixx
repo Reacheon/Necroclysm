@@ -692,9 +692,13 @@ void drawTiles()
             cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
         };
         
+
         if(elem->lifetime <6) indices[tileCounter] = 2018;
         else if(elem->lifetime <12) indices[tileCounter] = 2017;
         else indices[tileCounter] = 2016;
+
+        if (TileFloor(tgtX, tgtY, PlayerZ()) == itemRefCode::shallowFreshWater) indices[tileCounter] += 3;
+
         
         batchAlphas[tileCounter] = elem->alpha;
         tileCounter++;
@@ -713,6 +717,9 @@ void drawTiles()
         if (elem->lifetime < 6) indices[tileCounter] = 2032 + 32 + elem->dir;
         else if (elem->lifetime < 12) indices[tileCounter] = 2032 + 16 + elem->dir;
         else indices[tileCounter] = 2032 + elem->dir;
+
+        if (TileFloor(tgtX, tgtY, PlayerZ()) == itemRefCode::deepFreshWater) indices[tileCounter] += 8;
+
 
         batchAlphas[tileCounter] = elem->alpha;
         tileCounter++;
