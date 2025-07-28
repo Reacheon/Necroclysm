@@ -19,6 +19,8 @@ import globalTime;
 import Footprint;
 import GameOver;
 import turnWait;
+import Wave;
+import Wake;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -114,6 +116,11 @@ void Player::startMove(int inputDir)
 			{
 				new Footprint(getGridX(), getGridY(), getGridZ(), entityInfo.direction);
 			}
+			else if (TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemRefCode::deepFreshWater || TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater)
+			{
+				new Wake(getGridX(), getGridY(), getGridZ(), entityInfo.direction);
+			}
+
 			player->move(inputDir, false);
 			turnCycle = turn::playerAnime;
 		}
@@ -395,6 +402,13 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 	{
 		entityInfo.walkMode = walkFlag::walk;
 	}
+
+	if(TileFloor(getGridX(),getGridY(),getGridZ()) == itemRefCode::shallowFreshWater ||
+	   TileFloor(getGridX(),getGridY(),getGridZ()) == itemRefCode::shallowSeaWater)
+	{
+		new Wave(getGridX(), getGridY(), getGridZ());
+    }
+
 
 	
 	updateVision(entityInfo.eyeSight);

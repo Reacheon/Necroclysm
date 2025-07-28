@@ -92,7 +92,7 @@ export void startArea()
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	availableRecipe = std::make_unique<ItemPocket>(storageType::recipe);
-	for (int i = 1; i <= 212; i++)
+	for (int i = 1; i <= 242; i++)
 	{
 		if (itemDex[i].name != L"?")
 		{

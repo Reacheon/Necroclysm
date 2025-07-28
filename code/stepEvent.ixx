@@ -10,6 +10,7 @@ import Damage;
 import Corpse;
 import Particle;
 import Footprint;
+import Wave;
 import GUI;
 import mouseInput;
 import log;
@@ -17,6 +18,7 @@ import Player;
 import World;
 import textureVar;
 import globalTime;
+import Wake;
 
 
 //GUI의 스텝이벤트를 실행시키는 함수
@@ -81,6 +83,9 @@ export __int64 stepEvent()
 
 	//파티클 객체 스탭 이벤트 실행
 	for (int i = 0; i < Footprint::list.size(); i++) { Footprint::list[i]->step(); }
+	for (int i = 0; i < Wave::list.size(); i++) { Wave::list[i]->step(); }
+	for (int i = 0; i < Wake::list.size(); i++) { Wake::list[i]->step(); }
+
 
     //GUI 객체 스텝 이벤트 실행
     for (int i = 0; i < GUI::getActiveGUIList().size(); i++){GUI::getActiveGUIList()[i]->step();}

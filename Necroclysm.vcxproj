@@ -309,6 +309,8 @@
     <ClCompile Include="code\Vehicle.cpp" />
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\Vehicle_runAI.cpp" />
+    <ClCompile Include="code\Wake.ixx" />
+    <ClCompile Include="code\Wave.ixx" />
     <ClCompile Include="code\world\Chunk.ixx" />
     <ClCompile Include="code\world\Mapmaker.ixx" />
     <ClCompile Include="code\world\TileData.ixx" />
