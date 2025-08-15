@@ -17,7 +17,6 @@ private:
 public:
 
     ItemData leadItem;
-    float turnResource = 0;
     int displayHPBarCount = 0; //양수 200으로 설정시 점점 떨어지다가 1이 되면 alpha를 대신 줄임. alpha마저 모두 줄면 0으로
     int alphaHPBar = 0;
     int alphaFakeHPBar = 0;

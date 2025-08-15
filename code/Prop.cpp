@@ -19,7 +19,6 @@ import log;
 import Drawable;
 import drawSprite;
 import globalTime;
-import Player;
 import Sticker;
 import Particle;
 

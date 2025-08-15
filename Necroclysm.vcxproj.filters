@@ -324,9 +324,6 @@
     <ClCompile Include="code\util\stringToWstring.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\ThreadPool.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\util\timeKeeper.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -557,6 +554,9 @@
     </ClCompile>
     <ClCompile Include="code\Wake.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\ThreadPool.ixx">
+      <Filter>소스 파일\04_util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
