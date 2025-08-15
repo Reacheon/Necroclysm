@@ -1,8 +1,6 @@
 ﻿module;
 
 #include <SDL3/SDL.h>
-#define DEC_SPR(name) Sprite* name = nullptr;
-#define DEC_TXT(name) SDL_Texture* name = nullptr;
 
 export module textureVar;
 
@@ -24,8 +22,6 @@ export namespace spr
 	Sprite* zombie1 = nullptr;
 	Sprite* arabianHorse = nullptr;
 	Sprite* defaultMonster = nullptr;
-	Sprite* blockTexture = nullptr;
-	Sprite* tileTexture = nullptr;
 	Sprite* equipIcon = nullptr;
 	Sprite* effectBash1 = nullptr;
 	Sprite* effectCut1 = nullptr;
@@ -72,11 +68,9 @@ export namespace spr
 	Sprite* icon32 = nullptr;
 	Sprite* ring24 = nullptr;
 	Sprite* bloodM = nullptr;
-	Sprite* bodyTmpZombie = nullptr;
 	Sprite* aimMarker = nullptr;
 	Sprite* aimMarkerTmp = nullptr;
 	Sprite* aimAtkTypeMarker = nullptr;
-	Sprite* bodyTmpHuman = nullptr;
 	Sprite* partsSlotGauge = nullptr;
 	Sprite* tab = nullptr;
 	Sprite* aimLRChange = nullptr;

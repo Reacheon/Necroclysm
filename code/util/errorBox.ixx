@@ -13,7 +13,6 @@ export void errorBox(bool condition, std::wstring text)
 		stringText += L"                                                          ";
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", converter.to_bytes(stringText).c_str(), NULL);
 		throw std::runtime_error(converter.to_bytes(stringText).c_str());
-		exit(-1);
 	}
 }
 

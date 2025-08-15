@@ -21,8 +21,6 @@ export void textureLoader()
 
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");
 	spr::defaultMonster = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);
-	spr::blockTexture = new Sprite(renderer, "image/block.png", 16, 32);
-	spr::tileTexture = new Sprite(renderer, "image/tile.png", 16, 16);
 	spr::effectBash1 = new Sprite(renderer, "image/effect/effectBash1.png", 48, 48);
 	spr::effectCut1 = new Sprite(renderer, "image/effect/effectCut1.png", 48, 48);
 	spr::effectCut2 = new Sprite(renderer, "image/effect/effectCut2.png", 48, 48);
@@ -63,19 +61,16 @@ export void textureLoader()
 	spr::icon32 = new Sprite(renderer, "image/UI/icon32.png", 32, 32);
 	spr::ring24 = new Sprite(renderer, "image/UI/ring24.png", 24, 24);
 	spr::bloodM = new Sprite(renderer, "image/effect/bloodM1.png", 48, 48);
-	spr::bodyTmpZombie = new Sprite(renderer, "image/charFrame/bodyTmpZombie.png", 240, 128);
 	spr::aimMarker = new Sprite(renderer, "image/UI/aimMarker.png", 48, 48);
 	spr::aimMarkerTmp = new Sprite(renderer, "image/UI/aimMarkerTmp.png", 48, 48);
 
 	spr::aimAtkTypeMarker = new Sprite(renderer, "image/UI/aimAtkTypeMarker.png", 64, 64);
-	spr::bodyTmpHuman = new Sprite(renderer, "image/charFrame/bodyTmpHuman.png", 240, 128);
 	spr::tab = new Sprite(renderer, "image/UI/tabBox.png", 122, 122);
 	spr::aimLRChange = new Sprite(renderer, "image/UI/aimLRChange.png", 18, 18);
 	spr::floatWarning = new Sprite(renderer, "image/UI/floatWarning.png", 128, 24);
 	spr::epsilonFont = new Sprite(renderer, "image/epsilonFont.png", 4, 6);
 	spr::loadingAnime = new Sprite(renderer, "image/UI/loadingAnime.png", 32, 32);
 	spr::buildCursor = new Sprite(renderer, "image/UI/buildCursor.png", 48, 48);
-	spr::propset = new Sprite(renderer, "image/tileset/propset.png", 48, 48);
 	spr::msgChoiceBtn = new Sprite(renderer, "image/UI/msgChoiceBtn.png", 90, 46);
 
 	spr::itemSlotBtn = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 210, 18);
@@ -123,7 +118,7 @@ export void textureLoader()
 	spr::tailPedalR = new Sprite(renderer, "image/UI/GUI/HUD/tailPedalR.png", 64, 64);
 	spr::trainBrake = new Sprite(renderer, "image/UI/GUI/HUD/trainBrake.png", 80, 80);
 
-	spr::mainRotor = new Sprite(renderer, "image/mainRotor.png", 128, 128);
+	spr::mainRotor = new Sprite(renderer, "image/mainRotor3.png", 128, 128);
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset/equip"))
 	{
