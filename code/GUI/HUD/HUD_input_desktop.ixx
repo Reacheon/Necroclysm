@@ -182,7 +182,7 @@ void HUD::clickRightGUI()
 	}
 	else
 	{
-		/*if(option::inputMethod==input::mouse) */openContextMenu(getAbsMouseGrid());
+		if(option::inputMethod==input::mouse) openContextMenu(getAbsMouseGrid());
 	}
 
 	
@@ -192,7 +192,7 @@ void HUD::clickHoldGUI()
 	if (option::inputMethod == input::touch)
 	{
 		updateLog(L"[HUD] Touch hold event triggered.");
-		openContextMenu(getAbsMouseGrid());
+		openContextMenu(touchStartGrid);//터치이벤트가 끝나고 스텝이벤트라서 absMouse 함수 사용 금지(쓰레기값 출력됨)
 	}
 }
 

@@ -35,9 +35,9 @@ export namespace actSet
 export namespace option
 {
     std::wstring language = L"English";// 또는 "English"
-    bool fullScreen = false;
+    bool fullScreen = true;
     bool fixScreenRatio = true;
-    input inputMethod = input::mouse; //조작방식 설정
+    input inputMethod = input::touch; //조작방식 설정
 };
 
 export namespace debug
@@ -152,6 +152,13 @@ export Player* PlayerPtr = nullptr;
 export float hunger = PLAYER_MAX_CALORIE / 2;
 export float thirst = PLAYER_MAX_HYDRATION / 2 + 1000;
 export float fatigue = PLAYER_MAX_FATIGUE / 2;
+
+export bool gestureInitialized = false;
+export bool isPinchActive = false;
+export float pinchAccumulator = 0.0f;
+export Point2 pinchStartPos = { 0, 0 };
+export int activeTouchCount = 0;
+export Point2 touchStartGrid = { 0, 0 };
 
 export namespace dur
 {

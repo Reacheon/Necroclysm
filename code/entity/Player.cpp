@@ -35,8 +35,8 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	int i = 0;
 
-	getEquipPtr()->addItemFromDex(itemRefCode::katana);
-	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
+	//getEquipPtr()->addItemFromDex(itemRefCode::katana);
+	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
 
 	getEquipPtr()->addItemFromDex(2);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;

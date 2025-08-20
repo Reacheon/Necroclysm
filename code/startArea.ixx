@@ -3,6 +3,7 @@
 
 export module startArea;
 
+import util;
 import globalVar;
 import wrapVar;
 import HUD;
@@ -23,6 +24,15 @@ export void startArea()
 	PlayerPtr = (Player*)TileEntity(0, 0, 0);
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
+
+	Point2 sectorXY = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
+	for (int dx = -2; dx <= 2; dx++)
+	{
+		for (int dy = -2; dy <= 2; dy++)
+		{
+			if (World::ins()->isEmptySector(sectorXY.x + dx, sectorXY.y + dy, PlayerZ()) == true) World::ins()->createSector(sectorXY.x + dx, sectorXY.y + dy, PlayerZ());
+		}
+	}
 
 	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
 	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });

@@ -90,8 +90,10 @@ export __int64 renderTile()
 
     if (rangeRay)
     {
+        
         raySet.clear();
-        makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+        if(option::inputMethod == input::mouse) makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+        
     }
 
     auto PROFILE = [](auto&& f) -> __int64

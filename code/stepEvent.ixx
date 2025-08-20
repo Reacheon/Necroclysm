@@ -65,13 +65,10 @@ export __int64 stepEvent()
 
     if (dxClickStack > TOLERANCE_HOLD_DEL_XY || dyClickStack > TOLERANCE_HOLD_DEL_XY) deactHold = true;
 
-    if (getMilliTimer() - clickStartTime > 1000)
-    {
-        if (deactHold == false)
-        {
-            clickHold();
-        }
-    }
+	if (getMilliTimer() - clickStartTime > 1000)
+	{
+		if (deactHold == false) clickHold();
+	}
 	//데미지 객체 스탭 이벤트 실행
 	for (int i = 0; i < Damage::list.size(); i++){Damage::list[i]->step();}
 

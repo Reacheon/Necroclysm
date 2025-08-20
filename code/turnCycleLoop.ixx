@@ -25,6 +25,25 @@ import GameOver;
 import GUI;
 import Sleep;
 
+extern "C" 
+{
+	typedef struct 
+	{
+		Uint32 type;
+		Uint32 reserved;
+		Uint64 timestamp;
+		SDL_TouchID touchID;
+		float dTheta;
+		float dDist;
+		float x;
+		float y;
+		Uint16 numFingers;
+		Uint16 padding;
+	} Gesture_MultiGestureEvent;
+
+#define GESTURE_MULTIGESTURE 0x802
+}
+
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
 __int64 playerInputTurn(), animationTurn(), entityAITurn();
@@ -46,18 +65,6 @@ export __int64 turnCycleLoop()
 		}
 	}
 
-	//for (auto* ePtr : entityList)
-	//{
-	//	if (ePtr->entityInfo.fakeHP > ePtr->entityInfo.HP) { ePtr->entityInfo.fakeHP--; }
-
-	//	if (ePtr->entityInfo.fakeHP != ePtr->entityInfo.HP)
-	//	{
-	//		if (ePtr->entityInfo.fakeHPAlpha > 30) { ePtr->entityInfo.fakeHPAlpha -= 30; }
-	//		else { ePtr->entityInfo.fakeHPAlpha = 0; }
-	//	}
-	//	else { ePtr->entityInfo.fakeHPAlpha = 255; }
-	//}
-
 	__int64 playerInputTime = 0, animationTime = 0, entityAITime = 0;
 	if (turnCycle == turn::playerInput)
 	{
@@ -78,6 +85,98 @@ export __int64 turnCycleLoop()
 
 	return (getNanoTimer() - timeStampStart);
 };
+
+
+void applyZoom(float newZoom, Point2 zoomCenter) 
+{
+	int worldX = cameraX + (zoomCenter.x - cameraW / 2) / zoomScale;
+	int worldY = cameraY + (zoomCenter.y - cameraH / 2) / zoomScale;
+
+	zoomScale = newZoom;
+
+	cameraX = worldX - (zoomCenter.x - cameraW / 2) / zoomScale;
+	cameraY = worldY - (zoomCenter.y - cameraH / 2) / zoomScale;
+
+	prt(L"줌: %.0fx (위치: %d, %d)\n", zoomScale, zoomCenter.x, zoomCenter.y);
+}
+
+void handlePinchGesture(const SDL_Event& event) 
+{
+	if (!gestureInitialized) return;
+
+	if (event.type == GESTURE_MULTIGESTURE)
+	{
+		const Gesture_MultiGestureEvent& mgesture = reinterpret_cast<const Gesture_MultiGestureEvent&>(event);
+
+		if (mgesture.numFingers == 2)
+		{
+			if (!isPinchActive) 
+			{
+				isPinchActive = true;
+				pinchAccumulator = 0.0f;
+				pinchStartPos.x = static_cast<int>(mgesture.x * cameraW);
+				pinchStartPos.y = static_cast<int>(mgesture.y * cameraH);
+				deactClickUp = true;
+				deactHold = true;
+				clickStartTime = std::numeric_limits<__int64>::max();//clickHold 무효화 용도
+				return;
+			}
+
+			pinchAccumulator += mgesture.dDist;
+			const float threshold = 0.05f;
+			if (pinchAccumulator > threshold) 
+			{
+				if (zoomScale < 5.0f) applyZoom(zoomScale + 1.0f, pinchStartPos);
+				pinchAccumulator = 0.0f;
+
+			}
+			else if (pinchAccumulator < -threshold) 
+			{
+				if (zoomScale > 1.0f) applyZoom(zoomScale - 1.0f, pinchStartPos);
+				pinchAccumulator = 0.0f;
+			}
+		}
+	}
+}
+
+void snapToNearestZoomLevel() {
+	const float zoomLevels[] = { 1.0f,  2.0f, 3.0f, 4.0f, 5.0f };
+	const int numLevels = sizeof(zoomLevels) / sizeof(zoomLevels[0]);
+
+	float closestLevel = zoomLevels[0];
+	float minDistance = std::abs(zoomScale - zoomLevels[0]);
+
+	for (int i = 1; i < numLevels; i++) {
+		float distance = std::abs(zoomScale - zoomLevels[i]);
+		if (distance < minDistance) {
+			minDistance = distance;
+			closestLevel = zoomLevels[i];
+		}
+	}
+
+	zoomScale = closestLevel;
+	prt(L"줌 레벨 스냅: %.1f\n", zoomScale);
+}
+
+
+bool handleTouchEnd() {
+	activeTouchCount--; // 터치 카운트 감소
+
+	if (activeTouchCount < 0) activeTouchCount = 0; // 안전장치
+
+	if (isPinchActive) {
+		// 모든 터치가 끝났을 때만 핀치 종료
+		if (activeTouchCount == 0) {
+			isPinchActive = false;
+			pinchAccumulator = 0.0f;
+			deactClickUp = false;
+			deactHold = false;
+			prt(L"핀치 제스처 종료\n");
+		}
+		return true; // 핀치 상태였음
+	}
+	return false; // 핀치가 아니었음
+}
 
 __int64 playerInputTurn()
 {
@@ -228,39 +327,27 @@ __int64 playerInputTurn()
 					exit(0);
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-					if (option::inputMethod != input::mouse)
-					{
-						updateLog(L"Switched to mouse mode.");
-						option::inputMethod = input::mouse;
-					}
-
 					if (option::inputMethod == input::mouse) { clickDown(); }
 					break;
 				case SDL_EVENT_FINGER_DOWN:
-					if (option::inputMethod == input::touch) { clickDown(); }
+					if (option::inputMethod == input::touch) 
+					{
+                        touchStartGrid = getAbsMouseGrid();
+						activeTouchCount++;
+						if (!isPinchActive) clickDown();
+					}
 					break;
 				case SDL_EVENT_MOUSE_MOTION:
-					if (option::inputMethod != input::mouse)
-					{
-						updateLog(L"Switched to mouse mode.");
-						option::inputMethod = input::mouse;
-					}
-
 					if (option::inputMethod == input::mouse) { clickMotion(); }
 					break;
 				case SDL_EVENT_FINGER_MOTION:
-					if (option::inputMethod == input::touch && (std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
+					if (option::inputMethod == input::touch && !isPinchActive &&  // 핀치 중이 아닐 때만
+						(std::abs(event.tfinger.dx) * cameraW > 5 || std::abs(event.tfinger.dy) * cameraH > 5))
 					{
 						clickMotion();
 					}
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_UP:
-					if (option::inputMethod != input::mouse)
-					{
-						updateLog(L"Switched to mouse mode.");
-						option::inputMethod = input::mouse;
-					}
-
 					if (option::inputMethod == input::mouse)
 					{
 						if (event.button.button == SDL_BUTTON_LEFT) clickUp();
@@ -268,14 +355,15 @@ __int64 playerInputTurn()
 					}
 					break;
 				case SDL_EVENT_FINGER_UP:
-					if (option::inputMethod == input::touch) { clickUp(); }
+					if (option::inputMethod == input::touch)
+					{
+						bool wasPinchActive = handleTouchEnd(); // 핀치 종료 여부 저장
+						if (!wasPinchActive) { // 핀치가 아니었을 때만 클릭 처리
+							clickUp();
+						}
+					}
 					break;
 				case SDL_EVENT_MOUSE_WHEEL:
-					if (option::inputMethod != input::mouse)
-					{
-						updateLog(L"Switched to mouse mode.");
-						option::inputMethod = input::mouse;
-					}
 					mouseWheel();
 
 					break;
@@ -291,20 +379,10 @@ __int64 playerInputTurn()
 					}
 					else
 					{
-						if (option::inputMethod != input::mouse)
-						{
-							updateLog(L"Switched to mouse mode.");
-							option::inputMethod = input::mouse;
-						}
 						keyboardBtnDown();
 					}
 					break;
 				case SDL_EVENT_KEY_UP:
-					if (option::inputMethod != input::mouse)
-					{
-						updateLog(L"Switched to mouse mode.");
-						option::inputMethod = input::mouse;
-					}
 					keyboardBtnUp();
 					break;
 				case SDL_EVENT_TEXT_INPUT: //텍스트가 완전히 입력되었을 때의 이벤트(한글이 완성되었을 때)
@@ -347,6 +425,9 @@ __int64 playerInputTurn()
 					}
 					break;
 				}
+				case GESTURE_MULTIGESTURE:
+					if (option::inputMethod == input::touch) handlePinchGesture(event);
+					break;
 
 
 

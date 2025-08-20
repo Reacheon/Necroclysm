@@ -25,6 +25,8 @@ import log;
 import turnCycleLoop;
 import startArea;
 import initCoordTransform;
+#define SDL_GESTURE_IMPLEMENTATION 1
+#include "SDL_gesture.h"
 
 int main(int argc, char** argv)
 {
@@ -48,6 +50,17 @@ int main(int argc, char** argv)
 	initNanoTimer();
 	initCoordTransform();
 	startArea();//스타트 세팅
+
+	if (Gesture_Init() == 0) 
+	{
+		gestureInitialized = true;
+		prt(L"SDL_gesture 초기화 성공\n");
+	}
+	else 
+	{
+		gestureInitialized = false;
+		prt(L"SDL_gesture 초기화 실패: %s\n", SDL_GetError());
+	}
 
 	scriptLoader();
 
@@ -114,6 +127,11 @@ int main(int argc, char** argv)
 
 
 	delete threadPoolPtr;
+	if (gestureInitialized) 
+	{
+		Gesture_Quit();
+		gestureInitialized = false;
+	}
 	TTF_Quit();
 	SDL_Quit();
 	//_CrtDumpMemoryLeaks();
