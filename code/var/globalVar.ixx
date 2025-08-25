@@ -35,9 +35,9 @@ export namespace actSet
 export namespace option
 {
     std::wstring language = L"English";// 또는 "English"
-    bool fullScreen = true;
+    bool fullScreen = false;
     bool fixScreenRatio = true;
-    input inputMethod = input::touch; //조작방식 설정
+    input inputMethod = input::mouse; //조작방식 설정
 };
 
 export namespace debug

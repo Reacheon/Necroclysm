@@ -458,22 +458,21 @@ export enum class itemFlag
     PIPE_CNCT_LEFT,
     PIPE_CNCT_BOT,
 
-    WIRE_CNCT_RIGHT,
-    WIRE_CNCT_TOP,
-    WIRE_CNCT_LEFT,
-    WIRE_CNCT_BOT,
+    CABLE_CNCT_RIGHT,
+    CABLE_CNCT_TOP,
+    CABLE_CNCT_LEFT,
+    CABLE_CNCT_BOT,
 
     CONVEYOR_CNCT_RIGHT,
     CONVEYOR_CNCT_TOP,
     CONVEYOR_CNCT_LEFT,
     CONVEYOR_CNCT_BOT,
 
-    WIRE,
+    CABLE,
     PIPE,
     CONVEYOR,
 
     RAIL,
-
     RAIL_CNCT_TOP,
     RAIL_CNCT_BOT,
     RAIL_CNCT_LEFT,
@@ -549,6 +548,8 @@ export enum class itemFlag
     CAN_DRINK,
 
     CONTAINER_FLEX, //내부에 들어있는 아이템에 따라 부피가 더해짐
+
+    BURIED, //땅에 매립된 부품
 };
 
 export enum class walkFlag
@@ -1274,6 +1275,26 @@ export namespace skillRefCode
     constexpr int leap = 33;
 }
 
+export namespace connectFlag
+{
+    constexpr int cross = 0;
+    constexpr int none = 1;
+    constexpr int TLB = 2;
+    constexpr int LB = 3;
+    constexpr int RLB = 4;
+    constexpr int RB = 5;
+    constexpr int RTB = 6;
+    constexpr int RT = 7;
+    constexpr int RTL = 8;
+    constexpr int TL = 9;
+    constexpr int L = 10;
+    constexpr int B = 11;
+    constexpr int R = 12;
+    constexpr int T = 13;
+    constexpr int RL = 14;
+    constexpr int TB = 15;
+}
+
 export enum class skillSrc
 {
     GENERAL,
@@ -1401,6 +1422,7 @@ export enum class particleFlag
     parabolic,
     leaf,
 };
+
 
 
 //전방선언

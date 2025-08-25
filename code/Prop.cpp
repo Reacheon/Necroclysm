@@ -67,23 +67,23 @@ void Prop::updateSprIndex()
     bool rightTile = false;
 
 
-    if (leadItem.checkFlag(itemFlag::WIRE))//전선일 경우
+    if (leadItem.checkFlag(itemFlag::CABLE))//전선일 경우
     {
         auto wireCheck = [=](int dx, int dy) -> bool
             {
                 Prop* tgtProp = TileProp(getGridX() + dx, getGridY() + dy, getGridZ());
                 if (tgtProp != nullptr)
                 {
-                    if (tgtProp->leadItem.checkFlag(itemFlag::WIRE))//같은 전선일 경우
+                    if (tgtProp->leadItem.checkFlag(itemFlag::CABLE))//같은 전선일 경우
                     {
                         return true;
                     }
                     else
                     {
-                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_BOT)) return true;
-                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_TOP)) return true;
-                        else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_LEFT)) return true;
-                        else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::WIRE_CNCT_RIGHT)) return true;
+                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_BOT)) return true;
+                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_TOP)) return true;
+                        else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT)) return true;
+                        else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT)) return true;
                         else return false;
                     }
                 }

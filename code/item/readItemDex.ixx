@@ -406,10 +406,10 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"PIPE_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_LEFT);
                                 else if (strFragment.substr(0, j) == L"PIPE_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_BOT);
 
-                                else if (strFragment.substr(0, j) == L"WIRE_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::WIRE_CNCT_RIGHT);
-                                else if (strFragment.substr(0, j) == L"WIRE_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::WIRE_CNCT_TOP);
-                                else if (strFragment.substr(0, j) == L"WIRE_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::WIRE_CNCT_LEFT);
-                                else if (strFragment.substr(0, j) == L"WIRE_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::WIRE_CNCT_BOT);
+                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_RIGHT);
+                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_TOP);
+                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_LEFT);
+                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_BOT);
 
                                 else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_RIGHT);
                                 else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_TOP);
@@ -421,7 +421,7 @@ export int readItemDex(const wchar_t* file)
 
                                 else if (strFragment.substr(0, j) == L"PROP") itemDex[tgtIndex].flag.push_back(itemFlag::PROP);
 
-                                else if (strFragment.substr(0, j) == L"WIRE") itemDex[tgtIndex].flag.push_back(itemFlag::WIRE);
+                                else if (strFragment.substr(0, j) == L"CABLE") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE);
                                 else if (strFragment.substr(0, j) == L"PIPE") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE);
                                 else if (strFragment.substr(0, j) == L"CONVEYOR") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR);
 

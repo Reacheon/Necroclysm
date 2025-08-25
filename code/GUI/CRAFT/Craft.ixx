@@ -857,7 +857,7 @@ public:
 							targetStr.erase(0, targetStr.find(L",") + 1);
 							int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 							targetStr.erase(0, targetStr.find(L",") + 1);
-							int targetItemCode = wtoi(targetStr.c_str());
+							targetItemCode = wtoi(targetStr.c_str());
 
 							buildLocation = { targetX,targetY,PlayerZ() };
 
