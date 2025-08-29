@@ -141,7 +141,7 @@ export std::wstring coAnswer = L"";
 export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴, 즉 코루틴함수 도중에 턴을 스킵하는 기능을 할 수 있음
 /////////////////////////////////////////////////////////////////
 
-export std::unique_ptr<ItemPocket> availableRecipe;
+//export std::unique_ptr<ItemPocket> availableRecipe;//이게 인텔리센스 오류의 원인
 
 export Vehicle* ctrlVeh = nullptr;
 export std::map < dir16, std::unordered_map<Point2, Point2, Point2::Hash>> coordTransform;//좌표변환

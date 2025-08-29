@@ -96,7 +96,7 @@ public:
 
 
 		exInputText = L"";
-		recipePtr = availableRecipe.get();
+		recipePtr = ItemPocket::availableRecipe.get();
 		for (int i = 0; i < recipePtr->itemInfo.size(); i++)
 		{
 			recipePtr->itemInfo[i].eraseFlag(itemFlag::GRAYFILTER);
