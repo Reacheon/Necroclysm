@@ -10,6 +10,7 @@ import ItemData;
 import ItemStack;
 import ItemPocket;
 import log;
+import Msg;
 import Lst;
 import Player;
 import Prop;
@@ -410,5 +411,153 @@ export namespace actFunc
 
 		std::wstring logText = replaceStr(sysStr[297],L"(%container)" , itemName);
 		updateLog(logText);
+	}
+
+	Corouter executeWield(ItemPocket* targetPocket, int targetPocketCursor)
+	{
+		ItemData& tgtItem = targetPocket->itemInfo[targetPocketCursor];
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		if (tgtItem.checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
+		{
+			std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", tgtItem.name);
+			updateLog(logStr);
+			bool isWield = false;
+			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+			for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
+			{
+				if (equipPtr->itemInfo[i].equipState == equipHandFlag::left || equipPtr->itemInfo[i].equipState == equipHandFlag::right || equipPtr->itemInfo[i].equipState == equipHandFlag::both)
+				{
+					equipPtr->transferItem(drop.get(), i, 1);
+					isWield = true;
+				}
+			}
+			if (isWield == true) { PlayerPtr->drop(drop.get()); }
+
+			int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+			equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::both; //양손
+			equipPtr->sortEquip();
+		}
+		else
+		{
+			bool hasLeft = false;
+			bool hasRight = false;
+			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
+			{
+				switch (equipPtr->itemInfo[i].equipState)
+				{
+				case equipHandFlag::left:
+					hasLeft = true;
+					break;
+				case equipHandFlag::right:
+					hasRight = true;
+					break;
+				case equipHandFlag::both:
+					hasLeft = true;
+					hasRight = true;
+					break;
+				}
+			}
+
+			if (hasLeft == true && hasRight == true)
+			{
+				//왼손, 오른손
+				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
+				//선택, 어느 손에 들까?
+				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
+				co_await std::suspend_always();
+				if (coAnswer.empty()) co_return;
+
+				equipHandFlag handDir = equipHandFlag::none;
+				if (coAnswer == sysStr[49])//왼손
+				{
+					handDir = equipHandFlag::left;
+				}
+				else//오른손
+				{
+					handDir = equipHandFlag::right;
+				}
+
+				//왼손 아이템 떨구기
+				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
+				{
+					if (equipPtr->itemInfo[i].equipState == handDir)
+					{
+						equipPtr->transferItem(drop.get(), i, 1);
+						break;
+					}
+				}
+				//양손 아이템 떨구기
+				for (int i = equipPtr->itemInfo.size() - 1; i >= 0; i--)
+				{
+					if (equipPtr->itemInfo[i].equipState == equipHandFlag::both)
+					{
+						equipPtr->transferItem(drop.get(), i, 1);
+						break;
+					}
+				}
+				PlayerPtr->drop(drop.get());
+
+				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+				equipPtr->itemInfo[returnIndex].equipState = handDir;
+				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+			}
+			else if (hasLeft == false && hasRight == false)
+			{
+				//왼손, 오른손
+				std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
+				//선택, 어느 손에 들까?
+				new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
+				co_await std::suspend_always();
+				if (coAnswer.empty()) co_return;
+
+				equipHandFlag handDir = equipHandFlag::none;
+				if (coAnswer == sysStr[49])//왼손
+				{
+					handDir = equipHandFlag::left;
+				}
+				else//오른손
+				{
+					handDir = equipHandFlag::right;
+				}
+
+				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+				equipPtr->itemInfo[returnIndex].equipState = handDir;
+				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+			}
+			else if (hasLeft == false && hasRight == true)//왼손에 들기
+			{
+				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
+				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+			}
+			else//오른손에 들기
+			{
+				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
+				equipPtr->sortEquip();
+
+				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+			}
+		}
+		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
+		{
+			if (equipPtr->itemInfo[i].lightPtr != nullptr)
+			{
+				equipPtr->itemInfo[i].lightPtr.get()->setGrid(PlayerX(), PlayerY(), PlayerZ());
+			}
+		}
+		PlayerPtr->pullEquipLights();
+		PlayerPtr->updateStatus();
 	}
 };

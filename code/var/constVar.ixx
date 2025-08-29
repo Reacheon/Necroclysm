@@ -241,6 +241,9 @@ export enum class act
 
     dump, //쏟기 (포켓 내부에 있는 아이템을 바닥에 쏟음)
 
+    propCarry, //프롭 들기
+    propInstall, //프롭 설치
+
     //skillInfo,
 };
 

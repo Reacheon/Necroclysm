@@ -6,6 +6,7 @@ import globalVar;
 import util;
 import Loot;
 import ItemData;
+import actFuncSet;
 
 void Loot::gamepadBtnDown() 
 { 
@@ -143,7 +144,7 @@ void Loot::gamepadBtnDown()
 				executeEquip();
 				break;
 			case act::wield://들기
-				CORO(executeWield());
+				CORO(actFunc::executeWield(lootPocket,lootCursor));
 				break;
 			case act::insert://아이템 넣기
 				CORO(executeInsert());

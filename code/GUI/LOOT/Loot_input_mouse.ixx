@@ -133,7 +133,7 @@ void Loot::clickUpGUI()
 					executeEquip();
 					break;
 				case act::wield://들기
-					CORO(executeWield());
+					CORO(actFunc::executeWield(lootPocket, lootCursor));
 					break;
 					//case act::insert:
 					//	CORO(executeInsert());

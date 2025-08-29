@@ -154,4 +154,7 @@ export struct ItemDataBase
     __int32 codeID = 0; //랜덤으로 결정되는 ID값, Alchemy가 열릴 때 등... 일시적임(0인 경우 미할당)
 
     __int32 propWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
+
+    unsigned __int16 propInstallCode = 0; //이게 0이 아닐 경우 주변 타일에 설치 가능
+    unsigned __int16 propUninstallCode = 0; //이게 0이 아닐 경우 주변 타일에 해체 가능
 };

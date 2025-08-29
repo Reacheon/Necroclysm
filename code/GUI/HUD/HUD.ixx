@@ -950,6 +950,16 @@ public:
 			}
 		}
 
+		//문닫기 추가
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			Prop* instlPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
+			if (instlPtr->leadItem.propUninstallCode != 0)
+			{
+				inputOptions.push_back(act::propCarry);
+			}
+		}
+
 
 
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);

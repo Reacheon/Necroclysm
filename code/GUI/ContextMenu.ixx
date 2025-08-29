@@ -174,6 +174,11 @@ public:
 					optionText = sysStr[232];//마시기(바닥물마시기)
 					iconIndex = 99;
 				}
+				else if (actOptions[i] == act::propCarry)
+				{
+					optionText = sysStr[327];//프롭 들기
+					iconIndex = 100;
+				}
 				else optionText = L"???";
 
 				if (checkCursor(&optionRect[i]))
@@ -502,7 +507,9 @@ public:
 			{
 				thirst -= 100;
 			}
-			
+		}
+		else if (inputAct == act::propCarry)
+		{
 		}
 	}
 };
