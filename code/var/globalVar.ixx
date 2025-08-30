@@ -13,7 +13,6 @@ import ItemData;
 import EntityData;
 import SkillData;
 import Ani;
-import ItemPocket;
 import Player;
 import Drawable;
 

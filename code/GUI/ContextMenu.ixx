@@ -510,6 +510,15 @@ public:
 		}
 		else if (inputAct == act::propCarry)
 		{
+			if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			{
+                ItemData& propItem = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ())->leadItem;
+				std::unique_ptr<ItemPocket> tempPocket = std::make_unique<ItemPocket>(storageType::temp);
+                ItemPocket* tempPocketPtr = tempPocket.get();
+				tempPocket->addItemFromDex(propItem.propUninstallCode, 1);
+                CORO(actFunc::executeWield(tempPocketPtr, 0));//8월 30일 여기서부터... 아직 들기가 되지않음
+				destroyProp({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
+			}
 		}
 	}
 };
