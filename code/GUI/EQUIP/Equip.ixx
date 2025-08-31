@@ -27,6 +27,8 @@ import Lst;
 import Inventory;
 import ItemData;
 import ItemPocket;
+import CoordSelectCraft;
+
 
 export class Equip : public GUI
 {
@@ -508,4 +510,48 @@ public:
 		rangeRay = false;
 	}
 
+	Corouter executePropInstall()
+	{
+		deactDraw();
+		std::vector<Point2> selectableTile;
+		for (int dir = 0; dir < 8; dir++)
+		{
+			int dx, dy;
+			dir2Coord(dir, dx, dy);
+			if (TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
+		}
+
+		ItemData& tgtItem = equipPtr->itemInfo[equipCursor];
+		for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
+
+		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
+		co_await std::suspend_always();
+		rangeSet.clear();
+		actDraw();
+
+		if (coAnswer.empty() == false)
+		{
+			std::wstring targetStr = coAnswer;
+			int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+			targetStr.erase(0, targetStr.find(L",") + 1);
+			int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+			targetStr.erase(0, targetStr.find(L",") + 1);
+
+			int targetItemCode = wtoi(targetStr.c_str());
+			Point3 buildLocation = { targetX,targetY,PlayerZ() };
+
+			createProp(buildLocation, targetItemCode);
+
+			for (int i = equipPtr->itemInfo.size()-1; i >= 0; i--)
+			{
+				if (equipPtr->itemInfo[i].itemCode == itemDex[targetItemCode].propUninstallCode)
+				{
+                    equipPtr->itemInfo.erase(equipPtr->itemInfo.begin() + i);
+				}
+			}
+			PlayerPtr->updateStatus();
+			close(aniFlag::null);
+		}
+		else co_return;
+	}
 };

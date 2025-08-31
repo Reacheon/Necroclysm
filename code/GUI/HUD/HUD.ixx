@@ -588,6 +588,7 @@ public:
 			new Sleep();
 			break;
 		}
+
 		default:
 			updateLog(L"Unknown letterbox button was pressed.");
 			break;

@@ -169,6 +169,7 @@ void Entity::drawSelf()
 				}
 			}
 
+			//개별 아이템을 들었을 때의 범용 스프라이트
 			for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
 			{
 				Sprite* tgtSpr = nullptr;
@@ -179,7 +180,8 @@ void Entity::drawSelf()
 					for (int i = 0; i < 48; i++)
 					{
 						Point2 itemCoor = equipCoordTwoHanded[i];
-						drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						if(itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						
 					}
 					break;
 				case equipHandFlag::left:
@@ -188,7 +190,7 @@ void Entity::drawSelf()
 						for (int i = 0; i < 48; i++)
 						{
 							Point2 itemCoor = equipCoordLArm[i];
-							drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 						}
 					}
 					else
@@ -196,7 +198,7 @@ void Entity::drawSelf()
 						for (int i = 0; i < 48; i++)
 						{
 							Point2 itemCoor = equipCoordRArm[i];
-							drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 						}
 					}
 					break;
@@ -207,7 +209,7 @@ void Entity::drawSelf()
 						for (int i = 0; i < 48; i++)
 						{
 							Point2 itemCoor = equipCoordRArm[i];
-							drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 						}
 					}
 					else
@@ -215,7 +217,7 @@ void Entity::drawSelf()
 						for (int i = 0; i < 48; i++)
 						{
 							Point2 itemCoor = equipCoordLArm[i];
-							drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 						}
 					}
 					break;

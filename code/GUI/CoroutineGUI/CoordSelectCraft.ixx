@@ -93,6 +93,8 @@ public:
 				revY += sgn(revY) * (8 * zoomScale);
 				revGridY = revY / (16 * zoomScale);
 
+
+
 				setZoom(zoomScale);
 				//drawSpriteCenter
 				//(
@@ -112,6 +114,9 @@ public:
 					{
 						SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
 						SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
+						
+						if (revGridX > 0) PlayerPtr->setDirection(0);
+						else if (revGridX < 0) PlayerPtr->setDirection(4);
 					}
 					else
 					{
@@ -136,6 +141,9 @@ public:
 					{
 						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
 						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+
+						if (revGridX > 0) PlayerPtr->setDirection(0);
+						else if (revGridX < 0) PlayerPtr->setDirection(4);
 					}
 					else
 					{
@@ -160,6 +168,9 @@ public:
 					{
 						SDL_SetTextureColorMod(spr::tileset->getTexture(), 255, 255, 255);
 						SDL_SetTextureAlphaMod(spr::tileset->getTexture(), 100);
+
+						if (revGridX > 0) PlayerPtr->setDirection(0);
+						else if (revGridX < 0) PlayerPtr->setDirection(4);
 					}
 					else
 					{
@@ -334,6 +345,8 @@ public:
 							cameraFix = false;
 							cameraX = 16 * targetGridX + 8;
 							cameraY = 16 * targetGridY + 8;
+							if (targetGridX > PlayerX()) PlayerPtr->setDirection(0);
+							else if (targetGridY < PlayerX()) PlayerPtr->setDirection(4);
 						}
 						else
 						{

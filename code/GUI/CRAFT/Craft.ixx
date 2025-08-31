@@ -831,7 +831,7 @@ public:
 				}
 				else
 				{
-					//새로운 차량을 설치하시겠습니까?
+					//새로운 차량을 설치하시겠습니까? HUD의 propInstall과 같은 조건임 수정할거면 같이 수정할 것
 					std::vector<Point2> selectableTile;
 					for (int dir = 0; dir < 8; dir++)
 					{

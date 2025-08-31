@@ -1,9 +1,11 @@
 ﻿#include <SDL3/SDL.h>
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
+import util;
 import Equip;
 import checkCursor;
 import globalVar;
+import wrapVar;
 import actFuncSet;
 import ItemData;
 
@@ -122,7 +124,12 @@ void Equip::clickUpGUI()
 					actFunc::spillPocket(equipPtr->itemInfo[equipCursor]);
 					updateBarAct();
 					return;
+				case act::propInstall:
+				{
+					CORO(executePropInstall());
 				}
+				}
+
 
 
 				if (equipPtr->itemInfo.size() == 0)

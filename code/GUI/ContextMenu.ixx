@@ -50,6 +50,9 @@ public:
 		changeXY(inputMouseX, inputMouseY, false);
 		tabType = tabFlag::closeWin;
 
+		if (contextMenuTargetGrid.x > PlayerX()) PlayerPtr->setDirection(0);
+		else if (contextMenuTargetGrid.x < PlayerX()) PlayerPtr->setDirection(4);
+
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
