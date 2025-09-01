@@ -174,53 +174,58 @@ void Entity::drawSelf()
 			{
 				Sprite* tgtSpr = nullptr;
 				ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
-				switch (getEquipPtr()->itemInfo[equipCounter].equipState)
+				//if (getEquipPtr()->itemInfo[equipCounter].leftWieldSpr == nullptr && getEquipPtr()->itemInfo[equipCounter].rightWieldSpr == nullptr)
 				{
-				case equipHandFlag::both:
-					for (int i = 0; i < 48; i++)
+					switch (getEquipPtr()->itemInfo[equipCounter].equipState)
 					{
-						Point2 itemCoor = equipCoordTwoHanded[i];
-						if(itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-						
-					}
-					break;
-				case equipHandFlag::left:
-					if (entityInfo.sprFlip == false)
-					{
+					case equipHandFlag::both:
 						for (int i = 0; i < 48; i++)
 						{
-							Point2 itemCoor = equipCoordLArm[i];
+							Point2 itemCoor = equipCoordTwoHanded[i];
 							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-						}
-					}
-					else
-					{
-						for (int i = 0; i < 48; i++)
-						{
-							Point2 itemCoor = equipCoordRArm[i];
-							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-						}
-					}
-					break;
 
-				case equipHandFlag::right:
-					if (entityInfo.sprFlip == false)
-					{
-						for (int i = 0; i < 48; i++)
-						{
-							Point2 itemCoor = equipCoordRArm[i];
-							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 						}
-					}
-					else
-					{
-						for (int i = 0; i < 48; i++)
+						break;
+					case equipHandFlag::left:
+						if (entityInfo.sprFlip == false)
 						{
-							Point2 itemCoor = equipCoordLArm[i];
-							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							for (int i = 0; i < 48; i++)
+							{
+								Point2 itemCoor = equipCoordLArm[i];
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							}
 						}
+						else
+						{
+							for (int i = 0; i < 48; i++)
+							{
+								Point2 itemCoor = equipCoordRArm[i];
+								//itemCoor.x += 1;
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							}
+						}
+						break;
+
+					case equipHandFlag::right:
+						if (entityInfo.sprFlip == false)
+						{
+							for (int i = 0; i < 48; i++)
+							{
+								Point2 itemCoor = equipCoordRArm[i];
+								//itemCoor.x += 1;
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							}
+						}
+						else
+						{
+							for (int i = 0; i < 48; i++)
+							{
+								Point2 itemCoor = equipCoordLArm[i];
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							}
+						}
+						break;
 					}
-					break;
 				}
 			}
 

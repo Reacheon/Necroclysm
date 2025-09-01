@@ -216,6 +216,7 @@ export bool drawHUD = true;
 export int currentUsingSkill = -1;
 
 export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위)
+
 export SDL_Color rangeColor = { 0xff, 0xff, 0xff }; //선택 범위를 나타내는 색상
 export bool rangeRay = false;
 

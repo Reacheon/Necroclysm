@@ -550,6 +550,9 @@ public:
 				}
 			}
 			PlayerPtr->updateStatus();
+			
+            updateLog(replaceStr(sysStr[329], L"(%item)", itemDex[targetItemCode].name));
+
 			close(aniFlag::null);
 		}
 		else co_return;

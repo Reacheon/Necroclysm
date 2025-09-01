@@ -312,6 +312,7 @@ public:
 									return;
 								}
 								targetSelect = true;
+								rangeSet.clear();
 								targetGridX = throwingX;
 								targetGridY = throwingY;
 								cameraFix = false;

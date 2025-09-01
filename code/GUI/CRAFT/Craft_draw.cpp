@@ -476,7 +476,7 @@ void Craft::drawGUI()
 
 
 
-					if(queryTextWidth(iPtr->name)<110)setFontSize(10);
+					if(queryTextWidth(iPtr->name)<100)setFontSize(10);
 					else setFontSize(8);
 					
 					renderText(iPtr->name, pivotX + 34, pivotY + 7);
