@@ -12,6 +12,43 @@ import drawText;
 import util;
 import drawPrimitive;
 
+constexpr std::array<std::array<int, 2>, 48> equipCoordLArm =
+{ {
+	{29, 22},{29, 23},{28, 21},{0,0},{0,0},{0,0},
+	{30, 23},{31, 26},{28, 22},{0,0},{0,0},{0,0},
+	{30,27},{29,26},{31,27},{0,0},{0,0},{0,0},
+	{31,29},{32,31},{32,28},{31,24},{31,22},{27,18},
+	{31,24},{0,0},{0,0},{0,0},{27,10},{31,24},
+	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
+	{29,21},{29,23},{0,0},{0,0},{0,0},{0,0},
+	{31,27}, {0,0},{0,0},{0,0},{0,0},{0,0}
+} };
+
+constexpr std::array<std::array<int, 2>, 48> equipCoordRArm =
+{ {
+		{18, 24},{19,23},{24,24},{0,0},{0,0},{0,0},
+		{17, 23},{16,22},{23,25},{0,0},{0,0},{0,0},
+		{17, 26},{18,27},{17,26},{0,0},{0,0},{0,0},
+		{27, 28},{24,29},{27,30},{18,27},{15,22},{26,29},
+		{19,24},{0,0},{0,0},{0,0},{23,23},{16,21},
+		{16,15},{25,23},{0,0},{0,0},{17,23},{18,24},
+		{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
+		{17,23}, {0,0},{0,0},{0,0},{0,0},{0,0}
+} };
+
+constexpr std::array<std::array<int, 2>, 48> equipCoordTwoHanded =
+{ {
+	{0,0},{0,0},{0,0},{24,22},{24,23},{24,23},
+	{0,0},{0,0},{0,0},{24,23},{24,24},{24,24},
+	{0,0},{0,0},{0,0},{25,24},{25,25},{25,25},
+	{28,28},{28,30},{29,29},{18,28},{15,23},{27,30},
+	{21,25},{0,0},{0,0},{0,0},{0,0},{0,0},
+	{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},
+	{0,0},{0,0},{0,0},{0,0},{16,9},{29,24},
+	{16,24}, {0,0},{0,0},{0,0},{0,0},{0,0}
+} };
+
+
 
 void Entity::drawSelf()
 {
@@ -174,7 +211,7 @@ void Entity::drawSelf()
 			{
 				Sprite* tgtSpr = nullptr;
 				ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
-				//if (getEquipPtr()->itemInfo[equipCounter].leftWieldSpr == nullptr && getEquipPtr()->itemInfo[equipCounter].rightWieldSpr == nullptr)
+				if (getEquipPtr()->itemInfo[equipCounter].leftWieldSpr == nullptr && getEquipPtr()->itemInfo[equipCounter].rightWieldSpr == nullptr)
 				{
 					switch (getEquipPtr()->itemInfo[equipCounter].equipState)
 					{
@@ -200,7 +237,6 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordRArm[i];
-								//itemCoor.x += 1;
 								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
@@ -212,7 +248,6 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordRArm[i];
-								//itemCoor.x += 1;
 								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.sprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
