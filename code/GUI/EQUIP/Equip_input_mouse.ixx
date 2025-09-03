@@ -58,8 +58,12 @@ void Equip::clickUpGUI()
 				}
 				case act::throwing:
 				{
-					CORO(executeThrowing(equipPtr, equipCursor));
-					break;
+					deactDraw();
+					CORO(actFunc::executeThrowing(equipPtr, equipCursor));
+					actDraw();
+					tabType = tabFlag::autoAtk;
+					close(aniFlag::null);
+					return;
 				}
 				case act::open:
 				{

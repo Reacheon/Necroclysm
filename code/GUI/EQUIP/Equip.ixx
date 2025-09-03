@@ -470,45 +470,7 @@ public:
 		updateLog(sysStr[126]);
 	}
 
-	Corouter executeThrowing(ItemPocket* inputPocket, int inputIndex)//던지기
-	{
-		
-		new CoordSelect(sysStr[131]);
-		deactDraw();
-		rangeRay = true;
 
-		co_await std::suspend_always();
-
-		if (coAnswer.empty())
-		{
-			rangeRay = false;
-			actDraw();
-			tabType = tabFlag::closeWin;
-			co_return;
-		}
-
-		std::wstring targetStr = coAnswer;
-		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-		targetStr.erase(0, targetStr.find(L",") + 1);
-		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
-		targetStr.erase(0, targetStr.find(L",") + 1);
-		int targetZ = wtoi(targetStr.c_str());
-
-		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ());
-		else PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
-
-		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
-
-		std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
-        std::wstring logStr = replaceStr(L"You throw the (%item).", L"(%item)", inputPocket->itemInfo[inputIndex].name);
-		updateLog(logStr);
-		inputPocket->transferItem(throwing.get(), inputIndex, 1);
-		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
-		PlayerPtr->updateStatus();
-
-		close(aniFlag::null);
-		rangeRay = false;
-	}
 
 	Corouter executePropInstall()
 	{
