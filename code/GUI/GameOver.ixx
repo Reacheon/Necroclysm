@@ -51,8 +51,6 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::closeWin;
-
 		deactInput();
 		deactDraw();
 
@@ -66,7 +64,6 @@ public:
 	}
 	~GameOver()
 	{
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static GameOver* ins() { return ptr; }

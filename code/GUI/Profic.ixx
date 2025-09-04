@@ -35,15 +35,12 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::closeWin;
-
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 	}
 	~Profic()
 	{
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static Profic* ins() { return ptr; }
@@ -342,4 +339,9 @@ public:
 	}
 
 	void setWarningIndex(int inputVal) { warningIndex = inputVal; }
+
+    void step()
+    {
+        tabType = tabFlag::back;
+    }
 };

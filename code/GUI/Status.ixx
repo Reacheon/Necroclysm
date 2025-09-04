@@ -26,7 +26,6 @@ public:
 		changeXY((cameraW / 2) + 17, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
-		tabType = tabFlag::closeWin;
 		UIType = act::loot;
 
 		deactInput();
@@ -40,7 +39,6 @@ public:
 
 		UIType = act::null;
 		barAct = actSet::null;
-		tabType = tabFlag::autoAtk;
 	}
 	static Status* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -79,5 +77,9 @@ public:
 		else
 		{
 		}
+	}
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 };

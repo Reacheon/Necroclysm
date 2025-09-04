@@ -806,14 +806,14 @@ void HUD::drawTab()
 	case tabFlag::closeWin:
 		//창 닫기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		drawSpriteCenter(spr::icon48, 14, tab.x + 60, tab.y + 52);
+		drawSpriteCenter(spr::icon48, 17, tab.x + 60, tab.y + 52);
 		setFontSize(12);
 		renderTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::back:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		drawSpriteCenter(spr::icon48, 31, tab.x + 60, tab.y + 52);
+		drawSpriteCenter(spr::icon48, 182, tab.x + 60, tab.y + 52);
 		setFontSize(12);
 		renderTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;

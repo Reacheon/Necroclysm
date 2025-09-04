@@ -76,7 +76,6 @@ public:
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
-		tabType = tabFlag::closeWin;
 		UIType = act::loot;
 
 		lootPocket = inputPocket;
@@ -101,7 +100,6 @@ public:
 		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
-		tabType = tabFlag::closeWin;
 		UIType = act::loot;
 
 		lootStack = inputStack;
@@ -126,7 +124,6 @@ public:
 		lootCursor = -1;
 		lootScroll = 0;
 		for (int i = 0; i < lootPocket->itemInfo.size(); i++) { lootPocket->itemInfo[i].lootSelect = 0; }
-		tabType = tabFlag::autoAtk;
 		barAct = actSet::null;
 		barActCursor = -1;
 	}
@@ -223,6 +220,8 @@ public:
 	void gamepadBtnUp();
 	void step()
 	{
+		tabType = tabFlag::back;
+
 		lootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
 
 		if (option::inputMethod == input::gamepad)
@@ -283,7 +282,6 @@ public:
 			{
 				lootCursor = -1;
 				barAct = actSet::null;
-				tabType = tabFlag::closeWin;
 			}
 		}
 	}
@@ -553,7 +551,8 @@ public:
 	}
 	void executeEquip()
 	{
-		updateLog(sysStr[125]);
+        
+		updateLog(replaceStr(sysStr[125], L"(%item)", lootPocket->itemInfo[lootCursor].name));//(%item)를(을) 장착했다.
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		int returnIndex = lootPocket->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;

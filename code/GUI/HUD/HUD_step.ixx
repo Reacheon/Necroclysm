@@ -6,6 +6,8 @@ import Sleep;
 
 void HUD::step()
 {
+    tabType = tabFlag::autoAtk;
+
     if (GUI::getLastGUI() == this)
     {
         gamepadStep();

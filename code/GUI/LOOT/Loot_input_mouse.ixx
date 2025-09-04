@@ -71,13 +71,11 @@ void Loot::clickUpGUI()
 						{
 							lootCursor = lootScroll + i;
 							updateBarAct();
-							tabType = tabFlag::back;
 						}
 						else //커서 삭제
 						{
 							lootCursor = -1;
 							barAct = actSet::null;
-							tabType = tabFlag::closeWin;
 						}
 						return;
 					}
@@ -197,7 +195,6 @@ void Loot::clickUpGUI()
 	{
 		lootCursor = -1;
 		barAct = actSet::null;
-		tabType = tabFlag::closeWin;
 	}
 }
 void Loot::clickMotionGUI(int dx, int dy)

@@ -48,7 +48,6 @@ public:
 
 		//메세지 박스 렌더링
 		changeXY(inputMouseX, inputMouseY, false);
-		tabType = tabFlag::closeWin;
 
 		if (contextMenuTargetGrid.x > PlayerX()) PlayerPtr->setDirection(0);
 		else if (contextMenuTargetGrid.x < PlayerX()) PlayerPtr->setDirection(4);
@@ -59,7 +58,6 @@ public:
 	}
 	~ContextMenu()
 	{
-		if(getLastGUI()==this) tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static ContextMenu* ins() { return ptr; }
@@ -362,6 +360,7 @@ public:
 	}
 	void step() 
 	{
+		tabType = tabFlag::back;
 		contextMenuBase.h = 6 + 22 * (int)actOptions.size();
 		//bool openSub = false;
 		//for (int i = 0; i < actOptions.size(); i++)

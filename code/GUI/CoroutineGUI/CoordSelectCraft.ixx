@@ -53,14 +53,12 @@ public:
 		rotatedItemCode = tgtItemCode;
 		prt(L"CoordSelectCraft : 생성자가 호출되었습니다..\n");
 		ptr = this;
-		tabType = tabFlag::closeWin;
 	}
 
 	~CoordSelectCraft()
 	{
 		prt(L"CoordSelectCraft : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
-		tabType = tabFlag::autoAtk;
 		UIType = act::null;
 	}
 	static CoordSelectCraft* ins() { return ptr; }
@@ -260,7 +258,6 @@ public:
 	{
 		if (checkCursor(&tab) == true)
 		{
-			tabType = tabFlag::autoAtk;
 			coAnswer.clear();
 			cameraFix = true;
 			delete this;
@@ -379,5 +376,9 @@ public:
 				}
 			}
 		}
+	}
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 };

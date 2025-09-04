@@ -56,8 +56,6 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::closeWin;
-
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
@@ -71,7 +69,6 @@ public:
 	}
 	~Skill()
 	{
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static Skill* ins() { return ptr; }
@@ -398,6 +395,8 @@ public:
 
 	void step() 
 	{
+		tabType = tabFlag::back;
+
 		//잘못된 스크롤 위치 조정
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{

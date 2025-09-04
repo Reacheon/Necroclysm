@@ -70,9 +70,6 @@ public:
 
 		maintCoor = inputCoor;
 		maintMode = inputMode;
-
-		prevTabType = tabType;
-		tabType = tabFlag::back;
 	}
 
 	~Maint()
@@ -84,8 +81,6 @@ public:
 		exInputCursor = 0;
 		exInputEditing = false;
 		exInputIndex = -1;
-
-		tabType = tabFlag::autoAtk;
 	}
 
 	static Maint* ins() { return ptr; }
@@ -296,6 +291,8 @@ public:
 
 	void step()
 	{
+		tabType = tabFlag::back;
+
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
 		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });

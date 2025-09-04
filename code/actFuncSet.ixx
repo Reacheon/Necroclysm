@@ -571,8 +571,8 @@ export namespace actFunc
 
 		if (coAnswer.empty())
 		{
+			updateLog(sysStr[330]);
 			rangeRay = false;
-			tabType = tabFlag::closeWin;
 			co_return;
 		}
 

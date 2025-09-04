@@ -51,15 +51,12 @@ public:
 		//메세지 박스 렌더링
 		changeXY(inputX, inputY, false);
 
-		tabType = tabFlag::closeWin;
-
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 	}
 	~Inventory()
 	{
-		tabType = tabFlag::closeWin;
 		ptr = nullptr;
 	}
 	static Inventory* ins() { return ptr; }
@@ -129,5 +126,8 @@ public:
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
-	void step() { }
+	void step() 
+	{ 
+		tabType = tabFlag::back;
+	}
 };

@@ -88,7 +88,6 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::closeWin;
 
 		deactInput();
 		deactDraw();
@@ -117,8 +116,6 @@ public:
 		PlayerPtr->setFakeY(0);
 		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
 		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
-
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static Craft* ins() { return ptr; }
@@ -591,6 +588,8 @@ public:
 	void gamepadBtnUp() { }
 	void step()
 	{
+		tabType = tabFlag::back;
+
 		int maxScroll = myMax(0, (numNoneBlackFilter - 1) / CRAFT_MAX_COLUMN - (CRAFT_MAX_ROW - 1));
 		if (craftScroll > maxScroll) { craftScroll = maxScroll; }
 		else if (craftScroll < 0) { craftScroll = 0; }

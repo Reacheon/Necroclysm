@@ -53,7 +53,6 @@ public:
 		errorBox(ptr != nullptr, L"More than one message instance was generated.");
 		ptr = this;
 		changeXY(cameraW / 2, cameraH / 2, true);
-		tabType = tabFlag::closeWin;
 		PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
 		PlayerPtr->entityInfo.isEyesHalf = true;
 		PlayerPtr->entityInfo.isEyesClose = false;
@@ -64,7 +63,6 @@ public:
 	}
 	~Sleep()
 	{
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
@@ -293,6 +291,11 @@ public:
 
 		isAsleep = false;
 		close(aniFlag::null);
+	}
+
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 
 };

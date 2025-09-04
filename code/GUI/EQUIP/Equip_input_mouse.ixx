@@ -30,13 +30,11 @@ void Equip::clickUpGUI()
 					{
 						equipCursor = equipScroll + i;
 						updateBarAct();
-						tabType = tabFlag::back;
 					}
 					else //커서 삭제
 					{
 						equipCursor = -1;
 						barAct = actSet::null;
-						tabType = tabFlag::closeWin;
 					}
 					return;
 				}
@@ -60,10 +58,9 @@ void Equip::clickUpGUI()
 				{
 					deactDraw();
 					CORO(actFunc::executeThrowing(equipPtr, equipCursor));
-					actDraw();
-					tabType = tabFlag::autoAtk;
 					close(aniFlag::null);
 					return;
+
 				}
 				case act::open:
 				{
@@ -156,7 +153,6 @@ void Equip::clickUpGUI()
 	{
 		equipCursor = -1;
 		barAct = actSet::null;
-		tabType = tabFlag::closeWin;
 	}
 }
 void Equip::clickMotionGUI(int dx, int dy)

@@ -68,9 +68,6 @@ public:
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
-
-		prevTabType = tabType;
-		tabType = tabFlag::back;
 	}
 
 	~Lst()
@@ -82,8 +79,6 @@ public:
 		exInputCursor = 0;
 		exInputEditing = false;
 		exInputIndex = -1;
-
-		tabType = prevTabType;
 	}
 	static Lst* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -245,6 +240,8 @@ public:
 
 	void step()
 	{
+		tabType = tabFlag::back;
+
 		if (lstOptionVec.empty() || lstOptionVec.size() <= MAX_BTN) lstScroll = 0;
 		else 
 		{

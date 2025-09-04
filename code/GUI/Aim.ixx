@@ -45,7 +45,7 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-		tabType = tabFlag::aim;
+		
 
 
 		ItemPocket* pEquip = PlayerPtr->getEquipPtr();
@@ -92,7 +92,6 @@ public:
 	~Aim()
 	{
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static Aim* ins() { return ptr; }
@@ -440,6 +439,8 @@ public:
 	void gamepadBtnUp() {}
 	void step() 
 	{
+		tabType = tabFlag::aim;
+
 		{
 			if (PlayerPtr->flash.a > 0)
 			{

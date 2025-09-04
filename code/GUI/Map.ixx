@@ -40,8 +40,6 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
-
-		tabType = tabFlag::closeWin;
 		mapTexture = IMG_LoadTexture(renderer, "image/map/map1.png");
 		deactInput();
 		deactDraw();
@@ -50,7 +48,6 @@ public:
 	~Map()
 	{
 		SDL_DestroyTexture(mapTexture);
-		tabType = tabFlag::autoAtk;
 		ptr = nullptr;
 	}
 	static Map* ins() { return ptr; }
@@ -244,5 +241,10 @@ public:
 	{ 
 		initCursorX = cursorX;
 		initCursorY = cursorY;
+	}
+
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 };

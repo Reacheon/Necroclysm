@@ -65,8 +65,6 @@ public:
 		changeXY(0, (cameraH / 2) - 210, false);
 		setAniSlipDir(4);
 
-		//barAct = actSet::null;
-		tabType = tabFlag::closeWin;
 		UIType = act::equip;
 
 		deactInput();
@@ -82,7 +80,6 @@ public:
 		equipCursor = -1;
 		equipScroll = 0;
 		barAct = actSet::null;
-		tabType = tabFlag::autoAtk;
 	}
 	static Equip* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -152,7 +149,10 @@ public:
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
-	void step() {};
+	void step() 
+	{
+		tabType = tabFlag::back;
+	};
 
 
 	void executeTab()
@@ -168,7 +168,6 @@ public:
 			equipCursor = -1;
 			for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
 			barAct = actSet::null;
-			tabType = tabFlag::closeWin;
 		}
 	}
 
@@ -463,11 +462,10 @@ public:
 	void executeDroping()
 	{
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
+		updateLog(replaceStr(sysStr[126], L"(%item)", equipPtr->itemInfo[equipCursor].name));//(%item)를(을) 버렸다.
 		equipPtr->transferItem(drop.get(), equipCursor, 1);
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
-
-		updateLog(sysStr[126]);
 	}
 
 

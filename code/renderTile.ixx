@@ -92,7 +92,11 @@ export __int64 renderTile()
     {
         
         raySet.clear();
-        if(option::inputMethod == input::mouse) makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+
+        if (checkCursor(&tab) == false && checkCursor(&letterbox) == false)
+        {
+            if (option::inputMethod == input::mouse) makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+        }
         
     }
 

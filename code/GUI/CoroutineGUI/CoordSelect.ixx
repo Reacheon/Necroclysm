@@ -41,7 +41,6 @@ public:
 		telepathyStr = inputTelepathyStr;
 		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
 		ptr = this;
-		tabType = tabFlag::closeWin;
 	}
 	CoordSelect(std::wstring inputTelepathyStr) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr) { }
 
@@ -63,7 +62,6 @@ public:
 	{
 		prt(L"CoordSelect : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
-		tabType = tabFlag::autoAtk;
 		UIType = act::null;
 
 	}
@@ -176,7 +174,6 @@ public:
 	{
 		if (checkCursor(&tab) == true)
 		{
-			tabType = tabFlag::autoAtk;
 			close(aniFlag::null);
 		}
 		else
@@ -241,5 +238,11 @@ public:
 				}
 			}
 		}
+
+	}
+
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 };

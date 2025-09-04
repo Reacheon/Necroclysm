@@ -88,9 +88,6 @@ public:
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
 		msgItemCode = inputMsgItemCode;
-
-		prevTabType = tabType;
-		tabType = tabFlag::closeWin;
 	}
 	~Msg()
 	{
@@ -106,10 +103,6 @@ public:
 
 			SDL_StopTextInput(window);
 		}
-
-		tabType = prevTabType;
-
-
 	}
 	static Msg* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -322,6 +315,12 @@ public:
 			return;
 		}
 
+	}
+
+
+	void step()
+	{
+		tabType = tabFlag::back;
 	}
 };
 
