@@ -7,6 +7,7 @@ import std;
 import util;
 import GUI;
 import textureVar;
+import wrapVar;
 import drawText;
 import drawSprite;
 import globalVar;
@@ -17,6 +18,8 @@ import ItemPocket;
 import drawItemList;
 import Msg;
 import actFuncSet;
+import log;
+import CoordSelect;
 
 export class Inventory : public GUI
 {
@@ -40,6 +43,7 @@ private:
 	SDL_Rect inventoryLabelName;
 	SDL_Rect inventoryLabelQuantity;
 	SDL_Rect inventoryScrollBox;
+	SDL_Rect dropBtn;
 
 public:
 	Inventory(int inputX, int inputY, ItemData* inputData) : GUI(false)
@@ -100,6 +104,7 @@ public:
 		inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 62 , 26 };
 		inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 182 , 26 };
 		inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 71 , 26 };
+		dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };
 	}
 	void drawGUI();
 	void clickUpGUI()
@@ -127,6 +132,26 @@ public:
 				// 나중에 정렬 기능 추가 시 사용
 				// executeSort();
 			}
+		}
+		else if (checkCursor(&dropBtn))
+		{
+			// 선택된 아이템이 있는지 확인
+			bool hasSelectedItems = false;
+			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+			{
+				if (inventoryPocket->itemInfo[i].lootSelect > 0)
+				{
+					hasSelectedItems = true;
+					break;
+				}
+			}
+
+			if (hasSelectedItems)
+			{
+				CORO(executeDropInventory(inventoryPocket));
+
+			}
+			return;
 		}
 		else if (checkCursor(&inventoryBase))
 		{
@@ -483,6 +508,86 @@ public:
 			if (targetItem.pocketMaxVolume > 0 && targetItem.pocketPtr.get()->itemInfo.size() > 0)
 			{
 				barAct.push_back(act::dump);
+			}
+		}
+	}
+
+	Corouter executeDropInventory(ItemPocket* inventoryPocket)
+	{
+
+
+		// 선택된 아이템이 있는지 확인
+		bool hasSelectedItems = false;
+		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+		{
+			if (inventoryPocket->itemInfo[i].lootSelect > 0)
+			{
+				hasSelectedItems = true;
+				break;
+			}
+		}
+		if (!hasSelectedItems)
+		{
+			updateLog(L"No items selected to drop.");
+			co_return;
+		}
+
+		// 주변 9칸(자신 포함) 좌표 선택
+		std::vector<Point2> selectableCoord;
+		for (int dx = -1; dx <= 1; dx++)
+		{
+			for (int dy = -1; dy <= 1; dy++)
+			{
+				selectableCoord.push_back({ PlayerX() + dx, PlayerY() + dy });
+			}
+		}
+
+		new CoordSelect(L"Drop items where?", selectableCoord);
+		co_await std::suspend_always();
+
+		if (coAnswer.empty())
+		{
+			updateLog(L"Drop cancelled.");
+			co_return;
+		}
+
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetZ = wtoi(targetStr.c_str());
+
+		// 플레이어 방향 설정 (같은 위치가 아닐 때만)
+		if (targetX != PlayerX() || targetY != PlayerY())
+		{
+			PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
+		}
+
+		// 하나의 포켓에 모든 선택된 아이템을 담기
+		std::unique_ptr<ItemPocket> droppingPocket = std::make_unique<ItemPocket>(storageType::null);
+
+		for (int i = inventoryPocket->itemInfo.size() - 1; i >= 0; i--)
+		{
+			if (inventoryPocket->itemInfo[i].lootSelect > 0)
+			{
+				int dropAmount = inventoryPocket->itemInfo[i].lootSelect;
+				inventoryPocket->transferItem(droppingPocket.get(), i, dropAmount);
+			}
+		}
+
+		// 한 번에 던지기
+		updateLog(L"You drop the selected items.");
+		PlayerPtr->throwing(std::move(droppingPocket), targetX, targetY);
+		PlayerPtr->updateStatus();
+
+		for (int i = GUI::activeGUIList.size() - 1; i >= 0; i--)
+		{
+			if (GUI::activeGUIList[i] == this)//Equip과 Inventory를 모두 종료
+			{
+				GUI::activeGUIList[i]->close(aniFlag::null);
+				GUI::activeGUIList[i - 1]->close(aniFlag::null);
+				break;
 			}
 		}
 	}

@@ -55,6 +55,11 @@ public:
 		ptr = this;
 
 		selectableCoord = inputSelectableCoord;
+		rangeSet.clear();
+		for(int i=0; i<selectableCoord.size();i++)
+		{
+            rangeSet.insert({ selectableCoord[i].x, selectableCoord[i].y });
+        }
 	}
 	CoordSelect(std::wstring inputTelepathyStr, std::vector<Point2> inputSelectableCoord) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr, inputSelectableCoord) { }
 
@@ -63,6 +68,7 @@ public:
 		prt(L"CoordSelect : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 		UIType = act::null;
+		rangeSet.clear();
 
 	}
 
@@ -90,25 +96,6 @@ public:
 		else if (timer::timer600 % 30 < 20) { markerIndex = 3; }
 		else if (timer::timer600 % 30 < 25) { markerIndex = 4; }
 
-		if (displaySelectableCursor)
-		{
-			//플레이어 주변의 타일을 체크해 선택이 가능한 좌표만 옐로커서로 표시
-			for (int i = 0; i < selectableCoord.size(); i++)
-			{
-				int revX = PlayerX() - selectableCoord[i].x;
-				int revY = PlayerY() - selectableCoord[i].y;
-
-				setZoom(zoomScale);
-				drawSpriteCenter
-				(
-					spr::yellowMarker,
-					markerIndex,
-					cameraW / 2 + zoomScale * ((16 * revX + 8) - cameraX),
-					cameraH / 2 + zoomScale * ((16 * revY + 8) - cameraY)
-				);
-				setZoom(1.0);
-			}
-		}
 
 
 		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&quickSlotRegion) == false)

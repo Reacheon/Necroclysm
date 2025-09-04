@@ -13,10 +13,12 @@ import drawSprite;
 import checkCursor;
 import drawText;
 import drawItemList;
+import CoordSelect;
 
 void Inventory::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
+	if (CoordSelect::ins() != nullptr) return;
 
 	if (getFoldRatio() == 1.0)
 	{
@@ -80,8 +82,6 @@ void Inventory::drawGUI()
 
 
 
-		//우측상단 버리기 버튼
-		SDL_Rect dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };
 
 		// 선택된 아이템이 있는지 확인
 		bool hasSelectedItems = false;

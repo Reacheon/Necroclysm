@@ -13,10 +13,13 @@ import drawWindow;
 import drawItemList;
 import drawSprite;
 import ItemData;
+import CoordSelect;
 
 void Equip::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
+	if (CoordSelect::ins() != nullptr) return;
+
 
 	drawWindow(&equipBase, sysStr[13], 94);
 

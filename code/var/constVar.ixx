@@ -694,6 +694,7 @@ export enum class aniFlag
     entityThrow,
 
     faint,
+    dropInventory,
 };
 
 export enum class input
@@ -1441,6 +1442,7 @@ export class Vehicle;
 export class World;
 export class Chunk;
 export class Loot;
+export class Equip;
 export class LIght;
 
 export class statusEffect

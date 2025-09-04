@@ -13,7 +13,6 @@ import Player;
 export class GUI : public Ani
 {
 private:
-	inline static std::vector<GUI*> activeGUIList;
 	bool stateDraw = true;
 	bool stateInput = true;
 	int slipDir = 6;
@@ -23,6 +22,7 @@ private:
 	int distCounter = 100;
 	float distSpd = 1.0;
 public:
+	inline static std::vector<GUI*> activeGUIList;
 	int x, y;
 	GUI(bool corouterInput) : isCorouter(corouterInput)
 	{

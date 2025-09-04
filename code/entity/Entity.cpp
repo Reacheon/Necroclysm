@@ -721,7 +721,6 @@ void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 	throwCoord.y = gridY;
 	throwCoord.z = getGridZ();
 	addAniUSetPlayer(this, aniFlag::entityThrow);
-
 }
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getProficLevel(int index)

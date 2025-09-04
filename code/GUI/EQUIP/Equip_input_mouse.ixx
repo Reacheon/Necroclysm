@@ -8,6 +8,7 @@ import globalVar;
 import wrapVar;
 import actFuncSet;
 import ItemData;
+import log;
 
 void Equip::clickUpGUI()
 {
@@ -56,7 +57,6 @@ void Equip::clickUpGUI()
 				}
 				case act::throwing:
 				{
-					deactDraw();
 					CORO(actFunc::executeThrowing(equipPtr, equipCursor));
 					close(aniFlag::null);
 					return;

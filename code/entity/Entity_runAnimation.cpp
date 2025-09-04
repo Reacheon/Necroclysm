@@ -866,29 +866,25 @@ bool Entity::runAnimation(bool shutdown)
 	else if (getAniType() == aniFlag::entityThrow)
 	{
 		addTimer();
-		
+
 		static int arriveTimer = 0;
 
 		Point3 dstGrid = { throwCoord.x,throwCoord.y,throwCoord.z };
 		static Point3 prevCoor;
 
-		errorBox(throwingItemPocket->itemInfo.size() > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
-        errorBox(throwingItemPocket->itemInfo[0].number > 1, L"2개 이상의 아이템을 동시에 던질 수 없다!");
-
 		Sticker* sPtr = nullptr;
 		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
-		if (getTimer()==1)
+		if (getTimer() == 1)
 		{
 			int gX = getGridX();
-            int gY = getGridY();
-            int gZ = getGridZ();
-
-			Sticker* sPtr = new Sticker(false, getX(), getY(), spr::itemset, throwingItemPocket->itemInfo[0].sprIndex, stickerID, true);
+			int gY = getGridY();
+			int gZ = getGridZ();
+			int spriteIndex = throwingItemPocket->itemInfo.size() > 0 ? throwingItemPocket->itemInfo.back().sprIndex : 0;
+			Sticker* sPtr = new Sticker(false, getX(), getY(), spr::itemset, spriteIndex, stickerID, true);
 			arriveTimer = 0;
 			prevCoor = { getGridX(),getGridY(),getGridZ() };
-
 		}
-		
+
 		float spd = 4.0;
 		int relX = 16 * (dstGrid.x - getGridX());
 		int relY = 16 * (dstGrid.y - getGridY());
@@ -897,7 +893,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (StickerList.find(stickerID) != StickerList.end()) sPtr = ((Sticker*)(StickerList.find(stickerID))->second);
 		else sPtr = nullptr;
-		
+
 		if (sPtr != nullptr && arriveTimer == 0 && (relX != 0 || relY != 0))
 		{
 			float cosVal = relX / dist;
@@ -911,43 +907,46 @@ bool Entity::runAnimation(bool shutdown)
 			if (cGrid != prevCoor)
 			{
 				prevCoor = cGrid;
-				if (throwingItemPocket->itemInfo[0].lightPtr != nullptr)
+				if (throwingItemPocket->itemInfo.size() > 0 && throwingItemPocket->itemInfo[0].lightPtr != nullptr)
 				{
 					throwingItemPocket->itemInfo[0].lightPtr.get()->moveLight(cGrid.x, cGrid.y, getGridZ());
 					PlayerPtr->updateVision();
 				}
 			}
-        }
+		}
 
-
-
-		if (arriveTimer != 0 || sPtr == nullptr || (relX==0 && relY == 0)|| (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY)))
+		if (arriveTimer != 0 || sPtr == nullptr || (relX == 0 && relY == 0) || (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY)))
 		{
 			if (arriveTimer == 0) arriveTimer = getTimer();
 
 			ItemStack* targetStack;
 
 			bool throwToProp = false;
-            Prop* propPtr = TileProp(dstGrid.x, dstGrid.y, dstGrid.z);
+			Prop* propPtr = TileProp(dstGrid.x, dstGrid.y, dstGrid.z);
+			int totalVolume = 0;
+			for (int i = 0; i < throwingItemPocket->itemInfo.size(); i++)
+			{
+				totalVolume += getVolume(throwingItemPocket->itemInfo[i]) * throwingItemPocket->itemInfo[i].number;
+			}
 			throwToProp = propPtr != nullptr
 				&& propPtr->leadItem.pocketPtr != nullptr
-				&& propPtr->leadItem.pocketPtr->getPocketVolume() + getVolume(throwingItemPocket->itemInfo[0]) < propPtr->leadItem.pocketMaxVolume;
-            
+				&& propPtr->leadItem.pocketPtr->getPocketVolume() + totalVolume < propPtr->leadItem.pocketMaxVolume;
+
 			Vehicle* vPtr = TileVehicle(dstGrid.x, dstGrid.y, dstGrid.z);
 			bool throwToVehicle = false;
 			ItemPocket* throwTargetPocket = nullptr;
 			if (vPtr != nullptr)
 			{
 				ItemPocket* vParts = vPtr->partInfo[{ dstGrid.x, dstGrid.y }].get();
-				for (int i = vParts->itemInfo.size()-1; i >= 0; i--)
+				for (int i = vParts->itemInfo.size() - 1; i >= 0; i--)
 				{
-					if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + getVolume(throwingItemPocket->itemInfo[0]))
+					if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + totalVolume)
 					{
 						throwToVehicle = true;
 						throwTargetPocket = vParts->itemInfo[i].pocketPtr.get();
 						break;
 					}
-                }
+				}
 			}
 
 			if (throwToVehicle)
@@ -956,20 +955,24 @@ bool Entity::runAnimation(bool shutdown)
 				static int arriveFakeY = 0;
 				if (getTimer() == arriveTimer)
 				{
-                    arriveFakeX = sPtr->getFakeX();
-                    arriveFakeY = sPtr->getFakeY();
-					sPtr->setFakeY(arriveFakeY -4);
+					arriveFakeX = sPtr->getFakeX();
+					arriveFakeY = sPtr->getFakeY();
+					sPtr->setFakeY(arriveFakeY - 4);
 				}
-				else if (getTimer() == arriveTimer + 1) sPtr->setFakeY(arriveFakeY -5);
-				else if (getTimer() == arriveTimer + 3) sPtr->setFakeY(arriveFakeY -6);
-				else if (getTimer() == arriveTimer + 6) sPtr->setFakeY(arriveFakeY -7);
-				else if (getTimer() == arriveTimer + 9) sPtr->setFakeY(arriveFakeY -6);
-				else if (getTimer() == arriveTimer + 11) sPtr->setFakeY(arriveFakeY -5);
-				else if (getTimer() == arriveTimer + 12) sPtr->setFakeY(arriveFakeY -4);
+				else if (getTimer() == arriveTimer + 1) sPtr->setFakeY(arriveFakeY - 5);
+				else if (getTimer() == arriveTimer + 3) sPtr->setFakeY(arriveFakeY - 6);
+				else if (getTimer() == arriveTimer + 6) sPtr->setFakeY(arriveFakeY - 7);
+				else if (getTimer() == arriveTimer + 9) sPtr->setFakeY(arriveFakeY - 6);
+				else if (getTimer() == arriveTimer + 11) sPtr->setFakeY(arriveFakeY - 5);
+				else if (getTimer() == arriveTimer + 12) sPtr->setFakeY(arriveFakeY - 4);
 				else if (getTimer() >= arriveTimer + 15)
 				{
 					sPtr->setFakeY(arriveFakeY);
-					throwingItemPocket->transferItem(throwTargetPocket, 0, 1);
+					while (throwingItemPocket->itemInfo.size() > 0)
+					{
+						int itemCount = throwingItemPocket->itemInfo[0].number;
+						throwingItemPocket->transferItem(throwTargetPocket, 0, itemCount);
+					}
 
 					delete sPtr;
 					resetTimer();
@@ -984,17 +987,21 @@ bool Entity::runAnimation(bool shutdown)
 					propPtr->setFakeY(-4);
 					delete sPtr;
 				}
-				else if (getTimer() == arriveTimer+1) propPtr->setFakeY(-5);
-				else if (getTimer() == arriveTimer+3) propPtr->setFakeY(-6);
-				else if (getTimer() == arriveTimer+6) propPtr->setFakeY(-7);
-				else if (getTimer() == arriveTimer+9) propPtr->setFakeY(-6);
-				else if (getTimer() == arriveTimer+11) propPtr->setFakeY(-5);
-				else if (getTimer() == arriveTimer+12) propPtr->setFakeY(-4);
-				else if (getTimer() >= arriveTimer+15)
+				else if (getTimer() == arriveTimer + 1) propPtr->setFakeY(-5);
+				else if (getTimer() == arriveTimer + 3) propPtr->setFakeY(-6);
+				else if (getTimer() == arriveTimer + 6) propPtr->setFakeY(-7);
+				else if (getTimer() == arriveTimer + 9) propPtr->setFakeY(-6);
+				else if (getTimer() == arriveTimer + 11) propPtr->setFakeY(-5);
+				else if (getTimer() == arriveTimer + 12) propPtr->setFakeY(-4);
+				else if (getTimer() >= arriveTimer + 15)
 				{
 					propPtr->setFakeY(0);
-					throwingItemPocket->transferItem(propPtr->leadItem.pocketPtr.get(), 0, 1);
-					
+					while (throwingItemPocket->itemInfo.size() > 0)
+					{
+						int itemCount = throwingItemPocket->itemInfo[0].number;
+						throwingItemPocket->transferItem(propPtr->leadItem.pocketPtr.get(), 0, itemCount);
+					}
+
 					resetTimer();
 					setAniType(aniFlag::null);
 					return true;
@@ -1003,10 +1010,14 @@ bool Entity::runAnimation(bool shutdown)
 			else if (TileItemStack(dstGrid.x, dstGrid.y, dstGrid.z) == nullptr) //그 자리에 템 없는 경우
 			{
 				//기존 스택이 없으면 새로 만들고 그 ptr을 전달
-				
+
 				createItemStack(dstGrid);
 				targetStack = TileItemStack(dstGrid);
-				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
+				while (throwingItemPocket->itemInfo.size() > 0)
+				{
+					int itemCount = throwingItemPocket->itemInfo[0].number;
+					throwingItemPocket->transferItem(targetStack->getPocket(), 0, itemCount);
+				}
 				addAniUSetPlayer(targetStack, aniFlag::drop);
 
 				delete sPtr;
@@ -1018,7 +1029,11 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				//기존 스택이 있으면 그 스택을 그대로 전달
 				targetStack = TileItemStack(dstGrid);
-				throwingItemPocket->transferItem(targetStack->getPocket(), 0, 1);
+				while (throwingItemPocket->itemInfo.size() > 0)
+				{
+					int itemCount = throwingItemPocket->itemInfo[0].number;
+					throwingItemPocket->transferItem(targetStack->getPocket(), 0, itemCount);
+				}
 				addAniUSetPlayer(targetStack, aniFlag::drop);
 
 				delete sPtr;
@@ -1027,7 +1042,7 @@ bool Entity::runAnimation(bool shutdown)
 				return true;
 			}
 		}
-	}
+		}
 	else if (getAniType() == aniFlag::faint)
 	{
 		addTimer();
