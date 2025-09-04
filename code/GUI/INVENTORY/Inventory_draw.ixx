@@ -80,18 +80,47 @@ void Inventory::drawGUI()
 
 
 
-		
-
-
-
-		//좌측상단 버리기 버튼
+		//우측상단 버리기 버튼
 		SDL_Rect dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };
-		drawFillRect(dropBtn, col::black);
-		drawRect(dropBtn, col::gray);
+
+		// 선택된 아이템이 있는지 확인
+		bool hasSelectedItems = false;
+		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+		{
+			if (inventoryPocket->itemInfo[i].lootSelect > 0)
+			{
+				hasSelectedItems = true;
+				break;
+			}
+		}
+
+		SDL_Color btnColor = { 0x00, 0x00, 0x00 };
+		SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
+
+		if (hasSelectedItems && checkCursor(&dropBtn))
+		{
+			if (click == false)
+			{
+				btnColor = lowCol::blue;
+			}
+			else
+			{
+				btnColor = lowCol::deepBlue;
+			}
+			outlineColor = { 0xa6, 0xa6, 0xa6 };
+		}
+
+		drawFillRect(dropBtn, btnColor);
+		drawRect(dropBtn, outlineColor);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 11, dropBtn.y + 12);
 		setFontSize(10);
 		renderTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);//버리기
-		drawFillRect(dropBtn, col::black, 150);
+
+		// 선택된 아이템이 없으면 비활성화 효과
+		if (!hasSelectedItems)
+		{
+			drawFillRect(dropBtn, col::black, 150);
+		}
 
 
 		//라벨
@@ -126,6 +155,31 @@ void Inventory::drawGUI()
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
 		else  itemListColorLock = false;
 		drawItemList(inventoryPocket, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
+
+		if (inventoryPocket->itemInfo.size() > INVENTORY_ITEM_MAX)
+		{
+			SDL_Rect inventoryScrollBox = { inventoryBase.x + 325, inventoryLabel.y + 30, 2, 282 };
+			drawFillRect(inventoryScrollBox, { 120, 120, 120 });
+
+			SDL_Rect inScrollBox = inventoryScrollBox;
+			inScrollBox.h = inventoryScrollBox.h * myMin(1.0, (double)INVENTORY_ITEM_MAX / inventoryPocket->itemInfo.size());
+			if (inScrollBox.h < 5) inScrollBox.h = 5;
+
+			if (!inventoryPocket->itemInfo.empty())
+				inScrollBox.y = inventoryScrollBox.y + inventoryScrollBox.h * ((float)inventoryScroll / (float)inventoryPocket->itemInfo.size());
+			else
+				inScrollBox.y = inventoryScrollBox.y;
+
+			if (inScrollBox.y < inventoryScrollBox.y) inScrollBox.y = inventoryScrollBox.y;
+			if (inScrollBox.y + inScrollBox.h > inventoryScrollBox.y + inventoryScrollBox.h)
+				inScrollBox.y = inventoryScrollBox.y + inventoryScrollBox.h - inScrollBox.h;
+
+			drawFillRect(inScrollBox, col::white);
+		}
+
+		setFontSize(10);
+		renderText(std::to_wstring(inventoryCursor + 1) + L"/" + std::to_wstring(inventoryPocket->itemInfo.size()),
+			inventoryBase.x + 6, inventoryBase.y + inventoryBase.h - 16);
 
 		if (inventoryPocket->itemInfo.size() == 0)
 		{

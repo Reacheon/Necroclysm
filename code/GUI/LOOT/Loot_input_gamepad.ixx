@@ -141,7 +141,7 @@ void Loot::gamepadBtnDown()
 				executePick();
 				break;
 			case act::equip://장비
-				executeEquip();
+				actFunc::executeEquip(lootPocket, lootCursor);
 				break;
 			case act::wield://들기
 				CORO(actFunc::executeWield(lootPocket,lootCursor));

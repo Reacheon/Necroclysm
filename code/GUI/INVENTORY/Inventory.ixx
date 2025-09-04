@@ -1,4 +1,5 @@
 ﻿#include <SDL3/SDL.h>
+#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 export module Inventory;
 
@@ -14,6 +15,8 @@ import drawWindow;
 import ItemData;
 import ItemPocket;
 import drawItemList;
+import Msg;
+import actFuncSet;
 
 export class Inventory : public GUI
 {
@@ -58,6 +61,7 @@ public:
 	~Inventory()
 	{
 		ptr = nullptr;
+		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++) { inventoryPocket->itemInfo[i].lootSelect = 0; }
 	}
 	static Inventory* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -105,15 +109,166 @@ public:
 		if (checkCursor(&tab))
 		{
 			close(aniFlag::winUnfoldClose);
+			return;
 		}
-		else
+		else if (checkCursor(&inventoryLabel))
 		{
+			if (checkCursor(&inventoryLabelSelect))
+			{
+				executeSelectAll();
+			}
+			else if (checkCursor(&inventoryLabelName))
+			{
+				// 나중에 검색 기능 추가 시 사용
+				// CORO(executeSearch());
+			}
+			else if (checkCursor(&inventoryLabelQuantity))
+			{
+				// 나중에 정렬 기능 추가 시 사용
+				// executeSort();
+			}
+		}
+		else if (checkCursor(&inventoryBase))
+		{
+			// 만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
+			for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
+			{
+				if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
+				{
+					if (checkCursor(&inventoryItemRect[i]))
+					{
+						if (inventoryCursor != inventoryScroll + i) //새로운 커서 생성
+						{
+							inventoryCursor = inventoryScroll + i;
+							updateBarAct();
+						}
+						else //커서 삭제
+						{
+							inventoryCursor = -1;
+							barAct = actSet::null;
+						}
+						return;
+					}
+				}
+			}
 
+			// 아이템 좌측 셀렉트 클릭
+			for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
+			{
+				if (checkCursor(&inventoryItemSelectRect[i]))
+				{
+					if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
+					{
+						if (inventoryPocket->itemInfo[i + inventoryScroll].lootSelect == 0)
+						{
+							if (option::inputMethod == input::mouse)
+							{
+								executeSelectItem(i + inventoryScroll);
+							}
+							else if (option::inputMethod == input::touch)
+							{
+								executeSelectItem(i + inventoryScroll);
+							}
+						}
+						else
+						{
+							inventoryPocket->itemInfo[i + inventoryScroll].lootSelect = 0;
+						}
+					}
+				}
+			}
+		}
+		else if (checkCursor(&letterbox)) // 하단 액션 버튼들
+		{
+			for (int i = 0; i < barAct.size(); i++)
+			{
+				if (checkCursor(&barButton[i]))
+				{
+					switch (barAct[i])
+					{
+					case act::wield:
+						CORO(actFunc::executeWield(inventoryPocket, inventoryCursor));
+						break;
+					case act::equip:
+						actFunc::executeEquip(inventoryPocket, inventoryCursor);
+						break;
+					case act::throwing:
+						deactDraw();
+						CORO(actFunc::executeThrowing(inventoryPocket, inventoryCursor));
+						// close(aniFlag::null); // 필요에 따라
+						return;
+					case act::eat:
+						actFunc::eatFood(inventoryPocket, inventoryCursor);
+						updateBarAct();
+						return;
+					case act::drink:
+						actFunc::drinkBottle(inventoryPocket->itemInfo[inventoryCursor]);
+						updateBarAct();
+						return;
+					case act::toggleOff:
+					case act::toggleOn:
+						actFunc::toggle(inventoryPocket->itemInfo[inventoryCursor]);
+						updateBarAct();
+						return;
+					case act::dump:
+						actFunc::spillPocket(inventoryPocket->itemInfo[inventoryCursor]);
+						updateBarAct();
+						return;
+						// 총기 관련 액션들도 필요하면 추가
+					case act::reloadBulletToMagazine:
+					case act::reloadBulletToGun:
+						// ... 총기 관련 로직
+						break;
+						// 기타 액션들...
+					}
+
+					// 아이템이 삭제되었을 때 처리
+					if (inventoryPocket->itemInfo.size() == 0)
+					{
+						close(aniFlag::winUnfoldClose);
+						return;
+					}
+
+					// 스크롤 조정
+					if (inventoryPocket->itemInfo.size() - 1 <= inventoryScroll + INVENTORY_ITEM_MAX)
+					{
+						inventoryScroll = inventoryPocket->itemInfo.size() - INVENTORY_ITEM_MAX;
+						if (inventoryScroll < 0) { inventoryScroll = 0; }
+					}
+					break;
+				}
+			}
+		}
+
+		// 위의 모든 경우에서 return을 받지 못했으면 커서를 -1로 복구
+		{
+			inventoryCursor = -1;
+			barAct = actSet::null;
 		}
 	}
 	void clickMotionGUI(int dx, int dy) { }
 	void clickDownGUI() { }
-	void clickRightGUI() { }
+	void clickRightGUI()
+	{
+		//아이템 좌측 셀렉트 우클릭
+		for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
+		{
+			if (checkCursor(&inventoryItemSelectRect[i]))
+			{
+				if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
+				{
+					if (inventoryPocket->itemInfo[i + inventoryScroll].lootSelect == 0)
+					{
+						CORO(executeSelectItemEx(i + inventoryScroll));
+					}
+					else
+					{
+						inventoryPocket->itemInfo[i + inventoryScroll].lootSelect = 0;
+					}
+				}
+			}
+		}
+	}
 	void mouseWheel() 
 	{
 		if (checkCursor(&inventoryBase))
@@ -126,8 +281,209 @@ public:
 	void gamepadBtnDown() { }
 	void gamepadBtnMotion() { }
 	void gamepadBtnUp() { }
-	void step() 
-	{ 
+	void step()
+	{
 		tabType = tabFlag::back;
+
+		// 윈도우 높이 조정 (동적으로 변경)
+		inventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
+
+		// 게임패드 지원이 필요하다면
+		if (option::inputMethod == input::gamepad)
+		{
+			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
+			{
+				prt(L"탭이 실행되었다.\n");
+				close(aniFlag::winUnfoldClose);
+				delayR2 = 20;
+			}
+			else delayR2--;
+		}
+
+		// 잘못된 커서 위치 조정
+		if (inventoryCursor > (int)(inventoryPocket->itemInfo.size() - 1))
+		{
+			inventoryCursor = inventoryPocket->itemInfo.size() - 1;
+		}
+
+		// 잘못된 스크롤 위치 조정
+		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
+		{
+			if (inventoryScroll + INVENTORY_ITEM_MAX >= inventoryPocket->itemInfo.size())
+			{
+				inventoryScroll = myMax(0, (int)inventoryPocket->itemInfo.size() - INVENTORY_ITEM_MAX);
+			}
+			else if (inventoryScroll < 0)
+			{
+				inventoryScroll = 0;
+			}
+		}
+	}
+
+	void executeSelectAll()
+	{
+		bool isSelectAll = true;
+		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+		{
+			if (inventoryPocket->itemInfo[i].lootSelect != inventoryPocket->itemInfo[i].number)
+			{
+				isSelectAll = false;
+				break;
+			}
+		}
+
+		if (isSelectAll == false)
+		{
+			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+			{
+				inventoryPocket->itemInfo[i].lootSelect = inventoryPocket->itemInfo[i].number;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
+			{
+				inventoryPocket->itemInfo[i].lootSelect = 0;
+			}
+		}
+	}
+
+	void executeSelectItem(int index)
+	{
+		int itemNumber = inventoryPocket->itemInfo[index].number;
+		inventoryPocket->itemInfo[index].lootSelect = itemNumber;
+	}
+
+	Corouter executeSelectItemEx(int index)
+	{
+		//입력형 메시지 박스 열기
+		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
+		exInputText.clear();
+		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//아이템 선택, 얼마나?
+		co_await std::suspend_always();
+
+		if (exInputText.empty() == false)
+		{
+			int inputSelectNumber = 0;
+			try { inputSelectNumber = wtoi(exInputText.c_str()); }
+			catch (...) {}
+
+			if (inputSelectNumber < 0) inputSelectNumber = 0;
+			else if (inputSelectNumber > inventoryPocket->itemInfo[index].number)
+				inputSelectNumber = inventoryPocket->itemInfo[index].number;
+
+			inventoryPocket->itemInfo[index].lootSelect = inputSelectNumber;
+		}
+	}
+
+	void updateBarAct()
+	{
+		if (inventoryPocket->itemInfo.size() > 0)
+		{
+			ItemData& targetItem = inventoryPocket->itemInfo[inventoryCursor];
+			barAct.clear();
+			barAct.push_back(act::wield);
+
+			//업데이트할 아이템이 총일 경우
+			if (targetItem.checkFlag(itemFlag::GUN))
+			{
+				//전용 아이템이 탄창일 경우(일반 소총)
+				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
+				{
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
+
+					if (gunPtr->itemInfo.size() == 0)
+					{
+						barAct.push_back(act::reloadMagazine);
+					}
+					else
+					{
+						barAct.push_back(act::unloadMagazine);
+					}
+				}
+				//전용 아이템이 탄일 경우(리볼버류)
+				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
+				{
+					ItemPocket* gunPtr = targetItem.pocketPtr.get();
+					//탄환 분리
+					if (gunPtr->itemInfo.size() > 0)
+					{
+						barAct.push_back(act::unloadBulletFromGun);
+					}
+
+					//탄환 장전
+					int bulletNumber = 0;
+					for (int i = 0; i < gunPtr->itemInfo.size(); i++)
+					{
+						bulletNumber += gunPtr->itemInfo[i].number;
+					}
+
+					if (bulletNumber < targetItem.pocketMaxNumber)
+					{
+						barAct.push_back(act::reloadBulletToGun);
+					}
+				}
+			}
+			//업데이트할 아이템이 탄창일 경우
+			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
+			{
+				if (targetItem.itemCode != itemRefCode::arrowQuiver && targetItem.itemCode != itemRefCode::boltQuiver)
+					barAct.push_back(act::reloadMagazine);
+
+				//탄창 장전
+				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
+				if (magazinePtr->itemInfo.size() > 0)
+				{
+					barAct.push_back(act::unloadBulletFromMagazine);
+				}
+
+				//총알 장전
+				int bulletNumber = 0;
+				for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
+				{
+					bulletNumber += magazinePtr->itemInfo[i].number;
+				}
+
+				if (bulletNumber < targetItem.pocketMaxNumber)
+				{
+					barAct.push_back(act::reloadBulletToMagazine);
+				}
+			}
+			//업데이트할 아이템이 탄환일 경우
+			else if (targetItem.checkFlag(itemFlag::AMMO))
+			{
+				barAct.push_back(act::reloadBulletToGun);
+			}
+
+			if (targetItem.checkFlag(itemFlag::CANEQUIP) == true) { barAct.push_back(act::equip); }
+
+			if (targetItem.checkFlag(itemFlag::TOGGLE_ON)) barAct.push_back(act::toggleOff);
+			else if (targetItem.checkFlag(itemFlag::TOGGLE_OFF)) barAct.push_back(act::toggleOn);
+
+			if (targetItem.checkFlag(itemFlag::CAN_EAT))
+			{
+				barAct.push_back(act::eat);
+			}
+
+			if (targetItem.pocketMaxVolume > 0)
+			{
+				ItemPocket* pocketPtr = targetItem.pocketPtr.get();
+				// 포켓 내부에 CAN_DRINK 플래그가 있는 아이템이 있는지 확인
+				for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
+				{
+					if (pocketPtr->itemInfo[i].checkFlag(itemFlag::CAN_DRINK))
+					{
+						barAct.push_back(act::drink);
+						break; // 하나라도 찾으면 중단
+					}
+				}
+			}
+
+			//쏟기 추가
+			if (targetItem.pocketMaxVolume > 0 && targetItem.pocketPtr.get()->itemInfo.size() > 0)
+			{
+				barAct.push_back(act::dump);
+			}
+		}
 	}
 };

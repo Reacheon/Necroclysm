@@ -93,14 +93,7 @@ void Loot::clickUpGUI()
 						{
 							if (option::inputMethod == input::mouse)
 							{
-								if (event.button.button == SDL_BUTTON_LEFT)
-								{
-									executeSelectItem(i + lootScroll);
-								}
-								else if (event.button.button == SDL_BUTTON_RIGHT)
-								{
-									CORO(executeSelectItemEx(i + lootScroll));
-								}
+								executeSelectItem(i + lootScroll);
 							}
 							else if (option::inputMethod == input::touch)
 							{
@@ -128,7 +121,7 @@ void Loot::clickUpGUI()
 					executePick();
 					break;
 				case act::equip://장비
-					executeEquip();
+					actFunc::executeEquip(lootPocket, lootCursor);
 					break;
 				case act::wield://들기
 					CORO(actFunc::executeWield(lootPocket, lootCursor));
@@ -219,4 +212,26 @@ void Loot::clickDownGUI()
 	selectTouchTime = getMilliTimer();
 	initLootScroll = lootScroll;
 	initPocketCursor = pocketCursor;
+}
+
+void Loot::clickRightGUI()
+{
+	//아이템 좌측 셀렉트 우클릭
+	for (int i = 0; i < LOOT_ITEM_MAX; i++)
+	{
+		if (checkCursor(&lootItemSelectRect[i]))
+		{
+			if (lootPocket->itemInfo.size() - 1 >= i)
+			{
+				if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
+				{
+					CORO(executeSelectItemEx(i + lootScroll));
+				}
+				else
+				{
+					lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
+				}
+			}
+		}
+	}
 }

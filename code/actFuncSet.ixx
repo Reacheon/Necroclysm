@@ -597,4 +597,16 @@ export namespace actFunc
 
 		rangeRay = false;
 	}
+
+	void executeEquip(ItemPocket* sourcePocket, int sourceIndex)
+	{
+		updateLog(replaceStr(sysStr[125], L"(%item)", sourcePocket->itemInfo[sourceIndex].name)); // (%item)를(을) 장착했다.
+
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		int returnIndex = sourcePocket->transferItem(equipPtr, sourceIndex, 1);
+		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
+
+		PlayerPtr->pullEquipLights();
+		PlayerPtr->updateStatus();
+	}
 };

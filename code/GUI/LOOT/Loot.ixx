@@ -184,28 +184,7 @@ public:
 	void clickUpGUI();
 	void clickMotionGUI(int dx, int dy);
 	void clickDownGUI();
-	void clickRightGUI() 
-	{
-
-		//아이템 좌측 셀렉트 우클릭
-		for (int i = 0; i < LOOT_ITEM_MAX; i++)
-		{
-			if (checkCursor(&lootItemSelectRect[i]))
-			{
-				if (lootPocket->itemInfo.size() - 1 >= i)
-				{
-					if (lootPocket->itemInfo[i + lootScroll].lootSelect == 0)
-					{
-						CORO(executeSelectItemEx(i + lootScroll));
-					}
-					else
-					{
-						lootPocket->itemInfo[i + lootScroll].lootSelect = 0;
-					}
-				}
-			}
-		}
-	}
+	void clickRightGUI();
 	void clickHoldGUI() { }
 	void mouseWheel() 
 	{
@@ -469,38 +448,7 @@ public:
 	}
 
 
-	void executeSelectAll()
-	{
-		bool isSelectAll = true;
-		for (int i = 0; i < lootPocket->itemInfo.size(); i++)
-		{
-			if (lootPocket->itemInfo[i].lootSelect != lootPocket->itemInfo[i].number)
-			{
-				isSelectAll = false;
-				break;
-			}
-		}
 
-		if (isSelectAll == false)
-		{
-			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
-			{
-				lootPocket->itemInfo[i].lootSelect = lootPocket->itemInfo[i].number;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
-			{
-				lootPocket->itemInfo[i].lootSelect = 0;
-			}
-		}
-	}
-	void executeSelectItem(int index)
-	{
-		int itemNumber = lootPocket->itemInfo[index].number;
-		lootPocket->itemInfo[index].lootSelect = itemNumber;
-	}
 
 
 	void executePocketLeft()
@@ -548,16 +496,6 @@ public:
 			//아직 질량&부피 체크 추가하지 않았음
 			lootPocket->transferItem(equipPtr->itemInfo[pocketList[pocketCursor]].pocketPtr.get(), lootCursor, lootPocket->itemInfo[lootCursor].lootSelect);
 		}
-	}
-	void executeEquip()
-	{
-        
-		updateLog(replaceStr(sysStr[125], L"(%item)", lootPocket->itemInfo[lootCursor].name));//(%item)를(을) 장착했다.
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		int returnIndex = lootPocket->transferItem(PlayerPtr->getEquipPtr(), lootCursor, 1);
-		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
-		PlayerPtr->pullEquipLights();
-		PlayerPtr->updateStatus();
 	}
 
 	void updateBarAct()
@@ -704,6 +642,38 @@ public:
 		}
 	}
 
+	void executeSelectAll()
+	{
+		bool isSelectAll = true;
+		for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+		{
+			if (lootPocket->itemInfo[i].lootSelect != lootPocket->itemInfo[i].number)
+			{
+				isSelectAll = false;
+				break;
+			}
+		}
+
+		if (isSelectAll == false)
+		{
+			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+			{
+				lootPocket->itemInfo[i].lootSelect = lootPocket->itemInfo[i].number;
+			}
+		}
+		else
+		{
+			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+			{
+				lootPocket->itemInfo[i].lootSelect = 0;
+			}
+		}
+	}
+	void executeSelectItem(int index)
+	{
+		int itemNumber = lootPocket->itemInfo[index].number;
+		lootPocket->itemInfo[index].lootSelect = itemNumber;
+	}
 	Corouter executeSelectItemEx(int index)
 	{
 		//입력형 메시지 박스 열기
