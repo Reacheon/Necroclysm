@@ -27,7 +27,6 @@ private:
 	ItemData* inventoryItemData;
 	ItemPocket* inventoryPocket;
 
-	inline static Inventory* ptr = nullptr;
 	SDL_Rect inventoryBase;
 	std::array<SDL_Rect, 12> bionicRect;
 	int inventoryCursor = -1;
@@ -44,16 +43,11 @@ private:
 	SDL_Rect inventoryLabelQuantity;
 	SDL_Rect inventoryScrollBox;
 	SDL_Rect dropBtn;
-
 public:
 	Inventory(int inputX, int inputY, ItemData* inputData) : GUI(false)
 	{
 		inventoryItemData = inputData;
 		inventoryPocket = inputData->pocketPtr.get();
-
-		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
-		ptr = this;
 
 		//메세지 박스 렌더링
 		changeXY(inputX, inputY, false);
@@ -64,10 +58,8 @@ public:
 	}
 	~Inventory()
 	{
-		ptr = nullptr;
 		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++) { inventoryPocket->itemInfo[i].lootSelect = 0; }
 	}
-	static Inventory* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		inventoryBase = { 0, 0, 335, 336 };
@@ -245,6 +237,9 @@ public:
 						// ... 총기 관련 로직
 						break;
 						// 기타 액션들...
+					case act::open:
+						executeOpen();
+						return;
 					}
 
 					// 아이템이 삭제되었을 때 처리
@@ -407,6 +402,7 @@ public:
 		{
 			ItemData& targetItem = inventoryPocket->itemInfo[inventoryCursor];
 			barAct.clear();
+			if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
 			barAct.push_back(act::wield);
 
 			//업데이트할 아이템이 총일 경우
@@ -590,5 +586,11 @@ public:
 				break;
 			}
 		}
+	}
+
+	void executeOpen()
+	{
+		new Inventory(334, (cameraH / 2) - 210, &inventoryPocket->itemInfo[inventoryCursor]);
+		close(aniFlag::null);
 	}
 };
