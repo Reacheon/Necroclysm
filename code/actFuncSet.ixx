@@ -140,7 +140,6 @@ export namespace actFunc
 					}
 				}
 			}
-			updateQuiverSpr(PlayerPtr->getEquipPtr());
 		}
 
 	}
@@ -229,7 +228,6 @@ export namespace actFunc
 				}
 			}
 
-			updateQuiverSpr(PlayerPtr->getEquipPtr());
 		}
 	}
 
@@ -241,7 +239,6 @@ export namespace actFunc
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 		for (int i = 0; i < targetPocket->itemInfo.size(); i++) { targetPocket->transferItem(drop.get(), i, targetPocket->itemInfo[i].number); }
 		PlayerPtr->drop(drop.get());
-		updateQuiverSpr(PlayerPtr->getEquipPtr());
 	}
 
 	export void closeDoor(int tgtX, int tgtY, int tgtZ)
@@ -420,7 +417,7 @@ export namespace actFunc
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		if (tgtItem.checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
-			std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", tgtItem.name);
+			std::wstring logStr = replaceStr(sysStr[331], L"(%item)", tgtItem.name);
 			updateLog(logStr);
 			bool isWield = false;
 			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
@@ -500,11 +497,12 @@ export namespace actFunc
 				PlayerPtr->drop(drop.get());
 
 				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+
+				std::wstring logStr = replaceStr(sysStr[331], L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
 				equipPtr->sortEquip();
-
-				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
-				updateLog(logStr);
 			}
 			else if (hasLeft == false && hasRight == false)
 			{
@@ -526,29 +524,36 @@ export namespace actFunc
 				}
 
 				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+
+				std::wstring logStr = replaceStr(sysStr[331], L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+
 				equipPtr->itemInfo[returnIndex].equipState = handDir;
 				equipPtr->sortEquip();
-
-				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
-				updateLog(logStr);
 			}
 			else if (hasLeft == false && hasRight == true)//왼손에 들기
 			{
 				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+
+				std::wstring logStr = replaceStr(sysStr[331], L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::left;
 				equipPtr->sortEquip();
 
-				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
-				updateLog(logStr);
+
 			}
 			else//오른손에 들기
 			{
 				int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
+
+				std::wstring logStr = replaceStr(sysStr[331], L"(%item)", equipPtr->itemInfo[returnIndex].name);
+				updateLog(logStr);
+
 				equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::right;
 				equipPtr->sortEquip();
 
-				std::wstring logStr = replaceStr(L"You wield the (%item).", L"(%item)", equipPtr->itemInfo[returnIndex].name);
-				updateLog(logStr);
+
 			}
 		}
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)

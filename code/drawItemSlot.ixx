@@ -200,12 +200,12 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		SDL_SetTextureBlendMode(spr::itemset->getTexture(), SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 128, 128, 128);
-		drawSpriteCenter(spr::itemset, inputItem.itemSprIndex, itemBox.x + 15, itemBox.y + itemBox.h/2);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 15, itemBox.y + itemBox.h/2);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 255, 255, 255);
 	}
 	else
 	{
-		drawSpriteCenter(spr::itemset, inputItem.itemSprIndex, itemBox.x + 15, itemBox.y + itemBox.h / 2);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 15, itemBox.y + itemBox.h / 2);
 	}
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
@@ -527,7 +527,7 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData& i
 		}
 	}
 
-	drawSimpleItemRect(inputCursor, x, y, inputItem.itemSprIndex, col2Str(col::white) + mainName, inputItem.checkFlag(itemFlag::GRAYFILTER));
+	drawSimpleItemRect(inputCursor, x, y, getItemSprIndex(inputItem), col2Str(col::white) + mainName, inputItem.checkFlag(itemFlag::GRAYFILTER));
 
 }
 

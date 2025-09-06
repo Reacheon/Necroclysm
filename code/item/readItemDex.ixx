@@ -503,7 +503,8 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"LIQ_COL_WHITE") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_WHITE);
                                 else if (strFragment.substr(0, j) == L"LIQ_COL_GRAY") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_GRAY);
                                 else if (strFragment.substr(0, j) == L"LIQ_COL_BLACK") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_BLACK);
-
+                                else if (strFragment.substr(0, j) == L"CONTAINER_TRANSPARENT") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_TRANSPARENT);
+                                
                                 else
                                 {
                                     errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

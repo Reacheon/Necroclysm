@@ -580,7 +580,6 @@ public:
 				PlayerPtr->initAimStack();
 				aimAcc = 0.6;
 				PlayerPtr->setNextAtkType(targetAtkType);
-				updateQuiverSpr(PlayerPtr->getEquipPtr());
 			}
 			else//근접공격
 			{

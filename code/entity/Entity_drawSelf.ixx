@@ -219,7 +219,7 @@ void Entity::drawSelf()
 						for (int i = 0; i < 48; i++)
 						{
 							Point2 itemCoor = equipCoordTwoHanded[i];
-							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.itemSprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, getItemSprIndex(tgtItem), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 
 						}
 						break;
@@ -229,7 +229,7 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordLArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.itemSprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, getItemSprIndex(tgtItem), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
 						else
@@ -237,7 +237,7 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordRArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.itemSprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, getItemSprIndex(tgtItem), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
 						break;
@@ -248,7 +248,7 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordRArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.itemSprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, getItemSprIndex(tgtItem), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
 						else
@@ -256,7 +256,7 @@ void Entity::drawSelf()
 							for (int i = 0; i < 48; i++)
 							{
 								Point2 itemCoor = equipCoordLArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.itemSprIndex, 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, getItemSprIndex(tgtItem), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
 							}
 						}
 						break;

@@ -140,7 +140,7 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
     errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
-    return partInfo[{inputX, inputY}]->itemInfo[0].itemSprIndex;
+    return getItemSprIndex(partInfo[{inputX, inputY}]->itemInfo[0]);
 }
 
 void Vehicle::rotatePartInfo(dir16 inputDir16)
@@ -1004,7 +1004,7 @@ void Vehicle::drawSelf()
                     drawSpriteCenter
                     (
                         spr::itemset,
-                        pocketPtr->itemInfo[pocketPtr->itemInfo.size() - 1].itemSprIndex,
+                        getItemSprIndex(pocketPtr->itemInfo[pocketPtr->itemInfo.size() - 1]),
                         dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
                         dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
                     );

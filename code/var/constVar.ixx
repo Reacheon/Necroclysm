@@ -564,6 +564,8 @@ export enum class itemFlag
     LIQ_COL_WHITE,
     LIQ_COL_GRAY,
     LIQ_COL_BLACK,
+
+    CONTAINER_TRANSPARENT,
 };
 
 export enum class walkFlag

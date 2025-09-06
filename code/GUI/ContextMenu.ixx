@@ -272,7 +272,7 @@ public:
 							drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 							//아이템 아이콘
-							drawSpriteCenter(spr::itemset, tgtPart.itemSprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+							drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 							//아이템 이름
                             renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i, col::white);

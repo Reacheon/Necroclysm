@@ -442,7 +442,6 @@ public:
 					if (hasIllegal) updateLog(L"Some selected items cannot be put into this pocket.");
 				}
 			}
-			updateQuiverSpr(PlayerPtr->getEquipPtr());
 
 		}
 	}

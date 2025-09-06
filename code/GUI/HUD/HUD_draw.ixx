@@ -1581,7 +1581,7 @@ void HUD::drawHoverItemInfo()
 					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, tgtPart.itemSprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
 					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
@@ -1602,7 +1602,7 @@ void HUD::drawHoverItemInfo()
 				setFontSize(10);
 				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
 				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
-				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].itemSprIndex, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
+				drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())]), pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
 
 
 				int newPivotY = pivotY + 16;
@@ -1622,7 +1622,7 @@ void HUD::drawHoverItemInfo()
 					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, tgtPart.itemSprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
 					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);

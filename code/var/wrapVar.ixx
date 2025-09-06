@@ -154,26 +154,6 @@ export inline bool isRayBlocker(Point3 coord)
     else return false;
 };
 
-export int updateQuiverSpr(ItemData& inputData)
-{
-    if (inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver)
-    {
-        std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
-        int num = inputData.pocketPtr.get()->getPocketNumber();
-        if (num == 0) inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex;
-        else if (num == 1) inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex + 1;
-        else inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex + 2;
-
-        return num;
-    }
-}
-
-export void updateQuiverSpr(ItemPocket* inputPocket)
-{
-    for (int i = 0; i < inputPocket->itemInfo.size(); i++) updateQuiverSpr(inputPocket->itemInfo[i]);
-}
-
-
 export float getMouseX()
 {
     float px, py;
@@ -296,3 +276,34 @@ export void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffe
     }
 }
 
+export int getItemSprIndex(ItemData& inputData)
+{
+    if ((inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver)&& inputData.pocketPtr != nullptr)
+    {
+        std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
+        
+        int num = inputData.pocketPtr.get()->getPocketNumber();
+        if (num == 0) return itemDex[inputData.itemCode].itemSprIndex;
+        else if (num == 1) return itemDex[inputData.itemCode].itemSprIndex + 1;
+        else return itemDex[inputData.itemCode].itemSprIndex + 2;
+    }
+    else if (inputData.checkFlag(itemFlag::CONTAINER_LIQ) && inputData.checkFlag(itemFlag::CONTAINER_TRANSPARENT) && inputData.pocketPtr != nullptr)
+    {
+        std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
+
+        if (pocketInfo.size() > 0)
+        {
+            if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_RED))  return inputData.itemSprIndex+2;
+            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLUE)) return inputData.itemSprIndex+3;
+            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_YELLOW)) return inputData.itemSprIndex+4;
+            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_WHITE)) return inputData.itemSprIndex+5;
+            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_GRAY)) return inputData.itemSprIndex+6;
+            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLACK)) return inputData.itemSprIndex+7;
+            else return inputData.itemSprIndex + 8;
+        }
+        else return inputData.itemSprIndex;
+
+        
+    }
+    else return inputData.itemSprIndex;
+}

@@ -810,7 +810,7 @@ void drawItems()
         drawSpriteCenter
         (
             spr::itemset,
-            pocketInfo[pocketInfo.size() - 1].itemSprIndex,
+            getItemSprIndex(pocketInfo[pocketInfo.size() - 1]),
             (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );

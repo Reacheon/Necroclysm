@@ -210,7 +210,7 @@ public:
 				SDL_Rect iconBox = { pivotX,pivotY,36,36 };
 				drawWindow(&iconBox);
 				setZoom(2.0);
-				drawSpriteCenter(spr::itemset, itemDex[msgItemCode].itemSprIndex, pivotX + 18, pivotY + 18);
+				drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[msgItemCode]), pivotX + 18, pivotY + 18);
 				setZoom(1.0);
 				setFontSize(12);
 				renderText(itemDex[msgItemCode].name, pivotX + 50, pivotY + 7);

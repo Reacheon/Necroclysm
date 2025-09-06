@@ -176,7 +176,7 @@ public:
 					drawSprite(spr::lstSelectBox, selectBoxIndex, maintBtn[i].x, maintBtn[i].y);
 
 					setZoom(2.0);
-					drawSpriteCenter(spr::itemset, items[currentItemIndex].itemSprIndex, maintBtn[i].x + 15, maintBtn[i].y + 14);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(items[currentItemIndex]), maintBtn[i].x + 15, maintBtn[i].y + 14);
 					setZoom(1.0);
 
 					setFontSize(14);
