@@ -69,14 +69,14 @@ void Loot::drawGUI()
 
 		if (lootItemData != nullptr)
 		{
-			tileIndex = lootItemData->sprIndex;
+			tileIndex = lootItemData->itemSprIndex;
 			tileName = lootItemData->name;
 		}
 		else if (lootStack != nullptr)
 		{
 			Point3 targetTile = { lootStack->getGridX(), lootStack->getGridY(), lootStack->getGridZ() };
 			int floorIndex = TileFloor(targetTile.x, targetTile.y, targetTile.z);
-			tileIndex = itemDex[floorIndex].sprIndex;
+			tileIndex = itemDex[floorIndex].itemSprIndex;
 			tileName = itemDex[floorIndex].name;
 		}
 		drawSpriteCenter(spr::itemset, tileIndex, lootBase.x + 13 + 25, lootBase.y + 40 + 25);
@@ -191,17 +191,17 @@ void Loot::drawGUI()
 				setZoom(1.5);
 				drawFillRect(pocketItem[2].x, pocketItem[2].y, pocketItem[2].w, pocketItem[2].h, { 0,0,0 }, 200);
 				drawRect(pocketItem[2], col::gray);
-				drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 1]].sprIndex, pocketItem[2].x + (pocketItem[2].w / 2), pocketItem[2].y + (pocketItem[2].h / 2));
+				drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 1]].itemSprIndex, pocketItem[2].x + (pocketItem[2].w / 2), pocketItem[2].y + (pocketItem[2].h / 2));
 				if (pocketCursor != 1)
 				{
 					drawFillRect(pocketItem[1].x, pocketItem[1].y, pocketItem[1].w, pocketItem[1].h, { 0,0,0 }, 200);
 					drawRect(pocketItem[1], col::gray);
-					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 2]].sprIndex, pocketItem[1].x + (pocketItem[1].w / 2), pocketItem[1].y + (pocketItem[1].h / 2));
+					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 2]].itemSprIndex, pocketItem[1].x + (pocketItem[1].w / 2), pocketItem[1].y + (pocketItem[1].h / 2));
 					if (pocketCursor != 2)
 					{
 						drawFillRect(pocketItem[0].x, pocketItem[0].y, pocketItem[0].w, pocketItem[0].h, { 0,0,0 }, 200);
 						drawRect(pocketItem[0], col::gray);
-						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 3]].sprIndex, pocketItem[0].x + (pocketItem[0].w / 2), pocketItem[0].y + (pocketItem[0].h / 2));
+						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor - 3]].itemSprIndex, pocketItem[0].x + (pocketItem[0].w / 2), pocketItem[0].y + (pocketItem[0].h / 2));
 					}
 				}
 			}
@@ -210,7 +210,7 @@ void Loot::drawGUI()
 			setZoom(2.0);
 			drawFillRect(pocketItem[3].x, pocketItem[3].y, pocketItem[3].w, pocketItem[3].h, lowCol::blue, 200);
 			drawRect(pocketItem[3], col::white);
-			drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor]].sprIndex, lootBase.x + 167, lootBase.y + 50);
+			drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor]].itemSprIndex, lootBase.x + 167, lootBase.y + 50);
 
 			//포켓 5~7번째 칸 
 			if (pocketCursor != numberOfBag - 1)
@@ -218,17 +218,17 @@ void Loot::drawGUI()
 				setZoom(1.5);
 				drawFillRect(pocketItem[4].x, pocketItem[4].y, pocketItem[4].w, pocketItem[4].h, { 0,0,0 }, 200);
 				drawRect(pocketItem[4], col::gray);
-				drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 1]].sprIndex, pocketItem[4].x + (pocketItem[4].w / 2), pocketItem[4].y + (pocketItem[4].h / 2));
+				drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 1]].itemSprIndex, pocketItem[4].x + (pocketItem[4].w / 2), pocketItem[4].y + (pocketItem[4].h / 2));
 				if (pocketCursor != numberOfBag - 2)
 				{
 					drawFillRect(pocketItem[5].x, pocketItem[5].y, pocketItem[5].w, pocketItem[5].h, { 0,0,0 }, 200);
 					drawRect(pocketItem[5], col::gray);
-					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 2]].sprIndex, pocketItem[5].x + (pocketItem[5].w / 2), pocketItem[5].y + (pocketItem[5].h / 2));
+					drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 2]].itemSprIndex, pocketItem[5].x + (pocketItem[5].w / 2), pocketItem[5].y + (pocketItem[5].h / 2));
 					if (pocketCursor != numberOfBag - 3)
 					{
 						drawFillRect(pocketItem[6].x, pocketItem[6].y, pocketItem[6].w, pocketItem[6].h, { 0,0,0 }, 200);
 						drawRect(pocketItem[6], col::gray);
-						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 3]].sprIndex, pocketItem[6].x + (pocketItem[6].w / 2), pocketItem[6].y + (pocketItem[6].h / 2));
+						drawSpriteCenter(spr::itemset, equipPtr->itemInfo[pocketList[pocketCursor + 3]].itemSprIndex, pocketItem[6].x + (pocketItem[6].w / 2), pocketItem[6].y + (pocketItem[6].h / 2));
 					}
 				}
 			}

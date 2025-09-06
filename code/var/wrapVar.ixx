@@ -160,9 +160,9 @@ export int updateQuiverSpr(ItemData& inputData)
     {
         std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
         int num = inputData.pocketPtr.get()->getPocketNumber();
-        if (num == 0) inputData.sprIndex = itemDex[inputData.itemCode].sprIndex;
-        else if (num == 1) inputData.sprIndex = itemDex[inputData.itemCode].sprIndex + 1;
-        else inputData.sprIndex = itemDex[inputData.itemCode].sprIndex + 2;
+        if (num == 0) inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex;
+        else if (num == 1) inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex + 1;
+        else inputData.itemSprIndex = itemDex[inputData.itemCode].itemSprIndex + 2;
 
         return num;
     }
@@ -295,3 +295,4 @@ export void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffe
         }
     }
 }
+

@@ -272,7 +272,7 @@ public:
 							drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 							//아이템 아이콘
-							drawSpriteCenter(spr::itemset, tgtPart.sprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
+							drawSpriteCenter(spr::itemset, tgtPart.itemSprIndex, pivotX + 24, newPivotY + 12 + 17 * i);
 
 							//아이템 이름
                             renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i, col::white);
@@ -518,6 +518,18 @@ public:
 				std::unique_ptr<ItemPocket> tempPocket = std::make_unique<ItemPocket>(storageType::temp);
                 ItemPocket* tempPocketPtr = tempPocket.get();
 				tempPocket->addItemFromDex(propItem.propUninstallCode, 1);
+				
+
+				//프롭 내부에 있는 아이템을 전부 미설치 상태 아이템의 내부로 옮김
+                if (propItem.pocketPtr != nullptr && tempPocket->itemInfo[0].pocketPtr != nullptr)
+				{
+                    errorBox(propItem.pocketMaxVolume != tempPocket->itemInfo[0].pocketMaxVolume, L"Prop uninstall pocket volume is different from itemdex.");
+					for (int i = propItem.pocketPtr->itemInfo.size() - 1; i >= 0; i--)
+					{
+						propItem.pocketPtr->transferItem(tempPocket->itemInfo[0].pocketPtr.get(), i, propItem.pocketPtr->itemInfo[i].number);
+					}
+				}
+
                 CORO(actFunc::executeWield(tempPocketPtr, 0));//8월 30일 여기서부터... 아직 들기가 되지않음
 				destroyProp({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 			}

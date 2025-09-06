@@ -8,7 +8,7 @@ export struct ItemDataBase
 {
     std::wstring name; //기본 이름을 지정해두면 인텔리센스 오류가 발생함
     unsigned __int16 itemCode = 1;
-    unsigned __int16 sprIndex = 1;
+    unsigned __int16 itemSprIndex = 1;
     unsigned __int16 tooltipIndex = 0;
     itemCategory category = itemCategory::materials;
     itemSubcategory subcategory = itemSubcategory::material_etc;

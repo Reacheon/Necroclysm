@@ -91,7 +91,7 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
 
     if (name != tgtItem.name) { return false; }
     if (itemCode != tgtItem.itemCode) { return false; }
-    if (sprIndex != tgtItem.sprIndex) { return false; }
+    if (itemSprIndex != tgtItem.itemSprIndex) { return false; }
     if (tooltipIndex != tgtItem.tooltipIndex) { return false; }
     if (category != tgtItem.category) { return false; }
     if (subcategory != tgtItem.subcategory) { return false; }
@@ -147,3 +147,4 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
 
     return true;
 }
+

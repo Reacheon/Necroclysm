@@ -34,7 +34,7 @@ void Craft::drawGUI()
 		SDL_Rect iconBox = { tooltipBox.x + 36 - 18 - 10, tooltipBox.y + 60 - 18 - 37 + yOffset, 36, 36 };
 		drawWindow(&iconBox);
 		setZoom(2.0);
-		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].sprIndex, iconBox.x + 18, iconBox.y + 18);
+		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].itemSprIndex, iconBox.x + 18, iconBox.y + 18);
 		setZoom(1.0);
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
@@ -471,7 +471,7 @@ void Craft::drawGUI()
 
 					ItemData* iPtr = &(recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll]);
 					setZoom(2.0); 
-					drawSpriteCenter(spr::itemset, iPtr->sprIndex, pivotX + 16, pivotY + 12);
+					drawSpriteCenter(spr::itemset, iPtr->itemSprIndex, pivotX + 16, pivotY + 12);
 					setZoom(1.0);
 
 
@@ -542,7 +542,7 @@ void Craft::drawGUI()
 				SDL_Rect iconBox = { topWindow.x + 36 - 24,topWindow.y + 36 - 24,48,48 };
 				drawWindow(&iconBox);
 				setZoom(3.0);
-				drawSpriteCenter(spr::itemset, recipePtr->itemInfo[targetCursor].sprIndex, topWindow.x + 36, topWindow.y + 36);
+				drawSpriteCenter(spr::itemset, recipePtr->itemInfo[targetCursor].itemSprIndex, topWindow.x + 36, topWindow.y + 36);
 				setZoom(1.0);
 				setFontSize(16);
 				renderText(recipePtr->itemInfo[targetCursor].name, topWindow.x + 68, topWindow.y + 12);

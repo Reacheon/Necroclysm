@@ -113,7 +113,7 @@ export void startArea()
 	{
 		if (itemDex[i].name != L"?")
 		{
-			if (itemDex[i].checkFlag(itemFlag::CANCRAFT) && itemDex[i].sprIndex != 1)
+			if (itemDex[i].checkFlag(itemFlag::CANCRAFT) && itemDex[i].itemSprIndex != 1)
 			{
 				ItemPocket::availableRecipe.get()->addRecipe(i);
 			}

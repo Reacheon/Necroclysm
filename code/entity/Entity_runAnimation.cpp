@@ -879,7 +879,7 @@ bool Entity::runAnimation(bool shutdown)
 			int gX = getGridX();
 			int gY = getGridY();
 			int gZ = getGridZ();
-			int spriteIndex = throwingItemPocket->itemInfo.size() > 0 ? throwingItemPocket->itemInfo.back().sprIndex : 0;
+			int spriteIndex = throwingItemPocket->itemInfo.size() > 0 ? throwingItemPocket->itemInfo.back().itemSprIndex : 0;
 			Sticker* sPtr = new Sticker(false, getX(), getY(), spr::itemset, spriteIndex, stickerID, true);
 			arriveTimer = 0;
 			prevCoor = { getGridX(),getGridY(),getGridZ() };

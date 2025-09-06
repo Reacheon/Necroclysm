@@ -557,6 +557,13 @@ export enum class itemFlag
     BURIED, //땅에 매립된 부품
     
     WIELD_NORMAL_DISPLAY,//이게 있으면 손에 들면 보임(무기같은 이미 이미지가 장비 제외)
+
+    LIQ_COL_RED,
+    LIQ_COL_BLUE,
+    LIQ_COL_YELLOW,
+    LIQ_COL_WHITE,
+    LIQ_COL_GRAY,
+    LIQ_COL_BLACK,
 };
 
 export enum class walkFlag

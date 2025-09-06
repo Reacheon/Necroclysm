@@ -30,7 +30,7 @@ void Inventory::drawGUI()
 		drawSprite(spr::inventoryItemRect, 0, inventoryBase.x + 13, inventoryBase.y + 40);
 
 		setZoom(3.0);
-		drawSpriteCenter(spr::itemset, inventoryItemData->sprIndex, inventoryBase.x + 13 + 25, inventoryBase.y + 40 + 25);
+		drawSpriteCenter(spr::itemset, inventoryItemData->itemSprIndex, inventoryBase.x + 13 + 25, inventoryBase.y + 40 + 25);
 		setZoom(1.0);
 
 		setFontSize(16);

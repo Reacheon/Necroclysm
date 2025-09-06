@@ -276,7 +276,7 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].itemCode = wtoi(strFragment.c_str());
                         break;
                     case csvItem::sprIndex:
-                        itemDex[tgtIndex].sprIndex = wtoi(strFragment.c_str());
+                        itemDex[tgtIndex].itemSprIndex = wtoi(strFragment.c_str());
                         break;
                     case csvItem::dir:
                         break;
@@ -496,6 +496,14 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"CAN_DRINK") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_DRINK);
                                 else if (strFragment.substr(0, j) == L"CONTAINER_FLEX") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_FLEX);
                                 else if (strFragment.substr(0, j) == L"WIELD_NORMAL_DISPLAY") itemDex[tgtIndex].flag.push_back(itemFlag::WIELD_NORMAL_DISPLAY);
+
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_RED") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_RED);
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_BLUE") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_BLUE);
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_YELLOW") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_YELLOW);
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_WHITE") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_WHITE);
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_GRAY") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_GRAY);
+                                else if (strFragment.substr(0, j) == L"LIQ_COL_BLACK") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_BLACK);
+
                                 else
                                 {
                                     errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

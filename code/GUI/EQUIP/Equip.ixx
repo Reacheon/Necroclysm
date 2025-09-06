@@ -502,6 +502,19 @@ public:
 
 			createProp(buildLocation, targetItemCode);
 
+			ItemData& propItem = TileProp(targetX, targetY, PlayerZ())->leadItem;
+
+			//설치할 아이템의 내부에 있는 아이템을 전부 설치된 상태 아이템의 내부로 옮김
+			if (propItem.pocketPtr != nullptr && tgtItem.pocketPtr != nullptr)
+			{
+                errorBox(propItem.pocketMaxVolume != tgtItem.pocketMaxVolume, L"PropInstall : propItem.pocketMaxVolume != tgtItem.pocketMaxVolume");
+				for (int i = tgtItem.pocketPtr->itemInfo.size() - 1; i >= 0; i--)
+				{
+                    tgtItem.pocketPtr->transferItem(propItem.pocketPtr.get(), i, tgtItem.pocketPtr->itemInfo[i].number);
+				}
+			}
+
+
 			for (int i = equipPtr->itemInfo.size()-1; i >= 0; i--)
 			{
 				if (equipPtr->itemInfo[i].itemCode == itemDex[targetItemCode].propUninstallCode)
