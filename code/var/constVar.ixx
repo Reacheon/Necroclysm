@@ -138,7 +138,7 @@ export enum class act
     blank,      //빈칸
     status,     //상태창
     ability,    //특수능력
-    inventory,  //인벤토리
+    equipment,  //인벤토리
     bionic,     //바이오닉
     profic,      //재능
     runMode,    //달리기 모드
@@ -246,7 +246,8 @@ export enum class act
     propCarry, //프롭 들기
     propInstall, //프롭 설치
 
-    //skillInfo,
+    propTurnOn, //프롭 켜기
+    propTurnOff, //프롭 끄기
 };
 
 export namespace humanCustom
@@ -566,6 +567,10 @@ export enum class itemFlag
     LIQ_COL_BLACK,
 
     CONTAINER_TRANSPARENT,
+    CONTAINER_TRANSLUCENT,
+
+    PROP_POWER_OFF,//가솔린 발전기나 무선 장치 등등
+    PROP_POWER_ON,
 };
 
 export enum class walkFlag
@@ -1276,6 +1281,11 @@ export namespace itemRefCode
     constexpr int disel = 434;
     constexpr int electricity = 45;
 
+    constexpr int gasolineGeneratorR = 458;
+    constexpr int gasolineGeneratorT = 459;
+    constexpr int gasolineGeneratorL = 460;
+    constexpr int gasolineGeneratorB = 461;
+
 };
 
 export namespace entityRefCode
@@ -1464,8 +1474,8 @@ public:
 export class gasData
 {
 public:
-    int gasCode = 0;
-    int gasVol = 0;
+    int gasCode;
+    int gasVol;
     bool operator==(const gasData& other) const
     {
         return gasCode == other.gasCode && gasVol == other.gasVol;

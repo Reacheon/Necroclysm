@@ -339,6 +339,27 @@ void Prop::drawSelf()
     {
         sprIndex +=7;
     }
+    else if (leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
+        leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
+        leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
+        leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            static Uint32 lastUpdateTime = 0;
+            static int animFrame = 0;
+
+            Uint32 currentTime = SDL_GetTicks();
+
+            if (currentTime - lastUpdateTime >= 100)
+            {
+                animFrame = (animFrame + 1) % 3;
+                lastUpdateTime = currentTime;
+            }
+
+            sprIndex += (2 + animFrame);
+        }
+    }
 
 
     drawSpriteCenter

@@ -360,7 +360,7 @@ public:
 		bool popDownWhenEnd = true;
 		switch (inputAct)
 		{
-		case act::inventory:
+		case act::equipment:
 			new Equip();
 			break;
 		case act::profic:
@@ -961,6 +961,19 @@ public:
 			}
 		}
 
+
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			Prop* propPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
+			if (propPtr->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
+			{
+				inputOptions.push_back(act::propTurnOn);
+			}
+			else if (propPtr->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+			{
+                inputOptions.push_back(act::propTurnOff);
+			}
+		}
 
 
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);

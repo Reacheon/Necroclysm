@@ -21,7 +21,7 @@ void Equip::drawGUI()
 	if (CoordSelect::ins() != nullptr) return;
 
 
-	drawWindow(&equipBase, sysStr[13], 94);
+	drawWindow(&equipBase, sysStr[332], 94);
 
 
 	//여기서부턴 이큅 윈도우

@@ -1098,7 +1098,7 @@ void HUD::drawBarAct()
 		if (barAct[i] == act::status) setBtnLayout(sysStr[3], 33);
 		else if (barAct[i] == act::mutation) setBtnLayout(sysStr[54], 34);
 		else if (barAct[i] == act::ability) setBtnLayout(sysStr[4], 4);
-		else if (barAct[i] == act::inventory) setBtnLayout(sysStr[5], 79);
+		else if (barAct[i] == act::equipment) setBtnLayout(sysStr[332], 79);
 		else if (barAct[i] == act::bionic) setBtnLayout(sysStr[6], 47);
 		else if (barAct[i] == act::profic) setBtnLayout(sysStr[7], 7);
 		else if (barAct[i] == act::skill) setBtnLayout(sysStr[197], 4);

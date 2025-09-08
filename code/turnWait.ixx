@@ -125,10 +125,6 @@ export void turnWait(float waitTime)
     thirst -= waitTime * THIRST_SPEED;
     fatigue -= waitTime * FATIGUE_SPEED;
 
-    // 낮 { 0xFF,0xF8,0xED } 밝기 30
-    // 황혼 { 0x79,0x87,0xff} 밝기 20
-    // 노을 { 0xFF,0xB6,0x76 } 밝기 20
-
     timeGift = waitTime;
     turnCycle = turn::playerAnime;
 }

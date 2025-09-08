@@ -25,6 +25,7 @@ import Maint;
 import drawEpsilonText;
 import ItemData;
 import Sleep;
+import turnWait;
 
 export class ContextMenu : public GUI
 {
@@ -179,6 +180,16 @@ public:
 				{
 					optionText = sysStr[327];//프롭 들기
 					iconIndex = 100;
+				}
+				else if (actOptions[i] == act::propTurnOn)
+				{
+					optionText = sysStr[333];//켜기
+					iconIndex = 102;
+				}
+				else if (actOptions[i] == act::propTurnOff)
+				{
+					optionText = sysStr[334];//끄기
+					iconIndex = 101;
 				}
 				else optionText = L"???";
 
@@ -534,5 +545,47 @@ public:
 				destroyProp({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 			}
 		}
+		else if (inputAct == act::propTurnOn)
+		{
+			if(TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			{
+                Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+				if (pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+				{
+					if (pPtr->leadItem.pocketPtr->itemInfo.size() > 0)
+					{
+						if (pPtr->leadItem.pocketPtr->itemInfo[0].itemCode == itemRefCode::gasoline)
+						{
+							pPtr->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
+							pPtr->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+							updateLog(sysStr[337]);//가솔린 발전기에 시동을 걸었다.
+						}
+						else updateLog(sysStr[335]);//이 발전기를 켜기 위해서는 내부에 가솔린이 들어있어야 한다. 
+					}
+					else updateLog(sysStr[335]);//이 발전기를 켜기 위해서는 내부에 가솔린이 들어있어야 한다. 
+					turnWait(1.0);
+				}
+            }
+		}
+		else if (inputAct == act::propTurnOff)
+		{
+			if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			{
+				Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+				if (pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
+					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+				{
+					pPtr->leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
+					pPtr->leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+					updateLog(sysStr[339]);//발전기를 껐다.
+					turnWait(1.0);
+				}
+			}
+        }
 	}
 };

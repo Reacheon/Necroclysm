@@ -46,7 +46,7 @@ extern "C"
 
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
-__int64 playerInputTurn(), animationTurn(), entityAITurn();
+__int64 playerInputTurn(), animationTurn(), entityAITurn(), propTurn();
 
 export __int64 turnCycleLoop()
 {
@@ -481,7 +481,34 @@ __int64 animationTurn()
 			{
 				std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
 				std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
+
+				int startHour = getHour();
+				int startMin = getMin();
+				int startSec = getSec();
+
 				addTimeTurn(timeGift);
+
+				int endHour = getHour();
+				int endMin = getMin();
+				int endSec = getSec();
+
+				int minutesPassed = 0;
+
+				int startTotalSeconds = startHour * 3600 + startMin * 60 + startSec;
+				int endTotalSeconds = endHour * 3600 + endMin * 60 + endSec;
+
+				if (endTotalSeconds < startTotalSeconds) endTotalSeconds += 24 * 3600;
+
+				if (startSec == 0) minutesPassed = (endTotalSeconds - startTotalSeconds) / 60;
+				else 
+				{
+					int remainingTime = endTotalSeconds - startTotalSeconds;
+					if (remainingTime >= (60 - startSec)) minutesPassed = 1 + (remainingTime - (60 - startSec)) / 60;
+				}
+				for (int i = 0; i < minutesPassed; i++) propTurn();
+
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 				for (auto ePtr : entityList)
 				{
 					if (ePtr != (PlayerPtr)) ((Monster*)ePtr)->addTurnResource(timeGift);
@@ -597,4 +624,10 @@ __int64 entityAITurn()
 
 
 	return (getNanoTimer() - timeStampStart);
+}
+
+__int64 propTurn()
+{
+    //updateLog(L"Prop turn started.");
+	return 0;
 }
