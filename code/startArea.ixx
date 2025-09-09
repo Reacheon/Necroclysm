@@ -81,7 +81,7 @@ export void startArea()
 	}
 
 
-	createItemStack({ -5, 2, 0 }, { {373, 1} });//페트병
+	createItemStack({ -5, 2, 0 }, { {373, 1},{475, 1},{476, 1},{477, 1},{478, 1} });//페트병
 	
 
 	createItemStack({ 2, 8, 0 }, { {itemRefCode::arrowQuiver,1} });//화살통

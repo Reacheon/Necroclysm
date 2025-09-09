@@ -370,6 +370,44 @@ void Prop::drawSelf()
         dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
     );
 
+    if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+    {
+        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
+            leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
+            leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
+            leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+        {
+            int portSprIndex;
+            if (leadItem.itemCode == itemRefCode::gasolineGeneratorR) portSprIndex = 2768;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorT)  portSprIndex = 2769;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorL)   portSprIndex = 2770;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorB)   portSprIndex = 2771;
+
+            float pulseSpeed = 0.003f; // 펄스 속도 (작을수록 느림)
+            float minBrightness = 0.6f; // 최소 밝기 (0.0~1.0)
+            float maxBrightness = 1.0f; // 최대 밝기
+
+            float pulse = (sin(SDL_GetTicks() * pulseSpeed) + 1.0f) * 0.5f; // 0.0~1.0 사이값
+            float colorAlpha = minBrightness + (maxBrightness - minBrightness) * pulse;
+
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_SetTextureColorMod(spr::propset->getTexture(),
+                (Uint8)(255.0f * colorAlpha),
+                (Uint8)(255.0f * colorAlpha),
+                (Uint8)(255.0f * colorAlpha));
+
+            drawSpriteCenter
+            (
+                spr::propset,
+                portSprIndex,
+                dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+                dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
+            );
+
+            SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
+        }
+    }
+
     if (treeAngle != 0)
     {
         int extraSprIndex = 9;
