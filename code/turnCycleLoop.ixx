@@ -24,6 +24,7 @@ import log;
 import GameOver;
 import GUI;
 import Sleep;
+import Prop;
 
 extern "C" 
 {
@@ -44,6 +45,7 @@ extern "C"
 #define GESTURE_MULTIGESTURE 0x802
 }
 
+static int minutesPassed = 0;
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
 __int64 playerInputTurn(), animationTurn(), entityAITurn(), propTurn();
@@ -482,30 +484,31 @@ __int64 animationTurn()
 				std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
 				std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
 
-				int startHour = getHour();
-				int startMin = getMin();
-				int startSec = getSec();
-
-				addTimeTurn(timeGift);
-
-				int endHour = getHour();
-				int endMin = getMin();
-				int endSec = getSec();
-
-				int minutesPassed = 0;
-
-				int startTotalSeconds = startHour * 3600 + startMin * 60 + startSec;
-				int endTotalSeconds = endHour * 3600 + endMin * 60 + endSec;
-
-				if (endTotalSeconds < startTotalSeconds) endTotalSeconds += 24 * 3600;
-
-				if (startSec == 0) minutesPassed = (endTotalSeconds - startTotalSeconds) / 60;
-				else 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				{
-					int remainingTime = endTotalSeconds - startTotalSeconds;
-					if (remainingTime >= (60 - startSec)) minutesPassed = 1 + (remainingTime - (60 - startSec)) / 60;
+					int startHour = getHour();
+					int startMin = getMin();
+					int startSec = getSec();
+
+					addTimeTurn(timeGift);
+
+					int endHour = getHour();
+					int endMin = getMin();
+					int endSec = getSec();
+
+
+					int startTotalSeconds = startHour * 3600 + startMin * 60 + startSec;
+					int endTotalSeconds = endHour * 3600 + endMin * 60 + endSec;
+
+					if (endTotalSeconds < startTotalSeconds) endTotalSeconds += 24 * 3600;
+
+					if (startSec == 0) minutesPassed = (endTotalSeconds - startTotalSeconds) / 60;
+					else
+					{
+						int remainingTime = endTotalSeconds - startTotalSeconds;
+						if (remainingTime >= (60 - startSec)) minutesPassed = 1 + (remainingTime - (60 - startSec)) / 60;
+					}
 				}
-				for (int i = 0; i < minutesPassed; i++) propTurn();
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -583,10 +586,19 @@ __int64 entityAITurn()
 		//prt(col::cyan, L"[턴 페이즈 3] 몬스터 AI\n");
 	}
 
+
+
 	bool endMonsterTurn = true;
 
+    std::vector<Prop*> propList = (World::ins())->getActivePropList();
 	std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
 	std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
+
+	for (int i = 0; i < minutesPassed; i++)
+	{
+		propTurn();
+	}
+	minutesPassed = 0;
 
 	for (auto vPtr : vehList)
 	{
@@ -628,6 +640,6 @@ __int64 entityAITurn()
 
 __int64 propTurn()
 {
-    //updateLog(L"Prop turn started.");
+    updateLog(L"Prop turn started.");
 	return 0;
 }

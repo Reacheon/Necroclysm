@@ -25,6 +25,8 @@ import globalTime;
 //@param waitTime 기다린 턴(분), 예로 1.5를 입력하면 1.5턴(분)
 export void turnWait(float waitTime)
 {
+    errorBox(turnCycle != turn::playerInput && turnCycle != turn::playerAnime, L"turnWait() was called outside of the player's turn.");
+
     //240708기준 2ms 정도의 실행속도
 
     //prt(L"[대기] %f분을 대기했다.\n", waitTime);

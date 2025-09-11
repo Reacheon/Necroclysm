@@ -142,6 +142,22 @@ public:
 		return VehicleList;
 	}
 
+	std::vector<Prop*> getChunkPropList()
+	{
+		std::vector<Prop*> propList;
+		for (int x = 0; x < CHUNK_SIZE_X; x++)
+		{
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
+			{
+				if (getChunkTile(x, y).PropPtr != nullptr)
+				{
+					propList.push_back(getChunkTile(x, y).PropPtr.get());
+				}
+			}
+		}
+		return propList;
+    }
+
 
 	weatherFlag getWeather() {
 		return chunkWeather;

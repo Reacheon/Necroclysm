@@ -140,6 +140,20 @@ public:
 		return VehicleList;
 	}
 
+	std::vector<Prop*> getActivePropList()
+	{
+		std::vector<Prop*> propList;
+		std::vector<Prop*> chunkPropList;
+		for (int i = 0; i < activeChunk.size(); i++)
+		{
+			chunkPropList = activeChunk[i]->getChunkPropList();
+			for (int j = 0; j < chunkPropList.size(); j++)
+			{
+				propList.push_back(chunkPropList[j]);
+			}
+		}
+		return propList;
+    }
 
 	//섹터 관련
 	Point2 changeToSectorCoord(int inputGridX, int inputGridY)

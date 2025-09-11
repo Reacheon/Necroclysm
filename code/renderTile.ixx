@@ -95,7 +95,14 @@ export __int64 renderTile()
 
         if (checkCursor(&tab) == false && checkCursor(&letterbox) == false)
         {
-            if (option::inputMethod == input::mouse) makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+            if (option::inputMethod == input::mouse)
+            {
+                int revGridX = getAbsMouseGrid().x - PlayerX();
+                int revGridY = getAbsMouseGrid().y - PlayerY();
+                makeLine(raySet, getAbsMouseGrid().x - PlayerX(), getAbsMouseGrid().y - PlayerY());
+                if (revGridX > 0) PlayerPtr->setDirection(0);
+                else if (revGridX < 0) PlayerPtr->setDirection(4);
+            }
         }
         
     }

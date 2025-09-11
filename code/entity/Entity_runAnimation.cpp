@@ -94,8 +94,9 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeX(0);
 			setFakeY(0);
 
-			turnWait(1.0);
+			
 			endMove();
+			if(turnCycle == turn::playerAnime) turnWait(1.0);
 			if (entityInfo.isPlayer) cameraFix = true;
 			return true;
 		}

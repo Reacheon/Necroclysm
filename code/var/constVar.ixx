@@ -1458,6 +1458,7 @@ export class ItemPocket;
 export class ItemStack;
 export class Entity;
 export class Vehicle;
+export class Prop;
 export class World;
 export class Chunk;
 export class Loot;
