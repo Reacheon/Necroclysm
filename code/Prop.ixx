@@ -26,6 +26,8 @@ public:
 
     ~Prop();
 
+    void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
+
     void updateSprIndex();
 
     bool runAI();

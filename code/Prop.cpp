@@ -59,6 +59,19 @@ Prop::~Prop()
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 }
 
+void Prop::setGrid(int inputGridX, int inputGridY, int inputGridZ)
+{
+    Point2 prevChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& prevChunk = World::ins()->getChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ());
+    prevChunk.eraseProp(this);
+
+    Coord::setGrid(inputGridX, inputGridY, inputGridZ);
+
+    Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    currentChunk.addProp(this);
+}
+
 void Prop::updateSprIndex()
 {
     bool topTile = false;

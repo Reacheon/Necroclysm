@@ -481,8 +481,8 @@ __int64 animationTurn()
 		{
 			if (turnCycle == turn::playerAnime)
 			{
-				std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
-				std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
+				const std::unordered_set<Monster*>& monsterSet = (World::ins())->getActiveMonsterSet();
+				const std::unordered_set<Vehicle*>& vehSet = (World::ins())->getActiveVehicleSet();
 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				{
@@ -512,11 +512,8 @@ __int64 animationTurn()
 
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				for (auto ePtr : entityList)
-				{
-					if (ePtr != (PlayerPtr)) ((Monster*)ePtr)->addTurnResource(timeGift);
-				}
-				for (auto vPtr : vehList) vPtr->addTurnResource(timeGift);
+				for (auto mPtr : monsterSet) mPtr->addTurnResource(timeGift);
+				for (auto vPtr : vehSet) vPtr->addTurnResource(timeGift);
 				timeGift = 0;
 				turnCycle = turn::monsterAI;
 			}
@@ -590,9 +587,11 @@ __int64 entityAITurn()
 
 	bool endMonsterTurn = true;
 
-    std::vector<Prop*> propList = (World::ins())->getActivePropList();
-	std::vector<Entity*> entityList = (World::ins())->getActiveEntityList();
-	std::vector<Vehicle*> vehList = (World::ins())->getActiveVehicleList();
+	
+
+    const std::unordered_set<Prop*>& propList = (World::ins())->getActivePropSet();
+	const std::unordered_set<Monster*>& monsterList = (World::ins())->getActiveMonsterSet();
+	const std::unordered_set<Vehicle*>& vehList = (World::ins())->getActiveVehicleSet();
 
 	for (int i = 0; i < minutesPassed; i++)
 	{
@@ -605,32 +604,33 @@ __int64 entityAITurn()
 		if (vPtr->runAI() == false) endMonsterTurn = false;
 	}
 
-	for (auto ePtr : entityList)
+	for (auto mPtr : monsterList)
 	{
-		if (ePtr != (PlayerPtr))
-		{
-			if (((Monster*)ePtr)->runAI() == false) endMonsterTurn = false;
-		}
+		if (mPtr->runAI() == false) endMonsterTurn = false;
 	}
 
 	if (endMonsterTurn == true)
 	{
 		turnCycle = turn::playerInput;
 
-		//플레이어 스테미나 회복
-
-
 		//턴사이클 모두 종료
-		for (auto ePtr : entityList)
-		{
-			for (auto it = ePtr->entityInfo.statusEffectVec.begin(); it != ePtr->entityInfo.statusEffectVec.end();)
-			{
-				if (it->duration > 0) it->duration--;
 
-				if (it->duration == 0) it = ePtr->entityInfo.statusEffectVec.erase(it);
-				else it++;
-			}
-		}
+
+		auto statusCalc = [](Entity* ePtr)
+		{
+				for (auto it = ePtr->entityInfo.statusEffectVec.begin(); it != ePtr->entityInfo.statusEffectVec.end();)
+				{
+					if (it->duration > 0) it->duration--;
+
+					if (it->duration == 0) it = ePtr->entityInfo.statusEffectVec.erase(it);
+					else it++;
+				}
+            };
+
+		statusCalc(PlayerPtr);
+		for (auto mPtr : monsterList) statusCalc(mPtr);
+
+
 	}
 	else { turnCycle = turn::monsterAnime; }
 

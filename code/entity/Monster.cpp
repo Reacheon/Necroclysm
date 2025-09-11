@@ -49,6 +49,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 		scriptAI = buffer.str();
 	}
 
+    setGrid(gridX, gridY, gridZ);
 	prt(entityInfo.name.c_str());
 	prt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
 }
@@ -64,6 +65,19 @@ void Monster::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag i
 }
 
 void Monster::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, aniFlag::atk); }
+
+void Monster::setGrid(int inputGridX, int inputGridY, int inputGridZ)
+{
+	Point2 prevChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& prevChunk = World::ins()->getChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ());
+    prevChunk.eraseMonster(this);
+
+	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
+
+	Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+	Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    currentChunk.addMonster(this);
+}
 
 void Monster::endMove()
 {

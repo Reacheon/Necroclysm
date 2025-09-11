@@ -80,6 +80,8 @@ public:
     void erasePart(int inputX, int inputY, int index);
     //////////////////////////////////////////////※ 프레임 확장/////////////////////////////////////////////////////////
     void extendPart(int inputX, int inputY, int inputItemCode);
+
+    void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
     int getSprIndex(int inputX, int inputY);
     void rotatePartInfo(dir16 inputDir16);
     std::unordered_set<Point2, Point2::Hash> getRotateShadow(dir16 inputDir16);

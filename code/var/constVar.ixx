@@ -1457,6 +1457,7 @@ export struct ItemData;
 export class ItemPocket;
 export class ItemStack;
 export class Entity;
+export class Monster;
 export class Vehicle;
 export class Prop;
 export class World;

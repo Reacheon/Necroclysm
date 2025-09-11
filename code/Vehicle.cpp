@@ -136,6 +136,18 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
     updateSpr();
 }
 
+void Vehicle::setGrid(int inputGridX, int inputGridY, int inputGridZ)
+{
+    Point2 prevChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& prevChunk = World::ins()->getChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ());
+    prevChunk.eraseVehicle(this);
+
+    Coord::setGrid(inputGridX, inputGridY, inputGridZ);
+
+    Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    currentChunk.addVehicle(this);
+}
 
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
@@ -413,8 +425,8 @@ void Vehicle::shift(int dx, int dy)
     }
     partInfo = std::move(shiftPartInfo);
 
-    addGridX(dx);
-    addGridY(dy);
+
+    setGrid(getGridX() + dx, getGridY() + dy, getGridZ());
     updateHeadlight();
 }
 
@@ -441,7 +453,8 @@ void Vehicle::zShift(int dz)
             TileEntity(pos.x, pos.y, getGridZ() + dz)->setGrid(pos.x, pos.y, getGridZ() + dz);//위치 그리드 변경
         }
     }
-    addGridZ(dz);
+
+    setGrid(getGridX(), getGridY(), getGridZ() + dz);
     updateHeadlight();
 
 };

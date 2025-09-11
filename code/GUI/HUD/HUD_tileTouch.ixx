@@ -226,7 +226,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					else
 					{
 						updateLog(L"You go up the stairs.");
-						PlayerPtr->addGridZ(1);
+                        PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
 					}
 				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))

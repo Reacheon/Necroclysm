@@ -69,20 +69,6 @@ public:
 		return { fakeGridX, fakeGridY, gridZ };
 	}
 
-	void addGridX(int input)
-	{
-		setGrid(getGridX() + input, getGridY(), getGridZ());
-	}
-	void addGridY(int input)
-	{
-		setGrid(getGridX(), getGridY() + input, getGridZ());
-	}
-	void addGridZ(int input)
-	{
-		setGrid(getGridX(), getGridY(), getGridZ() + input);
-	}
-
-
 
 	void setDstGrid(int inputGridX, int inputGridY)
 	{

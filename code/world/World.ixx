@@ -71,7 +71,7 @@ public:
 		else if (chunkZ < 0) inputFlag = chunkFlag::underground;
 
 		if (Mapmaker::ins()->isEmptyProphecy(chunkX, chunkY, chunkZ) == false) inputFlag = Mapmaker::ins()->getProphecy(chunkX, chunkY, chunkZ);
-		
+
 		chunkPtr[{chunkX, chunkY, chunkZ}] = new Chunk(inputFlag);
 	}
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
@@ -99,61 +99,50 @@ public:
 		activeChunk.clear();
 	}
 
-	std::vector<Entity*> getActiveEntityList()
+	std::unordered_set<Monster*> getActiveMonsterSet()
 	{
-		std::vector<Entity*> entityList;
-		std::vector<Entity*> chunkEntityList;
+		std::unordered_set<Monster*> totalMonsterSet;
+		const std::unordered_set<Monster*>* chunkMonsterSet;
 		for (int i = 0; i < activeChunk.size(); i++)
 		{
-			chunkEntityList = activeChunk[i]->getChunkEntityList();
-			for (int j = 0; j < chunkEntityList.size(); j++)
+			chunkMonsterSet = &(activeChunk[i]->getMonsterSet());
+			for (auto monster : *chunkMonsterSet)
 			{
-				entityList.push_back(chunkEntityList[j]);
+				totalMonsterSet.insert(monster);
 			}
 		}
-		return entityList;
-	}
-	std::vector<Vehicle*> getActiveVehicleList()
-	{
-		__int64 startTime = getNanoTimer();
-		std::vector<Vehicle*> VehicleList;
-		std::vector<Vehicle*> chunkVehicleList;
-		for (int i = 0; i < activeChunk.size(); i++)
-		{
-			chunkVehicleList = activeChunk[i]->getChunkVehicleList();
-			for (int j = 0; j < chunkVehicleList.size(); j++)
-			{
-				VehicleList.push_back(chunkVehicleList[j]);
-			}
-		}
-		std::unordered_set<Vehicle*> cache;
-		auto it = VehicleList.begin();
-		while (it != VehicleList.end())
-		{
-			if (cache.find(*it) != cache.end()) it = VehicleList.erase(it);
-			else
-			{
-				cache.insert(*it);
-				++it;
-			}
-		}
-		return VehicleList;
+		return totalMonsterSet;
 	}
 
-	std::vector<Prop*> getActivePropList()
+	std::unordered_set<Vehicle*> getActiveVehicleSet()
 	{
-		std::vector<Prop*> propList;
-		std::vector<Prop*> chunkPropList;
+		std::unordered_set<Vehicle*> totalVehicleSet;
+		const std::unordered_set<Vehicle*>* chunkVehicleSet;
 		for (int i = 0; i < activeChunk.size(); i++)
 		{
-			chunkPropList = activeChunk[i]->getChunkPropList();
-			for (int j = 0; j < chunkPropList.size(); j++)
+			chunkVehicleSet = &(activeChunk[i]->getVehicleSet());
+			for (auto vehicle : *chunkVehicleSet)
 			{
-				propList.push_back(chunkPropList[j]);
+				totalVehicleSet.insert(vehicle);
 			}
 		}
-		return propList;
-    }
+		return totalVehicleSet;
+	}
+
+	std::unordered_set<Prop*> getActivePropSet()
+	{
+		std::unordered_set<Prop*> totalPropSet;
+		const std::unordered_set<Prop*>* chunkPropSet;
+		for (int i = 0; i < activeChunk.size(); i++)
+		{
+			chunkPropSet = &(activeChunk[i]->getPropSet());
+			for (auto prop : *chunkPropSet)
+			{
+				totalPropSet.insert(prop);
+			}
+		}
+		return totalPropSet;
+	}
 
 	//섹터 관련
 	Point2 changeToSectorCoord(int inputGridX, int inputGridY)
@@ -170,11 +159,11 @@ public:
 
 		//그리드 좌표를 청크로 변환
 		changeToChunkCoord(inputGridX, inputGridY, chunkX, chunkY);
-		
+
 		//청크 좌표를 섹터 좌표로 변환
 		if (chunkX > 0) sectorX = chunkX / SECTOR_SIZE;
 		else sectorX = (chunkX + 1) / SECTOR_SIZE - 1;
-		
+
 		if (chunkY > 0) sectorY = chunkY / SECTOR_SIZE;
 		else sectorY = (chunkY + 1) / SECTOR_SIZE - 1;
 
@@ -191,7 +180,7 @@ public:
 	{
 		if (sectorZ == 0)
 		{
-			if ((sectorY <= 26 && sectorY >= -27)&&(sectorX <= 53 && sectorX >= -54))
+			if ((sectorY <= 26 && sectorY >= -27) && (sectorX <= 53 && sectorX >= -54))
 			{
 				std::string filePath = "map/worldSector-";
 				int number = 2971 + sectorX + 108 * sectorY;
@@ -252,7 +241,7 @@ public:
 								return false;
 							};
 
-						if (isSameCol(pixelCol,chunkCol::seawater)) targetFlag = chunkFlag::seawater;
+						if (isSameCol(pixelCol, chunkCol::seawater)) targetFlag = chunkFlag::seawater;
 						else if (isSameCol(pixelCol, chunkCol::land)) targetFlag = chunkFlag::dirt;
 						else if (isSameCol(pixelCol, chunkCol::city)) targetFlag = chunkFlag::dirt;
 						else if (isSameCol(pixelCol, chunkCol::river)) targetFlag = chunkFlag::seawater;
@@ -287,9 +276,14 @@ public:
 		chunkPtr[{chunkX, chunkY, chunkZ}]->setWeather(input);
 	}
 
-	void chunkOverwrite(int chunkX, int chunkY, int chunkZ,chunkFlag inputChunk)
+	void chunkOverwrite(int chunkX, int chunkY, int chunkZ, chunkFlag inputChunk)
 	{
 		chunkPtr[{chunkX, chunkY, chunkZ}]->chunkLoad(inputChunk);
+	}
+
+	Chunk& getChunk(int chunkX, int chunkY, int chunkZ)
+	{
+		return *chunkPtr[{chunkX, chunkY, chunkZ}];
 	}
 };
 

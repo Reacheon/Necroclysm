@@ -11,6 +11,10 @@ private:
 	std::array<std::array<TileData, CHUNK_SIZE_Y>, CHUNK_SIZE_X> singleTile;
 	chunkFlag flag = chunkFlag::none;
 	weatherFlag chunkWeather = weatherFlag::sunny;
+	
+	std::unordered_set<Monster*> chunkMonsterSet;
+    std::unordered_set<Vehicle*> chunkVehicleSet;
+	std::unordered_set<Prop*> chunkPropSet;
 public:
 	Chunk(chunkFlag input)
 	{
@@ -170,4 +174,30 @@ public:
 	chunkFlag getChunkFlag() {
 		return flag;
 	}
+
+
+	//Monster 관련 함수들
+	void addMonster(Monster* monster)
+	{
+		if (monster != nullptr) chunkMonsterSet.insert(monster);
+	}
+	const std::unordered_set<Monster*>& getMonsterSet() const { return chunkMonsterSet; }
+	bool eraseMonster(Monster* monster) { return chunkMonsterSet.erase(monster) > 0; }
+
+	// Vehicle 관련 함수들
+	void addVehicle(Vehicle* vehicle)
+	{
+		if (vehicle != nullptr) chunkVehicleSet.insert(vehicle);
+	}
+	const std::unordered_set<Vehicle*>& getVehicleSet() const { return chunkVehicleSet; }
+	bool eraseVehicle(Vehicle* vehicle) { return chunkVehicleSet.erase(vehicle) > 0; }
+
+	// Prop 관련 함수들
+	void addProp(Prop* prop)
+	{
+		if (prop != nullptr) chunkPropSet.insert(prop);
+	}
+	const std::unordered_set<Prop*>& getPropSet() const { return chunkPropSet; }
+	bool eraseProp(Prop* prop) { return chunkPropSet.erase(prop) > 0; }
+
 };
