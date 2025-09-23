@@ -571,6 +571,8 @@ export enum class itemFlag
 
     PROP_POWER_OFF,//가솔린 발전기나 무선 장치 등등
     PROP_POWER_ON,
+
+    CIRCUIT, //전자회로 관련 부품
 };
 
 export enum class walkFlag

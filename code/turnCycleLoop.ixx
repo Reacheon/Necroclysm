@@ -589,9 +589,9 @@ __int64 entityAITurn()
 
 	
 
-    const std::unordered_set<Prop*>& propList = (World::ins())->getActivePropSet();
-	const std::unordered_set<Monster*>& monsterList = (World::ins())->getActiveMonsterSet();
-	const std::unordered_set<Vehicle*>& vehList = (World::ins())->getActiveVehicleSet();
+    const std::unordered_set<Prop*>& propSet = (World::ins())->getActivePropSet();
+	const std::unordered_set<Monster*>& monsterSet = (World::ins())->getActiveMonsterSet();
+	const std::unordered_set<Vehicle*>& vehSet = (World::ins())->getActiveVehicleSet();
 
 	for (int i = 0; i < minutesPassed; i++)
 	{
@@ -599,12 +599,12 @@ __int64 entityAITurn()
 	}
 	minutesPassed = 0;
 
-	for (auto vPtr : vehList)
+	for (auto vPtr : vehSet)
 	{
 		if (vPtr->runAI() == false) endMonsterTurn = false;
 	}
 
-	for (auto mPtr : monsterList)
+	for (auto mPtr : monsterSet)
 	{
 		if (mPtr->runAI() == false) endMonsterTurn = false;
 	}
@@ -628,7 +628,7 @@ __int64 entityAITurn()
             };
 
 		statusCalc(PlayerPtr);
-		for (auto mPtr : monsterList) statusCalc(mPtr);
+		for (auto mPtr : monsterSet) statusCalc(mPtr);
 
 
 	}
@@ -640,6 +640,13 @@ __int64 entityAITurn()
 
 __int64 propTurn()
 {
-    updateLog(L"Prop turn started.");
+	for (auto pPtr : (World::ins())->getActivePropSet()) pPtr->runUsed = false;
+
+	for (auto pPtr : (World::ins())->getActivePropSet())
+	{
+		pPtr->runPropFunc();
+	}
+
+    //updateLog(L"Prop turn started.");
 	return 0;
 }

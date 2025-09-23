@@ -509,6 +509,8 @@ export int readItemDex(const wchar_t* file)
                                 else if (strFragment.substr(0, j) == L"PROP_POWER_OFF") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_POWER_OFF);
                                 else if (strFragment.substr(0, j) == L"PROP_POWER_ON") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_POWER_ON);
 
+                                else if (strFragment.substr(0, j) == L"CIRCUIT") itemDex[tgtIndex].flag.push_back(itemFlag::CIRCUIT);
+
                                 else
                                 {
                                     errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));

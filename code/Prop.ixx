@@ -22,6 +22,15 @@ public:
     int alphaFakeHPBar = 0;
     float treeAngle = 0.0; //벌목 때 나무들이 가지는 앵글, 0이 아닐 경우 활성화됨
 
+    bool runUsed = false; //runProp
+    
+    double current = 0.0f; //전류
+	double elecResistance = 0.0f; //전기저항
+
+	double flow = 0.0f; //유량
+	double flowResistance = 0.0f; //흐름저항
+	int fluidCode = 0; //유체 아이템 코드
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();
@@ -31,6 +40,19 @@ public:
     void updateSprIndex();
 
     bool runAI();
+
+    void runPropFunc()
+    {
+        //prt(L"[Prop:runProp] ID : %p의 runProp를 실행시켰다.\n", this);
+
+		if (runUsed) return;
+
+        if (leadItem.checkFlag(itemFlag::CIRCUIT))
+        {
+        }
+
+		runUsed = true;
+    }
 
     bool runAnimation(bool shutdown);
 

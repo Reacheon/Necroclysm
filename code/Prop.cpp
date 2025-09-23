@@ -391,10 +391,10 @@ void Prop::drawSelf()
             leadItem.itemCode == itemRefCode::gasolineGeneratorB)
         {
             int portSprIndex;
-            if (leadItem.itemCode == itemRefCode::gasolineGeneratorR) portSprIndex = 2768;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorT)  portSprIndex = 2769;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorL)   portSprIndex = 2770;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorB)   portSprIndex = 2771;
+            if (leadItem.itemCode == itemRefCode::gasolineGeneratorR) portSprIndex = 3200;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorT)  portSprIndex = 3201;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorL)   portSprIndex = 3202;
+            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorB)   portSprIndex = 3203;
 
             float pulseSpeed = 0.003f; // 펄스 속도 (작을수록 느림)
             float minBrightness = 0.6f; // 최소 밝기 (0.0~1.0)
