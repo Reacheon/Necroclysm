@@ -162,6 +162,8 @@ namespace csvItem
 
     constexpr int propInstallCode = 134; //이게 0이 아닐 경우 주변 타일에 설치 가능
     constexpr int propUninstallCode = 135; //이게 0이 아닐 경우 프롭을 손에 드는 행위 등이 가능
+
+    constexpr int electricMaxPower = 136;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -375,152 +377,165 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::material:
                         break;
                     case csvItem::flag:
-                        for (int j = 0; j < strFragment.size(); j++)
+                    {
+                        static const std::unordered_map<std::wstring, itemFlag> flagMap{
+                            {L"TWOHANDED", itemFlag::TWOHANDED},
+                            {L"CANEQUIP", itemFlag::CANEQUIP},
+                            {L"NONSTACK", itemFlag::NONSTACK},
+                            {L"GUN", itemFlag::GUN},
+                            {L"MAGAZINE", itemFlag::MAGAZINE},
+                            {L"AMMO", itemFlag::AMMO},
+                            {L"POWERED", itemFlag::POWERED},
+                            {L"RAIDARMOR", itemFlag::RAIDARMOR},
+                            {L"COORDCRAFT", itemFlag::COORDCRAFT},
+                            {L"VFRAME", itemFlag::VFRAME},
+                            {L"LIQUID", itemFlag::LIQUID},
+                            {L"GAS", itemFlag::GAS},
+                            {L"VPART", itemFlag::VPART},
+                            {L"TRANSPARENT_WALL", itemFlag::TRANSPARENT_WALL},
+                            {L"PROP_BIG", itemFlag::PROP_BIG},
+                            {L"VEH_ROOF", itemFlag::VEH_ROOF},
+                            {L"PROP_WALKABLE", itemFlag::PROP_WALKABLE},
+                            {L"PROP_BLOCKER", itemFlag::PROP_BLOCKER},
+                            {L"PROP_DEPTH_LOWER", itemFlag::PROP_DEPTH_LOWER},
+                            {L"LIGHT_ON", itemFlag::LIGHT_ON},
+                            {L"LIGHT_OFF", itemFlag::LIGHT_OFF},
+                            {L"VPART_WALL_CONNECT", itemFlag::VPART_WALL_CONNECT},
+                            {L"VPART_DIR_DEPEND", itemFlag::VPART_DIR_DEPEND},
+                            {L"VPART_DOOR_OPEN", itemFlag::VPART_DOOR_OPEN},
+                            {L"VPART_DOOR_CLOSE", itemFlag::VPART_DOOR_CLOSE},
+
+                            {L"PIPE_CNCT_RIGHT", itemFlag::PIPE_CNCT_RIGHT},
+                            {L"PIPE_CNCT_TOP", itemFlag::PIPE_CNCT_TOP},
+                            {L"PIPE_CNCT_LEFT", itemFlag::PIPE_CNCT_LEFT},
+                            {L"PIPE_CNCT_BOT", itemFlag::PIPE_CNCT_BOT},
+
+                            {L"CABLE_CNCT_RIGHT", itemFlag::CABLE_CNCT_RIGHT},
+                            {L"CABLE_CNCT_TOP", itemFlag::CABLE_CNCT_TOP},
+                            {L"CABLE_CNCT_LEFT", itemFlag::CABLE_CNCT_LEFT},
+                            {L"CABLE_CNCT_BOT", itemFlag::CABLE_CNCT_BOT},
+
+                            {L"CONVEYOR_CNCT_RIGHT", itemFlag::CONVEYOR_CNCT_RIGHT},
+                            {L"CONVEYOR_CNCT_TOP", itemFlag::CONVEYOR_CNCT_TOP},
+                            {L"CONVEYOR_CNCT_LEFT", itemFlag::CONVEYOR_CNCT_LEFT},
+                            {L"CONVEYOR_CNCT_BOT", itemFlag::CONVEYOR_CNCT_BOT},
+
+                            {L"TIRE_NORMAL", itemFlag::TIRE_NORMAL},
+                            {L"TIRE_STEER", itemFlag::TIRE_STEER},
+
+                            {L"PROP", itemFlag::PROP},
+
+                            {L"CABLE", itemFlag::CABLE},
+                            {L"PIPE", itemFlag::PIPE},
+                            {L"CONVEYOR", itemFlag::CONVEYOR},
+
+                            {L"RAIL", itemFlag::RAIL},
+
+                            {L"RAIL_CNCT_TOP", itemFlag::RAIL_CNCT_TOP},
+                            {L"RAIL_CNCT_BOT", itemFlag::RAIL_CNCT_BOT},
+                            {L"RAIL_CNCT_LEFT", itemFlag::RAIL_CNCT_LEFT},
+                            {L"RAIL_CNCT_RIGHT", itemFlag::RAIL_CNCT_RIGHT},
+
+                            {L"RAIL_INPUT_TOP", itemFlag::RAIL_INPUT_TOP},
+                            {L"RAIL_INPUT_BOT", itemFlag::RAIL_INPUT_BOT},
+                            {L"RAIL_INPUT_LEFT", itemFlag::RAIL_INPUT_LEFT},
+                            {L"RAIL_INPUT_RIGHT", itemFlag::RAIL_INPUT_RIGHT},
+
+                            {L"RAIL_BUFFER", itemFlag::RAIL_BUFFER},
+
+                            {L"NOT_RECIPE", itemFlag::NOT_RECIPE},
+
+                            {L"TREE", itemFlag::TREE},
+
+                            {L"PLANT", itemFlag::PLANT},
+                            {L"PLANT_SEASON_DEPENDENT", itemFlag::PLANT_SEASON_DEPENDENT},
+                            {L"PLANT_GROWTH_DEPENDENT", itemFlag::PLANT_GROWTH_DEPENDENT},
+                            {L"MUSHROOM", itemFlag::MUSHROOM},
+                            {L"FLOOR", itemFlag::FLOOR},
+                            {L"WALL", itemFlag::WALL},
+                            {L"CEIL", itemFlag::CEIL},
+                            {L"WATER_SHALLOW", itemFlag::WATER_SHALLOW},
+                            {L"WATER_DEEP", itemFlag::WATER_DEEP},
+                            {L"FRESHWATER", itemFlag::FRESHWATER},
+                            {L"SEAWATER", itemFlag::SEAWATER},
+                            {L"TILE_SEASON", itemFlag::TILE_SEASON},
+
+                            {L"DOOR", itemFlag::DOOR},
+                            {L"UPSTAIR", itemFlag::UPSTAIR},
+                            {L"DOWNSTAIR", itemFlag::DOWNSTAIR},
+                            {L"SIGN", itemFlag::SIGN},
+                            {L"DOOR_CLOSE", itemFlag::DOOR_CLOSE},
+                            {L"DOOR_OPEN", itemFlag::DOOR_OPEN},
+                            {L"TRAIN_WHEEL", itemFlag::TRAIN_WHEEL},
+
+                            {L"PROP_GAS_OBSTACLE_ON", itemFlag::PROP_GAS_OBSTACLE_ON},
+                            {L"PROP_GAS_OBSTACLE_OFF", itemFlag::PROP_GAS_OBSTACLE_OFF},
+                            {L"WALL_GAS_PERMEABLE", itemFlag::WALL_GAS_PERMEABLE},
+
+                            {L"POCKET", itemFlag::POCKET},
+                            {L"CAN_CLIMB", itemFlag::CAN_CLIMB},
+                            {L"SPR_TH_WEAPON", itemFlag::SPR_TH_WEAPON},
+                            {L"NO_HAIR_HELMET", itemFlag::NO_HAIR_HELMET},
+                            {L"BOW", itemFlag::BOW},
+                            {L"CROSSBOW", itemFlag::CROSSBOW},
+                            {L"TOGGLE_ON", itemFlag::TOGGLE_ON},
+                            {L"TOGGLE_OFF", itemFlag::TOGGLE_OFF},
+                            {L"HAS_TOGGLE_SPRITE", itemFlag::HAS_TOGGLE_SPRITE},
+                            {L"CANCRAFT", itemFlag::CANCRAFT},
+                            {L"HEADLIGHT", itemFlag::HEADLIGHT},
+                            {L"SHIELD", itemFlag::SHIELD},
+                            {L"CONTAINER_LIQ", itemFlag::CONTAINER_LIQ},
+                            {L"VPART_NOT_WALKABLE", itemFlag::VPART_NOT_WALKABLE},
+                            {L"ENGINE_GASOLINE", itemFlag::ENGINE_GASOLINE},
+                            {L"ENGINE_DIESEL", itemFlag::ENGINE_DIESEL},
+                            {L"ENGINE_ELECTRIC", itemFlag::ENGINE_ELECTRIC},
+                            {L"CAN_EAT", itemFlag::CAN_EAT},
+                            {L"CAN_DRINK", itemFlag::CAN_DRINK},
+                            {L"CONTAINER_FLEX", itemFlag::CONTAINER_FLEX},
+                            {L"WIELD_NORMAL_DISPLAY", itemFlag::WIELD_NORMAL_DISPLAY},
+
+                            {L"LIQ_COL_RED", itemFlag::LIQ_COL_RED},
+                            {L"LIQ_COL_BLUE", itemFlag::LIQ_COL_BLUE},
+                            {L"LIQ_COL_YELLOW", itemFlag::LIQ_COL_YELLOW},
+                            {L"LIQ_COL_WHITE", itemFlag::LIQ_COL_WHITE},
+                            {L"LIQ_COL_GRAY", itemFlag::LIQ_COL_GRAY},
+                            {L"LIQ_COL_BLACK", itemFlag::LIQ_COL_BLACK},
+                            {L"CONTAINER_TRANSPARENT", itemFlag::CONTAINER_TRANSPARENT},
+                            {L"CONTAINER_TRANSLUCENT", itemFlag::CONTAINER_TRANSLUCENT},
+
+                            {L"PROP_POWER_OFF", itemFlag::PROP_POWER_OFF},
+                            {L"PROP_POWER_ON", itemFlag::PROP_POWER_ON},
+
+                            {L"CIRCUIT", itemFlag::CIRCUIT},
+                            {L"CABLE_BEHIND", itemFlag::CABLE_BEHIND},
+                            {L"VOLTAGE_SOURCE", itemFlag::VOLTAGE_SOURCE},
+
+                            {L"VOLTAGE_OUTPUT_RIGHT", itemFlag::VOLTAGE_OUTPUT_RIGHT},
+                            {L"VOLTAGE_OUTPUT_TOP", itemFlag::VOLTAGE_OUTPUT_TOP},
+                            {L"VOLTAGE_OUTPUT_LEFT", itemFlag::VOLTAGE_OUTPUT_LEFT},
+                            {L"VOLTAGE_OUTPUT_BOT", itemFlag::VOLTAGE_OUTPUT_BOT},
+                        };
+
+                        size_t pos = 0;
+                        while (pos <= strFragment.size()) 
                         {
-                            if (strFragment[j] == UNI::SEMICOLON || j == strFragment.size() - 1)
+                            size_t sep = strFragment.find(UNI::SEMICOLON, pos);
+                            std::wstring token = (sep == std::wstring::npos)
+                                ? strFragment.substr(pos)
+                                : strFragment.substr(pos, sep - pos);
+
+                            if (!token.empty()) 
                             {
-                                if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                if (strFragment.substr(0, j) == L"TWOHANDED") itemDex[tgtIndex].flag.push_back(itemFlag::TWOHANDED);
-                                else if (strFragment.substr(0, j) == L"CANEQUIP") itemDex[tgtIndex].flag.push_back(itemFlag::CANEQUIP);
-                                else if (strFragment.substr(0, j) == L"NONSTACK") itemDex[tgtIndex].flag.push_back(itemFlag::NONSTACK);
-                                else if (strFragment.substr(0, j) == L"GUN") itemDex[tgtIndex].flag.push_back(itemFlag::GUN);
-                                else if (strFragment.substr(0, j) == L"MAGAZINE") itemDex[tgtIndex].flag.push_back(itemFlag::MAGAZINE);
-                                else if (strFragment.substr(0, j) == L"AMMO") itemDex[tgtIndex].flag.push_back(itemFlag::AMMO);
-                                else if (strFragment.substr(0, j) == L"POWERED") itemDex[tgtIndex].flag.push_back(itemFlag::POWERED);
-                                else if (strFragment.substr(0, j) == L"RAIDARMOR") itemDex[tgtIndex].flag.push_back(itemFlag::RAIDARMOR);
-                                else if (strFragment.substr(0, j) == L"COORDCRAFT") itemDex[tgtIndex].flag.push_back(itemFlag::COORDCRAFT);
-                                else if (strFragment.substr(0, j) == L"VFRAME") itemDex[tgtIndex].flag.push_back(itemFlag::VFRAME);
-                                else if (strFragment.substr(0, j) == L"LIQUID") itemDex[tgtIndex].flag.push_back(itemFlag::LIQUID);
-                                else if (strFragment.substr(0, j) == L"GAS") itemDex[tgtIndex].flag.push_back(itemFlag::GAS);
-                                else if (strFragment.substr(0, j) == L"VPART") itemDex[tgtIndex].flag.push_back(itemFlag::VPART);
-                                else if (strFragment.substr(0, j) == L"TRANSPARENT_WALL") itemDex[tgtIndex].flag.push_back(itemFlag::TRANSPARENT_WALL);
-                                else if (strFragment.substr(0, j) == L"PROP_BIG") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_BIG);
-                                else if (strFragment.substr(0, j) == L"VEH_ROOF") itemDex[tgtIndex].flag.push_back(itemFlag::VEH_ROOF);
-                                else if (strFragment.substr(0, j) == L"PROP_WALKABLE") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_WALKABLE);
-                                else if (strFragment.substr(0, j) == L"PROP_BLOCKER") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_BLOCKER);
-                                else if (strFragment.substr(0, j) == L"PROP_DEPTH_LOWER") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_DEPTH_LOWER);
-                                else if (strFragment.substr(0, j) == L"LIGHT_ON") itemDex[tgtIndex].flag.push_back(itemFlag::LIGHT_ON);
-                                else if (strFragment.substr(0, j) == L"LIGHT_OFF") itemDex[tgtIndex].flag.push_back(itemFlag::LIGHT_OFF);
-                                else if (strFragment.substr(0, j) == L"VPART_WALL_CONNECT") itemDex[tgtIndex].flag.push_back(itemFlag::VPART_WALL_CONNECT);
-                                else if (strFragment.substr(0, j) == L"VPART_DIR_DEPEND") itemDex[tgtIndex].flag.push_back(itemFlag::VPART_DIR_DEPEND);
-                                else if (strFragment.substr(0, j) == L"VPART_DOOR_OPEN") itemDex[tgtIndex].flag.push_back(itemFlag::VPART_DOOR_OPEN);
-                                else if (strFragment.substr(0, j) == L"VPART_DOOR_CLOSE") itemDex[tgtIndex].flag.push_back(itemFlag::VPART_DOOR_CLOSE);
-
-                                else if (strFragment.substr(0, j) == L"PIPE_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_RIGHT);
-                                else if (strFragment.substr(0, j) == L"PIPE_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_TOP);
-                                else if (strFragment.substr(0, j) == L"PIPE_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_LEFT);
-                                else if (strFragment.substr(0, j) == L"PIPE_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE_CNCT_BOT);
-
-                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_RIGHT);
-                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_TOP);
-                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_LEFT);
-                                else if (strFragment.substr(0, j) == L"CABLE_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE_CNCT_BOT);
-
-                                else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_RIGHT);
-                                else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_TOP);
-                                else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_LEFT);
-                                else if (strFragment.substr(0, j) == L"CONVEYOR_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR_CNCT_BOT);
-
-                                else if (strFragment.substr(0, j) == L"TIRE_NORMAL") itemDex[tgtIndex].flag.push_back(itemFlag::TIRE_NORMAL);
-                                else if (strFragment.substr(0, j) == L"TIRE_STEER") itemDex[tgtIndex].flag.push_back(itemFlag::TIRE_STEER);
-
-                                else if (strFragment.substr(0, j) == L"PROP") itemDex[tgtIndex].flag.push_back(itemFlag::PROP);
-
-                                else if (strFragment.substr(0, j) == L"CABLE") itemDex[tgtIndex].flag.push_back(itemFlag::CABLE);
-                                else if (strFragment.substr(0, j) == L"PIPE") itemDex[tgtIndex].flag.push_back(itemFlag::PIPE);
-                                else if (strFragment.substr(0, j) == L"CONVEYOR") itemDex[tgtIndex].flag.push_back(itemFlag::CONVEYOR);
-
-                                else if (strFragment.substr(0, j) == L"RAIL") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL);
-
-                                else if (strFragment.substr(0, j) == L"RAIL_CNCT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_CNCT_TOP);
-                                else if (strFragment.substr(0, j) == L"RAIL_CNCT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_CNCT_BOT);
-                                else if (strFragment.substr(0, j) == L"RAIL_CNCT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_CNCT_LEFT);
-                                else if (strFragment.substr(0, j) == L"RAIL_CNCT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_CNCT_RIGHT);
-
-                                else if (strFragment.substr(0, j) == L"RAIL_INPUT_TOP") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_INPUT_TOP);
-                                else if (strFragment.substr(0, j) == L"RAIL_INPUT_BOT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_INPUT_BOT);
-                                else if (strFragment.substr(0, j) == L"RAIL_INPUT_LEFT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_INPUT_LEFT);
-                                else if (strFragment.substr(0, j) == L"RAIL_INPUT_RIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_INPUT_RIGHT);
-
-                                else if (strFragment.substr(0, j) == L"RAIL_BUFFER") itemDex[tgtIndex].flag.push_back(itemFlag::RAIL_BUFFER);
-
-                                else if (strFragment.substr(0, j) == L"NOT_RECIPE") itemDex[tgtIndex].flag.push_back(itemFlag::NOT_RECIPE);
-
-                                else if (strFragment.substr(0, j) == L"TREE") itemDex[tgtIndex].flag.push_back(itemFlag::TREE);
-
-                                else if (strFragment.substr(0, j) == L"PLANT") itemDex[tgtIndex].flag.push_back(itemFlag::PLANT);
-                                else if (strFragment.substr(0, j) == L"PLANT_SEASON_DEPENDENT") itemDex[tgtIndex].flag.push_back(itemFlag::PLANT_SEASON_DEPENDENT);
-                                else if (strFragment.substr(0, j) == L"PLANT_GROWTH_DEPENDENT") itemDex[tgtIndex].flag.push_back(itemFlag::PLANT_GROWTH_DEPENDENT);
-                                else if (strFragment.substr(0, j) == L"MUSHROOM") itemDex[tgtIndex].flag.push_back(itemFlag::MUSHROOM);
-                                else if (strFragment.substr(0, j) == L"FLOOR") itemDex[tgtIndex].flag.push_back(itemFlag::FLOOR);
-                                else if (strFragment.substr(0, j) == L"WALL") itemDex[tgtIndex].flag.push_back(itemFlag::WALL);
-                                else if (strFragment.substr(0, j) == L"CEIL") itemDex[tgtIndex].flag.push_back(itemFlag::CEIL);
-                                else if (strFragment.substr(0, j) == L"PROP") itemDex[tgtIndex].flag.push_back(itemFlag::PROP);
-                                else if (strFragment.substr(0, j) == L"WATER_SHALLOW") itemDex[tgtIndex].flag.push_back(itemFlag::WATER_SHALLOW);
-                                else if (strFragment.substr(0, j) == L"WATER_DEEP") itemDex[tgtIndex].flag.push_back(itemFlag::WATER_DEEP);
-                                else if (strFragment.substr(0, j) == L"FRESHWATER") itemDex[tgtIndex].flag.push_back(itemFlag::FRESHWATER);
-                                else if (strFragment.substr(0, j) == L"SEAWATER") itemDex[tgtIndex].flag.push_back(itemFlag::SEAWATER);
-                                else if (strFragment.substr(0, j) == L"TILE_SEASON") itemDex[tgtIndex].flag.push_back(itemFlag::TILE_SEASON);
-
-                                else if (strFragment.substr(0, j) == L"DOOR") itemDex[tgtIndex].flag.push_back(itemFlag::DOOR);
-                                else if (strFragment.substr(0, j) == L"UPSTAIR") itemDex[tgtIndex].flag.push_back(itemFlag::UPSTAIR);
-                                else if (strFragment.substr(0, j) == L"DOWNSTAIR") itemDex[tgtIndex].flag.push_back(itemFlag::DOWNSTAIR);
-                                else if (strFragment.substr(0, j) == L"SIGN") itemDex[tgtIndex].flag.push_back(itemFlag::SIGN);
-                                else if (strFragment.substr(0, j) == L"DOOR_CLOSE") itemDex[tgtIndex].flag.push_back(itemFlag::DOOR_CLOSE);
-                                else if (strFragment.substr(0, j) == L"DOOR_OEPN") itemDex[tgtIndex].flag.push_back(itemFlag::DOOR_OPEN);
-                                else if (strFragment.substr(0, j) == L"TRAIN_WHEEL") itemDex[tgtIndex].flag.push_back(itemFlag::TRAIN_WHEEL);
-
-                                else if (strFragment.substr(0, j) == L"PROP_GAS_OBSTACLE_ON") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_GAS_OBSTACLE_ON);
-                                else if (strFragment.substr(0, j) == L"PROP_GAS_OBSTACLE_OFF") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_GAS_OBSTACLE_OFF);
-                                else if (strFragment.substr(0, j) == L"WALL_GAS_PERMEABLE") itemDex[tgtIndex].flag.push_back(itemFlag::WALL_GAS_PERMEABLE);
-
-                                else if (strFragment.substr(0, j) == L"POCKET") itemDex[tgtIndex].flag.push_back(itemFlag::POCKET);
-                                else if (strFragment.substr(0, j) == L"CAN_CLIMB") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_CLIMB);
-                                else if (strFragment.substr(0, j) == L"SPR_TH_WEAPON") itemDex[tgtIndex].flag.push_back(itemFlag::SPR_TH_WEAPON);
-                                else if (strFragment.substr(0, j) == L"NO_HAIR_HELMET") itemDex[tgtIndex].flag.push_back(itemFlag::NO_HAIR_HELMET);
-                                else if (strFragment.substr(0, j) == L"BOW") itemDex[tgtIndex].flag.push_back(itemFlag::BOW);
-                                else if (strFragment.substr(0, j) == L"CROSSBOW") itemDex[tgtIndex].flag.push_back(itemFlag::CROSSBOW);
-                                else if (strFragment.substr(0, j) == L"TOGGLE_ON") itemDex[tgtIndex].flag.push_back(itemFlag::TOGGLE_ON);
-                                else if (strFragment.substr(0, j) == L"TOGGLE_OFF") itemDex[tgtIndex].flag.push_back(itemFlag::TOGGLE_OFF);
-                                else if (strFragment.substr(0, j) == L"HAS_TOGGLE_SPRITE") itemDex[tgtIndex].flag.push_back(itemFlag::HAS_TOGGLE_SPRITE);
-                                else if (strFragment.substr(0, j) == L"CANCRAFT") itemDex[tgtIndex].flag.push_back(itemFlag::CANCRAFT);
-                                else if (strFragment.substr(0, j) == L"HEADLIGHT") itemDex[tgtIndex].flag.push_back(itemFlag::HEADLIGHT);
-                                else if (strFragment.substr(0, j) == L"SHIELD") itemDex[tgtIndex].flag.push_back(itemFlag::SHIELD);
-                                else if (strFragment.substr(0, j) == L"CONTAINER_LIQ") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_LIQ);
-                                else if (strFragment.substr(0, j) == L"VPART_NOT_WALKABLE") itemDex[tgtIndex].flag.push_back(itemFlag::VPART_NOT_WALKABLE);
-                                else if (strFragment.substr(0, j) == L"ENGINE_GASOLINE") itemDex[tgtIndex].flag.push_back(itemFlag::ENGINE_GASOLINE);
-                                else if (strFragment.substr(0, j) == L"ENGINE_DISEL") itemDex[tgtIndex].flag.push_back(itemFlag::ENGINE_DISEL);
-                                else if (strFragment.substr(0, j) == L"ENGINE_ELECTRIC") itemDex[tgtIndex].flag.push_back(itemFlag::ENGINE_ELECTRIC);
-                                else if (strFragment.substr(0, j) == L"CAN_EAT") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_EAT);
-                                else if (strFragment.substr(0, j) == L"CAN_DRINK") itemDex[tgtIndex].flag.push_back(itemFlag::CAN_DRINK);
-                                else if (strFragment.substr(0, j) == L"CONTAINER_FLEX") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_FLEX);
-                                else if (strFragment.substr(0, j) == L"WIELD_NORMAL_DISPLAY") itemDex[tgtIndex].flag.push_back(itemFlag::WIELD_NORMAL_DISPLAY);
-
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_RED") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_RED);
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_BLUE") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_BLUE);
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_YELLOW") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_YELLOW);
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_WHITE") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_WHITE);
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_GRAY") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_GRAY);
-                                else if (strFragment.substr(0, j) == L"LIQ_COL_BLACK") itemDex[tgtIndex].flag.push_back(itemFlag::LIQ_COL_BLACK);
-                                else if (strFragment.substr(0, j) == L"CONTAINER_TRANSPARENT") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_TRANSPARENT);
-                                else if (strFragment.substr(0, j) == L"CONTAINER_TRANSLUCENT") itemDex[tgtIndex].flag.push_back(itemFlag::CONTAINER_TRANSLUCENT);
-
-                                else if (strFragment.substr(0, j) == L"PROP_POWER_OFF") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_POWER_OFF);
-                                else if (strFragment.substr(0, j) == L"PROP_POWER_ON") itemDex[tgtIndex].flag.push_back(itemFlag::PROP_POWER_ON);
-
-                                else if (strFragment.substr(0, j) == L"CIRCUIT") itemDex[tgtIndex].flag.push_back(itemFlag::CIRCUIT);
-
-                                else
-                                {
-                                    errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + strFragment.substr(0, j));
-                                }
-
-                                strFragment.erase(0, j + 1);
-                                j = 0;
+                                auto it = flagMap.find(token);
+                                if (it != flagMap.end()) itemDex[tgtIndex].flag.push_back(it->second);
+                                else errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + token);
                             }
+                            if (sep == std::wstring::npos) break;
+                            pos = sep + 1;
                         }
                         break;
+                    }
+
                     case csvItem::calorie:
                         itemDex[tgtIndex].calorie = wtoi(strFragment.c_str());
                         break;
@@ -1037,6 +1052,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::propUninstallCode:
                         itemDex[tgtIndex].propUninstallCode = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::electricMaxPower:
+						itemDex[tgtIndex].electricMaxPower = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");

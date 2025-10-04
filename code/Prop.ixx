@@ -31,6 +31,12 @@ public:
 	double flowResistance = 0.0f; //흐름저항
 	int fluidCode = 0; //유체 아이템 코드
 
+    dir16 voltageDir = dir16::none;
+
+    int nodeMaxElectron = 0;
+    int nodeCurrentElectron = 0;
+
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();
@@ -41,18 +47,7 @@ public:
 
     bool runAI();
 
-    void runPropFunc()
-    {
-        //prt(L"[Prop:runProp] ID : %p의 runProp를 실행시켰다.\n", this);
-
-		if (runUsed) return;
-
-        if (leadItem.checkFlag(itemFlag::CIRCUIT))
-        {
-        }
-
-		runUsed = true;
-    }
+    void runPropFunc();
 
     bool runAnimation(bool shutdown);
 

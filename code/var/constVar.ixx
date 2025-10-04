@@ -547,7 +547,7 @@ export enum class itemFlag
     VPART_NOT_WALKABLE,
 
     ENGINE_GASOLINE,
-    ENGINE_DISEL,
+    ENGINE_DIESEL,
     ENGINE_ELECTRIC,
 
     CAN_EAT,
@@ -573,6 +573,14 @@ export enum class itemFlag
     PROP_POWER_ON,
 
     CIRCUIT, //전자회로 관련 부품
+
+	CABLE_BEHIND, //케이블이 프롭 뒤에 그려짐
+
+    VOLTAGE_SOURCE, //전력 공급원(발전기 등)
+    VOLTAGE_OUTPUT_RIGHT,
+	VOLTAGE_OUTPUT_TOP,
+    VOLTAGE_OUTPUT_LEFT,
+    VOLTAGE_OUTPUT_BOT,
 };
 
 export enum class walkFlag
@@ -1288,6 +1296,20 @@ export namespace itemRefCode
     constexpr int gasolineGeneratorL = 460;
     constexpr int gasolineGeneratorB = 461;
 
+    constexpr int disselGeneratorR = 463;
+	constexpr int disselGeneratorT = 464;
+	constexpr int disselGeneratorL = 465;
+    constexpr int disselGeneratorB = 466;
+
+	constexpr int solarGeneratorR = 467;
+	constexpr int solarGeneratorT = 468;
+	constexpr int solarGeneratorL = 469;
+	constexpr int solarGeneratorB = 470;
+
+    constexpr int steamGenerator = 471;
+
+    constexpr int powerBankR = 472;
+    constexpr int powerBankL = 473;
 };
 
 export namespace entityRefCode

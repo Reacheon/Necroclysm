@@ -56,6 +56,10 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
 
 Prop::~Prop()
 {
+    Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    currentChunk.eraseProp(this);
+
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 }
 
@@ -338,6 +342,53 @@ void Prop::drawSelf()
         );
     }
 
+
+    if (leadItem.checkFlag(itemFlag::CABLE_BEHIND))
+    {
+		Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+		Prop* topProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
+		Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
+		Prop* botProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
+
+        bool isRightCable = rightProp != nullptr && rightProp->leadItem.checkFlag(itemFlag::CABLE);
+		bool isTopCable = topProp != nullptr && topProp->leadItem.checkFlag(itemFlag::CABLE);
+		bool isLeftCable = leftProp != nullptr && leftProp->leadItem.checkFlag(itemFlag::CABLE);
+		bool isBotCable = botProp != nullptr && botProp->leadItem.checkFlag(itemFlag::CABLE);
+
+        if (isRightCable || isTopCable || isLeftCable || isBotCable)
+        {
+            int cableSprIndex = 2720;
+
+            if (isRightCable && !isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2732;
+            else if (!isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2733;
+            else if (!isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2730;
+            else if (!isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2731;
+
+            else if (isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2729;
+            else if (isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2936;
+            else if (isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2725;
+            else if (!isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2729;
+            else if (!isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2939;
+            else if (!isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 2723;
+
+            else if (isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2728;
+            else if (isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2726;
+            else if (isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 2724;
+            else if (!isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 2722;
+
+            else if (isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 2720;
+
+
+            drawSpriteCenter
+            (
+                spr::propset,
+                cableSprIndex,
+                dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+                dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
+            );
+        }
+    }
+
     if (leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT) && !leadItem.checkFlag(itemFlag::STUMP))
     {
         if (World::ins()->getTile(getGridX(), getGridY(), PlayerZ()).hasSnow == true) sprIndex += 4;
@@ -486,3 +537,55 @@ void Prop::drawSelf()
     SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
     setZoom(1.0);
 };
+
+
+
+void Prop::runPropFunc()
+{
+    //prt(L"[Prop:runProp] ID : %p의 runProp를 실행시켰다.\n", this);
+
+    if (runUsed) return;
+
+    if (leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
+    {
+        constexpr int GASOLINE_MAX_POWER = 50;
+
+        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR || leadItem.itemCode == itemRefCode::gasolineGeneratorT || leadItem.itemCode == itemRefCode::gasolineGeneratorL || leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+        {
+            if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+            {
+                
+            }
+        }
+    }
+
+
+
+    if (leadItem.checkFlag(itemFlag::CIRCUIT))
+    {
+		int currentX = getGridX();
+		int currentY = getGridY();
+
+        while (1)
+        {
+            break;
+        }
+
+
+        std::vector<Prop*> connectedCircuitProps;  //잠깐 펌프같이 전자회로랑 연결되면서 파이프랑도 연결되는건 어떻게 처리하지? 그건 업데이트를 어떻게 하지?
+        if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
+        {
+            if (leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) || leadItem.checkFlag(itemFlag::CABLE))
+            {
+                Prop* tgtProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+                if (tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE))
+                {
+
+                }
+            }
+        }
+
+    }
+
+    runUsed = true;
+}

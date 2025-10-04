@@ -55,6 +55,10 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 }
 Monster::~Monster()
 {
+	Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+	Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+	currentChunk.eraseMonster(this);
+
 	prt(lowCol::red, L"Monster : 소멸자가 호출되었습니다..\n");
 }
 

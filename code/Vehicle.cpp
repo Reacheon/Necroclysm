@@ -42,6 +42,10 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 
 Vehicle::~Vehicle()
 {
+    Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    currentChunk.eraseVehicle(this);
+
     prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
 }
 
@@ -905,7 +909,7 @@ ItemData* Vehicle::getMainEngine()
         for (int i = 0; i < pocketPtr->itemInfo.size(); i++)
         {
             if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_GASOLINE)) return &pocketPtr->itemInfo[i];
-            else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_DISEL)) return &pocketPtr->itemInfo[i];
+            else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_DIESEL)) return &pocketPtr->itemInfo[i];
             else if (pocketPtr->itemInfo[i].checkFlag(itemFlag::ENGINE_ELECTRIC)) return &pocketPtr->itemInfo[i];
         }
     }
@@ -920,7 +924,7 @@ int Vehicle::getEngineFuel()
     else
     {
         if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) fuelNumber = getGasolineFuel();
-        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DISEL)) fuelNumber = getDiselFuel();
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) fuelNumber = getDiselFuel();
         else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) fuelNumber = getElectricityFuel();
     }
     return fuelNumber;
@@ -936,7 +940,7 @@ void Vehicle::useEngineFuel(int fuelAmount)
     else
     {
         if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) targetFuelCode = itemRefCode::gasoline;
-        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DISEL)) targetFuelCode = itemRefCode::disel;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) targetFuelCode = itemRefCode::disel;
         else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemRefCode::electricity;
     }
 

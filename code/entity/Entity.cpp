@@ -36,6 +36,7 @@ Entity::~Entity()//소멸자
 {
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
 	prt(L"Entity : 소멸자가 호출되었습니다..\n");
+
 }
 #pragma region getset method
 
