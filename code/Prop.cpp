@@ -563,16 +563,98 @@ void Prop::runPropFunc()
 
     if (leadItem.checkFlag(itemFlag::CIRCUIT))
     {
-		int currentX = getGridX();
-		int currentY = getGridY();
+		int cursorX = getGridX();
+		int cursorY = getGridY();
 
-        while (1)
+
+        std::queue<Point2> frontierQueue;
+        std::unordered_set<Point2, Point2::Hash> visitedSet;
+        std::queue<Point2> voltageSourceQueue;
+        
+        int circuitMaxEnergy = 0; //kJ
+
+        if (cursorX == 17 && cursorY == 8)
         {
-            break;
+            int a = 2;
         }
 
 
-        std::vector<Prop*> connectedCircuitProps;  //잠깐 펌프같이 전자회로랑 연결되면서 파이프랑도 연결되는건 어떻게 처리하지? 그건 업데이트를 어떻게 하지?
+        auto pushIfConnected = [&](int curretX, int currentY, int dx, int dy, itemFlag currentDirFlag, itemFlag neighborOppFlag)
+            {
+                Point2 dirCoord{ curretX + dx, currentY + dy };
+                if (visitedSet.find(dirCoord) != visitedSet.end()) return;
+
+                Prop* dirProp = TileProp(dirCoord.x, dirCoord.y, getGridZ());
+                if (!dirProp) return;
+
+				Prop* currentProp = TileProp(curretX, currentY, getGridZ());
+                bool curOK = currentProp->leadItem.checkFlag(currentDirFlag) || currentProp->leadItem.checkFlag(itemFlag::CABLE);
+                if (!curOK) return;
+
+                if (dirProp->leadItem.checkFlag(itemFlag::CIRCUIT) && (dirProp->leadItem.checkFlag(neighborOppFlag) || dirProp->leadItem.checkFlag(itemFlag::CABLE)))
+                {
+                    frontierQueue.push(dirCoord);
+                }
+            };
+
+		frontierQueue.push({ cursorX, cursorY });
+        while (!frontierQueue.empty())
+        {
+            Point2 current = frontierQueue.front();
+            frontierQueue.pop();
+
+            if (visitedSet.find(current) != visitedSet.end()) continue;
+            visitedSet.insert(current);
+
+            std::wprintf(L"[소자 탐색] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
+
+            Prop* currentProp = TileProp(current.x, current.y, getGridZ());
+
+            if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
+            {
+                currentProp->runUsed = true;
+                if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
+                {
+                    circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
+                    voltageSourceQueue.push(current);
+                }
+                pushIfConnected(current.x, current.y, +1, 0, itemFlag::CABLE_CNCT_RIGHT, itemFlag::CABLE_CNCT_LEFT);
+                pushIfConnected(current.x, current.y, 0, -1, itemFlag::CABLE_CNCT_TOP, itemFlag::CABLE_CNCT_BOT);
+                pushIfConnected(current.x, current.y, -1, 0, itemFlag::CABLE_CNCT_LEFT, itemFlag::CABLE_CNCT_RIGHT);
+                pushIfConnected(current.x, current.y, 0, +1, itemFlag::CABLE_CNCT_BOT, itemFlag::CABLE_CNCT_TOP);
+            }
+        }
+
+        std::wprintf(L"회로 탐색을 종료했습니다.\n");
+        if (visitedSet.size() > 0)std::wprintf(L"회로의 사이즈는 %d입니다.\n", visitedSet.size());
+        if (circuitMaxEnergy > 0) std::wprintf(L"회로의 최대 에너지 수송량은 %d kJ입니다.\n", circuitMaxEnergy);
+        
+        //전압 방향 설정
+        dir16 currentVoltageDir = dir16::none;
+        while (!voltageSourceQueue.empty())
+        {
+			Point2 current = voltageSourceQueue.front();
+			voltageSourceQueue.pop();
+            Prop* sourceProp = TileProp(current.x, current.y, getGridZ());
+           
+            if(sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::dir0;
+            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::dir2;
+            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::dir4;
+			else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::dir6;
+            
+            frontierQueue = std::queue<Point2>();
+            visitedSet = std::unordered_set<Point2, Point2::Hash>();
+
+            while (!frontierQueue.empty())
+            {
+                Point2 current = frontierQueue.front();
+                frontierQueue.pop();
+            }
+        }
+
+
+
+
         if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
         {
             if (leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) || leadItem.checkFlag(itemFlag::CABLE))
