@@ -23,6 +23,15 @@ export enum class dir16
     dir7,
     dir7_5,
     none,
+
+    right = dir0,
+	upRight = dir1,
+	up = dir2,
+	upLeft = dir3,
+	left = dir4,
+	downLeft = dir5,
+	down = dir6,
+	downRight = dir7
 };
 
 export dir16 ACW(dir16 input)

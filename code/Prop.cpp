@@ -613,6 +613,7 @@ void Prop::runPropFunc()
             if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
             {
                 currentProp->runUsed = true;
+				currentProp->voltageDir = dir16::none;
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
@@ -631,17 +632,18 @@ void Prop::runPropFunc()
         
         //전압 방향 설정
         dir16 currentVoltageDir = dir16::none;
-        while (!voltageSourceQueue.empty())
+
+        //첫번째 전압원이 전체적인 방향 결정
         {
-			Point2 current = voltageSourceQueue.front();
-			voltageSourceQueue.pop();
+            Point2 current = voltageSourceQueue.front();
+            voltageSourceQueue.pop();
             Prop* sourceProp = TileProp(current.x, current.y, getGridZ());
-           
-            if(sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::dir0;
-            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::dir2;
-            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::dir4;
-			else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::dir6;
-            
+
+            if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::right;
+            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::up;
+            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::left;
+            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::down;
+
             frontierQueue = std::queue<Point2>();
             visitedSet = std::unordered_set<Point2, Point2::Hash>();
 
@@ -649,9 +651,15 @@ void Prop::runPropFunc()
             {
                 Point2 current = frontierQueue.front();
                 frontierQueue.pop();
+
+                if (visitedSet.find(current) != visitedSet.end()) continue;
+                visitedSet.insert(current);
+
+                std::wprintf(L"[전압 방향 설정] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
+
+                Prop* currentProp = TileProp(current.x, current.y, getGridZ());
             }
         }
-
 
 
 
