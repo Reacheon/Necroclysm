@@ -573,10 +573,6 @@ void Prop::runPropFunc()
         
         int circuitMaxEnergy = 0; //kJ
 
-        if (cursorX == 17 && cursorY == 8)
-        {
-            int a = 2;
-        }
 
 
         auto pushIfConnected = [&](int curretX, int currentY, int dx, int dy, itemFlag currentDirFlag, itemFlag neighborOppFlag)
@@ -634,6 +630,7 @@ void Prop::runPropFunc()
         dir16 currentVoltageDir = dir16::none;
 
         //첫번째 전압원이 전체적인 방향 결정
+        if(voltageSourceQueue.empty() == false)
         {
             Point2 current = voltageSourceQueue.front();
             voltageSourceQueue.pop();
@@ -646,8 +643,9 @@ void Prop::runPropFunc()
 
             frontierQueue = std::queue<Point2>();
             visitedSet = std::unordered_set<Point2, Point2::Hash>();
+         
 
-            while (!frontierQueue.empty())
+            while (frontierQueue.empty() == false)
             {
                 Point2 current = frontierQueue.front();
                 frontierQueue.pop();

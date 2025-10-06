@@ -248,6 +248,9 @@ export enum class act
 
     propTurnOn, //프롭 켜기
     propTurnOff, //프롭 끄기
+
+    connectPlusZ, //위층의 타일과 연결
+    connectMinusZ, //아래층의 타일과 연결
 };
 
 export namespace humanCustom
@@ -581,6 +584,9 @@ export enum class itemFlag
 	VOLTAGE_OUTPUT_TOP,
     VOLTAGE_OUTPUT_LEFT,
     VOLTAGE_OUTPUT_BOT,
+
+    CABLE_Z_ASCEND, //위층의 현재 타일과 연결된 케이블
+    CABLE_Z_DESCEND, //아래층의 현재 타일과 연결된 케이블
 };
 
 export enum class walkFlag
@@ -1310,6 +1316,9 @@ export namespace itemRefCode
 
     constexpr int powerBankR = 472;
     constexpr int powerBankL = 473;
+
+    constexpr int cooperCable = 480;
+    constexpr int silverCable = 482;
 };
 
 export namespace entityRefCode

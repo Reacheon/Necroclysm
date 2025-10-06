@@ -510,10 +510,12 @@ export int readItemDex(const wchar_t* file)
                             {L"CABLE_BEHIND", itemFlag::CABLE_BEHIND},
                             {L"VOLTAGE_SOURCE", itemFlag::VOLTAGE_SOURCE},
 
-                            {L"VOLTAGE_OUTPUT_RIGHT", itemFlag::VOLTAGE_OUTPUT_RIGHT},
-                            {L"VOLTAGE_OUTPUT_TOP", itemFlag::VOLTAGE_OUTPUT_TOP},
-                            {L"VOLTAGE_OUTPUT_LEFT", itemFlag::VOLTAGE_OUTPUT_LEFT},
-                            {L"VOLTAGE_OUTPUT_BOT", itemFlag::VOLTAGE_OUTPUT_BOT},
+                            { L"VOLTAGE_OUTPUT_RIGHT", itemFlag::VOLTAGE_OUTPUT_RIGHT },
+                            { L"VOLTAGE_OUTPUT_TOP", itemFlag::VOLTAGE_OUTPUT_TOP },
+                            { L"VOLTAGE_OUTPUT_LEFT", itemFlag::VOLTAGE_OUTPUT_LEFT },
+                            { L"VOLTAGE_OUTPUT_BOT", itemFlag::VOLTAGE_OUTPUT_BOT },
+                            { L"CABLE_Z_ASCEND", itemFlag::CABLE_Z_ASCEND },
+                            { L"CABLE_Z_DESCEND", itemFlag::CABLE_Z_DESCEND },
                         };
 
                         size_t pos = 0;

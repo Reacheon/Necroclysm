@@ -31,7 +31,9 @@ export enum class dir16
 	left = dir4,
 	downLeft = dir5,
 	down = dir6,
-	downRight = dir7
+	downRight = dir7,
+    ascend,//+Z
+    descend,//-Z
 };
 
 export dir16 ACW(dir16 input)

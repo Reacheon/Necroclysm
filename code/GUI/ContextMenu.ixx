@@ -65,7 +65,7 @@ public:
 	void changeXY(int inputX, int inputY, bool center)
 	{
 		//94
-		contextMenuBase = { 0, 0, 110, 6 + 22 * (int)actOptions.size() };
+		contextMenuBase = { 0, 0, 124, 6 + 22 * (int)actOptions.size() };
 		subContextMenuBase = { 0,0,0,0 };
 
 		
@@ -189,6 +189,16 @@ public:
 				else if (actOptions[i] == act::propTurnOff)
 				{
 					optionText = sysStr[334];//끄기
+					iconIndex = 101;
+				}
+				else if (actOptions[i] == act::connectPlusZ)
+				{
+					optionText = sysStr[340];//상층과 연결
+					iconIndex = 101;
+				}
+				else if (actOptions[i] == act::connectMinusZ)
+				{
+					optionText = sysStr[341];//하층과 연결
 					iconIndex = 101;
 				}
 				else optionText = L"???";

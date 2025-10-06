@@ -975,6 +975,26 @@ public:
 			}
 		}
 
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			Prop* propPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
+
+			if (propPtr->leadItem.checkFlag(itemFlag::CABLE))
+			{
+				Prop* abovePropPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ()+ 1);
+				if (abovePropPtr != nullptr && abovePropPtr->leadItem.checkFlag(itemFlag::CABLE))
+				{
+					inputOptions.push_back(act::connectPlusZ);
+				}
+				
+				Prop* belowPropPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ() - 1);
+				if (belowPropPtr != nullptr && belowPropPtr->leadItem.checkFlag(itemFlag::CABLE))
+				{
+					inputOptions.push_back(act::connectMinusZ);
+				}
+			}
+		}
+
 
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
