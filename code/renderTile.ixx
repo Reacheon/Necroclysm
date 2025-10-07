@@ -833,37 +833,7 @@ void drawEntities()
         int tgtX = elem.x;
         int tgtY = elem.y;
         Prop* iPtr = TileProp(tgtX, tgtY, PlayerZ());
-        int bigShift = 16 * (iPtr->leadItem.checkFlag(itemFlag::PROP_BIG));
-        SDL_Rect dst;
-        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8 - bigShift) - cameraY) - ((16 * zoomScale) / 2);
-        dst.w = tileSize;
-        dst.h = tileSize;
-
-        setZoom(zoomScale);
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); // 텍스쳐 투명도 설정
-        SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); // 블렌드모드 설정
-        int sprIndex = iPtr->leadItem.propSprIndex + iPtr->leadItem.extraSprIndexSingle + 16 * iPtr->leadItem.extraSprIndex16;
-        if (iPtr->leadItem.checkFlag(itemFlag::PLANT_SEASON_DEPENDENT))
-        {
-            if (World::ins()->getTile(tgtX, tgtY, PlayerZ()).hasSnow == true) sprIndex += 5;
-            else
-            {
-                if (getSeason() == seasonFlag::summer) { sprIndex += 1; }
-                else if (getSeason() == seasonFlag::autumn) { sprIndex += 2; }
-                else if (getSeason() == seasonFlag::winter) { sprIndex += 3; }
-            }
-        }
-
-        drawSpriteCenter
-        (
-            spr::propset,
-            sprIndex,
-            dst.x + dst.w / 2 + zoomScale * iPtr->getIntegerFakeX(),
-            dst.y + dst.h / 2 + zoomScale * iPtr->getIntegerFakeY()
-        );
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
-        setZoom(1.0);
+        iPtr->drawSelf();
     }
 
     // 화염 그리기

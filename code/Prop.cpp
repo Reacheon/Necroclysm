@@ -47,6 +47,9 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
         leadItem.propSprIndex += randomRange(0, leadItem.randomPropSprSize - 1);
     }
 
+
+
+
     //HP 설정
     leadItem.propHP = leadItem.propMaxHP;
     leadItem.propFakeHP = leadItem.propMaxHP;
@@ -59,6 +62,21 @@ Prop::~Prop()
     Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
     Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
     currentChunk.eraseProp(this);
+
+    if (leadItem.checkFlag(itemFlag::CABLE))
+    {
+        if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
+        {
+            Prop* abovePropPtr = TileProp(getGridX(), getGridY(), getGridZ() + 1);
+            if (abovePropPtr != nullptr) abovePropPtr->leadItem.eraseFlag(itemFlag::CABLE_Z_DESCEND);
+        }
+        
+        if(leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
+        {
+            Prop* belowPropPtr = TileProp(getGridX(), getGridY(), getGridZ() - 1);
+            if (belowPropPtr != nullptr) belowPropPtr->leadItem.eraseFlag(itemFlag::CABLE_Z_ASCEND);
+		}
+    }
 
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 }
@@ -343,6 +361,8 @@ void Prop::drawSelf()
     }
 
 
+
+
     if (leadItem.checkFlag(itemFlag::CABLE_BEHIND))
     {
 		Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
@@ -494,7 +514,41 @@ void Prop::drawSelf()
         );
     }
 
+    if (leadItem.checkFlag(itemFlag::CABLE))
+    {
+        setFlip((getGridZ() % 2 != 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
+        int drawX = dst.x + dst.w / 2 + zoomScale * getIntegerFakeX();
+        int drawY = dst.y + dst.h / 2 + zoomScale * getIntegerFakeY();
+
+
+
+        if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
+        {
+            if (leadItem.itemCode == itemRefCode::cooperCable)
+            {
+                drawSpriteCenter(spr::propset, 2997, drawX, drawY);//상단으로 이어진 구리 케이블
+            }
+            else if (leadItem.itemCode == itemRefCode::silverCable)
+            {
+                drawSpriteCenter(spr::propset, 2997 + 16, drawX, drawY);//상단으로 이어진 은 케이블
+            }
+        }
+
+        if (leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
+        {
+            if (leadItem.itemCode == itemRefCode::cooperCable)
+            {
+                drawSpriteCenter(spr::propset, 2999, drawX, drawY);//하단으로 이어진 구리 케이블
+            }
+            else if (leadItem.itemCode == itemRefCode::silverCable)
+            {
+                drawSpriteCenter(spr::propset, 2999 + 16, drawX, drawY);//하단으로 이어진 은 케이블
+            }
+        }
+
+        setFlip(SDL_FLIP_NONE);
+    }
 
     if (displayHPBarCount > 0)//개체 HP 표기
     {

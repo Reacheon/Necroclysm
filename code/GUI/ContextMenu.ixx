@@ -597,5 +597,21 @@ public:
 				}
 			}
         }
+		else if (inputAct == act::connectPlusZ)
+		{
+			Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			pPtr->leadItem.addFlag(itemFlag::CABLE_Z_ASCEND);
+
+			Prop* abovePropPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() + 1);
+			abovePropPtr->leadItem.addFlag(itemFlag::CABLE_Z_DESCEND);
+		}
+		else if (inputAct == act::connectMinusZ)
+		{
+			Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			pPtr->leadItem.addFlag(itemFlag::CABLE_Z_DESCEND);
+
+			Prop* belowPropPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() - 1);
+			belowPropPtr->leadItem.addFlag(itemFlag::CABLE_Z_ASCEND);
+		}
 	}
 };
