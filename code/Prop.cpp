@@ -521,17 +521,25 @@ void Prop::drawSelf()
         int drawX = dst.x + dst.w / 2 + zoomScale * getIntegerFakeX();
         int drawY = dst.y + dst.h / 2 + zoomScale * getIntegerFakeY();
 
+        if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND) || leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
+        {
+            bool downConnected = false;
+            Prop* downProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
+            if (downProp != nullptr && (downProp->leadItem.checkFlag(itemFlag::CABLE)|| downProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_TOP))) downConnected = true;
 
+            if (leadItem.itemCode == itemRefCode::cooperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
+            if (leadItem.itemCode == itemRefCode::silverCable) drawSpriteCenter(spr::propset, 2993+16 + downConnected, drawX, drawY);
+        }
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
         {
             if (leadItem.itemCode == itemRefCode::cooperCable)
             {
-                drawSpriteCenter(spr::propset, 2997, drawX, drawY);//상단으로 이어진 구리 케이블
+                drawSpriteCenter(spr::propset, 2995, drawX, drawY);//상단으로 이어진 구리 케이블
             }
             else if (leadItem.itemCode == itemRefCode::silverCable)
             {
-                drawSpriteCenter(spr::propset, 2997 + 16, drawX, drawY);//상단으로 이어진 은 케이블
+                drawSpriteCenter(spr::propset, 2995 + 16, drawX, drawY);//상단으로 이어진 은 케이블
             }
         }
 
@@ -539,11 +547,11 @@ void Prop::drawSelf()
         {
             if (leadItem.itemCode == itemRefCode::cooperCable)
             {
-                drawSpriteCenter(spr::propset, 2999, drawX, drawY);//하단으로 이어진 구리 케이블
+                drawSpriteCenter(spr::propset, 2997, drawX, drawY);//하단으로 이어진 구리 케이블
             }
             else if (leadItem.itemCode == itemRefCode::silverCable)
             {
-                drawSpriteCenter(spr::propset, 2999 + 16, drawX, drawY);//하단으로 이어진 은 케이블
+                drawSpriteCenter(spr::propset, 2997 + 16, drawX, drawY);//하단으로 이어진 은 케이블
             }
         }
 
@@ -619,38 +627,48 @@ void Prop::runPropFunc()
     {
 		int cursorX = getGridX();
 		int cursorY = getGridY();
+        int cursorZ = getGridZ();
 
 
-        std::queue<Point2> frontierQueue;
-        std::unordered_set<Point2, Point2::Hash> visitedSet;
-        std::queue<Point2> voltageSourceQueue;
+        std::queue<Point3> frontierQueue;
+        std::unordered_set<Point3, Point3::Hash> visitedSet;
+        std::queue<Point3> voltageSourceQueue;
         
         int circuitMaxEnergy = 0; //kJ
 
 
-
-        auto pushIfConnected = [&](int curretX, int currentY, int dx, int dy, itemFlag currentDirFlag, itemFlag neighborOppFlag)
+        auto pushIfConnected = [&](int currentX, int currentY, int currentZ, int dx, int dy, int dz, itemFlag currentDirFlag, itemFlag neighborOppFlag)
             {
-                Point2 dirCoord{ curretX + dx, currentY + dy };
+                Point3 dirCoord{ currentX + dx, currentY + dy, currentZ + dz };
                 if (visitedSet.find(dirCoord) != visitedSet.end()) return;
-
-                Prop* dirProp = TileProp(dirCoord.x, dirCoord.y, getGridZ());
+                Prop* dirProp = TileProp(dirCoord.x, dirCoord.y, dirCoord.z);
                 if (!dirProp) return;
-
-				Prop* currentProp = TileProp(curretX, currentY, getGridZ());
-                bool curOK = currentProp->leadItem.checkFlag(currentDirFlag) || currentProp->leadItem.checkFlag(itemFlag::CABLE);
-                if (!curOK) return;
-
-                if (dirProp->leadItem.checkFlag(itemFlag::CIRCUIT) && (dirProp->leadItem.checkFlag(neighborOppFlag) || dirProp->leadItem.checkFlag(itemFlag::CABLE)))
+                Prop* currentProp = TileProp(currentX, currentY, currentZ);
+                if (dz == 0)
                 {
-                    frontierQueue.push(dirCoord);
+                    bool curOK = currentProp->leadItem.checkFlag(currentDirFlag) || currentProp->leadItem.checkFlag(itemFlag::CABLE);
+                    if (!curOK) return;
+                    if (dirProp->leadItem.checkFlag(itemFlag::CIRCUIT) && (dirProp->leadItem.checkFlag(neighborOppFlag) || dirProp->leadItem.checkFlag(itemFlag::CABLE)))
+                    {
+                        frontierQueue.push(dirCoord);
+                    }
+                }
+                else
+                {
+                    bool curOK = currentProp->leadItem.checkFlag(currentDirFlag) && currentProp->leadItem.checkFlag(itemFlag::CABLE);
+                    if (!curOK) return;
+                    if (dirProp->leadItem.checkFlag(itemFlag::CIRCUIT) && (dirProp->leadItem.checkFlag(neighborOppFlag) && dirProp->leadItem.checkFlag(itemFlag::CABLE)))
+                    {
+                        frontierQueue.push(dirCoord);
+                    }
                 }
             };
 
-		frontierQueue.push({ cursorX, cursorY });
+
+		frontierQueue.push({ cursorX, cursorY, cursorZ });
         while (!frontierQueue.empty())
         {
-            Point2 current = frontierQueue.front();
+            Point3 current = frontierQueue.front();
             frontierQueue.pop();
 
             if (visitedSet.find(current) != visitedSet.end()) continue;
@@ -658,7 +676,7 @@ void Prop::runPropFunc()
 
             std::wprintf(L"[소자 탐색] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
 
-            Prop* currentProp = TileProp(current.x, current.y, getGridZ());
+            Prop* currentProp = TileProp(current.x, current.y, current.z);
 
             if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
             {
@@ -669,10 +687,19 @@ void Prop::runPropFunc()
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
                     voltageSourceQueue.push(current);
                 }
-                pushIfConnected(current.x, current.y, +1, 0, itemFlag::CABLE_CNCT_RIGHT, itemFlag::CABLE_CNCT_LEFT);
-                pushIfConnected(current.x, current.y, 0, -1, itemFlag::CABLE_CNCT_TOP, itemFlag::CABLE_CNCT_BOT);
-                pushIfConnected(current.x, current.y, -1, 0, itemFlag::CABLE_CNCT_LEFT, itemFlag::CABLE_CNCT_RIGHT);
-                pushIfConnected(current.x, current.y, 0, +1, itemFlag::CABLE_CNCT_BOT, itemFlag::CABLE_CNCT_TOP);
+                pushIfConnected(current.x, current.y, current.z, +1, 0, 0, itemFlag::CABLE_CNCT_RIGHT, itemFlag::CABLE_CNCT_LEFT);
+                pushIfConnected(current.x, current.y, current.z, 0, -1, 0, itemFlag::CABLE_CNCT_TOP, itemFlag::CABLE_CNCT_BOT);
+                pushIfConnected(current.x, current.y, current.z, -1, 0, 0, itemFlag::CABLE_CNCT_LEFT, itemFlag::CABLE_CNCT_RIGHT);
+                pushIfConnected(current.x, current.y, current.z, 0, +1, 0, itemFlag::CABLE_CNCT_BOT, itemFlag::CABLE_CNCT_TOP);
+
+                if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
+                {
+                    pushIfConnected(current.x, current.y, current.z, 0, 0, +1, itemFlag::CABLE_Z_ASCEND, itemFlag::CABLE_Z_DESCEND);
+                }
+                else if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
+                {
+                    pushIfConnected(current.x, current.y, current.z, 0, 0, -1, itemFlag::CABLE_Z_DESCEND, itemFlag::CABLE_Z_ASCEND);
+                }
             }
         }
 
@@ -680,52 +707,51 @@ void Prop::runPropFunc()
         if (visitedSet.size() > 0)std::wprintf(L"회로의 사이즈는 %d입니다.\n", visitedSet.size());
         if (circuitMaxEnergy > 0) std::wprintf(L"회로의 최대 에너지 수송량은 %d kJ입니다.\n", circuitMaxEnergy);
         
-        //전압 방향 설정
-        dir16 currentVoltageDir = dir16::none;
+        ////전압 방향 설정
+        //dir16 currentVoltageDir = dir16::none;
 
-        //첫번째 전압원이 전체적인 방향 결정
-        if(voltageSourceQueue.empty() == false)
-        {
-            Point2 current = voltageSourceQueue.front();
-            voltageSourceQueue.pop();
-            Prop* sourceProp = TileProp(current.x, current.y, getGridZ());
+        ////첫번째 전압원이 전체적인 방향 결정
+        //if(voltageSourceQueue.empty() == false)
+        //{
+        //    Point2 current = voltageSourceQueue.front();
+        //    voltageSourceQueue.pop();
+        //    Prop* sourceProp = TileProp(current.x, current.y, getGridZ());
 
-            if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::right;
-            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::up;
-            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::left;
-            else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::down;
+        //    if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::right;
+        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::up;
+        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::left;
+        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::down;
 
-            frontierQueue = std::queue<Point2>();
-            visitedSet = std::unordered_set<Point2, Point2::Hash>();
-         
+        //    frontierQueue = std::queue<Point2>();
+        //    visitedSet = std::unordered_set<Point2, Point2::Hash>();
 
-            while (frontierQueue.empty() == false)
-            {
-                Point2 current = frontierQueue.front();
-                frontierQueue.pop();
+        //    while (frontierQueue.empty() == false)
+        //    {
+        //        Point2 current = frontierQueue.front();
+        //        frontierQueue.pop();
 
-                if (visitedSet.find(current) != visitedSet.end()) continue;
-                visitedSet.insert(current);
+        //        if (visitedSet.find(current) != visitedSet.end()) continue;
+        //        visitedSet.insert(current);
 
-                std::wprintf(L"[전압 방향 설정] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
+        //        std::wprintf(L"[전압 방향 설정] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
 
-                Prop* currentProp = TileProp(current.x, current.y, getGridZ());
-            }
-        }
-
+        //        Prop* currentProp = TileProp(current.x, current.y, getGridZ());
+        //    }
+        //}
 
 
-        if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
-        {
-            if (leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) || leadItem.checkFlag(itemFlag::CABLE))
-            {
-                Prop* tgtProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
-                if (tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE))
-                {
 
-                }
-            }
-        }
+        //if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
+        //{
+        //    if (leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) || leadItem.checkFlag(itemFlag::CABLE))
+        //    {
+        //        Prop* tgtProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+        //        if (tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE))
+        //        {
+
+        //        }
+        //    }
+        //}
 
     }
 
