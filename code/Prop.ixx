@@ -31,7 +31,7 @@ public:
 	double flowResistance = 0.0f; //흐름저항
 	int fluidCode = 0; //유체 아이템 코드
 
-    dir16 voltageDir = dir16::none;
+    std::vector<dir16> voltageDir;
 
     int nodeMaxElectron = 0;
     int nodeCurrentElectron = 0;

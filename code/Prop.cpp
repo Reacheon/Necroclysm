@@ -558,6 +558,26 @@ void Prop::drawSelf()
         setFlip(SDL_FLIP_NONE);
     }
 
+
+    for (int i=0; i<voltageDir.size(); i++)
+    {
+        int arrowSprIndex;
+        if (voltageDir[i] == dir16::right) arrowSprIndex = 0;
+        else if(voltageDir[i] == dir16::up) arrowSprIndex = 1;
+        else if (voltageDir[i] == dir16::left) arrowSprIndex = 2;
+        else if (voltageDir[i] == dir16::down) arrowSprIndex = 3;
+        else if (voltageDir[i] == dir16::ascend) arrowSprIndex = 4;
+        else if (voltageDir[i] == dir16::descend) arrowSprIndex = 5;
+
+        drawSpriteCenter
+        (
+            spr::propset,
+            arrowSprIndex,
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
+        );
+    }
+
     if (displayHPBarCount > 0)//개체 HP 표기
     {
         int pivotX = dst.x + dst.w / 2 - (int)(8 * zoomScale);
@@ -650,6 +670,7 @@ void Prop::runPropFunc()
                     if (!curOK) return;
                     if (dirProp->leadItem.checkFlag(itemFlag::CIRCUIT) && (dirProp->leadItem.checkFlag(neighborOppFlag) || dirProp->leadItem.checkFlag(itemFlag::CABLE)))
                     {
+
                         frontierQueue.push(dirCoord);
                     }
                 }
@@ -664,6 +685,69 @@ void Prop::runPropFunc()
                 }
             };
 
+        auto isConnected = [&](Point3 currentCoord, dir16 dir) -> bool
+            {
+                Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+                Point3 delCoord = { 0,0,0 };
+                itemFlag hostFlag, guestFlag;
+                switch (dir)
+                {
+                case dir16::right: 
+                    delCoord = { +1,0,0 };
+                    hostFlag = itemFlag::CABLE_CNCT_RIGHT;
+                    guestFlag = itemFlag::CABLE_CNCT_LEFT;
+                    break;
+                case dir16::up: 
+                    delCoord = { 0,-1,0 }; 
+                    hostFlag = itemFlag::CABLE_CNCT_TOP;
+                    guestFlag = itemFlag::CABLE_CNCT_BOT;
+                    break;
+                case dir16::left: 
+                    delCoord = { -1,0,0 };
+                    hostFlag = itemFlag::CABLE_CNCT_LEFT;
+                    guestFlag = itemFlag::CABLE_CNCT_RIGHT;
+                    break;
+                case dir16::down: 
+                    delCoord = { 0,+1,0 }; 
+                    hostFlag = itemFlag::CABLE_CNCT_BOT;
+                    guestFlag = itemFlag::CABLE_CNCT_TOP;
+                    break;
+                case dir16::ascend: 
+                    delCoord = { 0,0,+1 }; 
+                    hostFlag = itemFlag::CABLE_Z_ASCEND;
+                    guestFlag = itemFlag::CABLE_Z_DESCEND;  
+                    break;
+                case dir16::descend:
+                    delCoord = { 0,0,-1 };
+                    hostFlag = itemFlag::CABLE_Z_DESCEND;
+                    guestFlag = itemFlag::CABLE_Z_ASCEND;
+                    break;
+                default:
+                    errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+                    break;
+                }
+                Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+
+                if (targetProp == nullptr) return false;
+
+                if (dir == dir16::ascend || dir == dir16::descend)
+                {
+                    if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(hostFlag) &&
+                        targetProp->leadItem.checkFlag(itemFlag::CABLE) && targetProp->leadItem.checkFlag(guestFlag))
+                    {
+                        return true;
+                    }
+                    else return false;
+                }
+                else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
+                {
+                    if ((currentProp->leadItem.checkFlag(itemFlag::CABLE) || currentProp->leadItem.checkFlag(hostFlag)) &&
+                        (targetProp->leadItem.checkFlag(itemFlag::CABLE) || targetProp->leadItem.checkFlag(guestFlag)))
+                        return true;
+                    else return false;
+                }
+                else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+            };
 
 		frontierQueue.push({ cursorX, cursorY, cursorZ });
         while (!frontierQueue.empty())
@@ -681,25 +765,19 @@ void Prop::runPropFunc()
             if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
             {
                 currentProp->runUsed = true;
-				currentProp->voltageDir = dir16::none;
+                currentProp->voltageDir.clear();
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
                     voltageSourceQueue.push(current);
                 }
-                pushIfConnected(current.x, current.y, current.z, +1, 0, 0, itemFlag::CABLE_CNCT_RIGHT, itemFlag::CABLE_CNCT_LEFT);
-                pushIfConnected(current.x, current.y, current.z, 0, -1, 0, itemFlag::CABLE_CNCT_TOP, itemFlag::CABLE_CNCT_BOT);
-                pushIfConnected(current.x, current.y, current.z, -1, 0, 0, itemFlag::CABLE_CNCT_LEFT, itemFlag::CABLE_CNCT_RIGHT);
-                pushIfConnected(current.x, current.y, current.z, 0, +1, 0, itemFlag::CABLE_CNCT_BOT, itemFlag::CABLE_CNCT_TOP);
 
-                if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
-                {
-                    pushIfConnected(current.x, current.y, current.z, 0, 0, +1, itemFlag::CABLE_Z_ASCEND, itemFlag::CABLE_Z_DESCEND);
-                }
-                else if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
-                {
-                    pushIfConnected(current.x, current.y, current.z, 0, 0, -1, itemFlag::CABLE_Z_DESCEND, itemFlag::CABLE_Z_ASCEND);
-                }
+                if (isConnected(current, dir16::right)) frontierQueue.push({ current.x + 1, current.y, current.z });
+                if (isConnected(current, dir16::up)) frontierQueue.push({ current.x, current.y - 1, current.z });
+                if (isConnected(current, dir16::left)) frontierQueue.push({ current.x - 1, current.y, current.z });
+                if (isConnected(current, dir16::down)) frontierQueue.push({ current.x, current.y + 1, current.z });
+                if (isConnected(current, dir16::ascend)) frontierQueue.push({ current.x, current.y, current.z + 1 });
+                if (isConnected(current, dir16::descend)) frontierQueue.push({ current.x, current.y, current.z - 1 });
             }
         }
 
@@ -707,38 +785,114 @@ void Prop::runPropFunc()
         if (visitedSet.size() > 0)std::wprintf(L"회로의 사이즈는 %d입니다.\n", visitedSet.size());
         if (circuitMaxEnergy > 0) std::wprintf(L"회로의 최대 에너지 수송량은 %d kJ입니다.\n", circuitMaxEnergy);
         
-        ////전압 방향 설정
-        //dir16 currentVoltageDir = dir16::none;
+        //전압 방향 설정
+        dir16 currentVoltageDir = dir16::none;
 
-        ////첫번째 전압원이 전체적인 방향 결정
-        //if(voltageSourceQueue.empty() == false)
-        //{
-        //    Point2 current = voltageSourceQueue.front();
-        //    voltageSourceQueue.pop();
-        //    Prop* sourceProp = TileProp(current.x, current.y, getGridZ());
+        //첫번째 전압원이 전체적인 방향 결정
+        if(voltageSourceQueue.empty() == false)
+        {
+            Point3 firstSrc = voltageSourceQueue.front();
+            voltageSourceQueue.pop();
+            Prop* firstSrcProp = TileProp(firstSrc.x, firstSrc.y, getGridZ());
 
-        //    if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::right;
-        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::up;
-        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::left;
-        //    else if (sourceProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::down;
+            if (firstSrcProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT)) currentVoltageDir = dir16::right;
+            else if (firstSrcProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_TOP)) currentVoltageDir = dir16::up;
+            else if (firstSrcProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT)) currentVoltageDir = dir16::left;
+            else if (firstSrcProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_BOT)) currentVoltageDir = dir16::down;
 
-        //    frontierQueue = std::queue<Point2>();
-        //    visitedSet = std::unordered_set<Point2, Point2::Hash>();
+            frontierQueue = std::queue<Point3>();
+            visitedSet = std::unordered_set<Point3, Point3::Hash>();
 
-        //    while (frontierQueue.empty() == false)
-        //    {
-        //        Point2 current = frontierQueue.front();
-        //        frontierQueue.pop();
+            frontierQueue.push(firstSrc);
+            firstSrcProp->voltageDir.push_back(currentVoltageDir);
 
-        //        if (visitedSet.find(current) != visitedSet.end()) continue;
-        //        visitedSet.insert(current);
+            while (frontierQueue.empty() == false)
+            {
+                Point3 current = frontierQueue.front();
+                frontierQueue.pop();
 
-        //        std::wprintf(L"[전압 방향 설정] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
+                if (visitedSet.find(current) != visitedSet.end()) continue;
+                visitedSet.insert(current);
 
-        //        Prop* currentProp = TileProp(current.x, current.y, getGridZ());
-        //    }
-        //}
+                std::wprintf(L"[전압 방향 설정] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
 
+                Prop* currentProp = TileProp(current.x, current.y, getGridZ());
+
+                if (isConnected(current, dir16::right) && 
+                    visitedSet.find({ current.x + 1, current.y, current.z }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::left;
+                    currentProp->voltageDir.push_back(dir16::right);
+                    if(isConnected(current, dir16::up)) currentProp->voltageDir.push_back(dir16::up);
+                    if (isConnected(current, dir16::down)) currentProp->voltageDir.push_back(dir16::down);
+                    if (isConnected(current, dir16::ascend)) currentProp->voltageDir.push_back(dir16::ascend);
+                    if (isConnected(current, dir16::descend)) currentProp->voltageDir.push_back(dir16::descend);
+                }
+                else if(isConnected(current, dir16::up) && 
+                    visitedSet.find({ current.x, current.y - 1, current.z }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::down;
+                    currentProp->voltageDir.push_back(dir16::up);
+                    if (isConnected(current, dir16::right)) currentProp->voltageDir.push_back(dir16::right);
+                    if (isConnected(current, dir16::left)) currentProp->voltageDir.push_back(dir16::left);
+                    if (isConnected(current, dir16::ascend)) currentProp->voltageDir.push_back(dir16::ascend);
+                    if (isConnected(current, dir16::descend)) currentProp->voltageDir.push_back(dir16::descend);
+                }
+                else if (isConnected(current, dir16::left) && 
+                    visitedSet.find({ current.x - 1, current.y, current.z }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::right;
+                    currentProp->voltageDir.push_back(dir16::left);
+                    if (isConnected(current, dir16::up)) currentProp->voltageDir.push_back(dir16::up);
+                    if (isConnected(current, dir16::down)) currentProp->voltageDir.push_back(dir16::down);
+                    if (isConnected(current, dir16::ascend)) currentProp->voltageDir.push_back(dir16::ascend);
+                    if (isConnected(current, dir16::descend)) currentProp->voltageDir.push_back(dir16::descend);
+                }
+                else if (isConnected(current, dir16::down) && 
+                    visitedSet.find({ current.x, current.y + 1, current.z }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::up;
+                    currentProp->voltageDir.push_back(dir16::down);
+                    if (isConnected(current, dir16::right)) currentProp->voltageDir.push_back(dir16::right);
+                    if (isConnected(current, dir16::left)) currentProp->voltageDir.push_back(dir16::left);
+                    if (isConnected(current, dir16::ascend)) currentProp->voltageDir.push_back(dir16::ascend);
+                    if (isConnected(current, dir16::descend)) currentProp->voltageDir.push_back(dir16::descend);
+                }
+                else if (isConnected(current, dir16::ascend) && 
+                    visitedSet.find({ current.x, current.y, current.z + 1 }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::descend;
+                    currentProp->voltageDir.push_back(dir16::ascend);
+                    if (isConnected(current, dir16::right)) currentProp->voltageDir.push_back(dir16::right);
+                    if (isConnected(current, dir16::left)) currentProp->voltageDir.push_back(dir16::left);
+                    if (isConnected(current, dir16::up)) currentProp->voltageDir.push_back(dir16::up);
+                    if (isConnected(current, dir16::down)) currentProp->voltageDir.push_back(dir16::down);
+                }
+                else if (isConnected(current, dir16::descend) && 
+                    visitedSet.find({ current.x, current.y, current.z - 1 }) != visitedSet.end())
+                {
+                    dir16 forbiddentDir = dir16::ascend;
+                    currentProp->voltageDir.push_back(dir16::descend);
+                    if (isConnected(current, dir16::right)) currentProp->voltageDir.push_back(dir16::right);
+                    if (isConnected(current, dir16::left)) currentProp->voltageDir.push_back(dir16::left);
+                    if (isConnected(current, dir16::up)) currentProp->voltageDir.push_back(dir16::up);
+                    if (isConnected(current, dir16::down)) currentProp->voltageDir.push_back(dir16::down);
+                }
+
+
+                if (isConnected(current, dir16::right)) frontierQueue.push({ current.x + 1, current.y, current.z });
+                if (isConnected(current, dir16::up)) frontierQueue.push({ current.x, current.y - 1, current.z });
+                if (isConnected(current, dir16::left)) frontierQueue.push({ current.x - 1, current.y, current.z });
+                if (isConnected(current, dir16::down)) frontierQueue.push({ current.x, current.y + 1, current.z });
+                if (isConnected(current, dir16::ascend)) frontierQueue.push({ current.x, current.y, current.z + 1 });
+                if (isConnected(current, dir16::descend)) frontierQueue.push({ current.x, current.y, current.z - 1 });
+            }
+        }
+
+        //두번째 전압원부터는 분기점까지만 업데이트
+        while (voltageSourceQueue.empty() == false)
+        {
+        }
 
 
         //if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
