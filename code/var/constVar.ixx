@@ -581,9 +581,9 @@ export enum class itemFlag
 
     VOLTAGE_SOURCE, //전력 공급원(발전기 등)
     VOLTAGE_OUTPUT_RIGHT,
-	VOLTAGE_OUTPUT_TOP,
+	VOLTAGE_OUTPUT_UP,
     VOLTAGE_OUTPUT_LEFT,
-    VOLTAGE_OUTPUT_BOT,
+    VOLTAGE_OUTPUT_DOWN,
 
     CABLE_Z_ASCEND, //위층의 현재 타일과 연결된 케이블
     CABLE_Z_DESCEND, //아래층의 현재 타일과 연결된 케이블

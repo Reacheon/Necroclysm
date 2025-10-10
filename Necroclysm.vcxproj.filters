@@ -558,5 +558,8 @@
     <ClCompile Include="code\util\ThreadPool.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="code\Prop_drawSelf.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
