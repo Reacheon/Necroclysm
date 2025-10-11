@@ -34,7 +34,7 @@ public:
     std::vector<dir16> voltageDir;
 
     int nodeMaxElectron = 0;
-    int nodeCurrentElectron = 0;
+    int nodeElectron = 0;
 
 
     Prop(Point3 inputCoor, int leadItemCode);

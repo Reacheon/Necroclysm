@@ -356,7 +356,7 @@ void Prop::runPropFunc()
 
         std::queue<Point3> frontierQueue;
         std::unordered_set<Point3, Point3::Hash> visitedSet;
-        std::queue<Point3> voltageSourceQueue;
+        std::vector<Prop*> voltagePropVec;
         
         int circuitMaxEnergy = 0; //kJ
         bool hasGround = false;
@@ -445,78 +445,77 @@ void Prop::runPropFunc()
             {
                 currentProp->runUsed = true;
                 currentProp->voltageDir.clear();
+                currentProp->nodeElectron = 0;
+
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
-                    voltageSourceQueue.push(current);
+                    voltagePropVec.push_back(currentProp);
                 }
 
-                if (isConnected(current, dir16::right))
+                // 6방향 탐색 (상하좌우 + 위아래층)
+                const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend };
+                const itemFlag groundFlags[][2] = {
+                    { itemFlag::VOLTAGE_GND_LEFT, itemFlag::VOLTAGE_GND_ALL },   // right 방향
+                    { itemFlag::VOLTAGE_GND_DOWN, itemFlag::VOLTAGE_GND_ALL },   // up 방향
+                    { itemFlag::VOLTAGE_GND_RIGHT, itemFlag::VOLTAGE_GND_ALL },  // left 방향
+                    { itemFlag::VOLTAGE_GND_UP, itemFlag::VOLTAGE_GND_ALL },     // down 방향
+                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL },    // ascend
+                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL }     // descend
+                };
+
+                for (int i = 0; i < 6; ++i)
                 {
-                    frontierQueue.push({ current.x + 1, current.y, current.z });
-                    if (TileProp(current.x + 1, current.y, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                        TileProp(current.x + 1, current.y, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT))
-                        hasGround = true;
+                    if (isConnected(current, directions[i]))
+                    {
+                        int dx, dy, dz;
+                        dirToXYZ(directions[i], dx, dy, dz);
+                        Point3 nextCoord = { current.x + dx, current.y + dy, current.z + dz };
+                        Prop* nextProp = TileProp(nextCoord.x, nextCoord.y, nextCoord.z);
+
+                        frontierQueue.push(nextCoord);
+
+                        if (nextProp &&
+                            (nextProp->leadItem.checkFlag(groundFlags[i][0]) ||
+                                nextProp->leadItem.checkFlag(groundFlags[i][1])))
+                        {
+                            hasGround = true;
+                        }
+                    }
                 }
-                if (isConnected(current, dir16::up))
-                {
-                    frontierQueue.push({ current.x, current.y - 1, current.z });
-                    if (TileProp(current.x, current.y - 1, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                        TileProp(current.x, current.y - 1, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN))
-                        hasGround = true;
-                }
-                if (isConnected(current, dir16::left))
-                {
-                    frontierQueue.push({ current.x - 1, current.y, current.z });
-                    if (TileProp(current.x - 1, current.y, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                        TileProp(current.x - 1, current.y, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
-                        hasGround = true;
-                }
-                if (isConnected(current, dir16::down))
-                {
-                    frontierQueue.push({ current.x, current.y + 1, current.z });
-                    if (TileProp(current.x, current.y + 1, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                        TileProp(current.x, current.y + 1, current.z)->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP))
-                        hasGround = true;
-                }
-                if (isConnected(current, dir16::ascend)) frontierQueue.push({ current.x, current.y, current.z + 1 });
-                if (isConnected(current, dir16::descend)) frontierQueue.push({ current.x, current.y, current.z - 1 });
             }
         }
 
         std::wprintf(L"회로 탐색을 종료했습니다.\n");
         if (visitedSet.size() > 0)std::wprintf(L"회로의 사이즈는 %d입니다.\n", visitedSet.size());
         if (circuitMaxEnergy > 0) std::wprintf(L"회로의 최대 에너지 수송량은 %d kJ입니다.\n", circuitMaxEnergy);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //2. 연결된 모든 노드에 최대 수송 에너지 설정
+
+        for(auto coord : visitedSet)
+        {
+            Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
+            if (propPtr != nullptr) propPtr->nodeMaxElectron = circuitMaxEnergy;
+        }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //2. 첫번째 전압원이 전체적인 방향 결정
+        //3. 전압원마다 에너지를 밀어냄(재귀반복)
+        for(int i=0; i< voltagePropVec.size(); i++)
+        {
+            Prop* voltProp = voltagePropVec[i];
+            
+            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT))
+            {
+            }
+        }
+
 
         if (hasGround)
         {
             dir16 currentVoltageDir = dir16::none;
-            if (voltageSourceQueue.empty() == false)
-            {
 
-            }
-
-            //두번째 전압원부터는 분기점까지만 업데이트
-            while (voltageSourceQueue.empty() == false)
-            {
-
-            }
         }
-
-        //if (TileProp(getGridX() + 1, getGridY(), getGridZ()) != nullptr)
-        //{
-        //    if (leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) || leadItem.checkFlag(itemFlag::CABLE))
-        //    {
-        //        Prop* tgtProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
-        //        if (tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE))
-        //        {
-
-        //        }
-        //    }
-        //}
 
     }
 

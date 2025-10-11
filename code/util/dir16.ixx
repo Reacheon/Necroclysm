@@ -209,3 +209,22 @@ export float dir16toAngle(dir16 input)
     default:            return   0.f;
     }
 };
+
+export void dirToXYZ(dir16 inputDir, int& dx, int& dy, int& dz)
+{
+    switch (inputDir)
+    {
+    case dir16::ascend: dx =  0; dy =  0; dz = 1; break;
+    case dir16::descend:dx =  0; dy =  0; dz = -1; break;
+
+    case dir16::right:     dx = 1; dy = 0; dz = 0; break;
+    case dir16::upRight:   dx = 1; dy = -1; dz = 0; break;
+    case dir16::up:        dx = 0; dy = -1; dz = 0; break;
+    case dir16::upLeft:    dx = -1; dy = -1; dz = 0; break;
+    case dir16::left:     dx = -1; dy = 0; dz = 0; break;
+    case dir16::downLeft:  dx = -1; dy = 1; dz = 0; break;
+    case dir16::down:      dx = 0; dy = 1; dz = 0; break;
+    case dir16::downRight: dx = 1; dy = 1; dz = 0; break;
+    default:            dx =  0; dy =  0; dz = 0; break;
+    }
+}
