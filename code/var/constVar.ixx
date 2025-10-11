@@ -587,6 +587,12 @@ export enum class itemFlag
 
     CABLE_Z_ASCEND, //위층의 현재 타일과 연결된 케이블
     CABLE_Z_DESCEND, //아래층의 현재 타일과 연결된 케이블
+
+    VOLTAGE_GND_RIGHT,
+    VOLTAGE_GND_UP,
+    VOLTAGE_GND_LEFT,
+    VOLTAGE_GND_DOWN,
+    VOLTAGE_GND_ALL,
 };
 
 export enum class walkFlag

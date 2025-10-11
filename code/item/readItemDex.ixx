@@ -516,6 +516,12 @@ export int readItemDex(const wchar_t* file)
                             { L"VOLTAGE_OUTPUT_DOWN", itemFlag::VOLTAGE_OUTPUT_DOWN },
                             { L"CABLE_Z_ASCEND", itemFlag::CABLE_Z_ASCEND },
                             { L"CABLE_Z_DESCEND", itemFlag::CABLE_Z_DESCEND },
+
+                            { L"VOLTAGE_GND_UP", itemFlag::VOLTAGE_GND_UP },
+                            { L"VOLTAGE_GND_DOWN", itemFlag::VOLTAGE_GND_DOWN },
+                            { L"VOLTAGE_GND_LEFT", itemFlag::VOLTAGE_GND_LEFT },
+                            { L"VOLTAGE_GND_RIGHT", itemFlag::VOLTAGE_GND_RIGHT },
+                            { L"VOLTAGE_GND_ALL", itemFlag::VOLTAGE_GND_ALL },
                         };
 
                         size_t pos = 0;
