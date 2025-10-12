@@ -112,8 +112,8 @@ void Prop::updateSprIndex()
                     }
                     else
                     {
-                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_BOT)) return true;
-                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_TOP)) return true;
+                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_DOWN)) return true;
+                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP)) return true;
                         else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT)) return true;
                         else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT)) return true;
                         else return false;
@@ -141,8 +141,8 @@ void Prop::updateSprIndex()
                     }
                     else
                     {
-                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_BOT)) return true;
-                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_TOP)) return true;
+                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN)) return true;
+                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_UP)) return true;
                         else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT)) return true;
                         else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)) return true;
                         else return false;
@@ -170,8 +170,8 @@ void Prop::updateSprIndex()
                     }
                     else
                     {
-                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_BOT)) return true;
-                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_TOP)) return true;
+                        if ((dx == 0 && dy == -1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_DOWN)) return true;
+                        else if ((dx == 0 && dy == 1) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_UP)) return true;
                         else if ((dx == 1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_LEFT)) return true;
                         else if ((dx == -1 && dy == 0) && tgtProp->leadItem.checkFlag(itemFlag::CONVEYOR_CNCT_RIGHT)) return true;
                         else return false;
@@ -375,8 +375,8 @@ void Prop::runPropFunc()
                     break;
                 case dir16::up: 
                     delCoord = { 0,-1,0 }; 
-                    hostFlag = itemFlag::CABLE_CNCT_TOP;
-                    guestFlag = itemFlag::CABLE_CNCT_BOT;
+                    hostFlag = itemFlag::CABLE_CNCT_UP;
+                    guestFlag = itemFlag::CABLE_CNCT_DOWN;
                     break;
                 case dir16::left: 
                     delCoord = { -1,0,0 };
@@ -385,8 +385,8 @@ void Prop::runPropFunc()
                     break;
                 case dir16::down: 
                     delCoord = { 0,+1,0 }; 
-                    hostFlag = itemFlag::CABLE_CNCT_BOT;
-                    guestFlag = itemFlag::CABLE_CNCT_TOP;
+                    hostFlag = itemFlag::CABLE_CNCT_DOWN;
+                    guestFlag = itemFlag::CABLE_CNCT_UP;
                     break;
                 case dir16::ascend: 
                     delCoord = { 0,0,+1 }; 
@@ -500,7 +500,7 @@ void Prop::runPropFunc()
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //3. 전압원마다 에너지를 밀어냄(재귀반복)
+        //3. 전압원마다 에너지를 밀어냄(람다함수로 재귀반복)
         for(int i=0; i< voltagePropVec.size(); i++)
         {
             Prop* voltProp = voltagePropVec[i];
@@ -508,13 +508,6 @@ void Prop::runPropFunc()
             if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT))
             {
             }
-        }
-
-
-        if (hasGround)
-        {
-            dir16 currentVoltageDir = dir16::none;
-
         }
 
     }

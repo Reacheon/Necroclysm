@@ -212,15 +212,15 @@ void Prop::drawSelf()
         {
             bool downConnected = false;
             Prop* downProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
-            if (downProp != nullptr && (downProp->leadItem.checkFlag(itemFlag::CABLE) || downProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_TOP))) downConnected = true;
+            if (downProp != nullptr && (downProp->leadItem.checkFlag(itemFlag::CABLE) || downProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP))) downConnected = true;
 
-            if (leadItem.itemCode == itemRefCode::cooperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
+            if (leadItem.itemCode == itemRefCode::copperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
             if (leadItem.itemCode == itemRefCode::silverCable) drawSpriteCenter(spr::propset, 2993 + 16 + downConnected, drawX, drawY);
         }
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
         {
-            if (leadItem.itemCode == itemRefCode::cooperCable)
+            if (leadItem.itemCode == itemRefCode::copperCable)
             {
                 drawSpriteCenter(spr::propset, 2995, drawX, drawY);//상단으로 이어진 구리 케이블
             }
@@ -232,7 +232,7 @@ void Prop::drawSelf()
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
         {
-            if (leadItem.itemCode == itemRefCode::cooperCable)
+            if (leadItem.itemCode == itemRefCode::copperCable)
             {
                 drawSpriteCenter(spr::propset, 2997, drawX, drawY);//하단으로 이어진 구리 케이블
             }

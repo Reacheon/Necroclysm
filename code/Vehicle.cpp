@@ -866,7 +866,7 @@ int Vehicle::getDiselFuel()
             {
                 for (int j = 0; j < tankPtr->itemInfo.size(); j++)
                 {
-                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::disel)
+                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::diesel)
                     {
                         diselNumber += tankPtr->itemInfo[j].number;
                     }
@@ -940,7 +940,7 @@ void Vehicle::useEngineFuel(int fuelAmount)
     else
     {
         if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) targetFuelCode = itemRefCode::gasoline;
-        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) targetFuelCode = itemRefCode::disel;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) targetFuelCode = itemRefCode::diesel;
         else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemRefCode::electricity;
     }
 

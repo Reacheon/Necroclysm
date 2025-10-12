@@ -463,33 +463,33 @@ export enum class itemFlag
 
 
     PIPE_CNCT_RIGHT,
-    PIPE_CNCT_TOP,
+    PIPE_CNCT_UP,
     PIPE_CNCT_LEFT,
-    PIPE_CNCT_BOT,
+    PIPE_CNCT_DOWN,
 
     CABLE_CNCT_RIGHT,
-    CABLE_CNCT_TOP,
+    CABLE_CNCT_UP,
     CABLE_CNCT_LEFT,
-    CABLE_CNCT_BOT,
+    CABLE_CNCT_DOWN,
 
     CONVEYOR_CNCT_RIGHT,
-    CONVEYOR_CNCT_TOP,
+    CONVEYOR_CNCT_UP,
     CONVEYOR_CNCT_LEFT,
-    CONVEYOR_CNCT_BOT,
+    CONVEYOR_CNCT_DOWN,
 
     CABLE,
     PIPE,
     CONVEYOR,
 
     RAIL,
-    RAIL_CNCT_TOP,
-    RAIL_CNCT_BOT,
+    RAIL_CNCT_UP,
+    RAIL_CNCT_DOWN,
     RAIL_CNCT_LEFT,
     RAIL_CNCT_RIGHT,
 
     //선로전환기에서 고정된 레일
-    RAIL_INPUT_TOP,
-    RAIL_INPUT_BOT,
+    RAIL_INPUT_UP,
+    RAIL_INPUT_DOWN,
     RAIL_INPUT_LEFT,
     RAIL_INPUT_RIGHT,
 
@@ -884,9 +884,9 @@ export namespace keyIcon
     constexpr int duelSense_RStick = 89;
 
     constexpr int duelSense_RIGHT = 90;
-    constexpr int duelSense_TOP = 91;
+    constexpr int duelSense_UP = 91;
     constexpr int duelSense_LEFT = 92;
-    constexpr int duelSense_BOT = 93;
+    constexpr int duelSense_DOWN = 93;
     constexpr int duelSense_OPTIONS = 94;
     constexpr int duelSense_SHARE = 95;
 
@@ -905,9 +905,9 @@ export namespace keyIcon
     constexpr int joyCon_RStick = 105;
 
     constexpr int joyCon_RIGHT = 106;
-    constexpr int joyCon_TOP = 107;
+    constexpr int joyCon_UP = 107;
     constexpr int joyCon_LEFT = 108;
-    constexpr int joyCon_BOT = 109;
+    constexpr int joyCon_DOWN = 109;
     constexpr int joyCon_PLUS = 110;
     constexpr int joycon_MINUS = 111;
 
@@ -1300,7 +1300,7 @@ export namespace itemRefCode
     constexpr int boltQuiver = 409;
 
     constexpr int gasoline = 433;
-    constexpr int disel = 434;
+    constexpr int diesel = 434;
     constexpr int electricity = 45;
 
     constexpr int gasolineGeneratorR = 458;
@@ -1308,10 +1308,10 @@ export namespace itemRefCode
     constexpr int gasolineGeneratorL = 460;
     constexpr int gasolineGeneratorB = 461;
 
-    constexpr int disselGeneratorR = 463;
-	constexpr int disselGeneratorT = 464;
-	constexpr int disselGeneratorL = 465;
-    constexpr int disselGeneratorB = 466;
+    constexpr int dieselGeneratorR = 463;
+	constexpr int dieselGeneratorT = 464;
+	constexpr int dieselGeneratorL = 465;
+    constexpr int dieselGeneratorB = 466;
 
 	constexpr int solarGeneratorR = 467;
 	constexpr int solarGeneratorT = 468;
@@ -1323,7 +1323,7 @@ export namespace itemRefCode
     constexpr int powerBankR = 472;
     constexpr int powerBankL = 473;
 
-    constexpr int cooperCable = 480;
+    constexpr int copperCable = 480;
     constexpr int silverCable = 482;
 };
 
@@ -1447,7 +1447,7 @@ export enum charSprIndex
     LCAST_CROUCH = 35,
 
     RCAST = 36,
-    RCASH_CROUCH = 37,
+    RCAST_CROUCH = 37,
     BCAST = 38,
     BCAST_CROUCH = 39,
     MINING1 = 40,

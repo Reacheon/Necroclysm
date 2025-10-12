@@ -112,24 +112,24 @@ bool Vehicle::runAI()
                         if (singleRailSpdDir == dir16::dir0)//동쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                         }
                         else if (singleRailSpdDir == dir16::dir2)//북쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
                         else if (singleRailSpdDir == dir16::dir4)//서쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                         }
                         else if (singleRailSpdDir == dir16::dir6)//남쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
@@ -173,15 +173,15 @@ bool Vehicle::runAI()
                 if (singleRailSpdDir == dir16::dir0)
                 {
                     straightFlag = itemFlag::RAIL_CNCT_RIGHT;
-                    leftFlag = itemFlag::RAIL_CNCT_TOP;
-                    rightFlag = itemFlag::RAIL_CNCT_BOT;
+                    leftFlag = itemFlag::RAIL_CNCT_UP;
+                    rightFlag = itemFlag::RAIL_CNCT_DOWN;
 
                     leftDir = dir16::dir2;
                     rightDir = dir16::dir6;
                 }
                 else if (singleRailSpdDir == dir16::dir2)
                 {
-                    straightFlag = itemFlag::RAIL_CNCT_TOP;
+                    straightFlag = itemFlag::RAIL_CNCT_UP;
                     leftFlag = itemFlag::RAIL_CNCT_LEFT;
                     rightFlag = itemFlag::RAIL_CNCT_RIGHT;
 
@@ -191,15 +191,15 @@ bool Vehicle::runAI()
                 else if (singleRailSpdDir == dir16::dir4)
                 {
                     straightFlag = itemFlag::RAIL_CNCT_LEFT;
-                    leftFlag = itemFlag::RAIL_CNCT_BOT;
-                    rightFlag = itemFlag::RAIL_CNCT_TOP;
+                    leftFlag = itemFlag::RAIL_CNCT_DOWN;
+                    rightFlag = itemFlag::RAIL_CNCT_UP;
 
                     leftDir = dir16::dir6;
                     rightDir = dir16::dir2;
                 }
                 else if (singleRailSpdDir == dir16::dir6)
                 {
-                    straightFlag = itemFlag::RAIL_CNCT_BOT;
+                    straightFlag = itemFlag::RAIL_CNCT_DOWN;
                     leftFlag = itemFlag::RAIL_CNCT_RIGHT;
                     rightFlag = itemFlag::RAIL_CNCT_LEFT;
 
@@ -346,24 +346,24 @@ bool Vehicle::runAI()
                         if (bodyDir == dir16::dir0)//동쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                         }
                         else if (bodyDir == dir16::dir2)//북쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
                         else if (bodyDir == dir16::dir4)//서쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = dir16::dir2;
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = dir16::dir2;
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                         }
                         else if (bodyDir == dir16::dir6)//남쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = dir16::dir6;
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = dir16::dir6;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = dir16::dir4;
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = dir16::dir0;
                         }
@@ -373,24 +373,24 @@ bool Vehicle::runAI()
                         if (bodyDir == dir16::dir0)//동쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = reverse(dir16::dir2);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = reverse(dir16::dir6);
                         }
                         else if (bodyDir == dir16::dir2)//북쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = reverse(dir16::dir2);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
                         }
                         else if (bodyDir == dir16::dir4)//서쪽 방향 열차
                         {
                             if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_TOP)) singleRailSpdDir = reverse(dir16::dir2);
-                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_UP)) singleRailSpdDir = reverse(dir16::dir2);
+                            else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = reverse(dir16::dir6);
                         }
                         else if (bodyDir == dir16::dir6)//남쪽 방향 열차
                         {
-                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_BOT)) singleRailSpdDir = reverse(dir16::dir6);
+                            if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_DOWN)) singleRailSpdDir = reverse(dir16::dir6);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_LEFT)) singleRailSpdDir = reverse(dir16::dir4);
                             else if (currentRail->leadItem.checkFlag(itemFlag::RAIL_CNCT_RIGHT)) singleRailSpdDir = reverse(dir16::dir0);
                         }

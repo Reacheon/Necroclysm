@@ -406,19 +406,19 @@ export int readItemDex(const wchar_t* file)
                             {L"VPART_DOOR_CLOSE", itemFlag::VPART_DOOR_CLOSE},
 
                             {L"PIPE_CNCT_RIGHT", itemFlag::PIPE_CNCT_RIGHT},
-                            {L"PIPE_CNCT_TOP", itemFlag::PIPE_CNCT_TOP},
+                            {L"PIPE_CNCT_UP", itemFlag::PIPE_CNCT_UP},
                             {L"PIPE_CNCT_LEFT", itemFlag::PIPE_CNCT_LEFT},
-                            {L"PIPE_CNCT_BOT", itemFlag::PIPE_CNCT_BOT},
+                            {L"PIPE_CNCT_DOWN", itemFlag::PIPE_CNCT_DOWN},
 
                             {L"CABLE_CNCT_RIGHT", itemFlag::CABLE_CNCT_RIGHT},
-                            {L"CABLE_CNCT_TOP", itemFlag::CABLE_CNCT_TOP},
+                            {L"CABLE_CNCT_UP", itemFlag::CABLE_CNCT_UP},
                             {L"CABLE_CNCT_LEFT", itemFlag::CABLE_CNCT_LEFT},
-                            {L"CABLE_CNCT_BOT", itemFlag::CABLE_CNCT_BOT},
+                            {L"CABLE_CNCT_DOWN", itemFlag::CABLE_CNCT_DOWN},
 
                             {L"CONVEYOR_CNCT_RIGHT", itemFlag::CONVEYOR_CNCT_RIGHT},
-                            {L"CONVEYOR_CNCT_TOP", itemFlag::CONVEYOR_CNCT_TOP},
+                            {L"CONVEYOR_CNCT_UP", itemFlag::CONVEYOR_CNCT_UP},
                             {L"CONVEYOR_CNCT_LEFT", itemFlag::CONVEYOR_CNCT_LEFT},
-                            {L"CONVEYOR_CNCT_BOT", itemFlag::CONVEYOR_CNCT_BOT},
+                            {L"CONVEYOR_CNCT_DOWN", itemFlag::CONVEYOR_CNCT_DOWN},
 
                             {L"TIRE_NORMAL", itemFlag::TIRE_NORMAL},
                             {L"TIRE_STEER", itemFlag::TIRE_STEER},
@@ -431,13 +431,13 @@ export int readItemDex(const wchar_t* file)
 
                             {L"RAIL", itemFlag::RAIL},
 
-                            {L"RAIL_CNCT_TOP", itemFlag::RAIL_CNCT_TOP},
-                            {L"RAIL_CNCT_BOT", itemFlag::RAIL_CNCT_BOT},
+                            {L"RAIL_CNCT_UP", itemFlag::RAIL_CNCT_UP},
+                            {L"RAIL_CNCT_DOWN", itemFlag::RAIL_CNCT_DOWN},
                             {L"RAIL_CNCT_LEFT", itemFlag::RAIL_CNCT_LEFT},
                             {L"RAIL_CNCT_RIGHT", itemFlag::RAIL_CNCT_RIGHT},
 
-                            {L"RAIL_INPUT_TOP", itemFlag::RAIL_INPUT_TOP},
-                            {L"RAIL_INPUT_BOT", itemFlag::RAIL_INPUT_BOT},
+                            {L"RAIL_INPUT_UP", itemFlag::RAIL_INPUT_UP},
+                            {L"RAIL_INPUT_DOWN", itemFlag::RAIL_INPUT_DOWN},
                             {L"RAIL_INPUT_LEFT", itemFlag::RAIL_INPUT_LEFT},
                             {L"RAIL_INPUT_RIGHT", itemFlag::RAIL_INPUT_RIGHT},
 
