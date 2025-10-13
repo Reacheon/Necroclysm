@@ -106,6 +106,8 @@ export dir16 reverse(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir2_5;
     else if (input == dir16::dir7) return dir16::dir3;
     else if (input == dir16::dir7_5) return dir16::dir3_5;
+    else if (input == dir16::ascend) return dir16::descend;
+    else if (input == dir16::descend) return dir16::ascend;
     else errorBox(L"[utility] reverse에서 알 수 없는 방향이 입력되었다.");
 }
 
