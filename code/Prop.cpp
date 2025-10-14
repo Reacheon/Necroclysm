@@ -328,24 +328,21 @@ bool Prop::runAnimation(bool shutdown)
 
 void Prop::runPropFunc()
 {
-    //prt(L"[Prop:runProp] ID : %p의 runProp를 실행시켰다.\n", this);
-
     if (runUsed) return;
 
     if (leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
     {
         constexpr int GASOLINE_MAX_POWER = 50;
 
-        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR || leadItem.itemCode == itemRefCode::gasolineGeneratorT || leadItem.itemCode == itemRefCode::gasolineGeneratorL || leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR || leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
+            leadItem.itemCode == itemRefCode::gasolineGeneratorL || leadItem.itemCode == itemRefCode::gasolineGeneratorB)
         {
             if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
             {
-                
+
             }
         }
     }
-
-
 
     if (leadItem.checkFlag(itemFlag::CIRCUIT))
     {
@@ -353,12 +350,12 @@ void Prop::runPropFunc()
         int cursorY = getGridY();
         int cursorZ = getGridZ();
 
-
         std::queue<Point3> frontierQueue;
         std::unordered_set<Point3, Point3::Hash> visitedSet;
+        std::vector<Point3> visitedVec;//디버그용 나중에 지울 것
         std::vector<Prop*> voltagePropVec;
 
-        int circuitMaxEnergy = 0; //kJ
+        int circuitMaxEnergy = 0;
         bool hasGround = false;
 
         auto isConnected = [&](Point3 currentCoord, dir16 dir) -> bool
@@ -425,18 +422,8 @@ void Prop::runPropFunc()
                 else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
             };
 
-        auto isConnectedProp = [&](Prop* currentProp, dir16 dir) -> bool
-            {
-                int x, y, z;
-                x = currentProp->getGridX();
-                y = currentProp->getGridY();
-                z = currentProp->getGridZ();
-
-                return isConnected({ x,y,z }, dir);
-            };
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //1. 최초 연결점 탐색
+        //1. 회로 탐색
         frontierQueue.push({ cursorX, cursorY, cursorZ });
         while (!frontierQueue.empty())
         {
@@ -445,8 +432,8 @@ void Prop::runPropFunc()
 
             if (visitedSet.find(current) != visitedSet.end()) continue;
             visitedSet.insert(current);
+            visitedVec.push_back(current);
 
-            std::wprintf(L"[소자 탐색] 현재 커서는 %d,%d에 있습니다.\n", current.x, current.y);
 
             Prop* currentProp = TileProp(current.x, current.y, current.z);
 
@@ -454,7 +441,6 @@ void Prop::runPropFunc()
             {
                 currentProp->runUsed = true;
                 currentProp->voltageDir.clear();
-                currentProp->nodeElectron = 0;
 
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
@@ -462,15 +448,14 @@ void Prop::runPropFunc()
                     voltagePropVec.push_back(currentProp);
                 }
 
-                // 6방향 탐색 (상하좌우 + 위아래층)
                 const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend };
                 const itemFlag groundFlags[][2] = {
-                    { itemFlag::VOLTAGE_GND_LEFT, itemFlag::VOLTAGE_GND_ALL },   // right 방향
-                    { itemFlag::VOLTAGE_GND_DOWN, itemFlag::VOLTAGE_GND_ALL },   // up 방향
-                    { itemFlag::VOLTAGE_GND_RIGHT, itemFlag::VOLTAGE_GND_ALL },  // left 방향
-                    { itemFlag::VOLTAGE_GND_UP, itemFlag::VOLTAGE_GND_ALL },     // down 방향
-                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL },    // ascend
-                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL }     // descend
+                    { itemFlag::VOLTAGE_GND_LEFT, itemFlag::VOLTAGE_GND_ALL },
+                    { itemFlag::VOLTAGE_GND_DOWN, itemFlag::VOLTAGE_GND_ALL },
+                    { itemFlag::VOLTAGE_GND_RIGHT, itemFlag::VOLTAGE_GND_ALL },
+                    { itemFlag::VOLTAGE_GND_UP, itemFlag::VOLTAGE_GND_ALL },
+                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL },
+                    { itemFlag::VOLTAGE_GND_ALL, itemFlag::VOLTAGE_GND_ALL }
                 };
 
                 for (int i = 0; i < 6; ++i)
@@ -495,101 +480,179 @@ void Prop::runPropFunc()
             }
         }
 
-        std::wprintf(L"회로 탐색을 종료했습니다.\n");
-        if (visitedSet.size() > 0)std::wprintf(L"회로의 사이즈는 %d입니다.\n", visitedSet.size());
-        if (circuitMaxEnergy > 0) std::wprintf(L"회로의 최대 에너지 수송량은 %d kJ입니다.\n", circuitMaxEnergy);
+        // 노드가 2개 미만이면 출력하지 않음
+        if (visitedSet.size() < 2)
+        {
+            runUsed = true;
+            return;
+        }
+
+        std::wprintf(L"\n┌─────────────────────────────────┐\n");
+        std::wprintf(L"│ 회로 분석 완료                  │\n");
+        std::wprintf(L"├─────────────────────────────────┤\n");
+        std::wprintf(L"│ 노드 수: %3d                    │\n", visitedSet.size());
+        std::wprintf(L"│ 최대 전력: %3d kJ               │\n", circuitMaxEnergy);
+        std::wprintf(L"│ 접지 존재: %s                   │\n", hasGround ? L"Yes" : L"No ");
+        std::wprintf(L"└─────────────────────────────────┘\n\n");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //2. 연결된 모든 노드에 최대 수송 에너지 설정
-
+        //2. 최대 전력 설정
         for (auto coord : visitedSet)
         {
             Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
             if (propPtr != nullptr) propPtr->nodeMaxElectron = circuitMaxEnergy;
         }
 
-
-        std::function<bool(Prop*, dir16, int, std::unordered_set<Prop*> pathVisited)> pushElectron;
-        pushElectron = [&](Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited = {}) -> bool
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //3. 전력 전송 함수
+        std::function<int(Prop*, dir16, int, std::unordered_set<Prop*>)> pushElectron;
+        pushElectron = [&](Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited) -> int
             {
-                if (pathVisited.find(donorProp) != pathVisited.end()) return true;
+                if (pathVisited.find(donorProp) != pathVisited.end()) return 0;
                 pathVisited.insert(donorProp);
 
-                errorBox(donorProp == nullptr, L"[Error] pushElectron lambda function received null donorProp argument.\n");
-                
+                errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
+
                 int dx, dy, dz;
                 dirToXYZ(txDir, dx, dy, dz);
                 Prop* acceptorProp = TileProp(donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz);
-            
-                errorBox(acceptorProp == nullptr, L"[Error] pushElectron lambda function could not find acceptorProp.\n");
-                errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron lambda function received txElectronAmount greater than donorProp's nodeElectron.\n");
-                errorBox(isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir) == false, L"[Error] pushElectron lambda function found no connection between donorProp and acceptorProp.\n");
 
-                if (txElectronAmount <= 0) return true;
+                errorBox(acceptorProp == nullptr, L"[Error] pushElectron: null acceptor\n");
+                errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron: insufficient electron\n");
+                errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
+                    L"[Error] pushElectron: not connected\n");
 
-                int remainingSpace = acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron;
-                int finalTxElectron = std::min(txElectronAmount, remainingSpace);
+                if (txElectronAmount <= 0) return 0;
 
-                if (finalTxElectron > 0)
+                // 접지 체크
+                bool isGrounded = false;
+                if (acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL))
                 {
-                    bool isGrounded = false;
+                    isGrounded = true;
+                }
+                // 방향별 접지 체크
+                else if (txDir == dir16::right && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT))
+                {
+                    isGrounded = true;
+                }
+                else if (txDir == dir16::up && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN))
+                {
+                    isGrounded = true;
+                }
+                else if (txDir == dir16::left && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
+                {
+                    isGrounded = true;
+                }
+                else if (txDir == dir16::down && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP))
+                {
+                    isGrounded = true;
+                }
 
+                if (isGrounded)
+                {
+                    std::wprintf(L"  ⚡ GND: (%d,%d) 소모 %d\n",
+                        acceptorProp->getGridX(), acceptorProp->getGridY(), txElectronAmount);
+                    donorProp->nodeElectron -= txElectronAmount;
+                    return txElectronAmount;
+                }
 
-                    if (txDir == dir16::right && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT)) isGrounded = true;
-                    else if(txDir == dir16::up && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN)) isGrounded = true;
-                    else if(txDir == dir16::left && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT)) isGrounded = true;
-                    else if(txDir == dir16::down && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP)) isGrounded = true;
-                    else if ((txDir == dir16::ascend || txDir == dir16::descend) && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL)) isGrounded = true;
+                int pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
 
-                    if (isGrounded == false) acceptorProp->nodeElectron += finalTxElectron;
-                    
-                    donorProp->nodeElectron -= finalTxElectron; //매 루프마다 전압원의 전자는 완충되기에 항상 감소함
-                    std::wprintf(L"Prop %p에서 Prop %p로 %d의 전자를 보냈습니다. (현재 전자량: %d/%d)\n", donorProp, acceptorProp, finalTxElectron, acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron);
-
-
+                if (pushedElectron == 0)
+                {
+                    // Acceptor가 비어있음 - 직접 전송
+                    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
+                    donorProp->nodeElectron -= finalTxElectron;
+                    acceptorProp->nodeElectron += finalTxElectron;
+                    return finalTxElectron;
+                }
+                else
+                {
+                    // Acceptor에 전자 있음 - 재귀로 밀어냄
                     std::vector<dir16> possibleDirs;
                     for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend })
                     {
                         if (dir == reverse(txDir)) continue;
-
                         if (isConnected({ acceptorProp->getGridX(), acceptorProp->getGridY(), acceptorProp->getGridZ() }, dir))
                         {
                             possibleDirs.push_back(dir);
                         }
                     }
 
-                    if (possibleDirs.empty()) return true;
+                    if (possibleDirs.empty()) return 0;
 
-                    int splitElectron = finalTxElectron / possibleDirs.size();
-                    for(auto dir : possibleDirs)
+                    int outputElectron = 0;
+                    int splitElectron = pushedElectron / possibleDirs.size();
+                    for (auto dir : possibleDirs)
                     {
                         auto newPathVisited = pathVisited;
-                        pushElectron(acceptorProp, dir, splitElectron, newPathVisited);
+                        outputElectron += pushElectron(acceptorProp, dir, splitElectron, newPathVisited);
                     }
-                }
 
+                    acceptorProp->nodeElectron -= outputElectron;
+
+                    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
+                    donorProp->nodeElectron -= finalTxElectron;
+                    acceptorProp->nodeElectron += finalTxElectron;
+
+                    return outputElectron;
+                }
             };
 
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //3. 전압원마다 에너지를 밀어냄(람다함수로 재귀반복)
-        for(int i=0; i< voltagePropVec.size(); i++)
+        //4. 전압원에서 전송 시작
+        for (int i = 0; i < voltagePropVec.size(); i++)
         {
             Prop* voltProp = voltagePropVec[i];
             voltProp->nodeElectron = voltProp->nodeMaxElectron;
-            int x, y, z;
-            x = voltProp->getGridX();
-            y = voltProp->getGridY();
-            z = voltProp->getGridZ();
+            int x = voltProp->getGridX();
+            int y = voltProp->getGridY();
+            int z = voltProp->getGridZ();
 
-
-            //전압 출력은 단순화를 위해 항상 단일방향 출력
-            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right)) pushElectron(voltProp, dir16::right, voltProp->nodeElectron, {});
-            else if(voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up)) pushElectron(voltProp, dir16::up, voltProp->nodeElectron, {});
-            else if(voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left)) pushElectron(voltProp, dir16::left, voltProp->nodeElectron, {});
-            else if(voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down)) pushElectron(voltProp, dir16::down, voltProp->nodeElectron, {});
+            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
+                pushElectron(voltProp, dir16::right, voltProp->nodeElectron, {});
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
+                pushElectron(voltProp, dir16::up, voltProp->nodeElectron, {});
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
+                pushElectron(voltProp, dir16::left, voltProp->nodeElectron, {});
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
+                pushElectron(voltProp, dir16::down, voltProp->nodeElectron, {});
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //5. 최종 상태 출력
+        std::wprintf(L"\n┌────────────────────────────────────┐\n");
+        std::wprintf(L"│ 최종 회로 상태                     │\n");
+        std::wprintf(L"├────────────────────────────────────┤\n");
+
+        for (auto coord : visitedVec)
+        {
+            Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
+            if (propPtr != nullptr)
+            {
+                std::wstring nodeType = L"Wire";
+                if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE)) nodeType = L"Gen ";
+                else if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
+                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP) ||
+                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN) ||
+                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT) ||
+                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
+                    nodeType = L"GND ";
+
+                wchar_t status = L'○';
+                if (propPtr->nodeElectron == 0) status = L'○';
+                else if (propPtr->nodeElectron == propPtr->nodeMaxElectron) status = L'●';
+                else status = L'◐';
+
+                std::wprintf(L"│ %s (%3d,%3d): %3d/%3d %c     │\n",
+                    nodeType.c_str(),
+                    coord.x, coord.y,
+                    propPtr->nodeElectron, propPtr->nodeMaxElectron,
+                    status);
+            }
+        }
+
+        std::wprintf(L"└────────────────────────────────────┘\n\n");
     }
 
     runUsed = true;
