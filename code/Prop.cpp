@@ -358,69 +358,7 @@ void Prop::runPropFunc()
         int circuitMaxEnergy = 0;
         bool hasGround = false;
 
-        auto isConnected = [&](Point3 currentCoord, dir16 dir) -> bool
-            {
-                Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
-                Point3 delCoord = { 0,0,0 };
-                itemFlag hostFlag, guestFlag;
-                switch (dir)
-                {
-                case dir16::right:
-                    delCoord = { +1,0,0 };
-                    hostFlag = itemFlag::CABLE_CNCT_RIGHT;
-                    guestFlag = itemFlag::CABLE_CNCT_LEFT;
-                    break;
-                case dir16::up:
-                    delCoord = { 0,-1,0 };
-                    hostFlag = itemFlag::CABLE_CNCT_UP;
-                    guestFlag = itemFlag::CABLE_CNCT_DOWN;
-                    break;
-                case dir16::left:
-                    delCoord = { -1,0,0 };
-                    hostFlag = itemFlag::CABLE_CNCT_LEFT;
-                    guestFlag = itemFlag::CABLE_CNCT_RIGHT;
-                    break;
-                case dir16::down:
-                    delCoord = { 0,+1,0 };
-                    hostFlag = itemFlag::CABLE_CNCT_DOWN;
-                    guestFlag = itemFlag::CABLE_CNCT_UP;
-                    break;
-                case dir16::ascend:
-                    delCoord = { 0,0,+1 };
-                    hostFlag = itemFlag::CABLE_Z_ASCEND;
-                    guestFlag = itemFlag::CABLE_Z_DESCEND;
-                    break;
-                case dir16::descend:
-                    delCoord = { 0,0,-1 };
-                    hostFlag = itemFlag::CABLE_Z_DESCEND;
-                    guestFlag = itemFlag::CABLE_Z_ASCEND;
-                    break;
-                default:
-                    errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
-                    break;
-                }
-                Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
 
-                if (targetProp == nullptr) return false;
-
-                if (dir == dir16::ascend || dir == dir16::descend)
-                {
-                    if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(hostFlag) &&
-                        targetProp->leadItem.checkFlag(itemFlag::CABLE) && targetProp->leadItem.checkFlag(guestFlag))
-                    {
-                        return true;
-                    }
-                    else return false;
-                }
-                else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
-                {
-                    if ((currentProp->leadItem.checkFlag(itemFlag::CABLE) || currentProp->leadItem.checkFlag(hostFlag)) &&
-                        (targetProp->leadItem.checkFlag(itemFlag::CABLE) || targetProp->leadItem.checkFlag(guestFlag)))
-                        return true;
-                    else return false;
-                }
-                else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
-            };
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //1. 회로 탐색
@@ -487,13 +425,13 @@ void Prop::runPropFunc()
             return;
         }
 
-        std::wprintf(L"\n┌─────────────────────────────────┐\n");
-        std::wprintf(L"│ 회로 분석 완료                  │\n");
-        std::wprintf(L"├─────────────────────────────────┤\n");
-        std::wprintf(L"│ 노드 수: %3d                    │\n", visitedSet.size());
-        std::wprintf(L"│ 최대 전력: %3d kJ               │\n", circuitMaxEnergy);
-        std::wprintf(L"│ 접지 존재: %s                   │\n", hasGround ? L"Yes" : L"No ");
-        std::wprintf(L"└─────────────────────────────────┘\n\n");
+        //std::wprintf(L"\n┌─────────────────────────────────┐\n");
+        //std::wprintf(L"│ 회로 분석 완료                  │\n");
+        //std::wprintf(L"├─────────────────────────────────┤\n");
+        //std::wprintf(L"│ 노드 수: %3d                    │\n", visitedSet.size());
+        //std::wprintf(L"│ 최대 전력: %3d kJ               │\n", circuitMaxEnergy);
+        //std::wprintf(L"│ 접지 존재: %s                   │\n", hasGround ? L"Yes" : L"No ");
+        //std::wprintf(L"└─────────────────────────────────┘\n\n");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //2. 최대 전력 설정
@@ -502,102 +440,6 @@ void Prop::runPropFunc()
             Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
             if (propPtr != nullptr) propPtr->nodeMaxElectron = circuitMaxEnergy;
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //3. 전력 전송 함수
-        std::function<int(Prop*, dir16, int, std::unordered_set<Prop*>)> pushElectron;
-        pushElectron = [&](Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited) -> int
-            {
-                if (pathVisited.find(donorProp) != pathVisited.end()) return 0;
-                pathVisited.insert(donorProp);
-
-                errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
-
-                int dx, dy, dz;
-                dirToXYZ(txDir, dx, dy, dz);
-                Prop* acceptorProp = TileProp(donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz);
-
-                errorBox(acceptorProp == nullptr, L"[Error] pushElectron: null acceptor\n");
-                errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron: insufficient electron\n");
-                errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
-                    L"[Error] pushElectron: not connected\n");
-
-                if (txElectronAmount <= 0) return 0;
-
-                // 접지 체크
-                bool isGrounded = false;
-                if (acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL))
-                {
-                    isGrounded = true;
-                }
-                // 방향별 접지 체크
-                else if (txDir == dir16::right && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT))
-                {
-                    isGrounded = true;
-                }
-                else if (txDir == dir16::up && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN))
-                {
-                    isGrounded = true;
-                }
-                else if (txDir == dir16::left && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
-                {
-                    isGrounded = true;
-                }
-                else if (txDir == dir16::down && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP))
-                {
-                    isGrounded = true;
-                }
-
-                if (isGrounded)
-                {
-                    std::wprintf(L"  ⚡ GND: (%d,%d) 소모 %d\n",
-                        acceptorProp->getGridX(), acceptorProp->getGridY(), txElectronAmount);
-                    donorProp->nodeElectron -= txElectronAmount;
-                    return txElectronAmount;
-                }
-
-                int pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
-
-                if (pushedElectron == 0)
-                {
-                    // Acceptor가 비어있음 - 직접 전송
-                    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
-                    donorProp->nodeElectron -= finalTxElectron;
-                    acceptorProp->nodeElectron += finalTxElectron;
-                    return finalTxElectron;
-                }
-                else
-                {
-                    // Acceptor에 전자 있음 - 재귀로 밀어냄
-                    std::vector<dir16> possibleDirs;
-                    for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend })
-                    {
-                        if (dir == reverse(txDir)) continue;
-                        if (isConnected({ acceptorProp->getGridX(), acceptorProp->getGridY(), acceptorProp->getGridZ() }, dir))
-                        {
-                            possibleDirs.push_back(dir);
-                        }
-                    }
-
-                    if (possibleDirs.empty()) return 0;
-
-                    int outputElectron = 0;
-                    int splitElectron = pushedElectron / possibleDirs.size();
-                    for (auto dir : possibleDirs)
-                    {
-                        auto newPathVisited = pathVisited;
-                        outputElectron += pushElectron(acceptorProp, dir, splitElectron, newPathVisited);
-                    }
-
-                    acceptorProp->nodeElectron -= outputElectron;
-
-                    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
-                    donorProp->nodeElectron -= finalTxElectron;
-                    acceptorProp->nodeElectron += finalTxElectron;
-
-                    return outputElectron;
-                }
-            };
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //4. 전압원에서 전송 시작
@@ -617,6 +459,8 @@ void Prop::runPropFunc()
                 pushElectron(voltProp, dir16::left, voltProp->nodeElectron, {});
             else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
                 pushElectron(voltProp, dir16::down, voltProp->nodeElectron, {});
+
+            voltProp->nodeElectron = voltProp->nodeMaxElectron;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -656,4 +500,190 @@ void Prop::runPropFunc()
     }
 
     runUsed = true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+bool Prop::isConnected(Point3 currentCoord, dir16 dir)
+{
+    Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+    Point3 delCoord = { 0,0,0 };
+    itemFlag hostFlag, guestFlag;
+    switch (dir)
+    {
+    case dir16::right:
+        delCoord = { +1,0,0 };
+        hostFlag = itemFlag::CABLE_CNCT_RIGHT;
+        guestFlag = itemFlag::CABLE_CNCT_LEFT;
+        break;
+    case dir16::up:
+        delCoord = { 0,-1,0 };
+        hostFlag = itemFlag::CABLE_CNCT_UP;
+        guestFlag = itemFlag::CABLE_CNCT_DOWN;
+        break;
+    case dir16::left:
+        delCoord = { -1,0,0 };
+        hostFlag = itemFlag::CABLE_CNCT_LEFT;
+        guestFlag = itemFlag::CABLE_CNCT_RIGHT;
+        break;
+    case dir16::down:
+        delCoord = { 0,+1,0 };
+        hostFlag = itemFlag::CABLE_CNCT_DOWN;
+        guestFlag = itemFlag::CABLE_CNCT_UP;
+        break;
+    case dir16::ascend:
+        delCoord = { 0,0,+1 };
+        hostFlag = itemFlag::CABLE_Z_ASCEND;
+        guestFlag = itemFlag::CABLE_Z_DESCEND;
+        break;
+    case dir16::descend:
+        delCoord = { 0,0,-1 };
+        hostFlag = itemFlag::CABLE_Z_DESCEND;
+        guestFlag = itemFlag::CABLE_Z_ASCEND;
+        break;
+    default:
+        errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+        break;
+    }
+    Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+
+    if (targetProp == nullptr) return false;
+
+    if (dir == dir16::ascend || dir == dir16::descend)
+    {
+        if (currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(hostFlag) &&
+            targetProp->leadItem.checkFlag(itemFlag::CABLE) && targetProp->leadItem.checkFlag(guestFlag))
+        {
+            return true;
+        }
+        else return false;
+    }
+    else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
+    {
+        if ((currentProp->leadItem.checkFlag(itemFlag::CABLE) || currentProp->leadItem.checkFlag(hostFlag)) &&
+            (targetProp->leadItem.checkFlag(itemFlag::CABLE) || targetProp->leadItem.checkFlag(guestFlag)))
+            return true;
+        else return false;
+    }
+    else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited)
+{
+    if (pathVisited.find(donorProp) != pathVisited.end()) return 0;
+    pathVisited.insert(donorProp);
+
+    errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
+
+    int dx, dy, dz;
+    dirToXYZ(txDir, dx, dy, dz);
+    Prop* acceptorProp = TileProp(donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz);
+
+    std::wprintf(L"[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
+        donorProp->getGridX(), donorProp->getGridY(),
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        txElectronAmount);
+
+    errorBox(acceptorProp == nullptr, L"[Error] pushElectron: null acceptor\n");
+    errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron: insufficient electron\n");
+    errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
+        L"[Error] pushElectron: not connected\n");
+
+
+    if (txElectronAmount <= 0) return 0;
+
+    bool isGrounded = false;
+    if (acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL)) isGrounded = true;
+    else if (txDir == dir16::right && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT))
+    {
+        isGrounded = true;
+    }
+    else if (txDir == dir16::up && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN))
+    {
+        isGrounded = true;
+    }
+    else if (txDir == dir16::left && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
+    {
+        isGrounded = true;
+    }
+    else if (txDir == dir16::down && acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP))
+    {
+        isGrounded = true;
+    }
+
+    if (isGrounded)
+    {
+        std::wprintf(L"GND: (%d,%d) 소모 %d\n", acceptorProp->getGridX(), acceptorProp->getGridY(), txElectronAmount);
+        donorProp->nodeElectron -= txElectronAmount;
+        return txElectronAmount;
+    }
+
+    int pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
+
+
+    if (pushedElectron > 0)
+    {
+        std::vector<dir16> possibleDirs;
+        for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend })
+        {
+            if (dir == reverse(txDir)) continue;
+            if (isConnected({ acceptorProp->getGridX(), acceptorProp->getGridY(), acceptorProp->getGridZ() }, dir))
+            {
+                possibleDirs.push_back(dir);
+            }
+        }
+
+        if (possibleDirs.empty()) return 0;
+        divideElectron(acceptorProp, pushedElectron, possibleDirs, pathVisited);
+    }
+
+
+
+    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
+
+    std::wprintf(L"[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
+        donorProp->getGridX(), donorProp->getGridY(),
+        donorProp->nodeElectron,
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+        txElectronAmount, finalTxElectron);
+
+    donorProp->nodeElectron -= finalTxElectron;
+    acceptorProp->nodeElectron += finalTxElectron;
+    return finalTxElectron;
+
+}
+
+
+void Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited)
+{
+    errorBox(propPtr == nullptr, L"[Error] divideElectron: null prop\n");
+
+    if (possibleDirs.size() == 0) return;
+
+    int splitElectron = inputElectron / possibleDirs.size();
+    for (auto dir : possibleDirs)
+    {
+        auto newPathVisited = pathVisited;
+
+        int branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited);
+
+        errorBox(branchPushedElectron > splitElectron, L"[Error] divideElectron: pushed more than split\n");
+
+        if (branchPushedElectron < splitElectron)
+        {
+            std::vector<dir16> newPossibleDirs = possibleDirs;
+            newPossibleDirs.erase(std::remove(newPossibleDirs.begin(), newPossibleDirs.end(), dir), newPossibleDirs.end());
+            divideElectron(propPtr, splitElectron - branchPushedElectron, newPossibleDirs, newPathVisited);
+        }
+        else if (branchPushedElectron == splitElectron)
+        {
+        }
+        else errorBox(L"[Error] divideElectron: pushed more than split\n");
+        
+    }
 }

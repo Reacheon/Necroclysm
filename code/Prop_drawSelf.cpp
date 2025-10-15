@@ -11,6 +11,8 @@ import drawSprite;
 import World;
 import globalTime;
 
+import drawText;
+
 
 void Prop::drawSelf()
 {
@@ -270,6 +272,16 @@ void Prop::drawSelf()
             );
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
         }
+    }
+
+    if (leadItem.checkFlag(itemFlag::CIRCUIT))
+    {
+
+        setFontSize(9);
+        renderTextOutlineCenter(std::to_wstring(nodeElectron) + L"/" + std::to_wstring(nodeMaxElectron),
+            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+            dst.y + dst.h / 2 - (int)(12 * zoomScale) + zoomScale * getIntegerFakeY(),
+            col::white);
     }
 
     if (displayHPBarCount > 0)//개체 HP 표기

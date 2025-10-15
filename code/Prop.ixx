@@ -52,5 +52,11 @@ public:
     bool runAnimation(bool shutdown);
 
     void drawSelf() override;
+
+    bool isConnected(Point3 currentCoord, dir16 dir);
+
+    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited);
+
+    void divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited);
 };
 
