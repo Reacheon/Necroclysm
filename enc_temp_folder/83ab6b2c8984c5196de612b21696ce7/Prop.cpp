@@ -354,7 +354,6 @@ void Prop::runPropFunc()
         std::unordered_set<Point3, Point3::Hash> visitedSet;
         std::vector<Point3> visitedVec;//디버그용 나중에 지울 것
         std::vector<Prop*> voltagePropVec;
-        std::vector<Prop*> loadVec; //부하가 가해지는 전자기기들
 
         int circuitMaxEnergy = 0;
         bool hasGround = false;
@@ -386,8 +385,6 @@ void Prop::runPropFunc()
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
                     voltagePropVec.push_back(currentProp);
                 }
-
-                if (currentProp->leadItem.electricUsePower > 0) loadVec.push_back(currentProp);
 
                 const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend };
                 const itemFlag groundFlags[][2] = {
@@ -467,17 +464,9 @@ void Prop::runPropFunc()
 
             voltProp->nodeElectron = voltProp->nodeMaxElectron;
         }
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //5. 부하들 전력 소모 시작
-        for (int i = 0; i < loadVec.size(); i++)
-        {
-            loadVec[i]->groundChargeEnergy = 0;
-        }
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //6. 최종 상태 출력
+        //5. 최종 상태 출력
         std::wprintf(L"\n┌────────────────────────────────────┐\n");
         std::wprintf(L"│ 최종 회로 상태                     │\n");
         std::wprintf(L"├────────────────────────────────────┤\n");
@@ -638,23 +627,20 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     if (isGrounded)
     {
+
+
         int remainEnergy = acceptorProp->leadItem.electricUsePower - acceptorProp->groundChargeEnergy;
+        int consumeEnergy = std::min(txElectronAmount, remainEnergy);
 
-        if (remainEnergy > 0)
-        {
-            int consumeEnergy = std::min(txElectronAmount, remainEnergy);
+        donorProp->nodeElectron -= consumeEnergy;
+        acceptorProp->groundChargeEnergy += consumeEnergy;
 
-            donorProp->nodeElectron -= consumeEnergy;
-            acceptorProp->groundChargeEnergy += consumeEnergy;
+        std::wprintf(L"%sGND: (%d,%d) 소모 %d\n",
+            indent.c_str(),
+            acceptorProp->getGridX(), acceptorProp->getGridY(),
+            consumeEnergy);
 
-            std::wprintf(L"%sGND: (%d,%d) 소모 %d\n",
-                indent.c_str(),
-                acceptorProp->getGridX(), acceptorProp->getGridY(),
-                consumeEnergy);
-
-            return consumeEnergy;
-        }
-        else return 0;
+        return consumeEnergy;
     }
 
     int pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);

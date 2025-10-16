@@ -36,6 +36,7 @@ public:
     int nodeMaxElectron = 0;
     int nodeElectron = 0;
 
+    int groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
 
     Prop(Point3 inputCoor, int leadItemCode);
 
@@ -55,8 +56,8 @@ public:
 
     bool isConnected(Point3 currentCoord, dir16 dir);
 
-    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited);
+    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited,int depth);
 
-    void divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited);
+    int divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited,int depth);
 };
 

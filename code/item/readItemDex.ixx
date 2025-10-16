@@ -164,6 +164,7 @@ namespace csvItem
     constexpr int propUninstallCode = 135; //이게 0이 아닐 경우 프롭을 손에 드는 행위 등이 가능
 
     constexpr int electricMaxPower = 136;
+    constexpr int electricUsePower = 137; //전자기기 소비전력
 };
 
 export int readItemDex(const wchar_t* file)
@@ -1063,6 +1064,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::electricMaxPower:
 						itemDex[tgtIndex].electricMaxPower = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::electricUsePower:
+                        itemDex[tgtIndex].electricUsePower = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");
