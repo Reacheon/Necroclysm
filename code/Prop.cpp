@@ -330,20 +330,6 @@ void Prop::runPropFunc()
 {
     if (runUsed) return;
 
-    if (leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
-    {
-        constexpr int GASOLINE_MAX_POWER = 50;
-
-        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR || leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
-            leadItem.itemCode == itemRefCode::gasolineGeneratorL || leadItem.itemCode == itemRefCode::gasolineGeneratorB)
-        {
-            if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
-            {
-
-            }
-        }
-    }
-
     if (leadItem.checkFlag(itemFlag::CIRCUIT))
     {
         int cursorX = getGridX();
@@ -381,6 +367,9 @@ void Prop::runPropFunc()
                 currentProp->runUsed = true;
                 currentProp->voltageDir.clear();
 
+                currentProp->nodeInputElectron = 0;
+                currentProp->nodeOutputElectron = 0;
+                    
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
                     circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
@@ -388,6 +377,8 @@ void Prop::runPropFunc()
                 }
 
                 if (currentProp->leadItem.electricUsePower > 0) loadVec.push_back(currentProp);
+
+                
 
                 const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend };
                 const itemFlag groundFlags[][2] = {
@@ -454,62 +445,75 @@ void Prop::runPropFunc()
             int y = voltProp->getGridY();
             int z = voltProp->getGridZ();
 
-            
+            if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
+            {
+                if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
+                    pushElectron(voltProp, dir16::right, voltProp->leadItem.electricMaxPower, {}, 0);
+                else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
+                    pushElectron(voltProp, dir16::up, voltProp->leadItem.electricMaxPower, {}, 0);
+                else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
+                    pushElectron(voltProp, dir16::left, voltProp->leadItem.electricMaxPower, {}, 0);
+                else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
+                    pushElectron(voltProp, dir16::down, voltProp->leadItem.electricMaxPower, {}, 0);
 
-            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
-                pushElectron(voltProp, dir16::right, voltProp->leadItem.electricMaxPower, {},0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
-                pushElectron(voltProp, dir16::up, voltProp->leadItem.electricMaxPower, {}, 0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
-                pushElectron(voltProp, dir16::left, voltProp->leadItem.electricMaxPower, {}, 0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
-                pushElectron(voltProp, dir16::down, voltProp->leadItem.electricMaxPower, {}, 0);
-
-            voltProp->nodeElectron = voltProp->nodeMaxElectron;
+                voltProp->nodeElectron = voltProp->nodeMaxElectron;
+            }
         }
         
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //5. 부하들 전력 소모 시작
         for (int i = 0; i < loadVec.size(); i++)
         {
-            loadVec[i]->groundChargeEnergy = 0;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //6. 최종 상태 출력
-        std::wprintf(L"\n┌────────────────────────────────────┐\n");
-        std::wprintf(L"│ 최종 회로 상태                     │\n");
-        std::wprintf(L"├────────────────────────────────────┤\n");
-
-        for (auto coord : visitedVec)
-        {
-            Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
-            if (propPtr != nullptr)
+            Prop* loadProp = loadVec[i];
+            if (loadProp->groundChargeEnergy >= loadProp->leadItem.electricUsePower)
             {
-                std::wstring nodeType = L"Wire";
-                if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE)) nodeType = L"Gen ";
-                else if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
-                    nodeType = L"GND ";
-
-                wchar_t status = L'○';
-                if (propPtr->nodeElectron == 0) status = L'○';
-                else if (propPtr->nodeElectron == propPtr->nodeMaxElectron) status = L'●';
-                else status = L'◐';
-
-                std::wprintf(L"│ %s (%3d,%3d): %3d/%3d %c     │\n",
-                    nodeType.c_str(),
-                    coord.x, coord.y,
-                    propPtr->nodeElectron, propPtr->nodeMaxElectron,
-                    status);
+                if (loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) 
+                    loadProp->propTurnOn();
             }
+            else
+            {
+                if(loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)) 
+                    loadProp->propTurnOff();
+            }
+
+            loadProp->groundChargeEnergy = 0;
         }
 
-        std::wprintf(L"└────────────────────────────────────┘\n\n");
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////6. 최종 상태 출력
+        //std::wprintf(L"\n┌────────────────────────────────────┐\n");
+        //std::wprintf(L"│ 최종 회로 상태                     │\n");
+        //std::wprintf(L"├────────────────────────────────────┤\n");
+
+        //for (auto coord : visitedVec)
+        //{
+        //    Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
+        //    if (propPtr != nullptr)
+        //    {
+        //        std::wstring nodeType = L"Wire";
+        //        if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE)) nodeType = L"Gen ";
+        //        else if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
+        //            nodeType = L"GND ";
+
+        //        wchar_t status = L'○';
+        //        if (propPtr->nodeElectron == 0) status = L'○';
+        //        else if (propPtr->nodeElectron == propPtr->nodeMaxElectron) status = L'●';
+        //        else status = L'◐';
+
+        //        std::wprintf(L"│ %s (%3d,%3d): %3d/%3d %c     │\n",
+        //            nodeType.c_str(),
+        //            coord.x, coord.y,
+        //            propPtr->nodeElectron, propPtr->nodeMaxElectron,
+        //            status);
+        //    }
+        //}
+
+        //std::wprintf(L"└────────────────────────────────────┘\n\n");
     }
 
     runUsed = true;
@@ -583,6 +587,11 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
 }
 
+bool Prop::isConnected(Prop* currentProp, dir16 dir)
+{
+    return isConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
@@ -599,11 +608,11 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
     // 들여쓰기 생성
     std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
 
-    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
-        indent.c_str(),
-        donorProp->getGridX(), donorProp->getGridY(),
-        acceptorProp->getGridX(), acceptorProp->getGridY(),
-        txElectronAmount);
+    //std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
+    //    indent.c_str(),
+    //    donorProp->getGridX(), donorProp->getGridY(),
+    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+    //    txElectronAmount);
 
     if (donorProp->getGridX() == -3 && donorProp->getGridY() == -10)
     {
@@ -645,12 +654,18 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
             int consumeEnergy = std::min(txElectronAmount, remainEnergy);
 
             donorProp->nodeElectron -= consumeEnergy;
+            donorProp->nodeOutputElectron += consumeEnergy;
             acceptorProp->groundChargeEnergy += consumeEnergy;
+            acceptorProp->nodeInputElectron += consumeEnergy;
 
-            std::wprintf(L"%sGND: (%d,%d) 소모 %d\n",
-                indent.c_str(),
-                acceptorProp->getGridX(), acceptorProp->getGridY(),
-                consumeEnergy);
+            //std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
+            //    indent.c_str(),
+            //    donorProp->getGridX(), donorProp->getGridY(),
+            //    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
+            //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+            //    txElectronAmount,
+            //    consumeEnergy,
+            //    remainEnergy - consumeEnergy);
 
             return consumeEnergy;
         }
@@ -680,16 +695,18 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
-        indent.c_str(),
-        donorProp->getGridX(), donorProp->getGridY(),
-        donorProp->nodeElectron,
-        acceptorProp->getGridX(), acceptorProp->getGridY(),
-        acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-        txElectronAmount, finalTxElectron);
+    //std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
+    //    indent.c_str(),
+    //    donorProp->getGridX(), donorProp->getGridY(),
+    //    donorProp->nodeElectron,
+    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+    //    acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+    //    txElectronAmount, finalTxElectron);
 
     donorProp->nodeElectron -= finalTxElectron;
+    donorProp->nodeOutputElectron += finalTxElectron;
     acceptorProp->nodeElectron += finalTxElectron;
+    acceptorProp->nodeInputElectron += finalTxElectron;
     return finalTxElectron;
 }
 
@@ -729,4 +746,29 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
     }
 
     return totalPushedElectron;
+}
+
+void Prop::propTurnOn()
+{
+    leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
+    leadItem.addFlag(itemFlag::PROP_POWER_ON);
+
+    int iCode = leadItem.itemCode;
+    if (iCode == itemRefCode::bollardLight)
+    {
+        leadItem.lightPtr = std::make_unique<Light>(getGridX() + leadItem.lightDelX, getGridY() + leadItem.lightDelY, getGridZ(), leadItem.lightRange, leadItem.lightIntensity, SDL_Color{ leadItem.lightR,leadItem.lightG,leadItem.lightB });
+    }
+
+}
+
+void Prop::propTurnOff()
+{
+    leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
+    leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+    
+    int iCode = leadItem.itemCode;
+    if (iCode == itemRefCode::bollardLight)
+    {
+        leadItem.lightPtr = nullptr;
+    }
 }

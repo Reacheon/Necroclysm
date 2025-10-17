@@ -569,8 +569,7 @@ public:
 					{
 						if (pPtr->leadItem.pocketPtr->itemInfo[0].itemCode == itemRefCode::gasoline)
 						{
-							pPtr->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
-							pPtr->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+							pPtr->propTurnOn();
 							updateLog(sysStr[337]);//가솔린 발전기에 시동을 걸었다.
 						}
 						else updateLog(sysStr[335]);//이 발전기를 켜기 위해서는 내부에 가솔린이 들어있어야 한다. 
@@ -590,8 +589,7 @@ public:
 					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
 					pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
 				{
-					pPtr->leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
-					pPtr->leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+					pPtr->propTurnOff();
 					updateLog(sysStr[339]);//발전기를 껐다.
 					turnWait(1.0);
 				}

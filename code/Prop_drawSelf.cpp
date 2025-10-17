@@ -68,24 +68,24 @@ void Prop::drawSelf()
         {
             int cableSprIndex = 2720;
 
-            if (isRightCable && !isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2732;
-            else if (!isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2733;
-            else if (!isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2730;
-            else if (!isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2731;
+            if (isRightCable && !isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3036;
+            else if (!isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3037;
+            else if (!isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3034;
+            else if (!isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3035;
 
-            else if (isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 2729;
-            else if (isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2936;
-            else if (isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2725;
-            else if (!isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2729;
-            else if (!isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2939;
-            else if (!isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 2723;
+            else if (isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3033;
+            else if (isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3240;
+            else if (isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3029;
+            else if (!isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3033;
+            else if (!isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3243;
+            else if (!isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 3027;
 
-            else if (isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 2728;
-            else if (isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 2726;
-            else if (isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 2724;
-            else if (!isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 2722;
+            else if (isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3032;
+            else if (isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3030;
+            else if (isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 3028;
+            else if (!isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 3026;
 
-            else if (isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 2720;
+            else if (isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 3024;
 
 
             drawSpriteCenter
@@ -95,6 +95,46 @@ void Prop::drawSelf()
                 dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
                 dst.y + dst.h / 2 + zoomScale * getIntegerFakeY()
             );
+
+
+            if (nodeInputElectron > 0)
+            {
+                int drawX = dst.x + dst.w / 2 + zoomScale * getIntegerFakeX();
+                int drawY = dst.y + dst.h / 2 + zoomScale * getIntegerFakeY();
+
+                bool rConnected = isConnected(this, dir16::right);
+                bool uConnected = isConnected(this, dir16::up);
+                bool lConnected = isConnected(this, dir16::left);
+                bool dConnected = isConnected(this, dir16::down);
+
+                if (rConnected)
+                {
+                    Prop* rProp = TileProp({ getGridX() + 1,getGridY(),getGridZ() });
+                    if (rProp->nodeInputElectron > 0 || rProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 3041, drawX, drawY);
+                }
+
+                if (uConnected)
+                {
+                    Prop* uProp = TileProp({ getGridX(),getGridY() - 1,getGridZ() });
+                    if (uProp->nodeInputElectron > 0 || uProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 3042, drawX, drawY);
+                }
+
+                if (lConnected)
+                {
+                    Prop* lProp = TileProp({ getGridX() - 1,getGridY(),getGridZ() });
+                    if (lProp->nodeInputElectron > 0 || lProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 3043, drawX, drawY);
+                }
+
+                if (dConnected)
+                {
+                    Prop* dProp = TileProp({ getGridX(),getGridY() + 1,getGridZ() });
+                    if (dProp->nodeInputElectron > 0 || dProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 3044, drawX, drawY);
+                }
+            }
         }
     }
 
@@ -210,6 +250,57 @@ void Prop::drawSelf()
         int drawX = dst.x + dst.w / 2 + zoomScale * getIntegerFakeX();
         int drawY = dst.y + dst.h / 2 + zoomScale * getIntegerFakeY();
 
+        bool rConnected = isConnected(this, dir16::right);
+        bool uConnected = isConnected(this, dir16::up);
+        bool lConnected = isConnected(this, dir16::left);
+        bool dConnected = isConnected(this, dir16::down);
+
+        if (nodeInputElectron > 0)
+        {
+            if (rConnected && lConnected && !uConnected && !dConnected) //─
+            {
+                drawSpriteCenter(spr::propset, 2949, drawX, drawY);
+            }
+            else if (!rConnected && !lConnected && uConnected && dConnected) //│
+            {
+                drawSpriteCenter(spr::propset, 2950, drawX, drawY);
+            }
+            else
+            {
+                drawSpriteCenter(spr::propset, 2944, drawX, drawY);
+
+                if (rConnected)
+                {
+                    Prop* rProp = TileProp({ getGridX() + 1,getGridY(),getGridZ() });
+                    if (rProp->nodeInputElectron > 0 || rProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 2945, drawX, drawY);
+                }
+                
+                if (uConnected)
+                {
+                    Prop* uProp = TileProp({ getGridX(),getGridY() - 1,getGridZ() });
+                    if (uProp->nodeInputElectron > 0 || uProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 2946, drawX, drawY);
+                }
+
+                if(lConnected)
+                {
+                    Prop* lProp = TileProp({ getGridX() - 1,getGridY(),getGridZ() });
+                    if (lProp->nodeInputElectron > 0 || lProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 2947, drawX, drawY);
+                }
+
+                if(dConnected)
+                {
+                    Prop* dProp = TileProp({ getGridX(),getGridY() + 1,getGridZ() });
+                    if (dProp->nodeInputElectron > 0 || dProp->nodeOutputElectron > 0)
+                        drawSpriteCenter(spr::propset, 2948, drawX, drawY);
+                }
+            }
+        }
+
+
+
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND) || leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
         {
             bool downConnected = false;
@@ -218,6 +309,8 @@ void Prop::drawSelf()
 
             if (leadItem.itemCode == itemRefCode::copperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
             if (leadItem.itemCode == itemRefCode::silverCable) drawSpriteCenter(spr::propset, 2993 + 16 + downConnected, drawX, drawY);
+
+            if (nodeInputElectron > 0) drawSpriteCenter(spr::propset, 2944, drawX, drawY);
         }
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
@@ -230,6 +323,8 @@ void Prop::drawSelf()
             {
                 drawSpriteCenter(spr::propset, 2995 + 16, drawX, drawY);//상단으로 이어진 은 케이블
             }
+
+            if (nodeInputElectron > 0) drawSpriteCenter(spr::propset, 2951, drawX, drawY);
         }
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
@@ -242,6 +337,8 @@ void Prop::drawSelf()
             {
                 drawSpriteCenter(spr::propset, 2997 + 16, drawX, drawY);//하단으로 이어진 은 케이블
             }
+
+            if (nodeInputElectron > 0) drawSpriteCenter(spr::propset, 2952, drawX, drawY);
         }
 
         setFlip(SDL_FLIP_NONE);
@@ -274,15 +371,15 @@ void Prop::drawSelf()
         }
     }
 
-    if (leadItem.checkFlag(itemFlag::CIRCUIT))
-    {
+    //if (leadItem.checkFlag(itemFlag::CIRCUIT))
+    //{
 
-        setFontSize(9);
-        renderTextOutlineCenter(std::to_wstring(nodeElectron) + L"/" + std::to_wstring(nodeMaxElectron),
-            dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
-            dst.y + dst.h / 2 - (int)(12 * zoomScale) + zoomScale * getIntegerFakeY(),
-            col::white);
-    }
+    //    setFontSize(9);
+    //    renderTextOutlineCenter(std::to_wstring(nodeElectron) + L"/" + std::to_wstring(nodeMaxElectron),
+    //        dst.x + dst.w / 2 + zoomScale * getIntegerFakeX(),
+    //        dst.y + dst.h / 2 - (int)(12 * zoomScale) + zoomScale * getIntegerFakeY(),
+    //        col::white);
+    //}
 
     if (displayHPBarCount > 0)//개체 HP 표기
     {

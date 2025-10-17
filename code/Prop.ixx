@@ -35,6 +35,9 @@ public:
 
     int nodeMaxElectron = 0;
     int nodeElectron = 0;
+    
+    int nodeInputElectron = 0;
+    int nodeOutputElectron = 0;
 
     int groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
 
@@ -48,16 +51,22 @@ public:
 
     bool runAI();
 
-    void runPropFunc();
-
     bool runAnimation(bool shutdown);
 
     void drawSelf() override;
 
     bool isConnected(Point3 currentCoord, dir16 dir);
 
+    bool isConnected(Prop* currentProp, dir16 dir);
+
+    void runPropFunc();
+
     int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited,int depth);
 
     int divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited,int depth);
+
+    void propTurnOn();
+    
+    void propTurnOff();
 };
 
