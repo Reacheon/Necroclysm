@@ -1327,6 +1327,9 @@ export namespace itemRefCode
     constexpr int silverCable = 482;
 
     constexpr int bollardLight = 118;
+
+    constexpr int leverRL = 149;
+    constexpr int leverUD = 150;
 };
 
 export namespace entityRefCode

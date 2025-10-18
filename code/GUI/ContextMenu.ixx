@@ -577,7 +577,15 @@ public:
 					else updateLog(sysStr[335]);//이 발전기를 켜기 위해서는 내부에 가솔린이 들어있어야 한다. 
 					turnWait(1.0);
 				}
+				else
+				{
+					Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+					pPtr->propTurnOn();
+					turnWait(1.0);
+				}
             }
+
+
 		}
 		else if (inputAct == act::propTurnOff)
 		{
@@ -593,7 +601,15 @@ public:
 					updateLog(sysStr[339]);//발전기를 껐다.
 					turnWait(1.0);
 				}
+				else
+				{
+					Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+					pPtr->propTurnOff();
+					turnWait(1.0);
+				}
 			}
+
+
         }
 		else if (inputAct == act::connectPlusZ)
 		{
