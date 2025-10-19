@@ -60,32 +60,32 @@ void Prop::drawSelf()
         Prop* botProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
 
         bool isRightCable = rightProp != nullptr && rightProp->leadItem.checkFlag(itemFlag::CABLE);
-        bool isTopCable = topProp != nullptr && topProp->leadItem.checkFlag(itemFlag::CABLE);
+        bool isUpCable = topProp != nullptr && topProp->leadItem.checkFlag(itemFlag::CABLE);
         bool isLeftCable = leftProp != nullptr && leftProp->leadItem.checkFlag(itemFlag::CABLE);
-        bool isBotCable = botProp != nullptr && botProp->leadItem.checkFlag(itemFlag::CABLE);
+        bool isDownCable = botProp != nullptr && botProp->leadItem.checkFlag(itemFlag::CABLE);
 
-        if (isRightCable || isTopCable || isLeftCable || isBotCable)
+        if (isRightCable || isUpCable || isLeftCable || isDownCable)
         {
             int cableSprIndex = 2720;
 
-            if (isRightCable && !isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3036;
-            else if (!isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3037;
-            else if (!isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3034;
-            else if (!isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3035;
+            if (isRightCable && !isUpCable && !isLeftCable && !isDownCable) cableSprIndex = 3036;
+            else if (!isRightCable && isUpCable && !isLeftCable && !isDownCable) cableSprIndex = 3037;
+            else if (!isRightCable && !isUpCable && isLeftCable && !isDownCable) cableSprIndex = 3034;
+            else if (!isRightCable && !isUpCable && !isLeftCable && isDownCable) cableSprIndex = 3035;
 
-            else if (isRightCable && isTopCable && !isLeftCable && !isBotCable) cableSprIndex = 3033;
-            else if (isRightCable && !isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3240;
-            else if (isRightCable && !isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3029;
-            else if (!isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3033;
-            else if (!isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3243;
-            else if (!isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 3027;
+            else if (isRightCable && isUpCable && !isLeftCable && !isDownCable) cableSprIndex = 3033;
+            else if (isRightCable && !isUpCable && isLeftCable && !isDownCable) cableSprIndex = 3240;
+            else if (isRightCable && !isUpCable && !isLeftCable && isDownCable) cableSprIndex = 3029;
+            else if (!isRightCable && isUpCable && isLeftCable && !isDownCable) cableSprIndex = 3033;
+            else if (!isRightCable && isUpCable && !isLeftCable && isDownCable) cableSprIndex = 3243;
+            else if (!isRightCable && !isUpCable && isLeftCable && isDownCable) cableSprIndex = 3027;
 
-            else if (isRightCable && isTopCable && isLeftCable && !isBotCable) cableSprIndex = 3032;
-            else if (isRightCable && isTopCable && !isLeftCable && isBotCable) cableSprIndex = 3030;
-            else if (isRightCable && !isTopCable && isLeftCable && isBotCable) cableSprIndex = 3028;
-            else if (!isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 3026;
+            else if (isRightCable && isUpCable && isLeftCable && !isDownCable) cableSprIndex = 3032;
+            else if (isRightCable && isUpCable && !isLeftCable && isDownCable) cableSprIndex = 3030;
+            else if (isRightCable && !isUpCable && isLeftCable && isDownCable) cableSprIndex = 3028;
+            else if (!isRightCable && isUpCable && isLeftCable && isDownCable) cableSprIndex = 3026;
 
-            else if (isRightCable && isTopCable && isLeftCable && isBotCable) cableSprIndex = 3024;
+            else if (isRightCable && isUpCable && isLeftCable && isDownCable) cableSprIndex = 3024;
 
 
             drawSpriteCenter

@@ -8,9 +8,6 @@ import std;
 
 export constexpr int DARK_VISION_RADIUS = 13;
 
-export constexpr int GRAY_VISION_HALF_W = 23; //주변 FOV 회색으로 바꾸는 최대 W
-export constexpr int GRAY_VISION_HALF_H = 23; //주변 FOV 회색으로 바꾸는 최대 H
-
 export constexpr int CHUNK_SIZE_X = 13; //청크의 x길이
 export constexpr int CHUNK_SIZE_Y = 13; //청크의 y길이
 export constexpr int CHUNK_SIZE_Z = 1; //청크의 z길이, 현재 1로 미사용됨
@@ -309,37 +306,12 @@ export namespace humanCustom
 
 };
 
-export namespace axis
-{
-    constexpr int x = 0;
-    constexpr int y = 1;
-    constexpr int z = 2;
-};
-
-
-export enum entityIndex
-{
-    test = 1,
-    player = 2,
-    zombie = 3
-};
-
-export enum itemIndex
-{
-    glitchItem = 0,
-    orb = 1,
-};
-
-
-
 export enum class fovFlag
 {
     white,
     black,
     gray
 };
-
-
 
 export enum class weatherFlag
 {
@@ -1048,15 +1020,6 @@ export enum class atkType
     throwing,
 };
 
-export enum class sprFlag
-{
-    stand,
-    walkLeft,
-    walkRight,
-    attack1,
-    attack2,
-};
-
 export namespace UNI
 {
     constexpr int NUL = 0;   // Null char
@@ -1350,20 +1313,20 @@ export namespace connectFlag
 {
     constexpr int cross = 0;
     constexpr int none = 1;
-    constexpr int TLB = 2;
-    constexpr int LB = 3;
-    constexpr int RLB = 4;
-    constexpr int RB = 5;
-    constexpr int RTB = 6;
-    constexpr int RT = 7;
-    constexpr int RTL = 8;
-    constexpr int TL = 9;
+    constexpr int ULD = 2;
+    constexpr int LD = 3;
+    constexpr int RLD = 4;
+    constexpr int RD = 5;
+    constexpr int RUD = 6;
+    constexpr int RU = 7;
+    constexpr int RUL = 8;
+    constexpr int UL = 9;
     constexpr int L = 10;
-    constexpr int B = 11;
+    constexpr int D = 11;
     constexpr int R = 12;
-    constexpr int T = 13;
+    constexpr int U = 13;
     constexpr int RL = 14;
-    constexpr int TB = 15;
+    constexpr int UD = 15;
 }
 
 export enum class skillSrc
