@@ -59,13 +59,13 @@ void Prop::drawSelf()
     {
         Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
         Prop* topProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
-        Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
-        Prop* dProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
+        Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
+        Prop* botProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
 
         bool isRightCable = rightProp != nullptr && (rightProp->leadItem.checkFlag(itemFlag::CABLE)||rightProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT));
         bool isUpCable = topProp != nullptr && (topProp->leadItem.checkFlag(itemFlag::CABLE) || topProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_DOWN));
-        bool isLeftCable = lProp != nullptr && (lProp->leadItem.checkFlag(itemFlag::CABLE) || lProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT));
-        bool isDownCable = dProp != nullptr && (dProp->leadItem.checkFlag(itemFlag::CABLE) || dProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP));
+        bool isLeftCable = leftProp != nullptr && (leftProp->leadItem.checkFlag(itemFlag::CABLE) || leftProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT));
+        bool isDownCable = botProp != nullptr && (botProp->leadItem.checkFlag(itemFlag::CABLE) || botProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP));
 
         if (isRightCable || isUpCable || isLeftCable || isDownCable)
         {
@@ -278,15 +278,13 @@ void Prop::drawSelf()
 
     if (leadItem.checkFlag(itemFlag::CABLE))
     {
-        Prop* rProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
-        Prop* uProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
-        Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
-        Prop* dProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
+        setFlip((getGridZ() % 2 != 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
-        bool rConnected = rProp != nullptr && (rProp->leadItem.checkFlag(itemFlag::CABLE) || rProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT));
-        bool uConnected = uProp != nullptr && (uProp->leadItem.checkFlag(itemFlag::CABLE) || uProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_DOWN));
-        bool lConnected = lProp != nullptr && (lProp->leadItem.checkFlag(itemFlag::CABLE) || lProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT));
-        bool dConnected = dProp != nullptr && (dProp->leadItem.checkFlag(itemFlag::CABLE) || dProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP));
+
+        bool rConnected = isConnected(this, dir16::right);
+        bool uConnected = isConnected(this, dir16::up);
+        bool lConnected = isConnected(this, dir16::left);
+        bool dConnected = isConnected(this, dir16::down);
 
         if (nodeInputElectron > 0)
         {
@@ -304,24 +302,28 @@ void Prop::drawSelf()
 
                 if (rConnected)
                 {
+                    Prop* rProp = TileProp({ getGridX() + 1,getGridY(),getGridZ() });
                     if (rProp->nodeInputElectron > 0 || rProp->nodeOutputElectron > 0)
                         drawSpriteCenter(spr::propset, 2945, drawX, drawY);
                 }
                 
                 if (uConnected)
                 {
+                    Prop* uProp = TileProp({ getGridX(),getGridY() - 1,getGridZ() });
                     if (uProp->nodeInputElectron > 0 || uProp->nodeOutputElectron > 0)
                         drawSpriteCenter(spr::propset, 2946, drawX, drawY);
                 }
 
                 if(lConnected)
                 {
+                    Prop* lProp = TileProp({ getGridX() - 1,getGridY(),getGridZ() });
                     if (lProp->nodeInputElectron > 0 || lProp->nodeOutputElectron > 0)
                         drawSpriteCenter(spr::propset, 2947, drawX, drawY);
                 }
 
                 if(dConnected)
                 {
+                    Prop* dProp = TileProp({ getGridX(),getGridY() + 1,getGridZ() });
                     if (dProp->nodeInputElectron > 0 || dProp->nodeOutputElectron > 0)
                         drawSpriteCenter(spr::propset, 2948, drawX, drawY);
                 }
@@ -329,7 +331,6 @@ void Prop::drawSelf()
         }
 
 
-        setFlip((getGridZ() % 2 != 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND) || leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
         {

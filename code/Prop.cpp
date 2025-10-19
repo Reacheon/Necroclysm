@@ -489,40 +489,40 @@ void Prop::runPropFunc()
         }
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //6. 최종 상태 출력
-        std::wprintf(L"\n┌────────────────────────────────────┐\n");
-        std::wprintf(L"│ 최종 회로 상태                     │\n");
-        std::wprintf(L"├────────────────────────────────────┤\n");
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////6. 최종 상태 출력
+        //std::wprintf(L"\n┌────────────────────────────────────┐\n");
+        //std::wprintf(L"│ 최종 회로 상태                     │\n");
+        //std::wprintf(L"├────────────────────────────────────┤\n");
 
-        for (auto coord : visitedVec)
-        {
-            Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
-            if (propPtr != nullptr)
-            {
-                std::wstring nodeType = L"Wire";
-                if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE)) nodeType = L"Gen ";
-                else if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT) ||
-                    propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
-                    nodeType = L"GND ";
+        //for (auto coord : visitedVec)
+        //{
+        //    Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
+        //    if (propPtr != nullptr)
+        //    {
+        //        std::wstring nodeType = L"Wire";
+        //        if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE)) nodeType = L"Gen ";
+        //        else if (propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_UP) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_DOWN) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_LEFT) ||
+        //            propPtr->leadItem.checkFlag(itemFlag::VOLTAGE_GND_RIGHT))
+        //            nodeType = L"GND ";
 
-                wchar_t status = L'○';
-                if (propPtr->nodeElectron == 0) status = L'○';
-                else if (propPtr->nodeElectron == propPtr->nodeMaxElectron) status = L'●';
-                else status = L'◐';
+        //        wchar_t status = L'○';
+        //        if (propPtr->nodeElectron == 0) status = L'○';
+        //        else if (propPtr->nodeElectron == propPtr->nodeMaxElectron) status = L'●';
+        //        else status = L'◐';
 
-                std::wprintf(L"│ %s (%3d,%3d): %3d/%3d %c     │\n",
-                    nodeType.c_str(),
-                    coord.x, coord.y,
-                    propPtr->nodeElectron, propPtr->nodeMaxElectron,
-                    status);
-            }
-        }
+        //        std::wprintf(L"│ %s (%3d,%3d): %3d/%3d %c     │\n",
+        //            nodeType.c_str(),
+        //            coord.x, coord.y,
+        //            propPtr->nodeElectron, propPtr->nodeMaxElectron,
+        //            status);
+        //    }
+        //}
 
-        std::wprintf(L"└────────────────────────────────────┘\n\n");
+        //std::wprintf(L"└────────────────────────────────────┘\n\n");
     }
 
     runUsed = true;
@@ -627,11 +627,11 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
     // 들여쓰기 생성
     std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
 
-    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
-        indent.c_str(),
-        donorProp->getGridX(), donorProp->getGridY(),
-        acceptorProp->getGridX(), acceptorProp->getGridY(),
-        txElectronAmount);
+    //std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
+    //    indent.c_str(),
+    //    donorProp->getGridX(), donorProp->getGridY(),
+    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+    //    txElectronAmount);
 
     if (donorProp->getGridX() == -2 && donorProp->getGridY() == -11)
     {
@@ -677,14 +677,14 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
             acceptorProp->groundChargeEnergy += consumeEnergy;
             acceptorProp->nodeInputElectron += consumeEnergy;
 
-            std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
-                indent.c_str(),
-                donorProp->getGridX(), donorProp->getGridY(),
-                donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
-                acceptorProp->getGridX(), acceptorProp->getGridY(),
-                txElectronAmount,
-                consumeEnergy,
-                remainEnergy - consumeEnergy);
+            //std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
+            //    indent.c_str(),
+            //    donorProp->getGridX(), donorProp->getGridY(),
+            //    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
+            //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+            //    txElectronAmount,
+            //    consumeEnergy,
+            //    remainEnergy - consumeEnergy);
 
             return consumeEnergy;
         }
@@ -714,13 +714,13 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
-        indent.c_str(),
-        donorProp->getGridX(), donorProp->getGridY(),
-        donorProp->nodeElectron,
-        acceptorProp->getGridX(), acceptorProp->getGridY(),
-        acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-        txElectronAmount, finalTxElectron);
+    //std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
+    //    indent.c_str(),
+    //    donorProp->getGridX(), donorProp->getGridY(),
+    //    donorProp->nodeElectron,
+    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
+    //    acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+    //    txElectronAmount, finalTxElectron);
 
     donorProp->nodeElectron -= finalTxElectron;
     donorProp->nodeOutputElectron += finalTxElectron;
