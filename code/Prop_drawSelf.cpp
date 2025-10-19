@@ -59,10 +59,10 @@ void Prop::drawSelf()
         Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
         Prop* botProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
 
-        bool isRightCable = rightProp != nullptr && rightProp->leadItem.checkFlag(itemFlag::CABLE);
-        bool isUpCable = topProp != nullptr && topProp->leadItem.checkFlag(itemFlag::CABLE);
-        bool isLeftCable = leftProp != nullptr && leftProp->leadItem.checkFlag(itemFlag::CABLE);
-        bool isDownCable = botProp != nullptr && botProp->leadItem.checkFlag(itemFlag::CABLE);
+        bool isRightCable = rightProp != nullptr && (rightProp->leadItem.checkFlag(itemFlag::CABLE)||rightProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT));
+        bool isUpCable = topProp != nullptr && (topProp->leadItem.checkFlag(itemFlag::CABLE) || topProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_DOWN));
+        bool isLeftCable = leftProp != nullptr && (leftProp->leadItem.checkFlag(itemFlag::CABLE) || leftProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT));
+        bool isDownCable = botProp != nullptr && (botProp->leadItem.checkFlag(itemFlag::CABLE) || botProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP));
 
         if (isRightCable || isUpCable || isLeftCable || isDownCable)
         {
@@ -173,6 +173,65 @@ void Prop::drawSelf()
             sprIndex += (2 + animFrame);
         }
     }
+
+
+    if (leadItem.itemCode == itemRefCode::leverRL)
+    {
+        bool rConnected = isConnected(this, dir16::right);
+        bool uConnected = isConnected(this, dir16::up);
+        bool lConnected = isConnected(this, dir16::left);
+        bool dConnected = isConnected(this, dir16::down);
+
+
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            if (nodeInputElectron > 0 || nodeOutputElectron > 0) sprIndex += 4;
+            else sprIndex += 3;
+        }
+        else
+        {
+            Prop* rProp = TileProp({ getGridX() + 1,getGridY(),getGridZ() });
+            Prop* lProp = TileProp({ getGridX() - 1,getGridY(),getGridZ() });
+
+            if (rProp != nullptr && rConnected && rProp->nodeOutputElectron > 0)
+            {
+                sprIndex += 1;
+            }
+            else if (lProp != nullptr && lConnected && lProp->nodeOutputElectron > 0)
+            {
+                sprIndex += 2;
+            }
+            else sprIndex += 0;
+        }
+    }
+    else if (leadItem.itemCode == itemRefCode::leverUD)
+    {
+        bool rConnected = isConnected(this, dir16::right);
+        bool uConnected = isConnected(this, dir16::up);
+        bool lConnected = isConnected(this, dir16::left);
+        bool dConnected = isConnected(this, dir16::down);
+
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            if (nodeInputElectron > 0 || nodeOutputElectron > 0) sprIndex += 4;
+            else sprIndex += 3;
+        }
+        else
+        {
+            Prop* uProp = TileProp({ getGridX(),getGridY() - 1,getGridZ() });
+            Prop* dProp = TileProp({ getGridX(),getGridY() + 1,getGridZ() });
+            if (uProp != nullptr && uConnected && uProp->nodeOutputElectron > 0)
+            {
+                sprIndex += 1;
+            }
+            else if (dProp != nullptr && dConnected && dProp->nodeOutputElectron > 0)
+            {
+                sprIndex += 2;
+            }
+            else sprIndex += 0;
+        }
+    }
+
 
 
     drawSpriteCenter
