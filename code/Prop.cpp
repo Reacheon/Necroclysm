@@ -343,6 +343,7 @@ void Prop::runPropFunc()
         std::vector<Prop*> loadVec; //부하가 가해지는 전자기기들
 
         int circuitMaxEnergy = 0;
+        int circuitTotalLoad = 0;
         bool hasGround = false;
 
 
@@ -372,8 +373,12 @@ void Prop::runPropFunc()
                     
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
-                    circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
-                    voltagePropVec.push_back(currentProp);
+                    if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
+                        currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
+                    {
+                        circuitMaxEnergy += currentProp->leadItem.electricMaxPower;
+                        voltagePropVec.push_back(currentProp);
+                    }
                 }
 
                 if (currentProp->leadItem.electricUsePower > 0) loadVec.push_back(currentProp);
@@ -412,6 +417,11 @@ void Prop::runPropFunc()
             }
         }
 
+        for (int i = 0; i < loadVec.size(); i++)
+        {
+            circuitTotalLoad += loadVec[i]->leadItem.electricUsePower;
+        }
+
         // 노드가 2개 미만이면 출력하지 않음
         if (visitedSet.size() < 2)
         {
@@ -446,6 +456,20 @@ void Prop::runPropFunc()
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //4. 전압원에서 전송 시작
+
+        int totalPushedElectron = 0;
+
+        int totalAvailablePower = 0;
+        for (int i = 0; i < voltagePropVec.size(); i++)
+        {
+            Prop* voltProp = voltagePropVec[i];
+            if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
+                voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
+            {
+                totalAvailablePower += voltProp->leadItem.electricMaxPower;
+            }
+        }
+
         for (int i = 0; i < voltagePropVec.size(); i++)
         {
             Prop* voltProp = voltagePropVec[i];
@@ -453,17 +477,18 @@ void Prop::runPropFunc()
             int x = voltProp->getGridX();
             int y = voltProp->getGridY();
             int z = voltProp->getGridZ();
+            int voltOutputPower = myMin(ceil(circuitTotalLoad * ((double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower)), voltProp->leadItem.electricMaxPower);
 
             if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
             {
                 if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
-                    pushElectron(voltProp, dir16::right, voltProp->leadItem.electricMaxPower, {}, 0);
+                    totalPushedElectron += pushElectron(voltProp, dir16::right, voltOutputPower, {}, 0);
                 else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
-                    pushElectron(voltProp, dir16::up, voltProp->leadItem.electricMaxPower, {}, 0);
+                    totalPushedElectron += pushElectron(voltProp, dir16::up, voltOutputPower, {}, 0);
                 else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
-                    pushElectron(voltProp, dir16::left, voltProp->leadItem.electricMaxPower, {}, 0);
+                    totalPushedElectron += pushElectron(voltProp, dir16::left, voltOutputPower, {}, 0);
                 else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
-                    pushElectron(voltProp, dir16::down, voltProp->leadItem.electricMaxPower, {}, 0);
+                    totalPushedElectron += pushElectron(voltProp, dir16::down, voltOutputPower, {}, 0);
 
                 voltProp->nodeElectron = voltProp->nodeMaxElectron;
             }
