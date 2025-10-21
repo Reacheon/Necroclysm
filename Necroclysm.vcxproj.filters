@@ -561,8 +561,5 @@
     <ClCompile Include="code\Prop_drawSelf.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
     </ClCompile>
-    <ClCompile Include="code\PropBackup.ixx">
-      <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
