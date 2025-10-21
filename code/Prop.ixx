@@ -13,7 +13,7 @@ import Drawable;
 export class Prop : public Ani, public AI, public Coord, public Drawable
 {
 private:
-    
+
 public:
 
     ItemData leadItem;
@@ -23,19 +23,19 @@ public:
     float treeAngle = 0.0; //벌목 때 나무들이 가지는 앵글, 0이 아닐 경우 활성화됨
 
     bool runUsed = false; //runProp
-    
-    double current = 0.0f; //전류
-	double elecResistance = 0.0f; //전기저항
 
-	double flow = 0.0f; //유량
-	double flowResistance = 0.0f; //흐름저항
-	int fluidCode = 0; //유체 아이템 코드
+    double current = 0.0f; //전류
+    double elecResistance = 0.0f; //전기저항
+
+    double flow = 0.0f; //유량
+    double flowResistance = 0.0f; //흐름저항
+    int fluidCode = 0; //유체 아이템 코드
 
     std::vector<dir16> voltageDir;
 
     int nodeMaxElectron = 0;
     int nodeElectron = 0;
-    
+
     int nodeInputElectron = 0;
     int nodeOutputElectron = 0;
 
@@ -61,12 +61,11 @@ public:
 
     void runPropFunc();
 
-    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited,int depth);
+    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth);
 
-    int divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited,int depth);
+    int divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
 
     void propTurnOn();
-    
+
     void propTurnOff();
 };
-

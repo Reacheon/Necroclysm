@@ -67,12 +67,12 @@ Prop::~Prop()
             Prop* abovePropPtr = TileProp(getGridX(), getGridY(), getGridZ() + 1);
             if (abovePropPtr != nullptr) abovePropPtr->leadItem.eraseFlag(itemFlag::CABLE_Z_DESCEND);
         }
-        
-        if(leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
+
+        if (leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
         {
             Prop* belowPropPtr = TileProp(getGridX(), getGridY(), getGridZ() - 1);
             if (belowPropPtr != nullptr) belowPropPtr->leadItem.eraseFlag(itemFlag::CABLE_Z_ASCEND);
-		}
+        }
     }
 
     prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
@@ -266,19 +266,19 @@ bool Prop::runAnimation(bool shutdown)
         else if (getTimer() == 10) setFakeY(-6);
         else if (getTimer() == 12) setFakeY(-5);
         else if (getTimer() == 13) setFakeY(-4);
-        else if (getTimer() == 16) 
-        { 
-            setFakeY(0); 
-            resetTimer(); 
-            setAniType(aniFlag::null); 
-            return true; 
+        else if (getTimer() == 16)
+        {
+            setFakeY(0);
+            resetTimer();
+            setAniType(aniFlag::null);
+            return true;
         }
     }
     else if (getAniType() == aniFlag::treeFalling)
     {
         addTimer();
 
-        if(getTimer()==1) leadItem.addFlag(itemFlag::STUMP);
+        if (getTimer() == 1) leadItem.addFlag(itemFlag::STUMP);
 
         if (PlayerX() <= getGridX()) treeAngle += 0.7 + (float)(getTimer()) * 0.04;
         else treeAngle -= 0.7 + (float)(getTimer()) * 0.04;
@@ -296,7 +296,7 @@ bool Prop::runAnimation(bool shutdown)
                 createItemStack(itemPos, { {392,1} });
                 for (int i = 0; i < 8; i++)
                 {
-                    new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8) , randomRange(0, 7), randomRangeFloat(-1.2,1.2), randomRangeFloat(-2.6,-3.2), 0.18, randomRange(25,35));
+                    new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
                 }
             }
             else
@@ -310,8 +310,8 @@ bool Prop::runAnimation(bool shutdown)
                     new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
                 }
             }
-            
-            
+
+
             addAniUSetPlayer(TileItemStack(itemPos.x, itemPos.y, itemPos.z), aniFlag::drop);
             treeAngle = 0;
             resetTimer();
@@ -347,9 +347,9 @@ void Prop::runPropFunc()
         bool hasGround = false;
 
 
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //1. 회로 탐색
+        //==============================================================================
+        // 1. 회로 최초 탐색(BFS)
+        //==============================================================================
         frontierQueue.push({ cursorX, cursorY, cursorZ });
         while (!frontierQueue.empty())
         {
@@ -370,7 +370,7 @@ void Prop::runPropFunc()
 
                 currentProp->nodeInputElectron = 0;
                 currentProp->nodeOutputElectron = 0;
-                    
+
                 if (currentProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
                 {
                     if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
@@ -383,7 +383,7 @@ void Prop::runPropFunc()
 
                 if (currentProp->leadItem.electricUsePower > 0) loadVec.push_back(currentProp);
 
-                
+
 
                 const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend };
                 const itemFlag groundFlags[][2] = {
@@ -437,12 +437,13 @@ void Prop::runPropFunc()
         //std::wprintf(L"│ 접지 존재: %s                   │\n", hasGround ? L"Yes" : L"No ");
         //std::wprintf(L"└─────────────────────────────────┘\n\n");
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //2. 최대 전력 설정
+        //==============================================================================
+        // 2. 최대 전력 설정
+        //==============================================================================
         for (auto coord : visitedSet)
         {
             Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
-            
+
             if (propPtr->getGridX() == -2 && propPtr->getGridY() == -11)
             {
                 int a = 2;
@@ -454,9 +455,9 @@ void Prop::runPropFunc()
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //4. 전압원에서 전송 시작
-
+        //==============================================================================
+        // 3. 전압원 전송 시작
+        //==============================================================================
         int totalPushedElectron = 0;
 
         int totalAvailablePower = 0;
@@ -493,20 +494,21 @@ void Prop::runPropFunc()
                 voltProp->nodeElectron = voltProp->nodeMaxElectron;
             }
         }
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //5. 부하들 전력 소모 시작
+
+        //==============================================================================
+        // 4. 부하 부품들 전력 소모
+        //==============================================================================
         for (int i = 0; i < loadVec.size(); i++)
         {
             Prop* loadProp = loadVec[i];
             if (loadProp->groundChargeEnergy >= loadProp->leadItem.electricUsePower)
             {
-                if (loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) 
+                if (loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
                     loadProp->propTurnOn();
             }
             else
             {
-                if(loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)) 
+                if (loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
                     loadProp->propTurnOff();
             }
 
@@ -514,8 +516,9 @@ void Prop::runPropFunc()
         }
 
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////6. 최종 상태 출력
+        //==============================================================================
+        // 5. 최종 상태 출력
+        //==============================================================================
         //std::wprintf(L"\n┌────────────────────────────────────┐\n");
         //std::wprintf(L"│ 최종 회로 상태                     │\n");
         //std::wprintf(L"├────────────────────────────────────┤\n");
@@ -602,12 +605,12 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
 
     if (targetProp == nullptr) return false;
-    
-    if ((dir == dir16::right|| dir == dir16::left) && targetProp->leadItem.itemCode == itemRefCode::leverRL)
+
+    if ((dir == dir16::right || dir == dir16::left) && targetProp->leadItem.itemCode == itemRefCode::leverRL)
     {
-        if(targetProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
+        if (targetProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
     }
-    else if((dir == dir16::up || dir == dir16::down) && targetProp->leadItem.itemCode == itemRefCode::leverUD)
+    else if ((dir == dir16::up || dir == dir16::down) && targetProp->leadItem.itemCode == itemRefCode::leverUD)
     {
         if (targetProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
     }
@@ -652,11 +655,11 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
     // 들여쓰기 생성
     std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
 
-    //std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
-    //    indent.c_str(),
-    //    donorProp->getGridX(), donorProp->getGridY(),
-    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-    //    txElectronAmount);
+    std::wprintf(L"%s[PUSH] (%d,%d) → %s(%d,%d) 시도: %d\n",
+        indent.c_str(),
+        donorProp->getGridX(), donorProp->getGridY(),
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        txElectronAmount);
 
     if (donorProp->getGridX() == -2 && donorProp->getGridY() == -11)
     {
@@ -702,14 +705,14 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
             acceptorProp->groundChargeEnergy += consumeEnergy;
             acceptorProp->nodeInputElectron += consumeEnergy;
 
-            //std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
-            //    indent.c_str(),
-            //    donorProp->getGridX(), donorProp->getGridY(),
-            //    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
-            //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-            //    txElectronAmount,
-            //    consumeEnergy,
-            //    remainEnergy - consumeEnergy);
+            std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
+                indent.c_str(),
+                donorProp->getGridX(), donorProp->getGridY(),
+                donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
+                acceptorProp->getGridX(), acceptorProp->getGridY(),
+                txElectronAmount,
+                consumeEnergy,
+                remainEnergy - consumeEnergy);
 
             return consumeEnergy;
         }
@@ -739,13 +742,13 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    //std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
-    //    indent.c_str(),
-    //    donorProp->getGridX(), donorProp->getGridY(),
-    //    donorProp->nodeElectron,
-    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-    //    acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-    //    txElectronAmount, finalTxElectron);
+    std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
+        indent.c_str(),
+        donorProp->getGridX(), donorProp->getGridY(),
+        donorProp->nodeElectron,
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+        txElectronAmount, finalTxElectron);
 
     donorProp->nodeElectron -= finalTxElectron;
     donorProp->nodeOutputElectron += finalTxElectron;
@@ -809,7 +812,7 @@ void Prop::propTurnOff()
 {
     leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
     leadItem.addFlag(itemFlag::PROP_POWER_OFF);
-    
+
     int iCode = leadItem.itemCode;
     if (iCode == itemRefCode::bollardLight)
     {
