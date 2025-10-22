@@ -804,12 +804,14 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
 
         //접지 우선 배분
         std::vector<dir16> gndDirs;
+        std::vector<dir16> nonGndDirs;
         for (auto dir : possibleDirs)
         {
             if (isGround({ propPtr->getGridX(), propPtr->getGridY(), propPtr->getGridZ() }, dir))
             {
                 gndDirs.push_back(dir);
             }
+            else nonGndDirs.push_back(dir);
         }
 
         if (gndDirs.size() > 0)
@@ -821,42 +823,33 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
                 int branchPushedElectron = pushElectron(propPtr, dir, gndSplitElectron, newPathVisited, depth);
                 gndPushedElectron += branchPushedElectron;
                 totalPushedElectron += branchPushedElectron;
-                dirsToRemove.push_back(dir);
+                if(branchPushedElectron==0) dirsToRemove.push_back(dir);
             }
 
-            for (auto dir : dirsToRemove)
-            {
-                possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
-            }
-
-            dirsToRemove.clear();
-
+            for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
             remainingElectron -= gndPushedElectron;
         }
 
+        dirsToRemove.clear();
         if (possibleDirs.empty()) break;
 
-        int splitElectron = remainingElectron / possibleDirs.size();
-        if (splitElectron == 0) break;
-        for (auto dir : possibleDirs)
+        if (nonGndDirs.size() > 0)
         {
-            auto newPathVisited = pathVisited;
-            int branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited, depth);
+            int splitElectron = remainingElectron / nonGndDirs.size();
+            for (auto dir : nonGndDirs)
+            {
+                auto newPathVisited = pathVisited;
+                int branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited, depth);
+                loopPushedElectron += branchPushedElectron;
+                totalPushedElectron += branchPushedElectron;
+                if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
+            }
 
-            loopPushedElectron += branchPushedElectron;
-            totalPushedElectron += branchPushedElectron;
-
-            if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
+            for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
+            remainingElectron -= loopPushedElectron;
         }
 
-        for (auto dir : dirsToRemove)
-        {
-            possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
-        }
-
-        remainingElectron -= loopPushedElectron;
-
-        if (loopPushedElectron == 0) break;
+        if (loopPushedElectron == 0 && gndPushedElectron == 0) break;
     }
 
     return totalPushedElectron;
