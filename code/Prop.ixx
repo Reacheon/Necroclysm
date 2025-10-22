@@ -59,6 +59,8 @@ public:
 
     bool isConnected(Prop* currentProp, dir16 dir);
 
+    bool isGround(Point3 currentCoord, dir16 dir);
+
     void runPropFunc();
 
     int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth);

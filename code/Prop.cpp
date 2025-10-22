@@ -634,6 +634,47 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
 }
 
+bool Prop::isGround(Point3 currentCoord, dir16 dir)
+{
+    Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+    Point3 delCoord = { 0,0,0 };
+    itemFlag groundFlag;
+    switch (dir)
+    {
+    case dir16::right:
+        delCoord = { +1,0,0 };
+        groundFlag = itemFlag::VOLTAGE_GND_LEFT;
+        break;
+    case dir16::up:
+        delCoord = { 0,-1,0 };
+        groundFlag = itemFlag::VOLTAGE_GND_DOWN;
+        break;
+    case dir16::left:
+        delCoord = { -1,0,0 };
+        groundFlag = itemFlag::VOLTAGE_GND_RIGHT;
+        break;
+    case dir16::down:
+        delCoord = { 0,+1,0 };
+        groundFlag = itemFlag::VOLTAGE_GND_UP;
+        break;
+    case dir16::ascend:
+    case dir16::descend:
+        groundFlag = itemFlag::VOLTAGE_GND_ALL;
+        break;
+    default:
+        errorBox(L"[Error] isGround lambda function received invalid direction argument.\n");
+        break;
+    }
+    Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+    if (targetProp == nullptr) return false;
+    if (targetProp->leadItem.checkFlag(groundFlag) || targetProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL))
+    {
+        //중복인가? 최적화를 위해선 없어도 될 수도
+        if (isConnected(currentCoord, dir)) return true;
+    }
+    else return false;
+}
+
 bool Prop::isConnected(Prop* currentProp, dir16 dir)
 {
     return isConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
@@ -643,35 +684,27 @@ bool Prop::isConnected(Prop* currentProp, dir16 dir)
 
 int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    if (pathVisited.find(donorProp) != pathVisited.end()) return 0;
-    pathVisited.insert(donorProp);
-
     errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
-
     int dx, dy, dz;
     dirToXYZ(txDir, dx, dy, dz);
     Prop* acceptorProp = TileProp(donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz);
+    errorBox(acceptorProp == nullptr, L"[Error] pushElectron: no acceptor found\n");
 
-    // 들여쓰기 생성
-    std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
-
-    std::wprintf(L"%s[PUSH] (%d,%d) → %s(%d,%d) 시도: %d\n",
-        indent.c_str(),
-        donorProp->getGridX(), donorProp->getGridY(),
-        acceptorProp->getGridX(), acceptorProp->getGridY(),
-        txElectronAmount);
-
-    if (donorProp->getGridX() == -2 && donorProp->getGridY() == -11)
-    {
-        int a = 2;
-    }
-
-    errorBox(acceptorProp == nullptr, L"[Error] pushElectron: null acceptor\n");
     errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron: insufficient electron\n");
     errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
         L"[Error] pushElectron: not connected\n");
 
-    if (txElectronAmount <= 0) return 0;
+    if (pathVisited.find(donorProp) != pathVisited.end()) return 0;
+    pathVisited.insert(donorProp);
+    if (pathVisited.find(acceptorProp) != pathVisited.end()) return 0;
+
+    // 들여쓰기 생성
+    std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
+    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
+        indent.c_str(),
+        donorProp->getGridX(), donorProp->getGridY(),
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        txElectronAmount);
 
     bool isGrounded = false;
     if (acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL)) isGrounded = true;
@@ -765,12 +798,46 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
 
     while (remainingElectron > 0 && !possibleDirs.empty())
     {
-        int splitElectron = remainingElectron / possibleDirs.size();
-        if (splitElectron == 0) break;
-
+        int gndPushedElectron = 0;
         int loopPushedElectron = 0;
         std::vector<dir16> dirsToRemove;
 
+        //접지 우선 배분
+        std::vector<dir16> gndDirs;
+        for (auto dir : possibleDirs)
+        {
+            if (isGround({ propPtr->getGridX(), propPtr->getGridY(), propPtr->getGridZ() }, dir))
+            {
+                gndDirs.push_back(dir);
+            }
+        }
+
+        if (gndDirs.size() > 0)
+        {
+            int gndSplitElectron = remainingElectron / gndDirs.size();
+            for (auto dir : gndDirs)
+            {
+                auto newPathVisited = pathVisited;
+                int branchPushedElectron = pushElectron(propPtr, dir, gndSplitElectron, newPathVisited, depth);
+                gndPushedElectron += branchPushedElectron;
+                totalPushedElectron += branchPushedElectron;
+                dirsToRemove.push_back(dir);
+            }
+
+            for (auto dir : dirsToRemove)
+            {
+                possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
+            }
+
+            dirsToRemove.clear();
+
+            remainingElectron -= gndPushedElectron;
+        }
+
+        if (possibleDirs.empty()) break;
+
+        int splitElectron = remainingElectron / possibleDirs.size();
+        if (splitElectron == 0) break;
         for (auto dir : possibleDirs)
         {
             auto newPathVisited = pathVisited;
