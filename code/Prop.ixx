@@ -34,12 +34,11 @@ public:
     std::vector<dir16> voltageDir;
 
     int nodeMaxElectron = 0;
-    int nodeElectron = 0;
-
-    int nodeInputElectron = 0;
-    int nodeOutputElectron = 0;
-
-    int groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
+    
+    double nodeElectron = 0;
+    double nodeInputElectron = 0;
+    double nodeOutputElectron = 0;
+    double groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
 
     Prop(Point3 inputCoor, int leadItemCode);
 
@@ -63,9 +62,9 @@ public:
 
     void runPropFunc();
 
-    int pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth);
+    double pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth);
 
-    int divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
+    double divideElectron(Prop* propPtr, double inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
 
     void propTurnOn();
 

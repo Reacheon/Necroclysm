@@ -443,12 +443,6 @@ void Prop::runPropFunc()
         for (auto coord : visitedSet)
         {
             Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
-
-            if (propPtr->getGridX() == -2 && propPtr->getGridY() == -11)
-            {
-                int a = 2;
-            }
-
             if (propPtr != nullptr)
             {
                 propPtr->nodeMaxElectron = circuitMaxEnergy;
@@ -458,7 +452,7 @@ void Prop::runPropFunc()
         //==============================================================================
         // 3. 전압원 전송 시작
         //==============================================================================
-        int totalPushedElectron = 0;
+        double totalPushedElectron = 0;
 
         int totalAvailablePower = 0;
         for (int i = 0; i < voltagePropVec.size(); i++)
@@ -478,7 +472,7 @@ void Prop::runPropFunc()
             int x = voltProp->getGridX();
             int y = voltProp->getGridY();
             int z = voltProp->getGridZ();
-            int voltOutputPower = myMin(ceil(circuitTotalLoad * ((double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower)), voltProp->leadItem.electricMaxPower);
+            double voltOutputPower = myMin(ceil(circuitTotalLoad * ((double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower)), voltProp->leadItem.electricMaxPower);
 
             if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
             {
@@ -501,7 +495,7 @@ void Prop::runPropFunc()
         for (int i = 0; i < loadVec.size(); i++)
         {
             Prop* loadProp = loadVec[i];
-            if (loadProp->groundChargeEnergy >= loadProp->leadItem.electricUsePower)
+            if (loadProp->groundChargeEnergy >= static_cast<double>(loadProp->leadItem.electricUsePower))
             {
                 if (loadProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
                     loadProp->propTurnOn();
@@ -682,7 +676,7 @@ bool Prop::isConnected(Prop* currentProp, dir16 dir)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
+double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
     errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
     int dx, dy, dz;
@@ -700,7 +694,7 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     // 들여쓰기 생성
     std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
-    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %d\n",
+    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %.2f\n",
         indent.c_str(),
         donorProp->getGridX(), donorProp->getGridY(),
         acceptorProp->getGridX(), acceptorProp->getGridY(),
@@ -727,18 +721,18 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 
     if (isGrounded)
     {
-        int remainEnergy = acceptorProp->leadItem.electricUsePower - acceptorProp->groundChargeEnergy;
+        double remainEnergy = acceptorProp->leadItem.electricUsePower - acceptorProp->groundChargeEnergy;
 
         if (remainEnergy > 0)
         {
-            int consumeEnergy = std::min(txElectronAmount, remainEnergy);
+            double consumeEnergy = std::min(txElectronAmount, remainEnergy);
 
             donorProp->nodeElectron -= consumeEnergy;
             donorProp->nodeOutputElectron += consumeEnergy;
             acceptorProp->groundChargeEnergy += consumeEnergy;
             acceptorProp->nodeInputElectron += consumeEnergy;
 
-            std::wprintf(L"%s[전송-GND] (%d,%d)[%d] → (%d,%d)[GND]: 요청=%d, 소모=%d (부하 남은수요=%d)\n",
+            std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f (부하 남은수요=%.2f)\n",
                 indent.c_str(),
                 donorProp->getGridX(), donorProp->getGridY(),
                 donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
@@ -752,9 +746,9 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
         else return 0;
     }
 
-    int pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
+    double pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
 
-    int dividedElectron = 0;
+    double dividedElectron = 0;
     if (pushedElectron > 0)
     {
         std::vector<dir16> possibleDirs;
@@ -773,9 +767,9 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
         }
     }
 
-    int finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
+    double finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    std::wprintf(L"%s[전송] (%d,%d)[%d] → (%d,%d)[%d/%d]: 요청=%d, 전송=%d\n",
+    std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f\n",
         indent.c_str(),
         donorProp->getGridX(), donorProp->getGridY(),
         donorProp->nodeElectron,
@@ -791,15 +785,15 @@ int Prop::pushElectron(Prop* donorProp, dir16 txDir, int txElectronAmount, std::
 }
 
 
-int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth)
+double Prop::divideElectron(Prop* propPtr, double inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    int totalPushedElectron = 0;
-    int remainingElectron = inputElectron;
+    double totalPushedElectron = 0;
+    double remainingElectron = inputElectron;
 
     while (remainingElectron > 0 && !possibleDirs.empty())
     {
-        int gndPushedElectron = 0;
-        int loopPushedElectron = 0;
+        double gndPushedElectron = 0;
+        double loopPushedElectron = 0;
         std::vector<dir16> dirsToRemove;
 
         //접지 우선 배분
@@ -816,14 +810,14 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
 
         if (gndDirs.size() > 0)
         {
-            int gndSplitElectron = remainingElectron / gndDirs.size();
+            double gndSplitElectron = remainingElectron / gndDirs.size();
             for (auto dir : gndDirs)
             {
                 auto newPathVisited = pathVisited;
-                int branchPushedElectron = pushElectron(propPtr, dir, gndSplitElectron, newPathVisited, depth);
+                double branchPushedElectron = pushElectron(propPtr, dir, gndSplitElectron, newPathVisited, depth);
                 gndPushedElectron += branchPushedElectron;
                 totalPushedElectron += branchPushedElectron;
-                if(branchPushedElectron==0) dirsToRemove.push_back(dir);
+                if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
             }
 
             for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
@@ -835,11 +829,11 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
 
         if (nonGndDirs.size() > 0)
         {
-            int splitElectron = remainingElectron / nonGndDirs.size();
+            double splitElectron = remainingElectron / nonGndDirs.size();
             for (auto dir : nonGndDirs)
             {
                 auto newPathVisited = pathVisited;
-                int branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited, depth);
+                double branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited, depth);
                 loopPushedElectron += branchPushedElectron;
                 totalPushedElectron += branchPushedElectron;
                 if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
@@ -854,6 +848,7 @@ int Prop::divideElectron(Prop* propPtr, int inputElectron, std::vector<dir16> po
 
     return totalPushedElectron;
 }
+
 
 void Prop::propTurnOn()
 {
