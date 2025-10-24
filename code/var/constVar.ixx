@@ -81,6 +81,7 @@ export constexpr int MAX_BATCH = 4096;
 
 
 
+
 export namespace mulCol
 {
     constexpr SDL_Color day = { 255,255,255,255 };

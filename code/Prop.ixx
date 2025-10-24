@@ -40,6 +40,8 @@ public:
     double nodeOutputElectron = 0;
     double groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
 
+    double lossCompensationFactor = 1.1; //전압원에 저장되는 저항손실 보존 변수
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();

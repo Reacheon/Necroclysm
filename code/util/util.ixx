@@ -15,7 +15,7 @@ export import HSVConverter;
 export import isCircle;
 export import nanoTimer;
 export import prt;
-export import randomRange;
+export import randomEngine;
 export import readTSV;
 export import replaceStr;
 export import sgn;

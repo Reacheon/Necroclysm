@@ -19,6 +19,8 @@ import Drawable;
 import Sticker;
 import Particle;
 
+constexpr bool DEBUG_CIRCUIT_LOG = true;
+
 Prop::Prop(Point3 inputCoor, int leadItemCode)
 {
     leadItem = cloneFromItemDex(itemDex[leadItemCode], 1);
@@ -429,6 +431,7 @@ void Prop::runPropFunc()
             return;
         }
 
+
         //std::wprintf(L"\n┌─────────────────────────────────┐\n");
         //std::wprintf(L"│ 회로 분석 완료                  │\n");
         //std::wprintf(L"├─────────────────────────────────┤\n");
@@ -454,6 +457,8 @@ void Prop::runPropFunc()
         //==============================================================================
         double totalPushedElectron = 0;
 
+        //셔플 추가할 것
+
         int totalAvailablePower = 0;
         for (int i = 0; i < voltagePropVec.size(); i++)
         {
@@ -465,6 +470,7 @@ void Prop::runPropFunc()
             }
         }
 
+
         for (int i = 0; i < voltagePropVec.size(); i++)
         {
             Prop* voltProp = voltagePropVec[i];
@@ -473,7 +479,9 @@ void Prop::runPropFunc()
             int y = voltProp->getGridY();
             int z = voltProp->getGridZ();
             double voltOutputPower = myMin(ceil(circuitTotalLoad * ((double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower)), voltProp->leadItem.electricMaxPower);
+            voltOutputPower *= voltProp->lossCompensationFactor;  // 저항손실 보존 변수 (기본값 110%)
 
+            if (DEBUG_CIRCUIT_LOG) std::wprintf(L"========================▼전압원 %p : 밀어내기 시작▼========================\n", voltProp);
             if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
             {
                 if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
@@ -694,11 +702,11 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
     // 들여쓰기 생성
     std::wstring indent(depth * 2, L' ');  // depth마다 2칸씩
-    //std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %.2f\n",
-    //    indent.c_str(),
-    //    donorProp->getGridX(), donorProp->getGridY(),
-    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-    //    txElectronAmount);
+    std::wprintf(L"%s[PUSH] (%d,%d) → (%d,%d) 시도: %.2f\n",
+        indent.c_str(),
+        donorProp->getGridX(), donorProp->getGridY(),
+        acceptorProp->getGridX(), acceptorProp->getGridY(),
+        txElectronAmount);
 
     bool isGrounded = false;
     if (acceptorProp->leadItem.checkFlag(itemFlag::VOLTAGE_GND_ALL)) isGrounded = true;
@@ -732,14 +740,17 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
             acceptorProp->groundChargeEnergy += consumeEnergy;
             acceptorProp->nodeInputElectron += consumeEnergy;
 
-            //std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f (부하 남은수요=%.2f)\n",
-            //    indent.c_str(),
-            //    donorProp->getGridX(), donorProp->getGridY(),
-            //    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
-            //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-            //    txElectronAmount,
-            //    consumeEnergy,
-            //    remainEnergy - consumeEnergy);
+            if (DEBUG_CIRCUIT_LOG)
+            {
+                std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f (부하 남은수요=%.2f)\n",
+                    indent.c_str(),
+                    donorProp->getGridX(), donorProp->getGridY(),
+                    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
+                    acceptorProp->getGridX(), acceptorProp->getGridY(),
+                    txElectronAmount,
+                    consumeEnergy,
+                    remainEnergy - consumeEnergy);
+            }
 
             return consumeEnergy;
         }
@@ -769,13 +780,16 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
     double finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    //std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f\n",
-    //    indent.c_str(),
-    //    donorProp->getGridX(), donorProp->getGridY(),
-    //    donorProp->nodeElectron,
-    //    acceptorProp->getGridX(), acceptorProp->getGridY(),
-    //    acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-    //    txElectronAmount, finalTxElectron);
+    if (DEBUG_CIRCUIT_LOG)
+    {
+        std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f\n",
+            indent.c_str(),
+            donorProp->getGridX(), donorProp->getGridY(),
+            donorProp->nodeElectron,
+            acceptorProp->getGridX(), acceptorProp->getGridY(),
+            acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+            txElectronAmount, finalTxElectron);
+    }
 
     donorProp->nodeElectron -= finalTxElectron;
     donorProp->nodeOutputElectron += finalTxElectron;
