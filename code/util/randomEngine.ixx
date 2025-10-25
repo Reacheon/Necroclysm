@@ -54,3 +54,10 @@ export std::uint64_t getSeed()
     (void)rng();
     return currentSeedRef();
 }
+
+export template<typename RandomIt>
+void randomShuffle(RandomIt first, RandomIt last)
+{
+    std::lock_guard lock(rngMutex());
+    std::shuffle(first, last, rng());
+}

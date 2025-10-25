@@ -457,12 +457,11 @@ void Prop::runPropFunc()
         //==============================================================================
         double totalPushedElectron = 0;
 
-        //셔플 추가할 것
+        randomShuffle(voltagePropVec.begin(), voltagePropVec.end());
 
         int totalAvailablePower = 0;
-        for (int i = 0; i < voltagePropVec.size(); i++)
+        for (Prop* voltProp : voltagePropVec)
         {
-            Prop* voltProp = voltagePropVec[i];
             if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
                 voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
             {
@@ -471,9 +470,8 @@ void Prop::runPropFunc()
         }
 
 
-        for (int i = 0; i < voltagePropVec.size(); i++)
+        for (Prop* voltProp : voltagePropVec)
         {
-            Prop* voltProp = voltagePropVec[i];
             voltProp->nodeElectron = voltProp->nodeMaxElectron;
             int x = voltProp->getGridX();
             int y = voltProp->getGridY();
