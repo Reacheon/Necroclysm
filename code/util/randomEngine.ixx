@@ -55,9 +55,14 @@ export std::uint64_t getSeed()
     return currentSeedRef();
 }
 
-export template<typename RandomIt>
-void randomShuffle(RandomIt first, RandomIt last)
+export template<typename T>
+void randomVectorShuffle(std::vector<T>& vec)
 {
-    std::lock_guard lock(rngMutex());
-    std::shuffle(first, last, rng());
+    if (vec.size() <= 1) return;
+
+    for (size_t i = vec.size() - 1; i > 0; --i)
+    {
+        size_t j = static_cast<size_t>(randomRangeLL(0, static_cast<long long>(i)));
+        std::swap(vec[i], vec[j]);
+    }
 }

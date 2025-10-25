@@ -165,6 +165,7 @@ namespace csvItem
 
     constexpr int electricMaxPower = 136;
     constexpr int electricUsePower = 137; //전자기기 소비전력
+    constexpr int electricResistance = 138;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -1067,6 +1068,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::electricUsePower:
                         itemDex[tgtIndex].electricUsePower = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::electricResistance:
+                        itemDex[tgtIndex].electricResistance = wtof(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");

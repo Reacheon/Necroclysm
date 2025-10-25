@@ -42,6 +42,9 @@ public:
 
     double lossCompensationFactor = 1.1; //전압원에 저장되는 저항손실 보존 변수
 
+    double prevPushedElectron = 0;
+    double prevVoltOutputRatio = 1.0; //전압원에서의 이전 출력
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();
@@ -55,6 +58,8 @@ public:
     bool runAnimation(bool shutdown);
 
     void drawSelf() override;
+
+    void updateCircuitNetwork();
 
     bool isConnected(Point3 currentCoord, dir16 dir);
 
