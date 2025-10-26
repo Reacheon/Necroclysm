@@ -24,17 +24,7 @@ public:
 
     bool runUsed = false; //runProp
 
-    double current = 0.0f; //전류
-    double elecResistance = 0.0f; //전기저항
-
-    double flow = 0.0f; //유량
-    double flowResistance = 0.0f; //흐름저항
-    int fluidCode = 0; //유체 아이템 코드
-
-    std::vector<dir16> voltageDir;
-
     int nodeMaxElectron = 0;
-    
     double nodeElectron = 0;
     double nodeInputElectron = 0;
     double nodeOutputElectron = 0;

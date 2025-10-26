@@ -44,7 +44,6 @@ void Prop::updateCircuitNetwork()
         if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
         {
             currentProp->runUsed = true;
-            currentProp->voltageDir.clear();
 
             currentProp->nodeInputElectron = 0;
             currentProp->nodeOutputElectron = 0;

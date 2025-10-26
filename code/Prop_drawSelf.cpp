@@ -374,33 +374,6 @@ void Prop::drawSelf()
         setFlip(SDL_FLIP_NONE);
     }
 
-
-
-
-    if (leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE) == false)
-    {
-        for (int i = 0; i < voltageDir.size(); i++)
-        {
-            int arrowSprIndex = 2953;
-            if (voltageDir[i] == dir16::right) arrowSprIndex += 0;
-            else if (voltageDir[i] == dir16::up) arrowSprIndex += 1;
-            else if (voltageDir[i] == dir16::left) arrowSprIndex += 2;
-            else if (voltageDir[i] == dir16::down) arrowSprIndex += 3;
-            else if (voltageDir[i] == dir16::ascend) arrowSprIndex += 4;
-            else if (voltageDir[i] == dir16::descend) arrowSprIndex += 5;
-
-            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 130);
-            drawSpriteCenter
-            (
-                spr::propset,
-                arrowSprIndex,
-                drawX,
-                drawY
-            );
-            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
-        }
-    }
-
     //if (leadItem.checkFlag(itemFlag::CIRCUIT))
     //{
 
