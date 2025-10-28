@@ -10,22 +10,6 @@ constexpr bool DEBUG_CIRCUIT_LOG = true;
 
 void Prop::updateCircuitNetwork()
 {
-    
-    //==============================================================================
-    // 설계 예정 로직 251027
-    // 1. 전압원은 매 연산마다 자신의 위치의 전자를 가득 채운다. 전자의 밀도는 전압을 의미한다.(물의 수위)
-    // 2. 전압원의 전압은 통일할 것이므로 일단 전자의 최대치는 전압원의 숫자와 관계없다
-    // 3. 현재 위치로부터 주변 위치 간의 전자 수 차이(퍼텐셜 차이)를 계산하고 전자를 이동시킨다. 수위는 비슷해지겠지만 미세하게 차이가 난다.
-    // 4. 이때 저항은 전선의 저항이나 부하의 저항이 될 수 있으며 저항값이 클수록 전류가 작아져 전달되는 전자의 양이 작아진다.
-    // 5. (중요) 이상적인 경우 즉 저항이 없는 경우 주변 셀과 퍼텐셜 차이는 즉시 0이 된다. 100 0 -> 50 50
-    // 6. 이걸 계속 반복하고 수렴시킨다. 최종적으로 부하에 도달했을 경우에는 전선에 의해 최댓값에서 살짝 작아진 전자(전압) 95/100 (5%손실)
-    // 7. 부하 또한 내부저항을 가져서 전압 100과 그 값으로 일정한 양의 출력이 공급되면 작동한다.
-    // 8. 전자의 증감은 모든 계산이 완료된 후에 처리한다. 
-    // 9. 높이 100m 탱크 A와 200m 탱크 B가 노드 C에 연결될 경우 저항이 0일 때 확산에 의해 A에서 절반인 50만큼 즉시 흐른다. B에선 절반인 100만큼 즉시 흐른다.
-    //    노드 C의 물의 수위는 그 중간인 150m가 된다(저항이 없는 이상적인 경우)
-    //==============================================================================
-
-
     int cursorX = getGridX();
     int cursorY = getGridY();
     int cursorZ = getGridZ();
@@ -372,6 +356,9 @@ bool Prop::isConnected(Prop* currentProp, dir16 dir)
 
 double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
+    constexpr double SYSTEM_VOLTAGE = 24.0;
+    constexpr double TIME_PER_TURN = 60.0;
+
     errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
     int dx, dy, dz;
     dirToXYZ(txDir, dx, dy, dz);
@@ -421,20 +408,26 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
         {
             double consumeEnergy = std::min(txElectronAmount, remainEnergy);
 
-            donorProp->nodeElectron -= consumeEnergy;
-            donorProp->nodeOutputElectron += consumeEnergy;
-            acceptorProp->groundChargeEnergy += consumeEnergy;
+            double current = (consumeEnergy * 1000.0) / (SYSTEM_VOLTAGE * TIME_PER_TURN);
+            double electricLoss = (current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN) / 1000.0;
+            double requiredFromDonor = consumeEnergy + electricLoss;
+
+            donorProp->nodeElectron -= requiredFromDonor;
+            donorProp->nodeOutputElectron += requiredFromDonor;
+            acceptorProp->groundChargeEnergy += consumeEnergy;  // 손실 제외하고 충전
             acceptorProp->nodeInputElectron += consumeEnergy;
 
             if (DEBUG_CIRCUIT_LOG)
             {
-                std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f (부하 남은수요=%.2f)\n",
+                std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f, 손실=%.2f, 총요구=%.2f (부하 남은수요=%.2f)\n",
                     indent.c_str(),
                     donorProp->getGridX(), donorProp->getGridY(),
-                    donorProp->nodeElectron + consumeEnergy,  // 전송 전 상태
+                    donorProp->nodeElectron + requiredFromDonor,
                     acceptorProp->getGridX(), acceptorProp->getGridY(),
                     txElectronAmount,
                     consumeEnergy,
+                    electricLoss,
+                    requiredFromDonor,
                     remainEnergy - consumeEnergy);
             }
 
@@ -466,21 +459,29 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
     double finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
+    double current = (finalTxElectron * 1000.0) / (SYSTEM_VOLTAGE * TIME_PER_TURN);
+    double electricLoss = (current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN) / 1000.0;
+    double requiredFromDonor = finalTxElectron + electricLoss;
+
+    donorProp->nodeElectron -= requiredFromDonor;
+    donorProp->nodeOutputElectron += requiredFromDonor;
+    acceptorProp->nodeElectron += finalTxElectron;
+    acceptorProp->nodeInputElectron += finalTxElectron;
+
     if (DEBUG_CIRCUIT_LOG)
     {
-        std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f\n",
+        std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f, 손실=%.2f, 총요구=%.2f\n",
             indent.c_str(),
             donorProp->getGridX(), donorProp->getGridY(),
             donorProp->nodeElectron,
             acceptorProp->getGridX(), acceptorProp->getGridY(),
             acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-            txElectronAmount, finalTxElectron);
+            txElectronAmount,
+            finalTxElectron,
+            electricLoss,
+            requiredFromDonor);
     }
 
-    donorProp->nodeElectron -= finalTxElectron;
-    donorProp->nodeOutputElectron += finalTxElectron;
-    acceptorProp->nodeElectron += finalTxElectron;
-    acceptorProp->nodeInputElectron += finalTxElectron;
     return finalTxElectron;
 }
 
