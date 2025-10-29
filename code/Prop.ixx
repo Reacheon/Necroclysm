@@ -30,8 +30,6 @@ public:
     double nodeOutputElectron = 0;
     double groundChargeEnergy = 0; //전자기기 사용되기 전에 저장된 에너지(접지 방향)
 
-    double lossCompensationFactor = 1.1; //전압원에 저장되는 저항손실 보존 변수
-
     double prevPushedElectron = 0;
     double prevVoltOutputRatio = 1.0; //전압원에서의 이전 출력
 

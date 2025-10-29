@@ -147,6 +147,8 @@ void Prop::updateCircuitNetwork()
 
     for (Prop* voltProp : voltagePropVec)
     {
+        constexpr double LOSS_COMPENSATION_FACTOR = 1.2;
+
         voltProp->nodeElectron = voltProp->nodeMaxElectron;
         int x = voltProp->getGridX();
         int y = voltProp->getGridY();
@@ -154,7 +156,7 @@ void Prop::updateCircuitNetwork()
         double voltRatio = (double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower;
         double voltOutputPower = myMin(std::ceil(circuitTotalLoad * voltRatio), voltProp->leadItem.electricMaxPower);
         voltProp->prevPushedElectron = 0;
-        voltOutputPower *= voltProp->lossCompensationFactor;  // 저항손실 보존 변수 (기본값 110%)
+        voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // 저항손실 보존 변수 (기본값 110%)
 
         if (DEBUG_CIRCUIT_LOG) std::wprintf(L"========================▼전압원 %p : 밀어내기 시작▼========================\n", voltProp);
         if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
@@ -408,9 +410,11 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
         {
             double consumeEnergy = std::min(txElectronAmount, remainEnergy);
 
-            double current = (consumeEnergy * 1000.0) / (SYSTEM_VOLTAGE * TIME_PER_TURN);
-            double electricLoss = (current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN) / 1000.0;
+            double current = consumeEnergy / (SYSTEM_VOLTAGE * 60.0);
+            double electricLoss = current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN;
             double requiredFromDonor = consumeEnergy + electricLoss;
+
+            double donorBefore = donorProp->nodeElectron;
 
             donorProp->nodeElectron -= requiredFromDonor;
             donorProp->nodeOutputElectron += requiredFromDonor;
@@ -419,16 +423,13 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
             if (DEBUG_CIRCUIT_LOG)
             {
-                std::wprintf(L"%s[전송-GND] (%d,%d)[%.2f] → (%d,%d)[GND]: 요청=%.2f, 소모=%.2f, 손실=%.2f, 총요구=%.2f (부하 남은수요=%.2f)\n",
+                std::wprintf(L"%s[전송 GND] (%d,%d)[%.2f→%.2f] → (%d,%d) 전송:%.2f 손실:%.2f 부하:%.2f/%d\n",
                     indent.c_str(),
                     donorProp->getGridX(), donorProp->getGridY(),
-                    donorProp->nodeElectron + requiredFromDonor,
+                    donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
                     acceptorProp->getGridX(), acceptorProp->getGridY(),
-                    txElectronAmount,
-                    consumeEnergy,
-                    electricLoss,
-                    requiredFromDonor,
-                    remainEnergy - consumeEnergy);
+                    consumeEnergy, electricLoss,
+                    acceptorProp->groundChargeEnergy, acceptorProp->leadItem.electricUsePower);
             }
 
             return consumeEnergy;
@@ -459,8 +460,8 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
     double finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
 
-    double current = (finalTxElectron * 1000.0) / (SYSTEM_VOLTAGE * TIME_PER_TURN);
-    double electricLoss = (current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN) / 1000.0;
+    double current = finalTxElectron / (SYSTEM_VOLTAGE * 60.0);
+    double electricLoss = current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN;
     double requiredFromDonor = finalTxElectron + electricLoss;
 
     donorProp->nodeElectron -= requiredFromDonor;
@@ -470,16 +471,13 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
 
     if (DEBUG_CIRCUIT_LOG)
     {
-        std::wprintf(L"%s[전송] (%d,%d)[%.2f] → (%d,%d)[%.2f/%.2f]: 요청=%.2f, 전송=%.2f, 손실=%.2f, 총요구=%.2f\n",
+        std::wprintf(L"%s[전송] (%d,%d)[%.2f→%.2f] → (%d,%d)[%.2f/%d] 전송:%.2f 손실:%.2f\n",
             indent.c_str(),
             donorProp->getGridX(), donorProp->getGridY(),
-            donorProp->nodeElectron,
+            donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
             acceptorProp->getGridX(), acceptorProp->getGridY(),
             acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-            txElectronAmount,
-            finalTxElectron,
-            electricLoss,
-            requiredFromDonor);
+            finalTxElectron, electricLoss);
     }
 
     return finalTxElectron;
