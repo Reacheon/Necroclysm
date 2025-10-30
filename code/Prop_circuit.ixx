@@ -7,6 +7,9 @@ import constVar;
 import wrapVar;
 
 constexpr bool DEBUG_CIRCUIT_LOG = true;
+constexpr double SYSTEM_VOLTAGE = 24.0;
+constexpr double TIME_PER_TURN = 60.0;
+constexpr double EPSILON = 0.000001;
 
 void Prop::updateCircuitNetwork()
 {
@@ -123,7 +126,11 @@ void Prop::updateCircuitNetwork()
         Prop* propPtr = TileProp(coord.x, coord.y, coord.z);
         if (propPtr != nullptr)
         {
+            
             propPtr->nodeMaxElectron = circuitMaxEnergy;
+        
+            //전자회로는 항상 전자 가득 찬 상태
+            propPtr->nodeElectron = circuitMaxEnergy;
         }
     }
 
@@ -358,16 +365,15 @@ bool Prop::isConnected(Prop* currentProp, dir16 dir)
 
 double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    constexpr double SYSTEM_VOLTAGE = 24.0;
-    constexpr double TIME_PER_TURN = 60.0;
-
     errorBox(donorProp == nullptr, L"[Error] pushElectron: null donor\n");
     int dx, dy, dz;
     dirToXYZ(txDir, dx, dy, dz);
     Prop* acceptorProp = TileProp(donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz);
     errorBox(acceptorProp == nullptr, L"[Error] pushElectron: no acceptor found\n");
 
-    errorBox(txElectronAmount > donorProp->nodeElectron, L"[Error] pushElectron: insufficient electron\n");
+    txElectronAmount = std::min(donorProp->nodeElectron, txElectronAmount);
+
+    errorBox(txElectronAmount > donorProp->nodeElectron + EPSILON, L"[Error] pushElectron: insufficient electron\n");
     errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
         L"[Error] pushElectron: not connected\n");
 
@@ -406,32 +412,10 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
     {
         double remainEnergy = acceptorProp->leadItem.electricUsePower - acceptorProp->groundChargeEnergy;
 
-        if (remainEnergy > 0)
+        if (remainEnergy > EPSILON)
         {
             double consumeEnergy = std::min(txElectronAmount, remainEnergy);
-
-            double current = consumeEnergy / (SYSTEM_VOLTAGE * 60.0);
-            double electricLoss = current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN;
-            double requiredFromDonor = consumeEnergy + electricLoss;
-
-            double donorBefore = donorProp->nodeElectron;
-
-            donorProp->nodeElectron -= requiredFromDonor;
-            donorProp->nodeOutputElectron += requiredFromDonor;
-            acceptorProp->groundChargeEnergy += consumeEnergy;  // 손실 제외하고 충전
-            acceptorProp->nodeInputElectron += consumeEnergy;
-
-            if (DEBUG_CIRCUIT_LOG)
-            {
-                std::wprintf(L"%s[전송 GND] (%d,%d)[%.2f→%.2f] → (%d,%d) 전송:%.2f 손실:%.2f 부하:%.2f/%d\n",
-                    indent.c_str(),
-                    donorProp->getGridX(), donorProp->getGridY(),
-                    donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
-                    acceptorProp->getGridX(), acceptorProp->getGridY(),
-                    consumeEnergy, electricLoss,
-                    acceptorProp->groundChargeEnergy, acceptorProp->leadItem.electricUsePower);
-            }
-
+            transferElectron(donorProp, acceptorProp, consumeEnergy, indent, true);
             return consumeEnergy;
         }
         else return 0;
@@ -440,7 +424,7 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
     double pushedElectron = std::min(txElectronAmount, acceptorProp->nodeElectron);
 
     double dividedElectron = 0;
-    if (pushedElectron > 0)
+    if (pushedElectron > EPSILON)
     {
         std::vector<dir16> possibleDirs;
         for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::ascend, dir16::descend })
@@ -459,27 +443,7 @@ double Prop::pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount,
     }
 
     double finalTxElectron = std::min(txElectronAmount, acceptorProp->nodeMaxElectron - acceptorProp->nodeElectron);
-
-    double current = finalTxElectron / (SYSTEM_VOLTAGE * 60.0);
-    double electricLoss = current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN;
-    double requiredFromDonor = finalTxElectron + electricLoss;
-
-    donorProp->nodeElectron -= requiredFromDonor;
-    donorProp->nodeOutputElectron += requiredFromDonor;
-    acceptorProp->nodeElectron += finalTxElectron;
-    acceptorProp->nodeInputElectron += finalTxElectron;
-
-    if (DEBUG_CIRCUIT_LOG)
-    {
-        std::wprintf(L"%s[전송] (%d,%d)[%.2f→%.2f] → (%d,%d)[%.2f/%d] 전송:%.2f 손실:%.2f\n",
-            indent.c_str(),
-            donorProp->getGridX(), donorProp->getGridY(),
-            donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
-            acceptorProp->getGridX(), acceptorProp->getGridY(),
-            acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
-            finalTxElectron, electricLoss);
-    }
-
+    transferElectron(donorProp,acceptorProp,finalTxElectron,indent,false);
     return finalTxElectron;
 }
 
@@ -495,7 +459,7 @@ double Prop::divideElectron(Prop* propPtr, double inputElectron, std::vector<dir
     gndDirs.reserve(6);
     nonGndDirs.reserve(6);
 
-    while (remainingElectron > 0 && !possibleDirs.empty())
+    while (remainingElectron > EPSILON && !possibleDirs.empty())
     {
         dirsToRemove.clear();
         gndDirs.clear();
@@ -523,7 +487,7 @@ double Prop::divideElectron(Prop* propPtr, double inputElectron, std::vector<dir
                 double branchPushedElectron = pushElectron(propPtr, dir, gndSplitElectron, newPathVisited, depth);
                 gndPushedElectron += branchPushedElectron;
                 totalPushedElectron += branchPushedElectron;
-                if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
+                if (branchPushedElectron < EPSILON) dirsToRemove.push_back(dir);
             }
 
             for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
@@ -542,15 +506,75 @@ double Prop::divideElectron(Prop* propPtr, double inputElectron, std::vector<dir
                 double branchPushedElectron = pushElectron(propPtr, dir, splitElectron, newPathVisited, depth);
                 loopPushedElectron += branchPushedElectron;
                 totalPushedElectron += branchPushedElectron;
-                if (branchPushedElectron == 0) dirsToRemove.push_back(dir);
+                if (branchPushedElectron < EPSILON) dirsToRemove.push_back(dir);
             }
 
             for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
             remainingElectron -= loopPushedElectron;
         }
 
-        if (loopPushedElectron == 0 && gndPushedElectron == 0) break;
+        if (loopPushedElectron < EPSILON && gndPushedElectron < EPSILON) break;
     }
 
     return totalPushedElectron;
+}
+
+void Prop::transferElectron(Prop* donorProp, Prop* acceptorProp, double txElectronAmount, const std::wstring& indent, bool isGroundTransfer = false)
+{
+    if (txElectronAmount < EPSILON)
+    {
+        if (DEBUG_CIRCUIT_LOG)
+        {
+            std::wprintf(L"%s[전송 스킵] (%d,%d) → (%d,%d) 양:%.8f (EPSILON 미만)\n",
+                indent.c_str(),
+                donorProp->getGridX(), donorProp->getGridY(),
+                acceptorProp->getGridX(), acceptorProp->getGridY(),
+                txElectronAmount);
+        }
+        return;
+    }
+
+    double current = txElectronAmount / (SYSTEM_VOLTAGE * TIME_PER_TURN);
+    double electricLoss = current * current * acceptorProp->leadItem.electricResistance * TIME_PER_TURN;
+    double requiredFromDonor = txElectronAmount + electricLoss;
+
+    if (requiredFromDonor > donorProp->nodeElectron + EPSILON)
+    {
+        double availableRatio = donorProp->nodeElectron / requiredFromDonor;
+        requiredFromDonor = donorProp->nodeElectron;
+        txElectronAmount *= availableRatio;
+        electricLoss = requiredFromDonor - txElectronAmount;
+    }
+
+    donorProp->nodeElectron -= requiredFromDonor;
+    donorProp->nodeOutputElectron += requiredFromDonor;
+
+    if (isGroundTransfer) acceptorProp->groundChargeEnergy += txElectronAmount;
+    else acceptorProp->nodeElectron += txElectronAmount;
+
+    acceptorProp->nodeInputElectron += txElectronAmount;
+
+    if (DEBUG_CIRCUIT_LOG)
+    {
+        if (isGroundTransfer)
+        {
+            std::wprintf(L"%s[전송 GND] (%d,%d)[%.2f→%.2f] → (%d,%d) 전송:%.2f 손실:%.2f 부하:%.2f/%d\n",
+                indent.c_str(),
+                donorProp->getGridX(), donorProp->getGridY(),
+                donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
+                acceptorProp->getGridX(), acceptorProp->getGridY(),
+                txElectronAmount, electricLoss,
+                acceptorProp->groundChargeEnergy, acceptorProp->leadItem.electricUsePower);
+        }
+        else
+        {
+            std::wprintf(L"%s[전송] (%d,%d)[%.2f→%.2f] → (%d,%d)[%.2f/%d] 전송:%.2f 손실:%.2f\n",
+                indent.c_str(),
+                donorProp->getGridX(), donorProp->getGridY(),
+                donorProp->nodeElectron + requiredFromDonor, donorProp->nodeElectron,
+                acceptorProp->getGridX(), acceptorProp->getGridY(),
+                acceptorProp->nodeElectron, acceptorProp->nodeMaxElectron,
+                txElectronAmount, electricLoss);
+        }
+    }
 }

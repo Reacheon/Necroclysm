@@ -57,6 +57,8 @@ public:
 
     void runPropFunc();
 
+    void transferElectron(Prop* donorProp, Prop* acceptorProp, double txElectronAmount, const std::wstring& indent, bool isGroundTransfer);
+
     double pushElectron(Prop* donorProp, dir16 txDir, double txElectronAmount, std::unordered_set<Prop*> pathVisited, int depth);
 
     double divideElectron(Prop* propPtr, double inputElectron, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
