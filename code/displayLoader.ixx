@@ -1,12 +1,15 @@
 ﻿#include <SDL3/SDL.h>
+
 export module displayLoader;
 export import globalVar;
+
 import util;
 import constVar;
+
 export void displayLoader()
 {
-    cameraW = 720;
-    cameraH = 720;
+    cameraW = 1080;
+    cameraH = 1080;
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
     SDL_DisplayID disp = SDL_GetPrimaryDisplay();
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
@@ -17,16 +20,16 @@ export void displayLoader()
     // 2배 확대 적용
     if (option::fullScreen) option::fixScreenRatio = false;
 
-    int scaleFactor = 2;
+    double scaleFactor = 1.0;
     if (option::fixScreenRatio)
     {
         switch (0)
         {
-        default:  winW = 720 * scaleFactor;   winH = 720 * scaleFactor;   break;
-        case 1:   winW = 720 * scaleFactor;   winH = 1280 * scaleFactor;  break;
-        case 2:   winW = 960 * scaleFactor;   winH = 720 * scaleFactor;   break;
-        case 3:   winW = 720 * scaleFactor;   winH = 1440 * scaleFactor;  break;
-        case 4:   winW = 1280 * scaleFactor;  winH = 720 * scaleFactor;   break;
+        default:  winW = 1080 * scaleFactor;   winH = 1080 * scaleFactor;   break;
+        case 1:   winW = 1080 * scaleFactor;   winH = 1280 * scaleFactor;  break;
+        case 2:   winW = 960 * scaleFactor;   winH = 1080 * scaleFactor;   break;
+        case 3:   winW = 1080 * scaleFactor;   winH = 1440 * scaleFactor;  break;
+        case 4:   winW = 1280 * scaleFactor;  winH = 1080 * scaleFactor;   break;
         }
         cameraW = winW / scaleFactor;  // 게임 해상도는 원래대로
         cameraH = winH / scaleFactor;
@@ -37,25 +40,25 @@ export void displayLoader()
         winW = winW;  // 모니터 해상도 그대로 사용하거나
         winH = winH;
         // 또는 고정 크기로 2배 확대하려면:
-        // winW = 720 * scaleFactor;
-        // winH = 720 * scaleFactor;
+        // winW = 1080 * scaleFactor;
+        // winH = 1080 * scaleFactor;
 
         cameraW = winW;
         cameraH = winH;
         if (cameraW > cameraH)
         {
-            cameraW = (int)(((float)cameraW / (float)cameraH) * 720.0f);
-            cameraH = 720;
+            cameraW = (int)(((float)cameraW / (float)cameraH) * 1080.0f);
+            cameraH = 1080;
         }
         else if (cameraH > cameraW)
         {
-            cameraH = (int)(((float)cameraH / (float)cameraW) * 720.0f);
-            cameraW = 720;
+            cameraH = (int)(((float)cameraH / (float)cameraW) * 1080.0f);
+            cameraW = 1080;
         }
         else
         {
-            cameraW = 720;
-            cameraH = 720;
+            cameraW = 1080;
+            cameraH = 1080;
         }
     }
 
@@ -65,7 +68,7 @@ export void displayLoader()
         errorBox(L"창·렌더러 생성 실패");
     setPrimitiveRenderer(renderer);
 
-    // 논리적 해상도는 원래대로 유지 (720x720)
+    // 논리적 해상도는 원래대로 유지 (1080x1080)
     SDL_SetRenderLogicalPresentation(renderer,
         cameraW,
         cameraH,

@@ -154,12 +154,12 @@ public:
 			if (event.wheel.y > 0)
 			{
 				zoomScale += 1;
-				if (zoomScale > 5.0) zoomScale = 5;
+				if (zoomScale > MAX_ZOOM) zoomScale = MAX_ZOOM;
 			}
 			else if (event.wheel.y < 0)
 			{
 				zoomScale -= 1;
-				if (zoomScale < 1.0) zoomScale = 1;
+				if (zoomScale < MIN_ZOOM) zoomScale = MIN_ZOOM;
 			}
 		}
 		else

@@ -128,13 +128,13 @@ void handlePinchGesture(const SDL_Event& event)
 			const float threshold = 0.05f;
 			if (pinchAccumulator > threshold) 
 			{
-				if (zoomScale < 5.0f) applyZoom(zoomScale + 1.0f, pinchStartPos);
+				if (zoomScale < MAX_ZOOM) applyZoom(zoomScale + 1.0f, pinchStartPos);
 				pinchAccumulator = 0.0f;
 
 			}
 			else if (pinchAccumulator < -threshold) 
 			{
-				if (zoomScale > 1.0f) applyZoom(zoomScale - 1.0f, pinchStartPos);
+				if (zoomScale > MIN_ZOOM) applyZoom(zoomScale - 1.0f, pinchStartPos);
 				pinchAccumulator = 0.0f;
 			}
 		}

@@ -8,6 +8,9 @@ import std;
 
 export constexpr int DARK_VISION_RADIUS = 13;
 
+export constexpr double MAX_ZOOM = 5.0;
+export constexpr double MIN_ZOOM = 2.0;
+
 export constexpr int CHUNK_SIZE_X = 13; //청크의 x길이
 export constexpr int CHUNK_SIZE_Y = 13; //청크의 y길이
 export constexpr int CHUNK_SIZE_Z = 1; //청크의 z길이, 현재 1로 미사용됨
