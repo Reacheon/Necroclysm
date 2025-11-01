@@ -118,8 +118,8 @@ public:
 		tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
 
 
-		quickSlotRegion = { 185, 0,380,45, };
-		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 48 * i, 0, 44,45 };
+		quickSlotRegion = { 185 + 90, 0,380,45, };
+		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 90 + 48 * i, 0, 44,45 };
 
 
 		x = 0;

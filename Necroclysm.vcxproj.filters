@@ -510,9 +510,6 @@
     <ClCompile Include="code\world\Mapmaker.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\var\textureVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
     <ClCompile Include="code\var\wrapVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
@@ -563,6 +560,9 @@
     </ClCompile>
     <ClCompile Include="code\Prop_circuit.ixx">
       <Filter>소스 파일\05_Class\07_Vehicle&amp;Prop</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\textureVar.ixx">
+      <Filter>소스 파일\01_system</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

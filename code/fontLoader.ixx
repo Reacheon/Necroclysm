@@ -29,6 +29,13 @@ export void fontLoader()
                 errorBox(L"Failed to open the font file.");
             }
         }
+
+        for (int i = 11; i < MAX_FONT_SIZE; i++)
+        {
+            notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
+            notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
+            pixelFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
+        }
     }
     else if (option::language == L"English")
     {
@@ -46,6 +53,13 @@ export void fontLoader()
             {
                 errorBox(L"Failed to open the font file.");
             }
+        }
+
+        for (int i = 11; i < MAX_FONT_SIZE; i++)
+        {
+            notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
+            notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
+            pixelFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
         }
     }
     else

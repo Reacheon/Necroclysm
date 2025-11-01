@@ -20,13 +20,16 @@ export void displayLoader()
     // 2배 확대 적용
     if (option::fullScreen) option::fixScreenRatio = false;
 
+    option::fullScreen = false;
+
+
     double scaleFactor = 1.0;
     if (option::fixScreenRatio)
     {
         switch (0)
         {
         default:  winW = 1080 * scaleFactor;   winH = 1080 * scaleFactor;   break;
-        case 1:   winW = 1080 * scaleFactor;   winH = 1280 * scaleFactor;  break;
+        case 1:   winW = 1920 * scaleFactor;   winH = 1080 * scaleFactor;  break;
         case 2:   winW = 960 * scaleFactor;   winH = 1080 * scaleFactor;   break;
         case 3:   winW = 1080 * scaleFactor;   winH = 1440 * scaleFactor;  break;
         case 4:   winW = 1280 * scaleFactor;  winH = 1080 * scaleFactor;   break;

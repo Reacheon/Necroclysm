@@ -155,7 +155,7 @@ export void textureLoader()
 	spr::statusIcon = new Sprite(renderer, "image/UI/statusIcon.png", 16, 16);
 	spr::hpBlankGauge = new Sprite(renderer, "image/UI/hpGauge.png", 44, 11);
 
-	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 160, 160);
+	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 244, 244);
 
 	spr::bulletset = new Sprite(renderer, "image/item/bulletset.png", 48, 48);
 	spr::aimMarkerWhite = new Sprite(renderer, "image/UI/aimMarkerWhite.png", 48, 48);

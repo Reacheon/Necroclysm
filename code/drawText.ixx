@@ -13,6 +13,13 @@ static constexpr size_t MAX_CACHE_SIZE = 5000;
 export void setFontSize(int val) { s_fontSize = val; }
 export void setFontGap(int val) { s_fontGap = val; }
 
+export enum class font
+{
+    notoSans,
+    notoSansBold,
+    pixel,
+};
+
 struct TextCacheKey
 {
     std::wstring text;

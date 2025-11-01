@@ -74,24 +74,28 @@ void HUD::drawGUI()
 		{
 			SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(texture::minimap, 160);
-			setZoom(4.0);
-			drawTextureCenter(texture::minimap, 94, 94);
+			setZoom(6.0);
+			drawTexture(texture::minimap, 13, 13);
 			setZoom(1.0);
 
+			drawSprite(spr::minimapEdge, 0, 14, 14);
 
-			drawSprite(spr::minimapEdge, 1, 14, 14);
+			setZoom(1.5);
+			Point2 minimapBtn = { 36,36 };
 			Sprite* targetBtnSpr;
 			if (option::inputMethod == input::gamepad)
 			{
 				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
 				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, 14 + 15, 14 + 15);
+				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, minimapBtn.x, minimapBtn.y);
 			}
 			else if (option::inputMethod == input::mouse)
 			{
 				targetBtnSpr = spr::buttons;
-				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, 14 + 15, 14 + 15);
+				drawSpriteCenter(targetBtnSpr, keyIcon::keyboard_M, minimapBtn.x, minimapBtn.y);
 			}
+			setZoom(1.0);
+
 		}
 
 
@@ -848,7 +852,7 @@ void HUD::drawQuickSlot()
 
 	for (int i = 0; i < 8; i++)
 	{
-		int pivotX = 185 + 48 * i;
+		int pivotX = 185 + 90 + 48 * i;
 		int pivotY = 0;
 		SDL_Color btnCol = col::black;
 		bool keyPressed = state[quickSlotKeys[i]];
@@ -1277,7 +1281,7 @@ void HUD::drawStatusEffects()
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
 		int pivotX = 5;
-		int pivotY = 250 + 20 * i;
+		int pivotY = 350 + 20 * i;
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
 		SDL_Color textColor = col::white;
@@ -1640,21 +1644,22 @@ void HUD::drawHoverItemInfo()
 
 void HUD::drawQuest()
 {
+	int pivotY = 272;
 	setFontSize(16);
-	renderText(sysStr[212], 8, 182);
+	renderText(sysStr[212], 8, pivotY);
 
-	drawLine(8, 200, 118, 200);
+	drawLine(8, pivotY+18, 118, pivotY + 18);
 	for (int i = 0; i < 60; i++)
 	{
-		drawPoint(119 + i, 200, col::white, 255 - 4 * i);
+		drawPoint(119 + i, pivotY + 18, col::white, 255 - 4 * i);
 	}
 
 
-	drawRect({ 9, 206,9,9 }, col::white);
+	drawRect({ 9, pivotY + 24,9,9 }, col::white);
 	setFontSize(10);
 	int elapsedDay = getElapsedDays();
 	std::wstring questStr = sysStr[213] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
-	renderText(questStr, 21, 204);
+	renderText(questStr, 21, pivotY + 22);
 }
