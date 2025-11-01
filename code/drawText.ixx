@@ -5,30 +5,64 @@ import util;
 import globalVar;
 import constVar;
 
-static int  s_fontSize = 15;
-static int  s_fontGap = 4;
-static constexpr size_t MAX_CACHE_SIZE = 5000;
-
-// 폰트 설정 함수들
-export void setFontSize(int val) { s_fontSize = val; }
-export void setFontGap(int val) { s_fontGap = val; }
-
-export enum class font
+export enum class fontType
 {
     notoSans,
     notoSansBold,
     pixel,
 };
 
+export TTF_Font* notoSansFont[MAX_FONT_SIZE] = { nullptr, };
+export TTF_Font* notoSansBoldFont[MAX_FONT_SIZE] = { nullptr, };
+export TTF_Font* pixelFont[MAX_FONT_SIZE] = { nullptr, };
+
+static TTF_Font** s_currentFont = nullptr;
+static int  s_fontSize = 15;
+static int  s_fontGap = 4;
+static bool s_useSolidRender = true;
+static constexpr size_t MAX_CACHE_SIZE = 5000;
+
+// 폰트 설정 함수들
+export void setFontSize(int val) { s_fontSize = val; }
+export void setFontGap(int val) { s_fontGap = val; }
+void setFontSolidRender(bool useSolid) { s_useSolidRender = useSolid; }
+export void setFont(fontType inputFont)
+{ 
+    if (inputFont == fontType::notoSans)
+    {
+        s_currentFont = notoSansFont;
+        setFontSolidRender(false);
+    }
+    else if (inputFont == fontType::notoSansBold)
+    {
+        s_currentFont = notoSansBoldFont;
+        setFontSolidRender(false);
+    }
+    else if (inputFont == fontType::pixel)
+    {
+        s_currentFont = pixelFont;
+        setFontSolidRender(true);
+    }
+    else errorBox(L"Invalid font type specified.");
+}
+
 struct TextCacheKey
 {
     std::wstring text;
     int fontSize;
     SDL_Color color;
+    TTF_Font** fontArray;
+    bool solidRender;
+
     bool operator==(const TextCacheKey& other) const {
-        return text == other.text && fontSize == other.fontSize &&
-            color.r == other.color.r && color.g == other.color.g &&
-            color.b == other.color.b && color.a == other.color.a;
+        return text == other.text &&
+            fontSize == other.fontSize &&
+            fontArray == other.fontArray &&
+            solidRender == other.solidRender &&
+            color.r == other.color.r &&
+            color.g == other.color.g &&
+            color.b == other.color.b &&
+            color.a == other.color.a;
     }
 };
 
@@ -38,10 +72,12 @@ struct TextCacheKeyHasher
     {
         size_t h1 = std::hash<std::wstring>{}(key.text);
         size_t h2 = std::hash<int>{}(key.fontSize);
+        size_t h3 = std::hash<void*>{}((void*)key.fontArray);
 
-        // FNV-1a 해시 결합
         size_t hash = h1;
         hash ^= h2 + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= h3 + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+        hash ^= key.solidRender + 0x9e3779b9 + (hash << 6) + (hash >> 2);
         hash ^= key.color.r + 0x9e3779b9 + (hash << 6) + (hash >> 2);
         hash ^= key.color.g + 0x9e3779b9 + (hash << 6) + (hash >> 2);
         hash ^= key.color.b + 0x9e3779b9 + (hash << 6) + (hash >> 2);
@@ -111,7 +147,7 @@ export int getTextWidthWithoutColor(const std::wstring& text)
     std::string utf8 = toUTF8(cleanText);
 
     int w, h;
-    TTF_GetStringSize(mainFont[s_fontSize], utf8.c_str(), 0, &w, &h);
+    TTF_GetStringSize(s_currentFont[s_fontSize], utf8.c_str(), 0, &w, &h);
     return w;
 }
 
@@ -122,13 +158,13 @@ export int getTextHeightWithoutColor(const std::wstring& text)
     std::string utf8 = toUTF8(cleanText);
 
     int w, h;
-    TTF_GetStringSize(mainFont[s_fontSize], utf8.c_str(), 0, &w, &h);
+    TTF_GetStringSize(s_currentFont[s_fontSize], utf8.c_str(), 0, &w, &h);
     return h;
 }
 
 static CachedTexture* getCachedTexture(const std::wstring& text, int fontSize, SDL_Color color)
 {
-    TextCacheKey key{ text, fontSize, color };
+    TextCacheKey key{ text, fontSize, color, s_currentFont, s_useSolidRender };
 
     auto it = textureCache.find(key);
     if (it != textureCache.end()) {
@@ -141,7 +177,9 @@ static CachedTexture* getCachedTexture(const std::wstring& text, int fontSize, S
 
     // Create new texture
     std::string utf8 = toUTF8(text);
-    SDL_Surface* surf = TTF_RenderText_Solid(mainFont[fontSize], utf8.c_str(), 0, color);
+    SDL_Surface* surf = s_useSolidRender
+        ? TTF_RenderText_Solid(s_currentFont[fontSize], utf8.c_str(), 0, color)
+        : TTF_RenderText_Blended(s_currentFont[fontSize], utf8.c_str(), 0, color);
     if (!surf) return nullptr;
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
@@ -170,7 +208,7 @@ static CachedTexture* getCachedTexture(const std::wstring& text, int fontSize, S
 }
 
 // 멀티컬러 텍스트 렌더링 (내부 구현)
-static void renderMultiColorTextInternal(const std::wstring& text, int x, int y, SDL_Color defaultColor, bool center)
+static void drawMultiColorTextInternal(const std::wstring& text, int x, int y, SDL_Color defaultColor, bool center)
 {
     // 줄바꿈 처리
     size_t newlinePos = text.find(L'\n');
@@ -178,9 +216,9 @@ static void renderMultiColorTextInternal(const std::wstring& text, int x, int y,
         std::wstring line1 = text.substr(0, newlinePos);
         std::wstring line2 = text.substr(newlinePos + 1);
 
-        renderMultiColorTextInternal(line1, x, y, defaultColor, center);
+        drawMultiColorTextInternal(line1, x, y, defaultColor, center);
         int centerCorrection = center ? getTextHeightWithoutColor(L"A") / 2 : 0;
-        renderMultiColorTextInternal(line2, x, y + s_fontSize + s_fontGap + centerCorrection, defaultColor, center);
+        drawMultiColorTextInternal(line2, x, y + s_fontSize + s_fontGap + centerCorrection, defaultColor, center);
         return;
     }
 
@@ -242,11 +280,11 @@ static void renderMultiColorTextInternal(const std::wstring& text, int x, int y,
 }
 
 // 기본 단색 텍스트 렌더링 (기존 함수들)
-export void renderText(std::wstring text, int x, int y, SDL_Color inputCol)
+export void drawText(std::wstring text, int x, int y, SDL_Color inputCol)
 {
     // 컬러코드가 포함되어 있으면 멀티컬러 렌더링 사용
     if (text.find(L'#') != std::wstring::npos) {
-        renderMultiColorTextInternal(text, x, y, inputCol, false);
+        drawMultiColorTextInternal(text, x, y, inputCol, false);
         return;
     }
 
@@ -257,15 +295,15 @@ export void renderText(std::wstring text, int x, int y, SDL_Color inputCol)
     SDL_RenderTexture(renderer, cached->texture, nullptr, &dst);
 }
 
-export void renderText(std::wstring text, int x, int y) {
-    renderText(text, x, y, col::white);
+export void drawText(std::wstring text, int x, int y) {
+    drawText(text, x, y, col::white);
 }
 
-export void renderTextCenter(std::wstring text, int x, int y, SDL_Color inputCol)
+export void drawTextCenter(std::wstring text, int x, int y, SDL_Color inputCol)
 {
     // 컬러코드가 포함되어 있으면 멀티컬러 렌더링 사용
     if (text.find(L'#') != std::wstring::npos) {
-        renderMultiColorTextInternal(text, x, y, inputCol, true);
+        drawMultiColorTextInternal(text, x, y, inputCol, true);
         return;
     }
 
@@ -280,34 +318,34 @@ export void renderTextCenter(std::wstring text, int x, int y, SDL_Color inputCol
     SDL_RenderTexture(renderer, cached->texture, nullptr, &dst);
 }
 
-export void renderTextCenter(std::wstring text, int x, int y) {
-    renderTextCenter(text, x, y, col::white);
+export void drawTextCenter(std::wstring text, int x, int y) {
+    drawTextCenter(text, x, y, col::white);
 }
 
-export void renderTextOutline(std::wstring text, int x, int y, SDL_Color inputCol)
+export void drawTextOutline(std::wstring text, int x, int y, SDL_Color inputCol)
 {
-    renderText(text, x - 1, y, col::black);
-    renderText(text, x + 1, y, col::black);
-    renderText(text, x, y - 1, col::black);
-    renderText(text, x, y + 1, col::black);
-    renderText(text, x, y, inputCol);
+    drawText(text, x - 1, y, col::black);
+    drawText(text, x + 1, y, col::black);
+    drawText(text, x, y - 1, col::black);
+    drawText(text, x, y + 1, col::black);
+    drawText(text, x, y, inputCol);
 }
 
-export void renderTextOutlineCenter(std::wstring text, int x, int y, SDL_Color inputCol)
+export void drawTextOutlineCenter(std::wstring text, int x, int y, SDL_Color inputCol)
 {
-    renderTextCenter(text, x - 1, y, col::black);
-    renderTextCenter(text, x + 1, y, col::black);
-    renderTextCenter(text, x, y - 1, col::black);
-    renderTextCenter(text, x, y + 1, col::black);
-    renderTextCenter(text, x, y, inputCol);
+    drawTextCenter(text, x - 1, y, col::black);
+    drawTextCenter(text, x + 1, y, col::black);
+    drawTextCenter(text, x, y - 1, col::black);
+    drawTextCenter(text, x, y + 1, col::black);
+    drawTextCenter(text, x, y, inputCol);
 }
 
-export void renderTextOuline(std::wstring text, int x, int y) {
-    renderTextOutline(text, x, y, col::white);
+export void drawTextOuline(std::wstring text, int x, int y) {
+    drawTextOutline(text, x, y, col::white);
 }
 
-export void renderTextOutlineCenter(std::wstring text, int x, int y) {
-    renderTextOutlineCenter(text, x, y, col::white);
+export void drawTextOutlineCenter(std::wstring text, int x, int y) {
+    drawTextOutlineCenter(text, x, y, col::white);
 }
 
 // 텍스트 너비 자동 줄바꿈 기능
@@ -402,7 +440,7 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
 }
 
 // 너비 제한 텍스트 렌더링
-export int renderTextWidth(std::wstring text, int x, int y, bool center, int width, int height, int lineLimit)
+export int drawTextWidth(std::wstring text, int x, int y, bool center, int width, int height, int lineLimit)
 {
     std::array<std::wstring, 2> textPair = textSplitter(text, width);
 
@@ -415,27 +453,27 @@ export int renderTextWidth(std::wstring text, int x, int y, bool center, int wid
     }
     else if (textPair[1] == L"") {
         if (center) {
-            renderTextCenter(text, x, y);
+            drawTextCenter(text, x, y);
         }
         else {
-            renderText(text, x, y);
+            drawText(text, x, y);
         }
         return 1;
     }
     else {
         if (center) {
-            renderTextCenter(textPair[0], x, y);
+            drawTextCenter(textPair[0], x, y);
         }
         else {
-            renderText(textPair[0], x, y);
+            drawText(textPair[0], x, y);
         }
-        return 1 + renderTextWidth(textPair[1], x, y + height, center, width, height, lineLimit - 1);
+        return 1 + drawTextWidth(textPair[1], x, y + height, center, width, height, lineLimit - 1);
     }
 }
 
-export int renderTextWidth(std::wstring text, int x, int y, bool center, int width, int height)
+export int drawTextWidth(std::wstring text, int x, int y, bool center, int width, int height)
 {
-    return renderTextWidth(text, x, y, center, width, height, 999);
+    return drawTextWidth(text, x, y, center, width, height, 999);
 }
 
 // Cache cleanup function - call this when shutting down
@@ -462,10 +500,14 @@ export int queryTextHeight(const std::wstring& text, bool hasColor = false) {
 }
 
 //@brief 캐시없이 바로 텍스트를 출력하는 함수, 프레임이나 디버깅 시간 표시 용도로 쓸 것
-export void renderTextDirect(const std::wstring& text, int x, int y, SDL_Color col = col::white)
+export void drawTextDirect(const std::wstring& text, int x, int y, SDL_Color col = col::white)
 {
     std::string utf8 = toUTF8(text);
-    SDL_Surface* surf = TTF_RenderText_Solid(mainFont[s_fontSize], utf8.c_str(), 0, col);
+
+    SDL_Surface* surf = s_useSolidRender
+        ? TTF_RenderText_Solid(s_currentFont[s_fontSize], utf8.c_str(), 0, col)
+        : TTF_RenderText_Blended(s_currentFont[s_fontSize], utf8.c_str(), 0, col);
+
     SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
     SDL_DestroySurface(surf);

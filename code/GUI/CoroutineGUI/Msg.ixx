@@ -155,7 +155,7 @@ public:
 			drawSprite(spr::msgBox, msgBase.x, msgBase.y);
 
 			setFontSize(22);
-			renderTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
+			drawTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
 
 			drawSpriteCenter(spr::icon32, 1,msgBase.x + 150- queryTextWidth(msgTitleText) / 2.0 -24, msgBase.y + 34);
 			
@@ -194,11 +194,11 @@ public:
 			}
 		loopEnd:
 
-			if (exInput == true) renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 280, -1);
+			if (exInput == true) drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 40 + 14, true, 280, -1);
 			else if (msgItemCode != -1)
 			{
 				setFontSize(16);
-				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 20, true, 280, 14);
+				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 20, true, 280, 14);
 				
 				
 				int pivotX = msgBase.x + 22;
@@ -213,13 +213,13 @@ public:
 				drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[msgItemCode]), pivotX + 18, pivotY + 18);
 				setZoom(1.0);
 				setFontSize(12);
-				renderText(itemDex[msgItemCode].name, pivotX + 50, pivotY + 7);
+				drawText(itemDex[msgItemCode].name, pivotX + 50, pivotY + 7);
 
 
 			}
 			else
 			{
-				renderTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 280, -1);
+				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 280, -1);
 			}
 
 
@@ -244,7 +244,7 @@ public:
 			setFontSize(16);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
-				renderTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
+				drawTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
 			}
 
 			if (exInput == true)
@@ -265,7 +265,7 @@ public:
 				{
 					exInputTextCut = exInputTextCut.substr(1);
 				}
-				renderText(exInputTextCut, inputTextPoint.x, inputTextPoint.y);
+				drawText(exInputTextCut, inputTextPoint.x, inputTextPoint.y);
 				std::wstring cursorText = exInputTextCut.substr(0, exInputCursor + exInputEditing);
 				if (timer::timer600 % 30 <= 15 && exInput == true)
 				{

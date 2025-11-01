@@ -104,7 +104,7 @@ void HUD::drawGUI()
 		if (1)//플레이어 이름 그리기
 		{
 			setFontSize(10);
-			renderText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 29 + vShift, letterbox.y + 5, lowCol::yellow);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 29 + vShift, letterbox.y + 5, lowCol::yellow);
 		}
 
 		setFontSize(10);
@@ -125,7 +125,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(sysStr[108], pivotX - 16, pivotY + 5, col::lightGray);//왼팔
+				drawTextCenter(sysStr[108], pivotX - 16, pivotY + 5, col::lightGray);//왼팔
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 
@@ -156,7 +156,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(sysStr[110], pivotX - 16, pivotY + 5, col::lightGray);//좌다리
+				drawTextCenter(sysStr[110], pivotX - 16, pivotY + 5, col::lightGray);//좌다리
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -185,7 +185,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(sysStr[107], pivotX - 16, pivotY + 5, col::lightGray);//머리
+				drawTextCenter(sysStr[107], pivotX - 16, pivotY + 5, col::lightGray);//머리
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -204,7 +204,7 @@ void HUD::drawGUI()
 			{
 				int pivotX = letterbox.x + 36 + 83 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(sysStr[106], pivotX - 16, pivotY + 5, col::lightGray);//몸통
+				drawTextCenter(sysStr[106], pivotX - 16, pivotY + 5, col::lightGray);//몸통
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -233,7 +233,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
 				int pivotY = letterbox.y + 22;
-				renderTextCenter(sysStr[109], pivotX - 16, pivotY + 5, col::lightGray);
+				drawTextCenter(sysStr[109], pivotX - 16, pivotY + 5, col::lightGray);
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -262,7 +262,7 @@ void HUD::drawGUI()
 
 				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
 				int pivotY = letterbox.y + 22 + 15;
-				renderTextCenter(sysStr[111], pivotX - 16, pivotY + 5, col::lightGray);
+				drawTextCenter(sysStr[111], pivotX - 16, pivotY + 5, col::lightGray);
 				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
 
 				// 페이크 HP
@@ -332,25 +332,25 @@ void HUD::drawGUI()
 
 
 				setFontSize(10);
-				renderTextCenter(L"STA", pivotX + 24, pivotY + 16);
+				drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
 
 
 
 
 				std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
 				setFontSize(8);
-				renderTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
+				drawTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
 			}
 
 			setFontSize(10);
 
 			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6);
-			renderText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0, lowCol::yellow);
+			drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0, lowCol::yellow);
 
-			renderText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1, col::lightGray);
-			renderText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1, lowCol::green);
-			renderText(L"STRESS", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
-			renderText(L"79", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::red);
+			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1, col::lightGray);
+			drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1, lowCol::green);
+			drawText(L"STRESS", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
+			drawText(L"79", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::red);
 
 
 			//시간 표시 기능
@@ -604,12 +604,12 @@ void HUD::drawGUI()
 
 
 			setFontSize(8);
-			renderTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 25);
+			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 25);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
 			setFontSize(10);
 
-			renderTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
+			drawTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
 		}
 
 		//팝업 버튼
@@ -728,8 +728,8 @@ void HUD::drawTab()
 		if (option::language == L"Korean") setFontSize(12);
 		else  setFontSize(10);
 
-		renderTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
-		renderTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
+		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
+		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
 
 		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
@@ -783,8 +783,8 @@ void HUD::drawTab()
 
 
 		setFontSize(12);
-		renderTextCenter(sysStr[195], tab.x + 62, tab.y + 9);
-		renderTextCenter(sysStr[207], tab.x + 104, tab.y + 52);
+		drawTextCenter(sysStr[195], tab.x + 62, tab.y + 9);
+		drawTextCenter(sysStr[207], tab.x + 104, tab.y + 52);
 		//renderTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
 
 
@@ -812,21 +812,21 @@ void HUD::drawTab()
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 17, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		renderTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::back:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 182, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		renderTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
 		break;
 	case tabFlag::confirm:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
 		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
 		setFontSize(12);
-		renderTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
 		break;
 	default:
 		errorBox(L"undefined tabFalg");
@@ -892,7 +892,7 @@ void HUD::drawQuickSlot()
 		{
 			setFontSize(10);
 			std::wstring skillName = skillDex[quickSlot[i].second].name;
-			renderTextOutlineCenter(skillName, 374, 57);
+			drawTextOutlineCenter(skillName, 374, 57);
 			
 		}
 
@@ -923,7 +923,7 @@ void HUD::drawQuickSlot()
 			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
 		}
 		setFontSize(10);
-		renderText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+		drawText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
 
 		if (deact)
 		{
@@ -944,7 +944,7 @@ void HUD::drawQuickSlot()
 	{
 		setFontSize(10);
 		std::wstring skillName = skillDex[currentUsingSkill].name;
-		renderTextOutlineCenter(skillName, 374, 57);
+		drawTextOutlineCenter(skillName, 374, 57);
 	}
 
 	if (dragQuickSlotTarget != -1)
@@ -1227,7 +1227,7 @@ void HUD::drawBarAct()
 		if (option::language == L"Korean") fontSize = 12;
 		else fontSize = 10;
 		setFontSize(fontSize);
-		renderTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
+		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
 		if (checkCursor(&barButton[i]) || barActCursor == i)
 		{
@@ -1404,7 +1404,7 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-		renderTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
+		drawTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
 
         int intDuration = std::ceil(myEfcts[i].duration);
 		
@@ -1561,7 +1561,7 @@ void HUD::drawHoverItemInfo()
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
 				std::wstring titleName = vehPtr->name;
-				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
+				drawTextCenter(titleName, pivotX + 96, pivotY + 9);
 				if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 				else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -1588,7 +1588,7 @@ void HUD::drawHoverItemInfo()
 					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
-					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
 
 					//연료량
 					drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
@@ -1605,7 +1605,7 @@ void HUD::drawHoverItemInfo()
 				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 				setFontSize(10);
 				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
-				renderTextCenter(titleName, pivotX + 96, pivotY + 9);
+				drawTextCenter(titleName, pivotX + 96, pivotY + 9);
 				drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())]), pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
 
 
@@ -1629,7 +1629,7 @@ void HUD::drawHoverItemInfo()
 					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
-					renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
+					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
 
 					//연료량
 					//drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
@@ -1646,7 +1646,7 @@ void HUD::drawQuest()
 {
 	int pivotY = 272;
 	setFontSize(16);
-	renderText(sysStr[212], 8, pivotY);
+	drawText(sysStr[212], 8, pivotY);
 
 	drawLine(8, pivotY+18, 118, pivotY + 18);
 	for (int i = 0; i < 60; i++)
@@ -1661,5 +1661,5 @@ void HUD::drawQuest()
 	std::wstring questStr = sysStr[213] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
-	renderText(questStr, 21, pivotY + 22);
+	drawText(questStr, 21, pivotY + 22);
 }

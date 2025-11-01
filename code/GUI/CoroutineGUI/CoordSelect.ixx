@@ -78,7 +78,7 @@ public:
 	{
 		//사념파
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2 + 20, 105);
-		renderTextCenter(telepathyStr, cameraW / 2 + 20, 105);
+		drawTextCenter(telepathyStr, cameraW / 2 + 20, 105);
 
 		bool displaySelectableCursor = true;
 		bool yellowFullRectCursor = false;

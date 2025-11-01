@@ -210,7 +210,7 @@ public:
 				}
 				else drawFillRect(optionRect[i], lowCol::black);
 				setFontSize(16);
-				renderTextCenter(optionText, optionRect[i].x + optionRect[i].w / 2 + 16, optionRect[i].y + optionRect[i].h / 2 + 1);
+				drawTextCenter(optionText, optionRect[i].x + optionRect[i].w / 2 + 16, optionRect[i].y + optionRect[i].h / 2 + 1);
 				drawSpriteCenter(spr::icon16, iconIndex, optionRect[i].x + 10, optionRect[i].y + 10);
 			}
 			
@@ -269,7 +269,7 @@ public:
 						drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
 						setFontSize(10);
 						std::wstring titleName = vehPtr->name;
-						renderTextCenter(titleName, pivotX + 96, pivotY + 9);
+						drawTextCenter(titleName, pivotX + 96, pivotY + 9);
 						if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 						else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
 						else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
@@ -296,7 +296,7 @@ public:
 							drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
 
 							//아이템 이름
-                            renderText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i, col::white);
+                            drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i, col::white);
 
 
 							if (tgtPart.pocketPtr != nullptr) //Inventory에도 같은 코드가 존재

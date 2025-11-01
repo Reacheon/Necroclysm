@@ -50,7 +50,7 @@ public:
 		if (SDL_GetTicks() - startTime >= 200)
 		{
 			setFontSize(32);
-			renderTextOutlineCenter(L"Necroclysm", cameraW / 2 + 195, cameraH / 2 - 69);
+			drawTextOutlineCenter(L"Necroclysm", cameraW / 2 + 195, cameraH / 2 - 69);
 
 			for (int i = 0; i < 181; i++)
 			{
@@ -58,9 +58,9 @@ public:
 			}
 			
 			setFontSize(22);
-			renderTextOutline(L"Back to Game", cameraW / 2 + 255 - queryTextWidth(L"Back to Game"), cameraH / 2 ,col::white);
-			renderTextOutline(L"Option", cameraW / 2 + 255 - queryTextWidth(L"Option"), cameraH / 2 + 28, col::white);
-			renderTextOutline(L"Save and Quit", cameraW / 2 + 255 - queryTextWidth(L"Save and Quit"), cameraH / 2 + 56, col::white);
+			drawTextOutline(L"Back to Game", cameraW / 2 + 255 - queryTextWidth(L"Back to Game"), cameraH / 2 ,col::white);
+			drawTextOutline(L"Option", cameraW / 2 + 255 - queryTextWidth(L"Option"), cameraH / 2 + 28, col::white);
+			drawTextOutline(L"Save and Quit", cameraW / 2 + 255 - queryTextWidth(L"Save and Quit"), cameraH / 2 + 56, col::white);
 
 		}
 	}

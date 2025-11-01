@@ -106,13 +106,6 @@ export int dtClickStack = -1; //총 시간, 단 측정 중이지 않을 때에�
 export __int64 clickStartTime = std::numeric_limits<__int64>::max(); //밀리초로 저장되는 클릭을 시작한 시간
 export bool deactHold = false; //홀드이벤트를 비활성화, 예를 들어 카메라를 일정 값만큼 이동했을 경우 홀드 이벤트가 발생하지않음
 
-export TTF_Font* notoSansFont[MAX_FONT_SIZE] = { nullptr, };
-export TTF_Font* notoSansBoldFont[MAX_FONT_SIZE] = { nullptr, };
-export TTF_Font* pixelFont[MAX_FONT_SIZE] = { nullptr, };
-
-export TTF_Font* mainFont[MAX_FONT_SIZE] = { nullptr, }; //메인 폰트의 사이즈(언어 설정이 바뀌면 다른 폰트로 바뀜)
-
-
 export int selectMode = 0; // 선택모드 0일 경우 전체선택, 1이면 정밀선택
 /////////////////////////////////////////////////////////////////
 export bool exInput = false; // exInput(외부 텍스트 입력)가 작동 중인지의 여부

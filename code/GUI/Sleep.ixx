@@ -126,13 +126,13 @@ public:
 				std::wstring sleepText = sysStr[214];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 				setFontSize(12);
-				renderTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 14);
+				drawTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 14);
 
 				// 수면 확률 표시
 				setFontSize(8);
 				float probability = getSleepProbability();
 				std::wstring probText = sysStr[229] + L": " + std::to_wstring((int)(probability * 100)) + L"%";
-				renderTextCenter(probText, tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 30);
+				drawTextCenter(probText, tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 30);
 			}
 			else if (isAsleep)
 			{
@@ -141,7 +141,7 @@ public:
 				std::wstring sleepText = sysStr[215];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 				setFontSize(12);
-				renderTextCenter(sleepText.c_str(), tooltipBox.x + 113, tooltipBox.y + 12);
+				drawTextCenter(sleepText.c_str(), tooltipBox.x + 113, tooltipBox.y + 12);
 
 				// 진행 바
 				SDL_Rect sleepGauge = { tooltipBox.x + 51, tooltipBox.y + 23, 125, 7 };
@@ -163,7 +163,7 @@ public:
 				progressText += std::to_wstring((int)(((float)sleepTime * 100.0 / (float)sleepDuration)));
 				progressText += L"% )";
 
-				renderTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 7);
+				drawTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 7);
 
 				int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };
 				int animIndex = (SDL_GetTicks() / 250) % 8;   // 250ms마다 한 스텝 → 1.2초에 한 주기

@@ -84,7 +84,7 @@ void Loot::drawGUI()
 
 		setFontSize(16);
 		
-		renderText(tileName, lootBase.x + 73, lootBase.y + 41);
+		drawText(tileName, lootBase.x + 73, lootBase.y + 41);
 
 		drawLine(lootBase.x + 72, lootBase.y + 63, lootBase.x + 72 + 255, lootBase.y + 63, col::gray);//회색 분리선
 
@@ -95,7 +95,7 @@ void Loot::drawGUI()
 
 			drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 47, volumeGaugeRect.y + 4);
 			setFontSize(10);
-			renderText(sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);
+			drawText(sysStr[18], volumeGaugeRect.x - 38, volumeGaugeRect.y - 2);
 
 
 			if (lootStack == nullptr) //Inventory에도 같은 코드가 존재
@@ -114,7 +114,7 @@ void Loot::drawGUI()
 					std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxVolume / 1000.0, 1) + L" L";
 					setFontSize(10);
-					renderText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
 				}
 				else if (lootItemData->pocketMaxNumber > 0)
 				{
@@ -129,13 +129,13 @@ void Loot::drawGUI()
 					std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxNumber / 1000.0, 1);
 					setFontSize(10);
-					renderText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
+					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 110, volumeGaugeRect.y - 2);
 				}
 			}
 			else if (lootStack != nullptr)
 			{
 				setFontSize(10);
-				renderText(L"∞", volumeGaugeRect.x + 110 - 64, volumeGaugeRect.y - 2);
+				drawText(L"∞", volumeGaugeRect.x + 110 - 64, volumeGaugeRect.y - 2);
 			}
 		}
 
@@ -145,7 +145,7 @@ void Loot::drawGUI()
 		drawRect(dropBtn, col::gray);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 11, dropBtn.y + 12);
 		setFontSize(10);
-		renderTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);
+		drawTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 8, dropBtn.y + dropBtn.h / 2);
 		drawFillRect(dropBtn, col::black, 150);
 	}
 	else
@@ -169,7 +169,7 @@ void Loot::drawGUI()
 		{
 			//가방을 가지고 있지 않다.
 			setFontSize(12);
-			renderTextCenter(sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 15, col::lightGray);
+			drawTextCenter(sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 15, col::lightGray);
 		}
 		else
 		{
@@ -240,7 +240,7 @@ void Loot::drawGUI()
 			drawRect(weightBar, col::white);
 
 			setFontSize(10);
-			renderTextCenter(L"132.9/99.9 KG", weightBar.x + (weightBar.w / 2), weightBar.y - 8);
+			drawTextCenter(L"132.9/99.9 KG", weightBar.x + (weightBar.w / 2), weightBar.y - 8);
 
 			//루팅 주머니 부피 게이지
 			{
@@ -258,7 +258,7 @@ void Loot::drawGUI()
 
 				std::wstring volumeStr = decimalCutter(currentVolume / 1000.0, 2) + L"/" + decimalCutter(maxVolume / 1000.0, 2) + L" L";
 				setFontSize(10);
-				renderTextCenter(volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
+				drawTextCenter(volumeStr, volumeBar.x + (volumeBar.w / 2), volumeBar.y - 8);
 			}
 
 
@@ -375,7 +375,7 @@ void Loot::drawGUI()
 			}
 		}
 		setFontSize(10);
-		renderTextCenter(sysStr[15], lootLabel.x + 25, lootLabel.y + 12); //선택(상단바)
+		drawTextCenter(sysStr[15], lootLabel.x + 25, lootLabel.y + 12); //선택(상단바)
 
 		{ //이름(상단바)
 			std::wstring tailStr = L"";
@@ -396,25 +396,25 @@ void Loot::drawGUI()
 				tailStr = L" (" + std::to_wstring(whiteNumber) + L" "+sysStr[87] + L")";// n개 아이템 검색됨
 			}
 
-			renderTextCenter(sysStr[16] + tailStr, lootLabel.x + 152, lootLabel.y + 12);
+			drawTextCenter(sysStr[16] + tailStr, lootLabel.x + 152, lootLabel.y + 12);
 		}
 
 		switch (getSortType())
 		{
 		default:
-			renderTextCenter(sysStr[24], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
+			drawTextCenter(sysStr[24], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
 			break;
 		case sortFlag::weightDescend:
-			renderTextCenter(sysStr[45], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
+			drawTextCenter(sysStr[45], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
 			break;
 		case sortFlag::weightAscend:
-			renderTextCenter(sysStr[46], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
+			drawTextCenter(sysStr[46], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
 			break;
 		case sortFlag::volumeDescend:
-			renderTextCenter(sysStr[47], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
+			drawTextCenter(sysStr[47], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
 			break;
 		case sortFlag::volumeAscend:
-			renderTextCenter(sysStr[48], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
+			drawTextCenter(sysStr[48], lootLabel.x + 280, lootLabel.y + 12); //물리량(상단바)
 			break;
 		}
 
@@ -436,11 +436,11 @@ void Loot::drawGUI()
 		if (lootPocket->itemInfo.size() == 0)
 		{
 			setFontSize(10);
-			renderTextCenter(sysStr[162], lootBase.x + 162, lootBase.y + 140, col::lightGray); //선택(상단바)
+			drawTextCenter(sysStr[162], lootBase.x + 162, lootBase.y + 140, col::lightGray); //선택(상단바)
 		}
 
 		setFontSize(10);
-		renderText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 6, lootBase.y + lootBase.h - 16);
+		drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 6, lootBase.y + lootBase.h - 16);
 
 	}
 

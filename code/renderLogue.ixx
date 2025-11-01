@@ -28,11 +28,11 @@ export __int64 renderLog(SDL_Renderer* renderer)
 			//renderText(L"#000000" + eraseColorCodeText(logStrDeque[i]), 5 + 2, cameraH - 158 - textHeight * i + 2);
 			
             std::wstring shadowText = removeColorCodes(logStrDeque[i]);
-			renderText(shadowText, 5-1, cameraH - 158 - textHeight * i,col::black);
-			renderText(shadowText, 5+1, cameraH - 158 - textHeight * i, col::black);
-			renderText(shadowText, 5, cameraH - 158 - textHeight * i-1, col::black);
-			renderText(shadowText, 5, cameraH - 158 - textHeight * i+1, col::black);
-			renderText(logStrDeque[i], 5, cameraH - 158 - textHeight * i);
+			drawText(shadowText, 5-1, cameraH - 158 - textHeight * i,col::black);
+			drawText(shadowText, 5+1, cameraH - 158 - textHeight * i, col::black);
+			drawText(shadowText, 5, cameraH - 158 - textHeight * i-1, col::black);
+			drawText(shadowText, 5, cameraH - 158 - textHeight * i+1, col::black);
+			drawText(logStrDeque[i], 5, cameraH - 158 - textHeight * i);
 			if (stopLog == false)
 			{ 
 				minusLogTimerDeque(i);

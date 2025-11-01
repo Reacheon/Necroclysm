@@ -199,12 +199,12 @@ public:
 				setFontSize(10);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 22;
-				renderTextOutlineCenter(accStr, textX, textY, col::white);
+				drawTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(8);
 				int textX2 = cameraW / 2;
 				int textY2 = cameraH / 2 - 32;
-				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
 			}
@@ -213,12 +213,12 @@ public:
 				setFontSize(10);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 40;
-				renderTextOutlineCenter(accStr, textX, textY, col::white);
+				drawTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(8);
 				int textX2 = cameraW / 2;
 				int textY2 = cameraH / 2 - 50;
-				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
 			}
@@ -227,12 +227,12 @@ public:
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58;
-				renderTextOutlineCenter(accStr, textX, textY, col::white);
+				drawTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
 				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
@@ -243,12 +243,12 @@ public:
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58 - 15;
-				renderTextOutlineCenter(accStr, textX, textY, col::white);
+				drawTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
 				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
@@ -259,12 +259,12 @@ public:
 				setFontSize(12);
 				int textX = cameraW / 2;
 				int textY = cameraH / 2 - 58 - 34;
-				renderTextOutlineCenter(accStr, textX, textY, col::white);
+				drawTextOutlineCenter(accStr, textX, textY, col::white);
 
 				setFontSize(10);
 				int textX2 = textX + 5;
 				int textY2 = textY - 15;
-				renderTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
 
 				setZoom(2.0);
 				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
@@ -346,7 +346,7 @@ public:
 
 		setFontSize(12);
 		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 72);
-		renderTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 72);
+		drawTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 72);
 	}
 
 	void changeAimTarget(int tgtX, int tgtY)

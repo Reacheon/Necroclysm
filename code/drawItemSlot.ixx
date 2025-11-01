@@ -137,11 +137,11 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 		if (queryTextWidth(mainText) > widthLimit) 
 		{
 			setFontSize(8);
-			renderText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+			drawText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
 		}
-		else  renderText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+		else  drawText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
 		setFontSize(8);
-		renderText(subText, itemBox.x + 42, itemBox.y + itemBox.h / 2 + 1);
+		drawText(subText, itemBox.x + 42, itemBox.y + itemBox.h / 2 + 1);
 		};
 
 	if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ) && pocketPtr->itemInfo.size() > 0) 
@@ -177,14 +177,14 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			if (queryTextWidth(mainName) > widthLimit) 
 			{
 				setFontSize(8);
-				renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+				drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
 			}
-			else renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
+			else drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
 		}
 		else 
 		{
 			setFontSize(12);
-			renderText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
+			drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
 		}
 	}
 
@@ -213,7 +213,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		setFontSize(10);
 		std::wstring numberStr = L"x" + std::to_wstring(inputItem.number);
-		renderText(numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
+		drawText(numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
 		//mainName += std::to_wstring(inputItem.number) + L" "; 
 	}
 
@@ -298,7 +298,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	if (hasBox1 == true)
 	{
 		drawStadium(box1.x, box1.y, box1.w, box1.h, statusColor, 183, 5);
-		renderTextCenter(statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2, statusStrColor);
+		drawTextCenter(statusStr, box1.x + box1.w / 2, box1.y + box1.h / 2, statusStrColor);
 	}
 	else
 	{
@@ -365,23 +365,23 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		if (inputItem.weight > 1000)
 		{
 			std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
-			renderText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			drawText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
 		}
 		else
 		{
 			std::wstring kgStr = std::to_wstring(inputItem.weight);
-			renderText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			drawText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
 		}
 
 		if (getVolume(inputItem) > 1000)
 		{
 			std::wstring volStr = decimalCutter(getVolume(inputItem) / 1000.0, 2);
-			renderText(volStr + L" L", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
+			drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		else
 		{
 			std::wstring volStr = std::to_wstring(getVolume(inputItem));
-			renderText(volStr + L" mL", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
+			drawText(volStr + L" mL", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
 		}
 		
 	}
@@ -437,7 +437,7 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, int iconInd
 	std::wstring mainName = text;
 
 	setFontSize(fontSize);
-	renderText(mainName, itemBox.x + 34, itemBox.y + 1 + yCorrection);
+	drawText(mainName, itemBox.x + 34, itemBox.y + 1 + yCorrection);
 
 	if (gray)
 	{

@@ -95,9 +95,9 @@ public:
                 setFontSize(10);
                 int targetX = pivotX + 10;
                 int targetY = pivotY + (28 * (-1)) + 20;
-                renderTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //이름
-                renderTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY - 7); //레벨 
-                renderTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY - 7); //적성
+                drawTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //이름
+                drawTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY - 7); //레벨 
+                drawTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY - 7); //적성
             }
 
             setZoom(1.5);
@@ -214,7 +214,7 @@ public:
                 }
 
                 setFontSize(10);
-                renderText(focusStr, targetX + 30, targetY + 5);
+                drawText(focusStr, targetX + 30, targetY + 5);
 
                 int yOffset = 0;
                 {
@@ -225,7 +225,7 @@ public:
                         setFontSize(8);
                         yOffset = 2;
                     }
-                    renderText(col2Str(levelColor) + proficStr, targetX + 40, targetY + 5 + yOffset);
+                    drawText(col2Str(levelColor) + proficStr, targetX + 40, targetY + 5 + yOffset);
                 }
 
                 setFontSize(10);
@@ -233,11 +233,11 @@ public:
                 {
                     SDL_Color levelColor = col::white;
                     if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) levelColor = col::yellow;
-                    renderText(col2Str(levelColor) + levelStr , targetX + 145 - queryTextWidth(levelStr), targetY + 5);
+                    drawText(col2Str(levelColor) + levelStr , targetX + 145 - queryTextWidth(levelStr), targetY + 5);
 
                 }
 
-                renderText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 5);
+                drawText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 5);
 
                 // 회색 필터 (기존과 동일)
                 if (PlayerPtr->entityInfo.proficFocus[i] == 0 && PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
@@ -263,10 +263,10 @@ public:
             }
             setZoom(1.0);
 
-            renderTextWidth(sysStr[230], proficBase.x + 20, proficBase.y + proficBase.h - 40, false, 600, 14);
+            drawTextWidth(sysStr[230], proficBase.x + 20, proficBase.y + proficBase.h - 40, false, 600, 14);
 
             if (warningIndex > 0) {
-                renderText(L"#FF0000" + sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70);
+                drawText(L"#FF0000" + sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70);
             }
 
         }

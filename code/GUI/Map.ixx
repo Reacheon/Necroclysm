@@ -139,10 +139,10 @@ public:
 			backBlackRect.x = mapBase.x + 71 - backBlackRect.w / 2;
 			backBlackRect.y = mapBase.y + 39 - backBlackRect.h / 2;
 			drawFillRect(backBlackRect, col::black);
-			renderTextCenter(pCoordStr, mapBase.x + 71, mapBase.y + 39);
-			renderText(L"X = 39,273", mapBase.x + 13, mapBase.y + 46);
-			renderText(L"Y = 21,732", mapBase.x + 13, mapBase.y + 46 + 11);
-			renderText(L"Z = 0", mapBase.x + 13, mapBase.y + 46 + 22);
+			drawTextCenter(pCoordStr, mapBase.x + 71, mapBase.y + 39);
+			drawText(L"X = 39,273", mapBase.x + 13, mapBase.y + 46);
+			drawText(L"Y = 21,732", mapBase.x + 13, mapBase.y + 46 + 11);
+			drawText(L"Z = 0", mapBase.x + 13, mapBase.y + 46 + 22);
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -151,7 +151,7 @@ public:
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			setFontSize(10);
-			renderTextCenter(L"마킹", mapBase.x + 397, mapBase.y + 39);
+			drawTextCenter(L"마킹", mapBase.x + 397, mapBase.y + 39);
 
 
 			SDL_Rect markingBtnRed = { mapBase.x + 345, mapBase.y + 47, 32, 32 };
@@ -172,7 +172,7 @@ public:
 
 
 			setFontSize(10);
-			renderTextCenter(L"배율", mapBase.x + 585, mapBase.y + 39);
+			drawTextCenter(L"배율", mapBase.x + 585, mapBase.y + 39);
 
 			SDL_Rect reduceBtn = { mapBase.x + 487, mapBase.y + 47, 32, 32 };
 			drawFillRect(reduceBtn, col::black);

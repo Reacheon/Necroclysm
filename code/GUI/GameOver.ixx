@@ -120,7 +120,7 @@ public:
 			else { markerIndex = 0; }
 
 			setFontSize(12);
-			renderTextOutlineCenter(gameOverText, cameraW / 2, 100 + 155);
+			drawTextOutlineCenter(gameOverText, cameraW / 2, 100 + 155);
 
 			drawSpriteCenter(spr::gameOverOptionRect, 0, optionRect.x + optionRect.w / 2, optionRect.y + optionRect.h / 2);
 
@@ -141,7 +141,7 @@ public:
 				drawSpriteCenter(spr::gameOverOptionMarker, std::ceil(cursorSprIndex), newGameBtn.x + newGameBtn.w / 2, newGameBtn.y + newGameBtn.h / 2);
 			}
 			else drawFillRect(SDL_Rect{ newGameBtn.x + 1,newGameBtn.y + 1,newGameBtn.w - 2,newGameBtn.h - 2 }, col::black);
-			renderTextOutlineCenter(L"새 게임 시작", newGameBtn.x + newGameBtn.w / 2, newGameBtn.y + newGameBtn.h / 2);
+			drawTextOutlineCenter(L"새 게임 시작", newGameBtn.x + newGameBtn.w / 2, newGameBtn.y + newGameBtn.h / 2);
 
 			drawRect(toTitleBtn, col::lightGray);
 			if (checkCursor(&toTitleBtn))
@@ -156,7 +156,7 @@ public:
 				drawSpriteCenter(spr::gameOverOptionMarker, std::ceil(cursorSprIndex), toTitleBtn.x + toTitleBtn.w / 2, toTitleBtn.y + toTitleBtn.h / 2);
 			}
 			else drawFillRect(SDL_Rect{ toTitleBtn.x + 1,toTitleBtn.y + 1,toTitleBtn.w - 2,toTitleBtn.h - 2 }, col::black);
-			renderTextOutlineCenter(L"타이틀 화면으로", toTitleBtn.x + toTitleBtn.w / 2, toTitleBtn.y + toTitleBtn.h / 2);
+			drawTextOutlineCenter(L"타이틀 화면으로", toTitleBtn.x + toTitleBtn.w / 2, toTitleBtn.y + toTitleBtn.h / 2);
 		}
 		
 	}

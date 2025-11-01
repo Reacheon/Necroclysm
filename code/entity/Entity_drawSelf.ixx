@@ -503,7 +503,7 @@ void Entity::drawSelf()
 
 			if (zoomScale == 1.0) textY -= (int)(1 * zoomScale);
 
-			renderTextOutlineCenter(entityInfo.name, textX, textY);
+			drawTextOutlineCenter(entityInfo.name, textX, textY);
 		}
 	}
 

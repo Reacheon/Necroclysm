@@ -72,21 +72,21 @@ export void renderFPS(__int64 loopTime)
 
 
     setFontSize(12);
-    renderTextDirect(decimalCutter(avgFPS, 2), 20, 170);
+    drawTextDirect(decimalCutter(avgFPS, 2), 20, 170);
 
     int pivotY = 350;
     setFontSize(8);
-    renderTextDirect(L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 2) + L" ms", 20, pivotY);
-    renderTextDirect(L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 1);
-    renderTextDirect(L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 2);
-    renderTextDirect(L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 3);
-    renderTextDirect(L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 4);
-    renderTextDirect( L">tile : " + decimalCutter(tileAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 5);
-    renderTextDirect( L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 6);
-    renderTextDirect( L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 7);
-    renderTextDirect(L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 8);
-    renderTextDirect(L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 9);
-    renderTextDirect(L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 10);
-    renderTextDirect(L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 11);
-    renderTextDirect(L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 12);
+    drawTextDirect(L"turnCycle : " + decimalCutter(turnCycleAvg / 1000000.0, 2) + L" ms", 20, pivotY);
+    drawTextDirect(L"stepEvent : " + decimalCutter(stepEventAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 1);
+    drawTextDirect(L"renderUI : " + decimalCutter(renderUIAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 2);
+    drawTextDirect(L"renderTile : " + decimalCutter(renderTileAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 3);
+    drawTextDirect(L">analysis : " + decimalCutter(analysisAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 4);
+    drawTextDirect( L">tile : " + decimalCutter(tileAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 5);
+    drawTextDirect( L">corpse : " + decimalCutter(corpseAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 6);
+    drawTextDirect( L">itemTile : " + decimalCutter(itemAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 7);
+    drawTextDirect(L">entityTile : " + decimalCutter(entityAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 8);
+    drawTextDirect(L">damageTile : " + decimalCutter(damageAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 9);
+    drawTextDirect(L">fogTile : " + decimalCutter(fogAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 10);
+    drawTextDirect(L">markerTile : " + decimalCutter(markerAvg / 1000000.0, 2) + L" ms", 30, pivotY + 12 * 11);
+    drawTextDirect(L"totalTime : " + decimalCutter(loopTimeAvg / 1000000.0, 2) + L" ms", 20, pivotY + 12 * 12);
 }
