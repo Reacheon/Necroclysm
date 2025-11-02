@@ -164,47 +164,50 @@ export int getTextHeightWithoutColor(const std::wstring& text)
 
 static CachedTexture* getCachedTexture(const std::wstring& text, int fontSize, SDL_Color color)
 {
+    // 색상 정규화
+    if (color.a == 0) color.a = 255;
+
     TextCacheKey key{ text, fontSize, color, s_currentFont, s_useSolidRender };
 
     auto it = textureCache.find(key);
     if (it != textureCache.end()) {
-        // Move to front of LRU list
         lruList.erase(it->second.lru_it);
         lruList.push_front(key);
         it->second.lru_it = lruList.begin();
         return &it->second;
     }
 
-    // Create new texture
     std::string utf8 = toUTF8(text);
     SDL_Surface* surf = s_useSolidRender
         ? TTF_RenderText_Solid(s_currentFont[fontSize], utf8.c_str(), 0, color)
         : TTF_RenderText_Blended(s_currentFont[fontSize], utf8.c_str(), 0, color);
+
     if (!surf) return nullptr;
 
     SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
+
+    // 픽셀 폰트용 설정
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);  // 추가!
 
     float fw, fh;
     SDL_GetTextureSize(tex, &fw, &fh);
     SDL_DestroySurface(surf);
 
-    // Cache management
     if (textureCache.size() >= MAX_CACHE_SIZE) {
-        // Remove least recently used
         auto lru_key = lruList.back();
         auto lru_it = textureCache.find(lru_key);
-        SDL_DestroyTexture(lru_it->second.texture);
-        textureCache.erase(lru_it);
+        if (lru_it != textureCache.end()) {  // 안전성 체크 추가
+            SDL_DestroyTexture(lru_it->second.texture);
+            textureCache.erase(lru_it);
+        }
         lruList.pop_back();
     }
 
-    // Add to cache
     lruList.push_front(key);
-    CachedTexture cached{ tex, fw, fh, lruList.begin() };
-    textureCache[key] = cached;
+    auto [insert_it, success] = textureCache.emplace(key, CachedTexture{ tex, fw, fh, lruList.begin() });
 
-    return &textureCache[key];
+    return &insert_it->second;
 }
 
 // 멀티컬러 텍스트 렌더링 (내부 구현)
@@ -282,7 +285,9 @@ static void drawMultiColorTextInternal(const std::wstring& text, int x, int y, S
 // 기본 단색 텍스트 렌더링 (기존 함수들)
 export void drawText(std::wstring text, int x, int y, SDL_Color inputCol)
 {
-    // 컬러코드가 포함되어 있으면 멀티컬러 렌더링 사용
+    // 알파값 명시적 설정
+    if (inputCol.a == 0) inputCol.a = 255;
+
     if (text.find(L'#') != std::wstring::npos) {
         drawMultiColorTextInternal(text, x, y, inputCol, false);
         return;
@@ -291,7 +296,13 @@ export void drawText(std::wstring text, int x, int y, SDL_Color inputCol)
     CachedTexture* cached = getCachedTexture(text, s_fontSize, inputCol);
     if (!cached) return;
 
-    SDL_FRect dst = { float(x), float(y), cached->width, cached->height };
+    // 정수 좌표로 렌더링
+    SDL_FRect dst = {
+        std::round(float(x)),
+        std::round(float(y)),
+        std::round(cached->width),
+        std::round(cached->height)
+    };
     SDL_RenderTexture(renderer, cached->texture, nullptr, &dst);
 }
 
@@ -301,7 +312,8 @@ export void drawText(std::wstring text, int x, int y) {
 
 export void drawTextCenter(std::wstring text, int x, int y, SDL_Color inputCol)
 {
-    // 컬러코드가 포함되어 있으면 멀티컬러 렌더링 사용
+    if (inputCol.a == 0) inputCol.a = 255;
+
     if (text.find(L'#') != std::wstring::npos) {
         drawMultiColorTextInternal(text, x, y, inputCol, true);
         return;
@@ -311,9 +323,10 @@ export void drawTextCenter(std::wstring text, int x, int y, SDL_Color inputCol)
     if (!cached) return;
 
     SDL_FRect dst = {
-        float(x) - cached->width / 2.0f,
-        float(y) - cached->height / 2.0f,
-        cached->width, cached->height
+        std::round(float(x) - cached->width / 2.0f),
+        std::round(float(y) - cached->height / 2.0f),
+        std::round(cached->width),
+        std::round(cached->height)
     };
     SDL_RenderTexture(renderer, cached->texture, nullptr, &dst);
 }

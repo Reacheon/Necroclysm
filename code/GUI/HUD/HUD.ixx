@@ -102,6 +102,7 @@ public:
 		* inputY는 상대위치임 -10이면 평소 위치에서 10 픽셀만큼 위로 올라간 것과 같음
 		*/
 
+		//letterbox = { 0, 0, 945, 201 };
 		letterbox = { 0, 0, 630, 140 };
 		letterbox.x = (cameraW - letterbox.w) / 2;
 		letterbox.y = cameraH - letterbox.h + 6 + inputY;
@@ -114,12 +115,12 @@ public:
 		}
 		letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
 		//탭 버튼은 changeXY의 영향을 받지 않음
-		tab = { cameraW - 128, 22, 120, 120 };
-		tabSmallBox = { tab.x + 78, tab.y - 2,44,44 };
+		tab = { cameraW - 200, 22, 180, 180 };
+		tabSmallBox = { tab.x + 116, tab.y - 6, 68, 68 };
 
 
-		quickSlotRegion = { 185 + 90, 0,380,45, };
-		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 90 + 48 * i, 0, 44,45 };
+		quickSlotRegion = { 185 + 90, 0,566,64, };
+		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 90 + 72 * i, 0, 62,64 };
 
 
 		x = 0;

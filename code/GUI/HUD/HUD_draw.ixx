@@ -714,28 +714,55 @@ void HUD::drawTab()
 		{
 			if (checkCursor(&tabSmallBox))
 			{
-				if (click == false) { drawSprite(spr::tab, 3, tab.x, tab.y - 2); }
-				else { drawSprite(spr::tab, 4, tab.x, tab.y - 2); }
+				if (click == false) 
+				{ 
+					drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::blue, 255, 3);
+				}
+				else 
+				{ 
+					drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::deepBlue, 255, 3);
+				}
 			}
 			else if (checkCursor(&tab))
 			{
-				if (click == false) { drawSprite(spr::tab, 1, tab.x, tab.y - 2); }
-				else { drawSprite(spr::tab, 2, tab.x, tab.y - 2); }
+				if (click == false)
+				{
+					drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+				}
+				else
+				{
+					drawSprite(spr::tab, 5, tab.x, tab.y - 2);
+					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+				}
 			}
-			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+			else
+			{
+				drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+				drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+			}
 		}
 
 		if (option::language == L"Korean") setFontSize(12);
 		else  setFontSize(10);
 
-		drawTextCenter(sysStr[1], tab.x + 60, tab.y + 94);
-		drawTextCenter(sysStr[2], tab.x + 60, tab.y + 94 + 14);
 
 
-		drawSpriteCenter(spr::icon48, 1, tab.x + 42, tab.y + 55);
-		drawSpriteCenter(spr::icon48, 2, tab.x + 72, tab.y + 64);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 1, tab.x + 42+25, tab.y + 55+12);
+		drawSpriteCenter(spr::icon48, 2, tab.x + 72+40, tab.y + 64+29);
+		setZoom(1.0);
 
-		drawSpriteCenter(spr::icon48, 158, tab.x + 99, tab.y + 18);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 158, tabSmallBox.x + tabSmallBox.w / 2, tabSmallBox.y + tabSmallBox.h / 2);
+		setZoom(1.0);
+
+		setFont(fontType::pixel);
+		setFontSize(14);
+		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 36);
+		drawTextCenter(sysStr[2], tab.x + tab.w / 2, tab.y + tab.h - 36 + 16);
 
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)
@@ -852,7 +879,7 @@ void HUD::drawQuickSlot()
 
 	for (int i = 0; i < 8; i++)
 	{
-		int pivotX = 185 + 90 + 48 * i;
+		int pivotX = 185 + 90 + 72 * i;
 		int pivotY = 0;
 		SDL_Color btnCol = col::black;
 		bool keyPressed = state[quickSlotKeys[i]];
@@ -866,8 +893,6 @@ void HUD::drawQuickSlot()
 				deact = true;
 			}
 		}
-
-
 
 		if (currentUsingSkill == -1)
 		{
@@ -888,42 +913,46 @@ void HUD::drawQuickSlot()
 
 		if (deact) btnCol = col::black;
 
+		//스킬 이름 표시
 		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact==false)
 		{
-			setFontSize(10);
+			setFont(fontType::pixel);
+			setFontSize(12);
 			std::wstring skillName = skillDex[quickSlot[i].second].name;
-			drawTextOutlineCenter(skillName, 374, 57);
+			drawTextOutlineCenter(skillName, quickSlotRegion.x + quickSlotRegion.w / 2, quickSlotRegion.h + 15);
 			
 		}
 
-		drawFillRect(SDL_Rect{ pivotX,pivotY,44,39 }, btnCol, 200);
-		drawLine(pivotX + 1, pivotY + 39, pivotX + 42, pivotY + 39, btnCol, 200);
-		drawLine(pivotX + 2, pivotY + 39 + 1, pivotX + 41, pivotY + 39 + 1, btnCol, 200);
-		drawLine(pivotX + 3, pivotY + 39 + 2, pivotX + 40, pivotY + 39 + 2, btnCol, 200);
-		drawLine(pivotX + 4, pivotY + 39 + 3, pivotX + 39, pivotY + 39 + 3, btnCol, 200);
-		drawLine(pivotX + 5, pivotY + 39 + 4, pivotX + 38, pivotY + 39 + 4, btnCol, 200);
-		drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, btnCol, 200);
+		SDL_Rect skillRect = SDL_Rect{ pivotX,pivotY,62,58 };
+		drawFillRect(skillRect, btnCol, 200);
+		drawLine(pivotX + 1, pivotY + skillRect.h, pivotX + skillRect.w - 2, pivotY + skillRect.h, btnCol, 200);
+		drawLine(pivotX + 2, pivotY + skillRect.h + 1, pivotX + skillRect.w - 3, pivotY + skillRect.h + 1, btnCol, 200);
+		drawLine(pivotX + 3, pivotY + skillRect.h + 2, pivotX + skillRect.w - 4, pivotY + skillRect.h + 2, btnCol, 200);
+		drawLine(pivotX + 4, pivotY + skillRect.h + 3, pivotX + skillRect.w - 5, pivotY + skillRect.h + 3, btnCol, 200);
+		drawLine(pivotX + 5, pivotY + skillRect.h + 4, pivotX + skillRect.w - 6, pivotY + skillRect.h + 4, btnCol, 200);
+		drawLine(pivotX + 6, pivotY + skillRect.h + 5, pivotX + skillRect.w - 7, pivotY + skillRect.h + 5, btnCol, 200);
 
 		if (quickSlot[i].first == quickSlotFlag::NONE)
 		{
-			drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
-			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
-			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
-			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
-			drawFillRect(SDL_Rect{ pivotX + 5, pivotY ,34,34 }, col::black, 180);
+			//drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
+			//drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
+			//drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
+			//drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
+			drawFillRect(SDL_Rect{ pivotX + 6, pivotY ,48,48 }, col::black, 180);
 		}
 		else
 		{
-			setZoom(2.0);
+			setZoom(3.0);
 			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
 			setZoom(1.0);
-			drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
-			drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
-			drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
-			drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
+			drawCross2(pivotX + 5, pivotY, 0, 7, 0, 7);
+			drawCross2(pivotX + 5 + 48, pivotY, 0, 7, 7, 0);
+			drawCross2(pivotX + 5, pivotY + 48, 7, 0, 0, 7);
+			drawCross2(pivotX + 5 + 48, pivotY + 48, 7, 0, 7, 0);
 		}
-		setFontSize(10);
-		drawText(std::to_wstring(i + 1), pivotX + 20, pivotY + 33);
+		setFont(fontType::pixel);
+		setFontSize(12);
+		drawTextCenter(std::to_wstring(i + 1), pivotX + skillRect.w/2, pivotY + 58);
 
 		if (deact)
 		{
@@ -937,14 +966,6 @@ void HUD::drawQuickSlot()
 			drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, col::black, 120);
 		}
 		
-	}
-
-	//스킬 이름 표시
-	if (currentUsingSkill != -1 && !currentSkillFoundInQuickSlot)
-	{
-		setFontSize(10);
-		std::wstring skillName = skillDex[currentUsingSkill].name;
-		drawTextOutlineCenter(skillName, 374, 57);
 	}
 
 	if (dragQuickSlotTarget != -1)
@@ -1223,10 +1244,8 @@ void HUD::drawBarAct()
 
 		//하단 텍스트
 
-		int fontSize = 12;
-		if (option::language == L"Korean") fontSize = 12;
-		else fontSize = 10;
-		setFontSize(fontSize);
+		setFont(fontType::pixel);
+		setFontSize(12);
 		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
 		if (checkCursor(&barButton[i]) || barActCursor == i)
@@ -1253,6 +1272,11 @@ void HUD::drawBarAct()
 
 		if (deactRect == true) drawStadium(barButton[i].x, barButton[i].y, 72, 72, { 0,0,0 }, 120, 5);
 	}
+
+
+	//setFont(fontType::pixel);
+	//setFontSize(12);
+	//drawTextDirect(L"abcdefghijklmnopqrstuvwxyz 다람쥐 헌 쳇바퀴에 타고파", 350, 350);
 }
 
 void HUD::drawStatusEffects()
@@ -1280,8 +1304,8 @@ void HUD::drawStatusEffects()
 
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
-		int pivotX = 5;
-		int pivotY = 350 + 20 * i;
+		int pivotX = 10;
+		int pivotY = 370 + 30 * i;
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
 		SDL_Color textColor = col::white;
@@ -1390,21 +1414,24 @@ void HUD::drawStatusEffects()
 
 		setFontSize(10);
 
-		setZoom(1.0);
+		setZoom(1.5);
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
-		int textWidth = queryTextWidth(statEfctName) + 15;
+		setFont(fontType::pixel);
+		setFontSize(12);
+		int textWidth = queryTextWidth(statEfctName) + 30;
 
-		drawFillRect(SDL_Rect{ pivotX + 16, pivotY, textWidth, 16 }, col::black, 85);
-		int lineStartX = pivotX + textWidth + 16;
-		for (int i = 0; i < 8; i++)
+		drawFillRect(SDL_Rect{ pivotX + 24, pivotY, textWidth, 24 }, col::black, 85);
+		int lineStartX = pivotX + textWidth + 24;
+		for (int i = 0; i < 12; i++)
 		{
-			drawLine(lineStartX + i, pivotY + 1 + i, lineStartX + i, pivotY + 15, col::black, 85);
+			drawLine(lineStartX + i, pivotY + 1 + i, lineStartX + i, pivotY + 23, col::black, 85);
 			textWidth++;
 		}
 
-		drawTextOutline(statEfctName, pivotX + 19, pivotY + 1 + textOffsetY, textColor);
+
+		drawTextOutline(statEfctName, pivotX + 30, pivotY + 6 + textOffsetY, textColor);
 
         int intDuration = std::ceil(myEfcts[i].duration);
 		
@@ -1416,6 +1443,9 @@ void HUD::drawStatusEffects()
 			else if (intDuration < 10) xCorrection = +4;
 			drawEplsionText(std::to_wstring(intDuration), lineStartX + xCorrection, pivotY + 10, col::white);
 		}
+
+
+		setZoom(1.5);
 
 		if (myEfcts[i].effectType == statusEffectFlag::hungry)
 		{
@@ -1451,7 +1481,7 @@ void HUD::drawStatusEffects()
 			sprIndex = std::max(0, std::min(32, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 2, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::dehydrated)
@@ -1488,7 +1518,7 @@ void HUD::drawStatusEffects()
 			sprIndex = myMax(0, myMin(32, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 2, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::tired)
@@ -1525,9 +1555,11 @@ void HUD::drawStatusEffects()
 			sprIndex = myMax(0, myMin(32, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 2, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
+
+		setZoom(1.0);
 	}
 }
 
@@ -1644,22 +1676,22 @@ void HUD::drawHoverItemInfo()
 
 void HUD::drawQuest()
 {
+	setFont(fontType::notoSansBold);
+	int pivotX = 14;
 	int pivotY = 272;
-	setFontSize(16);
-	drawText(sysStr[212], 8, pivotY);
-
-	drawLine(8, pivotY+18, 118, pivotY + 18);
-	for (int i = 0; i < 60; i++)
+	setFontSize(24);
+	drawText(sysStr[212], pivotX, pivotY);
+	drawLine(pivotX, pivotY + 40, pivotX + 110, pivotY + 40);
+	for (int i = 0; i < 120; i++)
 	{
-		drawPoint(119 + i, pivotY + 18, col::white, 255 - 4 * i);
+		drawPoint(pivotX + 111 + i, pivotY + 40, col::white, 255 - 2 * i);
 	}
-
-
-	drawRect({ 9, pivotY + 24,9,9 }, col::white);
-	setFontSize(10);
+	setFont(fontType::notoSans);
+	drawRect({ pivotX + 1, pivotY + 49, 14, 14 }, col::white);
+	setFontSize(16);
 	int elapsedDay = getElapsedDays();
 	std::wstring questStr = sysStr[213] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
-	drawText(questStr, 21, pivotY + 22);
+	drawText(questStr, pivotX + 20, pivotY + 43);
 }

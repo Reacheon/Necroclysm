@@ -65,7 +65,7 @@ export void textureLoader()
 	spr::aimMarkerTmp = new Sprite(renderer, "image/UI/aimMarkerTmp.png", 48, 48);
 
 	spr::aimAtkTypeMarker = new Sprite(renderer, "image/UI/aimAtkTypeMarker.png", 64, 64);
-	spr::tab = new Sprite(renderer, "image/UI/tabBox.png", 122, 122);
+	spr::tab = new Sprite(renderer, "image/UI/GUI/HUD/tab.png", 180, 180);
 	spr::aimLRChange = new Sprite(renderer, "image/UI/aimLRChange.png", 18, 18);
 	spr::floatWarning = new Sprite(renderer, "image/UI/floatWarning.png", 128, 24);
 	spr::epsilonFont = new Sprite(renderer, "image/epsilonFont.png", 4, 6);
