@@ -394,7 +394,7 @@ public:
 		}
 		else if (checkCursor(&tab))
 		{
-			if ((getMouseX() - tab.x + getMouseY() - tab.y - 119) < 0)
+			if ((getMouseX() - tab.x) + (getMouseY() - tab.y) < 178)
 			{
 				executeTabShot();
 			}

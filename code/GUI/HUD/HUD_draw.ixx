@@ -22,6 +22,23 @@ import ContextMenu;
 import Maint;
 
 
+namespace tabSprFlag
+{
+	constexpr int ONE_BTN = 0;
+	constexpr int ONE_BTN_HOVER = 1;
+	constexpr int ONE_BTN_CLICK = 2;
+	constexpr int APPLE_BTN = 3;
+	constexpr int APPLE_BTN_HOVER = 4;
+	constexpr int APPLE_BTN_CLICK = 5;
+	constexpr int TWO_BTN = 6;
+	constexpr int TWO_BTN_TWO_HOVER = 7;
+	constexpr int TWO_BTN_TWO_CLICK = 8;
+	constexpr int TWO_BTN_UP_HOVER = 9;
+	constexpr int TWO_BTN_UP_CLICK = 10;
+	constexpr int TWO_BTN_DOWN_HOVER = 11;
+	constexpr int TWO_BTN_DOWN_CLICK = 12;
+}
+
 namespace segmentIndex
 {
 	int zero = 0;
@@ -700,28 +717,30 @@ void HUD::drawTab()
 		else { btnColor = lowCol::deepBlue; }
 	}
 
+
+
 	switch (tabType)
 	{
 	case tabFlag::autoAtk:
 	{
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
-			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
-			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, tabSprFlag::ONE_BTN_CLICK, tab.x, tab.y - 2);
+			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, tabSprFlag::ONE_BTN_HOVER, tab.x, tab.y - 2);
+			else drawSprite(spr::tab, tabSprFlag::ONE_BTN, tab.x, tab.y - 2);
 		}
 		else
 		{
 			if (checkCursor(&tabSmallBox))
 			{
-				if (click == false) 
-				{ 
-					drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+				if (click == false)
+				{
+					drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
 					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::blue, 255, 3);
 				}
-				else 
-				{ 
-					drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+				else
+				{
+					drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
 					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::deepBlue, 255, 3);
 				}
 			}
@@ -729,41 +748,34 @@ void HUD::drawTab()
 			{
 				if (click == false)
 				{
-					drawSprite(spr::tab, 4, tab.x, tab.y - 2);
+					drawSprite(spr::tab, tabSprFlag::APPLE_BTN_HOVER, tab.x, tab.y - 2);
 					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
 				}
 				else
 				{
-					drawSprite(spr::tab, 5, tab.x, tab.y - 2);
+					drawSprite(spr::tab, tabSprFlag::APPLE_BTN_CLICK, tab.x, tab.y - 2);
 					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
 				}
 			}
 			else
 			{
-				drawSprite(spr::tab, 3, tab.x, tab.y - 2);
+				drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
 				drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
 			}
 		}
-
 		if (option::language == L"Korean") setFontSize(12);
 		else  setFontSize(10);
-
-
-
 		setZoom(1.5);
-		drawSpriteCenter(spr::icon48, 1, tab.x + 42+25, tab.y + 55+12);
-		drawSpriteCenter(spr::icon48, 2, tab.x + 72+40, tab.y + 64+29);
+		drawSpriteCenter(spr::icon48, 1, tab.x + 42 + 25, tab.y + 55 + 12);
+		drawSpriteCenter(spr::icon48, 2, tab.x + 72 + 40, tab.y + 64 + 29);
 		setZoom(1.0);
-
 		setZoom(1.5);
 		drawSpriteCenter(spr::icon48, 158, tabSmallBox.x + tabSmallBox.w / 2, tabSmallBox.y + tabSmallBox.h / 2);
 		setZoom(1.0);
-
 		setFont(fontType::pixel);
 		setFontSize(14);
 		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 36);
 		drawTextCenter(sysStr[2], tab.x + tab.w / 2, tab.y + tab.h - 36 + 16);
-
 		Sprite* targetBtnSpr;
 		if (option::inputMethod == input::gamepad)
 		{
@@ -777,34 +789,40 @@ void HUD::drawTab()
 	{
 		if (option::inputMethod == input::gamepad)
 		{
-			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, 4, tab.x, tab.y - 2);
-			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, 2, tab.x, tab.y - 2);
-			else drawSprite(spr::tab, 0, tab.x, tab.y - 2);
+			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) drawSprite(spr::tab, tabSprFlag::ONE_BTN_CLICK, tab.x, tab.y - 2);
+			else if (SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000) drawSprite(spr::tab, tabSprFlag::ONE_BTN_HOVER, tab.x, tab.y - 2);
+			else drawSprite(spr::tab, tabSprFlag::ONE_BTN, tab.x, tab.y - 2);
 		}
 		else
 		{
+			drawLine(tab.x + 0, tab.y + 178, tab.x + 178, tab.y + 0, lowCol::red, 200);
 			if (checkCursor(&tabSmallBox))
 			{
-				if (click == false) { drawSprite(spr::tabBoxAim, 5, tab.x, tab.y - 2); }
-				else { drawSprite(spr::tabBoxAim, 6, tab.x, tab.y - 2); }
+				drawSprite(spr::tab, tabSprFlag::TWO_BTN, tab.x, tab.y - 2);
+				if (click == false) drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::blue, 255, 3);
+				else drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::deepBlue, 255, 3);
 			}
 			else if (checkCursor(&tab))
 			{
-				drawLine(tab.x + 0, tab.y + 119, tab.x + 121, tab.y - 2, lowCol::red, 200);
-				if ((getMouseX() - tab.x + getMouseY() - tab.y - 119) < 0)
+
+				drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+				if ((getMouseX() - tab.x) + (getMouseY() - tab.y) < 178)
 				{
-					if (click == false) { drawSprite(spr::tabBoxAim, 1, tab.x, tab.y - 2); }
-					else { drawSprite(spr::tabBoxAim, 2, tab.x, tab.y - 2); }
+					if (click == false) { drawSprite(spr::tab, tabSprFlag::TWO_BTN_UP_HOVER, tab.x, tab.y - 2); }
+					else { drawSprite(spr::tab, tabSprFlag::TWO_BTN_UP_CLICK, tab.x, tab.y - 2); }
 				}
 				else // 마우스 커서가 직선 위에 있거나(경계 포함) 아래에 있는 경우
 				{
-					if (click == false) { drawSprite(spr::tabBoxAim, 3, tab.x, tab.y - 2); }
-					else { drawSprite(spr::tabBoxAim, 4, tab.x, tab.y - 2); }
+					if (click == false) { drawSprite(spr::tab, tabSprFlag::TWO_BTN_DOWN_HOVER, tab.x, tab.y - 2); }
+					else { drawSprite(spr::tab, tabSprFlag::TWO_BTN_DOWN_CLICK, tab.x, tab.y - 2); }
 				}
 			}
-			else drawSprite(spr::tabBoxAim, 0, tab.x, tab.y - 2);
+			else
+			{
+				drawSprite(spr::tab, tabSprFlag::TWO_BTN, tab.x, tab.y - 2);
+				drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+			}
 		}
-
 
 
 
