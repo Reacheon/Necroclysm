@@ -262,7 +262,7 @@ public:
 						setFont(fontType::notoSans);
 						setFontSize(15);
 						std::wstring titleName = vehPtr->name;
-						drawTextCenter(titleName, pivotX + 144, pivotY + 14);
+						drawTextCenter(titleName, pivotX + 144, pivotY + 12);
 
 						setZoom(1.5);
 						if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 144 - queryTextWidth(titleName) / 2.0 - 17, pivotY + 11);
@@ -299,7 +299,7 @@ public:
 								ItemPocket* pkPtr = tgtPart.pocketPtr.get();
 								if (tgtPart.pocketMaxVolume > 0)
 								{
-									SDL_Rect volumeGaugeRect = { pivotX + 203, newPivotY + 11 + 26 * i, 80, 17 };
+									SDL_Rect volumeGaugeRect = { pivotX + 203, newPivotY + 10 + 26 * i, 80, 18 };
 									drawRect(volumeGaugeRect, col::white);
 
 									int currentVolume = 0;
@@ -307,15 +307,23 @@ public:
 									{
 										currentVolume += getVolume(pkPtr->itemInfo[j]) * (pkPtr->itemInfo[j].number);
 									}
+
 									float volumeRatio = (float)currentVolume / (float)tgtPart.pocketMaxVolume;
 									SDL_Color gaugeCol = lowCol::green;
 									if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
 									else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-									drawFillRect(SDL_Rect{ volumeGaugeRect.x + 3, volumeGaugeRect.y + 3, static_cast<int>(74.0 * volumeRatio), 9 }, gaugeCol);
+
+									drawFillRect(SDL_Rect{ volumeGaugeRect.x + 3, volumeGaugeRect.y + 3, static_cast<int>(74.0 * volumeRatio), 12 }, gaugeCol);
 
 									std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 									std::wstring maxVolumeStr = decimalCutter((float)tgtPart.pocketMaxVolume / 1000.0, 1) + L"L";
-									drawEplsionText(currentVolumeStr + L"/" + maxVolumeStr, pivotX + 208, newPivotY + 15 + 26 * i, col::white);
+
+									// Epsilon 텍스트 → 일반 폰트로 변경
+									setFont(fontType::pixel);
+									setFontSize(12); // 또는 10pt (보기 좋은 크기로)
+									drawTextOutlineCenter(currentVolumeStr + L"/" + maxVolumeStr,
+										volumeGaugeRect.x + volumeGaugeRect.w / 2,
+										volumeGaugeRect.y + volumeGaugeRect.h / 2); // 중앙 정렬
 								}
 								else if (tgtPart.pocketMaxNumber > 0)
 								{
