@@ -28,7 +28,7 @@ export void updateLog(std::wstring text)
 {
     
     prt(L"Run updateLog function\n");
-    std::array<std::wstring, 2> arr = textSplitter(text, 304);
+    std::array<std::wstring, 2> arr = textSplitter(text, 450);
     if (arr[1] != L"")
     {
         updateLog(arr[0]);

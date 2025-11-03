@@ -57,7 +57,6 @@ public:
 		PlayerPtr->entityInfo.isEyesHalf = true;
 		PlayerPtr->entityInfo.isEyesClose = false;
 
-
 		// 수면 시도 시작
 		CORO(executeSleep());
 	}
@@ -72,7 +71,7 @@ public:
 	static Sleep* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		sleepBase = { 0, 0, 650, 376 };
+		sleepBase = { 0, 0, 975, 564 }; // 650→975, 376→564 (×1.5)
 		if (center == false)
 		{
 			sleepBase.x += inputX;
@@ -104,12 +103,12 @@ public:
 			if (isTryingToSleep)
 			{
 				// 수면 시도 중일 때는 작은 박스
-				tooltipBox = { cameraW / 2 - 75, 50, 180, 46 };
+				tooltipBox = { cameraW / 2 - 113, 100, 270, 69 }; // 75→113, 50→75, 180→270, 46→69
 			}
 			else
 			{
 				// 수면 중일 때는 큰 박스 (게이지 표시용)
-				tooltipBox = { cameraW / 2 - 75, 50, 180, 46 };
+				tooltipBox = { cameraW / 2 - 113, 100, 270, 69 };
 			}
 			drawWindow(&tooltipBox);
 			setZoom(1.0);
@@ -117,7 +116,9 @@ public:
 			// 로딩 애니메이션
 			int markerIndex = 0;
 			if (Msg::ins() == nullptr) markerIndex = (SDL_GetTicks() / 64) % 12;
-			drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 78, tooltipBox.y + 6);
+			setZoom(1.5); // 로딩 애니메이션 1.5배
+			drawSprite(spr::loadingAnime, markerIndex, tooltipBox.x + tooltipBox.w / 2 - 117, tooltipBox.y + 9); // 78→117, 6→9
+			setZoom(1.0);
 
 			if (isTryingToSleep)
 			{
@@ -125,14 +126,17 @@ public:
 				int dotCount = (SDL_GetTicks() / 800) % 4;
 				std::wstring sleepText = sysStr[214];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
-				setFontSize(12);
-				drawTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 14);
+
+				setFont(fontType::notoSansBold);
+				setFontSize(18);
+				drawTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 27, tooltipBox.y + 21); // 18→27, 14→21
 
 				// 수면 확률 표시
-				setFontSize(8);
+				setFont(fontType::pixel);
+				setFontSize(12); // 8 × 1.5 = 12
 				float probability = getSleepProbability();
 				std::wstring probText = sysStr[229] + L": " + std::to_wstring((int)(probability * 100)) + L"%";
-				drawTextCenter(probText, tooltipBox.x + tooltipBox.w / 2 + 18, tooltipBox.y + 30);
+				drawTextCenter(probText, tooltipBox.x + tooltipBox.w / 2 + 27, tooltipBox.y + 48); // 18→27, 30→45
 			}
 			else if (isAsleep)
 			{
@@ -140,18 +144,21 @@ public:
 				int dotCount = (SDL_GetTicks() / 800) % 4;
 				std::wstring sleepText = sysStr[215];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
-				setFontSize(12);
-				drawTextCenter(sleepText.c_str(), tooltipBox.x + 113, tooltipBox.y + 12);
+
+				setFont(fontType::notoSansBold);
+				setFontSize(18);
+				drawTextCenter(sleepText.c_str(), tooltipBox.x + 170, tooltipBox.y + 16); // 113→170, 12→18
 
 				// 진행 바
-				SDL_Rect sleepGauge = { tooltipBox.x + 51, tooltipBox.y + 23, 125, 7 };
+				SDL_Rect sleepGauge = { tooltipBox.x + 77, tooltipBox.y + 35, 188, 11 }; // 51→77, 23→35, 125→188, 7→11
 				drawRect(sleepGauge, col::white);
 
-				SDL_Rect sleepInGauge = { sleepGauge.x + 2, sleepGauge.y + 2, 121, 3 };
-				sleepInGauge.w = 121 * ((float)sleepTime / (float)sleepDuration);
+				SDL_Rect sleepInGauge = { sleepGauge.x + 3, sleepGauge.y + 3, 182, 5 }; // 2→3, 121→182, 3→5
+				sleepInGauge.w = 182 * ((float)sleepTime / (float)sleepDuration); // 121→182
 				drawFillRect(sleepInGauge, col::white);
 
-				setFontSize(8);
+				setFont(fontType::pixel);
+				setFontSize(12); // 8 × 1.5 = 12
 				int remainingMinutes = sleepDuration - sleepTime;
 				int hours = remainingMinutes / 60;
 				int minutes = remainingMinutes % 60;
@@ -163,10 +170,11 @@ public:
 				progressText += std::to_wstring((int)(((float)sleepTime * 100.0 / (float)sleepDuration)));
 				progressText += L"% )";
 
-				drawTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 7);
+				drawTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 11); // 7→11
 
+				// 생각 말풍선 애니메이션
 				int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };
-				int animIndex = (SDL_GetTicks() / 250) % 8;   // 250ms마다 한 스텝 → 1.2초에 한 주기
+				int animIndex = (SDL_GetTicks() / 250) % 8;
 				int yOffset = yOffsetSeq[animIndex];
 				setZoom(zoomScale);
 				drawSpriteCenter(
@@ -196,7 +204,6 @@ public:
 
 	Corouter executeSleep()
 	{
-
 		// 1단계: 수면 시도
 		isTryingToSleep = true;
 		isAsleep = false;
@@ -204,7 +211,6 @@ public:
 
 		while (isTryingToSleep)
 		{
-
 			// 주변 적 체크 (수면 시도 중에만)
 			if (negateMonster == false)
 			{
@@ -217,7 +223,7 @@ public:
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									//경고, 주변에 적이 있습니다. 계속 수면을 시도하시겠습니까?, 네,아니오,무시
-									new Msg(msgFlag::normal, sysStr[306],sysStr[323], { sysStr[36],sysStr[37],sysStr[311] });
+									new Msg(msgFlag::normal, sysStr[306], sysStr[323], { sysStr[36],sysStr[37],sysStr[311] });
 									co_await std::suspend_always();
 									if (coAnswer == sysStr[36]) goto sleepTryLoopEnd;
 									else if (coAnswer == sysStr[311])
@@ -269,7 +275,6 @@ public:
 
 		while (sleepTime < sleepDuration && isAsleep)
 		{
-
 			turnWait(1.0);
 			coTurnSkip = true;
 
@@ -280,7 +285,6 @@ public:
 			fatigue += FATIGUE_SPEED;
 			fatigue += fatigueRecoveryPerMinute;
 			if (fatigue > PLAYER_MAX_FATIGUE) fatigue = PLAYER_MAX_FATIGUE;
-
 		}
 
 		// 수면 완료
@@ -297,5 +301,4 @@ public:
 	{
 		tabType = tabFlag::back;
 	}
-
 };

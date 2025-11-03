@@ -168,7 +168,7 @@
     <ClCompile Include="code\renderFPS.ixx">
       <Filter>소스 파일\03_renderer\render</Filter>
     </ClCompile>
-    <ClCompile Include="code\renderLogue.ixx">
+    <ClCompile Include="code\renderLog.ixx">
       <Filter>소스 파일\03_renderer\render</Filter>
     </ClCompile>
     <ClCompile Include="code\renderSticker.ixx">
