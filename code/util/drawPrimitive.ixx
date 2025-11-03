@@ -104,6 +104,25 @@ export void drawCross2(int x, int y, int north, int south, int west, int east)
     SDL_RenderLine(localRenderer, x, y+1, x + east + 1, y+1);
 }
 
+
+//두께 2 십자가
+export void drawCross2(int x, int y, int north, int south, int west, int east, SDL_Color col)
+{
+	SDL_SetRenderDrawColor(localRenderer, col.r, col.g, col.b, 0xff);
+	SDL_RenderLine(localRenderer, x, y, x, y - north);
+	SDL_RenderLine(localRenderer, x + 1, y, x + 1, y - north);
+
+	SDL_RenderLine(localRenderer, x, y, x, y + south + 1);
+	SDL_RenderLine(localRenderer, x + 1, y, x + 1, y + south + 1);
+
+	SDL_RenderLine(localRenderer, x, y, x - west, y);
+	SDL_RenderLine(localRenderer, x, y + 1, x - west, y + 1);
+
+	SDL_RenderLine(localRenderer, x, y, x + east + 1, y);
+	SDL_RenderLine(localRenderer, x, y + 1, x + east + 1, y + 1);
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 255);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //5는 일반적인 둥근 테두리, 6은 하단이 평평한 5번, 7은 상단이 평평한 5번
 export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, int edge)

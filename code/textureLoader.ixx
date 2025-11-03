@@ -179,7 +179,7 @@ export void textureLoader()
 	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 
-	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/statusEffectGaugeCircle.png", 14, 14);
+	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/statusEffectGaugeCircle.png", 20, 20);
 	spr::thoughtBubble = new Sprite(renderer, "image/thoughtBubble.png", 16, 16);
 	spr::waveFoam = new Sprite(renderer, "image/waveFoam.png", 16, 16);
 	spr::seaFoam = new Sprite(renderer, "image/seaFoam.png", 16, 16);

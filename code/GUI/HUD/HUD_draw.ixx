@@ -952,11 +952,13 @@ void HUD::drawQuickSlot()
 
 		if (quickSlot[i].first == quickSlotFlag::NONE)
 		{
-			//drawCross2(pivotX + 5, pivotY, 0, 5, 0, 5);
-			//drawCross2(pivotX + 5 + 32, pivotY, 0, 5, 5, 0);
-			//drawCross2(pivotX + 5, pivotY + 32, 5, 0, 0, 5);
-			//drawCross2(pivotX + 5 + 32, pivotY + 32, 5, 0, 5, 0);
-			drawFillRect(SDL_Rect{ pivotX + 6, pivotY ,48,48 }, col::black, 180);
+
+			drawFillRect(SDL_Rect{ pivotX + 6, pivotY + 1 ,48,48 }, col::black, 180);
+
+			drawCross2(pivotX + 5, pivotY, 0, 7, 0, 7,col::gray);
+			drawCross2(pivotX + 5 + 48, pivotY, 0, 7, 7, 0, col::gray);
+			drawCross2(pivotX + 5, pivotY + 48, 7, 0, 0, 7, col::gray);
+			drawCross2(pivotX + 5 + 48, pivotY + 48, 7, 0, 7, 0, col::gray);
 		}
 		else
 		{
@@ -1463,7 +1465,6 @@ void HUD::drawStatusEffects()
 		}
 
 
-		setZoom(1.5);
 
 		if (myEfcts[i].effectType == statusEffectFlag::hungry)
 		{
@@ -1495,11 +1496,11 @@ void HUD::drawStatusEffects()
 				gaugeRatio = (fakeHunger - PLAYER_HUNGRY_CALORIE) / static_cast<float>(PLAYER_MAX_CALORIE - PLAYER_HUNGRY_CALORIE);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 32);
-			sprIndex = std::max(0, std::min(32, sprIndex));
+			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
+			sprIndex = std::max(0, std::min(53, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::dehydrated)
@@ -1532,11 +1533,11 @@ void HUD::drawStatusEffects()
 				gaugeRatio = (fakeThirst - PLAYER_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_MAX_HYDRATION - PLAYER_THIRSTY_HYDRATION);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 32);
-			sprIndex = myMax(0, myMin(32, sprIndex));
+			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
+			sprIndex = std::max(0, std::min(53, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::tired)
@@ -1569,11 +1570,11 @@ void HUD::drawStatusEffects()
 				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_FATIGUE - PLAYER_TIRED_FATIGUE);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 32);
-			sprIndex = myMax(0, myMin(32, sprIndex));
+			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
+			sprIndex = std::max(0, std::min(53, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 1);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
 		}
 
