@@ -117,184 +117,87 @@ void HUD::drawGUI()
 
 
 		int vShift = 396 * (ctrlVeh != nullptr);
+		int LETTERBOX_Y_OFFSET = 5; // 하단 박스 요소들의 Y 오프셋
 
 		if (1)//플레이어 이름 그리기
 		{
-			setFontSize(10);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 29 + vShift, letterbox.y + 5, lowCol::yellow);
+			setFont(fontType::pixel);
+			setFontSize(12);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 20 + vShift, letterbox.y + 5 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 		}
 
-		setFontSize(10);
 
+
+		setFont(fontType::pixel);
+		setFontSize(11);
+
+		setFont(fontType::pixel);
+		setFontSize(11);
 
 		{
+			// HP 게이지 그리기 람다 함수
+			auto drawBodyPartHP = [&](
+				int& fakeHP,
+				int& realHP,
+				unsigned char& fakeHPAlpha,
+				int maxHP,
+				int pivotX,
+				int pivotY,
+				const std::wstring& partName) -> void
+				{
+					// 페이크 HP 업데이트
+					if (fakeHP > realHP) { fakeHP--; }
+					else if (fakeHP < realHP) fakeHP = realHP;
+					if (fakeHP != realHP)
+					{
+						if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
+						else { fakeHPAlpha = 0; }
+					}
+					else { fakeHPAlpha = 255; }
+					int gaugeX = pivotX + 2;
+					drawTextCenter(partName, pivotX - 16, pivotY + 5, col::lightGray);
+					drawSprite(spr::hpBlankGauge, gaugeX, pivotY);
+					// 페이크 HP
+					float ratioFakeHP = myMax(0.0f, static_cast<float>(fakeHP) / static_cast<float>(maxHP));
+					SDL_Rect fakeRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioFakeHP), 5 };
+					drawFillRect(fakeRect, lowCol::white, fakeHPAlpha);
+					// 실제 HP
+					float ratioHP = myMax(0.0f, static_cast<float>(realHP) / static_cast<float>(maxHP));
+					SDL_Rect realRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioHP), 5 };
+					if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+					drawFillRect(realRect, lowCol::green);
+				};
+
+			int X_OFFSET = 0;
+			int Y_OFFSET = 3;
+			int X_DIST = 83;
+			int Y_DIST = 16;
+
 			// 왼팔
-			{
-				//페이크 HP
-				if (PlayerPtr->lArmFakeHP > PlayerPtr->lArmHP) { PlayerPtr->lArmFakeHP--; }
-				else if (PlayerPtr->lArmFakeHP < PlayerPtr->lArmHP) PlayerPtr->lArmFakeHP = PlayerPtr->lArmHP;
-				if (PlayerPtr->lArmFakeHP != PlayerPtr->lArmHP)
-				{
-					if (PlayerPtr->lArmFakeHPAlpha > 30) { PlayerPtr->lArmFakeHPAlpha -= 30; }
-					else { PlayerPtr->lArmFakeHPAlpha = 0; }
-				}
-				else { PlayerPtr->lArmFakeHPAlpha = 255; }
-
-				int pivotX = letterbox.x + 36 + vShift;
-				int pivotY = letterbox.y + 22;
-				drawTextCenter(sysStr[108], pivotX - 16, pivotY + 5, col::lightGray);//왼팔
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->lArmFakeHP) / (float)(PART_MAX_HP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->lArmFakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->lArmHP) / (float)(PART_MAX_HP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
-
+			drawBodyPartHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha,
+				PART_MAX_HP,
+				letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[108]);
 			// 좌다리
-			{
-				//페이크 HP
-				if (PlayerPtr->lLegFakeHP > PlayerPtr->lLegHP) { PlayerPtr->lLegFakeHP--; }
-				else if (PlayerPtr->lLegFakeHP < PlayerPtr->lLegHP) PlayerPtr->lLegFakeHP = PlayerPtr->lLegHP;
-				if (PlayerPtr->lLegFakeHP != PlayerPtr->lLegHP)
-				{
-					if (PlayerPtr->lLegFakeHPAlpha > 30) { PlayerPtr->lLegFakeHPAlpha -= 30; }
-					else { PlayerPtr->lLegFakeHPAlpha = 0; }
-				}
-				else { PlayerPtr->lLegFakeHPAlpha = 255; }
-
-				int pivotX = letterbox.x + 36 + vShift;
-				int pivotY = letterbox.y + 22 + 15;
-				drawTextCenter(sysStr[110], pivotX - 16, pivotY + 5, col::lightGray);//좌다리
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->lLegFakeHP) / (float)(PART_MAX_HP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->lLegFakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->lLegHP) / (float)(PART_MAX_HP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
-
+			drawBodyPartHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha,
+				PART_MAX_HP,
+				letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[110]);
 			// 머리
-			{
-				//페이크 HP
-				if (PlayerPtr->headFakeHP > PlayerPtr->headHP) { PlayerPtr->headFakeHP--; }
-				else if (PlayerPtr->headFakeHP < PlayerPtr->headHP) PlayerPtr->headFakeHP = PlayerPtr->headHP;
-				if (PlayerPtr->headFakeHP != PlayerPtr->headHP)
-				{
-					if (PlayerPtr->headFakeHPAlpha > 30) { PlayerPtr->headFakeHPAlpha -= 30; }
-					else { PlayerPtr->headFakeHPAlpha = 0; }
-				}
-				else { PlayerPtr->headFakeHPAlpha = 255; }
-
-				int pivotX = letterbox.x + 36 + 83 + vShift;
-				int pivotY = letterbox.y + 22;
-				drawTextCenter(sysStr[107], pivotX - 16, pivotY + 5, col::lightGray);//머리
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->headFakeHP) / (float)(PART_MAX_HP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->headFakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->headHP) / (float)(PART_MAX_HP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
-
-			// 몸통 (기존 코드 유지)
-			{
-				int pivotX = letterbox.x + 36 + 83 + vShift;
-				int pivotY = letterbox.y + 22 + 15;
-				drawTextCenter(sysStr[106], pivotX - 16, pivotY + 5, col::lightGray);//몸통
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->entityInfo.fakeHP) / (float)(PlayerPtr->entityInfo.maxHP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->entityInfo.fakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->entityInfo.HP) / (float)(PlayerPtr->entityInfo.maxHP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
-
+			drawBodyPartHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha,
+				PART_MAX_HP,
+				letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[107]);
+			// 몸통
+			drawBodyPartHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha,
+				PlayerPtr->entityInfo.maxHP,
+				letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[106]);
 			// 오른팔
-			{
-				//페이크 HP
-				if (PlayerPtr->rArmFakeHP > PlayerPtr->rArmHP) { PlayerPtr->rArmFakeHP--; }
-				else if (PlayerPtr->rArmFakeHP < PlayerPtr->rArmHP) PlayerPtr->rArmFakeHP = PlayerPtr->rArmHP;
-				if (PlayerPtr->rArmFakeHP != PlayerPtr->rArmHP)
-				{
-					if (PlayerPtr->rArmFakeHPAlpha > 30) { PlayerPtr->rArmFakeHPAlpha -= 30; }
-					else { PlayerPtr->rArmFakeHPAlpha = 0; }
-				}
-				else { PlayerPtr->rArmFakeHPAlpha = 255; }
-
-				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
-				int pivotY = letterbox.y + 22;
-				drawTextCenter(sysStr[109], pivotX - 16, pivotY + 5, col::lightGray);
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->rArmFakeHP) / (float)(PART_MAX_HP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->rArmFakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->rArmHP) / (float)(PART_MAX_HP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
-
+			drawBodyPartHP(PlayerPtr->rArmFakeHP, PlayerPtr->rArmHP, PlayerPtr->rArmFakeHPAlpha,
+				PART_MAX_HP,
+				letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[109]);
 			// 우다리
-			{
-				//페이크 HP
-				if (PlayerPtr->rLegFakeHP > PlayerPtr->rLegHP) { PlayerPtr->rLegFakeHP--; }
-				else if (PlayerPtr->rLegFakeHP < PlayerPtr->rLegHP) PlayerPtr->rLegFakeHP = PlayerPtr->rLegHP;
-				if (PlayerPtr->rLegFakeHP != PlayerPtr->rLegHP)
-				{
-					if (PlayerPtr->rLegFakeHPAlpha > 30) { PlayerPtr->rLegFakeHPAlpha -= 30; }
-					else { PlayerPtr->rLegFakeHPAlpha = 0; }
-				}
-				else { PlayerPtr->rLegFakeHPAlpha = 255; }
-
-				int pivotX = letterbox.x + 36 + 83 * 2 + vShift;
-				int pivotY = letterbox.y + 22 + 15;
-				drawTextCenter(sysStr[111], pivotX - 16, pivotY + 5, col::lightGray);
-				drawSprite(spr::hpBlankGauge, pivotX, pivotY);
-
-				// 페이크 HP
-				float ratioFakeHP = myMax((float)0.0, (PlayerPtr->rLegFakeHP) / (float)(PART_MAX_HP));
-				SDL_Rect fakeRect = { pivotX + 3, pivotY + 3, 38 * ratioFakeHP, 5 };
-				drawFillRect(fakeRect, lowCol::white, PlayerPtr->rLegFakeHPAlpha);
-
-				// 실제 HP
-				float ratioHP = myMax((float)0.0, (float)(PlayerPtr->rLegHP) / (float)(PART_MAX_HP));
-				SDL_Rect realRect = { pivotX + 3, pivotY + 3, 38 * ratioHP, 5 };
-				if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-				drawFillRect(realRect, lowCol::green);
-			}
+			drawBodyPartHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha,
+				PART_MAX_HP,
+				letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[111]);
 		}
-
 
 
 		if (ctrlVeh == nullptr)
@@ -302,7 +205,7 @@ void HUD::drawGUI()
 			//스테미나
 			{
 				int pivotX = letterbox.x + 18 + 238;
-				int pivotY = letterbox.y + 4;
+				int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
 				setFontSize(10);
 
 				int pSTA = PlayerPtr->entityInfo.STA;
@@ -348,26 +251,29 @@ void HUD::drawGUI()
 				}
 
 
-				setFontSize(10);
+				setFont(fontType::pixel);
+				setFontSize(11);
 				drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
-
-
-
-
+				setFont(fontType::pixel);
+				setFontSize(11);
 				std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
-				setFontSize(8);
 				drawTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
 			}
 
-			setFontSize(10);
+			setFont(fontType::pixel);
+			setFontSize(12);
+			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
+			drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 
-			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6);
-			drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0, lowCol::yellow);
+			setFont(fontType::pixel);
+			setFontSize(11);
+			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
+			drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
 
-			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 1, col::lightGray);
-			drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 1, lowCol::green);
-			drawText(L"STRESS", letterbox.x + 18 + 296, letterbox.y + 5 + 15 * 2, col::lightGray);
-			drawText(L"79", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 15 * 2, lowCol::red);
+			setFont(fontType::pixel);
+			setFontSize(12);
+			drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, lowCol::green);
+			drawText(L"39%", letterbox.x + 18 + 50 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, lowCol::red);
 
 
 			//시간 표시 기능
@@ -376,35 +282,35 @@ void HUD::drawGUI()
 				// PM or AM
 				if (getHour() >= 12) { timeIndex = segmentIndex::pm; }
 				else { timeIndex = segmentIndex::am; }
-				drawSprite(spr::segment, timeIndex, letterbox.x + 18 + 446 + 14 * 0, letterbox.y + 10);
+				drawSprite(spr::segment, timeIndex, letterbox.x + 18 + 446 + 14 * 0, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
 				//xx시
-				drawSprite(spr::segment, getHour() / 10, letterbox.x + 18 + 446 + 14 * 1, letterbox.y + 10);
-				drawSprite(spr::segment, getHour() % 10, letterbox.x + 18 + 446 + 14 * 2, letterbox.y + 10);
+				drawSprite(spr::segment, getHour() / 10, letterbox.x + 18 + 446 + 14 * 1, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getHour() % 10, letterbox.x + 18 + 446 + 14 * 2, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
 				//:
-				drawSprite(spr::segment, segmentIndex::colon, letterbox.x + 18 + 446 + 14 * 3, letterbox.y + 10);
+				drawSprite(spr::segment, segmentIndex::colon, letterbox.x + 18 + 446 + 14 * 3, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
 				//xx분
-				drawSprite(spr::segment, getMin() / 10, letterbox.x + 18 + 446 + 14 * 4, letterbox.y + 10);
-				drawSprite(spr::segment, getMin() % 10, letterbox.x + 18 + 446 + 14 * 5, letterbox.y + 10);
+				drawSprite(spr::segment, getMin() / 10, letterbox.x + 18 + 446 + 14 * 4, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getMin() % 10, letterbox.x + 18 + 446 + 14 * 5, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
 				//xx초
 				setZoom(0.7);
-				drawSprite(spr::segment, getSec() / 10, letterbox.x + 18 + 446 + 14 * 6, letterbox.y + 15);
-				drawSprite(spr::segment, getSec() % 10, letterbox.x + 18 + 446 + 14 * 6 + 10, letterbox.y + 15);
+				drawSprite(spr::segment, getSec() / 10, letterbox.x + 18 + 446 + 14 * 6, letterbox.y + 15 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getSec() % 10, letterbox.x + 18 + 446 + 14 * 6 + 10, letterbox.y + 15 + LETTERBOX_Y_OFFSET);
 
 				//xxxx년
-				drawSprite(spr::segment, getYear() / 1000, letterbox.x + 18 + 460 + 10 * -1, letterbox.y + 7 + 25);
-				drawSprite(spr::segment, (getYear() % 1000) / 100, letterbox.x + 18 + 460 + 10 * 0, letterbox.y + 7 + 25);
-				drawSprite(spr::segment, ((getYear() % 100) / 10), letterbox.x + 18 + 460 + 10 * 1, letterbox.y + 7 + 25);
-				drawSprite(spr::segment, getYear() % 10, letterbox.x + 18 + 460 + 10 * 2, letterbox.y + 7 + 25);
+				drawSprite(spr::segment, getYear() / 1000, letterbox.x + 18 + 460 + 10 * -1, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, (getYear() % 1000) / 100, letterbox.x + 18 + 460 + 10 * 0, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, ((getYear() % 100) / 10), letterbox.x + 18 + 460 + 10 * 1, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getYear() % 10, letterbox.x + 18 + 460 + 10 * 2, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
 				//:
-				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 3, letterbox.y + 7 + 25);
+				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 3, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
 				//xx월
-				drawSprite(spr::segment, getMonth() / 10, letterbox.x + 18 + 460 + 10 * 4, letterbox.y + 7 + 25);
-				drawSprite(spr::segment, getMonth() % 10, letterbox.x + 18 + 460 + 10 * 5, letterbox.y + 7 + 25);
+				drawSprite(spr::segment, getMonth() / 10, letterbox.x + 18 + 460 + 10 * 4, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getMonth() % 10, letterbox.x + 18 + 460 + 10 * 5, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
 				//:
-				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 6, letterbox.y + 7 + 25);
+				drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 6, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
 				//xx일
-				drawSprite(spr::segment, getDay() / 10, letterbox.x + 18 + 460 + 10 * 7, letterbox.y + 7 + 25);
-				drawSprite(spr::segment, getDay() % 10, letterbox.x + 18 + 460 + 10 * 8, letterbox.y + 7 + 25);
+				drawSprite(spr::segment, getDay() / 10, letterbox.x + 18 + 460 + 10 * 7, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
+				drawSprite(spr::segment, getDay() % 10, letterbox.x + 18 + 460 + 10 * 8, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
 				setZoom(1.0);
 			}
 
@@ -445,7 +351,7 @@ void HUD::drawGUI()
 				}
 
 				// 이클립스 배경 이미지 그리기
-				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 4);
+				drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 4 + LETTERBOX_Y_OFFSET);
 
 				static const std::vector<std::pair<int, int>> celestialPath = {
 					// 동쪽에서 시작하여 서쪽으로
@@ -484,15 +390,15 @@ void HUD::drawGUI()
 				if (getHour() >= 6 && getHour() < 18)
 				{
 					int minutesSince6AM = (getHour() - 6) * 60 + getMin();
-					float progress = (float)minutesSince6AM / 720.0f; 
+					float progress = (float)minutesSince6AM / 720.0f;
 					int pathIndex = (int)(progress * (celestialPath.size() - 1));
 
 					if (pathIndex >= 0 && pathIndex < celestialPath.size())
 					{
 						int sunX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
-						int sunY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second;
+						int sunY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second + LETTERBOX_Y_OFFSET;
 
-						SDL_Color sunColor = { 255, 100, 100 }; 
+						SDL_Color sunColor = { 255, 100, 100 };
 						for (int dx = -1; dx <= 1; dx++)
 						{
 							for (int dy = -1; dy <= 1; dy++)
@@ -521,7 +427,7 @@ void HUD::drawGUI()
 						index++;
 						if (index == sprSize) index = 0;
 					}
-					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 25);
+					drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 				}
 				else
 				{
@@ -538,13 +444,13 @@ void HUD::drawGUI()
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
 					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
 
-					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 25);
+					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
 
 					SDL_Color centerLight = { 0xf7,0xf3,0xce };
 					SDL_Color outerLight = { 0xd0,0xc3,0x3f };
 					int lightPivotX = letterbox.x + 426 - 27;
-					int lightPivotY = letterbox.y + 19 - 2;
+					int lightPivotY = letterbox.y + 19 - 2 + LETTERBOX_Y_OFFSET;
 
 					drawPoint(lightPivotX, lightPivotY, centerLight);
 					drawPoint(lightPivotX + 1, lightPivotY, outerLight);
@@ -583,7 +489,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 			}
 			else if (currentWeather == weatherFlag::rain)
 			{
@@ -594,7 +500,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 			}
 			else if (currentWeather == weatherFlag::storm)
 			{
@@ -605,7 +511,7 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 			}
 			else if (currentWeather == weatherFlag::snow)
 			{
@@ -616,17 +522,18 @@ void HUD::drawGUI()
 					index++;
 					if (index >= sprSize) index = 0;
 				}
-				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 25);
+				drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
 			}
 
 
-			setFontSize(8);
-			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 25);
+			setFont(fontType::pixel);
+			setFontSize(12);
+			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 30 + LETTERBOX_Y_OFFSET);
 
-			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3);
+			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3 + LETTERBOX_Y_OFFSET);
 			setFontSize(10);
 
-			drawTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24);
+			drawTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24 + LETTERBOX_Y_OFFSET);
 		}
 
 		//팝업 버튼
@@ -1457,11 +1364,10 @@ void HUD::drawStatusEffects()
 		
 		if (intDuration > 0)
 		{
-			int xCorrection = 0;
-			if (intDuration > 999) xCorrection = -8;
-			else if (intDuration > 99) xCorrection = -4;
-			else if (intDuration < 10) xCorrection = +4;
-			drawEplsionText(std::to_wstring(intDuration), lineStartX + xCorrection, pivotY + 10, col::white);
+			setFont(fontType::pixel);
+			setFontSize(11);
+            int textWidth = queryTextWidth(std::to_wstring(intDuration));
+			drawText(std::to_wstring(intDuration), lineStartX + 7 - textWidth, pivotY + 11, col::white);
 		}
 
 

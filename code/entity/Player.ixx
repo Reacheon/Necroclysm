@@ -22,11 +22,11 @@ public:
 	int lLegFakeHP = 100;
 	int rLegFakeHP = 100;
 
-	int headFakeHPAlpha = 255;
-	int lArmFakeHPAlpha = 255;
-	int rArmFakeHPAlpha = 255;
-	int lLegFakeHPAlpha = 255;
-	int rLegFakeHPAlpha = 255;
+	Uint8 headFakeHPAlpha = 255;
+	Uint8 lArmFakeHPAlpha = 255;
+	Uint8 rArmFakeHPAlpha = 255;
+	Uint8 lLegFakeHPAlpha = 255;
+	Uint8 rLegFakeHPAlpha = 255;
 
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();

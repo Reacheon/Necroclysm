@@ -30,6 +30,7 @@ namespace
 
 export int randomRange(int a, int b)
 {
+    if (a > b) std::swap(a, b);
     std::lock_guard lock(rngMutex());
     std::uniform_int_distribution<int> dis(a, b);
     return dis(rng());
@@ -37,6 +38,7 @@ export int randomRange(int a, int b)
 
 export long long randomRangeLL(long long a, long long b)
 {
+    if (a > b) std::swap(a, b);
     std::lock_guard lock(rngMutex());
     std::uniform_int_distribution<long long> dis(a, b);
     return dis(rng());
@@ -44,6 +46,7 @@ export long long randomRangeLL(long long a, long long b)
 
 export double randomRangeFloat(double a, double b)
 {
+    if (a > b) std::swap(a, b);
     std::lock_guard lock(rngMutex());
     std::uniform_real_distribution<double> dis(a, b);
     return dis(rng());

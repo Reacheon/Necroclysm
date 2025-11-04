@@ -103,7 +103,7 @@ public:
 		*/
 
 		//letterbox = { 0, 0, 945, 201 };
-		letterbox = { 0, 0, 630, 140 };
+		letterbox = { 0, 0, 630, 156 };
 		letterbox.x = (cameraW - letterbox.w) / 2;
 		letterbox.y = cameraH - letterbox.h + 6 + inputY;
 		letterbox.h = cameraH - letterbox.y + 6;

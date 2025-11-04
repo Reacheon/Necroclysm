@@ -25,7 +25,7 @@ export struct EntityData_Base
     std::vector<unsigned __int16> material;
     unsigned __int8 HD = 1;
     //방어 계열 변수
-    __int16 maxHP = 100;
+    __int32 maxHP = 100;
     __int16 maxMP = 100;
     __int16 maxSTA = 60;
 
@@ -61,8 +61,8 @@ export struct EntityData : public EntityData_Base
 
     
     ////////////////////////////////csv에 없는 데이터/////////////////////////////////////
-    __int16 HP = 100;
-    __int16 fakeHP = 100;
+    __int32 HP = 100;
+    __int32 fakeHP = 100;
     unsigned __int8 fakeHPAlpha = 255;
     __int16 displayHPBarCount = 0;
     __int16 alphaHPBar = 0;
