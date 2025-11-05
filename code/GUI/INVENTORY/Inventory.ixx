@@ -62,8 +62,8 @@ public:
 	}
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		inventoryBase = { 0, 0, 335, 336 };
-		inventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size() - 1)));
+		inventoryBase = { 0, 0, 404, 506 };
+		inventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size() - 1)));
 
 		if (center == false)
 		{
@@ -84,19 +84,19 @@ public:
 		else
 		{
 			x = inputX - inventoryBase.w / 2;
-			y = inputY - inventoryBase.h / 2;
+			y = inventoryBase.h / 2;
 		}
 
 		for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
 		{
-			inventoryItemRect[i] = { inventoryBase.x + 52, inventoryBase.y + 125 + 32*i, 270, 26 };
-			inventoryItemSelectRect[i] = { inventoryBase.x + 10, inventoryBase.y + 125 + 32 * i, 36, 26 };
+			inventoryItemRect[i] = { inventoryBase.x + 63, inventoryBase.y + 150 + 37*i, 325, 32 };
+			inventoryItemSelectRect[i] = { inventoryBase.x + 12, inventoryBase.y + 150 + 37 * i, 43, 32 };
 		}
-		inventoryLabel = { inventoryBase.x + 10, inventoryBase.y + 95, inventoryBase.w - 20 , 26 };
-		inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 62 , 26 };
-		inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 182 , 26 };
-		inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 71 , 26 };
-		dropBtn = { inventoryBase.x + 259,inventoryBase.y + 36,69,23 };
+		inventoryLabel = { inventoryBase.x + 12, inventoryBase.y + 114, inventoryBase.w - 24 , 31 };
+		inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 75 , 31 };
+		inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 219 , 31 };
+		inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 85 , 31 };
+		dropBtn = { inventoryBase.x + 299, inventoryBase.y + 40, 100, 35 };
 	}
 	void drawGUI();
 	void clickUpGUI()
@@ -306,7 +306,7 @@ public:
 		tabType = tabFlag::back;
 
 		// 윈도우 높이 조정 (동적으로 변경)
-		inventoryBase.h = 164 + 32 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
+		inventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
 
 		// 게임패드 지원이 필요하다면
 		if (option::inputMethod == input::gamepad)
