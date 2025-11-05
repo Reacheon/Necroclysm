@@ -22,6 +22,8 @@ void Inventory::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
+		setFont(fontType::notoSans);
+		
 		SDL_Rect newInventoryBase = inventoryBase;
 		newInventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
 		drawWindowItemset(&newInventoryBase, titleInventory, titleItemSprIndex);
