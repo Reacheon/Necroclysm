@@ -29,19 +29,19 @@ void Equip::drawGUI()
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 		
 		//플레이어 무게 제한 게이지 그리기
-		SDL_Rect weightGaugeRect = { equipBase.x + 65,equipBase.y + 39,104,9 };
+		SDL_Rect weightGaugeRect = { equipBase.x + 78, equipBase.y + 47, 125, 11 };
 		drawRect(weightGaugeRect, col::white);
-		drawFillRect(SDL_Rect{ weightGaugeRect.x + 2,weightGaugeRect.y + 2,50,5 }, lowCol::green);
-		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 47, weightGaugeRect.y + 4);
+		drawFillRect(SDL_Rect{ weightGaugeRect.x + 2, weightGaugeRect.y + 2, 50, 6 }, lowCol::green);
+		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 56, weightGaugeRect.y + 5);
+		setFontSize(12);
+		drawText(sysStr[163], weightGaugeRect.x - 46, weightGaugeRect.y - 2);//무게
 		setFontSize(10);
-		drawText(sysStr[163], weightGaugeRect.x - 38, weightGaugeRect.y - 2);//무게
-		setFontSize(8);
-		drawText(L"32.5 / 92.3 kg", weightGaugeRect.x + 110, weightGaugeRect.y - 1);
+		drawText(L"32.5 / 92.3 kg", weightGaugeRect.x + 132, weightGaugeRect.y - 1);
 
 
 		//이큅 윈도우 본체
-		setFontSize(10);
-		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 6, equipWindow.y + equipWindow.h - 8);
+		setFontSize(12);
+		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 7, equipWindow.y + equipWindow.h - 10);
 
 		//우측 아이템 상단바(선택 이름 물리량)
 		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);
@@ -60,10 +60,10 @@ void Equip::drawGUI()
 				drawStadium(equipLabelQuantity.x, equipLabelQuantity.y, equipLabelQuantity.w, equipLabelQuantity.h, lowCol::blue, 183, 5);
 			}
 		}
-		setFontSize(12);
-		drawText(sysStr[15], equipLabel.x + 10, equipLabel.y + 4); //선택(상단바)
-		drawText(sysStr[16], equipLabel.x + 140, equipLabel.y + 4); //이름(상단바)
-		drawText(sysStr[24], equipLabel.x + 260, equipLabel.y + 4); //무리량(상단바)
+		setFontSize(14);
+		drawTextCenter(sysStr[15], equipLabel.x + 30, equipLabel.y + 14); //선택(상단바)
+		drawTextCenter(sysStr[16], equipLabel.x + 183, equipLabel.y + 14); //이름(상단바)
+		drawTextCenter(sysStr[24], equipLabel.x + 337, equipLabel.y + 14); //무리량(상단바)
 
 		//개별 아이템
 		if (GUI::getLastGUI() != this) itemListColorLock = true;
@@ -76,7 +76,7 @@ void Equip::drawGUI()
 		}
 
 		// 아이템 스크롤 그리기
-		SDL_Rect equipScrollBox = { equipBase.x + 325, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
+		SDL_Rect equipScrollBox = { equipBase.x + 391, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
 		drawFillRect(equipScrollBox, { 120,120,120 });
 		SDL_Rect inScrollBox = equipScrollBox; // 내부 스크롤 커서
 		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / PlayerPtr->getEquipPtr()->itemInfo.size());
@@ -98,22 +98,22 @@ void Equip::drawGUI()
 		drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 180, 5);
 
 		setFont(fontType::pixel);
-		setFontSize(12);
+		setFontSize(14);
 
-		drawText(sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0, col::lightGray);//머리
-		drawText(sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1, col::lightGray);//몸통
-		drawText(sysStr[108], topWindow.x + 10, topWindow.y + 24 + 18 * 2, col::lightGray);//왼팔
-		drawText(sysStr[109], topWindow.x + 10, topWindow.y + 24 + 18 * 3, col::lightGray);//오른팔
-		drawText(sysStr[110], topWindow.x + 10, topWindow.y + 24 + 18 * 4, col::lightGray);//왼다리
-		drawText(sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5, col::lightGray);//오른다리
+		drawText(sysStr[107], topWindow.x + 12, topWindow.y + 29 + 22 * 0, col::lightGray);//머리
+		drawText(sysStr[106], topWindow.x + 12, topWindow.y + 29 + 22 * 1, col::lightGray);//몸통
+		drawText(sysStr[108], topWindow.x + 12, topWindow.y + 29 + 22 * 2, col::lightGray);//왼팔
+		drawText(sysStr[109], topWindow.x + 12, topWindow.y + 29 + 22 * 3, col::lightGray);//오른팔
+		drawText(sysStr[110], topWindow.x + 12, topWindow.y + 29 + 22 * 4, col::lightGray);//왼다리
+		drawText(sysStr[111], topWindow.x + 12, topWindow.y + 29 + 22 * 5, col::lightGray);//오른다리
 
 
-		setFontSize(11);
+		setFontSize(13);
 		setFont(fontType::pixel);
-		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9, col::orange);//관통저항
-		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9, col::orange);//참격저항
-		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9, col::orange);//타격저항
-		drawTextCenter(sysStr[167], topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * -1 + 9, col::orange);//방해도
+		drawTextCenter(sysStr[164], topWindow.x + 36 + 65 * 1, topWindow.y + 29 + 22 * -1 + 11, col::orange);//관통저항
+		drawTextCenter(sysStr[165], topWindow.x + 36 + 65 * 2, topWindow.y + 29 + 22 * -1 + 11, col::orange);//참격저항
+		drawTextCenter(sysStr[166], topWindow.x + 36 + 65 * 3, topWindow.y + 29 + 22 * -1 + 11, col::orange);//타격저항
+		drawTextCenter(sysStr[167], topWindow.x + 36 + 65 * 4, topWindow.y + 29 + 22 * -1 + 11, col::orange);//방해도
 
 		for (int i = 0; i < 6; i++)
 		{
@@ -172,36 +172,36 @@ void Equip::drawGUI()
 
 			maxEnc = MAX_ENC;
 
-			drawTextCenter(std::to_wstring(rPierce), topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * i + 9);
-			drawTextCenter(std::to_wstring(rCut), topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * i + 9);
-			drawTextCenter(std::to_wstring(rBash), topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * i + 9);
-			drawTextCenter(std::to_wstring(enc) + L" / " + std::to_wstring(maxEnc), topWindow.x + 30 + 54 * 4, topWindow.y + 24 + 18 * i + 9, col::lightGray);
+			drawTextCenter(std::to_wstring(rPierce), topWindow.x + 36 + 65 * 1, topWindow.y + 29 + 22 * i + 11);
+			drawTextCenter(std::to_wstring(rCut), topWindow.x + 36 + 65 * 2, topWindow.y + 29 + 22 * i + 11);
+			drawTextCenter(std::to_wstring(rBash), topWindow.x + 36 + 65 * 3, topWindow.y + 29 + 22 * i + 11);
+			drawTextCenter(std::to_wstring(enc) + L" / " + std::to_wstring(maxEnc), topWindow.x + 36 + 65 * 4, topWindow.y + 29 + 22 * i + 11, col::lightGray);
 
 			
 		}
 
 
-		setFontSize(12);
+		setFontSize(14);
 		setFont(fontType::pixel);
-		drawText(sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1, lowCol::orange); // 방어
-		drawText(sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0, lowCol::orange); // 회피
+		drawText(sysStr[168], topWindow.x + 348, topWindow.y + 29 + 22 * -1, lowCol::orange); // 방어
+		drawText(sysStr[169], topWindow.x + 348, topWindow.y + 29 + 22 * 0, lowCol::orange); // 회피
 
-		drawText(sysStr[170], topWindow.x + 290, topWindow.y + 24 + 18 * 1, col::lightGray); // 화염저항
-		drawText(sysStr[171], topWindow.x + 290, topWindow.y + 24 + 18 * 2, col::lightGray); // 냉기저항
-		drawText(sysStr[172], topWindow.x + 290, topWindow.y + 24 + 18 * 3, col::lightGray); // 전기저항
-		drawText(sysStr[173], topWindow.x + 290, topWindow.y + 24 + 18 * 4, col::lightGray); // 피폭저항
-		drawText(sysStr[174], topWindow.x + 290, topWindow.y + 24 + 18 * 5, col::lightGray); // 부식저항
+		drawText(sysStr[170], topWindow.x + 348, topWindow.y + 29 + 22 * 1, col::lightGray); // 화염저항
+		drawText(sysStr[171], topWindow.x + 348, topWindow.y + 29 + 22 * 2, col::lightGray); // 냉기저항
+		drawText(sysStr[172], topWindow.x + 348, topWindow.y + 29 + 22 * 3, col::lightGray); // 전기저항
+		drawText(sysStr[173], topWindow.x + 348, topWindow.y + 29 + 22 * 4, col::lightGray); // 피폭저항
+		drawText(sysStr[174], topWindow.x + 348, topWindow.y + 29 + 22 * 5, col::lightGray); // 부식저항
 
 		int SH = PlayerPtr->getSH();
 		int EV = PlayerPtr->getEV();
 
 		drawTextCenter(std::to_wstring(SH),
-			topWindow.x + 290 + 70 + 20,
-			topWindow.y + 24 + 18 * -1 + 9,
+			topWindow.x + 348 + 84 + 24,
+			topWindow.y + 29 + 22 * -1 + 11,
 			col::white);
 		drawTextCenter(std::to_wstring(EV),
-			topWindow.x + 290 + 70 + 20,
-			topWindow.y + 24 + 18 * 0 + 9,
+			topWindow.x + 348 + 84 + 24,
+			topWindow.y + 29 + 22 * 0 + 11,
 			col::white);
 
 		int rFire = PlayerPtr->entityInfo.rFire;
@@ -211,15 +211,15 @@ void Equip::drawGUI()
 		int rRad = PlayerPtr->entityInfo.rRad;
 
 		drawText(L"Lv." + std::to_wstring(rFire),
-			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 1, lowCol::green);
+			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 1, lowCol::green);
 		drawText(L"Lv." + std::to_wstring(rCold),
-			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 2, lowCol::green);
+			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 2, lowCol::green);
 		drawText(L"Lv." + std::to_wstring(rElec),
-			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 3, lowCol::green);
+			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 3, lowCol::green);
 		drawText(L"Lv." + std::to_wstring(rCorr),
-			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 4, lowCol::green);
+			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 4, lowCol::green);
 		drawText(L"Lv." + std::to_wstring(rRad),
-			topWindow.x + 290 + 70, topWindow.y + 24 + 18 * 5, lowCol::green);
+			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 5, lowCol::green);
 	}
 
 }

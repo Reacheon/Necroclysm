@@ -84,7 +84,7 @@ public:
 	static Equip* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		equipBase = { 0,0,335,420 };
+		equipBase = { 0,0,404,506 };
 		if (center == false)
 		{
 			equipBase.x += inputX;
@@ -96,23 +96,23 @@ public:
 			equipBase.y += inputY - equipBase.h / 2;
 		}
 
-		equipTitle = { equipBase.x + 103, equipBase.y, 130, 30 };
-		equipWindow = { equipBase.x, equipBase.y + 30, 335, 380 };
+		equipTitle = { equipBase.x + 124, equipBase.y, 156, 36 };
+		equipWindow = { equipBase.x, equipBase.y + 36, 404, 456 };
 
-		equipLabel = { equipWindow.x + 10, equipWindow.y + 26, equipWindow.w - 20 , 26 };
-		equipLabelSelect = { equipLabel.x, equipLabel.y, 62 , 26 };
-		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 182 , 26 };
-		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 71 , 26 };
+		equipLabel = { equipWindow.x + 12, equipWindow.y + 31, equipWindow.w - 24 , 31 };
+		equipLabelSelect = { equipLabel.x, equipLabel.y, 75 , 31 };
+		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 219 , 31 };
+		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 85 , 31 };
 
-		equipArea = { equipWindow.x + 10, equipWindow.y + 56,312, 42 * 8 - 6 };
+		equipArea = { equipWindow.x + 12, equipWindow.y + 67, 376, 37 * 8 };
 		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
 		{
-			equipItemRect[i] = { equipArea.x + 42, equipArea.y + 32 * i, 270, 26 };
-			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 32 * i, 36, 26 };
+			equipItemRect[i] = { equipArea.x + 50, equipArea.y + 37 * i, 325, 32 };
+			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 37 * i, 43, 32 };
 		}
 
 
-		topWindow = { 0, 0, 410,140 };
+		topWindow = { 0, 0, 492, 168 };
 		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
 
 		if (center == false)
