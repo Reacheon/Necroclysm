@@ -1,5 +1,4 @@
 ﻿export module drawItemList;
-
 import drawWindowArrow;
 import ItemPocket;
 import globalVar;
@@ -19,12 +18,11 @@ export void drawItemList(ItemPocket* storage, int x, int y, int itemNumber, int 
 	int status = 0;
 	for (int i = 0; i < itemNumber; i++)
 	{
-		if (i + scroll < storage->itemInfo.size()) //storage에 있는 아이템만 표시함
+		if (i + scroll < storage->itemInfo.size())
 		{
-			drawItemRectExtend(cursor == i + scroll, x, y + 32 * i, storage->itemInfo[i + scroll], 0, true, whiteCursor);
+			drawItemRectExtend(cursor == i + scroll, x, y + 37 * i, storage->itemInfo[i + scroll], 0, true, whiteCursor);
 		}
 	}
-
-	if (scroll + itemNumber < storage->itemInfo.size()) { drawWindowArrow(x + 156, y + 32 * itemNumber - 16, 3); }
-	if (scroll > 0) { drawWindowArrow(x + 156, y + 10, 1); }
+	if (scroll + itemNumber < storage->itemInfo.size()) { drawWindowArrow(x + 188, y + 37 * itemNumber - 4, 3); }
+	if (scroll > 0) { drawWindowArrow(x + 188, y + 3, 1); }
 }

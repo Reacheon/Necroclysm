@@ -22,50 +22,52 @@ void Craft::drawGUI()
 {
 	const bool* state = SDL_GetKeyboardState(nullptr);
 
-	if (showCraftingTooltip && GameOver::ins()==nullptr)
+	if (showCraftingTooltip && GameOver::ins() == nullptr)
 	{
-		SDL_Rect tooltipBox = { cameraW / 2 - 75, 50, 180, 58 };
+		SDL_Rect tooltipBox = { cameraW / 2 - 113, 75, 270, 87 };
 		drawWindow(&tooltipBox);
 		setZoom(1.0);
 
-		int yOffset = 12;
+		int yOffset = 18;
 
 		// 아이템 아이콘 (로딩 아이콘 대신)
-		SDL_Rect iconBox = { tooltipBox.x + 36 - 18 - 10, tooltipBox.y + 60 - 18 - 37 + yOffset, 36, 36 };
+		SDL_Rect iconBox = { tooltipBox.x + 54 - 27 - 15, tooltipBox.y + 90 - 27 - 56 + yOffset, 54, 54 };
 		drawWindow(&iconBox);
-		setZoom(2.0);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[targetItemCode]), iconBox.x + 18, iconBox.y + 18);
+		setZoom(3.0);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[targetItemCode]), iconBox.x + 27, iconBox.y + 27);
 		setZoom(1.0);
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
 		int dotCount = (SDL_GetTicks() / 800) % 4;
 		std::wstring craftText = L"Crafting";
 		for (int i = 0; i < dotCount; i++) craftText += L".";
-		setFontSize(12);
-		drawTextCenter(craftText, tooltipBox.x + 113, tooltipBox.y + 12+ yOffset);
+		setFontSize(18);
+		drawTextCenter(craftText, tooltipBox.x + 170, tooltipBox.y + 18 + yOffset);
 
 		// 진행 바
-		SDL_Rect tooltipGauge = { tooltipBox.x + 51, tooltipBox.y + 23 + yOffset, 125, 7 };
+		SDL_Rect tooltipGauge = { tooltipBox.x + 77, tooltipBox.y + 35 + yOffset, 188, 11 };
 		drawRect(tooltipGauge, col::white);
 
-		SDL_Rect tooltipInGauge = { tooltipGauge.x + 2, tooltipGauge.y + 2, 121, 3 };
-		tooltipInGauge.w = 121 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
+		SDL_Rect tooltipInGauge = { tooltipGauge.x + 3, tooltipGauge.y + 3, 182, 5 };
+		tooltipInGauge.w = 182 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
 		drawFillRect(tooltipInGauge, col::white);
 
 		// 남은 시간 텍스트
-		setFontSize(8);
+		setFont(fontType::pixel);
+		setFontSize(12);
 		int remainingMinutes = itemDex[targetItemCode].craftTime - elapsedTime;
 		std::wstring progressText = std::to_wstring(remainingMinutes) + L" m left ( ";
 		progressText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
 		progressText += L"% )";
-		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 7);
+		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 11);
 
-		setFontSize(10);
-		drawTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 7);
+		setFont(fontType::notoSans);
+		setFontSize(16);
+		drawTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 11);
 
-		if(itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
+		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 		{
-			int pivotX = cameraW/2 - (int)(8 * zoomScale) + 16 * (buildLocation.x - PlayerX()) * zoomScale;
+			int pivotX = cameraW / 2 - (int)(8 * zoomScale) + 16 * (buildLocation.x - PlayerX()) * zoomScale;
 			int pivotY = cameraH / 2 + (int)(8 * zoomScale) + 16 * (buildLocation.y - PlayerY()) * zoomScale;
 
 			if (buildLocation.x == PlayerX() && buildLocation.y == PlayerY() - 1)
@@ -90,10 +92,10 @@ void Craft::drawGUI()
 		}
 
 
-		if(SDL_GetTicks() % 1000 < 500)
+		if (SDL_GetTicks() % 1000 < 500)
 		{
 			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT1;
-        }
+		}
 		else
 		{
 			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT2;
@@ -109,6 +111,7 @@ void Craft::drawGUI()
 		drawWindow(&craftBase, sysStr[75], 13);
 
 
+		setFont(fontType::pixel);
 		//즐겨찾기 버튼
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
@@ -197,13 +200,7 @@ void Craft::drawGUI()
 			}
 			drawSpriteCenter(spr::icon48, categoryIndex, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) - 10);
 
-			int fontSize = 10;
-			setFontSize(fontSize);
-			if (queryTextWidth(categoryName, true) > craftCategory[0].w - 10)
-			{
-				fontSize = 8;
-				setFontSize(fontSize);
-			}
+			setFontSize(11);
 			drawTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
 
 			if (checkCursor(&craftCategory[i]) && deactColorChange == false)
@@ -352,7 +349,7 @@ void Craft::drawGUI()
 
 					if (pressed)
 					{
-						SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 52, 2 }; // 42 → 52로 변경
+						SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 52, 2 };
 						drawRect(bottomWhiteRect, col::white);
 					}
 
@@ -476,9 +473,10 @@ void Craft::drawGUI()
 
 
 
-					if(queryTextWidth(iPtr.name)<100)setFontSize(10);
-					else setFontSize(8);
-					
+					//if(queryTextWidth(iPtr.name)<100)setFontSize(11);
+					//else setFontSize(8);
+
+					setFontSize(11);
 					drawText(iPtr.name, pivotX + 34, pivotY + 7);
 
 

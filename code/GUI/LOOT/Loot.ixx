@@ -73,7 +73,7 @@ public:
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
-		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
+		changeXY(cameraW - 425, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
 		UIType = act::loot;
@@ -97,7 +97,7 @@ public:
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
-		changeXY(cameraW - 335, (cameraH / 2) - 210, false);
+		changeXY(cameraW - 425, (cameraH / 2) - 210, false);
 		setAniSlipDir(0);
 
 		UIType = act::loot;
@@ -130,7 +130,7 @@ public:
 	static Loot* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		lootBase = { 0,0,335,420 };
+		lootBase = { 0, 0, 404, 506 };
 		if (center == false)
 		{
 			lootBase.x += inputX;
@@ -141,34 +141,21 @@ public:
 			lootBase.x += inputX - lootBase.w / 2;
 			lootBase.y += inputY - lootBase.h / 2;
 		}
-		lootTitle = { lootBase.x + 102, lootBase.y + 0, 130, 30 };
-
-		lootArea = { lootBase.x + 10, lootBase.y + 125,312, 246 };
+		lootTitle = { lootBase.x + 123, lootBase.y + 0, 157, 36 };
+		lootArea = { lootBase.x + 12, lootBase.y + 150, 376, 296 };
 		for (int i = 0; i < LOOT_ITEM_MAX; i++)
 		{
-			lootItemRect[i] = { lootBase.x + 52, lootBase.y + 125 + 32*i, 270, 26 };
-			lootItemSelectRect[i] = { lootBase.x + 10, lootBase.y + 125 + 32*i, 36, 26 };
+			lootItemRect[i] = { lootBase.x + 63, lootBase.y + 150 + 39 * i, 325, 32 };
+			lootItemSelectRect[i] = { lootBase.x + 12, lootBase.y + 150 + 39 * i, 43, 32 };
 		}
-		lootLabel = { lootBase.x + 10, lootBase.y + 95, lootBase.w - 20 , 26 };
-		lootLabelSelect = { lootLabel.x, lootLabel.y, 62 , 26 };
-		lootLabelName = { lootLabel.x + lootLabelSelect.w, lootLabel.y, 182 , 26 };
-		lootLabelQuantity = { lootLabel.x + lootLabelName.w + lootLabelSelect.w, lootLabel.y, 71 , 26 };
-
-		pocketWindow = { lootBase.x + 0, lootBase.y + 34, 335, 70 };
-
-		//pocketItem[0] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 3,pocketWindow.y + 11,32,32 };
-		//pocketItem[1] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38 * 2,pocketWindow.y + 11,32,32 };
-		//pocketItem[2] = { pocketWindow.x + (pocketWindow.w / 2) - 24 - 38,pocketWindow.y + 11,32,32 };
-		//pocketItem[3] = { pocketWindow.x + (pocketWindow.w / 2) - 24,pocketWindow.y + 11 - 8,48,48 };
-		//pocketItem[4] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38,pocketWindow.y + 11,32,32 };
-		//pocketItem[5] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38 * 2,pocketWindow.y + 11,32,32 };
-		//pocketItem[6] = { pocketWindow.x + (pocketWindow.w / 2) - 8 + 38 * 3,pocketWindow.y + 11,32,32 };
-
-		pocketLeft = { lootBase.x + 6,lootBase.y + 32, 24,44 };
-		pocketRight = { lootBase.x + lootBase.w - 29,lootBase.y + 32,24,44 };
-
-		lootBtn = { lootBase.x + lootBase.w / 2 - 32, lootBase.y + 67, 64, 25 };
-
+		lootLabel = { lootBase.x + 12, lootBase.y + 114, lootBase.w - 24, 31 };
+		lootLabelSelect = { lootLabel.x, lootLabel.y, 75, 31 };
+		lootLabelName = { lootLabel.x + lootLabelSelect.w, lootLabel.y, 219, 31 };
+		lootLabelQuantity = { lootLabel.x + lootLabelName.w + lootLabelSelect.w, lootLabel.y, 85, 31 };
+		pocketWindow = { lootBase.x + 0, lootBase.y + 41, 404, 84 };
+		pocketLeft = { lootBase.x + 7, lootBase.y + 38, 29, 53 };
+		pocketRight = { lootBase.x + lootBase.w - 35, lootBase.y + 38, 29, 53 };
+		lootBtn = { lootBase.x + lootBase.w / 2 - 38, lootBase.y + 80, 77, 30 };
 		if (center == false)
 		{
 			x = inputX;
@@ -201,7 +188,7 @@ public:
 	{
 		tabType = tabFlag::back;
 
-		lootBase.h = 164 + 32 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1)));
+		lootBase.h = 197 + 38 * myMax(0, (myMin(LOOT_ITEM_MAX - 1, lootPocket->itemInfo.size() - 1))); // 164→197, 32→38
 
 		if (option::inputMethod == input::gamepad)
 		{
@@ -216,30 +203,25 @@ public:
 
 		if (lootStack != nullptr && lootPocket->itemInfo.size() == 0)
 		{
-			destroyItemStack({ lootStack->getGridX(), lootStack->getGridY(), lootStack->getGridZ()});
+			destroyItemStack({ lootStack->getGridX(), lootStack->getGridY(), lootStack->getGridZ() });
 			delete this;
 			return;
 		}
 
-
-		//잘못된 커서 위치 조정
-		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1)) 
-		{ 
-			lootCursor = lootPocket->itemInfo.size() - 1; 
+		if (lootCursor > (int)(lootPocket->itemInfo.size() - 1))
+		{
+			lootCursor = lootPocket->itemInfo.size() - 1;
 		}
 
-		//잘못된 스크롤 위치 조정
 		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
 		{
 			if (lootScroll + LOOT_ITEM_MAX >= lootPocket->itemInfo.size()) { lootScroll = myMax(0, (int)lootPocket->itemInfo.size() - LOOT_ITEM_MAX); }
 			else if (lootScroll < 0) { lootScroll = 0; }
 		}
 
-		//루트 아이템의 갯수가 0이 되었을 경우 창을 닫음
 		if (lootPocket->itemInfo.size() == 0 && lootItemData == nullptr)
 		{
 			close(aniFlag::null);
-			//클로즈 후의 애니메이션이 문제가 된다. 애니메이션이 모두 실행되고 제거해야됨
 			delete TileItemStack(lootTile.x, lootTile.y, PlayerZ());
 			return;
 		}

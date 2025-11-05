@@ -97,8 +97,8 @@ void Equip::drawGUI()
 	{
 		drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 180, 5);
 
+		setFont(fontType::pixel);
 		setFontSize(12);
-
 
 		drawText(sysStr[107], topWindow.x + 10, topWindow.y + 24 + 18 * 0, col::lightGray);//머리
 		drawText(sysStr[106], topWindow.x + 10, topWindow.y + 24 + 18 * 1, col::lightGray);//몸통
@@ -108,7 +108,8 @@ void Equip::drawGUI()
 		drawText(sysStr[111], topWindow.x + 10, topWindow.y + 24 + 18 * 5, col::lightGray);//오른다리
 
 
-		setFontSize(10);
+		setFontSize(11);
+		setFont(fontType::pixel);
 		drawTextCenter(sysStr[164], topWindow.x + 30 + 54 * 1, topWindow.y + 24 + 18 * -1 + 9, col::orange);//관통저항
 		drawTextCenter(sysStr[165], topWindow.x + 30 + 54 * 2, topWindow.y + 24 + 18 * -1 + 9, col::orange);//참격저항
 		drawTextCenter(sysStr[166], topWindow.x + 30 + 54 * 3, topWindow.y + 24 + 18 * -1 + 9, col::orange);//타격저항
@@ -181,6 +182,7 @@ void Equip::drawGUI()
 
 
 		setFontSize(12);
+		setFont(fontType::pixel);
 		drawText(sysStr[168], topWindow.x + 290, topWindow.y + 24 + 18 * -1, lowCol::orange); // 방어
 		drawText(sysStr[169], topWindow.x + 290, topWindow.y + 24 + 18 * 0, lowCol::orange); // 회피
 

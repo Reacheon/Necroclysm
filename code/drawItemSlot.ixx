@@ -26,20 +26,21 @@ export enum class cursorFlag
 //아이템이 들어있는 사각형을 그림, 질량과 부피는 포함하지않음
 export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputItem)
 {
-	int fontSize = 12;
+	setFont(fontType::notoSans);
+	int fontSize = 18;
 	int yCorrection = 0;
 	bool split = false;
-	SDL_Rect itemBox = { x, y, 210, 26 };
+	SDL_Rect itemBox = { x, y, 253, 32 };
 	SDL_Color stadiumColor = { 0,0,0 };
 
 	switch (inputCursor)
 	{
-		case cursorFlag::click:
-			stadiumColor = lowCol::deepBlue;
-			break;
-		case cursorFlag::hover:
-			stadiumColor = lowCol::blue;
-			break;
+	case cursorFlag::click:
+		stadiumColor = lowCol::deepBlue;
+		break;
+	case cursorFlag::hover:
+		stadiumColor = lowCol::blue;
+		break;
 	}
 
 	drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5);
@@ -47,15 +48,13 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	std::wstring mainName = L"";
 
-
-
 	//아이템 이름
 	mainName += inputItem.name;
 
 	//후열 탄창이랑 탄환수 텍스트
 	if (inputItem.checkFlag(itemFlag::GUN) || inputItem.checkFlag(itemFlag::MAGAZINE))
 	{
-        ItemPocket* pocketPtr = inputItem.pocketPtr.get();
+		ItemPocket* pocketPtr = inputItem.pocketPtr.get();
 		if (pocketPtr->itemInfo.size() > 0)
 		{
 			//리볼버
@@ -102,49 +101,46 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 			}
 		}
 	}
-	
-	
-	const int widthLimit = 168;
+
+	const int widthLimit = 188;
 	ItemPocket* pocketPtr = inputItem.pocketPtr.get();
 
-	auto drawVolumeGauge = [&](int currentVol, int maxVol) 
+	auto drawVolumeGauge = [&](int currentVol, int maxVol)
 		{
-		drawRect(itemBox.x + 201, itemBox.y + 2, 5, 22, col::white);
-		int gaugeHeight = 18;
-		int currentGaugeHeight = 0;
+			drawRect(itemBox.x + 242, itemBox.y + 3, 6, 27, col::white);
+			int gaugeHeight = 23;
+			int currentGaugeHeight = 0;
 
-		if (maxVol > 0 && currentVol > 0) 
-		{
-			currentGaugeHeight = (currentVol * gaugeHeight) / maxVol;
-			if (currentGaugeHeight > gaugeHeight) currentGaugeHeight = gaugeHeight;
-			if (currentGaugeHeight == 0) currentGaugeHeight = 1; // 최소 1픽셀 보장
-		}
-
-		if (currentGaugeHeight > 0) 
-		{
-			// drawLine으로 세로 라인들을 그려서 게이지 채우기
-			for (int i = 0; i < currentGaugeHeight; i++) {
-				drawLine(itemBox.x + 203, itemBox.y + 4 + (gaugeHeight - currentGaugeHeight) + i,
-					itemBox.x + 203, itemBox.y + 4 + (gaugeHeight - currentGaugeHeight) + i, col::white);
+			if (maxVol > 0 && currentVol > 0)
+			{
+				currentGaugeHeight = (currentVol * gaugeHeight) / maxVol;
+				if (currentGaugeHeight > gaugeHeight) currentGaugeHeight = gaugeHeight;
+				if (currentGaugeHeight == 0) currentGaugeHeight = 1;
 			}
-		}
-		};
 
+			if (currentGaugeHeight > 0)
+			{
+				for (int i = 0; i < currentGaugeHeight; i++) {
+					drawLine(itemBox.x + 244, itemBox.y + 5 + (gaugeHeight - currentGaugeHeight) + i,
+						itemBox.x + 244, itemBox.y + 5 + (gaugeHeight - currentGaugeHeight) + i, col::white);
+				}
+			}
+		};
 
 	auto renderTextsWithSubInfo = [&](const std::wstring& mainText, const std::wstring& subText) {
-		setFontSize(10);
-		yCorrection = -4;
-		if (queryTextWidth(mainText) > widthLimit) 
+		setFontSize(14);
+		yCorrection = -5;
+		if (queryTextWidth(mainText) > widthLimit)
 		{
-			setFontSize(8);
-			drawText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+			setFontSize(12);
+			drawText(mainText, itemBox.x + 50, itemBox.y + itemBox.h / 2 - 11 + yCorrection + 5);
 		}
-		else  drawText(mainText, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
-		setFontSize(8);
-		drawText(subText, itemBox.x + 42, itemBox.y + itemBox.h / 2 + 1);
+		else  drawText(mainText, itemBox.x + 50, itemBox.y + itemBox.h / 2 - 11 + yCorrection + 2);
+		setFontSize(11);
+		drawText(subText, itemBox.x + 50, itemBox.y + itemBox.h / 2 + 1);
 		};
 
-	if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ) && pocketPtr->itemInfo.size() > 0) 
+	if (inputItem.checkFlag(itemFlag::CONTAINER_LIQ) && pocketPtr->itemInfo.size() > 0)
 	{
 		std::wstring insideStr = L"(";
 		insideStr += pocketPtr->itemInfo[0].name + L" ";
@@ -158,7 +154,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 		renderTextsWithSubInfo(mainName, insideStr);
 		drawVolumeGauge(currentVol, maxVol);
 	}
-	else if (inputItem.pocketMaxVolume > 0 && pocketPtr->itemInfo.size() > 0) 
+	else if (inputItem.pocketMaxVolume > 0 && pocketPtr->itemInfo.size() > 0)
 	{
 		std::wstring insideStr = L"(";
 		if (pocketPtr->itemInfo.size() == 1) insideStr += pocketPtr->itemInfo[0].name + L")";
@@ -169,28 +165,28 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 		renderTextsWithSubInfo(mainName, insideStr);
 		drawVolumeGauge(currentVol, maxVol);
 	}
-	else 
+	else
 	{
-		if (queryTextWidth(mainName) > widthLimit) 
+		setFontSize(18); // 기본 18px
+		if (queryTextWidth(mainName) > widthLimit)
 		{
-			setFontSize(10);
-			if (queryTextWidth(mainName) > widthLimit) 
+			setFontSize(17); // 1단계: 16px
+			if (queryTextWidth(mainName) > widthLimit)
 			{
-				setFontSize(8);
-				drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 4);
+				setFontSize(16); // 2단계: 12px
+				if (queryTextWidth(mainName) > widthLimit)
+				{
+					setFontSize(15); // 3단계: 10px (최소)
+					if (queryTextWidth(mainName) > widthLimit)
+					{
+						setFontSize(14); // 3단계: 10px (최소)
+						yCorrection += 2;
+					}
+				}
 			}
-			else drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection + 2);
 		}
-		else 
-		{
-			setFontSize(12);
-			drawText(mainName, itemBox.x + 42, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
-		}
+		drawText(mainName, itemBox.x + 46, itemBox.y + itemBox.h / 2 - 14 + yCorrection);
 	}
-
-
-
-
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
 
@@ -200,41 +196,42 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		SDL_SetTextureBlendMode(spr::itemset->getTexture(), SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 128, 128, 128);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 15, itemBox.y + itemBox.h/2);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 18, itemBox.y + itemBox.h / 2);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 255, 255, 255);
 	}
 	else
 	{
-		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 15, itemBox.y + itemBox.h / 2);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 18, itemBox.y + itemBox.h / 2);
 	}
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
 	if (inputItem.equipState == equipHandFlag::none && inputItem.number > 1)
 	{
-		setFontSize(10);
+		setFontSize(13);
 		std::wstring numberStr = L"x" + std::to_wstring(inputItem.number);
-		drawText(numberStr, itemBox.x + 208 - queryTextWidth(numberStr), itemBox.y + 1);
-		//mainName += std::to_wstring(inputItem.number) + L" "; 
+		drawTextOutline(numberStr, itemBox.x + 250 - queryTextWidth(numberStr), itemBox.y - 3,col::white);
 	}
 
 	setZoom(1.0);
 }
 
 //질량 부피 표시와 체크박스까지 포함한 확장형 아이템 박스를 그려냄
+//질량 부피 표시와 체크박스까지 포함한 확장형 아이템 박스를 그려냄
 export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, int quantity, bool hasBox1, bool whiteCursor)
 {
-	//세로 32 가로폭 312의 아이템 슬롯을 그립니다.
-	const int gapWidth = 6;
+	//세로 38 가로폭 376의 아이템 슬롯을 그립니다.
+	const int gapWidth = 7;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////     ▼BOX1(셀렉트박스) 그리기    ///////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	SDL_Rect box1 = { x, y, 36, 26 };
+	SDL_Rect box1 = { x, y, 43, 32 };
 	SDL_Color statusColor;
 	SDL_Color statusStrColor;
 	std::wstring statusStr = L"-";
-	setFontSize(12);
+	setFont(fontType::notoSans);
+	setFontSize(14);
 
 	if (inputItem.equipState == equipHandFlag::normal)
 	{
@@ -247,14 +244,14 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		statusColor = col::black;
 		statusStr = sysStr[49];//왼손
 		statusStrColor = lowCol::yellow;
-		setFontSize(10);
+		setFontSize(12);
 	}
 	else if (inputItem.equipState == equipHandFlag::right)
 	{
 		statusColor = col::black;
 		statusStr = sysStr[50];
 		statusStrColor = lowCol::yellow;
-		setFontSize(10);
+		setFontSize(12);
 	}
 	else if (inputItem.equipState == equipHandFlag::both)
 	{
@@ -309,11 +306,11 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	////////////////////////////////     ▼BOX2(메인박스) 그리기    ///////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	SDL_Rect box2 = { box1.x + box1.w + gapWidth, box1.y, 210, box1.h };
+	SDL_Rect box2 = { box1.x + box1.w + gapWidth, box1.y, 253, box1.h };
 	if (cursor == true) drawItemRect(cursorFlag::hover, box2.x, box2.y, inputItem);
 	else
 	{
-		SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), box2.h };
+		SDL_Rect clickRect = { box2.x ,y, 376 - (box1.w + gapWidth), box2.h };
 		//박스 3가 존재하지 않을 경우
 		if (quantity == -1) { clickRect.w = box2.w; }
 
@@ -334,12 +331,12 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 
 	if (quantity == 0)
 	{
-		SDL_Rect box3 = { box2.x + box2.w + gapWidth, box1.y, 54, box1.h };
+		SDL_Rect box3 = { box2.x + box2.w + gapWidth, box1.y, 65, box1.h };
 
 		if (cursor == true) drawStadium(box3.x, box3.y, box3.w, box3.h, lowCol::blue, 183, 5);
 		else
 		{
-			SDL_Rect clickRect = { box2.x ,y, 312 - (box1.w + gapWidth), box2.h };
+			SDL_Rect clickRect = { box2.x ,y, 376 - (box1.w + gapWidth), box2.h };
 			//박스 3가 존재하지 않을 경우
 			if (quantity == -1) { clickRect.w = box2.w; }
 
@@ -354,36 +351,34 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 			}
 		}
 
-
-
-		drawSpriteCenter(spr::icon13, 39, box3.x + 10, box2.y + 12 - 4);
-		drawSpriteCenter(spr::icon13, 40, box3.x + 10, box2.y + 10 + 16 - 7);
-
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-		setFontSize(8);
 
-		if (inputItem.weight > 1000)
+		setFont(fontType::pixel);
+		setFontSize(11);
+
+		drawSpriteCenter(spr::icon13, 39, box3.x + 12, box2.y + 8);
+		if (inputItem.weight >= 1000)
 		{
 			std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
-			drawText(kgStr + L" kg", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			drawText(kgStr + L" kg", box3.x + 9 + 11, box2.y + 2);
 		}
 		else
 		{
 			std::wstring kgStr = std::to_wstring(inputItem.weight);
-			drawText(kgStr + L" g", box3.x + 10 + 9, box2.y + 13 - 7 - 4);
+			drawText(kgStr + L" g", box3.x + 9 + 11, box2.y + 2);
 		}
 
-		if (getVolume(inputItem) > 1000)
+		drawSpriteCenter(spr::icon13, 40, box3.x + 12, box2.y + 23);
+		if (getVolume(inputItem) >= 1000)
 		{
 			std::wstring volStr = decimalCutter(getVolume(inputItem) / 1000.0, 2);
-			drawText(volStr + L" L", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
+			drawText(volStr + L" L", box3.x + 9 + 11, box2.y + 16);
 		}
 		else
 		{
 			std::wstring volStr = std::to_wstring(getVolume(inputItem));
-			drawText(volStr + L" mL", box3.x + 10 + 9, box2.y + 11 + 16 - 7 - 7);
+			drawText(volStr + L" mL", box3.x + 9 + 11, box2.y + 16);
 		}
-		
 	}
 
 	if (whiteCursor == true)
@@ -408,7 +403,6 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 			}
 		}
 	}
-
 }
 
 //심플 아이템렉트를 그립니다. 텍스트를 입력하는 타입.

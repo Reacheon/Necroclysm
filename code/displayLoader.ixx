@@ -18,7 +18,7 @@ export void displayLoader()
     int winH = mode->h;
 
     // 2배 확대 적용
-    option::fullScreen = true;
+    option::fullScreen = false;
     if (option::fullScreen) option::fixScreenRatio = false;
 
 

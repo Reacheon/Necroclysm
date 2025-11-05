@@ -123,7 +123,7 @@ void HUD::drawGUI()
 		{
 			setFont(fontType::pixel);
 			setFontSize(12);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 20 + vShift, letterbox.y + 5 + LETTERBOX_Y_OFFSET, lowCol::yellow);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 10 + vShift, letterbox.y +4 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 		}
 
 
@@ -251,8 +251,8 @@ void HUD::drawGUI()
 				}
 
 
-				setFont(fontType::pixel);
-				setFontSize(11);
+				setFont(fontType::notoSans);
+				setFontSize(12);
 				drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
 				setFont(fontType::pixel);
 				setFontSize(11);
@@ -265,10 +265,10 @@ void HUD::drawGUI()
 			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
 			drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 
-			setFont(fontType::pixel);
+			setFont(fontType::notoSans);
 			setFontSize(11);
-			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
-			drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
+			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
+			drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
 
 			setFont(fontType::pixel);
 			setFontSize(12);
@@ -531,8 +531,8 @@ void HUD::drawGUI()
 			drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 30 + LETTERBOX_Y_OFFSET);
 
 			drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3 + LETTERBOX_Y_OFFSET);
-			setFontSize(10);
-
+			
+			setFontSize(11);
 			drawTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24 + LETTERBOX_Y_OFFSET);
 		}
 
@@ -1171,7 +1171,7 @@ void HUD::drawBarAct()
 
 		//하단 텍스트
 
-		setFont(fontType::pixel);
+		setFont(fontType::notoSans);
 		setFontSize(12);
 		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
@@ -1231,12 +1231,12 @@ void HUD::drawStatusEffects()
 
 	for (int i = 0; i < myEfcts.size(); i++)
 	{
-		int pivotX = 10;
-		int pivotY = 370 + 30 * i;
+		int pivotX = 15;
+		int pivotY = 370 + 45 * i;
 		std::wstring statEfctName = L"";
 		int statEfctIcon = 0;
 		SDL_Color textColor = col::white;
-		int textOffsetY = 0;
+		int textOffsetY = -3;
 
 		switch (myEfcts[i].effectType)
 		{
@@ -1251,9 +1251,6 @@ void HUD::drawStatusEffects()
 			textColor = lowCol::red;
 			break;
 
-			// ────────────────────────────────
-			//  Hunger / 배고픔 · 굶주림 · 영양실조 · 배부름
-			// ────────────────────────────────
 		case statusEffectFlag::hungry:
 			if (fakeHunger < PLAYER_STARVE_CALORIE)
 			{
@@ -1278,9 +1275,6 @@ void HUD::drawStatusEffects()
 			statEfctIcon = 3;
 			break;
 
-			// ────────────────────────────────
-			//  Dehydration / 목마름 · 심한 갈증 · 탈수 상태 · 해갈
-			// ────────────────────────────────
 		case statusEffectFlag::dehydrated:
 			if (fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
 			{
@@ -1310,9 +1304,6 @@ void HUD::drawStatusEffects()
 			statEfctIcon = 15;
 			break;
 
-			// ────────────────────────────────
-			//  Fatigue / 피곤함 · 심한 피로 · 탈진 상태 · 개운함
-			// ────────────────────────────────
 		case statusEffectFlag::tired:
 			statEfctIcon = 11;
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
@@ -1339,38 +1330,35 @@ void HUD::drawStatusEffects()
 			break;
 		}
 
-		setFontSize(10);
+		setFontSize(15);
 
-		setZoom(1.5);
+		setZoom(2.0); // 2.25→2.0 (픽셀 퍼펙트)
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
-		setFont(fontType::pixel);
-		setFontSize(12);
-		int textWidth = queryTextWidth(statEfctName) + 30;
+		setFont(fontType::notoSans);
+		setFontSize(21);
+		int textWidth = queryTextWidth(statEfctName) + 45;
 
-		drawFillRect(SDL_Rect{ pivotX + 24, pivotY, textWidth, 24 }, col::black, 85);
-		int lineStartX = pivotX + textWidth + 24;
-		for (int i = 0; i < 12; i++)
+		drawFillRect(SDL_Rect{ pivotX + 32, pivotY, textWidth, 32 }, col::black, 85);
+		int lineStartX = pivotX + textWidth + 36;
+		for (int i = 0; i < 18; i++)
 		{
-			drawLine(lineStartX + i, pivotY + 1 + i, lineStartX + i, pivotY + 23, col::black, 85);
+			drawLine(lineStartX + i, pivotY + 2 + i, lineStartX + i, pivotY + 35, col::black, 85);
 			textWidth++;
 		}
 
+		drawTextOutline(statEfctName, pivotX + 45, pivotY + 2 + textOffsetY, textColor);
 
-		drawTextOutline(statEfctName, pivotX + 30, pivotY + 6 + textOffsetY, textColor);
+		int intDuration = std::ceil(myEfcts[i].duration);
 
-        int intDuration = std::ceil(myEfcts[i].duration);
-		
 		if (intDuration > 0)
 		{
 			setFont(fontType::pixel);
-			setFontSize(11);
-            int textWidth = queryTextWidth(std::to_wstring(intDuration));
-			drawText(std::to_wstring(intDuration), lineStartX + 7 - textWidth, pivotY + 11, col::white);
+			setFontSize(17);
+			int textWidth = queryTextWidth(std::to_wstring(intDuration));
+			drawText(std::to_wstring(intDuration), lineStartX + 11 - textWidth, pivotY + 17, col::white);
 		}
-
-
 
 		if (myEfcts[i].effectType == statusEffectFlag::hungry)
 		{
@@ -1380,34 +1368,32 @@ void HUD::drawStatusEffects()
 			if (fakeHunger < PLAYER_STARVE_CALORIE)
 			{
 				gaugeCol = lowCol::red;
-				// 영양실조 구간: 0 ~ PLAYER_STARVE_CALORIE
 				gaugeRatio = fakeHunger / static_cast<float>(PLAYER_STARVE_CALORIE);
 			}
 			else if (fakeHunger < PLAYER_VERY_HUNGRY_CALORIE)
 			{
 				gaugeCol = lowCol::orange;
-				// 매우 배고픔 구간: PLAYER_STARVE_CALORIE ~ PLAYER_VERY_HUNGRY_CALORIE
 				gaugeRatio = (fakeHunger - PLAYER_STARVE_CALORIE) / static_cast<float>(PLAYER_VERY_HUNGRY_CALORIE - PLAYER_STARVE_CALORIE);
 			}
 			else if (fakeHunger < PLAYER_HUNGRY_CALORIE)
 			{
 				gaugeCol = lowCol::yellow;
-				// 배고픔 구간: PLAYER_VERY_HUNGRY_CALORIE ~ PLAYER_HUNGRY_CALORIE
 				gaugeRatio = (fakeHunger - PLAYER_VERY_HUNGRY_CALORIE) / static_cast<float>(PLAYER_HUNGRY_CALORIE - PLAYER_VERY_HUNGRY_CALORIE);
 			}
 			else
 			{
 				gaugeCol = col::green;
-				// 배부름 구간: PLAYER_HUNGRY_CALORIE ~ PLAYER_MAX_CALORIE
 				gaugeRatio = (fakeHunger - PLAYER_HUNGRY_CALORIE) / static_cast<float>(PLAYER_MAX_CALORIE - PLAYER_HUNGRY_CALORIE);
 			}
 
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
+			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
+			setZoom(1.0);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::dehydrated)
 		{
@@ -1417,34 +1403,32 @@ void HUD::drawStatusEffects()
 			if (fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
 			{
 				gaugeCol = lowCol::red;
-				// 탈수증 구간: 0 ~ PLAYER_DEHYDRATION_HYDRATION
 				gaugeRatio = fakeThirst / static_cast<float>(PLAYER_DEHYDRATION_HYDRATION);
 			}
 			else if (fakeThirst < PLAYER_VERY_THIRSTY_HYDRATION)
 			{
 				gaugeCol = lowCol::orange;
-				// 매우 목마름 구간: PLAYER_DEHYDRATION_HYDRATION ~ PLAYER_VERY_THIRSTY_HYDRATION
 				gaugeRatio = (fakeThirst - PLAYER_DEHYDRATION_HYDRATION) / static_cast<float>(PLAYER_VERY_THIRSTY_HYDRATION - PLAYER_DEHYDRATION_HYDRATION);
 			}
 			else if (fakeThirst < PLAYER_THIRSTY_HYDRATION)
 			{
 				gaugeCol = lowCol::yellow;
-				// 목마름 구간: PLAYER_VERY_THIRSTY_HYDRATION ~ PLAYER_THIRSTY_HYDRATION
 				gaugeRatio = (fakeThirst - PLAYER_VERY_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_THIRSTY_HYDRATION - PLAYER_VERY_THIRSTY_HYDRATION);
 			}
 			else
 			{
 				gaugeCol = lowCol::skyBlue;
-				// 해갈 구간: PLAYER_THIRSTY_HYDRATION ~ PLAYER_MAX_HYDRATION
 				gaugeRatio = (fakeThirst - PLAYER_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_MAX_HYDRATION - PLAYER_THIRSTY_HYDRATION);
 			}
 
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
+			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
+			setZoom(1.0);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::tired)
 		{
@@ -1454,37 +1438,33 @@ void HUD::drawStatusEffects()
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
 			{
 				gaugeCol = lowCol::red;
-				// 탈진 구간: 0 ~ PLAYER_EXHAUSTED_FATIGUE
 				gaugeRatio = fakeFatigue / static_cast<float>(PLAYER_EXHAUSTED_FATIGUE);
 			}
 			else if (fakeFatigue < PLAYER_VERY_TIRED_FATIGUE)
 			{
 				gaugeCol = lowCol::orange;
-				// 매우 피곤함 구간: PLAYER_EXHAUSTED_FATIGUE ~ PLAYER_VERY_TIRED_FATIGUE
 				gaugeRatio = (fakeFatigue - PLAYER_EXHAUSTED_FATIGUE) / static_cast<float>(PLAYER_VERY_TIRED_FATIGUE - PLAYER_EXHAUSTED_FATIGUE);
 			}
 			else if (fakeFatigue < PLAYER_TIRED_FATIGUE)
 			{
 				gaugeCol = lowCol::yellow;
-				// 피곤함 구간: PLAYER_VERY_TIRED_FATIGUE ~ PLAYER_TIRED_FATIGUE
 				gaugeRatio = (fakeFatigue - PLAYER_VERY_TIRED_FATIGUE) / static_cast<float>(PLAYER_TIRED_FATIGUE - PLAYER_VERY_TIRED_FATIGUE);
 			}
 			else
 			{
 				gaugeCol = lowCol::green;
-				// 개운함 구간: PLAYER_TIRED_FATIGUE ~ PLAYER_MAX_FATIGUE
 				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_FATIGUE - PLAYER_TIRED_FATIGUE);
 			}
 
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
+			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 3, pivotY + 2);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
+			setZoom(1.0);
 		}
-
-		setZoom(1.0);
 	}
 }
 
