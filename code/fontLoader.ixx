@@ -18,9 +18,14 @@ export void fontLoader()
             notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
             notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
             pixelFont[i] = TTF_OpenFont("font/gulim/gulim-Regular.ttc", i);
+
+            mainFont[i] = TTF_OpenFont("font/pretendard/Pretendard-Regular.ttf", i);
+            mainFontBold[i] = TTF_OpenFont("font/pretendard/Pretendard-Bold.ttf", i);
+            mainFontSemiBold[i] = TTF_OpenFont("font/pretendard/Pretendard-SemiBold.ttf", i);
+            mainFontExtraBold[i] = TTF_OpenFont("font/pretendard/Pretendard-ExtraBold.ttf", i);
         }
 
-        setFont(fontType::notoSans);
+        setFont(fontType::mainFont);
     }
     else if (option::language == L"English")
     {
@@ -29,9 +34,14 @@ export void fontLoader()
             notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
             notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
             pixelFont[i] = TTF_OpenFont("font/gulim/gulim-Regular.ttc", i);
+
+            mainFont[i] = TTF_OpenFont("font/pretendard/Pretendard-Regular.ttf", i);
+            mainFontBold[i] = TTF_OpenFont("font/pretendard/Pretendard-Bold.ttf", i);
+            mainFontSemiBold[i] = TTF_OpenFont("font/pretendard/Pretendard-SemiBold.ttf", i);
+            mainFontExtraBold[i] = TTF_OpenFont("font/pretendard/Pretendard-ExtraBold.ttf", i);
         }
 
-        setFont(fontType::notoSans);
+        setFont(fontType::mainFont);
 
     }
     else

@@ -61,7 +61,7 @@ void Craft::drawGUI()
 		progressText += L"% )";
 		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 11);
 
-		setFont(fontType::notoSans);
+		setFont(fontType::mainFont);
 		setFontSize(16);
 		drawTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 11);
 

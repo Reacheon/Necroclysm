@@ -7,10 +7,19 @@ import constVar;
 
 export enum class fontType
 {
+    mainFont,
+    mainFontBold,
+    mainFontSemiBold,
+    mainFontExtraBold,
     notoSans,
     notoSansBold,
     pixel,
 };
+
+export TTF_Font* mainFont[MAX_FONT_SIZE] = { nullptr, };
+export TTF_Font* mainFontBold[MAX_FONT_SIZE] = { nullptr, };
+export TTF_Font* mainFontSemiBold[MAX_FONT_SIZE] = { nullptr, };
+export TTF_Font* mainFontExtraBold[MAX_FONT_SIZE] = { nullptr, };
 
 export TTF_Font* notoSansFont[MAX_FONT_SIZE] = { nullptr, };
 export TTF_Font* notoSansBoldFont[MAX_FONT_SIZE] = { nullptr, };
@@ -28,21 +37,18 @@ export void setFontGap(int val) { s_fontGap = val; }
 void setFontSolidRender(bool useSolid) { s_useSolidRender = useSolid; }
 export void setFont(fontType inputFont)
 { 
-    if (inputFont == fontType::notoSans)
-    {
-        s_currentFont = notoSansFont;
-        setFontSolidRender(false);
-    }
-    else if (inputFont == fontType::notoSansBold)
-    {
-        s_currentFont = notoSansBoldFont;
-        setFontSolidRender(false);
-    }
+    setFontSolidRender(false);
+    if (inputFont == fontType::notoSans) s_currentFont = notoSansFont;
+    else if (inputFont == fontType::notoSansBold) s_currentFont = notoSansBoldFont;
     else if (inputFont == fontType::pixel)
     {
         s_currentFont = pixelFont;
         setFontSolidRender(true);
     }
+    else if (inputFont == fontType::mainFont) s_currentFont = mainFont;
+    else if (inputFont == fontType::mainFontSemiBold) s_currentFont = mainFontSemiBold;
+    else if (inputFont == fontType::mainFontBold) s_currentFont = mainFontBold;
+    else if (inputFont == fontType::mainFontExtraBold) s_currentFont = mainFontExtraBold;
     else errorBox(L"Invalid font type specified.");
 }
 
