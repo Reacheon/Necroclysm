@@ -13,7 +13,7 @@ export __int64 renderLog(SDL_Renderer* renderer)
 	std::deque<std::wstring> logStrDeque = getLogStrDeque();
 	std::deque<int> logTimerDeque = getLogTimerDeque();
 
-	setFont(fontType::notoSans);
+	setFont(fontType::mainFont);
 	setFontSize(20); // 픽셀 폰트는 12pt 고정
 
 	int textHeight = queryTextHeight(L"가", true);

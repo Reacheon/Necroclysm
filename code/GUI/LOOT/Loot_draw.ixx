@@ -82,7 +82,9 @@ void Loot::drawGUI()
 		setZoom(1.0);
 
 		setFontSize(24);
-		drawText(tileName, lootBase.x + 88, lootBase.y + 42);
+        setFont(fontType::mainFontSemiBold);
+		drawText(tileName, lootBase.x + 88, lootBase.y + 46);
+        setFont(fontType::mainFont);
 
 		drawLine(lootBase.x + 86, lootBase.y + 81, lootBase.x + 86 + 307, lootBase.y + 81, col::gray); 
 
@@ -92,7 +94,7 @@ void Loot::drawGUI()
 
 			drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 			setFontSize(13);
-			drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 5);
+			drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);
 
 			if (lootStack == nullptr)
 			{
@@ -110,7 +112,7 @@ void Loot::drawGUI()
 					std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxVolume / 1000.0, 1) + L" L";
 					setFontSize(13);
-					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 5);
+					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
 				}
 				else if (lootItemData->pocketMaxNumber > 0)
 				{
@@ -125,7 +127,7 @@ void Loot::drawGUI()
 					std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxNumber / 1000.0, 1);
 					setFontSize(13);
-					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 5);
+					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
 				}
 			}
 			else if (lootStack != nullptr)
@@ -133,11 +135,11 @@ void Loot::drawGUI()
 				setFont(fontType::pixel);
 				setFontSize(14);
 				drawText(L"∞", volumeGaugeRect.x + 132 - 77, volumeGaugeRect.y - 2);
+				setFont(fontType::mainFont);
 			}
 		}
 
 		//좌측상단 버리기 버튼
-		setFont(fontType::notoSans);
 		SDL_Rect dropBtn = { lootBase.x + 299, lootBase.y + 40, 100, 35 };
 		drawFillRect(dropBtn, col::black);
 		drawRect(dropBtn, col::gray);
@@ -335,7 +337,7 @@ void Loot::drawGUI()
 
 	//여기서부턴 루팅 윈도우
 	{
-		setFont(fontType::notoSans);
+		setFont(fontType::mainFont);
 		//우측 아이템 상단바 라벨(선택 이름 물리량) - lootLabel 관련은 changeXY에서 수정됨
 		drawStadium(lootLabel.x, lootLabel.y, lootLabel.w, lootLabel.h, { 0,0,0 }, 183, 5);
 		if (GUI::getLastGUI() == this)
@@ -421,7 +423,8 @@ void Loot::drawGUI()
 
 		if (lootPocket->itemInfo.size() == 0)
 		{
-			setFontSize(12);
+			setFont(fontType::mainFont);
+			setFontSize(16);
 			drawTextCenter(sysStr[162], lootBase.x + 195, lootBase.y + 168, col::lightGray);
 		}
 

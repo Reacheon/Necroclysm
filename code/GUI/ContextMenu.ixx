@@ -199,9 +199,9 @@ public:
 				}
 				else drawFillRect(optionRect[i], lowCol::black);
 
-				setFont(fontType::notoSans);
+				setFont(fontType::mainFont);
 				setFontSize(24);
-				drawTextCenter(optionText, optionRect[i].x + optionRect[i].w / 2 + 24, optionRect[i].y + optionRect[i].h / 2 - 3);
+				drawTextCenter(optionText, optionRect[i].x + optionRect[i].w / 2 + 24, optionRect[i].y + optionRect[i].h / 2 - 1);
 
 				setZoom(1.5);
 				drawSpriteCenter(spr::icon16, iconIndex, optionRect[i].x + 15, optionRect[i].y + 15);
@@ -259,7 +259,7 @@ public:
 						drawFillRect(pivotX, pivotY, 288, 26, col::black, 200);
 						drawRect(pivotX, pivotY, 288, 26, col::lightGray, 255);
 
-						setFont(fontType::notoSans);
+						setFont(fontType::mainFont);
 						setFontSize(15);
 						std::wstring titleName = vehPtr->name;
 						drawTextCenter(titleName, pivotX + 144, pivotY + 12);
@@ -290,7 +290,7 @@ public:
 							setZoom(1.0);
 
 							//아이템 이름
-							setFont(fontType::notoSans);
+							setFont(fontType::mainFont);
 							setFontSize(15);
 							drawText(tgtPart.name, pivotX + 53, newPivotY + 7 + 26 * i, col::white);
 
@@ -324,6 +324,7 @@ public:
 									drawTextOutlineCenter(currentVolumeStr + L"/" + maxVolumeStr,
 										volumeGaugeRect.x + volumeGaugeRect.w / 2,
 										volumeGaugeRect.y + volumeGaugeRect.h / 2); // 중앙 정렬
+									setFont(fontType::mainFont);
 								}
 								else if (tgtPart.pocketMaxNumber > 0)
 								{

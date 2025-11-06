@@ -251,7 +251,7 @@ void HUD::drawGUI()
 				}
 
 
-				setFont(fontType::notoSans);
+				setFont(fontType::mainFont);
 				setFontSize(12);
 				drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
 				setFont(fontType::pixel);
@@ -265,7 +265,7 @@ void HUD::drawGUI()
 			drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
 			drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 
-			setFont(fontType::notoSans);
+			setFont(fontType::mainFont);
 			setFontSize(11);
 			drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
 			drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
@@ -1171,7 +1171,7 @@ void HUD::drawBarAct()
 
 		//하단 텍스트
 
-		setFont(fontType::notoSans);
+		setFont(fontType::mainFont);
 		setFontSize(12);
 		drawTextCenter(actName, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) + 23);
 
@@ -1336,7 +1336,7 @@ void HUD::drawStatusEffects()
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
-		setFont(fontType::notoSans);
+		setFont(fontType::mainFont);
 		setFontSize(21);
 		int textWidth = queryTextWidth(statEfctName) + 45;
 
@@ -1348,7 +1348,7 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-		drawTextOutline(statEfctName, pivotX + 45, pivotY + 2 + textOffsetY, textColor);
+		drawTextOutline(statEfctName, pivotX + 45, pivotY + 6 + textOffsetY, textColor);
 
 		int intDuration = std::ceil(myEfcts[i].duration);
 
@@ -1581,22 +1581,22 @@ void HUD::drawHoverItemInfo()
 
 void HUD::drawQuest()
 {
-	setFont(fontType::notoSansBold);
+	setFont(fontType::mainFontExtraBold);
 	int pivotX = 14;
 	int pivotY = 272;
 	setFontSize(24);
 	drawText(sysStr[212], pivotX, pivotY);
-	drawLine(pivotX, pivotY + 40, pivotX + 110, pivotY + 40);
+	drawLine(pivotX, pivotY + 36, pivotX + 110, pivotY + 36);
 	for (int i = 0; i < 120; i++)
 	{
-		drawPoint(pivotX + 111 + i, pivotY + 40, col::white, 255 - 2 * i);
+		drawPoint(pivotX + 111 + i, pivotY + 36, col::white, 255 - 2 * i);
 	}
-	setFont(fontType::notoSans);
+	setFont(fontType::mainFont);
 	drawRect({ pivotX + 1, pivotY + 49, 14, 14 }, col::white);
 	setFontSize(16);
 	int elapsedDay = getElapsedDays();
 	std::wstring questStr = sysStr[213] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
-	drawText(questStr, pivotX + 20, pivotY + 43);
+	drawText(questStr, pivotX + 20, pivotY + 46);
 }

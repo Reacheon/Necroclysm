@@ -26,7 +26,7 @@ export enum class cursorFlag
 //아이템이 들어있는 사각형을 그림, 질량과 부피는 포함하지않음
 export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputItem)
 {
-	setFont(fontType::notoSans);
+	setFont(fontType::mainFont);
 	int fontSize = 18;
 	int yCorrection = 0;
 	bool split = false;
@@ -185,7 +185,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 				}
 			}
 		}
-		drawText(mainName, itemBox.x + 46, itemBox.y + itemBox.h / 2 - 14 + yCorrection);
+		drawText(mainName, itemBox.x + 46, itemBox.y + itemBox.h / 2 - 12 + yCorrection);
 	}
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
@@ -230,7 +230,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	SDL_Color statusColor;
 	SDL_Color statusStrColor;
 	std::wstring statusStr = L"-";
-	setFont(fontType::notoSans);
+	setFont(fontType::mainFont);
 	setFontSize(14);
 
 	if (inputItem.equipState == equipHandFlag::normal)
@@ -355,6 +355,7 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 
 		setFont(fontType::pixel);
 		setFontSize(11);
+		setFont(fontType::mainFont);
 
 		drawSpriteCenter(spr::icon13, 39, box3.x + 12, box2.y + 8);
 		if (inputItem.weight >= 1000)
@@ -379,6 +380,8 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 			std::wstring volStr = std::to_wstring(getVolume(inputItem));
 			drawText(volStr + L" mL", box3.x + 9 + 11, box2.y + 16);
 		}
+
+		setFont(fontType::mainFont);
 	}
 
 	if (whiteCursor == true)

@@ -127,12 +127,12 @@ public:
 				std::wstring sleepText = sysStr[214];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
-				setFont(fontType::notoSansBold);
+				setFont(fontType::mainFontSemiBold);
 				setFontSize(18);
 				drawTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 27, tooltipBox.y + 21); // 18→27, 14→21
+				setFont(fontType::mainFont);
 
 				// 수면 확률 표시
-				setFont(fontType::pixel);
 				setFontSize(12); // 8 × 1.5 = 12
 				float probability = getSleepProbability();
 				std::wstring probText = sysStr[229] + L": " + std::to_wstring((int)(probability * 100)) + L"%";
@@ -145,7 +145,7 @@ public:
 				std::wstring sleepText = sysStr[215];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
-				setFont(fontType::notoSansBold);
+				setFont(fontType::mainFontSemiBold);
 				setFontSize(18);
 				drawTextCenter(sleepText.c_str(), tooltipBox.x + 170, tooltipBox.y + 16); // 113→170, 12→18
 
@@ -157,7 +157,7 @@ public:
 				sleepInGauge.w = 182 * ((float)sleepTime / (float)sleepDuration); // 121→182
 				drawFillRect(sleepInGauge, col::white);
 
-				setFont(fontType::pixel);
+				setFont(fontType::mainFont);
 				setFontSize(12); // 8 × 1.5 = 12
 				int remainingMinutes = sleepDuration - sleepTime;
 				int hours = remainingMinutes / 60;
@@ -170,7 +170,7 @@ public:
 				progressText += std::to_wstring((int)(((float)sleepTime * 100.0 / (float)sleepDuration)));
 				progressText += L"% )";
 
-				drawTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 11); // 7→11
+				drawTextCenter(progressText, sleepGauge.x + sleepGauge.w / 2, sleepGauge.y + sleepGauge.h + 9);
 
 				// 생각 말풍선 애니메이션
 				int yOffsetSeq[8] = { 0,0,0,0,0,1,2,1 };

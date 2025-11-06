@@ -22,7 +22,7 @@ void Inventory::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-		setFont(fontType::notoSans);
+		setFont(fontType::mainFont);
 		
 		SDL_Rect newInventoryBase = inventoryBase;
 		newInventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
@@ -37,7 +37,9 @@ void Inventory::drawGUI()
 		setZoom(1.0);
 
 		setFontSize(24);
-		drawText(inventoryItemData->name, inventoryBase.x + 88, inventoryBase.y + 42);
+		setFont(fontType::mainFontSemiBold);
+		drawText(inventoryItemData->name, inventoryBase.x + 88, inventoryBase.y + 46);
+		setFont(fontType::mainFont);
 
 		drawLine(inventoryBase.x + 86, inventoryBase.y + 81, inventoryBase.x + 86 + 307, inventoryBase.y + 81, col::gray);
 
@@ -46,7 +48,7 @@ void Inventory::drawGUI()
 		drawRect(volumeGaugeRect, col::white);
 		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 		setFontSize(13);
-		drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 5);//부피
+		drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);//부피
 
 		 //Inventory에도 같은 코드가 존재
 		{
@@ -64,7 +66,7 @@ void Inventory::drawGUI()
 				std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxVolume / 1000.0, 1) + L" L";
 				setFontSize(13);
-				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 5);
+				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
 			}
 			else if (inventoryItemData->pocketMaxNumber > 0)
 			{
@@ -79,7 +81,7 @@ void Inventory::drawGUI()
 				std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxNumber / 1000.0, 1);
 				setFontSize(13);
-				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 5);
+				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
 			}
 		}
 
@@ -188,7 +190,8 @@ void Inventory::drawGUI()
 
 		if (inventoryPocket->itemInfo.size() == 0)
 		{
-			setFontSize(12);
+            setFont(fontType::mainFont);
+			setFontSize(16);
 			drawTextCenter(sysStr[162], inventoryBase.x + 195, inventoryBase.y + 168, col::lightGray); //가방 안에 아이템이 없다
 		}
 
