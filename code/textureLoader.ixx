@@ -77,7 +77,7 @@ export void textureLoader()
 	spr::itemSlotPocketArrow = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 8, 40);
 	spr::vehicleTemplate = new Sprite(renderer, "image/UI/GUI/vehicleTemplate.png", 710, 376);
 	spr::vehicleCenterCursor = new Sprite(renderer, "image/UI/GUI/vehicleCenterCursor.png", 16, 16);
-	spr::lstSelectBox = new Sprite(renderer, "image/UI/GUI/lstSelectBox.png", 240, 29);
+	spr::lstSelectBox = new Sprite(renderer, "image/UI/GUI/lstSelectBox.png", 360, 44);// (240, 29)->(360,44)
 
 	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
 	spr::eyesBlue = new Sprite(renderer, "image/charset/body/eyesBlue.png", 48, 48);
