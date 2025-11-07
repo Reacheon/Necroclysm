@@ -87,9 +87,9 @@ public:
 
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		maintBase = { 0, 0, 280, 393 };
-		maintTitle = { 140 - 65,0,130,30 };
-		maintWindow = { 0,36,280,357 };
+		maintBase = { 0, 0, 420, 590 };
+		maintTitle = { 210 - 98, 0, 195, 45 };
+		maintWindow = { 0, 54, 420, 536 };
 
 		if (center == false)
 		{
@@ -113,12 +113,12 @@ public:
 		maintBtn.clear();
 		for (int i = 0; i < MAX_BTN; i++)
 		{
-			SDL_Rect tempMaintBtn = { maintWindow.x + 22 ,maintWindow.y + 48 + 32 * i, 240, 29 };
+			SDL_Rect tempMaintBtn = { maintWindow.x + 33, maintWindow.y + 72 + 48 * i, 360, 44 };
 			maintBtn.push_back(tempMaintBtn);
 		}
 
-		maintInputBox = { maintWindow.x + 50,maintWindow.y + 60, 200, 40 };
-		maintScrollBox = { maintWindow.x + 271,maintWindow.y + 48, 2, 285 };
+		maintInputBox = { maintWindow.x + 75, maintWindow.y + 90, 300, 60 };
+		maintScrollBox = { maintWindow.x + 407, maintWindow.y + 72, 3, 428 };
 
 		if (center == false)
 		{
@@ -147,13 +147,13 @@ public:
 			if (maintMode == maintFlag::repair) drawWindow(&maintBase, maintTitleText, 86);
 			else drawWindow(&maintBase, maintTitleText, 87);
 
-			SDL_Rect topWindow = { maintBase.x + 1, maintBase.y + 30, 278, 44 };
-			SDL_Rect botWindow = { maintBase.x + 1, maintBase.y + maintBase.h - 17, 278, 16 };
+			SDL_Rect topWindow = { maintBase.x + 2, maintBase.y + 45, 417, 66 };
+			SDL_Rect botWindow = { maintBase.x + 2, maintBase.y + maintBase.h - 26, 417, 24 };
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-			setFontSize(14);
-			drawTextCenter(maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 30 + 22);
+			setFontSize(21);
+			drawTextCenter(maintText, maintWindow.x + maintWindow.w / 2, maintBase.y + 45 + 33);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -175,22 +175,22 @@ public:
 
 					drawSprite(spr::lstSelectBox, selectBoxIndex, maintBtn[i].x, maintBtn[i].y);
 
-					setZoom(2.0);
-					drawSpriteCenter(spr::itemset, getItemSprIndex(items[currentItemIndex]), maintBtn[i].x + 15, maintBtn[i].y + 14);
+					setZoom(3.0);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(items[currentItemIndex]), maintBtn[i].x + 23, maintBtn[i].y + 21);
 					setZoom(1.0);
 
-					setFontSize(14);
-					drawText(items[currentItemIndex].name, maintBtn[i].x + 36, maintBtn[i].y + 5);
+					setFontSize(21);
+					drawText(items[currentItemIndex].name, maintBtn[i].x + 54, maintBtn[i].y + 8);
 
-					drawRect({ maintBtn[i].x + 230, maintBtn[i].y + 3, 7, 23 }, col::lightGray);
-					drawFillRect(SDL_Rect{ maintBtn[i].x + 230 + 2, maintBtn[i].y + 3 + 2, 3, 19 }, lowCol::green);
+					drawRect({ maintBtn[i].x + 345, maintBtn[i].y + 5, 11, 35 }, col::lightGray);
+					drawFillRect(SDL_Rect{ maintBtn[i].x + 345 + 3, maintBtn[i].y + 5 + 3, 5, 29 }, lowCol::green);
 				}
 			}
 
-			setFontSize(10);
+			setFontSize(15);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
-			drawTextCenter(hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 30, maintBase.y + maintBase.h - 17 + 8);
+			drawTextCenter(hoverText + L"/" + std::to_wstring(items.size()), maintWindow.x + maintWindow.w - 45, maintBase.y + maintBase.h - 26 + 12);
 
 			// 아이템 스크롤 그리기
 			if (items.size() > MAX_BTN)
@@ -199,7 +199,7 @@ public:
 
 				SDL_Rect inScrollBox = maintScrollBox;
 				inScrollBox.h = maintScrollBox.h * myMin(1.0, (float)MAX_BTN / (float)items.size());
-				if (inScrollBox.h < 5) inScrollBox.h = 5;
+				if (inScrollBox.h < 8) inScrollBox.h = 8;
 
 				if (!items.empty()) inScrollBox.y = maintScrollBox.y + maintScrollBox.h * ((float)maintScroll / (float)items.size());
 				else inScrollBox.y = maintScrollBox.y;
