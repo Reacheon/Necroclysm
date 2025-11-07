@@ -124,15 +124,17 @@ public:
 
 		if (getFoldRatio() == 1.0)
 		{
+			setFont(fontType::mainFont);
 			drawWindow(&lstBase, lstTitleText, 0);
 
-			SDL_Rect topWindow = { lstBase.x + 2, lstBase.y + 45, 417, 66 };
-			SDL_Rect botWindow = { lstBase.x + 2, lstBase.y + lstBase.h - 26, 417, 24 };
-			drawFillRect(topWindow, col::black, 180);
-			drawFillRect(botWindow, col::black, 180);
+			SDL_Rect topWindow = { lstBase.x + 1, lstBase.y + 35, 417, 66 };
+			SDL_Rect botWindow = { lstBase.x + 1, lstBase.y + lstBase.h - 25, 417, 24 };
+			drawFillRect(topWindow, col::black, 255);
+			drawFillRect(botWindow, col::black, 255);
 
-			setFontSize(15);
-			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 33, true, 405, -1);
+			setFontSize(20);
+			setFont(fontType::mainFont);
+			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, true, 405, -1);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -155,7 +157,7 @@ public:
 					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
 
 					setFontSize(24);
-					drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 18, lstBtn[i].y + 9);
+					drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 18, lstBtn[i].y + 7);
 				}
 			}
 
