@@ -58,11 +58,11 @@ public:
 
 
 		lstBtn.resize(MAX_BTN);
-		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 22 ,lstWindow.y + 48 + 32 * i, 240, 29 };
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 48 * i, 360, 44 };
 
 
-		lstScrollBox = { lstWindow.x + 271, lstWindow.y + 48, 2, 285 };
-		lstInputBox = { lstWindow.x + 50, lstWindow.y + 60, 200, 40 };
+		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 428 };
+		lstInputBox = { lstWindow.x + 75, lstWindow.y + 90, 300, 60 };
 
 
 		deactInput();
@@ -83,8 +83,8 @@ public:
 	static Lst* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		lstBase = { 0, 0, 280, 393 };
-		lstWindow = { 0,36,280,357 };
+		lstBase = { 0, 0, 420, 590 };
+		lstWindow = { 0, 54, 420, 536 };
 
 		if (center == false)
 		{
@@ -98,14 +98,14 @@ public:
 		}
 
 		lstWindow.x = lstBase.x;
-		lstWindow.y = lstBase.y + 36;
+		lstWindow.y = lstBase.y + 54;
 
 
 		lstBtn.resize(MAX_BTN);
-		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 22 ,lstWindow.y + 48 + 32 * i, 240, 29 };
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 48 * i, 360, 44 };
 
-		lstScrollBox = { lstWindow.x + 271,lstWindow.y + 48, 2, 285 };
-		lstInputBox = { lstWindow.x + 50,lstWindow.y + 60, 200, 40 };
+		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 428 };
+		lstInputBox = { lstWindow.x + 75, lstWindow.y + 90, 300, 60 };
 
 		if (center == false)
 		{
@@ -126,13 +126,13 @@ public:
 		{
 			drawWindow(&lstBase, lstTitleText, 0);
 
-			SDL_Rect topWindow = { lstBase.x + 1, lstBase.y + 30, 278, 44 };
-			SDL_Rect botWindow = { lstBase.x + 1, lstBase.y + lstBase.h - 17, 278, 16 };
+			SDL_Rect topWindow = { lstBase.x + 2, lstBase.y + 45, 417, 66 };
+			SDL_Rect botWindow = { lstBase.x + 2, lstBase.y + lstBase.h - 26, 417, 24 };
 			drawFillRect(topWindow, col::black, 180);
 			drawFillRect(botWindow, col::black, 180);
 
-			setFontSize(10);
-			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 30 + 22, true, 270, -1);
+			setFontSize(15);
+			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 33, true, 405, -1);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -154,15 +154,15 @@ public:
 
 					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
 
-					setFontSize(16);
-					drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 12, lstBtn[i].y + 6);
+					setFontSize(24);
+					drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 18, lstBtn[i].y + 9);
 				}
 			}
 
-			setFontSize(10);
+			setFontSize(15);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
-			drawTextCenter(hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 30, lstBase.y + lstBase.h - 17 + 8);
+			drawTextCenter(hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 45, lstBase.y + lstBase.h - 26 + 12);
 
 			// 아이템 스크롤 그리기
 			if (lstOptionVec.size() > MAX_BTN)
@@ -172,7 +172,7 @@ public:
 				SDL_Rect inScrollBox = lstScrollBox;
 
 				inScrollBox.h = lstScrollBox.h * myMin(1.0, (float)MAX_BTN / (float)lstOptionVec.size());
-				if (inScrollBox.h < 5) inScrollBox.h = 5;
+				if (inScrollBox.h < 8) inScrollBox.h = 8;
 
 				if (!lstOptionVec.empty()) inScrollBox.y = lstScrollBox.y + lstScrollBox.h * ((float)lstScroll / (float)lstOptionVec.size());
 				else inScrollBox.y = lstScrollBox.y;
