@@ -590,7 +590,7 @@ public:
 
 	void executeOpen()
 	{
-		new Inventory(334, (cameraH / 2) - 210, &inventoryPocket->itemInfo[inventoryCursor]);
+		new Inventory(404, (cameraH / 2) - 210, &inventoryPocket->itemInfo[inventoryCursor]);
 		close(aniFlag::null);
 	}
 };

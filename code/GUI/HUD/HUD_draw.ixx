@@ -679,7 +679,6 @@ void HUD::drawTab()
 		setZoom(1.5);
 		drawSpriteCenter(spr::icon48, 158, tabSmallBox.x + tabSmallBox.w / 2, tabSmallBox.y + tabSmallBox.h / 2);
 		setZoom(1.0);
-		setFont(fontType::pixel);
 		setFontSize(14);
 		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 36);
 		drawTextCenter(sysStr[2], tab.x + tab.w / 2, tab.y + tab.h - 36 + 16);
@@ -762,23 +761,29 @@ void HUD::drawTab()
 	case tabFlag::closeWin:
 		//창 닫기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		drawSpriteCenter(spr::icon48, 17, tab.x + 60, tab.y + 52);
-		setFontSize(12);
-		drawTextCenter(sysStr[14], tab.x + 60, tab.y + 92 + 7);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 17, tab.x + 90, tab.y + 78);
+		setZoom(1.0);
+		setFontSize(22);
+		drawTextCenter(sysStr[14], tab.x + 90, tab.y + 150);
 		break;
 	case tabFlag::back:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		drawSpriteCenter(spr::icon48, 182, tab.x + 60, tab.y + 52);
-		setFontSize(12);
-		drawTextCenter(sysStr[31], tab.x + 60, tab.y + 92 + 7);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 182, tab.x + 90, tab.y + 78);
+		setZoom(1.0);
+		setFontSize(22);
+		drawTextCenter(sysStr[31], tab.x + 90, tab.y + 150);
 		break;
 	case tabFlag::confirm:
 		//뒤로가기
 		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
-		drawSpriteCenter(spr::icon48, 39, tab.x + 60, tab.y + 52);
-		setFontSize(12);
-		drawTextCenter(sysStr[91], tab.x + 60, tab.y + 92 + 7);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 39, tab.x + 90, tab.y + 78);
+		setZoom(1.0);
+		setFontSize(22);
+		drawTextCenter(sysStr[91], tab.x + 90, tab.y + 150);
 		break;
 	default:
 		errorBox(L"undefined tabFalg");
@@ -1340,11 +1345,11 @@ void HUD::drawStatusEffects()
 		setFontSize(21);
 		int textWidth = queryTextWidth(statEfctName) + 45;
 
-		drawFillRect(SDL_Rect{ pivotX + 32, pivotY, textWidth, 32 }, col::black, 85);
-		int lineStartX = pivotX + textWidth + 36;
+		drawFillRect(SDL_Rect{ pivotX + 32, pivotY, textWidth, 32 }, col::black, 140);
+		int lineStartX = pivotX + textWidth + 32;
 		for (int i = 0; i < 18; i++)
 		{
-			drawLine(lineStartX + i, pivotY + 2 + i, lineStartX + i, pivotY + 35, col::black, 85);
+			drawLine(lineStartX + i, pivotY + 2 + i, lineStartX + i, pivotY + 31, col::black, 140);
 			textWidth++;
 		}
 
