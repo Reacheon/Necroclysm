@@ -71,7 +71,7 @@ export void textureLoader()
 	spr::epsilonFont = new Sprite(renderer, "image/epsilonFont.png", 4, 6);
 	spr::loadingAnime = new Sprite(renderer, "image/UI/loadingAnime.png", 32, 32);
 	spr::buildCursor = new Sprite(renderer, "image/UI/buildCursor.png", 48, 48);
-	spr::msgChoiceBtn = new Sprite(renderer, "image/UI/msgChoiceBtn.png", 90, 46);
+	spr::msgChoiceBtn = new Sprite(renderer, "image/UI/msgChoiceBtn.png", 134, 68);
 
 	spr::itemSlotBtn = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 210, 18);
 	spr::itemSlotPocketArrow = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 8, 40);

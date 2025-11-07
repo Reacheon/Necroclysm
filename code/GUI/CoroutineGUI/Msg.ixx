@@ -107,7 +107,7 @@ public:
 	static Msg* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		msgBase = { 0, 0, 300, 236 };
+		msgBase = { 0, 0, 450, 354 };
 
 		if (center == false)
 		{
@@ -125,9 +125,9 @@ public:
 		msgBtn =
 		{
 			{ },
-			{ {msgBase.x + 36 ,msgBase.y + msgBase.h - 54, 90 , 46} },
-			{ {msgBase.x + 36 ,msgBase.y + msgBase.h - 54, 90 , 46}, {msgBase.x + msgBase.w - 126 ,msgBase.y + msgBase.h - 54, 90 , 46} },
-			{ {msgBase.x + 7,msgBase.y + msgBase.h - 54, 90 , 46}, {msgBase.x + 105,msgBase.y + msgBase.h - 54, 90 ,46}, {msgBase.x + 203,msgBase.y + msgBase.h - 54, 90 , 46} }
+			{ {msgBase.x + 36 ,msgBase.y + msgBase.h - 54, 134 , 68} },
+			{ {msgBase.x + 61 ,msgBase.y + msgBase.h - 80, 134 , 68}, {msgBase.x + 255 ,msgBase.y + msgBase.h - 80, 134 , 68} },
+			{ {msgBase.x + 13,msgBase.y + msgBase.h - 54, 134 , 68}, {msgBase.x + 158,msgBase.y + msgBase.h - 54, 134 , 68}, {msgBase.x + 303,msgBase.y + msgBase.h - 54, 134 , 68} }
 		};
 		msgInputBox = { msgBase.x + 50,msgBase.y + 36 + 60, 200, 40 };
 
@@ -151,14 +151,31 @@ public:
 		if (getFoldRatio() == 1.0)
 		{
 			setWindowAlpha(230);
-			//drawWindow(&msgBase, msgTitleText, 0);
-			drawSprite(spr::msgBox, msgBase.x, msgBase.y);
+			drawWindow(&msgBase);
+			//drawSprite(spr::msgBox, msgBase.x, msgBase.y);
 
-			setFontSize(22);
-			drawTextCenter(msgTitleText, msgBase.x+150, msgBase.y+34);
+			int titleTextOffsetY = -5;
 
-			drawSpriteCenter(spr::icon32, 1,msgBase.x + 150- queryTextWidth(msgTitleText) / 2.0 -24, msgBase.y + 34);
-			
+			setFontSize(40);
+			setFont(fontType::mainFontBold);
+			drawTextCenter(msgTitleText, msgBase.x +msgBase.w/2, msgBase.y+64 + titleTextOffsetY);
+			setFont(fontType::mainFont);
+
+			setZoom(2.0);
+			drawSpriteCenter(spr::icon32, 1,msgBase.x + msgBase.w / 2 - queryTextWidth(msgTitleText) / 2.0 -36, msgBase.y + 64 + titleTextOffsetY);
+			setZoom(1.0);
+
+
+			for (int i = 0; i < 200; i++)
+			{
+				drawPoint(msgBase.x + msgBase.w / 2 + i, msgBase.y + 64 - 40 + titleTextOffsetY, col::white, 200 - i);
+				drawPoint(msgBase.x + msgBase.w / 2 - 1 - i , msgBase.y + 64 - 40 + titleTextOffsetY, col::white, 200 - i);
+
+
+				drawPoint(msgBase.x + msgBase.w / 2 + i, msgBase.y + 64 - 40 + 80 + titleTextOffsetY, col::white, 200 - i);
+				drawPoint(msgBase.x + msgBase.w / 2 - 1 - i, msgBase.y + 64 - 40 + 80 + titleTextOffsetY, col::white, 200 - i);
+			}
+
 
 			resetWindowAlpha();
 
@@ -219,7 +236,8 @@ public:
 			}
 			else
 			{
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60, true, 280, -1);
+				setFontSize(26);
+				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 130, true, msgBase.w, -1);
 			}
 
 
@@ -227,7 +245,7 @@ public:
 
 
 			//버튼 흰색 뚜껑
-			drawLine(msgBase.x + 1, msgBase.y + msgBase.h - 63, msgBase.x + msgBase.w - 1, msgBase.y + msgBase.h - 63, { 0x63,0x63,0x63 });
+			drawLine(msgBase.x + 1, msgBase.y + msgBase.h - 92, msgBase.x + msgBase.w - 1, msgBase.y + msgBase.h - 92, { 0x63,0x63,0x63 });
 
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
@@ -241,10 +259,12 @@ public:
 			}
 
 			//버튼 글자들
-			setFontSize(16);
+			setFontSize(24);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
+                setFont(fontType::mainFontSemiBold);
 				drawTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
+                setFont(fontType::mainFont);
 			}
 
 			if (exInput == true)

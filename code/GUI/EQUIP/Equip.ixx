@@ -174,7 +174,7 @@ public:
 
 	void executeOpen()
 	{
-		new Inventory(334, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
+		new Inventory(404, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
 	}
 	void updateBarAct()
 	{

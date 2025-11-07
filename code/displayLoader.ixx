@@ -26,7 +26,7 @@ export void displayLoader()
     double scaleFactor = 1.0;
     if (option::fixScreenRatio)
     {
-        switch (0)
+        switch (1)
         {
         default:  winW = 1080 * scaleFactor;   winH = 1080 * scaleFactor;   break;
         case 1:   winW = 1920 * scaleFactor;   winH = 1080 * scaleFactor;  break;
