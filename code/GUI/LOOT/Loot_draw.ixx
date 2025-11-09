@@ -19,6 +19,8 @@ void Loot::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
 
+	if (getFoldRatio() == 1.0)
+	{
 	const bool* state = SDL_GetKeyboardState(nullptr);
 	Sprite* targetBtnSpr = nullptr;
 
@@ -437,5 +439,23 @@ void Loot::drawGUI()
 
 		setFontSize(12);
 		drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 10, lootBase.y + lootBase.h - 16);
+	}
+	}
+	else
+	{
+		SDL_Rect vRect = lootBase;
+		int type = 1;
+		switch (type)
+		{
+		case 0:
+			vRect.w = vRect.w * getFoldRatio();
+			vRect.h = vRect.h * getFoldRatio();
+			break;
+		case 1:
+			vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
+			vRect.w = vRect.w * getFoldRatio();
+			break;
+		}
+		drawWindow(&vRect);
 	}
 }
