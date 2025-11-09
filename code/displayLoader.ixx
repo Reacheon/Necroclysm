@@ -8,62 +8,43 @@ import constVar;
 
 export void displayLoader()
 {
-    cameraW = 1080;
-    cameraH = 1080;
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
     SDL_DisplayID disp = SDL_GetPrimaryDisplay();
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
     if (!mode) errorBox(L"디스플레이 정보를 읽을 수 없습니다.");
+
     int winW = mode->w;
     int winH = mode->h;
 
-    // 2배 확대 적용
+    // 논리적 해상도는 항상 1:1 비율 (1080x1080)로 고정
+    cameraW = 1080;
+    cameraH = 1080;
+
     option::fullScreen = false;
-    if (option::fullScreen) option::fixScreenRatio = false;
 
-
-
-    double scaleFactor = 1.0;
-    if (option::fixScreenRatio)
+    // 풀스크린이 아닐 때는 창 크기 조정 가능
+    if (!option::fullScreen)
     {
-        switch (1)
+        double scaleFactor = 1.0;
+        if (option::fixScreenRatio)
         {
-        default:  winW = 1080 * scaleFactor;   winH = 1080 * scaleFactor;   break;
-        case 1:   winW = 1920 * scaleFactor;   winH = 1080 * scaleFactor;  break;
-        case 2:   winW = 960 * scaleFactor;   winH = 1080 * scaleFactor;   break;
-        case 3:   winW = 1080 * scaleFactor;   winH = 1440 * scaleFactor;  break;
-        case 4:   winW = 1280 * scaleFactor;  winH = 1080 * scaleFactor;   break;
-        }
-        cameraW = winW / scaleFactor;  // 게임 해상도는 원래대로
-        cameraH = winH / scaleFactor;
-    }
-    else
-    {
-        // 윈도우 크기만 2배로 확대
-        winW = winW;  // 모니터 해상도 그대로 사용하거나
-        winH = winH;
-        // 또는 고정 크기로 2배 확대하려면:
-        // winW = 1080 * scaleFactor;
-        // winH = 1080 * scaleFactor;
-
-        cameraW = winW;
-        cameraH = winH;
-        if (cameraW > cameraH)
-        {
-            cameraW = (int)(((float)cameraW / (float)cameraH) * 1080.0f);
-            cameraH = 1080;
-        }
-        else if (cameraH > cameraW)
-        {
-            cameraH = (int)(((float)cameraH / (float)cameraW) * 1080.0f);
-            cameraW = 1080;
+            switch (1)
+            {
+            default:  winW = 1080 * scaleFactor;   winH = 1080 * scaleFactor;   break;
+            case 1:   winW = 1920 * scaleFactor;   winH = 1080 * scaleFactor;  break;
+            case 2:   winW = 960 * scaleFactor;   winH = 1080 * scaleFactor;   break;
+            case 3:   winW = 1080 * scaleFactor;   winH = 1440 * scaleFactor;  break;
+            case 4:   winW = 1280 * scaleFactor;  winH = 1080 * scaleFactor;   break;
+            }
         }
         else
         {
-            cameraW = 1080;
-            cameraH = 1080;
+            // 윈도우 모드일 때 적당한 크기로
+            winW = 1080;
+            winH = 1080;
         }
     }
+    // 풀스크린일 때는 모니터 해상도 그대로 사용 (이미 winW, winH에 설정됨)
 
     if (!SDL_CreateWindowAndRenderer("Necroclysm", winW, winH,
         option::fullScreen ? SDL_WINDOW_FULLSCREEN : 0,
@@ -71,11 +52,11 @@ export void displayLoader()
         errorBox(L"창·렌더러 생성 실패");
     setPrimitiveRenderer(renderer);
 
-    // 논리적 해상도는 원래대로 유지 (1080x1080)
+    // 논리적 해상도는 1:1 비율 유지, 레터박스/필러박스 자동 추가
     SDL_SetRenderLogicalPresentation(renderer,
         cameraW,
         cameraH,
-        SDL_LOGICAL_PRESENTATION_STRETCH);
+        SDL_LOGICAL_PRESENTATION_LETTERBOX);
     {
         SDL_DisplayID disp = SDL_GetPrimaryDisplay();
         const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
