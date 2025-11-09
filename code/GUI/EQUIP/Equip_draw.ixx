@@ -20,7 +20,8 @@ void Equip::drawGUI()
 	if (getStateDraw() == false) { return; }
 	if (CoordSelect::ins() != nullptr) return;
 
-
+	if (getFoldRatio() == 1.0)
+	{
 	drawWindow(&equipBase, sysStr[332], 94);
 	setFlip(SDL_FLIP_HORIZONTAL);
 	drawSprite(spr::newWindowArrow, 0, equipBase.x + equipBase.w - 4, equipBase.y + 145);
@@ -223,5 +224,22 @@ void Equip::drawGUI()
 		drawText(L"Lv." + std::to_wstring(rRad),
 			topWindow.x + 348 + 84, topWindow.y + 29 + 22 * 5, lowCol::green);
 	}
-
+	}
+	else
+	{
+		SDL_Rect vRect = equipBase;
+		int type = 1;
+		switch (type)
+		{
+		case 0:
+			vRect.w = vRect.w * getFoldRatio();
+			vRect.h = vRect.h * getFoldRatio();
+			break;
+		case 1:
+			vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
+			vRect.w = vRect.w * getFoldRatio();
+			break;
+		}
+		drawWindow(&vRect);
+	}
 }
