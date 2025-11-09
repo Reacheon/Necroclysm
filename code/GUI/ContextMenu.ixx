@@ -398,21 +398,22 @@ public:
 		}
 		else if (inputAct == act::unbox)
 		{
-			Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+			Point3 containerPos = { contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() };
+			Vehicle* vPtr = TileVehicle(containerPos);
+			Prop* pPtr = TileProp(containerPos);
 
 			if (pPtr != nullptr && pPtr->leadItem.pocketPtr != nullptr)
 			{
-				new Loot(pPtr->leadItem.pocketPtr.get(), &(pPtr->leadItem));
+				new Loot(pPtr->leadItem.pocketPtr.get(), &(pPtr->leadItem), containerPos);
 			}
 			else if (vPtr != nullptr)
 			{
-				Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-				for (int i = 0; i < vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo.size(); i++)
+				Vehicle* vPtr = TileVehicle(containerPos.x, containerPos.y, PlayerZ());
+				for (int i = 0; i < vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo.size(); i++)
 				{
-					if (vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+					if (vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
 					{
-						new Loot(vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i].pocketPtr.get(), &(vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo[i]));
+						new Loot(vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i].pocketPtr.get(), &(vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i]), containerPos);
 						break;
 					}
 				}

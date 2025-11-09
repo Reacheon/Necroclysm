@@ -57,7 +57,15 @@ void Loot::drawGUI()
 		}
 	}
 	drawWindow(&lootBase, windowTitle, 1);
-    drawSprite(spr::newWindowArrow, 0, lootBase.x - 26, lootBase.y + 145);
+	if(arrowDir == dir16::left) drawSprite(spr::newWindowArrow, 0, lootBase.x - 26, lootBase.y + 145);
+	else if (arrowDir == dir16::right)
+	{
+		setFlip(SDL_FLIP_HORIZONTAL);
+		drawSprite(spr::newWindowArrow, 0, lootBase.x + lootBase.w - 4, lootBase.y + 145);
+		setFlip(SDL_FLIP_NONE);
+	}
+
+
 
 	//포켓
 	if (hasSelect == false)
