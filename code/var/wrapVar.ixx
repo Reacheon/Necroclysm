@@ -160,11 +160,10 @@ export float getMouseX()
     float px, py;
     SDL_GetMouseState(&px, &py);
 
-    int winW, winH;
-    SDL_GetWindowSize(window, &winW, &winH);
-
-    float scaleX = static_cast<float>(cameraW) / static_cast<float>(winW);
-    return px * scaleX;
+    // 윈도우 좌표를 렌더 논리 좌표로 변환 (레터박스 고려)
+    float renderX, renderY;
+    SDL_RenderCoordinatesFromWindow(renderer, px, py, &renderX, &renderY);
+    return renderX;
 }
 
 export float getMouseY()
@@ -172,11 +171,10 @@ export float getMouseY()
     float px, py;
     SDL_GetMouseState(&px, &py);
 
-    int winW, winH;
-    SDL_GetWindowSize(window, &winW, &winH);
-
-    float scaleY = static_cast<float>(cameraH) / static_cast<float>(winH);
-    return py * scaleY;
+    // 윈도우 좌표를 렌더 논리 좌표로 변환 (레터박스 고려)
+    float renderX, renderY;
+    SDL_RenderCoordinatesFromWindow(renderer, px, py, &renderX, &renderY);
+    return renderY;
 }
 
 export Point2 getAbsMouseGrid()
