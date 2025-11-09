@@ -24,7 +24,7 @@ void Equip::drawGUI()
 	{
 	drawWindow(&equipBase, sysStr[332], 94);
 	setFlip(SDL_FLIP_HORIZONTAL);
-	drawSprite(spr::newWindowArrow, 0, equipBase.x + equipBase.w - 4, equipBase.y + 145);
+	drawSprite(spr::newWindowArrow, 0, equipBase.x + equipBase.w - 4, equipBase.y + 225);
     setFlip(SDL_FLIP_NONE);
 
 	//여기서부턴 이큅 윈도우

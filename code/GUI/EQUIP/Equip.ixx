@@ -61,7 +61,13 @@ public:
 		errorBox(ptr != nullptr, L"More than equip instance was generated.");
 		ptr = this;
 
-		changeXY(0, (cameraH / 2) - 210, false);
+        int arrowEndX, arrowEndY, targetX, targetY;
+		arrowEndX = cameraW / 2 - 8 * zoomScale + 16 * 0 * zoomScale;
+		arrowEndY = cameraH / 2 + 16 * 0 * zoomScale;
+		targetX = arrowEndX - 429;
+		targetY = arrowEndY - 250;
+
+		changeXY(targetX, targetY, false);
 		setAniSlipDir(4);
 
 		UIType = act::equip;
@@ -171,7 +177,7 @@ public:
 
 	void executeOpen()
 	{
-		new Inventory(404, (cameraH / 2) - 210, &equipPtr->itemInfo[equipCursor]);
+		new Inventory(equipBase.x + equipBase.w - 1, equipBase.y, &equipPtr->itemInfo[equipCursor]);
 	}
 	void updateBarAct()
 	{

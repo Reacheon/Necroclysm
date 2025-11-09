@@ -63,18 +63,40 @@ private:
 	SDL_Rect pocketLeft;
 	SDL_Rect pocketRight;
 	SDL_Rect lootBtn;
+
+	dir16 arrowDir = dir16::left;
 public:
 	Corouter errorFunc();
 
-	Loot(ItemPocket* inputPocket, ItemData* inputData) : GUI(false)
+	Loot(ItemPocket* inputPocket, ItemData* inputData, Point3 tgtPoint) : GUI(false)
 	{
 		ptr = this;
 		prt(L"Loot : 생성자가 생성되었습니다..\n");
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
-		changeXY(cameraW - 425, (cameraH / 2) - 210, false);
-		setAniSlipDir(0);
+		int revX = tgtPoint.x - PlayerX();
+		int revY = tgtPoint.y - PlayerY();
+
+		int arrowEndX, arrowEndY, targetX, targetY;
+		if (revX >= 0)
+		{
+			arrowDir = dir16::left;
+			arrowEndX = cameraW / 2 + 8 * zoomScale + 16*revX * zoomScale;
+			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
+			targetX = arrowEndX + 26;
+			targetY = arrowEndY - 170;
+		}
+		else
+		{
+			arrowDir = dir16::right;
+			arrowEndX = cameraW / 2 - 8 * zoomScale + 16 * revX * zoomScale;
+			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
+			targetX = arrowEndX - 429;
+			targetY = arrowEndY - 170;
+		}
+
+		changeXY(targetX, targetY, false);
 
 		UIType = act::loot;
 
@@ -100,14 +122,25 @@ public:
 		int revX = inputStack->getGridX() - PlayerX();
 		int revY = inputStack->getGridY() - PlayerY();
 
-		int arrowEndX = cameraW / 2 + 8 * zoomScale + revX * zoomScale;
-		int arrowEndY = cameraH / 2 + revY * zoomScale;
-
-		int targetX = arrowEndX + 26;
-		int targetY = arrowEndY - 170;
+        int arrowEndX, arrowEndY, targetX, targetY;
+		if (revX >= 0)
+		{
+			arrowDir = dir16::left;
+			arrowEndX = cameraW / 2 + 8 * zoomScale + 16 * revX * zoomScale;
+			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
+			targetX = arrowEndX + 26;
+			targetY = arrowEndY - 170;
+		}
+		else
+		{
+            arrowDir = dir16::right;
+			arrowEndX = cameraW / 2 - 8 * zoomScale + 16 * revX * zoomScale;
+			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
+			targetX = arrowEndX - 429;
+			targetY = arrowEndY - 170;
+		}
 
 		changeXY(targetX, targetY, false);
-		setAniSlipDir(0);
 
 		UIType = act::loot;
 
