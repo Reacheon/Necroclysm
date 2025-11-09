@@ -31,6 +31,7 @@ void Inventory::drawGUI()
 		drawFillRect(inventoryBase.x + 16, inventoryBase.y + 44, 64, 64, col::black);
 		drawSprite(spr::inventoryItemRect, 0, inventoryBase.x + 16, inventoryBase.y + 44);
 
+		drawSpriteCenter(spr::itemBackgroundRect, 0, inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);
 
 		setZoom(4.0);
 		drawSpriteCenter(spr::itemset, getItemSprIndex(*inventoryItemData), inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);

@@ -22,7 +22,9 @@ void Equip::drawGUI()
 
 
 	drawWindow(&equipBase, sysStr[332], 94);
-
+	setFlip(SDL_FLIP_HORIZONTAL);
+	drawSprite(spr::newWindowArrow, 0, equipBase.x + equipBase.w - 4, equipBase.y + 145);
+    setFlip(SDL_FLIP_NONE);
 
 	//여기서부턴 이큅 윈도우
 	{
@@ -41,7 +43,7 @@ void Equip::drawGUI()
 
 		//이큅 윈도우 본체
 		setFontSize(12);
-		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipWindow.x + 7, equipWindow.y + equipWindow.h - 10);
+		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipBase.x + 7, equipBase.y + equipBase.h - 20);
 
 		//우측 아이템 상단바(선택 이름 물리량)
 		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);

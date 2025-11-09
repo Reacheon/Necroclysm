@@ -97,7 +97,16 @@ public:
 		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 		//errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 
-		changeXY(cameraW - 425, (cameraH / 2) - 210, false);
+		int revX = inputStack->getGridX() - PlayerX();
+		int revY = inputStack->getGridY() - PlayerY();
+
+		int arrowEndX = cameraW / 2 + 8 * zoomScale + revX * zoomScale;
+		int arrowEndY = cameraH / 2 + revY * zoomScale;
+
+		int targetX = arrowEndX + 26;
+		int targetY = arrowEndY - 170;
+
+		changeXY(targetX, targetY, false);
 		setAniSlipDir(0);
 
 		UIType = act::loot;
@@ -145,8 +154,8 @@ public:
 		lootArea = { lootBase.x + 12, lootBase.y + 150, 376, 296 };
 		for (int i = 0; i < LOOT_ITEM_MAX; i++)
 		{
-			lootItemRect[i] = { lootBase.x + 63, lootBase.y + 150 + 39 * i, 325, 32 };
-			lootItemSelectRect[i] = { lootBase.x + 12, lootBase.y + 150 + 39 * i, 43, 32 };
+			lootItemRect[i] = { lootBase.x + 62, lootBase.y + 150 + 37 * i, 325, 32 };
+			lootItemSelectRect[i] = { lootBase.x + 12, lootBase.y + 150 + 37 * i, 43, 32 };
 		}
 		lootLabel = { lootBase.x + 12, lootBase.y + 114, lootBase.w - 24, 31 };
 		lootLabelSelect = { lootLabel.x, lootLabel.y, 75, 31 };

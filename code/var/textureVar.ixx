@@ -51,7 +51,6 @@ export namespace spr
 	Sprite* buttons = nullptr;
 	Sprite* buttonsPressed = nullptr;
 	Sprite* menuPopUp = nullptr;
-	Sprite* floatLog = nullptr;
 	Sprite* letterboxBtnMarker = nullptr;
 	Sprite* proficIcon = nullptr;
 	Sprite* proficIconGold = nullptr;
@@ -74,7 +73,6 @@ export namespace spr
 	Sprite* partsSlotGauge = nullptr;
 	Sprite* tab = nullptr;
 	Sprite* aimLRChange = nullptr;
-	Sprite* floatWarning = nullptr;
 	Sprite* epsilonFont = nullptr;
 	Sprite* loadingAnime = nullptr;
 	Sprite* buildCursor = nullptr;
@@ -155,4 +153,8 @@ export namespace spr
 	
 	Sprite* seaFoam = nullptr;
 	Sprite* waterFoam = nullptr;
+
+	Sprite* itemBackgroundRect = nullptr;
+
+	Sprite* newWindowArrow = nullptr;
 }
