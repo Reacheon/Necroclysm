@@ -344,9 +344,36 @@ public:
 		}
 
 
-		setFontSize(12);
-		drawSpriteCenter(spr::floatLog, 0, cameraW / 2, 72);
-		drawTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 72);
+		//사념파
+		{
+			int yOffset = 44;
+			drawFillRect(SDL_Rect{ cameraW / 2 - 150, 80 + yOffset, 300, 60 }, col::black, 200);
+
+			// 오른쪽 페이드
+			{
+				int rectX = cameraW / 2 + 150;
+				for (int i = 0; i < 40; i++)
+				{
+					SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
+					drawFillRect(floatRect, col::black, 200 - 5 * i);
+					rectX += 5;
+				}
+			}
+
+			// 왼쪽 페이드
+			{
+				int rectX = cameraW / 2 - 150;
+				for (int i = 0; i < 40; i++)
+				{
+					rectX -= 5;
+					SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
+					drawFillRect(floatRect, col::black, 200 - 5 * i);
+				}
+			}
+
+			setFontSize(24);
+			drawTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 109 + yOffset);
+		}
 	}
 
 	void changeAimTarget(int tgtX, int tgtY)

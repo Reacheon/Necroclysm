@@ -37,7 +37,7 @@ export void textureLoader()
 	spr::windowArrow = new Sprite(renderer, "image/UI/windowArrow.png", 16, 16);
 	spr::whiteMarker = new Sprite(renderer, "image/UI/whiteMarker.png", 16, 16);
 	spr::yellowMarker = new Sprite(renderer, "image/UI/yellowMarker.png", 16, 16);
-	spr::itemCursorLong = new Sprite(renderer, "image/UI/itemCursorLong.png", 304, 64);
+	spr::itemCursorLong = new Sprite(renderer, "image/UI/itemCursorLong.png", 360, 64);
 	spr::itemCursorShort = new Sprite(renderer, "image/UI/itemCursorShort.png", 304, 64);
 	spr::lootBagArrow = new Sprite(renderer, "image/UI/lootBagArrow.png", 32, 32);
 	spr::icon16 = new Sprite(renderer, "image/UI/icon16.png", 16, 16);
@@ -45,7 +45,6 @@ export void textureLoader()
 	spr::buttons = new Sprite(renderer, "image/UI/buttons.png", 48, 48);
 	spr::buttonsPressed = new Sprite(renderer, "image/UI/buttonsPressed.png", 48, 48);
 	spr::menuPopUp = new Sprite(renderer, "image/UI/menuPopUp.png", 35, 36);
-	spr::floatLog = new Sprite(renderer, "image/UI/floatLog.png", 400, 40);
 	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 72, 72);
 	spr::proficIcon = new Sprite(renderer, "image/UI/proficIcon.png", 16, 16);
 	spr::proficIconGold = new Sprite(renderer, "image/UI/proficIconGold.png", 16, 16);
@@ -67,7 +66,6 @@ export void textureLoader()
 	spr::aimAtkTypeMarker = new Sprite(renderer, "image/UI/aimAtkTypeMarker.png", 64, 64);
 	spr::tab = new Sprite(renderer, "image/UI/GUI/HUD/tab.png", 180, 180);
 	spr::aimLRChange = new Sprite(renderer, "image/UI/aimLRChange.png", 18, 18);
-	spr::floatWarning = new Sprite(renderer, "image/UI/floatWarning.png", 128, 24);
 	spr::epsilonFont = new Sprite(renderer, "image/epsilonFont.png", 4, 6);
 	spr::loadingAnime = new Sprite(renderer, "image/UI/loadingAnime.png", 32, 32);
 	spr::buildCursor = new Sprite(renderer, "image/UI/buildCursor.png", 48, 48);
@@ -179,9 +177,13 @@ export void textureLoader()
 	spr::gameOverOptionRect = new Sprite(renderer, "image/UI/gameOverOptionRect.png", 220, 160);
 	spr::gameOverOptionMarker = new Sprite(renderer, "image/UI/gameOverOptionMarker.png", 156, 48);
 
-	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/statusEffectGaugeCircle.png", 20, 20);
+	spr::statusEffectGaugeCircle = new Sprite(renderer, "image/UI/GUI/HUD/gauge28.png", 28, 28);
 	spr::thoughtBubble = new Sprite(renderer, "image/thoughtBubble.png", 16, 16);
 	spr::waveFoam = new Sprite(renderer, "image/waveFoam.png", 16, 16);
 	spr::seaFoam = new Sprite(renderer, "image/seaFoam.png", 16, 16);
 	spr::waterFoam = new Sprite(renderer, "image/waterFoam.png", 16, 16);
+
+    spr::itemBackgroundRect = new Sprite(renderer, "image/UI/GUI/itemBackgroundRect.png", 68, 68);
+
+    spr::newWindowArrow = new Sprite(renderer, "image/UI/GUI/newWindowArrow.png", 30, 52);
 }

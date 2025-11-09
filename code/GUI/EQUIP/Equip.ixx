@@ -51,7 +51,6 @@ private:
 	SDL_Rect equipLabelName;
 	SDL_Rect equipLabelQuantity;
 	SDL_Rect equipArea;
-	SDL_Rect equipWindow;
 
 	SDL_Rect topWindow;//상단에 표시되는 저항이나 방어 상성, 아이템의 설명
 
@@ -97,20 +96,18 @@ public:
 		}
 
 		equipTitle = { equipBase.x + 124, equipBase.y, 156, 36 };
-		equipWindow = { equipBase.x, equipBase.y + 36, 404, 456 };
 
-		equipLabel = { equipWindow.x + 12, equipWindow.y + 31, equipWindow.w - 24 , 31 };
-		equipLabelSelect = { equipLabel.x, equipLabel.y, 75 , 31 };
-		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 219 , 31 };
-		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 85 , 31 };
+		equipLabel = { equipBase.x + 12, equipBase.y + 36 + 31, equipBase.w - 24, 31 };
+		equipLabelSelect = { equipLabel.x, equipLabel.y, 75, 31 };
+		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 219, 31 };
+		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 85, 31 };
 
-		equipArea = { equipWindow.x + 12, equipWindow.y + 67, 376, 37 * 8 };
+		equipArea = { equipBase.x + 12, equipBase.y + 36 + 67, 376, 37 * 8 };
 		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
 		{
 			equipItemRect[i] = { equipArea.x + 50, equipArea.y + 37 * i, 325, 32 };
 			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 37 * i, 43, 32 };
 		}
-
 
 		topWindow = { 0, 0, 492, 168 };
 		topWindow.x = (cameraW / 2) - (topWindow.w / 2);

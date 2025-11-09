@@ -55,6 +55,7 @@ void Loot::drawGUI()
 		}
 	}
 	drawWindow(&lootBase, windowTitle, 1);
+    drawSprite(spr::newWindowArrow, 0, lootBase.x - 26, lootBase.y + 145);
 
 	//포켓
 	if (hasSelect == false)
@@ -62,9 +63,14 @@ void Loot::drawGUI()
 		drawFillRect(lootBase.x + 16, lootBase.y + 44, 64, 64, col::black);
 		//drawSprite(spr::inventoryItemRect, 0, lootBase.x + 16, lootBase.y + 48);
 
-		setZoom(4.0);
+		//타일 또는 타일에 있는 포켓 아이템 대표 스프라이트 그리기
+
+
 		int tileIndex = 140;
 		std::wstring tileName = L"Tile name";
+
+		drawSpriteCenter(spr::itemBackgroundRect, 0, lootBase.x + 16 + 32, lootBase.y + 44 + 32);
+
 
 		if (lootItemData != nullptr)
 		{
@@ -78,6 +84,7 @@ void Loot::drawGUI()
 			tileIndex = getItemSprIndex(itemDex[floorIndex]);
 			tileName = itemDex[floorIndex].name;
 		}
+		setZoom(4.0);
 		drawSpriteCenter(spr::itemset, tileIndex, lootBase.x + 16 + 32, lootBase.y + 44 + 32);
 		setZoom(1.0);
 
@@ -429,6 +436,6 @@ void Loot::drawGUI()
 		}
 
 		setFontSize(12);
-		drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 7, lootBase.y + lootBase.h - 19);
+		drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 10, lootBase.y + lootBase.h - 16);
 	}
 }

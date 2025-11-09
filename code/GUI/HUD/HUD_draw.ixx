@@ -1394,11 +1394,9 @@ void HUD::drawStatusEffects()
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
-			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 9, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
-			setZoom(1.0);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::dehydrated)
 		{
@@ -1429,11 +1427,9 @@ void HUD::drawStatusEffects()
 			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
-			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 9, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
-			setZoom(1.0);
 		}
 		else if (myEfcts[i].effectType == statusEffectFlag::tired)
 		{
@@ -1461,14 +1457,12 @@ void HUD::drawStatusEffects()
 				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_FATIGUE - PLAYER_TIRED_FATIGUE);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
-			sprIndex = std::max(0, std::min(53, sprIndex));
+			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 73);
+			sprIndex = std::max(0, std::min(73, sprIndex));
 
-			setZoom(1.5);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
-			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 5, pivotY + 3);
+			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 9, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
-			setZoom(1.0);
 		}
 	}
 }

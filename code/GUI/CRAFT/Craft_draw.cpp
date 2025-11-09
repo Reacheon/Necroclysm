@@ -20,7 +20,7 @@ import GameOver;
 
 void Craft::drawGUI()
 {
-	return;
+	//return;
 	const bool* state = SDL_GetKeyboardState(nullptr);
 
 	if (showCraftingTooltip && GameOver::ins() == nullptr)
