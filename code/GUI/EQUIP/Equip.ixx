@@ -68,7 +68,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winSlipOpen);
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 	}
 	~Equip()
 	{
@@ -156,7 +156,7 @@ public:
 	{
 		if (equipCursor == -1) //아이템을 선택 중이지 않을 경우
 		{
-			close(aniFlag::winSlipClose);
+			close(aniFlag::winUnfoldClose);
 		}
 		else
 		{

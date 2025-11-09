@@ -83,7 +83,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winSlipOpen);
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
@@ -117,7 +117,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winSlipOpen);
+		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
@@ -242,12 +242,12 @@ public:
 	{
 		if (lootCursor == -1) //아이템을 선택 중이지 않을 경우
 		{
-			close(aniFlag::winSlipClose);
+			close(aniFlag::winUnfoldClose);
 		}
 		else
 		{
 
-			if (option::inputMethod == input::gamepad) close(aniFlag::winSlipClose);
+			if (option::inputMethod == input::gamepad) close(aniFlag::winUnfoldClose);
 			else
 			{
 				lootCursor = -1;
