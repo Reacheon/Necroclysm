@@ -159,24 +159,18 @@ export float getMouseX()
 {
     float px, py;
     SDL_GetMouseState(&px, &py);
-
-    int winW, winH;
-    SDL_GetWindowSize(window, &winW, &winH);
-
-    float scaleX = static_cast<float>(cameraW) / static_cast<float>(winW);
-    return px * scaleX;
+    float renderX, renderY;
+    SDL_RenderCoordinatesFromWindow(renderer, px, py, &renderX, &renderY);
+    return renderX;
 }
 
 export float getMouseY()
 {
     float px, py;
     SDL_GetMouseState(&px, &py);
-
-    int winW, winH;
-    SDL_GetWindowSize(window, &winW, &winH);
-
-    float scaleY = static_cast<float>(cameraH) / static_cast<float>(winH);
-    return py * scaleY;
+    float renderX, renderY;
+    SDL_RenderCoordinatesFromWindow(renderer, px, py, &renderX, &renderY);
+    return renderY;
 }
 
 export Point2 getAbsMouseGrid()
