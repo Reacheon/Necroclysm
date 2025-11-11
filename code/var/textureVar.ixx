@@ -157,4 +157,6 @@ export namespace spr
 	Sprite* itemBackgroundRect = nullptr;
 
 	Sprite* newWindowArrow = nullptr;
+
+	Sprite* icon28 = nullptr;
 }
