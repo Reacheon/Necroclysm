@@ -186,4 +186,6 @@ export void textureLoader()
     spr::itemBackgroundRect = new Sprite(renderer, "image/UI/GUI/itemBackgroundRect.png", 68, 68);
 
     spr::newWindowArrow = new Sprite(renderer, "image/UI/GUI/newWindowArrow.png", 30, 52);
+
+    spr::icon28 = new Sprite(renderer, "image/UI/icon28.png", 28, 28);
 }
