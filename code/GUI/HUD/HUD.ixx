@@ -69,7 +69,7 @@ private:
 	int quickSlotCursor = -1;
 
 	int fakeSTA = 0;
-	int alphaSTA = 255;
+	int alphaSTA = 150;
 
 
 	int delayR2 = 0;
@@ -103,16 +103,25 @@ public:
 		*/
 
 		//letterbox = { 0, 0, 945, 201 };
-		letterbox = { 0, 0, 630, 156 };
-		letterbox.x = (cameraW - letterbox.w) / 2;
-		letterbox.y = cameraH - letterbox.h + 6 + inputY;
-		letterbox.h = cameraH - letterbox.y + 6;
+		letterbox = { 0, 0, 782, 176 };
+		letterbox.x = cameraW - 1 - 781;
+		letterbox.y = cameraH - 1- 175 + inputY;
+		//letterbox.h = cameraH - letterbox.y + 6;
 
 		for (int i = 0; i < 35; i++)
 		{
 			barButton[i] = { cameraW / 2 - 300 + (88 * (i % 7)), cameraH - 80 + inputY + (88 * (i / 7)), 72,72 };
 			letterboxInButton[i] = { barButton[i].x + 3,  barButton[i].y + 3, 72 - 6, 72 - 6 };
 		}
+
+		for (int i = 0; i < 35; i++)
+		{
+			barButton[i] = { letterbox.x + 15 + (109 * (i % 7)),  letterbox.y + 73 + (109 * (i / 7)), 96,96 };
+			letterboxInButton[i] = { barButton[i].x + 4,  barButton[i].y + 4, barButton[i].w - 8, barButton[i].h - 8 };
+		}
+
+
+
 		letterboxPopUpButton = { letterbox.x + letterbox.w - 42 + 3, letterbox.y - 36 + 3,29,29 };
 		//탭 버튼은 changeXY의 영향을 받지 않음
 		tab = { cameraW - 200, 22, 180, 180 };

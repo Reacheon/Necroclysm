@@ -12,6 +12,7 @@ export namespace texture
 	SDL_Texture* minimap = nullptr;
 	SDL_Texture* worldmap = nullptr;
 	SDL_Texture* navimap = nullptr;
+	SDL_Texture* mainGaugeWhiteShadow = nullptr;
 }
 
 export namespace spr
@@ -159,4 +160,7 @@ export namespace spr
 	Sprite* newWindowArrow = nullptr;
 
 	Sprite* icon28 = nullptr;
+
+	Sprite* downRightLetterbox = nullptr;
+	Sprite* mainGauge = nullptr;
 }
