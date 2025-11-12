@@ -90,7 +90,7 @@ export void displayLoader()
         dispOption::fullScreen ? "Fullscreen" : "Windowed",
         (dispOption::fullScreen && dispOption::useLetterbox) ? "Letterbox" : "Stretch");
 
-    letterbox = { 0, 0, 630, 140 };
+    letterbox = { 0, 0, 782, 176 };
     letterbox.x = (cameraW - letterbox.w) / 2;
     letterbox.y = cameraH - letterbox.h + 6;
 
