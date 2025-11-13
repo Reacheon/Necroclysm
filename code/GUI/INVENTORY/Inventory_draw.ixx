@@ -29,7 +29,6 @@ void Inventory::drawGUI()
 		drawWindowItemset(&newInventoryBase, titleInventory, titleItemSprIndex);
 
 		drawFillRect(inventoryBase.x + 16, inventoryBase.y + 44, 64, 64, col::black);
-		drawSprite(spr::inventoryItemRect, 0, inventoryBase.x + 16, inventoryBase.y + 44);
 
 		drawSpriteCenter(spr::itemBackgroundRect, 0, inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);
 
