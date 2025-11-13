@@ -247,7 +247,6 @@ void HUD::drawGUI()
 		//			else { fakeHPAlpha = 255; }
 		//			int gaugeX = pivotX + 2;
 		//			drawTextCenter(partName, pivotX - 16, pivotY + 5, col::lightGray);
-		//			drawSprite(spr::hpBlankGauge, gaugeX, pivotY);
 		//			// 페이크 HP
 		//			float ratioFakeHP = myMax(0.0f, static_cast<float>(fakeHP) / static_cast<float>(maxHP));
 		//			SDL_Rect fakeRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioFakeHP), 5 };

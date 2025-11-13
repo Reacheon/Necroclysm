@@ -50,11 +50,9 @@ export void textureLoader()
 	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 72, 72);
 	spr::proficIcon = new Sprite(renderer, "image/UI/proficIcon.png", 16, 16);
 	spr::proficIconGold = new Sprite(renderer, "image/UI/proficIconGold.png", 16, 16);
-	spr::bionicGauge = new Sprite(renderer, "image/UI/bionicGauge.png", 72, 72);
 	spr::bionicSkeleton = new Sprite(renderer, "image/UI/bionicSkeleton.png", 36, 72);
 	spr::bionicSlotGauge = new Sprite(renderer, "image/UI/bionicSlotGauge.png", 64, 10);
 	spr::mutationIcon = new Sprite(renderer, "image/UI/mutationIcon.png", 16, 16);
-	spr::constructCategory = new Sprite(renderer, "image/UI/construct/constructCategory.png", 86, 22);
 	spr::staminaGauge = new Sprite(renderer, "image/UI/staminaGauge.png", 48, 48);
 	spr::segment = new Sprite(renderer, "image/UI/segment.png", 12, 16);
 	spr::tileset = new Sprite(renderer, "image/tileset/tileset.png", 16, 16);
@@ -75,8 +73,6 @@ export void textureLoader()
 
 	spr::itemSlotBtn = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 210, 18);
 	spr::itemSlotPocketArrow = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 8, 40);
-	spr::vehicleTemplate = new Sprite(renderer, "image/UI/GUI/vehicleTemplate.png", 710, 376);
-	spr::vehicleCenterCursor = new Sprite(renderer, "image/UI/GUI/vehicleCenterCursor.png", 16, 16);
 	spr::lstSelectBox = new Sprite(renderer, "image/UI/GUI/lstSelectBox.png", 360, 44);// (240, 29)->(360,44)
 
 	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
@@ -148,12 +144,10 @@ export void textureLoader()
 	spr::gasEffect1 = new Sprite(renderer, "image/gas/gasEffect1.png", 48, 48);
 	spr::steamEffect1 = new Sprite(renderer, "image/gas/steamEffect1.png", 48, 48);
 
-	spr::inventoryItemRect = new Sprite(renderer, "image/UI/GUI/Inventory/inventoryItemRect.png", 50, 50);
 	spr::trail = new Sprite(renderer, "image/trail.png", 16, 16);
 
 	spr::statusEffectRect = new Sprite(renderer, "image/UI/GUI/HUD//statusEffectRect.png", 130, 34);
 	spr::statusIcon = new Sprite(renderer, "image/UI/statusIcon.png", 16, 16);
-	spr::hpBlankGauge = new Sprite(renderer, "image/UI/hpGauge.png", 44, 11);
 
 	spr::minimapEdge = new Sprite(renderer, "image/UI/GUI/HUD//minimapEdge.png", 244, 244);
 

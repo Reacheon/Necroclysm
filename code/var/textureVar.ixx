@@ -55,11 +55,9 @@ export namespace spr
 	Sprite* letterboxBtnMarker = nullptr;
 	Sprite* proficIcon = nullptr;
 	Sprite* proficIconGold = nullptr;
-	Sprite* bionicGauge = nullptr;
 	Sprite* bionicSkeleton = nullptr;
 	Sprite* bionicSlotGauge = nullptr;
 	Sprite* mutationIcon = nullptr;
-	Sprite* constructCategory = nullptr;
 	Sprite* staminaGauge = nullptr;
 	Sprite* segment = nullptr;
 	Sprite* tileset = nullptr;
@@ -80,8 +78,6 @@ export namespace spr
 	Sprite* msgChoiceBtn = nullptr;
 	Sprite* itemSlotBtn = nullptr;
 	Sprite* itemSlotPocketArrow = nullptr;
-	Sprite* vehicleTemplate = nullptr;
-	Sprite* vehicleCenterCursor = nullptr;
 	Sprite* lstSelectBox = nullptr;
 	Sprite* skinYellow = nullptr;
 	Sprite* eyesBlue = nullptr;
@@ -123,11 +119,9 @@ export namespace spr
 	Sprite* flameSet = nullptr;
 	Sprite* gasEffect1 = nullptr;
 	Sprite* steamEffect1 = nullptr;
-	Sprite* inventoryItemRect = nullptr;
 	Sprite* trail = nullptr;
 	Sprite* statusEffectRect = nullptr;
 	Sprite* statusIcon = nullptr;
-	Sprite* hpBlankGauge = nullptr;
 	Sprite* minimapEdge = nullptr;
 	Sprite* bulletset = nullptr;
 	Sprite* aimMarkerWhite = nullptr;
