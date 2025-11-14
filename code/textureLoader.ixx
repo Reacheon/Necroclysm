@@ -47,7 +47,7 @@ export void textureLoader()
 	spr::buttons = new Sprite(renderer, "image/UI/buttons.png", 48, 48);
 	spr::buttonsPressed = new Sprite(renderer, "image/UI/buttonsPressed.png", 48, 48);
 	spr::menuPopUp = new Sprite(renderer, "image/UI/menuPopUp.png", 35, 36);
-	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 72, 72);
+	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 108, 108);
 	spr::proficIcon = new Sprite(renderer, "image/UI/proficIcon.png", 16, 16);
 	spr::proficIconGold = new Sprite(renderer, "image/UI/proficIconGold.png", 16, 16);
 	spr::bionicSkeleton = new Sprite(renderer, "image/UI/bionicSkeleton.png", 36, 72);

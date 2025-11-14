@@ -72,7 +72,7 @@ void HUD::drawGUI()
 
 
 
-	drawStadium(letterbox.x, letterbox.y, letterbox.w, letterbox.h, { 0,0,0 }, 150, 5);
+	drawStadium(letterbox.x, letterbox.y, letterbox.w, cameraH - letterbox.y + 20, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr)
 	{
 		drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73 + y);
@@ -126,7 +126,7 @@ void HUD::drawGUI()
 		{
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 14 + vShift, letterbox.y +1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
+			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 			setFont(fontType::mainFont);
 		}
 
@@ -190,7 +190,7 @@ void HUD::drawGUI()
 			drawSprite(spr::icon28, 3, staminaPivotX, staminaPivotY);
 
 			int staminaGaugePivotX = staminaPivotX + 34;
-            int staminaGaugePivotY = staminaPivotY + 6 + GAUGE_Y_OFFSET;
+			int staminaGaugePivotY = staminaPivotY + 6 + GAUGE_Y_OFFSET;
 			drawSprite(spr::mainGauge, 0, staminaGaugePivotX, staminaGaugePivotY);
 			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)fakeSTA / (double)pSTAMax, lowCol::white, alphaSTA);
 			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)pSTA / (double)pSTAMax, lowCol::yellow);
@@ -201,338 +201,374 @@ void HUD::drawGUI()
 			setFont(fontType::mainFont);
 		}
 
-  //      drawSprite(spr::mainGauge, 0, staminaPivotX + 34, staminaPivotY + 6);
-		//for (int i = 0; i < 170; i++)
-		//{
-		//	if (i == 0) drawLine(staminaPivotX + 34, staminaPivotY + 6 + 2, staminaPivotX + 34, staminaPivotY + 6 + 2 + 11);
-		//	else if (i == 1) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 13);
-		//	else if (i == 68) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 14);
-		//	else if (i == 69) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 13);
-		//	else if (i == 70) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 12);
-		//	else if (i == 71)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 11);
-		//	else if (i==72) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 10);
-		//	else if (i == 73) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 9);
-		//	else if (i == 169)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 5);
-		//	else if ( i >= 74) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 8);
-		//	else drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 15);
-		//}
+		//      drawSprite(spr::mainGauge, 0, staminaPivotX + 34, staminaPivotY + 6);
+			  //for (int i = 0; i < 170; i++)
+			  //{
+			  //	if (i == 0) drawLine(staminaPivotX + 34, staminaPivotY + 6 + 2, staminaPivotX + 34, staminaPivotY + 6 + 2 + 11);
+			  //	else if (i == 1) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 13);
+			  //	else if (i == 68) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 14);
+			  //	else if (i == 69) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 13);
+			  //	else if (i == 70) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 12);
+			  //	else if (i == 71)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 11);
+			  //	else if (i==72) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 10);
+			  //	else if (i == 73) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 9);
+			  //	else if (i == 169)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 5);
+			  //	else if ( i >= 74) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 8);
+			  //	else drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 15);
+			  //}
 
 
 
-		//setFont(fontType::pixel);
-		//setFontSize(11);
+			  //setFont(fontType::pixel);
+			  //setFontSize(11);
 
-		//setFont(fontType::pixel);
-		//setFontSize(11);
+			  //setFont(fontType::pixel);
+			  //setFontSize(11);
 
-		//{
-		//	// HP 게이지 그리기 람다 함수
-		//	auto drawBodyPartHP = [&](
-		//		int& fakeHP,
-		//		int& realHP,
-		//		unsigned char& fakeHPAlpha,
-		//		int maxHP,
-		//		int pivotX,
-		//		int pivotY,
-		//		const std::wstring& partName) -> void
-		//		{
-		//			// 페이크 HP 업데이트
-		//			if (fakeHP > realHP) { fakeHP--; }
-		//			else if (fakeHP < realHP) fakeHP = realHP;
-		//			if (fakeHP != realHP)
-		//			{
-		//				if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
-		//				else { fakeHPAlpha = 0; }
-		//			}
-		//			else { fakeHPAlpha = 255; }
-		//			int gaugeX = pivotX + 2;
-		//			drawTextCenter(partName, pivotX - 16, pivotY + 5, col::lightGray);
-		//			// 페이크 HP
-		//			float ratioFakeHP = myMax(0.0f, static_cast<float>(fakeHP) / static_cast<float>(maxHP));
-		//			SDL_Rect fakeRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioFakeHP), 5 };
-		//			drawFillRect(fakeRect, lowCol::white, fakeHPAlpha);
-		//			// 실제 HP
-		//			float ratioHP = myMax(0.0f, static_cast<float>(realHP) / static_cast<float>(maxHP));
-		//			SDL_Rect realRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioHP), 5 };
-		//			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-		//			drawFillRect(realRect, lowCol::green);
-		//		};
+			  //{
+			  //	// HP 게이지 그리기 람다 함수
+			  //	auto drawBodyPartHP = [&](
+			  //		int& fakeHP,
+			  //		int& realHP,
+			  //		unsigned char& fakeHPAlpha,
+			  //		int maxHP,
+			  //		int pivotX,
+			  //		int pivotY,
+			  //		const std::wstring& partName) -> void
+			  //		{
+			  //			// 페이크 HP 업데이트
+			  //			if (fakeHP > realHP) { fakeHP--; }
+			  //			else if (fakeHP < realHP) fakeHP = realHP;
+			  //			if (fakeHP != realHP)
+			  //			{
+			  //				if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
+			  //				else { fakeHPAlpha = 0; }
+			  //			}
+			  //			else { fakeHPAlpha = 255; }
+			  //			int gaugeX = pivotX + 2;
+			  //			drawTextCenter(partName, pivotX - 16, pivotY + 5, col::lightGray);
+			  //			// 페이크 HP
+			  //			float ratioFakeHP = myMax(0.0f, static_cast<float>(fakeHP) / static_cast<float>(maxHP));
+			  //			SDL_Rect fakeRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioFakeHP), 5 };
+			  //			drawFillRect(fakeRect, lowCol::white, fakeHPAlpha);
+			  //			// 실제 HP
+			  //			float ratioHP = myMax(0.0f, static_cast<float>(realHP) / static_cast<float>(maxHP));
+			  //			SDL_Rect realRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioHP), 5 };
+			  //			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
+			  //			drawFillRect(realRect, lowCol::green);
+			  //		};
 
-		//	int X_OFFSET = 0;
-		//	int Y_OFFSET = 3;
-		//	int X_DIST = 83;
-		//	int Y_DIST = 16;
+			  //	int X_OFFSET = 0;
+			  //	int Y_OFFSET = 3;
+			  //	int X_DIST = 83;
+			  //	int Y_DIST = 16;
 
-		//	// 왼팔
-		//	drawBodyPartHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha,
-		//		PART_MAX_HP,
-		//		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[108]);
-		//	// 좌다리
-		//	drawBodyPartHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha,
-		//		PART_MAX_HP,
-		//		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[110]);
-		//	// 머리
-		//	drawBodyPartHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha,
-		//		PART_MAX_HP,
-		//		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[107]);
-		//	// 몸통
-		//	drawBodyPartHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha,
-		//		PlayerPtr->entityInfo.maxHP,
-		//		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[106]);
-		//	// 오른팔
-		//	drawBodyPartHP(PlayerPtr->rArmFakeHP, PlayerPtr->rArmHP, PlayerPtr->rArmFakeHPAlpha,
-		//		PART_MAX_HP,
-		//		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[109]);
-		//	// 우다리
-		//	drawBodyPartHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha,
-		//		PART_MAX_HP,
-		//		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[111]);
-		//}
-
-
-		//if (ctrlVeh == nullptr)
-		//{
-			////스테미나
-			//{
-			//	int pivotX = letterbox.x + 18 + 238;
-			//	int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
-			//	setFontSize(10);
-
-			//	int pSTA = PlayerPtr->entityInfo.STA;
-			//	int pSTAMax = PlayerPtr->entityInfo.maxSTA;
+			  //	// 왼팔
+			  //	drawBodyPartHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha,
+			  //		PART_MAX_HP,
+			  //		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[108]);
+			  //	// 좌다리
+			  //	drawBodyPartHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha,
+			  //		PART_MAX_HP,
+			  //		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[110]);
+			  //	// 머리
+			  //	drawBodyPartHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha,
+			  //		PART_MAX_HP,
+			  //		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[107]);
+			  //	// 몸통
+			  //	drawBodyPartHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha,
+			  //		PlayerPtr->entityInfo.maxHP,
+			  //		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[106]);
+			  //	// 오른팔
+			  //	drawBodyPartHP(PlayerPtr->rArmFakeHP, PlayerPtr->rArmHP, PlayerPtr->rArmFakeHPAlpha,
+			  //		PART_MAX_HP,
+			  //		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[109]);
+			  //	// 우다리
+			  //	drawBodyPartHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha,
+			  //		PART_MAX_HP,
+			  //		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[111]);
+			  //}
 
 
-			//	if (fakeSTA > pSTA)
-			//	{
-			//		fakeSTA -= 1;
-			//		if (alphaSTA > 10) alphaSTA -= 10;
-			//		else alphaSTA = 0;
-			//	}
-			//	else if (fakeSTA < pSTA) fakeSTA++;
-			//	else alphaSTA = 255;
+			  //if (ctrlVeh == nullptr)
+			  //{
+				  ////스테미나
+				  //{
+				  //	int pivotX = letterbox.x + 18 + 238;
+				  //	int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
+				  //	setFontSize(10);
+
+				  //	int pSTA = PlayerPtr->entityInfo.STA;
+				  //	int pSTAMax = PlayerPtr->entityInfo.maxSTA;
 
 
-			//	SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), 0, 0, 0);
-			//	SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-			//	drawSprite(spr::staminaGaugeCircle, 0, pivotX, pivotY);
-
-			//	if (fakeSTA > pSTA)
-			//	{
-
-			//		int sprIndexFake = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
-			//		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), alphaSTA);
-			//		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::red.r, lowCol::red.g, lowCol::red.b);
-			//		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-			//		drawSprite(spr::staminaGaugeCircle, sprIndexFake, pivotX, pivotY);
-			//		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), 255);
+				  //	if (fakeSTA > pSTA)
+				  //	{
+				  //		fakeSTA -= 1;
+				  //		if (alphaSTA > 10) alphaSTA -= 10;
+				  //		else alphaSTA = 0;
+				  //	}
+				  //	else if (fakeSTA < pSTA) fakeSTA++;
+				  //	else alphaSTA = 255;
 
 
-			//		int sprIndex = (int)(90.0 - 90.0 * ((double)pSTA / (double)pSTAMax));
-			//		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
-			//		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-			//		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
-			//	}
-			//	else
-			//	{
-			//		int sprIndex = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
-			//		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
-			//		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-			//		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
-			//	}
+				  //	SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), 0, 0, 0);
+				  //	SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+				  //	drawSprite(spr::staminaGaugeCircle, 0, pivotX, pivotY);
+
+				  //	if (fakeSTA > pSTA)
+				  //	{
+
+				  //		int sprIndexFake = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
+				  //		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), alphaSTA);
+				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::red.r, lowCol::red.g, lowCol::red.b);
+				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+				  //		drawSprite(spr::staminaGaugeCircle, sprIndexFake, pivotX, pivotY);
+				  //		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), 255);
 
 
-			//	setFont(fontType::mainFont);
-			//	setFontSize(12);
-			//	drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
-			//	setFont(fontType::pixel);
-			//	setFontSize(11);
-			//	std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
-			//	drawTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
-			//}
-
-		//	setFont(fontType::pixel);
-		//	setFontSize(12);
-		//	drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
-		//	drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
-
-		//	setFont(fontType::mainFont);
-		//	setFontSize(11);
-		//	drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
-		//	drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
-
-		//	setFont(fontType::pixel);
-		//	setFontSize(12);
-		//	drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, lowCol::green);
-		//	drawText(L"39%", letterbox.x + 18 + 50 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, lowCol::red);
+				  //		int sprIndex = (int)(90.0 - 90.0 * ((double)pSTA / (double)pSTAMax));
+				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
+				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+				  //		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
+				  //	}
+				  //	else
+				  //	{
+				  //		int sprIndex = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
+				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
+				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
+				  //		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
+				  //	}
 
 
-		//	//시간 표시 기능
-		//	{
-		//		int timeIndex;
-		//		// PM or AM
-		//		if (getHour() >= 12) { timeIndex = segmentIndex::pm; }
-		//		else { timeIndex = segmentIndex::am; }
-		//		drawSprite(spr::segment, timeIndex, letterbox.x + 18 + 446 + 14 * 0, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		//xx시
-		//		drawSprite(spr::segment, getHour() / 10, letterbox.x + 18 + 446 + 14 * 1, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getHour() % 10, letterbox.x + 18 + 446 + 14 * 2, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		//:
-		//		drawSprite(spr::segment, segmentIndex::colon, letterbox.x + 18 + 446 + 14 * 3, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		//xx분
-		//		drawSprite(spr::segment, getMin() / 10, letterbox.x + 18 + 446 + 14 * 4, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getMin() % 10, letterbox.x + 18 + 446 + 14 * 5, letterbox.y + 10 + LETTERBOX_Y_OFFSET);
-		//		//xx초
-		//		setZoom(0.7);
-		//		drawSprite(spr::segment, getSec() / 10, letterbox.x + 18 + 446 + 14 * 6, letterbox.y + 15 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getSec() % 10, letterbox.x + 18 + 446 + 14 * 6 + 10, letterbox.y + 15 + LETTERBOX_Y_OFFSET);
+				  //	setFont(fontType::mainFont);
+				  //	setFontSize(12);
+				  //	drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
+				  //	setFont(fontType::pixel);
+				  //	setFontSize(11);
+				  //	std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
+				  //	drawTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
+				  //}
 
-		//		//xxxx년
-		//		drawSprite(spr::segment, getYear() / 1000, letterbox.x + 18 + 460 + 10 * -1, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, (getYear() % 1000) / 100, letterbox.x + 18 + 460 + 10 * 0, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, ((getYear() % 100) / 10), letterbox.x + 18 + 460 + 10 * 1, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getYear() % 10, letterbox.x + 18 + 460 + 10 * 2, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		//:
-		//		drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 3, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		//xx월
-		//		drawSprite(spr::segment, getMonth() / 10, letterbox.x + 18 + 460 + 10 * 4, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getMonth() % 10, letterbox.x + 18 + 460 + 10 * 5, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		//:
-		//		drawSprite(spr::segment, segmentIndex::dash, letterbox.x + 18 + 460 + 10 * 6, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		//xx일
-		//		drawSprite(spr::segment, getDay() / 10, letterbox.x + 18 + 460 + 10 * 7, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		drawSprite(spr::segment, getDay() % 10, letterbox.x + 18 + 460 + 10 * 8, letterbox.y + 7 + 25 + LETTERBOX_Y_OFFSET);
-		//		setZoom(1.0);
-		//	}
+			  //	setFont(fontType::pixel);
+			  //	setFontSize(12);
+			  //	drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
+			  //	drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
+
+			  //	setFont(fontType::mainFont);
+			  //	setFontSize(11);
+			  //	drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
+			  //	drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
+
+			  //	setFont(fontType::pixel);
+			  //	setFontSize(12);
+			  //	drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, lowCol::green);
+			  //	drawText(L"39%", letterbox.x + 18 + 50 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, lowCol::red);
 
 
 
 
 
+
+
+
+		{
+			int cx, cy;
+			int pz = PlayerZ();
+			World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
+			weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
+
+			int pivotX = letterbox.x + 453;
+			int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
+
+			// 하늘 배경 그리기 (기존 코드)
+			int eclipticIndex = 0;
+			if (getHour() >= 7 && getHour() < 17)
 			{
-				int cx, cy;
-				int pz = PlayerZ();
-				World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
-				weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
-				
-				int pivotX = letterbox.x + 458;
-				int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
+				eclipticIndex = 2; // 낮 하늘
+			}
+			else if (getHour() >= 17 && getHour() < 18)
+			{
+				eclipticIndex = 3; // 노을
+			}
+			else if (getHour() >= 6 && getHour() < 7)
+			{
+				eclipticIndex = 1; // 새벽
+			}
+			else
+			{
+				eclipticIndex = 4; // 밤
+			}
 
-				// 하늘 배경 그리기 (기존 코드)
-				int eclipticIndex = 0;
-				if (getHour() >= 7 && getHour() < 17)
+			if (getHour() >= 6 && getHour() < 18)
+			{
+				if (currentWeather == weatherFlag::cloudy || currentWeather == weatherFlag::rain ||
+					currentWeather == weatherFlag::snow || currentWeather == weatherFlag::storm)
 				{
-					eclipticIndex = 2; // 낮 하늘
+					eclipticIndex = 5; // 회색 하늘
 				}
-				else if (getHour() >= 17 && getHour() < 18)
+			}
+
+			// 이클립스 배경 이미지 그리기
+			drawSprite(spr::ecliptic, eclipticIndex, pivotX, pivotY);
+
+
+			if (currentWeather == weatherFlag::sunny)
+			{
+				if (getHour() >= 6 && getHour() < 18)
 				{
-					eclipticIndex = 3; // 노을
-				}
-				else if (getHour() >= 6 && getHour() < 7)
-				{
-					eclipticIndex = 1; // 새벽
+					static int index = 0;
+					int sprSize = 6;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index == sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolSunny, index, pivotX + 38, pivotY + 27);
 				}
 				else
 				{
-					eclipticIndex = 4; // 밤
-				}
+					static int moonBrightnessTimer = 0;
+					moonBrightnessTimer++;
 
-				if (getHour() >= 6 && getHour() < 18)
+					float breatheCycle = 240.0f;
+					float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
+
+					Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
+
+
+					int moonPhaseIndex = calculateMoonPhase();
+					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
+					SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
+
+					drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, pivotX + 38, pivotY + 27);
+					SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
+				}
+			}
+			else if (currentWeather == weatherFlag::cloudy)
+			{
+				static int index = 0;
+				int sprSize = 26;
+				if (timer::timer600 % 12 == 0)
 				{
-					if (currentWeather == weatherFlag::cloudy || currentWeather == weatherFlag::rain ||
-						currentWeather == weatherFlag::snow || currentWeather == weatherFlag::storm)
-					{
-						eclipticIndex = 5; // 회색 하늘
-					}
+					index++;
+					if (index >= sprSize) index = 0;
 				}
-
-				// 이클립스 배경 이미지 그리기
-				drawSprite(spr::ecliptic, eclipticIndex, pivotX, pivotY);
-
-
-				if (currentWeather == weatherFlag::sunny)
+				drawSpriteCenter(spr::symbolCloudy, index, pivotX + 38, pivotY + 27);
+			}
+			else if (currentWeather == weatherFlag::rain)
+			{
+				static int index = 0;
+				int sprSize = 8;
+				if (timer::timer600 % 12 == 0)
 				{
-					if (getHour() >= 6 && getHour() < 18)
-					{
-						static int index = 0;
-						int sprSize = 6;
-						if (timer::timer600 % 12 == 0)
-						{
-							index++;
-							if (index == sprSize) index = 0;
-						}
-						drawSpriteCenter(spr::symbolSunny, index, pivotX + 38, pivotY + 27);
-					}
-					else
-					{
-						static int moonBrightnessTimer = 0;
-						moonBrightnessTimer++;
-
-						float breatheCycle = 240.0f;
-						float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
-
-						Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
-
-
-						int moonPhaseIndex = calculateMoonPhase();
-						SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
-						SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
-
-						drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, pivotX + 38, pivotY + 27);
-						SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
-					}
+					index++;
+					if (index >= sprSize) index = 0;
 				}
-				else if (currentWeather == weatherFlag::cloudy)
+				drawSpriteCenter(spr::symbolRain, index, pivotX + 38, pivotY + 27);
+			}
+			else if (currentWeather == weatherFlag::storm)
+			{
+				static int index = 0;
+				int sprSize = 8;
+				if (timer::timer600 % 12 == 0)
 				{
-					static int index = 0;
-					int sprSize = 26;
-					if (timer::timer600 % 12 == 0)
-					{
-						index++;
-						if (index >= sprSize) index = 0;
-					}
-					drawSpriteCenter(spr::symbolCloudy, index, pivotX + 38, pivotY + 27);
+					index++;
+					if (index >= sprSize) index = 0;
 				}
-				else if (currentWeather == weatherFlag::rain)
+				drawSpriteCenter(spr::symbolStorm, index, pivotX + 38, pivotY + 27);
+			}
+			else if (currentWeather == weatherFlag::snow)
+			{
+				static int index = 0;
+				int sprSize = 15;
+				if (timer::timer600 % 12 == 0)
 				{
-					static int index = 0;
-					int sprSize = 8;
-					if (timer::timer600 % 12 == 0)
-					{
-						index++;
-						if (index >= sprSize) index = 0;
-					}
-					drawSpriteCenter(spr::symbolRain, index, pivotX + 38, pivotY + 27);
+					index++;
+					if (index >= sprSize) index = 0;
 				}
-				else if (currentWeather == weatherFlag::storm)
-				{
-					static int index = 0;
-					int sprSize = 8;
-					if (timer::timer600 % 12 == 0)
-					{
-						index++;
-						if (index >= sprSize) index = 0;
-					}
-					drawSpriteCenter(spr::symbolStorm, index, pivotX + 38, pivotY + 27);
-				}
-				else if (currentWeather == weatherFlag::snow)
-				{
-					static int index = 0;
-					int sprSize = 15;
-					if (timer::timer600 % 12 == 0)
-					{
-						index++;
-						if (index >= sprSize) index = 0;
-					}
-					drawSpriteCenter(spr::symbolSnow, index, pivotX + 38, pivotY + 27);
-				}
-
-
-
-					setFontSize(16);
-					drawTextCenter(L"15℃", pivotX  + 38, pivotY + 52);
+				drawSpriteCenter(spr::symbolSnow, index, pivotX + 38, pivotY + 27);
 			}
 
 
+
+			setFontSize(16);
+			drawTextCenter(L"15℃", pivotX + 38, pivotY + 52);
+		}
+
+
+		//시간 표시 기능
+		{
+			// pivot 좌표 정의 - 이 값만 수정하면 전체 시간 표시가 이동합니다
+			int pivotX = letterbox.x + 18 + 446 + 75;
+			int pivotY = letterbox.y + 10 + LETTERBOX_Y_OFFSET;
+
+			int timeIndex;
+			// PM or AM
+			setZoom(1.5);
+			if (getHour() >= 12) { timeIndex = segmentIndex::pm; }
+			else { timeIndex = segmentIndex::am; }
+			drawSprite(spr::segment, timeIndex, pivotX + 21 * 0, pivotY);
+
+			//xx시
+			drawSprite(spr::segment, getHour() / 10, pivotX + 21 * 1, pivotY);
+			drawSprite(spr::segment, getHour() % 10, pivotX + 21 * 2, pivotY);
+
+			//:
+			drawSprite(spr::segment, segmentIndex::colon, pivotX + 21 * 3, pivotY);
+
+			//xx분
+			drawSprite(spr::segment, getMin() / 10, pivotX + 21 * 4, pivotY);
+			drawSprite(spr::segment, getMin() % 10, pivotX + 21 * 5, pivotY);
+			setZoom(1.0);
+
+			//xx초
+			setZoom(1.0);
+			drawSprite(spr::segment, getSec() / 10, pivotX + 21 * 6, pivotY + 5);
+			drawSprite(spr::segment, getSec() % 10, pivotX + 21 * 6 + 15, pivotY + 5);
+
+			// 날짜 표시용 pivot (시간 표시 기준 상대 위치)
+			int datePivotX = pivotX + 14;
+			int datePivotY = pivotY + 32;
+
+			//xxxx년
+			drawSprite(spr::segment, getYear() / 1000, datePivotX + 15 * -1, datePivotY);
+			drawSprite(spr::segment, (getYear() % 1000) / 100, datePivotX + 15 * 0, datePivotY);
+			drawSprite(spr::segment, ((getYear() % 100) / 10), datePivotX + 15 * 1, datePivotY);
+			drawSprite(spr::segment, getYear() % 10, datePivotX + 15 * 2, datePivotY);
+
+			//-
+			drawSprite(spr::segment, segmentIndex::dash, datePivotX + 15 * 3, datePivotY);
+
+			//xx월
+			drawSprite(spr::segment, getMonth() / 10, datePivotX + 15 * 4, datePivotY);
+			drawSprite(spr::segment, getMonth() % 10, datePivotX + 15 * 5, datePivotY);
+
+			//-
+			drawSprite(spr::segment, segmentIndex::dash, datePivotX + 15 * 6, datePivotY);
+
+			//xx일
+			drawSprite(spr::segment, getDay() / 10, datePivotX + 15 * 7, datePivotY);
+			drawSprite(spr::segment, getDay() % 10, datePivotX + 15 * 8, datePivotY);
+			setZoom(1.0);
+		}
+
+		//배터리 잔량 표시
+		{
+			int pivotX = letterbox.x + 706;
+			int pivotY = letterbox.y + 21;
+
+			drawRect(pivotX, pivotY, 62, 34, col::lightGray);
+			drawRect(pivotX + 1, pivotY + 1, 60, 32, col::lightGray);
+			drawFillRect(pivotX + 61, pivotY + 12, 6, 8, col::lightGray);
+
+			drawFillRect(pivotX + 5, pivotY + 5, 52 * 0.72, 24, lowCol::green);
+
+			setFont(fontType::mainFontExtraBold);
+			setFontSize(18);
+			drawTextOutlineCenter(L"72%", pivotX + 31, pivotY + 16);
+			setFont(fontType::mainFont);
+		}
 
 
 
