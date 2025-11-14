@@ -347,7 +347,7 @@ public:
 	void executePopUp()
 	{
 		isPopUp = true;
-		popUpDist = ((barAct.size() - 1) / 7) * 89;
+		popUpDist = ((barAct.size() - 1) / 7) * 109;
 		deactInput();
 		addAniUSetPlayer(this, aniFlag::popUpLetterbox);
 	}
