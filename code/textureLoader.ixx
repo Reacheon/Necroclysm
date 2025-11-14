@@ -32,9 +32,9 @@ export void textureLoader()
 	spr::icon13 = new Sprite(renderer, "image/UI/icon13.png", 13, 13);
 	spr::icon48 = new Sprite(renderer, "image/UI/icon48.png", 48, 48);
 	spr::batteryGauge = new Sprite(renderer, "image/UI/batteryGauge.png", 32, 46);
-	spr::ecliptic = new Sprite(renderer, "image/UI/ecliptic.png", 64, 32);
-	spr::weather = new Sprite(renderer, "image/UI/weather.png", 72, 35);
-	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 72, 35);
+	spr::ecliptic = new Sprite(renderer, "image/UI/GUI/HUD/ecliptic.png", 76, 36);
+	spr::weather = new Sprite(renderer, "image/UI/weather.png", 48, 48);
+	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 48, 48);
 	spr::itemset = new Sprite(renderer, "image/item/itemset.png", 48, 48);
 	spr::windowArrow = new Sprite(renderer, "image/UI/windowArrow.png", 16, 16);
 	spr::whiteMarker = new Sprite(renderer, "image/UI/whiteMarker.png", 16, 16);
@@ -105,7 +105,7 @@ export void textureLoader()
 
 	spr::symbolSunny = new Sprite(renderer, "image/UI/GUI/HUD/symbolSunny.png", 48, 48);
 	spr::symbolCloudy = new Sprite(renderer, "image/UI/GUI/HUD/symbolCloudy.png", 48, 48);
-	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png", 16, 16);
+	spr::symbolMoon = new Sprite(renderer, "image/UI/GUI/HUD/symbolMoon.png", 48, 48);
 	spr::symbolRain = new Sprite(renderer, "image/UI/GUI/HUD/symbolRain.png", 48, 48);
 	spr::symbolStorm = new Sprite(renderer, "image/UI/GUI/HUD/symbolStorm.png", 48, 48);
 	spr::symbolSnow = new Sprite(renderer, "image/UI/GUI/HUD/symbolSnow.png", 48, 48);

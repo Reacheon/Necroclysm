@@ -405,220 +405,139 @@ void HUD::drawGUI()
 		//	}
 
 
-		//	int cx, cy;
-		//	int pz = PlayerZ();
-		//	World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
-		//	weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
-
-
-		//	{
-		//		// 하늘 배경 그리기 (기존 코드)
-		//		int eclipticIndex = 0;
-		//		if (getHour() >= 7 && getHour() < 17)
-		//		{
-		//			eclipticIndex = 2; // 낮 하늘
-		//		}
-		//		else if (getHour() >= 17 && getHour() < 18)
-		//		{
-		//			eclipticIndex = 3; // 노을
-		//		}
-		//		else if (getHour() >= 6 && getHour() < 7)
-		//		{
-		//			eclipticIndex = 1; // 새벽
-		//		}
-		//		else
-		//		{
-		//			eclipticIndex = 4; // 밤
-		//		}
-
-		//		if (getHour() >= 6 && getHour() < 18)
-		//		{
-		//			if (currentWeather == weatherFlag::cloudy || currentWeather == weatherFlag::rain ||
-		//				currentWeather == weatherFlag::snow || currentWeather == weatherFlag::storm)
-		//			{
-		//				eclipticIndex = 5; // 회색 하늘
-		//			}
-		//		}
-
-		//		// 이클립스 배경 이미지 그리기
-		//		drawSprite(spr::ecliptic, eclipticIndex, letterbox.x + 18 + 376, letterbox.y + 4 + LETTERBOX_Y_OFFSET);
-
-		//		static const std::vector<std::pair<int, int>> celestialPath = {
-		//			// 동쪽에서 시작하여 서쪽으로
-		//			{0, 0}, {0, -1}, {0, -2}, {0, -3}, {0, -4},
-		//			{1, -5}, {1, -6}, {1, -7},
-		//			{2, -8}, {2, -9},
-		//			{3, -10},
-		//			{4, -11},
-		//			{5, -12}, {5, -13},
-		//			{6, -14},
-		//			{7, -15}, {8, -15},
-		//			{9, -16},
-		//			{10, -17}, {11, -17},
-		//			{12, -18},
-		//			{13, -19}, {14, -19}, {15, -19},
-		//			{16, -20}, {17, -20},
-		//			{18, -21}, {19, -21}, {20, -21}, {21, -21}, {22, -21},
-		//			{23, -22}, {24, -22}, {25, -22}, {26, -22}, {27, -22}, {28, -22},
-		//			{29, -22}, {30, -22}, {31, -22}, {32, -22}, {33, -22}, {34, -22},
-		//			{35, -21}, {36, -21}, {37, -21}, {38, -21}, {39, -21},
-		//			{40, -20}, {41, -20},
-		//			{42, -19}, {43, -19}, {44, -19},
-		//			{45, -18},
-		//			{46, -17}, {47, -17},
-		//			{48, -16},
-		//			{49, -15}, {50, -15},
-		//			{51, -14},
-		//			{52, -13}, {52, -12},
-		//			{53, -11},
-		//			{54, -10},
-		//			{55, -9}, {55, -8},
-		//			{56, -7}, {56, -6}, {56, -5},
-		//			{57, -4}, {57, -3}, {57, -2}, {57, -1}, {57, 0}
-		//		};
-
-		//		if (getHour() >= 6 && getHour() < 18)
-		//		{
-		//			int minutesSince6AM = (getHour() - 6) * 60 + getMin();
-		//			float progress = (float)minutesSince6AM / 720.0f;
-		//			int pathIndex = (int)(progress * (celestialPath.size() - 1));
-
-		//			if (pathIndex >= 0 && pathIndex < celestialPath.size())
-		//			{
-		//				int sunX = letterbox.x + 18 + 379 + celestialPath[pathIndex].first;
-		//				int sunY = letterbox.y + 2 + 30 + celestialPath[pathIndex].second + LETTERBOX_Y_OFFSET;
-
-		//				SDL_Color sunColor = { 255, 100, 100 };
-		//				for (int dx = -1; dx <= 1; dx++)
-		//				{
-		//					for (int dy = -1; dy <= 1; dy++)
-		//					{
-		//						drawPoint(sunX + dx, sunY + dy, sunColor);
-		//					}
-		//				}
-
-		//				SDL_Color brightSun = { 255, 200, 100 };
-		//				drawPoint(sunX, sunY, brightSun);
-		//			}
-		//		}
-		//	}
 
 
 
+			{
+				int cx, cy;
+				int pz = PlayerZ();
+				World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
+				weatherFlag currentWeather = World::ins()->getChunkWeather(cx, cy, pz);
+				
+				int pivotX = letterbox.x + 458;
+				int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
 
-		//	if (currentWeather == weatherFlag::sunny)
-		//	{
-		//		if (getHour() >= 6 && getHour() < 18)
-		//		{
-		//			static int index = 0;
-		//			int sprSize = 6;
-		//			if (timer::timer600 % 12 == 0)
-		//			{
-		//				index++;
-		//				if (index == sprSize) index = 0;
-		//			}
-		//			drawSpriteCenter(spr::symbolSunny, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//		}
-		//		else
-		//		{
-		//			static int moonBrightnessTimer = 0;
-		//			moonBrightnessTimer++;
+				// 하늘 배경 그리기 (기존 코드)
+				int eclipticIndex = 0;
+				if (getHour() >= 7 && getHour() < 17)
+				{
+					eclipticIndex = 2; // 낮 하늘
+				}
+				else if (getHour() >= 17 && getHour() < 18)
+				{
+					eclipticIndex = 3; // 노을
+				}
+				else if (getHour() >= 6 && getHour() < 7)
+				{
+					eclipticIndex = 1; // 새벽
+				}
+				else
+				{
+					eclipticIndex = 4; // 밤
+				}
 
-		//			float breatheCycle = 240.0f;
-		//			float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
+				if (getHour() >= 6 && getHour() < 18)
+				{
+					if (currentWeather == weatherFlag::cloudy || currentWeather == weatherFlag::rain ||
+						currentWeather == weatherFlag::snow || currentWeather == weatherFlag::storm)
+					{
+						eclipticIndex = 5; // 회색 하늘
+					}
+				}
 
-		//			Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
-
-
-		//			int moonPhaseIndex = calculateMoonPhase();
-		//			SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
-		//			SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
-
-		//			drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//			SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
-
-		//			SDL_Color centerLight = { 0xf7,0xf3,0xce };
-		//			SDL_Color outerLight = { 0xd0,0xc3,0x3f };
-		//			int lightPivotX = letterbox.x + 426 - 27;
-		//			int lightPivotY = letterbox.y + 19 - 2 + LETTERBOX_Y_OFFSET;
-
-		//			drawPoint(lightPivotX, lightPivotY, centerLight);
-		//			drawPoint(lightPivotX + 1, lightPivotY, outerLight);
-		//			drawPoint(lightPivotX - 1, lightPivotY, outerLight);
-		//			drawPoint(lightPivotX, lightPivotY + 1, outerLight);
-		//			drawPoint(lightPivotX, lightPivotY - 1, outerLight);
-
-		//			drawPoint(lightPivotX + 2, lightPivotY - 10, outerLight);
-		//			drawPoint(lightPivotX + 8, lightPivotY - 6, outerLight);
-		//			drawPoint(lightPivotX + 12, lightPivotY - 13, centerLight);
-
-		//			drawPoint(lightPivotX + 19, lightPivotY - 12, centerLight);
-		//			drawPoint(lightPivotX + 19 + 1, lightPivotY - 12, outerLight);
-		//			drawPoint(lightPivotX + 19 - 1, lightPivotY - 12, outerLight);
-		//			drawPoint(lightPivotX + 19, lightPivotY - 12 + 1, outerLight);
-		//			drawPoint(lightPivotX + 19, lightPivotY - 12 - 1, outerLight);
-
-		//			drawPoint(lightPivotX + 32, lightPivotY - 11, centerLight);
-		//			drawPoint(lightPivotX + 40, lightPivotY - 13, outerLight);
-
-		//			drawPoint(lightPivotX + 47, lightPivotY - 9, centerLight);
-		//			drawPoint(lightPivotX + 47 + 1, lightPivotY - 9, outerLight);
-		//			drawPoint(lightPivotX + 47 - 1, lightPivotY - 9, outerLight);
-		//			drawPoint(lightPivotX + 47, lightPivotY - 9 + 1, outerLight);
-		//			drawPoint(lightPivotX + 47, lightPivotY - 9 - 1, outerLight);
-
-		//			drawPoint(lightPivotX + 53, lightPivotY - 1, outerLight);
-		//		}
-		//	}
-		//	else if (currentWeather == weatherFlag::cloudy)
-		//	{
-		//		static int index = 0;
-		//		int sprSize = 9;
-		//		if (timer::timer600 % 12 == 0)
-		//		{
-		//			index++;
-		//			if (index >= sprSize) index = 0;
-		//		}
-		//		drawSpriteCenter(spr::symbolCloudy, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//	}
-		//	else if (currentWeather == weatherFlag::rain)
-		//	{
-		//		static int index = 0;
-		//		int sprSize = 3;
-		//		if (timer::timer600 % 12 == 0)
-		//		{
-		//			index++;
-		//			if (index >= sprSize) index = 0;
-		//		}
-		//		drawSpriteCenter(spr::symbolRain, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//	}
-		//	else if (currentWeather == weatherFlag::storm)
-		//	{
-		//		static int index = 0;
-		//		int sprSize = 3;
-		//		if (timer::timer600 % 12 == 0)
-		//		{
-		//			index++;
-		//			if (index >= sprSize) index = 0;
-		//		}
-		//		drawSpriteCenter(spr::symbolStorm, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//	}
-		//	else if (currentWeather == weatherFlag::snow)
-		//	{
-		//		static int index = 0;
-		//		int sprSize = 15;
-		//		if (timer::timer600 % 12 == 0)
-		//		{
-		//			index++;
-		//			if (index >= sprSize) index = 0;
-		//		}
-		//		drawSpriteCenter(spr::symbolSnow, index, letterbox.x + 426, letterbox.y + 25 + LETTERBOX_Y_OFFSET);
-		//	}
+				// 이클립스 배경 이미지 그리기
+				drawSprite(spr::ecliptic, eclipticIndex, pivotX, pivotY);
 
 
-		//	setFont(fontType::pixel);
-		//	setFontSize(12);
-		//	drawTextCenter(L"15℃", letterbox.x + 18 + 374 + 36, letterbox.y + 16 + 30 + LETTERBOX_Y_OFFSET);
+				if (currentWeather == weatherFlag::sunny)
+				{
+					if (getHour() >= 6 && getHour() < 18)
+					{
+						static int index = 0;
+						int sprSize = 6;
+						if (timer::timer600 % 12 == 0)
+						{
+							index++;
+							if (index == sprSize) index = 0;
+						}
+						drawSpriteCenter(spr::symbolSunny, index, pivotX + 38, pivotY + 27);
+					}
+					else
+					{
+						static int moonBrightnessTimer = 0;
+						moonBrightnessTimer++;
+
+						float breatheCycle = 240.0f;
+						float brightness = (sin(moonBrightnessTimer * 2.0f * 3.141592 / breatheCycle) + 1.0f) * 0.5f;
+
+						Uint8 alpha = static_cast<Uint8>(128 + brightness * 127);
+
+
+						int moonPhaseIndex = calculateMoonPhase();
+						SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), alpha);
+						SDL_SetTextureBlendMode(spr::symbolMoon->getTexture(), SDL_BLENDMODE_BLEND);
+
+						drawSpriteCenter(spr::symbolMoon, moonPhaseIndex, pivotX + 38, pivotY + 27);
+						SDL_SetTextureAlphaMod(spr::symbolMoon->getTexture(), 255);
+					}
+				}
+				else if (currentWeather == weatherFlag::cloudy)
+				{
+					static int index = 0;
+					int sprSize = 26;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index >= sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolCloudy, index, pivotX + 38, pivotY + 27);
+				}
+				else if (currentWeather == weatherFlag::rain)
+				{
+					static int index = 0;
+					int sprSize = 8;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index >= sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolRain, index, pivotX + 38, pivotY + 27);
+				}
+				else if (currentWeather == weatherFlag::storm)
+				{
+					static int index = 0;
+					int sprSize = 8;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index >= sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolStorm, index, pivotX + 38, pivotY + 27);
+				}
+				else if (currentWeather == weatherFlag::snow)
+				{
+					static int index = 0;
+					int sprSize = 15;
+					if (timer::timer600 % 12 == 0)
+					{
+						index++;
+						if (index >= sprSize) index = 0;
+					}
+					drawSpriteCenter(spr::symbolSnow, index, pivotX + 38, pivotY + 27);
+				}
+
+
+
+					setFontSize(16);
+					drawTextCenter(L"15℃", pivotX  + 38, pivotY + 52);
+			}
+
+
+
+
+
+
+
 
 		//	drawSprite(spr::batteryGauge, 4, letterbox.x + 18 + 562, letterbox.y + 3 + LETTERBOX_Y_OFFSET);
 		//	
