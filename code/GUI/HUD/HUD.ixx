@@ -1009,4 +1009,5 @@ public:
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 
+	void drawBodyParts();
 };

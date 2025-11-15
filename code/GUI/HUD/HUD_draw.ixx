@@ -290,88 +290,8 @@ void HUD::drawGUI()
 			  //}
 
 
-			  //if (ctrlVeh == nullptr)
-			  //{
-				  ////스테미나
-				  //{
-				  //	int pivotX = letterbox.x + 18 + 238;
-				  //	int pivotY = letterbox.y + 4 + LETTERBOX_Y_OFFSET;
-				  //	setFontSize(10);
 
-				  //	int pSTA = PlayerPtr->entityInfo.STA;
-				  //	int pSTAMax = PlayerPtr->entityInfo.maxSTA;
-
-
-				  //	if (fakeSTA > pSTA)
-				  //	{
-				  //		fakeSTA -= 1;
-				  //		if (alphaSTA > 10) alphaSTA -= 10;
-				  //		else alphaSTA = 0;
-				  //	}
-				  //	else if (fakeSTA < pSTA) fakeSTA++;
-				  //	else alphaSTA = 255;
-
-
-				  //	SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), 0, 0, 0);
-				  //	SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-				  //	drawSprite(spr::staminaGaugeCircle, 0, pivotX, pivotY);
-
-				  //	if (fakeSTA > pSTA)
-				  //	{
-
-				  //		int sprIndexFake = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
-				  //		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), alphaSTA);
-				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::red.r, lowCol::red.g, lowCol::red.b);
-				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-				  //		drawSprite(spr::staminaGaugeCircle, sprIndexFake, pivotX, pivotY);
-				  //		SDL_SetTextureAlphaMod(spr::staminaGaugeCircle->getTexture(), 255);
-
-
-				  //		int sprIndex = (int)(90.0 - 90.0 * ((double)pSTA / (double)pSTAMax));
-				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
-				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-				  //		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
-				  //	}
-				  //	else
-				  //	{
-				  //		int sprIndex = (int)(90.0 - 90.0 * ((double)fakeSTA / (double)pSTAMax));
-				  //		SDL_SetTextureColorMod(spr::staminaGaugeCircle->getTexture(), lowCol::yellow.r, lowCol::yellow.g, lowCol::yellow.b);
-				  //		SDL_SetTextureBlendMode(spr::staminaGaugeCircle->getTexture(), SDL_BLENDMODE_BLEND);
-				  //		drawSprite(spr::staminaGaugeCircle, sprIndex, pivotX, pivotY);
-				  //	}
-
-
-				  //	setFont(fontType::mainFont);
-				  //	setFontSize(12);
-				  //	drawTextCenter(L"STA", pivotX + 24, pivotY + 16);
-				  //	setFont(fontType::pixel);
-				  //	setFontSize(11);
-				  //	std::wstring STAStr = std::to_wstring(PlayerPtr->entityInfo.STA) + L"/" + std::to_wstring(PlayerPtr->entityInfo.maxSTA);
-				  //	drawTextOutlineCenter(STAStr, pivotX + 24, pivotY + 29);
-				  //}
-
-			  //	setFont(fontType::pixel);
-			  //	setFontSize(12);
-			  //	drawSpriteCenter(spr::icon13, 25, letterbox.x + 18 + 296 + 5, letterbox.y + 5 + 15 * 0 + 6 + LETTERBOX_Y_OFFSET);
-			  //	drawText(L"6320", letterbox.x + 18 + 296 + 17, letterbox.y + 5 + 15 * 0 + LETTERBOX_Y_OFFSET, lowCol::yellow);
-
-			  //	setFont(fontType::mainFont);
-			  //	setFontSize(11);
-			  //	drawText(L"SPEED", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 1 + LETTERBOX_Y_OFFSET, col::lightGray);
-			  //	drawText(L"MENTAL", letterbox.x + 18 + 296, letterbox.y + 2 + 18 * 2 + LETTERBOX_Y_OFFSET, col::lightGray);
-
-			  //	setFont(fontType::pixel);
-			  //	setFontSize(12);
-			  //	drawText(L"120%", letterbox.x + 18 + 44 + 296, letterbox.y + 5 + 18 * 1 + LETTERBOX_Y_OFFSET, lowCol::green);
-			  //	drawText(L"39%", letterbox.x + 18 + 50 + 296, letterbox.y + 5 + 18 * 2 + LETTERBOX_Y_OFFSET, lowCol::red);
-
-
-
-
-
-
-
-
+		//하늘&날씨&온도 표시 기능
 		{
 			int cx, cy;
 			int pz = PlayerZ();
@@ -1645,3 +1565,8 @@ void HUD::drawQuest()
 	questStr += L"/100)";
 	drawText(questStr, pivotX + 20, pivotY + 46);
 }
+
+
+void HUD::drawBodyParts()
+{
+};
