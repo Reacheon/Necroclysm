@@ -68,9 +68,7 @@ void HUD::drawGUI()
 	Sprite* targetBtnSpr = nullptr;
 
 	drawStatusEffects();
-
-
-
+	drawBodyParts();
 
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, cameraH - letterbox.y + 20, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr)
@@ -1569,4 +1567,64 @@ void HUD::drawQuest()
 
 void HUD::drawBodyParts()
 {
+	SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 60);
+	drawSpriteCenter(spr::bodyShape, 0, 146, cameraH - 152);
+	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
+
+
+	//x와 y 좌표는 게이지 좌측 상단 기준
+	auto drawBodyPart = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName, double hpRatio)
+		{
+			drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, inputX, inputY);
+
+			SDL_SetRenderTarget(renderer, texture::hpGaugeWhiteShadow);
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+			SDL_RenderClear(renderer);
+			SDL_SetTextureBlendMode(texture::hpGaugeWhiteShadow, SDL_BLENDMODE_BLEND);
+
+			SDL_Rect clipRect = { 0, 0, static_cast<int>(95 * hpRatio), 13 };
+			SDL_SetRenderClipRect(renderer, &clipRect);
+
+			drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, 0, 0);
+
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+			SDL_SetRenderDrawColor(renderer, 0x62, 0xF0, 0x64, 255); // 녹색
+			SDL_FRect rect = { 0, 0, static_cast<float>(95 * hpRatio), 13.0f };
+			SDL_RenderFillRect(renderer, &rect);
+
+			SDL_SetRenderClipRect(renderer, nullptr);
+
+			SDL_SetRenderTarget(renderer, nullptr);
+			SDL_SetTextureAlphaMod(texture::hpGaugeWhiteShadow, 255);
+			drawTexture(texture::hpGaugeWhiteShadow, inputX, inputY);
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+			// 텍스트 그리기
+			if (gaugeFlip == false) drawText(partName, inputX, inputY - 26, col::white);
+			else  drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+
+			if (gaugeFlip == false) drawText(std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%", inputX + 40, inputY + 6, col::white);
+			else drawText(std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%", inputX + 5, inputY + 6, col::white);
+		};
+
+	drawBodyPart(false, 173, cameraH - 1 - 65, L"LLeg", 1.0);
+    drawBodyPart(true, 25, cameraH - 1 - 65, L"RLeg", 1.0);
+
+	drawBodyPart(false, 192, cameraH - 1 - 164, L"LArm", 0.67);
+	drawBodyPart(true, 4, cameraH - 1 - 164, L"RArm", 1.0);
+
+	drawBodyPart(true, 21, cameraH - 1 - 245, L"Torso", 1.0);
+
+	drawBodyPart(false, 167, cameraH - 1 - 282, L"Head", 1.0);
+
+	//{
+	//	int pivotX = 0;
+	//	int pivotY = cameraH - 1;
+	//	pivotX += 173;
+	//	pivotY -= 65;
+ //       drawSprite(spr::hpGauge, 0, pivotX, pivotY);
+ //       drawText(L"Left Leg", pivotX, pivotY - 26, col::white);
+	//	drawText(L"100%", pivotX + 35, pivotY + 6, col::white);
+	//}
 };

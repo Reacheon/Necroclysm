@@ -21,6 +21,9 @@ export void textureLoader()
 	texture::mainGaugeWhiteShadow = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 170, 16);
 	SDL_SetTextureScaleMode(texture::mainGaugeWhiteShadow, SDL_SCALEMODE_NEAREST);
 
+	texture::hpGaugeWhiteShadow = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 95, 13);
+	SDL_SetTextureScaleMode(texture::hpGaugeWhiteShadow, SDL_SCALEMODE_NEAREST);
+
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");
 	spr::defaultMonster = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);
 	spr::effectBash1 = new Sprite(renderer, "image/effect/effectBash1.png", 48, 48);
@@ -186,4 +189,7 @@ export void textureLoader()
     spr::icon28 = new Sprite(renderer, "image/UI/icon28.png", 28, 28);
     spr::downRightLetterbox = new Sprite(renderer, "image/UI/GUI/HUD/downRightLetterbox.png", 782, 176);
 	spr::mainGauge = new Sprite(renderer, "image/UI/GUI/HUD/mainGauge.png", 170, 16);
+
+    spr::bodyShape = new Sprite(renderer, "image/UI/GUI/HUD/bodyShape.png", 100, 256);
+    spr::hpGauge = new Sprite(renderer, "image/UI/GUI/HUD/hpGauge.png", 95, 13);
 }
