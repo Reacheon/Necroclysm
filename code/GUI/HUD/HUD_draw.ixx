@@ -1567,10 +1567,7 @@ void HUD::drawQuest()
 
 void HUD::drawBodyParts()
 {
-	SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
-	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 60);
-	drawSpriteCenter(spr::bodyShape, 0, 146, cameraH - 152);
-	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
+
 
 	// 페이크 HP 업데이트 람다 함수
 	auto updateFakeHP = [](int& fakeHP, int& realHP, unsigned char& fakeHPAlpha) 
@@ -1667,23 +1664,49 @@ void HUD::drawBodyParts()
 				drawText(hpText, inputX + 5, inputY + 6, col::white);
 		};
 
+
+	bool isMale = true;
+
+
+	SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 60);
+	drawSpriteCenter(spr::bodyShape, isMale ? 0 : 1, 146, cameraH - 152);
+	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
+
 	// 각 부위 그리기
-	drawBodyPart(false, 173, cameraH - 1 - 65, L"LLeg",
+	drawBodyPart(false, 
+		173,
+		cameraH - 1 - 65, 
+		L"LLeg",
 		PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
 
-	drawBodyPart(true, 25, cameraH - 1 - 65, L"RLeg",
+	drawBodyPart(true, 25, 
+		cameraH - 1 - 65, 
+		L"RLeg",
 		PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
 
-	drawBodyPart(false, 192, cameraH - 1 - 164, L"LArm",
+	drawBodyPart(false, 
+		193, 
+		cameraH - 1 - 164, 
+		L"LArm",
 		PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
 
-	drawBodyPart(true, 4, cameraH - 1 - 164, L"RArm",
+	drawBodyPart(true, 
+		3, 
+		cameraH - 1 - 164, 
+		L"RArm",
 		PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
 
-	drawBodyPart(true, 21, cameraH - 1 - 245, L"Torso",
+	drawBodyPart(true, 
+		21, 
+		cameraH - 1 - 245, 
+		L"Torso",
 		PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
 		PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
 
-	drawBodyPart(false, 167, cameraH - 1 - 282, L"Head",
+	drawBodyPart(false, 
+		167, 
+		cameraH - 1 - 282, 
+		L"Head",
 		PlayerPtr->headHP, PlayerPtr->headFakeHP, PART_MAX_HP, PlayerPtr->headFakeHPAlpha);
 }

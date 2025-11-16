@@ -18,7 +18,7 @@ export __int64 renderLog(SDL_Renderer* renderer)
 
 	int textHeight = queryTextHeight(L"가", true);
 	int pivotX = 12;
-	int pivotY = -180;
+	int pivotY = -340;
 
 	for (int i = 0; i < maxLogLine; i++)
 	{
