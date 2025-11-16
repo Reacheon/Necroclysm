@@ -1572,11 +1572,65 @@ void HUD::drawBodyParts()
 	drawSpriteCenter(spr::bodyShape, 0, 146, cameraH - 152);
 	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
 
+	// 페이크 HP 업데이트 람다 함수
+	auto updateFakeHP = [](int& fakeHP, int& realHP, unsigned char& fakeHPAlpha) 
+		{
+		if (fakeHP > realHP) {
+			fakeHP--;
+			if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
+			else { fakeHPAlpha = 0; }
+		}
+		else if (fakeHP < realHP) {
+			fakeHP = realHP;
+		}
+
+		if (fakeHP == realHP) {
+			fakeHPAlpha = 255;
+		}
+		};
+
+	updateFakeHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha);
+	updateFakeHP(PlayerPtr->rArmFakeHP, PlayerPtr->rArmHP, PlayerPtr->rArmFakeHPAlpha);
+	updateFakeHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha);
+	updateFakeHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha);
+	updateFakeHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha);
+	updateFakeHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha);
 
 	//x와 y 좌표는 게이지 좌측 상단 기준
-	auto drawBodyPart = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName, double hpRatio)
+	auto drawBodyPart = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName,
+		int realHP, int fakeHP, int maxHP, unsigned char fakeHPAlpha)
 		{
 			drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, inputX, inputY);
+
+			// 페이크 HP 게이지 그리기 (흰색으로 뒤에 깔림)
+			if (fakeHP != realHP && fakeHPAlpha > 0)
+			{
+				SDL_SetRenderTarget(renderer, texture::hpGaugeWhiteShadow);
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+				SDL_RenderClear(renderer);
+				SDL_SetTextureBlendMode(texture::hpGaugeWhiteShadow, SDL_BLENDMODE_BLEND);
+
+				double fakeRatio = myMax(0.0, static_cast<double>(fakeHP) / static_cast<double>(maxHP));
+				SDL_Rect clipRect = { 0, 0, static_cast<int>(95 * fakeRatio), 13 };
+				SDL_SetRenderClipRect(renderer, &clipRect);
+
+				drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, 0, 0);
+
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+				SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 255); // 흰색
+				SDL_FRect rect = { 0, 0, static_cast<float>(95 * fakeRatio), 13.0f };
+				SDL_RenderFillRect(renderer, &rect);
+
+				SDL_SetRenderClipRect(renderer, nullptr);
+				SDL_SetRenderTarget(renderer, nullptr);
+
+				SDL_SetTextureAlphaMod(texture::hpGaugeWhiteShadow, fakeHPAlpha);
+				drawTexture(texture::hpGaugeWhiteShadow, inputX, inputY);
+				SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+			}
+
+			// 실제 HP 게이지 그리기 (녹색)
+			double hpRatio = myMax(0.0, static_cast<double>(realHP) / static_cast<double>(maxHP));
 
 			SDL_SetRenderTarget(renderer, texture::hpGaugeWhiteShadow);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -1601,30 +1655,35 @@ void HUD::drawBodyParts()
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 			// 텍스트 그리기
-			if (gaugeFlip == false) drawText(partName, inputX, inputY - 26, col::white);
-			else  drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+			if (gaugeFlip == false)
+				drawText(partName, inputX, inputY - 26, col::white);
+			else
+				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
 
-			if (gaugeFlip == false) drawText(std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%", inputX + 40, inputY + 6, col::white);
-			else drawText(std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%", inputX + 5, inputY + 6, col::white);
+			std::wstring hpText = std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%";
+			if (gaugeFlip == false)
+				drawText(hpText, inputX + 40, inputY + 6, col::white);
+			else
+				drawText(hpText, inputX + 5, inputY + 6, col::white);
 		};
 
-	drawBodyPart(false, 173, cameraH - 1 - 65, L"LLeg", 1.0);
-    drawBodyPart(true, 25, cameraH - 1 - 65, L"RLeg", 1.0);
+	// 각 부위 그리기
+	drawBodyPart(false, 173, cameraH - 1 - 65, L"LLeg",
+		PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
 
-	drawBodyPart(false, 192, cameraH - 1 - 164, L"LArm", 0.67);
-	drawBodyPart(true, 4, cameraH - 1 - 164, L"RArm", 1.0);
+	drawBodyPart(true, 25, cameraH - 1 - 65, L"RLeg",
+		PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
 
-	drawBodyPart(true, 21, cameraH - 1 - 245, L"Torso", 1.0);
+	drawBodyPart(false, 192, cameraH - 1 - 164, L"LArm",
+		PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
 
-	drawBodyPart(false, 167, cameraH - 1 - 282, L"Head", 1.0);
+	drawBodyPart(true, 4, cameraH - 1 - 164, L"RArm",
+		PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
 
-	//{
-	//	int pivotX = 0;
-	//	int pivotY = cameraH - 1;
-	//	pivotX += 173;
-	//	pivotY -= 65;
- //       drawSprite(spr::hpGauge, 0, pivotX, pivotY);
- //       drawText(L"Left Leg", pivotX, pivotY - 26, col::white);
-	//	drawText(L"100%", pivotX + 35, pivotY + 6, col::white);
-	//}
-};
+	drawBodyPart(true, 21, cameraH - 1 - 245, L"Torso",
+		PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
+		PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
+
+	drawBodyPart(false, 167, cameraH - 1 - 282, L"Head",
+		PlayerPtr->headHP, PlayerPtr->headFakeHP, PART_MAX_HP, PlayerPtr->headFakeHPAlpha);
+}
