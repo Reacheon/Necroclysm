@@ -73,6 +73,7 @@ export inline void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoo
     World::ins()->getTile(endCoor).EntityPtr = std::move(inputPtr);
     World::ins()->getTile(endCoor).EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
     World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
+    
 }
 export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 export inline Prop* TileProp(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).PropPtr.get(); }

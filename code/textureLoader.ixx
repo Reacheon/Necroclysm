@@ -93,7 +93,7 @@ export void textureLoader()
 
 	spr::shadow = new Sprite(renderer, "image/charset/shadow.png", 48, 48);
 
-	spr::vehicleHUD = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUD.png", 720, 580);
+	spr::vehicleHUD = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUD.png", 900, 580);
 	spr::dashboard = new Sprite(renderer, "image/UI/GUI/Vehicle/dashboard.png", 720, 580);
 	spr::vehicleHUDParts = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUDParts.png", 64, 64);
 	spr::vehicleHUDSteeringWheel = new Sprite(renderer, "image/UI/GUI/Vehicle/vehicleHUDSteeringWheel.png", 256, 256);
