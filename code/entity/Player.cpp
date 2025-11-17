@@ -353,9 +353,9 @@ void Player::updateNearbyChunk(int range)
 
 	World::ins()->deactivate();
 
-	for (int y = chunkY - 1; y <= chunkY + 1; y++)
+	for (int y = chunkY - 2; y <= chunkY + 2; y++)
 	{
-		for (int x = chunkX - 1; x <= chunkX + 1; x++)
+		for (int x = chunkX - 2; x <= chunkX + 2; x++)
 		{
 			World::ins()->activate(x, y, PlayerPtr->getGridZ());
 		}

@@ -73,12 +73,15 @@ void HUD::drawGUI()
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, cameraH - letterbox.y + 20, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr)
 	{
-		drawSpriteCenter(spr::vehicleHUD, 0, cameraW / 2, cameraH + 73 + y);
+		int pivotX = cameraW - 851;
+		int pivotY = cameraH - 240 + y;
+		setZoom(1.0);
+		drawSprite(spr::vehicleHUD, 0, pivotX, pivotY);
 		if (ctrlVeh->isEngineOn)
 		{
-			drawSpriteCenter(spr::dashboard, 0, cameraW / 2, cameraH + 73 + y);
+			drawSpriteCenter(spr::dashboard, 0, pivotX + 420, pivotY + 294);
 			setZoom(2.0);
-			drawTextureCenter(texture::navimap, cameraW / 2, cameraH - 132 + y);
+			drawTexture(texture::navimap, pivotX + 355, pivotY + 22);
 			setZoom(1.0);
 		}
 	}
@@ -120,7 +123,7 @@ void HUD::drawGUI()
 		int vShift = 396 * (ctrlVeh != nullptr);
 		int LETTERBOX_Y_OFFSET = 5; // 하단 박스 요소들의 Y 오프셋
 
-		if (1)//플레이어 이름 그리기
+		if (ctrlVeh == nullptr)//플레이어 이름 그리기
 		{
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
@@ -156,6 +159,7 @@ void HUD::drawGUI()
 
 		const int GAUGE_Y_OFFSET = -4;
 
+		if (ctrlVeh == nullptr)
 		{
 			int stressPivotX = letterbox.x + 13;
 			int stressPivotY = letterbox.y + 38;
@@ -170,6 +174,7 @@ void HUD::drawGUI()
 			setFont(fontType::mainFont);
 		}
 
+		if (ctrlVeh == nullptr)
 		{
 			int pSTA = PlayerPtr->entityInfo.STA;
 			int pSTAMax = PlayerPtr->entityInfo.maxSTA;
@@ -199,97 +204,8 @@ void HUD::drawGUI()
 			setFont(fontType::mainFont);
 		}
 
-		//      drawSprite(spr::mainGauge, 0, staminaPivotX + 34, staminaPivotY + 6);
-			  //for (int i = 0; i < 170; i++)
-			  //{
-			  //	if (i == 0) drawLine(staminaPivotX + 34, staminaPivotY + 6 + 2, staminaPivotX + 34, staminaPivotY + 6 + 2 + 11);
-			  //	else if (i == 1) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 13);
-			  //	else if (i == 68) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 14);
-			  //	else if (i == 69) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 13);
-			  //	else if (i == 70) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 12);
-			  //	else if (i == 71)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 11);
-			  //	else if (i==72) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 10);
-			  //	else if (i == 73) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 9);
-			  //	else if (i == 169)  drawLine(staminaPivotX + 34 + i, staminaPivotY + 6 + 1, staminaPivotX + 34 + i, staminaPivotY + 6 + 1 + 5);
-			  //	else if ( i >= 74) drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 8);
-			  //	else drawLine(staminaPivotX + 34 + i, staminaPivotY + 6, staminaPivotX + 34 + i, staminaPivotY + 6 + 15);
-			  //}
-
-
-
-			  //setFont(fontType::pixel);
-			  //setFontSize(11);
-
-			  //setFont(fontType::pixel);
-			  //setFontSize(11);
-
-			  //{
-			  //	// HP 게이지 그리기 람다 함수
-			  //	auto drawBodyPartHP = [&](
-			  //		int& fakeHP,
-			  //		int& realHP,
-			  //		unsigned char& fakeHPAlpha,
-			  //		int maxHP,
-			  //		int pivotX,
-			  //		int pivotY,
-			  //		const std::wstring& partName) -> void
-			  //		{
-			  //			// 페이크 HP 업데이트
-			  //			if (fakeHP > realHP) { fakeHP--; }
-			  //			else if (fakeHP < realHP) fakeHP = realHP;
-			  //			if (fakeHP != realHP)
-			  //			{
-			  //				if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
-			  //				else { fakeHPAlpha = 0; }
-			  //			}
-			  //			else { fakeHPAlpha = 255; }
-			  //			int gaugeX = pivotX + 2;
-			  //			drawTextCenter(partName, pivotX - 16, pivotY + 5, col::lightGray);
-			  //			// 페이크 HP
-			  //			float ratioFakeHP = myMax(0.0f, static_cast<float>(fakeHP) / static_cast<float>(maxHP));
-			  //			SDL_Rect fakeRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioFakeHP), 5 };
-			  //			drawFillRect(fakeRect, lowCol::white, fakeHPAlpha);
-			  //			// 실제 HP
-			  //			float ratioHP = myMax(0.0f, static_cast<float>(realHP) / static_cast<float>(maxHP));
-			  //			SDL_Rect realRect = { gaugeX + 3, pivotY + 3, static_cast<int>(38 * ratioHP), 5 };
-			  //			if (ratioHP > 0 && realRect.w == 0) { realRect.w = 1; }
-			  //			drawFillRect(realRect, lowCol::green);
-			  //		};
-
-			  //	int X_OFFSET = 0;
-			  //	int Y_OFFSET = 3;
-			  //	int X_DIST = 83;
-			  //	int Y_DIST = 16;
-
-			  //	// 왼팔
-			  //	drawBodyPartHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha,
-			  //		PART_MAX_HP,
-			  //		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[108]);
-			  //	// 좌다리
-			  //	drawBodyPartHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha,
-			  //		PART_MAX_HP,
-			  //		letterbox.x + 36 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[110]);
-			  //	// 머리
-			  //	drawBodyPartHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha,
-			  //		PART_MAX_HP,
-			  //		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[107]);
-			  //	// 몸통
-			  //	drawBodyPartHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha,
-			  //		PlayerPtr->entityInfo.maxHP,
-			  //		letterbox.x + 36 + X_DIST + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[106]);
-			  //	// 오른팔
-			  //	drawBodyPartHP(PlayerPtr->rArmFakeHP, PlayerPtr->rArmHP, PlayerPtr->rArmFakeHPAlpha,
-			  //		PART_MAX_HP,
-			  //		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + LETTERBOX_Y_OFFSET, sysStr[109]);
-			  //	// 우다리
-			  //	drawBodyPartHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha,
-			  //		PART_MAX_HP,
-			  //		letterbox.x + 36 + X_DIST * 2 + vShift + X_OFFSET, letterbox.y + 22 + Y_OFFSET + Y_DIST + LETTERBOX_Y_OFFSET, sysStr[111]);
-			  //}
-
-
-
 		//하늘&날씨&온도 표시 기능
+		if (ctrlVeh == nullptr)
 		{
 			int cx, cy;
 			int pz = PlayerZ();
@@ -327,7 +243,7 @@ void HUD::drawGUI()
 				}
 			}
 
-			// 이클립스 배경 이미지 그리기
+			// 하늘 궤적(이클립스 배경) 이미지 그리기
 			drawSprite(spr::ecliptic, eclipticIndex, pivotX, pivotY);
 
 
@@ -809,10 +725,10 @@ void HUD::drawQuickSlot()
 		//스킬 이름 표시
 		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact==false)
 		{
-			setFont(fontType::pixel);
-			setFontSize(12);
+			setFont(fontType::mainFont);
+			setFontSize(18);
 			std::wstring skillName = skillDex[quickSlot[i].second].name;
-			drawTextOutlineCenter(skillName, quickSlotRegion.x + quickSlotRegion.w / 2, quickSlotRegion.h + 15);
+			drawTextOutlineCenter(skillName, quickSlotRegion.x + quickSlotRegion.w / 2, quickSlotRegion.h + 18);
 			
 		}
 
@@ -830,10 +746,10 @@ void HUD::drawQuickSlot()
 
 			drawFillRect(SDL_Rect{ pivotX + 6, pivotY + 1 ,48,48 }, col::black, 180);
 
-			drawCross2(pivotX + 5, pivotY, 0, 7, 0, 7,col::gray);
-			drawCross2(pivotX + 5 + 48, pivotY, 0, 7, 7, 0, col::gray);
-			drawCross2(pivotX + 5, pivotY + 48, 7, 0, 0, 7, col::gray);
-			drawCross2(pivotX + 5 + 48, pivotY + 48, 7, 0, 7, 0, col::gray);
+			drawCross2(pivotX + 5, pivotY, 0, 7, 0, 7, { 50,50,50 });
+			drawCross2(pivotX + 5 + 48, pivotY, 0, 7, 7, 0, { 50,50,50 });
+			drawCross2(pivotX + 5, pivotY + 48, 7, 0, 0, 7, { 50,50,50 });
+			drawCross2(pivotX + 5 + 48, pivotY + 48, 7, 0, 7, 0, { 50,50,50 });
 		}
 		else
 		{
@@ -1594,7 +1510,7 @@ void HUD::drawBodyParts()
 	updateFakeHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha);
 
 	//x와 y 좌표는 게이지 좌측 상단 기준
-	auto drawBodyPart = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName,
+	auto drawSingleBodyPartGauge = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName,
 		int realHP, int fakeHP, int maxHP, unsigned char fakeHPAlpha)
 		{
 			drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, inputX, inputY);
@@ -1674,37 +1590,37 @@ void HUD::drawBodyParts()
 	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
 
 	// 각 부위 그리기
-	drawBodyPart(false, 
+	drawSingleBodyPartGauge(false,
 		173,
 		cameraH - 1 - 65, 
 		L"LLeg",
 		PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
 
-	drawBodyPart(true, 25, 
+	drawSingleBodyPartGauge(true, 25,
 		cameraH - 1 - 65, 
 		L"RLeg",
 		PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
 
-	drawBodyPart(false, 
+	drawSingleBodyPartGauge(false,
 		193, 
 		cameraH - 1 - 164, 
 		L"LArm",
 		PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
 
-	drawBodyPart(true, 
+	drawSingleBodyPartGauge(true,
 		3, 
 		cameraH - 1 - 164, 
 		L"RArm",
 		PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
 
-	drawBodyPart(true, 
+	drawSingleBodyPartGauge(true,
 		21, 
 		cameraH - 1 - 245, 
 		L"Torso",
 		PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
 		PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
 
-	drawBodyPart(false, 
+	drawSingleBodyPartGauge(false,
 		167, 
 		cameraH - 1 - 282, 
 		L"Head",
