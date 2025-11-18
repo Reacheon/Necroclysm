@@ -92,7 +92,13 @@ void HUD::clickUpGUI()
 			if (checkCursor(&quickSlotBtn[i]))
 			{
 				prt(L"%d번 스킬 슬롯을 눌렀다!\n", i + 1);
-				CORO(useSkill(quickSlot[i].second));
+				if (quickSlot[i].first != quickSlotFlag::NONE)
+				{
+					if (dragQuickSlotTarget == -1)
+					{
+						CORO(useSkill(quickSlot[i].second));
+					}
+				}
 			}
 		}
 	}
@@ -119,20 +125,39 @@ void HUD::clickUpGUI()
 			{
 				if (checkCursor(&quickSlotBtn[i]))
 				{
-					quickSlotFlag prevFlag = quickSlot[dragQuickSlotTarget].first;
-					int prevIndex = quickSlot[dragQuickSlotTarget].second;
+					// 드래그한 슬롯의 정보 백업
+					quickSlotFlag dragFlag = quickSlot[dragQuickSlotTarget].first;
+					int dragIndex = quickSlot[dragQuickSlotTarget].second;
 
-					for (int j = 0; j < QUICK_SLOT_MAX; j++)
+					// 드롭 대상 슬롯의 정보 백업
+					quickSlotFlag targetFlag = quickSlot[i].first;
+					int targetIndex = quickSlot[i].second;
+
+					// 드롭 대상 슬롯에 스킬이 있으면 교환, 없으면 단순 이동
+					if (targetFlag != quickSlotFlag::NONE)
 					{
-						if (quickSlot[j].first == prevFlag && quickSlot[j].second == prevIndex)
-						{
-							quickSlot[j].first = quickSlotFlag::NONE;
-							quickSlot[j].second = -1;
-						}
-					}
+						// 서로 교환
+						quickSlot[i].first = dragFlag;
+						quickSlot[i].second = dragIndex;
 
-					quickSlot[i].first = prevFlag;
-					quickSlot[i].second = prevIndex;
+						quickSlot[dragQuickSlotTarget].first = targetFlag;
+						quickSlot[dragQuickSlotTarget].second = targetIndex;
+					}
+					else
+					{
+						// 빈 슬롯으로 이동 (기존 로직)
+						for (int j = 0; j < QUICK_SLOT_MAX; j++)
+						{
+							if (quickSlot[j].first == dragFlag && quickSlot[j].second == dragIndex)
+							{
+								quickSlot[j].first = quickSlotFlag::NONE;
+								quickSlot[j].second = -1;
+							}
+						}
+
+						quickSlot[i].first = dragFlag;
+						quickSlot[i].second = dragIndex;
+					}
 					break;
 				}
 			}

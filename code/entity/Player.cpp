@@ -59,21 +59,8 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	//getEquipPtr()->addItemFromDex(374);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	addSkill(27);
-
-	addSkill(19);
-
 	addSkill(30);
 	quickSlot[2] = { quickSlotFlag::SKILL, 30 };
-
-	addSkill(14);
-	quickSlot[3] = { quickSlotFlag::SKILL, 14 };
-
-	addSkill(10);
-	quickSlot[4] = { quickSlotFlag::SKILL, 10 };
-
-	addSkill(1);
-	quickSlot[5] = { quickSlotFlag::SKILL, 1 };
 
 	addSkill(32);
 	quickSlot[0] = { quickSlotFlag::SKILL,32 };
