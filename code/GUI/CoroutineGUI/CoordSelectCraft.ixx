@@ -38,7 +38,7 @@ private:
 	int targetGridY = 0;
 	int rotatedItemCode = 0;
 
-	SDL_Rect selectBox = { 270, 400, 180, 52 };
+	SDL_Rect selectBox = { cameraW/2 - 90, cameraH/2 + 42, 180, 52 };
 	SDL_Rect confirmBtn = { selectBox.x + 8, selectBox.y + 11, 51, 30 };
 	SDL_Rect rotateBtn = { selectBox.x + 8 + 57 * 1, selectBox.y + 11, 51, 30 };
 	SDL_Rect cancelBtn = { selectBox.x + 8 + 57 * 2, selectBox.y + 11, 51, 30 };
@@ -241,7 +241,7 @@ public:
 			SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
 			setZoom(1.0);
 
-			drawEdgeWindow(270, 400, 180, 52, 16, dir16::dir2);
+			drawEdgeWindow(selectBox.x, selectBox.y, selectBox.w, selectBox.h, 16, dir16::dir2);
 
 			auto drawBtn = [](int iconIndex, SDL_Rect targetBtn)
 				{

@@ -109,10 +109,11 @@ void Craft::drawGUI()
 	if (getFoldRatio() == 1.0)
 	{
 		//윈도우 박스 그리기
-		drawWindow(&craftBase, sysStr[75], 20);
+		setWindowAlpha(220);
+		drawWindow(&craftBase, sysStr[75], 13);
+		resetWindowAlpha();
 
-
-		setFont(fontType::pixel);
+		setFont(fontType::mainFont);
 		//즐겨찾기 버튼
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
@@ -128,7 +129,7 @@ void Craft::drawGUI()
 				btnColor = lowCol::deepBlue;
 				outlineColor = { 0xa6, 0xa6, 0xa6 };
 			}
-			drawStadium(bookmarkCategory.x, bookmarkCategory.y, bookmarkCategory.w, bookmarkCategory.h, btnColor, 200, 8);
+			drawStadium(bookmarkCategory.x, bookmarkCategory.y, bookmarkCategory.w, bookmarkCategory.h, btnColor, 200, 5);
 			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 5,  bookmarkCategory.y + 5, bookmarkCategory.w - 10, bookmarkCategory.h - 10 };
 			drawRect(bookmarkInCategory, outlineColor);
 			setFontSize(18);
@@ -152,7 +153,7 @@ void Craft::drawGUI()
 				outlineColor = { 0xa6, 0xa6, 0xa6 };
 			}
 
-			drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, btnColor, 200, 8);
+			drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, btnColor, 200, 5);
 			SDL_Rect craftInCategory = { craftCategory[i].x + 5,  craftCategory[i].y + 5, 108 - 10, 108 - 10 };
 			drawRect(craftInCategory, outlineColor);
 
@@ -199,7 +200,9 @@ void Craft::drawGUI()
 				break;
 
 			}
+			setZoom(1.5);
 			drawSpriteCenter(spr::icon48, categoryIndex, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) - 15);
+			setZoom(1.0);
 
 			setFontSize(17);
 			drawTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 36);
@@ -217,7 +220,7 @@ void Craft::drawGUI()
 
 			if (deactRect == true)
 			{
-				drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, { 0,0,0 }, 120, 8);
+				drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, { 0,0,0 }, 120, 5);
 			}
 		}
 
@@ -306,7 +309,7 @@ void Craft::drawGUI()
 					}
 				}
 
-				drawStadium(searchBtnRect.x, searchBtnRect.y, searchBtnRect.w, searchBtnRect.h, btnColor, 255, 8);
+				drawStadium(searchBtnRect.x, searchBtnRect.y, searchBtnRect.w, searchBtnRect.h, btnColor, 255, 5);
 
 				SDL_Rect searchBtnInRect = { searchBtnRect.x + 3, searchBtnRect.y + 3, searchBtnRect.w - 6, searchBtnRect.h - 6 };
 				drawRect(searchBtnInRect, outlineColor);
@@ -477,8 +480,37 @@ void Craft::drawGUI()
 					//if(queryTextWidth(iPtr.name)<100)setFontSize(11);
 					//else setFontSize(8);
 
-					setFontSize(17);
-					drawText(iPtr.name, pivotX + 51, pivotY + 11);
+					int textSize = queryTextWidth(iPtr.name);
+
+					if (textSize < 165)
+					{
+						setFontSize(17);
+						drawText(iPtr.name, pivotX + 51, pivotY + 9);
+					}
+					else
+					{
+						setFontSize(14);
+						int newTextSize = queryTextWidth(iPtr.name);
+
+						if (newTextSize < 165)
+						{
+							drawText(iPtr.name, pivotX + 51, pivotY + 9);
+						}
+						else
+						{
+							//텍스트 자르기
+							std::wstring cutText = iPtr.name;
+							while (queryTextWidth(cutText) > 160)
+							{
+								cutText = cutText.substr(0, cutText.length() - 1);
+							}
+							cutText += L"...";
+							drawText(cutText, pivotX + 51, pivotY + 9);
+                        }
+
+					}
+
+
 
 
 
@@ -520,7 +552,7 @@ void Craft::drawGUI()
 		setFontSize(12);
 		std::wstring whiteNumber = std::to_wstring(numNoneBlackFilter);
 		std::wstring totalNumber = std::to_wstring(recipePtr->itemInfo.size());
-		drawText(whiteNumber + L"/" + totalNumber, craftBase.x + 918, craftBase.y + 578);
+		drawText(whiteNumber + L"/" + totalNumber, craftBase.x + 918, craftBase.y + 582);
 
 
 		//아이템 디테일박스(툴팁) 그리기
@@ -535,7 +567,7 @@ void Craft::drawGUI()
 			if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BLACKFILTER) == false)
 			{
 
-				drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 210, 8);
+				drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 210, 5);
 
 				//아이템 아이콘 그리기
 				SDL_Rect iconBox = { topWindow.x + 54 - 36, topWindow.y + 54 - 36, 72, 72 };
@@ -655,8 +687,8 @@ void Craft::drawGUI()
 					//회색 테두리
 					drawRect(unfoldBtn, outlineColor);
 					//아이콘
-					if (tooltipUnfold == false) drawSpriteCenter(spr::icon16, 38, unfoldBtn.x + 14, unfoldBtn.y + unfoldBtn.h / 2);
-					else drawSpriteCenter(spr::icon16, 39, unfoldBtn.x + 14, unfoldBtn.y + unfoldBtn.h / 2);
+					if (tooltipUnfold == false) drawSpriteCenter(spr::icon16, 38, unfoldBtn.x + 21, unfoldBtn.y + unfoldBtn.h / 2);
+					else drawSpriteCenter(spr::icon16, 39, unfoldBtn.x + 21, unfoldBtn.y + unfoldBtn.h / 2);
 
 				}
 

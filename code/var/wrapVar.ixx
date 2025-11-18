@@ -311,3 +311,25 @@ export int getItemSprIndex(ItemData& inputData)
     }
     else return inputData.itemSprIndex;
 }
+
+
+export void changePlayerWalkMode(walkFlag inputMode)
+{
+    auto& pStatus = PlayerPtr->entityInfo.statusEffectVec;
+
+    //pStatus에서 run, crouch, crawl 모두 제거
+    pStatus.erase(std::remove_if(pStatus.begin(), pStatus.end(),
+        [](statusEffect& effect)
+        {
+            return effect.effectType == statusEffectFlag::run ||
+                effect.effectType == statusEffectFlag::crouch ||
+                effect.effectType == statusEffectFlag::crawl;
+        }),
+        pStatus.end());
+
+    if(inputMode == walkFlag::run) pStatus.push_back({statusEffectFlag::run, -1});
+    else if(inputMode == walkFlag::crouch) pStatus.push_back({statusEffectFlag::crouch, -1});
+    else if (inputMode == walkFlag::crawl) pStatus.push_back({ statusEffectFlag::crawl, -1 });
+
+    PlayerPtr->entityInfo.walkMode = inputMode;
+}

@@ -1146,9 +1146,12 @@ bool Entity::runAnimation(bool shutdown)
 
 			turnWait(1.0);
 			entityInfo.sprAngle = 0.0f;
-			entityInfo.walkMode = walkFlag::walk;
 			endMove();
-			if (entityInfo.isPlayer) cameraFix = true;
+			if (entityInfo.isPlayer)
+			{
+				cameraFix = true;
+				changePlayerWalkMode(walkFlag::walk);
+			}
 			return true;
 		}
 	}
@@ -1235,10 +1238,10 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeY(0);
 			entityInfo.jumpOffsetY = 0.0f; // 점프 오프셋 초기화
 			turnWait(1.0);
-			entityInfo.walkMode = walkFlag::walk;
 			endMove();
 			if (entityInfo.isPlayer)
 			{
+				changePlayerWalkMode(walkFlag::walk);
 				cameraFix = true;
 				cameraX = getX();
 				cameraY = getY();

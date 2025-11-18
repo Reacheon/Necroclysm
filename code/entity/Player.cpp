@@ -372,22 +372,22 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 		if (entityInfo.STA < 0)
 		{
 			entityInfo.STA = 0;
-			entityInfo.walkMode = walkFlag::walk;
+            changePlayerWalkMode(walkFlag::walk);
 		}
 	}
 
 
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 	{
-		entityInfo.walkMode = walkFlag::wade;
+        changePlayerWalkMode(walkFlag::wade);
 	}
 	else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 	{
-		entityInfo.walkMode = walkFlag::swim;
+        changePlayerWalkMode(walkFlag::swim);
 	}
 	else if (entityInfo.walkMode == walkFlag::swim || entityInfo.walkMode == walkFlag::wade)
 	{
-		entityInfo.walkMode = walkFlag::walk;
+		changePlayerWalkMode(walkFlag::walk);
 	}
 
 	if(TileFloor(getGridX(),getGridY(),getGridZ()) == itemRefCode::shallowFreshWater ||

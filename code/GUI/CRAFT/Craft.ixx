@@ -114,7 +114,7 @@ public:
 
 		PlayerPtr->setFakeX(0);
 		PlayerPtr->setFakeY(0);
-		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
+		changePlayerWalkMode(walkFlag::walk);
 		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
 		ptr = nullptr;
 	}

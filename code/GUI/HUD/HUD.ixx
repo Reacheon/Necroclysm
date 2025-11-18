@@ -384,10 +384,10 @@ public:
 			new Quest();
 			break;
 		case act::runMode:
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->entityInfo.walkMode = walkFlag::run;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->entityInfo.walkMode = walkFlag::crouch;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->entityInfo.walkMode = walkFlag::crawl;
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->entityInfo.walkMode = walkFlag::walk;
+			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) changePlayerWalkMode(walkFlag::run);
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) changePlayerWalkMode(walkFlag::crouch);
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) changePlayerWalkMode(walkFlag::crawl);
+            else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) changePlayerWalkMode(walkFlag::walk);
 			popDownWhenEnd = false;
 			break;
 		case act::skill:

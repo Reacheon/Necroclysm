@@ -754,7 +754,7 @@ void HUD::drawQuickSlot()
 		else
 		{
 			setZoom(2.0);
-			drawSprite(spr::icon24, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
+			drawSprite(spr::icon24, skillDex[quickSlot[i].second].iconIndex, pivotX + 7, pivotY + 1);
 			setZoom(1.0);
 		}
 		setFont(fontType::pixel);
@@ -1185,6 +1185,7 @@ void HUD::drawStatusEffects()
 			statEfctIcon = 15;
 			break;
 
+
 		case statusEffectFlag::tired:
 			statEfctIcon = 11;
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
@@ -1209,7 +1210,24 @@ void HUD::drawStatusEffects()
 				statEfctIcon = 58;
 			}
 			break;
+
+
+
+		case statusEffectFlag::run:
+			statEfctName = L"Run";
+			statEfctIcon = 60;
+			break;
+		case statusEffectFlag::crawl:
+			statEfctName = L"Crawl";
+			statEfctIcon = 61;
+			break;
+		case statusEffectFlag::crouch:
+			statEfctName = L"Crouch";
+			statEfctIcon = 62;
+            break;
 		}
+
+
 
 		setFontSize(15);
 
