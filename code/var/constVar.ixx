@@ -1388,6 +1388,10 @@ export enum statusEffectFlag
     blind = 4,
     tired = 5,
     exhausted = 6,
+
+    run = 7,
+    crouch = 8,
+    crawl = 9,
 };
 
 export enum charSprIndex

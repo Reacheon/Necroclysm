@@ -63,7 +63,7 @@ public:
 	~Sleep()
 	{
 		ptr = nullptr;
-		PlayerPtr->entityInfo.walkMode = walkFlag::walk;
+		changePlayerWalkMode(walkFlag::walk);
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 		PlayerPtr->entityInfo.isEyesHalf = false;
 		PlayerPtr->entityInfo.isEyesClose = false;
