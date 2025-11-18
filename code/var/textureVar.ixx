@@ -161,4 +161,6 @@ export namespace spr
 
 	Sprite* bodyShape = nullptr;
 	Sprite* hpGauge = nullptr;
+
+	Sprite* icon24 = nullptr;
 }

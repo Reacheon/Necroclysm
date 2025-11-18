@@ -753,13 +753,9 @@ void HUD::drawQuickSlot()
 		}
 		else
 		{
-			setZoom(3.0);
-			drawSprite(spr::skillSet, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
+			setZoom(2.0);
+			drawSprite(spr::icon24, skillDex[quickSlot[i].second].iconIndex, pivotX + 6, pivotY + 1);
 			setZoom(1.0);
-			drawCross2(pivotX + 5, pivotY, 0, 7, 0, 7);
-			drawCross2(pivotX + 5 + 48, pivotY, 0, 7, 7, 0);
-			drawCross2(pivotX + 5, pivotY + 48, 7, 0, 0, 7);
-			drawCross2(pivotX + 5 + 48, pivotY + 48, 7, 0, 7, 0);
 		}
 		setFont(fontType::pixel);
 		setFontSize(12);
@@ -784,10 +780,10 @@ void HUD::drawQuickSlot()
 		if (quickSlot[dragQuickSlotTarget].first == quickSlotFlag::SKILL)
 		{
 			setZoom(2.0);
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180);
-			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND);
-			drawSpriteCenter(spr::skillSet, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, getMouseX(), getMouseY());
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255);
+			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180);
+			SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND);
+			drawSpriteCenter(spr::icon24, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, getMouseX(), getMouseY());
+			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255);
 			setZoom(1.0);
 		}
 	}

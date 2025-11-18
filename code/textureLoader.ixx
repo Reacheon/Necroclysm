@@ -192,4 +192,6 @@ export void textureLoader()
 
     spr::bodyShape = new Sprite(renderer, "image/UI/GUI/HUD/bodyShape.png", 100, 256);
     spr::hpGauge = new Sprite(renderer, "image/UI/GUI/HUD/hpGauge.png", 95, 13);
+
+    spr::icon24 = new Sprite(renderer, "image/UI/icon24.png", 24, 24);
 }
