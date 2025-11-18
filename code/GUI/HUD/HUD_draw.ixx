@@ -181,11 +181,11 @@ void HUD::drawGUI()
 			if (fakeSTA > pSTA)
 			{
 				fakeSTA -= 1;
-				if (alphaSTA > 10) alphaSTA -= 10;
+				if (alphaSTA > 5) alphaSTA -= 5;
 				else alphaSTA = 0;
 			}
 			else if (fakeSTA < pSTA) fakeSTA++;
-			else alphaSTA = 150;
+			else alphaSTA = 255;
 
 
 			int staminaPivotX = letterbox.x + 13 + 224;
@@ -195,7 +195,7 @@ void HUD::drawGUI()
 			int staminaGaugePivotX = staminaPivotX + 34;
 			int staminaGaugePivotY = staminaPivotY + 6 + GAUGE_Y_OFFSET;
 			drawSprite(spr::mainGauge, 0, staminaGaugePivotX, staminaGaugePivotY);
-			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)fakeSTA / (double)pSTAMax, lowCol::white, alphaSTA);
+			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)fakeSTA / (double)pSTAMax, lowCol::red, alphaSTA);
 			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)pSTA / (double)pSTAMax, lowCol::yellow);
 
 			setFont(fontType::mainFontSemiBold);
