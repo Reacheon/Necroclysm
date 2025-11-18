@@ -24,46 +24,44 @@ void Craft::drawGUI()
 
 	if (showCraftingTooltip && GameOver::ins() == nullptr)
 	{
-		SDL_Rect tooltipBox = { cameraW / 2 - 113, 75, 270, 87 };
+		SDL_Rect tooltipBox = { cameraW / 2 - 170, 113, 405, 131 };
 		drawWindow(&tooltipBox);
 		setZoom(1.0);
 
-		int yOffset = 18;
+		int yOffset = 27;
 
 		// 아이템 아이콘 (로딩 아이콘 대신)
-		SDL_Rect iconBox = { tooltipBox.x + 54 - 27 - 15, tooltipBox.y + 90 - 27 - 56 + yOffset, 54, 54 };
+		SDL_Rect iconBox = { tooltipBox.x + 81 - 41 - 23, tooltipBox.y + 135 - 41 - 84 + yOffset, 81, 81 };
 		drawWindow(&iconBox);
-		setZoom(3.0);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[targetItemCode]), iconBox.x + 27, iconBox.y + 27);
+		setZoom(4.5);
+		drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[targetItemCode]), iconBox.x + 41, iconBox.y + 41);
 		setZoom(1.0);
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
 		int dotCount = (SDL_GetTicks() / 800) % 4;
 		std::wstring craftText = L"Crafting";
 		for (int i = 0; i < dotCount; i++) craftText += L".";
-		setFontSize(18);
-		drawTextCenter(craftText, tooltipBox.x + 170, tooltipBox.y + 18 + yOffset);
+		setFontSize(27);
+		drawTextCenter(craftText, tooltipBox.x + 255, tooltipBox.y + 27 + yOffset);
 
 		// 진행 바
-		SDL_Rect tooltipGauge = { tooltipBox.x + 77, tooltipBox.y + 35 + yOffset, 188, 11 };
+		SDL_Rect tooltipGauge = { tooltipBox.x + 116, tooltipBox.y + 53 + yOffset, 282, 17 };
 		drawRect(tooltipGauge, col::white);
 
-		SDL_Rect tooltipInGauge = { tooltipGauge.x + 3, tooltipGauge.y + 3, 182, 5 };
-		tooltipInGauge.w = 182 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
+		SDL_Rect tooltipInGauge = { tooltipGauge.x + 5, tooltipGauge.y + 5, 273, 8 };
+		tooltipInGauge.w = 273 * ((float)elapsedTime / (float)itemDex[targetItemCode].craftTime);
 		drawFillRect(tooltipInGauge, col::white);
 
 		// 남은 시간 텍스트
-		setFont(fontType::pixel);
-		setFontSize(12);
+		setFontSize(18);
 		int remainingMinutes = itemDex[targetItemCode].craftTime - elapsedTime;
 		std::wstring progressText = std::to_wstring(remainingMinutes) + L" m left ( ";
 		progressText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
 		progressText += L"% )";
-		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 11);
+		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 17);
 
-		setFont(fontType::notoSans);
-		setFontSize(16);
-		drawTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 11);
+		setFontSize(24);
+		drawTextOutlineCenter(itemDex[targetItemCode].name, tooltipBox.x + tooltipBox.w / 2, tooltipBox.y + 17);
 
 		if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))
 		{
@@ -111,7 +109,6 @@ void Craft::drawGUI()
 		drawWindow(&craftBase, sysStr[75], 13);
 
 
-		setFont(fontType::pixel);
 		//즐겨찾기 버튼
 		{
 			SDL_Color btnColor = { 0x00, 0x00, 0x00 };
@@ -128,9 +125,9 @@ void Craft::drawGUI()
 				outlineColor = { 0xa6, 0xa6, 0xa6 };
 			}
 			drawStadium(bookmarkCategory.x, bookmarkCategory.y, bookmarkCategory.w, bookmarkCategory.h, btnColor, 200, 5);
-			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 3,  bookmarkCategory.y + 3, bookmarkCategory.w - 6, bookmarkCategory.h - 6 };
+			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 5,  bookmarkCategory.y + 5, bookmarkCategory.w - 10, bookmarkCategory.h - 10 };
 			drawRect(bookmarkInCategory, outlineColor);
-			setFontSize(12);
+			setFontSize(18);
 			drawTextCenter(L"★ " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
 		}
 
@@ -151,8 +148,8 @@ void Craft::drawGUI()
 				outlineColor = { 0xa6, 0xa6, 0xa6 };
 			}
 
-			drawStadium(craftCategory[i].x, craftCategory[i].y, 72, 72, btnColor, 200, 5);
-			SDL_Rect craftInCategory = { craftCategory[i].x + 3,  craftCategory[i].y + 3, 72 - 6, 72 - 6 };
+			drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, btnColor, 200, 5);
+			SDL_Rect craftInCategory = { craftCategory[i].x + 5,  craftCategory[i].y + 5, 108 - 10, 108 - 10 };
 			drawRect(craftInCategory, outlineColor);
 
 			std::wstring categoryName = L" ";
@@ -198,10 +195,10 @@ void Craft::drawGUI()
 				break;
 
 			}
-			drawSpriteCenter(spr::icon48, categoryIndex, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) - 10);
+			drawSpriteCenter(spr::icon48, categoryIndex, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) - 15);
 
-			setFontSize(11);
-			drawTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 24);
+			setFontSize(17);
+			drawTextCenter(categoryName, craftCategory[i].x + (craftCategory[i].w / 2), craftCategory[i].y + (craftCategory[i].h / 2) + 36);
 
 			if (checkCursor(&craftCategory[i]) && deactColorChange == false)
 			{
@@ -216,33 +213,33 @@ void Craft::drawGUI()
 
 			if (deactRect == true)
 			{
-				drawStadium(craftCategory[i].x, craftCategory[i].y, 72, 72, { 0,0,0 }, 120, 5);
+				drawStadium(craftCategory[i].x, craftCategory[i].y, 108, 108, { 0,0,0 }, 120, 5);
 			}
 		}
 
 
 		//좌측 대형카테고리 분리선(회색)
-		drawLine(craftBase.x + 169, craftBase.y + 30, craftBase.x + 169, craftBase.y + 399, col::gray);
+		drawLine(craftBase.x + 254, craftBase.y + 45, craftBase.x + 254, craftBase.y + 599, col::gray);
 
-		drawLine(craftBase.x + 0, craftBase.y + 29, craftBase.x + 15, craftBase.y + 29, col::lightGray);
-		drawLine(craftBase.x + 0, craftBase.y + 30, craftBase.x + 15, craftBase.y + 30, col::lightGray);
-		drawLine(craftBase.x + 0, craftBase.y + 31, craftBase.x + 0, craftBase.y + 44, col::lightGray);
-		drawLine(craftBase.x + 1, craftBase.y + 31, craftBase.x + 1, craftBase.y + 44, col::lightGray);
+		drawLine(craftBase.x + 0, craftBase.y + 44, craftBase.x + 23, craftBase.y + 44, col::lightGray);
+		drawLine(craftBase.x + 0, craftBase.y + 45, craftBase.x + 23, craftBase.y + 45, col::lightGray);
+		drawLine(craftBase.x + 0, craftBase.y + 47, craftBase.x + 0, craftBase.y + 66, col::lightGray);
+		drawLine(craftBase.x + 1, craftBase.y + 47, craftBase.x + 1, craftBase.y + 66, col::lightGray);
 
-		drawLine(craftBase.x + 154, craftBase.y + 29, craftBase.x + 169, craftBase.y + 29, col::lightGray);
-		drawLine(craftBase.x + 154, craftBase.y + 30, craftBase.x + 169, craftBase.y + 30, col::lightGray);
-		drawLine(craftBase.x + 168, craftBase.y + 31, craftBase.x + 168, craftBase.y + 44, col::lightGray);
-		drawLine(craftBase.x + 169, craftBase.y + 31, craftBase.x + 169, craftBase.y + 44, col::lightGray);
+		drawLine(craftBase.x + 231, craftBase.y + 44, craftBase.x + 254, craftBase.y + 44, col::lightGray);
+		drawLine(craftBase.x + 231, craftBase.y + 45, craftBase.x + 254, craftBase.y + 45, col::lightGray);
+		drawLine(craftBase.x + 252, craftBase.y + 47, craftBase.x + 252, craftBase.y + 66, col::lightGray);
+		drawLine(craftBase.x + 254, craftBase.y + 47, craftBase.x + 254, craftBase.y + 66, col::lightGray);
 
-		drawLine(craftBase.x + 0, craftBase.y + 384, craftBase.x + 0, craftBase.y + 399, col::lightGray);
-		drawLine(craftBase.x + 1, craftBase.y + 384, craftBase.x + 1, craftBase.y + 399, col::lightGray);
-		drawLine(craftBase.x + 2, craftBase.y + 398, craftBase.x + 15, craftBase.y + 398, col::lightGray);
-		drawLine(craftBase.x + 2, craftBase.y + 399, craftBase.x + 15, craftBase.y + 399, col::lightGray);
+		drawLine(craftBase.x + 0, craftBase.y + 576, craftBase.x + 0, craftBase.y + 599, col::lightGray);
+		drawLine(craftBase.x + 1, craftBase.y + 576, craftBase.x + 1, craftBase.y + 599, col::lightGray);
+		drawLine(craftBase.x + 3, craftBase.y + 597, craftBase.x + 23, craftBase.y + 597, col::lightGray);
+		drawLine(craftBase.x + 3, craftBase.y + 599, craftBase.x + 23, craftBase.y + 599, col::lightGray);
 
-		drawLine(craftBase.x + 168, craftBase.y + 384, craftBase.x + 168, craftBase.y + 399, col::lightGray);
-		drawLine(craftBase.x + 169, craftBase.y + 384, craftBase.x + 169, craftBase.y + 399, col::lightGray);
-		drawLine(craftBase.x + 157, craftBase.y + 398, craftBase.x + 167, craftBase.y + 398, col::lightGray);
-		drawLine(craftBase.x + 157, craftBase.y + 399, craftBase.x + 167, craftBase.y + 399, col::lightGray);
+		drawLine(craftBase.x + 252, craftBase.y + 576, craftBase.x + 252, craftBase.y + 599, col::lightGray);
+		drawLine(craftBase.x + 254, craftBase.y + 576, craftBase.x + 254, craftBase.y + 599, col::lightGray);
+		drawLine(craftBase.x + 236, craftBase.y + 597, craftBase.x + 251, craftBase.y + 597, col::lightGray);
+		drawLine(craftBase.x + 236, craftBase.y + 599, craftBase.x + 251, craftBase.y + 599, col::lightGray);
 
 
 		//검색창
@@ -263,13 +260,13 @@ void Craft::drawGUI()
 				SDL_Rect searchInRect = { searchTextRect.x + 2, searchTextRect.y + 2, searchTextRect.w - 4, searchTextRect.h - 4 };
 				drawRect(searchInRect, outlineColor);
 
-				drawSpriteCenter(spr::icon16, 14, searchTextRect.x + 20, searchTextRect.y + searchTextRect.h / 2);
+				drawSpriteCenter(spr::icon16, 14, searchTextRect.x + 30, searchTextRect.y + searchTextRect.h / 2);
 
 				{
-					const unsigned __int16 maxTextWidth = 116;
-					SDL_Point inputTextPoint = { searchTextRect.x + 33, searchTextRect.y + 6 };
+					const unsigned __int16 maxTextWidth = 174;
+					SDL_Point inputTextPoint = { searchTextRect.x + 50, searchTextRect.y + 9 };
 
-					setFontSize(12);
+					setFontSize(18);
 					std::wstring exInputTextCut = exInputText;
 					while (queryTextWidth(exInputTextCut, false) > maxTextWidth)
 					{
@@ -280,7 +277,7 @@ void Craft::drawGUI()
 					if (timer::timer600 % 30 <= 15 && exInput == true)
 					{
 						int textWidth = queryTextWidth(cursorText, false);
-						int textHeight = 15;
+						int textHeight = 23;
 						drawLine(inputTextPoint.x + textWidth - 1, inputTextPoint.y, inputTextPoint.x + textWidth - 1, inputTextPoint.y + textHeight, col::white);
 					}
 				}
@@ -307,18 +304,18 @@ void Craft::drawGUI()
 
 				drawStadium(searchBtnRect.x, searchBtnRect.y, searchBtnRect.w, searchBtnRect.h, btnColor, 255, 5);
 
-				SDL_Rect searchBtnInRect = { searchBtnRect.x + 2, searchBtnRect.y + 2, searchBtnRect.w - 4, searchBtnRect.h - 4 };
+				SDL_Rect searchBtnInRect = { searchBtnRect.x + 3, searchBtnRect.y + 3, searchBtnRect.w - 6, searchBtnRect.h - 6 };
 				drawRect(searchBtnInRect, outlineColor);
 
-				setFontSize(12);
-				drawTextCenter(sysStr[27], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 1);
+				setFontSize(18);
+				drawTextCenter(sysStr[27], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 2);
 			}
 		}
 
 		//서브카테고리(소분류) 그리기
 		{
 			//서브 카테고리 분리선
-			drawLine(craftBase.x + 170, craftBase.y + 112, craftBase.x + 648, craftBase.y + 112, col::gray);
+			drawLine(craftBase.x + 255, craftBase.y + 168, craftBase.x + 972, craftBase.y + 168, col::gray);
 
 			auto drawSubcategoryBox = [](std::wstring boxStr, SDL_Rect box, bool pressed, bool deactColorChange)
 				{
@@ -339,8 +336,8 @@ void Craft::drawGUI()
 
 					if (pressed)
 					{
-						box.h += 2;
-						box.y -= 2;
+						box.h += 3;
+						box.y -= 3;
 					}
 
 
@@ -349,11 +346,11 @@ void Craft::drawGUI()
 
 					if (pressed)
 					{
-						SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 52, 2 };
+						SDL_Rect bottomWhiteRect = { box.x + 14, box.y + 29, 78, 3 };
 						drawRect(bottomWhiteRect, col::white);
 					}
 
-					setFontSize(10);
+					setFontSize(15);
 					drawTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2, letterColor);
 				};
 
@@ -467,8 +464,8 @@ void Craft::drawGUI()
 					}
 
 					ItemData& iPtr = recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll];
-					setZoom(2.0); 
-					drawSpriteCenter(spr::itemset, getItemSprIndex(iPtr), pivotX + 16, pivotY + 12);
+					setZoom(3.0);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(iPtr), pivotX + 24, pivotY + 18);
 					setZoom(1.0);
 
 
@@ -476,8 +473,8 @@ void Craft::drawGUI()
 					//if(queryTextWidth(iPtr.name)<100)setFontSize(11);
 					//else setFontSize(8);
 
-					setFontSize(11);
-					drawText(iPtr.name, pivotX + 34, pivotY + 7);
+					setFontSize(17);
+					drawText(iPtr.name, pivotX + 51, pivotY + 11);
 
 
 
@@ -500,26 +497,26 @@ void Craft::drawGUI()
 
 		if (numNoneBlackFilter == 0) // 만약 아이템이 없을 경우
 		{
-			setFontSize(12);
-			drawTextCenter(sysStr[127], craftBase.x + craftBase.w / 2 + 90, craftBase.y + craftBase.h / 2 + 40);
+			setFontSize(18);
+			drawTextCenter(sysStr[127], craftBase.x + craftBase.w / 2 + 135, craftBase.y + craftBase.h / 2 + 60);
 		}
 
 		// 스크롤 그리기
 		{
-			SDL_Rect craftScrollBox = { craftBase.x + craftBase.w - 18, craftBase.y + 36 + 95 - 6, 2, 252 };
+			SDL_Rect craftScrollBox = { craftBase.x + craftBase.w - 27, craftBase.y + 54 + 143 - 9, 3, 378 };
 			drawFillRect(craftScrollBox, { 120,120,120 });
 
-			SDL_Rect inScrollBox = { craftBase.x + craftBase.w - 18, craftBase.y + 36 + 95 - 6, 2, 252 };
+			SDL_Rect inScrollBox = { craftBase.x + craftBase.w - 27, craftBase.y + 54 + 143 - 9, 3, 378 };
 			inScrollBox.h = craftScrollBox.h * myMin(1.0, (double)24 / numNoneBlackFilter);
 			inScrollBox.y = craftScrollBox.y + craftScrollBox.h * ((float)CRAFT_MAX_COLUMN * craftScroll / (float)numNoneBlackFilter);
 			if (inScrollBox.y + inScrollBox.h > craftScrollBox.y + craftScrollBox.h) { inScrollBox.y = craftScrollBox.y + craftScrollBox.h - inScrollBox.h; }
 			drawFillRect(inScrollBox, col::white);
 		}
 
-		setFontSize(8);
+		setFontSize(12);
 		std::wstring whiteNumber = std::to_wstring(numNoneBlackFilter);
 		std::wstring totalNumber = std::to_wstring(recipePtr->itemInfo.size());
-		drawText(whiteNumber + L"/" + totalNumber, craftBase.x + 612, craftBase.y + 385);
+		drawText(whiteNumber + L"/" + totalNumber, craftBase.x + 918, craftBase.y + 578);
 
 
 		//아이템 디테일박스(툴팁) 그리기
@@ -537,28 +534,28 @@ void Craft::drawGUI()
 				drawStadium(topWindow.x, topWindow.y, topWindow.w, topWindow.h, { 0,0,0 }, 210, 5);
 
 				//아이템 아이콘 그리기
-				SDL_Rect iconBox = { topWindow.x + 36 - 24,topWindow.y + 36 - 24,48,48 };
+				SDL_Rect iconBox = { topWindow.x + 54 - 36, topWindow.y + 54 - 36, 72, 72 };
 				drawWindow(&iconBox);
-				setZoom(3.0);
-				drawSpriteCenter(spr::itemset, getItemSprIndex(recipePtr->itemInfo[targetCursor]), topWindow.x + 36, topWindow.y + 36);
+				setZoom(4.5);
+				drawSpriteCenter(spr::itemset, getItemSprIndex(recipePtr->itemInfo[targetCursor]), topWindow.x + 54, topWindow.y + 54);
 				setZoom(1.0);
-				setFontSize(16);
-				drawText(recipePtr->itemInfo[targetCursor].name, topWindow.x + 68, topWindow.y + 12);
+				setFontSize(24);
+				drawText(recipePtr->itemInfo[targetCursor].name, topWindow.x + 102, topWindow.y + 18);
 
-				setFontSize(10);
+				setFontSize(15);
 				std::wstring categoryStr = itemCategory2String(recipePtr->itemInfo[targetCursor].category) + L"-" + itemSubcategory2String(recipePtr->itemInfo[targetCursor].subcategory);
 
-				drawText(categoryStr, topWindow.x + 68, topWindow.y + 12 + 18, col::lightGray);
+				drawText(categoryStr, topWindow.x + 102, topWindow.y + 18 + 27, col::lightGray);
 
 				std::wstring weightStr = sysStr[17]+L" : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
 				weightStr += L"kg";
-				drawText(weightStr, topWindow.x + 68, topWindow.y + 12 + 32);
+				drawText(weightStr, topWindow.x + 102, topWindow.y + 18 + 48);
 
 				std::wstring volumeStr = sysStr[18] + L" : ";
 				volumeStr += decimalCutter(((float)getVolume(recipePtr->itemInfo[targetCursor])) / 1000.0, 3);
 				volumeStr += L"L";
-				drawText(volumeStr, topWindow.x + 168, topWindow.y + 12 + 32);
+				drawText(volumeStr, topWindow.x + 252, topWindow.y + 18 + 48);
 
 				std::wstring tooltipText;
 
@@ -635,9 +632,9 @@ void Craft::drawGUI()
 				tooltipText += col2Str(col::white);
 				tooltipText += itemTooltip[recipePtr->itemInfo[targetCursor].tooltipIndex];
 
-				setFontSize(10);
-				if (!tooltipUnfold) drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12, 6);
-				else drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 10, topWindow.y + 10 + 58 + 15 * 0, false, 360, 12);
+				setFontSize(15);
+				if (!tooltipUnfold) drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 15, topWindow.y + 15 + 87 + 23 * 0, false, 540, 18, 9);
+				else drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 15, topWindow.y + 15 + 87 + 23 * 0, false, 540, 18);
 
 				//접기-펼치기 버튼
 				{
@@ -674,14 +671,14 @@ void Craft::drawGUI()
 					drawFillRect(tooltipCraftBtn, btnColor, 180);
 					//회색 테두리
 					drawRect(tooltipCraftBtn, outlineColor);
-					setFontSize(12);
+					setFontSize(18);
 
-					drawTextCenter(sysStr[237], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4);//조합하기
-					setFontSize(10);
-					
+					drawTextCenter(sysStr[237], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6);//조합하기
+					setFontSize(15);
+
 					std::wstring remainStr = replaceStr(replaceStr(sysStr[238], L"(%hour)", L"1"), L"(%min)",L"34");
-					drawTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 10, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 2 - 4 + 12);
-					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 14, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
+					drawTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6 + 18);
+					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 21, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
 
 					if (canCraft == false) drawFillRect(tooltipCraftBtn, col::black, 100);
 				}
@@ -710,9 +707,9 @@ void Craft::drawGUI()
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK6)) bookmarkSprIndex = 37;
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
-					setFontSize(12);
-					drawTextCenter(sysStr[239], tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 10, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 2, textColor);//즐겨찾기
-					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 14, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
+					setFontSize(18);
+					drawTextCenter(sysStr[239], tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 15, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 3, textColor);//즐겨찾기
+					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 21, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 
 					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1));
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK2));

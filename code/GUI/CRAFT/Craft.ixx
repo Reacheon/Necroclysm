@@ -121,7 +121,7 @@ public:
 	static Craft* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		craftBase = { 0, 0, 650, 400 };
+		craftBase = { 0, 0, 975, 600 };
 
 		if (center == false)
 		{
@@ -134,47 +134,47 @@ public:
 			craftBase.y += inputY - craftBase.h / 2;
 		}
 
-		topWindow = { 0, 0, 410,148 };
+		topWindow = { 0, 0, 615, 222 };
 		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
 
-		int categoryX = craftBase.x + 9;
-		int categoryY = craftBase.y + 36 + 14 + 28;
-		int categoryIntervalW = 80;
-		int categoryIntervalH = 80;
+		int categoryX = craftBase.x + 14;
+		int categoryY = craftBase.y + 54 + 21 + 42;
+		int categoryIntervalW = 120;
+		int categoryIntervalH = 120;
 
 
-		bookmarkCategory.x = craftBase.x + 9;
-		bookmarkCategory.y = craftBase.y + 39;
-		bookmarkCategory.w = 152;
-		bookmarkCategory.h = 33;
+		bookmarkCategory.x = craftBase.x + 14;
+		bookmarkCategory.y = craftBase.y + 59;
+		bookmarkCategory.w = 228;
+		bookmarkCategory.h = 50;
 
 		for (int i = 0; i < 8; i++)
 		{
 			craftCategory[i].x = categoryX + categoryIntervalW * (i % 2);
 			craftCategory[i].y = categoryY + categoryIntervalH * (i / 2);
-			craftCategory[i].w = 72;
-			craftCategory[i].h = 72;
+			craftCategory[i].w = 108;
+			craftCategory[i].h = 108;
 		}
 
 		for (int i = 0; i < 8; i++)
 		{
-			subcategoryBox[i] = { craftBase.x + 169 + 68 * i, craftBase.y + 93, 68, 20 };
+			subcategoryBox[i] = { craftBase.x + 254 + 102 * i, craftBase.y + 140, 102, 30 };
 		}
 
-		searchTextRect = { craftBase.x + craftBase.w - 224, craftBase.y + 46, 150, 30 };
-		searchBtnRect = { searchTextRect.x + 153, searchTextRect.y, 48, searchTextRect.h };
+		searchTextRect = { craftBase.x + craftBase.w - 336, craftBase.y + 69, 225, 45 };
+		searchBtnRect = { searchTextRect.x + 230, searchTextRect.y, 72, searchTextRect.h };
 
 		for (int i = 0; i < 24; i++)
 		{
-			itemBox[i].x = craftBase.x + 177 + (152 * i) % (152 * 3);
-			itemBox[i].y = craftBase.y + 127 + 33 * ((152 * i) / (152 * 3));
-			itemBox[i].w = 145;
-			itemBox[i].h = 27;
+			itemBox[i].x = craftBase.x + 266 + (228 * i) % (228 * 3);
+			itemBox[i].y = craftBase.y + 191 + 50 * ((228 * i) / (228 * 3));
+			itemBox[i].w = 218;
+			itemBox[i].h = 41;
 		}
 
-		tooltipCraftBtn = { topWindow.x + 310,topWindow.y + 10,90,26 };
-		tooltipBookmarkBtn = { topWindow.x + 310,topWindow.y + 10 + 32,90,26 };
-		unfoldBtn = { topWindow.x + topWindow.w - 32,topWindow.y + topWindow.h - 32, 28 , 28 };
+		tooltipCraftBtn = { topWindow.x + 465, topWindow.y + 15, 135, 39 };
+		tooltipBookmarkBtn = { topWindow.x + 465, topWindow.y + 15 + 48, 135, 39 };
+		unfoldBtn = { topWindow.x + topWindow.w - 48, topWindow.y + topWindow.h - 48, 42, 42 };
 
 		if (center == false)
 		{
@@ -225,15 +225,15 @@ public:
 			{
 				tooltipUnfold = true;
 				deactColorChange = true;
-				topWindow.h += 300;
-				unfoldBtn.y += 300;
+				topWindow.h += 450;
+				unfoldBtn.y += 450;
 			}
 			else
 			{
 				tooltipUnfold = false;
 				deactColorChange = false;
-				topWindow.h -= 300;
-				unfoldBtn.y -= 300;
+				topWindow.h -= 450;
+				unfoldBtn.y -= 450;
 			}
 		}
 		else if (checkCursor(&bookmarkCategory))//즐겨찾기 카테고리 클릭업
