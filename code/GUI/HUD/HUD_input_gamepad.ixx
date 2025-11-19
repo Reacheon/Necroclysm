@@ -112,10 +112,10 @@ void HUD::gamepadStep()
 			{
 				dpadDelay = 6;
 				int dir = -1;
-				bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
-				bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
-				bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
-				bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+				dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
+				dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+				dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+				dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 
 				if (dpadUpPressed && dpadLeftPressed) dir = 3;
 				else if (dpadUpPressed && dpadRightPressed) dir = 1;
@@ -172,6 +172,12 @@ void HUD::gamepadStep()
 			}
 			else dpadDelay--;
 		}
+
+		// 매 프레임마다 D-Pad 상태 업데이트 (barActCursor 이동에 필요)
+		dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
+		dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+		dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+		dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 
 		if (barActCursorMoveDelay <= 0 && barActCursor != -1)
 		{
