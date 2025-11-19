@@ -109,7 +109,6 @@ void HUD::gamepadStep()
 		{
 			dpadDelay = 6;
 			int dir = -1;
-			SDL_PollEvent(&event);
 			bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
 			bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
 			bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
