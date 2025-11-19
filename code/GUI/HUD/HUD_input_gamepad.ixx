@@ -105,13 +105,13 @@ void HUD::gamepadStep()
 {
 	if (option::inputMethod == input::gamepad)
 	{
-		// 플레이어 애니메이션 중이 아닐 때만 D-pad 입력 처리
-		if (PlayerPtr->getAniType() == aniFlag::null)
+		if (dpadDelay <= 0)
 		{
-			if (dpadDelay <= 0)
+			if (PlayerPtr->getAniType() == aniFlag::null) // 플레이어 애니메이션 중이 아닐 때만 D-pad 입력 처리
 			{
-				dpadDelay = 6;
+                dpadDelay = 6;
 				int dir = -1;
+				SDL_UpdateGamepads();
 				bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
 				bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
 				bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
@@ -170,12 +170,18 @@ void HUD::gamepadStep()
 					}
 				}
 			}
-			else dpadDelay--;
 		}
+        else dpadDelay--;
 
 		if (barActCursorMoveDelay <= 0 && barActCursor != -1)
 		{
-			barActCursorMoveDelay = 5;
+			SDL_UpdateGamepads();
+			bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
+			bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+			bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+			bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+
+			barActCursorMoveDelay = 7;
 			if (dpadUpPressed)
 			{
 				if (barActCursor >= 7) barActCursor -= 7;
@@ -249,8 +255,6 @@ void HUD::gamepadStep()
 
 		if (std::abs(PlayerPtr->getX() - cameraX) > maxDist) cameraX = prevCameraX;
 		if (std::abs(PlayerPtr->getY() - cameraY) > maxDist) cameraY = prevCameraY;
-
-
 
 
 		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);

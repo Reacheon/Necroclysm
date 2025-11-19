@@ -59,11 +59,7 @@ private:
 
 	bool disableClickUp4Motion = false;
 
-	bool dpadUpPressed = false;
-	bool dpadDownPressed = false;
-	bool dpadLeftPressed = false;
-	bool dpadRightPressed = false;
-
+	int dpadDelay = 0;
 	int barActCursorMoveDelay = 0;
 	int rStickPressDelay = 0;
 	int quickSlotCursor = -1;
