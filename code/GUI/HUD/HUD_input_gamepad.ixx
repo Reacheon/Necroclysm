@@ -11,7 +11,7 @@ import Player;
 import World;
 import Prop;
 import Aim;
-
+import turnWait;
 
 void HUD::gamepadBtnDown()
 {
@@ -83,7 +83,14 @@ void HUD::gamepadBtnUp()
 			tileTouch(tgtX, tgtY);
 		}
 		break;
+    case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
+		if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) changePlayerWalkMode(walkFlag::run);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) changePlayerWalkMode(walkFlag::crouch);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) changePlayerWalkMode(walkFlag::crawl);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) changePlayerWalkMode(walkFlag::walk);
+		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
+		turnWait(1.0);
 		break;
 	case SDL_GAMEPAD_BUTTON_START:
 		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
