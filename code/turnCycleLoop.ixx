@@ -316,10 +316,11 @@ __int64 playerInputTurn()
 					break;
 				case SDL_EVENT_GAMEPAD_AXIS_MOTION:
 					gamepadBtnMotion();
+					break;
 				case SDL_EVENT_WINDOW_RESIZED:
 					SDL_SetRenderLogicalPresentation(renderer,
-						434,
-						244,
+						cameraW,
+						cameraH,
 						SDL_LOGICAL_PRESENTATION_LETTERBOX);
 					break;
 				case SDL_EVENT_QUIT:
