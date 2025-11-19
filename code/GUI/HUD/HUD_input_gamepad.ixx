@@ -105,70 +105,73 @@ void HUD::gamepadStep()
 {
 	if (option::inputMethod == input::gamepad)
 	{
-		if (dpadDelay <= 0)
+		// 플레이어 애니메이션 중이 아닐 때만 D-pad 입력 처리
+		if (PlayerPtr->getAniType() == aniFlag::null)
 		{
-			dpadDelay = 6;
-			int dir = -1;
-			SDL_PollEvent(&event);
-			bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
-			bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
-			bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
-			bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
-
-			if (dpadUpPressed && dpadLeftPressed) dir = 3;
-			else if (dpadUpPressed && dpadRightPressed) dir = 1;
-			else if (dpadDownPressed && dpadLeftPressed) dir = 5;
-			else if (dpadDownPressed && dpadRightPressed) dir = 7;
-			else if (dpadUpPressed) dir = 2;
-			else if (dpadDownPressed) dir = 6;
-			else if (dpadLeftPressed) dir = 4;
-			else if (dpadRightPressed) dir = 0;
-
-			if (barActCursor == -1 && quickSlotCursor == -1)
+			if (dpadDelay <= 0)
 			{
-				if (dir != -1)
+				dpadDelay = 6;
+				int dir = -1;
+				bool dpadUpPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_UP);
+				bool dpadDownPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_DOWN);
+				bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+				bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
+
+				if (dpadUpPressed && dpadLeftPressed) dir = 3;
+				else if (dpadUpPressed && dpadRightPressed) dir = 1;
+				else if (dpadDownPressed && dpadLeftPressed) dir = 5;
+				else if (dpadDownPressed && dpadRightPressed) dir = 7;
+				else if (dpadUpPressed) dir = 2;
+				else if (dpadDownPressed) dir = 6;
+				else if (dpadLeftPressed) dir = 4;
+				else if (dpadRightPressed) dir = 0;
+
+				if (barActCursor == -1 && quickSlotCursor == -1)
 				{
-					int dx, dy;
-					dir2Coord(dir, dx, dy);
-					if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1칸 이내
-					{
-						cameraFix = true;
-						PlayerPtr->startMove(dir);
-					}
-					else
+					if (dir != -1)
 					{
 						int dx, dy;
 						dir2Coord(dir, dx, dy);
-						Prop* tgtProp = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-						if (tgtProp != nullptr)
+						if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1칸 이내
 						{
-							int tgtItemCode = tgtProp->leadItem.itemCode;
-							if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
+							cameraFix = true;
+							PlayerPtr->startMove(dir);
+						}
+						else
+						{
+							int dx, dy;
+							dir2Coord(dir, dx, dy);
+							Prop* tgtProp = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+							if (tgtProp != nullptr)
 							{
-								if (tgtProp->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
+								int tgtItemCode = tgtProp->leadItem.itemCode;
+								if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
 								{
-									tgtProp->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
-									tgtProp->leadItem.addFlag(itemFlag::DOOR_OPEN);
-
-									tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
-									tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
-									tgtProp->leadItem.extraSprIndexSingle++;
-
-									if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+									if (tgtProp->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
 									{
-										tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
-										tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
-									}
+										tgtProp->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
+										tgtProp->leadItem.addFlag(itemFlag::DOOR_OPEN);
 
-									PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+										tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
+										tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+										tgtProp->leadItem.extraSprIndexSingle++;
+
+										if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+										{
+											tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+											tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+										}
+
+										PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			else dpadDelay--;
 		}
-		else dpadDelay--;
 
 		if (barActCursorMoveDelay <= 0 && barActCursor != -1)
 		{
