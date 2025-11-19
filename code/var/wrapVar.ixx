@@ -312,7 +312,6 @@ export int getItemSprIndex(ItemData& inputData)
     else return inputData.itemSprIndex;
 }
 
-
 export void changePlayerWalkMode(walkFlag inputMode)
 {
     auto& pStatus = PlayerPtr->entityInfo.statusEffectVec;

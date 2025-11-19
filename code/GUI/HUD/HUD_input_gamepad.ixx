@@ -44,7 +44,7 @@ void HUD::gamepadBtnDown()
 		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_STICK:
 		zoomScale += 1;
-		if (zoomScale > 5.0) zoomScale = 1.0;
+		if (zoomScale > 5.0) zoomScale = 2.0;
 		break;
 	}
 
