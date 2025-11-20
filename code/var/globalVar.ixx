@@ -19,7 +19,7 @@ import Drawable;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::test, act::quest,act::god, act::sleep };
+    std::vector<act> null = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait, act::test, act::quest,act::god, act::sleep };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
@@ -34,7 +34,7 @@ export namespace actSet
 export namespace option
 {
     std::wstring language = L"English";// 또는 "English"
-    input inputMethod = input::gamepad; //조작방식 설정
+    input inputMethod = input::mouse; //조작방식 설정
 };
 
 export namespace debug

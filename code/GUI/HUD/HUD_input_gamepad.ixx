@@ -12,6 +12,49 @@ import World;
 import Prop;
 import Aim;
 import turnWait;
+import Craft;
+import Equip;
+
+void gamepadMove(int dir)
+{
+	int dx, dy;
+	dir2Coord(dir, dx, dy);
+	if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1칸 이내
+	{
+		cameraFix = true;
+		PlayerPtr->startMove(dir);
+	}
+	else
+	{
+		int dx, dy;
+		dir2Coord(dir, dx, dy);
+		Prop* tgtProp = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+		if (tgtProp != nullptr)
+		{
+			int tgtItemCode = tgtProp->leadItem.itemCode;
+			if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
+			{
+				if (tgtProp->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
+				{
+					tgtProp->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
+					tgtProp->leadItem.addFlag(itemFlag::DOOR_OPEN);
+
+					tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
+					tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+					tgtProp->leadItem.extraSprIndexSingle++;
+
+					if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+					{
+						tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+						tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+					}
+
+					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+				}
+			}
+		}
+	}
+}
 
 void HUD::gamepadBtnDown()
 {
@@ -38,9 +81,7 @@ void HUD::gamepadBtnDown()
 		}
 		break;
 	case SDL_GAMEPAD_BUTTON_WEST:
-		quickSlotToggle();
-		if (isQuickSlotPop) quickSlotCursor = 0;
-		else quickSlotCursor = -1;
+		new Equip();
 		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_STICK:
 		zoomScale += 1;
@@ -65,6 +106,7 @@ void HUD::gamepadBtnUp()
 		break;
 	case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		break;
+
 	case SDL_GAMEPAD_BUTTON_SOUTH:
 		if (barActCursor != -1) clickLetterboxBtn(barAct[barActCursor]);
 		else
@@ -90,8 +132,27 @@ void HUD::gamepadBtnUp()
 		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) changePlayerWalkMode(walkFlag::walk);
 		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
-		turnWait(1.0);
+	{
+		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
+		__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
+
+		int tgtX = 0;
+		int tgtY = 0;
+
+		if (leftX > TOLERANCE_LSTICK) tgtX += 1;
+		else if (leftX < -TOLERANCE_LSTICK) tgtX -= 1;
+		if (leftY > TOLERANCE_LSTICK) tgtY += 1;
+		else if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
+
+		if(tgtX == 0 && tgtY == 0) turnWait(1.0);
+		else
+		{
+            int dir = coord2Dir(tgtX, tgtY);
+			gamepadMove(dir);
+		}
+		
 		break;
+	}
 	case SDL_GAMEPAD_BUTTON_START:
 		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
 		__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
@@ -105,9 +166,12 @@ void HUD::gamepadBtnUp()
 		if (leftY < -TOLERANCE_LSTICK) tgtY -= 1;
 
 		openContextMenu({ tgtX,tgtY });
-
+	
 	}
 }
+
+
+
 void HUD::gamepadStep()
 {
 	if (option::inputMethod == input::gamepad)
@@ -137,43 +201,7 @@ void HUD::gamepadStep()
 				{
 					if (dir != -1)
 					{
-						int dx, dy;
-						dir2Coord(dir, dx, dy);
-						if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }) == true)//1칸 이내
-						{
-							cameraFix = true;
-							PlayerPtr->startMove(dir);
-						}
-						else
-						{
-							int dx, dy;
-							dir2Coord(dir, dx, dy);
-							Prop* tgtProp = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-							if (tgtProp != nullptr)
-							{
-								int tgtItemCode = tgtProp->leadItem.itemCode;
-								if (tgtProp->leadItem.checkFlag(itemFlag::DOOR_CLOSE))
-								{
-									if (tgtProp->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false)
-									{
-										tgtProp->leadItem.eraseFlag(itemFlag::DOOR_CLOSE);
-										tgtProp->leadItem.addFlag(itemFlag::DOOR_OPEN);
-
-										tgtProp->leadItem.addFlag(itemFlag::PROP_WALKABLE);
-										tgtProp->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
-										tgtProp->leadItem.extraSprIndexSingle++;
-
-										if (tgtProp->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
-										{
-											tgtProp->leadItem.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
-											tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
-										}
-
-										PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
-									}
-								}
-							}
-						}
+						gamepadMove(dir);
 					}
 				}
 			}
@@ -228,10 +256,14 @@ void HUD::gamepadStep()
 				executeTab();
 				delayR2 = 20;
 			}
-			else
+			else delayR2--;
+
+			if (delayL2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 1000)
 			{
-				delayR2--;
+				new Craft();
+				delayL2 = 20;
 			}
+            else delayL2--;
 		}
 
 		__int16 rightX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHTX); // -32768 ~ 32767
@@ -263,7 +295,6 @@ void HUD::gamepadStep()
 		if (std::abs(PlayerPtr->getX() - cameraX) > maxDist) cameraX = prevCameraX;
 		if (std::abs(PlayerPtr->getY() - cameraY) > maxDist) cameraY = prevCameraY;
 
-
 		__int16 leftX = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTX);
 		__int16 leftY = SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_LEFTY);
 		int tgtX = PlayerX();
@@ -280,5 +311,6 @@ void HUD::gamepadStep()
 			gamepadWhiteMarker.z = PlayerZ();
 		}
 		else gamepadWhiteMarker.z = std::numeric_limits<int>::max();
+
 	}
 }

@@ -415,33 +415,36 @@ void HUD::drawGUI()
 		//	drawTextOutlineCenter(L"72%", letterbox.x + 18 + 562 + 16, letterbox.y + 3 + 24 + LETTERBOX_Y_OFFSET);
 		//}
 
-		//팝업 버튼
-		drawSprite(spr::menuPopUp, 0, letterbox.x + letterbox.w - 42, letterbox.y - 36);
+		if (option::inputMethod != input::gamepad)
 		{
-			SDL_Color popUpBtnColor = lowCol::black;
-			if (getLastGUI() == this)
+			//팝업 버튼
+			drawSprite(spr::menuPopUp, 0, letterbox.x + letterbox.w - 42, letterbox.y - 36);
 			{
-				if (checkCursor(&letterboxPopUpButton))
+				SDL_Color popUpBtnColor = lowCol::black;
+				if (getLastGUI() == this)
 				{
-					if (click == true) { popUpBtnColor = lowCol::deepBlue; }
-					else { popUpBtnColor = lowCol::blue; }
+					if (checkCursor(&letterboxPopUpButton))
+					{
+						if (click == true) { popUpBtnColor = lowCol::deepBlue; }
+						else { popUpBtnColor = lowCol::blue; }
+					}
+					else if (state[SDL_SCANCODE_RETURN]) { popUpBtnColor = lowCol::blue; }
+					else { popUpBtnColor = lowCol::black; }
 				}
-				else if (state[SDL_SCANCODE_RETURN]) { popUpBtnColor = lowCol::blue; }
-				else { popUpBtnColor = lowCol::black; }
-			}
 
-			drawStadium(letterboxPopUpButton.x, letterboxPopUpButton.y, letterboxPopUpButton.w, letterboxPopUpButton.h, popUpBtnColor, 200, 5);
+				drawStadium(letterboxPopUpButton.x, letterboxPopUpButton.y, letterboxPopUpButton.w, letterboxPopUpButton.h, popUpBtnColor, 200, 5);
 
-			if (option::inputMethod == input::gamepad)
-			{
-				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH) && getLastGUI() == this) { targetBtnSpr = spr::buttonsPressed; }
-				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
-			}
-			else
-			{
-				if (y == 0) drawSpriteCenter(spr::windowArrow, 1, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
-				else drawSpriteCenter(spr::windowArrow, 3, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
+				if (option::inputMethod == input::gamepad)
+				{
+					if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_NORTH) && getLastGUI() == this) { targetBtnSpr = spr::buttonsPressed; }
+					else { targetBtnSpr = spr::buttons; }
+					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
+				}
+				else
+				{
+					if (y == 0) drawSpriteCenter(spr::windowArrow, 1, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
+					else drawSpriteCenter(spr::windowArrow, 3, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
+				}
 			}
 		}
 
@@ -517,36 +520,20 @@ void HUD::drawTab()
 		}
 		else
 		{
-			if (checkCursor(&tabSmallBox))
+			if (checkCursor(&tab))
 			{
 				if (click == false)
 				{
-					drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
-					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::blue, 255, 3);
+					drawSprite(spr::tab, tabSprFlag::ONE_BTN_HOVER, tab.x, tab.y - 2);
 				}
 				else
 				{
-					drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
-					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::deepBlue, 255, 3);
-				}
-			}
-			else if (checkCursor(&tab))
-			{
-				if (click == false)
-				{
-					drawSprite(spr::tab, tabSprFlag::APPLE_BTN_HOVER, tab.x, tab.y - 2);
-					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
-				}
-				else
-				{
-					drawSprite(spr::tab, tabSprFlag::APPLE_BTN_CLICK, tab.x, tab.y - 2);
-					drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+					drawSprite(spr::tab, tabSprFlag::ONE_BTN_CLICK, tab.x, tab.y - 2);
 				}
 			}
 			else
 			{
-				drawSprite(spr::tab, tabSprFlag::APPLE_BTN, tab.x, tab.y - 2);
-				drawStadium(tab.x + 116, tab.y - 6, 68, 68, lowCol::black, 255, 3);
+				drawSprite(spr::tab, tabSprFlag::ONE_BTN, tab.x, tab.y - 2);
 			}
 		}
 		if (option::language == L"Korean") setFontSize(12);
@@ -555,19 +542,8 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon48, 1, tab.x + 42 + 25, tab.y + 55 + 12);
 		drawSpriteCenter(spr::icon48, 2, tab.x + 72 + 40, tab.y + 64 + 29);
 		setZoom(1.0);
-		setZoom(1.5);
-		drawSpriteCenter(spr::icon48, 158, tabSmallBox.x + tabSmallBox.w / 2, tabSmallBox.y + tabSmallBox.h / 2);
-		setZoom(1.0);
-		setFontSize(14);
-		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 36);
-		drawTextCenter(sysStr[2], tab.x + tab.w / 2, tab.y + tab.h - 36 + 16);
-		Sprite* targetBtnSpr;
-		if (option::inputMethod == input::gamepad)
-		{
-			if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
-			else { targetBtnSpr = spr::buttons; }
-			drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_R1, tab.x + 117, tab.y - 4);
-		}
+		setFontSize(18);
+		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 30);
 		break;
 	}
 	case tabFlag::aim:
@@ -612,19 +588,21 @@ void HUD::drawTab()
 
 
 
-		setFontSize(12);
-		drawTextCenter(sysStr[195], tab.x + 62, tab.y + 9);
-		drawTextCenter(sysStr[207], tab.x + 104, tab.y + 52);
+		setFontSize(16);
+		drawTextCenter(sysStr[195], tab.x + 92, tab.y + 11);
+		drawTextCenter(sysStr[207], tab.x + 142, tab.y + 80);
 		//renderTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
 
 
 
+		setZoom(2.0);
+		drawSpriteCenter(spr::icon48, 169, tab.x + 54, tab.y + 68);
 		setZoom(1.5);
-		drawSpriteCenter(spr::icon48, 169, tab.x + 38, tab.y + 52);
-		setZoom(1.0);
-		drawSpriteCenter(spr::icon48, 170, tab.x + 80, tab.y + 85);
+		drawSpriteCenter(spr::icon48, 170, tab.x + 120, tab.y + 128);
 
-		drawSpriteCenter(spr::icon48, 158, tab.x + 100, tab.y + 21);
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon48, 158, tab.x + 151, tab.y + 27);
+		setZoom(1.0);
 
 
 
@@ -981,7 +959,11 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::reloadBulletToGun) setBtnLayout(sysStr[113], 45);
 		else if (barAct[i] == act::unloadBulletFromGun) setBtnLayout(sysStr[114], 46);
 		else if (barAct[i] == act::turnLeft) setBtnLayout(sysStr[141], 0);
-		else if (barAct[i] == act::wait) setBtnLayout(sysStr[142], 0);
+		else if (barAct[i] == act::wait)
+		{
+			if (ctrlVeh == nullptr) setBtnLayout(sysStr[142], 2);
+			else setBtnLayout(sysStr[142], 0);
+		}
 		else if (barAct[i] == act::turnRight) setBtnLayout(sysStr[143], 0);
 		else if (barAct[i] == act::startEngine) setBtnLayout(sysStr[144], 0);
 		else if (barAct[i] == act::stopEngine) setBtnLayout(sysStr[145], 0);
