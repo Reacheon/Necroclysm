@@ -1305,30 +1305,33 @@ void drawMarkers()
         setZoom(1.0);
     }
 
-    // 화이트마커 그리기
+    // 게임패드 화이트마커 그리기
     if (option::inputMethod == input::gamepad)
     {
-        if (gamepadWhiteMarker.z == PlayerZ())
+        if (PlayerPtr->getAniType() == aniFlag::null)
         {
-            if (std::abs(gamepadWhiteMarker.x - PlayerX()) <= MARKER_LIMIT_DIST)
+            if (gamepadWhiteMarker.z == PlayerZ())
             {
-                if (std::abs(gamepadWhiteMarker.y - PlayerY()) <= MARKER_LIMIT_DIST)
+                if (std::abs(gamepadWhiteMarker.x - PlayerX()) <= MARKER_LIMIT_DIST)
                 {
-                    int tgtX = gamepadWhiteMarker.x;
-                    int tgtY = gamepadWhiteMarker.y;
-                    dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
-                    dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
-                    dst.w = tileSize;
-                    dst.h = tileSize;
-                    setZoom(zoomScale);
-                    drawSpriteCenter
-                    (
-                        spr::whiteMarker,
-                        0,
-                        dst.x + dst.w / 2,
-                        dst.y + dst.h / 2
-                    );
-                    setZoom(1.0);
+                    if (std::abs(gamepadWhiteMarker.y - PlayerY()) <= MARKER_LIMIT_DIST)
+                    {
+                        int tgtX = gamepadWhiteMarker.x;
+                        int tgtY = gamepadWhiteMarker.y;
+                        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+                        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+                        dst.w = tileSize;
+                        dst.h = tileSize;
+                        setZoom(zoomScale);
+                        drawSpriteCenter
+                        (
+                            spr::whiteMarker,
+                            0,
+                            dst.x + dst.w / 2,
+                            dst.y + dst.h / 2
+                        );
+                        setZoom(1.0);
+                    }
                 }
             }
         }

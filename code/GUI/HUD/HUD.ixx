@@ -67,7 +67,7 @@ private:
 	int fakeSTA = 0;
 	int alphaSTA = 150;
 
-
+	int delayL2 = 0;
 	int delayR2 = 0;
 
 	int dragQuickSlotTarget = -1;//HUD에서 스킬창 옮길 때 용도(Skill GUI랑 기능 동일)
@@ -810,16 +810,42 @@ public:
 
 	void executeTab()
 	{
-		int dx, dy = 0;
-		for (int dir = 0; dir < 8; dir++)
+		bool findRangeWeapon = false;
+		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		for (int i = 0; i < equipInfo.size(); i++)
 		{
-			dir2Coord(dir, dx, dy);
-			if (TileEntity(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
+			if (equipInfo[i].equipState != equipHandFlag::none)
 			{
-				PlayerPtr->startAtk(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				turnWait(1.0);
-				break;
+				if(equipInfo[i].checkFlag(itemFlag::BOW) ||
+				   equipInfo[i].checkFlag(itemFlag::CROSSBOW) ||
+				   equipInfo[i].checkFlag(itemFlag::GUN))
+				{
+					findRangeWeapon = true;
+					break;
+                }
 			}
+		}
+
+		if (findRangeWeapon == false)
+		{
+			int dx, dy = 0;
+			for (int dir = 0; dir < 8; dir++)
+			{
+				dir2Coord(dir, dx, dy);
+				if (TileEntity(PlayerX() + dx, PlayerY() + dy, PlayerZ()) != nullptr)
+				{
+					PlayerPtr->startAtk(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+					turnWait(1.0);
+					break;
+				}
+			}
+		}
+		else
+		{
+
+
+			findAndOpenAim();
+			
 		}
 	}
 
