@@ -564,5 +564,11 @@
     <ClCompile Include="code\var\textureVar.ixx">
       <Filter>소스 파일\01_system</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

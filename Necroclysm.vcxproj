@@ -192,6 +192,8 @@
     <ClCompile Include="code\GUI\CoroutineGUI\Msg.ixx" />
     <ClCompile Include="code\GUI\CRAFT\Craft.ixx" />
     <ClCompile Include="code\GUI\CRAFT\Craft_draw.cpp" />
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.ixx" />
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx" />
     <ClCompile Include="code\GUI\Dialogue.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip_draw.ixx" />

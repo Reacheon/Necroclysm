@@ -1,10 +1,13 @@
-﻿#include <SDL3/SDL.h>
+#include <SDL3/SDL.h>
+
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
-import Equip;
+export module Craft_input_gamepad;
+
+import Craft;
 import globalVar;
 
-void Equip::gamepadBtnDown() 
+void Craft::gamepadBtnDown() 
 {
 	switch (event.gbutton.button)
 	{
@@ -13,5 +16,5 @@ void Equip::gamepadBtnDown()
 		break;
 	}
 }
-void Equip::gamepadBtnMotion() { }
-void Equip::gamepadBtnUp() { }
+void Craft::gamepadBtnMotion() {}
+void Craft::gamepadBtnUp() {}

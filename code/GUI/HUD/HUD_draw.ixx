@@ -489,8 +489,8 @@ void HUD::drawGUI()
 
 
 	drawBarAct();
-	drawTab();
-	drawQuickSlot();
+	if(option::inputMethod != input::gamepad) drawTab();
+	if (option::inputMethod != input::gamepad) drawQuickSlot();
 	drawQuest();
 	//drawHoverItemInfo();
 
@@ -1479,8 +1479,6 @@ void HUD::drawQuest()
 
 void HUD::drawBodyParts()
 {
-
-
 	// 페이크 HP 업데이트 람다 함수
 	auto updateFakeHP = [](int& fakeHP, int& realHP, unsigned char& fakeHPAlpha) 
 		{
