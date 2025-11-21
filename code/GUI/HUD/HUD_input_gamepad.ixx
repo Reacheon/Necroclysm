@@ -216,7 +216,7 @@ void HUD::gamepadStep()
 			bool dpadLeftPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_LEFT);
 			bool dpadRightPressed = SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_DPAD_RIGHT);
 
-			barActCursorMoveDelay = 7;
+			barActCursorMoveDelay = 10;
 			if (dpadUpPressed)
 			{
 				if (barActCursor >= 7) barActCursor -= 7;

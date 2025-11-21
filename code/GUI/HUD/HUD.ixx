@@ -99,20 +99,21 @@ public:
 		*/
 
 		//letterbox = { 0, 0, 945, 201 };
+
 		letterbox = { 0, 0, 782, 176 };
 		letterbox.x = cameraW - 1 - 781;
 		letterbox.y = cameraH - 1- 175 + inputY;
+		
+		if (option::inputMethod == input::gamepad)
+		{
+			letterbox.y += 99;
+        }
+		
 		//letterbox.h = cameraH - letterbox.y + 6;
 
 		for (int i = 0; i < 35; i++)
 		{
-			barButton[i] = { cameraW / 2 - 300 + (88 * (i % 7)), cameraH - 80 + inputY + (88 * (i / 7)), 72,72 };
-			letterboxInButton[i] = { barButton[i].x + 3,  barButton[i].y + 3, 72 - 6, 72 - 6 };
-		}
-
-		for (int i = 0; i < 35; i++)
-		{
-			barButton[i] = { letterbox.x + 15 + (109 * (i % 7)),  letterbox.y + 73 + (109 * (i / 7)), 96,96 };
+			barButton[i] = { letterbox.x + 15 + (109 * (i % 7)),  letterbox.y + 77 + (109 * (i / 7)), 96,96 };
 			letterboxInButton[i] = { barButton[i].x + 4,  barButton[i].y + 4, barButton[i].w - 8, barButton[i].h - 8 };
 		}
 
@@ -343,7 +344,8 @@ public:
 	void executePopUp()
 	{
 		isPopUp = true;
-		popUpDist = ((barAct.size() - 1) / 7) * 109;
+		popUpDist = 5 + ((barAct.size() - 1) / 7) * 109;
+        popUpDist += option::inputMethod == input::gamepad ? 99 : 0;
 		deactInput();
 		addAniUSetPlayer(this, aniFlag::popUpLetterbox);
 	}
