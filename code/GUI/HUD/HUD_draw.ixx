@@ -70,6 +70,18 @@ void HUD::drawGUI()
 	drawStatusEffects();
 	drawBodyParts();
 
+	if (option::inputMethod == input::gamepad)
+	{
+		SDL_SetTextureBlendMode(spr::gamepadInstruction->getTexture(), SDL_BLENDMODE_BLEND);
+		SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 210);
+		int sprIndex = 0;
+		if (PlayerPtr->entityInfo.walkMode == walkFlag::run) sprIndex = 1;
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) sprIndex = 2;
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) sprIndex = 3;
+        drawSprite(spr::gamepadInstruction, sprIndex, 300, cameraH - 135);
+        SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 255);
+	}
+
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, cameraH - letterbox.y + 20, { 0,0,0 }, 150, 5);
 	if (ctrlVeh != nullptr)
 	{
@@ -106,9 +118,8 @@ void HUD::drawGUI()
 			Sprite* targetBtnSpr;
 			if (option::inputMethod == input::gamepad)
 			{
-				if (SDL_GetGamepadButton(controller, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER)) { targetBtnSpr = spr::buttonsPressed; }
-				else { targetBtnSpr = spr::buttons; }
-				drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_L1, minimapBtn.x, minimapBtn.y);
+				setZoom(1.0);
+				drawSpriteCenter(spr::gamepadButtons, 16, minimapBtn.x + 3, minimapBtn.y + 3);
 			}
 			else if (option::inputMethod == input::mouse)
 			{
