@@ -163,4 +163,7 @@ export namespace spr
 	Sprite* hpGauge = nullptr;
 
 	Sprite* icon24 = nullptr;
+
+	Sprite* gamepadInstruction = nullptr;
+	Sprite* gamepadButtons = nullptr;
 }

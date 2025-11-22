@@ -194,4 +194,7 @@ export void textureLoader()
     spr::hpGauge = new Sprite(renderer, "image/UI/GUI/HUD/hpGauge.png", 95, 13);
 
     spr::icon24 = new Sprite(renderer, "image/UI/icon24.png", 24, 24);
+
+    spr::gamepadInstruction = new Sprite(renderer, "image/UI/gamepadInstruction.png", 176, 112);
+	spr::gamepadButtons = new Sprite(renderer, "image/UI/gamepadButtons.png", 48, 48);
 }
