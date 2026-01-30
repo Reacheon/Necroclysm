@@ -1372,6 +1372,27 @@ export namespace itemRefCode
     
     constexpr int minerHelmet = 393;
 
+    ///////////////////////배관//////////////////////
+
+    constexpr int pipe = 182;
+    constexpr int transparentPipe = 183;
+    constexpr int fluidTank = 184;
+    constexpr int pumpR = 185;
+    constexpr int pumpU = 186;
+    constexpr int pumpL = 187;
+    constexpr int pumpD = 188;
+    constexpr int valveRL = 189;
+    constexpr int valveUD = 190;
+    constexpr int solenoidValveRL = 191;
+    constexpr int solenoidValveUD = 192;
+
+    constexpr int sprinklerRL = 193;
+    constexpr int sprinklerUD = 194;
+
+    constexpr int intakePipeR = 195;
+    constexpr int intakePipeU = 196;
+    constexpr int intakePipeL = 197;
+    constexpr int intakePipeD = 198;
 };
 
 export namespace entityRefCode

@@ -19,6 +19,7 @@ void Prop::drawSelf()
 {
     constexpr Uint8 HIDE_WIRE_ALPHA = 120;
     constexpr int SHOW_WIRE_HOVER_TIME = 120;
+   
 
     int tileSize = 16 * zoomScale;
     int bigShift = 16 * (leadItem.checkFlag(itemFlag::PROP_BIG));
@@ -453,6 +454,36 @@ void Prop::drawSelf()
         if (getInletCharge() > 0) sprIndex += 1;
     }
 
+    if (leadItem.itemCode == itemRefCode::fluidTank)
+    {
+        bool rConnected = false;
+        bool lConnected = false;
+
+        Prop* rProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+        Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
+
+        if (rProp != nullptr)
+        {
+            if (rProp->leadItem.checkFlag(itemFlag::PIPE) || rProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT))
+            {
+                rConnected = true;
+            }
+        }
+
+        if (lProp != nullptr)
+        {
+            if (lProp->leadItem.checkFlag(itemFlag::PIPE) || lProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT))
+            {
+                lConnected = true;
+            }
+        }
+
+        if(rConnected && lConnected) sprIndex += 3;
+        else if (rConnected) sprIndex += 1;
+        else if (lConnected) sprIndex += 2;
+    }
+
+
     ///////////////////////////////////////////////////////////////////////////
     /////////////////////////////메인 그리기 함수//////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
@@ -500,28 +531,6 @@ void Prop::drawSelf()
         if (chargeFlux[dir16::right] < 0) drawSpriteCenter(spr::propset, 3160 + 16, drawX, drawY);
     }
 
-    if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
-    {
-        if (leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
-            leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
-            leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
-            leadItem.itemCode == itemRefCode::gasolineGeneratorB)
-        {
-            int portSprIndex;
-            if (leadItem.itemCode == itemRefCode::gasolineGeneratorR) portSprIndex = 3200;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorT)  portSprIndex = 3201;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorL)   portSprIndex = 3202;
-            else if (leadItem.itemCode == itemRefCode::gasolineGeneratorB)   portSprIndex = 3203;
-
-            drawSpriteCenter
-            (
-                spr::propset,
-                portSprIndex,
-                drawX,
-                drawY
-            );
-        }
-    }
 
     if (treeAngle != 0)
     {
