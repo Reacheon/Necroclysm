@@ -1681,7 +1681,6 @@ void HUD::drawBodyParts()
 
 void HUD::drawCircuitInfo()
 {
-	return;
 	if (ContextMenu::ins() != nullptr) return;
 
 	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };

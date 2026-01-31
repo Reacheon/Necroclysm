@@ -127,6 +127,8 @@ const wchar_t* dirToArrow(dir16 dir)
     }
 }
 
+
+
 bool Prop::hasGround()
 {
     //일반 접지
@@ -153,6 +155,42 @@ bool Prop::isChargeFlowing()
         || chargeFlux[dir16::down] != 0
         || chargeFlux[dir16::above] != 0
         || chargeFlux[dir16::below] != 0;
+}
+
+void Prop::initChargeFlux()
+{
+    chargeFlux[dir16::right] = 0;
+    chargeFlux[dir16::up] = 0;
+    chargeFlux[dir16::left] = 0;
+    chargeFlux[dir16::down] = 0;
+    chargeFlux[dir16::above] = 0;
+    chargeFlux[dir16::below] = 0;
+}
+
+double Prop::getInletCharge()
+{
+    double totalInlet = 0;
+    if (chargeFlux[dir16::right] > 0) totalInlet += chargeFlux[dir16::right];
+    if (chargeFlux[dir16::up] > 0) totalInlet += chargeFlux[dir16::up];
+    if (chargeFlux[dir16::left] > 0) totalInlet += chargeFlux[dir16::left];
+    if (chargeFlux[dir16::down] > 0) totalInlet += chargeFlux[dir16::down];
+    if (chargeFlux[dir16::above] > 0) totalInlet += chargeFlux[dir16::above];
+    if (chargeFlux[dir16::below] > 0) totalInlet += chargeFlux[dir16::below];
+
+    return totalInlet;
+}
+
+double Prop::getOutletCharge()
+{
+    double totalOutlet = 0;
+    if (chargeFlux[dir16::right] < 0) totalOutlet -= chargeFlux[dir16::right];
+    if (chargeFlux[dir16::up] < 0) totalOutlet -= chargeFlux[dir16::up];
+    if (chargeFlux[dir16::left] < 0) totalOutlet -= chargeFlux[dir16::left];
+    if (chargeFlux[dir16::down] < 0) totalOutlet -= chargeFlux[dir16::down];
+    if (chargeFlux[dir16::above] < 0) totalOutlet -= chargeFlux[dir16::above];
+    if (chargeFlux[dir16::below] < 0) totalOutlet -= chargeFlux[dir16::below];
+
+    return totalOutlet;
 }
 
 void Prop::updateCircuitNetwork()

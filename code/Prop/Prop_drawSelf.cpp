@@ -19,7 +19,7 @@ void Prop::drawSelf()
 {
     constexpr Uint8 HIDE_WIRE_ALPHA = 120;
     constexpr int SHOW_WIRE_HOVER_TIME = 120;
-   
+
 
     int tileSize = 16 * zoomScale;
     int bigShift = 16 * (leadItem.checkFlag(itemFlag::PROP_BIG));
@@ -63,7 +63,7 @@ void Prop::drawSelf()
 
 
         //prevHoverGrid = currentHoverGrid;
-        
+
         //▲현재는 이렇게 주석 처리 해놨는데 마우스 오래 올려두면 보이게 하려면 하단1줄(▼) 제거하고 위에 주석처리한 코드들 전부 해제(일단 좀 지켜보자)
         showAllHideWire = false;
 
@@ -126,7 +126,7 @@ void Prop::drawSelf()
         Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
         Prop* dProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
 
-        bool isRightCable = rightProp != nullptr && (rightProp->leadItem.checkFlag(itemFlag::CABLE)||rightProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT));
+        bool isRightCable = rightProp != nullptr && (rightProp->leadItem.checkFlag(itemFlag::CABLE) || rightProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_LEFT));
         bool isUpCable = topProp != nullptr && (topProp->leadItem.checkFlag(itemFlag::CABLE) || topProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_DOWN));
         bool isLeftCable = lProp != nullptr && (lProp->leadItem.checkFlag(itemFlag::CABLE) || lProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT));
         bool isDownCable = dProp != nullptr && (dProp->leadItem.checkFlag(itemFlag::CABLE) || dProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP));
@@ -160,7 +160,7 @@ void Prop::drawSelf()
             }
             else
             {
-                if(leadItem.checkFlag(itemFlag::HIDE_WIRE) && showAllHideWire == true) SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
+                if (leadItem.checkFlag(itemFlag::HIDE_WIRE) && showAllHideWire == true) SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
 
                 drawSpriteCenter
                 (
@@ -308,11 +308,11 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (leadItem.itemCode== itemRefCode::relayR || leadItem.itemCode == itemRefCode::relayU || leadItem.itemCode == itemRefCode::relayL || leadItem.itemCode == itemRefCode::relayD)
+    else if (leadItem.itemCode == itemRefCode::relayR || leadItem.itemCode == itemRefCode::relayU || leadItem.itemCode == itemRefCode::relayL || leadItem.itemCode == itemRefCode::relayD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
-            if(leadItem.itemCode == itemRefCode::relayU || leadItem.itemCode == itemRefCode::relayD)
+            if (leadItem.itemCode == itemRefCode::relayU || leadItem.itemCode == itemRefCode::relayD)
             {
                 Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
                 Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
@@ -336,7 +336,7 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (leadItem.itemCode == itemRefCode::andGateR 
+    else if (leadItem.itemCode == itemRefCode::andGateR
         || leadItem.itemCode == itemRefCode::andGateL
         || leadItem.itemCode == itemRefCode::orGateR
         || leadItem.itemCode == itemRefCode::orGateL
@@ -390,7 +390,7 @@ void Prop::drawSelf()
         || leadItem.itemCode == itemRefCode::diodeL
         || leadItem.itemCode == itemRefCode::diodeD)
     {
-        if(isChargeFlowing())  sprIndex += 1;
+        if (isChargeFlowing())  sprIndex += 1;
     }
 
     if (leadItem.itemCode == itemRefCode::powerBankR || leadItem.itemCode == itemRefCode::powerBankL)
@@ -478,11 +478,67 @@ void Prop::drawSelf()
             }
         }
 
-        if(rConnected && lConnected) sprIndex += 3;
+        if (rConnected && lConnected) sprIndex += 3;
         else if (rConnected) sprIndex += 1;
         else if (lConnected) sprIndex += 2;
     }
 
+
+    if (leadItem.itemCode == itemRefCode::intakePipeR)
+    {
+        Prop* nextProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+        if(nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE)||nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT))) 
+            sprIndex += 1;
+    }
+    else if (leadItem.itemCode == itemRefCode::intakePipeL)
+    {
+        Prop* nextProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
+        if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)))
+            sprIndex += 1;
+    }
+    else if (leadItem.itemCode == itemRefCode::intakePipeU)
+    {
+        Prop* nextProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
+        if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN)))
+            sprIndex += 1;
+    }
+    else if (leadItem.itemCode == itemRefCode::intakePipeD)
+    {
+        Prop* nextProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
+        if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_UP)))
+            sprIndex += 1;
+    }
+
+    if (leadItem.itemCode == itemRefCode::intakePipeR
+        || leadItem.itemCode == itemRefCode::intakePipeU
+        || leadItem.itemCode == itemRefCode::intakePipeL
+        || leadItem.itemCode == itemRefCode::intakePipeD)
+    {
+        int floorItemIndex = TileFloor(getGridX(), getGridY(), getGridZ());
+        if(itemDex[floorItemIndex].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemIndex].checkFlag(itemFlag::WATER_DEEP))
+        {
+            sprIndex += 8;
+        }
+    }
+
+    if (leadItem.itemCode == itemRefCode::pumpR
+        || leadItem.itemCode == itemRefCode::pumpU
+        || leadItem.itemCode == itemRefCode::pumpL
+        || leadItem.itemCode == itemRefCode::pumpD)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            static Uint32 lastUpdateTime = 0;
+            static int animFrame = 0;
+            Uint32 currentTime = SDL_GetTicks();
+            if (currentTime - lastUpdateTime >= 100)
+            {
+                animFrame = (animFrame + 1) % 3;
+                lastUpdateTime = currentTime;
+            }
+            sprIndex += (1 + animFrame);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /////////////////////////////메인 그리기 함수//////////////////////////////

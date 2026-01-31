@@ -31,11 +31,11 @@ public:
 
     bool runUsed = false; //runProp
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     int nodeMaxCharge = 0; //회로망 전체의 총 가용 전력. 예로 20W 발전기 2개가 연결된 회로망은 절대 40W 이상이 전송될 수 없다.
     double nodeCharge = 0;
-
     double totalLossCharge = 0; //이번 턴에 저항으로 손실된 모든 에너지값
-
 
     std::unordered_map<dir16, double> chargeFlux = { {dir16::right,0},{dir16::up,0},{dir16::left,0},{dir16::down,0},{dir16::above,0},{dir16::below,0} };
     /*  ▲ chargeFlux 부호 규칙:
@@ -58,6 +58,17 @@ public:
     double gndSinkLeft = 0.0;
     double gndSinkDown = 0.0;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fluidType nodeFluidType = fluidType::NONE;
+    int nodeFluidAmount = 0;
+    int nodeMaxFluidAmount = 0;
+    double fluidSink = 0.0;
+
+    std::unordered_map<dir16, double> fluidFlux = { {dir16::right,0},{dir16::up,0},{dir16::left,0},{dir16::down,0},{dir16::above,0},{dir16::below,0} }; 
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();
@@ -76,41 +87,11 @@ public:
 
     bool isChargeFlowing();
 
-    void initChargeFlux()
-    {
-        chargeFlux[dir16::right] = 0;
-        chargeFlux[dir16::up] = 0;
-        chargeFlux[dir16::left] = 0;
-        chargeFlux[dir16::down] = 0;
-        chargeFlux[dir16::above] = 0;
-        chargeFlux[dir16::below] = 0;
-    }
+    void initChargeFlux();
 
-    double getInletCharge()
-    {
-        double totalInlet = 0;
-        if (chargeFlux[dir16::right] > 0) totalInlet += chargeFlux[dir16::right];
-        if (chargeFlux[dir16::up] > 0) totalInlet += chargeFlux[dir16::up];
-        if (chargeFlux[dir16::left] > 0) totalInlet += chargeFlux[dir16::left];
-        if (chargeFlux[dir16::down] > 0) totalInlet += chargeFlux[dir16::down];
-        if (chargeFlux[dir16::above] > 0) totalInlet += chargeFlux[dir16::above];
-        if (chargeFlux[dir16::below] > 0) totalInlet += chargeFlux[dir16::below];
-
-        return totalInlet;
-    }
+    double getInletCharge();
     
-    double getOutletCharge()
-    {
-        double totalOutlet = 0;
-        if (chargeFlux[dir16::right] < 0) totalOutlet -= chargeFlux[dir16::right];
-        if (chargeFlux[dir16::up] < 0) totalOutlet -= chargeFlux[dir16::up];
-        if (chargeFlux[dir16::left] < 0) totalOutlet -= chargeFlux[dir16::left];
-        if (chargeFlux[dir16::down] < 0) totalOutlet -= chargeFlux[dir16::down];
-        if (chargeFlux[dir16::above] < 0) totalOutlet -= chargeFlux[dir16::above];
-        if (chargeFlux[dir16::below] < 0) totalOutlet -= chargeFlux[dir16::below];
-
-        return totalOutlet;
-    }
+    double getOutletCharge();
 
     void updateCircuitNetwork();
 
@@ -135,4 +116,5 @@ public:
     bool hasGround();
 
     void loadAct();
+
 };

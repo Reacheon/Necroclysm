@@ -149,10 +149,22 @@ public:
 						SDL_SetTextureAlphaMod(spr::propset->getTexture(), 100);
 					}
 
+                    int drawItemCode = rotatedItemCode;
+
+					if (rotatedItemCode == itemRefCode::pipe && option::inputMethod == input::mouse)
+					{
+                        Point2 mouseCoord = getAbsMouseGrid();
+                        int floorItemCode = TileFloor(mouseCoord.x, mouseCoord.y, PlayerZ());
+						if(itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
+						{
+							drawItemCode = itemRefCode::intakePipeR;
+                        }
+					}
+
 					drawSpriteCenter
 					(
 						spr::propset,
-						itemDex[rotatedItemCode].propSprIndex,
+						itemDex[drawItemCode].propSprIndex,
 						(cameraW / 2) + (int)(16.0 * zoomScale * revGridX),
 						(cameraH / 2) + (int)(16.0 * zoomScale * revGridY)
 					);
@@ -345,6 +357,22 @@ public:
 						{
 							if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 							{
+								if (rotatedItemCode == itemRefCode::pipe)
+								{
+									int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
+									if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
+									{
+                                        rotatedItemCode = itemRefCode::intakePipeR;
+									}
+									else
+									{
+										coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
+										cameraFix = true;
+										delete this;
+										return;
+									}
+								}
+
 								if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
 								{
 									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
@@ -352,6 +380,13 @@ public:
 									delete this;
 									return;
 								}
+
+								if (rotatedItemCode == itemRefCode::pipe)
+								{
+									bool isFluidTile = false;
+									int floorItemCode = TileFloor(throwingX, throwingY, throwingZ);
+								}
+
 								targetSelect = true;
 								rangeSet.clear();
 								targetGridX = throwingX;
@@ -374,6 +409,22 @@ public:
 
 						if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 						{
+							if (rotatedItemCode == itemRefCode::pipe)
+							{
+								int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
+								if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
+								{
+									rotatedItemCode = itemRefCode::intakePipeR;
+								}
+								else
+								{
+									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
+									cameraFix = true;
+									delete this;
+									return;
+								}
+							}
+
 							if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
 							{
 								coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
@@ -423,6 +474,8 @@ public:
 	}
 	void step()
 	{
+
+
 		tabType = tabFlag::back;
 	}
 };

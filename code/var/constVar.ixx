@@ -1374,25 +1374,25 @@ export namespace itemRefCode
 
     ///////////////////////배관//////////////////////
 
-    constexpr int pipe = 182;
-    constexpr int transparentPipe = 183;
-    constexpr int fluidTank = 184;
-    constexpr int pumpR = 185;
-    constexpr int pumpU = 186;
-    constexpr int pumpL = 187;
-    constexpr int pumpD = 188;
-    constexpr int valveRL = 189;
-    constexpr int valveUD = 190;
-    constexpr int solenoidValveRL = 191;
-    constexpr int solenoidValveUD = 192;
+    constexpr int pipe = 170;
+    constexpr int transparentPipe = 171;
+    constexpr int fluidTank = 172;
+    constexpr int pumpR = 173;
+    constexpr int pumpU = 174;
+    constexpr int pumpL = 175;
+    constexpr int pumpD = 176;
+    constexpr int valveRL = 177;
+    constexpr int valveUD = 178;
+    constexpr int solenoidValveRL = 179;
+    constexpr int solenoidValveUD = 180;
 
-    constexpr int sprinklerRL = 193;
-    constexpr int sprinklerUD = 194;
+    constexpr int sprinklerRL = 181;
+    constexpr int sprinklerUD = 182;
 
-    constexpr int intakePipeR = 195;
-    constexpr int intakePipeU = 196;
-    constexpr int intakePipeL = 197;
-    constexpr int intakePipeD = 198;
+    constexpr int intakePipeR = 183;
+    constexpr int intakePipeU = 184;
+    constexpr int intakePipeL = 185;
+    constexpr int intakePipeD = 186;
 };
 
 export namespace entityRefCode
@@ -1428,6 +1428,17 @@ export namespace connectFlag
     constexpr int RL = 14;
     constexpr int UD = 15;
 }
+
+export enum class fluidType
+{
+    NONE,
+    WATER,          // 물
+    SEAWATER,       // 바닷물
+    POLLUTED_WATER, // 오염수
+    OIL,            // 석유
+    LAVA,           // 용암
+    HOT_SPRING,     // 온천수
+};
 
 export enum class skillSrc
 {

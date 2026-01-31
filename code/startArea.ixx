@@ -714,11 +714,11 @@ export void startArea()
 
 
 	//배관 설치
-	createProp({ 3, 6, 0 }, 144);
-	createProp({ 4, 6, 0 }, 144);
-	createProp({ 5, 6, 0 }, 144);
-	createProp({ 6, 6, 0 }, 144);
-	createProp({ 5, 7, 0 }, 144);
+	createProp({ 3, 6, 0 }, itemRefCode::pipe);
+	createProp({ 4, 6, 0 }, itemRefCode::pipe);
+	createProp({ 5, 6, 0 }, itemRefCode::pipe);
+	createProp({ 6, 6, 0 }, itemRefCode::pipe);
+	createProp({ 5, 7, 0 }, itemRefCode::pipe);
 
 	//종교
 
