@@ -323,10 +323,10 @@ export void startArea()
 			int cy = -1;
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i, -1);
-			createProp({ cx, cy + 1, -1 }, 291);//나무문 설치
+			createProp({ cx, cy + 1, -1 }, itemRefCode::woodenDoor);//나무문 설치
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy, -1);
-			createProp({ cx + 1, cy, -1 }, 291);
+			createProp({ cx + 1, cy, -1 }, itemRefCode::woodenDoor);
 			Prop* door2 = TileProp(cx + 1, cy, -1);//나무문 설치
 			door2->leadItem.extraSprIndexSingle = 2;
 
@@ -565,6 +565,75 @@ export void startArea()
 			//	createProp(targetX, endY - 20, pZ - 1, 303);//나무문 설치
 			//}
 		}
+
+		struct Range { int from, to; };
+
+		auto destroyRect = [](Range x, Range y) {
+			for (int xi = x.from; xi <= x.to; xi++)
+				for (int yi = y.from; yi <= y.to; yi++)
+					DestroyWall(xi, yi, -1);
+			};
+		auto destroyHLine = [](Range x, int y) {
+			for (int xi = x.from; xi <= x.to; xi++) DestroyWall(xi, y, -1);
+			};
+		auto destroyVLine = [](int x, Range y) {
+			for (int yi = y.from; yi <= y.to; yi++) DestroyWall(x, yi, -1);
+			};
+
+		// 중앙 큰 공간
+		destroyRect({ -15, -8 }, { -5, -1 });
+		destroyHLine({ -14, -7 }, 0);
+		destroyHLine({ -14, -12 }, 1);
+
+		// 상단 확장
+		destroyRect({ -13, -6 }, { -6, -5 });
+		destroyHLine({ -10, -5 }, -7);
+		destroyRect({ -9, -4 }, { -9, -8 });
+		destroyHLine({ -6, -3 }, -10);
+
+		// 우측 하단 돌출부
+		DestroyWall(-7, -1, -1);
+		DestroyWall(-7, -2, -1);
+		DestroyWall(-6, -2, -1);
+		destroyHLine({ -7, -4 }, -3);
+
+		// 좌측 통로
+		destroyVLine(-16, { -4, -2 });
+
+		destroyHLine({ -7, -5 }, -4);
+
+		createProp({ -4, -3, -1 }, itemRefCode::woodenDoor);
+		Prop* door3 = TileProp(-4, -3, -1);//나무문 설치
+		door3->leadItem.extraSprIndexSingle = 2;
+
+		//담수호
+		{
+			auto setDeep = [](int x, int y) { setFloor({ x, y, -1 }, itemRefCode::deepFreshWater); };
+			auto setShallow = [](int x, int y) { setFloor({ x, y, -1 }, itemRefCode::shallowFreshWater); };
+
+			auto floorRect = [](int code, Range x, Range y) {
+				for (int xi = x.from; xi <= x.to; xi++)
+					for (int yi = y.from; yi <= y.to; yi++)
+						setFloor({ xi, yi, -1 }, code);
+				};
+			auto floorHLine = [](int code, Range x, int y) {
+				for (int xi = x.from; xi <= x.to; xi++) setFloor({ xi, y, -1 }, code);
+				};
+			auto floorVLine = [](int code, int x, Range y) {
+				for (int yi = y.from; yi <= y.to; yi++) setFloor({ x, yi, -1 }, code);
+				};
+
+			floorVLine(itemRefCode::deepFreshWater, -16, { -4,-2 });
+			floorVLine(itemRefCode::deepFreshWater, -15, { -5,-1 });
+			floorVLine(itemRefCode::deepFreshWater, -14, { -5,1 });
+			floorRect(itemRefCode::shallowFreshWater, { -13,-12 }, { -6,1 });
+			floorVLine(itemRefCode::shallowFreshWater, -11, { -6,-3 });
+			floorVLine(itemRefCode::deepFreshWater, -13, { -6,-2 });
+			floorVLine(itemRefCode::shallowFreshWater, -10, { -5,-4 });
+			floorVLine(itemRefCode::deepFreshWater, -12, { -6,-4 });
+		}
+
+		createProp({ -3, -10, 0 }, itemRefCode::verticalPipeRB);//지상으로 나오는 파이프
 	}
 
 

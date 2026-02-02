@@ -451,16 +451,19 @@ export enum class itemFlag
     PROP_BLOCKER,//시야방해 프롭
     PROP_DEPTH_LOWER,//기존 설치물(&엔티티)들과 겹쳐지지 않고 바닥에 깔리는 설치물
 
+    CABLE_CNCT_RIGHT,
+    CABLE_CNCT_UP,
+    CABLE_CNCT_LEFT,
+    CABLE_CNCT_DOWN,
+    CABLE_Z_ASCEND, //위층의 현재 타일과 연결된 케이블
+    CABLE_Z_DESCEND, //아래층의 현재 타일과 연결된 케이블
 
     PIPE_CNCT_RIGHT,
     PIPE_CNCT_UP,
     PIPE_CNCT_LEFT,
     PIPE_CNCT_DOWN,
-
-    CABLE_CNCT_RIGHT,
-    CABLE_CNCT_UP,
-    CABLE_CNCT_LEFT,
-    CABLE_CNCT_DOWN,
+    PIPE_CNCT_ABOVE, //위층의 현재 타일과 연결된 파이프
+    PIPE_CNCT_BELOW, //아래층의 현재 타일과 연결된 파이프
 
     CONVEYOR_CNCT_RIGHT,
     CONVEYOR_CNCT_UP,
@@ -574,8 +577,7 @@ export enum class itemFlag
     VOLTAGE_OUTPUT_LEFT,
     VOLTAGE_OUTPUT_DOWN,
 
-    CABLE_Z_ASCEND, //위층의 현재 타일과 연결된 케이블
-    CABLE_Z_DESCEND, //아래층의 현재 타일과 연결된 케이블
+
 
     FORCE_LOAD, //BFS에 포함되기만 해도 loadSet에 포함되는 플래그(2개 이상의 경로 가짐)
 
@@ -1393,6 +1395,14 @@ export namespace itemRefCode
     constexpr int intakePipeU = 184;
     constexpr int intakePipeL = 185;
     constexpr int intakePipeD = 186;
+
+    constexpr int verticalPipe = 187;
+    constexpr int verticalPipeRB = 188;
+    constexpr int verticalPipeLB = 189;
+    constexpr int verticalPipeRA = 190;
+    constexpr int verticalPipeLA = 191;
+
+    constexpr int woodenDoor = 291;
 };
 
 export namespace entityRefCode
