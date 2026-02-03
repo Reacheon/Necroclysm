@@ -230,3 +230,16 @@ export void dirToXYZ(dir16 inputDir, int& dx, int& dy, int& dz)
     default:            dx =  0; dy =  0; dz = 0; break;
     }
 }
+
+export const wchar_t* dirToArrow(dir16 dir)
+{
+    switch (dir) {
+    case dir16::right: return L"→";
+    case dir16::up:    return L"↑";
+    case dir16::left:  return L"←";
+    case dir16::down:  return L"↓";
+    case dir16::above: return L"↗";
+    case dir16::below: return L"↘";
+    default: return L"?";
+    }
+}

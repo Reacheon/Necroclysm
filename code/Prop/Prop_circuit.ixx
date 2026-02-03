@@ -8,9 +8,9 @@ import wrapVar;
 import globalTime;
 
 
-constexpr double SYSTEM_VOLTAGE = 24.0;
 constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
+constexpr double SYSTEM_VOLTAGE = 24.0; //저항 계산에만 사용됨
 
 /*
 * 
@@ -111,23 +111,6 @@ constexpr double EPSILON = 0.000001;
 *    - 송신측 nodeCharge 차감, chargeFlux 기록
 *    - 수신측 nodeCharge 증가, chargeFlux 기록
 */
-
-
-
-const wchar_t* dirToArrow(dir16 dir)
-{
-    switch (dir) {
-    case dir16::right: return L"→";
-    case dir16::up:    return L"↑";
-    case dir16::left:  return L"←";
-    case dir16::down:  return L"↓";
-    case dir16::above: return L"↗";
-    case dir16::below: return L"↘";
-    default: return L"?";
-    }
-}
-
-
 
 bool Prop::hasGround()
 {

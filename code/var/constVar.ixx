@@ -465,6 +465,8 @@ export enum class itemFlag
     PIPE_CNCT_ABOVE, //위층의 현재 타일과 연결된 파이프
     PIPE_CNCT_BELOW, //아래층의 현재 타일과 연결된 파이프
 
+    FLUID_CIRCUIT,
+
     CONVEYOR_CNCT_RIGHT,
     CONVEYOR_CNCT_UP,
     CONVEYOR_CNCT_LEFT,

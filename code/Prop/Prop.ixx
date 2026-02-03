@@ -31,11 +31,15 @@ public:
 
     bool runUsed = false; //runProp
 
+    bool fluidRunUsed = false;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     int nodeMaxCharge = 0; //회로망 전체의 총 가용 전력. 예로 20W 발전기 2개가 연결된 회로망은 절대 40W 이상이 전송될 수 없다.
     double nodeCharge = 0;
     double totalLossCharge = 0; //이번 턴에 저항으로 손실된 모든 에너지값
+
+    double totalResistFluid = 0; //이번 턴에 저항으로 넘어가지 못한 유체
 
     std::unordered_map<dir16, double> chargeFlux = { {dir16::right,0},{dir16::up,0},{dir16::left,0},{dir16::down,0},{dir16::above,0},{dir16::below,0} };
     /*  ▲ chargeFlux 부호 규칙:
@@ -61,7 +65,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fluidType nodeFluidType = fluidType::NONE;
-    int nodeFluidAmount = 0;
+    int nodeFluidAmount = 0; //mL 단위
     int nodeMaxFluidAmount = 0;
     double fluidSink = 0.0;
 
@@ -117,4 +121,20 @@ public:
 
     void loadAct();
 
+    //▼유체 회로
+    bool hasSink();
+    double getTotalFluidFlux();
+    bool isFluidFlowing();
+    void initFluidFlux();
+    double getInletFluid();
+    double getOutletFluid();
+    void updateFluidCircuitNetwork();
+    bool isPipeConnected(Point3 currentCoord, dir16 dir);
+    bool isSink(Point3 current, dir16 dir);
+    bool isPipeConnected(Prop* currentProp, dir16 dir);
+    double pushFluid(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
+    void divideFluid(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
+    void transferFluid(Prop* thisProp, Prop* nextProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer = false);
+    void initFluidBFS(std::queue<Point3> startPointSet);
+    void loadFluidAct();
 };

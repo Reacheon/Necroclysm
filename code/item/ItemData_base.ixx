@@ -171,4 +171,6 @@ export struct ItemDataBase
     int gndUsePowerDown = 0;
 
     int powerStorageMax = 0; //저장 가능한 최대 전하량(파워뱅크용)
+
+    int fluidDemand = 0; //스프링클러 등이 사용하는 분당 유체 소모량
 };

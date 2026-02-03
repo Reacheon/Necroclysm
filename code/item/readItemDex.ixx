@@ -174,6 +174,8 @@ namespace csvItem
     constexpr int gndUsePowerDown = 142;
 
     constexpr int powerStorageMax = 143;
+
+    constexpr int fluidDemand = 144;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -533,6 +535,8 @@ export int readItemDex(const wchar_t* file)
 
                             { L"PIPE_CNCT_ABOVE", itemFlag::PIPE_CNCT_ABOVE },
                             { L"PIPE_CNCT_BELOW", itemFlag::PIPE_CNCT_BELOW },
+
+                            { L"FLUID_CIRCUIT", itemFlag::FLUID_CIRCUIT },
                         };
 
                         size_t pos = 0;
@@ -1095,6 +1099,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::powerStorageMax:
                         itemDex[tgtIndex].powerStorageMax = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::fluidDemand:
+                        itemDex[tgtIndex].fluidDemand = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");
