@@ -49,8 +49,6 @@ public:
     *       chargeFlux[dir16::left] = +5  → 왼쪽에서 5만큼 받음
     */
 
-    double prevPushedCharge = 0;
-
     int delayMaxStack = 3;
     double delayStartTurn = 0;
 
@@ -65,7 +63,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fluidType nodeFluidType = fluidType::NONE;
-    int nodeFluidAmount = 0; //mL 단위
+    double nodeFluidAmount = 0; //mL 단위
     int nodeMaxFluidAmount = 0;
     double fluidSink = 0.0;
 
@@ -78,47 +76,29 @@ public:
     ~Prop();
 
     void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
-
     void updateSprIndex();
-
     bool runAI();
-
     bool runAnimation(bool shutdown);
-
     void drawSelf() override;
 
-    double getTotalChargeFlux();
-
-    bool isChargeFlowing();
-
-    void initChargeFlux();
-
-    double getInletCharge();
-    
-    double getOutletCharge();
-
-    void updateCircuitNetwork();
-
-    bool isConnected(Point3 currentCoord, dir16 dir);
-
-    bool isConnected(Prop* currentProp, dir16 dir);
-
-    bool isGround(Point3 currentCoord, dir16 dir);
-
-    void transferCharge(Prop* donorProp, Prop* acceptorProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer);
-
-    double pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
-
-    void divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
-
     void propTurnOn();
-
     void propTurnOff();
 
+    //▼전기 회로
+    double getTotalChargeFlux();
+    bool isChargeFlowing();
+    void initChargeFlux();
+    double getInletCharge();
+    double getOutletCharge();
+    void updateCircuitNetwork();
+    bool isConnected(Point3 currentCoord, dir16 dir);
+    bool isConnected(Prop* currentProp, dir16 dir);
+    bool isGround(Point3 currentCoord, dir16 dir);
+    void transferCharge(Prop* donorProp, Prop* acceptorProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer);
+    double pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
+    void divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
     void initChargeBFS(std::queue<Point3> startPointSet);
-
     bool hasGround();
-
     void loadAct();
 
     //▼유체 회로
@@ -130,11 +110,12 @@ public:
     double getOutletFluid();
     void updateFluidCircuitNetwork();
     bool isPipeConnected(Point3 currentCoord, dir16 dir);
-    bool isSink(Point3 current, dir16 dir);
     bool isPipeConnected(Prop* currentProp, dir16 dir);
+    bool isSink(Point3 current, dir16 dir);
+    bool isSameFluid(Prop* prop1, Prop* prop2);
     double pushFluid(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
-    void divideFluid(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
     void transferFluid(Prop* thisProp, Prop* nextProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer = false);
+    void divideFluid(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth);
     void initFluidBFS(std::queue<Point3> startPointSet);
     void loadFluidAct();
 };

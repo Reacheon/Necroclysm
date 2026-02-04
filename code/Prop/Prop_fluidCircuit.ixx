@@ -9,9 +9,59 @@ constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
+/*
+* <취수 배관> : intakePipeR, intakePipeU, intakePipeL, intakePipeD
+* 유체 타일 위에 있는 취수 파이프, 연결 가능한 방향이 단 한 방향 뿐이다.
+* 바로 옆에 펌프가 설치될 경우 펌프가 이 취수배관의 유체를 다른 타일(자기 방향)로 밀어낸다.
+* 
+* <유체 탱크> : fluidTank
+* 유체를 저장한다. 탱크 옆에 펌프가 설치될 경우 탱크의 유체를 펌프 방향으로 밀어낸다.
+* 또한 펌프 이외에도 현재 자신에 저장된 양(적절한 수위)에 따라 독립적인 유압원으로 펌프 작동 후에 퍼진다.
+* 
+* <펌프> : pumpR, pumpU, pumpL, pumpD
+* 펌프 출력 방향의 반대편에 있는 타일의 유체를 끌어서 펌프 방향으로 보낸다.
+* 예를 들어 pumpR은 왼쪽에 취수배관이나 탱크가 있을 경우 그 유체를 오른쪽으로 밀어낸다.
+* 펌프는 전기회로로 작동한다. 지금은 ON/OFF만 판단하지만 나중에는 공급된 전력에 따라 밀어내는 양을 수정할 예정
+* 
+* <스프링클러> : sprinklerRL, sprinklerUD
+* 전기회로에서의 부하에 해당한다. 파이프의 끝부분의 뚫린 구멍과 더불어 유이한 싱크이다. 조금이라도 흐르면 작동하지만 일정 임계점을 넘으면
+* 넓게 흩뿌려지면서 주변 타일을 젖음 상태로 만든다. 이는 농사에 사용된다. 유압이 강하게 공급될 수록 더 널리 흩뿌린다.
+* 
+* <밸브, 솔레노이드 밸브>
+* 전자회로에서의 스위치 개념, 솔레노이드 밸브는 플레이어가 누르는게 아니라 전력이 공급되면 온오프가 된다.
+* 
+* <수직배관,수직꺾임배관> verticalPipe
+* z축으로 다른 층과 연결된 파이프이다.
+* Vertical Pipe : 위층과 아래층만 연결
+* Vertical Pipe ↱(RB) : 아래층과 오른쪽 방향의 타일을 연결
+* Vertical Pipe ↰(LB) : 아래층과 왼쪽 방향의 타일을 연결
+* Vertical Pipe ↳(RA) : 윗층과 오른쪽 방향의 타일을 연결
+* Vertical Pipe ↲ (LA) : 윗층과 왼쪽 방향의 타일을 연결
+* 
+* 자세한 아이템들의 refCode는 constVar.ixx를 참조할 것
+* 
+* [작동 순서]
+* 1. [펌프단계] 펌프들이 자신이 할 수 있는만큼 최대치의 양을 밀어낸다. (전자회로처럼 셔플없고 병렬 분배도 없음)
+* 2. [탱크단계] 탱크들이 현재 저장된 유량(적절한 비례상수로 구현된 수위)에 따라 압력을 발생시켜 좌우로 밀어내기를 발생시킨다.
+* 3. [평활화단계] 유체파이프들이 주변 타일과 유량(수위)가 다르면 주변 타일과 평활화가 되는 transfer가 일어난다(push가 아님에 유의)
+* 4. 다 한 후에 파이프 끝의 싱크(정해진 값임, 현재는 모든 파이프가 끝에 구멍이 뚫려있다)와 스프링클러에 쌓인 유량에 따라 각각이 작동함
+* 5. 스프링클러는 유량이 조금이라도 흡수됐으면 주변에 물을 흩뿌림. 단 주변 타일을 젖게 만드려면 더 넓게 젖게 만드려면 싱크의 유량 일정량 필요
+* 6. 파이프 끝의 싱크는 그냥 흘러내림. 흘러내린만큼 물웅덩이 타일을 만듬. 이건 아마 벼농사같은 곳에 사용될 듯 하다.
+* 
+* [※ 유의할 점]
+* -펌프와 탱크의 셔플이 일어나지 않아 모든 턴에서 작동 순서는 항상 같다.
+* -배관저항(Q^2R)으로 인해 발생하는 손실은 원래 지나가야할 유체를 조금 덜 지나가게 만든다. 전기회로랑 다르게 열로 손실되는 값이 아니다.
+* 포화에 이르기까지의 시간을 지연시키고 프로파일을 자연스럽게 만드는 역할을 한다. 너무 과하게 만들지는 말 것.
+* -펌프의 직병렬은 너무 복잡하게 생각하지 말 것. 어느 정도 물리적으로 어긋나도 이거는 그냥 넘어가자.
+* 전자회로랑 다르게 유압회로까지 한눈에 정확하게 직관적으로 계산할 수 있는 사람은 많지않다.
+* -전송할 위치에 유체의 종류가 다를 경우 섞이지 않고 완전히 막히게 설계해야 한다. 유의할 것
+*/
+
+
 
 bool Prop::hasSink()
 {
+
     if (leadItem.fluidDemand > 0) return true;
     return false;
 }
@@ -192,62 +242,463 @@ void Prop::updateFluidCircuitNetwork()
 
 
     //==============================================================================
-    // 3. 펌프 출력 시작
+    // 2. 펌프 출력 시작
     //==============================================================================
 
-    randomVectorShuffle(pumpPropVec);
-    randomVectorShuffle(tankPropVec);
-
-    int totalAvailablePower = 0;
     for (Prop* pumpProp : pumpPropVec)
     {
+        int x = pumpProp->getGridX();
+        int y = pumpProp->getGridY();
+        int z = pumpProp->getGridZ();
+
+        if (debug::printCircuitLog) std::wprintf(L"========================▼펌프 (%d,%d) : 밀어내기 시작▼========================\n", x, y);
         if (pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
             pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
-            totalAvailablePower += PUMP_POWER;
+            if (pumpProp->leadItem.itemCode == itemRefCode::pumpR && isPipeConnected({ x,y,z }, dir16::right))
+            {
+                if (isPipeConnected({ x,y,z }, dir16::left))
+                {
+                    Prop* srcProp = TileProp(x - 1, y, z);
+                    if (srcProp && (srcProp->leadItem.itemCode == itemRefCode::fluidTank
+                        || srcProp->leadItem.itemCode == itemRefCode::intakePipeR))
+                    {
+                        pushFluid(pumpProp, dir16::right, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
+                    }
+                }
+            }
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpL && isPipeConnected({ x,y,z }, dir16::left))
+            {
+                if (isPipeConnected({ x,y,z }, dir16::right))
+                {
+                    Prop* srcProp = TileProp(x + 1, y, z);
+                    if (srcProp && (srcProp->leadItem.itemCode == itemRefCode::fluidTank
+                        || srcProp->leadItem.itemCode == itemRefCode::intakePipeL))
+                    {
+                        pushFluid(pumpProp, dir16::left, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
+                    }
+                }
+            }
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpU && isPipeConnected({ x,y,z }, dir16::up))
+            {
+                if (isPipeConnected({ x,y,z }, dir16::down))
+                {
+                    Prop* srcProp = TileProp(x, y + 1, z);
+                    if (srcProp && srcProp->leadItem.itemCode == itemRefCode::intakePipeU)
+                    {
+                        pushFluid(pumpProp, dir16::up, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
+                    }
+                }
+            }
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpD && isPipeConnected({ x,y,z }, dir16::down))
+            {
+                if (isPipeConnected({ x,y,z }, dir16::up))
+                {
+                    Prop* srcProp = TileProp(x, y - 1, z);
+                    if (srcProp && srcProp->leadItem.itemCode == itemRefCode::intakePipeD)
+                    {
+                        pushFluid(pumpProp, dir16::down, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
+                    }
+                }
+            }
         }
     }
 
+    if (debug::printCircuitLog)
+    {
+        std::wprintf(L"======================== 유압 회로망 요약 ========================\n");
+        std::wprintf(L"노드: %zu개, 펌프: %zu개, 총부하: %d\n",
+            visitedSet.size(), pumpPropVec.size(), circuitTotalSink);
+    }
+}
 
-    //for (Prop* pumpProp : pumpPropVec)
-    //{
-    //    constexpr double LOSS_COMPENSATION_FACTOR = 1.2;
-    //    // ↑ 배관손실로 인해 전부 전달되지 않으므로, 
-    //    //   싱크에 가능하면 정확히 필요한 양이 도달하도록 20% 여유분 추가
+bool Prop::isPipeConnected(Point3 currentCoord, dir16 dir)
+{
+    Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+    errorBox(currentProp == nullptr, L"currentProp is nullptr in isPipeConnected");
+    ItemData& crtItem = currentProp->leadItem;
 
-    //    int x = pumpProp->getGridX();
-    //    int y = pumpProp->getGridY();
-    //    int z = pumpProp->getGridZ();
-    //    double pumpRatio = (double)(PUMP_POWER) / (double)totalAvailablePower;
-    //    double voltOutputPower = myMin(std::ceil(circuitTotalSink * pumpRatio), PUMP_POWER);
-    //    voltProp->prevPushedCharge = 0;
-    //    voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // 저항손실 보존 변수 (기본값 120%)
+    Point3 delCoord = { 0,0,0 };
+    itemFlag hostFlag, guestFlag;
+    switch (dir)
+    {
+    case dir16::right:
+        delCoord = { +1,0,0 };
+        hostFlag = itemFlag::PIPE_CNCT_RIGHT;
+        guestFlag = itemFlag::PIPE_CNCT_LEFT;
+        break;
+    case dir16::up:
+        delCoord = { 0,-1,0 };
+        hostFlag = itemFlag::PIPE_CNCT_UP;
+        guestFlag = itemFlag::PIPE_CNCT_DOWN;
+        break;
+    case dir16::left:
+        delCoord = { -1,0,0 };
+        hostFlag = itemFlag::PIPE_CNCT_LEFT;
+        guestFlag = itemFlag::PIPE_CNCT_RIGHT;
+        break;
+    case dir16::down:
+        delCoord = { 0,+1,0 };
+        hostFlag = itemFlag::PIPE_CNCT_DOWN;
+        guestFlag = itemFlag::PIPE_CNCT_UP;
+        break;
+    case dir16::above:
+        delCoord = { 0,0,+1 };
+        hostFlag = itemFlag::PIPE_CNCT_ABOVE;
+        guestFlag = itemFlag::PIPE_CNCT_BELOW;
+        break;
+    case dir16::below:
+        delCoord = { 0,0,-1 };
+        hostFlag = itemFlag::PIPE_CNCT_BELOW;
+        guestFlag = itemFlag::PIPE_CNCT_ABOVE;
+        break;
+    default:
+        errorBox(L"[Error] isPipeConnected lambda function received invalid direction argument.\n");
+        break;
+    }
+    Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+    if (targetProp == nullptr) return false;
+    ItemData& tgtItem = targetProp->leadItem;
 
-    //    if (debug::printCircuitLog) std::wprintf(L"========================▼전압원 (%d,%d)%ls : 밀어내기 시작▼========================\n", x, y, voltProp->leadItem.name.c_str());
-    //    if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
-    //    {
-    //        double finalVoltOutput = voltOutputPower;
-    //        if (voltProp->leadItem.itemCode == itemRefCode::powerBankR || voltProp->leadItem.itemCode == itemRefCode::powerBankL)
-    //            finalVoltOutput = std::min(voltOutputPower, voltProp->leadItem.powerStorage);
+    if (crtItem.itemCode == itemRefCode::valveRL
+        || crtItem.itemCode == itemRefCode::valveUD
+        || crtItem.itemCode == itemRefCode::solenoidValveRL
+        || crtItem.itemCode == itemRefCode::solenoidValveUD)
+    {
+        if (crtItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
+    }
 
 
-    //        if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
-    //            voltProp->prevPushedCharge += pushCharge(voltProp, dir16::right, finalVoltOutput, {}, 0);
-    //        else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
-    //            voltProp->prevPushedCharge += pushCharge(voltProp, dir16::up, finalVoltOutput, {}, 0);
-    //        else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
-    //            voltProp->prevPushedCharge += pushCharge(voltProp, dir16::left, finalVoltOutput, {}, 0);
-    //        else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
-    //            voltProp->prevPushedCharge += pushCharge(voltProp, dir16::down, finalVoltOutput, {}, 0);
+    if ((dir == dir16::right || dir == dir16::left) 
+        && (tgtItem.itemCode == itemRefCode::valveRL || tgtItem.itemCode == itemRefCode::solenoidValveRL)
+        && tgtItem.checkFlag(itemFlag::PROP_POWER_OFF))
+    {
+        return false;
+    }
+    else if ((dir == dir16::up || dir == dir16::down) 
+        && (tgtItem.itemCode == itemRefCode::valveUD || tgtItem.itemCode == itemRefCode::solenoidValveUD)
+        && tgtItem.checkFlag(itemFlag::PROP_POWER_OFF))
+    {
+        return false;
+    }
 
-    //        voltProp->nodeCharge = voltProp->nodeMaxCharge;
-    //    }
-    //}
+    if (dir == dir16::above || dir == dir16::below)
+    {
+        //전선과 달리 일반파이프는 z축 연결에 사용 불가
+        bool currentCondition = currentProp->leadItem.checkFlag(hostFlag);
+        bool targetCondition = targetProp->leadItem.checkFlag(guestFlag);
 
-    //if (debug::printCircuitLog)
-    //{
-    //    std::wprintf(L"======================== 회로망 요약 ========================\n");
-    //    std::wprintf(L"노드: %zu개, 전압원: %zu개, 총부하: %d, 총전력: %d\n",
-    //        visitedSet.size(), voltagePropVec.size(), circuitTotalSink, circuitMaxEnergy);
-    //}
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
+    {
+        bool currentCondition = (currentProp->leadItem.checkFlag(itemFlag::PIPE) || currentProp->leadItem.checkFlag(hostFlag));
+        bool targetCondition = (targetProp->leadItem.checkFlag(itemFlag::PIPE) || targetProp->leadItem.checkFlag(guestFlag));
+
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else errorBox(L"[Error] isPipeConnected lambda function received invalid direction argument.\n");
+}
+
+bool Prop::isPipeConnected(Prop* currentProp, dir16 dir)
+{
+    return isPipeConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
+}
+
+//2개의 프롭의 유체 종류가 같은지 비교(한쪽이라도 NONE일 경우 같다고 반환)
+//connect 체크를 하지 않음에 유의할 것
+bool Prop::isSameFluid(Prop* prop1, Prop* prop2)
+{
+    errorBox(prop1 == nullptr || prop2 == nullptr, L"Inserted parameter is nullptr in isSameFluid");
+    if (prop1->nodeFluidType == fluidType::NONE || prop2->nodeFluidType == fluidType::NONE) return true;
+    if (prop1->nodeFluidType == prop2->nodeFluidType) return true;
+    return false;
+}
+
+double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std::unordered_set<Prop*> pathVisited, int depth)
+{
+    errorBox(donorProp == nullptr, L"[Error] pushFluid: null donor\n");
+    int dx, dy, dz;
+    dirToXYZ(txDir, dx, dy, dz);
+    Point3 nextCoord = { donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz };
+    Prop* nextProp = TileProp(nextCoord);
+    errorBox(nextProp == nullptr, L"[Error] pushFluid: no acceptor found\n");
+
+    txFluidAmount = std::min(donorProp->nodeFluidAmount, txFluidAmount);
+
+    errorBox(txFluidAmount > donorProp->nodeFluidAmount + EPSILON, L"[Error] pushFluid: insufficient fluid\n");
+    errorBox(!isPipeConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
+        L"[Error] pushFluid: not connected\n");
+
+    if (isSameFluid(donorProp, nextProp) == false) return 0; //종류가 다른 유체일 경우 섞이지 않고 벽처럼 작동함
+
+    std::wstring indent(depth * 2, L' ');
+
+    if (pathVisited.find(donorProp) != pathVisited.end())
+    {
+        if (debug::printCircuitLog)
+            std::wprintf(L"%s[PUSH-SKIP] (%d,%d)%ls 이미 방문됨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
+        return 0;
+    }
+    pathVisited.insert(donorProp);
+    if (pathVisited.find(nextProp) != pathVisited.end()) return 0;
+
+
+    if (debug::printCircuitLog) std::wprintf(L"%s[PUSH] (%d,%d)%ls → (%d,%d)%ls [%ls] 시도: %.2f\n",
+        indent.c_str(),
+        donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str(),
+        nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
+        dirToArrow(txDir),
+        txFluidAmount);
+
+    double sinkTxFluid = 0;
+    Point3 current = { donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() };
+    if (isSink(current, txDir)) //해당 방향이 싱크일 경우
+    {
+        double remainFluid;
+        int requiredFluid = 0;
+
+        remainFluid = nextProp->leadItem.fluidDemand - nextProp->fluidSink;
+        requiredFluid = nextProp->leadItem.fluidDemand;
+
+        if (debug::printCircuitLog)
+        {
+            std::wprintf(L"%s  └─ \x1b[33m[SINK진입] SINK, 요구=%d, 잔여용량=%.2f, 시도량=%.2f\x1b[0m\n",
+                indent.c_str(),
+                requiredFluid,
+                remainFluid,
+                txFluidAmount);
+        }
+
+        if (remainFluid > EPSILON)
+        {
+            sinkTxFluid = std::min(std::min(txFluidAmount, remainFluid), nextProp->nodeFluidAmount);
+            nextProp->nodeFluidAmount -= sinkTxFluid;
+
+            if (debug::printCircuitLog)
+            {
+                std::wprintf(L"%s      → 실제소비=%.2f, 남은용량=%.2f\n",
+                    indent.c_str(),
+                    sinkTxFluid,
+                    remainFluid - sinkTxFluid);
+            }
+
+            nextProp->fluidSink += sinkTxFluid;
+        }
+        else if (debug::printCircuitLog)
+        {
+            std::wprintf(L"%s      → \x1b[90m용량 소진됨, 스킵\x1b[0m\n", indent.c_str());
+        }
+    }
+
+    double pushedFluid = std::min(txFluidAmount - sinkTxFluid, nextProp->nodeFluidAmount);
+
+    if (pushedFluid > EPSILON)
+    {
+        std::vector<dir16> possibleDirs;
+
+        for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below })
+        {
+            if (dir == reverse(txDir)) continue;
+            if (isPipeConnected({ nextProp->getGridX(), nextProp->getGridY(), nextProp->getGridZ() }, dir))
+            {
+                possibleDirs.push_back(dir);
+            }
+        }
+
+        if (possibleDirs.empty() == false)
+        {
+            if (possibleDirs.size() == 1)
+            {
+                auto newPathVisited = pathVisited;
+                pushFluid(nextProp, possibleDirs[0], pushedFluid, newPathVisited, depth + 1);
+            }
+            else if (possibleDirs.size() > 1)
+            {
+                divideFluid(nextProp, pushedFluid, possibleDirs, pathVisited, depth + 1);
+            }
+        }
+    }
+
+    // 재귀 복귀: 하위 노드들이 유체를 소비해서 생긴 빈 공간만큼 전송
+    double finalTxFluid = std::min(txFluidAmount, nextProp->nodeMaxFluidAmount - nextProp->nodeFluidAmount);
+    transferFluid(donorProp, nextProp, finalTxFluid, indent, txDir, false);
+    return finalTxFluid;
+}
+
+
+void Prop::divideFluid(Prop* propPtr, double inputFluid, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth)
+{
+    std::wstring indent(depth * 2, L' ');  // 인덴트 생성
+
+    if (debug::printCircuitLog)
+    {
+        std::wprintf(L"%s[DIVIDE] (%d,%d)%ls 분배시작: %.2f → %zu방향\n",
+            indent.c_str(),
+            propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
+            inputFluid, possibleDirs.size());
+    }
+
+    double remainingFluid = inputFluid;
+    std::vector<dir16> dirsToRemove;
+    std::vector<dir16> sinkDirs;
+    std::vector<dir16> nonSinkDirs;
+    dirsToRemove.reserve(6);
+    sinkDirs.reserve(6);
+    nonSinkDirs.reserve(6);
+
+    int loopCount = 0;
+    while (remainingFluid > EPSILON && !possibleDirs.empty())
+    {
+        loopCount++;
+        dirsToRemove.clear();
+        sinkDirs.clear();
+        nonSinkDirs.clear();
+        double sinkPushedFluid = 0;
+        double loopPushedFluid = 0;
+
+        //접지 우선 배분
+        for (auto dir : possibleDirs)
+        {
+            if (isSink({ propPtr->getGridX(), propPtr->getGridY(), propPtr->getGridZ() }, dir))
+            {
+                sinkDirs.push_back(dir);
+            }
+            else nonSinkDirs.push_back(dir);
+        }
+
+        if (sinkDirs.size() > 0)
+        {
+            double sinkSplitFluid = remainingFluid / sinkDirs.size();
+
+            if (debug::printCircuitLog)
+            {
+                std::wprintf(L"%s  [DIV-SINK] 접지 %zu방향, 각 %.2f씩\n",
+                    indent.c_str(), sinkDirs.size(), sinkSplitFluid);
+            }
+
+            for (auto dir : sinkDirs)
+            {
+                auto newPathVisited = pathVisited;
+                double branchPushedFluid = pushFluid(propPtr, dir, sinkSplitFluid, newPathVisited, depth + 1);
+                sinkPushedFluid += branchPushedFluid;
+                if (branchPushedFluid < EPSILON) dirsToRemove.push_back(dir);
+            }
+
+            possibleDirs.erase
+            (
+                std::remove_if
+                (
+                    possibleDirs.begin(),
+                    possibleDirs.end(),
+                    [&dirsToRemove](dir16 d) { return std::find(dirsToRemove.begin(), dirsToRemove.end(), d) != dirsToRemove.end(); }
+                ),
+                possibleDirs.end()
+            );
+
+            remainingFluid -= sinkPushedFluid;
+        }
+
+        dirsToRemove.clear();
+        if (possibleDirs.empty()) break;
+
+        if (nonSinkDirs.size() > 0)
+        {
+            double splitFluid = remainingFluid / nonSinkDirs.size();
+
+            if (debug::printCircuitLog)
+            {
+                std::wprintf(L"%s  [DIV-LOOP] 일반 %zu방향, 각 %.2f씩\n",
+                    indent.c_str(), nonSinkDirs.size(), splitFluid);
+            }
+
+            for (auto dir : nonSinkDirs)
+            {
+                auto newPathVisited = pathVisited;
+                double branchPushedFluid = pushFluid(propPtr, dir, splitFluid, newPathVisited, depth);
+                loopPushedFluid += branchPushedFluid;
+                if (branchPushedFluid < EPSILON) dirsToRemove.push_back(dir);
+            }
+
+            for (auto dir : dirsToRemove) possibleDirs.erase(std::remove(possibleDirs.begin(), possibleDirs.end(), dir), possibleDirs.end());
+            remainingFluid -= loopPushedFluid;
+        }
+
+        if (debug::printCircuitLog && (sinkPushedFluid > EPSILON || loopPushedFluid > EPSILON))
+        {
+            std::wprintf(L"%s  [DIV-RESULT] 루프%d: SINK=%.2f, 일반=%.2f, 잔여=%.2f\n",
+                indent.c_str(), loopCount, sinkPushedFluid, loopPushedFluid, remainingFluid);
+        }
+
+        if (loopPushedFluid < EPSILON && sinkPushedFluid < EPSILON) break;
+    }
+
+    if (debug::printCircuitLog)
+    {
+        std::wprintf(L"%s[DIVIDE-END] (%d,%d)%ls 총 %d회 반복, 미분배=%.2f\n",
+            indent.c_str(),
+            propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
+            loopCount, remainingFluid);
+    }
+}
+
+
+void Prop::transferFluid(Prop* thisProp, Prop* nextProp, double txFluidAmount, const std::wstring& indent, dir16 txDir, bool isSinkTransfer = false)
+{
+    if (txFluidAmount < EPSILON)
+    {
+        if (debug::printCircuitLog)
+        {
+            std::wprintf(L"%s[전송 스킵] (%d,%d)%ls → (%d,%d)%ls 양:%.8f (EPSILON 미만)\n",
+                indent.c_str(),
+                thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
+                nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
+                txFluidAmount);
+        }
+        return;
+    }
+
+    //유체의 종류에 따라 마찰저항이 달라지도록 수정할 것
+    constexpr double PIPE_RESIST = 0.001; //일단 아무 값으로 고정
+    double frictionLoss = txFluidAmount * txFluidAmount * PIPE_RESIST;
+
+    double actualTransfer = txFluidAmount - frictionLoss;
+    if (actualTransfer < 0) actualTransfer = 0;
+
+    if (actualTransfer > thisProp->nodeFluidAmount)
+        actualTransfer = thisProp->nodeFluidAmount;
+
+    thisProp->totalResistFluid += frictionLoss;
+
+    thisProp->nodeFluidAmount -= actualTransfer;
+    thisProp->fluidFlux[txDir] -= actualTransfer;
+
+    if (isSinkTransfer == false) nextProp->nodeFluidAmount += actualTransfer;
+    nextProp->fluidFlux[reverse(txDir)] += actualTransfer;
+
+    if (debug::printCircuitLog)
+    {
+        if (isSinkTransfer)
+        {
+            std::wprintf(L"\x1b[33m%s[전송 SINK] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls 전송:%.2f 마찰손실:%.2f 부하:%.2f/%d\x1b[0m\n",
+                indent.c_str(),
+                thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
+                thisProp->nodeFluidAmount + actualTransfer, thisProp->nodeFluidAmount,
+                nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
+                actualTransfer, frictionLoss,
+                nextProp->fluidSink, nextProp->leadItem.fluidDemand);
+        }
+        else
+        {
+            std::wprintf(L"%s[전송] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls [%.2f/%.2f] 전송:%.2f 마찰손실:%.2f\n",
+                indent.c_str(),
+                thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
+                thisProp->nodeFluidAmount + actualTransfer, thisProp->nodeFluidAmount,
+                nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
+                nextProp->nodeFluidAmount, nextProp->nodeMaxFluidAmount,
+                actualTransfer, frictionLoss);
+        }
+    }
 }

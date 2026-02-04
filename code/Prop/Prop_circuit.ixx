@@ -558,7 +558,6 @@ void Prop::updateCircuitNetwork()
         int z = voltProp->getGridZ();
         double voltRatio = (double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower;
         double voltOutputPower = myMin(std::ceil(circuitTotalLoad * voltRatio), voltProp->leadItem.electricMaxPower);
-        voltProp->prevPushedCharge = 0;
         voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // 저항손실 보존 변수 (기본값 120%)
 
         if (debug::printCircuitLog) std::wprintf(L"========================▼전압원 (%d,%d)%ls : 밀어내기 시작▼========================\n", x, y, voltProp->leadItem.name.c_str());
@@ -570,13 +569,13 @@ void Prop::updateCircuitNetwork()
 
 
             if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
-                voltProp->prevPushedCharge += pushCharge(voltProp, dir16::right, finalVoltOutput, {}, 0);
+                pushCharge(voltProp, dir16::right, finalVoltOutput, {}, 0);
             else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
-                voltProp->prevPushedCharge += pushCharge(voltProp, dir16::up, finalVoltOutput, {}, 0);
+                pushCharge(voltProp, dir16::up, finalVoltOutput, {}, 0);
             else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
-                voltProp->prevPushedCharge += pushCharge(voltProp, dir16::left, finalVoltOutput, {}, 0);
+                pushCharge(voltProp, dir16::left, finalVoltOutput, {}, 0);
             else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
-                voltProp->prevPushedCharge += pushCharge(voltProp, dir16::down, finalVoltOutput, {}, 0);
+                pushCharge(voltProp, dir16::down, finalVoltOutput, {}, 0);
 
             voltProp->nodeCharge = voltProp->nodeMaxCharge;
         }
@@ -814,6 +813,11 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
 }
 
+bool Prop::isConnected(Prop* currentProp, dir16 dir)
+{
+    return isConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
+}
+
 bool Prop::isGround(Point3 current, dir16 dir)
 {
     errorBox(dir == dir16::above || dir == dir16::below, L"[Error] isGround: invalid direction\n");
@@ -834,11 +838,6 @@ bool Prop::isGround(Point3 current, dir16 dir)
         if (dir == dir16::down && nextProp->leadItem.gndUsePowerUp > 0) return true;
     }
     return false;
-}
-
-bool Prop::isConnected(Prop* currentProp, dir16 dir)
-{
-    return isConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
