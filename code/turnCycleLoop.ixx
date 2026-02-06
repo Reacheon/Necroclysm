@@ -644,12 +644,13 @@ __int64 entityAITurn()
 	return (getNanoTimer() - timeStampStart);
 }
 
+
 __int64 propTurn()
 {
 	debug::printCircuitLog = true;
 
 	nextCircuitStartQueue = std::queue<Point3>();
-    auto actviePropSet = (World::ins())->getActivePropSet();
+	auto actviePropSet = (World::ins())->getActivePropSet();
 	std::unordered_set<Prop*> activeLoadSet;
 
 	for (auto pPtr : actviePropSet)
@@ -658,19 +659,18 @@ __int64 propTurn()
 		pPtr->totalLossCharge = 0;
 		pPtr->gndSink = 0;
 		pPtr->gndSinkRight = 0;
-        pPtr->gndSinkUp = 0;
+		pPtr->gndSinkUp = 0;
 		pPtr->gndSinkLeft = 0;
 		pPtr->gndSinkDown = 0;
 		pPtr->initChargeFlux();
 		if (pPtr->hasGround()) activeLoadSet.insert(pPtr);
-		else if(pPtr->leadItem.checkFlag(itemFlag::FORCE_LOAD)) activeLoadSet.insert(pPtr);
+		else if (pPtr->leadItem.checkFlag(itemFlag::FORCE_LOAD)) activeLoadSet.insert(pPtr);
 	}
 
 	int loopCount = 0;
 	reserveDelayInit.clear();
 	do
 	{
-
 		loopCount++;
 		if (loopCount >= MAX_CIRCUIT_LOOP_COUNT) break;
 		if (debug::printCircuitLog) std::wprintf(L"▼루프 카운트: %d\n", loopCount);
@@ -678,8 +678,8 @@ __int64 propTurn()
 		if (nextCircuitStartQueue.empty() == false)
 		{
 			Point3 tgtCoord = nextCircuitStartQueue.front();
-            nextCircuitStartQueue.pop();
-            Prop* tgtProp = TileProp(tgtCoord);
+			nextCircuitStartQueue.pop();
+			Prop* tgtProp = TileProp(tgtCoord);
 			if (tgtProp) tgtProp->updateCircuitNetwork();
 		}
 		else for (auto pPtr : actviePropSet)
@@ -699,20 +699,51 @@ __int64 propTurn()
 		{
 			Prop* loadProp = pPtr;
 			pPtr->loadAct();
-
 		}
 
-
-	} while (nextCircuitStartQueue.empty()==false);
+	} while (nextCircuitStartQueue.empty() == false);
 
 	for (auto tgtDelay : reserveDelayInit)
 	{
 		tgtDelay->delayStartTurn = 0.0;
 	}
 
-	//에너지 소모 확정 페이즈
-	//윗 단계에서 계산된 에너지만큼 발전기에서 소모됨
+	//==============================================================================
+	// 유체회로 연산 (전자회로 이후 실행 - 펌프 ON/OFF가 확정된 상태)
+	//==============================================================================
 
+	// 유체회로 변수 초기화
+	for (auto pPtr : actviePropSet)
+	{
+		pPtr->fluidRunUsed = false;
+		pPtr->totalResistFluid = 0;
+		pPtr->fluidSink = 0;
+		pPtr->initFluidFlux();
+	}
+
+	// 펌프에서 유체회로 탐색 시작 (runUsed가 아닌 fluidRunUsed 사용)
+	for (auto pPtr : actviePropSet)
+	{
+		if (pPtr->fluidRunUsed) continue;
+
+		bool isPump = (pPtr->leadItem.itemCode == itemRefCode::pumpR
+			|| pPtr->leadItem.itemCode == itemRefCode::pumpU
+			|| pPtr->leadItem.itemCode == itemRefCode::pumpL
+			|| pPtr->leadItem.itemCode == itemRefCode::pumpD);
+
+		if (isPump)
+		{
+			pPtr->updateFluidCircuitNetwork();
+		}
+	}
+
+	// 유체회로 부하 작동
+	for (auto pPtr : actviePropSet)
+	{
+		if (pPtr->fluidRunUsed)
+		{
+		}
+	}
 
 	return 0;
 }

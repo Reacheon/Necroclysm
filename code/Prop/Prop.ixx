@@ -30,7 +30,6 @@ public:
     float treeAngle = 0.0; //벌목 때 나무들이 가지는 앵글, 0이 아닐 경우 활성화됨
 
     bool runUsed = false; //runProp
-
     bool fluidRunUsed = false;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +63,6 @@ public:
 
     fluidType nodeFluidType = fluidType::NONE;
     double nodeFluidAmount = 0; //mL 단위
-    int nodeMaxFluidAmount = 0;
     double fluidSink = 0.0;
 
     std::unordered_map<dir16, double> fluidFlux = { {dir16::right,0},{dir16::up,0},{dir16::left,0},{dir16::down,0},{dir16::above,0},{dir16::below,0} }; 
@@ -102,7 +100,6 @@ public:
     void loadAct();
 
     //▼유체 회로
-    bool hasSink();
     double getTotalFluidFlux();
     bool isFluidFlowing();
     void initFluidFlux();
@@ -111,6 +108,8 @@ public:
     void updateFluidCircuitNetwork();
     bool isPipeConnected(Point3 currentCoord, dir16 dir);
     bool isPipeConnected(Prop* currentProp, dir16 dir);
+    dir16 getHoleDirection(Point3 current, dir16 dir);
+    dir16 getHoleDirection();
     bool isSink(Point3 current, dir16 dir);
     bool isSameFluid(Prop* prop1, Prop* prop2);
     double pushFluid(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);

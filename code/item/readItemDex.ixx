@@ -176,6 +176,7 @@ namespace csvItem
     constexpr int powerStorageMax = 143;
 
     constexpr int fluidDemand = 144;
+    constexpr int maxFluid = 145;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -1102,6 +1103,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::fluidDemand:
                         itemDex[tgtIndex].fluidDemand = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::maxFluid:
+                        itemDex[tgtIndex].maxFluid = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");

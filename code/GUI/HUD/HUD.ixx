@@ -1060,4 +1060,6 @@ public:
 	void drawBodyParts();
 
 	void drawCircuitInfo();
+
+	void drawFluidCircuitInfo();
 };

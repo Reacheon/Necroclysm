@@ -26,6 +26,8 @@ export inline int PlayerZ() { return PlayerPtr->getGridZ(); }
 
 export inline const unsigned __int16 TileFloor(int x, int y, int z) { return World::ins()->getTile(x, y, z).floor; }
 
+export inline const unsigned __int16 TileFloor(Point3 coord) { return World::ins()->getTile(coord.x, coord.y, coord.z).floor; }
+
 export inline const bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
 
 export inline const unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }

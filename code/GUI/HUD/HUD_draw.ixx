@@ -22,6 +22,8 @@ import ContextMenu;
 import Maint;
 import statusEffect;
 
+constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
+
 
 namespace tabSprFlag
 {
@@ -510,6 +512,7 @@ void HUD::drawGUI()
 	if (option::inputMethod != input::gamepad) drawQuickSlot();
 	drawQuest();
 	drawCircuitInfo();
+	drawFluidCircuitInfo();
 	//drawHoverItemInfo();
 
 }
@@ -1890,5 +1893,236 @@ void HUD::drawCircuitInfo()
 			drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);
 			SDL_SetTextureAlphaMod(texture::circuitInfo, 255);
 		}
+	}
+}
+
+void HUD::drawFluidCircuitInfo()
+{
+	if (ContextMenu::ins() != nullptr) return;
+
+	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };
+	static int hoverTime = 0;
+	Point2 currentHoverGrid = getAbsMouseGrid();
+
+	if (option::inputMethod == input::mouse) currentHoverGrid = getAbsMouseGrid();
+
+	if (prevHoverGrid != currentHoverGrid)
+	{
+		hoverTime = 0;
+		prevHoverGrid = currentHoverGrid;
+	}
+	else hoverTime += 1;
+
+	if (hoverTime > 30)
+	{
+		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
+
+		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerPtr->getGridZ());
+		if (tgtProp == nullptr) return;
+		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::PIPE))) return;
+
+		auto iCode = tgtProp->leadItem.itemCode;
+
+		std::wstring firstString, firstNumber, firstColStr, firstUnit;
+		std::wstring secondString, secondNumber, secondColStr, secondUnit;
+
+		bool isPump = (iCode == itemRefCode::pumpR || iCode == itemRefCode::pumpU
+			|| iCode == itemRefCode::pumpL || iCode == itemRefCode::pumpD);
+		bool isTank = (iCode == itemRefCode::fluidTank);
+		bool isValve = (iCode == itemRefCode::valveRL || iCode == itemRefCode::valveUD
+			|| iCode == itemRefCode::solenoidValveRL || iCode == itemRefCode::solenoidValveUD);
+
+		if (isPump)
+		{
+			bool isOn = tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)
+				&& !tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF);
+
+			firstString = L"Power:";
+			firstNumber = std::to_wstring(PUMP_POWER);
+			firstColStr = isOn ? col2Str(lowCol::green) : col2Str(col::gray);
+			firstUnit = L"mL/turn";
+
+			secondString = L"State:";
+			secondNumber = isOn ? (col2Str(lowCol::green) + L"ON") : (col2Str(lowCol::red) + L"OFF");
+			secondUnit = L"";
+		}
+		else if (isTank)
+		{
+			double stored = tgtProp->nodeFluidAmount;
+			double capacity = tgtProp->leadItem.maxFluid; // 멤버명 확인 필요
+			double ratio = (capacity > 0) ? std::clamp(stored / capacity, 0.0, 1.0) : 0.0;
+
+			firstString = L"Stored:";
+			firstNumber.clear();
+			if (ratio < 0.3333) firstNumber += col2Str(lowCol::red);
+			else if (ratio < 0.6666) firstNumber += col2Str(lowCol::yellow);
+			else firstNumber += col2Str(lowCol::green);
+			firstNumber += decimalCutter(stored, 1);
+			firstNumber += col2Str(col::gray) + L" / " + decimalCutter(capacity, 1);
+			firstUnit = L"mL";
+
+			secondString = L"Fill:";
+			if (ratio < 0.3333) secondColStr = col2Str(lowCol::red);
+			else if (ratio < 0.6666) secondColStr = col2Str(lowCol::yellow);
+			else secondColStr = col2Str(lowCol::green);
+			secondNumber = decimalCutter(ratio * 100.0, 1);
+			secondUnit = L"%";
+		}
+		else if (isValve)
+		{
+			bool isOpen = !tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF);
+
+			firstString = L"State:";
+			firstNumber = isOpen ? (col2Str(lowCol::green) + L"Open") : (col2Str(lowCol::red) + L"Closed");
+			firstUnit = L"";
+
+			secondString = L"Volume:";
+			secondNumber = decimalCutter(tgtProp->nodeFluidAmount, 1);
+			secondUnit = L"mL";
+		}
+		else // 일반 파이프/유체회로 노드
+		{
+			firstString = L"Volume:";
+			firstNumber = decimalCutter(tgtProp->nodeFluidAmount, 1);
+			firstUnit = L"mL";
+
+			secondString = L"Resist:";
+			secondNumber = decimalCutter(tgtProp->totalResistFluid, 2);
+			secondUnit = L"mL";
+		}
+
+		// 싱크에서 유체를 소비 중이면 2번째 줄을 Drain으로 오버라이드
+		if (tgtProp->fluidSink > 0 && !isPump && !isTank)
+		{
+			secondString = L"Drain:";
+			secondColStr = L"";
+			secondNumber = col2Str(lowCol::orange) + decimalCutter(tgtProp->fluidSink, 1);
+			secondUnit = L"mL/turn";
+		}
+
+		//==============================================================================
+		// 렌더링 (drawCircuitInfo와 동일한 패턴)
+		//==============================================================================
+
+		Uint8 windowAlpha = 255;
+
+		SDL_SetRenderTarget(renderer, texture::circuitInfo);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+		SDL_RenderClear(renderer);
+
+		SDL_Rect window = { 0, 0, 236, 69 };
+
+		setFont(fontType::mainFont);
+		setFontSize(18);
+
+		int strMaxFirst = myMax(queryTextWidth(firstString), queryTextWidth(secondString));
+		int strMaxSecond = myMax(queryTextWidth(firstNumber, true), queryTextWidth(secondNumber, true));
+		int unitMax = myMax(queryTextWidth(firstUnit), queryTextWidth(secondUnit));
+
+		int xLabel = 49;
+		int xNumber = xLabel + strMaxFirst + 26;
+		int gap = 12;
+		int rightPad = 6;
+
+		int wNeeded = xNumber + strMaxSecond + gap + rightPad + unitMax;
+		window.w = myMax(window.w, wNeeded);
+
+		drawWindow(window.x, window.y, window.w, window.h);
+
+		drawSpriteCenter(spr::fluxArrow, 0, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::right] < 0) drawSpriteCenter(spr::fluxArrow, 1, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::right] > 0) drawSpriteCenter(spr::fluxArrow, 2, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::up] < 0) drawSpriteCenter(spr::fluxArrow, 3, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::up] > 0) drawSpriteCenter(spr::fluxArrow, 4, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::left] < 0) drawSpriteCenter(spr::fluxArrow, 5, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::left] > 0) drawSpriteCenter(spr::fluxArrow, 6, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::down] < 0) drawSpriteCenter(spr::fluxArrow, 7, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::down] > 0) drawSpriteCenter(spr::fluxArrow, 8, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::above] < 0) drawSpriteCenter(spr::fluxArrow, 9, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::above] > 0) drawSpriteCenter(spr::fluxArrow, 10, 23, 46);
+
+		if (tgtProp->fluidFlux[dir16::below] < 0) drawSpriteCenter(spr::fluxArrow, 11, 23, 46);
+		else if (tgtProp->fluidFlux[dir16::below] > 0) drawSpriteCenter(spr::fluxArrow, 12, 23, 46);
+
+		// 타이틀
+		setFont(fontType::mainFontMedium);
+		setFontSize(22);
+
+		if (isTank)
+		{
+			double stored = tgtProp->nodeFluidAmount;
+			double capacity = tgtProp->leadItem.maxFluid;
+			double ratio = (capacity > 0) ? std::clamp(stored / capacity, 0.0, 1.0) : 0.0;
+
+			int xOffset = -17;
+			drawTextCenter(tgtProp->leadItem.name, window.w / 2 + xOffset, 14);
+
+			// 탱크 게이지 (파워뱅크 스타일)
+			int gaugePivotX = window.w / 2 + queryTextWidth(tgtProp->leadItem.name) / 2 + 10 + xOffset;
+			int gaugePivotY = 4;
+			drawRect(SDL_Rect{ gaugePivotX, gaugePivotY, 45, 20 }, col::lightGray);
+			drawRect(SDL_Rect{ gaugePivotX + 1, gaugePivotY + 1, 43, 18 }, col::lightGray);
+
+			SDL_Color gaugeCol = lowCol::green;
+			if (ratio < 0.3333) gaugeCol = lowCol::red;
+			else if (ratio < 0.6666) gaugeCol = lowCol::yellow;
+
+			constexpr int CELL_COUNT = 3;
+			constexpr int CELL_W = 11;
+			constexpr int CELL_H = 12;
+			constexpr int CELL_GAP = 2;
+			constexpr int CELL_X0 = 4;
+			constexpr int CELL_Y0 = 4;
+
+			double totalFill = ratio * (CELL_COUNT * CELL_W);
+			for (int i = 0; i < CELL_COUNT; ++i)
+			{
+				double remain = totalFill - (i * CELL_W);
+				int fillW = static_cast<int>(std::round(std::clamp(remain, 0.0, static_cast<double>(CELL_W))));
+				if (fillW > 0)
+				{
+					int x = gaugePivotX + CELL_X0 + i * (CELL_W + CELL_GAP);
+					int y = gaugePivotY + CELL_Y0;
+					drawFillRect(SDL_Rect{ x, y, fillW, CELL_H }, gaugeCol);
+				}
+			}
+		}
+		else
+		{
+			drawTextCenter(tgtProp->leadItem.name, window.w / 2, 14);
+		}
+
+		// 데이터 라인
+		setFont(fontType::mainFont);
+		setFontSize(18);
+
+		drawText(firstString, xLabel, 25);
+		drawText(firstColStr + firstNumber, xNumber, 25);
+		drawText(firstUnit, window.w - 6 - queryTextWidth(firstUnit), 25);
+
+		drawText(secondString, xLabel, 29 + 16);
+		drawText(secondColStr + secondNumber, xNumber, 29 + 16);
+		drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 29 + 16);
+
+		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+		SDL_SetRenderTarget(renderer, nullptr);
+
+		// 화면 위치 계산
+		Point2 mouseCoord = getAbsMouseGrid();
+		SDL_Rect dst;
+		dst.x = cameraW / 2 + zoomScale * ((16 * mouseCoord.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+		dst.y = cameraH / 2 + zoomScale * ((16 * mouseCoord.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+		Point2 windowCoord = { dst.x, dst.y };
+
+		if (windowCoord.y + window.h >= cameraH) windowCoord.y = cameraH - window.h;
+
+		SDL_SetTextureAlphaMod(texture::circuitInfo, windowAlpha);
+		drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);
+		SDL_SetTextureAlphaMod(texture::circuitInfo, 255);
 	}
 }
