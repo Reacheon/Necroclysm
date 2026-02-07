@@ -5,7 +5,7 @@ import util;
 import Equip;
 import checkCursor;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import actFuncSet;
 import ItemData;
 import log;

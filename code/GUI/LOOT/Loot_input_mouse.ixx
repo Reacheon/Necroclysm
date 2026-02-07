@@ -7,7 +7,7 @@ import util;
 import Player;
 import checkCursor;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import actFuncSet;
 
 void Loot::clickUpGUI()

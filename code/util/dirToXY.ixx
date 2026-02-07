@@ -1,6 +1,8 @@
 ﻿export module dirToXY;
 
 import std;
+import dir16;
+import Point;
 
 export void dir2Coord(int dir, int& dx, int& dy)
 {
@@ -15,6 +17,20 @@ export void dir2Coord(int dir, int& dx, int& dy)
 		case 6:dx = 0; dy = 1; break;
 		case 7:dx = 1; dy = 1; break;
 		default: dx = 0; dy = 0; break;
+	}
+}
+
+export Point3 dir2Coord (dir16 dir)
+{
+	switch (dir)
+	{
+	case dir16::right: return { 1,0,0 };
+	case dir16::up: return { 0,-1,0 };
+	case dir16::left:return { -1,0,0 };
+	case dir16::down:return { 0,1,0 };
+	case dir16::above:return { 0,0,1 };
+	case dir16::below:return { 0,0,-1 };
+	default: return { 0,0,0 };
 	}
 }
 

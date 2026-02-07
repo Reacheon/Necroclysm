@@ -7,7 +7,7 @@ import std;
 import util;
 import GUI;
 import textureVar;
-import wrapVar;
+import wrapFunc;
 import drawText;
 import drawSprite;
 import globalVar;

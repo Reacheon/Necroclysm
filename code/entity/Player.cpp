@@ -7,7 +7,7 @@ import util;
 import Entity;
 import World;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import constVar;
 import log;

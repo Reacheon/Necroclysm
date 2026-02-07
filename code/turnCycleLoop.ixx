@@ -7,7 +7,7 @@ export module turnCycleLoop;
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import Entity;
 import World;
 import Player;
@@ -717,7 +717,10 @@ __int64 propTurn()
 	{
 		pPtr->fluidRunUsed = false;
 		pPtr->totalResistFluid = 0;
-		pPtr->fluidSink = 0;
+		pPtr->sinkFluidAmount = 0;
+		pPtr->sinkFluidType = fluidType::NONE;
+		pPtr->jetFluidType = fluidType::NONE;
+		pPtr->jetFluidDir = dir16::none;
 		pPtr->initFluidFlux();
 	}
 

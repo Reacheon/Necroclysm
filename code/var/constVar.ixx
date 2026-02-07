@@ -1549,19 +1549,19 @@ export enum class dmgAniFlag
     dodged,
 };
 
+export enum class relationFlag
+{
+    neutral,
+    hostile,
+    friendly,
+};
+
 export enum class ridingFlag
 {
     none,
     horse,
     wyvern,
     dolphin,
-};
-
-export enum class relationFlag
-{
-    neutral,
-    hostile,
-    friendly,
 };
 
 export enum class particleFlag

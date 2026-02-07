@@ -4,7 +4,7 @@ export module debugConsole;
 
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import globalTime;
 import textureVar;
 import log;

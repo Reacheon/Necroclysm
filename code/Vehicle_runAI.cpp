@@ -3,12 +3,13 @@
 
 import Vehicle;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import util;
 import Entity;
 import Player;
 import log;
+import Prop;
 
 bool Vehicle::runAI()
 {

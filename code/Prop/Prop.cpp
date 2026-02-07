@@ -4,7 +4,7 @@
 
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import World;
 import ItemStack;

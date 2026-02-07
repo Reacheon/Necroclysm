@@ -1,8 +1,6 @@
-﻿module;
-
 #include <SDL3/SDL.h>
 
-export module wrapVar;
+import wrapFunc;
 
 import std;
 import util;
@@ -20,32 +18,33 @@ import Player;
 import log;
 import statusEffect;
 
-export inline int PlayerX() { return PlayerPtr->getGridX(); }
-export inline int PlayerY() { return PlayerPtr->getGridY(); }
-export inline int PlayerZ() { return PlayerPtr->getGridZ(); }
+int PlayerX() { return PlayerPtr->getGridX(); }
+int PlayerY() { return PlayerPtr->getGridY(); }
+int PlayerZ() { return PlayerPtr->getGridZ(); }
 
-export inline const unsigned __int16 TileFloor(int x, int y, int z) { return World::ins()->getTile(x, y, z).floor; }
+const unsigned __int16 TileFloor(int x, int y, int z) { return World::ins()->getTile(x, y, z).floor; }
 
-export inline const unsigned __int16 TileFloor(Point3 coord) { return World::ins()->getTile(coord.x, coord.y, coord.z).floor; }
+const unsigned __int16 TileFloor(Point3 coord) { return World::ins()->getTile(coord.x, coord.y, coord.z).floor; }
 
-export inline const bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
+const bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
 
-export inline const unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }
+const unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }
 
-export inline const bool ExistWall(int x, int y, int z) { return (World::ins()->getTile(x, y, z).wall != 0); }
+const bool ExistWall(int x, int y, int z) { return (World::ins()->getTile(x, y, z).wall != 0); }
 
-export inline void setWall(Point3 coord, int val)
+void setWall(Point3 coord, int val)
 {
     World::ins()->getTile(coord.x, coord.y, coord.z).setWall(val);
-};
+}
 
-export inline void setFloor(Point3 coord, int val)
+void setFloor(Point3 coord, int val)
 {
     World::ins()->getTile(coord.x, coord.y, coord.z).setFloor(val);
-};
+}
 
-export inline Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
-export inline void EntityPtrMove(Point3 startCoor, Point3 endCoor)
+Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
+
+void EntityPtrMove(Point3 startCoor, Point3 endCoor)
 {
     // 1단계: 시작 좌표의 EntityPtr 존재 확인
     auto& startTile = World::ins()->getTile(startCoor);
@@ -71,50 +70,50 @@ export inline void EntityPtrMove(Point3 startCoor, Point3 endCoor)
     endTile.EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
     endTile.EntityPtr->pullEquipLights();
 }
-export inline void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
+
+void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
 {
     World::ins()->getTile(endCoor).EntityPtr = std::move(inputPtr);
     World::ins()->getTile(endCoor).EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
     World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
-    
 }
-export inline Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
-export inline Prop* TileProp(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).PropPtr.get(); }
-export inline Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
-export inline Vehicle*& TileVehicle(Point3 pt) { return (Vehicle*&)World::ins()->getTile(pt.x, pt.y, pt.z).VehiclePtr; }
 
-export inline ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
-export inline ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
+Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
+Prop* TileProp(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).PropPtr.get(); }
+Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
+Vehicle*& TileVehicle(Point3 pt) { return (Vehicle*&)World::ins()->getTile(pt.x, pt.y, pt.z).VehiclePtr; }
 
-export inline fovFlag& TileFov(int x, int y, int z) { return static_cast<fovFlag&>(World::ins()->getTile(x, y, z).fov); }
+ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
+ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
 
-export inline void createMonster(Point3 inputCoor, int inputEntityCode)
+fovFlag& TileFov(int x, int y, int z) { return static_cast<fovFlag&>(World::ins()->getTile(x, y, z).fov); }
+
+void createMonster(Point3 inputCoor, int inputEntityCode)
 {
     World::ins()->getTile(inputCoor).EntityPtr = std::make_unique<Monster>(inputEntityCode, inputCoor.x, inputCoor.y, inputCoor.z);
 }
 
-export inline void createItemStack(Point3 inputCoor)
+void createItemStack(Point3 inputCoor)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor);
 }
 
-export inline void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
+void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor, inputItems);
 }
 
-export inline void destroyItemStack(Point3 inputCoor)
+void destroyItemStack(Point3 inputCoor)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr.reset();
 }
 
-export inline void destroyProp(Point3 inputCoor)
+void destroyProp(Point3 inputCoor)
 {
     World::ins()->getTile(inputCoor).PropPtr.reset();
 }
 
-
-export inline void createProp(Point3 inputCoor, int inputItemCode)
+void createProp(Point3 inputCoor, int inputItemCode)
 {
     World::ins()->getTile(inputCoor).PropPtr = std::make_unique<Prop>(inputCoor, inputItemCode);
 
@@ -130,11 +129,12 @@ export inline void createProp(Point3 inputCoor, int inputItemCode)
         if (targetProp != nullptr) targetProp->updateSprIndex();
     }
 }
-export inline void createFlame(Point3 inputCoor, flameFlag inputFlag) { World::ins()->getTile(inputCoor).flamePtr = std::make_unique<Flame>(inputCoor, inputFlag); }
 
-export inline void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
+void createFlame(Point3 inputCoor, flameFlag inputFlag) { World::ins()->getTile(inputCoor).flamePtr = std::make_unique<Flame>(inputCoor, inputFlag); }
 
-export inline bool isWalkable(Point3 coord)
+void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
+
+bool isWalkable(Point3 coord)
 {
     if (TileWall(coord.x, coord.y, coord.z) != 0) return false;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false) return false;
@@ -150,16 +150,16 @@ export inline bool isWalkable(Point3 coord)
     else if (TileFloor(coord.x, coord.y, coord.z) == 0) return false; //바닥이 없는 경우
 
     return true;
-};
+}
 
-export inline bool isRayBlocker(Point3 coord)
+bool isRayBlocker(Point3 coord)
 {
     if (TileWall(coord.x, coord.y, coord.z) != 0 && itemDex[TileWall(coord.x, coord.y, coord.z)].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true) return true;
     else return false;
-};
+}
 
-export float getMouseX()
+float getMouseX()
 {
     float px, py;
     SDL_GetMouseState(&px, &py);
@@ -168,7 +168,7 @@ export float getMouseX()
     return renderX;
 }
 
-export float getMouseY()
+float getMouseY()
 {
     float px, py;
     SDL_GetMouseState(&px, &py);
@@ -177,7 +177,7 @@ export float getMouseY()
     return renderY;
 }
 
-export Point2 getAbsMouseGrid()
+Point2 getAbsMouseGrid()
 {
     int cameraGridX, cameraGridY;
     if (cameraX >= 0) cameraGridX = cameraX / 16;
@@ -208,13 +208,7 @@ export Point2 getAbsMouseGrid()
     return { cameraGridX + revGridX, cameraGridY + revGridY };
 }
 
-/*******************************************************************************
-* 부피 관련 변수들
-* 부피는 CONTAINER_FLEX로 인해 가변적이므로 반드시 래퍼 함수를 거쳐야 함
-* ItemData의 originalVolume을 사용하는 코드가 이 래퍼함수 이외에 존재하면 제거할 것
- *******************************************************************************/
-
-export int getVolume(const ItemData& inputData)
+int getVolume(const ItemData& inputData)
 {
     int baseVolume = inputData.originalVolume;
 
@@ -229,7 +223,7 @@ export int getVolume(const ItemData& inputData)
     return baseVolume;
 }
 
-export void sortVolumeDescend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
+void sortVolumeDescend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
 {
     std::sort(inputInfo.begin() + startIndex, inputInfo.begin() + endIndex + 1,
         [](ItemData& a, ItemData& b)
@@ -238,9 +232,9 @@ export void sortVolumeDescend(std::vector<ItemData>& inputInfo, int startIndex, 
         }
     );
 }
-export void sortVolumeDescend(std::vector<ItemData>& inputInfo) { sortVolumeDescend(inputInfo, 0, inputInfo.size() - 1); }
+void sortVolumeDescend(std::vector<ItemData>& inputInfo) { sortVolumeDescend(inputInfo, 0, inputInfo.size() - 1); }
 
-export void sortVolumeAscend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
+void sortVolumeAscend(std::vector<ItemData>& inputInfo, int startIndex, int endIndex)
 {
     std::sort(inputInfo.begin() + startIndex, inputInfo.begin() + endIndex + 1,
         [](ItemData& a, ItemData& b)
@@ -249,10 +243,9 @@ export void sortVolumeAscend(std::vector<ItemData>& inputInfo, int startIndex, i
         }
     );
 }
-export void sortVolumeAscend(std::vector<ItemData>& inputInfo) { sortVolumeAscend(inputInfo, 0, inputInfo.size() - 1); }
+void sortVolumeAscend(std::vector<ItemData>& inputInfo) { sortVolumeAscend(inputInfo, 0, inputInfo.size() - 1); }
 
-
-export bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
 {
     for (const auto& effect : inputStatus)
     {
@@ -261,7 +254,7 @@ export bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffe
     return false;
 }
 
-export void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
 {
     for (auto it = inputStatus.begin(); it != inputStatus.end();)
     {
@@ -276,12 +269,12 @@ export void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffe
     }
 }
 
-export int getItemSprIndex(ItemData& inputData)
+int getItemSprIndex(ItemData& inputData)
 {
-    if ((inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver)&& inputData.pocketPtr != nullptr)
+    if ((inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver) && inputData.pocketPtr != nullptr)
     {
         std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
-        
+
         int num = inputData.pocketPtr.get()->getPocketNumber();
         if (num == 0) return itemDex[inputData.itemCode].itemSprIndex;
         else if (num == 1) return itemDex[inputData.itemCode].itemSprIndex + 1;
@@ -293,12 +286,12 @@ export int getItemSprIndex(ItemData& inputData)
 
         if (pocketInfo.size() > 0)
         {
-            if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_RED))  return inputData.itemSprIndex+2;
-            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLUE)) return inputData.itemSprIndex+3;
-            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_YELLOW)) return inputData.itemSprIndex+4;
-            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_WHITE)) return inputData.itemSprIndex+5;
-            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_GRAY)) return inputData.itemSprIndex+6;
-            else if(pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLACK)) return inputData.itemSprIndex+7;
+            if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_RED))  return inputData.itemSprIndex + 2;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLUE)) return inputData.itemSprIndex + 3;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_YELLOW)) return inputData.itemSprIndex + 4;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_WHITE)) return inputData.itemSprIndex + 5;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_GRAY)) return inputData.itemSprIndex + 6;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLACK)) return inputData.itemSprIndex + 7;
             else return inputData.itemSprIndex + 8;
         }
         else return inputData.itemSprIndex;
@@ -316,7 +309,7 @@ export int getItemSprIndex(ItemData& inputData)
     else return inputData.itemSprIndex;
 }
 
-export void changePlayerWalkMode(walkFlag inputMode)
+void changePlayerWalkMode(walkFlag inputMode)
 {
     auto& pStatus = PlayerPtr->entityInfo.statusEffectVec;
 
@@ -330,9 +323,37 @@ export void changePlayerWalkMode(walkFlag inputMode)
         }),
         pStatus.end());
 
-    if(inputMode == walkFlag::run) pStatus.push_back({statusEffectFlag::run, -1});
-    else if(inputMode == walkFlag::crouch) pStatus.push_back({statusEffectFlag::crouch, -1});
+    if (inputMode == walkFlag::run) pStatus.push_back({ statusEffectFlag::run, -1 });
+    else if (inputMode == walkFlag::crouch) pStatus.push_back({ statusEffectFlag::crouch, -1 });
     else if (inputMode == walkFlag::crawl) pStatus.push_back({ statusEffectFlag::crawl, -1 });
 
     PlayerPtr->entityInfo.walkMode = inputMode;
+}
+
+
+void addItemToTile(Point3 coord, int itemCode, int number)
+{
+    if (TileItemStack(coord.x, coord.y, coord.z) == nullptr) createItemStack(coord); //그 자리에 템 없는 경우
+    TileItemStack(coord)->getPocket()->addItemFromDex(itemCode, number);
+}
+void addItemToTile(Point3 coord, ItemPocket* inputPokcet)
+{
+    if (TileItemStack(coord.x, coord.y, coord.z) == nullptr) createItemStack(coord); //그 자리에 템 없는 경우
+    ItemStack* targetStack = TileItemStack(coord);
+    while (inputPokcet->itemInfo.size() > 0)
+    {
+        int itemCount = inputPokcet->itemInfo[0].number;
+        inputPokcet->transferItem(targetStack->getPocket(), 0, itemCount);
+    }
+}
+
+int fluidTypeToCode(fluidType inputType)
+{
+    switch (inputType)
+    {
+    default:
+        return 0;
+    case fluidType::WATER:
+        return itemRefCode::water;
+    }
 }

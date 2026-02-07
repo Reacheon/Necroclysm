@@ -4,7 +4,7 @@
 
 import std;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import constVar;
 import util;

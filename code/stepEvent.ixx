@@ -3,7 +3,7 @@
 export module stepEvent;
 
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import util;
 import Damage;

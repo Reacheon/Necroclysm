@@ -10,7 +10,7 @@ import util;
 import Player;
 import drawText;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import ItemPocket;
 import checkCursor;
@@ -28,6 +28,7 @@ import Inventory;
 import ItemData;
 import ItemPocket;
 import CoordSelectCraft;
+import Prop;
 
 
 export class Equip : public GUI

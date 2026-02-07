@@ -3,7 +3,7 @@
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import GUI;
 
 export void clickDown()

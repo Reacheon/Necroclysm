@@ -164,6 +164,7 @@
     <ClCompile Include="code\actFuncSet.ixx" />
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
+    <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\drawEpsilonText.ixx" />
@@ -184,6 +185,7 @@
     <ClCompile Include="code\gamepadInput.ixx" />
     <ClCompile Include="code\gasData.ixx" />
     <ClCompile Include="code\GUI\Aim.ixx" />
+    <ClCompile Include="code\GUI\ContextMenu.cpp" />
     <ClCompile Include="code\GUI\ContextMenu.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelect.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelectCraft.ixx" />
@@ -217,6 +219,7 @@
     <ClCompile Include="code\GUI\Profic.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />
     <ClCompile Include="code\GUI\Sample.ixx" />
+    <ClCompile Include="code\GUI\Skill.cpp" />
     <ClCompile Include="code\GUI\Skill.ixx" />
     <ClCompile Include="code\GUI\Sleep.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
@@ -311,8 +314,9 @@
     <ClCompile Include="code\util\wstring2Number.ixx" />
     <ClCompile Include="code\var\constVar.ixx" />
     <ClCompile Include="code\var\globalVar.ixx" />
+    <ClCompile Include="code\var\wrapFunc.cpp" />
     <ClCompile Include="code\var\textureVar.ixx" />
-    <ClCompile Include="code\var\wrapVar.ixx" />
+    <ClCompile Include="code\var\wrapFunc.ixx" />
     <ClCompile Include="code\Vehicle.cpp" />
     <ClCompile Include="code\Vehicle.ixx" />
     <ClCompile Include="code\Vehicle_runAI.cpp" />

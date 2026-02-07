@@ -5,7 +5,7 @@ export module renderTile;
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import textureVar;
 import checkCursor;

@@ -5,7 +5,7 @@
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import textureVar;
 import Player;
@@ -1992,11 +1992,11 @@ void HUD::drawFluidCircuitInfo()
 		}
 
 		// 싱크에서 유체를 소비 중이면 2번째 줄을 Drain으로 오버라이드
-		if (tgtProp->fluidSink > 0 && !isPump && !isTank)
+		if (tgtProp->sinkFluidAmount > 0 && !isPump && !isTank)
 		{
 			secondString = L"Drain:";
 			secondColStr = L"";
-			secondNumber = col2Str(lowCol::orange) + decimalCutter(tgtProp->fluidSink, 1);
+			secondNumber = col2Str(lowCol::orange) + decimalCutter(tgtProp->sinkFluidAmount, 1);
 			secondUnit = L"mL/turn";
 		}
 

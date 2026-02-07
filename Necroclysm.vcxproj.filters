@@ -504,7 +504,7 @@
     <ClCompile Include="code\world\Mapmaker.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\var\wrapVar.ixx">
+    <ClCompile Include="code\var\wrapFunc.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
     <ClCompile Include="code\var\constVar.ixx">
@@ -578,6 +578,18 @@
     </ClCompile>
     <ClCompile Include="code\Prop\Prop_fluidCircuit.ixx">
       <Filter>소스 파일\05_Class\08_Prop</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\wrapFunc.cpp">
+      <Filter>소스 파일\00_var</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Damage.cpp">
+      <Filter>소스 파일\05_Class\05_Etc</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\ContextMenu.cpp">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Skill.cpp">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

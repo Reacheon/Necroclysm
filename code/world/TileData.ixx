@@ -58,6 +58,9 @@ export struct TileData //총용량 29바이트
 
     bool hasSnow = false;
 
+    ////////////////////////////////////////////////////////////
+    bool isMoist = false;
+
     TileData() { randomVal = randomRange(0, 65535); }
     void destoryWall() { wall = 0; }
     void setWall(int inputIndex) { wall = inputIndex; }

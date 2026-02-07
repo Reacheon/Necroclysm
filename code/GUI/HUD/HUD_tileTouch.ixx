@@ -3,11 +3,12 @@
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import Vehicle;
 import log;
 import Dialogue;
 import Loot;
+import Prop;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {

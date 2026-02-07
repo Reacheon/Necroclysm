@@ -7,7 +7,7 @@ export module Loot;
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import drawWindowArrow;
 import ItemPocket;

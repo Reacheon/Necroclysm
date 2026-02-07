@@ -5,7 +5,7 @@ import util;
 import GUI;
 import globalVar;
 import constVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import drawText;
 import drawSprite;

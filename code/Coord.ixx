@@ -28,6 +28,7 @@ public:
 	int getGridX() { return gridX; }
 	int getGridY() { return gridY; }
 	int getGridZ() { return gridZ; }
+	Point3 getGrid() { return { gridX,gridY,gridZ };}
 	int getDstX() { return dstX; }
 	int getDstY() { return dstY; }
 	int getDstGridX() { return dstGridX; }

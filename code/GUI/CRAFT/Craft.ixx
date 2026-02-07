@@ -8,7 +8,7 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import Lst;
 import Player;

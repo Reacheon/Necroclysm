@@ -1,7 +1,7 @@
 ﻿import util;
 import Entity;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import textureVar;
 import turnWait;
@@ -1011,40 +1011,13 @@ bool Entity::runAnimation(bool shutdown)
 					return true;
 				}
 			}
-			else if (TileItemStack(dstGrid.x, dstGrid.y, dstGrid.z) == nullptr) //그 자리에 템 없는 경우
+			else
 			{
-				//기존 스택이 없으면 새로 만들고 그 ptr을 전달
-
-				createItemStack(dstGrid);
-				targetStack = TileItemStack(dstGrid);
-				while (throwingItemPocket->itemInfo.size() > 0)
-				{
-					int itemCount = throwingItemPocket->itemInfo[0].number;
-					throwingItemPocket->transferItem(targetStack->getPocket(), 0, itemCount);
-				}
-				addAniUSetPlayer(targetStack, aniFlag::drop);
-
+				addItemToTile(dstGrid, throwingItemPocket.get());
+				addAniUSetPlayer(TileItemStack(dstGrid), aniFlag::drop);
 				delete sPtr;
 				resetTimer();
 				setAniType(aniFlag::null);
-				if (entityInfo.isPlayer == true) { turnWait(1.0); }
-				return true;
-			}
-			else //이미 그 자리에 아이템이 있는 경우
-			{
-				//기존 스택이 있으면 그 스택을 그대로 전달
-				targetStack = TileItemStack(dstGrid);
-				while (throwingItemPocket->itemInfo.size() > 0)
-				{
-					int itemCount = throwingItemPocket->itemInfo[0].number;
-					throwingItemPocket->transferItem(targetStack->getPocket(), 0, itemCount);
-				}
-				addAniUSetPlayer(targetStack, aniFlag::drop);
-
-				delete sPtr;
-				resetTimer();
-				setAniType(aniFlag::null);
-
 				if (entityInfo.isPlayer == true) { turnWait(1.0); }
 				return true;
 			}

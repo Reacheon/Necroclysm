@@ -3,7 +3,7 @@
 export module scriptLoader;
 
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import Player;
 import util;
 import World;

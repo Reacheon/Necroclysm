@@ -5,7 +5,7 @@ export module startArea;
 
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import HUD;
 import Player;
 import ItemData;

@@ -3,7 +3,7 @@
 #include <SDL3/SDL.h>
 
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import constVar;
 import drawWindow;

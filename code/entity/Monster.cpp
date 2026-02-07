@@ -5,7 +5,7 @@
 import std;
 import Entity;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import textureVar;
 import Player;
 import World;

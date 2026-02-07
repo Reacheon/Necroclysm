@@ -4,7 +4,7 @@
 
 import globalVar;
 import constVar;
-import wrapVar;
+import wrapFunc;
 import ItemData;
 import textureVar;
 import drawSprite;

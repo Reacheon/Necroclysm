@@ -5,7 +5,7 @@
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import Player;
 import World;

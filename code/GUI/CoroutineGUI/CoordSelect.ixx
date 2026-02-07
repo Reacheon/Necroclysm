@@ -11,7 +11,7 @@ import World;
 import checkCursor;
 import constVar;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import drawSprite;
 import textureVar;
 import drawText;

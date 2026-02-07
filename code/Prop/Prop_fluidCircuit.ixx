@@ -3,7 +3,7 @@
 import Prop;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 
 constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
@@ -46,9 +46,12 @@ constexpr double INFINITE_DEMAND_DOUBLE = std::numeric_limits<double>::max();
 * 1. [펌프단계] 펌프들이 자신이 할 수 있는만큼 최대치의 양을 밀어낸다. (전자회로처럼 셔플없고 병렬 분배도 없음)
 * 2. [탱크단계] 탱크들이 현재 저장된 유량(적절한 비례상수로 구현된 수위)에 따라 압력을 발생시켜 좌우로 밀어내기를 발생시킨다.
 * 3. [평활화단계] 유체파이프들이 주변 타일과 유량(수위)가 다르면 주변 타일과 평활화가 되는 transfer가 일어난다(push가 아님에 유의)
-* 4. 다 한 후에 파이프 끝의 싱크(정해진 값임, 현재는 모든 파이프가 끝에 구멍이 뚫려있다)와 스프링클러에 쌓인 유량에 따라 각각이 작동함
+* 4. 다 한 후에 싱크로 전달된 유량에 따라 다양한 작동이 일어남. 현재 있는 싱크는 2개인데 첫번째는 파이프의 구멍, 두번째는 스프링클러이다.
+*  4-1. 구멍은 무한한 SINK값을 가진다.
+*  4-2. 스프링클러는 유한한 SINK값을 가진다.
+* 5. fluidSink에 누적된 값에서 스프링클러가 우선 사용된다. 
 * 5. 스프링클러는 유량이 조금이라도 흡수됐으면 주변에 물을 흩뿌림. 단 주변 타일을 젖게 만드려면 더 넓게 젖게 만드려면 싱크의 유량 일정량 필요
-* 6. 파이프 끝의 싱크는 그냥 흘러내림. 흘러내린만큼 물웅덩이 타일을 만듬. 이건 아마 벼농사같은 곳에 사용될 듯 하다.
+* 6. fluidSink에서 스프링클러 소모량을 제외한 나머지는 구멍으로 흘러내리며 물웅덩이 타일을 만듬. 이건 아마 벼농사같은 곳에 사용될 듯 하다.
 * 
 * [※ 유의할 점]
 * -펌프와 탱크의 셔플이 일어나지 않아 모든 턴에서 작동 순서는 항상 같다.
@@ -321,19 +324,19 @@ void Prop::updateFluidCircuitNetwork()
     //==============================================================================
     // 3. sinkSet(구멍,스프링클러 등) 작동 시작
     //==============================================================================
-    for (auto sink : loadSinkSet)
+    for (auto sinkProp : loadSinkSet)
     {
         // 0. 초기값 설정
-        double totalInlet = sink->fluidSink; // 이번 턴에 들어온 총 유량
+        double totalInlet = sinkProp->sinkFluidAmount; // 이번 턴에 들어온 총 유량
         double remainFluid = totalInlet;
 
         double consumedByDevice = 0.0;
         double leakedByHole = 0.0;
 
         // fluidDemand가 설정된 프롭은 해당 양만큼 우선 소비함
-        if (sink->leadItem.fluidDemand > 0)
+        if (sinkProp->leadItem.fluidDemand > 0)
         {
-            consumedByDevice = std::min(remainFluid, (double)sink->leadItem.fluidDemand);
+            consumedByDevice = std::min(remainFluid, (double)sinkProp->leadItem.fluidDemand);
             remainFluid -= consumedByDevice;
         }
 
@@ -341,7 +344,7 @@ void Prop::updateFluidCircuitNetwork()
         bool hasHole = false;
         for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below })
         {
-            Point3 coord = { sink->getGridX(), sink->getGridY(), sink->getGridZ() };
+            Point3 coord = { sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->getGridZ() };
             // 현재 타일에서 해당 방향으로 구멍이 뚫려있는지 확인
             if (getHoleDirection() != dir16::none)
             {
@@ -360,7 +363,7 @@ void Prop::updateFluidCircuitNetwork()
         if (debug::printCircuitLog && totalInlet > EPSILON)
         {
             std::wprintf(L"  \x1b[96m▶ [SINK 처리] (%d,%d)%ls \x1b[0m\n",
-                sink->getGridX(), sink->getGridY(), sink->leadItem.name.c_str());
+                sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->leadItem.name.c_str());
 
             std::wprintf(L"      │ 총 유입량: %.2f mL\n", totalInlet);
 
@@ -368,14 +371,18 @@ void Prop::updateFluidCircuitNetwork()
             {
                 std::wprintf(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
                     consumedByDevice,
-                    sink->leadItem.fluidDemand,
-                    (consumedByDevice / sink->leadItem.fluidDemand) * 100.0);
+                    sinkProp->leadItem.fluidDemand,
+                    (consumedByDevice / sinkProp->leadItem.fluidDemand) * 100.0);
             }
 
-            if (leakedByHole > EPSILON)
+            if (leakedByHole > EPSILON) //누수 알고리즘
             {
-                std::wprintf(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",
-                    leakedByHole);
+                std::wprintf(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",leakedByHole);
+                
+                sinkProp->jetFluidType = sinkProp->sinkFluidType;
+                sinkProp->jetFluidDir = getHoleDirection();
+                Point3 del = dir2Coord(sinkProp->jetFluidDir);
+                addItemToTile(sinkProp->getGrid() + del, fluidTypeToCode(sinkProp->jetFluidType), std::floor(leakedByHole));
             }
             else if (hasHole && leakedByHole <= EPSILON)
             {
@@ -719,7 +726,7 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
 
         if (getHoleDirection(current, txDir) == dir16::none)
         {
-            requiredFluid = nextProp->leadItem.fluidDemand - nextProp->fluidSink;
+            requiredFluid = nextProp->leadItem.fluidDemand - nextProp->sinkFluidAmount;
         }
         else
         {
@@ -730,8 +737,8 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
         {
             std::wprintf(L"%s  └─ \x1b[33m[SINK진입] SINK, 요구=%ls, 잔여용량=%ls, 시도량=%.2f\x1b[0m\n",
                 indent.c_str(),
-                (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E" : decimalCutter(nextProp->leadItem.fluidDemand, 2).c_str(),
-                (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E" : decimalCutter(requiredFluid, 2).c_str(),
+                (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(nextProp->leadItem.fluidDemand, 2).c_str(),
+                (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(requiredFluid, 2).c_str(),
                 txFluidAmount);
         }
 
@@ -745,10 +752,11 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
                 std::wprintf(L"%s      → 실제소비=%.2f, 남은용량=%ls\n",
                     indent.c_str(),
                     sinkTxFluid,
-                    (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E" : decimalCutter(requiredFluid - sinkTxFluid, 2).c_str());
+                    (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(requiredFluid - sinkTxFluid, 2).c_str());
             }
 
-            nextProp->fluidSink += sinkTxFluid;
+            nextProp->sinkFluidAmount += sinkTxFluid;
+            nextProp->sinkFluidType = donorProp->nodeFluidType;
         }
         else if (debug::printCircuitLog)
         {
@@ -910,7 +918,7 @@ void Prop::transferFluid(Prop* thisProp, Prop* nextProp, double txFluidAmount, c
                 thisProp->nodeFluidAmount + actualTransfer, thisProp->nodeFluidAmount,
                 nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
                 actualTransfer, frictionLoss,
-                nextProp->fluidSink, nextProp->leadItem.fluidDemand);
+                nextProp->sinkFluidAmount, nextProp->leadItem.fluidDemand);
         }
         else
         {

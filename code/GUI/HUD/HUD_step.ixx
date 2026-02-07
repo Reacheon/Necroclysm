@@ -1,6 +1,6 @@
 ﻿import HUD;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import Profic;
 import Sleep;
 import statusEffect;

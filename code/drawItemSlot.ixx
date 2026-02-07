@@ -9,7 +9,7 @@ import ItemPocket;
 import globalVar;
 import drawText;
 import constVar;
-import wrapVar;
+import wrapFunc;
 import checkCursor;
 import drawSprite;
 import textureVar;

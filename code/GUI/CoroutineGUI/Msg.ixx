@@ -6,7 +6,7 @@ export module Msg;
 import std;
 import util;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import constVar;
 import textureVar;
 import drawText;

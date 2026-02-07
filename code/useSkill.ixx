@@ -4,7 +4,7 @@ import std;
 import util;
 import checkCursor;
 import globalVar;
-import wrapVar;
+import wrapFunc;
 import Player;
 import World;
 import Vehicle;

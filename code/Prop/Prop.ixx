@@ -63,7 +63,13 @@ public:
 
     fluidType nodeFluidType = fluidType::NONE;
     double nodeFluidAmount = 0; //mL 단위
-    double fluidSink = 0.0;
+
+    double sinkFluidAmount = 0.0;
+    fluidType sinkFluidType = fluidType::NONE;
+
+    //스프라이트 그리기용 참고 변수
+    fluidType jetFluidType = fluidType::NONE;
+    dir16 jetFluidDir = dir16::none;
 
     std::unordered_map<dir16, double> fluidFlux = { {dir16::right,0},{dir16::up,0},{dir16::left,0},{dir16::down,0},{dir16::above,0},{dir16::below,0} }; 
     
