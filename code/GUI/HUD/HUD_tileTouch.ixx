@@ -255,6 +255,14 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::changePropDelay);
 				}
+				else if (tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorR 
+					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorT
+					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorL
+					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+				{
+					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+				}
 			}
 			else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
 			{

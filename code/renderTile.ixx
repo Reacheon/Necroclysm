@@ -400,6 +400,59 @@ void drawTiles()
             }
         }
 
+        //유체 웅덩이(유체 아이템으로 인한)
+        auto getStackLastFluidCode = [](Point3 coord)->int
+            {
+                ItemStack* tileStack = TileItemStack(coord);
+                if (tileStack == nullptr) return -1;
+
+                std::vector<ItemData>& stackInfo = tileStack->getPocket()->itemInfo;
+                for (int i = stackInfo.size() - 1; i >= 0; i--)
+                {
+                    if (stackInfo[i].checkFlag(itemFlag::LIQUID)) return stackInfo[i].itemCode;
+                }
+                return -1;
+            };
+
+        int currentFluidCode = getStackLastFluidCode({ tgtX,tgtY,PlayerZ() });
+        if (currentFluidCode != -1)
+        {
+            int dirCorrection = 0;
+
+            bool topCheck, botCheck, leftCheck, rightCheck;
+
+            topCheck = getStackLastFluidCode({ tgtX,tgtY - 1,PlayerZ() }) == currentFluidCode;
+            botCheck = getStackLastFluidCode({ tgtX,tgtY + 1,PlayerZ() }) == currentFluidCode;
+            leftCheck = getStackLastFluidCode({ tgtX - 1,tgtY,PlayerZ() }) == currentFluidCode;
+            rightCheck = getStackLastFluidCode({ tgtX + 1,tgtY,PlayerZ() }) == currentFluidCode;
+
+            dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+
+            int itemSprIndex = -1;
+            switch (currentFluidCode)
+            {
+            case itemRefCode::water:
+                itemSprIndex = 2080;
+                break;
+            case itemRefCode::gasoline:
+                itemSprIndex = 2144;
+                break;
+            default:
+                itemSprIndex = 2176;
+                break;
+            }
+
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            int tileAniExtraIndex16 = getMilliTimer() / 1000 % 2;
+            indices[tileCounter] = itemSprIndex + dirCorrection + 16 * tileAniExtraIndex16;
+            batchAlphas[tileCounter] = 200;
+            tileCounter++;
+        }
+
 
 
         if(thisTile->wall!=0)
@@ -830,15 +883,23 @@ void drawItems()
         if (address == nullptr) continue; //삭제된 ItemStack은 건너뜀
         std::vector<ItemData>& pocketInfo = address->getPocket()->itemInfo;
         if (pocketInfo.size() == 0) continue; //빈 포켓은 그리지 않음
-        setZoom(zoomScale);
-        drawSpriteCenter
-        (
-            spr::itemset,
-            getItemSprIndex(pocketInfo[pocketInfo.size() - 1]),
-            (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
-            (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
-        );
-        setZoom(1.0);
+
+        for (int i = pocketInfo.size() - 1; i >= 0; i--)
+        {
+            if (pocketInfo[pocketInfo.size() - 1].checkFlag(itemFlag::LIQUID) == false)
+            {
+                setZoom(zoomScale);
+                drawSpriteCenter
+                (
+                    spr::itemset,
+                    getItemSprIndex(pocketInfo[pocketInfo.size() - 1]),
+                    (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+                    (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+                );
+                setZoom(1.0);
+                break;
+            }
+        }
     }
 }
 

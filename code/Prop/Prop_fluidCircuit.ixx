@@ -360,16 +360,19 @@ void Prop::updateFluidCircuitNetwork()
         }
 
         // 3. 로그 출력 (std::wprintf 사용)
-        if (debug::printCircuitLog && totalInlet > EPSILON)
+        if (totalInlet > EPSILON)
         {
-            std::wprintf(L"  \x1b[96m▶ [SINK 처리] (%d,%d)%ls \x1b[0m\n",
-                sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->leadItem.name.c_str());
+            if (debug::printCircuitLog)
+            {
+                std::wprintf(L"  \x1b[96m▶ [SINK 처리] (%d,%d)%ls \x1b[0m\n",
+                    sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->leadItem.name.c_str());
 
-            std::wprintf(L"      │ 총 유입량: %.2f mL\n", totalInlet);
+                std::wprintf(L"      │ 총 유입량: %.2f mL\n", totalInlet);
+            }
 
             if (consumedByDevice > EPSILON)
             {
-                std::wprintf(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
+                if (debug::printCircuitLog) std::wprintf(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
                     consumedByDevice,
                     sinkProp->leadItem.fluidDemand,
                     (consumedByDevice / sinkProp->leadItem.fluidDemand) * 100.0);
@@ -377,24 +380,24 @@ void Prop::updateFluidCircuitNetwork()
 
             if (leakedByHole > EPSILON) //누수 알고리즘
             {
-                std::wprintf(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",leakedByHole);
+                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",leakedByHole);
                 
                 sinkProp->jetFluidType = sinkProp->sinkFluidType;
-                sinkProp->jetFluidDir = getHoleDirection();
+                sinkProp->jetFluidDir = sinkProp->getHoleDirection();
                 Point3 del = dir2Coord(sinkProp->jetFluidDir);
                 addItemToTile(sinkProp->getGrid() + del, fluidTypeToCode(sinkProp->jetFluidType), std::floor(leakedByHole));
             }
             else if (hasHole && leakedByHole <= EPSILON)
             {
-                std::wprintf(L"      │ └─ \x1b[90m[누수없음] 잔여 유량 없음\x1b[0m\n");
+                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[90m[누수없음] 잔여 유량 없음\x1b[0m\n");
             }
             else if (!hasHole && remainFluid > EPSILON)
             {
                 // 구멍이 없고 Demand보다 많이 들어온 경우 (막힌 관 끝에 압력이 차는 상황 등)
-                std::wprintf(L"      │ └─ \x1b[33m[잔류] %.2f (배출구 없음)\x1b[0m\n", remainFluid);
+                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[33m[잔류] %.2f (배출구 없음)\x1b[0m\n", remainFluid);
             }
 
-            std::wprintf(L"      └──────────────────────────────────\n");
+            if (debug::printCircuitLog) std::wprintf(L"      └──────────────────────────────────\n");
         }
 
     }
