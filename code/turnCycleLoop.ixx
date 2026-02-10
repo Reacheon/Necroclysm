@@ -729,15 +729,7 @@ __int64 propTurn()
 	{
 		if (pPtr->fluidRunUsed) continue;
 
-		bool isPump = (pPtr->leadItem.itemCode == itemRefCode::pumpR
-			|| pPtr->leadItem.itemCode == itemRefCode::pumpU
-			|| pPtr->leadItem.itemCode == itemRefCode::pumpL
-			|| pPtr->leadItem.itemCode == itemRefCode::pumpD);
-
-		if (isPump)
-		{
-			pPtr->updateFluidCircuitNetwork();
-		}
+		pPtr->updateFluidCircuitNetwork();
 	}
 
 	// 유체회로 부하 작동

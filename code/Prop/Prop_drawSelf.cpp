@@ -370,7 +370,20 @@ void Prop::drawSelf()
             else return;
         }
     }
-
+    else if (iCode == itemRefCode::valveRL || iCode == itemRefCode::valveUD)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            sprIndex += 1;
+        }
+    }
+    else if (iCode == itemRefCode::solenoidValveRL || iCode == itemRefCode::solenoidValveUD)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            sprIndex += 1;
+        }
+        }
 
 
     if (leadItem.checkFlag(itemFlag::CABLE) && leadItem.checkFlag(itemFlag::CROSSED_CABLE))
@@ -517,7 +530,9 @@ void Prop::drawSelf()
     if (iCode == itemRefCode::intakePipeR
         || iCode == itemRefCode::intakePipeU
         || iCode == itemRefCode::intakePipeL
-        || iCode == itemRefCode::intakePipeD)
+        || iCode == itemRefCode::intakePipeD
+        && (iCode != itemRefCode::verticalPipeLA && iCode != itemRefCode::verticalPipeLB
+            && iCode != itemRefCode::verticalPipeRA && iCode != itemRefCode::verticalPipeRB))
     {
         int floorItemIndex = TileFloor(getGridX(), getGridY(), getGridZ());
         if(itemDex[floorItemIndex].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemIndex].checkFlag(itemFlag::WATER_DEEP))
@@ -543,6 +558,39 @@ void Prop::drawSelf()
             }
             sprIndex += (1 + animFrame);
         }
+    }
+
+    if (iCode != itemRefCode::pipe && jetFluidType != fluidType::NONE)
+    {
+        static Uint32 jetLastUpdateTime = 0;
+        static int jetAnimFrame = 0;
+        Uint32 jetCurrentTime = SDL_GetTicks();
+        if (jetCurrentTime - jetLastUpdateTime >= 100)
+        {
+            jetAnimFrame = (jetAnimFrame + 1);
+            jetLastUpdateTime = jetCurrentTime;
+        }
+
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 200);
+
+        if (jetFluidDir == dir16::right)
+        {
+            drawSpriteCenter(spr::propset, 3296 + (jetAnimFrame % 4), drawX, drawY);
+        }
+        else if (jetFluidDir == dir16::up)
+        {
+            drawSpriteCenter(spr::propset, 3300 + (jetAnimFrame % 3), drawX, drawY);
+        }
+        else if (jetFluidDir == dir16::left)
+        {
+            drawSpriteCenter(spr::propset, 3304 + (jetAnimFrame % 4), drawX, drawY);
+        }
+        else if (jetFluidDir == dir16::down)
+        {
+            drawSpriteCenter(spr::propset, 3308 + (jetAnimFrame % 3), drawX, drawY);
+        }
+
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -581,6 +629,34 @@ void Prop::drawSelf()
         else if (jetFluidDir == dir16::down)
         {
             drawSpriteCenter(spr::propset, 3308 + (jetAnimFrame % 3), drawX, drawY);
+        }
+
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
+    }
+
+    if (iCode == itemRefCode::verticalPipeLA 
+        || iCode == itemRefCode::verticalPipeLB
+        || iCode == itemRefCode::verticalPipeRA 
+        || iCode == itemRefCode::verticalPipeRB)
+    {
+        static Uint32 jetLastUpdateTime = 0;
+        static int jetAnimFrame = 0;
+        Uint32 jetCurrentTime = SDL_GetTicks();
+        if (jetCurrentTime - jetLastUpdateTime >= 100)
+        {
+            jetAnimFrame = (jetAnimFrame + 1);
+            jetLastUpdateTime = jetCurrentTime;
+        }
+
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 200);
+
+        if (jetFluidDir == dir16::right)
+        {
+            drawSpriteCenter(spr::propset, 3296 + (jetAnimFrame % 4), drawX + zoomScale*2, drawY);
+        }
+        else if (jetFluidDir == dir16::left)
+        {
+            drawSpriteCenter(spr::propset, 3304 + (jetAnimFrame % 4), drawX - zoomScale * 2, drawY);
         }
 
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);

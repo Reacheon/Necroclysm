@@ -1709,6 +1709,8 @@ void HUD::drawCircuitInfo()
 		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) &&tgtProp->isChargeFlowing())
 			|| tgtProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
 		{
+			if (tgtProp->isFluidFlowing()) return;
+
 			std::wstring firstString = L"Power:";
 			std::wstring firstNumber = L"534.6";
 			std::wstring firstColStr = L"";

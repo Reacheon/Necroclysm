@@ -114,9 +114,11 @@ public:
     void updateFluidCircuitNetwork();
     bool isPipeConnected(Point3 currentCoord, dir16 dir);
     bool isPipeConnected(Prop* currentProp, dir16 dir);
-    dir16 getHoleDirection(Point3 current, dir16 dir);
+    //@brief 밸브나 그 외 요소를 무시하고 순수하게 연결만 되었는지 확인
+    bool isPipeLinked(Point3 currentCoord, dir16 dir);
+    bool isPipeLinked(Prop* currentProp, dir16 dir);
     dir16 getHoleDirection();
-    bool isSink(Point3 current, dir16 dir);
+    bool isSink();
     bool isSameFluid(Prop* prop1, Prop* prop2);
     double pushFluid(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
     void transferFluid(Prop* thisProp, Prop* nextProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer = false);

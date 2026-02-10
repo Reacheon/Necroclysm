@@ -219,6 +219,17 @@ void Prop::updateFluidCircuitNetwork()
                 }
             }
 
+            if (currentProp->isSink())
+            {
+                loadSinkSet.insert(currentProp);
+
+                if (debug::printCircuitLog)
+                {
+                    std::wprintf(L"  \x1b[91m◆ 싱크 감지: %ls (%d,%d,%d)\x1b[0m\n",
+                        currentProp->leadItem.name.c_str(),
+                        current.x, current.y, current.z);
+                }
+            }
 
             const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below };
 
@@ -232,22 +243,9 @@ void Prop::updateFluidCircuitNetwork()
                 if (isPipeConnected(current, directions[i]))
                 {
                     ItemData& nextItem = nextProp->leadItem;
-                    if (isSink(current, directions[i]))
-                    {
-                        loadSinkSet.insert(nextProp);
-
-                        if (debug::printCircuitLog)
-                        {
-                            std::wprintf(L"  \x1b[91m◆ 싱크 감지: %ls (%d,%d,%d)\x1b[0m\n",
-                                nextProp->leadItem.name.c_str(),
-                                nextCoord.x, nextCoord.y, nextCoord.z);
-                        }
-                    }
-
                     if (debug::printCircuitLog)
                         std::wprintf(L"  [연결] %ls (%d,%d) %ls\n",
                             dirToArrow(directions[i]), nextCoord.x, nextCoord.y, nextItem.name.c_str());
-
                     frontierQueue.push(nextCoord);
 
                 }
@@ -271,7 +269,7 @@ void Prop::updateFluidCircuitNetwork()
         if (pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
             pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
-            if (pumpProp->leadItem.itemCode == itemRefCode::pumpR && isPipeConnected({ x,y,z }, dir16::right))
+            if (pumpProp->leadItem.itemCode == itemRefCode::pumpR)
             {
                 if (isPipeConnected({ x,y,z }, dir16::left))
                 {
@@ -283,7 +281,7 @@ void Prop::updateFluidCircuitNetwork()
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpL && isPipeConnected({ x,y,z }, dir16::left))
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpL)
             {
                 if (isPipeConnected({ x,y,z }, dir16::right))
                 {
@@ -295,7 +293,7 @@ void Prop::updateFluidCircuitNetwork()
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpU && isPipeConnected({ x,y,z }, dir16::up))
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpU)
             {
                 if (isPipeConnected({ x,y,z }, dir16::down))
                 {
@@ -306,7 +304,7 @@ void Prop::updateFluidCircuitNetwork()
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpD && isPipeConnected({ x,y,z }, dir16::down))
+            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpD)
             {
                 if (isPipeConnected({ x,y,z }, dir16::up))
                 {
@@ -346,7 +344,7 @@ void Prop::updateFluidCircuitNetwork()
         {
             Point3 coord = { sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->getGridZ() };
             // 현재 타일에서 해당 방향으로 구멍이 뚫려있는지 확인
-            if (getHoleDirection() != dir16::none)
+            if (sinkProp->getHoleDirection() != dir16::none)
             {
                 hasHole = true;
                 break;
@@ -506,131 +504,109 @@ bool Prop::isPipeConnected(Prop* currentProp, dir16 dir)
     return isPipeConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
 }
 
-// 현재 타일의 해당 방향의 프롭이 구멍을 어느 방향에 가지고 있는지 반환
-// 구멍이 없으면 dir16::none 반환
-// 여러 구멍이 있을 경우 첫 번째 발견된 구멍 방향 반환
-dir16 Prop::getHoleDirection(Point3 prev, dir16 dir)
+bool Prop::isPipeLinked(Point3 currentCoord, dir16 dir)
 {
-    int dx, dy, dz;
-    dirToXYZ(dir, dx, dy, dz);
-    Prop* nextProp = TileProp(prev.x + dx, prev.y + dy, prev.z + dz);
+    Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+    errorBox(currentProp == nullptr, L"currentProp is nullptr in isPipeLinked");
 
-    if (nextProp == nullptr) return dir16::none;
-
-    if (isPipeConnected(prev, dir))
+    Point3 delCoord = { 0,0,0 };
+    itemFlag hostFlag, guestFlag;
+    switch (dir)
     {
-        if (nextProp->leadItem.checkFlag(itemFlag::PIPE))
-        {
-            if (dir == dir16::right)
-            {
-                if (!nextProp->isPipeConnected(nextProp, dir16::up)
-                    && !nextProp->isPipeConnected(nextProp, dir16::down)
-                    && !nextProp->isPipeConnected(nextProp, dir16::right))
-                {
-                    return dir16::right;
-                }
-            }
-            else if (dir == dir16::up)
-            {
-                if (!nextProp->isPipeConnected(nextProp, dir16::right)
-                    && !nextProp->isPipeConnected(nextProp, dir16::up)
-                    && !nextProp->isPipeConnected(nextProp, dir16::left))
-                {
-                    return dir16::up;
-                }
-            }
-            else if (dir == dir16::left)
-            {
-                if (!nextProp->isPipeConnected(nextProp, dir16::left)
-                    && !nextProp->isPipeConnected(nextProp, dir16::up)
-                    && !nextProp->isPipeConnected(nextProp, dir16::down))
-                {
-                    return dir16::left;
-                }
-            }
-            else if (dir == dir16::down)
-            {
-                if (!nextProp->isPipeConnected(nextProp, dir16::right)
-                    && !nextProp->isPipeConnected(nextProp, dir16::down)
-                    && !nextProp->isPipeConnected(nextProp, dir16::left))
-                {
-                    return dir16::down;
-                }
-            }
-            else if (dir == dir16::above)
-            {
-                if (nextProp->leadItem.itemCode == itemRefCode::verticalPipeRB)
-                {
-                    if (!nextProp->isPipeConnected(nextProp, dir16::right)) return dir16::right;
-                }
-                else if (nextProp->leadItem.itemCode == itemRefCode::verticalPipeLB)
-                {
-                    if (!nextProp->isPipeConnected(nextProp, dir16::left)) return dir16::left;
-                }
-            }
-            else if (dir == dir16::below)
-            {
-                if (nextProp->leadItem.itemCode == itemRefCode::verticalPipeRA)
-                {
-                    if (!nextProp->isPipeConnected(nextProp, dir16::right)) return dir16::right;
-                }
-                else if (nextProp->leadItem.itemCode == itemRefCode::verticalPipeLA)
-                {
-                    if (!nextProp->isPipeConnected(nextProp, dir16::left)) return dir16::left;
-                }
-            }
-        }
-        else // 일반 유체 부품
-        {
-            //일단은 유체 부품은 CNCT가 최대 2개인 경우밖에 없어 구멍이 2개 생길 여지는 없다
-
-            if (nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT) && !isPipeConnected(nextProp, dir16::right))
-                return dir16::right;
-            if (nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_UP) && !isPipeConnected(nextProp, dir16::up))
-                return dir16::up;
-            if (nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT) && !isPipeConnected(nextProp, dir16::left))
-                return dir16::left;
-            if (nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN) && !isPipeConnected(nextProp, dir16::down))
-                return dir16::down;
-        }
+    case dir16::right:
+        delCoord = { +1,0,0 };
+        hostFlag = itemFlag::PIPE_CNCT_RIGHT;
+        guestFlag = itemFlag::PIPE_CNCT_LEFT;
+        break;
+    case dir16::up:
+        delCoord = { 0,-1,0 };
+        hostFlag = itemFlag::PIPE_CNCT_UP;
+        guestFlag = itemFlag::PIPE_CNCT_DOWN;
+        break;
+    case dir16::left:
+        delCoord = { -1,0,0 };
+        hostFlag = itemFlag::PIPE_CNCT_LEFT;
+        guestFlag = itemFlag::PIPE_CNCT_RIGHT;
+        break;
+    case dir16::down:
+        delCoord = { 0,+1,0 };
+        hostFlag = itemFlag::PIPE_CNCT_DOWN;
+        guestFlag = itemFlag::PIPE_CNCT_UP;
+        break;
+    case dir16::above:
+        delCoord = { 0,0,+1 };
+        hostFlag = itemFlag::PIPE_CNCT_ABOVE;
+        guestFlag = itemFlag::PIPE_CNCT_BELOW;
+        break;
+    case dir16::below:
+        delCoord = { 0,0,-1 };
+        hostFlag = itemFlag::PIPE_CNCT_BELOW;
+        guestFlag = itemFlag::PIPE_CNCT_ABOVE;
+        break;
+    default:
+        errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+        break;
     }
+    Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+    if (targetProp == nullptr) return false;
 
-    return dir16::none;
+    if (dir == dir16::above || dir == dir16::below)
+    {
+        bool currentCondition = currentProp->leadItem.checkFlag(hostFlag);
+        bool targetCondition = targetProp->leadItem.checkFlag(guestFlag);
+
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
+    {
+        bool currentCondition = (currentProp->leadItem.checkFlag(itemFlag::PIPE) || currentProp->leadItem.checkFlag(hostFlag));
+        bool targetCondition = (targetProp->leadItem.checkFlag(itemFlag::PIPE) || targetProp->leadItem.checkFlag(guestFlag));
+
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+}
+
+bool Prop::isPipeLinked(Prop* currentProp, dir16 dir)
+{
+    return isPipeLinked({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
 }
 
 dir16 Prop::getHoleDirection()
 {
     if (leadItem.checkFlag(itemFlag::PIPE))
     {
-        if (isPipeConnected(this, dir16::left)
-            && !isPipeConnected(this, dir16::up)
-            && !isPipeConnected(this, dir16::down)
-            && !isPipeConnected(this, dir16::right))
+        if (isPipeLinked(this, dir16::left)
+            && !isPipeLinked(this, dir16::up)
+            && !isPipeLinked(this, dir16::down)
+            && !isPipeLinked(this, dir16::right))
         {
             return dir16::right;
         }
 
-        if (!isPipeConnected(this, dir16::left)
-            && isPipeConnected(this, dir16::up)
-            && !isPipeConnected(this, dir16::down)
-            && !isPipeConnected(this, dir16::right))
+        if (!isPipeLinked(this, dir16::left)
+            && isPipeLinked(this, dir16::up)
+            && !isPipeLinked(this, dir16::down)
+            && !isPipeLinked(this, dir16::right))
         {
             return dir16::down;
         }
 
-        if (!isPipeConnected(this, dir16::left)
-            && !isPipeConnected(this, dir16::up)
-            && isPipeConnected(this, dir16::down)
-            && !isPipeConnected(this, dir16::right))
+        if (!isPipeLinked(this, dir16::left)
+            && !isPipeLinked(this, dir16::up)
+            && isPipeLinked(this, dir16::down)
+            && !isPipeLinked(this, dir16::right))
         {
             return dir16::up;
         }
 
 
-        if (!isPipeConnected(this, dir16::left)
-            && !isPipeConnected(this, dir16::up)
-            && !isPipeConnected(this, dir16::down)
-            && isPipeConnected(this, dir16::right))
+        if (!isPipeLinked(this, dir16::left)
+            && !isPipeLinked(this, dir16::up)
+            && !isPipeLinked(this, dir16::down)
+            && isPipeLinked(this, dir16::right))
         {
             return dir16::left;
         }
@@ -638,40 +614,23 @@ dir16 Prop::getHoleDirection()
     else // 일반 유체 부품
     {
         //일단은 유체 부품은 CNCT가 최대 2개인 경우밖에 없어 구멍이 2개 생길 여지는 없다
-        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT) && !isPipeConnected(this, dir16::right))
+        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT) && !isPipeLinked(this, dir16::right))
             return dir16::right;
-        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_UP) && !isPipeConnected(this, dir16::up))
+        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_UP) && !isPipeLinked(this, dir16::up))
             return dir16::up;
-        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT) && !isPipeConnected(this, dir16::left))
+        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT) && !isPipeLinked(this, dir16::left))
             return dir16::left;
-        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN) && !isPipeConnected(this, dir16::down))
+        if (leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN) && !isPipeLinked(this, dir16::down))
             return dir16::down;
     }
+
+    return dir16::none;
 }
 
-bool Prop::isSink(Point3 current, dir16 dir)
+bool Prop::isSink()
 {
-    errorBox(dir == dir16::above || dir == dir16::below, L"[Error] isSink: invalid direction\n");
-    
-    if (current.x == -9 && current.y == -5)
-    {
-        int a = 3;
-    }
-
-    int dx, dy, dz;
-    dirToXYZ(dir, dx, dy, dz);
-    Prop* nextProp = TileProp(current.x + dx, current.y + dy, current.z + dz);
-
-    if (nextProp == nullptr)
-        return false;
-
-    if (isPipeConnected(current, dir))
-    {
-        if (nextProp->leadItem.fluidDemand > 0) return true;
-
-        if (getHoleDirection(current, dir) != dir16::none) return true;
-    }
-
+    if (leadItem.fluidDemand > 0) return true;
+    if (getHoleDirection() != dir16::none) return true;
     return false;
 }
 
@@ -723,11 +682,11 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
 
     double sinkTxFluid = 0;
     Point3 current = { donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() };
-    if (isSink(current, txDir))
+    if (nextProp->isSink())
     {
         double requiredFluid = 0;
 
-        if (getHoleDirection(current, txDir) == dir16::none)
+        if (nextProp->getHoleDirection() == dir16::none)
         {
             requiredFluid = nextProp->leadItem.fluidDemand - nextProp->sinkFluidAmount;
         }
