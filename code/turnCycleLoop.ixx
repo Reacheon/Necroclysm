@@ -650,10 +650,72 @@ __int64 propTurn()
 	debug::printCircuitLog = false;
 
 	nextCircuitStartQueue = std::queue<Point3>();
-	auto actviePropSet = (World::ins())->getActivePropSet();
+	auto activePropSet = (World::ins())->getActivePropSet();
 	std::unordered_set<Prop*> activeLoadSet;
 
-	for (auto pPtr : actviePropSet)
+	//액티브 전자회로 프롭셋 z축 확장
+	{
+		std::unordered_set<Prop*> frontier = activePropSet;
+		while (!frontier.empty())
+		{
+			std::unordered_set<Prop*> newProps;
+			for (auto pPtr : frontier)
+			{
+				if (pPtr->leadItem.checkFlag(itemFlag::CABLE) || pPtr->leadItem.checkFlag(itemFlag::CIRCUIT))
+				{
+					const dir16 dirs[] = { dir16::above, dir16::below, dir16::right, dir16::up, dir16::left, dir16::down };
+					for (int i = 0; i < 6; i++)
+					{
+						if (pPtr->isCableLinked(pPtr, dirs[i]))
+						{
+							int dx, dy, dz;
+							dirToXYZ(dirs[i], dx, dy, dz);
+							Prop* neighbor = TileProp(pPtr->getGrid() + Point3{ dx, dy, dz });
+							if (neighbor && activePropSet.find(neighbor) == activePropSet.end())
+							{
+								newProps.insert(neighbor);
+								activePropSet.insert(neighbor);
+							}
+						}
+					}
+				}
+			}
+			frontier = newProps;
+		}
+	}
+
+	//액티브 유체회로 프롭셋 z축 확장
+	{
+		std::unordered_set<Prop*> frontier = activePropSet;
+		while (!frontier.empty())
+		{
+			std::unordered_set<Prop*> newProps;
+			for (auto pPtr : frontier)
+			{
+				if (pPtr->leadItem.checkFlag(itemFlag::PIPE) || pPtr->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT))
+				{
+					const dir16 dirs[] = { dir16::above, dir16::below, dir16::right, dir16::up, dir16::left, dir16::down };
+					for (int i = 0; i < 6; i++)
+					{
+						if (pPtr->isPipeLinked(pPtr, dirs[i]))
+						{
+							int dx, dy, dz;
+							dirToXYZ(dirs[i], dx, dy, dz);
+							Prop* neighbor = TileProp(pPtr->getGrid() + Point3{ dx, dy, dz });
+							if (neighbor && activePropSet.find(neighbor) == activePropSet.end())
+							{
+								newProps.insert(neighbor);
+								activePropSet.insert(neighbor);
+							}
+						}
+					}
+				}
+			}
+			frontier = newProps;
+		}
+	}
+
+	for (auto pPtr : activePropSet)
 	{
 		pPtr->runUsed = false;
 		pPtr->totalLossCharge = 0;
@@ -682,7 +744,7 @@ __int64 propTurn()
 			Prop* tgtProp = TileProp(tgtCoord);
 			if (tgtProp) tgtProp->updateCircuitNetwork();
 		}
-		else for (auto pPtr : actviePropSet)
+		else for (auto pPtr : activePropSet)
 		{
 			if (pPtr->runUsed) continue;
 			if (pPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
@@ -713,7 +775,7 @@ __int64 propTurn()
 	//==============================================================================
 
 	// 유체회로 변수 초기화
-	for (auto pPtr : actviePropSet)
+	for (auto pPtr : activePropSet)
 	{
 		pPtr->fluidRunUsed = false;
 		pPtr->totalResistFluid = 0;
@@ -725,7 +787,7 @@ __int64 propTurn()
 	}
 
 	// 펌프에서 유체회로 탐색 시작 (runUsed가 아닌 fluidRunUsed 사용)
-	for (auto pPtr : actviePropSet)
+	for (auto pPtr : activePropSet)
 	{
 		if (pPtr->fluidRunUsed) continue;
 
@@ -733,7 +795,7 @@ __int64 propTurn()
 	}
 
 	// 유체회로 부하 작동
-	for (auto pPtr : actviePropSet)
+	for (auto pPtr : activePropSet)
 	{
 		if (pPtr->fluidRunUsed)
 		{

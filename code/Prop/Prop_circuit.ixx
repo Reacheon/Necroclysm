@@ -1,4 +1,4 @@
-import Prop;
+ï»¿import Prop;
 
 import std;
 import util;
@@ -12,113 +12,113 @@ import Entity;
 
 constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
-constexpr double SYSTEM_VOLTAGE = 24.0; //ÀúÇ× °è»ê¿¡¸¸ »ç¿ëµÊ
+constexpr double SYSTEM_VOLTAGE = 24.0; //ì €í•­ ê³„ì‚°ì—ë§Œ ì‚¬ìš©ë¨
 
 /*
-* 
-* relayR,U,L,D : Æ®·£Áö½ºÅÍ¿Í µ¿ÀÏÇÑ ¹æÇâ¼º °¡Áü
-* 
-* 
-* <Æ®·£Áö½ºÅÍ>
-* transistorR : °ÔÀÌÆ®ÇÉÀÌ ¿ìÃø, »ó´Ü°ú ÇÏ´ÜÀÌ ¸ŞÀÎ¶óÀÎ
-* transistorU : °ÔÀÌÆ®ÇÉÀÌ »ó´Ü, ÁÂÃø°ú ¿ìÃøÀÌ ¸ŞÀÎ¶óÀÎ
-* transistorL : °ÔÀÌÆ®ÇÉÀÌ ÁÂÃø, »ó´Ü°ú ÇÏ´ÜÀÌ ¸ŞÀÎ¶óÀÎ
-* transistorD : °ÔÀÌÆ®ÇÉÀÌ ÇÏ´Ü, ÁÂÃø°ú ¿ìÃøÀÌ ¸ŞÀÎ¶óÀÎ
-* 
-* <³í¸®°ÔÀÌÆ®>
-* andGateR : Ãâ·ÂÇÉÀÌ ¿ìÃø(R), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ÁÂÃø°ú ÇÏ´ÜÀº ÀÔ·ÂÇÉ
-* andGateL : Ãâ·ÂÇÉÀÌ ÁÂÃø(L), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ¿ìÃø°ú ÇÏ´ÜÀº ÀÔ·ÂÇÉ
-* andGate´Â ´Ü¼øÈ÷ ¼Ò¸ğÀü·ÂÀÌ 2°í, °¢ ÇÉÀº ÃÖ´ë 1À» ¹Ş´Âµ¥ ¹ŞÀº Àü·ÂÀÌ 2 ÀÌ»óÀÌ¸é ÀÛµ¿ÇÔ
-* 
-* orGateR & orGateL : andGate¿Í µ¿ÀÏ, ´Ù¸¸ ON/OFF ÆÇÁ¤À» ACTIVE ÇÃ·¡±×·Î ÇÔ
-* xorGateR & xorGateL : andGate¿Í µ¿ÀÏ, ´Ù¸¸ ON/OFF ÆÇÁ¤À» ACTIVE ÇÃ·¡±×·Î ÇÔ
-* notGateR : Ãâ·ÂÇÉÀÌ ¿ìÃø(R), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ÁÂÃøÀº ÀÔ·ÂÇÉ(GND)
-* notGateL : Ãâ·ÂÇÉÀÌ ÁÂÃø(L), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ¿ìÃøÀº ÀÔ·ÂÇÉ(GND)
-* 
-* srLatchR : Ãâ·ÂÇÉÀÌ ¿ìÃø(R), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ÁÂÃøÀº S(set)ÇÉ ÇÏ´ÜÀº R(reset)ÇÉ
-* srLatchL : Ãâ·ÂÇÉÀÌ ÁÂÃø(L), vcc ÀÔ·ÂÀº Ç×»ó »ó´Ü, ¿ìÃøÀº S(set)ÇÉ ÇÏ´ÜÀº R(reset)ÇÉ
-* 
-* leverRL : ÁÂ¿ì¸¸ ¿¬°á
-* leverUD : »óÇÏ¸¸ ¿¬°á
-* 
-* Æ®·£Áö½ºÅÍ¿Í ³í¸®°ÔÀÌÆ®´Â ¸±·¹ÀÌ¿Í ´Ù¸£°Ô »óÅÂ º¯°æ ½Ã¿¡ ¸ğµç È¸·Î°¡ Àç°è»êµÇ¾î¾ß ÇÔ
-* Æ®·£Áö½ºÅÍ¿Í ³í¸®°ÔÀÌÆ®´Â °ÔÀÌÆ® <-> ¸ŞÀÎ ¶óÀÎ°£ ÀüÆÄ°¡ ¾È µÇ°Ô Àß ¼öÁ¤ÇÒ °Í
-* °ÔÀÌÆ®->¸ŞÀÎ¶óÀÎÀ¸·Î ´©¼³ÀÌ ¾ÈµÇ°Ô ÇÏ·Á¸é BFS Å½»ö °úÁ¤¿¡¼­ skipBFSSet¿¡ Ãß°¡ÇØÁÖ¸é µÊ
-* ¸ŞÀÎ¶óÀÎ->°ÔÀÌÆ®·Î ´©¼³ÀÌ ¾ÈµÇ°Ô ÇÏ·Á¸é isConnected ÇÔ¼ö¿¡¼­ Ã¼Å©ÇØÁÖ¸é µÊ
-* 
-* <ÆÄ¿ö¹ğÅ©>
-* ÆÄ¿ö¹ğÅ©´Â Ãâ·Â°ú Á¢Áö(ÃæÀüºÎ)°¡ ÇÑ Å¸ÀÏ¿¡ µ¿½Ã¿¡ ÀÖ´Â Æ¯ÀÌÇÑ ±¸Á¶ÀÓ.
-* powerBankR : ¿ŞÂÊÀÌ Ãâ·Â, ¿À¸¥ÂÊÀÌ ÃæÀüÀÔ·Â(Á¢Áö)
-* powerBankL : ¿À¸¥ÂÊÀÌ Ãâ·Â, ¿ŞÂÊÀÌ ÃæÀüÀÔ·Â(Á¢Áö)
-* 
-* <±×¶ó¿îµå>
-* gndUsePower´Â Àü¹æÇâ(»óÇÏÁÂ¿ì, zÃà Á¦¿Ü) ÀÔ·ÂÀÓ. gndUsePower>0ÀÌ¸é ¹İµå½Ã ÁöÇâ¼º Á¢Áö°¡ Á¸ÀçÇÏÁö ¾ÊÀ½¿¡ À¯ÀÇ
-* ¹İ´ë·Î ÁöÇâ¼º Á¢Áö°¡ Á¸ÀçÇÏ¸é ´ç¿¬È÷ gndUsePower´Â 0°ú °°À½
+*
+* relayR,U,L,D : íŠ¸ëœì§€ìŠ¤í„°ì™€ ë™ì¼í•œ ë°©í–¥ì„± ê°€ì§
+*
+*
+* <íŠ¸ëœì§€ìŠ¤í„°>
+* transistorR : ê²Œì´íŠ¸í•€ì´ ìš°ì¸¡, ìƒë‹¨ê³¼ í•˜ë‹¨ì´ ë©”ì¸ë¼ì¸
+* transistorU : ê²Œì´íŠ¸í•€ì´ ìƒë‹¨, ì¢Œì¸¡ê³¼ ìš°ì¸¡ì´ ë©”ì¸ë¼ì¸
+* transistorL : ê²Œì´íŠ¸í•€ì´ ì¢Œì¸¡, ìƒë‹¨ê³¼ í•˜ë‹¨ì´ ë©”ì¸ë¼ì¸
+* transistorD : ê²Œì´íŠ¸í•€ì´ í•˜ë‹¨, ì¢Œì¸¡ê³¼ ìš°ì¸¡ì´ ë©”ì¸ë¼ì¸
+*
+* <ë…¼ë¦¬ê²Œì´íŠ¸>
+* andGateR : ì¶œë ¥í•€ì´ ìš°ì¸¡(R), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ì¢Œì¸¡ê³¼ í•˜ë‹¨ì€ ì…ë ¥í•€
+* andGateL : ì¶œë ¥í•€ì´ ì¢Œì¸¡(L), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ìš°ì¸¡ê³¼ í•˜ë‹¨ì€ ì…ë ¥í•€
+* andGateëŠ” ë‹¨ìˆœíˆ ì†Œëª¨ì „ë ¥ì´ 2ê³ , ê° í•€ì€ ìµœëŒ€ 1ì„ ë°›ëŠ”ë° ë°›ì€ ì „ë ¥ì´ 2 ì´ìƒì´ë©´ ì‘ë™í•¨
+*
+* orGateR & orGateL : andGateì™€ ë™ì¼, ë‹¤ë§Œ ON/OFF íŒì •ì„ ACTIVE í”Œë˜ê·¸ë¡œ í•¨
+* xorGateR & xorGateL : andGateì™€ ë™ì¼, ë‹¤ë§Œ ON/OFF íŒì •ì„ ACTIVE í”Œë˜ê·¸ë¡œ í•¨
+* notGateR : ì¶œë ¥í•€ì´ ìš°ì¸¡(R), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ì¢Œì¸¡ì€ ì…ë ¥í•€(GND)
+* notGateL : ì¶œë ¥í•€ì´ ì¢Œì¸¡(L), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ìš°ì¸¡ì€ ì…ë ¥í•€(GND)
+*
+* srLatchR : ì¶œë ¥í•€ì´ ìš°ì¸¡(R), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ì¢Œì¸¡ì€ S(set)í•€ í•˜ë‹¨ì€ R(reset)í•€
+* srLatchL : ì¶œë ¥í•€ì´ ì¢Œì¸¡(L), vcc ì…ë ¥ì€ í•­ìƒ ìƒë‹¨, ìš°ì¸¡ì€ S(set)í•€ í•˜ë‹¨ì€ R(reset)í•€
+*
+* leverRL : ì¢Œìš°ë§Œ ì—°ê²°
+* leverUD : ìƒí•˜ë§Œ ì—°ê²°
+*
+* íŠ¸ëœì§€ìŠ¤í„°ì™€ ë…¼ë¦¬ê²Œì´íŠ¸ëŠ” ë¦´ë ˆì´ì™€ ë‹¤ë¥´ê²Œ ìƒíƒœ ë³€ê²½ ì‹œì— ëª¨ë“  íšŒë¡œê°€ ì¬ê³„ì‚°ë˜ì–´ì•¼ í•¨
+* íŠ¸ëœì§€ìŠ¤í„°ì™€ ë…¼ë¦¬ê²Œì´íŠ¸ëŠ” ê²Œì´íŠ¸ <-> ë©”ì¸ ë¼ì¸ê°„ ì „íŒŒê°€ ì•ˆ ë˜ê²Œ ì˜ ìˆ˜ì •í•  ê²ƒ
+* ê²Œì´íŠ¸->ë©”ì¸ë¼ì¸ìœ¼ë¡œ ëˆ„ì„¤ì´ ì•ˆë˜ê²Œ í•˜ë ¤ë©´ BFS íƒìƒ‰ ê³¼ì •ì—ì„œ skipBFSSetì— ì¶”ê°€í•´ì£¼ë©´ ë¨
+* ë©”ì¸ë¼ì¸->ê²Œì´íŠ¸ë¡œ ëˆ„ì„¤ì´ ì•ˆë˜ê²Œ í•˜ë ¤ë©´ isCableConnected í•¨ìˆ˜ì—ì„œ ì²´í¬í•´ì£¼ë©´ ë¨
+*
+* <íŒŒì›Œë±…í¬>
+* íŒŒì›Œë±…í¬ëŠ” ì¶œë ¥ê³¼ ì ‘ì§€(ì¶©ì „ë¶€)ê°€ í•œ íƒ€ì¼ì— ë™ì‹œì— ìˆëŠ” íŠ¹ì´í•œ êµ¬ì¡°ì„.
+* powerBankR : ì™¼ìª½ì´ ì¶œë ¥, ì˜¤ë¥¸ìª½ì´ ì¶©ì „ì…ë ¥(ì ‘ì§€)
+* powerBankL : ì˜¤ë¥¸ìª½ì´ ì¶œë ¥, ì™¼ìª½ì´ ì¶©ì „ì…ë ¥(ì ‘ì§€)
+*
+* <ê·¸ë¼ìš´ë“œ>
+* gndUsePowerëŠ” ì „ë°©í–¥(ìƒí•˜ì¢Œìš°, zì¶• ì œì™¸) ì…ë ¥ì„. gndUsePower>0ì´ë©´ ë°˜ë“œì‹œ ì§€í–¥ì„± ì ‘ì§€ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒì— ìœ ì˜
+* ë°˜ëŒ€ë¡œ ì§€í–¥ì„± ì ‘ì§€ê°€ ì¡´ì¬í•˜ë©´ ë‹¹ì—°íˆ gndUsePowerëŠ” 0ê³¼ ê°™ìŒ
 */
 
 
 /*
-* <BFS ÀÛµ¿ ·ÎÁ÷>
+* <BFS ì‘ë™ ë¡œì§>
 *
-* 1. BFS Å½»öÀ¸·Î ¿¬°áµÈ ¸ğµç È¸·Î¸Á Å½»ö
-*    - ½ÃÀÛÁ¡: ºÎÇÏ ¶Ç´Â Àü¾Ğ¿ø (CROSS ÄÉÀÌºí ¹®Á¦·Î Àü¼±¿¡¼­ ½ÃÀÛ X)
-*    - ÀÌÀü Å½»ö °á°ú°¡ ÀÖÀ¸¸é Àç»ç¿ë (saveFrontierQueue, saveVisitedSet)
+* 1. BFS íƒìƒ‰ìœ¼ë¡œ ì—°ê²°ëœ ëª¨ë“  íšŒë¡œë§ íƒìƒ‰
+*    - ì‹œì‘ì : ë¶€í•˜ ë˜ëŠ” ì „ì••ì› (CROSS ì¼€ì´ë¸” ë¬¸ì œë¡œ ì „ì„ ì—ì„œ ì‹œì‘ X)
+*    - ì´ì „ íƒìƒ‰ ê²°ê³¼ê°€ ìˆìœ¼ë©´ ì¬ì‚¬ìš© (saveFrontierQueue, saveVisitedSet)
 *
-* 2. °¢ ³ëµå ¹æ¹® ½Ã Ã³¸®:
-*    - Àü¾Ğ¿ø(VOLTAGE_SOURCE): voltagePropVec¿¡ Ãß°¡, °¡¿ë Àü·Â ´©Àû
-*      ¡æ ÆÄ¿ö¹ğÅ©: min(electricMaxPower, powerStorage) »ç¿ë
-*    - ÀÏ¹İ ºÎÇÏ(gndUsePower > 0): ÃÑ ºÎÇÏ·®¿¡ ´©Àû
-*    - ÃæÀüÆ÷Æ®: ³»ºÎ ¹èÅÍ¸® ÀÜ·®¿¡ µû¶ó µ¿ÀûÀ¸·Î gndUsePower °è»ê
-*    - ÅÃÆ®½ºÀ§Ä¡: ´ÙÀ½ ÅÏ ÀÚµ¿ OFF ¿¹¾à
-*    - ¾Ğ·Â½ºÀ§Ä¡: ¹«°Ô(5000 ÀÌ»ó) °¨ÁöÇÏ¿© ON/OFF
+* 2. ê° ë…¸ë“œ ë°©ë¬¸ ì‹œ ì²˜ë¦¬:
+*    - ì „ì••ì›(VOLTAGE_SOURCE): voltagePropVecì— ì¶”ê°€, ê°€ìš© ì „ë ¥ ëˆ„ì 
+*      â†’ íŒŒì›Œë±…í¬: min(electricMaxPower, powerStorage) ì‚¬ìš©
+*    - ì¼ë°˜ ë¶€í•˜(gndUsePower > 0): ì´ ë¶€í•˜ëŸ‰ì— ëˆ„ì 
+*    - ì¶©ì „í¬íŠ¸: ë‚´ë¶€ ë°°í„°ë¦¬ ì”ëŸ‰ì— ë”°ë¼ ë™ì ìœ¼ë¡œ gndUsePower ê³„ì‚°
+*    - íƒíŠ¸ìŠ¤ìœ„ì¹˜: ë‹¤ìŒ í„´ ìë™ OFF ì˜ˆì•½
+*    - ì••ë ¥ìŠ¤ìœ„ì¹˜: ë¬´ê²Œ(5000 ì´ìƒ) ê°ì§€í•˜ì—¬ ON/OFF
 *
-* 3. 6¹æÇâ ÀÌ¿ô Å½»ö ½Ã Æ¯¼ö Ã³¸®:
-*    - CROSSED_CABLE: ÁøÀÔ ¹æÇâ(¼öÆò/¼öÁ÷)¿¡ µû¶ó ºĞ¸® Ã³¸®
-*    - ÁöÇâ¼º ÄÄÆ÷³ÍÆ®(Æ®·£Áö½ºÅÍ, ¸±·¹ÀÌ, ³í¸®°ÔÀÌÆ® µî):
-*      ¡æ °ÔÀÌÆ®/º£ÀÌ½º ¡æ ¸ŞÀÎ¶óÀÎ ¹æÇâ BFS Â÷´Ü (skipBFSSet)
-*      ¡æ ÁöÇâ¼º ºÎÇÏ·®(gndUsePowerLeft/Right/Up/Down) º°µµ ´©Àû
-*    - ÆÄ¿ö¹ğÅ© ÃæÀü: ÃæÀü·®¿¡ µû¶ó ·Î±× ÇÔ¼ö·Î ÃæÀü¼Óµµ °¨¼Ò
+* 3. 6ë°©í–¥ ì´ì›ƒ íƒìƒ‰ ì‹œ íŠ¹ìˆ˜ ì²˜ë¦¬:
+*    - CROSSED_CABLE: ì§„ì… ë°©í–¥(ìˆ˜í‰/ìˆ˜ì§)ì— ë”°ë¼ ë¶„ë¦¬ ì²˜ë¦¬
+*    - ì§€í–¥ì„± ì»´í¬ë„ŒíŠ¸(íŠ¸ëœì§€ìŠ¤í„°, ë¦´ë ˆì´, ë…¼ë¦¬ê²Œì´íŠ¸ ë“±):
+*      â†’ ê²Œì´íŠ¸/ë² ì´ìŠ¤ â†’ ë©”ì¸ë¼ì¸ ë°©í–¥ BFS ì°¨ë‹¨ (skipBFSSet)
+*      â†’ ì§€í–¥ì„± ë¶€í•˜ëŸ‰(gndUsePowerLeft/Right/Up/Down) ë³„ë„ ëˆ„ì 
+*    - íŒŒì›Œë±…í¬ ì¶©ì „: ì¶©ì „ëŸ‰ì— ë”°ë¼ ë¡œê·¸ í•¨ìˆ˜ë¡œ ì¶©ì „ì†ë„ ê°ì†Œ
 *
-* 4. Å½»ö ¿Ï·á ÈÄ ¸ğµç ³ëµå¿¡ nodeMaxCharge ¼³Á¤ (= ÃÑ °¡¿ë Àü·Â)
+* 4. íƒìƒ‰ ì™„ë£Œ í›„ ëª¨ë“  ë…¸ë“œì— nodeMaxCharge ì„¤ì • (= ì´ ê°€ìš© ì „ë ¥)
 *
-* 5. Àü¾Ğ¿øº° ÀüÇÏ ¹Ğ¾î³»±â ½ÃÀÛ:
-*    - °¢ Àü¾Ğ¿øÀº (ÀÚ½ÅÀÇ Ãâ·Â / ÃÑ Ãâ·Â) ºñÀ²·Î ºÎÇÏ ºĞ´ã
-*    - ÀúÇ×¼Õ½Ç º¸»óÀ» À§ÇØ LOSS_COMPENSATION_FACTOR(1.2) Àû¿ë
-*    - pushCharge() È£ÃâÇÏ¿© Ãâ·Â ¹æÇâÀ¸·Î ÀüÇÏ ¹Ğ¾î³¿
+* 5. ì „ì••ì›ë³„ ì „í•˜ ë°€ì–´ë‚´ê¸° ì‹œì‘:
+*    - ê° ì „ì••ì›ì€ (ìì‹ ì˜ ì¶œë ¥ / ì´ ì¶œë ¥) ë¹„ìœ¨ë¡œ ë¶€í•˜ ë¶„ë‹´
+*    - ì €í•­ì†ì‹¤ ë³´ìƒì„ ìœ„í•´ LOSS_COMPENSATION_FACTOR(1.2) ì ìš©
+*    - pushCharge() í˜¸ì¶œí•˜ì—¬ ì¶œë ¥ ë°©í–¥ìœ¼ë¡œ ì „í•˜ ë°€ì–´ëƒ„
 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-* <ÀüÇÏ ¹Ğ¾î³»±â ·ÎÁ÷>
-* 
-* 1. Àü¾Ğ¿ø¿¡¼­ pushCharge() È£ÃâÇÏ¿© Ãâ·Â ¹æÇâÀ¸·Î ÀüÇÏ ¹Ğ¾î³¿
-* 
-* 2. ´ÙÀ½ ³ëµå ÆÇÁ¤ (pushCharge ³»ºÎ):
-*    (2.1) ´ÙÀ½ ³ëµå°¡ Á¢Áö(ºÎÇÏ)¸¦ °¡Áö°í ÀÖÀ» °æ¿ì:
-*        ¡æ ÀÏ¹İ ºÎÇÏ: gndSink·Î Àü¼Û (¼Òºñ ÈÄ ³²Àº Àü·ÂÀº °è¼Ó ÀüÆÄ)
-*        ¡æ ÁöÇâ¼º ºÎÇÏ(Gate/Base): gndSink{Dir}·Î Àü¼Û ÈÄ Áï½Ã Á¾·á (½ÅÈ£ ÇÉÀº Àü·ÂÀ» Åë°ú½ÃÅ°Áö ¾ÊÀ½)
-* 
-*    (2.2) 2.1¿¡¼­ Àü¼ÛÇÑ charge¸¦ Á¦¿ÜÇÑ ³ª¸ÓÁö·Î ¾Æ·¡ ·ÎÁ÷µéÀ» ½ÇÇà
-*    - 2°¥·¡ ÀÌ»ó ºĞ±âÁ¡:
-*        ¡æ divideCharge()·Î ºĞ¹è (GND ¹æÇâ ¿ì¼± Ã³¸®)
-*        ¡æ °¢ ¹æÇâÀ¸·Î pushCharge() Àç±Í È£Ãâ
-*    - ´ÜÀÏ °æ·Î:
-*        ¡æ pushCharge() Àç±Í È£Ãâ
-*    (¡ØÁÖÀÇ: pathVisited·Î ¼øÈ¯ ¹æ¹® °¨Áö ½Ã ÇØ´ç °æ·Î Á¾·á)
-* 
-* 3. Àç±Í È£Ãâ ¿Ï·á ÈÄ º¹±ÍÇÏ¸é¼­ transferCharge()·Î »õ·Î »ı±ä ºó °ø°£¸¸Å­ ÀüÇÏ Àü¼Û ¼öÇà
-*    transferCharge() ³»ºÎ:
-*    - ÀúÇ×¼Õ½Ç °è»ê: I©÷R (I = Q / (V ¡¿ T))
-*    - ¼Û½ÅÃø nodeCharge Â÷°¨, chargeFlux ±â·Ï
-*    - ¼ö½ÅÃø nodeCharge Áõ°¡, chargeFlux ±â·Ï
+* <ì „í•˜ ë°€ì–´ë‚´ê¸° ë¡œì§>
+*
+* 1. ì „ì••ì›ì—ì„œ pushCharge() í˜¸ì¶œí•˜ì—¬ ì¶œë ¥ ë°©í–¥ìœ¼ë¡œ ì „í•˜ ë°€ì–´ëƒ„
+*
+* 2. ë‹¤ìŒ ë…¸ë“œ íŒì • (pushCharge ë‚´ë¶€):
+*    (2.1) ë‹¤ìŒ ë…¸ë“œê°€ ì ‘ì§€(ë¶€í•˜)ë¥¼ ê°€ì§€ê³  ìˆì„ ê²½ìš°:
+*        â†’ ì¼ë°˜ ë¶€í•˜: gndSinkë¡œ ì „ì†¡ (ì†Œë¹„ í›„ ë‚¨ì€ ì „ë ¥ì€ ê³„ì† ì „íŒŒ)
+*        â†’ ì§€í–¥ì„± ë¶€í•˜(Gate/Base): gndSink{Dir}ë¡œ ì „ì†¡ í›„ ì¦‰ì‹œ ì¢…ë£Œ (ì‹ í˜¸ í•€ì€ ì „ë ¥ì„ í†µê³¼ì‹œí‚¤ì§€ ì•ŠìŒ)
+*
+*    (2.2) 2.1ì—ì„œ ì „ì†¡í•œ chargeë¥¼ ì œì™¸í•œ ë‚˜ë¨¸ì§€ë¡œ ì•„ë˜ ë¡œì§ë“¤ì„ ì‹¤í–‰
+*    - 2ê°ˆë˜ ì´ìƒ ë¶„ê¸°ì :
+*        â†’ divideCharge()ë¡œ ë¶„ë°° (GND ë°©í–¥ ìš°ì„  ì²˜ë¦¬)
+*        â†’ ê° ë°©í–¥ìœ¼ë¡œ pushCharge() ì¬ê·€ í˜¸ì¶œ
+*    - ë‹¨ì¼ ê²½ë¡œ:
+*        â†’ pushCharge() ì¬ê·€ í˜¸ì¶œ
+*    (â€»ì£¼ì˜: pathVisitedë¡œ ìˆœí™˜ ë°©ë¬¸ ê°ì§€ ì‹œ í•´ë‹¹ ê²½ë¡œ ì¢…ë£Œ)
+*
+* 3. ì¬ê·€ í˜¸ì¶œ ì™„ë£Œ í›„ ë³µê·€í•˜ë©´ì„œ transferCharge()ë¡œ ìƒˆë¡œ ìƒê¸´ ë¹ˆ ê³µê°„ë§Œí¼ ì „í•˜ ì „ì†¡ ìˆ˜í–‰
+*    transferCharge() ë‚´ë¶€:
+*    - ì €í•­ì†ì‹¤ ê³„ì‚°: IÂ²R (I = Q / (V Ã— T))
+*    - ì†¡ì‹ ì¸¡ nodeCharge ì°¨ê°, chargeFlux ê¸°ë¡
+*    - ìˆ˜ì‹ ì¸¡ nodeCharge ì¦ê°€, chargeFlux ê¸°ë¡
 */
 
 bool Prop::hasGround()
 {
-    //ÀÏ¹İ Á¢Áö
+    //ì¼ë°˜ ì ‘ì§€
     if (leadItem.gndUsePower > 0) return true;
-    //ÁöÇâ¼º Á¢Áö
+    //ì§€í–¥ì„± ì ‘ì§€
     if (leadItem.gndUsePowerRight > 0) return true;
     if (leadItem.gndUsePowerUp > 0) return true;
     if (leadItem.gndUsePowerLeft > 0) return true;
@@ -180,7 +180,7 @@ double Prop::getOutletCharge()
 
 void Prop::updateCircuitNetwork()
 {
-    if(debug::printCircuitLog) std::wprintf(L"------------------------- È¸·Î¸Á ¾÷µ¥ÀÌÆ® ½ÃÀÛ ------------------------\n");
+    if (debug::printCircuitLog) std::wprintf(L"------------------------- íšŒë¡œë§ ì—…ë°ì´íŠ¸ ì‹œì‘ ------------------------\n");
     int cursorX = getGridX();
     int cursorY = getGridY();
     int cursorZ = getGridZ();
@@ -190,10 +190,10 @@ void Prop::updateCircuitNetwork()
     std::vector<Prop*> voltagePropVec;
 
     /*
-    * skipBFSSet: °ÔÀÌÆ®/º£ÀÌ½º ÇÉ¿¡¼­ ¸ŞÀÎ¶óÀÎÀ¸·ÎÀÇ BFS È®Àå Â÷´Ü¿ë
-    *   - Æ®·£Áö½ºÅÍ/¸±·¹ÀÌÀÇ º£ÀÌ½º ¡æ ¸ŞÀÎ¶óÀÎ ´©¼³ ¹æÁö
-    *   - ³í¸®°ÔÀÌÆ®ÀÇ ÀÔ·ÂÇÉ ¡æ Ãâ·ÂÇÉ ´©¼³ ¹æÁö
-    *   - ÇØ´ç ³ëµå´Â BFS¿¡ Ãß°¡µÇÁö¸¸, ±× ³ëµå¿¡¼­ÀÇ È®ÀåÀº 1È¸¸¸ Çã¿ë
+    * skipBFSSet: ê²Œì´íŠ¸/ë² ì´ìŠ¤ í•€ì—ì„œ ë©”ì¸ë¼ì¸ìœ¼ë¡œì˜ BFS í™•ì¥ ì°¨ë‹¨ìš©
+    *   - íŠ¸ëœì§€ìŠ¤í„°/ë¦´ë ˆì´ì˜ ë² ì´ìŠ¤ â†’ ë©”ì¸ë¼ì¸ ëˆ„ì„¤ ë°©ì§€
+    *   - ë…¼ë¦¬ê²Œì´íŠ¸ì˜ ì…ë ¥í•€ â†’ ì¶œë ¥í•€ ëˆ„ì„¤ ë°©ì§€
+    *   - í•´ë‹¹ ë…¸ë“œëŠ” BFSì— ì¶”ê°€ë˜ì§€ë§Œ, ê·¸ ë…¸ë“œì—ì„œì˜ í™•ì¥ì€ 1íšŒë§Œ í—ˆìš©
     */
     std::unordered_set<Point3, Point3::Hash> skipBFSSet;
 
@@ -201,21 +201,21 @@ void Prop::updateCircuitNetwork()
     int circuitTotalLoad = 0;
 
     //==============================================================================
-    // 1. È¸·Î ÃÖÃÊ Å½»ö(BFS)
+    // 1. íšŒë¡œ ìµœì´ˆ íƒìƒ‰(BFS)
     //==============================================================================
 
-    if(saveFrontierQueue.size()>0 && saveVisitedSet.size()>0)
+    if (saveFrontierQueue.size() > 0 && saveVisitedSet.size() > 0)
     {
-        if (debug::printCircuitLog) std::wprintf(L"------------------------- ÀÌÀü È¸·Î¸Á Å½»ö °á°ú ºÒ·¯¿À±â ------------------------\n");
+        if (debug::printCircuitLog) std::wprintf(L"------------------------- ì´ì „ íšŒë¡œë§ íƒìƒ‰ ê²°ê³¼ ë¶ˆëŸ¬ì˜¤ê¸° ------------------------\n");
         frontierQueue = saveFrontierQueue;
         visitedSet = saveVisitedSet;
     }
     else frontierQueue.push({ cursorX, cursorY, cursorZ });
-    
-    //BFS´Â Àü¼±¿¡¼­ ½ÃÀÛÇÏÁö ¾ÊÀ½(CROSS ÄÉÀÌºí¶§¹®¿¡), ºÎÇÏ³ª Àü¾Ğ¿ø¿¡¼­ Ç×»ó ½ÃÀÛÇÒ °Í
+
+    //BFSëŠ” ì „ì„ ì—ì„œ ì‹œì‘í•˜ì§€ ì•ŠìŒ(CROSS ì¼€ì´ë¸”ë•Œë¬¸ì—), ë¶€í•˜ë‚˜ ì „ì••ì›ì—ì„œ í•­ìƒ ì‹œì‘í•  ê²ƒ
     while (!frontierQueue.empty())
     {
-        
+
         Point3 current = frontierQueue.front();
         frontierQueue.pop();
         crossStates.clear();
@@ -231,7 +231,7 @@ void Prop::updateCircuitNetwork()
             if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)) powerState = L" [ON]";
             else if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) powerState = L" [OFF]";
 
-            std::wprintf(L"[BFS Å½»ö] %ls (%d,%d,%d)%ls\n",
+            std::wprintf(L"[BFS íƒìƒ‰] %ls (%d,%d,%d)%ls\n",
                 currentProp->leadItem.name.c_str(),
                 current.x, current.y, current.z,
                 powerState.c_str());
@@ -239,13 +239,13 @@ void Prop::updateCircuitNetwork()
 
         if (currentProp == nullptr)
         {
-            std::wprintf(L"[°æ°í] BFS°¡ nullptr ÇÁ·Ó¿¡ µµ´ŞÇÔ (%d,%d,%d)\n", current.x, current.y, current.z);
+            std::wprintf(L"[ê²½ê³ ] BFSê°€ nullptr í”„ë¡­ì— ë„ë‹¬í•¨ (%d,%d,%d)\n", current.x, current.y, current.z);
             continue;
         }
 
         if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::CABLE)))
         {
-            
+
             currentProp->runUsed = true;
             if (currentProp->leadItem.itemCode == itemRefCode::powerBankR || currentProp->leadItem.itemCode == itemRefCode::powerBankL) currentProp->runUsed = false;
 
@@ -255,7 +255,7 @@ void Prop::updateCircuitNetwork()
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[33m¡Ú Àü¿ø °¨Áö: %ls (Ãâ·Â: %d)\x1b[0m\n",
+                    std::wprintf(L"  \x1b[33mâ˜… ì „ì› ê°ì§€: %ls (ì¶œë ¥: %d)\x1b[0m\n",
                         currentProp->leadItem.name.c_str(),
                         currentProp->leadItem.electricMaxPower);
                 }
@@ -274,7 +274,7 @@ void Prop::updateCircuitNetwork()
                 }
 
             }
-            if (currentProp->leadItem.itemCode == itemRefCode::chargingPort)//ÃæÀüÆ÷Æ®ÀÏ °æ¿ì...
+            if (currentProp->leadItem.itemCode == itemRefCode::chargingPort)//ì¶©ì „í¬íŠ¸ì¼ ê²½ìš°...
             {
                 currentProp->leadItem.gndUsePower = 1;
                 ItemStack* hereStack = TileItemStack(current.x, current.y, current.z);
@@ -294,20 +294,20 @@ void Prop::updateCircuitNetwork()
                 }
             }
 
-            //ÇöÀç ÇÁ·ÓÀÌ ¼ÒºñÀü·ÂÀÌ ÀÖÀ» °æ¿ì loadSet¿¡ Ãß°¡
-            //µÚÀÇ isConnect 6¹æÇâ Ã¼Å©¿¡ ÁöÇâ¼º ºÎÇÏ loadSet Ãß°¡ ¸ŞÄ¿´ÏÁòÀÌ ÀÖÀ½(ÁÖÀÇÇÒ °Í)
+            //í˜„ì¬ í”„ë¡­ì´ ì†Œë¹„ì „ë ¥ì´ ìˆì„ ê²½ìš° loadSetì— ì¶”ê°€
+            //ë’¤ì˜ isConnect 6ë°©í–¥ ì²´í¬ì— ì§€í–¥ì„± ë¶€í•˜ loadSet ì¶”ê°€ ë©”ì»¤ë‹ˆì¦˜ì´ ìˆìŒ(ì£¼ì˜í•  ê²ƒ)
             if (currentProp->leadItem.gndUsePower > 0)
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[91m¡ß ºÎÇÏ °¨Áö: %ls (¼Òºñ: %d)\x1b[0m\n",
+                    std::wprintf(L"  \x1b[91mâ—† ë¶€í•˜ ê°ì§€: %ls (ì†Œë¹„: %d)\x1b[0m\n",
                         currentProp->leadItem.name.c_str(),
                         currentProp->leadItem.gndUsePower);
                 }
                 circuitTotalLoad += currentProp->leadItem.gndUsePower;
             }
 
-            //ÅÃÆ® ½ºÀ§Ä¡ÀÏ °æ¿ì ´ÙÀ½ ÅÏ ½ÃÀÛ ½Ã¿¡ Á¾·á
+            //íƒíŠ¸ ìŠ¤ìœ„ì¹˜ì¼ ê²½ìš° ë‹¤ìŒ í„´ ì‹œì‘ ì‹œì— ì¢…ë£Œ
             if (currentProp->leadItem.itemCode == itemRefCode::tactSwitchRL || currentProp->leadItem.itemCode == itemRefCode::tactSwitchUD)
             {
                 if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
@@ -324,11 +324,11 @@ void Prop::updateCircuitNetwork()
                     }
                 }
             }
-            else if(currentProp->leadItem.itemCode == itemRefCode::pressureSwitchRL || currentProp->leadItem.itemCode == itemRefCode::pressureSwitchUD)
+            else if (currentProp->leadItem.itemCode == itemRefCode::pressureSwitchRL || currentProp->leadItem.itemCode == itemRefCode::pressureSwitchUD)
             {
                 int totalWeight = 0;
-                
-                //¾ÆÀÌÅÛ ¹«°Ô
+
+                //ì•„ì´í…œ ë¬´ê²Œ
                 ItemStack* tgtItemStack = TileItemStack(current.x, current.y, current.z);
                 if (tgtItemStack != nullptr)
                 {
@@ -339,11 +339,11 @@ void Prop::updateCircuitNetwork()
                     }
                 }
 
-                //¿£Æ¼Æ¼ ¹«°Ô
+                //ì—”í‹°í‹° ë¬´ê²Œ
                 Entity* ePtr = TileEntity(current.x, current.y, current.z);
-                if(ePtr != nullptr) totalWeight += ePtr->entityInfo.weight;
-                
-                
+                if (ePtr != nullptr) totalWeight += ePtr->entityInfo.weight;
+
+
                 if (totalWeight >= 5000.0 && currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
                 {
                     currentProp->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
@@ -373,31 +373,31 @@ void Prop::updateCircuitNetwork()
                         if (crossStates[current] == crossFlag::horizontal && (directions[i] == dir16::up || directions[i] == dir16::down))
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"  \x1b[90m[SKIP] %ls¹æÇâ Å©·Î½ºÄÉÀÌºí ¹æÇâ ºÒÀÏÄ¡\x1b[0m\n", dirToArrow(directions[i]));
+                                std::wprintf(L"  \x1b[90m[SKIP] %lsë°©í–¥ í¬ë¡œìŠ¤ì¼€ì´ë¸” ë°©í–¥ ë¶ˆì¼ì¹˜\x1b[0m\n", dirToArrow(directions[i]));
                             crossStates.erase(current);
                             continue;
                         }
                         if (crossStates[current] == crossFlag::vertical && (directions[i] == dir16::right || directions[i] == dir16::left))
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"  \x1b[90m[SKIP] %ls¹æÇâ Å©·Î½ºÄÉÀÌºí ¹æÇâ ºÒÀÏÄ¡\x1b[0m\n", dirToArrow(directions[i]));
+                                std::wprintf(L"  \x1b[90m[SKIP] %lsë°©í–¥ í¬ë¡œìŠ¤ì¼€ì´ë¸” ë°©í–¥ ë¶ˆì¼ì¹˜\x1b[0m\n", dirToArrow(directions[i]));
                             crossStates.erase(current);
                             continue;
                         }
                     }
 
-                    if (isConnected(current, directions[i]))
+                    if (isCableConnected(current, directions[i]))
                     {
                         ItemData& nextItem = nextProp->leadItem;
 
                         if (debug::printCircuitLog)
-                            std::wprintf(L"  [¿¬°á] %ls (%d,%d) %ls\n",
+                            std::wprintf(L"  [ì—°ê²°] %ls (%d,%d) %ls\n",
                                 dirToArrow(directions[i]), nextCoord.x, nextCoord.y, nextItem.name.c_str());
 
                         bool isSignalInput = false;
                         if (nextProp != nullptr && nextProp->hasGround())
                         {
-                            //ÆÄ¿ö¹ğÅ© ÃæÀü¼Óµµ Á¦ÇÑ
+                            //íŒŒì›Œë±…í¬ ì¶©ì „ì†ë„ ì œí•œ
                             if (nextItem.itemCode == itemRefCode::powerBankR || nextItem.itemCode == itemRefCode::powerBankL)
                             {
                                 double ratio = (nextItem.powerStorage) / static_cast<double>(nextItem.powerStorageMax);
@@ -422,29 +422,29 @@ void Prop::updateCircuitNetwork()
                             if (directions[i] == dir16::right && nextProp->leadItem.gndUsePowerLeft > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    ¦¦¦¡ \x1b[35m¡ß ÁöÇâ¼ººÎÇÏ: ¼Òºñ=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerLeft);
+                                    std::wprintf(L"    â””â”€ \x1b[35mâ—† ì§€í–¥ì„±ë¶€í•˜: ì†Œë¹„=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerLeft);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerLeft;
                             }
                             else if (directions[i] == dir16::up && nextProp->leadItem.gndUsePowerDown > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    ¦¦¦¡ \x1b[35m¡ß ÁöÇâ¼ººÎÇÏ: ¼Òºñ=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerDown);
+                                    std::wprintf(L"    â””â”€ \x1b[35mâ—† ì§€í–¥ì„±ë¶€í•˜: ì†Œë¹„=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerDown);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerDown;
                             }
                             else if (directions[i] == dir16::left && nextProp->leadItem.gndUsePowerRight > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    ¦¦¦¡ \x1b[35m¡ß ÁöÇâ¼ººÎÇÏ: ¼Òºñ=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerRight);
+                                    std::wprintf(L"    â””â”€ \x1b[35mâ—† ì§€í–¥ì„±ë¶€í•˜: ì†Œë¹„=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerRight);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerRight;
                             }
                             else if (directions[i] == dir16::down && nextProp->leadItem.gndUsePowerUp > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    ¦¦¦¡ \x1b[35m¡ß ÁöÇâ¼ººÎÇÏ: ¼Òºñ=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerUp);
+                                    std::wprintf(L"    â””â”€ \x1b[35mâ—† ì§€í–¥ì„±ë¶€í•˜: ì†Œë¹„=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerUp);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerUp;
                             }
 
-                            //º£ÀÌ½º¿¡¼­ ¸ŞÀÎ¶óÀÎÀ¸·Î BFS¸¦ Ãß°¡ÇÏ´Â °ÍÀ» ¸·À½
+                            //ë² ì´ìŠ¤ì—ì„œ ë©”ì¸ë¼ì¸ìœ¼ë¡œ BFSë¥¼ ì¶”ê°€í•˜ëŠ” ê²ƒì„ ë§‰ìŒ
                             if (nextProp->leadItem.itemCode == itemRefCode::transistorL && directions[i] == dir16::right) isSignalInput = true;
                             else if (nextProp->leadItem.itemCode == itemRefCode::transistorU && directions[i] == dir16::down) isSignalInput = true;
                             else if (nextProp->leadItem.itemCode == itemRefCode::transistorR && directions[i] == dir16::left) isSignalInput = true;
@@ -489,7 +489,7 @@ void Prop::updateCircuitNetwork()
                         if (isSignalInput)
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"    ¦¦¦¡ \x1b[36m[½ÅÈ£ÀÔ·ÂÇÉ] BFS Â÷´Ü, ÀüÇÏ¸¸ °ø±Ş\x1b[0m\n");
+                                std::wprintf(L"    â””â”€ \x1b[36m[ì‹ í˜¸ì…ë ¥í•€] BFS ì°¨ë‹¨, ì „í•˜ë§Œ ê³µê¸‰\x1b[0m\n");
 
                             nextProp->nodeMaxCharge = circuitMaxEnergy;
                             nextProp->nodeCharge = circuitMaxEnergy;
@@ -508,15 +508,15 @@ void Prop::updateCircuitNetwork()
             else
             {
                 if (debug::printCircuitLog)
-                    std::wprintf(L"  \x1b[90m[SKIP-BFS] %ls - ½ÅÈ£ÇÉ¿¡¼­ ¸ŞÀÎ¶óÀÎ È®Àå Â÷´Ü\x1b[0m\n", currentProp->leadItem.name.c_str());
+                    std::wprintf(L"  \x1b[90m[SKIP-BFS] %ls - ì‹ í˜¸í•€ì—ì„œ ë©”ì¸ë¼ì¸ í™•ì¥ ì°¨ë‹¨\x1b[0m\n", currentProp->leadItem.name.c_str());
                 skipBFSSet.erase(current);
             }
-                
+
         }
     }
 
     //==============================================================================
-    // 2. ÃÖ´ë Àü·Â ¼³Á¤
+    // 2. ìµœëŒ€ ì „ë ¥ ì„¤ì •
     //==============================================================================
     for (auto coord : visitedSet)
     {
@@ -525,14 +525,14 @@ void Prop::updateCircuitNetwork()
         {
             propPtr->nodeMaxCharge = circuitMaxEnergy;
 
-            //(ÀüÀÚÈ¸·Î¿ë) Ç×»ó ÀüÀÚ °¡µæ Âù »óÅÂ
+            //(ì „ìíšŒë¡œìš©) í•­ìƒ ì „ì ê°€ë“ ì°¬ ìƒíƒœ
             propPtr->nodeCharge = circuitMaxEnergy;
 
         }
     }
 
     //==============================================================================
-    // 3. Àü¾Ğ¿ø Àü¼Û ½ÃÀÛ
+    // 3. ì „ì••ì› ì „ì†¡ ì‹œì‘
     //==============================================================================
 
     randomVectorShuffle(voltagePropVec);
@@ -551,8 +551,8 @@ void Prop::updateCircuitNetwork()
     for (Prop* voltProp : voltagePropVec)
     {
         constexpr double LOSS_COMPENSATION_FACTOR = 1.2;
-        // ¡è ÀúÇ×¼Õ½Ç(I©÷R)·Î ÀÎÇØ µµÁß¿¡ ÀüÇÏ°¡ ¼Ò¸ğµÇ¹Ç·Î, 
-        //   ºÎÇÏ¿¡ Á¤È®È÷ ÇÊ¿äÇÑ ¾çÀÌ µµ´ŞÇÏµµ·Ï 20% ¿©À¯ºĞ Ãß°¡
+        // â†‘ ì €í•­ì†ì‹¤(IÂ²R)ë¡œ ì¸í•´ ë„ì¤‘ì— ì „í•˜ê°€ ì†Œëª¨ë˜ë¯€ë¡œ, 
+        //   ë¶€í•˜ì— ì •í™•íˆ í•„ìš”í•œ ì–‘ì´ ë„ë‹¬í•˜ë„ë¡ 20% ì—¬ìœ ë¶„ ì¶”ê°€
 
         voltProp->nodeCharge = voltProp->nodeMaxCharge;
         int x = voltProp->getGridX();
@@ -560,9 +560,9 @@ void Prop::updateCircuitNetwork()
         int z = voltProp->getGridZ();
         double voltRatio = (double)voltProp->leadItem.electricMaxPower / (double)totalAvailablePower;
         double voltOutputPower = myMin(std::ceil(circuitTotalLoad * voltRatio), voltProp->leadItem.electricMaxPower);
-        voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // ÀúÇ×¼Õ½Ç º¸Á¸ º¯¼ö (±âº»°ª 120%)
+        voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // ì €í•­ì†ì‹¤ ë³´ì¡´ ë³€ìˆ˜ (ê¸°ë³¸ê°’ 120%)
 
-        if (debug::printCircuitLog) std::wprintf(L"========================¡åÀü¾Ğ¿ø (%d,%d)%ls : ¹Ğ¾î³»±â ½ÃÀÛ¡å========================\n", x, y, voltProp->leadItem.name.c_str());
+        if (debug::printCircuitLog) std::wprintf(L"========================â–¼ì „ì••ì› (%d,%d)%ls : ë°€ì–´ë‚´ê¸° ì‹œì‘â–¼========================\n", x, y, voltProp->leadItem.name.c_str());
         if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
             double finalVoltOutput = voltOutputPower;
@@ -570,13 +570,13 @@ void Prop::updateCircuitNetwork()
                 finalVoltOutput = std::min(voltOutputPower, voltProp->leadItem.powerStorage);
 
 
-            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isConnected({ x,y,z }, dir16::right))
+            if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_RIGHT) && isCableConnected({ x,y,z }, dir16::right))
                 pushCharge(voltProp, dir16::right, finalVoltOutput, {}, 0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isConnected({ x,y,z }, dir16::up))
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_UP) && isCableConnected({ x,y,z }, dir16::up))
                 pushCharge(voltProp, dir16::up, finalVoltOutput, {}, 0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isConnected({ x,y,z }, dir16::left))
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_LEFT) && isCableConnected({ x,y,z }, dir16::left))
                 pushCharge(voltProp, dir16::left, finalVoltOutput, {}, 0);
-            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isConnected({ x,y,z }, dir16::down))
+            else if (voltProp->leadItem.checkFlag(itemFlag::VOLTAGE_OUTPUT_DOWN) && isCableConnected({ x,y,z }, dir16::down))
                 pushCharge(voltProp, dir16::down, finalVoltOutput, {}, 0);
 
             voltProp->nodeCharge = voltProp->nodeMaxCharge;
@@ -585,13 +585,13 @@ void Prop::updateCircuitNetwork()
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"======================== È¸·Î¸Á ¿ä¾à ========================\n");
-        std::wprintf(L"³ëµå: %zu°³, Àü¾Ğ¿ø: %zu°³, ÃÑºÎÇÏ: %d, ÃÑÀü·Â: %d\n",
+        std::wprintf(L"======================== íšŒë¡œë§ ìš”ì•½ ========================\n");
+        std::wprintf(L"ë…¸ë“œ: %zuê°œ, ì „ì••ì›: %zuê°œ, ì´ë¶€í•˜: %d, ì´ì „ë ¥: %d\n",
             visitedSet.size(), voltagePropVec.size(), circuitTotalLoad, circuitMaxEnergy);
     }
 }
 
-bool Prop::isConnected(Point3 currentCoord, dir16 dir)
+bool Prop::isCableConnected(Point3 currentCoord, dir16 dir)
 {
     Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
 
@@ -630,14 +630,14 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
         guestFlag = itemFlag::CABLE_Z_ASCEND;
         break;
     default:
-        errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+        errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
         break;
     }
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
 
     if (targetProp == nullptr) return false;
 
-    if(currentProp->leadItem.itemCode == itemRefCode::tactSwitchRL 
+    if (currentProp->leadItem.itemCode == itemRefCode::tactSwitchRL
         || currentProp->leadItem.itemCode == itemRefCode::tactSwitchUD
         || currentProp->leadItem.itemCode == itemRefCode::leverRL
         || currentProp->leadItem.itemCode == itemRefCode::leverUD
@@ -694,11 +694,11 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
         if (tgtItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
     }
 
-    if (dir == dir16::down && (tgtItem.itemCode == itemRefCode::andGateR ||tgtItem.itemCode == itemRefCode::andGateL))
+    if (dir == dir16::down && (tgtItem.itemCode == itemRefCode::andGateR || tgtItem.itemCode == itemRefCode::andGateL))
     {
         if (tgtItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
     }
-    //³í¸®°ÔÀÌÆ® Ãâ·Â ´ÙÀÌ¿Àµå ¹ÙÀÌÆĞ½º
+    //ë…¼ë¦¬ê²Œì´íŠ¸ ì¶œë ¥ ë‹¤ì´ì˜¤ë“œ ë°”ì´íŒ¨ìŠ¤
     else if (dir == dir16::left && tgtItem.itemCode == itemRefCode::andGateR) return false;
     else if (dir == dir16::right && tgtItem.itemCode == itemRefCode::andGateL)return false;
 
@@ -746,10 +746,10 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
 
     ItemData& crtItem = currentProp->leadItem;
 
-    //(Æ®·£Áö½ºÅÍ) ¸ŞÀÎ¶óÀÎ¿¡¼­ º£ÀÌ½º ¹æÇâ Àı¿¬
+    //(íŠ¸ëœì§€ìŠ¤í„°) ë©”ì¸ë¼ì¸ì—ì„œ ë² ì´ìŠ¤ ë°©í–¥ ì ˆì—°
     if (crtItem.itemCode == itemRefCode::transistorL && dir == dir16::left) return false;
-    else if(crtItem.itemCode == itemRefCode::transistorU && dir == dir16::up) return false;
-    else if(crtItem.itemCode == itemRefCode::transistorR && dir == dir16::right) return false;
+    else if (crtItem.itemCode == itemRefCode::transistorU && dir == dir16::up) return false;
+    else if (crtItem.itemCode == itemRefCode::transistorR && dir == dir16::right) return false;
     else if (crtItem.itemCode == itemRefCode::transistorD && dir == dir16::down) return false;
 
     if (crtItem.itemCode == itemRefCode::relayL && dir == dir16::left) return false;
@@ -757,7 +757,7 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     else if (crtItem.itemCode == itemRefCode::relayR && dir == dir16::right) return false;
     else if (crtItem.itemCode == itemRefCode::relayD && dir == dir16::down) return false;
 
-    //(³í¸®°ÔÀÌÆ®) ¸ŞÀÎ¶óÀÎ¿¡¼­ ÀÔ·ÂÇÉ1,2 ¹æÇâ Àı¿¬
+    //(ë…¼ë¦¬ê²Œì´íŠ¸) ë©”ì¸ë¼ì¸ì—ì„œ ì…ë ¥í•€1,2 ë°©í–¥ ì ˆì—°
     if (crtItem.itemCode == itemRefCode::andGateR && (dir == dir16::left || dir == dir16::down)) return false;
     else if (crtItem.itemCode == itemRefCode::andGateL && (dir == dir16::right || dir == dir16::down)) return false;
 
@@ -767,7 +767,7 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
     if (crtItem.itemCode == itemRefCode::xorGateR && (dir == dir16::left || dir == dir16::down)) return false;
     else if (crtItem.itemCode == itemRefCode::xorGateL && (dir == dir16::right || dir == dir16::down)) return false;
 
-    //(NOT°ÔÀÌÆ®) ¸ŞÀÎ¶óÀÎ¿¡¼­ ÀÔ·ÂÇÉ ¹æÇâ Àı¿¬
+    //(NOTê²Œì´íŠ¸) ë©”ì¸ë¼ì¸ì—ì„œ ì…ë ¥í•€ ë°©í–¥ ì ˆì—°
     if (crtItem.itemCode == itemRefCode::notGateR && dir == dir16::left) return false;
     else if (crtItem.itemCode == itemRefCode::notGateL && dir == dir16::right) return false;
 
@@ -783,7 +783,7 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
         return false;
     }
 
-    //(ÆÄ¿ö¹ğÅ©) ¸ŞÀÎ¶óÀÎ(ÇöÀç)¿¡¼­ ÀÔ·ÂºÎ Â÷´Ü
+    //(íŒŒì›Œë±…í¬) ë©”ì¸ë¼ì¸(í˜„ì¬)ì—ì„œ ì…ë ¥ë¶€ ì°¨ë‹¨
     if (crtItem.itemCode == itemRefCode::powerBankR && dir == dir16::left) return false;
     else if (crtItem.itemCode == itemRefCode::powerBankL && dir == dir16::right) return false;
 
@@ -812,12 +812,82 @@ bool Prop::isConnected(Point3 currentCoord, dir16 dir)
         if (currentCondition && targetCondition) return true;
         else return false;
     }
-    else errorBox(L"[Error] isConnected lambda function received invalid direction argument.\n");
+    else errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
 }
 
-bool Prop::isConnected(Prop* currentProp, dir16 dir)
+bool Prop::isCableConnected(Prop* currentProp, dir16 dir)
 {
-    return isConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
+    return isCableConnected({ currentProp->getGridX(),currentProp->getGridY(),currentProp->getGridZ() }, dir);
+}
+
+bool Prop::isCableLinked(Point3 currentCoord, dir16 dir)
+{
+    Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
+    errorBox(currentProp == nullptr, L"currentProp is nullptr in isCableLinked");
+
+    Point3 delCoord = { 0,0,0 };
+    itemFlag hostFlag, guestFlag;
+    switch (dir)
+    {
+    case dir16::right:
+        delCoord = { +1,0,0 };
+        hostFlag = itemFlag::CABLE_CNCT_RIGHT;
+        guestFlag = itemFlag::CABLE_CNCT_LEFT;
+        break;
+    case dir16::up:
+        delCoord = { 0,-1,0 };
+        hostFlag = itemFlag::CABLE_CNCT_UP;
+        guestFlag = itemFlag::CABLE_CNCT_DOWN;
+        break;
+    case dir16::left:
+        delCoord = { -1,0,0 };
+        hostFlag = itemFlag::CABLE_CNCT_LEFT;
+        guestFlag = itemFlag::CABLE_CNCT_RIGHT;
+        break;
+    case dir16::down:
+        delCoord = { 0,+1,0 };
+        hostFlag = itemFlag::CABLE_CNCT_DOWN;
+        guestFlag = itemFlag::CABLE_CNCT_UP;
+        break;
+    case dir16::above:
+        delCoord = { 0,0,+1 };
+        hostFlag = itemFlag::CABLE_Z_ASCEND;
+        guestFlag = itemFlag::CABLE_Z_DESCEND;
+        break;
+    case dir16::below:
+        delCoord = { 0,0,-1 };
+        hostFlag = itemFlag::CABLE_Z_DESCEND;
+        guestFlag = itemFlag::CABLE_Z_ASCEND;
+        break;
+    default:
+        errorBox(L"[Error] isCableLinked received invalid direction argument.");
+        break;
+    }
+    Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
+    if (targetProp == nullptr) return false;
+
+    if (dir == dir16::above || dir == dir16::below)
+    {
+        bool currentCondition = currentProp->leadItem.checkFlag(itemFlag::CABLE) && currentProp->leadItem.checkFlag(hostFlag);
+        bool targetCondition = targetProp->leadItem.checkFlag(itemFlag::CABLE) && targetProp->leadItem.checkFlag(guestFlag);
+
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else if (dir == dir16::right || dir == dir16::up || dir == dir16::left || dir == dir16::down)
+    {
+        bool currentCondition = (currentProp->leadItem.checkFlag(itemFlag::CABLE) || currentProp->leadItem.checkFlag(hostFlag));
+        bool targetCondition = (targetProp->leadItem.checkFlag(itemFlag::CABLE) || targetProp->leadItem.checkFlag(guestFlag));
+
+        if (currentCondition && targetCondition) return true;
+        else return false;
+    }
+    else errorBox(L"[Error] isCableLinked received invalid direction argument.");
+}
+
+bool Prop::isCableLinked(Prop* currentProp, dir16 dir)
+{
+    return isCableLinked({ currentProp->getGridX(), currentProp->getGridY(), currentProp->getGridZ() }, dir);
 }
 
 bool Prop::isGround(Point3 current, dir16 dir)
@@ -831,7 +901,7 @@ bool Prop::isGround(Point3 current, dir16 dir)
     if (nextProp == nullptr || nextProp->hasGround() == false)
         return false;
 
-    if (isConnected(current, dir))
+    if (isCableConnected(current, dir))
     {
         if (nextProp->leadItem.gndUsePower > 0) return true;
         if (dir == dir16::right && nextProp->leadItem.gndUsePowerLeft > 0) return true;
@@ -856,7 +926,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
     txChargeAmount = std::min(donorProp->nodeCharge, txChargeAmount);
 
     errorBox(txChargeAmount > donorProp->nodeCharge + EPSILON, L"[Error] pushCharge: insufficient electron\n");
-    errorBox(!isConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
+    errorBox(!isCableConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
         L"[Error] pushCharge: not connected\n");
 
     std::wstring indent(depth * 2, L' ');
@@ -864,7 +934,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
     if (pathVisited.find(donorProp) != pathVisited.end())
     {
         if (debug::printCircuitLog)
-            std::wprintf(L"%s[PUSH-SKIP] (%d,%d)%ls ÀÌ¹Ì ¹æ¹®µÊ\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
+            std::wprintf(L"%s[PUSH-SKIP] (%d,%d)%ls ì´ë¯¸ ë°©ë¬¸ë¨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
         return 0;
     }
     pathVisited.insert(donorProp);
@@ -872,7 +942,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
 
 
-    if (debug::printCircuitLog) std::wprintf(L"%s[PUSH] (%d,%d)%ls ¡æ (%d,%d)%ls [%ls] ½Ãµµ: %.2f\n",
+    if (debug::printCircuitLog) std::wprintf(L"%s[PUSH] (%d,%d)%ls â†’ (%d,%d)%ls [%ls] ì‹œë„: %.2f\n",
         indent.c_str(),
         donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str(),
         nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -881,7 +951,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
     double gndTxEnergy = 0;
     Point3 current = { donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() };
-    if (isGround(current, txDir)) //ÇØ´ç ¹æÇâÀÌ GNDÀÏ °æ¿ì ÀüÇÏ ¼Òºñ ÈÄ¿¡ Áï½Ã Á¾·á return
+    if (isGround(current, txDir)) //í•´ë‹¹ ë°©í–¥ì´ GNDì¼ ê²½ìš° ì „í•˜ ì†Œë¹„ í›„ì— ì¦‰ì‹œ ì¢…ë£Œ return
     {
         double remainEnergy;
         bool isDirectionalGnd = false;
@@ -914,14 +984,14 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         else
         {
             remainEnergy = nextProp->leadItem.gndUsePower - nextProp->gndSink;
-            requiredPower = nextProp->leadItem.gndUsePower; 
+            requiredPower = nextProp->leadItem.gndUsePower;
         }
 
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s  ¦¦¦¡ \x1b[33m[GNDÁøÀÔ] %ls GND, ¿ä±¸=%d, ÀÜ¿©¿ë·®=%.2f, ½Ãµµ·®=%.2f\x1b[0m\n",
+            std::wprintf(L"%s  â””â”€ \x1b[33m[GNDì§„ì…] %ls GND, ìš”êµ¬=%d, ì”ì—¬ìš©ëŸ‰=%.2f, ì‹œë„ëŸ‰=%.2f\x1b[0m\n",
                 indent.c_str(),
-                isDirectionalGnd ? L"ÁöÇâ¼º" : L"ÀÏ¹İ",
+                isDirectionalGnd ? L"ì§€í–¥ì„±" : L"ì¼ë°˜",
                 requiredPower,
                 remainEnergy,
                 txChargeAmount);
@@ -934,7 +1004,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s      ¡æ ½ÇÁ¦¼Òºñ=%.2f, ³²Àº¿ë·®=%.2f\n",
+                std::wprintf(L"%s      â†’ ì‹¤ì œì†Œë¹„=%.2f, ë‚¨ì€ìš©ëŸ‰=%.2f\n",
                     indent.c_str(),
                     gndTxEnergy,
                     remainEnergy - gndTxEnergy);
@@ -948,7 +1018,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         }
         else if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s      ¡æ \x1b[90m¿ë·® ¼ÒÁøµÊ, ½ºÅµ\x1b[0m\n", indent.c_str());
+            std::wprintf(L"%s      â†’ \x1b[90mìš©ëŸ‰ ì†Œì§„ë¨, ìŠ¤í‚µ\x1b[0m\n", indent.c_str());
         }
 
         if (isDirectionalGnd)
@@ -958,7 +1028,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         }
     }
 
-    double pushedCharge = std::min(txChargeAmount- gndTxEnergy, nextProp->nodeCharge);
+    double pushedCharge = std::min(txChargeAmount - gndTxEnergy, nextProp->nodeCharge);
 
     if (pushedCharge > EPSILON)
     {
@@ -973,7 +1043,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below })
         {
             if (dir == reverse(txDir)) continue;
-            if (isConnected({ nextProp->getGridX(), nextProp->getGridY(), nextProp->getGridZ() }, dir))
+            if (isCableConnected({ nextProp->getGridX(), nextProp->getGridY(), nextProp->getGridZ() }, dir))
             {
                 possibleDirs.push_back(dir);
             }
@@ -993,20 +1063,20 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         }
     }
 
-    // Àç±Í º¹±Í: ÇÏÀ§ ³ëµåµéÀÌ ÀüÇÏ¸¦ ¼ÒºñÇØ¼­ »ı±ä ºó °ø°£¸¸Å­ Àü¼Û
+    // ì¬ê·€ ë³µê·€: í•˜ìœ„ ë…¸ë“œë“¤ì´ ì „í•˜ë¥¼ ì†Œë¹„í•´ì„œ ìƒê¸´ ë¹ˆ ê³µê°„ë§Œí¼ ì „ì†¡
     double finalTxCharge = std::min(txChargeAmount, nextProp->nodeMaxCharge - nextProp->nodeCharge);
-    transferCharge(donorProp,nextProp,finalTxCharge,indent,txDir,false);
+    transferCharge(donorProp, nextProp, finalTxCharge, indent, txDir, false);
     return finalTxCharge;
 }
 
 
 void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> possibleDirs, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    std::wstring indent(depth * 2, L' ');  // ÀÎµ§Æ® »ı¼º
+    std::wstring indent(depth * 2, L' ');  // ì¸ë´íŠ¸ ìƒì„±
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE] (%d,%d)%ls ºĞ¹è½ÃÀÛ: %.2f ¡æ %zu¹æÇâ\n",
+        std::wprintf(L"%s[DIVIDE] (%d,%d)%ls ë¶„ë°°ì‹œì‘: %.2f â†’ %zuë°©í–¥\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             inputCharge, possibleDirs.size());
@@ -1030,7 +1100,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
         double gndPushedCharge = 0;
         double loopPushedCharge = 0;
 
-        //Á¢Áö ¿ì¼± ¹èºĞ
+        //ì ‘ì§€ ìš°ì„  ë°°ë¶„
         for (auto dir : possibleDirs)
         {
             if (isGround({ propPtr->getGridX(), propPtr->getGridY(), propPtr->getGridZ() }, dir))
@@ -1046,14 +1116,14 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s  [DIV-GND] Á¢Áö %zu¹æÇâ, °¢ %.2f¾¿\n",
+                std::wprintf(L"%s  [DIV-GND] ì ‘ì§€ %zuë°©í–¥, ê° %.2fì”©\n",
                     indent.c_str(), gndDirs.size(), gndSplitCharge);
             }
 
             for (auto dir : gndDirs)
             {
                 auto newPathVisited = pathVisited;
-                double branchPushedCharge = pushCharge(propPtr, dir, gndSplitCharge, newPathVisited, depth+1);
+                double branchPushedCharge = pushCharge(propPtr, dir, gndSplitCharge, newPathVisited, depth + 1);
                 gndPushedCharge += branchPushedCharge;
                 if (branchPushedCharge < EPSILON) dirsToRemove.push_back(dir);
             }
@@ -1081,7 +1151,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s  [DIV-LOOP] ÀÏ¹İ %zu¹æÇâ, °¢ %.2f¾¿\n",
+                std::wprintf(L"%s  [DIV-LOOP] ì¼ë°˜ %zuë°©í–¥, ê° %.2fì”©\n",
                     indent.c_str(), nonGndDirs.size(), splitCharge);
             }
 
@@ -1099,7 +1169,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
         if (debug::printCircuitLog && (gndPushedCharge > EPSILON || loopPushedCharge > EPSILON))
         {
-            std::wprintf(L"%s  [DIV-RESULT] ·çÇÁ%d: GND=%.2f, ÀÏ¹İ=%.2f, ÀÜ¿©=%.2f\n",
+            std::wprintf(L"%s  [DIV-RESULT] ë£¨í”„%d: GND=%.2f, ì¼ë°˜=%.2f, ì”ì—¬=%.2f\n",
                 indent.c_str(), loopCount, gndPushedCharge, loopPushedCharge, remainingCharge);
         }
 
@@ -1108,7 +1178,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE-END] (%d,%d)%ls ÃÑ %dÈ¸ ¹İº¹, ¹ÌºĞ¹è=%.2f\n",
+        std::wprintf(L"%s[DIVIDE-END] (%d,%d)%ls ì´ %díšŒ ë°˜ë³µ, ë¯¸ë¶„ë°°=%.2f\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             loopCount, remainingCharge);
@@ -1122,7 +1192,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
     {
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s[Àü¼Û ½ºÅµ] (%d,%d)%ls ¡æ (%d,%d)%ls ¾ç:%.8f (EPSILON ¹Ì¸¸)\n",
+            std::wprintf(L"%s[ì „ì†¡ ìŠ¤í‚µ] (%d,%d)%ls â†’ (%d,%d)%ls ì–‘:%.8f (EPSILON ë¯¸ë§Œ)\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -1149,14 +1219,14 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
     if (thisProp->leadItem.itemCode == itemRefCode::powerBankR || thisProp->leadItem.itemCode == itemRefCode::powerBankL)
         thisProp->leadItem.powerStorage -= requiredFromDonor;
 
-    if(isGroundTransfer == false) nextProp->nodeCharge += txChargeAmount;
+    if (isGroundTransfer == false) nextProp->nodeCharge += txChargeAmount;
     nextProp->chargeFlux[reverse(txDir)] += txChargeAmount;
 
     if (debug::printCircuitLog)
     {
         if (isGroundTransfer)
         {
-            std::wprintf(L"\x1b[33m%s[Àü¼Û GND] (%d,%d)%ls [%.2f¡æ%.2f] ¡æ (%d,%d)%ls Àü¼Û:%.2f ¼Õ½Ç:%.2f ºÎÇÏ:%.2f/%d\x1b[0m\n",
+            std::wprintf(L"\x1b[33m%s[ì „ì†¡ GND] (%d,%d)%ls [%.2fâ†’%.2f] â†’ (%d,%d)%ls ì „ì†¡:%.2f ì†ì‹¤:%.2f ë¶€í•˜:%.2f/%d\x1b[0m\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeCharge + requiredFromDonor, thisProp->nodeCharge,
@@ -1166,7 +1236,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
         }
         else
         {
-            std::wprintf(L"%s[Àü¼Û] (%d,%d)%ls [%.2f¡æ%.2f] ¡æ (%d,%d)%ls [%.2f/%d] Àü¼Û:%.2f ¼Õ½Ç:%.2f\n",
+            std::wprintf(L"%s[ì „ì†¡] (%d,%d)%ls [%.2fâ†’%.2f] â†’ (%d,%d)%ls [%.2f/%d] ì „ì†¡:%.2f ì†ì‹¤:%.2f\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeCharge + requiredFromDonor, thisProp->nodeCharge,
@@ -1201,7 +1271,7 @@ void Prop::initChargeBFS(std::queue<Point3> startPointSet)
         const dir16 directions[] = { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below };
         for (int i = 0; i < 6; ++i)
         {
-            if (isConnected(current, directions[i]))
+            if (isCableConnected(current, directions[i]))
             {
                 int dx, dy, dz;
                 dirToXYZ(directions[i], dx, dy, dz);
@@ -1209,21 +1279,21 @@ void Prop::initChargeBFS(std::queue<Point3> startPointSet)
                 Prop* nextProp = TileProp(nextCoord.x, nextCoord.y, nextCoord.z);
                 if (nextProp != nullptr)
                 {
-                    //¸¸¾à BFS·Î ÇØ´ç ¹æÇâÀ¸·Î Ãß°¡ÇßÀ» ¶§ GND°¡ ÁöÇâ¼º GND Àü·Â¿ä±¸¸¦ °¡Áö°í ÀÖÀ» °æ¿ì
+                    //ë§Œì•½ BFSë¡œ í•´ë‹¹ ë°©í–¥ìœ¼ë¡œ ì¶”ê°€í–ˆì„ ë•Œ GNDê°€ ì§€í–¥ì„± GND ì „ë ¥ìš”êµ¬ë¥¼ ê°€ì§€ê³  ìˆì„ ê²½ìš°
                     ItemData& nextItem = nextProp->leadItem;
 
                     thisProp->chargeFlux[directions[i]] = 0;
                     nextProp->chargeFlux[reverse(directions[i])] = 0;
-                    
-                    if(directions[i] == dir16::right && nextItem.gndUsePowerLeft > 0) 
+
+                    if (directions[i] == dir16::right && nextItem.gndUsePowerLeft > 0)
                         nextProp->gndSinkLeft = 0;
-                    else if(directions[i] == dir16::up && nextItem.gndUsePowerDown > 0) 
+                    else if (directions[i] == dir16::up && nextItem.gndUsePowerDown > 0)
                         nextProp->gndSinkDown = 0;
-                    else if(directions[i] == dir16::left && nextItem.gndUsePowerRight > 0)
+                    else if (directions[i] == dir16::left && nextItem.gndUsePowerRight > 0)
                         nextProp->gndSinkRight = 0;
-                    else if(directions[i] == dir16::down && nextItem.gndUsePowerUp > 0)
+                    else if (directions[i] == dir16::down && nextItem.gndUsePowerUp > 0)
                         nextProp->gndSinkUp = 0;
-                    
+
                 }
                 frontierQueue.push(nextCoord);
             }
@@ -1232,18 +1302,18 @@ void Prop::initChargeBFS(std::queue<Point3> startPointSet)
 }
 
 /*
-* loadAct(): ÀüÇÏ °è»ê ¿Ï·á ÈÄ È£ÃâµÇ¾î ºÎÇÏÀÇ ON/OFF »óÅÂ °áÁ¤
-* È£Ãâ ½ÃÁ¡: updateCircuitNetwork() ¿Ï·á ÈÄ, ÅÏ »çÀÌÅ¬¿¡¼­ º°µµ È£Ãâ
-* ÆÇÁ¤ ±âÁØ: chargeFlux(¹ŞÀº ÀüÇÏ·®) >= gndUsePower(ÇÊ¿ä Àü·Â)
-* ¡Ø ÃæÀüÆ÷Æ®°°ÀÌ ÀÌÇÏ¿©µµ ÀÛµ¿ÇÏ´Â ¿¹¿Ü Á¸ÀçÇÏ´Ï À¯ÀÇÇÒ °Í
+* loadAct(): ì „í•˜ ê³„ì‚° ì™„ë£Œ í›„ í˜¸ì¶œë˜ì–´ ë¶€í•˜ì˜ ON/OFF ìƒíƒœ ê²°ì •
+* í˜¸ì¶œ ì‹œì : updateCircuitNetwork() ì™„ë£Œ í›„, í„´ ì‚¬ì´í´ì—ì„œ ë³„ë„ í˜¸ì¶œ
+* íŒì • ê¸°ì¤€: chargeFlux(ë°›ì€ ì „í•˜ëŸ‰) >= gndUsePower(í•„ìš” ì „ë ¥)
+* â€» ì¶©ì „í¬íŠ¸ê°™ì´ ì´í•˜ì—¬ë„ ì‘ë™í•˜ëŠ” ì˜ˆì™¸ ì¡´ì¬í•˜ë‹ˆ ìœ ì˜í•  ê²ƒ
 */
 void Prop::loadAct()
 {
 
     int iCode = leadItem.itemCode;
 
-    //¸ğµç °è»êÀÌ Á¾·áµÈ ÈÄ ºÎÇÏ¿¡ °ø±ŞµÈ ÀüÇÏ·®ÀÌ usePower ÀÌ»óÀÎÁö ÀÌÇÏÀÎÁö ÆÇ´ÜÇÏ¿© ºÎÇÏ ÇÁ·ÓÀÌ ÄÑÁö°Å³ª ²¨Áü
-    //´Ü ³í¸®°ÔÀÌÆ®µéÀº °ø±ŞµÈ ÀüÇÏ·®ÀÌ ¾Æ´Ï¶ó º°µµÀÇ ·ÎÁ÷À¸·Î Ã³¸®
+    //ëª¨ë“  ê³„ì‚°ì´ ì¢…ë£Œëœ í›„ ë¶€í•˜ì— ê³µê¸‰ëœ ì „í•˜ëŸ‰ì´ usePower ì´ìƒì¸ì§€ ì´í•˜ì¸ì§€ íŒë‹¨í•˜ì—¬ ë¶€í•˜ í”„ë¡­ì´ ì¼œì§€ê±°ë‚˜ êº¼ì§
+    //ë‹¨ ë…¼ë¦¬ê²Œì´íŠ¸ë“¤ì€ ê³µê¸‰ëœ ì „í•˜ëŸ‰ì´ ì•„ë‹ˆë¼ ë³„ë„ì˜ ë¡œì§ìœ¼ë¡œ ì²˜ë¦¬
     if (iCode == itemRefCode::transistorR
         || iCode == itemRefCode::transistorU
         || iCode == itemRefCode::transistorL
@@ -1424,7 +1494,7 @@ void Prop::loadAct()
             resetInput = gndSinkDown >= 1.0;
         }
 
-        if (setInput && resetInput) // ±İÁö»óÅÂ´Â ·£´ı
+        if (setInput && resetInput) // ê¸ˆì§€ìƒíƒœëŠ” ëœë¤
         {
             if (randomRange(0, 1) == 0)
             {
@@ -1474,7 +1544,7 @@ void Prop::loadAct()
             }
         }
     }
-    else if (iCode == itemRefCode::powerBankR || iCode == itemRefCode::powerBankL) //ÆÄ¿ö¹ğÅ© ÃæÀüÀÇ °æ¿ì ºÎÇÏ¿¡ ¹Ì´ŞÇØµµ ÀÛµ¿
+    else if (iCode == itemRefCode::powerBankR || iCode == itemRefCode::powerBankL) //íŒŒì›Œë±…í¬ ì¶©ì „ì˜ ê²½ìš° ë¶€í•˜ì— ë¯¸ë‹¬í•´ë„ ì‘ë™
     {
         ItemData& loadItem = leadItem;
         double inletCharge = 0;
@@ -1495,10 +1565,10 @@ void Prop::loadAct()
         if (hereStack != nullptr)
         {
             std::vector<ItemData>& items = hereStack->getPocket()->itemInfo;
-            double inletCharge = gndSink;  // ÃæÀüÆ÷Æ®´Â ¹«¹æÇâ ºÎÇÏ
+            double inletCharge = gndSink;  // ì¶©ì „í¬íŠ¸ëŠ” ë¬´ë°©í–¥ ë¶€í•˜
             if (inletCharge > 0)
             {
-                // ÃæÀü °¡´ÉÇÑ ¾ÆÀÌÅÛ ÀÎµ¦½º ¼öÁı
+                // ì¶©ì „ ê°€ëŠ¥í•œ ì•„ì´í…œ ì¸ë±ìŠ¤ ìˆ˜ì§‘
                 std::vector<int> chargeableIndices;
                 for (int i = 0; i < items.size(); i++)
                 {
@@ -1511,7 +1581,7 @@ void Prop::loadAct()
                     }
                 }
 
-                // ±Õµî ºĞ¹è
+                // ê· ë“± ë¶„ë°°
                 if (chargeableIndices.size() > 0)
                 {
                     double chargePerItem = inletCharge / chargeableIndices.size();
@@ -1534,7 +1604,7 @@ void Prop::loadAct()
             }
         }
     }
-    else //ÀÏ¹İÀûÀÎ ºÎÇÏµéÀº gndSink°¡ usePower ÀÌ»óÀÌ¸é ÄÑÁö°í ¾Æ´Ï¸é ²¨Áü
+    else //ì¼ë°˜ì ì¸ ë¶€í•˜ë“¤ì€ gndSinkê°€ usePower ì´ìƒì´ë©´ ì¼œì§€ê³  ì•„ë‹ˆë©´ êº¼ì§
     {
         if (gndSink >= static_cast<double>(leadItem.gndUsePower))
         {

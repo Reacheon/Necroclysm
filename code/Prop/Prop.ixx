@@ -95,8 +95,11 @@ public:
     double getInletCharge();
     double getOutletCharge();
     void updateCircuitNetwork();
-    bool isConnected(Point3 currentCoord, dir16 dir);
-    bool isConnected(Prop* currentProp, dir16 dir);
+    bool isCableConnected(Point3 currentCoord, dir16 dir);
+    bool isCableConnected(Prop* currentProp, dir16 dir);
+    //@brief 스위치나 그 외 요소를 무시하고 순수하게 연결만 되었는지 확인
+    bool isCableLinked(Point3 currentCoord, dir16 dir);
+    bool isCableLinked(Prop* currentProp, dir16 dir);
     bool isGround(Point3 currentCoord, dir16 dir);
     void transferCharge(Prop* donorProp, Prop* acceptorProp, double txChargeAmount, const std::wstring& indent, dir16 txDir, bool isGroundTransfer);
     double pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth);
