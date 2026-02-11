@@ -209,4 +209,7 @@ export void textureLoader()
 	spr::coordCraftMarker = new Sprite(renderer, "image/UI/GUI/coordCraftMarker.png", 80, 80);
 
 	spr::fluxArrow = new Sprite(renderer, "image/UI/GUI/HUD/fluxArrow.png", 48, 48);
+
+	spr::sprinkler33 = new Sprite(renderer, "image/sprinkler33.png", 112, 112);
+	spr::sprinkler55 = new Sprite(renderer, "image/sprinkler55.png", 112, 112);
 }

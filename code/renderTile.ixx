@@ -49,6 +49,7 @@ void drawEntities();
 void drawDamages();
 void drawBullets();
 void drawParticles();
+void drawSprinklerSpray();
 void drawMulFogs();
 void drawFogs();
 void drawMarkers();
@@ -60,6 +61,8 @@ std::vector<Point2> tileList, itemList, floorPropList, gasList, blackFogList, gr
 std::unordered_set<Point2, Point2::Hash> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
 std::vector<Drawable*> renderVehList, renderEntityList;
 std::unordered_set<Point2, Point2::Hash> raySet;
+std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
+std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
 
 export __int64 renderTile()
 {
@@ -88,6 +91,8 @@ export __int64 renderTile()
     shallowSeaWaves.clear();
     deepSeaWaves.clear();
     wallHPList.clear();
+    sprinklerSpraySet33.clear();
+    sprinklerSpraySet55.clear();
 
     if (rangeRay)
     {
@@ -124,6 +129,7 @@ export __int64 renderTile()
     dur::damage = PROFILE([] { drawDamages(); });
     dur::bullet = PROFILE([] { drawBullets(); });
     dur::particle = PROFILE([] { drawParticles(); });
+    dur::sprinklerSpray = PROFILE([] { drawSprinklerSpray(); });
     dur::mulFog = PROFILE([] { drawMulFogs(); });
     dur::fog = PROFILE([] { drawFogs(); });
     dur::marker = PROFILE([] { drawMarkers(); });
@@ -221,6 +227,16 @@ void analyseRender()
 
             // 가스
             if (thisTile->gasVec.size() > 0) gasList.push_back({ tgtX, tgtY });
+
+            //스프링클러 스프레이
+            if (pPtr != nullptr && (pPtr->leadItem.itemCode == itemRefCode::sprinklerRL || pPtr->leadItem.itemCode == itemRefCode::sprinklerUD))
+            {
+                if (pPtr->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+                {
+                    if (pPtr->sinkFluidAmount >= pPtr->leadItem.fluidDemand) sprinklerSpraySet55.insert({ tgtX,tgtY });
+                    else if (pPtr->sinkFluidAmount >= (double)(pPtr->leadItem.fluidDemand)/2.0) sprinklerSpraySet33.insert({ tgtX,tgtY });
+                }
+            }
 
             // 안개
             if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
@@ -1141,6 +1157,59 @@ void drawParticles()
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );
         SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
+        setZoom(1.0);
+    }
+}
+
+void drawSprinklerSpray()
+{
+    int sprIndex = (SDL_GetTicks() / 100) % 3;
+
+    for (auto i : sprinklerSpraySet33)
+    {
+        int tgtX = i.x;
+        int tgtY = i.y;
+
+        SDL_Rect dst;
+        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+        dst.w = tileSize;
+        dst.h = tileSize;
+
+        setZoom(zoomScale);
+        SDL_SetTextureAlphaMod(spr::sprinkler33->getTexture(), 200);
+        drawSpriteCenter
+        (
+            spr::sprinkler33,
+            sprIndex,
+            dst.x + dst.w / 2 + zoomScale,
+            dst.y + dst.h / 2 + zoomScale
+        );
+        SDL_SetTextureAlphaMod(spr::sprinkler33->getTexture(), 255);
+        setZoom(1.0);
+    }
+
+    for (auto i : sprinklerSpraySet55)
+    {
+        int tgtX = i.x;
+        int tgtY = i.y;
+
+        SDL_Rect dst;
+        dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+        dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+        dst.w = tileSize;
+        dst.h = tileSize;
+
+        setZoom(zoomScale);
+        SDL_SetTextureAlphaMod(spr::sprinkler55->getTexture(), 200);
+        drawSpriteCenter
+        (
+            spr::sprinkler55,
+            sprIndex,
+            dst.x + dst.w / 2 + zoomScale,
+            dst.y + dst.h / 2 + zoomScale
+        );
+        SDL_SetTextureAlphaMod(spr::sprinkler55->getTexture(), 255);
         setZoom(1.0);
     }
 }

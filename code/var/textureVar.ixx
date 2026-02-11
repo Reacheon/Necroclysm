@@ -175,4 +175,7 @@ export namespace spr
 	Sprite* coordCraftBox = nullptr;
 	Sprite* coordCraftMarker = nullptr;
 	Sprite* fluxArrow = nullptr;
+
+	Sprite* sprinkler33 = nullptr;
+	Sprite* sprinkler55 = nullptr;
 }

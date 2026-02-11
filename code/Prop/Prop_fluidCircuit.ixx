@@ -370,6 +370,24 @@ void Prop::updateFluidCircuitNetwork()
 
             if (consumedByDevice > EPSILON)
             {
+                /*
+                * 스프링클러는 요구량의 50%만 접수돼도 켜짐 상태가 된다.
+                * 단 50%~99.9% 구간은 주변 3*3 타일까지만 물을 흩뿌릴 수 있다.
+                * 100% 구간부터는 5*5까지 물을 흩뿌릴 수 있다.
+                */
+
+                if (consumedByDevice >= sinkProp->leadItem.fluidDemand / 2)
+                {
+                    sinkProp->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
+                    sinkProp->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+                }
+                else
+                {
+                    sinkProp->leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
+                    sinkProp->leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+                }
+
+
                 if (debug::printCircuitLog) std::wprintf(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
                     consumedByDevice,
                     sinkProp->leadItem.fluidDemand,
