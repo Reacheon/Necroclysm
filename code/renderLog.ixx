@@ -3,43 +3,82 @@ export module renderLog;
 import std;
 import util;
 import constVar;
+import textureVar;
 import drawText;
 import globalVar;
 import log;
+import drawSprite;
+
 
 export __int64 renderLog(SDL_Renderer* renderer)
 {
-	__int64 timeStampStart = getNanoTimer();//시간 측정 시작
-	std::deque<std::wstring> logStrDeque = getLogStrDeque();
-	std::deque<int> logTimerDeque = getLogTimerDeque();
+	__int64 timeStampStart = getNanoTimer();
+
+	const auto& magazine = getLogMagazine();
 
 	setFont(fontType::mainFont);
-	setFontSize(20); // 픽셀 폰트는 12pt 고정
+	setFontSize(18);
 
-	int textHeight = queryTextHeight(L"가", true);
-	int pivotX = 12;
-	int pivotY = -340;
-
-	for (int i = 0; i < maxLogLine; i++)
+	for (const auto& log : magazine)
 	{
-		if (logTimerDeque[i] > 0)
-		{
-			std::wstring shadowText = removeColorCodes(logStrDeque[i]);
+		if (log.dead) continue;
 
-			// 그림자 (4방향, 1.5배 오프셋)
-			drawText(shadowText, pivotX-1, cameraH + pivotY - textHeight * i, col::black); // 5-1→6 (왼쪽)
-			drawText(shadowText, pivotX+1, cameraH + pivotY - textHeight * i, col::black); // 5+1→9 (오른쪽) - 2픽셀 간격
-			drawText(shadowText, pivotX, cameraH + pivotY - textHeight * i - 2, col::black); // 5, -1→8, -2 (위)
-			drawText(shadowText, pivotX, cameraH + pivotY - textHeight * i + 2, col::black); // 5, +1→8, +2 (아래)
+		int width = spr::logBackground->getW();
+		int height = spr::logBackground->getH();
+		SDL_SetTextureAlphaMod(spr::logBackground->getTexture(), log.alpha);
+		drawSprite(spr::logBackground, log.x, log.y);
+
+		std::wstring shadowText = removeColorCodes(log.text);
+
+		if (queryTextWidth(shadowText) < 310)
+		{
+			int textX = log.x + 68;
+			int textY = log.y + 27;
+
+			// 그림자 (4방향)
+			drawText(shadowText, textX - 1, textY, col::black);
+			drawText(shadowText, textX + 1, textY, col::black);
+			drawText(shadowText, textX, textY - 2, col::black);
+			drawText(shadowText, textX, textY + 2, col::black);
 
 			// 본문
-			drawText(logStrDeque[i], pivotX, cameraH + pivotY - textHeight * i); // 5→8, 158→237 (×1.5)
+			drawText(log.text, textX, textY);
+		}
+		else
+		{
+			std::array<std::wstring, 2> arr = wordSplitter(log.text, 310);
+			std::wstring shadow1 = removeColorCodes(arr[0]);
+			std::wstring shadow2 = removeColorCodes(arr[1]);
 
-			if (stopLog == false)
-			{
-				minusLogTimerDeque(i);
-			}
+			int textX = log.x + 68;
+			int textY1 = log.y + 27 - 10;
+			int textY2 = log.y + 27 + 10;
+
+			// 1줄째 그림자
+			drawText(shadow1, textX - 1, textY1, col::black);
+			drawText(shadow1, textX + 1, textY1, col::black);
+			drawText(shadow1, textX, textY1 - 2, col::black);
+			drawText(shadow1, textX, textY1 + 2, col::black);
+
+			// 1줄째 본문
+			drawText(arr[0], textX, textY1);
+
+			// 2줄째 그림자
+			drawText(shadow2, textX - 1, textY2, col::black);
+			drawText(shadow2, textX + 1, textY2, col::black);
+			drawText(shadow2, textX, textY2 - 2, col::black);
+			drawText(shadow2, textX, textY2 + 2, col::black);
+
+			// 2줄째 본문
+			drawText(arr[1], textX, textY2);
 		}
 	}
+
+	// step 처리
+	if (!stopLog)
+	{
+		stepLogs();
+	}
+
 	return (getNanoTimer() - timeStampStart);
 }

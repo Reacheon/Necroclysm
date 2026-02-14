@@ -178,4 +178,6 @@ export namespace spr
 
 	Sprite* sprinkler33 = nullptr;
 	Sprite* sprinkler55 = nullptr;
+
+	Sprite* logBackground = nullptr;
 }

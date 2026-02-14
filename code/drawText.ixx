@@ -539,3 +539,29 @@ export void drawTextDirect(const std::wstring& text, int x, int y, SDL_Color col
     SDL_RenderTexture(renderer, tex, nullptr, &dst);
     SDL_DestroyTexture(tex);
 }
+
+//@brief 텍스트를 maxWidth 픽셀 내에서 단어 단위로 분할 (공백 기준, 단어 중간 끊김 방지)
+export std::array<std::wstring, 2> wordSplitter(const std::wstring& text, int maxWidth)
+{
+    std::wstring line;
+    int lastSpace = -1;
+
+    for (int i = 0; i < text.size(); i++)
+    {
+        line += text[i];
+        if (text[i] == L' ') lastSpace = i;
+
+        if (queryTextWidth(removeColorCodes(line)) >= maxWidth)
+        {
+            if (lastSpace != -1)
+            {
+                return { text.substr(0, lastSpace), text.substr(lastSpace + 1) };
+            }
+            else
+            {
+                return { text.substr(0, i), text.substr(i) };
+            }
+        }
+    }
+    return { text, L"" };
+}

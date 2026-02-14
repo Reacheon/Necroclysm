@@ -21,6 +21,7 @@ import useSkill;
 import ItemData;
 import ItemPocket;
 import SystemMenu;
+import debugConsole;
 
 static bool btnPressed = false;
 
@@ -272,6 +273,9 @@ void HUD::keyUpGUI()
 		break;
 	case SDLK_8:
 		if (quickSlot[7].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[7].second));
+		break;
+	case SDLK_GRAVE:
+		debugConsole();
 		break;
 	case SDLK_ESCAPE:
 		new SystemMenu();

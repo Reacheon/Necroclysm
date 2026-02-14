@@ -34,7 +34,7 @@ export void debugConsole()
 	prt(L"6.EntityPtr 콘솔 출력\n");
 	prt(L"7.벽 생성\n");
 	prt(L"8.로그 타이머 비활성화/활성화\n");
-	prt(L"9.로그 클리어\n");
+	prt(L"9.콘솔 입력 로그 출력\n");
 	prt(L"10.고정 텍스쳐 생성\n");
 	prt(L"11.가스 생성\n");
 	prt(L"12. 이큅 1번 제자리 드롭\n");
@@ -166,7 +166,12 @@ export void debugConsole()
 	}
 	case 9:
 	{
-		clearLog();
+		std::wstring input;
+		prt(L"로그에 출력할 문자열을 입력해주세요.\n");
+		std::wcin.ignore();
+		std::getline(std::wcin, input);
+		updateLog(input);
+		prt(L"[디버그] 로그를 출력했다!\n");
 		break;
 	}
 	case 10: // generate Sticker

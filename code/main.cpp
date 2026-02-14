@@ -21,7 +21,6 @@ import renderFPS;
 import Player;
 import wrapFunc;
 import stepEvent;
-import log;
 import turnCycleLoop;
 import startArea;
 import initCoordTransform;
@@ -46,7 +45,6 @@ int main(int argc, char** argv)
 	textureLoader(); //프로그램에 사용될 텍스쳐들을 image 폴더에서 로드
 	fontLoader(); //프로그램에 사용될 폰트들을 언어에 맞게 로드
 	dataLoader();
-	initLog();
 	initNanoTimer();
 	initCoordTransform();
 	startArea();//스타트 세팅

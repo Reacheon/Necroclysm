@@ -8,49 +8,70 @@ import globalVar;
 export constexpr int initialTimer = 180;
 export constexpr int maxLogLine = 8;
 
+export constexpr int LOG_X_LOWER_BOUND = 378;
+export constexpr int LOG_Y_LOWER_BOUND = 72;
+
 static std::deque<std::wstring> logStrDeque; // 로그 문자가 저장되는 디큐
 static std::deque<int> logTimerDeque; // 로그 문자들의 화면 나타나는 시간이 저장되는 디큐
 
-export const std::deque<std::wstring>& getLogStrDeque() { return logStrDeque; }
-export const std::deque<int>& getLogTimerDeque() { return logTimerDeque; }
-export void minusLogTimerDeque(int index) { logTimerDeque[index]--; }
-
-export void initLog()
+export class Log 
 {
-    for (int i = 0; i < maxLogLine; i++)
+public:
+    int x, y, alpha, lifetime, layer;
+    std::wstring text;
+    bool dead = false;
+
+    void step()
     {
-        logStrDeque.push_back(L"Dummy");
-        logTimerDeque.push_back(0);
+        if(lifetime>0) lifetime--;
+
+        
+        if (lifetime == 0)
+        {
+            x+=2;
+            alpha -= 8;
+            if (alpha < 0) alpha = 0;
+            if (x > cameraW - LOG_X_LOWER_BOUND + 30) dead = true;
+        }
+        else if (layer <= 3)
+        {
+            if (x > cameraW - LOG_X_LOWER_BOUND) x-=3;
+        }
+        else
+        {
+            x += 2;
+            alpha -= 8;
+            if (alpha < 0) alpha = 0;
+
+            if (x > cameraW - LOG_X_LOWER_BOUND + 30) dead = true;
+        }
+
+
+        if (y > (cameraH / 2) + LOG_Y_LOWER_BOUND - 90 * layer) y-=8;
     }
-}
+};
+
+static std::deque<Log> logMagazine;
+export const std::deque<Log>& getLogMagazine() { return logMagazine; }
 
 export void updateLog(std::wstring text)
 {
-    
     prt(L"Run updateLog function\n");
-    std::array<std::wstring, 2> arr = textSplitter(text, 450);
-    if (arr[1] != L"")
-    {
-        updateLog(arr[0]);
-        updateLog(arr[1]);
-    }
-    else
-    {
-        logStrDeque.pop_back();
-        logTimerDeque.pop_back();
-        logStrDeque.push_front(arr[0]);
-        logTimerDeque.push_front(initialTimer);
-    }
+
+    for (auto& logElem : logMagazine) logElem.layer++;
+
+    Log log;
+    log.x = cameraW - LOG_X_LOWER_BOUND + 30;
+    log.y = (cameraH/2) + LOG_Y_LOWER_BOUND;
+    log.text = std::move(text);
+    log.lifetime = initialTimer;
+    log.alpha = 255;
+    log.layer=0;
+    logMagazine.push_back(std::move(log));
 }
 
-export void clearLog()
+export void stepLogs()
 {
-    logStrDeque.clear();
-    logTimerDeque.clear();
-
-    for (int i = 0; i < maxLogLine; i++)
-    {
-        logStrDeque.push_back(L"Dummy");
-        logTimerDeque.push_back(0);
-    }
+    for (auto& log : logMagazine) log.step();
+    std::erase_if(logMagazine, [](const Log& l) { return l.dead; });
 }
