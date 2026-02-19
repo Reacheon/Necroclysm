@@ -1265,6 +1265,27 @@ bool Entity::runAnimation(bool shutdown)
 				}
 			});
 	}
+	else if (getAniType() == aniFlag::tilling)
+	{
+		return hitAnimation(shutdown, [this]()
+			{
+				int dx, dy;
+				dir2Coord(entityInfo.direction, dx, dy);
+
+				int tileItemCode = TileFloor(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+
+				if (tileItemCode == itemRefCode::dirt || tileItemCode == itemRefCode::grass)
+				{
+					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemRefCode::farmland);
+				}
+				else
+				{
+					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemRefCode::dirt);
+				}
+
+			});
+	}
+	else errorBox(L"Entity_runAnimation: unhandled aniFlag.");
 
 	return false;
 }

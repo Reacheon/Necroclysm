@@ -195,7 +195,7 @@ void HUD::mouseStep()
 
 void HUD::clickRightGUI()
 {
-	updateLog(L"[HUD] Right click event triggered.");
+	//updateLog(L"[HUD] Right click event triggered.");
 
 	if (checkCursor(&quickSlotRegion) == true)
 	{

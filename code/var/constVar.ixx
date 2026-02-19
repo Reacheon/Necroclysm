@@ -266,6 +266,9 @@ export enum class act
 
     hideWire,
     showWire,
+
+    till,
+    flatten
 };
 
 export namespace humanCustom
@@ -729,6 +732,8 @@ export enum class aniFlag
 
     propTurnOnOff, //프롭 켜기/끄기
     changePropDelay, //딜레이 조정
+
+    tilling, //밭갈기(이미 갈아져 있으면 평탄화)
 };
 
 export enum class input
@@ -1405,6 +1410,19 @@ export namespace itemRefCode
     constexpr int verticalPipeLA = 191;
 
     constexpr int woodenDoor = 291;
+
+    /////////////////////////////////////////////////
+
+    constexpr int hoe = 139;
+    constexpr int scythe = 140;
+    constexpr int farmland = 110;
+    constexpr int rice = 505;
+    constexpr int wheat = 506;
+    constexpr int potato = 507;
+    constexpr int orange = 508;
+
+    constexpr int strawHat = 509;
+    constexpr int wateringCan = 510;
 };
 
 export namespace entityRefCode
