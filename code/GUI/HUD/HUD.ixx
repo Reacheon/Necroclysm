@@ -1052,34 +1052,6 @@ public:
 			}
 		}
 
-		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::grass 
-			|| TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::dirt)
-		{
-			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
-			for (ItemData& eqItem : equipInfo)
-			{
-				if (eqItem.equipState == equipHandFlag::both && eqItem.itemCode == itemRefCode::hoe)
-				{
-					inputOptions.push_back(act::till);
-					break;
-				}
-			}
-		}
-
-		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::farmland)
-		{
-			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
-			for (ItemData& eqItem : equipInfo)
-			{
-				if (eqItem.equipState == equipHandFlag::both && eqItem.itemCode == itemRefCode::hoe)
-				{
-					inputOptions.push_back(act::flatten);
-					break;
-				}
-			}
-		}
-
-
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 

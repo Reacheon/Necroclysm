@@ -196,16 +196,6 @@ void ContextMenu::drawGUI()
 				optionText = L"Show Wire";
 				iconIndex = 101;
 			}
-			else if (actOptions[i] == act::till)
-			{
-				optionText = L"Till";
-				iconIndex = 104;
-			}
-			else if (actOptions[i] == act::flatten)
-			{
-				optionText = L"Flatten";
-				iconIndex = 105;
-			}
 			else optionText = L"???";
 
 			if (checkCursor(&optionRect[i]))
@@ -670,10 +660,5 @@ void ContextMenu::executeContextAct(act inputAct)
 		{
 			actFunc::showWire({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 		}
-	}
-	else if (inputAct == act::till || inputAct == act::flatten)
-	{
-		PlayerPtr->setDirection(coord2Dir(contextMenuTargetGrid.x - PlayerX(), contextMenuTargetGrid.y - PlayerY()));
-		addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
 	}
 }

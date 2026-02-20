@@ -267,9 +267,6 @@ export enum class act
     hideWire,
     showWire,
 
-    till,
-    flatten,
-    watering,//식물 물 주기
 };
 
 export namespace humanCustom
