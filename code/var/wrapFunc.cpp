@@ -357,3 +357,8 @@ int fluidTypeToCode(fluidType inputType)
         return itemRefCode::water;
     }
 }
+
+const bool isWetTile(Point3 coord)
+{
+    return World::ins()->getTile(coord).isWet;
+}

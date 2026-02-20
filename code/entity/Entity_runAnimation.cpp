@@ -1285,6 +1285,101 @@ bool Entity::runAnimation(bool shutdown)
 
 			});
 	}
+	else if (getAniType() == aniFlag::watering)
+	{
+		addTimer();
+
+		int dx, dy;
+
+		static int prevSprIndex;
+		dir2Coord(entityInfo.direction, dx, dy);
+
+		if (shutdown == true)//사망으로 인한 강제종료
+		{
+			aniUSet.erase(aniUSet.find(this));
+			setFakeX(0);
+			setFakeY(0);
+			return true;
+		}
+
+		switch (getTimer())
+		{
+		case 1:
+			prevSprIndex = PlayerPtr->getSpriteIndex();
+			PlayerPtr->setSpriteIndex(charSprIndex::AIM_PISTOL);
+			break;
+		case 3:
+			setFakeX(getFakeX() + 2.5 * dx);
+			setFakeY(getFakeY() + 2.5 * dy);
+			break;
+		case 4:
+			setFakeX(getFakeX() + 2.0 * dx);
+			setFakeY(getFakeY() + 2.0 * dy);
+			break;
+		case 5:
+			setFakeX(getFakeX() + 1.5 * dx);
+			setFakeY(getFakeY() + 1.5 * dy);
+			break;
+		case 6:
+			setFakeX(getFakeX() + 1.0 * dx);
+			setFakeY(getFakeY() + 1.0 * dy);
+			break;
+		case 7:
+		{
+			setFakeX(getFakeX() + 0.5 * dx);
+			setFakeY(getFakeY() + 0.5 * dy);
+
+			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			for (const ItemData& eqItem : equipInfo)
+			{
+				if (eqItem.equipState == equipHandFlag::both)
+				{
+					if (eqItem.itemCode == itemRefCode::wateringCan)
+					{
+						eqItem.pocketPtr->itemInfo[0].number -= 100;
+						World::ins()->getTile(PlayerPtr->getGrid() + Point3{ dx, dy, 0 }).isWet = true;
+						break;
+					}
+				}
+			}
+			break;
+		}
+		case 9:
+			setFakeX(getIntegerFakeX() - 0.5 * dx);
+			setFakeY(getIntegerFakeY() - 0.5 * dy);
+			break;
+		case 10:
+			setFakeX(getFakeX() - 1.0 * (float)dx);
+			setFakeY(getIntegerFakeY() - 1.0 * (float)dy);
+			break;
+		case 11:
+			setFakeX(getFakeX() - 1.5 * dx);
+			setFakeY(getFakeY() - 1.5 * dy);
+			break;
+		case 12:
+			setFakeX(getFakeX() - 2.0 * (float)dx);
+			setFakeY(getFakeY() - 2.0 * (float)dy);
+			break;
+		case 13:
+			setFakeX(getFakeX() - 2.5 * dx);
+			setFakeY(getFakeY() - 2.5 * dy);
+			break;
+		case 15:
+			break;
+		case 17:
+		case 19:
+			setFakeX(0);
+			setFakeY(0);
+			resetTimer();
+			setAniType(aniFlag::null);
+			PlayerPtr->setSpriteIndex(prevSprIndex);
+			if (entityInfo.isPlayer == true) { turnWait(1.0); }
+			else {}
+			return true;
+		}
+
+		return false;
+	}
 	else errorBox(L"Entity_runAnimation: unhandled aniFlag.");
 
 	return false;

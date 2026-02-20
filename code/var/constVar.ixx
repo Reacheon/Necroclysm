@@ -268,7 +268,8 @@ export enum class act
     showWire,
 
     till,
-    flatten
+    flatten,
+    watering,//식물 물 주기
 };
 
 export namespace humanCustom
@@ -734,6 +735,7 @@ export enum class aniFlag
     changePropDelay, //딜레이 조정
 
     tilling, //밭갈기(이미 갈아져 있으면 평탄화)
+    watering, //밭 물주기
 };
 
 export enum class input
@@ -803,6 +805,8 @@ export namespace keyboardIndex
     constexpr int mPressed = 4;
     constexpr int enter = 5;
     constexpr int enterPressed = 6;
+    constexpr int shift = 7;
+    constexpr int shiftPressed = 8;
 }
 
 export namespace keyIcon

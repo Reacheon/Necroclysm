@@ -21,6 +21,7 @@ import drawEpsilonText;
 import ContextMenu;
 import Maint;
 import statusEffect;
+import ItemData;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
@@ -504,6 +505,7 @@ void HUD::drawGUI()
 		);
 		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), 255);
 		setZoom(1.0);
+	
 	}
 
 
@@ -514,6 +516,46 @@ void HUD::drawGUI()
 	drawCircuitInfo();
 	drawFluidCircuitInfo();
 	//drawHoverItemInfo();
+
+	//호미나 기타 도구들을 들었을 때 커맨드를 화면에 표시하는 가이드 로그
+	bool wieldHoe = false;
+	bool wieldWateringCan = false;
+	std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+	for (const ItemData& eqItem : equipInfo)
+	{
+		if (eqItem.equipState == equipHandFlag::both)
+		{
+			if (eqItem.itemCode == itemRefCode::hoe) wieldHoe = true;
+			else if (eqItem.itemCode == itemRefCode::wateringCan) wieldWateringCan = true;
+		}
+	}
+
+	if (wieldHoe)
+	{
+		drawSpriteCenter(spr::floatGuideLog, 0,cameraW/2, 126);
+		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::shift, cameraW / 2 - 86, 126);
+		setFontSize(24);
+		drawTextCenter(L"+", cameraW / 2 - 36, 124);
+		drawSpriteCenter(spr::keyboardButtons, 10, cameraW / 2 + 2, 126);
+		drawTextCenter(L"=", cameraW / 2 + 50, 124);
+
+		setZoom(1.0);
+		drawSpriteCenter(spr::icon80, 43, cameraW / 2 + 100, 126);
+		setZoom(1.0);
+	}
+	else if (wieldWateringCan)
+	{
+		drawSpriteCenter(spr::floatGuideLog, 0, cameraW / 2, 126);
+		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::shift, cameraW / 2 - 86, 126);
+		setFontSize(24);
+		drawTextCenter(L"+", cameraW / 2 - 36, 124);
+		drawSpriteCenter(spr::keyboardButtons, 10, cameraW / 2 + 2, 126);
+		drawTextCenter(L"=", cameraW / 2 + 50, 124);
+
+		setZoom(1.0);
+		drawSpriteCenter(spr::icon80, 44, cameraW / 2 + 100, 126);
+		setZoom(1.0);
+	}
 
 }
 

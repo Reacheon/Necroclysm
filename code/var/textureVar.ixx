@@ -180,4 +180,6 @@ export namespace spr
 	Sprite* sprinkler55 = nullptr;
 
 	Sprite* logBackground = nullptr;
+
+	Sprite* floatGuideLog = nullptr;
 }

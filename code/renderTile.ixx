@@ -355,6 +355,8 @@ void drawTiles()
         }
 
 
+        if (thisTile->floor == itemRefCode::farmland && thisTile->isWet) sprIndex++;
+
         vertices[tileCounter] = 
         { 
             cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)), 

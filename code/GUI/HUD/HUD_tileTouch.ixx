@@ -1,4 +1,6 @@
-﻿import HUD;
+﻿#include <SDL3/SDL.h>;
+
+import HUD;
 
 import std;
 import util;
@@ -9,10 +11,35 @@ import log;
 import Dialogue;
 import Loot;
 import Prop;
+import ItemData;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
-
+	const bool* state = SDL_GetKeyboardState(nullptr);
+	bool pressShift = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
+	bool wieldHoe = false;
+	bool wieldPickaxe = false;
+	bool wieldWateringCan = false;
+	int wateringCanRemaining = 0;
+	std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+	for (const ItemData& eqItem : equipInfo)
+	{
+		if (eqItem.equipState == equipHandFlag::both)
+		{
+			if (eqItem.itemCode == itemRefCode::hoe) wieldHoe = true;
+			else if (eqItem.itemCode == itemRefCode::pickaxe) wieldPickaxe = true;
+			else if (eqItem.itemCode == itemRefCode::wateringCan)
+			{
+				wieldWateringCan = true;
+				if (eqItem.pocketPtr->itemInfo.size() == 1 
+					&& eqItem.pocketPtr->itemInfo[0].itemCode == itemRefCode::water)
+				{
+					wateringCanRemaining = eqItem.pocketPtr->itemInfo[0].number;
+				}
+			}
+		}
+	}
+	int floorCode = TileFloor(touchX, touchY, PlayerZ());
 
 	if (ctrlVeh == nullptr && currentUsingSkill ==-1)//차량 조종 중이 아닐 경우
 	{
@@ -152,9 +179,9 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				}
 			}
 		}
-		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1칸 이내
+		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1칸 이내(이동불가타일)
 		{
-			if (TileWall(touchX, touchY, PlayerZ()) != 0)
+			if (TileWall(touchX, touchY, PlayerZ()) != 0) //곡괭이 벽 굴착 액션
 			{
 				auto ePtr = PlayerPtr->getEquipPtr();
 				for (int i = 0; i < ePtr->itemInfo.size(); i++)
@@ -217,21 +244,6 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
 					}
 				}
-				else if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
-				{
-					if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
-					{
-						updateLog(L"There is no floor above these stairs.");
-					}
-					else
-					{
-						updateLog(L"You go up the stairs.");
-                        PlayerPtr->setGrid(PlayerX(), PlayerY(), PlayerZ() + 1);
-					}
-				}
-				else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
-				{
-				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
@@ -277,6 +289,25 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			else
 			{
 				PlayerPtr->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+			}
+		}
+		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) 
+			&& (pressShift && wieldHoe && (floorCode == itemRefCode::dirt || floorCode == itemRefCode::grass || floorCode == itemRefCode::farmland)))
+		{
+			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+			addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
+		}
+		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
+			&& (pressShift && wieldWateringCan && floorCode == itemRefCode::farmland && isWetTile({ touchX,touchY,PlayerZ() })==false))
+			{
+			if (wateringCanRemaining >= 100)
+			{
+				PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+				addAniUSetPlayer(PlayerPtr, aniFlag::watering);
+			}
+			else
+			{
+				updateLog(L"Watering can is empty.");
 			}
 		}
 		else

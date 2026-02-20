@@ -214,4 +214,5 @@ export void textureLoader()
 	spr::sprinkler55 = new Sprite(renderer, "image/sprinkler55.png", 112, 112);
 
 	spr::logBackground = new Sprite(renderer, "image/UI/GUI/HUD/logBackground.png", 378, 80);
+	spr::floatGuideLog = new Sprite(renderer, "image/UI/GUI/HUD/floatGuideLog.png", 378, 80);
 }
