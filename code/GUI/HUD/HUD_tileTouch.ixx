@@ -4,6 +4,7 @@ import HUD;
 
 import std;
 import util;
+import constVar;
 import globalVar;
 import wrapFunc;
 import Vehicle;
@@ -26,13 +27,13 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 	{
 		if (eqItem.equipState == equipHandFlag::both)
 		{
-			if (eqItem.itemCode == itemRefCode::hoe) wieldHoe = true;
-			else if (eqItem.itemCode == itemRefCode::pickaxe) wieldPickaxe = true;
-			else if (eqItem.itemCode == itemRefCode::wateringCan)
+			if (eqItem.itemCode == itemID::hoe) wieldHoe = true;
+			else if (eqItem.itemCode == itemID::pickaxe) wieldPickaxe = true;
+			else if (eqItem.itemCode == itemID::wateringCan)
 			{
 				wieldWateringCan = true;
 				if (eqItem.pocketPtr->itemInfo.size() == 1 
-					&& eqItem.pocketPtr->itemInfo[0].itemCode == itemRefCode::water)
+					&& eqItem.pocketPtr->itemInfo[0].itemCode == itemID::water)
 				{
 					wateringCanRemaining = eqItem.pocketPtr->itemInfo[0].number;
 				}
@@ -109,7 +110,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							typeHUD = vehFlag::none;;
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemRefCode::minecartController) //열차 조종장치
+					else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemID::minecartController) //열차 조종장치
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -186,7 +187,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				auto ePtr = PlayerPtr->getEquipPtr();
 				for (int i = 0; i < ePtr->itemInfo.size(); i++)
 				{
-					if (ePtr->itemInfo[i].itemCode == itemRefCode::pickaxe)
+					if (ePtr->itemInfo[i].itemCode == itemID::pickaxe)
 					{
 						if (ePtr->itemInfo[i].equipState == equipHandFlag::both)
 						{
@@ -249,17 +250,17 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::felling);
 				}
-				else if (tgtProp->leadItem.itemCode == itemRefCode::leverRL || tgtProp->leadItem.itemCode == itemRefCode::leverUD)
+				else if (tgtProp->leadItem.itemCode == itemID::leverRL || tgtProp->leadItem.itemCode == itemID::leverUD)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
                 }
-				else if (tgtProp->leadItem.itemCode == itemRefCode::valveRL || tgtProp->leadItem.itemCode == itemRefCode::valveUD)
+				else if (tgtProp->leadItem.itemCode == itemID::valveRL || tgtProp->leadItem.itemCode == itemID::valveUD)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
 				}
-				else if (tgtProp->leadItem.itemCode == itemRefCode::tactSwitchRL || tgtProp->leadItem.itemCode == itemRefCode::tactSwitchUD)
+				else if (tgtProp->leadItem.itemCode == itemID::tactSwitchRL || tgtProp->leadItem.itemCode == itemID::tactSwitchUD)
 				{
 					if (tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
 					{
@@ -267,15 +268,15 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
 					}
 				}
-				else if (tgtProp->leadItem.itemCode == itemRefCode::delayR || tgtProp->leadItem.itemCode == itemRefCode::delayL)
+				else if (tgtProp->leadItem.itemCode == itemID::delayR || tgtProp->leadItem.itemCode == itemID::delayL)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::changePropDelay);
 				}
-				else if (tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorR 
-					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorT
-					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorL
-					|| tgtProp->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+				else if (tgtProp->leadItem.itemCode == itemID::gasolineGeneratorR 
+					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorT
+					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorL
+					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorB)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
@@ -292,13 +293,13 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			}
 		}
 		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) 
-			&& (pressShift && wieldHoe && (floorCode == itemRefCode::dirt || floorCode == itemRefCode::grass || floorCode == itemRefCode::farmland)))
+			&& (pressShift && wieldHoe && (floorCode == itemID::dirt || floorCode == itemID::grass || floorCode == itemID::farmland)))
 		{
 			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 			addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
 		}
 		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
-			&& (pressShift && wieldWateringCan && floorCode == itemRefCode::farmland && isWetTile({ touchX,touchY,PlayerZ() })==false))
+			&& (pressShift && wieldWateringCan && floorCode == itemID::farmland && isWetTile({ touchX,touchY,PlayerZ() })==false))
 			{
 			if (wateringCanRemaining >= 100)
 			{

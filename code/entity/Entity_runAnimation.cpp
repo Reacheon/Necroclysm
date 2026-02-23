@@ -495,7 +495,7 @@ bool Entity::runAnimation(bool shutdown)
 				tile.displayHPBarCount = 50;
 
 
-				if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::dirtWall)
+				if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemID::dirtWall)
 				{
 					if(randomRange(0,100)<=25) createItemStack({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, { {396,1} });
 					for (int i = 0; i < 8; i++)
@@ -503,7 +503,7 @@ bool Entity::runAnimation(bool shutdown)
 						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(24, 31), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
 					}
 				}
-				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::stoneWall)
+				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemID::stoneWall)
 				{
 					if (randomRange(0, 100) <= 25) createItemStack({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, { {398,1} });
 					for (int i = 0; i < 8; i++)
@@ -511,14 +511,14 @@ bool Entity::runAnimation(bool shutdown)
 						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(8, 15), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
 					}
 				}
-				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::glassWall)
+				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemID::glassWall)
 				{
 					for (int i = 0; i < 8; i++)
 					{
 						new Particle(getX() + 16 * dx + randomRange(-3, 3), getY() + 16 * dy + 4 + randomRange(-3, 3), randomRange(32, 39), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
 					}
 				}
-				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemRefCode::wireFence)
+				else if (TileWall(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == itemID::wireFence)
 				{
 					for (int i = 0; i < 8; i++)
 					{
@@ -1274,13 +1274,13 @@ bool Entity::runAnimation(bool shutdown)
 
 				int tileItemCode = TileFloor(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 
-				if (tileItemCode == itemRefCode::dirt || tileItemCode == itemRefCode::grass)
+				if (tileItemCode == itemID::dirt || tileItemCode == itemID::grass)
 				{
-					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemRefCode::farmland);
+					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemID::farmland);
 				}
 				else
 				{
-					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemRefCode::dirt);
+					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemID::dirt);
 				}
 
 			});
@@ -1334,7 +1334,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				if (eqItem.equipState == equipHandFlag::both)
 				{
-					if (eqItem.itemCode == itemRefCode::wateringCan)
+					if (eqItem.itemCode == itemID::wateringCan)
 					{
 						eqItem.pocketPtr->itemInfo[0].number -= 100;
 						World::ins()->getTile(PlayerPtr->getGrid() + Point3{ dx, dy, 0 }).isWet = true;

@@ -2,6 +2,7 @@
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import util;
+import constVar;
 import Equip;
 import checkCursor;
 import globalVar;

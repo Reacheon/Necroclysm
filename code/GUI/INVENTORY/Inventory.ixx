@@ -5,6 +5,7 @@ export module Inventory;
 
 import std;
 import util;
+import constVar;
 import GUI;
 import textureVar;
 import wrapFunc;
@@ -448,7 +449,7 @@ public:
 			//업데이트할 아이템이 탄창일 경우
 			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
 			{
-				if (targetItem.itemCode != itemRefCode::arrowQuiver && targetItem.itemCode != itemRefCode::boltQuiver)
+				if (targetItem.itemCode != itemID::arrowQuiver && targetItem.itemCode != itemID::boltQuiver)
 					barAct.push_back(act::reloadMagazine);
 
 				//탄창 장전

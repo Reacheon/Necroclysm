@@ -94,6 +94,9 @@
     <Filter Include="소스 파일\05_Class\07_Vehicle">
       <UniqueIdentifier>{6f6cbb85-1d23-42d6-9843-603bea97363e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\00_var\constVar">
+      <UniqueIdentifier>{8186169b-c69a-4b90-8b99-70abd1930d93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -507,9 +510,6 @@
     <ClCompile Include="code\var\wrapFunc.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
-    <ClCompile Include="code\var\constVar.ixx">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
     <ClCompile Include="code\var\globalVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
@@ -593,6 +593,30 @@
     </ClCompile>
     <ClCompile Include="code\actFuncSet.cpp">
       <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-constants.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-colors.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-enums.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-names.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-fwd.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-itemFlags.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-itemIDs.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

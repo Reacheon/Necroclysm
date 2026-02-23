@@ -271,7 +271,7 @@ void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag 
 
 int getItemSprIndex(ItemData& inputData)
 {
-    if ((inputData.itemCode == itemRefCode::arrowQuiver || inputData.itemCode == itemRefCode::boltQuiver) && inputData.pocketPtr != nullptr)
+    if ((inputData.itemCode == itemID::arrowQuiver || inputData.itemCode == itemID::boltQuiver) && inputData.pocketPtr != nullptr)
     {
         std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
 
@@ -354,7 +354,7 @@ int fluidTypeToCode(fluidType inputType)
     default:
         return 0;
     case fluidType::WATER:
-        return itemRefCode::water;
+        return itemID::water;
     }
 }
 

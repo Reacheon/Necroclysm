@@ -6,6 +6,7 @@ export module turnCycleLoop;
 
 import std;
 import util;
+import constVar;
 import globalVar;
 import wrapFunc;
 import Entity;

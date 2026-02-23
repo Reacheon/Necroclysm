@@ -842,7 +842,7 @@ int Vehicle::getGasolineFuel()
             {
                 for (int j = 0; j < tankPtr->itemInfo.size(); j++)
                 {
-                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::gasoline)
+                    if (tankPtr->itemInfo[j].itemCode == itemID::gasoline)
                     {
                         gasolineNumber += tankPtr->itemInfo[j].number;
                     }
@@ -866,7 +866,7 @@ int Vehicle::getDiselFuel()
             {
                 for (int j = 0; j < tankPtr->itemInfo.size(); j++)
                 {
-                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::diesel)
+                    if (tankPtr->itemInfo[j].itemCode == itemID::diesel)
                     {
                         diselNumber += tankPtr->itemInfo[j].number;
                     }
@@ -890,7 +890,7 @@ int Vehicle::getElectricityFuel()
             {
                 for (int j = 0; j < tankPtr->itemInfo.size(); j++)
                 {
-                    if (tankPtr->itemInfo[j].itemCode == itemRefCode::electricity)
+                    if (tankPtr->itemInfo[j].itemCode == itemID::electricity)
                     {
                         electricityNumber += tankPtr->itemInfo[j].number;
                     }
@@ -939,9 +939,9 @@ void Vehicle::useEngineFuel(int fuelAmount)
     if (getMainEngine() == nullptr) return;
     else
     {
-        if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) targetFuelCode = itemRefCode::gasoline;
-        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) targetFuelCode = itemRefCode::diesel;
-        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemRefCode::electricity;
+        if (getMainEngine()->checkFlag(itemFlag::ENGINE_GASOLINE)) targetFuelCode = itemID::gasoline;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_DIESEL)) targetFuelCode = itemID::diesel;
+        else if (getMainEngine()->checkFlag(itemFlag::ENGINE_ELECTRIC)) targetFuelCode = itemID::electricity;
     }
 
     for (const auto& [pos, pocket] : partInfo)
@@ -996,7 +996,7 @@ void Vehicle::drawSelf()
             SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
             int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
 
-            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemRefCode::minecart)
+            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemID::minecart)
             {
                 if (bodyDir == dir16::dir0 || bodyDir == dir16::dir4) sprIndex += 0;
                 else sprIndex += 1;

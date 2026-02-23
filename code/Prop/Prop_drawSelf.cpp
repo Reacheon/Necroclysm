@@ -200,10 +200,10 @@ void Prop::drawSelf()
     {
         sprIndex += 7;
     }
-    else if (iCode == itemRefCode::gasolineGeneratorR ||
-        iCode == itemRefCode::gasolineGeneratorT ||
-        iCode == itemRefCode::gasolineGeneratorL ||
-        iCode == itemRefCode::gasolineGeneratorB)
+    else if (iCode == itemID::gasolineGeneratorR ||
+        iCode == itemID::gasolineGeneratorT ||
+        iCode == itemID::gasolineGeneratorL ||
+        iCode == itemID::gasolineGeneratorB)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -223,7 +223,7 @@ void Prop::drawSelf()
     }
 
 
-    if (iCode == itemRefCode::leverRL || iCode == itemRefCode::leverUD)
+    if (iCode == itemID::leverRL || iCode == itemID::leverUD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -243,7 +243,7 @@ void Prop::drawSelf()
             sprIndex += 16;
         }
     }
-    else if (iCode == itemRefCode::tactSwitchRL || iCode == itemRefCode::tactSwitchUD)
+    else if (iCode == itemID::tactSwitchRL || iCode == itemID::tactSwitchUD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -262,7 +262,7 @@ void Prop::drawSelf()
             sprIndex += 16;
         }
     }
-    else if (iCode == itemRefCode::pressureSwitchRL || iCode == itemRefCode::pressureSwitchUD)
+    else if (iCode == itemID::pressureSwitchRL || iCode == itemID::pressureSwitchUD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -281,11 +281,11 @@ void Prop::drawSelf()
             sprIndex += 16;
         }
     }
-    else if (iCode == itemRefCode::transistorR || iCode == itemRefCode::transistorU || iCode == itemRefCode::transistorL || iCode == itemRefCode::transistorD)
+    else if (iCode == itemID::transistorR || iCode == itemID::transistorU || iCode == itemID::transistorL || iCode == itemID::transistorD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
-            if (iCode == itemRefCode::transistorU || iCode == itemRefCode::transistorD)
+            if (iCode == itemID::transistorU || iCode == itemID::transistorD)
             {
                 Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
                 Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
@@ -293,7 +293,7 @@ void Prop::drawSelf()
                 else if (rightProp != nullptr && rightProp->isChargeFlowing()) sprIndex += 2;
                 else sprIndex += 1;
             }
-            else if (iCode == itemRefCode::transistorR || iCode == itemRefCode::transistorL)
+            else if (iCode == itemID::transistorR || iCode == itemID::transistorL)
             {
                 Prop* upProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
                 Prop* downProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
@@ -309,11 +309,11 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (iCode == itemRefCode::relayR || iCode == itemRefCode::relayU || iCode == itemRefCode::relayL || iCode == itemRefCode::relayD)
+    else if (iCode == itemID::relayR || iCode == itemID::relayU || iCode == itemID::relayL || iCode == itemID::relayD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
-            if (iCode == itemRefCode::relayU || iCode == itemRefCode::relayD)
+            if (iCode == itemID::relayU || iCode == itemID::relayD)
             {
                 Prop* leftProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
                 Prop* rightProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
@@ -321,7 +321,7 @@ void Prop::drawSelf()
                 else if (rightProp != nullptr && rightProp->isChargeFlowing()) sprIndex += 2;
                 else sprIndex += 1;
             }
-            else if (iCode == itemRefCode::relayR || iCode == itemRefCode::relayL)
+            else if (iCode == itemID::relayR || iCode == itemID::relayL)
             {
                 Prop* upProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
                 Prop* downProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
@@ -337,16 +337,16 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (iCode == itemRefCode::andGateR
-        || iCode == itemRefCode::andGateL
-        || iCode == itemRefCode::orGateR
-        || iCode == itemRefCode::orGateL
-        || iCode == itemRefCode::xorGateR
-        || iCode == itemRefCode::xorGateL
-        || iCode == itemRefCode::notGateR
-        || iCode == itemRefCode::notGateL
-        || iCode == itemRefCode::srLatchR
-        || iCode == itemRefCode::srLatchL
+    else if (iCode == itemID::andGateR
+        || iCode == itemID::andGateL
+        || iCode == itemID::orGateR
+        || iCode == itemID::orGateL
+        || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateL
+        || iCode == itemID::notGateR
+        || iCode == itemID::notGateL
+        || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchL
         )
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
@@ -357,12 +357,12 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (iCode == itemRefCode::delayR || iCode == itemRefCode::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayL)
     {
         if (delayMaxStack == 0) sprIndex = 3089;
         else sprIndex = 3089 + delayMaxStack;
 
-        if (iCode == itemRefCode::delayL) sprIndex += 16;
+        if (iCode == itemID::delayL) sprIndex += 16;
 
         if (leadItem.checkFlag(itemFlag::HIDE_WIRE))
         {
@@ -370,14 +370,14 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (iCode == itemRefCode::valveRL || iCode == itemRefCode::valveUD)
+    else if (iCode == itemID::valveRL || iCode == itemID::valveUD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
             sprIndex += 1;
         }
     }
-    else if (iCode == itemRefCode::solenoidValveRL || iCode == itemRefCode::solenoidValveUD)
+    else if (iCode == itemID::solenoidValveRL || iCode == itemID::solenoidValveUD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -391,7 +391,7 @@ void Prop::drawSelf()
         bool flowH = (chargeFlux[dir16::right] != 0) || (chargeFlux[dir16::left] != 0);
         bool flowV = (chargeFlux[dir16::up] != 0) || (chargeFlux[dir16::down] != 0);
 
-        int baseIndex = (iCode == itemRefCode::silverCable) ? 3128 : 3124;
+        int baseIndex = (iCode == itemID::silverCable) ? 3128 : 3124;
         int offset = 0;
         if (flowH && flowV) offset = 3;
         else if (flowH) offset = 1;
@@ -399,19 +399,19 @@ void Prop::drawSelf()
         sprIndex = baseIndex + offset;
     }
 
-    if (iCode == itemRefCode::diodeR
-        || iCode == itemRefCode::diodeU
-        || iCode == itemRefCode::diodeL
-        || iCode == itemRefCode::diodeD)
+    if (iCode == itemID::diodeR
+        || iCode == itemID::diodeU
+        || iCode == itemID::diodeL
+        || iCode == itemID::diodeD)
     {
         if (isChargeFlowing())  sprIndex += 1;
     }
 
-    if (iCode == itemRefCode::powerBankR || iCode == itemRefCode::powerBankL)
+    if (iCode == itemID::powerBankR || iCode == itemID::powerBankL)
     {
         bool nowCharging = false;
-        if (iCode == itemRefCode::powerBankR && chargeFlux[dir16::left] > 0) nowCharging = true;
-        else if (iCode == itemRefCode::powerBankL && chargeFlux[dir16::right] > 0) nowCharging = true;
+        if (iCode == itemID::powerBankR && chargeFlux[dir16::left] > 0) nowCharging = true;
+        else if (iCode == itemID::powerBankL && chargeFlux[dir16::right] > 0) nowCharging = true;
 
         double ratio = leadItem.powerStorage / static_cast<double>(leadItem.powerStorageMax);
 
@@ -463,12 +463,12 @@ void Prop::drawSelf()
         }
     }
 
-    if (iCode == itemRefCode::chargingPort)
+    if (iCode == itemID::chargingPort)
     {
         if (getInletCharge() > 0) sprIndex += 1;
     }
 
-    if (iCode == itemRefCode::fluidTank)
+    if (iCode == itemID::fluidTank)
     {
         bool rConnected = false;
         bool lConnected = false;
@@ -498,41 +498,41 @@ void Prop::drawSelf()
     }
 
 
-    if (iCode == itemRefCode::intakePipeR
-        || iCode == itemRefCode::verticalPipeRB
-        || iCode == itemRefCode::verticalPipeRA)
+    if (iCode == itemID::intakePipeR
+        || iCode == itemID::verticalPipeRB
+        || iCode == itemID::verticalPipeRA)
     {
         Prop* nextProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
         if(nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE)||nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT))) 
             sprIndex += 1;
     }
-    else if (iCode == itemRefCode::intakePipeL
-        || iCode == itemRefCode::verticalPipeLB
-        || iCode == itemRefCode::verticalPipeLA)
+    else if (iCode == itemID::intakePipeL
+        || iCode == itemID::verticalPipeLB
+        || iCode == itemID::verticalPipeLA)
     {
         Prop* nextProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)))
             sprIndex += 1;
     }
-    else if (iCode == itemRefCode::intakePipeU)
+    else if (iCode == itemID::intakePipeU)
     {
         Prop* nextProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN)))
             sprIndex += 1;
     }
-    else if (iCode == itemRefCode::intakePipeD)
+    else if (iCode == itemID::intakePipeD)
     {
         Prop* nextProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_UP)))
             sprIndex += 1;
     }
 
-    if (iCode == itemRefCode::intakePipeR
-        || iCode == itemRefCode::intakePipeU
-        || iCode == itemRefCode::intakePipeL
-        || iCode == itemRefCode::intakePipeD
-        && (iCode != itemRefCode::verticalPipeLA && iCode != itemRefCode::verticalPipeLB
-            && iCode != itemRefCode::verticalPipeRA && iCode != itemRefCode::verticalPipeRB))
+    if (iCode == itemID::intakePipeR
+        || iCode == itemID::intakePipeU
+        || iCode == itemID::intakePipeL
+        || iCode == itemID::intakePipeD
+        && (iCode != itemID::verticalPipeLA && iCode != itemID::verticalPipeLB
+            && iCode != itemID::verticalPipeRA && iCode != itemID::verticalPipeRB))
     {
         int floorItemIndex = TileFloor(getGridX(), getGridY(), getGridZ());
         if(itemDex[floorItemIndex].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemIndex].checkFlag(itemFlag::WATER_DEEP))
@@ -541,10 +541,10 @@ void Prop::drawSelf()
         }
     }
 
-    if (iCode == itemRefCode::pumpR
-        || iCode == itemRefCode::pumpU
-        || iCode == itemRefCode::pumpL
-        || iCode == itemRefCode::pumpD)
+    if (iCode == itemID::pumpR
+        || iCode == itemID::pumpU
+        || iCode == itemID::pumpL
+        || iCode == itemID::pumpD)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
         {
@@ -560,7 +560,7 @@ void Prop::drawSelf()
         }
     }
 
-    if (iCode != itemRefCode::pipe && jetFluidType != fluidType::NONE)
+    if (iCode != itemID::pipe && jetFluidType != fluidType::NONE)
     {
         static Uint32 jetLastUpdateTime = 0;
         static int jetAnimFrame = 0;
@@ -601,7 +601,7 @@ void Prop::drawSelf()
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
-    if (iCode == itemRefCode::pipe && jetFluidType != fluidType::NONE)
+    if (iCode == itemID::pipe && jetFluidType != fluidType::NONE)
     {
         static Uint32 jetLastUpdateTime = 0;
         static int jetAnimFrame = 0;
@@ -634,10 +634,10 @@ void Prop::drawSelf()
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
     }
 
-    if (iCode == itemRefCode::verticalPipeLA 
-        || iCode == itemRefCode::verticalPipeLB
-        || iCode == itemRefCode::verticalPipeRA 
-        || iCode == itemRefCode::verticalPipeRB)
+    if (iCode == itemID::verticalPipeLA 
+        || iCode == itemID::verticalPipeLB
+        || iCode == itemID::verticalPipeRA 
+        || iCode == itemID::verticalPipeRB)
     {
         static Uint32 jetLastUpdateTime = 0;
         static int jetAnimFrame = 0;
@@ -662,7 +662,7 @@ void Prop::drawSelf()
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
     }
 
-    //if (iCode == itemRefCode::chargingPort)
+    //if (iCode == itemID::chargingPort)
     //{
     //    if (getInletCharge() > 0)
     //    {
@@ -688,13 +688,13 @@ void Prop::drawSelf()
     //    }
     //}
 
-    if (iCode == itemRefCode::powerBankR)
+    if (iCode == itemID::powerBankR)
     {
         if (chargeFlux[dir16::left] > 0) drawSpriteCenter(spr::propset,3159,drawX,drawY);
 
         if (chargeFlux[dir16::right] < 0) drawSpriteCenter(spr::propset, 3160, drawX, drawY);
     }
-    else if (iCode == itemRefCode::powerBankL)
+    else if (iCode == itemID::powerBankL)
     {
         if (chargeFlux[dir16::left] > 0) drawSpriteCenter(spr::propset, 3159 + 16, drawX, drawY);
 
@@ -790,19 +790,19 @@ void Prop::drawSelf()
             Prop* downProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
             if (downProp != nullptr && (downProp->leadItem.checkFlag(itemFlag::CABLE) || downProp->leadItem.checkFlag(itemFlag::CABLE_CNCT_UP))) downConnected = true;
 
-            if (iCode == itemRefCode::copperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
-            if (iCode == itemRefCode::silverCable) drawSpriteCenter(spr::propset, 2993 + 16 + downConnected, drawX, drawY);
+            if (iCode == itemID::copperCable) drawSpriteCenter(spr::propset, 2993 + downConnected, drawX, drawY);
+            if (iCode == itemID::silverCable) drawSpriteCenter(spr::propset, 2993 + 16 + downConnected, drawX, drawY);
 
             if (isChargeFlowing()) drawSpriteCenter(spr::propset, 2944, drawX, drawY);
         }
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_ASCEND))
         {
-            if (iCode == itemRefCode::copperCable)
+            if (iCode == itemID::copperCable)
             {
                 drawSpriteCenter(spr::propset, 2995, drawX, drawY);//상단으로 이어진 구리 케이블
             }
-            else if (iCode == itemRefCode::silverCable)
+            else if (iCode == itemID::silverCable)
             {
                 drawSpriteCenter(spr::propset, 2995 + 16, drawX, drawY);//상단으로 이어진 은 케이블
             }
@@ -812,11 +812,11 @@ void Prop::drawSelf()
 
         if (leadItem.checkFlag(itemFlag::CABLE_Z_DESCEND))
         {
-            if (iCode == itemRefCode::copperCable)
+            if (iCode == itemID::copperCable)
             {
                 drawSpriteCenter(spr::propset, 2997, drawX, drawY);//하단으로 이어진 구리 케이블
             }
-            else if (iCode == itemRefCode::silverCable)
+            else if (iCode == itemID::silverCable)
             {
                 drawSpriteCenter(spr::propset, 2997 + 16, drawX, drawY);//하단으로 이어진 은 케이블
             }

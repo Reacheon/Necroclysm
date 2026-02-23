@@ -28,7 +28,7 @@ namespace actFunc
 		{
 			for (int j = 0; j < equipInfo.size(); j++)
 			{
-				if (equipInfo[j].itemCode == itemRefCode::arrowQuiver)
+				if (equipInfo[j].itemCode == itemID::arrowQuiver)
 				{
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
@@ -43,7 +43,7 @@ namespace actFunc
 		{
 			for (int j = 0; j < equipInfo.size(); j++)
 			{
-				if (equipInfo[j].itemCode == itemRefCode::boltQuiver)
+				if (equipInfo[j].itemCode == itemID::boltQuiver)
 				{
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
@@ -271,7 +271,7 @@ namespace actFunc
 
 	void toggle(ItemData& inputItem)
 	{
-		if (inputItem.itemCode == itemRefCode::minerHelmet)
+		if (inputItem.itemCode == itemID::minerHelmet)
 		{
 			if (inputItem.checkFlag(itemFlag::TOGGLE_OFF))
 			{
@@ -317,7 +317,7 @@ namespace actFunc
 
 		for (int i = 0; i < inputData.pocketPtr->itemInfo.size(); i++)
 		{
-			if (inputData.pocketPtr->itemInfo[i].itemCode == itemRefCode::water)
+			if (inputData.pocketPtr->itemInfo[i].itemCode == itemID::water)
 			{
 				int hydrationPerWater = inputData.pocketPtr->itemInfo[i].hydrationPerML;
 				int waterCount = inputData.pocketPtr->itemInfo[i].number;
@@ -597,7 +597,7 @@ namespace actFunc
 			for (int i = 0; i < targetSearchPtr[j].first->itemInfo.size(); i++)
 			{
 				int itemCode = targetSearchPtr[j].first->itemInfo[i].itemCode;
-				if (itemCode == itemRefCode::battery || itemCode == itemRefCode::batteryPack)
+				if (itemCode == itemID::battery || itemCode == itemID::batteryPack)
 				{
 					batteryList.push_back(targetSearchPtr[j].first->itemInfo[i].name);
 				}
@@ -623,7 +623,7 @@ namespace actFunc
 				for (int i = 0; i < targetSearchPtr[j].first->itemInfo.size(); i++)
 				{
 					int itemCode = targetSearchPtr[j].first->itemInfo[i].itemCode;
-					if (itemCode == itemRefCode::battery || itemCode == itemRefCode::batteryPack)
+					if (itemCode == itemID::battery || itemCode == itemID::batteryPack)
 					{
 						if (counter == wtoi(coAnswer.c_str()))
 						{

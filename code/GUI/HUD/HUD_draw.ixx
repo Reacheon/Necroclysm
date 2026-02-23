@@ -525,8 +525,8 @@ void HUD::drawGUI()
 	{
 		if (eqItem.equipState == equipHandFlag::both)
 		{
-			if (eqItem.itemCode == itemRefCode::hoe) wieldHoe = true;
-			else if (eqItem.itemCode == itemRefCode::wateringCan) wieldWateringCan = true;
+			if (eqItem.itemCode == itemID::hoe) wieldHoe = true;
+			else if (eqItem.itemCode == itemID::wateringCan) wieldWateringCan = true;
 		}
 	}
 
@@ -1771,7 +1771,7 @@ void HUD::drawCircuitInfo()
 				firstUnit = L"kJ/turn";
 
 				secondString = L"Stored:";
-				if (tgtProp->leadItem.itemCode == itemRefCode::powerBankR || tgtProp->leadItem.itemCode == itemRefCode::powerBankL)
+				if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankL)
 				{
 					secondNumber.clear();
 					double ratio = tgtProp->leadItem.powerStorage / static_cast<double>(tgtProp->leadItem.powerStorageMax);
@@ -1861,7 +1861,7 @@ void HUD::drawCircuitInfo()
 			setFontSize(22);
 			std::wstring title = tgtProp->leadItem.name;
 
-			if (tgtProp->leadItem.itemCode == itemRefCode::powerBankR || tgtProp->leadItem.itemCode == itemRefCode::powerBankL)
+			if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankL)
 			{
 				int xOffset = -17;
 				drawTextCenter(title, window.w / 2 + xOffset, 14);
@@ -1900,8 +1900,8 @@ void HUD::drawCircuitInfo()
 					}
 				}
 
-				if ((tgtProp->leadItem.itemCode == itemRefCode::powerBankR && tgtProp->chargeFlux[dir16::left]>0)
-					|| tgtProp->leadItem.itemCode == itemRefCode::powerBankL && tgtProp->chargeFlux[dir16::right] > 0)
+				if ((tgtProp->leadItem.itemCode == itemID::powerBankR && tgtProp->chargeFlux[dir16::left]>0)
+					|| tgtProp->leadItem.itemCode == itemID::powerBankL && tgtProp->chargeFlux[dir16::right] > 0)
 				{
 					drawSpriteCenter(spr::icon16, 103, gaugePivotX + 22, gaugePivotY + 10);
 				}
@@ -1971,11 +1971,11 @@ void HUD::drawFluidCircuitInfo()
 		std::wstring firstString, firstNumber, firstColStr, firstUnit;
 		std::wstring secondString, secondNumber, secondColStr, secondUnit;
 
-		bool isPump = (iCode == itemRefCode::pumpR || iCode == itemRefCode::pumpU
-			|| iCode == itemRefCode::pumpL || iCode == itemRefCode::pumpD);
-		bool isTank = (iCode == itemRefCode::fluidTank);
-		bool isValve = (iCode == itemRefCode::valveRL || iCode == itemRefCode::valveUD
-			|| iCode == itemRefCode::solenoidValveRL || iCode == itemRefCode::solenoidValveUD);
+		bool isPump = (iCode == itemID::pumpR || iCode == itemID::pumpU
+			|| iCode == itemID::pumpL || iCode == itemID::pumpD);
+		bool isTank = (iCode == itemID::fluidTank);
+		bool isValve = (iCode == itemID::valveRL || iCode == itemID::valveUD
+			|| iCode == itemID::solenoidValveRL || iCode == itemID::solenoidValveUD);
 
 		if (isPump)
 		{

@@ -45,7 +45,7 @@ public:
 			{
 				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
-					singleTile[x][y].floor = itemRefCode::deepSeaWater;
+					singleTile[x][y].floor = itemID::deepSeaWater;
 				}
 			}
 		}
@@ -98,7 +98,7 @@ public:
 			{
 				for (int y = 0; y < CHUNK_SIZE_Y; y++)
 				{
-					singleTile[x][y].floor = itemRefCode::grass;
+					singleTile[x][y].floor = itemID::grass;
 				}
 			}
 		}

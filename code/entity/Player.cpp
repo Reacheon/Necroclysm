@@ -35,7 +35,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	int i = 0;
 
-	//getEquipPtr()->addItemFromDex(itemRefCode::katana);
+	//getEquipPtr()->addItemFromDex(itemID::katana);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
 
 	getEquipPtr()->addItemFromDex(2);
@@ -99,11 +99,11 @@ void Player::startMove(int inputDir)
 		if (isWalkable({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }))
 		{
 			player->setDirection(inputDir);
-			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemRefCode::sandFloor)
+			if (TileSnow(PlayerX(), PlayerY(), PlayerZ()) || TileFloor(PlayerX(),PlayerY(),PlayerZ()) == itemID::sandFloor)
 			{
 				new Footprint(getGridX(), getGridY(), getGridZ(), entityInfo.direction);
 			}
-			else if (TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemRefCode::deepFreshWater || TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemRefCode::deepSeaWater)
+			else if (TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemID::deepFreshWater || TileFloor(PlayerX(), PlayerY(), PlayerZ()) == itemID::deepSeaWater)
 			{
 				new Wake(getGridX(), getGridY(), getGridZ(), entityInfo.direction);
 			}
@@ -394,8 +394,8 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 		changePlayerWalkMode(walkFlag::walk);
 	}
 
-	if(TileFloor(getGridX(),getGridY(),getGridZ()) == itemRefCode::shallowFreshWater ||
-	   TileFloor(getGridX(),getGridY(),getGridZ()) == itemRefCode::shallowSeaWater)
+	if(TileFloor(getGridX(),getGridY(),getGridZ()) == itemID::shallowFreshWater ||
+	   TileFloor(getGridX(),getGridY(),getGridZ()) == itemID::shallowSeaWater)
 	{
 		new Wave(getGridX(), getGridY(), getGridZ());
     }

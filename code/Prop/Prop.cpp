@@ -343,37 +343,37 @@ void Prop::propTurnOn()
     Point3 downCoord = { getGridX(), getGridY() + 1, getGridZ() };
 
     int iCode = leadItem.itemCode;
-    if (iCode == itemRefCode::bollardLight)
+    if (iCode == itemID::bollardLight)
     {
         leadItem.lightPtr = std::make_unique<Light>(getGridX() + leadItem.lightDelX, getGridY() + leadItem.lightDelY, getGridZ(), leadItem.lightRange, leadItem.lightIntensity, SDL_Color{ leadItem.lightR,leadItem.lightG,leadItem.lightB });
     }
-    else if (iCode == itemRefCode::transistorR
-        || iCode == itemRefCode::transistorL
-        || iCode == itemRefCode::transistorU
-        || iCode == itemRefCode::transistorD
-        || iCode == itemRefCode::andGateR
-        || iCode == itemRefCode::andGateL
-        || iCode == itemRefCode::orGateR
-        || iCode == itemRefCode::orGateL
-        || iCode == itemRefCode::xorGateR
-        || iCode == itemRefCode::xorGateL
-        || iCode == itemRefCode::notGateR
-        || iCode == itemRefCode::notGateL
-        || iCode == itemRefCode::srLatchR
-        || iCode == itemRefCode::srLatchL
+    else if (iCode == itemID::transistorR
+        || iCode == itemID::transistorL
+        || iCode == itemID::transistorU
+        || iCode == itemID::transistorD
+        || iCode == itemID::andGateR
+        || iCode == itemID::andGateL
+        || iCode == itemID::orGateR
+        || iCode == itemID::orGateL
+        || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateL
+        || iCode == itemID::notGateR
+        || iCode == itemID::notGateL
+        || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchL
         )
     {
         //현재 위치 추가
         nextCircuitStartQueue.push(currentCoord);
         initChargeBFS(nextCircuitStartQueue);
     }
-    else if (iCode == itemRefCode::delayR || iCode == itemRefCode::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayL)
     {
         //현재 위치 추가
         nextCircuitStartQueue.push(currentCoord);
         initChargeBFS(nextCircuitStartQueue);
-        if (iCode == itemRefCode::delayR) leadItem.gndUsePowerLeft = 0;
-        else if (iCode == itemRefCode::delayL) leadItem.gndUsePowerRight = 0;
+        if (iCode == itemID::delayR) leadItem.gndUsePowerLeft = 0;
+        else if (iCode == itemID::delayL) leadItem.gndUsePowerRight = 0;
     }
 }
 
@@ -389,24 +389,24 @@ void Prop::propTurnOff()
     Point3 downCoord = { getGridX(), getGridY() + 1, getGridZ() };
 
     int iCode = leadItem.itemCode;
-    if (iCode == itemRefCode::bollardLight)
+    if (iCode == itemID::bollardLight)
     {
         leadItem.lightPtr = nullptr;
     }
-    else if (iCode == itemRefCode::transistorR
-        || iCode == itemRefCode::transistorL
-        || iCode == itemRefCode::transistorU
-        || iCode == itemRefCode::transistorD
-        || iCode == itemRefCode::andGateR
-        || iCode == itemRefCode::andGateL
-        || iCode == itemRefCode::orGateR
-        || iCode == itemRefCode::orGateL
-        || iCode == itemRefCode::xorGateR
-        || iCode == itemRefCode::xorGateL
-        || iCode == itemRefCode::notGateR
-        || iCode == itemRefCode::notGateL
-        || iCode == itemRefCode::srLatchR
-        || iCode == itemRefCode::srLatchL
+    else if (iCode == itemID::transistorR
+        || iCode == itemID::transistorL
+        || iCode == itemID::transistorU
+        || iCode == itemID::transistorD
+        || iCode == itemID::andGateR
+        || iCode == itemID::andGateL
+        || iCode == itemID::orGateR
+        || iCode == itemID::orGateL
+        || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateL
+        || iCode == itemID::notGateR
+        || iCode == itemID::notGateL
+        || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchL
         )
     {
 
@@ -445,11 +445,11 @@ void Prop::propTurnOff()
         initChargeBFS(nextCircuitStartQueue);
 
     }
-    else if (iCode == itemRefCode::delayR || iCode == itemRefCode::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayL)
     {
         //꺼질 때는 재계산 로직 필요없음 (신호선=전력입력)
-        if (iCode == itemRefCode::delayR) leadItem.gndUsePowerLeft = 1;
-        else if (iCode == itemRefCode::delayL) leadItem.gndUsePowerRight = 1;
+        if (iCode == itemID::delayR) leadItem.gndUsePowerLeft = 1;
+        else if (iCode == itemID::delayL) leadItem.gndUsePowerRight = 1;
         
     }
 }

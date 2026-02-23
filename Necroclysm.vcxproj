@@ -313,6 +313,13 @@
     <ClCompile Include="code\util\util.ixx" />
     <ClCompile Include="code\util\Vec3.ixx" />
     <ClCompile Include="code\util\wstring2Number.ixx" />
+    <ClCompile Include="code\var\constVar-colors.ixx" />
+    <ClCompile Include="code\var\constVar-constants.ixx" />
+    <ClCompile Include="code\var\constVar-enums.ixx" />
+    <ClCompile Include="code\var\constVar-fwd.ixx" />
+    <ClCompile Include="code\var\constVar-itemFlags.ixx" />
+    <ClCompile Include="code\var\constVar-itemIDs.ixx" />
+    <ClCompile Include="code\var\constVar-names.ixx" />
     <ClCompile Include="code\var\constVar.ixx" />
     <ClCompile Include="code\var\globalVar.ixx" />
     <ClCompile Include="code\var\wrapFunc.cpp" />

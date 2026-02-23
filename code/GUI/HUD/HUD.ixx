@@ -661,7 +661,7 @@ public:
 						{
 							for (int j = 0; j < equipInfo.size(); j++)
 							{
-								if (equipInfo[j].itemCode == itemRefCode::arrowQuiver)
+								if (equipInfo[j].itemCode == itemID::arrowQuiver)
 								{
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
@@ -682,7 +682,7 @@ public:
 						{
 							for (int j = 0; j < equipInfo.size(); j++)
 							{
-								if (equipInfo[j].itemCode == itemRefCode::boltQuiver)
+								if (equipInfo[j].itemCode == itemID::boltQuiver)
 								{
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
@@ -963,10 +963,10 @@ public:
 			}
 		}
 
-		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::shallowFreshWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::deepFreshWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::shallowSeaWater ||
-			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemRefCode::deepSeaWater)
+		if (TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemID::shallowFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemID::deepFreshWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemID::shallowSeaWater ||
+			TileFloor(targetGrid.x, targetGrid.y, PlayerZ()) == itemID::deepSeaWater)
 		{
 
 			inputOptions.push_back(act::drinkFloorWater);

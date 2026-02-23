@@ -497,7 +497,7 @@ void ContextMenu::executeContextAct(act inputAct)
 		if (targetBottle != nullptr)
 		{
 			targetBottle->itemInfo.clear();
-			targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemRefCode::water], maxVolume)));
+			targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemID::water], maxVolume)));
 			updateLog(L"You fill the bottle with water.");
 		}
 	}
@@ -508,11 +508,11 @@ void ContextMenu::executeContextAct(act inputAct)
 	else if (inputAct == act::drinkFloorWater)
 	{
 		int floorCode = TileFloor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-		if (floorCode == itemRefCode::shallowFreshWater || floorCode == itemRefCode::deepFreshWater)
+		if (floorCode == itemID::shallowFreshWater || floorCode == itemID::deepFreshWater)
 		{
 			thirst = PLAYER_MAX_HYDRATION;
 		}
-		else if (floorCode == itemRefCode::shallowSeaWater || floorCode == itemRefCode::deepSeaWater)
+		else if (floorCode == itemID::shallowSeaWater || floorCode == itemID::deepSeaWater)
 		{
 			thirst -= 100;
 		}
@@ -544,14 +544,14 @@ void ContextMenu::executeContextAct(act inputAct)
 		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
 		{
 			Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			if (pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+			if (pPtr->leadItem.itemCode == itemID::gasolineGeneratorR ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorT ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorL ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorB)
 			{
 				if (pPtr->leadItem.pocketPtr->itemInfo.size() > 0)
 				{
-					if (pPtr->leadItem.pocketPtr->itemInfo[0].itemCode == itemRefCode::gasoline)
+					if (pPtr->leadItem.pocketPtr->itemInfo[0].itemCode == itemID::gasoline)
 					{
 						pPtr->propTurnOn();
 						updateLog(sysStr[337]);
@@ -574,10 +574,10 @@ void ContextMenu::executeContextAct(act inputAct)
 		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
 		{
 			Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-			if (pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorR ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorT ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorL ||
-				pPtr->leadItem.itemCode == itemRefCode::gasolineGeneratorB)
+			if (pPtr->leadItem.itemCode == itemID::gasolineGeneratorR ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorT ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorL ||
+				pPtr->leadItem.itemCode == itemID::gasolineGeneratorB)
 			{
 				pPtr->propTurnOff();
 				updateLog(sysStr[339]);

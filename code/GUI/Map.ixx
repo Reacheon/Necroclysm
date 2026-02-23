@@ -5,6 +5,7 @@ export module Map;
 
 import std;
 import util;
+import constVar;
 import GUI;
 import textureVar;
 import drawText;

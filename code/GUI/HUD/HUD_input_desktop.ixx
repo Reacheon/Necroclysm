@@ -6,6 +6,7 @@ import HUD;
 
 import std;
 import util;
+import constVar;
 import checkCursor;
 import globalVar;
 import wrapFunc;

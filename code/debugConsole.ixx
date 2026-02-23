@@ -3,6 +3,7 @@
 export module debugConsole;
 
 import util;
+import constVar;
 import globalVar;
 import wrapFunc;
 import globalTime;

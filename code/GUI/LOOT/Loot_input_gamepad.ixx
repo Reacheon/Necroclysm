@@ -2,6 +2,7 @@
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
 import std;
+import constVar;
 import globalVar;
 import util;
 import Loot;

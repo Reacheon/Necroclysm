@@ -5,6 +5,7 @@ export module Maint;
 import std;
 import util;
 import GUI;
+import constVar;
 import globalVar;
 import wrapFunc;
 import drawText;

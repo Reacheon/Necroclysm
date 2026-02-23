@@ -7,6 +7,7 @@ export module Equip;
 
 import std;
 import util;
+import constVar;
 import Player;
 import drawText;
 import globalVar;
@@ -234,7 +235,7 @@ public:
 			//업데이트할 아이템이 탄창일 경우
 			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
 			{
-				if (targetItem.itemCode != itemRefCode::arrowQuiver && targetItem.itemCode != itemRefCode::boltQuiver) barAct.push_back(act::reloadMagazine);
+				if (targetItem.itemCode != itemID::arrowQuiver && targetItem.itemCode != itemID::boltQuiver) barAct.push_back(act::reloadMagazine);
 
 				//탄창 장전
 				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
@@ -266,7 +267,7 @@ public:
                 ItemPocket* pocketPtr = targetItem.pocketPtr.get();	
 				if (pocketPtr->itemInfo.size() == 1)
 				{
-					if (pocketPtr->itemInfo[0].itemCode == itemRefCode::water)
+					if (pocketPtr->itemInfo[0].itemCode == itemID::water)
 					{
 
 					}

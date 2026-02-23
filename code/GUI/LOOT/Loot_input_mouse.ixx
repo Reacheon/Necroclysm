@@ -4,6 +4,7 @@
 import Loot;
 import std;
 import util;
+import constVar;
 import Player;
 import checkCursor;
 import globalVar;

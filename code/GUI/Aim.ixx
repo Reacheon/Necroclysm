@@ -5,6 +5,7 @@ export module Aim;
 import std;
 import util;
 import GUI;
+import constVar;
 import textureVar;
 import wrapFunc;
 import drawText;

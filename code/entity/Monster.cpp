@@ -4,6 +4,7 @@
 
 import std;
 import Entity;
+import constVar;
 import globalVar;
 import wrapFunc;
 import textureVar;

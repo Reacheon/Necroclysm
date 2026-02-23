@@ -151,13 +151,13 @@ public:
 
                     int drawItemCode = rotatedItemCode;
 
-					if (rotatedItemCode == itemRefCode::pipe && option::inputMethod == input::mouse)
+					if (rotatedItemCode == itemID::pipe && option::inputMethod == input::mouse)
 					{
                         Point2 mouseCoord = getAbsMouseGrid();
                         int floorItemCode = TileFloor(mouseCoord.x, mouseCoord.y, PlayerZ());
 						if(itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
 						{
-							drawItemCode = itemRefCode::intakePipeR;
+							drawItemCode = itemID::intakePipeR;
                         }
 					}
 
@@ -357,12 +357,12 @@ public:
 						{
 							if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 							{
-								if (rotatedItemCode == itemRefCode::pipe)
+								if (rotatedItemCode == itemID::pipe)
 								{
 									int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
 									if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
 									{
-                                        rotatedItemCode = itemRefCode::intakePipeR;
+                                        rotatedItemCode = itemID::intakePipeR;
 									}
 									else
 									{
@@ -381,7 +381,7 @@ public:
 									return;
 								}
 
-								if (rotatedItemCode == itemRefCode::pipe)
+								if (rotatedItemCode == itemID::pipe)
 								{
 									bool isFluidTile = false;
 									int floorItemCode = TileFloor(throwingX, throwingY, throwingZ);
@@ -409,12 +409,12 @@ public:
 
 						if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 						{
-							if (rotatedItemCode == itemRefCode::pipe)
+							if (rotatedItemCode == itemID::pipe)
 							{
 								int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
 								if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
 								{
-									rotatedItemCode = itemRefCode::intakePipeR;
+									rotatedItemCode = itemID::intakePipeR;
 								}
 								else
 								{

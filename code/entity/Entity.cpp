@@ -5,6 +5,7 @@
 
 import std;
 import util;
+import constVar;
 import globalVar;
 import ItemData;
 import ItemPocket;

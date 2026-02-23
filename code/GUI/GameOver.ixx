@@ -5,6 +5,7 @@ export module GameOver;
 import std;
 import util;
 import GUI;
+import constVar;
 import textureVar;
 import drawText;
 import drawSprite;

@@ -102,7 +102,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 		}
 	}
 
-	if (inputItem.itemCode == itemRefCode::battery || inputItem.itemCode == itemRefCode::batteryPack)
+	if (inputItem.itemCode == itemID::battery || inputItem.itemCode == itemID::batteryPack)
 	{
 		mainName += L" (" + decimalCutter(100.0*(inputItem.powerStorage / static_cast<double>(inputItem.powerStorageMax)), 0) + L"%)";
 	}
@@ -111,8 +111,8 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 		if (inputItem.pocketPtr->itemInfo.size() == 1)
 		{
 			ItemData& batteryData = inputItem.pocketPtr->itemInfo[0];
-			if (batteryData.itemCode == itemRefCode::battery
-				|| batteryData.itemCode == itemRefCode::batteryPack)
+			if (batteryData.itemCode == itemID::battery
+				|| batteryData.itemCode == itemID::batteryPack)
 			{
 				mainName += L" (" + decimalCutter(100.0 * (batteryData.powerStorage / static_cast<double>(batteryData.powerStorageMax)), 0) + L"%)";
 			}

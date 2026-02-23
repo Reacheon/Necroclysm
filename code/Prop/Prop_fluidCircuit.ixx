@@ -2,6 +2,7 @@
 
 import Prop;
 import util;
+import constVar;
 import globalVar;
 import wrapFunc;
 
@@ -175,10 +176,10 @@ void Prop::updateFluidCircuitNetwork()
 
             currentProp->totalResistFluid = 0;
 
-            if (currentProp->leadItem.itemCode == itemRefCode::pumpR
-                || currentProp->leadItem.itemCode == itemRefCode::pumpU
-                || currentProp->leadItem.itemCode == itemRefCode::pumpL
-                || currentProp->leadItem.itemCode == itemRefCode::pumpD)
+            if (currentProp->leadItem.itemCode == itemID::pumpR
+                || currentProp->leadItem.itemCode == itemID::pumpU
+                || currentProp->leadItem.itemCode == itemID::pumpL
+                || currentProp->leadItem.itemCode == itemID::pumpD)
             {
                 if (debug::printCircuitLog)
                 {
@@ -192,7 +193,7 @@ void Prop::updateFluidCircuitNetwork()
                     pumpPropVec.push_back(currentProp);
                 }
             }
-            else if (currentProp->leadItem.itemCode == itemRefCode::fluidTank)
+            else if (currentProp->leadItem.itemCode == itemID::fluidTank)
             {
                 if (debug::printCircuitLog)
                 {
@@ -202,17 +203,17 @@ void Prop::updateFluidCircuitNetwork()
 
                 tankPropVec.push_back(currentProp);
             }
-            else if (currentProp->leadItem.itemCode == itemRefCode::intakePipeR
-                || currentProp->leadItem.itemCode == itemRefCode::intakePipeU
-                || currentProp->leadItem.itemCode == itemRefCode::intakePipeL
-                || currentProp->leadItem.itemCode == itemRefCode::intakePipeD)
+            else if (currentProp->leadItem.itemCode == itemID::intakePipeR
+                || currentProp->leadItem.itemCode == itemID::intakePipeU
+                || currentProp->leadItem.itemCode == itemID::intakePipeL
+                || currentProp->leadItem.itemCode == itemID::intakePipeD)
             {
-                if (TileFloor(current) == itemRefCode::deepFreshWater || TileFloor(current) == itemRefCode::shallowFreshWater)
+                if (TileFloor(current) == itemID::deepFreshWater || TileFloor(current) == itemID::shallowFreshWater)
                 {
                     currentProp->nodeFluidAmount = currentProp->leadItem.maxFluid;
                     currentProp->nodeFluidType = fluidType::WATER;
                 }
-                else if (TileFloor(current) == itemRefCode::deepSeaWater || TileFloor(current) == itemRefCode::shallowSeaWater)
+                else if (TileFloor(current) == itemID::deepSeaWater || TileFloor(current) == itemID::shallowSeaWater)
                 {
                     currentProp->nodeFluidAmount = currentProp->leadItem.maxFluid;
                     currentProp->nodeFluidType = fluidType::SEAWATER;
@@ -269,47 +270,47 @@ void Prop::updateFluidCircuitNetwork()
         if (pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
             pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
-            if (pumpProp->leadItem.itemCode == itemRefCode::pumpR)
+            if (pumpProp->leadItem.itemCode == itemID::pumpR)
             {
                 if (isPipeConnected({ x,y,z }, dir16::left))
                 {
                     Prop* srcProp = TileProp(x - 1, y, z);
-                    if (srcProp && (srcProp->leadItem.itemCode == itemRefCode::fluidTank
-                        || srcProp->leadItem.itemCode == itemRefCode::intakePipeR))
+                    if (srcProp && (srcProp->leadItem.itemCode == itemID::fluidTank
+                        || srcProp->leadItem.itemCode == itemID::intakePipeR))
                     {
                         pushFluid(srcProp, dir16::right, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpL)
+            else if (pumpProp->leadItem.itemCode == itemID::pumpL)
             {
                 if (isPipeConnected({ x,y,z }, dir16::right))
                 {
                     Prop* srcProp = TileProp(x + 1, y, z);
-                    if (srcProp && (srcProp->leadItem.itemCode == itemRefCode::fluidTank
-                        || srcProp->leadItem.itemCode == itemRefCode::intakePipeL))
+                    if (srcProp && (srcProp->leadItem.itemCode == itemID::fluidTank
+                        || srcProp->leadItem.itemCode == itemID::intakePipeL))
                     {
                         pushFluid(srcProp, dir16::left, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpU)
+            else if (pumpProp->leadItem.itemCode == itemID::pumpU)
             {
                 if (isPipeConnected({ x,y,z }, dir16::down))
                 {
                     Prop* srcProp = TileProp(x, y + 1, z);
-                    if (srcProp && srcProp->leadItem.itemCode == itemRefCode::intakePipeU)
+                    if (srcProp && srcProp->leadItem.itemCode == itemID::intakePipeU)
                     {
                         pushFluid(srcProp, dir16::up, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
                     }
                 }
             }
-            else if (pumpProp->leadItem.itemCode == itemRefCode::pumpD)
+            else if (pumpProp->leadItem.itemCode == itemID::pumpD)
             {
                 if (isPipeConnected({ x,y,z }, dir16::up))
                 {
                     Prop* srcProp = TileProp(x, y - 1, z);
-                    if (srcProp && srcProp->leadItem.itemCode == itemRefCode::intakePipeD)
+                    if (srcProp && srcProp->leadItem.itemCode == itemID::intakePipeD)
                     {
                         pushFluid(srcProp, dir16::down, std::min((double)PUMP_POWER, srcProp->nodeFluidAmount), {}, 0);
                     }
@@ -475,23 +476,23 @@ bool Prop::isPipeConnected(Point3 currentCoord, dir16 dir)
     if (targetProp == nullptr) return false;
     ItemData& tgtItem = targetProp->leadItem;
 
-    if (crtItem.itemCode == itemRefCode::valveRL
-        || crtItem.itemCode == itemRefCode::valveUD
-        || crtItem.itemCode == itemRefCode::solenoidValveRL
-        || crtItem.itemCode == itemRefCode::solenoidValveUD)
+    if (crtItem.itemCode == itemID::valveRL
+        || crtItem.itemCode == itemID::valveUD
+        || crtItem.itemCode == itemID::solenoidValveRL
+        || crtItem.itemCode == itemID::solenoidValveUD)
     {
         if (crtItem.checkFlag(itemFlag::PROP_POWER_OFF)) return false;
     }
 
 
     if ((dir == dir16::right || dir == dir16::left) 
-        && (tgtItem.itemCode == itemRefCode::valveRL || tgtItem.itemCode == itemRefCode::solenoidValveRL)
+        && (tgtItem.itemCode == itemID::valveRL || tgtItem.itemCode == itemID::solenoidValveRL)
         && tgtItem.checkFlag(itemFlag::PROP_POWER_OFF))
     {
         return false;
     }
     else if ((dir == dir16::up || dir == dir16::down) 
-        && (tgtItem.itemCode == itemRefCode::valveUD || tgtItem.itemCode == itemRefCode::solenoidValveUD)
+        && (tgtItem.itemCode == itemID::valveUD || tgtItem.itemCode == itemID::solenoidValveUD)
         && tgtItem.checkFlag(itemFlag::PROP_POWER_OFF))
     {
         return false;

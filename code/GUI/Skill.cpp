@@ -5,6 +5,7 @@ module Skill;
 
 import std;
 import util;
+import constVar;
 import textureVar;
 import drawText;
 import drawSprite;
