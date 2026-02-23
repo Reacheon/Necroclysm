@@ -1,8 +1,8 @@
 ﻿export module const2Str;
 
 import std;
-import globalVar;
 import constVar;
+import globalVar;
 
 export std::wstring itemCategory2String(itemCategory input)
 {

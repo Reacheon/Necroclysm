@@ -591,5 +591,8 @@
     <ClCompile Include="code\GUI\Skill.cpp">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\actFuncSet.cpp">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

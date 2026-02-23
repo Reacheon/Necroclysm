@@ -308,7 +308,7 @@ public:
 				else barAct.push_back(act::insertBattery);
 			}
 
-			
+			if (targetItem.checkFlag(itemFlag::CAN_PLANT)) barAct.push_back(act::plant);
 		}
 	}
 

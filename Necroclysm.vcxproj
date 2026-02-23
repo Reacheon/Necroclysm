@@ -161,6 +161,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="code\actFuncSet.cpp" />
     <ClCompile Include="code\actFuncSet.ixx" />
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\Bullet.ixx" />

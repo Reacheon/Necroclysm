@@ -267,6 +267,7 @@ export enum class act
     hideWire,
     showWire,
 
+    plant, //씨앗을 심는 행동(벼나 밀, 감자같은 것들)
 };
 
 export namespace humanCustom
@@ -589,6 +590,8 @@ export enum class itemFlag
     POWERED_BY_BATTERY, //광부헬멧같이 내부에 장착된 배터리로 동작하는 전자기기들
 
     HIDE_WIRE, //전자회로의 전선을 보이지 않게 하는 플래그
+
+    CAN_PLANT, //씨앗같이 밭에 심을 수 있는 아이템들
 };
 
 export enum class walkFlag
@@ -625,36 +628,6 @@ export namespace toolQuality
     constexpr int heating = 19;
 };
 
-export enum class itemAct
-{
-    pick = 0,
-    wield = 1,
-    drop = 2,
-    pitch = 3,
-
-    wear = 4,
-    takeOff = 5,
-    repair = 6,
-    disasm = 7,
-
-    apply = 8,
-    eat = 9,
-    read = 10,
-    reload = 11,
-    unload = 12,
-    open = 13,
-};
-
-
-export enum class playerSpriteCategory
-{
-    oneHanded = 0,
-    twoHanded = 2,
-    sitOneHanded = 4,
-    sitTwoHanded = 6,
-    runOneHanded = 8,
-    runTwoHanded = 10,
-};
 
 export enum class btn
 {

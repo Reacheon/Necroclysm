@@ -538,6 +538,8 @@ export int readItemDex(const wchar_t* file)
                             { L"PIPE_CNCT_BELOW", itemFlag::PIPE_CNCT_BELOW },
 
                             { L"FLUID_CIRCUIT", itemFlag::FLUID_CIRCUIT },
+
+                            { L"CAN_PLANT", itemFlag::CAN_PLANT },
                         };
 
                         size_t pos = 0;

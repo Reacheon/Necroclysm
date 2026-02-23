@@ -474,8 +474,6 @@ public:
 	}
 	void step()
 	{
-
-
 		tabType = tabFlag::back;
 	}
 };
