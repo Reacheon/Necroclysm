@@ -131,6 +131,11 @@ void Equip::clickUpGUI()
 					CORO(executePropInstall());
 					break;
 				}
+				case act::plant:
+				{
+					CORO(executePlant());
+					break;
+				}
 				case act::insertBattery:
 					CORO(actFunc::insertBattery(actEnv::Equip, equipPtr, equipCursor));
 					break;
@@ -140,18 +145,19 @@ void Equip::clickUpGUI()
 					return;
 				}
 
-
-
-				if (equipPtr->itemInfo.size() == 0)
+				if (Equip::ins() != nullptr)
 				{
-					close(aniFlag::null);
-					return;
-				}
+					if (equipPtr->itemInfo.size() == 0)
+					{
+						close(aniFlag::null);
+						return;
+					}
 
-				if (equipPtr->itemInfo.size() - 1 <= equipScroll + equipScrollSize)
-				{
-					equipScroll = equipPtr->itemInfo.size() - equipScrollSize;
-					if (equipScroll < 0) { equipScroll = 0; }
+					if (equipPtr->itemInfo.size() - 1 <= equipScroll + equipScrollSize)
+					{
+						equipScroll = equipPtr->itemInfo.size() - equipScrollSize;
+						if (equipScroll < 0) { equipScroll = 0; }
+					}
 				}
 				break;
 			}
