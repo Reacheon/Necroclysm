@@ -1964,7 +1964,7 @@ void HUD::drawFluidCircuitInfo()
 
 		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerPtr->getGridZ());
 		if (tgtProp == nullptr) return;
-		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::PIPE))) return;
+		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT))) return;
 
 		auto iCode = tgtProp->leadItem.itemCode;
 

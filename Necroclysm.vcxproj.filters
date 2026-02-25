@@ -618,5 +618,8 @@
     <ClCompile Include="code\var\constVar-itemIDs.ixx">
       <Filter>소스 파일\00_var\constVar</Filter>
     </ClCompile>
+    <ClCompile Include="code\turnCycleLoop_propTurn.cpp">
+      <Filter>소스 파일\01_system\02_turn</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

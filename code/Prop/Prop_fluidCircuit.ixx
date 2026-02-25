@@ -170,7 +170,7 @@ void Prop::updateFluidCircuitNetwork()
             continue;
         }
 
-        if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT) || currentProp->leadItem.checkFlag(itemFlag::PIPE)))
+        if (currentProp && (currentProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT)))
         {
             currentProp->fluidRunUsed = true;
 

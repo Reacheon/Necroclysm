@@ -267,6 +267,7 @@
     <ClCompile Include="code\statusEffect.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
     <ClCompile Include="code\SystemMenu.ixx" />
+    <ClCompile Include="code\turnCycleLoop_propTurn.cpp" />
     <ClCompile Include="code\useSkill.ixx" />
     <ClCompile Include="code\globalTime.ixx" />
     <ClCompile Include="code\Light.ixx" />
