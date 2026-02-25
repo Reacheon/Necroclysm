@@ -5,6 +5,7 @@ import util;
 import constVar;
 import globalVar;
 import wrapFunc;
+import World;
 
 constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
@@ -343,7 +344,6 @@ void Prop::updateFluidCircuitNetwork()
         bool hasHole = false;
         for (auto dir : { dir16::right, dir16::up, dir16::left, dir16::down, dir16::above, dir16::below })
         {
-            Point3 coord = { sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->getGridZ() };
             // 현재 타일에서 해당 방향으로 구멍이 뚫려있는지 확인
             if (sinkProp->getHoleDirection() != dir16::none)
             {
@@ -377,10 +377,45 @@ void Prop::updateFluidCircuitNetwork()
                 * 100% 구간부터는 5*5까지 물을 흩뿌릴 수 있다.
                 */
 
-                if (consumedByDevice >= sinkProp->leadItem.fluidDemand / 2)
+                if (consumedByDevice >= sinkProp->leadItem.fluidDemand - EPSILON)
                 {
                     sinkProp->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
                     sinkProp->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+
+                    Point3 sinkCoord = sinkProp->getGrid();
+                    for (int dx = -2; dx <= 2; dx++)
+                    {
+                        for (int dy = -2; dy <= 2; dy++)
+                        {
+                            if (TileFloor(sinkCoord + Point3{ dx, dy, 0 }) == itemID::farmland
+                                && isWetTile(sinkCoord + Point3{ dx, dy, 0 })==false
+                                && randomRange(1, 100) <= 60)
+                            {
+                                updateWetTile(sinkCoord + Point3{ dx, dy, 0 });
+                            }
+
+                        }
+                    }
+                }
+                else if (consumedByDevice >= sinkProp->leadItem.fluidDemand / 2)
+                {
+                    sinkProp->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
+                    sinkProp->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+
+                    Point3 sinkCoord = sinkProp->getGrid();
+                    for (int dx = -1; dx <= 1; dx++)
+                    {
+                        for (int dy = -1; dy <= 1; dy++)
+                        {
+                            if (TileFloor(sinkCoord + Point3{ dx, dy, 0 }) == itemID::farmland
+                                && isWetTile(sinkCoord + Point3{ dx, dy, 0 }) == false
+                                && randomRange(1, 100) <= 60)
+                            {
+                                updateWetTile(sinkCoord + Point3{ dx, dy, 0 });
+                            }
+
+                        }
+                    }
                 }
                 else
                 {

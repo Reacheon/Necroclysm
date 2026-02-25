@@ -179,4 +179,8 @@ export namespace itemID
 
     constexpr int strawHat = 509;
     constexpr int wateringCan = 510;
+
+    constexpr int riceCrop = 511;
+    constexpr int wheatCrop = 512;
+    constexpr int potatoCrop = 513;
 };

@@ -17,6 +17,7 @@ import Monster;
 import Player;
 import log;
 import statusEffect;
+import globalTime;
 
 int PlayerX() { return PlayerPtr->getGridX(); }
 int PlayerY() { return PlayerPtr->getGridY(); }
@@ -360,5 +361,17 @@ int fluidTypeToCode(fluidType inputType)
 
 const bool isWetTile(Point3 coord)
 {
-    return World::ins()->getTile(coord).isWet;
+    if (World::ins()->getTile(coord).lastWetTurn == -1) return false;
+    else if (getElapsedTurn() - World::ins()->getTile(coord).lastWetTurn < 1440) return true;
+    else return false;
+}
+
+void updateWetTile(Point3 coord)
+{
+    World::ins()->getTile(coord).lastWetTurn = getElapsedTurn();
+}
+
+void resetWetTile(Point3 coord)
+{
+    World::ins()->getTile(coord).lastWetTurn = -1;
 }

@@ -78,3 +78,5 @@ export void addItemToTile(Point3 coord, ItemPocket* inputPokcet);
 export int fluidTypeToCode(fluidType inputType);
 
 export const bool isWetTile(Point3 coord);
+export void updateWetTile(Point3 coord);
+export void resetWetTile(Point3 coord);

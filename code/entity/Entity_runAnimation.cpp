@@ -1277,10 +1277,12 @@ bool Entity::runAnimation(bool shutdown)
 				if (tileItemCode == itemID::dirt || tileItemCode == itemID::grass)
 				{
 					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemID::farmland);
+					resetWetTile({ PlayerX() + dx, PlayerY() + dy, PlayerZ() });
 				}
 				else
 				{
 					setFloor({ PlayerX() + dx, PlayerY() + dy, PlayerZ() }, itemID::dirt);
+					resetWetTile({ PlayerX() + dx, PlayerY() + dy, PlayerZ() });
 				}
 
 			});
@@ -1337,7 +1339,7 @@ bool Entity::runAnimation(bool shutdown)
 					if (eqItem.itemCode == itemID::wateringCan)
 					{
 						eqItem.pocketPtr->itemInfo[0].number -= 100;
-						World::ins()->getTile(PlayerPtr->getGrid() + Point3{ dx, dy, 0 }).isWet = true;
+						updateWetTile(PlayerPtr->getGrid() + Point3{ dx, dy, 0 });
 						break;
 					}
 				}

@@ -95,6 +95,7 @@ __int64 propTurn()
 		else if (pPtr->leadItem.checkFlag(itemFlag::FORCE_LOAD)) activeLoadSet.insert(pPtr);
 
 		//유체회로 변수 초기화
+		if (pPtr->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT)) fluidComponents.push_back(pPtr);
 		pPtr->fluidRunUsed = false;
 		pPtr->totalResistFluid = 0;
 		pPtr->sinkFluidAmount = 0;
@@ -102,6 +103,37 @@ __int64 propTurn()
 		pPtr->jetFluidType = fluidType::NONE;
 		pPtr->jetFluidDir = dir16::none;
 		pPtr->initFluidFlux();
+
+		//농작물 성장
+		if (pPtr->leadItem.checkFlag(itemFlag::CROP))
+		{
+			if (pPtr->leadItem.itemCode == itemID::riceCrop)//벼는 물에 잠겨야지만 성장
+			{
+				bool hasWaterPool = false;
+				if (TileItemStack(pPtr->getGrid()) != nullptr)
+				{
+					std::vector<ItemData>& stackInfo = TileItemStack(pPtr->getGrid())->getPocket()->itemInfo;
+					for (ItemData& item : stackInfo)
+					{
+						if (item.itemCode == itemID::water) hasWaterPool = true;
+					}
+				}
+
+				if (TileFloor(pPtr->getGrid()) == itemID::farmland && hasWaterPool)
+				{
+					pPtr->plantGrowthPercent += 0.1;
+					if (pPtr->plantGrowthPercent > 100.0) pPtr->plantGrowthPercent = 100.0;
+				}
+			}
+			else //그 외 식물은 밭이 젖어있기만 하면 자동으로 성장
+			{
+				if (TileFloor(pPtr->getGrid()) == itemID::farmland && isWetTile(pPtr->getGrid()))
+				{
+					pPtr->plantGrowthPercent += 0.1;
+					if (pPtr->plantGrowthPercent > 100.0) pPtr->plantGrowthPercent = 100.0;
+				}
+			}
+		}
 	}
 
 	int loopCount = 0;
@@ -119,7 +151,7 @@ __int64 propTurn()
 			Prop* tgtProp = TileProp(tgtCoord);
 			if (tgtProp) tgtProp->updateCircuitNetwork();
 		}
-		else for (auto pPtr : activePropSet)
+		else for (auto pPtr : elecComponents)
 		{
 			if (pPtr->runUsed) continue;
 			if (pPtr->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
@@ -148,19 +180,11 @@ __int64 propTurn()
 	//==============================================================================
 
 	// 펌프에서 유체회로 탐색 시작 (runUsed가 아닌 fluidRunUsed 사용)
-	for (auto pPtr : activePropSet)
+	for (auto pPtr : fluidComponents)
 	{
 		if (pPtr->fluidRunUsed) continue;
 
 		pPtr->updateFluidCircuitNetwork();
-	}
-
-	// 유체회로 부하 작동
-	for (auto pPtr : activePropSet)
-	{
-		if (pPtr->fluidRunUsed)
-		{
-		}
 	}
 
 	return 0;

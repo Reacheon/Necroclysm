@@ -182,4 +182,6 @@ export enum class itemFlag
     HIDE_WIRE, //전자회로의 전선을 보이지 않게 하는 플래그
 
     CAN_PLANT, //씨앗같이 밭에 심을 수 있는 아이템들
+
+    CROP, //매턴 성장이 발생하는 농작물 종류들
 };

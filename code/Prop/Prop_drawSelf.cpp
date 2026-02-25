@@ -593,6 +593,17 @@ void Prop::drawSelf()
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
     }
 
+    if (iCode == itemID::potatoCrop
+        || iCode == itemID::wheatCrop
+        || iCode == itemID::riceCrop)
+    {
+        if (plantGrowthPercent >= 100.0) sprIndex += 4;
+        else if (plantGrowthPercent >= 75) sprIndex += 3;
+        else if (plantGrowthPercent >= 50) sprIndex += 2;
+        else if (plantGrowthPercent >= 25) sprIndex += 1;
+    }
+
+
     ///////////////////////////////////////////////////////////////////////////
     /////////////////////////////메인 그리기 함수//////////////////////////////
     ///////////////////////////////////////////////////////////////////////////

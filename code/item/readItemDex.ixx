@@ -540,6 +540,8 @@ export int readItemDex(const wchar_t* file)
                             { L"FLUID_CIRCUIT", itemFlag::FLUID_CIRCUIT },
 
                             { L"CAN_PLANT", itemFlag::CAN_PLANT },
+
+                            { L"CROP", itemFlag::PROP },
                         };
 
                         size_t pos = 0;

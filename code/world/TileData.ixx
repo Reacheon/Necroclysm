@@ -56,6 +56,7 @@ export struct TileData //총용량 29바이트
 
     ////////////////////////////////////////////////////////////
     bool isWet = false;
+    double lastWetTurn = -1;
 
     TileData() { randomVal = randomRange(0, 65535); }
     void destoryWall() { wall = 0; }
