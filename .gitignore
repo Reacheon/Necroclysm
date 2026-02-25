@@ -371,3 +371,4 @@ x64/
 enc_temp_folder/
 /code/GUI/HUD/HUD_input_gamepad.ixx
 /code/GUI/Aim.ixx
+map/
