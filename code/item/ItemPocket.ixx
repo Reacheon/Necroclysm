@@ -90,6 +90,9 @@ public:
 	void popTopBullet();
 
 	void updateItems();
+
+	//입력한 코드의 아이템의 인덱스를 반환
+	int findItemIndex(int inputItemCode);
 };
 
 inline std::unique_ptr<ItemPocket> ItemPocket::unlockRecipes = std::make_unique<ItemPocket>(storageType::recipe);

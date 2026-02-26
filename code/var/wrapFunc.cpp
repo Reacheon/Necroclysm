@@ -97,26 +97,37 @@ void createMonster(Point3 inputCoor, int inputEntityCode)
 void createItemStack(Point3 inputCoor)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor);
+    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
+    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
 }
 
 void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor, inputItems);
+    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
+    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
 }
 
 void destroyItemStack(Point3 inputCoor)
 {
+    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
+    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).eraseStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
     World::ins()->getTile(inputCoor).ItemStackPtr.reset();
 }
 
 void destroyProp(Point3 inputCoor)
 {
+    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
+    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).eraseProp(World::ins()->getTile(inputCoor).PropPtr.get());
     World::ins()->getTile(inputCoor).PropPtr.reset();
 }
 
 void createProp(Point3 inputCoor, int inputItemCode)
 {
     World::ins()->getTile(inputCoor).PropPtr = std::make_unique<Prop>(inputCoor, inputItemCode);
+
+    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
+    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addProp(World::ins()->getTile(inputCoor).PropPtr.get());
 
     World::ins()->getTile(inputCoor).PropPtr->updateSprIndex();
 

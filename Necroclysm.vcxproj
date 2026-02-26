@@ -336,6 +336,9 @@
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="vsDebug.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

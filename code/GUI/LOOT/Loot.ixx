@@ -264,7 +264,7 @@ public:
 		if (lootPocket->itemInfo.size() == 0 && lootItemData == nullptr)
 		{
 			close(aniFlag::null);
-			delete TileItemStack(lootTile.x, lootTile.y, PlayerZ());
+			destroyItemStack({ lootTile.x, lootTile.y, PlayerZ() });
 			return;
 		}
 	}

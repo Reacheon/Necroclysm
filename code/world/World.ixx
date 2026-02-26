@@ -161,18 +161,19 @@ public:
 		return totalPropSet;
 	}
 
-	std::vector<ItemStack*>& getActiveStackVec()
+	std::unordered_set<ItemStack*> getActiveStackSet()
 	{
-		std::vector<ItemStack*> totalStackVec;
+		std::unordered_set<ItemStack*> totalStackSet;
+		const std::unordered_set<ItemStack*>* chunkStackSet;
 		for (int i = 0; i < activeChunk.size(); i++)
 		{
-			const std::vector<ItemStack*>& chunkStackVec = activeChunk[i]->getChunkStackVec();
-			for (auto stack : chunkStackVec)
+			chunkStackSet = &(activeChunk[i]->getStackSet());
+			for (auto stack : *chunkStackSet)
 			{
-				totalStackVec.push_back(stack);
+				totalStackSet.insert(stack);
 			}
 		}
-		return totalStackVec;
+		return totalStackSet;
 	}
 
 	//섹터 관련

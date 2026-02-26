@@ -571,7 +571,7 @@ void Prop::drawSelf()
             jetLastUpdateTime = jetCurrentTime;
         }
 
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 200);
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
 
         if (jetFluidDir == dir16::right)
         {
@@ -623,7 +623,7 @@ void Prop::drawSelf()
             jetLastUpdateTime = jetCurrentTime;
         }
 
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 200);
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
 
         if (jetFluidDir == dir16::right)
         {
@@ -659,7 +659,7 @@ void Prop::drawSelf()
             jetLastUpdateTime = jetCurrentTime;
         }
 
-        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 200);
+        SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
 
         if (jetFluidDir == dir16::right)
         {

@@ -133,7 +133,9 @@ void Equip::clickUpGUI()
 				}
 				case act::plant:
 				{
-					CORO(executePlant());
+					deactDraw();
+					CORO(actFunc::executePlant(equipPtr, equipCursor));
+					actDraw();
 					break;
 				}
 				case act::insertBattery:

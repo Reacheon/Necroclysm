@@ -355,7 +355,7 @@ void drawTiles()
         }
 
 
-        if (thisTile->floor == itemID::farmland && thisTile->isWet) sprIndex++;
+        if (thisTile->floor == itemID::farmland && isWetTile({tgtX, tgtY,PlayerZ()})) sprIndex++;
 
         vertices[tileCounter] = 
         { 
@@ -467,7 +467,7 @@ void drawTiles()
             };
             int tileAniExtraIndex16 = getMilliTimer() / 1000 % 2;
             indices[tileCounter] = itemSprIndex + dirCorrection + 16 * tileAniExtraIndex16;
-            batchAlphas[tileCounter] = 200;
+            batchAlphas[tileCounter] = 150;
             tileCounter++;
         }
 

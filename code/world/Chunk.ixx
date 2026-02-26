@@ -163,7 +163,7 @@ public:
 		return propList;
     }
 
-	std::vector<ItemStack*>& getChunkStackVec()
+	std::vector<ItemStack*> getChunkStackVec()
 	{
 		std::vector<ItemStack*> stackVec;
 		for (int x = 0; x < CHUNK_SIZE_X; x++)
@@ -215,4 +215,12 @@ public:
 	}
 	const std::unordered_set<Prop*>& getPropSet() const { return chunkPropSet; }
 	bool eraseProp(Prop* prop) { return chunkPropSet.erase(prop) > 0; }
+
+	// ItemStack 관련 함수들
+	void addStack(ItemStack* stack)
+	{
+		if (stack != nullptr) chunkStackSet.insert(stack);
+	}
+	const std::unordered_set<ItemStack*>& getStackSet() const { return chunkStackSet; }
+	bool eraseStack(ItemStack* stack) { return chunkStackSet.erase(stack) > 0; }
 };

@@ -622,4 +622,7 @@
       <Filter>소스 파일\01_system\02_turn</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="vsDebug.natvis" />
+  </ItemGroup>
 </Project>

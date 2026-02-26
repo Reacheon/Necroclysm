@@ -40,4 +40,5 @@ export namespace actFunc
 	export void setWireVisibility(Point3 tgtPoint, bool hide);
 	export void hideWire(Point3 tgtPoint);
 	export void showWire(Point3 tgtPoint);
+	export Corouter executePlant(ItemPocket* tgtPocket, int tgtIndex);
 };

@@ -874,7 +874,7 @@ bool Entity::runAnimation(bool shutdown)
 		Point3 dstGrid = { throwCoord.x,throwCoord.y,throwCoord.z };
 		static Point3 prevCoor;
 
-		Sticker* sPtr = nullptr;
+		Sticker* stickerPtr = nullptr;
 		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
 		if (getTimer() == 1)
 		{
@@ -893,19 +893,19 @@ bool Entity::runAnimation(bool shutdown)
 		float dist = std::sqrt(std::pow(relX, 2) + std::pow(relY, 2));
 		float xSpd, ySpd;
 
-		if (StickerList.find(stickerID) != StickerList.end()) sPtr = ((Sticker*)(StickerList.find(stickerID))->second);
-		else sPtr = nullptr;
+		if (StickerList.find(stickerID) != StickerList.end()) stickerPtr = ((Sticker*)(StickerList.find(stickerID))->second);
+		else stickerPtr = nullptr;
 
-		if (sPtr != nullptr && arriveTimer == 0 && (relX != 0 || relY != 0))
+		if (stickerPtr != nullptr && arriveTimer == 0 && (relX != 0 || relY != 0))
 		{
 			float cosVal = relX / dist;
 			float sinVal = relY / dist;
 			xSpd = spd * cosVal;
 			ySpd = spd * sinVal;
-			sPtr->addFakeX(xSpd);
-			sPtr->addFakeY(ySpd);
+			stickerPtr->addFakeX(xSpd);
+			stickerPtr->addFakeY(ySpd);
 
-			Point3 cGrid = sPtr->getClosestGridWithFake();
+			Point3 cGrid = stickerPtr->getClosestGridWithFake();
 			if (cGrid != prevCoor)
 			{
 				prevCoor = cGrid;
@@ -917,7 +917,7 @@ bool Entity::runAnimation(bool shutdown)
 			}
 		}
 
-		if (arriveTimer != 0 || sPtr == nullptr || (relX == 0 && relY == 0) || (std::abs(sPtr->getFakeX()) >= std::abs(relX) && std::abs(sPtr->getFakeY()) >= std::abs(relY)))
+		if (arriveTimer != 0 || stickerPtr == nullptr || (relX == 0 && relY == 0) || (std::abs(stickerPtr->getFakeX()) >= std::abs(relX) && std::abs(stickerPtr->getFakeY()) >= std::abs(relY)))
 		{
 			if (arriveTimer == 0) arriveTimer = getTimer();
 
@@ -957,26 +957,26 @@ bool Entity::runAnimation(bool shutdown)
 				static int arriveFakeY = 0;
 				if (getTimer() == arriveTimer)
 				{
-					arriveFakeX = sPtr->getFakeX();
-					arriveFakeY = sPtr->getFakeY();
-					sPtr->setFakeY(arriveFakeY - 4);
+					arriveFakeX = stickerPtr->getFakeX();
+					arriveFakeY = stickerPtr->getFakeY();
+					stickerPtr->setFakeY(arriveFakeY - 4);
 				}
-				else if (getTimer() == arriveTimer + 1) sPtr->setFakeY(arriveFakeY - 5);
-				else if (getTimer() == arriveTimer + 3) sPtr->setFakeY(arriveFakeY - 6);
-				else if (getTimer() == arriveTimer + 6) sPtr->setFakeY(arriveFakeY - 7);
-				else if (getTimer() == arriveTimer + 9) sPtr->setFakeY(arriveFakeY - 6);
-				else if (getTimer() == arriveTimer + 11) sPtr->setFakeY(arriveFakeY - 5);
-				else if (getTimer() == arriveTimer + 12) sPtr->setFakeY(arriveFakeY - 4);
+				else if (getTimer() == arriveTimer + 1) stickerPtr->setFakeY(arriveFakeY - 5);
+				else if (getTimer() == arriveTimer + 3) stickerPtr->setFakeY(arriveFakeY - 6);
+				else if (getTimer() == arriveTimer + 6) stickerPtr->setFakeY(arriveFakeY - 7);
+				else if (getTimer() == arriveTimer + 9) stickerPtr->setFakeY(arriveFakeY - 6);
+				else if (getTimer() == arriveTimer + 11) stickerPtr->setFakeY(arriveFakeY - 5);
+				else if (getTimer() == arriveTimer + 12) stickerPtr->setFakeY(arriveFakeY - 4);
 				else if (getTimer() >= arriveTimer + 15)
 				{
-					sPtr->setFakeY(arriveFakeY);
+					stickerPtr->setFakeY(arriveFakeY);
 					while (throwingItemPocket->itemInfo.size() > 0)
 					{
 						int itemCount = throwingItemPocket->itemInfo[0].number;
 						throwingItemPocket->transferItem(throwTargetPocket, 0, itemCount);
 					}
 
-					delete sPtr;
+					delete stickerPtr;
 					resetTimer();
 					setAniType(aniFlag::null);
 					if (entityInfo.isPlayer == true) { turnWait(1.0); }
@@ -988,7 +988,7 @@ bool Entity::runAnimation(bool shutdown)
 				if (getTimer() == arriveTimer)
 				{
 					propPtr->setFakeY(-4);
-					delete sPtr;
+					delete stickerPtr;
 				}
 				else if (getTimer() == arriveTimer + 1) propPtr->setFakeY(-5);
 				else if (getTimer() == arriveTimer + 3) propPtr->setFakeY(-6);
@@ -1015,7 +1015,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				addItemToTile(dstGrid, throwingItemPocket.get());
 				addAniUSetPlayer(TileItemStack(dstGrid), aniFlag::drop);
-				delete sPtr;
+				delete stickerPtr;
 				resetTimer();
 				setAniType(aniFlag::null);
 				if (entityInfo.isPlayer == true) { turnWait(1.0); }

@@ -104,6 +104,9 @@ __int64 propTurn()
 		pPtr->jetFluidDir = dir16::none;
 		pPtr->initFluidFlux();
 
+		if (pPtr->leadItem.itemCode == itemID::wheatCrop)
+			int a = 3;
+
 		//농작물 성장
 		if (pPtr->leadItem.checkFlag(itemFlag::CROP))
 		{

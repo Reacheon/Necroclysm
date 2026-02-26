@@ -84,6 +84,8 @@ export void startArea()
 	}
 
 
+
+
 	createItemStack({ -5, 2, 0 }, { {373, 1},{475, 1},{476, 1},{477, 1},{478, 1} });//페트병
 	
 
@@ -647,13 +649,16 @@ export void startArea()
 	createItemStack({ -4, -12, 0 }, 
 		{ {itemID::hoe,1},
 		{itemID::scythe,1},
-		{itemID::rice,1},
-		{itemID::wheat,1}, 
-		{ itemID::potato,1 },
-		{ itemID::orange,1 },
+		{itemID::rice,20},
+		{itemID::wheat,20}, 
+		{ itemID::potato,20 },
+		{ itemID::orange,20 },
 		{ itemID::strawHat,1 },
 		{ itemID::wateringCan,1}
 		});
+
+
+
 
 
 
@@ -1134,6 +1139,30 @@ export void startArea()
 		setFloor({ 4, 2, 0 }, 293);
 		for (int i = 0; i < 9; i++) setFloor({ 5 + i, 2, 0 }, 293);
 	}
+
+	//상단 연못 및 농업펌프
+	setFloor({ -1,-16,0 }, itemID::shallowFreshWater);
+	setFloor({ -1,-15,0 }, itemID::deepFreshWater);
+	setFloor({ -1,-14,0 }, itemID::deepFreshWater);
+	setFloor({ -1,-13,0 }, itemID::shallowFreshWater);
+
+	setFloor({ -2,-15,0 }, itemID::shallowFreshWater);
+	setFloor({ -2,-14,0 }, itemID::shallowFreshWater);
+
+	setFloor({ 0,-15,0 }, itemID::shallowFreshWater);
+	setFloor({ 0,-14,0 }, itemID::shallowFreshWater);
+
+	createProp({ 0,-14,0 }, itemID::intakePipeR);
+	createProp({ 1,-14,0 }, itemID::pumpR);
+	createProp({ 2,-14,0 }, itemID::valveRL);
+	createProp({ 3,-14,0 }, itemID::pipe);
+
+	createProp({ 1,-16,0 }, itemID::gasolineGeneratorB);
+	createProp({ 1,-15,0 }, itemID::copperCable);
+
+	TileProp({ 1,-16,0 })->leadItem.pocketPtr->addItemFromDex(itemID::gasoline, 1000);
+		
+
 
 	World::ins()->createSector(0, 0, 0);
 

@@ -650,23 +650,103 @@ __int64 propTurn();
 
 //턴의 시간 흐름에 따라 변하는 아이템들(ex : 광부헬멧의 배터리 잔량에 따른 턴온오프)
 //활성화 범위 내의 stack들 + 활성화 범위 내의 Prop pocket + 활성화 범위 내의 Vehicle pocket + Player Equip
-__int64 itemTurn()
+__int64 itemTurn() 
 {
 	std::vector<ItemPocket*> targetPockets;
-
 	targetPockets.push_back(PlayerPtr->getEquipPtr());
 
-	std::vector<ItemStack*>& activeStackVec = (World::ins())->getActiveStackVec();
-	for (auto stack : activeStackVec)
+	std::unordered_set<ItemStack*> activeStackSet = (World::ins())->getActiveStackSet();
+	for (auto stack : activeStackSet)
 	{
-		if (stack->getPocket()->itemInfo.size() > 0) targetPockets.push_back(stack->getPocket());
-	}
-	
-	///////////////////////////////////////
+		if (stack->getPocket()->itemInfo.size() == 0) continue;
+		stack->getPocket()->updateItems();
 
-	for (auto pocket : targetPockets)
+		//물 수량 합산
+		int currentWaterV = 0;
+		for (ItemData& item : stack->getPocket()->itemInfo)
+		{
+			if (item.itemCode == itemID::water)
+			{
+				errorBox(currentWaterV != 0, L"Multiple water items exist in a single ItemStack. (stacking did not occur)");
+				currentWaterV += item.number;
+			}
+		}
+
+		if (currentWaterV < 2) continue;
+
+		//1단계: 인접 타일 수위 조사
+		struct WaterNeighbor { ItemStack* nearStack; int waterV; };
+		std::vector<WaterNeighbor> lowNeighbors;
+
+		for (int dir = 0; dir <= 7; dir++)
+		{
+			int dx, dy;
+			dir2Coord(dir, dx, dy);
+			Point3 tgtCoord = stack->getGrid() + Point3{ dx,dy,0 };
+
+			TileData* thisTile = &World::ins()->getTile(tgtCoord.x, tgtCoord.y, tgtCoord.z);
+			bool obstacleCondition = (thisTile->wall != 0 || thisTile->floor != itemID::farmland);
+
+			if (obstacleCondition) continue;
+
+			ItemStack* nearbyStack = TileItemStack(tgtCoord);
+			int nearbyWaterV = 0;
+
+			if (nearbyStack != nullptr)
+			{
+				for (ItemData& nearbyItem : nearbyStack->getPocket()->itemInfo)
+				{
+					if (nearbyItem.itemCode == itemID::water)
+						nearbyWaterV += nearbyItem.number;
+				}
+			}
+
+			if (currentWaterV >= nearbyWaterV + 2)
+			{
+				if (nearbyStack == nullptr)
+				{
+					createItemStack(tgtCoord);
+					nearbyStack = TileItemStack(tgtCoord);
+				}
+				lowNeighbors.push_back({ nearbyStack, nearbyWaterV });
+			}
+		}
+
+		if (lowNeighbors.empty()) continue;
+
+		//2단계: 전체 수량으로 균등 수위 계산
+		int totalWater = currentWaterV;
+		for (auto& n : lowNeighbors) totalWater += n.waterV;
+		int avgWater = totalWater / (int)(lowNeighbors.size() + 1);
+
+		//3단계: 평균 수위와의 차이만큼 이동
+		int waterIndex = stack->getPocket()->findItemIndex(itemID::water);
+		for (auto& n : lowNeighbors)
+		{
+			int transferAmount = avgWater - n.waterV;
+			if (transferAmount > 0)
+			{
+				stack->getPocket()->transferItem(n.nearStack->getPocket(), waterIndex, transferAmount);
+			}
+		}
+	}
+
+	//모든 아이템 스택의 액체류 아이템들의 숫자를 절반으로 줄인다. 1이 남았으면 아예 제거한다.
+	for (auto stack : activeStackSet)
 	{
-		pocket->updateItems();
+		if (stack->getPocket()->itemInfo.size() == 0) continue;
+		for (int i = stack->getPocket()->itemInfo.size() - 1; i >= 0; --i)
+		{
+			ItemData& item = stack->getPocket()->itemInfo[i];
+			if (item.checkFlag(itemFlag::LIQUID))
+			{
+				constexpr int LIQUID_EVAP_DIVISOR = 2;
+				int evapAmount = item.number - item.number / LIQUID_EVAP_DIVISOR;
+				stack->getPocket()->subtractItemIndex(i, evapAmount);
+			}
+		}
+
+		if (stack->getPocket()->itemInfo.size() == 0) destroyItemStack(stack->getGrid());
 	}
 
 	return 0;

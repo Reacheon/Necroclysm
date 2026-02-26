@@ -451,6 +451,17 @@ void ItemPocket::updateItems()
 
 }
 
+int ItemPocket::findItemIndex(int inputItemCode)
+{
+	for (int i=0; i<itemInfo.size(); i++)
+	{
+		if (itemInfo[i].itemCode == inputItemCode) return i;
+	}
+
+	return -1;
+}
+
+
 
 //@brief 현재 이 총에 장전된 모든 총알을 벡터 형태로 반환
 ItemPocket* getBulletPocket(ItemData& inputGun)
@@ -493,7 +504,6 @@ int getBulletNumber(ItemData& inputGun)
 	}
 	else { return 0; }
 };
-
 
 
 
