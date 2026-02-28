@@ -293,6 +293,7 @@ export enum class aniFlag
 
     tilling, //밭갈기(이미 갈아져 있으면 평탄화)
     watering, //밭 물주기
+    harvesting, //작물 수확
 };
 
 export enum class input

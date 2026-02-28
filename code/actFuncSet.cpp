@@ -12,6 +12,7 @@ import Msg;
 import CoordSelect;
 import turnWait;
 import CoordSelectCraft;
+import GUI;
 
 namespace actFunc
 {
@@ -711,6 +712,7 @@ namespace actFunc
 
 	Corouter executePlant(ItemPocket* tgtPocket,int tgtIndex)
 	{
+		GUI::deactDrawAll();
 		std::vector<Point2> selectableTile;
 		for (int dir = 0; dir < 8; dir++)
 		{
@@ -728,6 +730,7 @@ namespace actFunc
 		if (rangeSet.size() == 0)
 		{
 			updateLog(L"No suitable farmland nearby.");
+			GUI::actDrawAll();
 			co_return;
 		}
 
@@ -736,6 +739,7 @@ namespace actFunc
 		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 		co_await std::suspend_always();
 		rangeSet.clear();
+		GUI::actDrawAll();
 
 		if (coAnswer.empty() == false)
 		{

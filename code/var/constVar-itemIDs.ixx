@@ -183,4 +183,7 @@ export namespace itemID
     constexpr int riceCrop = 511;
     constexpr int wheatCrop = 512;
     constexpr int potatoCrop = 513;
+
+    constexpr int tomato = 514;
+    constexpr int watermelon = 515;
 };

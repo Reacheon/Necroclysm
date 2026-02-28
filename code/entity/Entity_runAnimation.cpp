@@ -1265,6 +1265,50 @@ bool Entity::runAnimation(bool shutdown)
 				}
 			});
 	}
+	else if (getAniType() == aniFlag::harvesting)
+	{
+		return hitAnimation(shutdown, [this]()
+			{
+				int dx, dy;
+				dir2Coord(entityInfo.direction, dx, dy);
+				Point3 cropPos = { PlayerX() + dx, PlayerY() + dy, PlayerZ() };
+				Prop* cropProp = TileProp(cropPos.x, cropPos.y, cropPos.z);
+				if (cropProp != nullptr && cropProp->leadItem.checkFlag(itemFlag::CROP) && cropProp->plantGrowthPercent >= 100.0)
+				{
+					int harvestItemCode = 0;
+					int harvestAmount = 0;
+					if (cropProp->leadItem.itemCode == itemID::wheatCrop)
+					{
+						harvestItemCode = itemID::wheat;
+						harvestAmount = randomRange(3, 5);
+					}
+					else if (cropProp->leadItem.itemCode == itemID::riceCrop)
+					{
+						harvestItemCode = itemID::rice;
+						harvestAmount = randomRange(4, 6);
+					}
+					else if (cropProp->leadItem.itemCode == itemID::potatoCrop)
+					{
+						harvestItemCode = itemID::potato;
+						harvestAmount = randomRange(3, 5);
+					}
+
+					if (harvestItemCode != 0)
+					{
+						if (TileItemStack(cropPos) == nullptr)
+						{
+							createItemStack(cropPos, { {harvestItemCode, harvestAmount} });
+						}
+						else
+						{
+							TileItemStack(cropPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
+						}
+						addAniUSetPlayer(TileItemStack(cropPos), aniFlag::drop);
+						destroyProp(cropPos);
+					}
+				}
+			});
+	}
 	else if (getAniType() == aniFlag::tilling)
 	{
 		return hitAnimation(shutdown, [this]()

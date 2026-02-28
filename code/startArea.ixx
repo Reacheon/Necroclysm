@@ -646,15 +646,17 @@ export void startArea()
 
 
 	createProp({ -3, -10, 0 }, itemID::verticalPipeRB);//지상으로 나오는 파이프
-	createItemStack({ -4, -12, 0 }, 
+	createItemStack({ -4, -12, 0 },
 		{ {itemID::hoe,1},
 		{itemID::scythe,1},
 		{itemID::rice,20},
-		{itemID::wheat,20}, 
+		{itemID::wheat,20},
 		{ itemID::potato,20 },
 		{ itemID::orange,20 },
 		{ itemID::strawHat,1 },
-		{ itemID::wateringCan,1}
+		{ itemID::wateringCan,1},
+		{ itemID::tomato, 15},
+		{ itemID::watermelon,3}
 		});
 
 

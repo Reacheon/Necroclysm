@@ -86,6 +86,7 @@ public:
 		prt(L"HUD instance was generated.\n");
 		errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
 		ptr = this;
+		setAlwaysDraw(true);
 		changeXY(0, 0, false);
 	}
 	~HUD()

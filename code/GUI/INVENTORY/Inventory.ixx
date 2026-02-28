@@ -241,6 +241,11 @@ public:
 					case act::open:
 						executeOpen();
 						return;
+					case act::plant:
+					{
+						CORO(actFunc::executePlant(inventoryPocket, inventoryCursor));
+						break;
+					}
 					}
 
 					// 아이템이 삭제되었을 때 처리
@@ -505,6 +510,15 @@ public:
 			if (targetItem.pocketMaxVolume > 0 && targetItem.pocketPtr.get()->itemInfo.size() > 0)
 			{
 				barAct.push_back(act::dump);
+			}
+
+			//설치 및 심기 추가
+			if (targetItem.propInstallCode != 0)
+			{
+				if (targetItem.checkFlag(itemFlag::CAN_PLANT))
+					barAct.push_back(act::plant);
+				else
+					barAct.push_back(act::propInstall);
 			}
 		}
 	}

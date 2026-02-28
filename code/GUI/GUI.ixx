@@ -18,6 +18,7 @@ private:
 	int slipDir = 6;
 	float foldRatio = 1.0;
 	bool isCorouter = false;
+	bool alwaysDraw = false;
 
 	int distCounter = 100;
 	float distSpd = 1.0;
@@ -50,6 +51,23 @@ public:
     void deactInput() { stateInput = false; }
     bool getStateDraw() { return stateDraw; }
     bool getStateInput() { return stateInput; }
+	void setAlwaysDraw(bool val) { alwaysDraw = val; }
+	static void deactDrawAll(GUI* except = nullptr)
+	{
+		for (auto* gui : activeGUIList)
+		{
+			if (gui->alwaysDraw || gui == except) continue;
+			gui->deactDraw();
+		}
+	}
+	static void actDrawAll(GUI* except = nullptr)
+	{
+		for (auto* gui : activeGUIList)
+		{
+			if (gui->alwaysDraw || gui == except) continue;
+			gui->actDraw();
+		}
+	}
 	void close(aniFlag aniType)
 	{
 		if (aniType == aniFlag::winUnfoldClose)

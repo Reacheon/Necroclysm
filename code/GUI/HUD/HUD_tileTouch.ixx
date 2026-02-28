@@ -273,13 +273,18 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::changePropDelay);
 				}
-				else if (tgtProp->leadItem.itemCode == itemID::gasolineGeneratorR 
+				else if (tgtProp->leadItem.itemCode == itemID::gasolineGeneratorR
 					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorT
 					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorL
 					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorB)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+				}
+				else if (tgtProp->leadItem.checkFlag(itemFlag::CROP) && tgtProp->plantGrowthPercent >= 100.0)
+				{
+					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					addAniUSetPlayer(PlayerPtr, aniFlag::harvesting);
 				}
 			}
 			else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
@@ -292,7 +297,15 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				PlayerPtr->startMove(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 			}
 		}
-		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) 
+		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
+			&& TileProp(touchX, touchY, PlayerZ()) != nullptr
+			&& TileProp(touchX, touchY, PlayerZ())->leadItem.checkFlag(itemFlag::CROP)
+			&& TileProp(touchX, touchY, PlayerZ())->plantGrowthPercent >= 100.0)
+		{
+			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+			addAniUSetPlayer(PlayerPtr, aniFlag::harvesting);
+		}
+		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
 			&& (pressShift && wieldHoe && (floorCode == itemID::dirt || floorCode == itemID::grass || floorCode == itemID::farmland)))
 		{
 			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));

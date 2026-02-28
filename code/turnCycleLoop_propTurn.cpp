@@ -124,7 +124,7 @@ __int64 propTurn()
 
 				if (TileFloor(pPtr->getGrid()) == itemID::farmland && hasWaterPool)
 				{
-					pPtr->plantGrowthPercent += 0.1;
+					pPtr->plantGrowthPercent += 0.5;
 					if (pPtr->plantGrowthPercent > 100.0) pPtr->plantGrowthPercent = 100.0;
 				}
 			}
@@ -132,7 +132,7 @@ __int64 propTurn()
 			{
 				if (TileFloor(pPtr->getGrid()) == itemID::farmland && isWetTile(pPtr->getGrid()))
 				{
-					pPtr->plantGrowthPercent += 0.1;
+					pPtr->plantGrowthPercent += 0.5;
 					if (pPtr->plantGrowthPercent > 100.0) pPtr->plantGrowthPercent = 100.0;
 				}
 			}
