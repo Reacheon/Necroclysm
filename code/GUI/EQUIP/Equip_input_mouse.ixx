@@ -136,6 +136,10 @@ void Equip::clickUpGUI()
 					CORO(actFunc::executePlant(equipPtr, equipCursor));
 					break;
 				}
+				case act::extractSeed:
+					actFunc::extractSeed(actEnv::Equip, equipPtr, equipCursor);
+					updateBarAct();
+					return;
 				case act::insertBattery:
 					CORO(actFunc::insertBattery(actEnv::Equip, equipPtr, equipCursor));
 					break;

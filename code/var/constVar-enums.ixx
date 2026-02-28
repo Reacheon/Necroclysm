@@ -129,6 +129,8 @@ export enum class act
     showWire,
 
     plant, //씨앗을 심는 행동(벼나 밀, 감자같은 것들)
+
+    extractSeed, //과일에서 씨앗을 여러개 추출함(원래 과일은 사라짐)
 };
 
 export namespace humanCustom

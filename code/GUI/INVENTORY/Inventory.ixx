@@ -246,6 +246,10 @@ public:
 						CORO(actFunc::executePlant(inventoryPocket, inventoryCursor));
 						break;
 					}
+					case act::extractSeed:
+						actFunc::extractSeed(actEnv::Inventory, inventoryPocket, inventoryCursor, inventoryItemData->pocketMaxVolume);
+						updateBarAct();
+						return;
 					}
 
 					// 아이템이 삭제되었을 때 처리
@@ -519,6 +523,12 @@ public:
 					barAct.push_back(act::plant);
 				else
 					barAct.push_back(act::propInstall);
+			}
+
+			//씨앗 추출 추가
+			if (targetItem.checkFlag(itemFlag::SEED_FRUIT))
+			{
+				barAct.push_back(act::extractSeed);
 			}
 		}
 	}

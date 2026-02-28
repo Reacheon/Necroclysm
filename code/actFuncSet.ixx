@@ -41,4 +41,6 @@ export namespace actFunc
 	export void hideWire(Point3 tgtPoint);
 	export void showWire(Point3 tgtPoint);
 	export Corouter executePlant(ItemPocket* tgtPocket, int tgtIndex);
+	//씨앗 추출 : SEED_FRUIT 과일에서 씨앗을 추출, Equip이면 바닥 드랍, Inventory면 가방에 넣되 부피초과시 바닥 드랍
+	export void extractSeed(actEnv envType, ItemPocket* tgtPocket, int tgtIndex, int pocketMaxVolume = 0);
 };

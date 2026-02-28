@@ -187,6 +187,10 @@ void Loot::clickUpGUI()
 					actFunc::removeBattery(lootPocket, lootCursor);
 					updateBarAct();
 					return;
+				case act::extractSeed:
+					actFunc::extractSeed(actEnv::Loot, lootPocket, lootCursor);
+					updateBarAct();
+					return;
 				}
 			}
 		}

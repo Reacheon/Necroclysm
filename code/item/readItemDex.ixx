@@ -542,6 +542,7 @@ export int readItemDex(const wchar_t* file)
                             { L"CAN_PLANT", itemFlag::CAN_PLANT },
 
                             { L"CROP", itemFlag::CROP },
+                            { L"SEED_FRUIT", itemFlag::SEED_FRUIT },
                         };
 
                         size_t pos = 0;

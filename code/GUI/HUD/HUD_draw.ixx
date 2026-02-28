@@ -1105,6 +1105,7 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::insertBattery) setBtnLayout80(sysStr[342], 35);
 		else if (barAct[i] == act::removeBattery) setBtnLayout80(sysStr[343], 36);
 		else if (barAct[i] == act::plant) setBtnLayout80(sysStr[349], 34);
+		else if (barAct[i] == act::extractSeed) setBtnLayout80(sysStr[350], 39);
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기

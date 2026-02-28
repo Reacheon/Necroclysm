@@ -762,4 +762,58 @@ namespace actFunc
 		}
 		else co_return;
 	}
+
+	void extractSeed(actEnv envType, ItemPocket* tgtPocket, int tgtIndex, int pocketMaxVolume)
+	{
+		int fruitCode = tgtPocket->itemInfo[tgtIndex].itemCode;
+		int seedCode = 0;
+		int seedAmount = 0;
+
+		if (fruitCode == itemID::tomato)
+		{
+			seedCode = itemID::tomatoSeed;
+			seedAmount = 3;
+		}
+		else if (fruitCode == itemID::watermelon)
+		{
+			seedCode = itemID::watermelonSeed;
+			seedAmount = 5;
+		}
+
+		if (seedCode == 0) return;
+
+		//과일 1개 소모
+		tgtPocket->subtractItemIndex(tgtIndex, 1);
+
+		//씨앗 배치 결정
+		bool dropToGround = true;
+
+		if (envType == actEnv::Inventory && pocketMaxVolume > 0)
+		{
+			int seedVolume = itemDex[seedCode].originalVolume * seedAmount;
+			int currentVolume = tgtPocket->getPocketVolume();
+			if (currentVolume + seedVolume <= pocketMaxVolume)
+			{
+				tgtPocket->addItemFromDex(seedCode, seedAmount);
+				dropToGround = false;
+			}
+		}
+
+		if (dropToGround)
+		{
+			Point3 dropPos = { PlayerX(), PlayerY(), PlayerZ() };
+			if (TileItemStack(dropPos) == nullptr)
+			{
+				createItemStack(dropPos, { {seedCode, seedAmount} });
+			}
+			else
+			{
+				TileItemStack(dropPos)->getPocket()->addItemFromDex(seedCode, seedAmount);
+			}
+			addAniUSetPlayer(TileItemStack(dropPos), aniFlag::drop);
+		}
+
+		PlayerPtr->updateStatus();
+		updateLog(replaceStr(sysStr[351], L"(%item)", itemDex[fruitCode].name)); //(%item)에서 씨앗을 추출했다. 
+	}
 }

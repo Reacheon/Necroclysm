@@ -184,4 +184,6 @@ export enum class itemFlag
     CAN_PLANT, //씨앗같이 밭에 심을 수 있는 아이템들
 
     CROP, //매턴 성장이 발생하는 농작물 종류들
+    
+    SEED_FRUIT, //씨앗을 얻을 수 있는 과일
 };

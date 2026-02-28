@@ -312,17 +312,17 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
 		}
 		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
-			&& (pressShift && wieldWateringCan && floorCode == itemID::farmland && isWetTile({ touchX,touchY,PlayerZ() })==false))
+			&& (pressShift && wieldWateringCan && floorCode == itemID::farmland && isWetTile({ touchX,touchY,PlayerZ() }) == false))
 			{
-			if (wateringCanRemaining >= 100)
-			{
-				PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-				addAniUSetPlayer(PlayerPtr, aniFlag::watering);
-			}
-			else
-			{
-				updateLog(L"Watering can is empty.");
-			}
+				if (wateringCanRemaining >= 100)
+				{
+					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					addAniUSetPlayer(PlayerPtr, aniFlag::watering);
+				}
+				else
+				{
+					updateLog(L"Watering can is empty.");
+				}
 		}
 		else
 		{

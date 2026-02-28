@@ -305,6 +305,11 @@ public:
 				else barAct.push_back(act::propInstall);
 			}
 
+			if (targetItem.checkFlag(itemFlag::SEED_FRUIT))
+			{
+				barAct.push_back(act::extractSeed);
+			}
+
 			if (targetItem.checkFlag(itemFlag::POWERED_BY_BATTERY))
 			{
 				if (targetItem.pocketPtr->itemInfo.size() >= 1) barAct.push_back(act::removeBattery);

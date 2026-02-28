@@ -1292,19 +1292,67 @@ bool Entity::runAnimation(bool shutdown)
 						harvestItemCode = itemID::potato;
 						harvestAmount = randomRange(3, 5);
 					}
+					else if (cropProp->leadItem.itemCode == itemID::tomatoCrop)
+					{
+						harvestItemCode = itemID::tomato;
+						harvestAmount = randomRange(3, 5);
+					}
+					else if (cropProp->leadItem.itemCode == itemID::watermelonCrop)
+					{
+						harvestItemCode = itemID::watermelon;
+						harvestAmount = 1;
+					}
+					else if (cropProp->leadItem.itemCode == itemID::carrotCrop)
+					{
+						harvestItemCode = itemID::carrot;
+						harvestAmount = 1;
+					}
 
 					if (harvestItemCode != 0)
 					{
-						if (TileItemStack(cropPos) == nullptr)
+						//토마토는 프롭 유지, 성장도만 되돌리고 플레이어 위치에 드랍
+						if (cropProp->leadItem.itemCode == itemID::tomatoCrop)
 						{
-							createItemStack(cropPos, { {harvestItemCode, harvestAmount} });
+							Point3 playerPos = { PlayerX(), PlayerY(), PlayerZ() };
+							if (TileItemStack(playerPos) == nullptr)
+							{
+								createItemStack(playerPos, { {harvestItemCode, harvestAmount} });
+							}
+							else
+							{
+								TileItemStack(playerPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
+							}
+							addAniUSetPlayer(TileItemStack(playerPos), aniFlag::drop);
+							cropProp->plantGrowthPercent = 60.0;
 						}
 						else
 						{
-							TileItemStack(cropPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
+							//당근은 씨앗을 먼저 넣어서 대표이미지가 당근이 되도록 함
+							if (cropProp->leadItem.itemCode == itemID::carrotCrop)
+							{
+								int seedAmount = randomRange(3, 5);
+								if (TileItemStack(cropPos) == nullptr)
+								{
+									createItemStack(cropPos, { {itemID::carrotSeed, seedAmount} });
+								}
+								else
+								{
+									TileItemStack(cropPos)->getPocket()->addItemFromDex(itemID::carrotSeed, seedAmount);
+								}
+							}
+
+							if (TileItemStack(cropPos) == nullptr)
+							{
+								createItemStack(cropPos, { {harvestItemCode, harvestAmount} });
+							}
+							else
+							{
+								TileItemStack(cropPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
+							}
+
+							addAniUSetPlayer(TileItemStack(cropPos), aniFlag::drop);
+							destroyProp(cropPos);
 						}
-						addAniUSetPlayer(TileItemStack(cropPos), aniFlag::drop);
-						destroyProp(cropPos);
 					}
 				}
 			});
