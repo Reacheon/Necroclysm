@@ -1,4 +1,4 @@
-﻿export module SkillData;
+export module SkillData;
 
 import std;
 import constVar;

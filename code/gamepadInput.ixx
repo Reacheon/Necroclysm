@@ -1,4 +1,4 @@
-﻿export module gamepadInput;
+export module gamepadInput;
 
 import std;
 import globalVar;

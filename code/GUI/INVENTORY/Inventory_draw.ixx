@@ -1,4 +1,4 @@
-﻿export module Inventory_draw;
+export module Inventory_draw;
 
 import Inventory;
 import globalVar;

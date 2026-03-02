@@ -1,4 +1,4 @@
-﻿export module statusEffect;
+export module statusEffect;
 
 export enum statusEffectFlag
 {

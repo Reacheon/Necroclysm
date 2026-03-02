@@ -1,4 +1,4 @@
-﻿export module initCoordTransform;
+export module initCoordTransform;
 
 import std;
 import util;

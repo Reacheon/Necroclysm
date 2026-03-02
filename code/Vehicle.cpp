@@ -1,4 +1,4 @@
-﻿import Vehicle;
+import Vehicle;
 
 #include <SDL3/SDL.h>
 

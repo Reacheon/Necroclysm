@@ -1,4 +1,4 @@
-﻿export module getDegree;
+export module getDegree;
 
 import std;
 

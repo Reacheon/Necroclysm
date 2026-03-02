@@ -1,4 +1,4 @@
-﻿import HUD;
+import HUD;
 import constVar;
 import globalVar;
 import wrapFunc;

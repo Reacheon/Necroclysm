@@ -1,4 +1,4 @@
-﻿export module Coord;
+export module Coord;
 
 import std;
 import util;

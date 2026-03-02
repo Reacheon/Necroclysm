@@ -1,4 +1,4 @@
-﻿export module const2Str;
+export module const2Str;
 
 import std;
 import constVar;

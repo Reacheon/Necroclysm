@@ -1,4 +1,4 @@
-﻿export module useSkill;
+export module useSkill;
 
 import std;
 import util;

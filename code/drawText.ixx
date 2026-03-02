@@ -1,4 +1,4 @@
-﻿#include <SDL3_ttf/SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 export module drawText;
 import std;
 import util;

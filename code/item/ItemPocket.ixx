@@ -1,4 +1,4 @@
-﻿export module ItemPocket;
+export module ItemPocket;
 
 import std;
 import util;

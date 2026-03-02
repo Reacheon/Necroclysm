@@ -1,4 +1,4 @@
-﻿export module sgn;
+export module sgn;
 
 export int sgn(int val)
 {

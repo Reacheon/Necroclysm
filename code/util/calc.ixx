@@ -1,4 +1,4 @@
-﻿export module calc;
+export module calc;
 
 import extremum;
 

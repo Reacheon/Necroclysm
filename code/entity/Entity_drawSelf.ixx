@@ -1,4 +1,4 @@
-﻿import Entity;
+import Entity;
 
 #include <SDL3/SDL.h>
 

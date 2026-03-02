@@ -1,4 +1,4 @@
-﻿export module decimalCutter;
+export module decimalCutter;
 import std;
 //@brief 실수를 입력했을 때 해당 소수점까지 반올림하고 그 문자열을 반환하는 함수
 //@param val 입력할 실수

@@ -1,4 +1,4 @@
-﻿import Player;
+import Player;
 
 #include <SDL3/SDL.h>
 

@@ -1,4 +1,4 @@
-﻿export module Ani;
+export module Ani;
 
 import util;
 import constVar;

@@ -1,4 +1,4 @@
-﻿import Prop;
+import Prop;
 
 #include <SDL3/SDL.h>
 

@@ -1,4 +1,4 @@
-﻿import Monster;
+import Monster;
 
 #include <sol/sol.hpp>
 

@@ -1,4 +1,4 @@
-﻿export module actFuncSet;
+export module actFuncSet;
 
 import ItemData;
 import ItemPocket;

@@ -1,4 +1,4 @@
-﻿export module Vec3;
+export module Vec3;
 
 import std;
 import errorBox;

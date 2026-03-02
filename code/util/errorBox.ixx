@@ -1,4 +1,4 @@
-﻿#include <SDL3/SDL.h>
+#include <SDL3/SDL.h>
 
 export module errorBox;
 
@@ -16,4 +16,4 @@ export void errorBox(bool condition, std::wstring text)
 	}
 }
 
-export void errorBox(std::wstring text) {errorBox(1, text);}
+export void errorBox(std::wstring text) { errorBox(1, text); }

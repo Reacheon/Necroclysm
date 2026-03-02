@@ -1,4 +1,4 @@
-﻿export module AI;
+export module AI;
 
 export class AI
 {

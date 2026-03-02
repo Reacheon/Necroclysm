@@ -1,4 +1,4 @@
-﻿module;
+module;
 
 #include <SDL3/SDL.h>
 

@@ -1,4 +1,4 @@
-﻿import util;
+import util;
 import Entity;
 import globalVar;
 import wrapFunc;

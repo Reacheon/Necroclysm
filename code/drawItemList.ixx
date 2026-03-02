@@ -1,4 +1,4 @@
-﻿export module drawItemList;
+export module drawItemList;
 import drawWindowArrow;
 import ItemPocket;
 import globalVar;

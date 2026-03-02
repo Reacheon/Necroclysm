@@ -1,4 +1,4 @@
-﻿export module EntityData;
+export module EntityData;
 
 import std;
 import constVar;

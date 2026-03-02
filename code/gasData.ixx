@@ -1,4 +1,4 @@
-﻿export module gasData;
+export module gasData;
 
 import std;
 

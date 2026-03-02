@@ -1,4 +1,4 @@
-﻿export module hasher;
+export module hasher;
 
 import std;
 import Point;

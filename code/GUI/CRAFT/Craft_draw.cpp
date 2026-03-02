@@ -1,4 +1,4 @@
-﻿import Craft;
+import Craft;
 
 #include <SDL3/SDL.h>
 

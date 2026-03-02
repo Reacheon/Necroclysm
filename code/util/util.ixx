@@ -1,4 +1,4 @@
-﻿export module util;
+export module util;
 
 export import aStar;
 export import calc;

@@ -1,4 +1,4 @@
-﻿import Prop;
+import Prop;
 
 import std;
 import util;

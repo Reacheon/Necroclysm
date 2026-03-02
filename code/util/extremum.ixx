@@ -1,4 +1,4 @@
-﻿export module extremum;
+export module extremum;
 
 //최대값과 최소값을 가변인자로 구해주는 함수
 //chatGPT가 만듬

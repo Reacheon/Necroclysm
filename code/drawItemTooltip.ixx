@@ -1,4 +1,4 @@
-﻿export module drawItemTooltip;
+export module drawItemTooltip;
 
 import globalVar;
 

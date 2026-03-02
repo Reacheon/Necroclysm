@@ -1,4 +1,4 @@
-﻿import Loot;
+import Loot;
 
 #include <SDL3/SDL.h>
 

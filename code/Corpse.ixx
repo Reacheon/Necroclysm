@@ -1,4 +1,4 @@
-﻿export module Corpse;
+export module Corpse;
 
 import std;
 import textureVar;

@@ -1,4 +1,4 @@
-﻿import Light;
+import Light;
 
 #include <SDL3/SDL.h>
 #include <cmath>

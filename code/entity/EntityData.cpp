@@ -1,4 +1,4 @@
-﻿import EntityData;
+import EntityData;
 
 EntityData::EntityData() = default;
 EntityData::~EntityData() = default;

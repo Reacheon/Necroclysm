@@ -1,4 +1,4 @@
-﻿export module randomEngine;
+export module randomEngine;
 
 import std;
 

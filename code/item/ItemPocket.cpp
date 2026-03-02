@@ -1,4 +1,4 @@
-﻿import ItemPocket;
+import ItemPocket;
 
 #include <SDL3/SDL.h>
 

@@ -1,4 +1,4 @@
-﻿#include <SDL3/SDL.h>
+#include <SDL3/SDL.h>
 export module Wake;
 import Coord;
 import std;

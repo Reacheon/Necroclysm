@@ -1,4 +1,4 @@
-﻿export module dir16;
+export module dir16;
 
 import std;
 import Vec3;

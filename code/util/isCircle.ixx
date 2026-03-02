@@ -1,4 +1,4 @@
-﻿export module isCircle;
+export module isCircle;
 
 import std;
 

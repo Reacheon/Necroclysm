@@ -1,4 +1,4 @@
-﻿export module drawWindowArrow;
+export module drawWindowArrow;
 
 import textureVar;
 import globalVar;

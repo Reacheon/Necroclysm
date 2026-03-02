@@ -1,4 +1,4 @@
-﻿export module ThreadPool;
+export module ThreadPool;
 
 import std;
 

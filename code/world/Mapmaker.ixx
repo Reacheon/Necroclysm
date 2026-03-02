@@ -1,4 +1,4 @@
-﻿export module Mapmaker;
+export module Mapmaker;
 
 import std;
 import util;

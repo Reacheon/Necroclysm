@@ -1,4 +1,4 @@
-﻿export module Prop;
+export module Prop;
 
 import std;
 import constVar;

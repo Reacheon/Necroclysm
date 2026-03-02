@@ -1,4 +1,4 @@
-﻿export module globalTime;
+export module globalTime;
 import std;
 import constVar;
 static int year = START_YEAR;

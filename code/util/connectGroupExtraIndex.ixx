@@ -1,4 +1,4 @@
-﻿export module connectGroupExtraIndex;
+export module connectGroupExtraIndex;
 
 //@brief 상하좌우 타일에 따라 현재 타일의 추가인덱스(0~15)를 반환하는 함수
 export int connectGroupExtraIndex(bool topCheck, bool botCheck, bool leftCheck, bool rightCheck)

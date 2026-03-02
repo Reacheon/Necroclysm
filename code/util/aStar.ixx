@@ -1,4 +1,4 @@
-﻿export module aStar;
+export module aStar;
 
 import std;
 import Point;

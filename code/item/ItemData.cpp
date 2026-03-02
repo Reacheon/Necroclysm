@@ -1,4 +1,4 @@
-﻿import ItemData;
+import ItemData;
 import ItemPocket;
 import std;
 import util;

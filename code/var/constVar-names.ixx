@@ -1,4 +1,4 @@
-﻿export module constVar:names;
+export module constVar:names;
 
 
 export namespace partType

@@ -1,4 +1,4 @@
-﻿export module keyboardInput;
+export module keyboardInput;
 
 import std;
 import globalVar;

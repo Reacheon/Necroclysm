@@ -1,4 +1,4 @@
-﻿export module Prop_fluidCircuit;
+export module Prop_fluidCircuit;
 
 import Prop;
 import util;

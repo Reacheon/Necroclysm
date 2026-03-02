@@ -1,4 +1,4 @@
-﻿#include <SDL3/sdl.h>
+#include <SDL3/sdl.h>
 
 export module TileData;
 

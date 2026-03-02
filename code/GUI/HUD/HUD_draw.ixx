@@ -1,4 +1,4 @@
-﻿import HUD;
+import HUD;
 
 #include <SDL3/SDL.h>
 

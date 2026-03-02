@@ -1,4 +1,4 @@
-﻿import ItemStack;
+import ItemStack;
 
 #include <SDL3/SDL.h>
 

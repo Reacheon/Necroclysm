@@ -1,4 +1,4 @@
-﻿export module Corouter;
+export module Corouter;
 
 import std;
 import errorBox;  

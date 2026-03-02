@@ -1,4 +1,4 @@
-﻿module actFuncSet;
+module actFuncSet;
 
 import util;
 import constVar;

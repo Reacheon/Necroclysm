@@ -1,4 +1,4 @@
-﻿export module mouseInput;
+export module mouseInput;
 
 import std;
 import util;

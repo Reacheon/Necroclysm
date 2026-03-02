@@ -1,4 +1,4 @@
-﻿export module lineMaker;
+export module lineMaker;
 
 import std;
 import Point;

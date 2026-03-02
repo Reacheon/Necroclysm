@@ -1,4 +1,4 @@
-﻿export module Flame;
+export module Flame;
 
 import util;
 import constVar;

@@ -1,4 +1,4 @@
-﻿export module renderUI;
+export module renderUI;
 
 import std;
 import util;

@@ -1,4 +1,4 @@
-﻿import Flame;
+import Flame;
 import util;
 import Coord;
 import TileData;

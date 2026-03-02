@@ -1,4 +1,4 @@
-﻿#include <SDL3/SDL.h>
+#include <SDL3/SDL.h>
 
 #define 낮 { 0xFF,0xF8,0xED }
 #define 새벽 { 0x79,0x87,0xff}

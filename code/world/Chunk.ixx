@@ -1,4 +1,4 @@
-﻿export module Chunk;
+export module Chunk;
 
 import std;
 import util;

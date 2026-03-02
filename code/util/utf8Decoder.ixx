@@ -1,4 +1,4 @@
-﻿export module utf8Decoder;
+export module utf8Decoder;
 
 import std;
 import prt;

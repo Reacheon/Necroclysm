@@ -1,4 +1,4 @@
-﻿export module ItemDataBase;
+export module ItemDataBase;
 
 import std;
 import util;

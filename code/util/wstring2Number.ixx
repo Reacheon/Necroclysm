@@ -1,4 +1,4 @@
-﻿export module wstring2Number;
+export module wstring2Number;
 
 import std;
 

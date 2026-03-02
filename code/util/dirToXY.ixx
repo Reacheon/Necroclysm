@@ -1,4 +1,4 @@
-﻿export module dirToXY;
+export module dirToXY;
 
 import std;
 import dir16;
