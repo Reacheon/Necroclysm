@@ -54,7 +54,7 @@ export dir16 ACW(dir16 input)
     else if (input == dir16::dir6_5) return dir16::dir7;
     else if (input == dir16::dir7) return dir16::dir7_5;
     else if (input == dir16::dir7_5) return dir16::dir0;
-    else errorBox(L"[utility] ACW에서 알 수 없는 방향이 입력되었다.");
+    else  errorBox(L"[utility] ACW에서 알 수 없는 방향이 입력되었다.");
 }
 
 export dir16 ACW2(dir16 input)

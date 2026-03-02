@@ -187,7 +187,6 @@ public:
 			SDL_SetRenderDrawColor(renderer, lowCol::white.r, lowCol::white.g, lowCol::white.b, 0xff);
 			setFontSize(16);
 
-			int numberStart;
 			int targetItemCode = 0;
 			int firstTextEnd = 0;
 			int lastTextStart = 0;

@@ -117,7 +117,6 @@ void HUD::drawGUI()
 			drawSprite(spr::minimapEdge, 0, 14, 14);
 
 			Point2 minimapBtn = { 36,36 };
-			Sprite* targetBtnSpr;
 			if (option::inputMethod == input::gamepad)
 			{
 				setZoom(1.0);

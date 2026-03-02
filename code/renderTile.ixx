@@ -1482,7 +1482,6 @@ void drawMarkers()
             }
         }
     }
-whiteMarkerEnd:
     return;
 }
 

@@ -620,7 +620,11 @@ bool Prop::isPipeLinked(Point3 currentCoord, dir16 dir)
         if (currentCondition && targetCondition) return true;
         else return false;
     }
-    else errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+    else
+    {
+        errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+        return false;
+    }
 }
 
 bool Prop::isPipeLinked(Prop* currentProp, dir16 dir)

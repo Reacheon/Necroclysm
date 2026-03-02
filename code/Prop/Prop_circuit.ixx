@@ -812,7 +812,11 @@ bool Prop::isCableConnected(Point3 currentCoord, dir16 dir)
         if (currentCondition && targetCondition) return true;
         else return false;
     }
-    else errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
+    else
+    {
+        errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
+        return false;
+    }
 }
 
 bool Prop::isCableConnected(Prop* currentProp, dir16 dir)

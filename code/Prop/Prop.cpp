@@ -286,8 +286,6 @@ bool Prop::runAnimation(bool shutdown)
         if (treeAngle >= 90.0 || treeAngle <= -90.0)
         {
             Point3 itemPos;
-            ItemStack* itemPtr1;
-            ItemStack* itemPtr2;
             if (treeAngle >= 90.0)
             {
                 if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };

@@ -1,4 +1,6 @@
-class ItemPocket;
+module;
+
+class ItemPocket; //이거 익스포트모듈 아래로 옮기면 에러 나니까 옮기지 마라
 
 export module ItemData;
 
@@ -11,7 +13,6 @@ import ItemDataBase;
 //__int8 : -128~127
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
-
 
 export struct ItemData : public ItemDataBase
 {

@@ -17,4 +17,4 @@ export void errorBox(bool condition, std::wstring text)
 	}
 }
 
-export void errorBox(std::wstring text) { errorBox(1, text); }
+export [[noreturn]] void errorBox(std::wstring text) { errorBox(1, text); }

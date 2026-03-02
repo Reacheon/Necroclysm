@@ -24,7 +24,7 @@ private:
 
 	SDL_Rect proficBase;
 
-	bool warningIndex = 0;
+	int warningIndex = 0;
 
 	std::array<SDL_Rect, TALENT_SIZE> proficButton = { { 0,0,0,0 }, };
 public:

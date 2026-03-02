@@ -378,6 +378,7 @@ void Vehicle::updateSpr()
                             }
                             return false;
                         }
+                        return false;
                     };
                 bool topTile = checkWallGroup(0, -1);
                 bool botTile = checkWallGroup(0, 1);

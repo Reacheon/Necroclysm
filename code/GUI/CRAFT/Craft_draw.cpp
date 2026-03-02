@@ -361,7 +361,6 @@ void Craft::drawGUI()
 				};
 
 			std::vector<std::wstring> subcategoryList;
-			itemCategory targetCategory;
 			//소분류(서브카테고리)
 			switch (selectCategory)
 			{

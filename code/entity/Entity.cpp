@@ -811,13 +811,8 @@ int Entity::getAimWeaponIndex()
 				return i;
 				break;
 			}
-
-			if (i == equipInfo.size() - 1)
-			{
-				return -1;
-				break;
-			}
 		}
+		return -1;
 	}
 }
 

@@ -180,8 +180,8 @@ void HUD::mouseStep()
 		{
 			//터치한 좌표를 얻어내는 부분
 			// prt(L"1초 이상 눌렀다.\n");
-			int revX, revY, revGridX, revGridY;
-			revX = clickDownPoint.x - (cameraW / 2);
+			//int revX, revY, revGridX, revGridY;
+			//revX = clickDownPoint.x - (cameraW / 2);
 			//revY = clickDownPoint.y - (cameraH / 2);
 			//revX += sgn(revX) * (8 * zoomScale);
 			//revGridX = revX / (16 * zoomScale);

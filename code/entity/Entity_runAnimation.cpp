@@ -921,8 +921,6 @@ bool Entity::runAnimation(bool shutdown)
 		{
 			if (arriveTimer == 0) arriveTimer = getTimer();
 
-			ItemStack* targetStack;
-
 			bool throwToProp = false;
 			Prop* propPtr = TileProp(dstGrid.x, dstGrid.y, dstGrid.z);
 			int totalVolume = 0;
