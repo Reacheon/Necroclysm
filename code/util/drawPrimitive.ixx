@@ -1,3 +1,4 @@
+module;
 #include <SDL3/SDL.h>
 
 export module drawPrimitive;

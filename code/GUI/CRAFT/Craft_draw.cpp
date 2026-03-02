@@ -1,7 +1,6 @@
-import Craft;
-
 #include <SDL3/SDL.h>
 
+import Craft;
 import globalVar;
 import wrapFunc;
 import textureVar;

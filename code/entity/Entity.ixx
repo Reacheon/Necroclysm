@@ -1,3 +1,4 @@
+module;
 #include <SDL3/SDL.h>
 
 export module Entity;
@@ -12,6 +13,7 @@ import Sprite;
 import Drawable;
 import EntityData;
 import Vehicle;
+import ItemPocket;
 
 export class Entity : public Ani, public Coord, public Drawable 
 {

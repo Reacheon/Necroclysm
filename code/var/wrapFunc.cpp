@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>
 
 import wrapFunc;
-
 import std;
 import util;
 import globalVar;

@@ -1,3 +1,4 @@
+module;
 #include <atomic>
 
 export module sequenceCounter;

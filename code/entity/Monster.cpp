@@ -1,7 +1,6 @@
-import Monster;
-
 #include <sol/sol.hpp>
 
+import Monster;
 import std;
 import Entity;
 import constVar;

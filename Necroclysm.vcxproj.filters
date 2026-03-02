@@ -399,22 +399,22 @@
     <ClCompile Include="code\GUI\CRAFT\Craft.ixx">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.ixx">
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.cpp">
       <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.ixx">
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.cpp">
       <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx">
       <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\EQUIP\Equip_draw.ixx">
+    <ClCompile Include="code\GUI\EQUIP\Equip_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\HUD\HUD.ixx">
@@ -429,16 +429,16 @@
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx">
       <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.ixx">
+    <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp">
       <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.ixx">
+    <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.cpp">
       <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\LOOT\Loot.ixx">
       <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\LOOT\Loot_draw.ixx">
+    <ClCompile Include="code\GUI\LOOT\Loot_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\item\readItemDex.ixx">
@@ -492,7 +492,7 @@
     <ClCompile Include="code\entity\Entity.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
-    <ClCompile Include="code\entity\Entity_drawSelf.ixx">
+    <ClCompile Include="code\entity\Entity_drawSelf.cpp">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\world\TileData.ixx">
@@ -513,7 +513,7 @@
     <ClCompile Include="code\var\globalVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Sample.ixx">
@@ -534,7 +534,7 @@
     <ClCompile Include="code\SystemMenu.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_step.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_step.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\item\ItemData_base.ixx">

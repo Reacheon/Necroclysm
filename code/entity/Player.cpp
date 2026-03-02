@@ -1,7 +1,6 @@
-import Player;
-
 #include <SDL3/SDL.h>
 
+import Player;
 import std;
 import util;
 import Entity;
@@ -726,4 +725,3 @@ int Player::getEncRLeg()
 	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encRLeg;
 	return totalVal;
 }
-

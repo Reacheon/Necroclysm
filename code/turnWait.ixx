@@ -1,3 +1,4 @@
+module;
 #include <SDL3/SDL.h>
 
 #define 낮 { 0xFF,0xF8,0xED }

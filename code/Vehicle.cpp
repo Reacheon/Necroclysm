@@ -1,7 +1,6 @@
-import Vehicle;
-
 #include <SDL3/SDL.h>
 
+import Vehicle;
 import std;
 import globalVar;
 import wrapFunc;

@@ -154,7 +154,7 @@ public:
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
-				if (getChunkTile(x, y).PropPtr != nullptr)
+				if (getChunkTile(x, y).PropPtr.get() != nullptr)
 				{
 					propList.push_back(getChunkTile(x, y).PropPtr.get());
 				}
@@ -170,7 +170,7 @@ public:
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
-				if (getChunkTile(x, y).ItemStackPtr != nullptr)
+				if (getChunkTile(x, y).ItemStackPtr.get() != nullptr)
 				{
 					stackVec.push_back(getChunkTile(x, y).ItemStackPtr.get());
 				}

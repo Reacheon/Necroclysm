@@ -1,6 +1,7 @@
-export module constVar:colors;
-
+module;
 #include <SDL3/SDL.h>
+
+export module constVar:colors;
 
 export namespace mulCol
 {

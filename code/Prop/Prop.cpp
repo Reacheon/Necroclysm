@@ -1,7 +1,6 @@
-import Prop;
-
 #include <SDL3/SDL.h>
 
+import Prop;
 import util;
 import globalVar;
 import wrapFunc;

@@ -335,7 +335,7 @@ bool Vehicle::runAI()
                     float delSpd = frictionCoeff / massCoeff;
 
                     if (delSpd > singleRailSpdVal) singleRailSpdVal = 0;
-                    else singleRailSpdVal - delSpd;
+                    else singleRailSpdVal -= delSpd;
                 }
 
                 //2. 현재 차량의 위치에 있는 레일에 따라 시작하는 속도의 방향(singleRailSpdDir)을 정한다.

@@ -49,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -177,7 +177,7 @@
     <ClCompile Include="code\entity\Entity.ixx" />
     <ClCompile Include="code\entity\EntityData.cpp" />
     <ClCompile Include="code\entity\EntityData.ixx" />
-    <ClCompile Include="code\entity\Entity_drawSelf.ixx" />
+    <ClCompile Include="code\entity\Entity_drawSelf.cpp" />
     <ClCompile Include="code\entity\Entity_runAnimation.cpp" />
     <ClCompile Include="code\entity\Monster.cpp" />
     <ClCompile Include="code\entity\Monster.ixx" />
@@ -203,23 +203,23 @@
     <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx" />
     <ClCompile Include="code\GUI\Dialogue.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx" />
-    <ClCompile Include="code\GUI\EQUIP\Equip_draw.ixx" />
-    <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.ixx" />
-    <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.ixx" />
+    <ClCompile Include="code\GUI\EQUIP\Equip_draw.cpp" />
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.cpp" />
+    <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.cpp" />
     <ClCompile Include="code\GUI\GameOver.ixx" />
     <ClCompile Include="code\GUI\GUI.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_draw.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_step.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.ixx" />
+    <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.cpp" />
+    <ClCompile Include="code\GUI\HUD\HUD_input_desktop.cpp" />
+    <ClCompile Include="code\GUI\HUD\HUD_step.cpp" />
+    <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx" />
     <ClCompile Include="code\GUI\LOOT\Loot.ixx" />
-    <ClCompile Include="code\GUI\LOOT\Loot_draw.ixx" />
-    <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.ixx" />
-    <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.ixx" />
+    <ClCompile Include="code\GUI\LOOT\Loot_draw.cpp" />
+    <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp" />
+    <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.cpp" />
     <ClCompile Include="code\GUI\Map.ixx" />
     <ClCompile Include="code\GUI\Profic.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />

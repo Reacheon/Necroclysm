@@ -1,8 +1,6 @@
-import Entity;
-
 #include <SDL3/SDL.h>
 
-
+import Entity;
 import std;
 import util;
 import constVar;
@@ -834,4 +832,3 @@ void Entity::pullEquipLights()
 		}
 	}
 }
-

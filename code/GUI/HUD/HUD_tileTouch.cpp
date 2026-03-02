@@ -1,7 +1,6 @@
 #include <SDL3/SDL.h>;
 
 import HUD;
-
 import std;
 import util;
 import constVar;

@@ -1,11 +1,10 @@
-import Light;
-
 #include <SDL3/SDL.h>
 #include <cmath>
 #include <cstdlib>
 #include <set>
 #include <array>
 
+import Light;
 import std;
 import util;
 import World;
