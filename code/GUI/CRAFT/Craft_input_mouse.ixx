@@ -1,4 +1,4 @@
-#include <SDL3/SDL.h>
+ï»¿#include <SDL3/SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 
@@ -20,15 +20,15 @@ void Craft::clickUpGUI()
 		executeTab();
 
 	}
-	else if (checkCursor(&tooltipCraftBtn) && craftCursor >= 0)//ÅøÆÁ Á¶ÇÕÇÏ±â
+	else if (checkCursor(&tooltipCraftBtn) && craftCursor >= 0)//íˆ´íŒ ì¡°í•©í•˜ê¸°
 	{
 		CORO(executeCraft());
 	}
-	else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//ÅøÆÁ Áñ°ÜÃ£±â
+	else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//íˆ´íŒ ì¦ê²¨ì°¾ê¸°
 	{
 		CORO(executeBookmark());
 	}
-	else if (checkCursor(&bookmarkCategory))//Áñ°ÜÃ£±â Ä«Å×°í¸® Å¬¸¯¾÷
+	else if (checkCursor(&bookmarkCategory))//ì¦ê²¨ì°¾ê¸° ì¹´í…Œê³ ë¦¬ í´ë¦­ì—…
 	{
 		craftCursor = -1;
 		if (selectCategory != -2)
@@ -40,7 +40,7 @@ void Craft::clickUpGUI()
 			filterUpdate(matchCount);
 
 		}
-		else //ÀçÂ÷ ´­·¶À» °æ¿ì ÀüÃ¼ ºĞ·ù·Î º¯°æ
+		else //ì¬ì°¨ ëˆŒë €ì„ ê²½ìš° ì „ì²´ ë¶„ë¥˜ë¡œ ë³€ê²½
 		{
 			selectCategory = -1;
 		}
@@ -50,12 +50,12 @@ void Craft::clickUpGUI()
 		if (exInput == false)
 		{
 			exInput = true;
-			SDL_StartTextInput(window);  // Ãß°¡
+			SDL_StartTextInput(window);  // ì¶”ê°€
 		}
 		else
 		{
 			exInput = false;
-			SDL_StopTextInput(window);  // Ãß°¡
+			SDL_StopTextInput(window);  // ì¶”ê°€
 		}
 	}
 	else if (checkCursor(&searchBtnRect))
@@ -66,7 +66,7 @@ void Craft::clickUpGUI()
 	}
 	else
 	{
-		//Ä«Å×°í¸® 8¹öÆ° Å¬¸¯¾÷
+		//ì¹´í…Œê³ ë¦¬ 8ë²„íŠ¼ í´ë¦­ì—…
 		for (int i = 0; i < 8; i++)
 		{
 			if (checkCursor(&craftCategory[i]))
@@ -121,39 +121,39 @@ void Craft::clickUpGUI()
 			}
 		}
 
-		//¼­ºêÄ«Å×°í¸® ÀÔ·Â
+		//ì„œë¸Œì¹´í…Œê³ ë¦¬ ì…ë ¥
 		{
 			int maxSubcategorySize;
 			switch (selectCategory)
 			{
-			case -2://Áñ°ÜÃ£±â
+			case -2://ì¦ê²¨ì°¾ê¸°
 				maxSubcategorySize = 6;
 				break;
-			case -1://ÀüÃ¼
+			case -1://ì „ì²´
 				maxSubcategorySize = 1;
 				break;
-			case 0://Àåºñ
+			case 0://ì¥ë¹„
 				maxSubcategorySize = 6;
 				break;
-			case 1://À½½Ä
+			case 1://ìŒì‹
 				maxSubcategorySize = 6;
 				break;
-			case 2://µµ±¸
+			case 2://ë„êµ¬
 				maxSubcategorySize = 5;
 				break;
-			case 3://±â¼ú
+			case 3://ê¸°ìˆ 
 				maxSubcategorySize = 3;
 				break;
-			case 4://¼Ò¸ğÇ°
+			case 4://ì†Œëª¨í’ˆ
 				maxSubcategorySize = 5;
 				break;
-			case 5://Â÷·®
+			case 5://ì°¨ëŸ‰
 				maxSubcategorySize = 5;
 				break;
-			case 6://°ÇÃà¹°
+			case 6://ê±´ì¶•ë¬¼
 				maxSubcategorySize = 5;
 				break;
-			case 7://Àç·á
+			case 7://ì¬ë£Œ
 				maxSubcategorySize = 6;
 				break;
 			}
@@ -180,10 +180,10 @@ void Craft::clickUpGUI()
 							else if (selectSubcategory == 5) { targetFlag = itemFlag::BOOKMARK6; }
 							matchCount = recipePtr->searchFlag(targetFlag);
 							break;
-						case 0://Àåºñ
+						case 0://ì¥ë¹„
 							if (selectSubcategory == 0)
 							{
-								// All - ÀüÃ¼ Àåºñ Ä«Å×°í¸® Ç¥½Ã
+								// All - ì „ì²´ ì¥ë¹„ ì¹´í…Œê³ ë¦¬ í‘œì‹œ
 								itemCategory targetCategory = itemCategory::equipment;
 								matchCount = recipePtr->searchCategory(targetCategory);
 							}
@@ -197,7 +197,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 1://À½½Ä
+						case 1://ìŒì‹
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::foods;
@@ -213,7 +213,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 2://µµ±¸
+						case 2://ë„êµ¬
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::tools;
@@ -228,7 +228,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 3://±â¼ú
+						case 3://ê¸°ìˆ 
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::tech;
@@ -241,7 +241,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 4://¼Ò¸ğÇ°
+						case 4://ì†Œëª¨í’ˆ
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::consumables;
@@ -256,7 +256,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 5://Â÷·®
+						case 5://ì°¨ëŸ‰
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::vehicles;
@@ -271,7 +271,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 6://°ÇÃà¹°
+						case 6://ê±´ì¶•ë¬¼
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::structures;
@@ -286,7 +286,7 @@ void Craft::clickUpGUI()
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;
-						case 7://Àç·á
+						case 7://ì¬ë£Œ
 							if (selectSubcategory == 0)
 							{
 								itemCategory targetCategory = itemCategory::materials;
@@ -310,7 +310,7 @@ void Craft::clickUpGUI()
 			}
 		}
 
-		//¾ÆÀÌÅÛ¹Ú½º Å¬¸¯
+		//ì•„ì´í…œë°•ìŠ¤ í´ë¦­
 		for (int i = 0; i < 24; i++)
 		{
 			if (checkCursor(&itemBox[i]))
@@ -348,7 +348,7 @@ void Craft::clickMotionGUI(int dx, int dy)
 	{
 		if (click == true)
 		{
-			int scrollAccelConst = 20; // °¡¼Ó»ó¼ö, ÀÛ¾ÆÁú¼ö·Ï ½ºÅ©·Ñ ¼Óµµ°¡ »¡¶óÁü
+			int scrollAccelConst = 20; // ê°€ì†ìƒìˆ˜, ì‘ì•„ì§ˆìˆ˜ë¡ ìŠ¤í¬ë¡¤ ì†ë„ê°€ ë¹¨ë¼ì§
 			craftScroll = initCraftScroll + dy / scrollAccelConst;
 			if (std::abs(dy / scrollAccelConst) >= 1)
 			{

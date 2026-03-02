@@ -1,4 +1,4 @@
-module turnCycleLoop;
+﻿module turnCycleLoop;
 
 import constVar;
 import globalVar;

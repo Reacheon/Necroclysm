@@ -1,4 +1,4 @@
-export module constVar:constants;
+﻿export module constVar:constants;
 
 import std;
 

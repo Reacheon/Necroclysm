@@ -1,4 +1,4 @@
-export module constVar:enums;
+﻿export module constVar:enums;
 
 export enum class act
 {

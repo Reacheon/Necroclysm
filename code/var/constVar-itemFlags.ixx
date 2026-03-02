@@ -1,4 +1,4 @@
-export module constVar:itemFlags;
+﻿export module constVar:itemFlags;
 
 export enum class itemFlag
 {

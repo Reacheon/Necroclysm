@@ -1,4 +1,4 @@
-export module constVar:colors;
+﻿export module constVar:colors;
 
 #include <SDL3/SDL.h>
 

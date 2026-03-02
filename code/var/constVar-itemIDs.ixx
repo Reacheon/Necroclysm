@@ -1,4 +1,4 @@
-export module constVar:itemIDs;
+﻿export module constVar:itemIDs;
 
 export namespace itemID
 {

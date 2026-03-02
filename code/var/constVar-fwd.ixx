@@ -1,4 +1,4 @@
-export module constVar:fwd;
+﻿export module constVar:fwd;
 
 export struct ItemData;
 export class ItemPocket;
