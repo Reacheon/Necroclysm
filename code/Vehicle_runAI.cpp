@@ -168,6 +168,8 @@ bool Vehicle::runAI()
                         case dir16::dir6:
                             return 6;
                             break;
+                        default:
+                            errorBox(L"[Vehicle_runAI.cpp : intDir] Unsupported direction. Only dir0, dir2, dir4, and dir6 are allowed.");
                         }
                     };
 
