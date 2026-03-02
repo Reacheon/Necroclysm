@@ -802,6 +802,113 @@ public:
 		}
 	};
 
+	Corouter executeTill()
+	{
+		std::vector<Point2> selectableTile;
+		for (int dir = 0; dir < 8; dir++)
+		{
+			int dx, dy;
+			dir2Coord(dir, dx, dy);
+			int floorCode = TileFloor(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+			if (floorCode == itemID::dirt || floorCode == itemID::grass || floorCode == itemID::farmland)
+			{
+				selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
+			}
+		}
+		if (selectableTile.empty())
+		{
+			updateLog(L"No suitable soil nearby to till.");
+			co_return;
+		}
+
+		GUI::deactDrawAll();
+
+		rangeSet.clear();
+		for (auto& tile : selectableTile)
+			rangeSet.insert({ tile.x, tile.y });
+
+		new CoordSelect(L"Select a tile to till.", selectableTile);
+		co_await std::suspend_always();
+
+		rangeSet.clear();
+		GUI::actDrawAll();
+
+		if (coAnswer.empty()) co_return;
+
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+
+		PlayerPtr->setDirection(coord2Dir(targetX - PlayerX(), targetY - PlayerY()));
+		addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
+	};
+
+	Corouter executeWatering()
+	{
+		//물뿌리개 물 잔량 확인
+		int wateringCanRemaining = 0;
+		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		for (const ItemData& eqItem : equipInfo)
+		{
+			if (eqItem.equipState == equipHandFlag::both && eqItem.itemCode == itemID::wateringCan)
+			{
+				if (eqItem.pocketPtr->itemInfo.size() == 1
+					&& eqItem.pocketPtr->itemInfo[0].itemCode == itemID::water)
+				{
+					wateringCanRemaining = eqItem.pocketPtr->itemInfo[0].number;
+				}
+				break;
+			}
+		}
+		if (wateringCanRemaining < 100)
+		{
+			updateLog(L"Watering can is empty.");
+			co_return;
+		}
+
+		//인접 8타일에서 farmland이면서 젖지 않은 타일 수집
+		std::vector<Point2> selectableTile;
+		for (int dir = 0; dir < 8; dir++)
+		{
+			int dx, dy;
+			dir2Coord(dir, dx, dy);
+			int tx = PlayerX() + dx;
+			int ty = PlayerY() + dy;
+			if (TileFloor(tx, ty, PlayerZ()) == itemID::farmland && isWetTile({ tx, ty, PlayerZ() }) == false)
+			{
+				selectableTile.push_back({ tx, ty });
+			}
+		}
+		if (selectableTile.empty())
+		{
+			updateLog(L"No dry farmland nearby to water.");
+			co_return;
+		}
+
+		GUI::deactDrawAll();
+
+		rangeSet.clear();
+		for (auto& tile : selectableTile)
+			rangeSet.insert({ tile.x, tile.y });
+
+		new CoordSelect(L"Select a tile to water.", selectableTile);
+		co_await std::suspend_always();
+
+		rangeSet.clear();
+		GUI::actDrawAll();
+
+		if (coAnswer.empty()) co_return;
+
+		std::wstring targetStr = coAnswer;
+		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+		targetStr.erase(0, targetStr.find(L",") + 1);
+		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
+
+		PlayerPtr->setDirection(coord2Dir(targetX - PlayerX(), targetY - PlayerY()));
+		addAniUSetPlayer(PlayerPtr, aniFlag::watering);
+	};
+
 	void quickSlotToggle()
 	{
 		if (isPopUp == false)
@@ -823,6 +930,17 @@ public:
 
 	void executeTab()
 	{
+		if (tabType == tabFlag::till)
+		{
+			CORO(executeTill());
+			return;
+		}
+		if (tabType == tabFlag::water)
+		{
+			CORO(executeWatering());
+			return;
+		}
+
 		bool findRangeWeapon = false;
 		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
 		for (int i = 0; i < equipInfo.size(); i++)
@@ -1049,7 +1167,7 @@ public:
 			if (propPtr->leadItem.checkFlag(itemFlag::CIRCUIT))
 			{
 				if (propPtr->leadItem.checkFlag(itemFlag::HIDE_WIRE)) inputOptions.push_back(act::showWire);
-                else inputOptions.push_back(act::hideWire);
+                else if (propPtr->leadItem.checkFlag(itemFlag::CABLE)) inputOptions.push_back(act::hideWire);
 			}
 		}
 

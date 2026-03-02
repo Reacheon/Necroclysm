@@ -323,6 +323,8 @@ export enum class tabFlag
     back,
     confirm,
     aim,
+    till,
+    water,
 
 };
 

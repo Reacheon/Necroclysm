@@ -17,27 +17,13 @@ import ItemData;
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
 	const bool* state = SDL_GetKeyboardState(nullptr);
-	bool pressShift = state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT];
-	bool wieldHoe = false;
 	bool wieldPickaxe = false;
-	bool wieldWateringCan = false;
-	int wateringCanRemaining = 0;
 	std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
 	for (const ItemData& eqItem : equipInfo)
 	{
 		if (eqItem.equipState == equipHandFlag::both)
 		{
-			if (eqItem.itemCode == itemID::hoe) wieldHoe = true;
-			else if (eqItem.itemCode == itemID::pickaxe) wieldPickaxe = true;
-			else if (eqItem.itemCode == itemID::wateringCan)
-			{
-				wieldWateringCan = true;
-				if (eqItem.pocketPtr->itemInfo.size() == 1 
-					&& eqItem.pocketPtr->itemInfo[0].itemCode == itemID::water)
-				{
-					wateringCanRemaining = eqItem.pocketPtr->itemInfo[0].number;
-				}
-			}
+			if (eqItem.itemCode == itemID::pickaxe) wieldPickaxe = true;
 		}
 	}
 	int floorCode = TileFloor(touchX, touchY, PlayerZ());
@@ -304,25 +290,6 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 		{
 			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 			addAniUSetPlayer(PlayerPtr, aniFlag::harvesting);
-		}
-		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
-			&& (pressShift && wieldHoe && (floorCode == itemID::dirt || floorCode == itemID::grass || floorCode == itemID::farmland)))
-		{
-			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-			addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
-		}
-		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1)
-			&& (pressShift && wieldWateringCan && floorCode == itemID::farmland && isWetTile({ touchX,touchY,PlayerZ() }) == false))
-			{
-				if (wateringCanRemaining >= 100)
-				{
-					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::watering);
-				}
-				else
-				{
-					updateLog(L"Watering can is empty.");
-				}
 		}
 		else
 		{

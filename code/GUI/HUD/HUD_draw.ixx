@@ -517,45 +517,6 @@ void HUD::drawGUI()
 	drawFluidCircuitInfo();
 	//drawHoverItemInfo();
 
-	//호미나 기타 도구들을 들었을 때 커맨드를 화면에 표시하는 가이드 로그
-	bool wieldHoe = false;
-	bool wieldWateringCan = false;
-	std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
-	for (const ItemData& eqItem : equipInfo)
-	{
-		if (eqItem.equipState == equipHandFlag::both)
-		{
-			if (eqItem.itemCode == itemID::hoe) wieldHoe = true;
-			else if (eqItem.itemCode == itemID::wateringCan) wieldWateringCan = true;
-		}
-	}
-
-	if (wieldHoe)
-	{
-		drawSpriteCenter(spr::floatGuideLog, 0,cameraW/2, 126);
-		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::shift, cameraW / 2 - 86, 126);
-		setFontSize(24);
-		drawTextCenter(L"+", cameraW / 2 - 36, 124);
-		drawSpriteCenter(spr::keyboardButtons, 10, cameraW / 2 + 2, 126);
-		drawTextCenter(L"=", cameraW / 2 + 50, 124);
-
-		setZoom(1.0);
-		drawSpriteCenter(spr::icon80, 43, cameraW / 2 + 100, 126);
-		setZoom(1.0);
-	}
-	else if (wieldWateringCan)
-	{
-		drawSpriteCenter(spr::floatGuideLog, 0, cameraW / 2, 126);
-		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::shift, cameraW / 2 - 86, 126);
-		setFontSize(24);
-		drawTextCenter(L"+", cameraW / 2 - 36, 124);
-		drawSpriteCenter(spr::keyboardButtons, 10, cameraW / 2 + 2, 126);
-		drawTextCenter(L"=", cameraW / 2 + 50, 124);
-
-		setZoom(1.0);
-		drawSpriteCenter(spr::icon80, 44, cameraW / 2 + 100, 126);
-		setZoom(1.0);
-	}
 
 }
 
@@ -708,6 +669,26 @@ void HUD::drawTab()
 		setZoom(1.0);
 		setFontSize(22);
 		drawTextCenter(sysStr[91], tab.x + 90, tab.y + 150);
+		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
+		break;
+	case tabFlag::till:
+		//쟁기질
+		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
+		setZoom(1.0);
+		drawSpriteCenter(spr::icon80, 43, tab.x + 90, tab.y + 55 + 25);
+		setZoom(1.0);
+		setFontSize(22);
+		drawTextCenter(L"Tilling", tab.x + 90, tab.y + 150);
+		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
+		break;
+	case tabFlag::water:
+		//물주기
+		drawStadium(tab.x, tab.y, tab.w, tab.h, btnColor, 150, 5);
+		setZoom(1.0);
+		drawSpriteCenter(spr::icon80, 44, tab.x + 90, tab.y + 55 + 25);
+		setZoom(1.0);
+		setFontSize(22);
+		drawTextCenter(L"Watering", tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	default:
@@ -1728,27 +1709,11 @@ void HUD::drawBodyParts()
 
 void HUD::drawCircuitInfo()
 {
-	if (ContextMenu::ins() != nullptr) return;
+	if (ContextMenu::ins() == nullptr) return;
 
-	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };
-	static int hoverTime = 0;
-	Point2 currentHoverGrid = getAbsMouseGrid();
-	
-	if(option::inputMethod == input::mouse) currentHoverGrid = getAbsMouseGrid();
-
-	if (prevHoverGrid != currentHoverGrid)
 	{
-		hoverTime = 0;
-		prevHoverGrid = currentHoverGrid;
-	}
-	else hoverTime += 1;
-
-	if (hoverTime > 30)
-	{
-		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
-            
-
-		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerPtr->getGridZ());
+		Point2 tgtGrid = contextMenuTargetGrid;
+		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerPtr->getGridZ());
 		if (tgtProp == nullptr) return;
 		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) &&tgtProp->isChargeFlowing())
 			|| tgtProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
@@ -1927,13 +1892,7 @@ void HUD::drawCircuitInfo()
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 			SDL_SetRenderTarget(renderer, nullptr);
 
-			Point2 mouseCoord = getAbsMouseGrid();
-			SDL_Rect dst;
-			dst.x = cameraW / 2 + zoomScale * ((16 * mouseCoord.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
-			dst.y = cameraH / 2 + zoomScale * ((16 * mouseCoord.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
-			Point2 windowCoord = { dst.x, dst.y };
-
-			if (windowCoord.y + window.w >= cameraH) windowCoord.y = cameraH - window.w;
+			Point2 windowCoord = { cameraW - 20 - window.w, 220 };
 
 			SDL_SetTextureAlphaMod(texture::circuitInfo, windowAlpha);
 			drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);
@@ -1944,26 +1903,11 @@ void HUD::drawCircuitInfo()
 
 void HUD::drawFluidCircuitInfo()
 {
-	if (ContextMenu::ins() != nullptr) return;
+	if (ContextMenu::ins() == nullptr) return;
 
-	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };
-	static int hoverTime = 0;
-	Point2 currentHoverGrid = getAbsMouseGrid();
-
-	if (option::inputMethod == input::mouse) currentHoverGrid = getAbsMouseGrid();
-
-	if (prevHoverGrid != currentHoverGrid)
 	{
-		hoverTime = 0;
-		prevHoverGrid = currentHoverGrid;
-	}
-	else hoverTime += 1;
-
-	if (hoverTime > 30)
-	{
-		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
-
-		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerPtr->getGridZ());
+		Point2 tgtGrid = contextMenuTargetGrid;
+		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerPtr->getGridZ());
 		if (tgtProp == nullptr) return;
 		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT))) return;
 
@@ -2159,13 +2103,7 @@ void HUD::drawFluidCircuitInfo()
 		SDL_SetRenderTarget(renderer, nullptr);
 
 		// 화면 위치 계산
-		Point2 mouseCoord = getAbsMouseGrid();
-		SDL_Rect dst;
-		dst.x = cameraW / 2 + zoomScale * ((16 * mouseCoord.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
-		dst.y = cameraH / 2 + zoomScale * ((16 * mouseCoord.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
-		Point2 windowCoord = { dst.x, dst.y };
-
-		if (windowCoord.y + window.h >= cameraH) windowCoord.y = cameraH - window.h;
+		Point2 windowCoord = { cameraW - 20 - window.w, 220 };
 
 		SDL_SetTextureAlphaMod(texture::circuitInfo, windowAlpha);
 		drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);

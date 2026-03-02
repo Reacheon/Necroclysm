@@ -2,6 +2,7 @@
 import constVar;
 import globalVar;
 import wrapFunc;
+import ItemData;
 import Profic;
 import Sleep;
 import statusEffect;
@@ -9,6 +10,19 @@ import statusEffect;
 void HUD::step()
 {
     tabType = tabFlag::attackNearby;
+
+    // 도구 장착 시 탭 변경
+    {
+        std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+        for (const ItemData& eqItem : equipInfo)
+        {
+            if (eqItem.equipState == equipHandFlag::both)
+            {
+                if (eqItem.itemCode == itemID::hoe) { tabType = tabFlag::till; break; }
+                else if (eqItem.itemCode == itemID::wateringCan) { tabType = tabFlag::water; break; }
+            }
+        }
+    }
 
     if (GUI::getLastGUI() == this)
     {

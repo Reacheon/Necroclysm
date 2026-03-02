@@ -656,8 +656,8 @@ export void startArea()
 		{ itemID::strawHat,1 },
 		{ itemID::wateringCan,1},
 		{ itemID::tomato, 15},
-		{ itemID::watermelon,3},
-		{ itemID::carrotSeed,3 },
+		{ itemID::watermelon,10},
+		{ itemID::carrotSeed,5 },
 		{ itemID::carrot,3 }
 		});
 
