@@ -20,6 +20,7 @@ import World;
 import Entity;
 import log;
 import ItemData;
+import ItemPocket;
 import replaceStr;
 import turnWait;
 

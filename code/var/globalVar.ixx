@@ -16,6 +16,9 @@ import Ani;
 import Player;
 import Drawable;
 
+import Vehicle;
+import Prop;
+
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {

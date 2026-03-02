@@ -107,7 +107,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		mainName += L" (" + decimalCutter(100.0*(inputItem.powerStorage / static_cast<double>(inputItem.powerStorageMax)), 0) + L"%)";
 	}
-	else if (inputItem.pocketPtr != nullptr)
+	else if (inputItem.pocketPtr)
 	{
 		if (inputItem.pocketPtr->itemInfo.size() == 1)
 		{

@@ -5,6 +5,9 @@ import util;
 import constVar;
 import TileData;
 
+import Monster;
+import Vehicle;
+
 export class Chunk
 {
 private:

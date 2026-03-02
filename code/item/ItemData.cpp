@@ -87,7 +87,7 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
 {
     if (checkFlag(itemFlag::NONSTACK) || tgtItem.checkFlag(itemFlag::NONSTACK)) { return false; }
 
-    if (lightPtr != nullptr || pocketPtr != nullptr) return false;
+    if (lightPtr || pocketPtr) return false;
 
     if (name != tgtItem.name) { return false; }
     if (itemCode != tgtItem.itemCode) { return false; }

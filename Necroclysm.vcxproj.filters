@@ -420,7 +420,7 @@
     <ClCompile Include="code\GUI\HUD\HUD.ixx">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\HUD\HUD_draw.ixx">
+    <ClCompile Include="code\GUI\HUD\HUD_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx">
@@ -607,9 +607,6 @@
       <Filter>소스 파일\00_var\constVar</Filter>
     </ClCompile>
     <ClCompile Include="code\var\constVar-names.ixx">
-      <Filter>소스 파일\00_var\constVar</Filter>
-    </ClCompile>
-    <ClCompile Include="code\var\constVar-fwd.ixx">
       <Filter>소스 파일\00_var\constVar</Filter>
     </ClCompile>
     <ClCompile Include="code\var\constVar-itemFlags.ixx">

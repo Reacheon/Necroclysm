@@ -10,6 +10,11 @@ import Mapmaker;
 import constVar;
 import TileData;
 
+import Vehicle;
+import Prop;
+import Monster;
+import ItemStack;
+
 export class World
 {
 private:

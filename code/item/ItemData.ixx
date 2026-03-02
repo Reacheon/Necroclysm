@@ -1,3 +1,5 @@
+class ItemPocket;
+
 export module ItemData;
 
 import std;
@@ -5,7 +7,6 @@ import util;
 import constVar;
 import Light;
 import ItemDataBase;
-export import ItemPocket;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767

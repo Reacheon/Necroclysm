@@ -24,6 +24,7 @@ import Lst;
 import Maint;
 import drawEpsilonText;
 import ItemData;
+import ItemStack;
 import Sleep;
 import turnWait;
 

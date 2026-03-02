@@ -43,13 +43,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -209,7 +209,7 @@
     <ClCompile Include="code\GUI\GameOver.ixx" />
     <ClCompile Include="code\GUI\GUI.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD.ixx" />
-    <ClCompile Include="code\GUI\HUD\HUD_draw.ixx" />
+    <ClCompile Include="code\GUI\HUD\HUD_draw.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_input_desktop.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_step.cpp" />
@@ -321,7 +321,6 @@
     <ClCompile Include="code\var\constVar-colors.ixx" />
     <ClCompile Include="code\var\constVar-constants.ixx" />
     <ClCompile Include="code\var\constVar-enums.ixx" />
-    <ClCompile Include="code\var\constVar-fwd.ixx" />
     <ClCompile Include="code\var\constVar-itemFlags.ixx" />
     <ClCompile Include="code\var\constVar-itemIDs.ixx" />
     <ClCompile Include="code\var\constVar-names.ixx" />

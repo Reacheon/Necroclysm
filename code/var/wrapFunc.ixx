@@ -7,6 +7,12 @@ import std;
 import util;
 import constVar;
 import statusEffect;
+import ItemData;
+import ItemPocket;
+import ItemStack;
+import Entity;
+import Prop;
+import Vehicle;
 
 export int PlayerX();
 export int PlayerY();
