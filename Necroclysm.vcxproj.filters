@@ -97,6 +97,9 @@
     <Filter Include="소스 파일\00_var\constVar">
       <UniqueIdentifier>{8186169b-c69a-4b90-8b99-70abd1930d93}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\COOK">
+      <UniqueIdentifier>{73243e2e-3875-4bd8-a019-3d6c7a7ef262}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -617,6 +620,9 @@
     </ClCompile>
     <ClCompile Include="code\turnCycleLoop_propTurn.cpp">
       <Filter>소스 파일\01_system\02_turn</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Cook.ixx">
+      <Filter>소스 파일\01_system\04_GUI\COOK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

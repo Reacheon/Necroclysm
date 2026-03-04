@@ -257,6 +257,7 @@
     <ClCompile Include="code\item\readItemDex.ixx" />
     <ClCompile Include="code\keyboardInput.ixx" />
     <ClCompile Include="code\Light.cpp" />
+    <ClCompile Include="code\Cook.ixx" />
     <ClCompile Include="code\mouseInput.ixx" />
     <ClCompile Include="code\Particle.ixx" />
     <ClCompile Include="code\Prop\Prop.cpp" />
