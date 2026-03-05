@@ -659,7 +659,12 @@ export void startArea()
 		{ itemID::tomato, 15},
 		{ itemID::watermelon,10},
 		{ itemID::carrotSeed,5 },
-		{ itemID::carrot,3 }
+		{ itemID::carrot,3 },
+		{ itemID::cabbage,3 },
+		{ itemID::cabbageSeed,12 },
+		{ itemID::rawChicken,3 },
+		{ itemID::cacaoFruit,3 },
+		{ itemID::butter,3 },
 		});
 
 

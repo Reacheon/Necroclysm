@@ -195,4 +195,12 @@ export namespace itemID
     constexpr int carrot = 522;
     constexpr int carrotSeed = 523;
     constexpr int carrotCrop = 524;
+
+    constexpr int cabbage = 525;
+    constexpr int cabbageSeed = 526;
+    constexpr int cabbageCrop = 527;
+
+    constexpr int rawChicken = 528;
+    constexpr int cacaoFruit = 529;
+    constexpr int butter = 530;
 };

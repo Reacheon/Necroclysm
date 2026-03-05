@@ -596,7 +596,8 @@ void Prop::drawSelf()
     if (iCode == itemID::potatoCrop
         || iCode == itemID::wheatCrop
         || iCode == itemID::riceCrop
-        || iCode == itemID::carrotCrop)
+        || iCode == itemID::carrotCrop
+        || iCode == itemID::cabbageCrop)
     {
         if (plantGrowthPercent >= 100.0) sprIndex += 4;
         else if (plantGrowthPercent >= 75) sprIndex += 3;

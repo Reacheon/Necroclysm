@@ -1305,6 +1305,11 @@ bool Entity::runAnimation(bool shutdown)
 						harvestItemCode = itemID::carrot;
 						harvestAmount = 1;
 					}
+					else if (cropProp->leadItem.itemCode == itemID::cabbageCrop)
+					{
+						harvestItemCode = itemID::cabbage;
+						harvestAmount = 1;
+					}
 
 					if (harvestItemCode != 0)
 					{
@@ -1336,6 +1341,18 @@ bool Entity::runAnimation(bool shutdown)
 								else
 								{
 									TileItemStack(cropPos)->getPocket()->addItemFromDex(itemID::carrotSeed, seedAmount);
+								}
+							}
+							else if (cropProp->leadItem.itemCode == itemID::cabbageCrop)
+							{
+								int seedAmount = randomRange(3, 5);
+								if (TileItemStack(cropPos) == nullptr)
+								{
+									createItemStack(cropPos, { {itemID::cabbageSeed, seedAmount} });
+								}
+								else
+								{
+									TileItemStack(cropPos)->getPocket()->addItemFromDex(itemID::cabbageSeed, seedAmount);
 								}
 							}
 
