@@ -22,7 +22,7 @@ import Prop;
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait, act::test, act::quest,act::god, act::sleep, act::cooking };
+    std::vector<act> null = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait,act::god, act::sleep, act::cooking };
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };

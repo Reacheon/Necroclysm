@@ -31,6 +31,8 @@ import ItemData;
 import ItemPocket;
 import CoordSelectCraft;
 import Prop;
+import ItemListPanel;
+import barActCommon;
 
 
 export class Equip : public GUI
@@ -39,26 +41,20 @@ private:
 	inline static Equip* ptr = nullptr;
 	ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 
-	int equipScroll = 0; //좌측 장비창의 스크롤
-	int equipCursor = -1; //좌측 장비창의 커서
 	const int equipScrollSize = 8;
 
 	bool isTargetPocket = false; //우측의 포켓창이 조작 타겟일 경우
 
 	SDL_Rect equipBase;
 	SDL_Rect equipTitle;
-	SDL_Rect equipItemRect[30];
-	SDL_Rect equipItemSelectRect[30];
-	SDL_Rect equipLabel;
-	SDL_Rect equipLabelSelect;
-	SDL_Rect equipLabelName;
-	SDL_Rect equipLabelQuantity;
 	SDL_Rect equipArea;
 
 	SDL_Rect topWindow;//상단에 표시되는 저항이나 방어 상성, 아이템의 설명
 
 
 public:
+	ItemListPanel panel{ EQUIP_ITEM_MAX };
+
 	Equip() : GUI(false)
 	{
 		errorBox(ptr != nullptr, L"More than equip instance was generated.");
@@ -75,6 +71,8 @@ public:
 
 		UIType = act::equip;
 
+		panel.pocket = equipPtr;
+
 		deactInput();
 		deactDraw();
 		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
@@ -85,8 +83,8 @@ public:
 		ptr = nullptr;
 
 		UIType = act::null;
-		equipCursor = -1;
-		equipScroll = 0;
+		panel.cursor = -1;
+		panel.scroll = 0;
 		barAct = actSet::null;
 	}
 	static Equip* ins() { return ptr; }
@@ -105,18 +103,9 @@ public:
 		}
 
 		equipTitle = { equipBase.x + 124, equipBase.y, 156, 36 };
-
-		equipLabel = { equipBase.x + 12, equipBase.y + 36 + 31, equipBase.w - 24, 31 };
-		equipLabelSelect = { equipLabel.x, equipLabel.y, 75, 31 };
-		equipLabelName = { equipLabel.x + equipLabelSelect.w, equipLabel.y, 219, 31 };
-		equipLabelQuantity = { equipLabel.x + equipLabelName.w + equipLabelSelect.w, equipLabel.y, 85, 31 };
-
 		equipArea = { equipBase.x + 12, equipBase.y + 36 + 67, 376, 37 * 8 };
-		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
-		{
-			equipItemRect[i] = { equipArea.x + 50, equipArea.y + 37 * i, 325, 32 };
-			equipItemSelectRect[i] = { equipArea.x, equipArea.y + 37 * i, 43, 32 };
-		}
+		panel.initRects(equipBase.x, equipBase.y + 103);
+		panel.label.w = equipBase.w - 24;
 
 		topWindow = { 0, 0, 492, 168 };
 		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
@@ -138,24 +127,14 @@ public:
 	void clickDownGUI();
 	void clickRightGUI() { }
 	void clickHoldGUI() { }
-	void mouseWheel() 
+	void mouseWheel()
 	{
-		if (checkCursor(&equipBase))
-		{
-			if (event.wheel.y > 0)
-			{
-				if(equipScroll>0) equipScroll -= 1;
-			}
-			else if (event.wheel.y < 0)
-			{
-				if(equipScroll + EQUIP_ITEM_MAX < equipPtr->itemInfo.size()) equipScroll += 1;
-			}
-		}
+		panel.handleWheel(equipBase);
 	}
 	void gamepadBtnDown();
 	void gamepadBtnMotion();
 	void gamepadBtnUp();
-	void step() 
+	void step()
 	{
 		tabType = tabFlag::back;
 	};
@@ -163,16 +142,16 @@ public:
 
 	void executeTab()
 	{
-		if (equipCursor == -1) //아이템을 선택 중이지 않을 경우
+		if (panel.cursor == -1) //아이템을 선택 중이지 않을 경우
 		{
 			close(aniFlag::winUnfoldClose);
 		}
 		else
 		{
 			//select 아이템이 하나라도 있을 경우 전부 제거
-			equipScroll = 0;
-			equipCursor = -1;
-			for (int i = 0; i < equipPtr->itemInfo.size(); i++) { equipPtr->itemInfo[i].lootSelect = 0; }
+			panel.scroll = 0;
+			panel.cursor = -1;
+			panel.clearAllSelections();
 			barAct = actSet::null;
 		}
 	}
@@ -180,92 +159,23 @@ public:
 
 	void executeOpen()
 	{
-		new Inventory(equipBase.x + equipBase.w - 1, equipBase.y, &equipPtr->itemInfo[equipCursor]);
+		new Inventory(equipBase.x + equipBase.w - 1, equipBase.y, &equipPtr->itemInfo[panel.cursor]);
 	}
 	void updateBarAct()
 	{
 		if (equipPtr->itemInfo.size() > 0)
 		{
-			ItemData& targetItem = equipPtr->itemInfo[equipCursor];
+			ItemData& targetItem = equipPtr->itemInfo[panel.cursor];
 			barAct.clear();
 			if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
-			//if (targetItem.pocketOnlyItem.size() > 0) { barAct.push_back(act::reload); }//전용 아이템 있을 경우 reload 추가
 			barAct.push_back(act::droping);//droping은 항상 추가
 			barAct.push_back(act::throwing);//throwing도 항상 추가
 
-			//업데이트할 아이템이 총일 경우
-			if (targetItem.checkFlag(itemFlag::GUN))
-			{
-				//전용 아이템이 탄창일 경우(일반 소총)
-				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
-				{
-					ItemPocket* gunPtr = targetItem.pocketPtr.get();
+			appendGunAmmoBarActs(targetItem);
 
-					if (gunPtr->itemInfo.size() == 0)
-					{
-						barAct.push_back(act::reloadMagazine);
-					}
-					else
-					{
-						barAct.push_back(act::unloadMagazine);
-					}
-				}
-				//전용 아이템이 탄일 경우(리볼버류)
-				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
-				{
-					ItemPocket* gunPtr = targetItem.pocketPtr.get();
-					//탄환 분리
-					if (gunPtr->itemInfo.size() > 0)
-					{
-						barAct.push_back(act::unloadBulletFromGun);
-					}
-
-					//탄환 장전
-					int bulletNumber = 0;
-					for (int i = 0; i < gunPtr->itemInfo.size(); i++)
-					{
-						bulletNumber += gunPtr->itemInfo[i].number;
-					}
-
-					if (bulletNumber < targetItem.pocketMaxNumber)
-					{
-						barAct.push_back(act::reloadBulletToGun);
-					}
-				}
-			}
-			//업데이트할 아이템이 탄창일 경우
-			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
-			{
-				if (targetItem.itemCode != itemID::arrowQuiver && targetItem.itemCode != itemID::boltQuiver) barAct.push_back(act::reloadMagazine);
-
-				//탄창 장전
-				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
-				if (magazinePtr->itemInfo.size() > 0)
-				{
-					barAct.push_back(act::unloadBulletFromMagazine);
-				}
-
-				//총알 장전
-				int bulletNumber = 0;
-				for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
-				{
-					bulletNumber += magazinePtr->itemInfo[i].number;
-				}
-
-				if (bulletNumber < targetItem.pocketMaxNumber)
-				{
-					barAct.push_back(act::reloadBulletToMagazine);
-				}
-			}
-			//업데이트할 아이템이 탄환일 경우
-			else if (targetItem.checkFlag(itemFlag::AMMO))
-			{
-				barAct.push_back(act::reloadBulletToGun);
-			}
-			
 			if (targetItem.pocketMaxVolume > 0)
 			{
-                ItemPocket* pocketPtr = targetItem.pocketPtr.get();	
+                ItemPocket* pocketPtr = targetItem.pocketPtr.get();
 				if (pocketPtr->itemInfo.size() == 1)
 				{
 					if (pocketPtr->itemInfo[0].itemCode == itemID::water)
@@ -321,14 +231,14 @@ public:
 
 	Corouter executeReload()//장전 : 타겟아이템(탄창이나 총)에 넣을 수 있는 탄환을 넣는다.
 	{
-		int targetEquipCursor = equipCursor;
+		int targetEquipCursor = panel.cursor;
 		std::vector<std::wstring> bulletList;
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
-			if (i == equipCursor) { continue; }
+			if (i == panel.cursor) { continue; }
 
 			//1층 : 현재 장비 중인 아이템 중에서 넣을 수 있는 탄창이 있는지 확인
-			std::vector<unsigned short> onlyItem = equipPtr->itemInfo[equipCursor].pocketOnlyItem;
+			std::vector<unsigned short> onlyItem = equipPtr->itemInfo[panel.cursor].pocketOnlyItem;
 			//넣을 수 있는 아이템인 경우
 			if (std::find(onlyItem.begin(), onlyItem.end(), equipPtr->itemInfo[i].itemCode) != onlyItem.end())
 			{
@@ -342,7 +252,7 @@ public:
 				for (int pocketItr = 0; pocketItr < pocketPtr->itemInfo.size(); pocketItr++)
 				{
 					//2층 : 현재 이 포켓의 아이템 중에서 넣을 수 있는 탄창이 있는지 확인
-					std::vector<unsigned short> onlyItem = equipPtr->itemInfo[equipCursor].pocketOnlyItem;
+					std::vector<unsigned short> onlyItem = equipPtr->itemInfo[panel.cursor].pocketOnlyItem;
 					//넣을 수 있는 아이템인 경우
 					if (std::find(onlyItem.begin(), onlyItem.end(), pocketPtr->itemInfo[pocketItr].itemCode) != onlyItem.end())
 					{
@@ -479,8 +389,8 @@ public:
 	void executeDroping()
 	{
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-		updateLog(replaceStr(sysStr[126], L"(%item)", equipPtr->itemInfo[equipCursor].name));//(%item)를(을) 버렸다.
-		equipPtr->transferItem(drop.get(), equipCursor, 1);
+		updateLog(replaceStr(sysStr[126], L"(%item)", equipPtr->itemInfo[panel.cursor].name));//(%item)를(을) 버렸다.
+		equipPtr->transferItem(drop.get(), panel.cursor, 1);
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
 	}
@@ -498,7 +408,7 @@ public:
 			if (TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ()) == nullptr) selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 		}
 
-		ItemData& tgtItem = equipPtr->itemInfo[equipCursor];
+		ItemData& tgtItem = equipPtr->itemInfo[panel.cursor];
 		rangeSet.clear();
 		for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 		if (rangeSet.size() == 0)
@@ -507,7 +417,7 @@ public:
 			co_return;
 		}
 
-		int tgtItemCode = equipPtr->itemInfo[equipCursor].itemCode;
+		int tgtItemCode = equipPtr->itemInfo[panel.cursor].itemCode;
 
 		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 		co_await std::suspend_always();
@@ -548,7 +458,7 @@ public:
 				}
 			}
 			PlayerPtr->updateStatus();
-			
+
             updateLog(replaceStr(sysStr[329], L"(%item)", itemDex[targetItemCode].name));
 
 			close(aniFlag::null);

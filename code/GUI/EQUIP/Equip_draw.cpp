@@ -10,7 +10,6 @@ import Player;
 import drawText;
 import checkCursor;
 import drawWindow;
-import drawItemList;
 import drawSprite;
 import ItemData;
 import CoordSelect;
@@ -29,8 +28,6 @@ void Equip::drawGUI()
 
 	//여기서부턴 이큅 윈도우
 	{
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		
 		//플레이어 무게 제한 게이지 그리기
 		SDL_Rect weightGaugeRect = { equipBase.x + 78, equipBase.y + 47, 125, 11 };
 		drawRect(weightGaugeRect, col::white);
@@ -43,49 +40,23 @@ void Equip::drawGUI()
 
 
 		//이큅 윈도우 본체
-		setFontSize(12);
-		drawText(std::to_wstring(equipCursor + 1) + L"/" + std::to_wstring(equipPtr->itemInfo.size()), equipBase.x + 7, equipBase.y + equipBase.h - 20);
+		panel.drawCursorInfo(equipBase.x + 7, equipBase.y + equipBase.h - 20);
 
-		//우측 아이템 상단바(선택 이름 물리량)
-		drawStadium(equipLabel.x, equipLabel.y, equipLabel.w, equipLabel.h, { 0,0,0 }, 183, 5);
-		if (GUI::getLastGUI() == this)
-		{
-			if (checkCursor(&equipLabelSelect))
-			{
-				drawStadium(equipLabelSelect.x, equipLabelSelect.y, equipLabelSelect.w, equipLabelSelect.h, lowCol::blue, 183, 5);
-			}
-			else if (checkCursor(&equipLabelName))
-			{
-				drawStadium(equipLabelName.x, equipLabelName.y, equipLabelName.w, equipLabelName.h, lowCol::blue, 183, 5);
-			}
-			else if (checkCursor(&equipLabelQuantity))
-			{
-				drawStadium(equipLabelQuantity.x, equipLabelQuantity.y, equipLabelQuantity.w, equipLabelQuantity.h, lowCol::blue, 183, 5);
-			}
-		}
-		setFontSize(14);
-		drawTextCenter(sysStr[15], equipLabel.x + 30, equipLabel.y + 14); //선택(상단바)
-		drawTextCenter(sysStr[16], equipLabel.x + 183, equipLabel.y + 14); //이름(상단바)
-		drawTextCenter(sysStr[24], equipLabel.x + 337, equipLabel.y + 14); //무리량(상단바)
+		//상단바 라벨(선택 이름 물리량)
+		panel.drawLabelBar(GUI::getLastGUI() == this);
 
 		//개별 아이템
-		if (GUI::getLastGUI() != this) itemListColorLock = true;
-		else  itemListColorLock = false;
-		drawItemList(equipPtr, equipArea.x, equipArea.y, EQUIP_ITEM_MAX, equipCursor, equipScroll, isTargetPocket == false);
+		itemListColorLock = (GUI::getLastGUI() != this);
+		panel.drawList(equipArea.x, equipArea.y, isTargetPocket == false);
 
-		if (equipPtr->itemInfo.size() == 0) // 만약 아이템이 없을 경우
+		if (panel.pocket->itemInfo.size() == 0) // 만약 아이템이 없을 경우
 		{
 			drawTextCenter(sysStr[90], equipArea.x + equipArea.w / 2, equipArea.y + equipArea.h / 2);
 		}
 
-		// 아이템 스크롤 그리기
-		SDL_Rect equipScrollBox = { equipBase.x + 391, equipItemRect[0].y, 2, equipItemRect[EQUIP_ITEM_MAX - 1].y + equipItemRect[EQUIP_ITEM_MAX - 1].h - equipItemRect[0].y };
-		drawFillRect(equipScrollBox, { 120,120,120 });
-		SDL_Rect inScrollBox = equipScrollBox; // 내부 스크롤 커서
-		inScrollBox.h = equipScrollBox.h * myMin(1.0, (double)EQUIP_ITEM_MAX / PlayerPtr->getEquipPtr()->itemInfo.size());
-		inScrollBox.y = equipScrollBox.y + equipScrollBox.h * ((float)equipScroll / (float)PlayerPtr->getEquipPtr()->itemInfo.size());
-		if (inScrollBox.y + inScrollBox.h > equipScrollBox.y + equipScrollBox.h) { inScrollBox.y = equipScrollBox.y + equipScrollBox.h - inScrollBox.h; }
-		drawFillRect(inScrollBox, col::white);
+		//스크롤바
+		panel.drawScrollbar(equipBase.x + 391, panel.itemRect[0].y,
+			panel.itemRect[EQUIP_ITEM_MAX - 1].y + panel.itemRect[EQUIP_ITEM_MAX - 1].h - panel.itemRect[0].y);
 
 
 		if (GUI::getActiveGUIList()[GUI::getActiveGUIList().size() - 1] != this)
@@ -180,7 +151,7 @@ void Equip::drawGUI()
 			drawTextCenter(std::to_wstring(rBash), topWindow.x + 36 + 65 * 3, topWindow.y + 29 + 22 * i + 11);
 			drawTextCenter(std::to_wstring(enc) + L" / " + std::to_wstring(maxEnc), topWindow.x + 36 + 65 * 4, topWindow.y + 29 + 22 * i + 11, col::lightGray);
 
-			
+
 		}
 
 

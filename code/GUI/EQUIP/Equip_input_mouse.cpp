@@ -21,26 +21,10 @@ void Equip::clickUpGUI()
 	else if (checkCursor(&equipArea)) //아이템 클릭 -> 에러 파트
 	{
 		//아이템 메인 클릭
-		//만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-		for (int i = 0; i < EQUIP_ITEM_MAX; i++)
 		{
-			if (equipPtr->itemInfo.size() - 1 >= i)
-			{
-				if (checkCursor(&equipItemRect[i]))
-				{
-					if (equipCursor != equipScroll + i) //새로운 커서 생성
-					{
-						equipCursor = equipScroll + i;
-						updateBarAct();
-					}
-					else //커서 삭제
-					{
-						equipCursor = -1;
-						barAct = actSet::null;
-					}
-					return;
-				}
-			}
+			int result = panel.handleItemClick();
+			if (result == 1) { updateBarAct(); return; }
+			else if (result == -1) { return; }
 		}
 	}
 	else if (checkCursor(&letterbox)) //버튼은 return 없음
@@ -58,7 +42,7 @@ void Equip::clickUpGUI()
 				}
 				case act::throwing:
 				{
-					CORO(actFunc::executeThrowing(equipPtr, equipCursor));
+					CORO(actFunc::executeThrowing(equipPtr, panel.cursor));
 					close(aniFlag::null);
 					return;
 
@@ -75,55 +59,55 @@ void Equip::clickUpGUI()
 				}
 				case act::reloadBulletToMagazine:
 				case act::reloadBulletToGun:
-					if (equipPtr->itemInfo[equipCursor].checkFlag(itemFlag::MAGAZINE))
+					if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, equipCursor));
+						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
-					else if (equipPtr->itemInfo[equipCursor].checkFlag(itemFlag::AMMO))
+					else if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::AMMO))
 					{
-						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, equipCursor));
+						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
 					}
-					else if (equipPtr->itemInfo[equipCursor].checkFlag(itemFlag::GUN))
+					else if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::GUN))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, equipCursor));
+						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					break;
 				case act::reloadMagazine:
 					//총에서 사용하는 경우와 탄창에서 사용하는 경우가 다름
 					//총에서 사용하면 자기 자신에게 장전함(self)
 					//탄창에 사용하면 다른 타일의 총에게 장비함
-					if (equipPtr->itemInfo[equipCursor].checkFlag(itemFlag::MAGAZINE))
+					if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, equipCursor));
+						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					else
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, equipCursor));
+						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					break;
 				case act::unloadMagazine:
 				case act::unloadBulletFromMagazine:
 				case act::unloadBulletFromGun:
 				{
-					actFunc::unload(equipPtr, equipCursor);
+					actFunc::unload(equipPtr, panel.cursor);
 				}
 				break;
 				case act::toggleOff:
 				case act::toggleOn:
-					actFunc::toggle(equipPtr->itemInfo[equipCursor]);
+					actFunc::toggle(equipPtr->itemInfo[panel.cursor]);
 					updateBarAct();
 					return;
 				case act::drink:
-					actFunc::drinkBottle(equipPtr->itemInfo[equipCursor]);
+					actFunc::drinkBottle(equipPtr->itemInfo[panel.cursor]);
 					updateBarAct();
 					close(aniFlag::null);
 					return;
 				case act::eat:
-					actFunc::eatFood(equipPtr,equipCursor);
+					actFunc::eatFood(equipPtr,panel.cursor);
 					updateBarAct();
 					return;
 				case act::dump:
-					actFunc::spillPocket(equipPtr->itemInfo[equipCursor]);
+					actFunc::spillPocket(equipPtr->itemInfo[panel.cursor]);
 					updateBarAct();
 					return;
 				case act::propInstall:
@@ -133,18 +117,18 @@ void Equip::clickUpGUI()
 				}
 				case act::plant:
 				{
-					CORO(actFunc::executePlant(equipPtr, equipCursor));
+					CORO(actFunc::executePlant(equipPtr, panel.cursor));
 					break;
 				}
 				case act::extractSeed:
-					actFunc::extractSeed(actEnv::Equip, equipPtr, equipCursor);
+					actFunc::extractSeed(actEnv::Equip, equipPtr, panel.cursor);
 					updateBarAct();
 					return;
 				case act::insertBattery:
-					CORO(actFunc::insertBattery(actEnv::Equip, equipPtr, equipCursor));
+					CORO(actFunc::insertBattery(actEnv::Equip, equipPtr, panel.cursor));
 					break;
 				case act::removeBattery:
-					actFunc::removeBattery(equipPtr, equipCursor);
+					actFunc::removeBattery(equipPtr, panel.cursor);
 					updateBarAct();
 					return;
 				}
@@ -157,10 +141,10 @@ void Equip::clickUpGUI()
 						return;
 					}
 
-					if (equipPtr->itemInfo.size() - 1 <= equipScroll + equipScrollSize)
+					if (equipPtr->itemInfo.size() - 1 <= panel.scroll + equipScrollSize)
 					{
-						equipScroll = equipPtr->itemInfo.size() - equipScrollSize;
-						if (equipScroll < 0) { equipScroll = 0; }
+						panel.scroll = equipPtr->itemInfo.size() - equipScrollSize;
+						if (panel.scroll < 0) { panel.scroll = 0; }
 					}
 				}
 				break;
@@ -170,7 +154,7 @@ void Equip::clickUpGUI()
 
 	//위의 모든 경우에서 return을 받지 못했으면 버튼 이외를 누른 것이므로 커서를 -1로 복구
 	{
-		equipCursor = -1;
+		panel.cursor = -1;
 		barAct = actSet::null;
 	}
 }

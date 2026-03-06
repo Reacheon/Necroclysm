@@ -204,6 +204,7 @@
     <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.ixx" />
     <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx" />
     <ClCompile Include="code\GUI\Dialogue.ixx" />
+    <ClCompile Include="code\GUI\barActCommon.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip_draw.cpp" />
     <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.cpp" />
@@ -216,6 +217,7 @@
     <ClCompile Include="code\GUI\HUD\HUD_input_desktop.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_step.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp" />
+    <ClCompile Include="code\GUI\ItemListPanel.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx" />
     <ClCompile Include="code\GUI\LOOT\Loot.ixx" />

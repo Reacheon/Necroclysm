@@ -12,7 +12,7 @@ import drawWindow;
 import drawSprite;
 import checkCursor;
 import drawText;
-import drawItemList;
+import drawItemSlot;
 import CoordSelect;
 
 void Inventory::drawGUI()
@@ -23,9 +23,9 @@ void Inventory::drawGUI()
 	if (getFoldRatio() == 1.0)
 	{
 		setFont(fontType::mainFont);
-		
+
 		SDL_Rect newInventoryBase = inventoryBase;
-		newInventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
+		newInventoryBase.h = panel.calcWindowHeight();
 		drawWindowItemset(&newInventoryBase, titleInventory, titleItemSprIndex);
 
 		drawFillRect(inventoryBase.x + 16, inventoryBase.y + 44, 64, 64, col::black);
@@ -43,61 +43,11 @@ void Inventory::drawGUI()
 
 		drawLine(inventoryBase.x + 86, inventoryBase.y + 81, inventoryBase.x + 86 + 307, inventoryBase.y + 81, col::gray);
 
-
-		SDL_Rect volumeGaugeRect = { inventoryBase.x + 148, inventoryBase.y + 90, 125, 11 };
-		drawRect(volumeGaugeRect, col::white);
-		drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
-		setFontSize(13);
-		drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);//부피
-
-		 //Inventory에도 같은 코드가 존재
-		{
-			ItemPocket* pkPtr = inventoryItemData->pocketPtr.get();
-			if (inventoryItemData->pocketMaxVolume > 0)
-			{
-				int currentVolume = 0;
-				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
-				float volumeRatio = (float)currentVolume / (float)inventoryItemData->pocketMaxVolume;
-				SDL_Color gaugeCol = lowCol::green;
-				if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
-				else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-				drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
-
-				std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
-				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxVolume / 1000.0, 1) + L" L";
-				setFontSize(13);
-				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
-			}
-			else if (inventoryItemData->pocketMaxNumber > 0)
-			{
-				int currentNumber = 0;
-				for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentNumber += pkPtr->itemInfo[i].number;
-				float volumeRatio = (float)currentNumber / (float)inventoryItemData->pocketMaxNumber;
-				SDL_Color gaugeCol = lowCol::green;
-				if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
-				else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-				drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
-
-				std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
-				std::wstring maxVolumeStr = decimalCutter((float)inventoryItemData->pocketMaxNumber / 1000.0, 1);
-				setFontSize(13);
-				drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
-			}
-		}
-
-
-
+		//부피 게이지
+		drawVolumeGauge(inventoryBase.x + 78, inventoryBase.y + 90, *inventoryItemData);
 
 		// 선택된 아이템이 있는지 확인
-		bool hasSelectedItems = false;
-		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-		{
-			if (inventoryPocket->itemInfo[i].lootSelect > 0)
-			{
-				hasSelectedItems = true;
-				break;
-			}
-		}
+		bool hasSelectedItems = panel.hasAnySelection();
 
 		SDL_Color btnColor = { 0x00, 0x00, 0x00 };
 		SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
@@ -129,71 +79,21 @@ void Inventory::drawGUI()
 			drawFillRect(dropBtn, col::black, 150);
 		}
 
-
 		//라벨
-		SDL_Rect inventoryLabel = { inventoryBase.x + 12, inventoryBase.y + 114, 376, 31 };
-		SDL_Rect inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 75 , 31 };
-		SDL_Rect inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 219 , 31 };
-		SDL_Rect inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 85 , 31 };
+		panel.drawLabelBar(GUI::getLastGUI() == this);
 
-		drawStadium(inventoryLabel.x, inventoryLabel.y, inventoryLabel.w, inventoryLabel.h, { 0,0,0 }, 183, 5);
-		if (GUI::getLastGUI() == this)
-		{
-			if (checkCursor(&inventoryLabelSelect))
-			{
-				drawStadium(inventoryLabelSelect.x, inventoryLabelSelect.y, inventoryLabelSelect.w, inventoryLabelSelect.h, lowCol::blue, 183, 5);
-			}
-			else if (checkCursor(&inventoryLabelName))
-			{
-				drawStadium(inventoryLabelName.x, inventoryLabelName.y, inventoryLabelName.w, inventoryLabelName.h, lowCol::blue, 183, 5);
-			}
-			else if (checkCursor(&inventoryLabelQuantity))
-			{
-				drawStadium(inventoryLabelQuantity.x, inventoryLabelQuantity.y, inventoryLabelQuantity.w, inventoryLabelQuantity.h, lowCol::blue, 183, 5);
-			}
-		}
-		setFontSize(14);
-		drawTextCenter(sysStr[15], inventoryLabel.x + 30, inventoryLabel.y + 14); //선택(상단바)
-		drawTextCenter(sysStr[16], inventoryLabel.x + 183, inventoryLabel.y + 14); //이름(상단바)
-		drawTextCenter(sysStr[24], inventoryLabel.x + 337, inventoryLabel.y + 14); //무리량(상단바)
+		//개별 아이템
+		itemListColorLock = (GUI::getLastGUI() != this);
+		panel.drawList(panel.label.x, panel.label.y + 36, true);
 
-		SDL_Rect invenArea = { inventoryLabel.x, inventoryLabel.y + 36, 376, 296 };
+		//스크롤바
+		panel.drawScrollbar(inventoryBase.x + 391, panel.label.y + 36, 296);
 
-		if (GUI::getLastGUI() != this) itemListColorLock = true;
-		else  itemListColorLock = false;
-		drawItemList(inventoryPocket, invenArea.x, invenArea.y, myMax(0, (myMin(INVENTORY_ITEM_MAX, inventoryPocket->itemInfo.size()))), inventoryCursor, inventoryScroll, true);
+		//커서 정보
+		panel.drawCursorInfo(inventoryBase.x + 7, inventoryBase.y + inventoryBase.h - 19);
 
-		if (inventoryPocket->itemInfo.size() > INVENTORY_ITEM_MAX)
-		{
-			SDL_Rect inventoryScrollBox = { inventoryBase.x + 391, inventoryLabel.y + 36, 2, invenArea.h };
-			drawFillRect(inventoryScrollBox, { 120, 120, 120 });
-
-			SDL_Rect inScrollBox = inventoryScrollBox;
-			inScrollBox.h = inventoryScrollBox.h * myMin(1.0, (double)INVENTORY_ITEM_MAX / inventoryPocket->itemInfo.size());
-			if (inScrollBox.h < 5) inScrollBox.h = 5;
-
-			if (!inventoryPocket->itemInfo.empty())
-				inScrollBox.y = inventoryScrollBox.y + inventoryScrollBox.h * ((float)inventoryScroll / (float)inventoryPocket->itemInfo.size());
-			else
-				inScrollBox.y = inventoryScrollBox.y;
-
-			if (inScrollBox.y < inventoryScrollBox.y) inScrollBox.y = inventoryScrollBox.y;
-			if (inScrollBox.y + inScrollBox.h > inventoryScrollBox.y + inventoryScrollBox.h)
-				inScrollBox.y = inventoryScrollBox.y + inventoryScrollBox.h - inScrollBox.h;
-
-			drawFillRect(inScrollBox, col::white);
-		}
-
-		setFontSize(12);
-		drawText(std::to_wstring(inventoryCursor + 1) + L"/" + std::to_wstring(inventoryPocket->itemInfo.size()),
-			inventoryBase.x + 7, inventoryBase.y + inventoryBase.h - 19);
-
-		if (inventoryPocket->itemInfo.size() == 0)
-		{
-            setFont(fontType::mainFont);
-			setFontSize(16);
-			drawTextCenter(sysStr[162], inventoryBase.x + 195, inventoryBase.y + 168, col::lightGray); //가방 안에 아이템이 없다
-		}
+		//빈 리스트 메시지
+		panel.drawEmptyMsg(inventoryBase.x + 195, inventoryBase.y + 168);
 
 	}
 	else

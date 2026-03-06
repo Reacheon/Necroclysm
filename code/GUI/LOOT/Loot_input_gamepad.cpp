@@ -9,8 +9,8 @@ import Loot;
 import ItemData;
 import actFuncSet;
 
-void Loot::gamepadBtnDown() 
-{ 
+void Loot::gamepadBtnDown()
+{
 	if (labelCursor != -1)//라벨 커서 조작 중
 	{
 		switch (event.gbutton.button)
@@ -18,7 +18,7 @@ void Loot::gamepadBtnDown()
 		case SDL_GAMEPAD_BUTTON_DPAD_UP:
 			break;
 		case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
-			lootCursor = 0;
+			panel.cursor = 0;
 			labelCursor = -1;
 			break;
 		case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
@@ -43,46 +43,46 @@ void Loot::gamepadBtnDown()
 		switch (event.gbutton.button)
 		{
 		case SDL_GAMEPAD_BUTTON_DPAD_UP:
-			if (lootCursor > 0)
+			if (panel.cursor > 0)
 			{
-				if (lootCursor % LOOT_ITEM_MAX == 0)//스크롤 변경
+				if (panel.cursor % LOOT_ITEM_MAX == 0)//스크롤 변경
 				{
-					lootScroll -= LOOT_ITEM_MAX;
-					if (lootScroll < 0) { lootScroll = 0; }
+					panel.scroll -= LOOT_ITEM_MAX;
+					if (panel.scroll < 0) { panel.scroll = 0; }
 				}
-				lootCursor--;
+				panel.cursor--;
 			}
 			else
 			{
-				lootCursor = -1;
+				panel.cursor = -1;
 				labelCursor = 1;
 			}
 			break;
 		case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
-			if (lootCursor < lootPocket->itemInfo.size() - 1)
+			if (panel.cursor < (int)panel.pocket->itemInfo.size() - 1)
 			{
-				if (lootCursor % LOOT_ITEM_MAX == 5 && lootCursor != lootPocket->itemInfo.size() - 1)
+				if (panel.cursor % LOOT_ITEM_MAX == 5 && panel.cursor != (int)panel.pocket->itemInfo.size() - 1)
 				{
-					lootScroll += LOOT_ITEM_MAX;
+					panel.scroll += LOOT_ITEM_MAX;
 				}
-				lootCursor++;
+				panel.cursor++;
 			}
 			break;
 		case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
 		{
-			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
+			int currentNumber = panel.pocket->itemInfo[panel.cursor].lootSelect;
 			if (currentNumber > 0)
 			{
-				lootPocket->itemInfo[lootCursor].lootSelect = currentNumber - 1;
+				panel.pocket->itemInfo[panel.cursor].lootSelect = currentNumber - 1;
 			}
 			break;
 		}
 		case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
 		{
-			int currentNumber = lootPocket->itemInfo[lootCursor].lootSelect;
-			if (currentNumber < lootPocket->itemInfo[lootCursor].number)
+			int currentNumber = panel.pocket->itemInfo[panel.cursor].lootSelect;
+			if (currentNumber < panel.pocket->itemInfo[panel.cursor].number)
 			{
-				lootPocket->itemInfo[lootCursor].lootSelect = currentNumber + 1;
+				panel.pocket->itemInfo[panel.cursor].lootSelect = currentNumber + 1;
 			}
 			break;
 		}
@@ -99,13 +99,13 @@ void Loot::gamepadBtnDown()
 		}
 		case SDL_GAMEPAD_BUTTON_WEST://아이템 선택
 		{
-			if (lootPocket->itemInfo[lootCursor].lootSelect == 0)
+			if (panel.pocket->itemInfo[panel.cursor].lootSelect == 0)
 			{
-				executeSelectItem(lootCursor);
+				panel.selectItem(panel.cursor);
 			}
 			else
 			{
-				lootPocket->itemInfo[lootCursor].lootSelect = 0;
+				panel.pocket->itemInfo[panel.cursor].lootSelect = 0;
 			}
 			break;
 		}
@@ -142,10 +142,10 @@ void Loot::gamepadBtnDown()
 				executePick();
 				break;
 			case act::equip://장비
-				actFunc::executeEquip(lootPocket, lootCursor);
+				actFunc::executeEquip(panel.pocket, panel.cursor);
 				break;
 			case act::wield://들기
-				CORO(actFunc::executeWield(lootPocket,lootCursor));
+				CORO(actFunc::executeWield(panel.pocket, panel.cursor));
 				break;
 			case act::insert://아이템 넣기
 				CORO(executeInsert());
@@ -165,7 +165,7 @@ void Loot::gamepadBtnDown()
 		}
 		}
 }
-void Loot::gamepadBtnMotion() 
+void Loot::gamepadBtnMotion()
 {
 
 }
@@ -180,16 +180,16 @@ void Loot::gamepadBtnUp()
 		{
 			if (labelCursor == 0)
 			{
-				executeSelectAll();
+				panel.selectAll();
 			}
 			else if (labelCursor == 1)
 			{
 				//게임패드로는 글 입력을 못하므로
-				//CORO(executeSearch());
+				//CORO(actFunc::searchItems(panel.pocket, panel.scroll));
 			}
 			else
 			{
-				executeSort();
+				panel.sort();
 			}
 			break;
 		}

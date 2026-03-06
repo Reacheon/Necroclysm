@@ -13,7 +13,7 @@ import drawWindow;
 import drawSprite;
 import checkCursor;
 import drawText;
-import drawItemList;
+import drawItemSlot;
 
 void Loot::drawGUI()
 {
@@ -24,19 +24,7 @@ void Loot::drawGUI()
 	const bool* state = SDL_GetKeyboardState(nullptr);
 	Sprite* targetBtnSpr = nullptr;
 
-	bool hasSelect = false;
-	for (int i = 0; i < lootPocket->itemInfo.size(); i++)
-	{
-		if (lootPocket->itemInfo[i].lootSelect > 0)
-		{
-			hasSelect = true;
-			break;
-		}
-		if (i == lootPocket->itemInfo.size() - 1)
-		{
-			hasSelect = false;
-		}
-	}
+	bool hasSelect = panel.hasAnySelection();
 
 	std::wstring windowTitle = sysStr[10];
 
@@ -103,8 +91,13 @@ void Loot::drawGUI()
 		drawText(tileName, lootBase.x + 88, lootBase.y + 46);
         setFont(fontType::mainFont);
 
-		drawLine(lootBase.x + 86, lootBase.y + 81, lootBase.x + 86 + 307, lootBase.y + 81, col::gray); 
+		drawLine(lootBase.x + 86, lootBase.y + 81, lootBase.x + 86 + 307, lootBase.y + 81, col::gray);
 
+		if (lootStack == nullptr && lootItemData != nullptr)
+		{
+			drawVolumeGauge(lootBase.x + 78, lootBase.y + 90, *lootItemData);
+		}
+		else if (lootStack != nullptr)
 		{
 			SDL_Rect volumeGaugeRect = { lootBase.x + 148, lootBase.y + 90, 125, 11 };
 			drawRect(volumeGaugeRect, col::white);
@@ -113,47 +106,10 @@ void Loot::drawGUI()
 			setFontSize(13);
 			drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);
 
-			if (lootStack == nullptr)
-			{
-				ItemPocket* pkPtr = lootItemData->pocketPtr.get();
-				if (lootItemData->pocketMaxVolume > 0)
-				{
-					int currentVolume = 0;
-					for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
-					float volumeRatio = (float)currentVolume / (float)lootItemData->pocketMaxVolume;
-					SDL_Color gaugeCol = lowCol::green;
-					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
-					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-					drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
-
-					std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
-					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxVolume / 1000.0, 1) + L" L";
-					setFontSize(13);
-					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
-				}
-				else if (lootItemData->pocketMaxNumber > 0)
-				{
-					int currentNumber = 0;
-					for (int i = 0; i < pkPtr->itemInfo.size(); i++) currentNumber += pkPtr->itemInfo[i].number;
-					float volumeRatio = (float)currentNumber / (float)lootItemData->pocketMaxNumber;
-					SDL_Color gaugeCol = lowCol::green;
-					if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
-					else if (volumeRatio > 0.9) gaugeCol = lowCol::red;
-					drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
-
-					std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
-					std::wstring maxVolumeStr = decimalCutter((float)lootItemData->pocketMaxNumber / 1000.0, 1);
-					setFontSize(13);
-					drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
-				}
-			}
-			else if (lootStack != nullptr)
-			{
-				setFont(fontType::pixel);
-				setFontSize(14);
-				drawText(L"∞", volumeGaugeRect.x + 132 - 77, volumeGaugeRect.y - 2);
-				setFont(fontType::mainFont);
-			}
+			setFont(fontType::pixel);
+			setFontSize(14);
+			drawText(L"∞", volumeGaugeRect.x + 132 - 77, volumeGaugeRect.y - 2);
+			setFont(fontType::mainFont);
 		}
 
 		//좌측상단 버리기 버튼
@@ -227,7 +183,7 @@ void Loot::drawGUI()
 			drawRect(pocketItem[3], col::white);
 			drawSpriteCenter(spr::itemset, getItemSprIndex(equipPtr->itemInfo[pocketList[pocketCursor]]), lootBase.x + 201, lootBase.y + 60);
 
-			//포켓 5~7번째 칸 
+			//포켓 5~7번째 칸
 			if (pocketCursor != numberOfBag - 1)
 			{
 				setZoom(1.8);
@@ -355,42 +311,41 @@ void Loot::drawGUI()
 	//여기서부턴 루팅 윈도우
 	{
 		setFont(fontType::mainFont);
-		//우측 아이템 상단바 라벨(선택 이름 물리량) - lootLabel 관련은 changeXY에서 수정됨
-		drawStadium(lootLabel.x, lootLabel.y, lootLabel.w, lootLabel.h, { 0,0,0 }, 183, 5);
+		//우측 아이템 상단바 라벨(선택 이름 물리량)
+		drawStadium(panel.label.x, panel.label.y, panel.label.w, panel.label.h, { 0,0,0 }, 183, 5);
 		if (GUI::getLastGUI() == this)
 		{
-			if (checkCursor(&lootLabelSelect) || labelCursor == 0)
+			if (checkCursor(&panel.labelSelect) || labelCursor == 0)
 			{
 				SDL_Color btnColor;
 				if (click == true) { btnColor = lowCol::deepBlue; }
 				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelSelect.x, lootLabelSelect.y, lootLabelSelect.w, lootLabelSelect.h, btnColor, 183, 5);
+				drawStadium(panel.labelSelect.x, panel.labelSelect.y, panel.labelSelect.w, panel.labelSelect.h, btnColor, 183, 5);
 			}
-			else if (checkCursor(&lootLabelName) || labelCursor == 1)
+			else if (checkCursor(&panel.labelName) || labelCursor == 1)
 			{
 				SDL_Color btnColor;
 				if (click == true) { btnColor = lowCol::deepBlue; }
 				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelName.x, lootLabelName.y, lootLabelName.w, lootLabelName.h, btnColor, 183, 5);
+				drawStadium(panel.labelName.x, panel.labelName.y, panel.labelName.w, panel.labelName.h, btnColor, 183, 5);
 			}
-			else if (checkCursor(&lootLabelQuantity) || labelCursor == 2)
+			else if (checkCursor(&panel.labelQuantity) || labelCursor == 2)
 			{
 				SDL_Color btnColor;
 				if (click == true) { btnColor = lowCol::deepBlue; }
 				else { btnColor = lowCol::blue; }
-				drawStadium(lootLabelQuantity.x, lootLabelQuantity.y, lootLabelQuantity.w, lootLabelQuantity.h, btnColor, 183, 5);
+				drawStadium(panel.labelQuantity.x, panel.labelQuantity.y, panel.labelQuantity.w, panel.labelQuantity.h, btnColor, 183, 5);
 			}
 		}
 		setFontSize(14);
-		drawTextCenter(sysStr[15], lootLabel.x + 30, lootLabel.y + 14);
+		drawTextCenter(sysStr[15], panel.label.x + 30, panel.label.y + 14);
 
 		{
 			std::wstring tailStr = L"";
 			int grayNumber = 0;
-			int whiteNumber = 0;
-			for (int i = 0; i < lootPocket->itemInfo.size(); i++)
+			for (int i = 0; i < panel.pocket->itemInfo.size(); i++)
 			{
-				if (lootPocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))
+				if (panel.pocket->itemInfo[i].checkFlag(itemFlag::GRAYFILTER))
 				{
 					grayNumber++;
 				}
@@ -398,55 +353,44 @@ void Loot::drawGUI()
 
 			if (grayNumber > 0)
 			{
-				whiteNumber = lootPocket->itemInfo.size() - grayNumber;
+				int whiteNumber = panel.pocket->itemInfo.size() - grayNumber;
 				tailStr = L" (" + std::to_wstring(whiteNumber) + L" " + sysStr[87] + L")";
 			}
 
-			drawTextCenter(sysStr[16] + tailStr, lootLabel.x + 183, lootLabel.y + 14);
+			drawTextCenter(sysStr[16] + tailStr, panel.label.x + 183, panel.label.y + 14);
 		}
 
-		switch (getSortType())
+		switch (panel.sortType)
 		{
 		default:
-			drawTextCenter(sysStr[24], lootLabel.x + 337, lootLabel.y + 14);
+			drawTextCenter(sysStr[24], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::weightDescend:
-			drawTextCenter(sysStr[45], lootLabel.x + 337, lootLabel.y + 14);
+			drawTextCenter(sysStr[45], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::weightAscend:
-			drawTextCenter(sysStr[46], lootLabel.x + 337, lootLabel.y + 14);
+			drawTextCenter(sysStr[46], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::volumeDescend:
-			drawTextCenter(sysStr[47], lootLabel.x + 337, lootLabel.y + 14);
+			drawTextCenter(sysStr[47], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::volumeAscend:
-			drawTextCenter(sysStr[48], lootLabel.x + 337, lootLabel.y + 14);
+			drawTextCenter(sysStr[48], panel.label.x + 337, panel.label.y + 14);
 			break;
 		}
 
 		//개별 아이템
-		if (GUI::getLastGUI() != this) itemListColorLock = true;
-		else  itemListColorLock = false;
-		drawItemList(lootPocket, lootArea.x, lootArea.y, LOOT_ITEM_MAX, lootCursor, lootScroll, true);
+		itemListColorLock = (GUI::getLastGUI() != this);
+		panel.drawList(lootArea.x, lootArea.y, true);
 
-		// 아이템 스크롤 그리기
-		SDL_Rect lootScrollBox = { lootBase.x + 391, lootItemRect[0].y, 2, lootBase.h - 173 };
-		drawFillRect(lootScrollBox, { 120,120,120 });
-		SDL_Rect inScrollBox = lootScrollBox;
-		inScrollBox.h = lootScrollBox.h * myMin(1.0, (double)LOOT_ITEM_MAX / lootPocket->itemInfo.size());
-		inScrollBox.y = lootScrollBox.y + lootScrollBox.h * ((float)lootScroll / (float)lootPocket->itemInfo.size());
-		if (inScrollBox.y + inScrollBox.h > lootScrollBox.y + lootScrollBox.h) { inScrollBox.y = lootScrollBox.y + lootScrollBox.h - inScrollBox.h; }
-		drawFillRect(inScrollBox, col::white);
+		//스크롤바
+		panel.drawScrollbar(lootBase.x + 391, panel.itemRect[0].y, lootBase.h - 173);
 
-		if (lootPocket->itemInfo.size() == 0)
-		{
-			setFont(fontType::mainFont);
-			setFontSize(16);
-			drawTextCenter(sysStr[162], lootBase.x + 195, lootBase.y + 168, col::lightGray);
-		}
+		//빈 리스트 메시지
+		panel.drawEmptyMsg(lootBase.x + 195, lootBase.y + 168);
 
-		setFontSize(12);
-		drawText(std::to_wstring(lootCursor + 1) + L"/" + std::to_wstring(lootPocket->itemInfo.size()), lootBase.x + 10, lootBase.y + lootBase.h - 16);
+		//커서 정보
+		panel.drawCursorInfo(lootBase.x + 10, lootBase.y + lootBase.h - 16);
 	}
 	}
 	else

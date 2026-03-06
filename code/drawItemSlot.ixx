@@ -565,4 +565,50 @@ export void drawSimpleItemRectAdd(cursorFlag inputCursor, int x, int y)
 }
 
 
+///@brief 컨테이너 아이템의 부피/수량 게이지를 그린다. Loot과 Inventory에서 공통으로 사용.
+///@param x 게이지 시작 x (아이콘 포함)
+///@param y 게이지 시작 y
+///@param containerItem 표시할 컨테이너 아이템
+export void drawVolumeGauge(int x, int y, ItemData& containerItem)
+{
+	SDL_Rect volumeGaugeRect = { x + 70, y, 125, 11 };
+	drawRect(volumeGaugeRect, col::white);
 
+	drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
+	setFontSize(13);
+	drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3); //부피
+
+	ItemPocket* pkPtr = containerItem.pocketPtr.get();
+	if (containerItem.pocketMaxVolume > 0)
+	{
+		int currentVolume = 0;
+		for (int i = 0; i < pkPtr->itemInfo.size(); i++)
+			currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
+		float volumeRatio = (float)currentVolume / (float)containerItem.pocketMaxVolume;
+		SDL_Color gaugeCol = lowCol::green;
+		if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+		else if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+		drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
+
+		std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
+		std::wstring maxVolumeStr = decimalCutter((float)containerItem.pocketMaxVolume / 1000.0, 1) + L" L";
+		setFontSize(13);
+		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
+	}
+	else if (containerItem.pocketMaxNumber > 0)
+	{
+		int currentNumber = 0;
+		for (int i = 0; i < pkPtr->itemInfo.size(); i++)
+			currentNumber += pkPtr->itemInfo[i].number;
+		float volumeRatio = (float)currentNumber / (float)containerItem.pocketMaxNumber;
+		SDL_Color gaugeCol = lowCol::green;
+		if (volumeRatio > 0.9) gaugeCol = lowCol::red;
+		else if (volumeRatio > 0.6) gaugeCol = lowCol::yellow;
+		drawFillRect(SDL_Rect{ volumeGaugeRect.x + 2, volumeGaugeRect.y + 2, static_cast<int>(120.0 * volumeRatio), 6 }, gaugeCol);
+
+		std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
+		std::wstring maxVolumeStr = decimalCutter((float)containerItem.pocketMaxNumber / 1000.0, 1);
+		setFontSize(13);
+		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
+	}
+}

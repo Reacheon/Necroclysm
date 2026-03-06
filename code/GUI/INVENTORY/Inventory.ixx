@@ -22,6 +22,8 @@ import Msg;
 import actFuncSet;
 import log;
 import CoordSelect;
+import ItemListPanel;
+import barActCommon;
 
 export class Inventory : public GUI
 {
@@ -31,25 +33,19 @@ private:
 
 	SDL_Rect inventoryBase;
 	std::array<SDL_Rect, 12> bionicRect;
-	int inventoryCursor = -1;
-	int inventoryScroll = 0;
 
 	std::wstring titleInventory = sysStr[185];
 	int titleItemSprIndex = 60;
 
-	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemRect; //마우스를 위한 인벤아이템렉트 판정 박스
-	std::array<SDL_Rect, INVENTORY_ITEM_MAX> inventoryItemSelectRect; //마우스를 위한 인벤아이템렉트 셀렉트 판정 박스
-	SDL_Rect inventoryLabel;
-	SDL_Rect inventoryLabelSelect;
-	SDL_Rect inventoryLabelName;
-	SDL_Rect inventoryLabelQuantity;
-	SDL_Rect inventoryScrollBox;
 	SDL_Rect dropBtn;
 public:
+	ItemListPanel panel{ INVENTORY_ITEM_MAX };
+
 	Inventory(int inputX, int inputY, ItemData* inputData) : GUI(false)
 	{
 		inventoryItemData = inputData;
 		inventoryPocket = inputData->pocketPtr.get();
+		panel.pocket = inventoryPocket;
 
 		//메세지 박스 렌더링
 		changeXY(inputX, inputY, false);
@@ -60,7 +56,7 @@ public:
 	}
 	~Inventory()
 	{
-		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++) { inventoryPocket->itemInfo[i].lootSelect = 0; }
+		panel.clearAllSelections();
 	}
 	void changeXY(int inputX, int inputY, bool center)
 	{
@@ -89,15 +85,11 @@ public:
 			y = inventoryBase.h / 2;
 		}
 
-		for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
-		{
-			inventoryItemRect[i] = { inventoryBase.x + 63, inventoryBase.y + 150 + 37*i, 325, 32 };
-			inventoryItemSelectRect[i] = { inventoryBase.x + 12, inventoryBase.y + 150 + 37 * i, 43, 32 };
-		}
-		inventoryLabel = { inventoryBase.x + 12, inventoryBase.y + 114, inventoryBase.w - 24 , 31 };
-		inventoryLabelSelect = { inventoryLabel.x, inventoryLabel.y, 75 , 31 };
-		inventoryLabelName = { inventoryLabel.x + inventoryLabelSelect.w, inventoryLabel.y, 219 , 31 };
-		inventoryLabelQuantity = { inventoryLabel.x + inventoryLabelName.w + inventoryLabelSelect.w, inventoryLabel.y, 85 , 31 };
+		panel.initRects(inventoryBase.x + 12, inventoryBase.y + 150, 51);
+		panel.label = { inventoryBase.x + 12, inventoryBase.y + 114, inventoryBase.w - 24, 31 };
+		panel.labelSelect = { panel.label.x, panel.label.y, 75, 31 };
+		panel.labelName = { panel.label.x + panel.labelSelect.w, panel.label.y, 219, 31 };
+		panel.labelQuantity = { panel.label.x + panel.labelName.w + panel.labelSelect.w, panel.label.y, 85, 31 };
 		dropBtn = { inventoryBase.x + 299, inventoryBase.y + 40, 100, 35 };
 	}
 	void drawGUI();
@@ -110,92 +102,42 @@ public:
 			close(aniFlag::winUnfoldClose);
 			return;
 		}
-		else if (checkCursor(&inventoryLabel))
+		else if (checkCursor(&panel.label))
 		{
-			if (checkCursor(&inventoryLabelSelect))
+			if (checkCursor(&panel.labelSelect))
 			{
-				executeSelectAll();
+				panel.selectAll();
 			}
-			else if (checkCursor(&inventoryLabelName))
+			else if (checkCursor(&panel.labelName))
 			{
 				// 나중에 검색 기능 추가 시 사용
-				// CORO(executeSearch());
+				// CORO(actFunc::searchItems(panel.pocket, panel.scroll));
 			}
-			else if (checkCursor(&inventoryLabelQuantity))
+			else if (checkCursor(&panel.labelQuantity))
 			{
 				// 나중에 정렬 기능 추가 시 사용
-				// executeSort();
+				// panel.sort();
 			}
 		}
 		else if (checkCursor(&dropBtn))
 		{
-			// 선택된 아이템이 있는지 확인
-			bool hasSelectedItems = false;
-			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-			{
-				if (inventoryPocket->itemInfo[i].lootSelect > 0)
-				{
-					hasSelectedItems = true;
-					break;
-				}
-			}
-
-			if (hasSelectedItems)
+			if (panel.hasAnySelection())
 			{
 				CORO(executeDropInventory(inventoryPocket));
-
 			}
 			return;
 		}
 		else if (checkCursor(&inventoryBase))
 		{
-			// 만약 아이템을 클릭했으면 커서를 그 아이템으로 옮김, 다른 곳 누르면 -1로 바꿈
-			for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
+			//아이템 클릭 → 커서 토글
 			{
-				if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
-				{
-					if (checkCursor(&inventoryItemRect[i]))
-					{
-						if (inventoryCursor != inventoryScroll + i) //새로운 커서 생성
-						{
-							inventoryCursor = inventoryScroll + i;
-							updateBarAct();
-						}
-						else //커서 삭제
-						{
-							inventoryCursor = -1;
-							barAct = actSet::null;
-						}
-						return;
-					}
-				}
+				int result = panel.handleItemClick();
+				if (result == 1) { updateBarAct(); return; }
+				else if (result == -1) { return; }
 			}
 
-			// 아이템 좌측 셀렉트 클릭
-			for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
-			{
-				if (checkCursor(&inventoryItemSelectRect[i]))
-				{
-					if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
-					{
-						if (inventoryPocket->itemInfo[i + inventoryScroll].lootSelect == 0)
-						{
-							if (option::inputMethod == input::mouse)
-							{
-								executeSelectItem(i + inventoryScroll);
-							}
-							else if (option::inputMethod == input::touch)
-							{
-								executeSelectItem(i + inventoryScroll);
-							}
-						}
-						else
-						{
-							inventoryPocket->itemInfo[i + inventoryScroll].lootSelect = 0;
-						}
-					}
-				}
-			}
+			//아이템 좌측 셀렉트 클릭
+			if (panel.handleSelectClick()) { return; }
 		}
 		else if (checkCursor(&letterbox)) // 하단 액션 버튼들
 		{
@@ -206,49 +148,46 @@ public:
 					switch (barAct[i])
 					{
 					case act::wield:
-						CORO(actFunc::executeWield(inventoryPocket, inventoryCursor));
+						CORO(actFunc::executeWield(inventoryPocket, panel.cursor));
 						break;
 					case act::equip:
-						actFunc::executeEquip(inventoryPocket, inventoryCursor);
+						actFunc::executeEquip(inventoryPocket, panel.cursor);
 						break;
 					case act::throwing:
 						deactDraw();
-						CORO(actFunc::executeThrowing(inventoryPocket, inventoryCursor));
-						// close(aniFlag::null); // 필요에 따라
+						CORO(actFunc::executeThrowing(inventoryPocket, panel.cursor));
 						return;
 					case act::eat:
-						actFunc::eatFood(inventoryPocket, inventoryCursor);
+						actFunc::eatFood(inventoryPocket, panel.cursor);
 						updateBarAct();
 						return;
 					case act::drink:
-						actFunc::drinkBottle(inventoryPocket->itemInfo[inventoryCursor]);
+						actFunc::drinkBottle(inventoryPocket->itemInfo[panel.cursor]);
 						updateBarAct();
 						return;
 					case act::toggleOff:
 					case act::toggleOn:
-						actFunc::toggle(inventoryPocket->itemInfo[inventoryCursor]);
+						actFunc::toggle(inventoryPocket->itemInfo[panel.cursor]);
 						updateBarAct();
 						return;
 					case act::dump:
-						actFunc::spillPocket(inventoryPocket->itemInfo[inventoryCursor]);
+						actFunc::spillPocket(inventoryPocket->itemInfo[panel.cursor]);
 						updateBarAct();
 						return;
-						// 총기 관련 액션들도 필요하면 추가
 					case act::reloadBulletToMagazine:
 					case act::reloadBulletToGun:
 						// ... 총기 관련 로직
 						break;
-						// 기타 액션들...
 					case act::open:
 						executeOpen();
 						return;
 					case act::plant:
 					{
-						CORO(actFunc::executePlant(inventoryPocket, inventoryCursor));
+						CORO(actFunc::executePlant(inventoryPocket, panel.cursor));
 						break;
 					}
 					case act::extractSeed:
-						actFunc::extractSeed(actEnv::Inventory, inventoryPocket, inventoryCursor, inventoryItemData->pocketMaxVolume);
+						actFunc::extractSeed(actEnv::Inventory, inventoryPocket, panel.cursor, inventoryItemData->pocketMaxVolume);
 						updateBarAct();
 						return;
 					}
@@ -261,11 +200,7 @@ public:
 					}
 
 					// 스크롤 조정
-					if (inventoryPocket->itemInfo.size() - 1 <= inventoryScroll + INVENTORY_ITEM_MAX)
-					{
-						inventoryScroll = inventoryPocket->itemInfo.size() - INVENTORY_ITEM_MAX;
-						if (inventoryScroll < 0) { inventoryScroll = 0; }
-					}
+					panel.adjustScrollAfterAction();
 					break;
 				}
 			}
@@ -273,7 +208,7 @@ public:
 
 		// 위의 모든 경우에서 return을 받지 못했으면 커서를 -1로 복구
 		{
-			inventoryCursor = -1;
+			panel.cursor = -1;
 			barAct = actSet::null;
 		}
 	}
@@ -282,31 +217,15 @@ public:
 	void clickRightGUI()
 	{
 		//아이템 좌측 셀렉트 우클릭
-		for (int i = 0; i < INVENTORY_ITEM_MAX; i++)
+		int idx = panel.getSelectRightClickIndex();
+		if (idx >= 0)
 		{
-			if (checkCursor(&inventoryItemSelectRect[i]))
-			{
-				if (inventoryPocket->itemInfo.size() - 1 >= i + inventoryScroll)
-				{
-					if (inventoryPocket->itemInfo[i + inventoryScroll].lootSelect == 0)
-					{
-						CORO(executeSelectItemEx(i + inventoryScroll));
-					}
-					else
-					{
-						inventoryPocket->itemInfo[i + inventoryScroll].lootSelect = 0;
-					}
-				}
-			}
+			CORO(actFunc::selectItemEx(panel.pocket, idx));
 		}
 	}
-	void mouseWheel() 
+	void mouseWheel()
 	{
-		if (checkCursor(&inventoryBase))
-		{
-			if (event.wheel.y > 0 && inventoryScroll > 1) inventoryScroll -= 1;
-			else if (event.wheel.y < 0 && inventoryScroll + INVENTORY_ITEM_MAX < inventoryPocket->itemInfo.size()) inventoryScroll += 1;
-		}
+		panel.handleWheel(inventoryBase);
 	}
 	void clickHoldGUI() { }
 	void gamepadBtnDown() { }
@@ -317,7 +236,7 @@ public:
 		tabType = tabFlag::back;
 
 		// 윈도우 높이 조정 (동적으로 변경)
-		inventoryBase.h = 197 + 38 * myMax(0, (myMin(INVENTORY_ITEM_MAX - 1, inventoryPocket->itemInfo.size() - 1)));
+		inventoryBase.h = panel.calcWindowHeight();
 
 		// 게임패드 지원이 필요하다면
 		if (option::inputMethod == input::gamepad)
@@ -331,161 +250,19 @@ public:
 			else delayR2--;
 		}
 
-		// 잘못된 커서 위치 조정
-		if (inventoryCursor > (int)(inventoryPocket->itemInfo.size() - 1))
-		{
-			inventoryCursor = inventoryPocket->itemInfo.size() - 1;
-		}
-
-		// 잘못된 스크롤 위치 조정
-		if (option::inputMethod == input::mouse || option::inputMethod == input::touch)
-		{
-			if (inventoryScroll + INVENTORY_ITEM_MAX >= inventoryPocket->itemInfo.size())
-			{
-				inventoryScroll = myMax(0, (int)inventoryPocket->itemInfo.size() - INVENTORY_ITEM_MAX);
-			}
-			else if (inventoryScroll < 0)
-			{
-				inventoryScroll = 0;
-			}
-		}
-	}
-
-	void executeSelectAll()
-	{
-		bool isSelectAll = true;
-		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-		{
-			if (inventoryPocket->itemInfo[i].lootSelect != inventoryPocket->itemInfo[i].number)
-			{
-				isSelectAll = false;
-				break;
-			}
-		}
-
-		if (isSelectAll == false)
-		{
-			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-			{
-				inventoryPocket->itemInfo[i].lootSelect = inventoryPocket->itemInfo[i].number;
-			}
-		}
-		else
-		{
-			for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-			{
-				inventoryPocket->itemInfo[i].lootSelect = 0;
-			}
-		}
-	}
-
-	void executeSelectItem(int index)
-	{
-		int itemNumber = inventoryPocket->itemInfo[index].number;
-		inventoryPocket->itemInfo[index].lootSelect = itemNumber;
-	}
-
-	Corouter executeSelectItemEx(int index)
-	{
-		//입력형 메시지 박스 열기
-		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
-		exInputText.clear();
-		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//아이템 선택, 얼마나?
-		co_await std::suspend_always();
-
-		if (exInputText.empty() == false)
-		{
-			int inputSelectNumber = 0;
-			try { inputSelectNumber = wtoi(exInputText.c_str()); }
-			catch (...) {}
-
-			if (inputSelectNumber < 0) inputSelectNumber = 0;
-			else if (inputSelectNumber > inventoryPocket->itemInfo[index].number)
-				inputSelectNumber = inventoryPocket->itemInfo[index].number;
-
-			inventoryPocket->itemInfo[index].lootSelect = inputSelectNumber;
-		}
+		panel.adjustScrollAndCursor();
 	}
 
 	void updateBarAct()
 	{
 		if (inventoryPocket->itemInfo.size() > 0)
 		{
-			ItemData& targetItem = inventoryPocket->itemInfo[inventoryCursor];
+			ItemData& targetItem = inventoryPocket->itemInfo[panel.cursor];
 			barAct.clear();
 			if (targetItem.pocketMaxVolume > 0) { barAct.push_back(act::open); }//가방 종류일 경우 open 추가
 			barAct.push_back(act::wield);
 
-			//업데이트할 아이템이 총일 경우
-			if (targetItem.checkFlag(itemFlag::GUN))
-			{
-				//전용 아이템이 탄창일 경우(일반 소총)
-				if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::MAGAZINE))
-				{
-					ItemPocket* gunPtr = targetItem.pocketPtr.get();
-
-					if (gunPtr->itemInfo.size() == 0)
-					{
-						barAct.push_back(act::reloadMagazine);
-					}
-					else
-					{
-						barAct.push_back(act::unloadMagazine);
-					}
-				}
-				//전용 아이템이 탄일 경우(리볼버류)
-				else if (itemDex[targetItem.pocketOnlyItem[0]].checkFlag(itemFlag::AMMO))
-				{
-					ItemPocket* gunPtr = targetItem.pocketPtr.get();
-					//탄환 분리
-					if (gunPtr->itemInfo.size() > 0)
-					{
-						barAct.push_back(act::unloadBulletFromGun);
-					}
-
-					//탄환 장전
-					int bulletNumber = 0;
-					for (int i = 0; i < gunPtr->itemInfo.size(); i++)
-					{
-						bulletNumber += gunPtr->itemInfo[i].number;
-					}
-
-					if (bulletNumber < targetItem.pocketMaxNumber)
-					{
-						barAct.push_back(act::reloadBulletToGun);
-					}
-				}
-			}
-			//업데이트할 아이템이 탄창일 경우
-			else if (targetItem.checkFlag(itemFlag::MAGAZINE))
-			{
-				if (targetItem.itemCode != itemID::arrowQuiver && targetItem.itemCode != itemID::boltQuiver)
-					barAct.push_back(act::reloadMagazine);
-
-				//탄창 장전
-				ItemPocket* magazinePtr = targetItem.pocketPtr.get();
-				if (magazinePtr->itemInfo.size() > 0)
-				{
-					barAct.push_back(act::unloadBulletFromMagazine);
-				}
-
-				//총알 장전
-				int bulletNumber = 0;
-				for (int i = 0; i < magazinePtr->itemInfo.size(); i++)
-				{
-					bulletNumber += magazinePtr->itemInfo[i].number;
-				}
-
-				if (bulletNumber < targetItem.pocketMaxNumber)
-				{
-					barAct.push_back(act::reloadBulletToMagazine);
-				}
-			}
-			//업데이트할 아이템이 탄환일 경우
-			else if (targetItem.checkFlag(itemFlag::AMMO))
-			{
-				barAct.push_back(act::reloadBulletToGun);
-			}
+			appendGunAmmoBarActs(targetItem);
 
 			if (targetItem.checkFlag(itemFlag::CANEQUIP) == true) { barAct.push_back(act::equip); }
 
@@ -536,19 +313,8 @@ public:
 
 	Corouter executeDropInventory(ItemPocket* inventoryPocket)
 	{
-
-
 		// 선택된 아이템이 있는지 확인
-		bool hasSelectedItems = false;
-		for (int i = 0; i < inventoryPocket->itemInfo.size(); i++)
-		{
-			if (inventoryPocket->itemInfo[i].lootSelect > 0)
-			{
-				hasSelectedItems = true;
-				break;
-			}
-		}
-		if (!hasSelectedItems)
+		if (!panel.hasAnySelection())
 		{
 			updateLog(L"No items selected to drop.");
 			co_return;
@@ -616,7 +382,7 @@ public:
 
 	void executeOpen()
 	{
-		new Inventory(404, (cameraH / 2) - 210, &inventoryPocket->itemInfo[inventoryCursor]);
+		new Inventory(404, (cameraH / 2) - 210, &inventoryPocket->itemInfo[panel.cursor]);
 		close(aniFlag::null);
 	}
 };
