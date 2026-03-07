@@ -1239,11 +1239,30 @@ bool Entity::runAnimation(bool shutdown)
 					{
 						address->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
 						address->leadItem.addFlag(itemFlag::PROP_POWER_ON);
+
+						//모닥불 켤 때 Light 생성
+						if (address->leadItem.itemCode == itemID::campfire && address->leadItem.checkFlag(itemFlag::LIGHT_ON))
+						{
+							address->leadItem.lightPtr = std::make_unique<Light>(
+								address->getGridX() + address->leadItem.lightDelX,
+								address->getGridY() + address->leadItem.lightDelY,
+								address->getGridZ(),
+								address->leadItem.lightRange,
+								address->leadItem.lightIntensity,
+								SDL_Color{ address->leadItem.lightR, address->leadItem.lightG, address->leadItem.lightB }
+							);
+						}
 					}
 					else if (address->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
 					{
 						address->leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
 						address->leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+
+						//모닥불 끌 때 Light 제거
+						if (address->leadItem.itemCode == itemID::campfire)
+						{
+							address->leadItem.lightPtr = nullptr;
+						}
 					}
 				}
 			});

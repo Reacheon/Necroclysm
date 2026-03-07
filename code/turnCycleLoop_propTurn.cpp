@@ -137,6 +137,21 @@ __int64 propTurn()
 				}
 			}
 		}
+
+		//모닥불 에너지 소모
+		if (pPtr->leadItem.itemCode == itemID::campfire && pPtr->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+		{
+			pPtr->energyPercent -= 3.0f;
+			if (pPtr->energyPercent < 0.0f) pPtr->energyPercent = 0.0f;
+
+			//에너지가 0이 되면 불이 꺼지고 Light 제거
+			if (pPtr->energyPercent <= 0.0f)
+			{
+				pPtr->leadItem.eraseFlag(itemFlag::PROP_POWER_ON);
+				pPtr->leadItem.addFlag(itemFlag::PROP_POWER_OFF);
+				pPtr->leadItem.lightPtr = nullptr;
+			}
+		}
 	}
 
 	int loopCount = 0;

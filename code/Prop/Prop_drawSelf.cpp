@@ -614,6 +614,25 @@ void Prop::drawSelf()
         else if (plantGrowthPercent >= 10) sprIndex += 1;
     }
 
+    if (iCode == itemID::campfire)
+    {
+        if (energyPercent <= 0.0f)
+        {
+            sprIndex += 6; //다 타서 재만 남은 스프라이트
+        }
+        else if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+        {
+            int animFrame = (SDL_GetTicks() / 120) % 5;
+            sprIndex += (1 + animFrame);
+        }
+    }
+
+    if (iCode == itemID::electricOven || iCode == itemID::electricCooktop)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
+    }
+
+
 
     ///////////////////////////////////////////////////////////////////////////
     /////////////////////////////메인 그리기 함수//////////////////////////////

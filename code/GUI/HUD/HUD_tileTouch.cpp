@@ -266,6 +266,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
 				}
+				else if (tgtProp->leadItem.itemCode == itemID::campfire && tgtProp->energyPercent > 0.0f)
+				{
+					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::CROP) && tgtProp->plantGrowthPercent >= 100.0)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));

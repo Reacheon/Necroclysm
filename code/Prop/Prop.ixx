@@ -77,6 +77,8 @@ public:
 
     double plantGrowthPercent = 0; //식물의 성장 정도를 나타내는 퍼센트
 
+    float energyPercent = 100.0f; //0.0~100.0 프롭의 에너지이며 모닥불 등의 연료 시스템에 사용됨
+
     Prop(Point3 inputCoor, int leadItemCode);
 
     ~Prop();

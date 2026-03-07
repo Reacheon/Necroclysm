@@ -203,4 +203,8 @@ export namespace itemID
     constexpr int rawChicken = 528;
     constexpr int cacaoFruit = 529;
     constexpr int butter = 530;
+
+    constexpr int campfire = 531;
+    constexpr int electricOven = 532;
+    constexpr int electricCooktop = 533;
 };
