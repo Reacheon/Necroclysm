@@ -207,4 +207,8 @@ export namespace itemID
     constexpr int campfire = 531;
     constexpr int electricOven = 532;
     constexpr int electricCooktop = 533;
+
+    constexpr int cookingPot = 534;
+    constexpr int fryingPan = 535;
+    constexpr int ttukbaegi = 536;
 };

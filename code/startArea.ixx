@@ -1171,6 +1171,11 @@ export void startArea()
 	createProp({ 1,-15,0 }, itemID::copperCable);
 
 	TileProp({ 1,-16,0 })->leadItem.pocketPtr->addItemFromDex(itemID::gasoline, 1000);
+
+
+	//요리도구
+	createItemStack({ 5, -18, 0 }, { {itemID::cookingPot,1},{itemID::fryingPan,1},{itemID::ttukbaegi,1 } });
+
 		
 
 
