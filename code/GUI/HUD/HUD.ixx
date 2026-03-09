@@ -41,6 +41,7 @@ import Skill;
 import Quest;
 import Sleep;
 import Aim;
+import Cook;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -392,6 +393,9 @@ public:
 			break;
 		case act::quest:
 			new Quest();
+			break;
+		case act::cooking:
+			new Cook();
 			break;
 		case act::runMode:
 			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) changePlayerWalkMode(walkFlag::run);

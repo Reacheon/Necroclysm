@@ -76,15 +76,6 @@
     <Filter Include="소스 파일\01_system\04_GUI\HUD">
       <UniqueIdentifier>{22f9baed-4728-4fb7-8327-47dc9f1961ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\LOOT">
-      <UniqueIdentifier>{d408acbb-070f-4da7-8883-b3d5eea7fcc3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\EQUIP">
-      <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\INVENTORY">
-      <UniqueIdentifier>{3d8fab15-a267-4023-b6cb-b5868c2a8072}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\CRAFT">
       <UniqueIdentifier>{9d79e804-c248-4c63-a091-579272003866}</UniqueIdentifier>
     </Filter>
@@ -99,6 +90,18 @@
     </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\COOK">
       <UniqueIdentifier>{73243e2e-3875-4bd8-a019-3d6c7a7ef262}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI">
+      <UniqueIdentifier>{3f6a1567-1a5a-4551-b342-03fdc1472dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI\LOOT">
+      <UniqueIdentifier>{d408acbb-070f-4da7-8883-b3d5eea7fcc3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY">
+      <UniqueIdentifier>{3d8fab15-a267-4023-b6cb-b5868c2a8072}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP">
+      <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -403,16 +406,16 @@
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\EQUIP\Equip_input_gamepad.cpp">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.cpp">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\EQUIP\Equip_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI\EQUIP</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
@@ -427,22 +430,22 @@
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx">
-      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx">
-      <Filter>소스 파일\01_system\04_GUI\INVENTORY</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\LOOT\Loot.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\LOOT\Loot_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LOOT</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\LOOT</Filter>
     </ClCompile>
     <ClCompile Include="code\item\readItemDex.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
@@ -623,6 +626,12 @@
     </ClCompile>
     <ClCompile Include="code\Cook.ixx">
       <Filter>소스 파일\01_system\04_GUI\COOK</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\barActCommon.ixx">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\ItemListPanel.ixx">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
