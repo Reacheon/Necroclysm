@@ -13,12 +13,18 @@ import drawSprite;
 import globalVar;
 import checkCursor;
 import drawWindow;
+import log;
 
 export class Cook : public GUI
 {
 private:
 	inline static Cook* ptr = nullptr;
 	SDL_Rect cookBase;
+	SDL_Rect heatSrcBtn;
+	SDL_Rect recipeBtn;
+	SDL_Rect cookwareBtn;
+	std::array<SDL_Rect, 6> ingredientBtn;
+	SDL_Rect cookBtn;
 	int cookCursor = -1;
 	int cookScroll = 0;
 public:
@@ -75,6 +81,17 @@ public:
 			y = inputY - cookBase.h / 2;
 		}
 
+		heatSrcBtn = { cookBase.x + 15, cookBase.y + 50, 64, 64 };
+		recipeBtn = { cookBase.x + cookBase.w - 79, cookBase.y + 50, 64, 64 };
+		cookwareBtn = { cookBase.x + 132, cookBase.y + 212, 248, 40 };
+		for (int i = 0; i < 6; i++)
+		{
+			int pivotX = cookBase.x + 22;
+			int pivotY = cookBase.y + 296;
+			ingredientBtn[i] = { pivotX + 190 * (i % 2), pivotY + 50 * (i / 2), 170, 40 };
+		}
+		cookBtn = { cookBase.x + 170, cookBase.y + 465, 140, 40 };
+		cookBtn.x += cookBtn.w / 2;
 	}
 	void drawGUI()
 	{
@@ -87,16 +104,16 @@ public:
 			drawSprite(spr::newWindowArrow, 0, cookBase.x + cookBase.w - 4, cookBase.y + 234);
 			setFlip(SDL_FLIP_NONE);
 
-			SDL_Rect heatSrcBtn = { cookBase.x + 15, cookBase.y + 50, 64, 64 };
-			drawStadium(heatSrcBtn, col::black, 255, 3);
+			if (checkCursor(&heatSrcBtn)) drawStadium(heatSrcBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 3);
+			else drawStadium(heatSrcBtn, col::black, 255, 3);
 			setZoom(3.0);
 			drawSpriteCenter(spr::itemset, 152, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 - 5);
 			setZoom(1.0);
 			setFontSize(16);
 			drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 5);
 
-			SDL_Rect recipeBtn = { cookBase.x + cookBase.w - 79, cookBase.y + 50, 64, 64 };
-			drawStadium(recipeBtn, col::black, 255, 3);
+			if (checkCursor(&recipeBtn)) drawStadium(recipeBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 3);
+			else drawStadium(recipeBtn, col::black, 255, 3);
 			setZoom(1.0);
 			drawSpriteCenter(spr::icon48, 190, recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 - 5);
 			setZoom(1.0);
@@ -109,12 +126,10 @@ public:
 			setZoom(1.0);
 
 			//쿡웨어 버튼(프라이팬 혹은 냄비 혹은 뚝배기)
-			SDL_Rect containerBtn = { cookBase.x + 132, cookBase.y + 212, 248,40 };
 			setFontSize(18);
-			drawTextCenter(col2Str(col::lightGray) + L"Cookware", containerBtn.x - 52, containerBtn.y + containerBtn.h/2 - 12);
-			drawStadium(containerBtn, col::black, 255, 3);
-
-			drawRect(containerBtn, col::gray);
+			drawTextCenter(col2Str(col::lightGray) + L"Cookware", cookwareBtn.x - 52, cookwareBtn.y + cookwareBtn.h/2 - 12);
+			if (checkCursor(&cookwareBtn)) { drawFillRect(cookwareBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookwareBtn, col::lightGray); }
+			else { drawFillRect(cookwareBtn, col::black); drawRect(cookwareBtn, col::gray); }
 
 			setFontSize(16);
 			drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 263);
@@ -143,14 +158,33 @@ public:
 
 
 
-			std::array<SDL_Rect, 6> ingredientBtn;
 			for (int i = 0; i < 6; i++)
 			{
-				int pivotX = cookBase.x + 22;
-				int pivotY = cookBase.y + 296;
-				ingredientBtn[i] = { pivotX + 190 * (i % 2) ,pivotY + 50 * (i / 2), 170, 40 };
-				drawStadium(ingredientBtn[i], col::black, 255, 3);
-				drawRect(ingredientBtn[i], col::gray);
+				
+				if (i == 0)//이미 해당 슬롯에 재료가 있을 경우
+				{
+					drawFillRect(ingredientBtn[i], col::black);
+					drawRect(ingredientBtn[i], col::gray);
+
+					setZoom(2.0);
+					drawSpriteCenter(spr::itemset, 606, ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
+					setZoom(1.0);
+					
+					drawText(L"Cabbage", ingredientBtn[i].x + 46, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 11);
+				}
+				else if (i == 1)//재료를 새롭게 추가할 수 있는 버튼, 재료가 있는 칸 바로 다음에 딱 1칸만 그려지는 버튼
+				{
+					drawFillRect(ingredientBtn[i], col::black);
+					drawRect(ingredientBtn[i], col::gray);
+
+					setFontSize(28);
+					drawTextCenter(L"+", ingredientBtn[i].x + ingredientBtn[i].w / 2, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 4);
+				}
+				else//빈 슬롯이며 눌러도 아무 기능 없음
+				{
+					drawFillRect(ingredientBtn[i], col::black,80);
+					drawRect(ingredientBtn[i], col::gray,80);
+				}
 			}
 
 			{
@@ -166,10 +200,8 @@ public:
 				}
 			}
 
-			SDL_Rect cookBtn = { cookBase.x + 170, cookBase.y + 465, 140, 40 };
-			cookBtn.x += cookBtn.w / 2;
-			drawStadium(cookBtn, col::black, 255, 3);
-			drawRect(cookBtn, col::gray);
+			if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
+			else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
 			setFontSize(22);
 			drawTextCenter(L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
 		}
@@ -191,6 +223,18 @@ public:
 			drawWindow(&vRect);
 		}
 	}
+	void onClickRecipeBtn()
+	{
+		updateLog(L"[Cook] Recipe button clicked.");
+	}
+	void onClickHeatBtn()
+	{
+		updateLog(L"[Cook] Heat source button clicked.");
+	}
+	void onClickCookBtn()
+	{
+		updateLog(L"[Cook] Cook button clicked.");
+	}
 	void clickUpGUI()
 	{
 		if (getStateInput() == false) { return; }
@@ -199,8 +243,17 @@ public:
 		{
 			close(aniFlag::winUnfoldClose);
 		}
-		else
+		else if (checkCursor(&recipeBtn))
 		{
+			onClickRecipeBtn();
+		}
+		else if (checkCursor(&heatSrcBtn))
+		{
+			onClickHeatBtn();
+		}
+		else if (checkCursor(&cookBtn))
+		{
+			onClickCookBtn();
 		}
 	}
 

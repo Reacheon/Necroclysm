@@ -186,4 +186,7 @@ export enum class itemFlag
     CROP, //매턴 성장이 발생하는 농작물 종류들
     
     SEED_FRUIT, //씨앗을 얻을 수 있는 과일
+
+    INGREDIENT, //요리에 넣을 수 있는 재료
+    COOKWARE, //조리도구
 };
