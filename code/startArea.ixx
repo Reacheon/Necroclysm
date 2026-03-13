@@ -665,6 +665,7 @@ export void startArea()
 		{ itemID::rawChicken,3 },
 		{ itemID::cacaoFruit,3 },
 		{ itemID::butter,3 },
+		{ itemID::egg,10 },
 		});
 
 
@@ -1174,7 +1175,8 @@ export void startArea()
 
 
 	//요리도구
-	createItemStack({ 5, -18, 0 }, { {itemID::cookingPot,1},{itemID::fryingPan,1},{itemID::ttukbaegi,1 } });
+	createItemStack({ -3, -12, 0 }, { {itemID::cookingPot,1},{itemID::fryingPan,1},{itemID::ttukbaegi,1 } });
+	createItemStack({ -2, -12, 0 }, { {itemID::woodenPlate,1},{itemID::ceramicPlate,1} });
 
 		
 

@@ -189,4 +189,8 @@ export enum class itemFlag
 
     INGREDIENT, //요리에 넣을 수 있는 재료
     COOKWARE, //조리도구
+
+    DISH, //요리된 결과물, 크림파스타나 치킨필라프 등등...
+    PLATE, //완성된 요리를 담을 수 있는 접시
+    VEGETABLE, //야채 플래그
 };

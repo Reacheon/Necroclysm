@@ -585,9 +585,6 @@
     <ClCompile Include="code\Prop\Prop_fluidCircuit.ixx">
       <Filter>소스 파일\05_Class\08_Prop</Filter>
     </ClCompile>
-    <ClCompile Include="code\var\wrapFunc.cpp">
-      <Filter>소스 파일\00_var</Filter>
-    </ClCompile>
     <ClCompile Include="code\Damage.cpp">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
@@ -632,6 +629,9 @@
     </ClCompile>
     <ClCompile Include="code\GUI\ItemListPanel.ixx">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\wrapFunc.cpp">
+      <Filter>소스 파일\01_system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

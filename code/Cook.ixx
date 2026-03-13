@@ -45,11 +45,12 @@ private:
 	struct DdItem {
 		int itemCode;
 		int totalCount;
+		ItemData* itemPtr;
 	};
 	std::vector<DdItem> ddItems;
 
 	//선택된 재료 (가상넘버)
-	int cookwareCode = -1;
+	ItemData* cookwarePtr = nullptr;
 	std::array<int, 6> ingredientCode;
 	int ingredientCount = 0;
 public:
@@ -147,9 +148,8 @@ public:
 			drawTextCenter(L"Recipe", recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 + 30 - 5);
 
 			//확대된 요리 그림
-			setZoom(10.0);
-			drawSpriteCenter(spr::itemset, 159, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 120);
-			setZoom(1.0);
+			
+			drawSpriteCenter(spr::fryingPan, 1, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
 
 			//쿡웨어 버튼(프라이팬 혹은 냄비 혹은 뚝배기)
 			setFontSize(18);
@@ -157,13 +157,13 @@ public:
 			if (checkCursor(&cookwareBtn)) { drawFillRect(cookwareBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookwareBtn, col::lightGray); }
 			else { drawFillRect(cookwareBtn, col::black); drawRect(cookwareBtn, col::gray); }
 
-			if (cookwareCode != -1)
+			if (cookwarePtr != nullptr)
 			{
 				setZoom(2.0);
-				drawSpriteCenter(spr::itemset, itemDex[cookwareCode].itemSprIndex, cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
+				drawSpriteCenter(spr::itemset, getItemSprIndex(*cookwarePtr), cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
 				setZoom(1.0);
 				setFontSize(16);
-				drawText(itemDex[cookwareCode].name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+				drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
 			}
 
 			setFontSize(16);
@@ -201,7 +201,7 @@ public:
 					else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
 
 					setZoom(2.0);
-					drawSpriteCenter(spr::itemset, itemDex[ingredientCode[i]].itemSprIndex, ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
+					drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[ingredientCode[i]]), ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
 					setZoom(1.0);
 
 					setFontSize(16);
@@ -287,10 +287,10 @@ public:
 				{
 					int idx = i + ddScroll;
 					if (idx >= (int)ddItems.size()) break;
-					SDL_Rect blockRect = { ddRect.x, ddRect.y + DD_BLOCK_H * i, ddRect.w, DD_BLOCK_H };
+					SDL_Rect blockRect = { ddRect.x, ddRect.y + DD_BLOCK_H * i, ddRect.w, DD_BLOCK_H - 1 };
 					if (checkCursor(&blockRect))
 					{
-						selectItem(ddItems[idx].itemCode);
+						selectItem(idx);
 						closeDropdown();
 						return;
 					}
@@ -316,13 +316,13 @@ public:
 		}
 		else if (checkCursor(&cookwareBtn))
 		{
-			if (cookwareCode == -1)
+			if (cookwarePtr == nullptr)
 			{
 				openDropdown(0, itemFlag::COOKWARE);
 			}
 			else
 			{
-				cookwareCode = -1;
+				cookwarePtr = nullptr;
 			}
 		}
 		else if (checkCursor(&cookBtn))
@@ -364,11 +364,10 @@ public:
 
 	//========== 드롭다운 헬퍼 함수 ==========
 
-	//이미 선택된 아이템 수량 계산
+	//이미 선택된 아이템 수량 계산 (Ingredient 전용, Cookware는 포인터로 별도 비교)
 	int countSelected(int itemCode)
 	{
 		int count = 0;
-		if (cookwareCode == itemCode) count++;
 		for (int i = 0; i < ingredientCount; i++)
 		{
 			if (ingredientCode[i] == itemCode) count++;
@@ -376,27 +375,36 @@ public:
 		return count;
 	}
 
-	//포켓 하나를 스캔하여 ddItems에 합산
-	void scanPocket(ItemPocket* pocket, itemFlag targetFlag)
+	//포켓 하나를 스캔하여 ddItems에 등록
+	void scanPocket(ItemPocket* pocket, itemFlag targetFlag, bool individual)
 	{
 		for (int i = 0; i < pocket->itemInfo.size(); i++)
 		{
 			ItemData& item = pocket->itemInfo[i];
 			if (item.checkFlag(targetFlag))
 			{
-				bool found = false;
-				for (int j = 0; j < ddItems.size(); j++)
+				if (individual)
 				{
-					if (ddItems[j].itemCode == item.itemCode)
-					{
-						ddItems[j].totalCount += item.number;
-						found = true;
-						break;
-					}
+					//Cookware: 개별 등록 (내부 상태가 다를 수 있으므로 합산하지 않음)
+					ddItems.push_back({ (int)item.itemCode, 1, &item });
 				}
-				if (!found)
+				else
 				{
-					ddItems.push_back({ (int)item.itemCode, (int)item.number });
+					//Ingredient: itemCode 기준 합산
+					bool found = false;
+					for (int j = 0; j < ddItems.size(); j++)
+					{
+						if (ddItems[j].itemCode == item.itemCode)
+						{
+							ddItems[j].totalCount += item.number;
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+					{
+						ddItems.push_back({ (int)item.itemCode, (int)item.number, &item });
+					}
 				}
 			}
 		}
@@ -406,17 +414,18 @@ public:
 	void scanItems(itemFlag targetFlag)
 	{
 		ddItems.clear();
+		bool individual = (targetFlag == itemFlag::COOKWARE);
 
 		//1. 플레이어 장비
 		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		scanPocket(equipPtr, targetFlag);
+		scanPocket(equipPtr, targetFlag, individual);
 
 		//2. 장비 내부 포켓 1단계 (가방 안 아이템)
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
-				scanPocket(equipPtr->itemInfo[i].pocketPtr.get(), targetFlag);
+				scanPocket(equipPtr->itemInfo[i].pocketPtr.get(), targetFlag, individual);
 			}
 		}
 
@@ -430,24 +439,39 @@ public:
 			ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 			if (stack != nullptr)
 			{
-				scanPocket(stack->getPocket(), targetFlag);
+				scanPocket(stack->getPocket(), targetFlag, individual);
 			}
 
 			//프롭 내부 포켓 (냉장고, 상자 등)
 			Prop* prop = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 			if (prop != nullptr && prop->leadItem.pocketPtr != nullptr)
 			{
-				scanPocket(prop->leadItem.pocketPtr.get(), targetFlag);
+				scanPocket(prop->leadItem.pocketPtr.get(), targetFlag, individual);
 			}
 		}
 
-		//이미 선택된 수량을 빼고 남은 것이 없으면 제거
-		for (int i = (int)ddItems.size() - 1; i >= 0; i--)
+		//이미 선택된 아이템 제거
+		if (individual)
 		{
-			ddItems[i].totalCount -= countSelected(ddItems[i].itemCode);
-			if (ddItems[i].totalCount <= 0)
+			//Cookware: 포인터로 비교하여 이미 선택된 아이템 제거
+			for (int i = (int)ddItems.size() - 1; i >= 0; i--)
 			{
-				ddItems.erase(ddItems.begin() + i);
+				if (ddItems[i].itemPtr == cookwarePtr)
+				{
+					ddItems.erase(ddItems.begin() + i);
+				}
+			}
+		}
+		else
+		{
+			//Ingredient: 코드 기준 수량 차감
+			for (int i = (int)ddItems.size() - 1; i >= 0; i--)
+			{
+				ddItems[i].totalCount -= countSelected(ddItems[i].itemCode);
+				if (ddItems[i].totalCount <= 0)
+				{
+					ddItems.erase(ddItems.begin() + i);
+				}
 			}
 		}
 	}
@@ -484,15 +508,15 @@ public:
 	}
 
 	//아이템 선택
-	void selectItem(int itemCode)
+	void selectItem(int ddIndex)
 	{
 		if (ddTarget == 0)
 		{
-			cookwareCode = itemCode;
+			cookwarePtr = ddItems[ddIndex].itemPtr;
 		}
 		else if (ddTarget >= 1 && ingredientCount < 6)
 		{
-			ingredientCode[ingredientCount] = itemCode;
+			ingredientCode[ingredientCount] = ddItems[ddIndex].itemCode;
 			ingredientCount++;
 		}
 	}
@@ -528,7 +552,7 @@ public:
 			int idx = i + ddScroll;
 			if (idx >= (int)ddItems.size()) break;
 
-			SDL_Rect blockRect = { ddRect.x, ddRect.y + DD_BLOCK_H * i, ddRect.w, DD_BLOCK_H };
+			SDL_Rect blockRect = { ddRect.x, ddRect.y + DD_BLOCK_H * i, ddRect.w, DD_BLOCK_H - 1 };
 
 			//호버/클릭 색상
 			if (checkCursor(&blockRect))
@@ -542,12 +566,12 @@ public:
 
 			//아이콘
 			setZoom(2.0);
-			drawSpriteCenter(spr::itemset, itemDex[ddItems[idx].itemCode].itemSprIndex, blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
+			drawSpriteCenter(spr::itemset, getItemSprIndex(*ddItems[idx].itemPtr), blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
 			setZoom(1.0);
 
 			//이름
 			setFontSize(16);
-			drawText(itemDex[ddItems[idx].itemCode].name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+			drawText(ddItems[idx].itemPtr->name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
 
 			//블록 사이 구분선 (마지막 제외)
 			if (i < visibleCount - 1)

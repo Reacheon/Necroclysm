@@ -545,6 +545,9 @@ export int readItemDex(const wchar_t* file)
                             { L"SEED_FRUIT", itemFlag::SEED_FRUIT },
                             { L"INGREDIENT", itemFlag::INGREDIENT },
                             { L"COOKWARE", itemFlag::COOKWARE },
+                            { L"DISH", itemFlag::DISH },
+                            { L"PLATE", itemFlag::PLATE },
+                            { L"VAGETABLE", itemFlag::VEGETABLE },
                         };
 
                         size_t pos = 0;

@@ -291,6 +291,17 @@ int getItemSprIndex(ItemData& inputData)
         else if (num == 1) return itemDex[inputData.itemCode].itemSprIndex + 1;
         else return itemDex[inputData.itemCode].itemSprIndex + 2;
     }
+    if (inputData.itemCode == itemID::fryingPan || inputData.itemCode == itemID::cookingPot || inputData.itemCode == itemID::ttukbaegi)
+    {
+        if (inputData.pocketPtr != nullptr)
+        {
+            std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
+            if (pocketInfo.size() > 0)
+            {
+                 return (inputData.itemSprIndex + 1);
+            }
+        }
+    }
     else if (inputData.checkFlag(itemFlag::CONTAINER_LIQ) && inputData.checkFlag(itemFlag::CONTAINER_TRANSPARENT) && inputData.pocketPtr != nullptr)//투명 액체 용기
     {
         std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
@@ -318,6 +329,8 @@ int getItemSprIndex(ItemData& inputData)
         else return inputData.itemSprIndex;
     }
     else return inputData.itemSprIndex;
+
+    return inputData.itemSprIndex;
 }
 
 void changePlayerWalkMode(walkFlag inputMode)

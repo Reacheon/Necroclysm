@@ -182,4 +182,6 @@ export namespace spr
 	Sprite* logBackground = nullptr;
 
 	Sprite* floatGuideLog = nullptr;
+
+	Sprite* fryingPan = nullptr;
 }
