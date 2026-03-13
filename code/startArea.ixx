@@ -1175,7 +1175,7 @@ export void startArea()
 
 
 	//요리도구
-	createItemStack({ -3, -12, 0 }, { {itemID::cookingPot,1},{itemID::fryingPan,1},{itemID::ttukbaegi,1 } });
+	createItemStack({ -3, -12, 0 }, { {itemID::cookingPot,1},{itemID::fryingPan,1} });
 	createItemStack({ -2, -12, 0 }, { {itemID::woodenPlate,1},{itemID::ceramicPlate,1} });
 
 		

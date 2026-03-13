@@ -291,7 +291,7 @@ int getItemSprIndex(ItemData& inputData)
         else if (num == 1) return itemDex[inputData.itemCode].itemSprIndex + 1;
         else return itemDex[inputData.itemCode].itemSprIndex + 2;
     }
-    if (inputData.itemCode == itemID::fryingPan || inputData.itemCode == itemID::cookingPot || inputData.itemCode == itemID::ttukbaegi)
+    if (inputData.itemCode == itemID::fryingPan || inputData.itemCode == itemID::cookingPot)
     {
         if (inputData.pocketPtr != nullptr)
         {

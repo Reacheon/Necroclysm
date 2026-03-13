@@ -218,4 +218,5 @@ export void textureLoader()
 	spr::floatGuideLog = new Sprite(renderer, "image/UI/GUI/HUD/floatGuideLog.png", 378, 80);
 
 	spr::fryingPan = new Sprite(renderer, "image/UI/GUI/Cook/fryingPan.png", 160, 160);
+	spr::cookingPot = new Sprite(renderer, "image/UI/GUI/Cook/cookingPot.png", 160, 160);
 }

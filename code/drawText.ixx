@@ -235,10 +235,13 @@ static void drawMultiColorTextInternal(const std::wstring& text, int x, int y, S
         return;
     }
 
-    // Center 처리를 위한 전체 너비 계산
+    // Center 처리를 위한 전체 너비/높이 계산
     int totalWidth = 0;
+    int totalHeight = 0;
     if (center) {
         totalWidth = getTextWidthWithoutColor(text);
+        totalHeight = getTextHeightWithoutColor(text);
+        y -= totalHeight / 2;
     }
 
     int currentX = center ? x - totalWidth / 2 : x;

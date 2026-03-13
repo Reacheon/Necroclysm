@@ -36,8 +36,9 @@ private:
 	//드롭다운 메뉴 상태
 	static constexpr int MAX_DD_VISIBLE = 6;
 	static constexpr int DD_BLOCK_H = 36;
+	static constexpr int DD_HEATSRC = -2;   // 열원 드롭다운 타겟
 	bool ddOpen = false;
-	int ddTarget = -1;          // -1:없음, 0:cookware, 1~:ingredient 슬롯
+	int ddTarget = -1;          // -1:없음, DD_HEATSRC:열원, 0:cookware, 1~:ingredient 슬롯
 	float ddRatio = 0.0f;       // 애니메이션 비율 (0.0~1.0)
 	int ddScroll = 0;
 	SDL_Rect ddRect = {};
@@ -46,13 +47,37 @@ private:
 		int itemCode;
 		int totalCount;
 		ItemData* itemPtr;
+		Prop* propPtr = nullptr;  // 열원 전용 (나머지 nullptr)
 	};
 	std::vector<DdItem> ddItems;
 
-	//선택된 재료 (가상넘버)
+	//레시피 구조체
+	struct CookRecipe {
+		int resultCode;
+		std::wstring resultName;
+		std::vector<int> heatSources;
+		std::vector<int> cookwareList;
+		int minWaterML;
+		std::vector<int> requiredIngredients;
+	};
+	inline static const std::vector<CookRecipe> recipes = {
+		{
+			itemID::chickPilaff,
+			L"Chicken Pilaf",
+			{ itemID::campfire, itemID::electricCooktop },
+			{ itemID::fryingPan, itemID::cookingPot },
+			200,
+			{ itemID::rice, itemID::butter, itemID::rawChicken, itemID::egg }
+		},
+	};
+
+	//선택된 재료
+	Prop* heatSrcPropPtr = nullptr;
 	ItemData* cookwarePtr = nullptr;
 	std::array<int, 6> ingredientCode;
 	int ingredientCount = 0;
+	int matchedRecipeIdx = -1;
+	bool canCook = false;
 public:
 	Cook() : GUI(false)
 	{
@@ -133,19 +158,33 @@ public:
 
 			if (checkCursor(&heatSrcBtn)) drawStadium(heatSrcBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 3);
 			else drawStadium(heatSrcBtn, col::black, 255, 3);
-			setZoom(3.0);
-			drawSpriteCenter(spr::itemset, 152, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 - 5);
-			setZoom(1.0);
-			setFontSize(16);
-			drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 5);
+			if (heatSrcPropPtr != nullptr)
+			{
+				setZoom(3.0);
+				drawSpriteCenter(spr::itemset, getItemSprIndex(heatSrcPropPtr->leadItem), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 5);
+				//drawSpriteCenter(spr::itemset, getItemSprIndex(heatSrcPropPtr->leadItem), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 10);
+				setZoom(1.0);
+				setFontSize(12);
+				drawTextCenter(heatSrcPropPtr->leadItem.name, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y);
+			}
+			else
+			{
+				setZoom(3.0);
+				//drawSpriteCenter(spr::itemset, 152, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 - 5);
+				setZoom(1.0);
+				setFontSize(16);
+				drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y);
+				//drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 40);
+				//drawTextCenter(L"Source", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 23);
+			}
 
 			if (checkCursor(&recipeBtn)) drawStadium(recipeBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 3);
 			else drawStadium(recipeBtn, col::black, 255, 3);
 			setZoom(1.0);
-			drawSpriteCenter(spr::icon48, 190, recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 - 5);
+			drawSpriteCenter(spr::icon48, 190, recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 + 2);
 			setZoom(1.0);
 			setFontSize(16);
-			drawTextCenter(L"Recipe", recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 + 30 - 5);
+			drawTextCenter(L"Recipe", recipeBtn.x + recipeBtn.w / 2, recipeBtn.y);
 
 			//확대된 요리 그림
 			
@@ -153,7 +192,7 @@ public:
 
 			//쿡웨어 버튼(프라이팬 혹은 냄비 혹은 뚝배기)
 			setFontSize(18);
-			drawTextCenter(col2Str(col::lightGray) + L"Cookware", cookwareBtn.x - 52, cookwareBtn.y + cookwareBtn.h/2 - 12);
+			drawTextCenter(col2Str(col::lightGray) + L"Cookware", cookwareBtn.x - 52, cookwareBtn.y + cookwareBtn.h/2);
 			if (checkCursor(&cookwareBtn)) { drawFillRect(cookwareBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookwareBtn, col::lightGray); }
 			else { drawFillRect(cookwareBtn, col::black); drawRect(cookwareBtn, col::gray); }
 
@@ -163,11 +202,15 @@ public:
 				drawSpriteCenter(spr::itemset, getItemSprIndex(*cookwarePtr), cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
 				setZoom(1.0);
 				setFontSize(16);
-				drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+				int waterML = getWaterML(cookwarePtr);
+				if (waterML > 0)
+					drawText(cookwarePtr->name + L" (" + std::to_wstring(waterML) + L"mL)", cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+				else
+					drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
 			}
 
 			setFontSize(16);
-			drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 263);
+			drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 273);
 
 			{
 				int lineY = cookBase.y + 263 + 12;
@@ -235,10 +278,20 @@ public:
 				}
 			}
 
-			if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
-			else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
-			setFontSize(22);
-			drawTextCenter(L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
+			if (canCook)
+			{
+				if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
+				else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
+				setFontSize(22);
+				drawTextCenter(L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
+			}
+			else
+			{
+				drawFillRect(cookBtn, col::black, 80);
+				drawRect(cookBtn, col::gray, 80);
+				setFontSize(22);
+				drawTextCenter(col2Str(col::gray) + L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
+			}
 		}
 		else
 		{
@@ -267,11 +320,21 @@ public:
 	}
 	void onClickHeatBtn()
 	{
-		updateLog(L"[Cook] Heat source button clicked.");
+		if (heatSrcPropPtr != nullptr)
+		{
+			heatSrcPropPtr = nullptr;
+		}
+		else
+		{
+			openDropdown(DD_HEATSRC, itemFlag::INGREDIENT);
+		}
 	}
 	void onClickCookBtn()
 	{
-		updateLog(L"[Cook] Cook button clicked.");
+		if (!canCook || matchedRecipeIdx < 0) return;
+		const CookRecipe& recipe = recipes[matchedRecipeIdx];
+		updateLog(recipe.resultName + L" has been cooked successfully!");
+		//TODO: 실제 아이템 생성 및 재료 소모 로직 추가
 	}
 	void clickUpGUI()
 	{
@@ -327,7 +390,7 @@ public:
 		}
 		else if (checkCursor(&cookBtn))
 		{
-			onClickCookBtn();
+			if (canCook) onClickCookBtn();
 		}
 		else
 		{
@@ -360,6 +423,25 @@ public:
 		int maxScroll = myMax(0, (int)ddItems.size() - MAX_DD_VISIBLE);
 		if (event.wheel.y > 0 && ddScroll > 0) ddScroll--;
 		else if (event.wheel.y < 0 && ddScroll < maxScroll) ddScroll++;
+	}
+
+	//========== 헬퍼 함수 ==========
+
+	//열원 아이템 코드 확인
+	static bool isHeatSource(int code)
+	{
+		return code == itemID::campfire || code == itemID::electricCooktop;
+	}
+
+	//쿡웨어 내부 물의 양(mL) 반환, 물 없으면 0
+	static int getWaterML(ItemData* cw)
+	{
+		if (cw == nullptr || cw->pocketPtr == nullptr) return 0;
+		for (auto& item : cw->pocketPtr->itemInfo)
+		{
+			if (item.itemCode == itemID::water) return (int)item.number;
+		}
+		return 0;
 	}
 
 	//========== 드롭다운 헬퍼 함수 ==========
@@ -476,10 +558,31 @@ public:
 		}
 	}
 
+	//주변 열원 프롭 스캔 (9타일)
+	void scanHeatSources()
+	{
+		ddItems.clear();
+		for (int dir = -1; dir < 8; dir++)
+		{
+			int dx = 0, dy = 0;
+			dir2Coord(dir, dx, dy);
+			Prop* prop = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+			if (prop != nullptr && isHeatSource(prop->leadItem.itemCode))
+			{
+				if (prop == heatSrcPropPtr) continue;
+				ddItems.push_back({ (int)prop->leadItem.itemCode, 1, &prop->leadItem, prop });
+			}
+		}
+	}
+
 	//드롭다운 열기
 	void openDropdown(int target, itemFlag flag)
 	{
-		scanItems(flag);
+		if (target == DD_HEATSRC)
+			scanHeatSources();
+		else
+			scanItems(flag);
+
 		if (ddItems.empty())
 		{
 			updateLog(L"There are no items nearby.");
@@ -492,11 +595,13 @@ public:
 
 		//부모 Rect 결정
 		SDL_Rect parentRect;
-		if (target == 0) parentRect = cookwareBtn;
+		if (target == DD_HEATSRC) parentRect = heatSrcBtn;
+		else if (target == 0) parentRect = cookwareBtn;
 		else parentRect = ingredientBtn[ingredientCount];
 
 		int visibleCount = std::min((int)ddItems.size(), MAX_DD_VISIBLE);
-		ddRect = { parentRect.x, parentRect.y + parentRect.h, parentRect.w, DD_BLOCK_H * visibleCount };
+		int ddW = myMax(parentRect.w, 180);
+		ddRect = { parentRect.x, parentRect.y + parentRect.h, ddW, DD_BLOCK_H * visibleCount };
 	}
 
 	//드롭다운 닫기
@@ -510,7 +615,11 @@ public:
 	//아이템 선택
 	void selectItem(int ddIndex)
 	{
-		if (ddTarget == 0)
+		if (ddTarget == DD_HEATSRC)
+		{
+			heatSrcPropPtr = ddItems[ddIndex].propPtr;
+		}
+		else if (ddTarget == 0)
 		{
 			cookwarePtr = ddItems[ddIndex].itemPtr;
 		}
@@ -530,6 +639,74 @@ public:
 		}
 		ingredientCode[ingredientCount - 1] = -1;
 		ingredientCount--;
+	}
+
+	//========== 레시피 체크 ==========
+
+	//가장 많이 일치하는 레시피를 찾고, 모든 조건 충족 시 canCook 활성화
+	void checkCanCook()
+	{
+		matchedRecipeIdx = -1;
+		canCook = false;
+
+		int bestMatchCount = 0;
+		int bestIdx = -1;
+
+		for (int r = 0; r < (int)recipes.size(); r++)
+		{
+			const CookRecipe& recipe = recipes[r];
+
+			//재료 매칭 수 세기
+			int matchCount = 0;
+			for (int req : recipe.requiredIngredients)
+			{
+				for (int s = 0; s < ingredientCount; s++)
+				{
+					if (ingredientCode[s] == req) { matchCount++; break; }
+				}
+			}
+
+			if (matchCount > bestMatchCount)
+			{
+				bestMatchCount = matchCount;
+				bestIdx = r;
+			}
+		}
+
+		if (bestIdx < 0) return;
+		const CookRecipe& best = recipes[bestIdx];
+
+		//1. 모든 필수 재료가 있는지 확인
+		if (bestMatchCount < (int)best.requiredIngredients.size()) return;
+
+		//2. 열원 확인
+		if (heatSrcPropPtr == nullptr) return;
+		bool heatOK = false;
+		for (int h : best.heatSources)
+		{
+			if ((int)heatSrcPropPtr->leadItem.itemCode == h) { heatOK = true; break; }
+		}
+		if (!heatOK) return;
+
+		//3. 쿡웨어 확인
+		if (cookwarePtr == nullptr) return;
+		bool cwOK = false;
+		for (int c : best.cookwareList)
+		{
+			if ((int)cookwarePtr->itemCode == c) { cwOK = true; break; }
+		}
+		if (!cwOK) return;
+
+		//4. 물의 양 확인
+		if (best.minWaterML > 0)
+		{
+			int waterML = getWaterML(cookwarePtr);
+			if (waterML < best.minWaterML) return;
+		}
+
+		//모든 조건 충족
+		matchedRecipeIdx = bestIdx;
+		canCook = true;
 	}
 
 	//드롭다운 그리기
@@ -569,9 +746,20 @@ public:
 			drawSpriteCenter(spr::itemset, getItemSprIndex(*ddItems[idx].itemPtr), blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
 			setZoom(1.0);
 
-			//이름
+			//이름 (쿡웨어일 경우 mL 표시)
 			setFontSize(16);
-			drawText(ddItems[idx].itemPtr->name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+			if (ddTarget == 0)
+			{
+				int waterML = getWaterML(ddItems[idx].itemPtr);
+				if (waterML > 0)
+					drawText(ddItems[idx].itemPtr->name + L" (" + std::to_wstring(waterML) + L"mL)", blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+				else
+					drawText(ddItems[idx].itemPtr->name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+			}
+			else
+			{
+				drawText(ddItems[idx].itemPtr->name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+			}
 
 			//블록 사이 구분선 (마지막 제외)
 			if (i < visibleCount - 1)
@@ -622,5 +810,8 @@ public:
 			ddRatio += 0.1f;
 			if (ddRatio >= 1.0f) ddRatio = 1.0f;
 		}
+
+		//레시피 확인
+		checkCanCook();
 	}
 };
