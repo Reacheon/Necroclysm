@@ -30,6 +30,8 @@ private:
 	SDL_Rect cookwareBtn;
 	std::array<SDL_Rect, 6> ingredientBtn;
 	SDL_Rect cookBtn;
+	SDL_Rect transferBtn;
+	SDL_Rect eatBtn;
 	int cookCursor = -1;
 	int cookScroll = 0;
 
@@ -50,6 +52,8 @@ private:
 		Prop* propPtr = nullptr;  // 열원 전용 (나머지 nullptr)
 	};
 	std::vector<DdItem> ddItems;
+
+	bool resultPhase = false;
 
 	//레시피 구조체
 	struct CookRecipe {
@@ -144,6 +148,10 @@ public:
 		}
 		cookBtn = { cookBase.x + 170, cookBase.y + 465, 140, 40 };
 		cookBtn.x += cookBtn.w / 2;
+		transferBtn = { cookBase.x + 170, cookBase.y + 465, 140, 40 };
+		transferBtn.x += transferBtn.w / 2 - 152;
+		eatBtn = { cookBase.x + 170, cookBase.y + 465, 140, 40 };
+		eatBtn.x += eatBtn.w / 2;
 	}
 	void drawGUI()
 	{
@@ -187,8 +195,40 @@ public:
 			drawTextCenter(L"Recipe", recipeBtn.x + recipeBtn.w / 2, recipeBtn.y);
 
 			//확대된 요리 그림
-			
-			drawSpriteCenter(spr::fryingPan, 1, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
+			{
+				Sprite* cwSpr = spr::fryingPan;
+				int cwSprIdx = 0;
+				if (cookwarePtr != nullptr)
+				{
+					if ((int)cookwarePtr->itemCode == itemID::cookingPot) cwSpr = spr::cookingPot;
+					else cwSpr = spr::fryingPan;
+					cwSprIdx = getCookwareLargeSprIndex();
+				}
+				drawSpriteCenter(cwSpr, cwSprIdx, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
+
+				//김 애니메이션 (요리 완성 시)
+				if (resultPhase)
+				{
+					Uint32 t = SDL_GetTicks();
+					int steamCX = cookBase.x + cookBase.w / 2;
+					int steamCY = cookBase.y + cookBase.h / 2 - 140;
+
+					constexpr int steamCount = 6;
+					constexpr float offsets[steamCount] = { 0, 370, 780, 1150, 1560, 1900 };
+					constexpr float xOffsets[steamCount] = { 0, 2.1f, 4.2f, 1.0f, 3.3f, 5.4f };
+
+					for (int p = 0; p < steamCount; p++)
+					{
+						float phase = std::fmod((t + (Uint32)offsets[p]) / 2400.0f, 1.0f);
+						int py = steamCY - (int)(phase * 50);
+						int px = steamCX + (int)(std::sin(phase * 3.14159 * 2.0 + xOffsets[p]) * 8);
+						int rx = 7 + (int)(phase * 6);
+						int ry = 5 + (int)(phase * 4);
+						Uint8 alpha = (Uint8)((1.0f - phase * phase) * 70);
+						drawFillEllipse(px, py, rx, ry, { 255, 255, 255 }, alpha);
+					}
+				}
+			}
 
 			//쿡웨어 버튼(프라이팬 혹은 냄비 혹은 뚝배기)
 			setFontSize(18);
@@ -201,16 +241,31 @@ public:
 				setZoom(2.0);
 				drawSpriteCenter(spr::itemset, getItemSprIndex(*cookwarePtr), cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
 				setZoom(1.0);
-				setFontSize(16);
-				int waterML = getWaterML(cookwarePtr);
-				if (waterML > 0)
-					drawText(cookwarePtr->name + L" (" + std::to_wstring(waterML) + L"mL)", cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+
+				if (resultPhase && matchedRecipeIdx >= 0)
+				{
+					//결과 단계: 쿡웨어 이름(흰색 12px) + 요리 이름(노란색 16px) 2줄 표시
+					setFontSize(12);
+					drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + 3);
+					setFontSize(16);
+					drawText(L"#e9c900" + recipes[matchedRecipeIdx].resultName, cookwareBtn.x + 46, cookwareBtn.y + 16);
+				}
 				else
-					drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+				{
+					setFontSize(16);
+					int waterML = getWaterML(cookwarePtr);
+					if (waterML > 0)
+						drawText(cookwarePtr->name + L" (" + std::to_wstring(waterML) + L"mL)", cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+					else
+						drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + cookwareBtn.h / 2 - 11);
+				}
 			}
 
 			setFontSize(16);
-			drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 273);
+			if (resultPhase)
+				drawTextCenter(col2Str(col::lightGray) + L"Description", cookBase.x + cookBase.w / 2, cookBase.y + 273);
+			else
+				drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 273);
 
 			{
 				int lineY = cookBase.y + 263 + 12;
@@ -234,34 +289,104 @@ public:
 				}
 			}
 
-
-
-			for (int i = 0; i < 6; i++)
+			if (!resultPhase)
 			{
-				if (i < ingredientCount)//이미 해당 슬롯에 재료가 있을 경우
+				for (int i = 0; i < 6; i++)
 				{
-					if (checkCursor(&ingredientBtn[i])) { drawFillRect(ingredientBtn[i], click ? lowCol::deepBlue : lowCol::blue); drawRect(ingredientBtn[i], col::lightGray); }
-					else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
+					if (i < ingredientCount)//이미 해당 슬롯에 재료가 있을 경우
+					{
+						if (checkCursor(&ingredientBtn[i])) { drawFillRect(ingredientBtn[i], click ? lowCol::deepBlue : lowCol::blue); drawRect(ingredientBtn[i], col::lightGray); }
+						else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
 
-					setZoom(2.0);
-					drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[ingredientCode[i]]), ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
-					setZoom(1.0);
+						setZoom(2.0);
+						drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[ingredientCode[i]]), ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
+						setZoom(1.0);
+
+						setFontSize(16);
+						drawText(itemDex[ingredientCode[i]].name, ingredientBtn[i].x + 46, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 11);
+					}
+					else if (i == ingredientCount && ingredientCount < 6)//재료를 새롭게 추가할 수 있는 (+) 버튼
+					{
+						if (checkCursor(&ingredientBtn[i])) { drawFillRect(ingredientBtn[i], click ? lowCol::deepBlue : lowCol::blue); drawRect(ingredientBtn[i], col::lightGray); }
+						else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
+
+						setFontSize(28);
+						drawTextCenter(L"+", ingredientBtn[i].x + ingredientBtn[i].w / 2, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 4);
+					}
+					else//빈 슬롯이며 눌러도 아무 기능 없음
+					{
+						drawFillRect(ingredientBtn[i], col::black, 80);
+						drawRect(ingredientBtn[i], col::gray, 80);
+					}
+				}
+			}
+			//resultPhase일 때 Description 내용 표시
+			if (resultPhase && matchedRecipeIdx >= 0)
+			{
+				int descX = cookBase.x + 32;
+				int descY = cookBase.y + 300;
+				setFontSize(14);
+
+				if (recipes[matchedRecipeIdx].resultCode == itemID::chickPilaff)
+				{
+					//치킨 필라프 설명
+					setFontSize(24);
+					drawTextCenter(L"#e9c900★★★", cookBase.x + cookBase.w / 2, cookBase.y + 303);
 
 					setFontSize(16);
-					drawText(itemDex[ingredientCode[i]].name, ingredientBtn[i].x + 46, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 11);
-				}
-				else if (i == ingredientCount && ingredientCount < 6)//재료를 새롭게 추가할 수 있는 (+) 버튼
-				{
-					if (checkCursor(&ingredientBtn[i])) { drawFillRect(ingredientBtn[i], click ? lowCol::deepBlue : lowCol::blue); drawRect(ingredientBtn[i], col::lightGray); }
-					else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
+					drawTextWidth(L" Butter-toasted rice slow-cooked in chicken broth, topped with seasoned chicken.", cookBase.x + 19, cookBase.y + 326, false, 380,20);
 
-					setFontSize(28);
-					drawTextCenter(L"+", ingredientBtn[i].x + ingredientBtn[i].w / 2, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 4);
-				}
-				else//빈 슬롯이며 눌러도 아무 기능 없음
-				{
-					drawFillRect(ingredientBtn[i], col::black, 80);
-					drawRect(ingredientBtn[i], col::gray, 80);
+					for (int i = 0; i < 4; i++)
+					{
+						int pivotX = cookBase.x+62 + 192*(i%2);
+						int pivotY = cookBase.y+398 + 25 * (i / 2);
+
+						if (i == 0)
+						{
+
+							setFontSize(16);
+							setFont(fontType::mainFontSemiBold);
+							drawTextCenter(L"Hunger", pivotX, pivotY);
+
+							setFont(fontType::mainFontBold);
+							drawTextCenter(L"#59cb65-12%", pivotX + 92, pivotY);
+							setFont(fontType::mainFont);
+						}
+						else if (i == 1)
+						{
+							setFontSize(16);
+							setFont(fontType::mainFontSemiBold);
+							drawTextCenter(L"Thirsty", pivotX, pivotY);
+
+							setFont(fontType::mainFontBold);
+							drawTextCenter(L"#59cb65-16%", pivotX + 92, pivotY);
+							setFont(fontType::mainFont);
+						}
+						else if (i == 2)
+						{
+							setFontSize(16);
+							setFont(fontType::mainFontSemiBold);
+							drawTextCenter(L"Mental", pivotX, pivotY);
+
+							setFont(fontType::mainFontBold);
+							drawTextCenter(L"#59cb65+25%", pivotX + 92, pivotY);
+							setFont(fontType::mainFont);
+						}
+						else if (i == 3)
+						{
+							setFontSize(16);
+							setFont(fontType::mainFontSemiBold);
+							drawTextCenter(L"Atk Speed", pivotX, pivotY);
+
+							setFont(fontType::mainFontBold);
+							setFontSize(14);
+							std::wstring valText = L"#59cb65-11%#e9c900 (-3%)";
+							drawTextCenter(valText, pivotX + 92, pivotY);
+							int valWidth = getTextWidthWithoutColor(removeColorCodes(valText));
+							drawSprite(spr::icon16, 107, pivotX + 92 + valWidth / 2 - 3, pivotY - 12);//별모양 심볼
+							setFont(fontType::mainFont);
+						}
+					}
 				}
 			}
 
@@ -278,7 +403,20 @@ public:
 				}
 			}
 
-			if (canCook)
+			if (resultPhase)
+			{
+				//결과 단계: Transfer / Eat Now 버튼 2개
+				if (checkCursor(&transferBtn)) { drawFillRect(transferBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(transferBtn, col::lightGray); }
+				else { drawFillRect(transferBtn, col::black); drawRect(transferBtn, col::gray); }
+				setFontSize(18);
+				drawTextCenter(L"Transfer", transferBtn.x + transferBtn.w / 2, transferBtn.y + transferBtn.h / 2);
+
+				if (checkCursor(&eatBtn)) { drawFillRect(eatBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(eatBtn, col::lightGray); }
+				else { drawFillRect(eatBtn, col::black); drawRect(eatBtn, col::gray); }
+				setFontSize(18);
+				drawTextCenter(L"Eat Now", eatBtn.x + eatBtn.w / 2, eatBtn.y + eatBtn.h / 2);
+			}
+			else if (canCook)
 			{
 				if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
 				else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
@@ -334,7 +472,31 @@ public:
 		if (!canCook || matchedRecipeIdx < 0) return;
 		const CookRecipe& recipe = recipes[matchedRecipeIdx];
 		updateLog(recipe.resultName + L" has been cooked successfully!");
-		//TODO: 실제 아이템 생성 및 재료 소모 로직 추가
+
+		//쿡웨어 내부 물 삭제
+		if (cookwarePtr != nullptr && cookwarePtr->pocketPtr != nullptr)
+		{
+			auto& pocketInfo = cookwarePtr->pocketPtr->itemInfo;
+			for (int i = (int)pocketInfo.size() - 1; i >= 0; i--)
+			{
+				if (pocketInfo[i].itemCode == itemID::water)
+				{
+					cookwarePtr->pocketPtr->eraseItemInfo(i);
+				}
+			}
+			//쿡웨어에 완성된 요리 추가
+			cookwarePtr->pocketPtr->addItemFromDex(recipe.resultCode, 1);
+		}
+
+		resultPhase = true;
+	}
+	void onClickTransferBtn()
+	{
+		updateLog(L"[Cook] Transfer button clicked.");
+	}
+	void onClickEatBtn()
+	{
+		updateLog(L"[Cook] Eat Now button clicked.");
 	}
 	void clickUpGUI()
 	{
@@ -368,6 +530,18 @@ public:
 		if (checkCursor(&tab))
 		{
 			close(aniFlag::winUnfoldClose);
+		}
+		else if (resultPhase)
+		{
+			//결과 단계: Transfer / Eat Now 버튼만 처리
+			if (checkCursor(&transferBtn))
+			{
+				onClickTransferBtn();
+			}
+			else if (checkCursor(&eatBtn))
+			{
+				onClickEatBtn();
+			}
 		}
 		else if (checkCursor(&recipeBtn))
 		{
@@ -431,6 +605,21 @@ public:
 	static bool isHeatSource(int code)
 	{
 		return code == itemID::campfire || code == itemID::electricCooktop;
+	}
+
+	//쿡웨어 확대 스프라이트 인덱스 (0:빈, 1:물, 2:요리)
+	int getCookwareLargeSprIndex()
+	{
+		if (cookwarePtr == nullptr || cookwarePtr->pocketPtr == nullptr) return 0;
+		for (auto& item : cookwarePtr->pocketPtr->itemInfo)
+		{
+			if (item.itemCode == itemID::chickPilaff) return 2;
+		}
+		for (auto& item : cookwarePtr->pocketPtr->itemInfo)
+		{
+			if (item.itemCode == itemID::water) return 1;
+		}
+		return 0;
 	}
 
 	//쿡웨어 내부 물의 양(mL) 반환, 물 없으면 0
@@ -646,6 +835,7 @@ public:
 	//가장 많이 일치하는 레시피를 찾고, 모든 조건 충족 시 canCook 활성화
 	void checkCanCook()
 	{
+		if (resultPhase) return; //결과 단계에서는 재검사하지 않음
 		matchedRecipeIdx = -1;
 		canCook = false;
 

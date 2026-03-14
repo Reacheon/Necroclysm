@@ -272,6 +272,38 @@ export void drawStadium(int x, int y, int w, int h, SDL_Color color, int alpha, 
 
 export void drawStadium(SDL_Rect rect, SDL_Color color, int alpha, int edge){ drawStadium(rect.x, rect.y, rect.w, rect.h, color, alpha, edge); }
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// 채워진 타원 (미드포인트 타원 알고리즘)
+// cx, cy = 중심 좌표, rx = 가로 반지름, ry = 세로 반지름
+export void drawFillEllipse(int cx, int cy, int rx, int ry, const SDL_Color& col, Uint8 alpha)
+{
+	if (rx <= 0 || ry <= 0) return;
+
+	SDL_SetRenderDrawBlendMode(localRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(localRenderer, col.r, col.g, col.b, alpha);
+
+	// 스캔라인 방식: y좌표별로 정확히 한 번만 그림 (alpha 누적 방지)
+	float rx2 = (float)rx * rx;
+	float ry2 = (float)ry * ry;
+	for (int dy = -ry; dy <= ry; dy++)
+	{
+		// 타원 방정식: x^2/rx^2 + y^2/ry^2 = 1 → x = rx * sqrt(1 - y^2/ry^2)
+		float xSpan = rx * std::sqrt(1.0f - (float)(dy * dy) / ry2);
+		int x1 = cx - (int)xSpan;
+		int x2 = cx + (int)xSpan;
+		SDL_RenderLine(localRenderer, x1, cy + dy, x2, cy + dy);
+	}
+
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
+}
+export void drawFillEllipse(int cx, int cy, int rx, int ry, const SDL_Color& col) { drawFillEllipse(cx, cy, rx, ry, col, 255); }
+
+// 채워진 원 (반지름 r)
+export void drawFillCircle(int cx, int cy, int r, const SDL_Color& col, Uint8 alpha) { drawFillEllipse(cx, cy, r, r, col, alpha); }
+export void drawFillCircle(int cx, int cy, int r, const SDL_Color& col) { drawFillEllipse(cx, cy, r, r, col, 255); }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 export void drawRectBatch(int rectW, int rectH, SDL_Color* cols, const Point2* pts, size_t count, float inputZoomScale)
 {
 	if (!cols || !pts || !cols || count == 0) return;

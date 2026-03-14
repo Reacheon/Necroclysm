@@ -105,7 +105,7 @@ struct CachedTexture
 };
 
 static std::unordered_map<TextCacheKey, CachedTexture, TextCacheKeyHasher> textureCache;
-static std::unordered_map<std::wstring, std::array<std::wstring, 2>> splitCache;
+static std::unordered_map<std::wstring, std::array<std::wstring, 2>> splitCache; // 키: text + L"|" + widthLimit
 static std::list<TextCacheKey> lruList;
 
 static std::string toUTF8(const std::wstring& w)
@@ -380,17 +380,17 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
     static constexpr size_t MAX_SPLIT_CACHE_SIZE = 1000;
     static std::list<std::wstring> splitLruList;
 
-    std::wstring originalText = text;
+    std::wstring cacheKey = text + L"|" + std::to_wstring(widthLimit);
 
     // 캐시 확인
-    auto splitCached = splitCache.find(originalText);
+    auto splitCached = splitCache.find(cacheKey);
     if (splitCached != splitCache.end()) {
         // LRU 업데이트: 해당 키를 리스트에서 제거하고 맨 앞으로 이동
-        auto lruIt = std::find(splitLruList.begin(), splitLruList.end(), originalText);
+        auto lruIt = std::find(splitLruList.begin(), splitLruList.end(), cacheKey);
         if (lruIt != splitLruList.end()) {
             splitLruList.erase(lruIt);
         }
-        splitLruList.push_front(originalText);
+        splitLruList.push_front(cacheKey);
         return splitCached->second;
     }
 
@@ -400,6 +400,7 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
     if (textNoColorWidth > widthLimit) {
         // 컬러코드를 고려한 분할 로직
         std::wstring lastColorCode = L"";
+        size_t lastSpaceInOriginal = std::wstring::npos; // 원본 text에서 마지막 공백 위치 추적
 
         for (size_t i = 0; i < text.size(); i++) {
             if (text[i] == L'#' && i + 6 < text.size()) {
@@ -408,12 +409,25 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
                 continue;
             }
 
+            if (text[i] == L' ') {
+                lastSpaceInOriginal = i;
+            }
+
             std::wstring testText = removeColorCodes(text.substr(0, i + 1));
             int testWidth = getTextWidthWithoutColor(testText);
 
             if (testWidth > widthLimit) {
-                std::wstring return1 = text.substr(0, i);
-                std::wstring return2 = text.substr(i);
+                // 단어 단위 줄바꿈: 마지막 공백 위치로 backtrack
+                size_t splitPos;
+                if (lastSpaceInOriginal != std::wstring::npos && lastSpaceInOriginal > 0) {
+                    splitPos = lastSpaceInOriginal + 1; // 공백 다음에서 분할
+                }
+                else {
+                    splitPos = i; // fallback: 공백이 없으면 글자 단위로 분할
+                }
+
+                std::wstring return1 = text.substr(0, splitPos);
+                std::wstring return2 = text.substr(splitPos);
 
                 // 줄바꿈 문자 처리
                 size_t newlinePos = return1.find(L'\n');
@@ -459,8 +473,8 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
     }
 
     // 새 결과를 캐시에 추가
-    splitCache[originalText] = result;
-    splitLruList.push_front(originalText);
+    splitCache[cacheKey] = result;
+    splitLruList.push_front(cacheKey);
 
     return result;
 }

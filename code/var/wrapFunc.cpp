@@ -298,7 +298,12 @@ int getItemSprIndex(ItemData& inputData)
             std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
             if (pocketInfo.size() > 0)
             {
-                 return (inputData.itemSprIndex + 1);
+                //치킨 필라프가 들어있으면 +2
+                for (auto& item : pocketInfo)
+                {
+                    if (item.itemCode == itemID::chickPilaff) return (inputData.itemSprIndex + 2);
+                }
+                return (inputData.itemSprIndex + 1);
             }
         }
     }
