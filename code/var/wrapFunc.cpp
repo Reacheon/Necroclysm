@@ -291,17 +291,18 @@ int getItemSprIndex(ItemData& inputData)
         else if (num == 1) return itemDex[inputData.itemCode].itemSprIndex + 1;
         else return itemDex[inputData.itemCode].itemSprIndex + 2;
     }
-    if (inputData.itemCode == itemID::fryingPan || inputData.itemCode == itemID::cookingPot)
+    if (inputData.itemCode == itemID::fryingPan || inputData.itemCode == itemID::cookingPot
+        || inputData.itemCode == itemID::woodenPlate || inputData.itemCode == itemID::ceramicPlate)
     {
         if (inputData.pocketPtr != nullptr)
         {
             std::vector<ItemData>& pocketInfo = inputData.pocketPtr.get()->itemInfo;
             if (pocketInfo.size() > 0)
             {
-                //치킨 필라프가 들어있으면 +2
+                //DISH 플래그 아이템이 들어있으면 +2
                 for (auto& item : pocketInfo)
                 {
-                    if (item.itemCode == itemID::eggFriedRice) return (inputData.itemSprIndex + 2);
+                    if (item.checkFlag(itemFlag::DISH)) return (inputData.itemSprIndex + 2);
                 }
                 return (inputData.itemSprIndex + 1);
             }

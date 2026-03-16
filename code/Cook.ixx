@@ -39,8 +39,9 @@ private:
 	static constexpr int MAX_DD_VISIBLE = 6;
 	static constexpr int DD_BLOCK_H = 36;
 	static constexpr int DD_HEATSRC = -2;   // 열원 드롭다운 타겟
+	static constexpr int DD_TRANSFER = -3;  // Transfer 드롭다운 타겟
 	bool ddOpen = false;
-	int ddTarget = -1;          // -1:없음, DD_HEATSRC:열원, 0:cookware, 1~:ingredient 슬롯
+	int ddTarget = -1;          // -1:없음, DD_HEATSRC:열원, DD_TRANSFER:Transfer, 0:cookware, 1~:ingredient 슬롯
 	float ddRatio = 0.0f;       // 애니메이션 비율 (0.0~1.0)
 	int ddScroll = 0;
 	SDL_Rect ddRect = {};
@@ -49,7 +50,10 @@ private:
 		int itemCode;
 		int totalCount;
 		ItemData* itemPtr;
-		Prop* propPtr = nullptr;  // 열원 전용 (나머지 nullptr)
+		Prop* propPtr = nullptr;    // 열원 전용 (나머지 nullptr)
+		std::wstring locationTag;   // Transfer 전용: "Wield", "E Tile" 등 (나머지 빈 문자열)
+		ItemPocket* sourcePocket = nullptr; // Transfer 전용: 아이템이 속한 포켓
+		int sourceIndex = -1;       // Transfer 전용: 포켓 내 인덱스
 	};
 	std::vector<DdItem> ddItems;
 
@@ -490,11 +494,28 @@ public:
 	}
 	void onClickTransferBtn()
 	{
-		updateLog(L"[Cook] Transfer button clicked.");
+		openDropdown(DD_TRANSFER, itemFlag::PLATE);
 	}
 	void onClickEatBtn()
 	{
-		updateLog(L"[Cook] Eat Now button clicked.");
+		if (cookwarePtr == nullptr || cookwarePtr->pocketPtr == nullptr) return;
+		if (matchedRecipeIdx < 0) return;
+
+		const CookRecipe& recipe = recipes[matchedRecipeIdx];
+
+		//쿡웨어 포켓에서 완성된 요리 제거
+		ItemPocket* cwPocket = cookwarePtr->pocketPtr.get();
+		for (int i = 0; i < (int)cwPocket->itemInfo.size(); i++)
+		{
+			if (cwPocket->itemInfo[i].itemCode == recipe.resultCode)
+			{
+				cwPocket->eraseItemInfo(i);
+				break;
+			}
+		}
+
+		updateLog(L"You ate " + recipe.resultName + L".");
+		close(aniFlag::winUnfoldClose);
 	}
 	void clickUpGUI()
 	{
@@ -762,17 +783,112 @@ public:
 		}
 	}
 
+	//방향 인덱스 → 문자열 (Transfer 위치 표시용)
+	static std::wstring dirToLabel(int dir)
+	{
+		switch (dir)
+		{
+		case 0: return L"E";
+		case 1: return L"NE";
+		case 2: return L"N";
+		case 3: return L"NW";
+		case 4: return L"W";
+		case 5: return L"SW";
+		case 6: return L"S";
+		case 7: return L"SE";
+		default: return L"Here";
+		}
+	}
+
+	//Transfer 가능한 용기인지 확인 (PLATE 또는 COOKWARE)
+	static bool isTransferTarget(const ItemData& item)
+	{
+		return item.checkFlag(itemFlag::PLATE) || item.checkFlag(itemFlag::COOKWARE);
+	}
+
+	//Transfer 대상 포켓 스캔 (개별 등록 + 위치 태그)
+	void scanPocketForTransfer(ItemPocket* pocket, const std::wstring& locTag)
+	{
+		for (int i = 0; i < (int)pocket->itemInfo.size(); i++)
+		{
+			ItemData& item = pocket->itemInfo[i];
+			if (isTransferTarget(item))
+			{
+				//현재 요리에 사용 중인 쿡웨어는 제외
+				if (&item == cookwarePtr) continue;
+				ddItems.push_back({ (int)item.itemCode, 1, &item, nullptr, locTag, pocket, i });
+			}
+		}
+	}
+
+	//Transfer 대상 스캔: 장비, 가방, 주변 타일
+	void scanTransferTargets()
+	{
+		ddItems.clear();
+
+		//1. 플레이어 장비 (Wield/Equip)
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		for (int i = 0; i < (int)equipPtr->itemInfo.size(); i++)
+		{
+			ItemData& item = equipPtr->itemInfo[i];
+			if (isTransferTarget(item))
+			{
+				if (&item == cookwarePtr) continue;
+				std::wstring tag;
+				if (item.equipState == equipHandFlag::left) tag = L"L Hand";
+				else if (item.equipState == equipHandFlag::right) tag = L"R Hand";
+				else if (item.equipState == equipHandFlag::both) tag = L"Both";
+				else tag = L"Equip";
+				ddItems.push_back({ (int)item.itemCode, 1, &item, nullptr, tag, equipPtr, i });
+			}
+		}
+
+		//2. 장비 내부 포켓 (가방 안)
+		for (int i = 0; i < (int)equipPtr->itemInfo.size(); i++)
+		{
+			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
+			{
+				scanPocketForTransfer(equipPtr->itemInfo[i].pocketPtr.get(), L"Bag");
+			}
+		}
+
+		//3. 바닥 아이템스택 + 프롭 포켓 (주변 9타일)
+		for (int dir = -1; dir < 8; dir++)
+		{
+			int dx = 0, dy = 0;
+			dir2Coord(dir, dx, dy);
+			std::wstring tileTag = (dir == -1) ? L"Floor" : (dirToLabel(dir) + L" Tile");
+
+			ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+			if (stack != nullptr)
+			{
+				scanPocketForTransfer(stack->getPocket(), tileTag);
+			}
+
+			Prop* prop = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
+			if (prop != nullptr && prop->leadItem.pocketPtr != nullptr)
+			{
+				scanPocketForTransfer(prop->leadItem.pocketPtr.get(), tileTag);
+			}
+		}
+	}
+
 	//드롭다운 열기
 	void openDropdown(int target, itemFlag flag)
 	{
 		if (target == DD_HEATSRC)
 			scanHeatSources();
+		else if (target == DD_TRANSFER)
+			scanTransferTargets();
 		else
 			scanItems(flag);
 
 		if (ddItems.empty())
 		{
-			updateLog(L"There are no items nearby.");
+			if (target == DD_TRANSFER)
+				updateLog(L"There are no containers nearby to transfer to.");
+			else
+				updateLog(L"There are no items nearby.");
 			return;
 		}
 		ddTarget = target;
@@ -783,12 +899,19 @@ public:
 		//부모 Rect 결정
 		SDL_Rect parentRect;
 		if (target == DD_HEATSRC) parentRect = heatSrcBtn;
+		else if (target == DD_TRANSFER) parentRect = transferBtn;
 		else if (target == 0) parentRect = cookwareBtn;
 		else parentRect = ingredientBtn[ingredientCount];
 
 		int visibleCount = std::min((int)ddItems.size(), MAX_DD_VISIBLE);
-		int ddW = myMax(parentRect.w, 180);
-		ddRect = { parentRect.x, parentRect.y + parentRect.h, ddW, DD_BLOCK_H * visibleCount };
+		int ddW = myMax(parentRect.w, 220);
+		ddRect = { parentRect.x, parentRect.y - DD_BLOCK_H * visibleCount, ddW, DD_BLOCK_H * visibleCount };
+
+		//Transfer 드롭다운은 버튼 위쪽으로 열림 (화면 하단 근처이므로)
+		if (target != DD_TRANSFER)
+		{
+			ddRect.y = parentRect.y + parentRect.h;
+		}
 	}
 
 	//드롭다운 닫기
@@ -806,6 +929,10 @@ public:
 		{
 			heatSrcPropPtr = ddItems[ddIndex].propPtr;
 		}
+		else if (ddTarget == DD_TRANSFER)
+		{
+			executeTransfer(ddIndex);
+		}
 		else if (ddTarget == 0)
 		{
 			cookwarePtr = ddItems[ddIndex].itemPtr;
@@ -815,6 +942,52 @@ public:
 			ingredientCode[ingredientCount] = ddItems[ddIndex].itemCode;
 			ingredientCount++;
 		}
+	}
+
+	//Transfer 실행: 쿡웨어에서 완성된 요리를 선택된 용기로 이동
+	void executeTransfer(int ddIndex)
+	{
+		if (cookwarePtr == nullptr || cookwarePtr->pocketPtr == nullptr) return;
+		if (matchedRecipeIdx < 0) return;
+
+		const CookRecipe& recipe = recipes[matchedRecipeIdx];
+		DdItem& target = ddItems[ddIndex];
+
+		//쿡웨어 포켓에서 완성된 요리 찾기
+		ItemPocket* cwPocket = cookwarePtr->pocketPtr.get();
+		int dishIndex = -1;
+		for (int i = 0; i < (int)cwPocket->itemInfo.size(); i++)
+		{
+			if (cwPocket->itemInfo[i].itemCode == recipe.resultCode)
+			{
+				dishIndex = i;
+				break;
+			}
+		}
+		if (dishIndex < 0) return;
+
+		//대상 용기에 포켓이 있으면 포켓으로 이동, 없으면 같은 포켓에 추가
+		ItemPocket* destPocket = nullptr;
+		if (target.itemPtr->pocketPtr != nullptr)
+		{
+			destPocket = target.itemPtr->pocketPtr.get();
+		}
+		else if (target.sourcePocket != nullptr)
+		{
+			destPocket = target.sourcePocket;
+		}
+
+		if (destPocket != nullptr)
+		{
+			//transferItem이 destPocket->itemInfo를 변경할 수 있으므로
+			//같은 벡터에 속한 target.itemPtr이 무효화될 수 있음 → 이름을 미리 복사
+			std::wstring targetName = target.itemPtr->name;
+			cwPocket->transferItem(destPocket, dishIndex, 1);
+			updateLog(L"Transferred " + recipe.resultName + L" to " + targetName + L".");
+		}
+
+		//Transfer 후 Cook UI 닫기
+		close(aniFlag::winUnfoldClose);
 	}
 
 	//재료 제거 (앞으로 당기기)
@@ -905,9 +1078,18 @@ public:
 		int visibleCount = std::min((int)ddItems.size(), MAX_DD_VISIBLE);
 		int animH = (int)(ddRect.h * ddRatio);
 
-		//애니메이션 중: 검은 배경만
-		drawFillRect(ddRect.x, ddRect.y, ddRect.w, animH, col::black);
-		drawRect(ddRect.x, ddRect.y, ddRect.w, animH, col::gray);
+		//애니메이션 중: 검은 배경만 (Transfer는 아래→위로, 나머지는 위→아래로)
+		if (ddTarget == DD_TRANSFER)
+		{
+			int animY = ddRect.y + ddRect.h - animH;
+			drawFillRect(ddRect.x, animY, ddRect.w, animH, col::black);
+			drawRect(ddRect.x, animY, ddRect.w, animH, col::gray);
+		}
+		else
+		{
+			drawFillRect(ddRect.x, ddRect.y, ddRect.w, animH, col::black);
+			drawRect(ddRect.x, ddRect.y, ddRect.w, animH, col::gray);
+		}
 
 		if (ddRatio < 1.0f) return;
 
@@ -934,9 +1116,20 @@ public:
 			drawSpriteCenter(spr::itemset, getItemSprIndex(*ddItems[idx].itemPtr), blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
 			setZoom(1.0);
 
-			//이름 (쿡웨어일 경우 mL 표시)
+			//이름 표시
 			setFontSize(16);
-			if (ddTarget == 0)
+			if (ddTarget == DD_TRANSFER)
+			{
+				//Transfer: 아이템 이름 + 위치 태그 (회색으로)
+				drawText(ddItems[idx].itemPtr->name, blockRect.x + 42, blockRect.y + DD_BLOCK_H / 2 - 10);
+				if (!ddItems[idx].locationTag.empty())
+				{
+					int nameW = getTextWidthWithoutColor(ddItems[idx].itemPtr->name);
+					setFontSize(13);
+					drawText(col2Str(col::gray) + L" " + ddItems[idx].locationTag, blockRect.x + 42 + nameW, blockRect.y + DD_BLOCK_H / 2 - 9);
+				}
+			}
+			else if (ddTarget == 0)
 			{
 				int waterML = getWaterML(ddItems[idx].itemPtr);
 				if (waterML > 0)
