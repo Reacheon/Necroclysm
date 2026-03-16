@@ -212,9 +212,13 @@ export namespace itemID
     constexpr int fryingPan = 535;
     constexpr int ttukbaegi = 536;
 
-    constexpr int chickPilaff = 537;
+    constexpr int eggFriedRice = 537;
     constexpr int woodenPlate = 538;
     constexpr int ceramicPlate = 539;
 
     constexpr int egg = 58;
+
+    constexpr int scallion = 540;
+    constexpr int onion = 541;
+    constexpr int garlic = 542;
 };

@@ -301,7 +301,7 @@ int getItemSprIndex(ItemData& inputData)
                 //치킨 필라프가 들어있으면 +2
                 for (auto& item : pocketInfo)
                 {
-                    if (item.itemCode == itemID::chickPilaff) return (inputData.itemSprIndex + 2);
+                    if (item.itemCode == itemID::eggFriedRice) return (inputData.itemSprIndex + 2);
                 }
                 return (inputData.itemSprIndex + 1);
             }

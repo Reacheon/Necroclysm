@@ -66,12 +66,12 @@ private:
 	};
 	inline static const std::vector<CookRecipe> recipes = {
 		{
-			itemID::chickPilaff,
-			L"Chicken Pilaf",
+			itemID::eggFriedRice,
+			L"Egg Fried Rice",
 			{ itemID::campfire, itemID::electricCooktop },
 			{ itemID::fryingPan, itemID::cookingPot },
-			200,
-			{ itemID::rice, itemID::butter, itemID::rawChicken, itemID::egg }
+			0,
+			{ itemID::rice, itemID::egg, itemID::scallion, itemID::carrot }
 		},
 	};
 
@@ -196,15 +196,13 @@ public:
 
 			//확대된 요리 그림
 			{
-				Sprite* cwSpr = spr::fryingPan;
-				int cwSprIdx = 0;
 				if (cookwarePtr != nullptr)
 				{
+					Sprite* cwSpr = spr::fryingPan;
 					if ((int)cookwarePtr->itemCode == itemID::cookingPot) cwSpr = spr::cookingPot;
-					else cwSpr = spr::fryingPan;
-					cwSprIdx = getCookwareLargeSprIndex();
+					int cwSprIdx = getCookwareLargeSprIndex();
+					drawSpriteCenter(cwSpr, cwSprIdx, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
 				}
-				drawSpriteCenter(cwSpr, cwSprIdx, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
 
 				//김 애니메이션 (요리 완성 시)
 				if (resultPhase)
@@ -327,14 +325,14 @@ public:
 				int descY = cookBase.y + 300;
 				setFontSize(14);
 
-				if (recipes[matchedRecipeIdx].resultCode == itemID::chickPilaff)
+				if (recipes[matchedRecipeIdx].resultCode == itemID::eggFriedRice)
 				{
-					//치킨 필라프 설명
+					//계란볶음밥 설명
 					setFontSize(24);
 					drawTextCenter(L"#e9c900★★★", cookBase.x + cookBase.w / 2, cookBase.y + 303);
 
 					setFontSize(16);
-					drawTextWidth(L" Butter-toasted rice slow-cooked in chicken broth, topped with seasoned chicken.", cookBase.x + 19, cookBase.y + 326, false, 380,20);
+					drawTextWidth(L" Rice stir-fried with scrambled egg and carrot sauteed in scallion oil. A quick, satisfying meal.", cookBase.x + 19, cookBase.y + 326, false, 380,20);
 
 					for (int i = 0; i < 4; i++)
 					{
@@ -613,7 +611,7 @@ public:
 		if (cookwarePtr == nullptr || cookwarePtr->pocketPtr == nullptr) return 0;
 		for (auto& item : cookwarePtr->pocketPtr->itemInfo)
 		{
-			if (item.itemCode == itemID::chickPilaff) return 2;
+			if (item.itemCode == itemID::eggFriedRice) return 2;
 		}
 		for (auto& item : cookwarePtr->pocketPtr->itemInfo)
 		{

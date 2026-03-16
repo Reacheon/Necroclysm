@@ -666,6 +666,9 @@ export void startArea()
 		{ itemID::cacaoFruit,3 },
 		{ itemID::butter,3 },
 		{ itemID::egg,10 },
+		{ itemID::scallion, 10},
+		{ itemID::onion, 10},
+		{ itemID::garlic, 10}
 		});
 
 
