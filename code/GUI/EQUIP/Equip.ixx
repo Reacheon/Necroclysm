@@ -64,7 +64,7 @@ public:
 		arrowEndX = cameraW / 2 - 8 * zoomScale + 16 * 0 * zoomScale;
 		arrowEndY = cameraH / 2 + 16 * 0 * zoomScale;
 		targetX = arrowEndX - 429;
-		targetY = arrowEndY - 250;
+		targetY = arrowEndY - 280;
 
 		changeXY(targetX, targetY, false);
 		setAniSlipDir(4);

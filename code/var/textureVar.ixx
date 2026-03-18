@@ -185,4 +185,6 @@ export namespace spr
 
 	Sprite* fryingPan = nullptr;
 	Sprite* cookingPot = nullptr;
+	
+	Sprite* bodyPartEncLine = nullptr;
 }

@@ -219,4 +219,6 @@ export void textureLoader()
 
 	spr::fryingPan = new Sprite(renderer, "image/UI/GUI/Cook/fryingPan.png", 160, 160);
 	spr::cookingPot = new Sprite(renderer, "image/UI/GUI/Cook/cookingPot.png", 160, 160);
+
+	spr::bodyPartEncLine = new Sprite(renderer, "image/UI/GUI/HUD/bodyPartEncLine.png", 106, 28);
 }

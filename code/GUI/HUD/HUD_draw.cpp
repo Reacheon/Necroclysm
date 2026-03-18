@@ -21,6 +21,7 @@ import ContextMenu;
 import Maint;
 import statusEffect;
 import ItemData;
+import Equip;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
@@ -1666,42 +1667,149 @@ void HUD::drawBodyParts()
 	drawSpriteCenter(spr::bodyShape, isMale ? 0 : 1, 146, cameraH - 152);
 	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
 
+	auto drawPartName = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName)
+		{
+			if (gaugeFlip == false)
+				drawText(partName, inputX, inputY - 26, col::white);
+			else
+				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+		};
+
+	drawPartName(false, 173, cameraH - 1 - 65,  L"LLeg");
+	drawPartName(true,   25, cameraH - 1 - 65,  L"RLeg");
+	drawPartName(false, 193, cameraH - 1 - 164, L"LArm");
+	drawPartName(true,    3, cameraH - 1 - 164, L"RArm");
+	drawPartName(true,   21, cameraH - 1 - 245, L"Torso");
+	drawPartName(false, 167, cameraH - 1 - 282, L"Head");
+
 	// 각 부위 그리기
-	drawSingleBodyPartGauge(false,
-		173,
-		cameraH - 1 - 65, 
-		L"LLeg",
-		PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
+	if (Equip::ins() == nullptr || !Equip::ins()->isFullyOpen())
+	{
+		drawSingleBodyPartGauge(false,
+			173,
+			cameraH - 1 - 65,
+			L"LLeg",
+			PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
 
-	drawSingleBodyPartGauge(true, 25,
-		cameraH - 1 - 65, 
-		L"RLeg",
-		PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
+		drawSingleBodyPartGauge(true, 25,
+			cameraH - 1 - 65,
+			L"RLeg",
+			PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
 
-	drawSingleBodyPartGauge(false,
-		193, 
-		cameraH - 1 - 164, 
-		L"LArm",
-		PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
+		drawSingleBodyPartGauge(false,
+			193,
+			cameraH - 1 - 164,
+			L"LArm",
+			PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
 
-	drawSingleBodyPartGauge(true,
-		3, 
-		cameraH - 1 - 164, 
-		L"RArm",
-		PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
+		drawSingleBodyPartGauge(true,
+			3,
+			cameraH - 1 - 164,
+			L"RArm",
+			PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
 
-	drawSingleBodyPartGauge(true,
-		21, 
-		cameraH - 1 - 245, 
-		L"Torso",
-		PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
-		PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
+		drawSingleBodyPartGauge(true,
+			21,
+			cameraH - 1 - 245,
+			L"Torso",
+			PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
+			PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
 
-	drawSingleBodyPartGauge(false,
-		167, 
-		cameraH - 1 - 282, 
-		L"Head",
-		PlayerPtr->headHP, PlayerPtr->headFakeHP, PART_MAX_HP, PlayerPtr->headFakeHPAlpha);
+		drawSingleBodyPartGauge(false,
+			167,
+			cameraH - 1 - 282,
+			L"Head",
+			PlayerPtr->headHP, PlayerPtr->headFakeHP, PART_MAX_HP, PlayerPtr->headFakeHPAlpha);
+	}
+	else
+	{
+		// 파츠별 부가정보 표시
+		// 비반전(L계열/Head): textOff=14, 방해도 center=+89
+		// 반전(R계열/Torso):  textOff=6,  방해도 center=+17
+		// 행 간격 17px, 물리저항(0~2행) / 속성저항(3~6행, 전신 공통)
+
+		auto drawPartInfo = [&](bool flip, int pivotX, int pivotY)
+		{
+			const int tOff = flip ? 6  : 14;  // 텍스트 X 오프셋
+			const int cOff = flip ? 17 : 89;  // 방해도 center X 오프셋
+
+			if (flip) setFlip(SDL_FLIP_HORIZONTAL);
+			drawSprite(spr::bodyPartEncLine, pivotX, pivotY);
+			if (flip) setFlip(SDL_FLIP_NONE);
+
+			setFont(fontType::mainFontSemiBold);
+			setFontSize(12);
+			drawTextCenter(L"#f2c122방해도", pivotX + cOff, pivotY + 7);
+			setFontSize(14);
+			drawTextCenter(L"72%", pivotX + cOff, pivotY + 20);
+
+			setFontSize(16);
+			// 물리저항
+			drawText(L"#f26522rPierce", pivotX + tOff,      pivotY + 29 + 17 * 0);
+			drawText(L"6",              pivotX + tOff + 66, pivotY + 29 + 17 * 0);
+
+			drawText(L"#f26522rCut",    pivotX + tOff,      pivotY + 29 + 17 * 1);
+			drawText(L"12",             pivotX + tOff + 66, pivotY + 29 + 17 * 1);
+
+			drawText(L"#f26522rBash",   pivotX + tOff,      pivotY + 29 + 17 * 2);
+			drawText(col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
+
+		};
+
+		drawPartInfo(false, 164, cameraH - 311);  // 머리
+		drawPartInfo(true,   16, cameraH - 274);  // 상체
+		drawPartInfo(false, 190, cameraH - 193);  // 왼팔
+		drawPartInfo(true,    2, cameraH - 193);  // 오른팔
+		drawPartInfo(false, 170, cameraH - 94);   // 왼다리
+		drawPartInfo(true,   20, cameraH - 94);   // 오른다리
+
+
+		int pivotX = 0;
+		int pivotY = cameraH - 665;
+		drawStadium(SDL_Rect{ pivotX -10,pivotY,97,351 }, col::black, 220, 3);
+		setFontSize(18);
+		drawTextCenter(L"#f26522Shield", pivotX + 42, pivotY + 20);
+		drawTextCenter(L"27", pivotX + 42, pivotY + 20 + 20);
+
+		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20 + 3 + 50);
+		drawTextCenter(L"16", pivotX + 42, pivotY + 20 + 20 + 50);
+
+		// 속성저항 (전신 공통)
+		const int resGap = 45; // 속성저항 간 간격 (조절용)
+		const int resBaseY = pivotY + 116;
+
+		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
+		setFontSize(14);
+		drawText(L"화염저항", pivotX + 5 + 18, resBaseY + resGap * 0 - 2);
+		setFontSize(18);
+		drawTextCenter(L"#75d03f+++", pivotX + 5 + 34, resBaseY + resGap * 0 + 24);
+
+		drawSprite(spr::icon16, 109, pivotX + 4, resBaseY + resGap * 1);
+		setFontSize(14);
+		drawText(L"냉기저항", pivotX + 5 + 18, resBaseY + resGap * 1 - 2);
+		setFontSize(18);
+		drawTextCenter(L"#75d03f++.", pivotX + 5 + 34, resBaseY + resGap * 1 + 24);
+
+		drawSprite(spr::icon16, 110, pivotX + 4, resBaseY + resGap * 2);
+		setFontSize(14);
+		drawText(L"전기저항", pivotX + 5 + 18, resBaseY + resGap * 2 - 2);
+		setFontSize(18);
+		drawTextCenter(L"#75d03f+..", pivotX + 5 + 34, resBaseY + resGap * 2 + 24);
+
+		drawSprite(spr::icon16, 111, pivotX + 4, resBaseY + resGap * 3);
+		setFontSize(14);
+		drawText(L"방사능저항", pivotX + 5 + 18, resBaseY + resGap * 3 - 2);
+		setFontSize(18);
+		drawTextCenter(col2Str(col::lightGray) + L"...", pivotX + 5 + 34, resBaseY + resGap * 3 + 24);
+
+		drawSprite(spr::icon16, 112, pivotX + 4, resBaseY + resGap * 4);
+		setFontSize(14);
+		drawText(L"부식저항", pivotX + 5 + 18, resBaseY + resGap * 4 - 2);
+		setFontSize(18);
+		drawTextCenter(L"#f26522-..", pivotX + 5 + 34, resBaseY + resGap * 4 + 24);
+
+
+	}
 }
 
 

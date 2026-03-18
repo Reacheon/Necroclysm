@@ -45,6 +45,7 @@ public:
 		distCounter = val;
 	}
 	float getFoldRatio() { return foldRatio; }
+	bool isFullyOpen() { return foldRatio >= 1.0f && getAniType() == aniFlag::null; }
     void setAniSlipDir(int inputDir) { slipDir = inputDir; }
     void actDraw() { stateDraw = true; }
     void deactDraw() { stateDraw = false; }
