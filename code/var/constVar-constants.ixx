@@ -40,7 +40,7 @@ export constexpr int QUICK_SLOT_MAX = 8;
 
 export constexpr int CRAFT_MAX_ROW = 4;
 
-export constexpr int MAX_ENC = 10; //최대 방해도
+export constexpr int MAX_ENC = 100; //최대 방해도
 export constexpr int PART_MAX_HP = 100;
 
 export constexpr int START_YEAR = 2099;

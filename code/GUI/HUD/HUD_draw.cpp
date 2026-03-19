@@ -1724,14 +1724,14 @@ void HUD::drawBodyParts()
 	else
 	{
 		// 파츠별 부가정보 표시
-		// 비반전(L계열/Head): textOff=14, 방해도 center=+89
-		// 반전(R계열/Torso):  textOff=6,  방해도 center=+17
+		// 비반전(L계열/Head): textOff=14, Enc center=+89
+		// 반전(R계열/Torso):  textOff=6,  Enc center=+17
 		// 행 간격 17px, 물리저항(0~2행) / 속성저항(3~6행, 전신 공통)
 
-		auto drawPartInfo = [&](bool flip, int pivotX, int pivotY)
+		auto drawPartInfo = [&](bool flip, int pivotX, int pivotY, int rPierce, int rCut, int rBash, int enc)
 		{
 			const int tOff = flip ? 6  : 14;  // 텍스트 X 오프셋
-			const int cOff = flip ? 17 : 89;  // 방해도 center X 오프셋
+			const int cOff = flip ? 17 : 89;  // Enc center X 오프셋
 
 			if (flip) setFlip(SDL_FLIP_HORIZONTAL);
 			drawSprite(spr::bodyPartEncLine, pivotX, pivotY);
@@ -1739,29 +1739,32 @@ void HUD::drawBodyParts()
 
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(12);
-			drawTextCenter(L"#f2c122방해도", pivotX + cOff, pivotY + 7);
+			drawTextCenter(L"#f2c122Enc", pivotX + cOff, pivotY + 7);
 			setFontSize(14);
-			drawTextCenter(L"72%", pivotX + cOff, pivotY + 20);
+			if (enc >= 100)
+				drawTextCenter(L"#ff3333100", pivotX + cOff, pivotY + 20);
+			else
+				drawTextCenter(std::to_wstring(enc) + L"%", pivotX + cOff, pivotY + 20);
 
 			setFontSize(16);
 			// 물리저항
 			drawText(L"#f26522rPierce", pivotX + tOff,      pivotY + 29 + 17 * 0);
-			drawText(L"6",              pivotX + tOff + 66, pivotY + 29 + 17 * 0);
+			drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 0);
 
 			drawText(L"#f26522rCut",    pivotX + tOff,      pivotY + 29 + 17 * 1);
-			drawText(L"12",             pivotX + tOff + 66, pivotY + 29 + 17 * 1);
+			drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 1);
 
 			drawText(L"#f26522rBash",   pivotX + tOff,      pivotY + 29 + 17 * 2);
-			drawText(col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
+			drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
 
 		};
 
-		drawPartInfo(false, 164, cameraH - 311);  // 머리
-		drawPartInfo(true,   16, cameraH - 274);  // 상체
-		drawPartInfo(false, 190, cameraH - 193);  // 왼팔
-		drawPartInfo(true,    2, cameraH - 193);  // 오른팔
-		drawPartInfo(false, 170, cameraH - 94);   // 왼다리
-		drawPartInfo(true,   20, cameraH - 94);   // 오른다리
+		drawPartInfo(false, 164, cameraH - 311, PlayerPtr->getResPierceHead(), PlayerPtr->getResCutHead(), PlayerPtr->getResBashHead(), PlayerPtr->getEncHead());  // 머리
+		drawPartInfo(true,   16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 상체
+		drawPartInfo(false, 190, cameraH - 193, PlayerPtr->getResPierceLArm(), PlayerPtr->getResCutLArm(), PlayerPtr->getResBashLArm(), PlayerPtr->getEncLArm());  // 왼팔
+		drawPartInfo(true,    2, cameraH - 193, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
+		drawPartInfo(false, 170, cameraH - 94,  PlayerPtr->getResPierceLLeg(), PlayerPtr->getResCutLLeg(), PlayerPtr->getResBashLLeg(), PlayerPtr->getEncLLeg());  // 왼다리
+		drawPartInfo(true,   20, cameraH - 94,  PlayerPtr->getResPierceRLeg(), PlayerPtr->getResCutRLeg(), PlayerPtr->getResBashRLeg(), PlayerPtr->getEncRLeg());  // 오른다리
 
 
 		int pivotX = 0;
@@ -1769,44 +1772,67 @@ void HUD::drawBodyParts()
 		drawStadium(SDL_Rect{ pivotX -10,pivotY,97,351 }, col::black, 220, 3);
 		setFontSize(18);
 		drawTextCenter(L"#f26522Shield", pivotX + 42, pivotY + 20);
-		drawTextCenter(L"27", pivotX + 42, pivotY + 20 + 20);
+		drawTextCenter(std::to_wstring(PlayerPtr->getSH()), pivotX + 42, pivotY + 20 + 20);
 
-		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20 + 3 + 50);
-		drawTextCenter(L"16", pivotX + 42, pivotY + 20 + 20 + 50);
+		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20  + 50);
+		drawTextCenter(std::to_wstring(PlayerPtr->getEV()), pivotX + 42, pivotY + 20 + 20 + 50);
 
 		// 속성저항 (전신 공통)
 		const int resGap = 45; // 속성저항 간 간격 (조절용)
 		const int resBaseY = pivotY + 116;
 
+		// 속성저항 레벨 → 표시 문자열 변환
+		auto resLvStr = [](int lv) -> std::wstring
+		{
+			std::wstring colorTag;
+			if (lv > 0) colorTag = L"#75d03f";
+			else if (lv < 0) colorTag = L"#f26522";
+			else colorTag = col2Str(col::lightGray);
+
+			std::wstring bar;
+			int absLv = abs(lv);
+			wchar_t mark = (lv >= 0) ? L'+' : L'-';
+			for (int j = 0; j < 3; j++)
+				bar += (j < absLv) ? mark : L'.';
+
+			return colorTag + bar;
+		};
+
+		int rFire = PlayerPtr->entityInfo.rFire;
+		int rCold = PlayerPtr->entityInfo.rCold;
+		int rElec = PlayerPtr->entityInfo.rElec;
+		int rRad  = PlayerPtr->entityInfo.rRad;
+		int rCorr = PlayerPtr->entityInfo.rCorr;
+
 		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
 		setFontSize(14);
-		drawText(L"화염저항", pivotX + 5 + 18, resBaseY + resGap * 0 - 2);
+		drawText(L"rFire", pivotX + 5 + 18, resBaseY + resGap * 0 - 1);
 		setFontSize(18);
-		drawTextCenter(L"#75d03f+++", pivotX + 5 + 34, resBaseY + resGap * 0 + 24);
+		drawTextCenter(resLvStr(rFire), pivotX + 5 + 34, resBaseY + resGap * 0 + 24);
 
 		drawSprite(spr::icon16, 109, pivotX + 4, resBaseY + resGap * 1);
 		setFontSize(14);
-		drawText(L"냉기저항", pivotX + 5 + 18, resBaseY + resGap * 1 - 2);
+		drawText(L"rCold", pivotX + 5 + 18, resBaseY + resGap * 1 - 1);
 		setFontSize(18);
-		drawTextCenter(L"#75d03f++.", pivotX + 5 + 34, resBaseY + resGap * 1 + 24);
+		drawTextCenter(resLvStr(rCold), pivotX + 5 + 34, resBaseY + resGap * 1 + 24);
 
 		drawSprite(spr::icon16, 110, pivotX + 4, resBaseY + resGap * 2);
 		setFontSize(14);
-		drawText(L"전기저항", pivotX + 5 + 18, resBaseY + resGap * 2 - 2);
+		drawText(L"rElec", pivotX + 5 + 18, resBaseY + resGap * 2 - 1);
 		setFontSize(18);
-		drawTextCenter(L"#75d03f+..", pivotX + 5 + 34, resBaseY + resGap * 2 + 24);
+		drawTextCenter(resLvStr(rElec), pivotX + 5 + 34, resBaseY + resGap * 2 + 24);
 
 		drawSprite(spr::icon16, 111, pivotX + 4, resBaseY + resGap * 3);
 		setFontSize(14);
-		drawText(L"방사능저항", pivotX + 5 + 18, resBaseY + resGap * 3 - 2);
+		drawText(L"rRad", pivotX + 5 + 18, resBaseY + resGap * 3 - 1);
 		setFontSize(18);
-		drawTextCenter(col2Str(col::lightGray) + L"...", pivotX + 5 + 34, resBaseY + resGap * 3 + 24);
+		drawTextCenter(resLvStr(rRad), pivotX + 5 + 34, resBaseY + resGap * 3 + 24);
 
 		drawSprite(spr::icon16, 112, pivotX + 4, resBaseY + resGap * 4);
 		setFontSize(14);
-		drawText(L"부식저항", pivotX + 5 + 18, resBaseY + resGap * 4 - 2);
+		drawText(L"rCorr", pivotX + 5 + 18, resBaseY + resGap * 4 - 1);
 		setFontSize(18);
-		drawTextCenter(L"#f26522-..", pivotX + 5 + 34, resBaseY + resGap * 4 + 24);
+		drawTextCenter(resLvStr(rCorr), pivotX + 5 + 34, resBaseY + resGap * 4 + 24);
 
 
 	}

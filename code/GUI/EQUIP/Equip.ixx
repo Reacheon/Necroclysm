@@ -49,7 +49,6 @@ private:
 	SDL_Rect equipTitle;
 	SDL_Rect equipArea;
 
-	SDL_Rect topWindow;//상단에 표시되는 저항이나 방어 상성, 아이템의 설명
 
 
 public:
@@ -107,9 +106,6 @@ public:
 		panel.initRects(equipBase.x, equipBase.y + 103);
 		panel.label.w = equipBase.w - 24;
 
-		topWindow = { 0, 0, 492, 168 };
-		topWindow.x = (cameraW / 2) - (topWindow.w / 2);
-
 		if (center == false)
 		{
 			x = inputX;
@@ -119,6 +115,17 @@ public:
 		{
 			x = inputX - equipBase.w / 2;
 			y = inputY - equipBase.h / 2;
+		}
+
+		// x 하한선 보정
+		if (x < 87)
+		{
+			int diff = 87 - x;
+			x = 87;
+			equipBase.x += diff;
+			equipTitle.x += diff;
+			equipArea.x += diff;
+			panel.initRects(equipBase.x, equipBase.y + 103);
 		}
 	}
 	void drawGUI();
