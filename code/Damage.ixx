@@ -14,11 +14,12 @@ private:
     SDL_Color color = { 0xff,0xff,0xff };
     Sprite* sprite = nullptr;
     unsigned __int8 alpha = 255;
-    int x = 0;
-    int y = 0;
+    float x = 0.f;
+    float y = 0.f;
+    float velX = 0.f;
+    float velY = 0.f;
+    float originY = 0.f;
     int timer = 40;
-
-    int animeType = 0;
 
     dmgAniFlag myDmgAniFlag = dmgAniFlag::none;
 public:
@@ -27,9 +28,10 @@ public:
     Damage(std::wstring inputStr, SDL_Color inputCol, int gridX, int gridY, dmgAniFlag inputFlag);
     ~Damage();
     std::wstring getStr() { return letters; }
-    int getX() { return x; }
-    int getY() { return y; }
+    float getX() { return x; }
+    float getY() { return y; }
     int getAlpha() { return alpha; }
     void step();
     Sprite* getSprite() { return sprite; }
+    dmgAniFlag getAniFlag() { return myDmgAniFlag; }
 };

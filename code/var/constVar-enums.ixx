@@ -600,6 +600,7 @@ export enum class dmgAniFlag
 {
     none,
     dodged,
+    blocked,
 };
 
 export enum class relationFlag

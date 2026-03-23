@@ -245,7 +245,7 @@ void Entity::takeDamage(int inputDmg, dmgFlag inputType, humanPartFlag inputPart
 		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rRad, 99))) / 100.0f)));
 	}
 
-	new Damage(std::to_wstring(calcDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
+	if (option::showDamage) new Damage(std::to_wstring(calcDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
 
 	if (entityInfo.isPlayer)
 	{
@@ -474,10 +474,18 @@ void Entity::attack(int gridX, int gridY)
 	{
 		//명중률 계산
 		float aimAcc;
-		aimAcc = 0.98;
+		aimAcc = 0.95;
 
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
+			// [테스트] 10% 확률로 BLOCK 발생
+			if (randomRange(0, 100) < 10)
+			{
+				victimEntity->flash = { 85, 187, 255, 120 }; // 하늘색 점멸 (#55BBFF)
+				if (option::showDamage) new Damage(L"BLOCK", col::white, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::blocked);
+				return;
+			}
+
 			victimEntity->flash = { 255, 0, 0, 120 };
 			if (victimEntity->entityInfo.isPlayer)
 			{
@@ -499,7 +507,7 @@ void Entity::attack(int gridX, int gridY)
 		}
 		else
 		{
-			new Damage(L"MISS", col::yellow, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
+			if (option::showDamage) new Damage(L"MISS", col::lightGray, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
 			prt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}

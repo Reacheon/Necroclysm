@@ -38,6 +38,7 @@ export namespace option
 {
     std::wstring language = L"English";// 또는 "English"
     input inputMethod = input::mouse; //조작방식 설정
+    bool showDamage = true; //데미지 폰트 출력 여부
 };
 
 export namespace debug

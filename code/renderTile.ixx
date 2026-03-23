@@ -1118,10 +1118,11 @@ void drawDamages()
     for (int i = 0; i < Damage::list.size(); i++)
     {
         Damage* address = Damage::list[i];
-        setFontSize(10 * zoomScale);
         int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
         int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
-        setZoom(zoomScale);
+
+        if(zoomScale == 3.0f || zoomScale == 2.0f) setZoom(2.0f);
+        else if (zoomScale == 4.0f || zoomScale == 5.0f) setZoom(3.0f);
         SDL_SetTextureAlphaMod(address->getSprite()->getTexture(), address->getAlpha());
         drawSpriteCenter(address->getSprite(), 0, drawingX, drawingY);
         setZoom(1.0);
