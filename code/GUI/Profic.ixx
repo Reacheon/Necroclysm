@@ -24,8 +24,6 @@ private:
 
 	SDL_Rect proficBase;
 
-	int warningIndex = 0;
-
 	std::array<SDL_Rect, TALENT_SIZE> proficButton = { { 0,0,0,0 }, };
 public:
 	Profic() : GUI(false)
@@ -48,7 +46,7 @@ public:
 	static Profic* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		proficBase = { 0, 0, 650, 376 };
+		proficBase = { 0, 0, 866, 502 };
 
 		if (center == false)
 		{
@@ -61,13 +59,13 @@ public:
 			proficBase.y += inputY - proficBase.h / 2;
 		}
 
-		int pivotX = proficBase.x + 20;
-		int pivotY = proficBase.y + 56;
+		int pivotX = proficBase.x + 27;
+		int pivotY = proficBase.y + 75;
 		for (int i = 0; i < TALENT_SIZE; i++)
 		{
-			int targetX = pivotX + 210 * (i / 8);
-			int targetY = pivotY + (28 * (i % 8));
-			proficButton[i] = { targetX, targetY, 200, 24 };
+			int targetX = pivotX + 280 * (i / 8);
+			int targetY = pivotY + (37 * (i % 8));
+			proficButton[i] = { targetX, targetY, 267, 32 };
 		}
 
 		if (center == false)
@@ -89,20 +87,21 @@ public:
         {
             drawWindow(&proficBase, sysStr[7], 6);
 
-            int pivotX = proficBase.x + 20;
-            int pivotY = proficBase.y + 56;
+            int pivotX = proficBase.x + 27;
+            int pivotY = proficBase.y + 75;
 
             for (int i = 0; i <= 2; i++)
             {
-                setFontSize(10);
-                int targetX = pivotX + 10;
-                int targetY = pivotY + (28 * (-1)) + 20;
-                drawTextCenter(L"#234A63" + sysStr[182], targetX + 54 + (210 * i), targetY - 7); //이름
-                drawTextCenter(L"#234A63" + sysStr[183], targetX + 125 + (210 * i), targetY - 7); //레벨 
-                drawTextCenter(L"#234A63" + sysStr[184], targetX + 174 + (210 * i), targetY - 7); //적성
+                setFontSize(14);
+                setFont(fontType::mainFontMedium);
+                int targetX = pivotX + 13;
+                int targetY = pivotY + (37 * (-1)) + 27;
+                drawTextCenter(L"#234A63" + sysStr[182], targetX + 72 + (280 * i), targetY - 9); //이름
+                drawTextCenter(L"#234A63" + sysStr[183], targetX + 167 + (280 * i), targetY - 9); //레벨
+                drawTextCenter(L"#234A63" + sysStr[184], targetX + 232 + (280 * i), targetY - 9); //적성
+                setFont(fontType::mainFont);
             }
 
-            setZoom(1.5);
             for (int i = 0; i < TALENT_SIZE; i++)
             {
                 SDL_Color btnColor;
@@ -112,10 +111,10 @@ public:
                     else btnColor = lowCol::deepBlue;
                 }
                 else btnColor = lowCol::black;
-                drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 255, 5);
+                drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 255, 7);
 
-                int targetX = pivotX + 210 * (i / 8);
-                int targetY = pivotY + (28 * (i % 8));
+                int targetX = pivotX + 280 * (i / 8);
+                int targetY = pivotY + (37 * (i % 8));
 
                 std::wstring focusStr;
                 std::wstring proficStr;
@@ -215,46 +214,46 @@ public:
                     break;
                 }
 
-                setFontSize(10);
-                drawText(focusStr, targetX + 30, targetY + 5);
+                setFontSize(14);
+                drawText(focusStr, targetX + 40, targetY + 7);
 
                 int yOffset = 0;
                 {
                     SDL_Color levelColor = col::white;
                     if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) levelColor = col::yellow;
-                    if (queryTextWidth(proficStr) > 70)
+                    if (queryTextWidth(proficStr) > 93)
                     {
-                        setFontSize(8);
+                        setFontSize(12);
                         yOffset = 2;
                     }
-                    drawText(col2Str(levelColor) + proficStr, targetX + 40, targetY + 5 + yOffset);
+                    drawText(col2Str(levelColor) + proficStr, targetX + 53, targetY + 7 + yOffset);
                 }
 
-                setFontSize(10);
+                setFontSize(14);
                 // 레벨과 게이지 그리기
                 {
                     SDL_Color levelColor = col::white;
                     if (PlayerPtr->getProficLevel(i) >= MAX_PROFIC_LEVEL) levelColor = col::yellow;
-                    drawText(col2Str(levelColor) + levelStr , targetX + 145 - queryTextWidth(levelStr), targetY + 5);
+                    drawText(col2Str(levelColor) + levelStr , targetX + 193 - queryTextWidth(levelStr), targetY + 7);
 
                 }
 
-                drawText(L"#FFFFFF" + aptStr, targetX + 175, targetY + 5);
+                drawText(L"#FFFFFF" + aptStr, targetX + 233, targetY + 7);
 
                 // 회색 필터 (기존과 동일)
                 if (PlayerPtr->entityInfo.proficFocus[i] == 0 && PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
                 {
-                    drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 150, 5);
+                    drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 150, 7);
                 }
 
                 // 재능 아이콘 그리기
-                setZoom(1.5);
+                setZoom(2.0);
                 if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
                 {
                     drawSprite(spr::proficIcon, i, targetX, targetY);
                     if (PlayerPtr->entityInfo.proficFocus[i] == 0)
                     {
-                        SDL_Rect rect = { targetX,targetY,24,24 };
+                        SDL_Rect rect = { targetX,targetY,32,32 };
                         drawFillRect(rect, col::black, 150);
                     }
                 }
@@ -265,10 +264,21 @@ public:
             }
             setZoom(1.0);
 
-            drawTextWidth(sysStr[230], proficBase.x + 20, proficBase.y + proficBase.h - 40, false, 600, 14);
+            setFontSize(15);
+            drawTextWidth(sysStr[230]/*When gaining experience points for a specific proficiency through actions, the same amount of bonus experience points will be additionally distributed to the selected proficiencies.*/,
+                proficBase.x + 27, proficBase.y + proficBase.h - 56, false, 790, 19);
 
-            if (warningIndex > 0) {
-                drawText(L"#FF0000" + sysStr[74], proficBase.x + 20, proficBase.y + proficBase.h - 70);
+            {
+                bool anyTraining = false;
+                for (int i = 0; i < TALENT_SIZE; i++)
+                {
+                    if (PlayerPtr->entityInfo.proficFocus[i] > 0) { anyTraining = true; break; }
+                }
+                if (!anyTraining)
+                {
+                    setFontSize(16);
+                    drawText(col2Str(lowCol::red) + sysStr[74]/*You must train at least one proficiency.*/, proficBase.x + 27, proficBase.y + proficBase.h - 88);
+                }
             }
 
         }
@@ -303,13 +313,9 @@ public:
 					close(aniFlag::winUnfoldClose);
 					return;
 				}
-
-				if (i == TALENT_SIZE - 1) //만약 수련 중인 재능이 없으면
-				{
-					warningIndex = 1;
-					return;
-				}
 			}
+			//수련 중인 재능이 없으면 닫기 차단 (경고는 drawGUI에서 실시간 표시)
+			return;
 		}
 		else
 		{
@@ -340,7 +346,6 @@ public:
 		}
 	}
 
-	void setWarningIndex(int inputVal) { warningIndex = inputVal; }
 
     void step()
     {

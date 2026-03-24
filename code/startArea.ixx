@@ -827,6 +827,7 @@ export void startArea()
 	createProp({ 5, 6, 0 }, itemID::pipe);
 	createProp({ 6, 6, 0 }, itemID::pipe);
 	createProp({ 5, 7, 0 }, itemID::pipe);
+	createProp({ 5, 8, 0 }, itemID::intakePipeU);
 
 	//종교
 

@@ -479,7 +479,7 @@ void Entity::attack(int gridX, int gridY)
 		if (aimAcc * 100.0 > randomRange(0, 100))
 		{
 			// [테스트] 10% 확률로 BLOCK 발생
-			if (randomRange(0, 100) < 10)
+			if (randomRange(0, 100) < 10 && victimEntity->entityInfo.isPlayer)
 			{
 				victimEntity->flash = { 85, 187, 255, 120 }; // 하늘색 점멸 (#55BBFF)
 				if (option::showDamage) new Damage(L"BLOCK", col::white, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::blocked);

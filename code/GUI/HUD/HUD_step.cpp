@@ -38,7 +38,6 @@ void HUD::step()
             if (i == TALENT_SIZE - 1)
             {
                 new Profic();
-                Profic::ins()->setWarningIndex(1);
             }
         }
     }

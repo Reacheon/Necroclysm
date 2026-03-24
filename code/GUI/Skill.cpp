@@ -46,7 +46,7 @@ Skill::~Skill()
 
 void Skill::changeXY(int inputX, int inputY, bool center)
 {
-	skillBase = { 0, 0, 280, 408 };
+	skillBase = { 0, 0, 410, 548 };
 
 	if (center == false)
 	{
@@ -59,14 +59,14 @@ void Skill::changeXY(int inputX, int inputY, bool center)
 		skillBase.y += inputY - skillBase.h / 2;
 	}
 
-	generalBox = { skillBase.x,skillBase.y + 68,66,20 };
-	mutationBox = { skillBase.x + 66,skillBase.y + 68,66,20 };
-	bionicBox = { skillBase.x + 132,skillBase.y + 68,66,20 };
-	magicBox = { skillBase.x + 198,skillBase.y + 68,66,20 };
+	generalBox = { skillBase.x + 22 + 90 * 0,skillBase.y + 82,90,26 };
+	mutationBox = { skillBase.x + 22 + 90 * 1,skillBase.y + 82,90,26 };
+	bionicBox = { skillBase.x + 22 + 90 * 2,skillBase.y + 82,90,26 };
+	magicBox = { skillBase.x + 22 + 90 * 3,skillBase.y + 82,90,26 };
 
 	for (int i = 0; i < 7; i++)
 	{
-		skillBtn[i] = { skillBase.x + 14, skillBase.y + 101 + 43*i, 250,34 };
+		skillBtn[i] = { skillBase.x + 13, skillBase.y + 121 + 61*i, 374,48 };
 	}
 
 	if (center == false)
@@ -87,23 +87,23 @@ void Skill::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-		drawWindow(&skillBase, sysStr[197], 5);
+		drawWindow(&skillBase, sysStr[197], 113);
 
 		auto drawSubcategoryBox = [](std::wstring boxStr, SDL_Rect box, bool pressed, bool deactColorChange)
 			{
 				SDL_Color btnColor = { 0x00, 0x00, 0x00 };
-				SDL_Color outlineColor = { 0x4A, 0x4A, 0x4A };
+				SDL_Color outlineColor = col::gray;
 				SDL_Color letterColor = { 0xff,0xff,0xff };
 				if (checkCursor(&box) && deactColorChange == false)
 				{
 					if (click == false) { btnColor = lowCol::blue; }
 					else { btnColor = lowCol::deepBlue; }
-					outlineColor = { 0xa6, 0xa6, 0xa6 };
+					outlineColor = col::gray;
 				}
 				else if (pressed)
 				{
 					btnColor = lowCol::deepBlue;
-					outlineColor = { 0xa6, 0xa6, 0xa6 };
+					outlineColor = col::gray;
 				}
 
 				if (pressed)
@@ -113,29 +113,41 @@ void Skill::drawGUI()
 				}
 
 				drawFillRect(box, btnColor);
-				drawRect(box, col::gray);
+				drawRect(box, outlineColor);
 
 				if (pressed)
 				{
-					SDL_Rect bottomWhiteRect = { box.x + 9, box.y + 19, 42,2 };
-					drawRect(bottomWhiteRect, col::white);
+					SDL_Rect bottomWhiteRect = { box.x + 20, box.y + 24, 50,3 };
+					drawFillRect(bottomWhiteRect, col::white);
 				}
 
-				setFontSize(10);
-				drawTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2, letterColor);
+				setFontSize(14);
+				drawTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2 - 1, letterColor);
 			};
 
-		drawLine(skillBase.x+1, skillBase.y+87, skillBase.x + 1+278, skillBase.y + 87, col::lightGray);
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, col::gray);
+		// 왼쪽 그라데이션
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 16, skillBase.y + 107, { 0x4c,0x4c,0x4c });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 12, skillBase.y + 107, { 0x34,0x34,0x34 });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 8, skillBase.y + 107, { 0x26,0x26,0x26 });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 4, skillBase.y + 107, { 0x1f,0x1f,0x1f });
+		// 오른쪽 그라데이션
+		drawLine(skillBase.x + 405 - 16, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x4c,0x4c,0x4c });
+		drawLine(skillBase.x + 405 - 12, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x34,0x34,0x34 });
+		drawLine(skillBase.x + 405 - 8, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x26,0x26,0x26 });
+		drawLine(skillBase.x + 405 - 4, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x1f,0x1f,0x1f });
+
 
 		drawSubcategoryBox(sysStr[199], generalBox, categoryCursor == skillCategory::general, false);
 		drawSubcategoryBox(sysStr[200], mutationBox, categoryCursor == skillCategory::mutation, false);
 		drawSubcategoryBox(sysStr[201], bionicBox, categoryCursor == skillCategory::bionic, false);
 		drawSubcategoryBox(sysStr[202], magicBox, categoryCursor == skillCategory::magic, false);
 
+
 		// 스킬 스크롤 그리기
 		if (filteredSkills.size() > SKILL_GUI_MAX)
 		{
-			SDL_Rect skillScrollBox = { skillBase.x + 270, skillBase.y + 101, 2, 292 };
+			SDL_Rect skillScrollBox = { skillBase.x + 397, skillBase.y + 121, 2, 414 };
 			drawFillRect(skillScrollBox, { 120,120,120 });
 			SDL_Rect inScrollBox = skillScrollBox; // 내부 스크롤 커서
 			inScrollBox.h = skillScrollBox.h * myMin(1.0, (float)SKILL_GUI_MAX / (float)filteredSkills.size());
@@ -144,56 +156,61 @@ void Skill::drawGUI()
 			drawFillRect(inScrollBox, col::white);
 		}
 
-		setFontSize(10);
-		std::wstring aquiredSkillText = sysStr[231] + L" : 13";
-		drawText(aquiredSkillText, skillBase.x + 272 - queryTextWidth(aquiredSkillText), skillBase.y +34);//습득한 스킬
+		//setFontSize(10);
+		//std::wstring aquiredSkillText = sysStr[231] + L" : 13";
+		//drawText(aquiredSkillText, skillBase.x + 272 - queryTextWidth(aquiredSkillText), skillBase.y +34);//습득한 스킬
 
 		for (int i = 0; i < 7; i++)
 		{
 			if (skillScroll + i < filteredSkills.size())
 			{
-				SkillData tgtData = filteredSkills[skillScroll + i];
 
-				int btnIndex = 0;
+				SDL_Color skillBtnColor = col::black;
+				SDL_Color skillOutlineColor = col::gray;
 				if (checkCursor(&skillBtn[i]))
 				{
-					if (click) btnIndex = 2;
-					else btnIndex = 1;
+					if (click) skillBtnColor = { 0x14, 0x38, 0x78 };
+					else skillBtnColor = lowCol::deepBlue;
 				}
-				drawSprite(spr::skillRect, btnIndex, skillBtn[i].x, skillBtn[i].y);
-
+				drawFillRect(skillBtn[i], skillBtnColor);
+				drawRect(skillBtn[i], skillOutlineColor);
+				SkillData tgtData = filteredSkills[skillScroll + i];
 				setZoom(2.0);
-				std::wstring skillName = L"";
-				drawSprite(spr::skillSet, tgtData.iconIndex, skillBtn[i].x + 1, skillBtn[i].y + 1);
-				skillName = tgtData.name;
+				drawSprite(spr::icon24, tgtData.iconIndex, skillBtn[i].x, skillBtn[i].y);
 				setZoom(1.0);
 
+				std::wstring skillName = L"";
+				skillName = tgtData.name;
+				setFontSize(22);
+				setFont(fontType::mainFontMedium);
+				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
+
+				drawLine(skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y, skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y + skillBtn[i].h - 1, col::gray);
+
+				setFont(fontType::mainFontSemiBold);
+				setFontSize(16);
+				std::wstring rankText = L"Rank " + tgtData.skillRank;
+				drawText(rankText, skillBtn[i].x + 330- queryTextWidth(rankText), skillBtn[i].y + 4);
+				setFont(fontType::mainFont);
+				std::wstring profText = L"Invocation / Fighting";
 				setFontSize(12);
+				drawText(profText, skillBtn[i].x + 330 - queryTextWidth(profText), skillBtn[i].y + 25);
 
-				drawText(skillName, skillBtn[i].x + 43, skillBtn[i].y + 3);
-				int textWidth = queryTextWidth(skillName);
 
-				drawText(tgtData.skillRank, skillBtn[i].x + 231, skillBtn[i].y + 3, lowCol::green);
-
-				setFontSize(10);
-
-				std::wstring expStr = decimalCutter(tgtData.skillExp,1);
-				drawText(expStr + L"/100.0", skillBtn[i].x + 182, skillBtn[i].y + 20);
-
-				drawRect({ skillBtn[i].x + 41,skillBtn[i].y + 23, 134,7 }, col::gray);
-				drawFillRect(SDL_Rect{ skillBtn[i].x + 41 + 2,skillBtn[i].y + 23 + 2, int(42.0* (myMin(1.0,tgtData.skillExp/100.0))),3 }, col::white);
-
-				drawLine(skillBtn[i].x + 33, skillBtn[i].y + 1, skillBtn[i].x + 33, skillBtn[i].y + 32, { 0x80,0x80,0x80 });
+				drawTextCenter(L"Fail", skillBtn[i].x + skillBtn[i].w - 20, skillBtn[i].y + 12);
+				setFont(fontType::mainFontSemiBold);
+				setFontSize(15);
+				drawTextCenter(L"33%", skillBtn[i].x + skillBtn[i].w - 18, skillBtn[i].y + 29);
 			}
 		}
 
 		if (dragSkillTarget != -1)
 		{
 			setZoom(2.0);
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 180); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(spr::skillSet->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenter(spr::skillSet, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
-			SDL_SetTextureAlphaMod(spr::skillSet->getTexture(), 255); //텍스쳐 투명도 설정
+			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180); //텍스쳐 투명도 설정
+			SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+			drawSpriteCenter(spr::icon24, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
+			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255); //텍스쳐 투명도 설정
 			setZoom(1.0);
 		}
 	}
@@ -264,9 +281,11 @@ void Skill::clickUpGUI()
 		{
 			if (checkCursor(&skillBtn[i]))
 			{
-				CORO(useSkill(dragSkillTarget));
-
-				delete this;
+				if (dragSkillTarget != -1)
+				{
+					CORO(useSkill(dragSkillTarget));
+					delete this;
+				}
 			}
 		}
 	}
@@ -318,9 +337,12 @@ void Skill::clickDownGUI()
 {
 	for (int i = 0; i < SKILL_GUI_MAX; i++)
 	{
-		if (checkCursor(&skillBtn[i]))
+		if (dragSkillTarget == -1)
 		{
-			dragSkillTarget = filteredSkills[skillScroll + i].skillCode;
+			if (checkCursor(&skillBtn[i]))
+			{
+				dragSkillTarget = filteredSkills[skillScroll + i].skillCode;
+			}
 		}
 	}
 }
