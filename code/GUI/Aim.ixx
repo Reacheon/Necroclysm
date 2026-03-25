@@ -37,6 +37,10 @@ private:
 	int aimStack = 0;
 	atkType targetAtkType = atkType::shot;
 
+	SDL_Texture* aimInfoTex = nullptr;
+	static constexpr int AIM_INFO_W = 120;
+	static constexpr int AIM_INFO_H = 34;
+
 	bool deactClickUp = false;
 public:
 	Aim() : GUI(false)
@@ -47,6 +51,10 @@ public:
 
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
+
+		aimInfoTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, AIM_INFO_W, AIM_INFO_H);
+		SDL_SetTextureScaleMode(aimInfoTex, SDL_SCALEMODE_NEAREST);
+		SDL_SetTextureBlendMode(aimInfoTex, SDL_BLENDMODE_BLEND);
 
 		
 
@@ -94,6 +102,7 @@ public:
 	}
 	~Aim()
 	{
+		if (aimInfoTex) { SDL_DestroyTexture(aimInfoTex); aimInfoTex = nullptr; }
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 		ptr = nullptr;
 	}
@@ -132,9 +141,6 @@ public:
 		if (getStateDraw() == false) { return; }
 
 		SDL_Rect dst;
-
-		setFontSize(12);
-
 
 		if (aimAcc != 0 && turnCycle == turn::playerInput)
 		{
@@ -197,82 +203,42 @@ public:
 			accStr += L"%";
 			//if(aimStack>0) accStr += L" (" + std::to_wstring(aimStack) + L")";
 
-			if (zoomScale == 1.0)
-			{
-				setFontSize(10);
-				int textX = cameraW / 2;
-				int textY = cameraH / 2 - 22;
-				drawTextOutlineCenter(accStr, textX, textY, col::white);
+			// ── 텍스쳐에 조준 정보 렌더링 ──
+			setFont(fontType::pixel);
+			setFontSize(12);
 
-				setFontSize(8);
-				int textX2 = cameraW / 2;
-				int textY2 = cameraH / 2 - 32;
-				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+			SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
+			SDL_SetRenderTarget(renderer, aimInfoTex);
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+			SDL_RenderClear(renderer);
 
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
-			}
-			else if (zoomScale == 2.0)
-			{
-				setFontSize(10);
-				int textX = cameraW / 2;
-				int textY = cameraH / 2 - 40;
-				drawTextOutlineCenter(accStr, textX, textY, col::white);
+			setZoom(1.0);
+			int cx = AIM_INFO_W / 2;
 
-				setFontSize(8);
-				int textX2 = cameraW / 2;
-				int textY2 = cameraH / 2 - 50;
-				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+			// 잔탄 (상단)
+			int bulletY = 9;
+			drawTextOutlineCenter(bulletStr, cx, bulletY, col::white);
+			setZoom(2.0);
+			drawSpriteCenter(spr::icon16, iconIndex, cx - queryTextWidth(bulletStr) / 2 - 9, bulletY + 1);
+			setZoom(1.0);
 
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 5, textY2 - 1);
-			}
-			else if (zoomScale == 3.0)
-			{
-				setFontSize(12);
-				int textX = cameraW / 2;
-				int textY = cameraH / 2 - 58;
-				drawTextOutlineCenter(accStr, textX, textY, col::white);
+			// 명중률 (하단)
+			int accY = AIM_INFO_H - 9;
+			drawTextOutlineCenter(accStr, cx, accY, col::white);
 
-				setFontSize(10);
-				int textX2 = textX + 5;
-				int textY2 = textY - 15;
-				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
+			SDL_SetRenderTarget(renderer, prevTarget);
 
-				setZoom(2.0);
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
-				setZoom(1.0);
-			}
-			else if (zoomScale == 4.0)
-			{
-				setFontSize(12);
-				int textX = cameraW / 2;
-				int textY = cameraH / 2 - 58 - 15;
-				drawTextOutlineCenter(accStr, textX, textY, col::white);
-
-				setFontSize(10);
-				int textX2 = textX + 5;
-				int textY2 = textY - 15;
-				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
-
-				setZoom(2.0);
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
-				setZoom(1.0);
-			}
-			else if (zoomScale == 5.0)
-			{
-				setFontSize(12);
-				int textX = cameraW / 2;
-				int textY = cameraH / 2 - 58 - 34;
-				drawTextOutlineCenter(accStr, textX, textY, col::white);
-
-				setFontSize(10);
-				int textX2 = textX + 5;
-				int textY2 = textY - 15;
-				drawTextOutlineCenter(bulletStr, textX2, textY2, col::white);
-
-				setZoom(2.0);
-				drawSpriteCenter(spr::icon16, iconIndex, textX2 - queryTextWidth(bulletStr) / 2.0 - 10, textY2 - 1);
-				setZoom(1.0);
-			}
+			// zoomScale에 따라 확대하여 출력
+			if(zoomScale==2.0) setZoom(1.5);
+			else setZoom(2.0);
+			int yOffset = 0;
+			if (zoomScale == 2.0) yOffset = -12;
+			else if (zoomScale == 3.0)  yOffset = -8;
+			else if (zoomScale == 4.0)  yOffset = -2;
+			else if (zoomScale == 5.0)  yOffset = +8;
+			int drawY = (int)(cameraH / 2.0 - (8.0 + AIM_INFO_H / 2.0) * zoomScale + yOffset);
+			drawTextureCenter(aimInfoTex, cameraW / 2, drawY);
+			setZoom(1.0);
 		}
 
 
@@ -375,7 +341,8 @@ public:
 			}
 
 			setFontSize(24);
-			drawTextCenter(L"사격할 위치를 선택해주세요.", cameraW / 2, 109 + yOffset);
+			setFont(fontType::mainFont);
+			drawTextCenter(L"Choose where to shoot.", cameraW / 2, 109 + yOffset);
 		}
 	}
 

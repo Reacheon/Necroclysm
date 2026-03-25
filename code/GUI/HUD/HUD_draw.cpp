@@ -581,7 +581,7 @@ void HUD::drawTab()
 		}
 		else
 		{
-			drawLine(tab.x + 0, tab.y + 178, tab.x + 178, tab.y + 0, lowCol::red, 200);
+			//drawLine(tab.x + 0, tab.y + 178, tab.x + 178, tab.y + 0, lowCol::red, 200);
 			if (checkCursor(&tabSmallBox))
 			{
 				drawSprite(spr::tab, tabSprFlag::TWO_BTN, tab.x, tab.y - 2);

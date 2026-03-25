@@ -354,6 +354,10 @@ export void drawTextOutline(std::wstring text, int x, int y, SDL_Color inputCol)
     drawText(text, x + 1, y, col::black);
     drawText(text, x, y - 1, col::black);
     drawText(text, x, y + 1, col::black);
+    drawText(text, x - 1, y - 1, col::black);
+    drawText(text, x + 1, y - 1, col::black);
+    drawText(text, x - 1, y + 1, col::black);
+    drawText(text, x + 1, y + 1, col::black);
     drawText(text, x, y, inputCol);
 }
 
@@ -363,6 +367,10 @@ export void drawTextOutlineCenter(std::wstring text, int x, int y, SDL_Color inp
     drawTextCenter(text, x + 1, y, col::black);
     drawTextCenter(text, x, y - 1, col::black);
     drawTextCenter(text, x, y + 1, col::black);
+    drawTextCenter(text, x - 1, y - 1, col::black);
+    drawTextCenter(text, x + 1, y - 1, col::black);
+    drawTextCenter(text, x - 1, y + 1, col::black);
+    drawTextCenter(text, x + 1, y + 1, col::black);
     drawTextCenter(text, x, y, inputCol);
 }
 

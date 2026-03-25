@@ -206,12 +206,27 @@ void Skill::drawGUI()
 
 		if (dragSkillTarget != -1)
 		{
-			setZoom(2.0);
-			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180); //텍스쳐 투명도 설정
-			SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-			drawSpriteCenter(spr::icon24, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
-			SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255); //텍스쳐 투명도 설정
-			setZoom(1.0);
+			bool cursorIconDraw = true;
+			for (int i = 0; i < 7; i++)
+			{
+				if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
+				{
+					if (filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
+					{
+						cursorIconDraw = false;
+					}
+				}
+			}
+
+			if (cursorIconDraw)
+			{
+				setZoom(2.0);
+				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180); //텍스쳐 투명도 설정
+				SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+				drawSpriteCenter(spr::icon24, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
+				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255); //텍스쳐 투명도 설정
+				setZoom(1.0);
+			}
 		}
 	}
 	else
@@ -279,9 +294,9 @@ void Skill::clickUpGUI()
 
 		for (int i = 0; i < SKILL_GUI_MAX; i++)
 		{
-			if (checkCursor(&skillBtn[i]))
+			if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 			{
-				if (dragSkillTarget != -1)
+				if (dragSkillTarget != -1 && filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
 				{
 					CORO(useSkill(dragSkillTarget));
 					delete this;
@@ -339,7 +354,7 @@ void Skill::clickDownGUI()
 	{
 		if (dragSkillTarget == -1)
 		{
-			if (checkCursor(&skillBtn[i]))
+			if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 			{
 				dragSkillTarget = filteredSkills[skillScroll + i].skillCode;
 			}
