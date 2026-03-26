@@ -24,6 +24,15 @@ import ItemPocket;
 import replaceStr;
 import turnWait;
 
+enum class fireSelector
+{
+	AUTO,
+	SINGLE,
+	BURST,
+};
+
+static fireSelector currentSelector = fireSelector::SINGLE;
+
 export class Aim : public GUI
 {
 private:
@@ -38,10 +47,12 @@ private:
 	atkType targetAtkType = atkType::shot;
 
 	SDL_Texture* aimInfoTex = nullptr;
-	static constexpr int AIM_INFO_W = 120;
+	static constexpr int AIM_INFO_W = 200;
 	static constexpr int AIM_INFO_H = 34;
 
 	bool deactClickUp = false;
+
+	bool isRifle = false;
 public:
 	Aim() : GUI(false)
 	{
@@ -63,6 +74,14 @@ public:
 		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
 		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
 		else if (pEquip->itemInfo[0].checkFlag(itemFlag::GUN) && pEquip->itemInfo[0].checkFlag(itemFlag::SPR_TH_WEAPON)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+
+		// 돌격소총 조정간 활성화 여부
+		for (int i = 0; i < pEquip->itemInfo.size(); ++i)
+		{
+			if (pEquip->itemInfo[i].equipState == equipHandFlag::none) continue;
+			if (pEquip->itemInfo[i].itemCode == itemID::assaultRifle) isRifle = true;
+			break;
+		}
 
 		
 
@@ -226,6 +245,28 @@ public:
 			int accY = AIM_INFO_H - 9;
 			drawTextOutlineCenter(accStr, cx, accY, col::white);
 
+			// 조정간 표시 (돌격소총만)
+			if (isRifle)
+			{
+				setFontSize(11);
+				auto selectorLabel = [&](const wchar_t* label, fireSelector sel, int yPos)
+				{
+					if (currentSelector == sel)
+					{
+						std::wstring text = std::wstring(label) + L"◀";
+						drawTextOutline(text.c_str(), cx + 22, yPos, col::white);
+					}
+					else
+					{
+						drawTextOutline(label, cx + 22, yPos, col::lightGray);
+					}
+				};
+				selectorLabel(L"Auto",   fireSelector::AUTO,   accY - 4 - 22);
+				selectorLabel(L"Single", fireSelector::SINGLE, accY - 4 - 11);
+				selectorLabel(L"Burst",  fireSelector::BURST,  accY - 4);
+			}
+
+
 			SDL_SetRenderTarget(renderer, prevTarget);
 
 			// zoomScale에 따라 확대하여 출력
@@ -315,34 +356,52 @@ public:
 
 		//사념파
 		{
-			int yOffset = 44;
-			drawFillRect(SDL_Rect{ cameraW / 2 - 150, 80 + yOffset, 300, 60 }, col::black, 200);
+			//int yOffset = 44;
+			//drawFillRect(SDL_Rect{ cameraW / 2 - 150, 80 + yOffset, 300, 60 }, col::black, 200);
 
-			// 오른쪽 페이드
+			//// 오른쪽 페이드
+			//{
+			//	int rectX = cameraW / 2 + 150;
+			//	for (int i = 0; i < 40; i++)
+			//	{
+			//		SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
+			//		drawFillRect(floatRect, col::black, 200 - 5 * i);
+			//		rectX += 5;
+			//	}
+			//}
+
+			//// 왼쪽 페이드
+			//{
+			//	int rectX = cameraW / 2 - 150;
+			//	for (int i = 0; i < 40; i++)
+			//	{
+			//		rectX -= 5;
+			//		SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
+			//		drawFillRect(floatRect, col::black, 200 - 5 * i);
+			//	}
+			//}
+
+			//setFontSize(24);
+			//setFont(fontType::mainFont);
+			//if (isRifle) drawTextCenter(L"Choose where to shoot. (Scroll: Fire Selector)", cameraW / 2, 109 + yOffset);
+			//else drawTextCenter(L"Choose where to shoot.", cameraW / 2, 109 + yOffset);
+
+			if (isRifle)
 			{
-				int rectX = cameraW / 2 + 150;
-				for (int i = 0; i < 40; i++)
-				{
-					SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
-					drawFillRect(floatRect, col::black, 200 - 5 * i);
-					rectX += 5;
-				}
-			}
+				setFontSize(24);
+				setFont(fontType::mainFont);
+				int pivotX = cameraW - 426;
+				int pivotY = cameraH - 280;
+				drawSprite(spr::btnGuideBackground, pivotX, pivotY);
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseLeft, pivotX + 112, pivotY + 30);
+				drawText(L"Shot", pivotX + 132, pivotY + 15);
 
-			// 왼쪽 페이드
-			{
-				int rectX = cameraW / 2 - 150;
-				for (int i = 0; i < 40; i++)
-				{
-					rectX -= 5;
-					SDL_Rect floatRect = { rectX, 80 + yOffset, 5, 60 };
-					drawFillRect(floatRect, col::black, 200 - 5 * i);
-				}
-			}
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseRight, pivotX + 112 + 100, pivotY + 30);
+				drawText(L"Aim", pivotX + 132 + 100, pivotY + 15);
 
-			setFontSize(24);
-			setFont(fontType::mainFont);
-			drawTextCenter(L"Choose where to shoot.", cameraW / 2, 109 + yOffset);
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseWheel, pivotX + 112 + 190, pivotY + 30);
+				drawText(L"Selector", pivotX + 132 + 190, pivotY + 15);
+			}
 		}
 	}
 
@@ -385,40 +444,68 @@ public:
 	{
 		if (getStateInput() == false) { return; }
 
-		if (checkCursor(&tabSmallBox))
+		if (checkCursor(&tab))
 		{
-			aimAddAcc();
+			close(aniFlag::null); // Back 버튼
 		}
-		else if (checkCursor(&tab))
-		{
-			if ((getMouseX() - tab.x) + (getMouseY() - tab.y) < 178)
-			{
-				executeTabShot();
-			}
-			else // 마우스 커서가 직선 위에 있거나(경계 포함) 아래에 있는 경우
-			{
-				close(aniFlag::null);
-			}
-
-			
-		}
-	}
-	void clickMotionGUI(int dx, int dy) {}
-	void clickDownGUI() 
-	{
-		if (checkCursor(&letterbox) || checkCursor(&quickSlotRegion))
+		else if (checkCursor(&letterbox) || checkCursor(&quickSlotRegion))
 		{
 			close(aniFlag::null);
 		}
-		else if (checkCursor(&tab) == false)
+		else
 		{
-			changeAimTarget(getAbsMouseGrid().x, getAbsMouseGrid().y);
+			// 좌클릭: 현재 조준 대상에게 사격
+			executeTabShot();
 		}
-		
 	}
-	void clickRightGUI() {}
+	void clickMotionGUI(int dx, int dy) {}
+	void clickDownGUI() {}
+	void clickRightGUI()
+	{
+		if (getStateInput() == false) { return; }
+		if (checkCursor(&tab) || checkCursor(&letterbox) || checkCursor(&quickSlotRegion)) return;
+
+		int tgtX = getAbsMouseGrid().x;
+		int tgtY = getAbsMouseGrid().y;
+
+		if (tgtX == aimCoord.x && tgtY == aimCoord.y)
+		{
+			// 같은 대상: 조준 집중 (명중률 상승)
+			aimAddAcc();
+		}
+		else
+		{
+			// 다른 대상: 조준 대상 변경
+			changeAimTarget(tgtX, tgtY);
+		}
+	}
 	void clickHoldGUI() {}
-	void mouseWheel() {}
+	void mouseWheel()
+	{
+		if (!isRifle) return;
+
+		// 순서: AUTO(0) - SINGLE(1) - BURST(2), 위 → 아래
+		int sel = static_cast<int>(currentSelector);
+		if (event.wheel.y > 0) sel--;  // 스크롤 위 → 위쪽 항목
+		else if (event.wheel.y < 0) sel++;  // 스크롤 아래 → 아래쪽 항목
+
+		if (sel < 0) sel = 0;
+		if (sel > 2) sel = 2;
+
+		fireSelector newSel = static_cast<fireSelector>(sel);
+		if (newSel != currentSelector)
+		{
+			currentSelector = newSel;
+			const wchar_t* name = L"";
+			switch (currentSelector)
+			{
+			case fireSelector::AUTO:   name = L"Auto";   break;
+			case fireSelector::SINGLE: name = L"Single"; break;
+			case fireSelector::BURST:  name = L"Burst";  break;
+			}
+			updateLog(std::wstring(L"Changed fire selector to #58D68D") + name + L"#FFFFFF.");
+		}
+	}
 	void gamepadBtnDown() 
 	{
 		switch (event.gbutton.button)
@@ -436,7 +523,7 @@ public:
 	void gamepadBtnUp() {}
 	void step() 
 	{
-		tabType = tabFlag::aim;
+		tabType = tabFlag::back;
 
 		{
 			if (PlayerPtr->flash.a > 0)

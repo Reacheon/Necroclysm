@@ -88,6 +88,9 @@ export namespace keyboardIndex
     constexpr int enterPressed = 6;
     constexpr int shift = 7;
     constexpr int shiftPressed = 8;
+    constexpr int mouseLeft = 10;
+    constexpr int mouseRight = 11;
+    constexpr int mouseWheel = 12;
 }
 
 export namespace keyIcon

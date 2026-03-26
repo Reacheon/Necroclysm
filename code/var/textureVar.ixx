@@ -187,4 +187,6 @@ export namespace spr
 	Sprite* cookingPot = nullptr;
 	
 	Sprite* bodyPartEncLine = nullptr;
+
+	Sprite* btnGuideBackground = nullptr;
 }

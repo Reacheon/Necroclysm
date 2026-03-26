@@ -221,4 +221,6 @@ export namespace itemID
     constexpr int scallion = 540;
     constexpr int onion = 541;
     constexpr int garlic = 542;
+
+    constexpr int assaultRifle = 12;
 };
