@@ -708,7 +708,19 @@ bool Entity::runAnimation(bool shutdown)
 		{
 			bulletPtr = new Bullet(getX(), getY());
 			bulletPtr->sprite = spr::bulletset;
-			bulletPtr->sprIndex = 0 + del2Dir(delX, delY);
+			int bulletBase = 0; // 볼트 (기본)
+			{
+				ItemPocket* equipPtr = getEquipPtr();
+				int weaponIdx = getAimWeaponIndex();
+				if (weaponIdx >= 0 && weaponIdx < (int)equipPtr->itemInfo.size())
+				{
+					ItemData& weapon = equipPtr->itemInfo[weaponIdx];
+					if (weapon.checkFlag(itemFlag::GUN))           bulletBase = 16; // 총기류
+					else if (weapon.checkFlag(itemFlag::BOW))      bulletBase = 8;  // 화살
+					else if (weapon.checkFlag(itemFlag::CROSSBOW)) bulletBase = 0;  // 볼트
+				}
+			}
+			bulletPtr->sprIndex = bulletBase + del2Dir(delX, delY);
 		}
 
 		if (bulletPtr != nullptr)

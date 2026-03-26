@@ -7,12 +7,87 @@ import wrapFunc;
 import ItemStack;
 import log;
 import Prop;
+import Vehicle;
 import Lst;
 import Msg;
 import CoordSelect;
 import turnWait;
 import CoordSelectCraft;
 import GUI;
+
+namespace
+{
+	//포켓 내부의 모든 서브포켓을 재귀적으로 수집한다 (가방 안의 가방 등)
+	void collectSubPockets(ItemPocket* pocket, std::vector<ItemPocket*>& outVec)
+	{
+		for (auto& item : pocket->itemInfo)
+		{
+			if (item.pocketPtr != nullptr)
+			{
+				outVec.push_back(item.pocketPtr.get());
+				collectSubPockets(item.pocketPtr.get(), outVec);
+			}
+		}
+	}
+
+	//플레이어 주변에서 접근 가능한 모든 ItemPocket을 수집한다.
+	//탐색 대상: 장비 + 장비 서브포켓(가방 등), 주변 9타일의 바닥/프롭/차량
+	std::vector<ItemPocket*> gatherNearbyPockets()
+	{
+		std::vector<ItemPocket*> result;
+		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+
+		//1. 장비 포켓 + 장비 서브포켓 (가방, 파우치 등)
+		result.push_back(equipPtr);
+		collectSubPockets(equipPtr, result);
+
+		//2. 주변 9타일 순회 (현재 타일 + 인접 8타일)
+		for (int dir = -1; dir < 8; dir++)
+		{
+			int dx = 0, dy = 0;
+			dir2Coord(dir, dx, dy);
+			int x = PlayerX() + dx;
+			int y = PlayerY() + dy;
+			int z = PlayerZ();
+
+			//2a. 바닥 ItemStack + 서브포켓
+			ItemStack* stack = TileItemStack(x, y, z);
+			if (stack != nullptr)
+			{
+				result.push_back(stack->getPocket());
+				collectSubPockets(stack->getPocket(), result);
+			}
+
+			//2b. Prop 내부 포켓 + 서브포켓
+			Prop* prop = TileProp(x, y, z);
+			if (prop != nullptr && prop->leadItem.pocketPtr != nullptr)
+			{
+				result.push_back(prop->leadItem.pocketPtr.get());
+				collectSubPockets(prop->leadItem.pocketPtr.get(), result);
+			}
+
+			//2c. Vehicle 파트 중 POCKET 아이템의 포켓 + 서브포켓
+			Vehicle* veh = TileVehicle(x, y, z);
+			if (veh != nullptr)
+			{
+				auto it = veh->partInfo.find({ x, y });
+				if (it != veh->partInfo.end())
+				{
+					for (auto& item : it->second->itemInfo)
+					{
+						if (item.checkFlag(itemFlag::POCKET) && item.pocketPtr != nullptr)
+						{
+							result.push_back(item.pocketPtr.get());
+							collectSubPockets(item.pocketPtr.get(), result);
+						}
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+}
 
 namespace actFunc
 {
@@ -22,10 +97,9 @@ namespace actFunc
 		prt(L"executeReloadSelf이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 		std::vector<std::wstring> bulletList;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		std::vector<ItemPocket*> targetSearchPtr;
 		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
 
+		//활/석궁은 장비 중인 화살통/볼트통에서만 장전
 		if (reloadItemPocket->itemInfo[targetLootCursor].checkFlag(itemFlag::BOW))
 		{
 			for (int j = 0; j < equipInfo.size(); j++)
@@ -57,31 +131,17 @@ namespace actFunc
 			}
 		}
 
-		//탐사할 타일 추가 (장비, 주변타일 9칸)
-		{
-			//장비타일
-			targetSearchPtr.push_back(equipPtr);
-			//바닥타일(주변9타일)
-			for (int dir = -1; dir < 8; dir++)
-			{
-				int dx = 0, dy = 0;
-				dir2Coord(dir, dx, dy);
-
-				ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				if (stack != nullptr)
-				{
-					ItemPocket* lootPtr = stack->getPocket();
-					targetSearchPtr.push_back(lootPtr);
-				}
-			}
-		}
+		//주변 접근 가능한 모든 포켓 수집 (장비, 서브포켓, 바닥, 프롭, 차량)
+		std::vector<ItemPocket*> targetSearchPtr = gatherNearbyPockets();
+		//재장전 대상의 내부 포켓 (이미 장전된 탄환이 자기 자신의 후보로 표시되는 것을 방지)
+		ItemPocket* selfPocket = reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get();
 
 		for (int j = 0; j < targetSearchPtr.size(); j++)
 		{
-			//장비 중인 아이템에서 bulletList(또는 magazine) 추가
+			if (targetSearchPtr[j] == selfPocket) continue; //자기 자신의 내부 포켓은 건너뜀
+
 			for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 			{
-				//만약 이 아이템에 넣을 수 있는 아이템코드가 equip에 있는 아이템과 같으면
 				if (std::find(reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.begin(), reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end(), targetSearchPtr[j]->itemInfo[i].itemCode) != reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end())
 				{
 					bulletList.push_back(targetSearchPtr[j]->itemInfo[i].name);
@@ -106,19 +166,19 @@ namespace actFunc
 			int counter = 0;
 			for (int j = 0; j < targetSearchPtr.size(); j++)
 			{
+				if (targetSearchPtr[j] == selfPocket) continue; //자기 자신의 내부 포켓은 건너뜀
+
 				for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 				{
-					//만약 이 아이템에 넣을 수 있는 아이템코드가 equip에 있는 아이템과 같으면
 					if (std::find(reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.begin(), reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end(), targetSearchPtr[j]->itemInfo[i].itemCode) != reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end())
 					{
 						if (counter == wtoi(coAnswer.c_str()))
 						{
-							//넣을 수 있는만큼 가득 넣음
 							targetSearchPtr[j]->transferItem
 							(
-								reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(),
+								selfPocket,
 								i,
-								1//일단은 전부 넣는걸로
+								1
 							);
 
 							co_return;
@@ -138,25 +198,9 @@ namespace actFunc
 		prt(L"executeReloadOther이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 		std::vector<std::wstring> pocketList;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		std::vector<ItemPocket*> targetSearchPtr;
 
-		//1. 탐사할 타일 추가 (장비, 주변타일 9칸)
-		{
-			targetSearchPtr.push_back(equipPtr);
-			//바닥타일(주변9타일)
-			for (int dir = -1; dir < 8; dir++)
-			{
-				int dx = 0, dy = 0;
-				dir2Coord(dir, dx, dy);
-				ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				if (stack != nullptr)
-				{
-					ItemPocket* lootPtr = stack->getPocket();
-					targetSearchPtr.push_back(lootPtr);
-				}
-			}
-		}
+		//주변 접근 가능한 모든 포켓 수집 (장비, 서브포켓, 바닥, 프롭, 차량)
+		std::vector<ItemPocket*> targetSearchPtr = gatherNearbyPockets();
 
 		//2. 주변 타일과 장비 포인터들을 보관 중인 targetSearchPtr에서 리로드 가능한 아이템의 이름들을 수집
 		for (int j = 0; j < targetSearchPtr.size(); j++)
@@ -571,37 +615,19 @@ namespace actFunc
 		prt(L"insertBattery가 실행되었다.\n");
 
 		std::vector<std::wstring> batteryList;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		std::vector<std::pair<ItemPocket*, ItemStack*>> targetSearchPtr; //ItemPocket과 소유 ItemStack(없으면 nullptr)
 
-		//탐사할 타일 추가 (장비, 주변타일 9칸)
-		{
-			//장비타일 (ItemStack 없음)
-			targetSearchPtr.push_back({ equipPtr, nullptr });
-			//바닥타일(주변9타일)
-			for (int dir = -1; dir < 8; dir++)
-			{
-				int dx = 0, dy = 0;
-				dir2Coord(dir, dx, dy);
-
-				ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				if (stack != nullptr)
-				{
-					ItemPocket* lootPtr = stack->getPocket();
-					targetSearchPtr.push_back({ lootPtr, stack });
-				}
-			}
-		}
+		//주변 접근 가능한 모든 포켓 수집 (장비, 서브포켓, 바닥, 프롭, 차량)
+		std::vector<ItemPocket*> targetSearchPtr = gatherNearbyPockets();
 
 		//주변에서 battery 또는 batteryPack 찾기
 		for (int j = 0; j < targetSearchPtr.size(); j++)
 		{
-			for (int i = 0; i < targetSearchPtr[j].first->itemInfo.size(); i++)
+			for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 			{
-				int itemCode = targetSearchPtr[j].first->itemInfo[i].itemCode;
+				int itemCode = targetSearchPtr[j]->itemInfo[i].itemCode;
 				if (itemCode == itemID::battery || itemCode == itemID::batteryPack)
 				{
-					batteryList.push_back(targetSearchPtr[j].first->itemInfo[i].name);
+					batteryList.push_back(targetSearchPtr[j]->itemInfo[i].name);
 				}
 			}
 		}
@@ -622,15 +648,15 @@ namespace actFunc
 			int counter = 0;
 			for (int j = 0; j < targetSearchPtr.size(); j++)
 			{
-				for (int i = 0; i < targetSearchPtr[j].first->itemInfo.size(); i++)
+				for (int i = 0; i < targetSearchPtr[j]->itemInfo.size(); i++)
 				{
-					int itemCode = targetSearchPtr[j].first->itemInfo[i].itemCode;
+					int itemCode = targetSearchPtr[j]->itemInfo[i].itemCode;
 					if (itemCode == itemID::battery || itemCode == itemID::batteryPack)
 					{
 						if (counter == wtoi(coAnswer.c_str()))
 						{
 							//배터리를 전자기기에 장착
-							targetSearchPtr[j].first->transferItem
+							targetSearchPtr[j]->transferItem
 							(
 								targetItemPocket->itemInfo[targetItemCursor].pocketPtr.get(),
 								i,

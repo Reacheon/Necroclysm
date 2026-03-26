@@ -33,6 +33,17 @@ enum class fireSelector
 
 static fireSelector currentSelector = fireSelector::SINGLE;
 
+enum class pistolAimMode
+{
+	NONE,
+	TWO_HAND,   // 한 손 권총 + 빈 손 (양손 사격)
+	ONE_HAND,   // 한 손 권총 + 다른 물건
+	DUAL,       // 쌍권총
+};
+
+static bool dualNextLeft = false;
+static equipHandFlag dualSelected = equipHandFlag::right;
+
 export class Aim : public GUI
 {
 private:
@@ -53,6 +64,12 @@ private:
 	bool deactClickUp = false;
 
 	bool isRifle = false;
+	pistolAimMode pistolMode = pistolAimMode::NONE;
+	equipHandFlag pistolHand = equipHandFlag::none;
+	int leftPistolIdx = -1;
+	int rightPistolIdx = -1;
+	std::wstring leftPistolName;
+	std::wstring rightPistolName;
 public:
 	Aim() : GUI(false)
 	{
@@ -71,9 +88,91 @@ public:
 
 
 		ItemPocket* pEquip = PlayerPtr->getEquipPtr();
-		if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
-		else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
-		else if (pEquip->itemInfo[0].checkFlag(itemFlag::GUN) && pEquip->itemInfo[0].checkFlag(itemFlag::SPR_TH_WEAPON)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+
+		// 한손 권총 감지
+		bool hasLeftItem = false, hasRightItem = false;
+		for (int i = 0; i < pEquip->itemInfo.size(); ++i)
+		{
+			auto& item = pEquip->itemInfo[i];
+			if (item.equipState == equipHandFlag::none) continue;
+			bool isOneHandGun = item.checkFlag(itemFlag::GUN) && !item.checkFlag(itemFlag::SPR_TH_WEAPON);
+			if (item.equipState == equipHandFlag::left)
+			{
+				hasLeftItem = true;
+				if (isOneHandGun) leftPistolIdx = i;
+			}
+			else if (item.equipState == equipHandFlag::right)
+			{
+				hasRightItem = true;
+				if (isOneHandGun) rightPistolIdx = i;
+			}
+		}
+
+		if (leftPistolIdx != -1 && rightPistolIdx != -1)
+		{
+			// 쌍권총
+			bool leftAmmo = getBulletNumber(pEquip->itemInfo[leftPistolIdx]) > 0;
+			bool rightAmmo = getBulletNumber(pEquip->itemInfo[rightPistolIdx]) > 0;
+
+			if (leftAmmo && rightAmmo)
+			{
+				pistolMode = pistolAimMode::DUAL;
+				dualSelected = dualNextLeft ? equipHandFlag::left : equipHandFlag::right;
+			}
+			else if (leftAmmo)
+			{
+				pistolMode = pistolAimMode::ONE_HAND;
+				pistolHand = equipHandFlag::left;
+			}
+			else if (rightAmmo)
+			{
+				pistolMode = pistolAimMode::ONE_HAND;
+				pistolHand = equipHandFlag::right;
+			}
+			else
+			{
+				pistolMode = pistolAimMode::DUAL;
+				dualSelected = dualNextLeft ? equipHandFlag::left : equipHandFlag::right;
+			}
+
+			leftPistolName = pEquip->itemInfo[leftPistolIdx].name;
+			rightPistolName = pEquip->itemInfo[rightPistolIdx].name;
+
+			if (pistolMode == pistolAimMode::DUAL)
+				PlayerPtr->setSpriteIndex(charSprIndex::BCAST);
+			else if (pistolHand == equipHandFlag::right)
+				PlayerPtr->setSpriteIndex(charSprIndex::RCAST);
+			else
+				PlayerPtr->setSpriteIndex(charSprIndex::LCAST);
+		}
+		else if (leftPistolIdx != -1 || rightPistolIdx != -1)
+		{
+			equipHandFlag gunHand = (leftPistolIdx != -1) ? equipHandFlag::left : equipHandFlag::right;
+			bool otherHasItem = (gunHand == equipHandFlag::left) ? hasRightItem : hasLeftItem;
+
+			if (!otherHasItem)
+			{
+				pistolMode = pistolAimMode::TWO_HAND;
+				pistolHand = gunHand;
+				PlayerPtr->setSpriteIndex(charSprIndex::AIM_PISTOL);
+			}
+			else
+			{
+				pistolMode = pistolAimMode::ONE_HAND;
+				pistolHand = gunHand;
+				if (gunHand == equipHandFlag::right)
+					PlayerPtr->setSpriteIndex(charSprIndex::RCAST);
+				else
+					PlayerPtr->setSpriteIndex(charSprIndex::LCAST);
+			}
+		}
+		else
+		{
+			// 기존 로직: 소총/활/석궁
+			if (pEquip->itemInfo[0].checkFlag(itemFlag::CROSSBOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+			else if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+			else if (pEquip->itemInfo[0].checkFlag(itemFlag::GUN) && pEquip->itemInfo[0].checkFlag(itemFlag::SPR_TH_WEAPON)) PlayerPtr->setSpriteIndex(charSprIndex::AIM_RIFLE);
+		}
 
 		// 돌격소총 조정간 활성화 여부
 		for (int i = 0; i < pEquip->itemInfo.size(); ++i)
@@ -171,15 +270,28 @@ public:
 			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
 			//손에 든 장비 찾기
 			int weaponIdx = -1;
-			for (int i = 0; i < equipInfo.size(); ++i)
+			if (pistolMode == pistolAimMode::DUAL)
 			{
-				if (equipInfo[i].equipState == equipHandFlag::none) continue;
-				weaponIdx = i;                                   
+				weaponIdx = (dualSelected == equipHandFlag::left) ? leftPistolIdx : rightPistolIdx;
+				iconIndex = 97;
+			}
+			else if (pistolMode != pistolAimMode::NONE)
+			{
+				weaponIdx = (pistolHand == equipHandFlag::left) ? leftPistolIdx : rightPistolIdx;
+				iconIndex = 97;
+			}
+			else
+			{
+				for (int i = 0; i < equipInfo.size(); ++i)
+				{
+					if (equipInfo[i].equipState == equipHandFlag::none) continue;
+					weaponIdx = i;
 
-				if (equipInfo[i].checkFlag(itemFlag::BOW))      iconIndex = 95;
-				else if (equipInfo[i].checkFlag(itemFlag::CROSSBOW)) iconIndex = 96;
-				else if (equipInfo[i].checkFlag(itemFlag::GUN))      iconIndex = 97;
-				break;                                              
+					if (equipInfo[i].checkFlag(itemFlag::BOW))      iconIndex = 95;
+					else if (equipInfo[i].checkFlag(itemFlag::CROSSBOW)) iconIndex = 96;
+					else if (equipInfo[i].checkFlag(itemFlag::GUN))      iconIndex = 97;
+					break;
+				}
 			}
 
 
@@ -264,6 +376,24 @@ public:
 				selectorLabel(L"Auto",   fireSelector::AUTO,   accY - 4 - 22);
 				selectorLabel(L"Single", fireSelector::SINGLE, accY - 4 - 11);
 				selectorLabel(L"Burst",  fireSelector::BURST,  accY - 4);
+			}
+			// 쌍권총 선택 표시
+			else if (pistolMode == pistolAimMode::DUAL)
+			{
+				setFontSize(11);
+				std::wstring labelL = L"[L]" + leftPistolName;
+				std::wstring labelR = L"[R]" + rightPistolName;
+
+				if (dualSelected == equipHandFlag::left)
+				{
+					drawTextOutline((labelL + L"◀").c_str(), cx + 22, accY - 4 - 11, col::white);
+					drawTextOutline(labelR.c_str(), cx + 22, accY - 4, col::lightGray);
+				}
+				else
+				{
+					drawTextOutline(labelL.c_str(), cx + 22, accY - 4 - 11, col::lightGray);
+					drawTextOutline((labelR + L"◀").c_str(), cx + 22, accY - 4, col::white);
+				}
 			}
 
 
@@ -386,7 +516,7 @@ public:
 			//if (isRifle) drawTextCenter(L"Choose where to shoot. (Scroll: Fire Selector)", cameraW / 2, 109 + yOffset);
 			//else drawTextCenter(L"Choose where to shoot.", cameraW / 2, 109 + yOffset);
 
-			if (isRifle)
+			if (isRifle || pistolMode == pistolAimMode::DUAL)
 			{
 				setFontSize(24);
 				setFont(fontType::mainFont);
@@ -400,7 +530,20 @@ public:
 				drawText(L"Aim", pivotX + 132 + 100, pivotY + 15);
 
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseWheel, pivotX + 112 + 190, pivotY + 30);
-				drawText(L"Selector", pivotX + 132 + 190, pivotY + 15);
+				drawText(isRifle ? L"Selector" : L"Switch", pivotX + 132 + 190, pivotY + 15);
+			}
+			else
+			{
+				setFontSize(24);
+				setFont(fontType::mainFont);
+				int pivotX = cameraW - 426 + 90;
+				int pivotY = cameraH - 280;
+				drawSprite(spr::btnGuideBackground, pivotX, pivotY);
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseLeft, pivotX + 122, pivotY + 30);
+				drawText(L"Shot", pivotX + 142, pivotY + 15);
+
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseRight, pivotX + 132 + 100, pivotY + 30);
+				drawText(L"Aim", pivotX + 152 + 100, pivotY + 15);
 			}
 		}
 	}
@@ -482,6 +625,17 @@ public:
 	void clickHoldGUI() {}
 	void mouseWheel()
 	{
+		// 쌍권총: 사격할 총 선택
+		if (pistolMode == pistolAimMode::DUAL)
+		{
+			if (event.wheel.y != 0)
+			{
+				if (dualSelected == equipHandFlag::left) dualSelected = equipHandFlag::right;
+				else dualSelected = equipHandFlag::left;
+			}
+			return;
+		}
+
 		if (!isRifle) return;
 
 		// 순서: AUTO(0) - SINGLE(1) - BURST(2), 위 → 아래
@@ -596,7 +750,21 @@ public:
 		int targetZ = aimCoord.z;
 		int weaponRange = 10;
 
-		PlayerPtr->aimWeaponLeft();
+		// 사격 손 설정
+		if (pistolMode == pistolAimMode::DUAL)
+		{
+			if (dualSelected == equipHandFlag::left) PlayerPtr->aimWeaponLeft();
+			else PlayerPtr->aimWeaponRight();
+		}
+		else if (pistolMode != pistolAimMode::NONE)
+		{
+			if (pistolHand == equipHandFlag::left) PlayerPtr->aimWeaponLeft();
+			else PlayerPtr->aimWeaponRight();
+		}
+		else
+		{
+			PlayerPtr->aimWeaponLeft();
+		}
 
 		if (victimEntity == nullptr)
 		{
@@ -664,6 +832,14 @@ public:
 				PlayerPtr->initAimStack();
 				aimAcc = 0.6;
 				PlayerPtr->setNextAtkType(targetAtkType);
+
+				// 쌍권총: 사격 후 Aim 닫기 & 다음 손 전환
+				if (pistolMode == pistolAimMode::DUAL)
+				{
+					dualNextLeft = (dualSelected != equipHandFlag::left);
+					close(aniFlag::null);
+					return;
+				}
 			}
 			else//근접공격
 			{
