@@ -541,7 +541,7 @@ void Vehicle::rush(int dx, int dy)
     updateHeadlight(getClosestGridWithFake());
     if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
 
-    addAniUSetMonster(this, aniFlag::propRush);
+    addAniToMonsterTurn(this, aniFlag::propRush);
 }
 
 void Vehicle::centerShift(int dx, int dy, int dz)

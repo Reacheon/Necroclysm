@@ -68,7 +68,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 		maintCoor = inputCoor;
 		maintMode = inputMode;

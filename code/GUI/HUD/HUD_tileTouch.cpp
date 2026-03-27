@@ -177,7 +177,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						if (ePtr->itemInfo[i].equipState == equipHandFlag::both)
 						{
 							PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-							addAniUSetPlayer(PlayerPtr, aniFlag::miningWall);
+							addAniToPlayerTurn(PlayerPtr, aniFlag::miningWall);
 							break;
 						}
 					}
@@ -233,30 +233,30 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::felling);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::felling);
 				}
 				else if (tgtProp->leadItem.itemCode == itemID::leverRL || tgtProp->leadItem.itemCode == itemID::leverUD)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
                 }
 				else if (tgtProp->leadItem.itemCode == itemID::valveRL || tgtProp->leadItem.itemCode == itemID::valveUD)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
 				else if (tgtProp->leadItem.itemCode == itemID::tactSwitchRL || tgtProp->leadItem.itemCode == itemID::tactSwitchUD)
 				{
 					if (tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
 					{
 						PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-						addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+						addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 					}
 				}
 				else if (tgtProp->leadItem.itemCode == itemID::delayR || tgtProp->leadItem.itemCode == itemID::delayL)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::changePropDelay);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::changePropDelay);
 				}
 				else if (tgtProp->leadItem.itemCode == itemID::gasolineGeneratorR
 					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorT
@@ -264,17 +264,17 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					|| tgtProp->leadItem.itemCode == itemID::gasolineGeneratorB)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
 				else if (tgtProp->leadItem.itemCode == itemID::campfire && tgtProp->energyPercent > 0.0f)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::propTurnOnOff);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::CROP) && tgtProp->plantGrowthPercent >= 100.0)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-					addAniUSetPlayer(PlayerPtr, aniFlag::harvesting);
+					addAniToPlayerTurn(PlayerPtr, aniFlag::harvesting);
 				}
 			}
 			else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
@@ -293,7 +293,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			&& TileProp(touchX, touchY, PlayerZ())->plantGrowthPercent >= 100.0)
 		{
 			PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
-			addAniUSetPlayer(PlayerPtr, aniFlag::harvesting);
+			addAniToPlayerTurn(PlayerPtr, aniFlag::harvesting);
 		}
 		else
 		{

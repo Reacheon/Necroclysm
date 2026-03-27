@@ -45,7 +45,7 @@ public:
 		mapTexture = IMG_LoadTexture(renderer, "image/map/map1.png");
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 	}
 	~Map()
 	{

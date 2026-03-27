@@ -97,7 +97,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
@@ -141,7 +141,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 

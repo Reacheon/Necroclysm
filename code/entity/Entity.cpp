@@ -432,7 +432,7 @@ void Entity::move(int dir, bool jump)
 			int dir = coord2Dir(dx, dy);
 			pulledCart->setFakeX(-16 * dx);
 			pulledCart->setFakeY(-16 * dy);
-			addAniUSet(pulledCart, aniFlag::move);
+			addAni(pulledCart, aniFlag::move);
 
 			pulledCart->shift(dx, dy);
 			pulledCart->pullMoveSpd = entityInfo.gridMoveSpd;
@@ -447,7 +447,7 @@ void Entity::move(int dir, bool jump)
 			cameraX = getX() + getIntegerFakeX();
 			cameraY = getY() + getIntegerFakeY();
 		}
-		addAniUSet(this, aniFlag::move);
+		addAni(this, aniFlag::move);
 
 
 	}
@@ -717,7 +717,7 @@ void Entity::drop(ItemPocket* txPtr)
 		for (int i = txPtr->itemInfo.size() - 1; i >= 0; i--) txPtr->transferItem(targetStack->getPocket(), i, txPtr->itemInfo[i].number);
 	}
 
-	addAniUSetPlayer(targetStack, aniFlag::drop);
+	addAniToPlayerTurn(targetStack, aniFlag::drop);
 	targetStack->pullStackLights();
 }
 void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
@@ -728,7 +728,7 @@ void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 	throwCoord.x = gridX;
 	throwCoord.y = gridY;
 	throwCoord.z = getGridZ();
-	addAniUSetPlayer(this, aniFlag::entityThrow);
+	addAniToPlayerTurn(this, aniFlag::entityThrow);
 }
 //@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
 float Entity::getProficLevel(int index)

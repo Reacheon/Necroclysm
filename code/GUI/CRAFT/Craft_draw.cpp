@@ -554,7 +554,7 @@ void Craft::drawGUI()
 
 
 		//아이템 디테일박스(툴팁) 그리기
-		if (aniUSet.find(this) == aniUSet.end() && (pointingCursor >= 0 || craftCursor >= 0))
+		if (!aniManager.contains(this) && (pointingCursor >= 0 || craftCursor >= 0))
 		{
 			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
 			bool canCraft = true; //현재 플레이어의 상태로 조합이 가능한지 체크함 

@@ -28,7 +28,7 @@ Skill::Skill() : GUI(false)
 
 	deactInput();
 	deactDraw();
-	addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+	addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 	filteredSkills.clear();
 	for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)

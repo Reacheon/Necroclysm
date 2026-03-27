@@ -45,7 +45,7 @@ ContextMenu::ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int i
 
 	deactInput();
 	deactDraw();
-	addAniUSetPlayer(this, aniFlag::winUnfoldOpen);
+	addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 }
 
 ContextMenu::~ContextMenu()

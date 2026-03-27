@@ -375,7 +375,7 @@ namespace actFunc
 			{
 				TileItemStack(dropPos)->getPocket()->addItemFromDex(seedCode, seedAmount);
 			}
-			addAniUSetPlayer(TileItemStack(dropPos), aniFlag::drop);
+			addAniToPlayerTurn(TileItemStack(dropPos), aniFlag::drop);
 		}
 
 		PlayerPtr->updateStatus();

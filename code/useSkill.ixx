@@ -59,7 +59,7 @@ export Corouter useSkill(int skillCode)
 		int targetZ = wtoi(targetStr.c_str());
 
 		PlayerPtr->setSkillTarget(targetX, targetY, targetZ);
-		addAniUSetPlayer(PlayerPtr, aniFlag::fireStorm);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::fireStorm);
 		break;
 	}
 	case 32://구르기
@@ -116,7 +116,7 @@ export Corouter useSkill(int skillCode)
 		cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
 		cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
 
-		addAniUSetPlayer(PlayerPtr, aniFlag::roll);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::roll);
 		break;
 	}
 
@@ -177,7 +177,7 @@ export Corouter useSkill(int skillCode)
 		cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
 		cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
 
-		addAniUSetPlayer(PlayerPtr, aniFlag::leap);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::leap);
 		break;
 	}
 	}

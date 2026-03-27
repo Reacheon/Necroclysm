@@ -31,7 +31,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this, aniFlag::winSlipOpen);
+		addAniToPlayerTurn(this, aniFlag::winSlipOpen);
 	}
 	~Status()
 	{

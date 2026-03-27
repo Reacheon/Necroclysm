@@ -95,7 +95,7 @@ public:
 
 		deactInput();
 		deactDraw();
-		addAniUSetPlayer(this,aniFlag::winUnfoldOpen);
+		addAniToPlayerTurn(this,aniFlag::winUnfoldOpen);
 
 
 		exInputText = L"";

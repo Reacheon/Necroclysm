@@ -65,7 +65,7 @@ Monster::~Monster()
 void Monster::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
 	Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputAniType);
-	addAniUSet(this, inputAniType);
+	addAni(this, inputAniType);
 }
 
 void Monster::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, aniFlag::atk); }
@@ -223,7 +223,7 @@ bool Monster::runAI()
 
 void Monster::death()
 {
-	if (aniUSet.find(this) != aniUSet.end())
+	if (aniManager.contains(this))
 	{
 		prt(lowCol::red, L"[Monster] runAnimation 강제 종료\n");
 		runAnimation(true);

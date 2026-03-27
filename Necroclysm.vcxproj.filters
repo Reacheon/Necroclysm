@@ -132,6 +132,9 @@
     <ClCompile Include="code\Ani.ixx">
       <Filter>소스 파일\05_Class\04_Interface</Filter>
     </ClCompile>
+    <ClCompile Include="code\AniManager.ixx">
+      <Filter>소스 파일\05_Class\04_Interface</Filter>
+    </ClCompile>
     <ClCompile Include="code\main.cpp">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>

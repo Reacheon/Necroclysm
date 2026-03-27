@@ -61,7 +61,7 @@ public:
         gameOverText = inputText;	
 
 
-		addAniUSetPlayer(PlayerPtr, aniFlag::faint);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::faint);
 
 	}
 	~GameOver()

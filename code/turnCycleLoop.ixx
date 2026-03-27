@@ -454,10 +454,10 @@ __int64 playerInputTurn()
 
 __int64 animationTurn()
 {
-	//AniUSet
-	//Ani 클래스를 상속받은 클래스는 aniUSet이라는 unordered set에 ID가 추가될 경우
-	//루프마다 그 ID의 runAnimation 메소드를 실행시킴. 만약 runAnimation이 true를 반환할 경우
-	//aniUSet에 있는 그 ID를 지워버리고 만약 모든 애니메이션을 실행시켰을 경우 turnCycle을 2(Entity의 AI 연산)으로 넘김
+	//AniManager
+	//Ani 클래스를 상속받은 클래스는 aniManager에 추가될 경우
+	//루프마다 그 인스턴스의 runAnimation 메소드를 실행시킴. 만약 runAnimation이 true를 반환할 경우
+	//aniManager에서 제거하고 만약 모든 애니메이션을 실행시켰을 경우 turnCycle을 monsterAI로 넘김
 	__int64 timeStampStart = getNanoTimer();
 	if (turnCycle == turn::playerAnime)
 	{
@@ -543,29 +543,26 @@ __int64 animationTurn()
 		}
 	}
 
-	int aniSize = aniUSet.size();
-	if (aniUSet.size() > 0)
+	if (!aniManager.empty())
 	{
-		//aniUSet에 있는 모든 인스턴스를 체크해서 애니메이션을 실행시킴. 
-		for (auto it = aniUSet.begin(); it != aniUSet.end();)
+		//aniManager에 있는 모든 인스턴스를 체크해서 애니메이션을 실행시킴.
+		for (auto it = aniManager.begin(); it != aniManager.end();)
 		{
-			//prt(L"aniUSet의 사이즈는 %d이다.\n",aniUSet.size());
 			bool loopBreak = false;
 			if ((*it)->isDictator()) { loopBreak = true; }
 
 			if ((*it)->runAnimation(false) == true)//종료하는 애니메이션을 실행했을 경우
 			{
-				aniUSet.erase(it++);//it가 가리키는 요소를 제거하고 후위연산자로 늘려버려서 반복자가 무효화되지않도록 함
-				if (aniUSet.size() == 0)
+				it = aniManager.erase(it);//it가 가리키는 요소를 제거하고 다음 반복자를 반환
+				if (aniManager.empty())
 				{
 					endAnimeTurn();
-					//prt(L"runAnimation 종료, 걸린 시간은 %ls이다.\n", decimalCutter((getNanoTimer()- timeStampStart) / 1000000.0, 5).c_str());
 				}
 			}
 			else it++;
 
 			if (loopBreak) break;
-			else if (it != aniUSet.end())//설령 Dictator가 아니라도 다음 Ani가 Dictator면 미리 종료함, 다음은 Dictator만의 독무대를 위해 
+			else if (it != aniManager.end())//설령 Dictator가 아니라도 다음 Ani가 Dictator면 미리 종료함, 다음은 Dictator만의 독무대를 위해
 			{
 				if ((*it)->isDictator()) break;
 			}

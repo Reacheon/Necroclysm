@@ -78,7 +78,7 @@ Player::~Player()
 void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
 {
 	Entity::startAtk(inputGridX, inputGridY, inputGridZ, inputAniType);
-	addAniUSetPlayer(this, inputAniType);
+	addAniToPlayerTurn(this, inputAniType);
 }
 
 void Player::startAtk(int inputGridX, int inputGridY, int inputGridZ) { startAtk(inputGridX, inputGridY, inputGridZ, aniFlag::atk); }

@@ -169,7 +169,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				address->flash.a = 0;
 			}
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
 			setFakeY(0);
@@ -322,7 +322,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
 			setFakeY(0);
@@ -368,7 +368,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				if (address->leadItem.checkFlag(itemFlag::STUMP) == false)
 				{
-					addAniUSetPlayer(address, aniFlag::treeFalling);
+					addAniToPlayerTurn(address, aniFlag::treeFalling);
 					address->displayHPBarCount = 50;
 					address->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
 					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
@@ -451,7 +451,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
 			setFakeY(0);
@@ -534,7 +534,7 @@ bool Entity::runAnimation(bool shutdown)
 				}
 
 				ItemStack* itemPtr = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				if(itemPtr != nullptr) addAniUSetPlayer(itemPtr, aniFlag::drop);
+				if(itemPtr != nullptr) addAniToPlayerTurn(itemPtr, aniFlag::drop);
 
 				DestroyWall(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
@@ -607,7 +607,7 @@ bool Entity::runAnimation(bool shutdown)
 			{
 				address->flash.a = 0;
 			}
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
 			setFakeY(0);
@@ -688,7 +688,7 @@ bool Entity::runAnimation(bool shutdown)
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
 			if (ePtr != nullptr) ePtr->flash.a = 0;
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			delete(((Sticker*)(StickerList.find(stickerID))->second));
 			setFakeX(0);
 			setFakeY(0);
@@ -1024,7 +1024,7 @@ bool Entity::runAnimation(bool shutdown)
 			else
 			{
 				addItemToTile(dstGrid, throwingItemPocket.get());
-				addAniUSetPlayer(TileItemStack(dstGrid), aniFlag::drop);
+				addAniToPlayerTurn(TileItemStack(dstGrid), aniFlag::drop);
 				delete stickerPtr;
 				resetTimer();
 				setAniType(aniFlag::null);
@@ -1356,7 +1356,7 @@ bool Entity::runAnimation(bool shutdown)
 							{
 								TileItemStack(playerPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
 							}
-							addAniUSetPlayer(TileItemStack(playerPos), aniFlag::drop);
+							addAniToPlayerTurn(TileItemStack(playerPos), aniFlag::drop);
 							cropProp->plantGrowthPercent = 60.0;
 						}
 						else
@@ -1396,7 +1396,7 @@ bool Entity::runAnimation(bool shutdown)
 								TileItemStack(cropPos)->getPocket()->addItemFromDex(harvestItemCode, harvestAmount);
 							}
 
-							addAniUSetPlayer(TileItemStack(cropPos), aniFlag::drop);
+							addAniToPlayerTurn(TileItemStack(cropPos), aniFlag::drop);
 							destroyProp(cropPos);
 						}
 					}
@@ -1436,7 +1436,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
-			aniUSet.erase(aniUSet.find(this));
+			aniManager.remove(this);
 			setFakeX(0);
 			setFakeY(0);
 			return true;
@@ -1540,7 +1540,7 @@ bool Entity::hitAnimation(bool shutdown, const std::function<void()> inputFunc)
 
 	if (shutdown == true)//사망으로 인한 강제종료
 	{
-		aniUSet.erase(aniUSet.find(this));
+		aniManager.remove(this);
 		setFakeX(0);
 		setFakeY(0);
 		return true;

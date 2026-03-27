@@ -289,7 +289,7 @@ bool Vehicle::runAI()
                 //prt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFakeX(), getFakeY());
 
                 //iAmDictator();
-                addAniUSetMonster(this, aniFlag::minecartRush);
+                addAniToMonsterTurn(this, aniFlag::minecartRush);
 
                 extraRenderVehList.push_back(this);
                 for (auto it = partInfo.begin(); it != partInfo.end(); it++)

@@ -173,6 +173,7 @@
     <ClCompile Include="code\actFuncSet_ui.cpp" />
     <ClCompile Include="code\actFuncSet.ixx" />
     <ClCompile Include="code\Ani.ixx" />
+    <ClCompile Include="code\AniManager.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />

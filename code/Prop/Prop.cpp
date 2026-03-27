@@ -310,7 +310,7 @@ bool Prop::runAnimation(bool shutdown)
             }
 
 
-            addAniUSetPlayer(TileItemStack(itemPos.x, itemPos.y, itemPos.z), aniFlag::drop);
+            addAniToPlayerTurn(TileItemStack(itemPos.x, itemPos.y, itemPos.z), aniFlag::drop);
             treeAngle = 0;
             resetTimer();
             setAniType(aniFlag::null);

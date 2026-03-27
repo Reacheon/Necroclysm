@@ -75,12 +75,12 @@ public:
 		if (aniType == aniFlag::winUnfoldClose)
 		{
 			deactInput();
-			addAniUSetPlayer(this, aniFlag::winUnfoldClose);
+			addAniToPlayerTurn(this, aniFlag::winUnfoldClose);
 		}
 		else if (aniType == aniFlag::winSlipClose)
 		{
 			deactInput();
-			addAniUSetPlayer(this, aniFlag::winSlipClose);
+			addAniToPlayerTurn(this, aniFlag::winSlipClose);
 		}
 		else if (aniType == aniFlag::null)
 		{

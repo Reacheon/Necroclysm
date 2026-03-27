@@ -13,6 +13,7 @@ import ItemData;
 import EntityData;
 import SkillData;
 import Ani;
+import AniManager;
 import Player;
 import Drawable;
 
@@ -299,32 +300,25 @@ export bool undoCircuitNetwork = false; //트랜지스터의 상태가 꺼져서
 
 /////////////////////////////////////////////전역함수////////////////////////////////////////////////////////////
 
-export std::set<Ani*, bool(*)(Ani*, Ani*)> aniUSet(
-    [](Ani* a, Ani* b) -> bool {
-        if (a->getAniPriority() == b->getAniPriority())
-            return a < b;
-        else
-            return a->getAniPriority() > b->getAniPriority();
-    }
-);
-//AniUSet에 애니메이션을 추가한다. 단 턴을 넘기지는 않는다. 몬스터의 경우 모든 AI에서 실행 후 자동으로 턴이 넘어가므로...
-export std::function<void(Ani*, aniFlag)> addAniUSet = [](Ani* tgtPtr, aniFlag inputType)
+export AniManager aniManager;
+
+//애니메이션을 추가한다. 단 턴을 넘기지는 않는다. 몬스터의 경우 모든 AI에서 실행 후 자동으로 턴이 넘어가므로...
+export std::function<void(Ani*, aniFlag)> addAni = [](Ani* tgtPtr, aniFlag inputType)
     {
-        aniUSet.insert(tgtPtr);
-        tgtPtr->setAniType(inputType);
+        aniManager.add(tgtPtr, inputType);
     };
 
-//AniUSet에 애니메이션을 추가한다. 플레이어의 입력턴을 강제로 종료하고 플레이어 애니메이션으로 넘어간다.
-export std::function<void(Ani*, aniFlag)> addAniUSetPlayer = [](Ani* tgtPtr, aniFlag inputType)
+//애니메이션을 추가한다. 플레이어의 입력턴을 강제로 종료하고 플레이어 애니메이션으로 넘어간다.
+export std::function<void(Ani*, aniFlag)> addAniToPlayerTurn = [](Ani* tgtPtr, aniFlag inputType)
     {
-        addAniUSet(tgtPtr, inputType);
+        aniManager.add(tgtPtr, inputType);
         turnCycle = turn::playerAnime;
     };
 
-//AniUSet에 애니메이션을 추가한다. 몬스터의 연산턴을 강제로 종료하고 플레이어 애니메이션으로 넘어간다.
-export std::function<void(Ani*, aniFlag)> addAniUSetMonster = [](Ani* tgtPtr, aniFlag inputType)
+//애니메이션을 추가한다. 몬스터의 연산턴을 강제로 종료하고 몬스터 애니메이션으로 넘어간다.
+export std::function<void(Ani*, aniFlag)> addAniToMonsterTurn = [](Ani* tgtPtr, aniFlag inputType)
     {
-        addAniUSet(tgtPtr, inputType);
+        aniManager.add(tgtPtr, inputType);
         turnCycle = turn::monsterAnime;
     };
 

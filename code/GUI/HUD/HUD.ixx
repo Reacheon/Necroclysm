@@ -360,20 +360,20 @@ public:
 		popUpDist = 5 + ((barAct.size() - 1) / 7) * 109;
         popUpDist += option::inputMethod == input::gamepad ? 99 : 0;
 		deactInput();
-		addAniUSetPlayer(this, aniFlag::popUpLetterbox);
+		addAniToPlayerTurn(this, aniFlag::popUpLetterbox);
 	}
 	void executePopDown()
 	{
 		barActCursor = -1;
 		isPopUp = false;
 		deactInput();
-		addAniUSetPlayer(this, aniFlag::popDownLetterbox);
+		addAniToPlayerTurn(this, aniFlag::popDownLetterbox);
 	}
 	void executePopUpSingle()
 	{
 		isPopUp = true;
 		deactInput();
-		addAniUSetPlayer(this, aniFlag::popUpSingleLetterbox);
+		addAniToPlayerTurn(this, aniFlag::popUpSingleLetterbox);
 	}
 
 	void clickLetterboxBtn(act inputAct)
@@ -846,7 +846,7 @@ public:
 		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 
 		PlayerPtr->setDirection(coord2Dir(targetX - PlayerX(), targetY - PlayerY()));
-		addAniUSetPlayer(PlayerPtr, aniFlag::tilling);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::tilling);
 	};
 
 	Corouter executeWatering()
@@ -911,7 +911,7 @@ public:
 		int targetY = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
 
 		PlayerPtr->setDirection(coord2Dir(targetX - PlayerX(), targetY - PlayerY()));
-		addAniUSetPlayer(PlayerPtr, aniFlag::watering);
+		addAniToPlayerTurn(PlayerPtr, aniFlag::watering);
 	};
 
 	void quickSlotToggle()
@@ -922,13 +922,13 @@ public:
 			{
 				isQuickSlotPop = false;
 				deactInput();
-				addAniUSetPlayer(this, aniFlag::quickSlotPopRight);
+				addAniToPlayerTurn(this, aniFlag::quickSlotPopRight);
 			}
 			else
 			{
 				isQuickSlotPop = true;
 				deactInput();
-				addAniUSetPlayer(this, aniFlag::quickSlotPopLeft);
+				addAniToPlayerTurn(this, aniFlag::quickSlotPopLeft);
 			}
 		}
 	}
