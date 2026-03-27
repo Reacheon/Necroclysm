@@ -181,15 +181,17 @@ bool Entity::runAnimation(bool shutdown)
 		case 1:
 			if (entityInfo.isPlayer)
 			{
+				// sprFlip 시 LATK↔RATK 교환 (좌우반전되면 물리적 오른손이 시각적 왼손이 됨)
+				bool flip = entityInfo.sprFlip;
 				if (dualAtk)
 				{
-					if (prevDualAtk == equipHandFlag::right) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
-					else  PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
+					if (prevDualAtk == equipHandFlag::right) PlayerPtr->setSpriteIndex(flip ? charSprIndex::LATK1 : charSprIndex::RATK1);
+					else PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK1 : charSprIndex::LATK1);
 				}
-				else if (leftAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
-				else if (rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK1);
+				else if (leftAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK1 : charSprIndex::LATK1);
+				else if (rightAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::LATK1 : charSprIndex::RATK1);
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING1);
-				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK1);
+				else if (unarmedAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK1 : charSprIndex::LATK1);
 			}
 			else
 			{
@@ -220,27 +222,37 @@ bool Entity::runAnimation(bool shutdown)
 				address->setFakeX(address->getIntegerFakeX() + 2 * dx);
 				address->setFakeY(address->getIntegerFakeY() + 2 * dy);
 			}
+			// 근접공격 손 설정
+			if (entityInfo.isPlayer)
+			{
+				if (dualAtk) meleeAtkHand = prevDualAtk;
+				else if (leftAtk) meleeAtkHand = equipHandFlag::left;
+				else if (rightAtk) meleeAtkHand = equipHandFlag::right;
+				else if (twoHandedAtk) meleeAtkHand = equipHandFlag::both;
+				else meleeAtkHand = equipHandFlag::none; // 맨손
+			}
 			attack(atkTarget.x, atkTarget.y);
 			new Sticker(false, getX() + (16 * (atkTarget.x - getGridX())), getY() + (16 * (atkTarget.y - getGridY())), spr::effectCut1, 0, stickerID, true);
 			if (entityInfo.isPlayer)
 			{
+				bool flip = entityInfo.sprFlip;
 				if (dualAtk)
 				{
 					if (prevDualAtk == equipHandFlag::right)
 					{
-						PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
+						PlayerPtr->setSpriteIndex(flip ? charSprIndex::LATK2 : charSprIndex::RATK2);
 						prevDualAtk = equipHandFlag::left;
 					}
 					else
 					{
-						PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
+						PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK2 : charSprIndex::LATK2);
 						prevDualAtk = equipHandFlag::right;
 					}
 				}
-				else if (leftAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
-				else if (rightAtk) PlayerPtr->setSpriteIndex(charSprIndex::RATK2);
+				else if (leftAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK2 : charSprIndex::LATK2);
+				else if (rightAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::LATK2 : charSprIndex::RATK2);
 				else if (twoHandedAtk) PlayerPtr->setSpriteIndex(charSprIndex::MINING2);
-				else if (unarmedAtk) PlayerPtr->setSpriteIndex(charSprIndex::LATK2);
+				else if (unarmedAtk) PlayerPtr->setSpriteIndex(flip ? charSprIndex::RATK2 : charSprIndex::LATK2);
 			}
 			else
 			{

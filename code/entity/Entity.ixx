@@ -26,6 +26,7 @@ private:
     atkType nextAtkType = atkType::bash; //다음 공격에 사용할 공격의 타입
     int atkTargetPart = -1;
     equipHandFlag aimWeaponHand = equipHandFlag::right;//현재 적에게 겨누는 주무기
+    equipHandFlag meleeAtkHand = equipHandFlag::none;//현재 근접공격에 사용하는 손
     unsigned __int8 aimStack = 0; //다음 공격에 가산될 조준 스택
     bool footChanged = false;
     bool leftFoot = true; //걷기 애니메이션에서의 왼발, 오른발 순서

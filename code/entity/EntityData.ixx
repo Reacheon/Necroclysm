@@ -55,6 +55,11 @@ export struct EntityData_Base
 
     __int8 atkSpr1 = -1;
     __int8 atkSpr2 = -1;
+
+    //공격 계열 변수
+    __int16 atkPierce = 0;
+    __int16 atkCut = 0;
+    __int16 atkBash = 1; // 기본 맨손 타격
 };
 
 export struct EntityData : public EntityData_Base

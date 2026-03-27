@@ -46,6 +46,9 @@ namespace csvEntity
     constexpr int isHumanCustomSprite = 30;
     constexpr int atkSpr1 = 31;
     constexpr int atkSpr2 = 32;
+    constexpr int atkPierce = 33;
+    constexpr int atkCut = 34;
+    constexpr int atkBash = 35;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -247,6 +250,15 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::atkSpr2:
                             entityDex[tgtIndex].atkSpr2 = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::atkPierce:
+                            entityDex[tgtIndex].atkPierce = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::atkCut:
+                            entityDex[tgtIndex].atkCut = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::atkBash:
+                            entityDex[tgtIndex].atkBash = wtoi(strFragment.c_str());
                             break;
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

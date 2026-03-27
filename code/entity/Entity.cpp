@@ -472,37 +472,152 @@ void Entity::attack(int gridX, int gridY)
 	}
 	else
 	{
-		//명중률 계산
-		float aimAcc;
-		aimAcc = 0.95;
+		// [1단계] EV 회피 판정: missChance = ev / (ev + 100)
+		int defEV = victimEntity->getEV();
+		float evadePortion = static_cast<float>(defEV) / (static_cast<float>(defEV) + 100.0f);
+		float hitChance = 0.95f - evadePortion;
+		if (hitChance < 0.05f) hitChance = 0.05f; // 최소 5% 명중 보장
 
-		if (aimAcc * 100.0 > randomRange(0, 100))
+		if (hitChance * 100.0f > randomRange(0, 100))
 		{
-			// [테스트] 10% 확률로 BLOCK 발생
-			if (randomRange(0, 100) < 10 && victimEntity->entityInfo.isPlayer)
+			// [2단계] SH 블록 판정: blockChance = sh / (sh + 50)
+			int defSH = victimEntity->getSH();
+			if (defSH > 0)
 			{
-				victimEntity->flash = { 85, 187, 255, 120 }; // 하늘색 점멸 (#55BBFF)
-				if (option::showDamage) new Damage(L"BLOCK", col::white, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::blocked);
-				return;
+				float blockChance = static_cast<float>(defSH) / (static_cast<float>(defSH) + 50.0f);
+				if (blockChance * 100.0f > randomRange(0, 100))
+				{
+					victimEntity->flash = { 85, 187, 255, 120 }; // 하늘색 점멸 (#55BBFF)
+					if (option::showDamage) new Damage(L"BLOCK", col::white, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::blocked);
+					return;
+				}
 			}
 
+			// [3단계] 데미지 계산
 			victimEntity->flash = { 255, 0, 0, 120 };
+
+			// 공격력과 데미지 타입 결정
+			int atkDmg = 1;
+			dmgFlag atkDmgType = dmgFlag::bash;
+			atkType currentAtkType = getNextAtkType();
+			setNextAtkType(atkType::bash); // 사용 후 초기화
+
+			if (currentAtkType == atkType::shot && entityInfo.isPlayer)
+			{
+				// 사격: 총기 성능 × 탄환 공격력
+				int weaponIdx = getAimWeaponIndex();
+				if (weaponIdx >= 0 && weaponIdx < static_cast<int>(getEquipPtr()->itemInfo.size()))
+				{
+					ItemData& weapon = getEquipPtr()->itemInfo[weaponIdx];
+					float gunPower = weapon.gunDmg;
+					float gunBal = weapon.gunBalance;
+
+					// 탄환 스탯 가져오기
+					int bPierce = 0, bCut = 0, bBash = 0;
+					ItemPocket* bulletPocket = getBulletPocket(weapon);
+
+					if (bulletPocket != nullptr && !bulletPocket->itemInfo.empty())
+					{
+						// 남은 탄환에서 스탯 읽기
+						bPierce = bulletPocket->itemInfo[0].bulletPierce;
+						bCut = bulletPocket->itemInfo[0].bulletCut;
+						bBash = bulletPocket->itemInfo[0].bulletBash;
+					}
+					else if (!weapon.pocketOnlyItem.empty())
+					{
+						// 마지막 탄환이었을 경우 → itemDex에서 탄환 타입 검색
+						int ammoCode = weapon.pocketOnlyItem[0];
+						if (itemDex[ammoCode].checkFlag(itemFlag::MAGAZINE) && !itemDex[ammoCode].pocketOnlyItem.empty())
+						{
+							ammoCode = itemDex[ammoCode].pocketOnlyItem[0]; // 탄창 → 탄환 코드
+						}
+						bPierce = itemDex[ammoCode].bulletPierce;
+						bCut = itemDex[ammoCode].bulletCut;
+						bBash = itemDex[ammoCode].bulletBash;
+					}
+
+					// 최대 데미지 타입 결정
+					int bulletAtk = bBash;
+					atkDmgType = dmgFlag::bash;
+					if (bPierce > bulletAtk) { bulletAtk = bPierce; atkDmgType = dmgFlag::pierce; }
+					if (bCut > bulletAtk) { bulletAtk = bCut; atkDmgType = dmgFlag::cut; }
+
+					// 데미지 = randomRange(bulletAtk × gunDmg × gunBalance, bulletAtk × gunDmg)
+					int maxD = static_cast<int>(static_cast<float>(bulletAtk) * gunPower);
+					int minD = static_cast<int>(static_cast<float>(maxD) * gunBal);
+					if (minD > maxD) std::swap(minD, maxD);
+					atkDmg = myMax(1, randomRange(minD, maxD));
+				}
+			}
+			else if (entityInfo.isPlayer)
+			{
+				// 근접: 장비 포켓에서 현재 공격 손의 무기를 찾아 스탯 적용
+				if (meleeAtkHand != equipHandFlag::none)
+				{
+					auto& equip = getEquipPtr()->itemInfo;
+					for (int i = 0; i < equip.size(); i++)
+					{
+						if (equip[i].equipState == meleeAtkHand && !equip[i].checkFlag(itemFlag::SHIELD))
+						{
+							int maxVal = equip[i].bash;
+							atkDmgType = dmgFlag::bash;
+
+							if (equip[i].pierce > maxVal)
+							{
+								maxVal = equip[i].pierce;
+								atkDmgType = dmgFlag::pierce;
+							}
+							if (equip[i].cut > maxVal)
+							{
+								maxVal = equip[i].cut;
+								atkDmgType = dmgFlag::cut;
+							}
+
+							// 데미지 = randomRange(최대 × meleeBalance, 최대)
+							int minVal = static_cast<int>(static_cast<float>(maxVal) * equip[i].meleeBalance);
+							atkDmg = myMax(1, randomRange(minVal, maxVal));
+							break;
+						}
+					}
+				}
+				// meleeAtkHand == none → 맨손: atkDmg=1, bash 유지
+			}
+			else
+			{
+				// 몬스터: entityInfo의 공격력 사용
+				int maxVal = entityInfo.atkBash;
+				atkDmgType = dmgFlag::bash;
+
+				if (entityInfo.atkPierce > maxVal)
+				{
+					maxVal = entityInfo.atkPierce;
+					atkDmgType = dmgFlag::pierce;
+				}
+				if (entityInfo.atkCut > maxVal)
+				{
+					maxVal = entityInfo.atkCut;
+					atkDmgType = dmgFlag::cut;
+				}
+
+				atkDmg = myMax(1, maxVal);
+			}
+
 			if (victimEntity->entityInfo.isPlayer)
 			{
-                int prob = randomRange(0, 100);	
+                int prob = randomRange(0, 100);
                 humanPartFlag part = humanPartFlag::torso;
 
 				if (prob <= 10) part = humanPartFlag::head;
 				else if(prob <= 20) part = humanPartFlag::lArm;
 				else if (prob <= 30) part = humanPartFlag::rArm;
 				else if (prob <= 40) part = humanPartFlag::lLeg;
-                else if (prob <= 50) part = humanPartFlag::rLeg;	
+                else if (prob <= 50) part = humanPartFlag::rLeg;
 
-				victimEntity->takeDamage(randomRange(6, 10), dmgFlag::pierce, part);
+				victimEntity->takeDamage(atkDmg, atkDmgType, part);
 			}
 			else
 			{
-				victimEntity->takeDamage(randomRange(6, 10), dmgFlag::pierce);
+				victimEntity->takeDamage(atkDmg, atkDmgType);
 			}
 		}
 		else
