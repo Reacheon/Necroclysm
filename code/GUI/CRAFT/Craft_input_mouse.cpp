@@ -1,9 +1,6 @@
-module;
 #include <SDL3/SDL.h>
 
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
-export module Craft_input_mouse;
 
 import Craft;
 import globalVar;

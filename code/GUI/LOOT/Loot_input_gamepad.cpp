@@ -147,8 +147,6 @@ void Loot::gamepadBtnDown()
 			case act::wield://들기
 				CORO(actFunc::executeWield(panel.pocket, panel.cursor));
 				break;
-			case act::insert://아이템 넣기
-				CORO(executeInsert());
 			}
 			break;
 		case SDL_GAMEPAD_BUTTON_EAST:

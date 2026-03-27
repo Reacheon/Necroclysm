@@ -46,8 +46,6 @@ export enum class act
     construct,  //건축
     open,       //가방열기
     test,       //테스트 기능
-    insert,     //아이템 넣기(가방에 옮기기)
-    reload,     //아이템 장전
     reloadBulletToMagazine, //탄환 장전
     unloadBulletFromMagazine, //탄환 분리
     reloadMagazine, //탄창 장전, 총과 탄창 양쪽에 있으며 기능이 다름

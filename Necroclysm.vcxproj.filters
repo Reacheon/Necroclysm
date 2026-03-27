@@ -399,6 +399,9 @@
     <ClCompile Include="code\GUI\CoroutineGUI\Lst.ixx">
       <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\CoroutineGUI\LstEx.ixx">
+      <Filter>소스 파일\01_system\04_GUI\CoroutineGUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\GUI\CRAFT\Craft_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
@@ -429,7 +432,7 @@
     <ClCompile Include="code\GUI\HUD\HUD_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx">
+    <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx">
@@ -558,10 +561,10 @@
     <ClCompile Include="code\var\textureVar.ixx">
       <Filter>소스 파일\01_system</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.ixx">
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.cpp">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx">
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.cpp">
       <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
     <ClCompile Include="code\Prop\Prop.cpp">
@@ -594,7 +597,16 @@
     <ClCompile Include="code\GUI\Skill.cpp">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\actFuncSet.cpp">
+    <ClCompile Include="code\actFuncSet_reload.cpp">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\actFuncSet_prop.cpp">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\actFuncSet_item.cpp">
+      <Filter>소스 파일\01_system\01_main</Filter>
+    </ClCompile>
+    <ClCompile Include="code\actFuncSet_ui.cpp">
       <Filter>소스 파일\01_system\01_main</Filter>
     </ClCompile>
     <ClCompile Include="code\var\constVar.ixx">

@@ -1012,8 +1012,6 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::construct) setBtnLayout(sysStr[73], 20);
 		else if (barAct[i] == act::open) setBtnLayout80(sysStr[88], 41);
 		else if (barAct[i] == act::test) setBtnLayout(sysStr[92], 60);
-		else if (barAct[i] == act::insert) setBtnLayout(sysStr[11], 17);
-		else if (barAct[i] == act::reload) setBtnLayout80(sysStr[100], 30);
 		else if (barAct[i] == act::reloadBulletToMagazine) setBtnLayout80(sysStr[113], 32);
 		else if (barAct[i] == act::unloadBulletFromMagazine) setBtnLayout80(sysStr[114], 33);
 		else if (barAct[i] == act::reloadMagazine) setBtnLayout80(sysStr[115], 30);

@@ -52,11 +52,6 @@ void Equip::clickUpGUI()
 					executeOpen();
 					break;
 				}
-				case act::reload:
-				{
-					CORO(executeReload());
-					break;
-				}
 				case act::reloadBulletToMagazine:
 				case act::reloadBulletToGun:
 					if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))

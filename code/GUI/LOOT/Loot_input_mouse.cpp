@@ -86,9 +86,6 @@ void Loot::clickUpGUI()
 				case act::wield://들기
 					CORO(actFunc::executeWield(panel.pocket, panel.cursor));
 					break;
-					//case act::insert:
-					//	CORO(executeInsert());
-					//	break;
 				case act::reloadBulletToMagazine:
 				case act::reloadBulletToGun:
 					if (panel.pocket->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))

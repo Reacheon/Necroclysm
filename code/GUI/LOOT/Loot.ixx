@@ -25,7 +25,6 @@ import Msg;
 import GUI;
 import actFuncSet;
 import drawWindow;
-import Lst;
 import ItemData;
 import ItemListPanel;
 import barActCommon;
@@ -503,80 +502,6 @@ public:
 			if (targetItem.checkFlag(itemFlag::SEED_FRUIT))
 			{
 				barAct.push_back(act::extractSeed);
-			}
-		}
-	}
-
-	Corouter executeInsert()//삽탄 : 총알에 사용, 이 탄환을 넣을 수 있는 탄창 리스트를 표시하고 거기에 넣음
-	{
-		int targetLootCursor = panel.cursor;
-		std::vector<std::wstring> pocketList;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
-		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-		{
-			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxNumber > 0)
-				{
-					if (std::find(equipPtr->itemInfo[i].pocketOnlyItem.begin(), equipPtr->itemInfo[i].pocketOnlyItem.end(), panel.pocket->itemInfo[targetLootCursor].itemCode) == equipPtr->itemInfo[i].pocketOnlyItem.end())
-					{
-						continue;
-					}
-				}
-
-				pocketList.push_back(equipPtr->itemInfo[i].name);
-			}
-		}
-
-		if (pocketList.size() == 0)
-		{
-			updateLog(sysStr[96]);
-			co_return;
-		}
-
-		////////////////////////////////////////////////////////////////////
-
-		new Lst(sysStr[95], sysStr[94], pocketList);//넣기, 넣을 포켓을 선택해주세요.
-		co_await std::suspend_always();
-		if (coAnswer.empty()) co_return;
-
-		////////////////////////////////////////////////////////////////////
-
-		int counter = 0;
-		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
-		{
-			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
-			{
-				if (equipPtr->itemInfo[i].pocketMaxNumber > 0)
-				{
-					if (std::find(equipPtr->itemInfo[i].pocketOnlyItem.begin(), equipPtr->itemInfo[i].pocketOnlyItem.end(), panel.pocket->itemInfo[targetLootCursor].itemCode) == equipPtr->itemInfo[i].pocketOnlyItem.end())
-					{
-						continue;
-					}
-				}
-
-				if (counter == wtoi(coAnswer.c_str()))
-				{
-
-					int transferNumber;
-					if (panel.pocket->itemInfo[targetLootCursor].lootSelect != 0)
-					{
-						transferNumber = panel.pocket->itemInfo[targetLootCursor].lootSelect;
-						panel.pocket->itemInfo[targetLootCursor].lootSelect = 0;
-					}
-					else { transferNumber = panel.pocket->itemInfo[targetLootCursor].number; }
-
-					panel.pocket->transferItem
-					(
-						equipPtr->itemInfo[i].pocketPtr.get(),
-						targetLootCursor,
-						transferNumber
-					);
-
-					co_return;
-				}
-
-				counter++;
 			}
 		}
 	}

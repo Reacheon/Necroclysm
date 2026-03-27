@@ -1,5 +1,3 @@
-export module Inventory_draw;
-
 import Inventory;
 import globalVar;
 import wrapFunc;

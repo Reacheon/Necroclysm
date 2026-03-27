@@ -89,10 +89,10 @@ export int cameraY = 0; // 카메라의 Y 좌표(좌측상단)
 //여기가 체크포인트
 export float zoomScale = 3.0; // 줌 배율, 2.0부터 시작
 export SDL_Event event; // SDL 이벤트
-export act UIType = act::null; // 0 : 일반, 1 :루팅, 2: 인벤토리
-export bool click = false; // 현재 플레이어가 화면을 누르고 있는지 나타냄
+export act UIType = act::null; // 현재 UI 컨텍스트 | Writer: Loot/Equip/Inventory 생성자·소멸자 | Reader: HUD, CoordSelect
+export bool click = false; // 현재 플레이어가 화면을 누르고 있는지 나타냄 | Writer: 메인 이벤트루프 | Reader: 모든 GUI
 export SDL_Point clickTile = { 0,0 }; // 현재 플레이어가 터치하고 있는 타일(그리드 단위 절대좌표)
-export Point3 lootTile = { 0,0,0 };
+export Point3 lootTile = { 0,0,0 }; // Writer: HUD_tileTouch | Reader: Loot(step)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 export int detailScroll = 0; //상단 디테일의 스크롤
 export SDL_Point clickDownPoint = { 0,0 }; //다운 이벤트를 실행한 좌표
@@ -101,7 +101,7 @@ export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌�
 export bool deactClickUp = false; //true일 경우 클릭업 및 클릭라이트(업) 함수를 실행하지 않음
 export bool itemListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
 export bool skillListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
-export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트
+export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트 | Writer: Loot/Equip/Inventory(updateBarAct), 소멸자에서 reset | Reader: HUD_draw
 export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
 export int dtClickStackStart = 0; //클릭 시간 측정 시작한 시간
@@ -111,16 +111,16 @@ export bool deactHold = false; //홀드이벤트를 비활성화, 예를 들어 
 
 export int selectMode = 0; // 선택모드 0일 경우 전체선택, 1이면 정밀선택
 /////////////////////////////////////////////////////////////////
-export bool exInput = false; // exInput(외부 텍스트 입력)가 작동 중인지의 여부
-export std::wstring exInputText = L""; // 메시지 박스에 입력한 문자열
-export int exInputCursor = 0; // 메시지 박스에서 현재 가리키는 커서
-export bool exInputEditing = false; // 현재 입력이 수정 중인지, 예로 한글 완성 전에는 true임, 이 값을 바탕으로 그리는 위치도 변동됨
+export bool exInput = false; // exInput(외부 텍스트 입력)가 작동 중인지의 여부 | Writer: Msg | Reader: 메인 이벤트루프
+export std::wstring exInputText = L""; // 메시지 박스에 입력한 문자열 | Writer: Msg, 메인 이벤트루프 | Reader: actFuncSet_ui
+export int exInputCursor = 0; // 메시지 박스에서 현재 가리키는 커서 | Writer: Msg | Reader: Msg(draw)
+export bool exInputEditing = false; // 현재 입력이 수정 중인지, 예로 한글 완성 전에는 true임 | Writer: 메인 이벤트루프 | Reader: Msg(draw)
 export int exInputIndex = -1; // -1은 미선택, 0부터 할당, 0은 아이템 선택 숫자 입력
 ////////////////////////////////////////////////////////////////
 //HUD 관련 전역변수
-export tabFlag tabType = tabFlag::attackNearby;
+export tabFlag tabType = tabFlag::attackNearby; // Writer: Loot/Equip(step) | Reader: HUD
 export SDL_Rect letterbox = { 0, 0, 0, 0 };
-export SDL_Rect barButton[35] = { 0, 0, 0, 0 };
+export SDL_Rect barButton[35] = { 0, 0, 0, 0 }; // Writer: HUD_draw(레이아웃 계산) | Reader: Loot/Equip/Inventory(클릭 판정)
 export SDL_Rect letterboxInButton[35] = { 0, 0, 0, 0 };
 export SDL_Rect letterboxPopUpButton = { 0, 0, 0, 0 };
 export int letterboxPopUpRelY = 0;
@@ -129,7 +129,7 @@ export SDL_Rect tabSmallBox = { 0, 0, 0, 0 };
 export bool doPopUpSingleHUD = false;
 export bool doPopDownHUD = false;
 
-export int barActCursor = -1; //키보드 입력 시에 사용되는 레터박스 커서, 비활성은 -1
+export int barActCursor = -1; //키보드 입력 시에 사용되는 레터박스 커서, 비활성은 -1 | Writer: HUD_input_gamepad, Loot 소멸자 | Reader: HUD_draw
 
 export SDL_Color mainLightColor = { 0xff,0xff,0xff };
 export int mainLightBright = 20;
@@ -137,9 +137,9 @@ export int mainLightSight = 0;
 
 
 /////////////////////코루틴 관련 변수///////////////////////////////
-export Corouter* coFunc;
-export std::wstring coAnswer = L"";
-export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴, 즉 코루틴함수 도중에 턴을 스킵하는 기능을 할 수 있음
+export Corouter* coFunc; // Writer/Reader: 코루틴을 사용하는 모든 GUI (Equip, Loot, Inventory, Craft, Sleep 등)
+export std::wstring coAnswer = L""; // Writer: CoroutineGUI(Msg, Lst, LstEx, CoordSelect) | Reader: 호출측 코루틴
+export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴 | Writer: Sleep | Reader: turnCycleLoop
 /////////////////////////////////////////////////////////////////
 
 //export std::unique_ptr<ItemPocket> availableRecipe;//이게 인텔리센스 오류의 원인
@@ -220,10 +220,10 @@ export bool drawHUD = true;
 
 export int currentUsingSkill = -1;
 
-export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위)
+export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위) | Writer: CoordSelect, Equip(propInstall), Craft | Reader: HUD_draw(타일 하이라이트)
 
-export SDL_Color rangeColor = { 0xff, 0xff, 0xff }; //선택 범위를 나타내는 색상
-export bool rangeRay = false;
+export SDL_Color rangeColor = { 0xff, 0xff, 0xff }; //선택 범위를 나타내는 색상 | Writer: CoordSelect, Aim | Reader: HUD_draw
+export bool rangeRay = false; // Writer: Aim | Reader: HUD_draw
 
 export std::unordered_set<Prop*> reserveDelayInit; //턴사이클루프에서 쓰이는 딜레이부품의 임시 저장 컨테이너
 

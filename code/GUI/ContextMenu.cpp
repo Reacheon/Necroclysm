@@ -1,15 +1,16 @@
-module;
 #define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 #include <SDL3/SDL.h>
 
-module ContextMenu;
+import ContextMenu;
 
 import std;
 import util;
 import textureVar;
+import constVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import constVar;
 import wrapFunc;
 import checkCursor;
 import drawWindow;

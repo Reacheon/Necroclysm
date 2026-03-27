@@ -167,7 +167,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="code\actFuncSet.cpp" />
+    <ClCompile Include="code\actFuncSet_reload.cpp" />
+    <ClCompile Include="code\actFuncSet_prop.cpp" />
+    <ClCompile Include="code\actFuncSet_item.cpp" />
+    <ClCompile Include="code\actFuncSet_ui.cpp" />
     <ClCompile Include="code\actFuncSet.ixx" />
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
@@ -197,12 +200,13 @@
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelect.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\CoordSelectCraft.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\Lst.ixx" />
+    <ClCompile Include="code\GUI\CoroutineGUI\LstEx.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\Maint.ixx" />
     <ClCompile Include="code\GUI\CoroutineGUI\Msg.ixx" />
     <ClCompile Include="code\GUI\CRAFT\Craft.ixx" />
     <ClCompile Include="code\GUI\CRAFT\Craft_draw.cpp" />
-    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.ixx" />
-    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.ixx" />
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_gamepad.cpp" />
+    <ClCompile Include="code\GUI\CRAFT\Craft_input_mouse.cpp" />
     <ClCompile Include="code\GUI\Dialogue.ixx" />
     <ClCompile Include="code\GUI\barActCommon.ixx" />
     <ClCompile Include="code\GUI\EQUIP\Equip.ixx" />
@@ -219,7 +223,7 @@
     <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp" />
     <ClCompile Include="code\GUI\ItemListPanel.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
-    <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.ixx" />
+    <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.cpp" />
     <ClCompile Include="code\GUI\LOOT\Loot.ixx" />
     <ClCompile Include="code\GUI\LOOT\Loot_draw.cpp" />
     <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp" />

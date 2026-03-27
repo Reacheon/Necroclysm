@@ -7,7 +7,7 @@ import std;
 import GUI;
 import SkillData;
 
-enum class skillCategory
+export enum class skillCategory
 {
 	all,
 	general,
