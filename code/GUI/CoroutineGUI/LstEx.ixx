@@ -160,8 +160,8 @@ public:
 				if (isHover) hoverCursor = currentItemIndex;
 
 				//버튼 배경
-				if (isClick)      drawFillRect(lstBtn[i], SDL_Color{ 25, 40, 120 }, 180);
-				else if (isHover) drawFillRect(lstBtn[i], SDL_Color{ 35, 55, 150 }, 180);
+				if (isClick)      drawFillRect(lstBtn[i], SDL_Color{ 25, 40, 120 }, 255);
+				else if (isHover) drawFillRect(lstBtn[i], SDL_Color{ 35, 55, 150 }, 255);
 				else              drawFillRect(lstBtn[i], SDL_Color{ 0, 0, 0 }, 180);
 
 				//버튼 배경 (보류 옵션임 투명 회색)

@@ -401,9 +401,9 @@ public:
 			new Lst(sysStr[95], sysStr[94], numList);//넣기, 넣을 포켓을 선택해주세요.
 			deactColorChange = true;
 			co_await std::suspend_always();
+			deactColorChange = false;
 			if (coAnswer.empty() == false)
 			{
-				deactColorChange = false;
 				switch (wtoi(coAnswer.c_str()))
 				{
 				case 0:

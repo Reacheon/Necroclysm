@@ -60,10 +60,10 @@ public:
 
 
 		lstBtn.resize(MAX_BTN);
-		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 48 * i, 360, 44 };
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 50 * i, 360, 44 };
 
 
-		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 428 };
+		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 450 };
 		lstInputBox = { lstWindow.x + 75, lstWindow.y + 90, 300, 60 };
 
 
@@ -85,8 +85,8 @@ public:
 	static Lst* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		lstBase = { 0, 0, 420, 590 };
-		lstWindow = { 0, 54, 420, 536 };
+		lstBase = { 0, 0, 420, 608 };
+		lstWindow = { 0, 54, 420, 554 };
 
 		if (center == false)
 		{
@@ -104,9 +104,9 @@ public:
 
 
 		lstBtn.resize(MAX_BTN);
-		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 48 * i, 360, 44 };
+		for (int i = 0; i < MAX_BTN; i++) lstBtn[i] = { lstWindow.x + 33, lstWindow.y + 72 + 50 * i, 360, 44 };
 
-		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 428 };
+		lstScrollBox = { lstWindow.x + 407, lstWindow.y + 72, 3, 450 };
 		lstInputBox = { lstWindow.x + 75, lstWindow.y + 90, 300, 60 };
 
 		if (center == false)
@@ -129,14 +129,14 @@ public:
 			setFont(fontType::mainFont);
 			drawWindow(&lstBase, lstTitleText, 0);
 
-			SDL_Rect topWindow = { lstBase.x + 1, lstBase.y + 35, 417, 66 };
-			SDL_Rect botWindow = { lstBase.x + 1, lstBase.y + lstBase.h - 25, 417, 24 };
+			SDL_Rect topWindow = { lstBase.x + 1, lstBase.y + 35, lstBase.w - 2, 66 };
+			SDL_Rect botWindow = { lstBase.x + 1, lstBase.y + lstBase.h - 25, lstBase.w - 2, 24 };
 			drawFillRect(topWindow, col::black, 255);
 			drawFillRect(botWindow, col::black, 255);
 
 			setFontSize(20);
 			setFont(fontType::mainFont);
-			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, true, 405, -1);
+			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, true, lstBase.w - 15, -1);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;
@@ -144,37 +144,38 @@ public:
 			for (int i = 0; i < MAX_BTN; i++)
 			{
 				int currentItemIndex = lstScroll + i;
+				if (currentItemIndex < 0 || currentItemIndex >= lstOptionVec.size()) continue;
 
-				if (currentItemIndex >= 0 && currentItemIndex < lstOptionVec.size())
-				{
-					int selectBoxIndex = 0;
+				//마우스 호버/클릭 상태 감지
+				bool isHover = checkCursor(&lstBtn[i]);
+				bool isClick = isHover && click;
+				if (isHover) hoverCursor = currentItemIndex;
 
-					if (checkCursor(&lstBtn[i]))
-					{
-						hoverCursor = currentItemIndex;
-						if (click == true) selectBoxIndex = 2;
-						else selectBoxIndex = 1;
-					}
+				//버튼 배경
+				if (isClick)      drawFillRect(lstBtn[i], SDL_Color{ 25, 40, 120 }, 255);
+				else if (isHover) drawFillRect(lstBtn[i], SDL_Color{ 35, 55, 150 }, 255);
+				else              drawFillRect(lstBtn[i], SDL_Color{ 0, 0, 0 }, 180);
 
-					drawSprite(spr::lstSelectBox, selectBoxIndex, lstBtn[i].x, lstBtn[i].y);
+				drawRect(lstBtn[i], col::gray);
 
-					setFontSize(24);
-					drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 18, lstBtn[i].y + 7);
-				}
+				//텍스트 표시
+				setFontSize(21);
+				setFont(fontType::mainFont);
+				drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 14, lstBtn[i].y + 8);
 			}
 
+			//하단 호버 인덱스 표시
 			setFontSize(15);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
 			drawTextCenter(hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 45, lstBase.y + lstBase.h - 26 + 12);
 
-			// 아이템 스크롤 그리기
+			//스크롤바
+			drawFillRect(lstScrollBox, { 120, 120, 120 });
+
 			if (lstOptionVec.size() > MAX_BTN)
 			{
-				drawFillRect(lstScrollBox, { 120, 120, 120 });
-
 				SDL_Rect inScrollBox = lstScrollBox;
-
 				inScrollBox.h = lstScrollBox.h * myMin(1.0, (float)MAX_BTN / (float)lstOptionVec.size());
 				if (inScrollBox.h < 8) inScrollBox.h = 8;
 
@@ -182,7 +183,8 @@ public:
 				else inScrollBox.y = lstScrollBox.y;
 
 				if (inScrollBox.y < lstScrollBox.y) inScrollBox.y = lstScrollBox.y;
-				if (inScrollBox.y + inScrollBox.h > lstScrollBox.y + lstScrollBox.h) inScrollBox.y = lstScrollBox.y + lstScrollBox.h - inScrollBox.h;
+				if (inScrollBox.y + inScrollBox.h > lstScrollBox.y + lstScrollBox.h)
+					inScrollBox.y = lstScrollBox.y + lstScrollBox.h - inScrollBox.h;
 
 				drawFillRect(inScrollBox, col::white);
 			}
