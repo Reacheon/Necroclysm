@@ -12,7 +12,7 @@ import checkCursor;
 export class Status : public GUI
 {
 private:
-	inline static Status* ptr;
+	inline static Status* ptr = nullptr;
 	SDL_Rect statusBase;
 	SDL_Rect statusWindow;
 

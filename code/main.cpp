@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	int numThreads = std::thread::hardware_concurrency();
 	if (numThreads == 0) numThreads = 4;
 	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
-	threadPoolPtr = new ThreadPool(numThreads);
+	threadPoolPtr = std::make_unique<ThreadPool>(numThreads);
 	SDL_AddGamepadMappingsFromFile("gamecontrollerdb.txt");
 
 	initCircle();
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 	}
 
 
-	delete threadPoolPtr;
+	threadPoolPtr.reset();
 	if (gestureInitialized) 
 	{
 		Gesture_Quit();

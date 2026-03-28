@@ -46,12 +46,11 @@ export struct Corouter
     }
 
     // 전역 코루틴 관리
-    static inline Corouter* current = nullptr;
+    static inline std::unique_ptr<Corouter> current = nullptr;
 
     static void start(Corouter&& coro)
     {
-        delete current;
-        current = new Corouter(std::move(coro));
+        current = std::make_unique<Corouter>(std::move(coro));
         current->run();
     }
 
