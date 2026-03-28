@@ -54,6 +54,7 @@ private:
 
 	double aimAcc = 0;
 	double fakeAimAcc = aimAcc;
+	double aimProgress = 0; //sqrt 곡선 조준 진행도 (매 턴 0.7~1.3씩 랜덤 증가)
 	int aimStack = 0;
 	atkType targetAtkType = atkType::shot;
 
@@ -548,12 +549,61 @@ public:
 		}
 	}
 
+	//현재 조준 중인 무기의 itemCode를 반환 (무기 없으면 0)
+	unsigned __int16 getAimWeaponCode()
+	{
+		auto& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		if (pistolMode == pistolAimMode::DUAL)
+		{
+			int idx = (dualSelected == equipHandFlag::left) ? leftPistolIdx : rightPistolIdx;
+			if (idx >= 0 && idx < equipInfo.size()) return equipInfo[idx].itemCode;
+		}
+		else if (pistolMode != pistolAimMode::NONE)
+		{
+			int idx = (pistolHand == equipHandFlag::left) ? leftPistolIdx : rightPistolIdx;
+			if (idx >= 0 && idx < equipInfo.size()) return equipInfo[idx].itemCode;
+		}
+		else
+		{
+			if (equipInfo.size() > 0) return equipInfo[0].itemCode;
+		}
+		return 0;
+	}
+
+	//sqrt 곡선으로 명중률 계산: baseAim + (maxAim - baseAim) * sqrt(min(1, aimProgress / fullAimTurns))
+	double calcAimAcc()
+	{
+		unsigned __int16 weaponCode = getAimWeaponCode();
+		float baseAim = itemDex[weaponCode].gunAccInit;
+		float maxAim = itemDex[weaponCode].gunAccMax;
+		int fullAimTurns = itemDex[weaponCode].gunFullAimTurns;
+		int optRange = itemDex[weaponCode].gunOptRange;
+
+		//거리 보정: 적정거리에서 벗어날수록 baseAim만 감소 (maxAim은 유지)
+		int distance = myMax(abs(PlayerX() - aimCoord.x), abs(PlayerY() - aimCoord.y));
+		float distPenalty = (float)abs(distance - optRange) * 0.03f;
+		float effectiveBaseAim = baseAim - distPenalty;
+		if (effectiveBaseAim < 0.01f) effectiveBaseAim = 0.01f;
+
+		//sqrt 곡선 적용
+		double ratio = (fullAimTurns > 0) ? myMin(1.0, aimProgress / (double)fullAimTurns) : 1.0;
+		double acc = effectiveBaseAim + (maxAim - effectiveBaseAim) * sqrt(ratio);
+
+		if (acc < 0.01) acc = 0.01;
+		if (acc > maxAim) acc = maxAim;
+		return acc;
+	}
+
 	void changeAimTarget(int tgtX, int tgtY)
 	{
 		aimCoord.x = tgtX;
 		aimCoord.y = tgtY;
 
-		if (TileEntity(aimCoord.x, aimCoord.y, aimCoord.z) != nullptr) aimAcc = randomRangeFloat(0.5, 0.8);
+		if (TileEntity(aimCoord.x, aimCoord.y, aimCoord.z) != nullptr)
+		{
+			aimProgress = 0;
+			aimAcc = calcAimAcc();
+		}
 		else aimAcc = 0;
 		fakeAimAcc = aimAcc;
 		aimStack = 0;
@@ -576,8 +626,8 @@ public:
 	{
 		if (aimAcc != 0)
 		{
-			aimAcc += randomRangeFloat(0.03, 0.07);
-			if (aimAcc > 0.999) aimAcc = 0.999;
+			aimProgress += randomRangeFloat(0.7, 1.3); //매 턴 랜덤 진행도 증가
+			aimAcc = calcAimAcc();
 			PlayerPtr->flash = { 255, 255, 255, 255 };
 			aimStack++;
 		}
@@ -687,17 +737,14 @@ public:
 			}
 		}
 
-		if (fabs(aimAcc - fakeAimAcc) > 0.002)
+		if (fabs(aimAcc - fakeAimAcc) > 0.001)
 		{
-			if (aimAcc > fakeAimAcc)
-			{
-				fakeAimAcc += 0.004;
-			}
-			else if (aimAcc < fakeAimAcc)
-			{
-				fakeAimAcc -= 0.004;
-			}
+			//목표까지 약 0.3초(18프레임)에 도달하도록 매 프레임 차이의 일정 비율 이동
+			double delta = (aimAcc - fakeAimAcc) * 0.12;
+			if (fabs(delta) < 0.001) delta = (aimAcc > fakeAimAcc) ? 0.001 : -0.001;
+			fakeAimAcc += delta;
 		}
+		else fakeAimAcc = aimAcc;
 
 
 
@@ -830,7 +877,9 @@ public:
 				PlayerPtr->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);
 				turnWait(1.0);
 				PlayerPtr->initAimStack();
-				aimAcc = 0.6;
+				//사격 후 반동: 조준 진행도를 일부 되돌림
+				aimProgress = myMax(0.0, aimProgress - (double)itemDex[getAimWeaponCode()].gunRebound * 0.3);
+				aimAcc = calcAimAcc();
 				PlayerPtr->setNextAtkType(targetAtkType);
 
 				// 쌍권총: 사격 후 Aim 닫기 & 다음 손 전환

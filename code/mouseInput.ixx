@@ -72,6 +72,7 @@ export void clickRight()
 	dxClickStack = 0;
 	dyClickStack = 0;
 	dtClickStack = -1;
+	clickStartTime = std::numeric_limits<__int64>::max(); //clickHold 오발동 방지
 
 
 	switch (option::inputMethod)

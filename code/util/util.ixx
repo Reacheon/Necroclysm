@@ -1,7 +1,6 @@
 export module util;
 
 export import aStar;
-export import calc;
 export import col2Str;
 export import Corouter;
 export import decimalCutter;

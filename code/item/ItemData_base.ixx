@@ -94,8 +94,9 @@ export struct ItemDataBase
     unsigned __int8 bulletRange = 1;
     float gunDmg = 0.00f;
     float gunAccInit = 0.5f;
-    unsigned __int8 gunAccSpd = 100;
+    unsigned __int8 gunFullAimTurns = 5; //최대 명중률 도달까지 걸리는 평균 턴 수
     float gunAccMax = 0.99f;
+    unsigned __int8 gunOptRange = 5; //최적 사거리 (이 거리에서 명중률 패널티 0)
     unsigned __int8 gunRebound = 5;
     float gunShotSpd = 1.0f;
     float gunReloadSpd = 1.0f;

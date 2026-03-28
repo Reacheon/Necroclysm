@@ -110,7 +110,7 @@ namespace csvItem
     constexpr int bulletRange = 82;
     constexpr int gunDmg = 83;
     constexpr int gunAccInit = 84;
-    constexpr int gunAccSpd = 85;
+    constexpr int gunFullAimTurns = 85;
     constexpr int gunAccMax = 86;
     constexpr int gunRebound = 87;
     constexpr int gunShotSpd = 88;
@@ -177,6 +177,7 @@ namespace csvItem
 
     constexpr int fluidDemand = 144;
     constexpr int maxFluid = 145;
+    constexpr int gunOptRange = 146;
 };
 
 export int readItemDex(const wchar_t* file)
@@ -877,8 +878,8 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::gunAccInit:
                         itemDex[tgtIndex].gunAccInit = wtof(strFragment.c_str());
                         break;
-                    case csvItem::gunAccSpd:
-                        itemDex[tgtIndex].gunAccSpd = wtoi(strFragment.c_str());
+                    case csvItem::gunFullAimTurns:
+                        itemDex[tgtIndex].gunFullAimTurns = wtoi(strFragment.c_str());
                         break;
                     case csvItem::gunAccMax:
                         itemDex[tgtIndex].gunAccMax = wtof(strFragment.c_str());
@@ -1116,6 +1117,9 @@ export int readItemDex(const wchar_t* file)
                         break;
                     case csvItem::maxFluid:
                         itemDex[tgtIndex].maxFluid = wtoi(strFragment.c_str());
+                        break;
+                    case csvItem::gunOptRange:
+                        itemDex[tgtIndex].gunOptRange = wtoi(strFragment.c_str());
                         break;
                     default:
                         errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");

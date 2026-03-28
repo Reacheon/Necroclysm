@@ -354,9 +354,6 @@
     <ClCompile Include="code\util\aStar.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\calc.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\util\col2Str.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>

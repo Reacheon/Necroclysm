@@ -219,30 +219,18 @@ void Entity::takeDamage(int inputDmg, dmgFlag inputType, humanPartFlag inputPart
 		}
 		else calcDmg = myMax(0, inputDmg - randomRange(0, entityInfo.rBash));
 	}
-	else if (inputType == dmgFlag::fire)
+	else if (inputType == dmgFlag::fire || inputType == dmgFlag::ice || inputType == dmgFlag::elec || inputType == dmgFlag::corr || inputType == dmgFlag::rad)
 	{
-		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResFire(), 99))) / 100.0f)));
-		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rFire, 99))) / 100.0f)));
-	}
-	else if (inputType == dmgFlag::ice)
-	{
-		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResCold(), 99))) / 100.0f)));
-		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rCold, 99))) / 100.0f)));
-	}
-	else if (inputType == dmgFlag::elec)
-	{
-		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResElec(), 99))) / 100.0f)));
-		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rElec, 99))) / 100.0f)));
-	}
-	else if (inputType == dmgFlag::corr)
-	{
-		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResCorr(), 99))) / 100.0f)));
-		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rCorr, 99))) / 100.0f)));
-	}
-	else if (inputType == dmgFlag::rad)
-	{
-		if (entityInfo.isPlayer) calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(PlayerPtr->getResRad(), 99))) / 100.0f)));
-		else calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * ((100.0f - static_cast<float>(myMin(entityInfo.rRad, 99))) / 100.0f)));
+		//속성 저항 레벨 가져오기 (장비 합산값, -5~+5 범위)
+		int resLevel = 0;
+		if (inputType == dmgFlag::fire) resLevel = entityInfo.isPlayer ? PlayerPtr->getResFire() : entityInfo.rFire;
+		else if (inputType == dmgFlag::ice) resLevel = entityInfo.isPlayer ? PlayerPtr->getResCold() : entityInfo.rCold;
+		else if (inputType == dmgFlag::elec) resLevel = entityInfo.isPlayer ? PlayerPtr->getResElec() : entityInfo.rElec;
+		else if (inputType == dmgFlag::corr) resLevel = entityInfo.isPlayer ? PlayerPtr->getResCorr() : entityInfo.rCorr;
+		else if (inputType == dmgFlag::rad) resLevel = entityInfo.isPlayer ? PlayerPtr->getResRad() : entityInfo.rRad;
+
+		//실제피해 = 원래피해 × 0.7^레벨 (레벨이 음수면 피해 증가)
+		calcDmg = myMax(0, static_cast<int>(static_cast<float>(inputDmg) * pow(0.7f, resLevel)));
 	}
 
 	if (option::showDamage) new Damage(std::to_wstring(calcDmg), col::white, getGridX(), getGridY(), dmgAniFlag::none);
@@ -599,7 +587,8 @@ void Entity::attack(int gridX, int gridY)
 					atkDmgType = dmgFlag::cut;
 				}
 
-				atkDmg = myMax(1, maxVal);
+				int minVal = static_cast<int>(static_cast<float>(maxVal) * entityInfo.atkBalance);
+				atkDmg = myMax(1, randomRange(minVal, maxVal));
 			}
 
 			if (victimEntity->entityInfo.isPlayer)
