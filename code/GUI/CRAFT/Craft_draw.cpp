@@ -373,7 +373,6 @@ void Craft::drawGUI()
 				drawSubcategoryBox(L"3", subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(L"4", subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 				drawSubcategoryBox(L"5", subcategoryBox[4], selectSubcategory == 4, deactColorChange);
-				drawSubcategoryBox(L"6", subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 			case 0://장비
 				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
@@ -718,17 +717,17 @@ void Craft::drawGUI()
 					drawRect(tooltipBookmarkBtn, outlineColor);
 
 					int bookmarkSprIndex;
+					std::wstring bookmarkLabel = sysStr[239]; //즐겨찾기
 					SDL_Color textColor = col::white;
-					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1)) bookmarkSprIndex = 32;
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK2)) bookmarkSprIndex = 33;
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK3)) bookmarkSprIndex = 34;
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK4)) bookmarkSprIndex = 35;
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK5)) bookmarkSprIndex = 36;
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK6)) bookmarkSprIndex = 37;
+					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1)) { bookmarkSprIndex = 32; bookmarkLabel += L" 1"; }
+					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK2)) { bookmarkSprIndex = 33; bookmarkLabel += L" 2"; }
+					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK3)) { bookmarkSprIndex = 34; bookmarkLabel += L" 3"; }
+					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK4)) { bookmarkSprIndex = 35; bookmarkLabel += L" 4"; }
+					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK5)) { bookmarkSprIndex = 36; bookmarkLabel += L" 5"; }
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
 					setFontSize(18);
-					drawTextCenter(sysStr[239], tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 15, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 3, textColor);//즐겨찾기
+					drawTextCenter(bookmarkLabel, tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 15, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 3, textColor);//즐겨찾기
 					setZoom(1.5);
 					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 21, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 					setZoom(1.0);
@@ -738,7 +737,6 @@ void Craft::drawGUI()
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK3));
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK4));
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK5));
-					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK6));
 					else
 					{
 						drawFillRect(tooltipBookmarkBtn, col::black, 100);
@@ -764,4 +762,65 @@ void Craft::drawGUI()
 		}
 		drawWindow(&vRect);
 	}
+
+	//즐겨찾기 드롭다운 (다른 UI 위에 그려져야 하므로 마지막에 호출)
+	drawBookmarkDropdown();
+}
+
+void Craft::drawBookmarkDropdown()
+{
+	if (!bmDdOpen) return;
+
+	int animH = (int)(bmDdRect.h * bmDdRatio);
+
+	//애니메이션 중: 검은 배경만 (위→아래로 펼쳐짐)
+	drawFillRect(bmDdRect.x, bmDdRect.y, bmDdRect.w, animH, col::black);
+	drawRect(bmDdRect.x, bmDdRect.y, bmDdRect.w, animH, col::gray);
+
+	if (bmDdRatio < 1.0f) return;
+
+	//완전 열림: 내용 그리기
+	std::wstring slotNames[BM_DD_COUNT] = { L"1", L"2", L"3", L"4", L"5" };
+	int slotSprIndex[BM_DD_COUNT] = { 32, 33, 34, 35, 36 };
+
+	for (int i = 0; i < BM_DD_COUNT; i++)
+	{
+		SDL_Rect blockRect = { bmDdRect.x, bmDdRect.y + BM_DD_BLOCK_H * i, bmDdRect.w, BM_DD_BLOCK_H - 1 };
+
+		//호버/클릭 색상
+		if (checkCursor(&blockRect))
+		{
+			drawFillRect(blockRect, click ? lowCol::deepBlue : lowCol::blue);
+		}
+		else
+		{
+			drawFillRect(blockRect, col::black);
+		}
+
+		//북마크 아이콘
+		setZoom(1.5);
+		drawSpriteCenter(spr::icon16, slotSprIndex[i], blockRect.x + 21, blockRect.y + BM_DD_BLOCK_H / 2);
+		setZoom(1.0);
+
+		//슬롯 번호
+		setFontSize(18);
+		drawText(sysStr[239] + L" " + slotNames[i], blockRect.x + 42, blockRect.y + BM_DD_BLOCK_H / 2 - 10);
+
+		//블록 사이 구분선 (마지막 제외)
+		if (i < BM_DD_COUNT - 1)
+		{
+			int lineY = blockRect.y + BM_DD_BLOCK_H - 1;
+			int centerX = bmDdRect.x + bmDdRect.w / 2;
+			int halfLen = bmDdRect.w / 2 - 8;
+			for (int p = 0; p < halfLen; p++)
+			{
+				Uint8 alpha = 255 - (255 * p / halfLen);
+				drawPoint(centerX - p, lineY, col::gray, alpha);
+				drawPoint(centerX + p, lineY, col::gray, alpha);
+			}
+		}
+	}
+
+	//외곽 테두리
+	drawRect(bmDdRect.x, bmDdRect.y, bmDdRect.w, bmDdRect.h, col::gray);
 }

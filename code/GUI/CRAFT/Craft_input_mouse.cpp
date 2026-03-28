@@ -10,6 +10,27 @@ void Craft::clickUpGUI()
 {
 	if (getStateInput() == false) { return; }
 
+	//즐겨찾기 드롭다운이 열려있을 때: 최우선 처리
+	if (bmDdOpen)
+	{
+		if (bmDdRatio >= 1.0f)
+		{
+			for (int i = 0; i < BM_DD_COUNT; i++)
+			{
+				SDL_Rect blockRect = { bmDdRect.x, bmDdRect.y + BM_DD_BLOCK_H * i, bmDdRect.w, BM_DD_BLOCK_H - 1 };
+				if (checkCursor(&blockRect))
+				{
+					selectBookmark(i);
+					closeBookmarkDropdown();
+					return;
+				}
+			}
+		}
+		//드롭다운 외부 클릭 → 닫기
+		closeBookmarkDropdown();
+		return;
+	}
+
 	exInput = false;
 	if (checkCursor(&tab))
 	{
@@ -22,7 +43,7 @@ void Craft::clickUpGUI()
 	}
 	else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//툴팁 즐겨찾기
 	{
-		Corouter::start(executeBookmark());
+		openBookmarkDropdown();
 	}
 	else if (checkCursor(&bookmarkCategory))//즐겨찾기 카테고리 클릭업
 	{
@@ -123,7 +144,7 @@ void Craft::clickUpGUI()
 			switch (selectCategory)
 			{
 			case -2://즐겨찾기
-				maxSubcategorySize = 6;
+				maxSubcategorySize = 5;
 				break;
 			case -1://전체
 				maxSubcategorySize = 1;
@@ -173,7 +194,6 @@ void Craft::clickUpGUI()
 							else if (selectSubcategory == 2) { targetFlag = itemFlag::BOOKMARK3; }
 							else if (selectSubcategory == 3) { targetFlag = itemFlag::BOOKMARK4; }
 							else if (selectSubcategory == 4) { targetFlag = itemFlag::BOOKMARK5; }
-							else if (selectSubcategory == 5) { targetFlag = itemFlag::BOOKMARK6; }
 							matchCount = recipePtr->searchFlag(targetFlag);
 							break;
 						case 0://장비
@@ -361,6 +381,7 @@ void Craft::clickDownGUI()
 
 void Craft::mouseWheel()
 {
+	if (bmDdOpen) return;
 	if (checkCursor(&craftBase))
 	{
 		int maxScroll = (numNoneBlackFilter - 1) / CRAFT_MAX_COLUMN - (CRAFT_MAX_ROW - 1);
