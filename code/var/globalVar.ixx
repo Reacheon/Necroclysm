@@ -11,7 +11,6 @@ import util;
 import constVar;
 import ItemData;
 import EntityData;
-import SkillData;
 import Ani;
 import AniManager;
 import Player;
@@ -70,7 +69,6 @@ export float timeGift = 0; // 유저의 행동에 의해 엔티티들에게 주�
 
 export std::vector<EntityData> entityDex; // Entity DB
 export std::vector<ItemData> itemDex;// 아이템 DB
-export std::vector<SkillData> skillDex; //스킬 DB
 
 export std::vector<std::wstring> itemTooltip;
 export std::vector<std::wstring> entityTooltip;

@@ -22,6 +22,8 @@ import Maint;
 import statusEffect;
 import ItemData;
 import Equip;
+import SkillBehavior;
+import SkillRegistry;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
@@ -753,7 +755,8 @@ void HUD::drawQuickSlot()
 		{
 			setFont(fontType::mainFont);
 			setFontSize(18);
-			std::wstring skillName = skillDex[quickSlot[i].second].name;
+			auto* skillBhv = SkillRegistry::get(quickSlot[i].second);
+			std::wstring skillName = skillBhv ? skillBhv->name : L"?";
 			drawTextOutlineCenter(skillName, quickSlotRegion.x + quickSlotRegion.w / 2, quickSlotRegion.h + 18);
 			
 		}
@@ -780,7 +783,8 @@ void HUD::drawQuickSlot()
 		else
 		{
 			setZoom(2.0);
-			drawSprite(spr::icon24, skillDex[quickSlot[i].second].iconIndex, pivotX + 7, pivotY + 1);
+			auto* skillBhvIcon = SkillRegistry::get(quickSlot[i].second);
+			drawSprite(spr::icon24, skillBhvIcon ? skillBhvIcon->iconIndex : 0, pivotX + 7, pivotY + 1);
 			setZoom(1.0);
 		}
 		setFont(fontType::pixel);
@@ -810,7 +814,8 @@ void HUD::drawQuickSlot()
 				setZoom(2.0);
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180);
 				SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND);
-				drawSpriteCenter(spr::icon24, skillDex[quickSlot[dragQuickSlotTarget].second].iconIndex, getMouseX(), getMouseY());
+				auto* dragBhv = SkillRegistry::get(quickSlot[dragQuickSlotTarget].second);
+			drawSpriteCenter(spr::icon24, dragBhv ? dragBhv->iconIndex : 0, getMouseX(), getMouseY());
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255);
 				setZoom(1.0);
 			}

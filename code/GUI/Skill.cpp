@@ -13,6 +13,8 @@ import checkCursor;
 import drawWindow;
 import Player;
 import SkillData;
+import SkillBehavior;
+import SkillRegistry;
 import useSkill;
 import wrapFunc;
 
@@ -30,10 +32,11 @@ Skill::Skill() : GUI(false)
 	addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 	filteredSkills.clear();
-	for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+	for (auto& sd : PlayerPtr->entityInfo.skillList)
 	{
-		if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::GENERAL)
-			filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+		auto* bhv = SkillRegistry::get(sd.skillCode);
+		if (bhv && bhv->src == skillSrc::GENERAL)
+			filteredSkills.push_back(sd);
 	}
 }
 
@@ -172,13 +175,13 @@ void Skill::drawGUI()
 				}
 				drawFillRect(skillBtn[i], skillBtnColor);
 				drawRect(skillBtn[i], skillOutlineColor);
-				SkillData tgtData = filteredSkills[skillScroll + i];
+				SkillData& tgtData = filteredSkills[skillScroll + i];
+				auto* tgtBhv = SkillRegistry::get(tgtData.skillCode);
 				setZoom(2.0);
-				drawSprite(spr::icon24, tgtData.iconIndex, skillBtn[i].x, skillBtn[i].y);
+				drawSprite(spr::icon24, tgtBhv ? tgtBhv->iconIndex : 0, skillBtn[i].x, skillBtn[i].y);
 				setZoom(1.0);
 
-				std::wstring skillName = L"";
-				skillName = tgtData.name;
+				std::wstring skillName = tgtBhv ? tgtBhv->name : L"?";
 				setFontSize(22);
 				setFont(fontType::mainFontMedium);
 				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
@@ -187,7 +190,7 @@ void Skill::drawGUI()
 
 				setFont(fontType::mainFontSemiBold);
 				setFontSize(16);
-				std::wstring rankText = L"Rank " + tgtData.skillRank;
+				std::wstring rankText = L"Rank " + (tgtBhv ? tgtBhv->skillRank : L"?");
 				drawText(rankText, skillBtn[i].x + 330- queryTextWidth(rankText), skillBtn[i].y + 4);
 				setFont(fontType::mainFont);
 				std::wstring profText = L"Invocation / Fighting";
@@ -221,7 +224,8 @@ void Skill::drawGUI()
 				setZoom(2.0);
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180); //텍스쳐 투명도 설정
 				SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-				drawSpriteCenter(spr::icon24, skillDex[dragSkillTarget].iconIndex, getMouseX(), getMouseY());
+				auto* dragBhv = SkillRegistry::get(dragSkillTarget);
+				drawSpriteCenter(spr::icon24, dragBhv ? dragBhv->iconIndex : 0, getMouseX(), getMouseY());
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255); //텍스쳐 투명도 설정
 				setZoom(1.0);
 			}
@@ -296,50 +300,28 @@ void Skill::clickUpGUI()
 			{
 				if (dragSkillTarget != -1 && filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
 				{
-					Corouter::start(useSkill(dragSkillTarget));
+					useSkill(dragSkillTarget);
 					delete this;
 				}
 			}
 		}
 	}
 
-	if (categoryCursor == skillCategory::all) filteredSkills = PlayerPtr->entityInfo.skillList;
-	else if (categoryCursor == skillCategory::general)
+	filteredSkills.clear();
+	for (auto& sd : PlayerPtr->entityInfo.skillList)
 	{
-		filteredSkills.clear();
-		for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+		if (categoryCursor == skillCategory::all)
 		{
-			if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::GENERAL) filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
+			filteredSkills.push_back(sd);
 		}
-	}
-	else if (categoryCursor == skillCategory::mutation)
-	{
-		filteredSkills.clear();
-		for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
+		else
 		{
-			if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::MUTATION) filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
-		}
-	}
-	else if (categoryCursor == skillCategory::bionic)
-	{
-		filteredSkills.clear();
-		for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
-		{
-			if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::BIONIC)
-			{
-				filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
-			}
-		}
-	}
-	else if (categoryCursor == skillCategory::magic)
-	{
-		filteredSkills.clear();
-		for (int i = 0; i < PlayerPtr->entityInfo.skillList.size(); i++)
-		{
-			if (PlayerPtr->entityInfo.skillList[i].src == skillSrc::MAGIC)
-			{
-				filteredSkills.push_back(PlayerPtr->entityInfo.skillList[i]);
-			}
+			auto* bhv = SkillRegistry::get(sd.skillCode);
+			if (!bhv) continue;
+			if (categoryCursor == skillCategory::general && bhv->src == skillSrc::GENERAL) filteredSkills.push_back(sd);
+			else if (categoryCursor == skillCategory::mutation && bhv->src == skillSrc::MUTATION) filteredSkills.push_back(sd);
+			else if (categoryCursor == skillCategory::bionic && bhv->src == skillSrc::BIONIC) filteredSkills.push_back(sd);
+			else if (categoryCursor == skillCategory::magic && bhv->src == skillSrc::MAGIC) filteredSkills.push_back(sd);
 		}
 	}
 

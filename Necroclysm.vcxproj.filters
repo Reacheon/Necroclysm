@@ -219,7 +219,25 @@
     <ClCompile Include="code\SkillData.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="code\readSkillDex.ixx">
+    <ClCompile Include="code\skill\SkillBehavior.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRegistry.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRegistry.cpp">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillFireStorm.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRoll.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillSample.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillLeap.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\drawEpsilonText.ixx">

@@ -17,6 +17,8 @@ import World;
 import EntityData;
 import Damage;
 import SkillData;
+import SkillBehavior;
+import SkillRegistry;
 import Flame;
 import Vehicle;
 
@@ -46,10 +48,16 @@ void Entity::setSkillTarget(int gridX, int gridY, int gridZ)
 	skillTarget.z = gridZ;
 }
 Point3 Entity::getSkillTarget() { return skillTarget; }
-void Entity::addSkill(int index)
+void Entity::addSkill(int skillCode)
 {
-	prt(L"스킬 %ls를 추가했다.\n", skillDex[index].name.c_str());
-	entityInfo.skillList.push_back(skillDex[index]);
+	auto* behavior = SkillRegistry::get(skillCode);
+	if (behavior)
+	{
+		prt(L"스킬 %ls를 추가했다.\n", behavior->name.c_str());
+	}
+	SkillData newSkill;
+	newSkill.skillCode = skillCode;
+	entityInfo.skillList.push_back(newSkill);
 }
 
 

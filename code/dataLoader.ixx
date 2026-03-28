@@ -8,7 +8,7 @@ import util;
 import globalVar;
 import readItemDex;
 import readEntityDex;
-import readSkillDex;
+import SkillRegistry;
 
 export void dataLoader()
 {
@@ -23,9 +23,8 @@ export void dataLoader()
 	std::wstring entityPath = L"language/" + option::language + L"/entityDex.tsv";
 	readEntityDex(entityPath.c_str());
 
-	//스킬 데이터 로드
-	std::wstring skillPath = L"language/" + option::language + L"/skillDex.tsv";
-	readSkillDex(skillPath.c_str());
+	//스킬 행동 등록
+	SkillRegistry::init();
 
 	//시스템(UI) 문자열 로드
 	std::wstring systemPath = L"language/" + option::language + L"/sysStr.tsv";

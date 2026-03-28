@@ -3,33 +3,17 @@ export module SkillData;
 import std;
 import constVar;
 
+// 엔티티별 스킬 런타임 상태 (메타데이터는 SkillBehavior에서 관리)
 export struct SkillData
 {
-    std::wstring name = L"DEFAULT SKILL NAME";
     int skillCode = 0;
-    int iconIndex = 0;
-    std::wstring descript = L"TEST_DESCRIPTION";
-    std::wstring abstract = L"TEST_ABSTRACT";
-    skillSrc src = skillSrc::MUTATION;
-    skillType type = skillType::PASSIVE;
 
-    float energyPerAct = 0.0;
-    float energyPerTurn = 0.0;
-    float energyPerDay = 0.0;
-
-    std::wstring reqStat = L"";
-    std::vector<int> reqProfic;
-
-    //비데이터베이스 변수
     bool isLearned = false;
     bool isQuickSlot = false;
     bool toggle = false;
 
     int skillLevel = 1;
-    float skillExp = 0.0; //100.0 이상이면 자동으로 레벨업됨
-    int maxSkillLevel = 5;
+    float skillExp = 0.0f; //100.0 이상이면 자동으로 레벨업됨
 
-    float maxCooldown = 30.0;
-    float currentCooldown = 0.0;   
-    std::wstring skillRank = L"F";
+    float currentCooldown = 0.0f;
 };
