@@ -13,6 +13,7 @@ import Flame;
 import Prop;
 import ItemStack;
 import Entity;
+import Vehicle;
 import gasData;
 //__int8 : -128~127
 //__int16 : -32768 ~32767
@@ -47,7 +48,7 @@ export struct TileData //총용량 29바이트
     std::unique_ptr<ItemStack> ItemStackPtr = nullptr;
     std::unique_ptr<Prop> PropPtr = nullptr;
     std::unique_ptr<Flame> flamePtr = nullptr;
-    void* VehiclePtr = nullptr;
+    Vehicle* VehiclePtr = nullptr;
 
     std::vector<SDL_Color> lightVec;
 

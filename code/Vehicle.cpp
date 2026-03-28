@@ -36,7 +36,14 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 
 Vehicle::~Vehicle()
 {
-    Point2 currentChunkCoord = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+    //점유 타일에서 Vehicle 포인터 제거
+    for (const auto& [pos, pocket] : partInfo)
+    {
+        TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
+    }
+
+    //청크에서 등록 해제 (changeToSectorCoord -> changeToChunkCoord 버그 수정)
+    Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
     Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
     currentChunk.eraseVehicle(this);
 

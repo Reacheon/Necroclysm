@@ -35,7 +35,21 @@ ItemStack::ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputIte
 
 ItemStack::~ItemStack()
 {
+	Point2 cc = World::ins()->changeToChunkCoord(getGridX(), getGridY());
+	World::ins()->getChunk(cc.x, cc.y, getGridZ()).eraseStack(this);
+
 	prt(L"ItemStack : 소멸자가 호출되었습니다..\n");
+}
+
+void ItemStack::setGrid(int inputGridX, int inputGridY, int inputGridZ)
+{
+	Point2 prevCC = World::ins()->changeToChunkCoord(getGridX(), getGridY());
+	World::ins()->getChunk(prevCC.x, prevCC.y, getGridZ()).eraseStack(this);
+
+	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
+
+	Point2 curCC = World::ins()->changeToChunkCoord(getGridX(), getGridY());
+	World::ins()->getChunk(curCC.x, curCC.y, getGridZ()).addStack(this);
 }
 Sprite* ItemStack::getSprite()
 {

@@ -398,7 +398,7 @@ export void startArea()
 			//지하철 설치
 			int vX = 7;
 			int vY = -1;
-			Vehicle* myTrainPower = new Vehicle(vX, vY, -1, itemID::metalFrame);//차량 설치
+			Vehicle* myTrainPower = World::ins()->createVehicle(vX, vY, -1, itemID::metalFrame);//차량 설치
 			{
 				myTrainPower->name = L"동력차";
 				myTrainPower->vehType = vehFlag::train;
@@ -477,7 +477,7 @@ export void startArea()
 
 			//지하철(화물칸) 설치
 
-			Vehicle* myTrain = new Vehicle(7, 7, -1, itemID::metalFrame);//차량 설치
+			Vehicle* myTrain = World::ins()->createVehicle(7, 7, -1, itemID::metalFrame);//차량 설치
 
 			{
 				int vX = 7;
@@ -836,7 +836,7 @@ export void startArea()
 
 	int vX = -8;
 	int vY = +3;
-	Vehicle* myCar = new Vehicle(vX, vY, 0, itemID::metalFrame);//차량 설치
+	Vehicle* myCar = World::ins()->createVehicle(vX, vY, 0, itemID::metalFrame);//차량 설치
 	myCar->name = L"SUV";
 	myCar->vehType = vehFlag::car;
 
@@ -913,7 +913,7 @@ export void startArea()
 
 
 	///////////////////오토바이///////////////////////////////////////////
-	Vehicle* myMoto = new Vehicle(vX + 6, vY + 5, 0, itemID::metalFrame);
+	Vehicle* myMoto = World::ins()->createVehicle(vX + 6, vY + 5, 0, itemID::metalFrame);
 	myMoto->extendPart(vX + 6, vY + 4, itemID::metalFrame);
 	myMoto->extendPart(vX + 6, vY + 6, itemID::metalFrame);
 
@@ -922,7 +922,7 @@ export void startArea()
 	myMoto->addPart(vX + 6, vY + 6, 102);
 
 	////////////////////자전거////////////////////////////////////////////
-	Vehicle* myBike = new Vehicle(vX + 9, vY + 4, 0, itemID::metalFrame);
+	Vehicle* myBike = World::ins()->createVehicle(vX + 9, vY + 4, 0, itemID::metalFrame);
 	myBike->extendPart(vX + 9, vY + 3, itemID::metalFrame);
 	myBike->extendPart(vX + 9, vY + 5, itemID::metalFrame);
 
@@ -935,7 +935,7 @@ export void startArea()
 	{
 		int cx = 15;
 		int cy = 0;
-		Vehicle* myHeli = new Vehicle(cx, cy, 0, itemID::metalFrame);
+		Vehicle* myHeli = World::ins()->createVehicle(cx, cy, 0, itemID::metalFrame);
 		myHeli->name = L"헬기";
 		myHeli->vehType = vehFlag::heli;
 		myHeli->addPart(cx, cy, { 311 });
@@ -979,30 +979,30 @@ export void startArea()
 	}
 
 	//수레 3종
-	Vehicle* cart1 = new Vehicle(10, 5, 0, 378);
+	Vehicle* cart1 = World::ins()->createVehicle(10, 5, 0, 378);
 	cart1->vehType = vehFlag::car;
 
-	Vehicle* cart2 = new Vehicle(8, 5, 0, 379);
+	Vehicle* cart2 = World::ins()->createVehicle(8, 5, 0, 379);
 	cart2->vehType = vehFlag::car;
 
-	Vehicle* cart3 = new Vehicle(6, 5, 0, 137);
+	Vehicle* cart3 = World::ins()->createVehicle(6, 5, 0, 137);
 	cart3->vehType = vehFlag::car;
 
-	Vehicle* cart4 = new Vehicle(7, -5, 0, 378);
+	Vehicle* cart4 = World::ins()->createVehicle(7, -5, 0, 378);
 	cart4->vehType = vehFlag::car;
 
 	//광차
-	Vehicle* minecart1 = new Vehicle(3, 15, 0, 405);
+	Vehicle* minecart1 = World::ins()->createVehicle(3, 15, 0, 405);
 	minecart1->vehType = vehFlag::minecart;
 	minecart1->addPart(3, 15, { itemID::minecartController });
 	minecart1->bodyDir = dir16::dir0;
 	minecart1->isPowerCart = true;
 
-	Vehicle* minecart2 = new Vehicle(2, 15, 0, 405);
+	Vehicle* minecart2 = World::ins()->createVehicle(2, 15, 0, 405);
 	minecart2->vehType = vehFlag::minecart;
 	minecart2->bodyDir = dir16::dir0;
 
-	Vehicle* minecart3 = new Vehicle(1, 15, 0, 405);
+	Vehicle* minecart3 = World::ins()->createVehicle(1, 15, 0, 405);
 	minecart3->vehType = vehFlag::minecart;
 	minecart3->bodyDir = dir16::dir0;
 

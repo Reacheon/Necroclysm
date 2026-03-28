@@ -33,78 +33,29 @@ public:
 
 	void chunkLoad(chunkFlag inputChunk)
 	{
+		unsigned __int16 floorVal = itemID::grass;
+		unsigned __int16 wallVal = 0;
+
+		switch (inputChunk)
+		{
+		case chunkFlag::seawater:    floorVal = itemID::deepSeaWater; break;
+		case chunkFlag::none:        floorVal = 0; break;
+		case chunkFlag::underground: floorVal = 109; wallVal = 302; break;
+		case chunkFlag::meadow:      floorVal = 220; break;
+		case chunkFlag::dirt:        floorVal = 109; break;
+		default: break;
+		}
+
 		for (int x = 0; x < CHUNK_SIZE_X; x++)
 		{
 			for (int y = 0; y < CHUNK_SIZE_Y; y++)
 			{
 				singleTile[x][y].randomVal = randomRange(0, 65535);
+				singleTile[x][y].floor = floorVal;
+				if (wallVal != 0) singleTile[x][y].setWall(wallVal);
 			}
 		}
 
-		if (inputChunk == chunkFlag::seawater)
-		{
-			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = itemID::deepSeaWater;
-				}
-			}
-		}
-		else if (inputChunk == chunkFlag::none)
-		{
-			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = 0;
-				}
-			}
-		}
-		else if (inputChunk == chunkFlag::underground)
-		{
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = 109;
-					singleTile[x][y].setWall(302);
-				}
-			}
-		}
-		else if (inputChunk == chunkFlag::meadow)
-		{
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = 220;
-				}
-			}
-		}
-		else if (inputChunk == chunkFlag::dirt)
-		{
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = 109;
-				}
-			}
-		}
-		else
-		{
-			//prt(lowCol::blue, L"Chunk : 이 청크는 해수 타일이다..\n");
-			for (int x = 0; x < CHUNK_SIZE_X; x++)
-			{
-				for (int y = 0; y < CHUNK_SIZE_Y; y++)
-				{
-					singleTile[x][y].floor = itemID::grass;
-				}
-			}
-		}
 		flag = inputChunk;
 	}
 
@@ -117,70 +68,6 @@ public:
 		flag = input;
 	}
 
-
-	Vehicle* getChunkVehiclePos(int x, int y) { return (Vehicle*)getChunkTile(x, y).VehiclePtr; }
-	void setChunkVehiclePos(int x, int y, Vehicle* inputPtr) { prt(lowCol::green, L"Chunk : %d,%d에 Vehicle %p를 배정했다.\n", x, y, inputPtr); getChunkTile(x, y).VehiclePtr = inputPtr; }
-
-	std::vector<Entity*> getChunkEntityList()
-	{
-		std::vector<Entity*> entityList;
-		for (int x = 0; x < CHUNK_SIZE_X; x++)
-		{
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				if (getChunkTile(x, y).EntityPtr != nullptr) { entityList.push_back(getChunkTile(x, y).EntityPtr.get()); }
-			}
-		}
-		return entityList;
-	}
-
-	std::vector<Vehicle*> getChunkVehicleList()
-	{
-		std::vector<Vehicle*> VehicleList;
-		for (int x = 0; x < CHUNK_SIZE_X; x++)
-		{
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				if (getChunkTile(x, y).VehiclePtr != nullptr)
-				{
-					VehicleList.push_back((Vehicle*)getChunkTile(x, y).VehiclePtr);
-				}
-			}
-		}
-		return VehicleList;
-	}
-
-	std::vector<Prop*> getChunkPropList()
-	{
-		std::vector<Prop*> propList;
-		for (int x = 0; x < CHUNK_SIZE_X; x++)
-		{
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				if (getChunkTile(x, y).PropPtr.get() != nullptr)
-				{
-					propList.push_back(getChunkTile(x, y).PropPtr.get());
-				}
-			}
-		}
-		return propList;
-    }
-
-	std::vector<ItemStack*> getChunkStackVec()
-	{
-		std::vector<ItemStack*> stackVec;
-		for (int x = 0; x < CHUNK_SIZE_X; x++)
-		{
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				if (getChunkTile(x, y).ItemStackPtr.get() != nullptr)
-				{
-					stackVec.push_back(getChunkTile(x, y).ItemStackPtr.get());
-				}
-			}
-		}
-		return stackVec;
-	}
 
 	weatherFlag getWeather() {
 		return chunkWeather;

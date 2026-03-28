@@ -23,6 +23,7 @@ public:
 	ItemStack(Point3 inputCoor);
 	ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems);
 	~ItemStack();
+	void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
 	Sprite* getSprite(); 
 	void setSprite(Sprite* inputSprite);
 	ItemPocket* getPocket();

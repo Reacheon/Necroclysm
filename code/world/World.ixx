@@ -21,6 +21,8 @@ private:
 	std::unordered_map<Point3, Chunk*, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk;
 	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
+	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
+	uint32_t vehicleIdCounter = 0;
 
 public:
 	static World* ins()//싱글톤 함수
@@ -63,7 +65,7 @@ public:
 		changeToChunkCoord(x, y, chunkX, chunkY);
 		int localX = x - (chunkX * CHUNK_SIZE_X);
 		int localY = y - (chunkY * CHUNK_SIZE_Y);
-		return chunkPtr[{chunkX, chunkY, z}]->getChunkTile(localX, localY);
+		return chunkPtr.at({chunkX, chunkY, z})->getChunkTile(localX, localY);
 	}
 	TileData& getTile(Point3 inputCoor)
 	{
@@ -110,7 +112,7 @@ public:
 	}
 	void activate(int x, int y, int z)
 	{
-		activeChunk.push_back(chunkPtr[{x, y, z}]);
+		activeChunk.push_back(chunkPtr.at({x, y, z}));
 	}
 	void deactivate()
 	{
@@ -302,26 +304,50 @@ public:
 
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr[{chunkX, chunkY, chunkZ}]->getChunkFlag();
+		return chunkPtr.at({chunkX, chunkY, chunkZ})->getChunkFlag();
 	}
 	weatherFlag getChunkWeather(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr[{chunkX, chunkY, chunkZ}]->getWeather();
+		return chunkPtr.at({chunkX, chunkY, chunkZ})->getWeather();
 	}
 
 	void setChunkWeather(int chunkX, int chunkY, int chunkZ, weatherFlag input)
 	{
-		chunkPtr[{chunkX, chunkY, chunkZ}]->setWeather(input);
+		chunkPtr.at({chunkX, chunkY, chunkZ})->setWeather(input);
 	}
 
 	void chunkOverwrite(int chunkX, int chunkY, int chunkZ, chunkFlag inputChunk)
 	{
-		chunkPtr[{chunkX, chunkY, chunkZ}]->chunkLoad(inputChunk);
+		chunkPtr.at({chunkX, chunkY, chunkZ})->chunkLoad(inputChunk);
 	}
 
 	Chunk& getChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		return *chunkPtr[{chunkX, chunkY, chunkZ}];
+		return *chunkPtr.at({chunkX, chunkY, chunkZ});
+	}
+
+	Vehicle* createVehicle(int inputX, int inputY, int inputZ, int leadItemCode)
+	{
+		uint32_t id = vehicleIdCounter++;
+		auto vehicle = std::make_unique<Vehicle>(inputX, inputY, inputZ, leadItemCode);
+		vehicle->vehicleId = id;
+		Vehicle* ptr = vehicle.get();
+		vehicleOwnerMap[id] = std::move(vehicle);
+		return ptr;
+	}
+
+	void destroyVehicle(uint32_t id)
+	{
+		auto it = vehicleOwnerMap.find(id);
+		if (it != vehicleOwnerMap.end())
+		{
+			vehicleOwnerMap.erase(it);
+		}
+	}
+
+	void destroyVehicle(Vehicle* target)
+	{
+		if (target != nullptr) destroyVehicle(target->vehicleId);
 	}
 };
 

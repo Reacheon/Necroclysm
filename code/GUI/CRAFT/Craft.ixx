@@ -827,7 +827,7 @@ public:
 
 				if (canConnect.size() == 0)
 				{
-					Vehicle* newVehicle = new Vehicle(buildLocation.x, buildLocation.y, buildLocation.z, targetItemCode);
+					Vehicle* newVehicle = World::ins()->createVehicle(buildLocation.x, buildLocation.y, buildLocation.z, targetItemCode);
 					new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//새로운 차량의 이름을 입력해주세요. 결정, 취소
 					co_await std::suspend_always();
 					if (coAnswer == sysStr[139]) newVehicle->name = exInputText;
@@ -863,7 +863,7 @@ public:
 					}
 					else
 					{
-						Vehicle* newVehicle = new Vehicle(buildLocation.x, buildLocation.y, buildLocation.z, targetItemCode);
+						Vehicle* newVehicle = World::ins()->createVehicle(buildLocation.x, buildLocation.y, buildLocation.z, targetItemCode);
 						new Msg(msgFlag::input, sysStr[138], sysStr[137], { sysStr[139], sysStr[140] });//새로운 차량의 이름을 입력해주세요. 결정, 취소
 						co_await std::suspend_always();
 						if (coAnswer == sysStr[139]) newVehicle->name = exInputText;

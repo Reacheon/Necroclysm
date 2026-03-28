@@ -29,6 +29,7 @@ import Drawable;
 export class Vehicle : public Ani, public AI, public Coord, public Drawable
 {
 public:
+    uint32_t vehicleId = 0;
     std::wstring name = L"Vehicle";
     bool isEngineOn = false;
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도

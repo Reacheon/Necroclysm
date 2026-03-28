@@ -80,8 +80,8 @@ void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
 
 Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
 Prop* TileProp(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).PropPtr.get(); }
-Vehicle*& TileVehicle(int x, int y, int z) { return (Vehicle*&)World::ins()->getTile(x, y, z).VehiclePtr; }
-Vehicle*& TileVehicle(Point3 pt) { return (Vehicle*&)World::ins()->getTile(pt.x, pt.y, pt.z).VehiclePtr; }
+Vehicle*& TileVehicle(int x, int y, int z) { return World::ins()->getTile(x, y, z).VehiclePtr; }
+Vehicle*& TileVehicle(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).VehiclePtr; }
 
 ItemStack* TileItemStack(int x, int y, int z) { return World::ins()->getTile(x, y, z).ItemStackPtr.get(); }
 ItemStack* TileItemStack(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).ItemStackPtr.get(); }
@@ -96,37 +96,31 @@ void createMonster(Point3 inputCoor, int inputEntityCode)
 void createItemStack(Point3 inputCoor)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor);
-    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
-    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
+    //addStack()은 ItemStack 생성자 내부의 setGrid()에서 자동 호출됨
 }
 
 void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems)
 {
     World::ins()->getTile(inputCoor).ItemStackPtr = std::make_unique<ItemStack>(inputCoor, inputItems);
-    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
-    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
+    //addStack()은 ItemStack 생성자 내부의 setGrid()에서 자동 호출됨
 }
 
 void destroyItemStack(Point3 inputCoor)
 {
-    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
-    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).eraseStack(World::ins()->getTile(inputCoor).ItemStackPtr.get());
+    //eraseStack()은 ItemStack 소멸자에서 자동 호출됨
     World::ins()->getTile(inputCoor).ItemStackPtr.reset();
 }
 
 void destroyProp(Point3 inputCoor)
 {
-    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
-    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).eraseProp(World::ins()->getTile(inputCoor).PropPtr.get());
+    //eraseProp()은 Prop 소멸자에서 자동 호출됨
     World::ins()->getTile(inputCoor).PropPtr.reset();
 }
 
 void createProp(Point3 inputCoor, int inputItemCode)
 {
     World::ins()->getTile(inputCoor).PropPtr = std::make_unique<Prop>(inputCoor, inputItemCode);
-
-    Point2 cc = World::ins()->changeToChunkCoord(inputCoor.x, inputCoor.y);
-    World::ins()->getChunk(cc.x, cc.y, inputCoor.z).addProp(World::ins()->getTile(inputCoor).PropPtr.get());
+    //addProp()은 Prop 생성자 내부의 setGrid()에서 자동 호출됨
 
     World::ins()->getTile(inputCoor).PropPtr->updateSprIndex();
 
