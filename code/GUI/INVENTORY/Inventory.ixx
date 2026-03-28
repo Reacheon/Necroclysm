@@ -1,7 +1,5 @@
 module;
 #include <SDL3/SDL.h>
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 export module Inventory;
 
 import std;
@@ -111,7 +109,7 @@ public:
 			else if (checkCursor(&panel.labelName))
 			{
 				// 나중에 검색 기능 추가 시 사용
-				// CORO(actFunc::searchItems(panel.pocket, panel.scroll));
+				// Corouter::start(actFunc::searchItems(panel.pocket, panel.scroll));
 			}
 			else if (checkCursor(&panel.labelQuantity))
 			{
@@ -123,7 +121,7 @@ public:
 		{
 			if (panel.hasAnySelection())
 			{
-				CORO(executeDropInventory(inventoryPocket));
+				Corouter::start(executeDropInventory(inventoryPocket));
 			}
 			return;
 		}
@@ -148,14 +146,14 @@ public:
 					switch (barAct[i])
 					{
 					case act::wield:
-						CORO(actFunc::executeWield(inventoryPocket, panel.cursor));
+						Corouter::start(actFunc::executeWield(inventoryPocket, panel.cursor));
 						break;
 					case act::equip:
 						actFunc::executeEquip(inventoryPocket, panel.cursor);
 						break;
 					case act::throwing:
 						deactDraw();
-						CORO(actFunc::executeThrowing(inventoryPocket, panel.cursor));
+						Corouter::start(actFunc::executeThrowing(inventoryPocket, panel.cursor));
 						return;
 					case act::eat:
 						actFunc::eatFood(inventoryPocket, panel.cursor);
@@ -183,7 +181,7 @@ public:
 						return;
 					case act::plant:
 					{
-						CORO(actFunc::executePlant(inventoryPocket, panel.cursor));
+						Corouter::start(actFunc::executePlant(inventoryPocket, panel.cursor));
 						break;
 					}
 					case act::extractSeed:
@@ -220,7 +218,7 @@ public:
 		int idx = panel.getSelectRightClickIndex();
 		if (idx >= 0)
 		{
-			CORO(actFunc::selectItemEx(panel.pocket, idx));
+			Corouter::start(actFunc::selectItemEx(panel.pocket, idx));
 		}
 	}
 	void mouseWheel()

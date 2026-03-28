@@ -1,6 +1,4 @@
 #include <SDL3/SDL.h>
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 import std;
 import constVar;
 import globalVar;
@@ -145,7 +143,7 @@ void Loot::gamepadBtnDown()
 				actFunc::executeEquip(panel.pocket, panel.cursor);
 				break;
 			case act::wield://들기
-				CORO(actFunc::executeWield(panel.pocket, panel.cursor));
+				Corouter::start(actFunc::executeWield(panel.pocket, panel.cursor));
 				break;
 			}
 			break;
@@ -183,7 +181,7 @@ void Loot::gamepadBtnUp()
 			else if (labelCursor == 1)
 			{
 				//게임패드로는 글 입력을 못하므로
-				//CORO(actFunc::searchItems(panel.pocket, panel.scroll));
+				//Corouter::start(actFunc::searchItems(panel.pocket, panel.scroll));
 			}
 			else
 			{

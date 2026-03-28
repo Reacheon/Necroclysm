@@ -1,8 +1,6 @@
 module;
 #include <SDL3/SDL.h>
 
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 export module HUD;
 
 import ItemData;
@@ -561,7 +559,7 @@ public:
 		}
 		case act::closeDoor:
 		{
-			CORO(closeDoor(PlayerX(), PlayerY(), PlayerZ()));
+			Corouter::start(closeDoor(PlayerX(), PlayerY(), PlayerZ()));
 			break;
 		}
 		case act::headlight:
@@ -937,12 +935,12 @@ public:
 	{
 		if (tabType == tabFlag::till)
 		{
-			CORO(executeTill());
+			Corouter::start(executeTill());
 			return;
 		}
 		if (tabType == tabFlag::water)
 		{
-			CORO(executeWatering());
+			Corouter::start(executeWatering());
 			return;
 		}
 

@@ -19,13 +19,40 @@ export struct Corouter
     };
 
     std::coroutine_handle<promise_type> handler;
+    bool started = false;
 
     Corouter(std::coroutine_handle<promise_type> inputHandler) : handler(inputHandler) {}
 
+    Corouter(Corouter&& other) noexcept : handler(other.handler), started(other.started) { other.handler = nullptr; }
+    Corouter& operator=(Corouter&& other) noexcept
+    {
+        if (this != &other)
+        {
+            if (handler) handler.destroy();
+            handler = other.handler;
+            started = other.started;
+            other.handler = nullptr;
+        }
+        return *this;
+    }
+    Corouter(const Corouter&) = delete;
+    Corouter& operator=(const Corouter&) = delete;
+
     ~Corouter()
     {
-        if (handler && !handler.done() && handler.promise().is_running)  errorBox(L"Corouter 소멸자: 아직 실행 중인 코루틴이 삭제되려고 합니다!");
-        handler.destroy();
+        if (handler && !started) errorBox(L"Corouter destroyed without being started. Use Corouter::start() to run coroutine functions.");
+        if (handler && !handler.done() && handler.promise().is_running) errorBox(L"Corouter destroyed while still running.");
+        if (handler) handler.destroy();
+    }
+
+    // 전역 코루틴 관리
+    static inline Corouter* current = nullptr;
+
+    static void start(Corouter&& coro)
+    {
+        delete current;
+        current = new Corouter(std::move(coro));
+        current->run();
     }
 
     bool done() { return handler.done(); }
@@ -46,6 +73,7 @@ export struct Corouter
             return;
         }
 
+        started = true;
         handler.promise().is_running = true;
 
         try 

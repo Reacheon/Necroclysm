@@ -1,4 +1,3 @@
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 #include <SDL3/SDL.h>
 
 import Skill;
@@ -297,7 +296,7 @@ void Skill::clickUpGUI()
 			{
 				if (dragSkillTarget != -1 && filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
 				{
-					CORO(useSkill(dragSkillTarget));
+					Corouter::start(useSkill(dragSkillTarget));
 					delete this;
 				}
 			}

@@ -1,6 +1,4 @@
 #include <SDL3/SDL.h>
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 import util;
 import constVar;
 import Equip;
@@ -42,7 +40,7 @@ void Equip::clickUpGUI()
 				}
 				case act::throwing:
 				{
-					CORO(actFunc::executeThrowing(equipPtr, panel.cursor));
+					Corouter::start(actFunc::executeThrowing(equipPtr, panel.cursor));
 					close(aniFlag::null);
 					return;
 
@@ -56,15 +54,15 @@ void Equip::clickUpGUI()
 				case act::reloadBulletToGun:
 					if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					else if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::AMMO))
 					{
-						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
+						Corouter::start(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					else if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::GUN))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					break;
 				case act::reloadMagazine:
@@ -73,11 +71,11 @@ void Equip::clickUpGUI()
 					//탄창에 사용하면 다른 타일의 총에게 장비함
 					if (equipPtr->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
+						Corouter::start(actFunc::reloadOther(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					else
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Equip, equipPtr, panel.cursor));
 					}
 					break;
 				case act::unloadMagazine:
@@ -107,12 +105,12 @@ void Equip::clickUpGUI()
 					return;
 				case act::propInstall:
 				{
-					CORO(executePropInstall());
+					Corouter::start(executePropInstall());
 					break;
 				}
 				case act::plant:
 				{
-					CORO(actFunc::executePlant(equipPtr, panel.cursor));
+					Corouter::start(actFunc::executePlant(equipPtr, panel.cursor));
 					break;
 				}
 				case act::extractSeed:
@@ -120,7 +118,7 @@ void Equip::clickUpGUI()
 					updateBarAct();
 					return;
 				case act::insertBattery:
-					CORO(actFunc::insertBattery(actEnv::Equip, equipPtr, panel.cursor));
+					Corouter::start(actFunc::insertBattery(actEnv::Equip, equipPtr, panel.cursor));
 					break;
 				case act::removeBattery:
 					actFunc::removeBattery(equipPtr, panel.cursor);

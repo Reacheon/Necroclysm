@@ -1,4 +1,3 @@
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
 #include <SDL3/SDL.h>
 
 import ContextMenu;
@@ -538,7 +537,7 @@ void ContextMenu::executeContextAct(act inputAct)
 				}
 			}
 
-			CORO(actFunc::executeWield(tempPocketPtr, 0));
+			Corouter::start(actFunc::executeWield(tempPocketPtr, 0));
 			destroyProp({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 		}
 	}

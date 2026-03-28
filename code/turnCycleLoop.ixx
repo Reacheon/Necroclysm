@@ -245,7 +245,7 @@ __int64 playerInputTurn()
 		{
 			//prt(L"메인 함수 코루틴 재실행\n");
 			coTurnSkip = false;
-			(*coFunc).run();
+			Corouter::current->run();
 		}
 
 		if (PlayerPtr->getHasAStarDst() == false) isPlayerMoving = false;

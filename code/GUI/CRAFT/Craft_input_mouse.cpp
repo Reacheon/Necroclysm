@@ -1,7 +1,5 @@
 #include <SDL3/SDL.h>
 
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 import Craft;
 import globalVar;
 import checkCursor;
@@ -20,11 +18,11 @@ void Craft::clickUpGUI()
 	}
 	else if (checkCursor(&tooltipCraftBtn) && craftCursor >= 0)//툴팁 조합하기
 	{
-		CORO(executeCraft());
+		Corouter::start(executeCraft());
 	}
 	else if (checkCursor(&tooltipBookmarkBtn) && craftCursor >= 0)//툴팁 즐겨찾기
 	{
-		CORO(executeBookmark());
+		Corouter::start(executeBookmark());
 	}
 	else if (checkCursor(&bookmarkCategory))//즐겨찾기 카테고리 클릭업
 	{

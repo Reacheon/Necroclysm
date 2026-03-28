@@ -18,8 +18,6 @@ import log;
 import Player;
 import turnWait;
 
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 export class Sleep : public GUI
 {
 private:
@@ -59,7 +57,7 @@ public:
 		PlayerPtr->entityInfo.isEyesClose = false;
 
 		// 수면 시도 시작
-		CORO(executeSleep());
+		Corouter::start(executeSleep());
 	}
 	~Sleep()
 	{

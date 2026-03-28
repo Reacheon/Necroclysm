@@ -1,5 +1,3 @@
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 import HUD;
 
 #include <SDL3/SDL.h>
@@ -99,7 +97,7 @@ void HUD::clickUpGUI()
 				{
 					if (dragQuickSlotTarget == i)
 					{
-						CORO(useSkill(quickSlot[i].second));
+						Corouter::start(useSkill(quickSlot[i].second));
 					}
 				}
 			}
@@ -252,28 +250,28 @@ void HUD::keyUpGUI()
 	switch (event.key.key)
 	{
 	case SDLK_1:
-		if (quickSlot[0].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[0].second));
+		if (quickSlot[0].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[0].second));
 		break;
 	case SDLK_2:
-		if (quickSlot[1].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[1].second));
+		if (quickSlot[1].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[1].second));
 		break;
 	case SDLK_3:
-		if (quickSlot[2].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[2].second));
+		if (quickSlot[2].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[2].second));
 		break;
 	case SDLK_4:
-		if (quickSlot[3].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[3].second));
+		if (quickSlot[3].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[3].second));
 		break;
 	case SDLK_5:
-		if (quickSlot[4].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[4].second));
+		if (quickSlot[4].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[4].second));
 		break;
 	case SDLK_6:
-		if (quickSlot[5].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[5].second));
+		if (quickSlot[5].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[5].second));
 		break;
 	case SDLK_7:
-		if (quickSlot[6].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[6].second));
+		if (quickSlot[6].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[6].second));
 		break;
 	case SDLK_8:
-		if (quickSlot[7].first == quickSlotFlag::SKILL) CORO(useSkill(quickSlot[7].second));
+		if (quickSlot[7].first == quickSlotFlag::SKILL) Corouter::start(useSkill(quickSlot[7].second));
 		break;
 	case SDLK_GRAVE:
 		debugConsole();

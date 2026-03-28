@@ -1,8 +1,6 @@
 module;
 #include <SDL3/SDL.h>
 
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 export module Craft;
 
 import std;
@@ -220,7 +218,7 @@ public:
 
 		if (existCraftData() || existCraftDataStructure())
 		{
-			CORO(executeCraft());
+			Corouter::start(executeCraft());
 		}
 	}
 	~Craft()

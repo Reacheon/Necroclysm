@@ -1,6 +1,4 @@
 #include <SDL3/SDL.h>
-#define CORO(func) delete coFunc; coFunc = new Corouter(func); (*coFunc).run();
-
 import Loot;
 import std;
 import util;
@@ -26,7 +24,7 @@ void Loot::clickUpGUI()
 		}
 		else if (checkCursor(&panel.labelName))
 		{
-			CORO(actFunc::searchItems(panel.pocket, panel.scroll));
+			Corouter::start(actFunc::searchItems(panel.pocket, panel.scroll));
 		}
 		else if (checkCursor(&panel.labelQuantity))
 		{
@@ -84,21 +82,21 @@ void Loot::clickUpGUI()
 					actFunc::executeEquip(panel.pocket, panel.cursor);
 					break;
 				case act::wield://들기
-					CORO(actFunc::executeWield(panel.pocket, panel.cursor));
+					Corouter::start(actFunc::executeWield(panel.pocket, panel.cursor));
 					break;
 				case act::reloadBulletToMagazine:
 				case act::reloadBulletToGun:
 					if (panel.pocket->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Loot, panel.pocket, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Loot, panel.pocket, panel.cursor));
 					}
 					else if (panel.pocket->itemInfo[panel.cursor].checkFlag(itemFlag::AMMO))
 					{
-						CORO(actFunc::reloadOther(actEnv::Loot, panel.pocket, panel.cursor));
+						Corouter::start(actFunc::reloadOther(actEnv::Loot, panel.pocket, panel.cursor));
 					}
 					else if (panel.pocket->itemInfo[panel.cursor].checkFlag(itemFlag::GUN))
 					{
-						CORO(actFunc::reloadSelf(actEnv::Equip, panel.pocket, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Equip, panel.pocket, panel.cursor));
 					}
 					break;
 				case act::reloadMagazine:
@@ -107,11 +105,11 @@ void Loot::clickUpGUI()
 					//탄창에 사용하면 다른 타일의 총에게 장비함
 					if (panel.pocket->itemInfo[panel.cursor].checkFlag(itemFlag::MAGAZINE))
 					{
-						CORO(actFunc::reloadOther(actEnv::Loot, panel.pocket, panel.cursor));
+						Corouter::start(actFunc::reloadOther(actEnv::Loot, panel.pocket, panel.cursor));
 					}
 					else
 					{
-						CORO(actFunc::reloadSelf(actEnv::Loot, panel.pocket, panel.cursor));
+						Corouter::start(actFunc::reloadSelf(actEnv::Loot, panel.pocket, panel.cursor));
 					}
 					break;
 				case act::unloadMagazine:
@@ -137,7 +135,7 @@ void Loot::clickUpGUI()
 					updateBarAct();
 					return;
 				case act::insertBattery:
-					CORO(actFunc::insertBattery(actEnv::Loot, panel.pocket, panel.cursor));
+					Corouter::start(actFunc::insertBattery(actEnv::Loot, panel.pocket, panel.cursor));
 					break;
 				case act::removeBattery:
 					actFunc::removeBattery(panel.pocket, panel.cursor);
@@ -188,6 +186,6 @@ void Loot::clickRightGUI()
 	int idx = panel.getSelectRightClickIndex();
 	if (idx >= 0)
 	{
-		CORO(actFunc::selectItemEx(panel.pocket, idx));
+		Corouter::start(actFunc::selectItemEx(panel.pocket, idx));
 	}
 }

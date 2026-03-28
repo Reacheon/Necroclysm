@@ -138,9 +138,8 @@ export int mainLightSight = 0;
 
 
 /////////////////////코루틴 관련 변수///////////////////////////////
-export Corouter* coFunc; // Writer/Reader: 코루틴을 사용하는 모든 GUI (Equip, Loot, Inventory, Craft, Sleep 등)
 export std::wstring coAnswer = L""; // Writer: CoroutineGUI(Msg, Lst, LstEx, CoordSelect) | Reader: 호출측 코루틴
-export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 coFunc에 할당된 코루틴 함수를 실행시킴 | Writer: Sleep | Reader: turnCycleLoop
+export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 Corouter::current에 할당된 코루틴 함수를 실행시킴 | Writer: Sleep | Reader: turnCycleLoop
 /////////////////////////////////////////////////////////////////
 
 //export std::unique_ptr<ItemPocket> availableRecipe;//이게 인텔리센스 오류의 원인
