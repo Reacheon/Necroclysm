@@ -59,6 +59,7 @@ public:
 		//   if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
 
 		currentUsingSkill = -1;
+		co_return;
 	}
 
 	// [선택] 패시브: 매 턴 호출

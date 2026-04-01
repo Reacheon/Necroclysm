@@ -414,12 +414,19 @@ export enum class itemSubcategory
 export enum class godFlag
 {
     none,
-    teshub,
-    buddha,
-    jesus,
-    amaterasu,
-    yudi,
-    ra,
+    rehylion,
+};
+
+//신이 감시하는 행동 유형
+export enum class conductType
+{
+    KILL_NEUTRAL,       //중립 몬스터 살해
+    KILL_HOLY,          //신성한 존재 살해
+    KILL_EVIL,          //사악한 존재 살해
+    USE_NECROMANCY,     //네크로맨시 사용
+    USE_EVIL_ITEM,      //사악한 아이템 사용
+    ATTACK_ALLY,        //아군 공격
+    SELF_MUTATE,        //자발적 변이
 };
 
 //입은 데미지의 종류
@@ -511,6 +518,7 @@ export enum class skillSrc
     BIONIC,
     MUTATION,
     MAGIC,
+    GOD,
 };
 
 export enum class skillType

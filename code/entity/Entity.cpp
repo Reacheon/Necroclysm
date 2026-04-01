@@ -60,6 +60,21 @@ void Entity::addSkill(int skillCode)
 	entityInfo.skillList.push_back(newSkill);
 }
 
+void Entity::removeSkill(int skillCode)
+{
+	auto& list = entityInfo.skillList;
+	auto it = std::find_if(list.begin(), list.end(),
+		[skillCode](const SkillData& sd) { return sd.skillCode == skillCode; });
+	if (it != list.end())
+	{
+		auto* behavior = SkillRegistry::get(skillCode);
+		if (behavior)
+		{
+			prt(L"스킬 %ls를 잃었다.\n", behavior->name.c_str());
+		}
+		list.erase(it);
+	}
+}
 
 unsigned __int8 Entity::getAimStack() { return aimStack; }
 void Entity::initAimStack() { aimStack = 0; }

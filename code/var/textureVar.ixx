@@ -22,10 +22,7 @@ export namespace spr
 	std::unordered_map<std::wstring, Sprite*> spriteMapper;
 
 	Sprite* charsetHero = nullptr;
-	Sprite* zombie1 = nullptr;
-	Sprite* arabianHorse = nullptr;
 	Sprite* defaultMonster = nullptr;
-	Sprite* equipIcon = nullptr;
 	Sprite* effectBash1 = nullptr;
 	Sprite* effectCut1 = nullptr;
 	Sprite* effectCut2 = nullptr;
@@ -42,10 +39,6 @@ export namespace spr
 	Sprite* windowArrow = nullptr;
 	Sprite* whiteMarker = nullptr;
 	Sprite* yellowMarker = nullptr;
-	Sprite* equipRoll = nullptr;
-	Sprite* lootRoll = nullptr;
-	Sprite* detailRoll = nullptr;
-	Sprite* pocketRoll = nullptr;
 	Sprite* itemCursorLong = nullptr;
 	Sprite* itemCursorShort = nullptr;
 	Sprite* lootBagArrow = nullptr;
@@ -63,7 +56,6 @@ export namespace spr
 	Sprite* staminaGauge = nullptr;
 	Sprite* segment = nullptr;
 	Sprite* tileset = nullptr;
-	Sprite* wallset = nullptr;
 	Sprite* propset = nullptr;
 	Sprite* icon32 = nullptr;
 	Sprite* ring24 = nullptr;
@@ -71,7 +63,6 @@ export namespace spr
 	Sprite* aimMarker = nullptr;
 	Sprite* aimMarkerTmp = nullptr;
 	Sprite* aimAtkTypeMarker = nullptr;
-	Sprite* partsSlotGauge = nullptr;
 	Sprite* tab = nullptr;
 	Sprite* aimLRChange = nullptr;
 	Sprite* epsilonFont = nullptr;
@@ -98,8 +89,6 @@ export namespace spr
 	Sprite* vehicleHUDSteeringWheel = nullptr;
 	Sprite* vehicleActCursor = nullptr;
 	Sprite* dirMarker = nullptr;
-	Sprite* craftEdge = nullptr;
-	Sprite* craftSelectWindow = nullptr;
 	Sprite* windowArrow2 = nullptr;
 	Sprite* mapHereMarker = nullptr;
 	Sprite* screenRain = nullptr;

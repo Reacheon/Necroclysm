@@ -49,6 +49,7 @@ public:
     void setSkillTarget(int gridX, int gridY, int gridZ);
     Point3 getSkillTarget();
     void addSkill(int index);
+    void removeSkill(int skillCode);
 
     unsigned __int8 getAimStack();
     void initAimStack();

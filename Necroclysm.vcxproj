@@ -284,6 +284,11 @@
     <ClCompile Include="code\skill\SkillRegistry.cpp" />
     <ClCompile Include="code\skill\SkillRoll.ixx" />
     <ClCompile Include="code\skill\SkillSample.ixx" />
+    <ClCompile Include="code\god\GodBehavior.ixx" />
+    <ClCompile Include="code\god\GodRegistry.ixx" />
+    <ClCompile Include="code\god\GodRegistry.cpp" />
+    <ClCompile Include="code\god\GodRehylion.ixx" />
+    <ClCompile Include="code\god\GodService.ixx" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\statusEffect.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
