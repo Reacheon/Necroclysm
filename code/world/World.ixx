@@ -20,8 +20,8 @@ import ItemPocket;
 export class World
 {
 private:
-	std::unordered_map<Point3, Chunk*, Point3::Hash> chunkPtr;
-	std::vector<Chunk*> activeChunk;
+	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
+	std::vector<Chunk*> activeChunk; // 비소유 포인터
 	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
@@ -32,6 +32,11 @@ public:
 		static World* ptr = new World();
 		return ptr;
 	}
+
+	World(const World&) = delete;
+	World& operator=(const World&) = delete;
+
+private:
 	World()
 	{
 		const int baseRange = 4;
@@ -40,7 +45,7 @@ public:
 		{
 			for (int x = -baseRange; x <= baseRange; x++)
 			{
-				chunkPtr[{x, y, 0}] = new Chunk(chunkFlag::seawater);
+				chunkPtr[{x, y, 0}] = std::make_unique<Chunk>(chunkFlag::seawater);
 			}
 		}
 
@@ -48,7 +53,7 @@ public:
 		{
 			for (int x = -baseRange; x <= baseRange; x++)
 			{
-				chunkPtr[{x, y, 1}] = new Chunk(chunkFlag::none);
+				chunkPtr[{x, y, 1}] = std::make_unique<Chunk>(chunkFlag::none);
 			}
 		}
 
@@ -56,11 +61,12 @@ public:
 		{
 			for (int x = -baseRange; x <= baseRange; x++)
 			{
-				chunkPtr[{x, y, -1}] = new Chunk(chunkFlag::underground);
+				chunkPtr[{x, y, -1}] = std::make_unique<Chunk>(chunkFlag::underground);
 			}
 		}
 	}
 
+public:
 	TileData& getTile(int x, int y, int z)
 	{
 		int chunkX, chunkY;
@@ -82,7 +88,7 @@ public:
 
 		if (Mapmaker::ins()->isEmptyProphecy(chunkX, chunkY, chunkZ) == false) inputFlag = Mapmaker::ins()->getProphecy(chunkX, chunkY, chunkZ);
 
-		chunkPtr[{chunkX, chunkY, chunkZ}] = new Chunk(inputFlag);
+		chunkPtr[{chunkX, chunkY, chunkZ}] = std::make_unique<Chunk>(inputFlag);
 	}
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
 	{
@@ -114,7 +120,7 @@ public:
 	}
 	void activate(int x, int y, int z)
 	{
-		activeChunk.push_back(chunkPtr.at({x, y, z}));
+		activeChunk.push_back(chunkPtr.at({x, y, z}).get());
 	}
 	void deactivate()
 	{
@@ -218,91 +224,7 @@ public:
 		else return false;
 	}
 
-	void createSector(int sectorX, int sectorY, int sectorZ)
-	{
-		if (sectorZ == 0)
-		{
-			if ((sectorY <= 26 && sectorY >= -27) && (sectorX <= 53 && sectorX >= -54))
-			{
-				std::string filePath = "map/worldSector-";
-				int number = 2971 + sectorX + 108 * sectorY;
-				if (number < 100) filePath += "0";
-				filePath += std::to_string(number);
-				filePath += ".png";
-				std::wstring wPath(filePath.begin(), filePath.end());
-				//std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
-				SDL_Surface* refSector = IMG_Load(filePath.c_str());
-
-				if (!refSector)   // 디버깅: 로드 실패 이유 출력
-				{
-					// SDL_GetError() → std::string → std::wstring
-					std::wstring sdlErr = stringToWstring(std::string(SDL_GetError()));
-
-					// 실행 중의 작업 디렉터리 (char→wstring)
-					std::wstring cwd = std::filesystem::current_path().wstring();
-
-					std::wstring msg =
-						L"IMG_Load 실패\n"
-						L"  SDL_GetError : " + sdlErr +
-						L"\n  시도한 경로   : " + wPath +
-						L"\n  현재 CWD      : " + cwd + L'\n';
-
-					prt(L"%ls", msg.c_str());               // 콘솔/디버그 출력
-				}
-
-				errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
-				Uint32* pixels = (Uint32*)refSector->pixels;
-
-
-				for (int x = 0; x < 400; x++)
-				{
-					for (int y = 0; y < 400; y++)
-					{
-						chunkFlag targetFlag = chunkFlag::none;
-
-						Uint32 pixel = pixels[(y * refSector->w) + x];
-						SDL_Color pixelCol;
-						SDL_GetRGB(pixel,
-							SDL_GetPixelFormatDetails(refSector->format),
-							SDL_GetSurfacePalette(refSector),
-							&pixelCol.r, &pixelCol.g, &pixelCol.b);
-
-						auto isSameCol = [](SDL_Color col1, SDL_Color col2)->bool
-							{
-								if (col1.r == col2.r)
-								{
-									if (col1.g == col2.g)
-									{
-										if (col1.b == col2.b)
-										{
-											return true;
-										}
-									}
-								}
-
-								return false;
-							};
-
-						if (isSameCol(pixelCol, chunkCol::seawater)) targetFlag = chunkFlag::seawater;
-						else if (isSameCol(pixelCol, chunkCol::land)) targetFlag = chunkFlag::dirt;
-						else if (isSameCol(pixelCol, chunkCol::city)) targetFlag = chunkFlag::dirt;
-						else if (isSameCol(pixelCol, chunkCol::river)) targetFlag = chunkFlag::seawater;
-
-						//섹터 좌표로 청크 좌표 구하기
-						int chunkOriginX, chunkOriginY;
-						chunkOriginX = 400 * sectorX;
-						chunkOriginY = 400 * sectorY;
-
-						Mapmaker::ins()->addProphecy(chunkOriginX + x, chunkOriginY + y, sectorZ, targetFlag);
-					}
-				}
-
-				SDL_DestroySurface(refSector);
-			}
-		}
-
-		isSectorCreated.insert({ sectorX,sectorY,sectorZ });
-	}
+	void createSector(int sectorX, int sectorY, int sectorZ);
 
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{

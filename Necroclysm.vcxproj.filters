@@ -681,6 +681,18 @@
     <ClCompile Include="code\GUI\ItemListPanel.ixx">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\CRAFT\Craft_execute.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle_runAnimation.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle_drawSelf.cpp">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\World_createSector.cpp">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />
