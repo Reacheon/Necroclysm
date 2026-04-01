@@ -9,31 +9,30 @@ public:
     ~ThreadPool();
     void addTask(std::function<void()> func);
     size_t getAvailableThreads();
-    void waitForThreads(); // waitForThreads로 이름 변경
+    void waitForThreads();
 private:
     std::vector<std::thread> workers;
     std::queue<std::function<void()>> tasks;
-    std::mutex queue_mutex;
+    std::mutex queueMutex;
     std::condition_variable condition;
-    std::condition_variable completion_condition;
+    std::condition_variable completionCondition;
     bool stop;
-    size_t available_threads;
-    size_t active_tasks;
-    void worker_thread();
+    size_t activeTasks;
+    void workerThread();
 };
 
-ThreadPool::ThreadPool(size_t num_threads) : stop(false), available_threads(num_threads), active_tasks(0)
+ThreadPool::ThreadPool(size_t numThreads) : stop(false), activeTasks(0)
 {
-    for (size_t i = 0; i < num_threads; ++i)
+    for (size_t i = 0; i < numThreads; ++i)
     {
-        workers.emplace_back([this] { worker_thread(); });
+        workers.emplace_back([this] { workerThread(); });
     }
 }
 
 ThreadPool::~ThreadPool()
 {
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
+        std::unique_lock<std::mutex> lock(queueMutex);
         stop = true;
     }
     condition.notify_all();
@@ -46,36 +45,36 @@ ThreadPool::~ThreadPool()
 void ThreadPool::addTask(std::function<void()> func)
 {
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
+        std::unique_lock<std::mutex> lock(queueMutex);
         if (stop) throw std::runtime_error("ThreadPool is stopping");
-        tasks.emplace(func);
-        --available_threads;
-        ++active_tasks;
+        tasks.emplace(std::move(func));
+        ++activeTasks;
     }
     condition.notify_one();
 }
 
 size_t ThreadPool::getAvailableThreads()
 {
-    std::unique_lock<std::mutex> lock(queue_mutex);
-    return available_threads;
+    std::unique_lock<std::mutex> lock(queueMutex);
+    return workers.size() - activeTasks;
 }
 
 void ThreadPool::waitForThreads()
 {
-    std::unique_lock<std::mutex> lock(queue_mutex);
-    completion_condition.wait(lock, [this] { return active_tasks == 0; });
+    std::unique_lock<std::mutex> lock(queueMutex);
+    completionCondition.wait(lock, [this] { return activeTasks == 0; });
 }
 
-void ThreadPool::worker_thread()
+void ThreadPool::workerThread()
 {
     while (true)
     {
         std::function<void()> task;
         {
-            std::unique_lock<std::mutex> lock(queue_mutex);
+            std::unique_lock<std::mutex> lock(queueMutex);
             condition.wait(lock, [this] { return stop || !tasks.empty(); });
-            if (stop && tasks.empty()) {
+            if (stop && tasks.empty()) 
+            {
                 return;
             }
             task = std::move(tasks.front());
@@ -83,11 +82,11 @@ void ThreadPool::worker_thread()
         }
         task();
         {
-            std::unique_lock<std::mutex> lock(queue_mutex);
-            ++available_threads;
-            --active_tasks;
-            if (active_tasks == 0) {
-                completion_condition.notify_all();
+            std::unique_lock<std::mutex> lock(queueMutex);
+            --activeTasks;
+            if (activeTasks == 0) 
+            {
+                completionCondition.notify_all();
             }
         }
     }
