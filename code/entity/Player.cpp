@@ -369,7 +369,7 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 {
 
-	if (PlayerPtr->entityInfo.walkMode == walkFlag::run)
+	if (PlayerInfo().walkMode == walkFlag::run)
 	{
 		entityInfo.STA -= 7;
 		if (entityInfo.STA < 0)

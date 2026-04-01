@@ -650,7 +650,7 @@ __int64 propTurn();
 __int64 itemTurn() 
 {
 	std::vector<ItemPocket*> targetPockets;
-	targetPockets.push_back(PlayerPtr->getEquipPtr());
+	targetPockets.push_back(PlayerEquip());
 
 	std::unordered_set<ItemStack*> activeStackSet = (World::ins())->getActiveStackSet();
 	for (auto stack : activeStackSet)

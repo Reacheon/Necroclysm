@@ -240,7 +240,7 @@ public:
 		PlayerPtr->setFakeX(0);
 		PlayerPtr->setFakeY(0);
 		PlayerPtr->changeWalkMode(walkFlag::walk);
-		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
+		PlayerInfo().sprIndex = charSprIndex::WALK;
 		ptr = nullptr;
 	}
 	static Craft* ins() { return ptr; }
@@ -351,7 +351,7 @@ public:
 		for (int i = 0; i < recipePtr->itemInfo.size(); i++) recipePtr->itemInfo[i].addFlag(itemFlag::BLACKFILTER);
 		for (int i = 0; i < matchCount; i++) recipePtr->itemInfo[i].eraseFlag(itemFlag::BLACKFILTER);
 
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		for (int targetCursor = 0; targetCursor < matchCount; targetCursor++)
 		{
 			if (canCraft(recipePtr->itemInfo[targetCursor].itemCode)) recipePtr->itemInfo[targetCursor].addFlag(itemFlag::WHITEFILTER);
@@ -364,7 +364,7 @@ public:
 
 	bool canCraft(int itemCode, bool exceptMaterial)
 	{
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		//조합에 필요한 플레이어 재능 체크
 		for (int i = 0; i < itemDex[itemCode].recipeProficNeed.size(); i++)
 		{

@@ -470,25 +470,25 @@ void ContextMenu::executeContextAct(act inputAct)
 	{
 		ItemPocket* targetBottle = nullptr;
 		int maxVolume = 0;
-		for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
+		for (int i = 0; i < PlayerEquip()->itemInfo.size(); i++)
 		{
-			if (PlayerPtr->getEquipPtr()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
+			if (PlayerEquip()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
 			{
-				targetBottle = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get();
-				maxVolume = PlayerPtr->getEquipPtr()->itemInfo[i].pocketMaxVolume;
+				targetBottle = PlayerEquip()->itemInfo[i].pocketPtr.get();
+				maxVolume = PlayerEquip()->itemInfo[i].pocketMaxVolume;
 				break;
 			}
 
-			if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr != nullptr &&
-				PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size() > 0)
+			if (PlayerEquip()->itemInfo[i].pocketPtr != nullptr &&
+				PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo.size() > 0)
 			{
-				for (int j = 0; j < PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
+				for (int j = 0; j < PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
 				{
-					if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
+					if (PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
 					{
-						targetBottle = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketPtr.get();
-						maxVolume = PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketMaxVolume;
-						i = PlayerPtr->getEquipPtr()->itemInfo.size();
+						targetBottle = PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketPtr.get();
+						maxVolume = PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo[j].pocketMaxVolume;
+						i = PlayerEquip()->itemInfo.size();
 						break;
 					}
 				}

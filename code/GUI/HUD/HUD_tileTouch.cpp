@@ -18,7 +18,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
 	const bool* state = SDL_GetKeyboardState(nullptr);
 	bool wieldPickaxe = false;
-	std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+	std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 	for (const ItemData& eqItem : equipInfo)
 	{
 		if (eqItem.equipState == equipHandFlag::both)
@@ -131,7 +131,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
 
-							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+							PlayerPtr->updateVision(PlayerInfo().eyeSight);
 							PlayerPtr->updateMinimap();
 
 							Prop* upProp = TileProp(touchX, touchY, PlayerZ());
@@ -153,7 +153,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
 
-							PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+							PlayerPtr->updateVision(PlayerInfo().eyeSight);
 							PlayerPtr->updateMinimap();
 
 							Prop* downProp = TileProp(touchX, touchY, PlayerZ());
@@ -170,7 +170,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 		{
 			if (TileWall(touchX, touchY, PlayerZ()) != 0) //곡괭이 벽 굴착 액션
 			{
-				auto ePtr = PlayerPtr->getEquipPtr();
+				auto ePtr = PlayerEquip();
 				for (int i = 0; i < ePtr->itemInfo.size(); i++)
 				{
 					if (ePtr->itemInfo[i].itemCode == itemID::pickaxe)
@@ -203,7 +203,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						}
 
 						tgtPocket->itemInfo[i].propSprIndex += 16;
-						PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+						PlayerPtr->updateVision(PlayerInfo().eyeSight);
 					}
 				}
 			}
@@ -228,7 +228,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 						}
 
-						PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+						PlayerPtr->updateVision(PlayerInfo().eyeSight);
 					}
 				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))

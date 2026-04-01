@@ -26,7 +26,7 @@ export void useSkill(int skillCode)
 
 	// skillList에서 해당 스킬 데이터 찾기
 	SkillData* skillDataPtr = nullptr;
-	for (auto& sd : PlayerPtr->entityInfo.skillList)
+	for (auto& sd : PlayerInfo().skillList)
 	{
 		if (sd.skillCode == skillCode)
 		{

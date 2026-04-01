@@ -13,7 +13,7 @@ void HUD::step()
 
     // 도구 장착 시 탭 변경
     {
-        std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+        std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
         for (const ItemData& eqItem : equipInfo)
         {
             if (eqItem.equipState == equipHandFlag::both)
@@ -34,7 +34,7 @@ void HUD::step()
     {
         for (int i = 0; i < TALENT_SIZE; i++)
         {
-            if (PlayerPtr->entityInfo.proficFocus[i] > 0) { break; }
+            if (PlayerInfo().proficFocus[i] > 0) { break; }
             if (i == TALENT_SIZE - 1)
             {
                 new Profic();
@@ -55,7 +55,7 @@ void HUD::step()
     static int hungryDisplayTimer = 0;
     static int thirstDisplayTimer = 0;
     static int fatigueDisplayTimer = 0;
-    auto& statInfo = PlayerPtr->entityInfo.statusEffectVec;
+    auto& statInfo = PlayerInfo().statusEffectVec;
 
     int currentHunger = hunger;
     int currentThirst = thirst;

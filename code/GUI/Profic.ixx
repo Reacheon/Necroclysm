@@ -128,12 +128,12 @@ public:
                 levelStr += std::to_wstring(wholePart) + L"." + std::to_wstring(decimalPart);
 
                 std::wstring aptStr;
-                if(PlayerPtr->entityInfo.proficApt[i]>0) aptStr = L"+";
-                else if(PlayerPtr->entityInfo.proficApt[i]<0) aptStr += L"-";
+                if(PlayerInfo().proficApt[i]>0) aptStr = L"+";
+                else if(PlayerInfo().proficApt[i]<0) aptStr += L"-";
                 else aptStr += L" ";
-                aptStr += std::to_wstring(PlayerPtr->entityInfo.proficApt[i]);
+                aptStr += std::to_wstring(PlayerInfo().proficApt[i]);
 
-                switch (PlayerPtr->entityInfo.proficFocus[i])
+                switch (PlayerInfo().proficFocus[i])
                 {
                 case 1:
                     focusStr = L"+";
@@ -240,7 +240,7 @@ public:
                 drawText(L"#FFFFFF" + aptStr, targetX + 233, targetY + 7);
 
                 // 회색 필터 (기존과 동일)
-                if (PlayerPtr->entityInfo.proficFocus[i] == 0 && PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
+                if (PlayerInfo().proficFocus[i] == 0 && PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
                 {
                     drawStadium(proficButton[i].x, proficButton[i].y, proficButton[i].w, proficButton[i].h, btnColor, 150, 7);
                 }
@@ -250,7 +250,7 @@ public:
                 if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
                 {
                     drawSprite(spr::proficIcon, i, targetX, targetY);
-                    if (PlayerPtr->entityInfo.proficFocus[i] == 0)
+                    if (PlayerInfo().proficFocus[i] == 0)
                     {
                         SDL_Rect rect = { targetX,targetY,32,32 };
                         drawFillRect(rect, col::black, 150);
@@ -271,7 +271,7 @@ public:
                 bool anyTraining = false;
                 for (int i = 0; i < TALENT_SIZE; i++)
                 {
-                    if (PlayerPtr->entityInfo.proficFocus[i] > 0) { anyTraining = true; break; }
+                    if (PlayerInfo().proficFocus[i] > 0) { anyTraining = true; break; }
                 }
                 if (!anyTraining)
                 {
@@ -307,7 +307,7 @@ public:
 		{
 			for (int i = 0; i < TALENT_SIZE; i++)
 			{
-				if (PlayerPtr->entityInfo.proficFocus[i] > 0) //수련 중인 재능을 1개라도 발견했을 경우
+				if (PlayerInfo().proficFocus[i] > 0) //수련 중인 재능을 1개라도 발견했을 경우
 				{
 					close(aniFlag::winUnfoldClose);
 					return;
@@ -324,16 +324,16 @@ public:
 				{
 					if (PlayerPtr->getProficLevel(i) < MAX_PROFIC_LEVEL)
 					{
-						switch (PlayerPtr->entityInfo.proficFocus[i])
+						switch (PlayerInfo().proficFocus[i])
 						{
 						case 0:
-							PlayerPtr->entityInfo.proficFocus[i] = 1;
+							PlayerInfo().proficFocus[i] = 1;
 							break;
 						case 1:
-							PlayerPtr->entityInfo.proficFocus[i] = 2;
+							PlayerInfo().proficFocus[i] = 2;
 							break;
 						case 2:
-							PlayerPtr->entityInfo.proficFocus[i] = 0;
+							PlayerInfo().proficFocus[i] = 0;
 							break;
 						default:
 							errorBox(L"Unvalid profic focus point");

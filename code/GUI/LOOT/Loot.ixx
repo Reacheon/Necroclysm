@@ -262,7 +262,7 @@ public:
 	void executePickSelect()
 	{
 		//1. 포켓 커서가 가리키는 아이템의 Array의 잔여부피와 플레이어의 질량 한계를 참조
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		ItemPocket* bagPtr = nullptr;
 		int bagIndex = -1;
 		int bagNumber = 0;
@@ -415,7 +415,7 @@ public:
 	void executePocketRight()
 	{
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
@@ -430,7 +430,7 @@ public:
 	{
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketPtr != nullptr)

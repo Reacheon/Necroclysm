@@ -151,6 +151,8 @@ export Player* PlayerPtr = nullptr;
 export inline int PlayerX() { return PlayerPtr->getGridX(); }
 export inline int PlayerY() { return PlayerPtr->getGridY(); }
 export inline int PlayerZ() { return PlayerPtr->getGridZ(); }
+export inline EntityData& PlayerInfo() { return PlayerPtr->entityInfo; }
+export inline ItemPocket* PlayerEquip() { return PlayerPtr->getEquipPtr(); }
 
 export float getMouseX();
 export float getMouseY();

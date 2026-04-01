@@ -120,8 +120,8 @@ export void turnWait(float waitTime)
         }
     }
 
-    PlayerPtr->entityInfo.STA += 2;
-    if (PlayerPtr->entityInfo.STA > PlayerPtr->entityInfo.maxSTA) PlayerPtr->entityInfo.STA = PlayerPtr->entityInfo.maxSTA;
+    PlayerInfo().STA += 2;
+    if (PlayerInfo().STA > PlayerInfo().maxSTA) PlayerInfo().STA = PlayerInfo().maxSTA;
 
     hunger -= waitTime * HUNGRY_SPPED;
     thirst -= waitTime * THIRST_SPEED;

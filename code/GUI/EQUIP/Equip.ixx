@@ -36,7 +36,7 @@ export class Equip : public GUI
 {
 private:
 	inline static Equip* ptr = nullptr;
-	ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+	ItemPocket* equipPtr = PlayerEquip();
 
 	const int equipScrollSize = 8;
 

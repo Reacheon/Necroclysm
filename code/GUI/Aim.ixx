@@ -86,7 +86,7 @@ public:
 		
 
 
-		ItemPocket* pEquip = PlayerPtr->getEquipPtr();
+		ItemPocket* pEquip = PlayerEquip();
 
 		// 한손 권총 감지
 		bool hasLeftItem = false, hasRightItem = false;
@@ -185,7 +185,7 @@ public:
 
 		int pX = PlayerX(), pY = PlayerY(), pZ = PlayerZ();
 		
-		if(PlayerPtr->entityInfo.sprFlip == false) aimCoord = { pX + 1, pY, pZ };
+		if(PlayerInfo().sprFlip == false) aimCoord = { pX + 1, pY, pZ };
 		else  aimCoord = { pX - 1, pY, pZ };
 
 		Entity* nearTarget = nullptr;
@@ -266,7 +266,7 @@ public:
 			int iconIndex = 0;
 			int currentBullet = 0;
 			int maxBullet = 0;
-			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 			//손에 든 장비 찾기
 			int weaponIdx = -1;
 			if (pistolMode == pistolAimMode::DUAL)
@@ -550,7 +550,7 @@ public:
 	//현재 조준 중인 무기의 itemCode를 반환 (무기 없으면 0)
 	unsigned __int16 getAimWeaponCode()
 	{
-		auto& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		auto& equipInfo = PlayerEquip()->itemInfo;
 		if (pistolMode == pistolAimMode::DUAL)
 		{
 			int idx = (dualSelected == equipHandFlag::left) ? leftPistolIdx : rightPistolIdx;
@@ -837,8 +837,8 @@ public:
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-				updateLog(replaceStr(L"You throw the (%item).", L"(%item)", PlayerPtr->getEquipPtr()->itemInfo[PlayerPtr->getAimWeaponIndex()].name));
-				PlayerPtr->getEquipPtr()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
+				updateLog(replaceStr(L"You throw the (%item).", L"(%item)", PlayerEquip()->itemInfo[PlayerPtr->getAimWeaponIndex()].name));
+				PlayerEquip()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
 				PlayerPtr->throwing(std::move(drop), targetX, targetY);
 				PlayerPtr->updateStatus();
 
@@ -850,7 +850,7 @@ public:
 			}
 			else if (targetAtkType == atkType::shot) //사격
 			{
-				ItemData& tmpAimWeapon = PlayerPtr->getEquipPtr()->itemInfo[PlayerPtr->getAimWeaponIndex()];
+				ItemData& tmpAimWeapon = PlayerEquip()->itemInfo[PlayerPtr->getAimWeaponIndex()];
 				if (getBulletNumber(tmpAimWeapon) > 0) //사격인데 총알이 없을 경우
 				{
 					if (weaponRange < myMax(abs(PlayerX() - targetX), abs(PlayerY() - targetY))) { return; }
@@ -869,7 +869,7 @@ public:
 					magazineData.pocketPtr->popTopBullet();
 				}
 
-				auto pEquip = PlayerPtr->getEquipPtr();
+				auto pEquip = PlayerEquip();
 				if (pEquip->itemInfo[0].checkFlag(itemFlag::BOW)) PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 
 				PlayerPtr->startAtk(targetX, targetY, targetZ, aniFlag::shotSingle);

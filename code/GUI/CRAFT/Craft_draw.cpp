@@ -94,11 +94,11 @@ void Craft::drawGUI()
 
 		if (SDL_GetTicks() % 1000 < 500)
 		{
-			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT1;
+			PlayerInfo().sprIndex = charSprIndex::CRAFT1;
 		}
 		else
 		{
-			PlayerPtr->entityInfo.sprIndex = charSprIndex::CRAFT2;
+			PlayerInfo().sprIndex = charSprIndex::CRAFT2;
 		}
 	}
 
@@ -555,7 +555,7 @@ void Craft::drawGUI()
 		//아이템 디테일박스(툴팁) 그리기
 		if (!aniManager.contains(this) && (pointingCursor >= 0 || craftCursor >= 0))
 		{
-			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+			ItemPocket* equipPtr = PlayerEquip();
 			bool canCraft = true; //현재 플레이어의 상태로 조합이 가능한지 체크함 
 			int targetCursor;
 			if (pointingCursor >= 0) targetCursor = pointingCursor + CRAFT_MAX_COLUMN *craftScroll;

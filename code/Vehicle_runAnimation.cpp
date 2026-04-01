@@ -118,7 +118,7 @@ bool Vehicle::runAnimation(bool shutdown)
                         {
                             updateHeadlight({ startPoint.x + lineRevPath[i].x,startPoint.y + lineRevPath[i].y,getGridZ() });
                             if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this)
-                                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i].x, startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i].y);
+                                PlayerPtr->updateVision(PlayerInfo().eyeSight, startPoint.x + (PlayerX() - getGridX()) + lineRevPath[i].x, startPoint.y + (PlayerY() - getGridY()) + lineRevPath[i].y);
                             lineCheck++;
                         }
                     }
@@ -148,7 +148,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 }
 
                 cameraFix = true;
-                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+                PlayerPtr->updateVision(PlayerInfo().eyeSight);
                 PlayerPtr->updateMinimap();
                 resetTimer();
                 setAniType(aniFlag::null);
@@ -199,7 +199,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getTimer() >= 4)
             {
-                PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
+                PlayerPtr->updateVision(PlayerInfo().eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
                 //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 singleRailMoveVec.erase(singleRailMoveVec.begin());
                 resetTimer();
@@ -210,7 +210,7 @@ bool Vehicle::runAnimation(bool shutdown)
             //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
-            PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+            PlayerPtr->updateVision(PlayerInfo().eyeSight);
             PlayerPtr->updateMinimap();
             cameraFix = true;
             resetTimer();

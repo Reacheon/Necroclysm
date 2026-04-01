@@ -80,9 +80,9 @@ void HUD::drawGUI()
 		SDL_SetTextureBlendMode(spr::gamepadInstruction->getTexture(), SDL_BLENDMODE_BLEND);
 		SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 210);
 		int sprIndex = 0;
-		if (PlayerPtr->entityInfo.walkMode == walkFlag::run) sprIndex = 1;
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) sprIndex = 2;
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) sprIndex = 3;
+		if (PlayerInfo().walkMode == walkFlag::run) sprIndex = 1;
+		else if (PlayerInfo().walkMode == walkFlag::crouch) sprIndex = 2;
+		else if (PlayerInfo().walkMode == walkFlag::crawl) sprIndex = 3;
         drawSprite(spr::gamepadInstruction, sprIndex, 300, cameraH - 135);
         SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 255);
 	}
@@ -193,8 +193,8 @@ void HUD::drawGUI()
 
 		if (ctrlVeh == nullptr)
 		{
-			int pSTA = PlayerPtr->entityInfo.STA;
-			int pSTAMax = PlayerPtr->entityInfo.maxSTA;
+			int pSTA = PlayerInfo().STA;
+			int pSTAMax = PlayerInfo().maxSTA;
 			if (fakeSTA > pSTA)
 			{
 				fakeSTA -= 1;
@@ -982,16 +982,16 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::runMode)
 		{
 
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) setBtnLayout80(sysStr[8], 4);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) setBtnLayout80(sysStr[8], 5);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) setBtnLayout80(sysStr[8], 7);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) setBtnLayout80(sysStr[8], 6);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::wade)
+			if (PlayerInfo().walkMode == walkFlag::walk) setBtnLayout80(sysStr[8], 4);
+			else if (PlayerInfo().walkMode == walkFlag::run) setBtnLayout80(sysStr[8], 5);
+			else if (PlayerInfo().walkMode == walkFlag::crouch) setBtnLayout80(sysStr[8], 7);
+			else if (PlayerInfo().walkMode == walkFlag::crawl) setBtnLayout80(sysStr[8], 6);
+			else if (PlayerInfo().walkMode == walkFlag::wade)
 			{
 				setBtnLayout80(sysStr[8], 9);
 				deactRect = true;
 			}
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::swim)
+			else if (PlayerInfo().walkMode == walkFlag::swim)
 			{
 				setBtnLayout80(sysStr[8], 8);
 				deactRect = true;
@@ -1157,7 +1157,7 @@ void HUD::drawBarAct()
 
 void HUD::drawStatusEffects()
 {
-	std::vector<statusEffect>& myEfcts = PlayerPtr->entityInfo.statusEffectVec;
+	std::vector<statusEffect>& myEfcts = PlayerInfo().statusEffectVec;
 
 	// 페이크값 업데이트 람다 함수
 	auto updateFakeValue = [](int& fakeValue, int realValue) {
@@ -1587,7 +1587,7 @@ void HUD::drawBodyParts()
 	updateFakeHP(PlayerPtr->lLegFakeHP, PlayerPtr->lLegHP, PlayerPtr->lLegFakeHPAlpha);
 	updateFakeHP(PlayerPtr->rLegFakeHP, PlayerPtr->rLegHP, PlayerPtr->rLegFakeHPAlpha);
 	updateFakeHP(PlayerPtr->headFakeHP, PlayerPtr->headHP, PlayerPtr->headFakeHPAlpha);
-	updateFakeHP(PlayerPtr->entityInfo.fakeHP, PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHPAlpha);
+	updateFakeHP(PlayerInfo().fakeHP, PlayerInfo().HP, PlayerInfo().fakeHPAlpha);
 
 	//x와 y 좌표는 게이지 좌측 상단 기준
 	auto drawSingleBodyPartGauge = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName,
@@ -1714,8 +1714,8 @@ void HUD::drawBodyParts()
 			21,
 			cameraH - 1 - 245,
 			L"Torso",
-			PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.fakeHP,
-			PlayerPtr->entityInfo.maxHP, PlayerPtr->entityInfo.fakeHPAlpha);
+			PlayerInfo().HP, PlayerInfo().fakeHP,
+			PlayerInfo().maxHP, PlayerInfo().fakeHPAlpha);
 
 		drawSingleBodyPartGauge(false,
 			167,
@@ -1800,11 +1800,11 @@ void HUD::drawBodyParts()
 			return colorTag + bar;
 		};
 
-		int rFire = PlayerPtr->entityInfo.rFire;
-		int rCold = PlayerPtr->entityInfo.rCold;
-		int rElec = PlayerPtr->entityInfo.rElec;
-		int rRad  = PlayerPtr->entityInfo.rRad;
-		int rCorr = PlayerPtr->entityInfo.rCorr;
+		int rFire = PlayerInfo().rFire;
+		int rCold = PlayerInfo().rCold;
+		int rElec = PlayerInfo().rElec;
+		int rRad  = PlayerInfo().rRad;
+		int rCorr = PlayerInfo().rCorr;
 
 		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
 		setFontSize(14);

@@ -40,7 +40,7 @@ void Loot::clickUpGUI()
 		else if (checkCursor(&pocketRight))
 		{
 			int numberOfBag = 0;
-			ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+			ItemPocket* equipPtr = PlayerEquip();
 			for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 			{
 				if (equipPtr->itemInfo[i].pocketPtr !=nullptr)

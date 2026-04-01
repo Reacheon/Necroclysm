@@ -52,8 +52,8 @@ public:
 		ptr = this;
 		changeXY(cameraW / 2, cameraH / 2, true);
 		PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
-		PlayerPtr->entityInfo.isEyesHalf = true;
-		PlayerPtr->entityInfo.isEyesClose = false;
+		PlayerInfo().isEyesHalf = true;
+		PlayerInfo().isEyesClose = false;
 
 		// 수면 시도 시작
 		Corouter::start(executeSleep());
@@ -63,8 +63,8 @@ public:
 		ptr = nullptr;
 		PlayerPtr->changeWalkMode(walkFlag::walk);
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
-		PlayerPtr->entityInfo.isEyesHalf = false;
-		PlayerPtr->entityInfo.isEyesClose = false;
+		PlayerInfo().isEyesHalf = false;
+		PlayerInfo().isEyesClose = false;
 	}
 	static Sleep* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -257,7 +257,7 @@ public:
 				updateLog(L"You fell asleep.");
 				isTryingToSleep = false;
 				isAsleep = true;
-				PlayerPtr->entityInfo.isEyesClose = true; // 눈을 감음
+				PlayerInfo().isEyesClose = true; // 눈을 감음
 
 				// 피로도 회복 관련 초기화
 				initialFatigue = fatigue;

@@ -708,7 +708,7 @@ public:
 		bool individual = (targetFlag == itemFlag::COOKWARE);
 
 		//1. 플레이어 장비
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		scanPocket(equipPtr, targetFlag, individual);
 
 		//2. 장비 내부 포켓 1단계 (가방 안 아이템)
@@ -828,7 +828,7 @@ public:
 		ddItems.clear();
 
 		//1. 플레이어 장비 (Wield/Equip)
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		for (int i = 0; i < (int)equipPtr->itemInfo.size(); i++)
 		{
 			ItemData& item = equipPtr->itemInfo[i];

@@ -395,10 +395,10 @@ public:
 			new Cook();
 			break;
 		case act::runMode:
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
-            else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
+			if (PlayerInfo().walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
+			else if (PlayerInfo().walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
+			else if (PlayerInfo().walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
+            else if (PlayerInfo().walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
 			popDownWhenEnd = false;
 			break;
 		case act::skill:
@@ -652,7 +652,7 @@ public:
 		}
 		else//찾았을 경우
 		{
-			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 			for (int i = 0; i < equipInfo.size(); i++)
 			{
 				if (equipInfo[i].equipState != equipHandFlag::none)
@@ -772,7 +772,7 @@ public:
 				tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 				tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 				tgtProp->leadItem.extraSprIndexSingle--;
-				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerInfo().eyeSight);
 			};
 
 		if (doorNumber == 1)
@@ -800,7 +800,7 @@ public:
 			tgtProp->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
 			tgtProp->leadItem.addFlag(itemFlag::PROP_BLOCKER);
 			tgtProp->leadItem.extraSprIndexSingle--;
-			PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+			PlayerPtr->updateVision(PlayerInfo().eyeSight);
 		}
 	};
 
@@ -850,7 +850,7 @@ public:
 	{
 		//물뿌리개 물 잔량 확인
 		int wateringCanRemaining = 0;
-		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 		for (const ItemData& eqItem : equipInfo)
 		{
 			if (eqItem.equipState == equipHandFlag::both && eqItem.itemCode == itemID::wateringCan)
@@ -944,7 +944,7 @@ public:
 		}
 
 		bool findRangeWeapon = false;
-		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 		for (int i = 0; i < equipInfo.size(); i++)
 		{
 			if (equipInfo[i].equipState != equipHandFlag::none)
@@ -1092,23 +1092,23 @@ public:
 
 			inputOptions.push_back(act::drinkFloorWater);
 
-			for (int i = 0; i < PlayerPtr->getEquipPtr()->itemInfo.size(); i++)
+			for (int i = 0; i < PlayerEquip()->itemInfo.size(); i++)
 			{
-				if (PlayerPtr->getEquipPtr()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
+				if (PlayerEquip()->itemInfo[i].checkFlag(itemFlag::CONTAINER_LIQ))
 				{
 					inputOptions.push_back(act::drawLiquid);
 					break;
                 }
 
-				if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr != nullptr && 
-					PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size()>0)
+				if (PlayerEquip()->itemInfo[i].pocketPtr != nullptr && 
+					PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo.size()>0)
 				{
-					for (int j = 0; j < PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
+					for (int j = 0; j < PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo.size(); j++)
 					{
-						if (PlayerPtr->getEquipPtr()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
+						if (PlayerEquip()->itemInfo[i].pocketPtr.get()->itemInfo[j].checkFlag(itemFlag::CONTAINER_LIQ))
 						{
 							inputOptions.push_back(act::drawLiquid);
-							i = PlayerPtr->getEquipPtr()->itemInfo.size();//이중루프 탈출
+							i = PlayerEquip()->itemInfo.size();//이중루프 탈출
 							break;
                         }
 					}

@@ -130,7 +130,7 @@ bool Entity::runAnimation(bool shutdown)
 				bool findRight = false;
 				bool findTwoHanded = false;
 
-				auto& equip = PlayerPtr->getEquipPtr()->itemInfo;
+				auto& equip = PlayerEquip()->itemInfo;
 				for (int i = 0; i < equip.size(); i++)
 				{
 					if (equip[i].equipState == equipHandFlag::left && !equip[i].checkFlag(itemFlag::SHIELD)) findLeft = true;
@@ -382,7 +382,7 @@ bool Entity::runAnimation(bool shutdown)
 					addAniToPlayerTurn(address, aniFlag::treeFalling);
 					address->displayHPBarCount = 50;
 					address->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
-					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+					PlayerPtr->updateVision(PlayerInfo().eyeSight);
 				}
 				else
 				{
@@ -548,7 +548,7 @@ bool Entity::runAnimation(bool shutdown)
 				if(itemPtr != nullptr) addAniToPlayerTurn(itemPtr, aniFlag::drop);
 
 				DestroyWall(PlayerX() + dx, PlayerY() + dy, PlayerZ());
-				PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+				PlayerPtr->updateVision(PlayerInfo().eyeSight);
 			}
 			new Sticker(false, getX() + (16 * dx), getY() + (16 * dy), spr::effectCut1, 0, stickerID, true);
 			break;
@@ -1054,7 +1054,7 @@ bool Entity::runAnimation(bool shutdown)
 		{
 		case 1:
 			PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
-			PlayerPtr->entityInfo.isEyesClose = true;
+			PlayerInfo().isEyesClose = true;
 			setFakeY(-4);
 			break;
 		case 2:
@@ -1123,7 +1123,7 @@ bool Entity::runAnimation(bool shutdown)
 		}
 
 
-		if (PlayerPtr->entityInfo.sprFlip == false)
+		if (PlayerInfo().sprFlip == false)
 		{
 			if (getTimer() == 1) entityInfo.sprAngle = 90.0f;
 			if (std::abs(getIntegerFakeX()) <= 5.0 && std::abs(getIntegerFakeY()) <= 5.0) entityInfo.sprAngle = 270.0f;
@@ -1480,7 +1480,7 @@ bool Entity::runAnimation(bool shutdown)
 			setFakeX(getFakeX() + 0.5 * dx);
 			setFakeY(getFakeY() + 0.5 * dy);
 
-			std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+			std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 			for (const ItemData& eqItem : equipInfo)
 			{
 				if (eqItem.equipState == equipHandFlag::both)

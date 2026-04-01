@@ -200,7 +200,7 @@ export void debugConsole()
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
 	{
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		std::unique_ptr<ItemPocket> txPtr = std::make_unique<ItemPocket>(storageType::temp);
 		if (equipPtr->itemInfo.size() > 0)
 		{
@@ -321,7 +321,7 @@ export void debugConsole()
 		std::cin >> tgtEfctDur;
 
 		prt(L"상태이상을 성공적으로 추가하였다.\n");
-		PlayerPtr->entityInfo.statusEffectVec.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
+		PlayerInfo().statusEffectVec.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
 	}

@@ -540,7 +540,7 @@ void Vehicle::rush(int dx, int dy)
     }
 
     updateHeadlight(getClosestGridWithFake());
-    if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
+    if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) PlayerPtr->updateVision(PlayerInfo().eyeSight, getClosestGridWithFake().x, getClosestGridWithFake().y);
 
     addAniToMonsterTurn(this, aniFlag::propRush);
 }

@@ -30,7 +30,7 @@ void Loot::drawGUI()
 
 	if (hasSelect == true)
 	{
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		std::vector<int> pocketList;
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
@@ -128,7 +128,7 @@ void Loot::drawGUI()
 		//가방이 몇 개 있는지 체크
 		std::vector<int> pocketList;
 		int numberOfBag = 0;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		for (int i = 0; i < equipPtr->itemInfo.size(); i++)
 		{
 			if (equipPtr->itemInfo[i].pocketPtr != nullptr)

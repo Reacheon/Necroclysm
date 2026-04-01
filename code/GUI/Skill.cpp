@@ -32,7 +32,7 @@ Skill::Skill() : GUI(false)
 	addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
 	filteredSkills.clear();
-	for (auto& sd : PlayerPtr->entityInfo.skillList)
+	for (auto& sd : PlayerInfo().skillList)
 	{
 		auto* bhv = SkillRegistry::get(sd.skillCode);
 		if (bhv && bhv->src == skillSrc::GENERAL)
@@ -308,7 +308,7 @@ void Skill::clickUpGUI()
 	}
 
 	filteredSkills.clear();
-	for (auto& sd : PlayerPtr->entityInfo.skillList)
+	for (auto& sd : PlayerInfo().skillList)
 	{
 		if (categoryCursor == skillCategory::all)
 		{

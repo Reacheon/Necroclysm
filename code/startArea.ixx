@@ -36,9 +36,9 @@ export void startArea()
 		}
 	}
 
-	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
-	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });
-	PlayerPtr->entityInfo.statusEffectVec.push_back({ statusEffectFlag::tired, -1 });
+	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
+	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });
+	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::tired, -1 });
 
 
 
@@ -1186,6 +1186,6 @@ export void startArea()
 
 	World::ins()->createSector(0, 0, 0);
 
-	PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+	PlayerPtr->updateVision(PlayerInfo().eyeSight);
 
 };

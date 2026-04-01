@@ -33,7 +33,7 @@ namespace
 	std::vector<ItemPocket*> gatherNearbyPockets()
 	{
 		std::vector<ItemPocket*> result;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 
 		//1. 장비 포켓 + 장비 서브포켓 (가방, 파우치 등)
 		result.push_back(equipPtr);
@@ -120,7 +120,7 @@ namespace
 	std::vector<PocketSource> gatherNearbyPocketsWithSource()
 	{
 		std::vector<PocketSource> result;
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 
 		//1. 장비 포켓 + 장비 서브포켓
 		result.push_back({ equipPtr, L"Equip" });
@@ -187,7 +187,7 @@ namespace actFunc
 	{
 		prt(L"executeReloadSelf이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
-		std::vector<ItemData>& equipInfo = PlayerPtr->getEquipPtr()->itemInfo;
+		std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 
 		//활/석궁은 장비 중인 화살통/볼트통에서만 장전
 		if (reloadItemPocket->itemInfo[targetLootCursor].checkFlag(itemFlag::BOW))

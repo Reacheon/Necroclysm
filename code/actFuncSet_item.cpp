@@ -117,7 +117,7 @@ namespace actFunc
 	Corouter executeWield(ItemPocket* targetPocket, int targetPocketCursor)
 	{
 		ItemData& tgtItem = targetPocket->itemInfo[targetPocketCursor];
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		if (tgtItem.checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
 			std::wstring logStr = replaceStr(sysStr[331], L"(%item)", tgtItem.name);
@@ -268,7 +268,7 @@ namespace actFunc
 	{
 		updateLog(replaceStr(sysStr[125], L"(%item)", sourcePocket->itemInfo[sourceIndex].name)); // (%item)를(을) 장착했다.
 
-		ItemPocket* equipPtr = PlayerPtr->getEquipPtr();
+		ItemPocket* equipPtr = PlayerEquip();
 		int returnIndex = sourcePocket->transferItem(equipPtr, sourceIndex, 1);
 		equipPtr->itemInfo[returnIndex].equipState = equipHandFlag::normal;
 

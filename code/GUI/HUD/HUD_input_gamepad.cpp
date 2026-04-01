@@ -47,7 +47,7 @@ void gamepadMove(int dir)
 						tgtProp->leadItem.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 					}
 
-					PlayerPtr->updateVision(PlayerPtr->entityInfo.eyeSight);
+					PlayerPtr->updateVision(PlayerInfo().eyeSight);
 				}
 			}
 		}
@@ -124,10 +124,10 @@ void HUD::gamepadBtnUp()
 		}
 		break;
     case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
-		if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
+		if (PlayerInfo().walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
+		else if (PlayerInfo().walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
+		else if (PlayerInfo().walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
+		else if (PlayerInfo().walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
 		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 	{

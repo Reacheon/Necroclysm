@@ -84,7 +84,7 @@ Corouter Craft::executeCraft()
 					//툴 퀄리티에 따라 적색, 녹색 변화
 					int materialItemCode = itemDex[targetItemCode].recipe[i].first;
 					int needNumber = itemDex[targetItemCode].recipe[i].second;
-					PlayerPtr->getEquipPtr()->subtractItemCode(materialItemCode, needNumber);
+					PlayerEquip()->subtractItemCode(materialItemCode, needNumber);
 				}
 			}
 		}
