@@ -14,6 +14,8 @@ import Vehicle;
 import Prop;
 import Monster;
 import ItemStack;
+import Entity;
+import ItemPocket;
 
 export class World
 {
@@ -351,5 +353,51 @@ public:
 	}
 };
 
+////////////////////////////////////////////////////////////////////////////////
+// 타일 접근 자유함수
+////////////////////////////////////////////////////////////////////////////////
 
+export unsigned __int16 TileFloor(int x, int y, int z);
+export unsigned __int16 TileFloor(Point3 coord);
+export bool TileSnow(int x, int y, int z);
+export unsigned __int16 TileWall(int x, int y, int z);
+export bool ExistWall(int x, int y, int z);
 
+export void setWall(Point3 coord, int val);
+export void setFloor(Point3 coord, int val);
+
+export Entity* TileEntity(int x, int y, int z);
+export void EntityPtrMove(Point3 startCoor, Point3 endCoor);
+export void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor);
+
+export Prop* TileProp(int x, int y, int z);
+export Prop* TileProp(Point3 pt);
+export Vehicle*& TileVehicle(int x, int y, int z);
+export Vehicle*& TileVehicle(Point3 pt);
+
+export ItemStack* TileItemStack(int x, int y, int z);
+export ItemStack* TileItemStack(Point3 pt);
+
+export fovFlag& TileFov(int x, int y, int z);
+
+export void createMonster(Point3 inputCoor, int inputEntityCode);
+export void createItemStack(Point3 inputCoor);
+export void createItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputItems);
+export void destroyItemStack(Point3 inputCoor);
+export void destroyProp(Point3 inputCoor);
+export void createProp(Point3 inputCoor, int inputItemCode);
+export void createFlame(Point3 inputCoor, flameFlag inputFlag);
+
+export void DestroyWall(int x, int y, int z);
+
+export bool isWalkable(Point3 coord);
+export bool isRayBlocker(Point3 coord);
+
+//@brief 입력한 좌표의 타일에 해당한 아이템을 number개만큼 추가함. 아이템스택이 없다면 생성함. 있다면 그 스택에 추가함
+export void addItemToTile(Point3 coord, int itemCode, int number);
+//@brief 입력한 좌표의 타일에 inputPocket의 모든 아이템을 전송함. 아이템스택이 없다면 생성함. 있다면 그 스택에 추가함
+export void addItemToTile(Point3 coord, ItemPocket* inputPokcet);
+
+export bool isWetTile(Point3 coord);
+export void updateWetTile(Point3 coord);
+export void resetWetTile(Point3 coord);

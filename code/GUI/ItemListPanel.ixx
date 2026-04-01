@@ -7,7 +7,6 @@ import std;
 import util;
 import constVar;
 import globalVar;
-import wrapFunc;
 import ItemPocket;
 import ItemData;
 import drawItemList;
@@ -253,11 +252,11 @@ public:
 			sortType = sortFlag::weightAscend;
 			break;
 		case sortFlag::weightAscend:
-			sortVolumeDescend(pocket->itemInfo);
+			pocket->sortVolumeDescend();
 			sortType = sortFlag::volumeDescend;
 			break;
 		case sortFlag::volumeDescend:
-			sortVolumeAscend(pocket->itemInfo);
+			pocket->sortVolumeAscend();
 			sortType = sortFlag::volumeAscend;
 			break;
 		case sortFlag::volumeAscend:

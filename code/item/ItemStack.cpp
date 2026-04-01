@@ -5,7 +5,6 @@ import std;
 import util;
 import globalVar;
 import constVar;
-import wrapFunc;
 import textureVar;
 import World;
 import ItemPocket;

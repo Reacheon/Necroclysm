@@ -4,7 +4,6 @@ module;
 export module stepEvent;
 
 import globalVar;
-import wrapFunc;
 import constVar;
 import util;
 import Damage;

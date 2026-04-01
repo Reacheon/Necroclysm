@@ -10,7 +10,6 @@ import drawText;
 import drawSprite;
 import globalVar;
 import constVar;
-import wrapFunc;
 import checkCursor;
 import drawWindow;
 import actFuncSet;
@@ -294,7 +293,7 @@ void ContextMenu::drawGUI()
 
 						//아이템 아이콘
 						setZoom(1.5);
-						drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 36, newPivotY + 18 + 26 * i);
+						drawSpriteCenter(spr::itemset, tgtPart.getSprIndex(), pivotX + 36, newPivotY + 18 + 26 * i);
 						setZoom(1.0);
 
 						//아이템 이름
@@ -313,7 +312,7 @@ void ContextMenu::drawGUI()
 								int currentVolume = 0;
 								for (int j = 0; j < pkPtr->itemInfo.size(); j++)
 								{
-									currentVolume += getVolume(pkPtr->itemInfo[j]) * (pkPtr->itemInfo[j].number);
+									currentVolume += pkPtr->itemInfo[j].getVolume() * (pkPtr->itemInfo[j].number);
 								}
 
 								float volumeRatio = (float)currentVolume / (float)tgtPart.pocketMaxVolume;

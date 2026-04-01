@@ -3,7 +3,7 @@
 import Equip;
 import util;
 import globalVar;
-import wrapFunc;
+import World;
 import constVar;
 import textureVar;
 import Player;

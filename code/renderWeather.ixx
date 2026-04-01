@@ -6,7 +6,6 @@ export module renderWeather;
 
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import World;
 import Player;

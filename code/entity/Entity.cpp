@@ -8,7 +8,6 @@ import globalVar;
 import ItemData;
 import ItemPocket;
 import ItemStack;
-import wrapFunc;
 import log;
 import Sprite;
 import Ani;

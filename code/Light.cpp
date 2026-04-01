@@ -9,7 +9,6 @@ import std;
 import util;
 import World;
 import constVar;
-import wrapFunc;
 import Coord;
 
 Light::Light(int inputGridX, int inputGridY, int inputGridZ, int inputRange, Uint8 inputBright, SDL_Color inputColor)

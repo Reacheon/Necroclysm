@@ -4,7 +4,7 @@ import constVar;
 import Equip;
 import checkCursor;
 import globalVar;
-import wrapFunc;
+import World;
 import actFuncSet;
 import ItemData;
 import log;

@@ -2,7 +2,7 @@
 
 import Craft;
 import globalVar;
-import wrapFunc;
+import World;
 import textureVar;
 import constVar;
 import drawWindow;
@@ -34,7 +34,7 @@ void Craft::drawGUI()
 		SDL_Rect iconBox = { tooltipBox.x + 81 - 41 - 23, tooltipBox.y + 135 - 41 - 84 + yOffset, 81, 81 };
 		drawWindow(&iconBox);
 		setZoom(3.0);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[targetItemCode]), iconBox.x + 41, iconBox.y + 41);
+		drawSpriteCenter(spr::itemset, itemDex[targetItemCode].getSprIndex(), iconBox.x + 41, iconBox.y + 41);
 		setZoom(1.0);
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
@@ -469,7 +469,7 @@ void Craft::drawGUI()
 
 					ItemData& iPtr = recipePtr->itemInfo[i + CRAFT_MAX_COLUMN * craftScroll];
 					setZoom(3.0);
-					drawSpriteCenter(spr::itemset, getItemSprIndex(iPtr), pivotX + 24, pivotY + 18);
+					drawSpriteCenter(spr::itemset, iPtr.getSprIndex(), pivotX + 24, pivotY + 18);
 					setZoom(1.0);
 
 
@@ -575,7 +575,7 @@ void Craft::drawGUI()
 					int iconPivotY = topWindow.y + 18 + spr::itemBackgroundRect->getH() / 2;
 					drawSpriteCenter(spr::itemBackgroundRect, 0, iconPivotX, iconPivotY);
 					setZoom(3.0);
-					drawSpriteCenter(spr::itemset, getItemSprIndex(recipePtr->itemInfo[targetCursor]), iconPivotX, iconPivotY);
+					drawSpriteCenter(spr::itemset, recipePtr->itemInfo[targetCursor].getSprIndex(), iconPivotX, iconPivotY);
 					setZoom(1.0);
 				}
 				setFontSize(24);
@@ -592,7 +592,7 @@ void Craft::drawGUI()
 				drawText(weightStr, topWindow.x + 102, topWindow.y + 18 + 48);
 
 				std::wstring volumeStr = sysStr[18] + L" : ";
-				volumeStr += decimalCutter(((float)getVolume(recipePtr->itemInfo[targetCursor])) / 1000.0, 3);
+				volumeStr += decimalCutter(((float)recipePtr->itemInfo[targetCursor].getVolume()) / 1000.0, 3);
 				volumeStr += L"L";
 				drawText(volumeStr, topWindow.x + 252, topWindow.y + 18 + 48);
 

@@ -4,7 +4,6 @@ import Prop;
 import util;
 import constVar;
 import globalVar;
-import wrapFunc;
 import World;
 
 constexpr double TIME_PER_TURN = 60.0;

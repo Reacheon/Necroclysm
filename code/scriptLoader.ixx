@@ -4,7 +4,6 @@ module;
 export module scriptLoader;
 
 import globalVar;
-import wrapFunc;
 import Player;
 import util;
 import World;

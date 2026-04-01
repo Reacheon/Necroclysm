@@ -13,7 +13,6 @@ import Loot;
 import checkCursor;
 import constVar;
 import globalVar;
-import wrapFunc;
 import drawSprite;
 import textureVar;
 import drawText;

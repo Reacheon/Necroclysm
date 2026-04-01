@@ -1,7 +1,6 @@
 import Vehicle;
 import std;
 import globalVar;
-import wrapFunc;
 import constVar;
 import util;
 import World;
@@ -157,7 +156,7 @@ void Vehicle::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
     errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
-    return getItemSprIndex(partInfo[{inputX, inputY}]->itemInfo[0]);
+    return partInfo[{inputX, inputY}]->itemInfo[0].getSprIndex();
 }
 
 void Vehicle::rotatePartInfo(dir16 inputDir16)

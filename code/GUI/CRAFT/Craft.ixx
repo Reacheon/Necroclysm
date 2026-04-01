@@ -7,7 +7,6 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import wrapFunc;
 import constVar;
 import Lst;
 import Player;
@@ -240,7 +239,7 @@ public:
 
 		PlayerPtr->setFakeX(0);
 		PlayerPtr->setFakeY(0);
-		changePlayerWalkMode(walkFlag::walk);
+		PlayerPtr->changeWalkMode(walkFlag::walk);
 		PlayerPtr->entityInfo.sprIndex = charSprIndex::WALK;
 		ptr = nullptr;
 	}

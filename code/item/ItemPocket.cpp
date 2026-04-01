@@ -259,6 +259,28 @@ void ItemPocket::sortWeightAscend(int startIndex, int endIndex)
 }
 void ItemPocket::sortWeightAscend() { sortWeightAscend(0, itemInfo.size() - 1); }
 
+void ItemPocket::sortVolumeDescend(int startIndex, int endIndex)
+{
+	std::sort(itemInfo.begin() + startIndex, itemInfo.begin() + endIndex + 1,
+		[](ItemData& a, ItemData& b)
+		{
+			return (a.getVolume() > b.getVolume());
+		}
+	);
+}
+void ItemPocket::sortVolumeDescend() { sortVolumeDescend(0, itemInfo.size() - 1); }
+
+void ItemPocket::sortVolumeAscend(int startIndex, int endIndex)
+{
+	std::sort(itemInfo.begin() + startIndex, itemInfo.begin() + endIndex + 1,
+		[](ItemData& a, ItemData& b)
+		{
+			return (a.getVolume() < b.getVolume());
+		}
+	);
+}
+void ItemPocket::sortVolumeAscend() { sortVolumeAscend(0, itemInfo.size() - 1); }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

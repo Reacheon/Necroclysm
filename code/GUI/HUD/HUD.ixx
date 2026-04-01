@@ -8,7 +8,6 @@ import std;
 import util;
 import GUI;
 import globalVar;
-import wrapFunc;
 import constVar;
 import textureVar;
 import Loot;
@@ -396,10 +395,10 @@ public:
 			new Cook();
 			break;
 		case act::runMode:
-			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) changePlayerWalkMode(walkFlag::run);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) changePlayerWalkMode(walkFlag::crouch);
-			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) changePlayerWalkMode(walkFlag::crawl);
-            else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) changePlayerWalkMode(walkFlag::walk);
+			if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
+			else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
+            else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
 			popDownWhenEnd = false;
 			break;
 		case act::skill:

@@ -16,7 +16,7 @@ import SkillData;
 import SkillBehavior;
 import SkillRegistry;
 import useSkill;
-import wrapFunc;
+import World;
 
 Skill::Skill() : GUI(false)
 {

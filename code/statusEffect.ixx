@@ -1,5 +1,7 @@
 export module statusEffect;
 
+import std;
+
 export enum statusEffectFlag
 {
     none = -1,
@@ -22,3 +24,27 @@ public:
     statusEffectFlag effectType;
     float duration;
 };
+
+export inline bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+{
+    for (const auto& effect : inputStatus)
+    {
+        if (effect.effectType == inputFlag) return true;
+    }
+    return false;
+}
+
+export inline void eraseStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)
+{
+    for (auto it = inputStatus.begin(); it != inputStatus.end();)
+    {
+        if (it->effectType == inputFlag)
+        {
+            it = inputStatus.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}

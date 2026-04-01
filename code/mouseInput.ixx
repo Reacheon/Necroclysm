@@ -3,7 +3,7 @@ export module mouseInput;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
+import World;
 import GUI;
 
 export void clickDown()

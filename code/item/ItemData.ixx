@@ -59,6 +59,9 @@ export struct ItemData : public ItemDataBase
     ItemData& operator=(const ItemData&) = delete;
 
     bool isPocketOnlyItem(int inputCode);
+
+    int getVolume() const;
+    int getSprIndex();
 };
 
 export ItemData cloneFromItemDex(ItemData& inputData, int transferNumber);

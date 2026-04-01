@@ -3,6 +3,7 @@ import ItemPocket;
 import std;
 import util;
 import constVar;
+import globalVar;
 
 ItemData::ItemData() = default;
 ItemData::~ItemData() = default;
@@ -146,5 +147,76 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
     if (equipState != tgtItem.equipState) { return false; }
 
     return true;
+}
+
+int ItemData::getVolume() const
+{
+    int baseVolume = originalVolume;
+
+    if (checkFlag(itemFlag::CONTAINER_FLEX) && pocketPtr)
+    {
+        for (const auto& item : pocketPtr->itemInfo)
+        {
+            baseVolume += item.getVolume() * item.number;
+        }
+    }
+
+    return baseVolume;
+}
+
+int ItemData::getSprIndex()
+{
+    if ((itemCode == itemID::arrowQuiver || itemCode == itemID::boltQuiver) && pocketPtr)
+    {
+        int num = pocketPtr->getPocketNumber();
+        if (num == 0) return itemDex[itemCode].itemSprIndex;
+        else if (num == 1) return itemDex[itemCode].itemSprIndex + 1;
+        else return itemDex[itemCode].itemSprIndex + 2;
+    }
+    if (itemCode == itemID::fryingPan || itemCode == itemID::cookingPot
+        || itemCode == itemID::woodenPlate || itemCode == itemID::ceramicPlate)
+    {
+        if (pocketPtr)
+        {
+            std::vector<ItemData>& pocketInfo = pocketPtr->itemInfo;
+            if (pocketInfo.size() > 0)
+            {
+                for (auto& item : pocketInfo)
+                {
+                    if (item.checkFlag(itemFlag::DISH)) return (itemSprIndex + 2);
+                }
+                return (itemSprIndex + 1);
+            }
+        }
+    }
+    else if (checkFlag(itemFlag::CONTAINER_LIQ) && checkFlag(itemFlag::CONTAINER_TRANSPARENT) && pocketPtr)
+    {
+        std::vector<ItemData>& pocketInfo = pocketPtr->itemInfo;
+
+        if (pocketInfo.size() > 0)
+        {
+            if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_RED))  return itemSprIndex + 2;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLUE)) return itemSprIndex + 3;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_YELLOW)) return itemSprIndex + 4;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_WHITE)) return itemSprIndex + 5;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_GRAY)) return itemSprIndex + 6;
+            else if (pocketInfo[0].checkFlag(itemFlag::LIQ_COL_BLACK)) return itemSprIndex + 7;
+            else return itemSprIndex + 8;
+        }
+        else return itemSprIndex;
+    }
+    else if (checkFlag(itemFlag::CONTAINER_LIQ) && checkFlag(itemFlag::CONTAINER_TRANSLUCENT) && pocketPtr)
+    {
+        std::vector<ItemData>& pocketInfo = pocketPtr->itemInfo;
+
+        if (pocketInfo.size() > 0)
+        {
+            return itemSprIndex + 1;
+        }
+        else return itemSprIndex;
+    }
+    else return itemSprIndex;
+
+    return itemSprIndex;
 }
 

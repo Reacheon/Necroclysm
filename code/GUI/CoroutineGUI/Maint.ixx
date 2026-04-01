@@ -8,7 +8,6 @@ import util;
 import GUI;
 import constVar;
 import globalVar;
-import wrapFunc;
 import drawText;
 import checkCursor;
 import drawSprite;
@@ -178,7 +177,7 @@ public:
 					drawSprite(spr::lstSelectBox, selectBoxIndex, maintBtn[i].x, maintBtn[i].y);
 
 					setZoom(3.0);
-					drawSpriteCenter(spr::itemset, getItemSprIndex(items[currentItemIndex]), maintBtn[i].x + 23, maintBtn[i].y + 21);
+					drawSpriteCenter(spr::itemset, items[currentItemIndex].getSprIndex(), maintBtn[i].x + 23, maintBtn[i].y + 21);
 					setZoom(1.0);
 
 					setFontSize(21);

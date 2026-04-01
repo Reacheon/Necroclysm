@@ -1,7 +1,7 @@
 import HUD;
 import constVar;
 import globalVar;
-import wrapFunc;
+import World;
 import ItemData;
 import Profic;
 import Sleep;

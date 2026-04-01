@@ -5,7 +5,6 @@ import std;
 import Entity;
 import constVar;
 import globalVar;
-import wrapFunc;
 import textureVar;
 import Player;
 import World;
@@ -104,7 +103,7 @@ bool Monster::runAI()
 
 		if (getTurnResource() >= 1.2 && entityInfo.entityCode != 5 && entityInfo.relation == relationFlag::hostile)//플레이어에게 직선 경로로 이동
 		{
-			if (std::abs(PlayerPtr->getGridX() - getGridX()) > 1 || std::abs(PlayerPtr->getGridY() - getGridY()) > 1)//1칸 이내에 있지 않으면
+			if (std::abs(PlayerX() - getGridX()) > 1 || std::abs(PlayerY() - getGridY()) > 1)//1칸 이내에 있지 않으면
 			{
 				useTurnResource(1.2);
 				prt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.2, getTurnResource());
@@ -112,8 +111,8 @@ bool Monster::runAI()
 				int toDir = -1;
 				int x1 = getGridX();
 				int y1 = getGridY();
-				int x2 = PlayerPtr->getGridX();
-				int y2 = PlayerPtr->getGridY();
+				int x2 = PlayerX();
+				int y2 = PlayerY();
 				int xo = x1;
 				int yo = y1;
 				int delx = std::abs(x2 - x1);
@@ -201,13 +200,13 @@ bool Monster::runAI()
 
 		if (getTurnResource() >= 1.3 && entityInfo.entityCode != 5 && entityInfo.relation == relationFlag::hostile)//추적스택이 0보다 크고 플레이어가 1칸 이내에 잇을 경우 평타를 날림
 		{
-			if (std::abs(PlayerPtr->getGridX() - getGridX()) <= 1 && std::abs(PlayerPtr->getGridY() - getGridY()) <= 1)//1칸 이내에 있으면
+			if (std::abs(PlayerX() - getGridX()) <= 1 && std::abs(PlayerY() - getGridY()) <= 1)//1칸 이내에 있으면
 			{
 				useTurnResource(1.3);
 				prt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.3, getTurnResource());
 				prt(lowCol::red, L"[Monster 공격] 적이 당신을 강타했다!\n");
-				setDirection(coord2Dir(PlayerPtr->getGridX() - getGridX(), PlayerPtr->getGridY() - getGridY()));
-				startAtk(PlayerPtr->getGridX(), PlayerPtr->getGridY(), PlayerPtr->getGridZ());
+				setDirection(coord2Dir(PlayerX() - getGridX(), PlayerY() - getGridY()));
+				startAtk(PlayerX(), PlayerY(), PlayerZ());
 				return false;
 			}
 		}

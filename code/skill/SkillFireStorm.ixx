@@ -6,7 +6,7 @@ import constVar;
 import SkillData;
 import SkillBehavior;
 import globalVar;
-import wrapFunc;
+import World;
 import Entity;
 import CoordSelect;
 

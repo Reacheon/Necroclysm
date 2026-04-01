@@ -148,6 +148,24 @@ export std::map < dir16, std::unordered_map<Point2, Point2, Point2::Hash>> coord
 export SDL_Rect quickSlotBtn[8];
 
 export Player* PlayerPtr = nullptr;
+export inline int PlayerX() { return PlayerPtr->getGridX(); }
+export inline int PlayerY() { return PlayerPtr->getGridY(); }
+export inline int PlayerZ() { return PlayerPtr->getGridZ(); }
+
+export float getMouseX();
+export float getMouseY();
+export Point2 getAbsMouseGrid();
+
+export inline int fluidTypeToCode(fluidType inputType)
+{
+    switch (inputType)
+    {
+    default:
+        return 0;
+    case fluidType::WATER:
+        return itemID::water;
+    }
+}
 export float hunger = PLAYER_MAX_CALORIE / 2;
 export float thirst = PLAYER_MAX_HYDRATION / 2 + 1000;
 export float fatigue = PLAYER_MAX_FATIGUE / 2;

@@ -10,7 +10,6 @@ export module turnWait;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import Player;
 import World;

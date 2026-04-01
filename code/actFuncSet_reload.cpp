@@ -3,7 +3,8 @@ module actFuncSet;
 import util;
 import constVar;
 import globalVar;
-import wrapFunc;
+import World;
+import Player;
 import ItemStack;
 import log;
 import Prop;
@@ -236,7 +237,7 @@ namespace actFunc
 				ItemData& item = targetSearchPtr[j].pocket->itemInfo[i];
 				if (std::find(reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.begin(), reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end(), item.itemCode) != reloadItemPocket->itemInfo[targetLootCursor].pocketOnlyItem.end())
 				{
-					bulletList.push_back({ getItemSprIndex(item), item.name, targetSearchPtr[j].source });
+					bulletList.push_back({ item.getSprIndex(), item.name, targetSearchPtr[j].source });
 				}
 			}
 		}
@@ -308,7 +309,7 @@ namespace actFunc
 						targetItemInfo[i].pocketOnlyItem.end(),
 						reloadItemPocket->itemInfo[targetLootCursor].itemCode) != targetItemInfo[i].pocketOnlyItem.end())
 					{
-						pocketList.push_back({ getItemSprIndex(targetItemInfo[i]), targetItemInfo[i].name, targetSearchPtr[j].source });
+						pocketList.push_back({ targetItemInfo[i].getSprIndex(), targetItemInfo[i].name, targetSearchPtr[j].source });
 					}
 				}
 			}
@@ -383,7 +384,7 @@ namespace actFunc
 				int itemCode = targetSearchPtr[j].pocket->itemInfo[i].itemCode;
 				if (itemCode == itemID::battery || itemCode == itemID::batteryPack)
 				{
-					batteryList.push_back({ getItemSprIndex(targetSearchPtr[j].pocket->itemInfo[i]), targetSearchPtr[j].pocket->itemInfo[i].name, targetSearchPtr[j].source });
+					batteryList.push_back({ targetSearchPtr[j].pocket->itemInfo[i].getSprIndex(), targetSearchPtr[j].pocket->itemInfo[i].name, targetSearchPtr[j].source });
 				}
 			}
 		}

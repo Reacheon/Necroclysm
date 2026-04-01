@@ -1,7 +1,6 @@
 import util;
 import Entity;
 import globalVar;
-import wrapFunc;
 import constVar;
 import textureVar;
 import turnWait;
@@ -905,7 +904,7 @@ bool Entity::runAnimation(bool shutdown)
 			int gX = getGridX();
 			int gY = getGridY();
 			int gZ = getGridZ();
-			int spriteIndex = throwingItemPocket->itemInfo.size() > 0 ? getItemSprIndex(throwingItemPocket->itemInfo.back()) : 0;
+			int spriteIndex = throwingItemPocket->itemInfo.size() > 0 ? throwingItemPocket->itemInfo.back().getSprIndex() : 0;
 			Sticker* sPtr = new Sticker(false, getX(), getY(), spr::itemset, spriteIndex, stickerID, true);
 			arriveTimer = 0;
 			prevCoor = { getGridX(),getGridY(),getGridZ() };
@@ -950,7 +949,7 @@ bool Entity::runAnimation(bool shutdown)
 			int totalVolume = 0;
 			for (int i = 0; i < throwingItemPocket->itemInfo.size(); i++)
 			{
-				totalVolume += getVolume(throwingItemPocket->itemInfo[i]) * throwingItemPocket->itemInfo[i].number;
+				totalVolume += throwingItemPocket->itemInfo[i].getVolume() * throwingItemPocket->itemInfo[i].number;
 			}
 			throwToProp = propPtr != nullptr
 				&& propPtr->leadItem.pocketPtr != nullptr
@@ -1151,7 +1150,7 @@ bool Entity::runAnimation(bool shutdown)
 			if (entityInfo.isPlayer)
 			{
 				cameraFix = true;
-				changePlayerWalkMode(walkFlag::walk);
+				PlayerPtr->changeWalkMode(walkFlag::walk);
 			}
 			return true;
 		}
@@ -1242,7 +1241,7 @@ bool Entity::runAnimation(bool shutdown)
 			endMove();
 			if (entityInfo.isPlayer)
 			{
-				changePlayerWalkMode(walkFlag::walk);
+				PlayerPtr->changeWalkMode(walkFlag::walk);
 				cameraFix = true;
 				cameraX = getX();
 				cameraY = getY();

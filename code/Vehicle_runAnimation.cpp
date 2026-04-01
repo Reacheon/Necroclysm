@@ -1,7 +1,7 @@
 import Vehicle;
 import std;
 import globalVar;
-import wrapFunc;
+import World;
 import constVar;
 import util;
 import Entity;

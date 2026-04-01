@@ -6,7 +6,7 @@ import util;
 import globalVar;
 import constVar;
 import textureVar;
-import wrapFunc;
+import Player;
 import drawSprite;
 import World;
 import globalTime;

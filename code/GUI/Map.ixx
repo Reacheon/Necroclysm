@@ -12,7 +12,6 @@ import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
-import wrapFunc;
 import checkCursor;
 import drawWindow;
 import Player;

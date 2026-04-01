@@ -6,7 +6,6 @@ export module Loot;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import drawWindowArrow;
 import ItemPocket;
@@ -307,7 +306,7 @@ public:
 			{
 				if (panel.pocket->itemInfo[i].lootSelect > 0)
 				{
-					itemsVol += panel.pocket->itemInfo[i].lootSelect * getVolume(panel.pocket->itemInfo[i]);
+					itemsVol += panel.pocket->itemInfo[i].lootSelect * panel.pocket->itemInfo[i].getVolume();
 				}
 			}
 

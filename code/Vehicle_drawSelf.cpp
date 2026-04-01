@@ -3,7 +3,7 @@
 import Vehicle;
 import std;
 import globalVar;
-import wrapFunc;
+import World;
 import textureVar;
 import constVar;
 import util;
@@ -56,7 +56,7 @@ void Vehicle::drawSelf()
                     drawSpriteCenter
                     (
                         spr::itemset,
-                        getItemSprIndex(pocketPtr->itemInfo[pocketPtr->itemInfo.size() - 1]),
+                        pocketPtr->itemInfo[pocketPtr->itemInfo.size() - 1].getSprIndex(),
                         dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
                         dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
                     );

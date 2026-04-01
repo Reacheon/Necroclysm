@@ -1,6 +1,5 @@
 import Inventory;
 import globalVar;
-import wrapFunc;
 import constVar;
 import textureVar;
 import util;
@@ -31,7 +30,7 @@ void Inventory::drawGUI()
 		drawSpriteCenter(spr::itemBackgroundRect, 0, inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);
 
 		setZoom(4.0);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(*inventoryItemData), inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);
+		drawSpriteCenter(spr::itemset, inventoryItemData->getSprIndex(), inventoryBase.x + 16 + 32, inventoryBase.y + 44 + 32);
 		setZoom(1.0);
 
 		setFontSize(24);

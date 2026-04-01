@@ -3,7 +3,7 @@
 import Prop;
 import util;
 import globalVar;
-import wrapFunc;
+import Player;
 import constVar;
 import World;
 import ItemStack;

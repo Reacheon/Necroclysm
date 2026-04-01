@@ -2,7 +2,6 @@ module turnCycleLoop;
 
 import constVar;
 import globalVar;
-import wrapFunc;
 import Prop;
 import World;
 

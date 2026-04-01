@@ -10,7 +10,6 @@ import ItemPocket;
 import globalVar;
 import drawText;
 import constVar;
-import wrapFunc;
 import checkCursor;
 import drawSprite;
 import textureVar;
@@ -215,12 +214,12 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		SDL_SetTextureBlendMode(spr::itemset->getTexture(), SDL_BLENDMODE_BLEND);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 128, 128, 128);
-		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 18, itemBox.y + itemBox.h / 2);
+		drawSpriteCenter(spr::itemset, inputItem.getSprIndex(), itemBox.x + 18, itemBox.y + itemBox.h / 2);
 		SDL_SetTextureColorMod(spr::itemset->getTexture(), 255, 255, 255);
 	}
 	else
 	{
-		drawSpriteCenter(spr::itemset, getItemSprIndex(inputItem), itemBox.x + 18, itemBox.y + itemBox.h / 2);
+		drawSpriteCenter(spr::itemset, inputItem.getSprIndex(), itemBox.x + 18, itemBox.y + itemBox.h / 2);
 	}
 
 	//장비 중인 아이템이나 갯수가 1 이하인 아이템은 갯수 표시하지 않음
@@ -389,14 +388,14 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		}
 
 		drawSpriteCenter(spr::icon13, 40, box3.x + 12, box2.y + 23);
-		if (getVolume(inputItem) >= 1000)
+		if (inputItem.getVolume() >= 1000)
 		{
-			std::wstring volStr = decimalCutter(getVolume(inputItem) / 1000.0, 2);
+			std::wstring volStr = decimalCutter(inputItem.getVolume() / 1000.0, 2);
 			drawText(volStr + L" L", box3.x + 9 + 11, box2.y + 16);
 		}
 		else
 		{
-			std::wstring volStr = std::to_wstring(getVolume(inputItem));
+			std::wstring volStr = std::to_wstring(inputItem.getVolume());
 			drawText(volStr + L" mL", box3.x + 9 + 11, box2.y + 16);
 		}
 
@@ -543,7 +542,7 @@ export void drawSimpleItemRect(cursorFlag inputCursor, int x, int y, ItemData& i
 		}
 	}
 
-	drawSimpleItemRect(inputCursor, x, y, getItemSprIndex(inputItem), col2Str(col::white) + mainName, inputItem.checkFlag(itemFlag::GRAYFILTER));
+	drawSimpleItemRect(inputCursor, x, y, inputItem.getSprIndex(), col2Str(col::white) + mainName, inputItem.checkFlag(itemFlag::GRAYFILTER));
 
 }
 
@@ -583,7 +582,7 @@ export void drawVolumeGauge(int x, int y, ItemData& containerItem)
 	{
 		int currentVolume = 0;
 		for (int i = 0; i < pkPtr->itemInfo.size(); i++)
-			currentVolume += getVolume(pkPtr->itemInfo[i]) * (pkPtr->itemInfo[i].number);
+			currentVolume += pkPtr->itemInfo[i].getVolume() * (pkPtr->itemInfo[i].number);
 		float volumeRatio = (float)currentVolume / (float)containerItem.pocketMaxVolume;
 		SDL_Color gaugeCol = lowCol::green;
 		if (volumeRatio > 0.9) gaugeCol = lowCol::red;

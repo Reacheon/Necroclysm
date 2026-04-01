@@ -19,7 +19,7 @@ import renderLog;
 import renderWeather;
 import renderFPS;
 import Player;
-import wrapFunc;
+import World;
 import stepEvent;
 import turnCycleLoop;
 import startArea;

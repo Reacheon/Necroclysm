@@ -6,7 +6,6 @@ import util;
 import GUI;
 import globalVar;
 import constVar;
-import wrapFunc;
 import textureVar;
 import drawText;
 import drawSprite;
@@ -62,7 +61,7 @@ public:
 	~Sleep()
 	{
 		ptr = nullptr;
-		changePlayerWalkMode(walkFlag::walk);
+		PlayerPtr->changeWalkMode(walkFlag::walk);
 		PlayerPtr->setSpriteIndex(charSprIndex::WALK);
 		PlayerPtr->entityInfo.isEyesHalf = false;
 		PlayerPtr->entityInfo.isEyesClose = false;

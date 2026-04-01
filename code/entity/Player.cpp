@@ -6,9 +6,9 @@ import util;
 import Entity;
 import World;
 import globalVar;
-import wrapFunc;
 import textureVar;
 import constVar;
+import statusEffect;
 import log;
 import TileData;
 import ItemPocket;
@@ -347,7 +347,7 @@ void Player::updateNearbyChunk(int range)
 		{
             //std::wprintf(L"(%d,%d) ", x, y);
 			//if (y == chunkY + 2) std::wprintf(L"\n");
-			World::ins()->activate(x, y, PlayerPtr->getGridZ());
+			World::ins()->activate(x, y, PlayerZ());
 		}
 	}
 }
@@ -375,22 +375,22 @@ void Player::endMove()//aStar로 인해 이동이 끝났을 경우
 		if (entityInfo.STA < 0)
 		{
 			entityInfo.STA = 0;
-            changePlayerWalkMode(walkFlag::walk);
+            changeWalkMode(walkFlag::walk);
 		}
 	}
 
 
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW))
 	{
-        changePlayerWalkMode(walkFlag::wade);
+        changeWalkMode(walkFlag::wade);
 	}
 	else if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP))
 	{
-        changePlayerWalkMode(walkFlag::swim);
+        changeWalkMode(walkFlag::swim);
 	}
 	else if (entityInfo.walkMode == walkFlag::swim || entityInfo.walkMode == walkFlag::wade)
 	{
-		changePlayerWalkMode(walkFlag::walk);
+		changeWalkMode(walkFlag::walk);
 	}
 
 	if(TileFloor(getGridX(),getGridY(),getGridZ()) == itemID::shallowFreshWater ||
@@ -724,4 +724,24 @@ int Player::getEncRLeg()
 	int totalVal = 0;
 	for (int i = 0; i < equip.size(); i++) totalVal += equip[i].encRLeg;
 	return totalVal;
+}
+
+void Player::changeWalkMode(walkFlag inputMode)
+{
+	auto& pStatus = entityInfo.statusEffectVec;
+
+	pStatus.erase(std::remove_if(pStatus.begin(), pStatus.end(),
+		[](statusEffect& effect)
+		{
+			return effect.effectType == statusEffectFlag::run ||
+				effect.effectType == statusEffectFlag::crouch ||
+				effect.effectType == statusEffectFlag::crawl;
+		}),
+		pStatus.end());
+
+	if (inputMode == walkFlag::run) pStatus.push_back({ statusEffectFlag::run, -1 });
+	else if (inputMode == walkFlag::crouch) pStatus.push_back({ statusEffectFlag::crouch, -1 });
+	else if (inputMode == walkFlag::crawl) pStatus.push_back({ statusEffectFlag::crawl, -1 });
+
+	entityInfo.walkMode = inputMode;
 }

@@ -4,7 +4,6 @@ import HUD;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import textureVar;
 import Player;
@@ -1484,7 +1483,7 @@ void HUD::drawHoverItemInfo()
 					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
+					drawSpriteCenter(spr::itemset, tgtPart.getSprIndex(), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
 					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
@@ -1505,7 +1504,7 @@ void HUD::drawHoverItemInfo()
 				setFontSize(10);
 				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
 				drawTextCenter(titleName, pivotX + 96, pivotY + 9);
-				drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())]), pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
+				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].getSprIndex(), pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
 
 
 				int newPivotY = pivotY + 16;
@@ -1525,7 +1524,7 @@ void HUD::drawHoverItemInfo()
 					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
 
 					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, getItemSprIndex(tgtPart), pivotX + 24, newPivotY + 12 + 17 * i);
+					drawSpriteCenter(spr::itemset, tgtPart.getSprIndex(), pivotX + 24, newPivotY + 12 + 17 * i);
 
 					//아이템 이름
 					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
@@ -1848,7 +1847,7 @@ void HUD::drawCircuitInfo()
 
 	{
 		Point2 tgtGrid = contextMenuTargetGrid;
-		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerPtr->getGridZ());
+		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
 		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) &&tgtProp->isChargeFlowing())
 			|| tgtProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
@@ -2042,7 +2041,7 @@ void HUD::drawFluidCircuitInfo()
 
 	{
 		Point2 tgtGrid = contextMenuTargetGrid;
-		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerPtr->getGridZ());
+		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
 		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT))) return;
 

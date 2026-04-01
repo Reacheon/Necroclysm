@@ -6,7 +6,7 @@ import constVar;
 import Player;
 import checkCursor;
 import globalVar;
-import wrapFunc;
+import World;
 import actFuncSet;
 
 void Loot::clickUpGUI()

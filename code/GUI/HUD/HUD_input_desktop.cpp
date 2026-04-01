@@ -7,7 +7,6 @@ import util;
 import constVar;
 import checkCursor;
 import globalVar;
-import wrapFunc;
 import Player;
 import World;
 import Vehicle;

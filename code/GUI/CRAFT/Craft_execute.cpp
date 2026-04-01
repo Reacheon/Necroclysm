@@ -2,7 +2,6 @@
 
 import Craft;
 import globalVar;
-import wrapFunc;
 import constVar;
 import util;
 import Lst;

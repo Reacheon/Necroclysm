@@ -8,7 +8,6 @@ import util;
 import GUI;
 import constVar;
 import globalVar;
-import wrapFunc;
 import drawText;
 import checkCursor;
 import drawSprite;

@@ -6,7 +6,6 @@ export module renderTile;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import textureVar;
 import checkCursor;
@@ -911,7 +910,7 @@ void drawItems()
                 drawSpriteCenter
                 (
                     spr::itemset,
-                    getItemSprIndex(pocketInfo[pocketInfo.size() - 1]),
+                    pocketInfo[pocketInfo.size() - 1].getSprIndex(),
                     (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
                     (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
                 );

@@ -4,7 +4,7 @@ import std;
 import util;
 import globalVar;
 import constVar;
-import wrapFunc;
+import World;
 import globalTime;
 import ItemStack;
 import Entity;

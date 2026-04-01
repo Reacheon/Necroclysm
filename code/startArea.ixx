@@ -7,7 +7,6 @@ export module startArea;
 import util;
 import constVar;
 import globalVar;
-import wrapFunc;
 import HUD;
 import Player;
 import ItemData;
@@ -119,7 +118,7 @@ export void startArea()
 	{
 		if (itemDex[i].name != L"?")
 		{
-			if (itemDex[i].checkFlag(itemFlag::CANCRAFT) && getItemSprIndex(itemDex[i]) != 1)
+			if (itemDex[i].checkFlag(itemFlag::CANCRAFT) && itemDex[i].getSprIndex() != 1)
 			{
 				ItemPocket::unlockRecipes.get()->addRecipe(i);
 			}

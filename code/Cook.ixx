@@ -14,7 +14,8 @@ import globalVar;
 import checkCursor;
 import drawWindow;
 import log;
-import wrapFunc;
+import World;
+import Player;
 import ItemStack;
 import ItemPocket;
 import ItemData;
@@ -173,8 +174,8 @@ public:
 			if (heatSrcPropPtr != nullptr)
 			{
 				setZoom(3.0);
-				drawSpriteCenter(spr::itemset, getItemSprIndex(heatSrcPropPtr->leadItem), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 5);
-				//drawSpriteCenter(spr::itemset, getItemSprIndex(heatSrcPropPtr->leadItem), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 10);
+				drawSpriteCenter(spr::itemset, heatSrcPropPtr->leadItem.getSprIndex(), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 5);
+				//drawSpriteCenter(spr::itemset, heatSrcPropPtr->leadItem.getSprIndex(), heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 10);
 				setZoom(1.0);
 				setFontSize(12);
 				drawTextCenter(heatSrcPropPtr->leadItem.name, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y);
@@ -241,7 +242,7 @@ public:
 			if (cookwarePtr != nullptr)
 			{
 				setZoom(2.0);
-				drawSpriteCenter(spr::itemset, getItemSprIndex(*cookwarePtr), cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
+				drawSpriteCenter(spr::itemset, (*cookwarePtr).getSprIndex(), cookwareBtn.x + 20, cookwareBtn.y + cookwareBtn.h / 2);
 				setZoom(1.0);
 
 				if (resultPhase && matchedRecipeIdx >= 0)
@@ -301,7 +302,7 @@ public:
 						else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
 
 						setZoom(2.0);
-						drawSpriteCenter(spr::itemset, getItemSprIndex(itemDex[ingredientCode[i]]), ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
+						drawSpriteCenter(spr::itemset, itemDex[ingredientCode[i]].getSprIndex(), ingredientBtn[i].x + 20, ingredientBtn[i].y + ingredientBtn[i].h / 2);
 						setZoom(1.0);
 
 						setFontSize(16);
@@ -1113,7 +1114,7 @@ public:
 
 			//아이콘
 			setZoom(2.0);
-			drawSpriteCenter(spr::itemset, getItemSprIndex(*ddItems[idx].itemPtr), blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
+			drawSpriteCenter(spr::itemset, (*ddItems[idx].itemPtr).getSprIndex(), blockRect.x + 16, blockRect.y + DD_BLOCK_H / 2);
 			setZoom(1.0);
 
 			//이름 표시

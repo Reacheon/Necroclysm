@@ -4,7 +4,6 @@ import HUD;
 import std;
 import util;
 import globalVar;
-import wrapFunc;
 import constVar;
 import Player;
 import World;
@@ -125,10 +124,10 @@ void HUD::gamepadBtnUp()
 		}
 		break;
     case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
-		if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) changePlayerWalkMode(walkFlag::run);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) changePlayerWalkMode(walkFlag::crouch);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) changePlayerWalkMode(walkFlag::crawl);
-		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) changePlayerWalkMode(walkFlag::walk);
+		if (PlayerPtr->entityInfo.walkMode == walkFlag::walk) PlayerPtr->changeWalkMode(walkFlag::run);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::run) PlayerPtr->changeWalkMode(walkFlag::crouch);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crouch) PlayerPtr->changeWalkMode(walkFlag::crawl);
+		else if (PlayerPtr->entityInfo.walkMode == walkFlag::crawl) PlayerPtr->changeWalkMode(walkFlag::walk);
 		break;
 	case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
 	{

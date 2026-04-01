@@ -84,4 +84,6 @@ public:
 	int getEncRArm();
 	int getEncLLeg();
 	int getEncRLeg();
+
+	void changeWalkMode(walkFlag inputMode);
 };
