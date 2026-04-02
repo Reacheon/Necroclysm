@@ -18,6 +18,8 @@ import Light;
 import Flame;
 import ItemStack;
 import GameOver;
+import GodService;
+import SkillRegistry;
 
 export void debugConsole()
 {
@@ -55,6 +57,7 @@ export void debugConsole()
 	prt(L"26. 청크 덮어쓰기\n");
 	prt(L"27. Lua 스크립트 실행\n");
 	prt(L"28. 게임오버\n");
+	prt(L"29. 신앙도 변경\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -392,9 +395,26 @@ export void debugConsole()
 		}
 		break;
 	}
-	case 28://Lua 스크립트 실행
+	case 28://게임오버
 	{
 		GameOver::create(L"테스트 사망 문구입니다.");
+		break;
+	}
+	case 29://신앙도 변경
+	{
+		int pietyDelta;
+		prt(L"현재 신: %d, 현재 신앙도: %d, 현재 랭크: %d\n", (int)playerGod, godPiety, GodService::getPietyRank());
+		prt(L"현재 스킬 수: %d\n", (int)PlayerInfo().skillList.size());
+		prt(L"추가할 신앙도를 입력해주세요. (음수 가능)\n");
+		std::cin >> pietyDelta;
+		GodService::changePiety(pietyDelta);
+		prt(L"[디버그] 신앙도를 %d만큼 변경하였다. 현재 신앙도: %d (랭크: %d)\n", pietyDelta, godPiety, GodService::getPietyRank());
+		prt(L"변경 후 스킬 수: %d\n", (int)PlayerInfo().skillList.size());
+		for (auto& sd : PlayerInfo().skillList)
+		{
+			auto* bhv = SkillRegistry::get(sd.skillCode);
+			prt(L"  - 스킬코드 %d: %ls\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)");
+		}
 		break;
 	}
 	case 99://콘솔 출력 초기화

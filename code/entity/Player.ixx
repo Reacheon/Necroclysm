@@ -11,6 +11,8 @@ import constVar;
 export class Player :public Entity //플레이어는 엔티티를 상속받고 시야에 따라 미니맵을 업데이트하는 기능을 가지고 있다.
 {
 public:
+	float regenAccum = 0.0f;
+
 	int headHP = 100;
 	int lArmHP = 100;
 	int rArmHP = 100;

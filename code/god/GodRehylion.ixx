@@ -14,9 +14,10 @@ public:
 		descript = L"";
 		iconIndex = 0;
 
-		// rankSkills[1] = { SKILL_CODE_MINOR_HEAL };
-		// rankSkills[3] = { SKILL_CODE_PURIFY };
-		// rankSkills[5] = { SKILL_CODE_DIVINE_VIGOUR };
+		rankSkills[1] = { 40, 41 };  // 자가치료, 타인치료
+		rankSkills[2] = { 42 };      // 정화
+		rankSkills[3] = { 43 };      // 집중치료
+		rankSkills[4] = { 44 };      // 초재생
 	}
 
 	godFlag getGodFlag() const override { return godFlag::rehylion; }

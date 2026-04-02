@@ -51,6 +51,7 @@ export struct EntityData_Base
     __int8 hpBarHeight = -12;
 
     relationFlag relation = relationFlag::hostile;
+    creatureType creature = creatureType::human;
     bool isHumanCustomSprite = false;
 
     __int8 atkSpr1 = -1;

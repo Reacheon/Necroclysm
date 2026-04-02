@@ -223,4 +223,6 @@ export namespace itemID
     constexpr int garlic = 542;
 
     constexpr int assaultRifle = 12;
+
+    constexpr int altarOfRehylion = 543;
 };

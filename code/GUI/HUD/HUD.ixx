@@ -1173,6 +1173,15 @@ public:
 			}
 		}
 
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			Prop* propPtr = TileProp(targetGrid.x, targetGrid.y, PlayerZ());
+			if (propPtr->leadItem.itemCode == itemID::altarOfRehylion)
+			{
+				inputOptions.push_back(act::pray);
+			}
+		}
+
 		new ContextMenu(windowCoord.x, windowCoord.y, targetGrid.x, targetGrid.y, inputOptions);
 	}
 

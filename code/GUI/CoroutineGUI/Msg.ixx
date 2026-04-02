@@ -243,7 +243,7 @@ public:
 			else
 			{
 				setFontSize(26);
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 130, true, msgBase.w, -1);
+				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 130, true, msgBase.w - 50, -1);
 			}
 
 

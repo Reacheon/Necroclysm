@@ -16,6 +16,9 @@ export enum statusEffectFlag
     run = 7,
     crouch = 8,
     crawl = 9,
+
+    superRegen = 10,
+    immuneStatus = 11,
 };
 
 export class statusEffect

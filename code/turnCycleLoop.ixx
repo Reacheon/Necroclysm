@@ -634,6 +634,26 @@ __int64 entityAITurn()
 		statusCalc(PlayerPtr);
 		for (auto mPtr : monsterSet) statusCalc(mPtr);
 
+		// 플레이어 HP 재생
+		{
+			float regenRate = 0.1f;
+			if (checkStatusEffect(PlayerPtr->entityInfo.statusEffectVec, statusEffectFlag::superRegen))
+				regenRate += 3.0f;
+
+			PlayerPtr->regenAccum += regenRate;
+			int healTick = (int)PlayerPtr->regenAccum;
+			if (healTick >= 1)
+			{
+				PlayerPtr->regenAccum -= (float)healTick;
+				int maxHP = PlayerPtr->entityInfo.maxHP;
+				PlayerPtr->headHP = myMin(maxHP, PlayerPtr->headHP + healTick);
+				PlayerPtr->lArmHP = myMin(maxHP, PlayerPtr->lArmHP + healTick);
+				PlayerPtr->rArmHP = myMin(maxHP, PlayerPtr->rArmHP + healTick);
+				PlayerPtr->lLegHP = myMin(maxHP, PlayerPtr->lLegHP + healTick);
+				PlayerPtr->rLegHP = myMin(maxHP, PlayerPtr->rLegHP + healTick);
+				PlayerPtr->entityInfo.HP = myMin(maxHP, PlayerPtr->entityInfo.HP + healTick);
+			}
+		}
 
 	}
 	else { turnCycle = turn::monsterAnime; }

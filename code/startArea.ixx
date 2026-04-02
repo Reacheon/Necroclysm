@@ -829,7 +829,7 @@ export void startArea()
 	createProp({ 5, 8, 0 }, itemID::intakePipeU);
 
 	//종교
-
+	createProp({ -23, 0, 0 }, itemID::altarOfRehylion);//리힐리온 제단
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 

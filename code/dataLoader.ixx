@@ -9,6 +9,7 @@ import globalVar;
 import readItemDex;
 import readEntityDex;
 import SkillRegistry;
+import GodRegistry;
 
 export void dataLoader()
 {
@@ -25,6 +26,9 @@ export void dataLoader()
 
 	//스킬 행동 등록
 	SkillRegistry::init();
+
+	//신 행동 등록
+	GodRegistry::init();
 
 	//시스템(UI) 문자열 로드
 	std::wstring systemPath = L"language/" + option::language + L"/sysStr.tsv";
