@@ -7,12 +7,13 @@ import std;
 
 export std::wstring col2Str(SDL_Color color)
 {
+	constexpr wchar_t hex[] = L"0123456789ABCDEF";
 	std::wstring instantColor = L"#000000";
-	instantColor[1] = color.r / 16 + 48;
-	instantColor[2] = color.r % 16 + 48;
-	instantColor[3] = color.g / 16 + 48;
-	instantColor[4] = color.g % 16 + 48;
-	instantColor[5] = color.b / 16 + 48;
-	instantColor[6] = color.b % 16 + 48;
+	instantColor[1] = hex[color.r / 16];
+	instantColor[2] = hex[color.r % 16];
+	instantColor[3] = hex[color.g / 16];
+	instantColor[4] = hex[color.g % 16];
+	instantColor[5] = hex[color.b / 16];
+	instantColor[6] = hex[color.b % 16];
 	return instantColor;
 }

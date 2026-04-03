@@ -23,6 +23,7 @@ import ItemData;
 import Equip;
 import SkillBehavior;
 import SkillRegistry;
+import Entity;
 import GodService;
 import GodBehavior;
 import GodRegistry;
@@ -766,15 +767,36 @@ void HUD::drawQuickSlot()
 
 		if (deact) btnCol = col::black;
 
-		//스킬 이름 표시
+		//스킬 이름 + 실패율 표시
 		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact==false)
 		{
 			setFont(fontType::mainFont);
 			setFontSize(18);
 			auto* skillBhv = SkillRegistry::get(quickSlot[i].second);
 			std::wstring skillName = skillBhv ? skillBhv->name : L"?";
-			drawTextOutlineCenter(skillName, quickSlotRegion.x + quickSlotRegion.w / 2, quickSlotRegion.h + 18);
-			
+
+			int centerX = quickSlotRegion.x + quickSlotRegion.w / 2;
+			int textY = quickSlotRegion.h + 18;
+
+			if (skillBhv && !skillBhv->reqProfic.empty())
+			{
+				int failRate = skillBhv->calcFailRate(static_cast<Entity*>(PlayerPtr));
+				SDL_Color failCol;
+				if (failRate <= 4) failCol = col::yellowGreen;
+				else if (failRate <= 20) failCol = lowCol::yellow;
+				else failCol = lowCol::red;
+
+				std::wstring failStr = L" (" + std::to_wstring(failRate) + L"%)";
+				int totalW = queryTextWidth(skillName) + queryTextWidth(failStr);
+				int startX = centerX - totalW / 2;
+
+				drawTextOutline(skillName, startX, textY, col::white);
+				drawTextOutline(failStr, startX + queryTextWidth(skillName), textY, failCol);
+			}
+			else
+			{
+				drawTextOutlineCenter(skillName, centerX, textY);
+			}
 		}
 
 		SDL_Rect skillRect = SDL_Rect{ pivotX,pivotY,62,58 };
@@ -1199,24 +1221,17 @@ void HUD::drawStatusEffects()
 	{
 		int pivotX = 15;
 		int pivotY = 370 + 45 * i;
-		std::wstring statEfctName = L"";
-		int statEfctIcon = 0;
-		SDL_Color textColor = col::white;
 		int textOffsetY = -3;
 
+		// 메타데이터 테이블에서 기본값 참조
+		const auto& meta = statusEffectMeta[static_cast<int>(myEfcts[i].effectType)];
+		std::wstring statEfctName = meta.name ? meta.name : L"";
+		int statEfctIcon = meta.iconIndex;
+		SDL_Color textColor = meta.color;
+
+		// 동적 상태이상: 수치에 따라 이름/색상 결정
 		switch (myEfcts[i].effectType)
 		{
-		case statusEffectFlag::confused:
-			statEfctName = L"혼란";
-			statEfctIcon = 1;
-			break;
-
-		case statusEffectFlag::bleeding:
-			statEfctName = L"출혈";
-			statEfctIcon = 2;
-			textColor = lowCol::red;
-			break;
-
 		case statusEffectFlag::hungry:
 			if (fakeHunger < PLAYER_STARVE_CALORIE)
 			{
@@ -1238,7 +1253,6 @@ void HUD::drawStatusEffects()
 				statEfctName = sysStr[217]; // 배부름 (Full)
 				textColor = col::green;
 			}
-			statEfctIcon = 3;
 			break;
 
 		case statusEffectFlag::dehydrated:
@@ -1262,17 +1276,9 @@ void HUD::drawStatusEffects()
 				statEfctName = sysStr[221]; // 해갈 (Hydrated)
 				textColor = col::green;
 			}
-			statEfctIcon = 4;
 			break;
-
-		case statusEffectFlag::blind:
-			statEfctName = L"실명";
-			statEfctIcon = 15;
-			break;
-
 
 		case statusEffectFlag::tired:
-			statEfctIcon = 11;
 			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
 			{
 				statEfctName = sysStr[228]; // 탈진 상태 (Exhausted)
@@ -1296,20 +1302,8 @@ void HUD::drawStatusEffects()
 			}
 			break;
 
-
-
-		case statusEffectFlag::run:
-			statEfctName = L"Run";
-			statEfctIcon = 60;
+		default:
 			break;
-		case statusEffectFlag::crawl:
-			statEfctName = L"Crawl";
-			statEfctIcon = 61;
-			break;
-		case statusEffectFlag::crouch:
-			statEfctName = L"Crouch";
-			statEfctIcon = 62;
-            break;
 		}
 
 

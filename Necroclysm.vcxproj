@@ -352,6 +352,7 @@
     <ClCompile Include="code\var\constVar-itemFlags.ixx" />
     <ClCompile Include="code\var\constVar-itemIDs.ixx" />
     <ClCompile Include="code\var\constVar-names.ixx" />
+    <ClCompile Include="code\var\constVar-fwd.ixx" />
     <ClCompile Include="code\var\constVar.ixx" />
     <ClCompile Include="code\var\globalVar.ixx" />
     <ClCompile Include="code\var\globalVar_input.cpp" />

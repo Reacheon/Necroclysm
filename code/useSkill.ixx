@@ -9,6 +9,8 @@ import Entity;
 import SkillData;
 import SkillBehavior;
 import SkillRegistry;
+import log;
+import turnWait;
 
 export void useSkill(int skillCode)
 {
@@ -38,6 +40,18 @@ export void useSkill(int skillCode)
 
 	Entity* caster = static_cast<Entity*>(PlayerPtr);
 	if (!behavior->canUse(caster, *skillDataPtr)) return;
+
+	// 실패율 판정 (reqProfic이 있는 스킬만 실패 가능)
+	if (!behavior->reqProfic.empty())
+	{
+		int failRate = behavior->calcFailRate(caster);
+		if (failRate > 0 && randomRange(1, 100) <= failRate)
+		{
+			updateLog(L"You fail to use " + behavior->name + L".");
+			turnWait(1.0);
+			return;
+		}
+	}
 
 	currentUsingSkill = skillCode;
 	Corouter::start(behavior->execute(caster, *skillDataPtr));

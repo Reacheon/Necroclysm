@@ -23,7 +23,8 @@ public:
 		src = skillSrc::GENERAL;
 		type = skillType::ACTIVE;
 		reqStat = L"DEX";
-		reqProfic = { 1 };
+		reqProfic = { proficFlag::dodging };
+		skillRank = L"E";
 	}
 
 	int getSkillCode() const override { return 33; }

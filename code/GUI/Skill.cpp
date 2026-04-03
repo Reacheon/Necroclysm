@@ -17,6 +17,24 @@ import SkillBehavior;
 import SkillRegistry;
 import useSkill;
 import World;
+import Entity;
+
+// 숙련도 인덱스 → 표시 이름
+static std::wstring getProficName(int index)
+{
+	if (index >= 0 && index <= 18) return sysStr[55 + index];
+	if (index == 19) return sysStr[295]; // Invocations
+	return L"?";
+}
+
+// 실패율에 따른 DCSS 스타일 색상 반환
+// 0%: 밝은 초록, 1-25%: 흰색, 26-50%: 노랑, 51-75%: 주황, 76-100%: 빨강
+static SDL_Color getFailColor(int failRate)
+{
+	if (failRate <= 4) return col::yellowGreen;
+	if (failRate <= 20) return lowCol::yellow;
+	return lowCol::red;
+}
 
 Skill::Skill() : GUI(false)
 {
@@ -193,15 +211,33 @@ void Skill::drawGUI()
 				std::wstring rankText = L"Rank " + (tgtBhv ? tgtBhv->skillRank : L"?");
 				drawText(rankText, skillBtn[i].x + 330- queryTextWidth(rankText), skillBtn[i].y + 4);
 				setFont(fontType::mainFont);
-				std::wstring profText = L"Invocation / Fighting";
+
+				// 요구 숙련도 이름 표시
+				std::wstring profText;
+				if (tgtBhv)
+				{
+					for (size_t p = 0; p < tgtBhv->reqProfic.size(); p++)
+					{
+						if (p > 0) profText += L" / ";
+						profText += getProficName(tgtBhv->reqProfic[p]);
+					}
+				}
+				if (profText.empty()) profText = L"-";
 				setFontSize(12);
 				drawText(profText, skillBtn[i].x + 330 - queryTextWidth(profText), skillBtn[i].y + 25);
 
+				// 실패율 계산 및 색상 적용
+				int failRate = 0;
+				if (tgtBhv)
+					failRate = tgtBhv->calcFailRate(static_cast<Entity*>(PlayerPtr));
 
+				setFontSize(12);
 				drawTextCenter(L"Fail", skillBtn[i].x + skillBtn[i].w - 20, skillBtn[i].y + 12);
 				setFont(fontType::mainFontSemiBold);
 				setFontSize(15);
-				drawTextCenter(L"33%", skillBtn[i].x + skillBtn[i].w - 18, skillBtn[i].y + 29);
+				SDL_Color failCol = getFailColor(failRate);
+				std::wstring failStr = std::to_wstring(failRate) + L"%";
+				drawTextCenter(col2Str(failCol) + failStr, skillBtn[i].x + skillBtn[i].w - 18, skillBtn[i].y + 29);
 			}
 		}
 

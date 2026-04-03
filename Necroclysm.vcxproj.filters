@@ -106,6 +106,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP">
       <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\GOD">
+      <UniqueIdentifier>{b4c5d6e7-2f3a-4b5c-8d9e-0f1a2b3c4d5e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -259,7 +262,7 @@
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\drawEpsilonText.ixx">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -676,13 +679,13 @@
       <Filter>소스 파일\01_system\04_GUI\COOK</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\barActCommon.ixx">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\ItemListPanel.ixx">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\01_system\04_GUI\ITEM_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\CRAFT\Craft_execute.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>소스 파일\01_system\04_GUI\CRAFT</Filter>
     </ClCompile>
     <ClCompile Include="code\Vehicle_runAnimation.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
@@ -692,6 +695,30 @@
     </ClCompile>
     <ClCompile Include="code\world\World_createSector.cpp">
       <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\GOD\GodPanel.ixx">
+      <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\GOD\GodPanel_draw.cpp">
+      <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillHealOther.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillPurify.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillFocusHeal.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\var\constVar-fwd.ixx">
+      <Filter>소스 파일\00_var\constVar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

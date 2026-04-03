@@ -12,9 +12,22 @@ public:
 		name = L"Rehylion";
 		title = L"the Healer";
 		playerTitle = L"Vessel";
-		descript = L"";
+		descript = L"A god of healing and medicine widely worshipped across the Balkans. Followers of Rehylion consider acts of healing toward others as the greatest virtue. Rehylion and the devoted seek to guide all undead to their rightful rest.";
 		iconIndex = 0;
 		altarItemCode = itemID::altarOfRehylion;
+
+		prohibitions = {
+			L"Attacking friendly creatures",
+			L"Using tools of evil origin",
+			L"Necromutation"
+		};
+		pietyGains = {
+			L"Pray (once per day)",
+			L"Administering first aid with tools",
+			L"Waking from a restful sleep",
+			L"Slaying undead",
+			L"Converting others through healing, or laying undead to rest"
+		};
 
 		rankSkills[1] = { 40, 41 };  // 자가치료, 타인치료
 		rankSkills[2] = { 42 };      // 정화

@@ -13,6 +13,8 @@ public:
 	std::wstring title = L"";
 	std::wstring playerTitle = L"Follower";
 	std::wstring descript = L"";
+	std::vector<std::wstring> prohibitions;
+	std::vector<std::wstring> pietyGains;
 	int iconIndex = 0;
 	int altarItemCode = 0;
 

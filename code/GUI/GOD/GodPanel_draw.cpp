@@ -11,8 +11,11 @@ import drawWindow;
 import drawSprite;
 import checkCursor;
 import drawText;
+import drawPrimitive;
 import GodBehavior;
 import GodRegistry;
+import SkillBehavior;
+import SkillRegistry;
 
 void GodPanel::drawGUI()
 {
@@ -21,32 +24,142 @@ void GodPanel::drawGUI()
 	if (getFoldRatio() == 1.0)
 	{
 		auto* behavior = GodRegistry::get(targetGod);
-		std::wstring windowTitle = behavior ? behavior->name : L"Unknown God";
+		if (!behavior) return;
+
+		const int px = panelBase.x;
+		const int py = panelBase.y;
+		const int pw = panelBase.w;
 
 		setWindowAlpha(230);
 		drawWindow(&panelBase, L"God", 1);
 		resetWindowAlpha();
 
-		// 화살표
-		if (arrowDir == dir16::left) drawSprite(spr::newWindowArrow, 0, panelBase.x - 26, panelBase.y + arrowOffsetY);
+		// ── 화살표 ──
+		if (arrowDir == dir16::left) drawSprite(spr::newWindowArrow, 0, px - 26, py + arrowOffsetY);
 		else if (arrowDir == dir16::right)
 		{
 			setFlip(SDL_FLIP_HORIZONTAL);
-			drawSprite(spr::newWindowArrow, 0, panelBase.x + panelBase.w - 4, panelBase.y + arrowOffsetY);
+			drawSprite(spr::newWindowArrow, 0, px + pw - 4, py + arrowOffsetY);
 			setFlip(SDL_FLIP_NONE);
 		}
 
+		// ── 제단 아이콘 + 신 이름 ──
+		setZoom(2.0);
+		drawSprite(spr::propset, itemDex[behavior->altarItemCode].propSprIndex, px + 12, py + 30);
+		setZoom(1.0);
 
 		setFontSize(24);
 		setFont(fontType::mainFontBold);
-		drawTextCenter(L"Rehylion, the Healer", panelBase.x + panelBase.w/2, panelBase.y + 68);
+		drawTextCenter(behavior->name + L", " + behavior->title, px + pw / 2, py + 68);
+
+		// ── 설명문 (Lore) ──
+		int curY = py + 95;
+		if (!behavior->descript.empty())
+		{
+			setFont(fontType::mainFont);
+			setFontSize(15);
+			setFontGap(3);
+			int lines = drawTextWidth(behavior->descript, px + 17, curY, false, pw - 34, -1);
+			curY += lines * (15 + 3) + 10;
+			setFontGap(0);
+		}
+
+		// ── 구분선 ──
+		drawLine(px + 14, curY, px + pw - 14, curY, col::gray, 100);
+		curY += 10;
+
+		// ════════════════════════════════════
+		// ── Granted Skills 섹션 ──
+		// ════════════════════════════════════
+		setFont(fontType::mainFontSemiBold);
+		setFontSize(16);
+		drawText(L"#e9c900Granted Skills", px + 17, curY);
+		curY += 24;
+
+		// rankSkills를 flat한 리스트로 전개 (rank 순서대로)
+		struct SkillEntry { int skillCode; int rank; };
+		std::vector<SkillEntry> skillList;
+		for (auto& [rank, codes] : behavior->rankSkills)
+		{
+			for (int code : codes)
+				skillList.push_back({ code, rank });
+		}
+
 		setFont(fontType::mainFont);
-		setZoom(2.0);
-		drawSprite(spr::propset, itemDex[behavior->altarItemCode].propSprIndex, panelBase.x + 12, panelBase.y + 30);
-		setZoom(1.0);
+		setFontSize(14);
+
+		const int colWidth = (pw - 34) / 2;	// 한 열 너비
+		const int rowH = 30;					// 한 행 높이
+
+		for (int i = 0; i < (int)skillList.size(); i++)
+		{
+			int col = i % 2;
+			int row = i / 2;
+			int sx = px + 17 + col * colWidth;
+			int sy = curY + row * rowH;
+
+			auto* skill = SkillRegistry::get(skillList[i].skillCode);
+			if (!skill) continue;
+
+			// 스킬 아이콘
+			drawSprite(spr::icon24, skill->iconIndex, sx, sy);
+
+			// 스킬 이름 + 필요 랭크 (★)
+			std::wstring starStr;
+			for (int s = 0; s < skillList[i].rank; s++) starStr += L"\u2605";
+
+			std::wstring skillText = skill->name + L" #e9c900(" + starStr + L")";
+			drawText(skillText, sx + 28, sy + 5);
+		}
+
+		int skillRows = ((int)skillList.size() + 1) / 2;
+		curY += skillRows * rowH + 10;
+
+		// ── 구분선 ──
+		drawLine(px + 14, curY, px + pw - 14, curY, col::gray, 100);
+		curY += 10;
+
+		// ════════════════════════════════════
+		// ── Prohibitions 섹션 ──
+		// ════════════════════════════════════
+		setFont(fontType::mainFontSemiBold);
+		setFontSize(16);
+		drawText(L"#E04040Prohibitions", px + 17, curY);
+		curY += 24;
+
+		setFont(fontType::mainFont);
+		setFontSize(14);
+		for (auto& item : behavior->prohibitions)
+		{
+			drawText(L"#E04040- #FFFFFF" + item, px + 22, curY);
+			curY += 20;
+		}
+		curY += 6;
+
+		// ── 구분선 ──
+		drawLine(px + 14, curY, px + pw - 14, curY, col::gray, 100);
+		curY += 10;
+
+		// ════════════════════════════════════
+		// ── Gaining Piety 섹션 ──
+		// ════════════════════════════════════
+		setFont(fontType::mainFontSemiBold);
+		setFontSize(16);
+		drawText(L"#59cb65Gaining Piety", px + 17, curY);
+		curY += 24;
+
+		setFont(fontType::mainFont);
+		setFontSize(14);
+		setFontGap(2);
+		for (auto& item : behavior->pietyGains)
+		{
+			std::wstring bulletText = L"#59cb65- #FFFFFF" + item;
+			int lines = drawTextWidth(bulletText, px + 22, curY, false, pw - 44, -1);
+			curY += lines * (14 + 2) + 4;
+		}
+		setFontGap(0);
 
 		// ── 하단 버튼 (Devote / Renounce) ──
-		// Msg 스타일 버튼 (spr::msgChoiceBtn)
 		{
 			bool isFollowing = (playerGod == targetGod);
 			bool canDevote = (playerGod == godFlag::none);
@@ -65,7 +178,6 @@ void GodPanel::drawGUI()
 
 			if (isFollowing)
 			{
-				// 빨간색 Renounce
 				drawTextCenter(L"Renounce", actionBtn.x + actionBtn.w / 2, actionBtn.y + actionBtn.h / 2, { 0xE0, 0x40, 0x40 });
 			}
 			else if (canDevote)
@@ -74,7 +186,6 @@ void GodPanel::drawGUI()
 			}
 			else
 			{
-				// 이미 다른 신을 믿고 있음 - 회색 비활성 표시
 				drawTextCenter(L"Devote", actionBtn.x + actionBtn.w / 2, actionBtn.y + actionBtn.h / 2, col::gray);
 			}
 

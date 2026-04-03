@@ -18,6 +18,8 @@ import drawWindow;
 import GodService;
 import GodBehavior;
 import GodRegistry;
+import SkillBehavior;
+import SkillRegistry;
 import log;
 
 export class GodPanel : public GUI
@@ -52,7 +54,7 @@ public:
 			arrowEndX = cameraW / 2 + 8 * zoomScale + 16 * revX * zoomScale;
 			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
 			targetX = arrowEndX + 26;
-			targetY = arrowEndY - 263;
+			targetY = arrowEndY - 330;
 		}
 		else
 		{
@@ -60,10 +62,10 @@ public:
 			arrowEndX = cameraW / 2 - 8 * zoomScale + 16 * revX * zoomScale;
 			arrowEndY = cameraH / 2 + 16 * revY * zoomScale;
 			targetX = arrowEndX - 429;
-			targetY = arrowEndY - 263;
+			targetY = arrowEndY - 330;
 		}
 		targetX = std::clamp(targetX, 0, cameraW - 404);
-		targetY = std::clamp(targetY, 0, cameraH - 506);
+		targetY = std::clamp(targetY, 0, cameraH - 660);
 		arrowOffsetY = arrowEndY - 25 - targetY;
 
 		changeXY(targetX, targetY, false);
@@ -86,9 +88,9 @@ public:
 		int arrowEndX = cameraW / 2 + 8 * zoomScale;
 		int arrowEndY = cameraH / 2;
 		int targetX = arrowEndX + 26;
-		int targetY = arrowEndY - 263;
+		int targetY = arrowEndY - 330;
 		targetX = std::clamp(targetX, 0, cameraW - 404);
-		targetY = std::clamp(targetY, 0, cameraH - 506);
+		targetY = std::clamp(targetY, 0, cameraH - 660);
 		arrowOffsetY = arrowEndY - 25 - targetY;
 
 		changeXY(targetX, targetY, false);
@@ -107,7 +109,7 @@ public:
 
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		panelBase = { 0, 0, 404, 506 };
+		panelBase = { 0, 0, 404, 660 };
 		if (center == false)
 		{
 			panelBase.x += inputX;

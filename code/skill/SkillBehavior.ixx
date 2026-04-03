@@ -27,6 +27,35 @@ public:
 	float maxCooldown = 30.0f;
 	std::wstring skillRank = L"F";
 
+	// 랭크 문자열을 난이도 숫자로 변환 (F=1, E=2, D=3, C=4, B=5, A=6, S=7)
+	int getRankDifficulty() const
+	{
+		if (skillRank == L"F") return 1;
+		if (skillRank == L"E") return 2;
+		if (skillRank == L"D") return 3;
+		if (skillRank == L"C") return 4;
+		if (skillRank == L"B") return 5;
+		if (skillRank == L"A") return 6;
+		if (skillRank == L"S") return 7;
+		return 1;
+	}
+
+	// 실패율 계산: failRate = 15*난이도 - 5 - (25/6)*평균숙련도
+	// F(Lv0)=10%, S(Lv0)=100%, S(Lv24)=0%
+	// reqProfic이 비어있으면 실패율 0% (실패 없음)
+	int calcFailRate(Entity* caster) const
+	{
+		if (reqProfic.empty()) return 0;
+
+		float avgLevel = 0.0f;
+		for (int idx : reqProfic)
+			avgLevel += caster->getProficLevel(idx);
+		avgLevel /= static_cast<float>(reqProfic.size());
+
+		int rawFail = 15 * getRankDifficulty() - 5 - static_cast<int>(avgLevel * 25.0f / 6.0f);
+		return std::clamp(rawFail, 0, 100);
+	}
+
 	// 스킬 코드 (SkillData.skillCode와 매칭)
 	virtual int getSkillCode() const = 0;
 

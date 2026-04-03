@@ -29,6 +29,8 @@ public:
 		src = skillSrc::MAGIC;
 		type = skillType::ACTIVE;
 		maxCooldown = 0.0f;
+		reqProfic = { proficFlag::invocations };
+		skillRank = L"C";
 	}
 
 	int getSkillCode() const override { return 43; }
