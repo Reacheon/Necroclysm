@@ -148,7 +148,7 @@ void Equip::clickUpGUI()
 	//위의 모든 경우에서 return을 받지 못했으면 버튼 이외를 누른 것이므로 커서를 -1로 복구
 	{
 		panel.cursor = -1;
-		barAct = actSet::null;
+		barAct = actSet::null();
 	}
 }
 void Equip::clickMotionGUI(int dx, int dy)

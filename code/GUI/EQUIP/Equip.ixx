@@ -81,7 +81,7 @@ public:
 		UIType = act::null;
 		panel.cursor = -1;
 		panel.scroll = 0;
-		barAct = actSet::null;
+		barAct = actSet::null();
 	}
 	static Equip* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -156,7 +156,7 @@ public:
 			panel.scroll = 0;
 			panel.cursor = -1;
 			panel.clearAllSelections();
-			barAct = actSet::null;
+			barAct = actSet::null();
 		}
 	}
 

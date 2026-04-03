@@ -23,6 +23,9 @@ import ItemData;
 import Equip;
 import SkillBehavior;
 import SkillRegistry;
+import GodService;
+import GodBehavior;
+import GodRegistry;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
@@ -144,7 +147,21 @@ void HUD::drawGUI()
 		{
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
-			drawText(L"Jackson, Practitioner of Elivilon ******", letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
+
+			std::wstring titleText = L"Nekbung, ";
+			auto* god = GodService::getCurrentGod();
+			if (god)
+			{
+				titleText += god->playerTitle + L" of " + god->name + L" ";
+				int rank = GodService::getPietyRank();
+				for (int i = 0; i < 6; i++) titleText += (i < rank) ? L"*" : L".";
+			}
+			else
+			{
+				titleText += L"Survivor";
+			}
+
+			drawText(titleText, letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 			setFont(fontType::mainFont);
 		}
 

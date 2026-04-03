@@ -289,7 +289,7 @@ public:
 					else //커서 해제
 					{
 						cursor = -1;
-						barAct = actSet::null;
+						barAct = actSet::null();
 						return -1;
 					}
 				}

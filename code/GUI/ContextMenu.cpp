@@ -27,29 +27,6 @@ import ItemStack;
 import Sleep;
 import turnWait;
 import Msg;
-import GodService;
-
-namespace
-{
-	Corouter prayAtAltar()
-	{
-		new Msg(msgFlag::normal, L"Altar",
-			L"Do you wish to worship Rehylion, the Healer?",
-			{ L"Yes", L"No" });
-		co_await std::suspend_always();
-
-		if (coAnswer == L"Yes")
-		{
-			GodService::joinGod(godFlag::rehylion);
-			updateLog(L"You kneel before the altar. Rehylion accepts you as a follower.");
-		}
-		else
-		{
-			updateLog(L"You step away from the altar.");
-		}
-		co_return;
-	}
-}
 
 ContextMenu::ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int inputGridY, std::vector<act> inputOptions) : GUI(false)
 {
@@ -691,23 +668,5 @@ void ContextMenu::executeContextAct(act inputAct)
 			actFunc::showWire({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 		}
 	}
-	else if (inputAct == act::pray)
-	{
-		Prop* pPtr = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-		if (pPtr != nullptr && pPtr->leadItem.itemCode == itemID::altarOfRehylion)
-		{
-			if (playerGod == godFlag::rehylion)
-			{
-				updateLog(L"You are already a follower of Rehylion.");
-			}
-			else if (playerGod != godFlag::none)
-			{
-				updateLog(L"You must abandon your current god first.");
-			}
-			else
-			{
-				Corouter::start(prayAtAltar());
-			}
-		}
-	}
 }
+

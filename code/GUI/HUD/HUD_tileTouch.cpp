@@ -13,6 +13,7 @@ import Dialogue;
 import Loot;
 import Prop;
 import ItemData;
+import GodPanel;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
@@ -60,7 +61,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						else
 						{
 							ctrlVeh = nullptr;
-							barAct = actSet::null;
+							barAct = actSet::null();
 							typeHUD = vehFlag::none;
 							PlayerPtr->updateVision();
 							PlayerPtr->updateMinimap();
@@ -77,7 +78,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						else
 						{
 							ctrlVeh = nullptr;
-							barAct = actSet::null;
+							barAct = actSet::null();
 							typeHUD = vehFlag::none;;
 						}
 					}
@@ -92,7 +93,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						else
 						{
 							ctrlVeh = nullptr;
-							barAct = actSet::null;
+							barAct = actSet::null();
 							typeHUD = vehFlag::none;;
 						}
 					}
@@ -107,7 +108,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						else
 						{
 							ctrlVeh = nullptr;
-							barAct = actSet::null;
+							barAct = actSet::null();
 							typeHUD = vehFlag::none;;
 						}
 					}
@@ -161,6 +162,14 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							{
 								createProp({ PlayerX(), PlayerY(), PlayerZ() }, 298);//상승계단
 							}
+						}
+					}
+					else if (tgtProp->leadItem.itemCode == itemID::altarOfRehylion)
+					{
+						if (GodPanel::ins() == nullptr)
+						{
+							new GodPanel(godFlag::rehylion, { touchX, touchY, PlayerZ() });
+							click = false;
 						}
 					}
 				}
@@ -272,6 +281,14 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
+				else if (tgtProp->leadItem.itemCode == itemID::altarOfRehylion)
+				{
+					if (GodPanel::ins() == nullptr)
+					{
+						new GodPanel(godFlag::rehylion, { touchX, touchY, PlayerZ() });
+						click = false;
+					}
+				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::CROP) && tgtProp->plantGrowthPercent >= 100.0)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
@@ -306,7 +323,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 		if (touchX == PlayerX() && touchY == PlayerY())
 		{
 			ctrlVeh = nullptr;
-			barAct = actSet::null;
+			barAct = actSet::null();
 		}
 	}
 }

@@ -294,6 +294,8 @@
     <ClCompile Include="code\god\GodRegistry.cpp" />
     <ClCompile Include="code\god\GodRehylion.ixx" />
     <ClCompile Include="code\god\GodService.ixx" />
+    <ClCompile Include="code\GUI\GOD\GodPanel.ixx" />
+    <ClCompile Include="code\GUI\GOD\GodPanel_draw.cpp" />
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\statusEffect.ixx" />
     <ClCompile Include="code\Sticker.ixx" />

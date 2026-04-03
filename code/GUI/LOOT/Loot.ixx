@@ -154,7 +154,7 @@ public:
 		panel.clearAllSelections();
 		panel.cursor = -1;
 		panel.scroll = 0;
-		barAct = actSet::null;
+		barAct = actSet::null();
 		barActCursor = -1;
 	}
 	static Loot* ins() { return ptr; }
@@ -254,7 +254,7 @@ public:
 			else
 			{
 				panel.cursor = -1;
-				barAct = actSet::null;
+				barAct = actSet::null();
 			}
 		}
 	}

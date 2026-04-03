@@ -11,8 +11,10 @@ public:
 	// 메타데이터 (서브클래스 생성자에서 설정)
 	std::wstring name = L"UNNAMED GOD";
 	std::wstring title = L"";
+	std::wstring playerTitle = L"Follower";
 	std::wstring descript = L"";
 	int iconIndex = 0;
+	int altarItemCode = 0;
 
 	// 신앙도 단계 경계값 (0~200, 6단계)
 	// rank 0: 0~29, rank 1: 30~49, rank 2: 50~74,

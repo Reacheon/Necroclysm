@@ -19,10 +19,18 @@ import Drawable;
 import Vehicle;
 import Prop;
 
+export godFlag playerGod = godFlag::none;
+export int godPiety = 0;
+
 /////////////////////////////////////////////////////////////////
 export namespace actSet
 {
-    std::vector<act> null = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait,act::god, act::sleep, act::cooking };
+    inline std::vector<act> null()
+    {
+        std::vector<act> result = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait, act::sleep, act::cooking };
+        if (playerGod != godFlag::none) result.insert(result.begin() + 7, act::god);
+        return result;
+    }
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
     std::vector<act> helicopter = { act::collectiveLever, act::wait, act::cyclicLever, act::startEngine, act::rpmLever, act::tailRotorPedalL, act::tailRotorPedalR };
@@ -100,7 +108,7 @@ export SDL_Point clickHoldPoint = { 0,0 }; //홀드 이벤트를 실행한 좌�
 export bool deactClickUp = false; //true일 경우 클릭업 및 클릭라이트(업) 함수를 실행하지 않음
 export bool itemListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
 export bool skillListColorLock = false; //스크롤 행동시 마우스를 옮겼을 때 버튼들의 색변화 방지
-export std::vector<act> barAct = actSet::null; //하단에 표시되는 행동 리스트 | Writer: Loot/Equip/Inventory(updateBarAct), 소멸자에서 reset | Reader: HUD_draw
+export std::vector<act> barAct = actSet::null(); //하단에 표시되는 행동 리스트 | Writer: Loot/Equip/Inventory(updateBarAct), 소멸자에서 reset | Reader: HUD_draw
 export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
 export int dtClickStackStart = 0; //클릭 시간 측정 시작한 시간
@@ -208,9 +216,6 @@ export namespace dur
 }
 
 export int extraCameraLength = 0;
-
-export godFlag playerGod = godFlag::none;
-export int godPiety = 0;
 
 //화면 내에 있지않아도 여기에 추가될 경우 반드시 그려짐
 export std::vector<Drawable*> extraRenderVehList;

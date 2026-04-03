@@ -11,8 +11,10 @@ public:
 	{
 		name = L"Rehylion";
 		title = L"the Healer";
+		playerTitle = L"Vessel";
 		descript = L"";
 		iconIndex = 0;
+		altarItemCode = itemID::altarOfRehylion;
 
 		rankSkills[1] = { 40, 41 };  // 자가치료, 타인치료
 		rankSkills[2] = { 42 };      // 정화

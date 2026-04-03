@@ -208,7 +208,7 @@ public:
 		// 위의 모든 경우에서 return을 받지 못했으면 커서를 -1로 복구
 		{
 			panel.cursor = -1;
-			barAct = actSet::null;
+			barAct = actSet::null();
 		}
 	}
 	void clickMotionGUI(int dx, int dy) { }

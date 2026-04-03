@@ -150,7 +150,7 @@ void Loot::gamepadBtnDown()
 		case SDL_GAMEPAD_BUTTON_EAST:
 		{
 			barActCursor = -1;
-			barAct = actSet::null;
+			barAct = actSet::null();
 		}
 		case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
 			executePocketLeft();

@@ -39,7 +39,7 @@ public:
 		ptr = nullptr;
 
 		UIType = act::null;
-		barAct = actSet::null;
+		barAct = actSet::null();
 	}
 	static Status* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
