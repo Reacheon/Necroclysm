@@ -15,7 +15,6 @@ import globalTime;
 import checkCursor;
 import Vehicle;
 import drawWindow;
-import drawEpsilonText;
 import ContextMenu;
 import Maint;
 import statusEffect;
@@ -533,7 +532,6 @@ void HUD::drawGUI()
 	drawQuest();
 	drawCircuitInfo();
 	drawFluidCircuitInfo();
-	//drawHoverItemInfo();
 
 
 }
@@ -1436,117 +1434,6 @@ void HUD::drawStatusEffects()
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
 			drawSprite(spr::statusEffectGaugeCircle, sprIndex, pivotX + textWidth - 9, pivotY + 2);
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), 255, 255, 255);
-		}
-	}
-}
-
-void HUD::drawHoverItemInfo()
-{
-	if (getLastGUI() == ContextMenu::ins() || getLastGUI() == this)
-	{
-
-		int mouseX = getAbsMouseGrid().x;
-		int mouseY = getAbsMouseGrid().y;
-
-		int tileW = (float)cameraW / (16.0 * zoomScale);
-		int tileH = (float)cameraH / (16.0 * zoomScale);
-
-		Point2 tgtGrid;
-
-		//컨텍스트메뉴가 열려있으면 거기로 고정
-		if (ContextMenu::ins() != nullptr)  tgtGrid = { contextMenuTargetGrid.x,contextMenuTargetGrid.y };
-		else tgtGrid = { mouseX,mouseY };
-
-		if (tgtGrid.x > PlayerX() - tileW / 2 - 1 && tgtGrid.x < PlayerX() + tileW / 2 + 1 && tgtGrid.y > PlayerY() - tileH / 2 - 1 && tgtGrid.y < PlayerY() + tileH / 2 + 1)
-		{
-			Vehicle* vehPtr = TileVehicle(tgtGrid.x, tgtGrid.y, PlayerZ());
-			ItemStack* stackPtr = TileItemStack(tgtGrid.x, tgtGrid.y, PlayerZ());
-			if (vehPtr != nullptr)
-			{
-				int pivotX = cameraW - 200;
-				int pivotY = 148;
-
-				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
-				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
-				setFontSize(10);
-				std::wstring titleName = vehPtr->name;
-				drawTextCenter(titleName, pivotX + 96, pivotY + 9);
-				if (vehPtr->vehType == vehFlag::heli) drawSpriteCenter(spr::icon16, 89, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
-				else if (vehPtr->vehType == vehFlag::train) drawSpriteCenter(spr::icon16, 90, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
-				else if (vehPtr->vehType == vehFlag::minecart) drawSpriteCenter(spr::icon16, 92, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
-				else drawSpriteCenter(spr::icon16, 88, pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 7);
-
-
-
-				int newPivotY = pivotY + 16;
-
-
-				int vehSize = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo.size();
-				drawFillRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::black, 200);
-				drawRect(pivotX, newPivotY, 192, 25 + 17 * (vehSize - 1), col::lightGray, 255);
-
-
-				for (int i = 0; i < vehSize; i++)
-				{
-					ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo[vehSize - 1 - i];
-					//내구도
-					drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
-					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
-
-					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, tgtPart.getSprIndex(), pivotX + 24, newPivotY + 12 + 17 * i);
-
-					//아이템 이름
-					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
-
-					//연료량
-					drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
-					drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
-					drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
-				}
-			}
-			else if (stackPtr != nullptr && false)
-			{
-				int pivotX = cameraW - 200;
-				int pivotY = 148;
-
-				drawFillRect(pivotX, pivotY, 192, 17, col::black, 200);
-				drawRect(pivotX, pivotY, 192, 17, col::lightGray, 255);
-				setFontSize(10);
-				std::wstring titleName = itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].name;
-				drawTextCenter(titleName, pivotX + 96, pivotY + 9);
-				drawSpriteCenter(spr::itemset, itemDex[TileFloor(tgtGrid.x, tgtGrid.y, PlayerZ())].getSprIndex(), pivotX + 96 - queryTextWidth(titleName) / 2.0 - 11, pivotY + 10);
-
-
-				int newPivotY = pivotY + 16;
-
-
-				int stackSize = stackPtr->getPocket()->itemInfo.size();
-
-				drawFillRect(pivotX, newPivotY, 192, 25 + 17 * (stackSize - 1), col::black, 200);
-				drawRect(pivotX, newPivotY, 192, 25 + 17 * (stackSize - 1), col::lightGray, 255);
-
-
-				for (int i = 0; i < stackSize; i++)
-				{
-					ItemData& tgtPart = stackPtr->getPocket()->itemInfo[i];
-					//내구도
-					drawRect(pivotX + 6, newPivotY + 6 + 17 * i, 6, 13, col::white);
-					drawFillRect(pivotX + 8, newPivotY + 8 + 17 * i, 2, 9, lowCol::green);
-
-					//아이템 아이콘
-					drawSpriteCenter(spr::itemset, tgtPart.getSprIndex(), pivotX + 24, newPivotY + 12 + 17 * i);
-
-					//아이템 이름
-					drawText(tgtPart.name, pivotX + 35, newPivotY + 6 + 17 * i);
-
-					//연료량
-					//drawRect(pivotX + 135, newPivotY + 7 + 17 * i, 53, 11, col::white);
-					//drawFillRect(pivotX + 135 + 2, newPivotY + 7 + 2 + 17 * i, 45, 7, lowCol::orange);
-					//drawEplsionText(L"32.7/30.0 L", pivotX + 135 + 3, newPivotY + 7 + 3 + 17 * i, col::white);
-				}
-			}
-
 		}
 	}
 }

@@ -21,7 +21,6 @@ import Prop;
 import log;
 import Lst;
 import Maint;
-import drawEpsilonText;
 import ItemData;
 import ItemStack;
 import Sleep;

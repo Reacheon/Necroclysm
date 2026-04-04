@@ -71,13 +71,7 @@ export inline void eraseStatusEffect(std::vector<statusEffect>& inputStatus, sta
 {
     for (auto it = inputStatus.begin(); it != inputStatus.end();)
     {
-        if (it->effectType == inputFlag)
-        {
-            it = inputStatus.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
+        if (it->effectType == inputFlag) it = inputStatus.erase(it);
+        else ++it;
     }
 }

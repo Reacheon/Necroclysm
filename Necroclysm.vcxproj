@@ -178,7 +178,6 @@
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
-    <ClCompile Include="code\drawEpsilonText.ixx" />
     <ClCompile Include="code\entity\Entity.cpp" />
     <ClCompile Include="code\entity\Entity.ixx" />
     <ClCompile Include="code\entity\EntityData.cpp" />
@@ -352,7 +351,6 @@
     <ClCompile Include="code\var\constVar-itemFlags.ixx" />
     <ClCompile Include="code\var\constVar-itemIDs.ixx" />
     <ClCompile Include="code\var\constVar-names.ixx" />
-    <ClCompile Include="code\var\constVar-fwd.ixx" />
     <ClCompile Include="code\var\constVar.ixx" />
     <ClCompile Include="code\var\globalVar.ixx" />
     <ClCompile Include="code\var\globalVar_input.cpp" />

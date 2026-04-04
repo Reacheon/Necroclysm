@@ -148,7 +148,6 @@ public:
 	void drawQuickSlot();
 	void drawBarAct();
 	void drawStatusEffects();
-	void drawHoverItemInfo();
 	void drawHoverEntityName();
 	void drawQuest();
 

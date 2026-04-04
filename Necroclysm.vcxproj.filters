@@ -109,6 +109,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\GOD">
       <UniqueIdentifier>{b4c5d6e7-2f3a-4b5c-8d9e-0f1a2b3c4d5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\00_var\Skill\GodSkill">
+      <UniqueIdentifier>{badb3356-b475-4df9-bd0e-c2c1384510dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -260,9 +263,6 @@
     </ClCompile>
     <ClCompile Include="code\skill\SkillLeap.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="code\drawEpsilonText.ixx">
-      <Filter>소스 파일\03_renderer\draw</Filter>
     </ClCompile>
     <ClCompile Include="code\Bullet.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
@@ -702,23 +702,20 @@
     <ClCompile Include="code\GUI\GOD\GodPanel_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillHealOther.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillPurify.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillHealOther.ixx">
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillFocusHeal.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="code\var\constVar-fwd.ixx">
-      <Filter>소스 파일\00_var\constVar</Filter>
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
