@@ -2,6 +2,7 @@ import GodPanel;
 
 #include <SDL3/SDL.h>
 
+import Msg;
 import globalVar;
 import constVar;
 import textureVar;
@@ -104,11 +105,8 @@ void GodPanel::drawGUI()
 			// 스킬 아이콘
 			drawSprite(spr::icon24, skill->iconIndex, sx, sy);
 
-			// 스킬 이름 + 필요 랭크 (★)
-			std::wstring starStr;
-			for (int s = 0; s < skillList[i].rank; s++) starStr += L"\u2605";
-
-			std::wstring skillText = skill->name + L" #e9c900(" + starStr + L")";
+			// 스킬 이름 + 필요 랭크 (★N)
+			std::wstring skillText = skill->name + L" #e9c900(\u2605" + std::to_wstring(skillList[i].rank) + L")";
 			drawText(skillText, sx + 28, sy + 5);
 		}
 
@@ -165,7 +163,7 @@ void GodPanel::drawGUI()
 			bool canDevote = (playerGod == godFlag::none);
 
 			int btnColorSprIndex = 0;
-			if (checkCursor(&actionBtn))
+			if (Msg::ins() == nullptr && checkCursor(&actionBtn))
 			{
 				if (click) btnColorSprIndex = 2;
 				else btnColorSprIndex = 1;

@@ -21,6 +21,8 @@ import GodRegistry;
 import SkillBehavior;
 import SkillRegistry;
 import log;
+import Msg;
+import Corouter;
 
 export class GodPanel : public GUI
 {
@@ -152,23 +154,18 @@ public:
 		// Devote / Renounce 버튼
 		if (checkCursor(&actionBtn))
 		{
+			auto* behavior = GodRegistry::get(targetGod);
+			if (!behavior) return;
+
 			if (playerGod == targetGod)
 			{
-				// 배교
-				GodService::leaveGod();
-				updateLog(L"You have renounced your faith.");
-				close(aniFlag::null);
+				// 배교 확인
+				Corouter::start(confirmRenounce(behavior->name));
 			}
 			else if (playerGod == godFlag::none)
 			{
-				// 입교
-				GodService::joinGod(targetGod);
-				auto* behavior = GodRegistry::get(targetGod);
-				if (behavior)
-				{
-					updateLog(L"You kneel before the altar. " + behavior->name + L" accepts you as a follower.");
-				}
-				close(aniFlag::null);
+				// 입교 확인
+				Corouter::start(confirmDevote(behavior->name));
 			}
 			else
 			{
@@ -176,6 +173,37 @@ public:
 				updateLog(L"You must abandon your current god first.");
 			}
 			return;
+		}
+	}
+
+	Corouter confirmDevote(std::wstring godName)
+	{
+		new Msg(msgFlag::normal, L"Devote", L"Do you truly wish to devote yourself to " + godName + L"?", { sysStr[36], sysStr[37] });
+		co_await std::suspend_always();
+
+		if (coAnswer == sysStr[36])
+		{
+			GodService::joinGod(targetGod);
+			auto* behavior = GodRegistry::get(targetGod);
+			if (behavior)
+			{
+				updateLog(L"You kneel before the altar. " + behavior->name + L" accepts you as a follower.");
+			}
+			close(aniFlag::null);
+		}
+	}
+
+	Corouter confirmRenounce(std::wstring godName)
+	{
+		std::wstring redYes = col2Str({ 0xE0, 0x40, 0x40 }) + sysStr[36];
+		new Msg(msgFlag::normal, L"Renounce", L"Do you truly wish to renounce " + godName + L"?", { redYes, sysStr[37] });
+		co_await std::suspend_always();
+
+		if (coAnswer == redYes)
+		{
+			GodService::leaveGod();
+			updateLog(L"You have renounced your faith.");
+			close(aniFlag::null);
 		}
 	}
 
