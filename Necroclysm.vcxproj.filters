@@ -705,6 +705,9 @@
     <ClCompile Include="code\skill\SkillSuperRegen.ixx">
       <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
+    <ClCompile Include="code\skill\SkillLivingWard.ixx">
+      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+    </ClCompile>
     <ClCompile Include="code\skill\SkillSelfHeal.ixx">
       <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>

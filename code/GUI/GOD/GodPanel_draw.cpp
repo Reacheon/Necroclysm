@@ -32,7 +32,7 @@ void GodPanel::drawGUI()
 		const int pw = panelBase.w;
 
 		setWindowAlpha(230);
-		drawWindow(&panelBase, L"God", 1);
+		drawWindow(&panelBase, L"God", 114);
 		resetWindowAlpha();
 
 		// ── 화살표 ──
@@ -105,9 +105,14 @@ void GodPanel::drawGUI()
 			// 스킬 아이콘
 			drawSprite(spr::icon24, skill->iconIndex, sx, sy);
 
-			// 스킬 이름 + 필요 랭크 (★N)
-			std::wstring skillText = skill->name + L" #e9c900(\u2605" + std::to_wstring(skillList[i].rank) + L")";
-			drawText(skillText, sx + 28, sy + 5);
+			// 스킬 이름 + 필요 랭크 (★N) 또는 패시브 표시
+			std::wstring skillText;
+			if (skill->type == skillType::PASSIVE) skillText = skill->name + L" #e9c900(Passive)";
+			else
+				skillText = skill->name + L" #e9c900\u2605" + std::to_wstring(skillList[i].rank) + L"";
+			setFontSize(14);
+			if (queryTextWidth(skillText, true) >= 156) setFontSize(13);
+			drawText(skillText, sx + 28, sy + 4);
 		}
 
 		int skillRows = ((int)skillList.size() + 1) / 2;

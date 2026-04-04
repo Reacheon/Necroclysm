@@ -10,6 +10,7 @@ import SkillHealOther;
 import SkillPurify;
 import SkillFocusHeal;
 import SkillSuperRegen;
+import SkillLivingWard;
 
 void SkillRegistry::init()
 {
@@ -21,4 +22,5 @@ void SkillRegistry::init()
 	registerSkill(std::make_unique<SkillPurify>());
 	registerSkill(std::make_unique<SkillFocusHeal>());
 	registerSkill(std::make_unique<SkillSuperRegen>());
+	registerSkill(std::make_unique<SkillLivingWard>());
 }

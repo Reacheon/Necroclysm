@@ -22,9 +22,9 @@ export class SkillSuperRegen : public SkillBehavior
 public:
 	SkillSuperRegen()
 	{
-		name = L"Super Regen";
+		name = L"Divine Regeneration";
 		iconIndex = 4;
-		descript = L"Grant super regeneration and status immunity for a period of time.";
+		descript = L"Grant divine regeneration and status immunity for a period of time.";
 		src = skillSrc::MAGIC;
 		type = skillType::ACTIVE;
 		maxCooldown = 0.0f;
