@@ -45,7 +45,7 @@ public:
 	static Profic* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		proficBase = { 0, 0, 866, 502 };
+		proficBase = { 0, 0, 866, 466 };
 
 		if (center == false)
 		{

@@ -20,6 +20,7 @@ import Maint;
 import statusEffect;
 import ItemData;
 import Equip;
+import Status;
 import SkillBehavior;
 import SkillRegistry;
 import Entity;
@@ -86,8 +87,8 @@ void HUD::drawGUI()
 		if (PlayerInfo().walkMode == walkFlag::run) sprIndex = 1;
 		else if (PlayerInfo().walkMode == walkFlag::crouch) sprIndex = 2;
 		else if (PlayerInfo().walkMode == walkFlag::crawl) sprIndex = 3;
-        drawSprite(spr::gamepadInstruction, sprIndex, 300, cameraH - 135);
-        SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 255);
+		drawSprite(spr::gamepadInstruction, sprIndex, 300, cameraH - 135);
+		SDL_SetTextureAlphaMod(spr::gamepadInstruction->getTexture(), 255);
 	}
 
 	drawStadium(letterbox.x, letterbox.y, letterbox.w, cameraH - letterbox.y + 20, { 0,0,0 }, 150, 5);
@@ -131,8 +132,8 @@ void HUD::drawGUI()
 			{
 				if (checkCursor(&openMapBtn)) drawStadium(openMapBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 2);
 				else drawStadium(openMapBtn, { 0,0,0 }, 255, 2);
-                
-                drawSpriteCenter(spr::keyboardButtons, keyboardIndex::m + state[SDL_SCANCODE_M]
+
+				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::m + state[SDL_SCANCODE_M]
 					, minimapBtn.x, minimapBtn.y);
 			}
 			setZoom(1.0);
@@ -473,9 +474,9 @@ void HUD::drawGUI()
 					else { targetBtnSpr = spr::buttons; }
 					drawSpriteCenter(targetBtnSpr, keyIcon::duelSense_TRI, letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 				}
-                else if (option::inputMethod == input::mouse)
+				else if (option::inputMethod == input::mouse)
 				{
-                    drawSpriteCenter(spr::keyboardButtons, keyboardIndex::enter + state[SDL_SCANCODE_RETURN], letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
+					drawSpriteCenter(spr::keyboardButtons, keyboardIndex::enter + state[SDL_SCANCODE_RETURN], letterboxPopUpButton.x + 15, letterboxPopUpButton.y + 15);
 				}
 				else if (option::inputMethod == input::touch)
 				{
@@ -522,12 +523,12 @@ void HUD::drawGUI()
 		);
 		SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), 255);
 		setZoom(1.0);
-	
+
 	}
 
 
 	drawBarAct();
-	if(option::inputMethod != input::gamepad) drawTab();
+	if (option::inputMethod != input::gamepad) drawTab();
 	if (option::inputMethod != input::gamepad) drawQuickSlot();
 	drawQuest();
 	drawCircuitInfo();
@@ -579,12 +580,12 @@ void HUD::drawTab()
 		if (option::language == L"Korean") setFontSize(12);
 		else  setFontSize(10);
 		setZoom(1.0);
-		drawSpriteCenter(spr::icon80, 18, tab.x + tab.w/2, tab.y + 55 + 25);
+		drawSpriteCenter(spr::icon80, 18, tab.x + tab.w / 2, tab.y + 55 + 25);
 		setZoom(1.0);
 		setFontSize(18);
 		drawTextCenter(sysStr[1], tab.x + tab.w / 2, tab.y + tab.h - 30);
-		
-        drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
+
+		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 
 		break;
 	}
@@ -766,7 +767,7 @@ void HUD::drawQuickSlot()
 		if (deact) btnCol = col::black;
 
 		//스킬 이름 + 실패율 표시
-		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact==false)
+		if (showSkillName && quickSlot[i].first != quickSlotFlag::NONE && deact == false)
 		{
 			setFont(fontType::mainFont);
 			setFontSize(18);
@@ -825,7 +826,7 @@ void HUD::drawQuickSlot()
 		}
 		setFont(fontType::pixel);
 		setFontSize(12);
-		drawTextCenter(std::to_wstring(i + 1), pivotX + skillRect.w/2, pivotY + 58);
+		drawTextCenter(std::to_wstring(i + 1), pivotX + skillRect.w / 2, pivotY + 58);
 
 		if (deact)
 		{
@@ -838,7 +839,7 @@ void HUD::drawQuickSlot()
 			drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, col::black, 120);
 			drawLine(pivotX + 6, pivotY + 39 + 5, pivotX + 37, pivotY + 39 + 5, col::black, 120);
 		}
-		
+
 	}
 
 	if (dragQuickSlotTarget != -1)
@@ -851,7 +852,7 @@ void HUD::drawQuickSlot()
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 180);
 				SDL_SetTextureBlendMode(spr::icon24->getTexture(), SDL_BLENDMODE_BLEND);
 				auto* dragBhv = SkillRegistry::get(quickSlot[dragQuickSlotTarget].second);
-			drawSpriteCenter(spr::icon24, dragBhv ? dragBhv->iconIndex : 0, getMouseX(), getMouseY());
+				drawSpriteCenter(spr::icon24, dragBhv ? dragBhv->iconIndex : 0, getMouseX(), getMouseY());
 				SDL_SetTextureAlphaMod(spr::icon24->getTexture(), 255);
 				setZoom(1.0);
 			}
@@ -873,10 +874,10 @@ void HUD::drawBarAct()
 			if (ctrlVeh->wheelDir == ACW(ctrlVeh->bodyDir)) wheelIndex = 1;
 			else if (ctrlVeh->wheelDir == CW(ctrlVeh->bodyDir)) wheelIndex = 2;
 			else if (ctrlVeh->wheelDir == CW2(ctrlVeh->bodyDir)) wheelIndex = 4;
-            else if (ctrlVeh->wheelDir == ACW2(ctrlVeh->bodyDir)) wheelIndex = 3;
+			else if (ctrlVeh->wheelDir == ACW2(ctrlVeh->bodyDir)) wheelIndex = 3;
 			else wheelIndex = 0;
 
-			drawSpriteCenter(spr::vehicleHUDSteeringWheel, wheelIndex, barButton[1].x + (barButton[1].w / 2), barButton[1].y + (barButton[1].h / 2) + 10*(click&& checkCursor(&barButton[1])));
+			drawSpriteCenter(spr::vehicleHUDSteeringWheel, wheelIndex, barButton[1].x + (barButton[1].w / 2), barButton[1].y + (barButton[1].h / 2) + 10 * (click && checkCursor(&barButton[1])));
 
 			drawSpriteCenter(spr::vehicleHUDParts, 15, barButton[0].x + barButton[0].w / 2, barButton[0].y + barButton[0].h / 2); //좌회전 마크
 			drawSpriteCenter(spr::vehicleHUDParts, 16, barButton[1].x + barButton[1].w / 2, barButton[1].y + barButton[1].h / 2); //1턴 대기
@@ -894,7 +895,7 @@ void HUD::drawBarAct()
 			else if (ctrlVeh->gearState == gearFlag::neutral) gearSprIndex = 3;
 			else gearSprIndex = 4;
 			drawSpriteCenter(spr::gearStick, gearSprIndex, barButton[4].x + barButton[4].w / 2, barButton[4].y + barButton[4].h / 2 - 35);
-			
+
 			drawSpriteCenter(spr::vehicleHUDParts, 10 + (checkCursor(&barButton[5]) && click), barButton[5].x + barButton[5].w / 2, barButton[5].y + barButton[5].h / 2);
 			drawSpriteCenter(spr::vehicleHUDParts, 12 + (checkCursor(&barButton[6]) && click), barButton[6].x + barButton[6].w / 2, barButton[6].y + barButton[6].h / 2);
 		}
@@ -1002,7 +1003,7 @@ void HUD::drawBarAct()
 			{
 				actName = inputString;
 				actIndex = inputActIndex;
-                useIcon80 = true;
+				useIcon80 = true;
 			};
 
 		if (barAct[i] == act::status) setBtnLayout80(sysStr[3], 15);
@@ -1138,7 +1139,7 @@ void HUD::drawBarAct()
 			setZoom(1.5);
 			drawSpriteCenter(spr::icon48, actIndex, barButton[i].x + (barButton[i].w / 2), barButton[i].y + (barButton[i].h / 2) - 10);
 		}
-		
+
 		setZoom(1.0);
 
 		//하단 텍스트
@@ -1464,20 +1465,20 @@ void HUD::drawQuest()
 void HUD::drawBodyParts()
 {
 	// 페이크 HP 업데이트 람다 함수
-	auto updateFakeHP = [](int& fakeHP, int& realHP, unsigned char& fakeHPAlpha) 
+	auto updateFakeHP = [](int& fakeHP, int& realHP, unsigned char& fakeHPAlpha)
 		{
-		if (fakeHP > realHP) {
-			fakeHP--;
-			if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
-			else { fakeHPAlpha = 0; }
-		}
-		else if (fakeHP < realHP) {
-			fakeHP = realHP;
-		}
+			if (fakeHP > realHP) {
+				fakeHP--;
+				if (fakeHPAlpha > 30) { fakeHPAlpha -= 30; }
+				else { fakeHPAlpha = 0; }
+			}
+			else if (fakeHP < realHP) {
+				fakeHP = realHP;
+			}
 
-		if (fakeHP == realHP) {
-			fakeHPAlpha = 255;
-		}
+			if (fakeHP == realHP) {
+				fakeHPAlpha = 255;
+			}
 		};
 
 	updateFakeHP(PlayerPtr->lArmFakeHP, PlayerPtr->lArmHP, PlayerPtr->lArmFakeHPAlpha);
@@ -1575,15 +1576,16 @@ void HUD::drawBodyParts()
 				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
 		};
 
-	drawPartName(false, 173, cameraH - 1 - 65,  L"LLeg");
-	drawPartName(true,   25, cameraH - 1 - 65,  L"RLeg");
+	drawPartName(false, 173, cameraH - 1 - 65, L"LLeg");
+	drawPartName(true, 25, cameraH - 1 - 65, L"RLeg");
 	drawPartName(false, 193, cameraH - 1 - 164, L"LArm");
-	drawPartName(true,    3, cameraH - 1 - 164, L"RArm");
-	drawPartName(true,   21, cameraH - 1 - 245, L"Torso");
+	drawPartName(true, 3, cameraH - 1 - 164, L"RArm");
+	drawPartName(true, 21, cameraH - 1 - 245, L"Torso");
 	drawPartName(false, 167, cameraH - 1 - 282, L"Head");
 
 	// 각 부위 그리기
-	if (Equip::ins() == nullptr || !Equip::ins()->isFullyOpen())
+	if ((Equip::ins() == nullptr || !Equip::ins()->isFullyOpen()) &&
+		(Status::ins() == nullptr || !Status::ins()->isFullyOpen()))
 	{
 		drawSingleBodyPartGauge(false,
 			173,
@@ -1629,52 +1631,52 @@ void HUD::drawBodyParts()
 		// 행 간격 17px, 물리저항(0~2행) / 속성저항(3~6행, 전신 공통)
 
 		auto drawPartInfo = [&](bool flip, int pivotX, int pivotY, int rPierce, int rCut, int rBash, int enc)
-		{
-			const int tOff = flip ? 6  : 14;  // 텍스트 X 오프셋
-			const int cOff = flip ? 17 : 89;  // Enc center X 오프셋
+			{
+				const int tOff = flip ? 6 : 14;  // 텍스트 X 오프셋
+				const int cOff = flip ? 17 : 89;  // Enc center X 오프셋
 
-			if (flip) setFlip(SDL_FLIP_HORIZONTAL);
-			drawSprite(spr::bodyPartEncLine, pivotX, pivotY);
-			if (flip) setFlip(SDL_FLIP_NONE);
+				if (flip) setFlip(SDL_FLIP_HORIZONTAL);
+				drawSprite(spr::bodyPartEncLine, pivotX, pivotY);
+				if (flip) setFlip(SDL_FLIP_NONE);
 
-			setFont(fontType::mainFontSemiBold);
-			setFontSize(12);
-			drawTextCenter(L"#f2c122Enc", pivotX + cOff, pivotY + 7);
-			setFontSize(14);
-			if (enc >= 100)
-				drawTextCenter(L"#ff3333100", pivotX + cOff, pivotY + 20);
-			else
-				drawTextCenter(std::to_wstring(enc) + L"%", pivotX + cOff, pivotY + 20);
+				setFont(fontType::mainFontSemiBold);
+				setFontSize(12);
+				drawTextCenter(L"#f2c122Enc", pivotX + cOff, pivotY + 7);
+				setFontSize(14);
+				if (enc >= 100)
+					drawTextCenter(L"#ff3333100", pivotX + cOff, pivotY + 20);
+				else
+					drawTextCenter(std::to_wstring(enc) + L"%", pivotX + cOff, pivotY + 20);
 
-			setFontSize(16);
-			// 물리저항
-			drawText(L"#f26522rPierce", pivotX + tOff,      pivotY + 29 + 17 * 0);
-			drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 0);
+				setFontSize(16);
+				// 물리저항
+				drawText(L"#f26522rPierce", pivotX + tOff, pivotY + 29 + 17 * 0);
+				drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 0);
 
-			drawText(L"#f26522rCut",    pivotX + tOff,      pivotY + 29 + 17 * 1);
-			drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 1);
+				drawText(L"#f26522rCut", pivotX + tOff, pivotY + 29 + 17 * 1);
+				drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 1);
 
-			drawText(L"#f26522rBash",   pivotX + tOff,      pivotY + 29 + 17 * 2);
-			drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
+				drawText(L"#f26522rBash", pivotX + tOff, pivotY + 29 + 17 * 2);
+				drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
 
-		};
+			};
 
 		drawPartInfo(false, 164, cameraH - 311, PlayerPtr->getResPierceHead(), PlayerPtr->getResCutHead(), PlayerPtr->getResBashHead(), PlayerPtr->getEncHead());  // 머리
-		drawPartInfo(true,   16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 상체
+		drawPartInfo(true, 16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 상체
 		drawPartInfo(false, 190, cameraH - 193, PlayerPtr->getResPierceLArm(), PlayerPtr->getResCutLArm(), PlayerPtr->getResBashLArm(), PlayerPtr->getEncLArm());  // 왼팔
-		drawPartInfo(true,    2, cameraH - 193, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
-		drawPartInfo(false, 170, cameraH - 94,  PlayerPtr->getResPierceLLeg(), PlayerPtr->getResCutLLeg(), PlayerPtr->getResBashLLeg(), PlayerPtr->getEncLLeg());  // 왼다리
-		drawPartInfo(true,   20, cameraH - 94,  PlayerPtr->getResPierceRLeg(), PlayerPtr->getResCutRLeg(), PlayerPtr->getResBashRLeg(), PlayerPtr->getEncRLeg());  // 오른다리
+		drawPartInfo(true, 2, cameraH - 193, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
+		drawPartInfo(false, 170, cameraH - 94, PlayerPtr->getResPierceLLeg(), PlayerPtr->getResCutLLeg(), PlayerPtr->getResBashLLeg(), PlayerPtr->getEncLLeg());  // 왼다리
+		drawPartInfo(true, 20, cameraH - 94, PlayerPtr->getResPierceRLeg(), PlayerPtr->getResCutRLeg(), PlayerPtr->getResBashRLeg(), PlayerPtr->getEncRLeg());  // 오른다리
 
 
 		int pivotX = 0;
 		int pivotY = cameraH - 665;
-		drawStadium(SDL_Rect{ pivotX -10,pivotY,97,351 }, col::black, 220, 3);
+		drawStadium(SDL_Rect{ pivotX - 10,pivotY,97,351 }, col::black, 220, 3);
 		setFontSize(18);
 		drawTextCenter(L"#f26522Shield", pivotX + 42, pivotY + 20);
 		drawTextCenter(std::to_wstring(PlayerPtr->getSH()), pivotX + 42, pivotY + 20 + 20);
 
-		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20  + 50);
+		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20 + 50);
 		drawTextCenter(std::to_wstring(PlayerPtr->getEV()), pivotX + 42, pivotY + 20 + 20 + 50);
 
 		// 속성저항 (전신 공통)
@@ -1683,25 +1685,25 @@ void HUD::drawBodyParts()
 
 		// 속성저항 레벨 → 표시 문자열 변환
 		auto resLvStr = [](int lv) -> std::wstring
-		{
-			std::wstring colorTag;
-			if (lv > 0) colorTag = L"#75d03f";
-			else if (lv < 0) colorTag = L"#f26522";
-			else colorTag = col2Str(col::lightGray);
+			{
+				std::wstring colorTag;
+				if (lv > 0) colorTag = L"#75d03f";
+				else if (lv < 0) colorTag = L"#f26522";
+				else colorTag = col2Str(col::lightGray);
 
-			std::wstring bar;
-			int absLv = abs(lv);
-			wchar_t mark = (lv >= 0) ? L'+' : L'-';
-			for (int j = 0; j < 3; j++)
-				bar += (j < absLv) ? mark : L'.';
+				std::wstring bar;
+				int absLv = abs(lv);
+				wchar_t mark = (lv >= 0) ? L'+' : L'-';
+				for (int j = 0; j < 3; j++)
+					bar += (j < absLv) ? mark : L'.';
 
-			return colorTag + bar;
-		};
+				return colorTag + bar;
+			};
 
 		int rFire = PlayerInfo().rFire;
 		int rCold = PlayerInfo().rCold;
 		int rElec = PlayerInfo().rElec;
-		int rRad  = PlayerInfo().rRad;
+		int rRad = PlayerInfo().rRad;
 		int rCorr = PlayerInfo().rCorr;
 
 		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
@@ -1747,7 +1749,7 @@ void HUD::drawCircuitInfo()
 		Point2 tgtGrid = contextMenuTargetGrid;
 		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
-		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) &&tgtProp->isChargeFlowing())
+		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) && tgtProp->isChargeFlowing())
 			|| tgtProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
 		{
 			if (tgtProp->isFluidFlowing()) return;
@@ -1774,10 +1776,10 @@ void HUD::drawCircuitInfo()
 					secondNumber.clear();
 					double ratio = tgtProp->leadItem.powerStorage / static_cast<double>(tgtProp->leadItem.powerStorageMax);
 					if (ratio < 0.3333) secondNumber += col2Str(lowCol::red);
-					else if(ratio <0.6666) secondNumber += col2Str(lowCol::yellow);
+					else if (ratio < 0.6666) secondNumber += col2Str(lowCol::yellow);
 					else secondNumber += col2Str(lowCol::green);
 					secondNumber += decimalCutter((tgtProp->leadItem.powerStorage) / 1000.0, 1);
-					secondNumber += col2Str(col::gray)+L" / " + decimalCutter((tgtProp->leadItem.powerStorageMax) / 1000.0, 1);
+					secondNumber += col2Str(col::gray) + L" / " + decimalCutter((tgtProp->leadItem.powerStorageMax) / 1000.0, 1);
 				}
 				else
 					secondNumber = L"-";
@@ -1805,7 +1807,7 @@ void HUD::drawCircuitInfo()
 				firstNumber = decimalCutter(tgtProp->getInletCharge() / 1000.0, 3);
 
 				secondString = L"Loss:";
-				secondNumber = decimalCutter(tgtProp->totalLossCharge/1000, 4);
+				secondNumber = decimalCutter(tgtProp->totalLossCharge / 1000, 4);
 				secondUnit = L"kJ/turn";
 			}
 
@@ -1898,7 +1900,7 @@ void HUD::drawCircuitInfo()
 					}
 				}
 
-				if ((tgtProp->leadItem.itemCode == itemID::powerBankR && tgtProp->chargeFlux[dir16::left]>0)
+				if ((tgtProp->leadItem.itemCode == itemID::powerBankR && tgtProp->chargeFlux[dir16::left] > 0)
 					|| tgtProp->leadItem.itemCode == itemID::powerBankL && tgtProp->chargeFlux[dir16::right] > 0)
 				{
 					drawSpriteCenter(spr::icon16, 103, gaugePivotX + 22, gaugePivotY + 10);
@@ -1906,7 +1908,7 @@ void HUD::drawCircuitInfo()
 			}
 			else drawTextCenter(tgtProp->leadItem.name, window.w / 2, 14);
 
-			
+
 
 			setFont(fontType::mainFont);
 			setFontSize(18);

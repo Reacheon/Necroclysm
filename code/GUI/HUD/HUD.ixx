@@ -40,6 +40,7 @@ import Quest;
 import Sleep;
 import Aim;
 import Cook;
+import Status;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -378,6 +379,9 @@ public:
 		bool popDownWhenEnd = true;
 		switch (inputAct)
 		{
+		case act::status:
+			new Status();
+			break;
 		case act::equipment:
 			new Equip();
 			break;
