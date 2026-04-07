@@ -77,37 +77,68 @@ public:
 
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
+			std::wstring nameText = L"Nekbung";
+			int nameTextWIdth = queryTextWidth(nameText, true);
+			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + nameText, statusBase.x + 139, statusBase.y + 44);
+			setFontSize(16);
+			setFont(fontType::mainFontSemiBold);
+			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"(Loop #7)", statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
 			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung (Loop #7)", statusBase.x + 139, statusBase.y + 44);
-			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung, Survivor", statusBase.x + 139, statusBase.y + 44);
+
+			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung, Survivor", statusBase.x + 139, statusBase.y + 44);
 			setFont(fontType::mainFont);
 
 			setFontSize(16);
 			setFont(fontType::mainFontBold);
 			//좌측 열: Age, Race, God
-			SDL_Rect ageRect = { statusBase.x + 137,statusBase.y + 79,151,23 };
+			Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
+			drawText(L"#e1772eAge", agePivot.x + 5, agePivot.y + 1);
+			SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
 			drawStadium(ageRect, col::black, 255, 4);
-			drawText(L"Age", ageRect.x + 5, ageRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(L"20", ageRect.x + ageRect.w / 2, ageRect.y + ageRect.h / 2);
 
-			SDL_Rect raceRect = { statusBase.x + 137,statusBase.y + 79 + 27 * 1,151,23 };
+			Point2 racePivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 1 };
+			setFont(fontType::mainFontBold);
+			drawText(L"#e1772eRace", racePivot.x + 5, racePivot.y + 1);
+			SDL_Rect raceRect = { racePivot.x + 55, racePivot.y, 120, 23 };
 			drawStadium(raceRect, col::black, 255, 4);
-			drawText(L"Race", raceRect.x + 5, raceRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(L"Human", raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
 
-			SDL_Rect godRect = { statusBase.x + 137,statusBase.y + 79 + 27 * 2,151,23 };
+			Point2 godPivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 2 };
+			setFont(fontType::mainFontBold);
+			drawText(L"#e1772eGod", godPivot.x + 5, godPivot.y + 1);
+			SDL_Rect godRect = { godPivot.x + 55, godPivot.y, 120, 23 };
 			drawStadium(godRect, col::black, 255, 4);
-			drawText(L"God", godRect.x + 5, godRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(L"Rehylion", godRect.x + godRect.w / 2, godRect.y + godRect.h / 2);
+
 
 			//우측 열: Hunger, Thirsty, Fatigue
-			SDL_Rect hungerRect = { statusBase.x + 137 + 221,statusBase.y + 79,151,23 };
+			Point2 hungerPivot = { statusBase.x + 137 + 221, statusBase.y + 79 };
+			setFont(fontType::mainFontBold);
+			drawText(L"#e1772eHunger", hungerPivot.x + 5, hungerPivot.y + 1);
+			SDL_Rect hungerRect = { hungerPivot.x + 75, hungerPivot.y, 77, 23 };
 			drawStadium(hungerRect, col::black, 255, 4);
-			drawText(L"Hunger", hungerRect.x + 5, hungerRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(L"98%", hungerRect.x + hungerRect.w / 2, hungerRect.y + hungerRect.h / 2);
 
-			SDL_Rect thirstyRect = { statusBase.x + 137 + 221,statusBase.y + 79 + 27 * 1,151,23 };
+			Point2 thirstyPivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 1 };
+			setFont(fontType::mainFontBold);
+			drawText(L"#e1772eThirsty", thirstyPivot.x + 5, thirstyPivot.y + 1);
+			SDL_Rect thirstyRect = { thirstyPivot.x + 75, thirstyPivot.y, 77, 23 };
 			drawStadium(thirstyRect, col::black, 255, 4);
-			drawText(L"Thirsty", thirstyRect.x + 5, thirstyRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(L"47%", thirstyRect.x + thirstyRect.w / 2, thirstyRect.y + thirstyRect.h / 2);
 
-			SDL_Rect fatigueRect = { statusBase.x + 137 + 221,statusBase.y + 79 + 27 * 2,151,23 };
+			Point2 fatiguePivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 2 };
+			setFont(fontType::mainFontBold);
+			drawText(L"#e1772eFatigue", fatiguePivot.x + 5, fatiguePivot.y + 1);
+			SDL_Rect fatigueRect = { fatiguePivot.x + 75, fatiguePivot.y, 77, 23 };
 			drawStadium(fatigueRect, col::black, 255, 4);
-			drawText(L"Fatigue", fatigueRect.x + 5, fatigueRect.y + 1);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(col2Str(SDL_Color{ 0xff, 0x44, 0x44 }) + L"97%", fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
 			setFont(fontType::mainFont);
 
 
@@ -175,23 +206,58 @@ public:
 					drawLine((int)bx[i], (int)by[i], (int)bx[(i + 1) % 6], (int)by[(i + 1) % 6], col::white);
 			}
 
-			SDL_Rect vertex1Btn = { statusBase.x+ 181,statusBase.y+176,70,56 };
-			drawStadium(vertex1Btn, col::black, 150, 4);
+			//vertex 버튼 타이틀+값 그리기 람다
+			auto drawVertexBtn = [](const SDL_Rect& btn, const std::wstring& title, const std::wstring& value)
+			{
+				drawStadium(btn, col::black, 150, 4);
+				int cx = btn.x + btn.w / 2;
+
+				setFontSize(12);
+				setFont(fontType::mainFontMedium);
+				if (queryTextWidth(removeColorCodes(title)) > btn.w)
+				{
+					auto split = wordSplitter(title, btn.w);
+					// 컬러코드가 첫 줄에만 있으면 둘째 줄에도 적용
+					std::wstring colorPrefix;
+					if (split[0].size() >= 7 && split[0][0] == L'#')
+						colorPrefix = split[0].substr(0, 7);
+					if (!split[1].empty() && split[1][0] != L'#' && !colorPrefix.empty())
+						split[1] = colorPrefix + split[1];
+					drawTextCenter(split[0], cx, btn.y + 6);
+					drawTextCenter(split[1], cx, btn.y + 6 + 12);
+				}
+				else
+				{
+					drawTextCenter(title, cx, btn.y + 12);
+				}
+
+				setFont(fontType::mainFontBold);
+				setFontSize(18);
+				drawTextCenter(value, cx, btn.y + 38);
+				setFont(fontType::mainFont);
+			};
+
+			SDL_Rect vertex1Btn = { statusBase.x + 181,statusBase.y + 176,70,56 };
+			drawVertexBtn(vertex1Btn, L"#e1772eMutation Threshold", L"72%");
 
 			SDL_Rect vertex2Btn = { statusBase.x + 208,statusBase.y + 244,70,56 };
-			drawStadium(vertex2Btn, col::black, 150, 4);
+			drawVertexBtn(vertex2Btn, L"#e1772eBionic Capacity", L"6 / 10");
 
 			SDL_Rect vertex3Btn = { statusBase.x + 181,statusBase.y + 312,70,56 };
-			drawStadium(vertex3Btn, col::black, 150, 4);
+			drawVertexBtn(vertex3Btn, L"#e1772eProgress", L"20%");
 
 			SDL_Rect vertex4Btn = { statusBase.x + 52,statusBase.y + 312,70,56 };
-			drawStadium(vertex4Btn, col::black, 150, 4);
+			drawVertexBtn(vertex4Btn, L"#e1772eProfic Avg", L"15.2");
 
 			SDL_Rect vertex5Btn = { statusBase.x + 25,statusBase.y + 244,70,56 };
-			drawStadium(vertex5Btn, col::black, 150, 4);
+			drawVertexBtn(vertex5Btn, L"#e1772eStatus Avg", L"4.3");
 
 			SDL_Rect vertex6Btn = { statusBase.x + 52,statusBase.y + 176,70,56 };
 			drawStadium(vertex6Btn, col::black, 150, 4);
+			setFontSize(14);
+			setFont(fontType::mainFontMedium);
+			drawTextCenter(col2Str(col::gray) + L"Locked", vertex6Btn.x + vertex6Btn.w / 2, vertex6Btn.y + vertex6Btn.h / 2);
+			setFont(fontType::mainFont);
 
 			//세로 구분선 (하단 실선 + 상단 페이드아웃)
 			{
@@ -222,6 +288,8 @@ public:
 			setFontSize(20);
 			drawText(L"Strategist", statusBase.x + 88, statusBase.y + 388);
 			setFont(fontType::mainFont);
+			setFontSize(15);
+			drawTextWidth(L" quick fox jumps over the lazy dog. quick fox jumps over the lazy dog. quick fox jumps over the lazy dog.", statusBase.x + 1 + 7, statusBase.y + 416 + 8, 288, 18);
 
 			setFontSize(12);
 			
@@ -371,26 +439,40 @@ public:
 				drawText(L"Nerve Boost", headRect.x + 3 + 19, headRect.y + 26 + 38);
 
 
-				drawSprite(spr::icon16, 117, headRect.x + 3 + 118, headRect.y + 26);
+				drawSprite(spr::icon16, 117, headRect.x + 3 + 114, headRect.y + 26);
 				setFontSize(12);
-				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 118, headRect.y + 26);
+				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 114, headRect.y + 26);
 
-				drawSprite(spr::icon16, 117, headRect.x + 3 + 118, headRect.y + 26 + 19);
+				drawSprite(spr::icon16, 117, headRect.x + 3 + 114, headRect.y + 26 + 19);
 				setFontSize(12);
-				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 118, headRect.y + 26 + 19);
+				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 114, headRect.y + 26 + 19);
 
+				if(0) //바이오닉+돌연변이 합이 6개를 초과했을 때 그려지는 스크롤 기믹
+				{
+					SDL_Rect scrollRect = { headRect.x + 232,headRect.y + 23,2,56 };
+					SDL_Rect scrollInRect = { headRect.x + 232,headRect.y + 23,2,28 };
+					drawFillRect(scrollRect, col::gray);
+					drawFillRect(scrollInRect, col::white);
+				}
 			}
 
 
-			SDL_Rect rArmRect = { statusBase.x + 298,statusBase.y + 206 + 91*1,236,83 };
-			drawStadium(rArmRect, col::black, 150, 4);
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawText(L"Right Arm", rArmRect.x + 6, rArmRect.y-2);
-
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawTextCenter(col2Str(col::gray)+L"No Data", rArmRect.x + rArmRect.w/2, rArmRect.y + 45);
+			{
+				SDL_Rect rArmRect = { statusBase.x + 298,statusBase.y + 206 + 91 * 1,236,83 };
+				drawStadium(rArmRect, col::black, 150, 4);
+				setFontSize(18);
+				setFont(fontType::mainFontSemiBold);
+				drawText(L"Right Arm", rArmRect.x + 6, rArmRect.y - 2);
+				//구분선 (오른쪽으로 페이드아웃)
+				for (int px = 0; px <= 98; px++)
+				{
+					Uint8 a = (Uint8)(255.0 * (1.0 - (double)px / 98.0));
+					drawPoint(rArmRect.x + 3 + px, rArmRect.y + 21, col::gray, a);
+				}
+				setFontSize(18);
+				setFont(fontType::mainFontSemiBold);
+				drawTextCenter(col2Str(col::gray) + L"No Data", rArmRect.x + rArmRect.w / 2, rArmRect.y + 45);
+			}
 
 			SDL_Rect rLegRect = { statusBase.x + 298,statusBase.y + 206 + 91*2,236,83 };
 			drawStadium(rLegRect, col::black, 150, 4);

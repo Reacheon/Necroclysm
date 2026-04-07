@@ -265,7 +265,7 @@ public:
 
             setFontSize(15);
             drawTextWidth(sysStr[230]/*When gaining experience points for a specific proficiency through actions, the same amount of bonus experience points will be additionally distributed to the selected proficiencies.*/,
-                proficBase.x + 27, proficBase.y + proficBase.h - 56, false, 790, 19);
+                proficBase.x + 27, proficBase.y + proficBase.h - 56, 790, 19);
 
             {
                 bool anyTraining = false;

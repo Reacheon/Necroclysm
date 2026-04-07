@@ -488,7 +488,7 @@ export std::array<std::wstring, 2> textSplitter(std::wstring text, int widthLimi
 }
 
 // 너비 제한 텍스트 렌더링
-export int drawTextWidth(std::wstring text, int x, int y, bool center, int width, int height, int lineLimit)
+export int drawTextWidth(std::wstring text, int x, int y, int width, int height, int lineLimit)
 {
     std::array<std::wstring, 2> textPair = textSplitter(text, width);
 
@@ -500,28 +500,44 @@ export int drawTextWidth(std::wstring text, int x, int y, bool center, int width
         return 0;
     }
     else if (textPair[1] == L"") {
-        if (center) {
-            drawTextCenter(text, x, y);
-        }
-        else {
-            drawText(text, x, y);
-        }
+        drawText(text, x, y);
         return 1;
     }
     else {
-        if (center) {
-            drawTextCenter(textPair[0], x, y);
-        }
-        else {
-            drawText(textPair[0], x, y);
-        }
-        return 1 + drawTextWidth(textPair[1], x, y + height, center, width, height, lineLimit - 1);
+        drawText(textPair[0], x, y);
+        return 1 + drawTextWidth(textPair[1], x, y + height, width, height, lineLimit - 1);
     }
 }
 
-export int drawTextWidth(std::wstring text, int x, int y, bool center, int width, int height)
+export int drawTextWidth(std::wstring text, int x, int y, int width, int height)
 {
-    return drawTextWidth(text, x, y, center, width, height, 999);
+    return drawTextWidth(text, x, y, width, height, 999);
+}
+
+export int drawTextCenterWidth(std::wstring text, int x, int y, int width, int height, int lineLimit)
+{
+    std::array<std::wstring, 2> textPair = textSplitter(text, width);
+
+    if (height == -1) {
+        height = s_fontSize + s_fontGap;
+    }
+
+    if (lineLimit <= 0) {
+        return 0;
+    }
+    else if (textPair[1] == L"") {
+        drawTextCenter(text, x, y);
+        return 1;
+    }
+    else {
+        drawTextCenter(textPair[0], x, y);
+        return 1 + drawTextCenterWidth(textPair[1], x, y + height, width, height, lineLimit - 1);
+    }
+}
+
+export int drawTextCenterWidth(std::wstring text, int x, int y, int width, int height)
+{
+    return drawTextCenterWidth(text, x, y, width, height, 999);
 }
 
 // Cache cleanup function - call this when shutting down

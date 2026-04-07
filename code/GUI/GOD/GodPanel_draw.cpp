@@ -60,7 +60,7 @@ void GodPanel::drawGUI()
 			setFont(fontType::mainFont);
 			setFontSize(15);
 			setFontGap(3);
-			int lines = drawTextWidth(behavior->descript, px + 17, curY, false, pw - 34, -1);
+			int lines = drawTextWidth(behavior->descript, px + 17, curY, pw - 34, -1);
 			curY += lines * (15 + 3) + 10;
 			setFontGap(0);
 		}
@@ -157,7 +157,7 @@ void GodPanel::drawGUI()
 		for (auto& item : behavior->pietyGains)
 		{
 			std::wstring bulletText = L"#59cb65- #FFFFFF" + item;
-			int lines = drawTextWidth(bulletText, px + 22, curY, false, pw - 44, -1);
+			int lines = drawTextWidth(bulletText, px + 22, curY, pw - 44, -1);
 			curY += lines * (14 + 2) + 4;
 		}
 		setFontGap(0);

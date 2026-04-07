@@ -337,7 +337,7 @@ public:
 					drawTextCenter(L"#e9c900★★★", cookBase.x + cookBase.w / 2, cookBase.y + 303);
 
 					setFontSize(16);
-					drawTextWidth(L" Rice stir-fried with scrambled egg and carrot sauteed in scallion oil. A quick, satisfying meal.", cookBase.x + 19, cookBase.y + 326, false, 380,20);
+					drawTextWidth(L" Rice stir-fried with scrambled egg and carrot sauteed in scallion oil. A quick, satisfying meal.", cookBase.x + 19, cookBase.y + 326, 380,20);
 
 					for (int i = 0; i < 4; i++)
 					{

@@ -672,7 +672,7 @@ void Craft::drawGUI()
 				tooltipText += itemTooltip[recipePtr->itemInfo[targetCursor].tooltipIndex];
 
 				setFontSize(15);
-				drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 15, topWindow.y + 15 + 87 + 23 * 0, false, 540, 18, 9);
+				drawTextWidth(col2Str(lowCol::white) + tooltipText, topWindow.x + 15, topWindow.y + 15 + 87 + 23 * 0, 540, 18, 9);
 
 				//조합하기 버튼
 				{

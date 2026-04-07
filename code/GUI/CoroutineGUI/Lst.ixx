@@ -135,7 +135,7 @@ public:
 
 			setFontSize(20);
 			setFont(fontType::mainFont);
-			drawTextWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, true, lstBase.w - 15, -1);
+			drawTextCenterWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, lstBase.w - 15, -1);
 
 			//선택지 버튼 그리기
 			int hoverCursor = -1;

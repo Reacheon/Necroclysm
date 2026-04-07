@@ -216,12 +216,12 @@ public:
 			if (exInput == true)
 			{
 				setFontSize(24);
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 128, true, 280, -1);
+				drawTextCenterWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 128, 280, -1);
 			}
 			else if (msgItemCode != -1)
 			{
 				setFontSize(16);
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 20, true, 280, 14);
+				drawTextCenterWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 60 - 47 + 20, 280, 14);
 				
 				
 				int pivotX = msgBase.x + 22;
@@ -243,7 +243,7 @@ public:
 			else
 			{
 				setFontSize(26);
-				drawTextWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 130, true, msgBase.w - 50, -1);
+				drawTextCenterWidth(msgText, msgBase.x + msgBase.w / 2, msgBase.y + 36 + 130, msgBase.w - 50, -1);
 			}
 
 
