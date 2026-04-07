@@ -13,6 +13,13 @@ import globalVar;
 import checkCursor;
 import drawWindow;
 import constVar;
+import Player;
+import SkillData;
+import SkillBehavior;
+import SkillRegistry;
+import statusEffect;
+import GodRegistry;
+import GodBehavior;
 
 export class Status : public GUI
 {
@@ -21,6 +28,7 @@ private:
 	SDL_Rect statusBase;
 	int statusCursor = -1;
 	int statusScroll = 0;
+	int partScroll[6] = { 0, }; // 부위별 바이오닉/돌연변이 스크롤
 public:
 	Status() : GUI(false)
 	{
@@ -70,6 +78,12 @@ public:
 			drawWindow(&statusBase, L"Status", 4);
 			resetWindowAlpha();
 
+			// 호버 시 푸른색 틴트 적용 람다
+			constexpr SDL_Color hoverBlue = { 0x22, 0x3c, 0x68 };
+			auto stadiumCol = [&](const SDL_Rect& r) -> SDL_Color {
+				return checkCursor(&r) ? hoverBlue : col::black;
+			};
+
 			drawFillRect(SDL_Rect{ statusBase.x + 12,statusBase.y + 46, 118, 110 }, col::black);
 			drawRect(SDL_Rect{ statusBase.x+12,statusBase.y + 46, 118, 110 }, col::white);
 
@@ -77,12 +91,13 @@ public:
 
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			std::wstring nameText = L"Nekbung";
+			std::wstring nameText = PlayerPtr->entityInfo.name;
 			int nameTextWIdth = queryTextWidth(nameText, true);
 			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + nameText, statusBase.x + 139, statusBase.y + 44);
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"(Loop #7)", statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
+			if (loopCount > 1)
+				drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"(Loop #" + std::to_wstring(loopCount) + L")", statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
 			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung (Loop #7)", statusBase.x + 139, statusBase.y + 44);
 
 			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung, Survivor", statusBase.x + 139, statusBase.y + 44);
@@ -94,15 +109,15 @@ public:
 			Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
 			drawText(L"#e1772eAge", agePivot.x + 5, agePivot.y + 1);
 			SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
-			drawStadium(ageRect, col::black, 255, 4);
+			drawStadium(ageRect, stadiumCol(ageRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(L"20", ageRect.x + ageRect.w / 2, ageRect.y + ageRect.h / 2);
+			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.age), ageRect.x + ageRect.w / 2, ageRect.y + ageRect.h / 2);
 
 			Point2 racePivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 1 };
 			setFont(fontType::mainFontBold);
 			drawText(L"#e1772eRace", racePivot.x + 5, racePivot.y + 1);
 			SDL_Rect raceRect = { racePivot.x + 55, racePivot.y, 120, 23 };
-			drawStadium(raceRect, col::black, 255, 4);
+			drawStadium(raceRect, stadiumCol(raceRect), 255, 4);
 			setFont(fontType::mainFontMedium);
 			drawTextCenter(L"Human", raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
 
@@ -110,35 +125,51 @@ public:
 			setFont(fontType::mainFontBold);
 			drawText(L"#e1772eGod", godPivot.x + 5, godPivot.y + 1);
 			SDL_Rect godRect = { godPivot.x + 55, godPivot.y, 120, 23 };
-			drawStadium(godRect, col::black, 255, 4);
+			drawStadium(godRect, stadiumCol(godRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(L"Rehylion", godRect.x + godRect.w / 2, godRect.y + godRect.h / 2);
+			std::wstring godName = L"-";
+			if (playerGod != godFlag::none)
+			{
+				GodBehavior* godBhv = GodRegistry::get(playerGod);
+				if (godBhv) godName = godBhv->name;
+			}
+			drawTextCenter(godName, godRect.x + godRect.w / 2, godRect.y + godRect.h / 2);
 
 
-			//우측 열: Hunger, Thirsty, Fatigue
+			//우측 열: Hunger, Thirsty, Fatigue (퍼센트 실시간 표시)
+			auto makePercentStr = [](double percent) -> std::wstring {
+				return std::to_wstring((int)std::round(percent)) + L"%";
+			};
+			auto percentColor = [](double percent) -> std::wstring {
+				if (percent >= 75.0) return col2Str(SDL_Color{ 0xff, 0x44, 0x44 });
+				if (percent >= 50.0) return col2Str(SDL_Color{ 0xff, 0xc1, 0x07 });
+				if (percent >= 25.0) return col2Str(SDL_Color{ 0xff, 0xe0, 0x80 });
+				return L"";
+			};
+
 			Point2 hungerPivot = { statusBase.x + 137 + 221, statusBase.y + 79 };
 			setFont(fontType::mainFontBold);
 			drawText(L"#e1772eHunger", hungerPivot.x + 5, hungerPivot.y + 1);
 			SDL_Rect hungerRect = { hungerPivot.x + 75, hungerPivot.y, 77, 23 };
-			drawStadium(hungerRect, col::black, 255, 4);
+			drawStadium(hungerRect, stadiumCol(hungerRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(L"98%", hungerRect.x + hungerRect.w / 2, hungerRect.y + hungerRect.h / 2);
+			drawTextCenter(percentColor(hunger) + makePercentStr(hunger), hungerRect.x + hungerRect.w / 2, hungerRect.y + hungerRect.h / 2);
 
 			Point2 thirstyPivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 1 };
 			setFont(fontType::mainFontBold);
 			drawText(L"#e1772eThirsty", thirstyPivot.x + 5, thirstyPivot.y + 1);
 			SDL_Rect thirstyRect = { thirstyPivot.x + 75, thirstyPivot.y, 77, 23 };
-			drawStadium(thirstyRect, col::black, 255, 4);
+			drawStadium(thirstyRect, stadiumCol(thirstyRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(L"47%", thirstyRect.x + thirstyRect.w / 2, thirstyRect.y + thirstyRect.h / 2);
+			drawTextCenter(percentColor(thirst) + makePercentStr(thirst), thirstyRect.x + thirstyRect.w / 2, thirstyRect.y + thirstyRect.h / 2);
 
 			Point2 fatiguePivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 2 };
 			setFont(fontType::mainFontBold);
 			drawText(L"#e1772eFatigue", fatiguePivot.x + 5, fatiguePivot.y + 1);
 			SDL_Rect fatigueRect = { fatiguePivot.x + 75, fatiguePivot.y, 77, 23 };
-			drawStadium(fatigueRect, col::black, 255, 4);
+			drawStadium(fatigueRect, stadiumCol(fatigueRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(col2Str(SDL_Color{ 0xff, 0x44, 0x44 }) + L"97%", fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
+			drawTextCenter(percentColor(fatigue) + makePercentStr(fatigue), fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
 			setFont(fontType::mainFont);
 
 
@@ -152,8 +183,24 @@ public:
 				for (int i = 0; i < 6; i++)
 					hexAngle[i] = std::numbers::pi / 180.0 * (60.0 * i);
 
-				//임의의 ratio 값 (0.0~1.0)
-				double ratio[6] = { 0.9, 0.6, 0.75, 0.4, 0.85, 0.5 };
+				// ratio 값 (0.0~1.0): 각 꼭짓점의 실제 데이터 비율
+				// i=0: Bionic Capacity, i=1: Progress, i=2: Profic Avg
+				// i=3: Status Avg, i=4: Locked, i=5: Mutation Threshold
+				double proficSum = 0.0;
+				for (int i = 0; i < TALENT_SIZE; i++)
+					proficSum += PlayerPtr->getProficLevel(i);
+				double statAvgVal = (PlayerPtr->entityInfo.statStr
+					+ PlayerPtr->entityInfo.statInt
+					+ PlayerPtr->entityInfo.statDex) / 3.0;
+
+				double ratio[6] = {
+					0.9,                                                       // Bionic Capacity (미구현)
+					0.6,                                                       // Progress (미구현)
+					std::clamp(proficSum / TALENT_SIZE / MAX_PROFIC_LEVEL, 0.0, 1.0), // Profic Avg
+					std::clamp(statAvgVal / 10.0, 0.0, 1.0),                  // Status Avg
+					0.0,                                                       // Locked
+					0.9,                                                       // Mutation Threshold (미구현)
+				};
 
 				//삼각형 팬으로 채워진 육각형을 그리는 람다
 				auto drawFilledHex = [&](float* vx, float* vy, SDL_Color c, Uint8 a)
@@ -188,12 +235,15 @@ public:
 				}
 				drawFilledHex(bx, by, { 0, 0, 0 }, 255);
 
-				//2) 스탯 레이더 (ratio 반영)
+				//2) 스탯 레이더 (ratio 반영, 최소 비율 보장)
+				// 0.0→minR, 1.0→1.0 으로 선형 보간하여 죽는 구간 없이 매핑
+				constexpr double minR = 0.12;
 				float sx[6], sy[6];
 				for (int i = 0; i < 6; i++)
 				{
-					sx[i] = cx + (float)(r * ratio[i] * std::cos(hexAngle[i]));
-					sy[i] = cy + (float)(r * ratio[i] * std::sin(hexAngle[i]));
+					double mapped = minR + ratio[i] * (1.0 - minR);
+					sx[i] = cx + (float)(r * mapped * std::cos(hexAngle[i]));
+					sy[i] = cy + (float)(r * mapped * std::sin(hexAngle[i]));
 				}
 				drawFilledHex(sx, sy, { 0x44, 0xaa, 0xff }, 160);
 
@@ -207,9 +257,9 @@ public:
 			}
 
 			//vertex 버튼 타이틀+값 그리기 람다
-			auto drawVertexBtn = [](const SDL_Rect& btn, const std::wstring& title, const std::wstring& value)
+			auto drawVertexBtn = [](const SDL_Rect& btn, const std::wstring& title, const std::wstring& value, SDL_Color bgCol = col::black)
 			{
-				drawStadium(btn, col::black, 150, 4);
+				drawStadium(btn, bgCol, 150, 4);
 				int cx = btn.x + btn.w / 2;
 
 				setFontSize(12);
@@ -238,19 +288,36 @@ public:
 			};
 
 			SDL_Rect vertex1Btn = { statusBase.x + 181,statusBase.y + 176,70,56 };
-			drawVertexBtn(vertex1Btn, L"#e1772eMutation Threshold", L"72%");
+			drawVertexBtn(vertex1Btn, L"#e1772eMutation Threshold", L"72%", stadiumCol(vertex1Btn));
 
 			SDL_Rect vertex2Btn = { statusBase.x + 208,statusBase.y + 244,70,56 };
-			drawVertexBtn(vertex2Btn, L"#e1772eBionic Capacity", L"6 / 10");
+			drawVertexBtn(vertex2Btn, L"#e1772eBionic Capacity", L"6 / 10", stadiumCol(vertex2Btn));
 
 			SDL_Rect vertex3Btn = { statusBase.x + 181,statusBase.y + 312,70,56 };
-			drawVertexBtn(vertex3Btn, L"#e1772eProgress", L"20%");
+			drawVertexBtn(vertex3Btn, L"#e1772eProgress", L"20%", stadiumCol(vertex3Btn));
 
 			SDL_Rect vertex4Btn = { statusBase.x + 52,statusBase.y + 312,70,56 };
-			drawVertexBtn(vertex4Btn, L"#e1772eProfic Avg", L"15.2");
+			{
+				// Profic Avg: 전체 숙련도 레벨 평균 (최대 27)
+				double proficSum = 0.0;
+				for (int i = 0; i < TALENT_SIZE; i++)
+					proficSum += PlayerPtr->getProficLevel(i);
+				double proficAvg = proficSum / TALENT_SIZE;
+				std::wstringstream wss;
+				wss << std::fixed << std::setprecision(1) << proficAvg;
+				drawVertexBtn(vertex4Btn, L"#e1772eProfic Avg", wss.str(), stadiumCol(vertex4Btn));
+			}
 
 			SDL_Rect vertex5Btn = { statusBase.x + 25,statusBase.y + 244,70,56 };
-			drawVertexBtn(vertex5Btn, L"#e1772eStatus Avg", L"4.3");
+			{
+				// Status Avg: STR/INT/DEX 평균 (최대 10)
+				double statAvg = (PlayerPtr->entityInfo.statStr
+					+ PlayerPtr->entityInfo.statInt
+					+ PlayerPtr->entityInfo.statDex) / 3.0;
+				std::wstringstream wss;
+				wss << std::fixed << std::setprecision(1) << statAvg;
+				drawVertexBtn(vertex5Btn, L"#e1772eStatus Avg", wss.str(), stadiumCol(vertex5Btn));
+			}
 
 			SDL_Rect vertex6Btn = { statusBase.x + 52,statusBase.y + 176,70,56 };
 			drawStadium(vertex6Btn, col::black, 150, 4);
@@ -293,7 +360,7 @@ public:
 
 			setFontSize(12);
 			
-			std::wstring mbtiText = L"INTJ";
+			std::wstring mbtiText = PlayerPtr->entityInfo.mbti;
 			drawText(mbtiText, statusBase.x + 291 - queryTextWidth(mbtiText), statusBase.y + 398);
 
 
@@ -310,58 +377,95 @@ public:
 				constexpr int efctW = 113;
 				constexpr int efctH = 26;
 				constexpr int efctGap = 30;
+				constexpr int efctMaxVisible = 14; // 표시 영역에 들어가는 최대 개수
 
-				//예시 상태이상 목록 (아이콘 인덱스, 이름, 색상)
-				struct EffectEntry { int icon; const wchar_t* name; SDL_Color col; };
-				EffectEntry effects[] = {
-					{ 56, L"Hungry",     { 0xff, 0xc1, 0x07 } },
-					{ 53, L"Thirsty",    { 0x44, 0xaa, 0xff } },
-					{ 58, L"Tired",      { 0xaa, 0xaa, 0xaa } },
-				};
-
-				for (int i = 0; i < 3; i++)
+				// 표시 대상 상태이상 필터링
+				struct FilteredEffect { int metaIdx; };
+				std::vector<FilteredEffect> filtered;
+				for (const auto& eff : PlayerPtr->entityInfo.statusEffectVec)
 				{
-					SDL_Rect efctRect = { statusBase.x + efctX, statusBase.y + 67 + efctGap * i, efctW, efctH };
-					drawStadium(efctRect, col::black, 255, 4);
-					drawSprite(spr::statusIcon, effects[i].icon, efctRect.x + 4, efctRect.y + 4);
-					drawText(col2Str(effects[i].col) + effects[i].name, efctRect.x + 30, efctRect.y + 3);
+					int idx = (int)eff.effectType;
+					if (idx < 0 || idx >= (int)statusEffectFlag::STATUS_EFFECT_COUNT) continue;
+					if (eff.effectType == statusEffectFlag::hungry
+						|| eff.effectType == statusEffectFlag::dehydrated
+						|| eff.effectType == statusEffectFlag::tired) continue;
+					const auto& meta = statusEffectMeta[idx];
+					if (meta.name == nullptr) continue;
+					filtered.push_back({ idx });
+				}
+
+				int totalCount = (int)filtered.size();
+
+				// 스크롤 범위 클램프
+				int maxScroll = std::max(0, totalCount - efctMaxVisible);
+				statusScroll = std::clamp(statusScroll, 0, maxScroll);
+
+				// 보이는 범위만 그리기
+				int drawEnd = std::min(statusScroll + efctMaxVisible, totalCount);
+				for (int i = statusScroll; i < drawEnd; i++)
+				{
+					const auto& meta = statusEffectMeta[filtered[i].metaIdx];
+					int drawIdx = i - statusScroll;
+					SDL_Rect efctRect = { statusBase.x + efctX, statusBase.y + 67 + efctGap * drawIdx, efctW, efctH };
+					drawStadium(efctRect, stadiumCol(efctRect), 255, 4);
+					drawSprite(spr::statusIcon, meta.iconIndex, efctRect.x + 4, efctRect.y + 4);
+					drawText(col2Str(meta.color) + meta.name, efctRect.x + 30, efctRect.y + 3);
+				}
+
+				// 스크롤이 필요할 때만 스크롤바 표시
+				if (totalCount > efctMaxVisible)
+				{
+					constexpr int scrollX = 990;
+					constexpr int scrollY = 67;
+					constexpr int scrollW = 2;
+					constexpr int scrollH = 416;
+
+					// 썸 높이: 보이는 비율에 비례, 최소 20px
+					int thumbH = std::max(20, scrollH * efctMaxVisible / totalCount);
+					int thumbTravel = scrollH - thumbH;
+					int thumbY = (maxScroll > 0) ? scrollY + thumbTravel * statusScroll / maxScroll : scrollY;
+
+					SDL_Rect scrollTrack = { statusBase.x + scrollX, statusBase.y + scrollY, scrollW, scrollH };
+					SDL_Rect scrollThumb = { statusBase.x + scrollX, statusBase.y + thumbY, scrollW, thumbH };
+					drawFillRect(scrollTrack, col::gray);
+					//drawFillRect(scrollThumb, col::white);
 				}
 			}
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
 			SDL_Rect strBtn = { statusBase.x + 625,statusBase.y + 96,60,60 };
-			drawStadium(strBtn, col::black, 255, 4);
+			drawStadium(strBtn, stadiumCol(strBtn), 255, 4);
 			drawTextCenter(L"Str", strBtn.x + strBtn.w/2, strBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(L"4", strBtn.x + strBtn.w / 2, strBtn.y + strBtn.h / 2 + 8);
+			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statStr), strBtn.x + strBtn.w / 2, strBtn.y + strBtn.h / 2 + 8);
 
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
 			SDL_Rect intBtn = { statusBase.x + 625 + 83*1,statusBase.y + 96,60,60 };
-			drawStadium(intBtn, col::black, 255, 4);
+			drawStadium(intBtn, stadiumCol(intBtn), 255, 4);
 			drawTextCenter(L"Int", intBtn.x + intBtn.w / 2, intBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(L"4", intBtn.x + intBtn.w / 2, intBtn.y + intBtn.h / 2 + 8);
+			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statInt), intBtn.x + intBtn.w / 2, intBtn.y + intBtn.h / 2 + 8);
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
 			SDL_Rect dexBtn = { statusBase.x + 625 + 83 * 2,statusBase.y + 96,60,60 };
-			drawStadium(dexBtn, col::black, 255, 4);
+			drawStadium(dexBtn, stadiumCol(dexBtn), 255, 4);
 			drawTextCenter(L"Dex", dexBtn.x + dexBtn.w / 2, dexBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(L"3", dexBtn.x + dexBtn.w / 2, dexBtn.y + dexBtn.h / 2 + 8);
+			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statDex), dexBtn.x + dexBtn.w / 2, dexBtn.y + dexBtn.h / 2 + 8);
 
 
 			setFont(fontType::mainFont);
 
 
 			SDL_Rect energyIcon = { statusBase.x + 624,statusBase.y + 48,32,32 };
-			drawStadium(energyIcon, col::black, 255, 4);
+			drawStadium(energyIcon, stadiumCol(energyIcon), 255, 4);
 			setZoom(2.0);
 			drawSprite(spr::icon16, 118, energyIcon.x, energyIcon.y);
 			setZoom(1.0);
@@ -391,113 +495,126 @@ public:
 
 
 
-			//좌측 열: Head, R.Arm, R.Leg
+			// 부위별 스타디움 공통 그리기 람다
+			auto drawBodyPart = [&](SDL_Rect partRect, const wchar_t* partName, int curHP, int maxHP, humanPartFlag part, int& scroll)
 			{
-				SDL_Rect headRect = { statusBase.x + 298,statusBase.y + 206,236,83 };
-				drawStadium(headRect, col::black, 150, 4);
+				drawStadium(partRect, stadiumCol(partRect), 150, 4);
 				setFontSize(18);
 				setFont(fontType::mainFontSemiBold);
-				drawText(L"Head", headRect.x + 6, headRect.y - 2);
+				drawText(partName, partRect.x + 6, partRect.y - 2);
 
-				SDL_Rect headGaugeRect = { headRect.x + 109, headRect.y + 3, 122, 15 };
-				SDL_Rect headInGaugeRect = { headRect.x + 112, headRect.y + 6, 116, 9 };
-				drawRect(headGaugeRect, col::white);
-				drawFillRect(headInGaugeRect, { 0x5b,0xbf,0x75 });
+				// HP 게이지
+				SDL_Rect gaugeRect = { partRect.x + 109, partRect.y + 3, 122, 15 };
+				SDL_Rect inGaugeRect = { partRect.x + 112, partRect.y + 6, 116, 9 };
+				drawRect(gaugeRect, col::white);
 
+				float hpRatio = (maxHP > 0) ? std::clamp((float)curHP / (float)maxHP, 0.0f, 1.0f) : 0.0f;
+				SDL_Color gaugeCol = { 0x5b, 0xbf, 0x75 };
+				if (hpRatio <= 0.25f) gaugeCol = { 0xff, 0x44, 0x44 };
+				else if (hpRatio <= 0.5f) gaugeCol = { 0xff, 0xc1, 0x07 };
+				SDL_Rect fillRect = { inGaugeRect.x, inGaugeRect.y, (int)(inGaugeRect.w * hpRatio), inGaugeRect.h };
+				drawFillRect(fillRect, gaugeCol);
+
+				std::wstring hpText = std::to_wstring(curHP) + L" / " + std::to_wstring(maxHP);
 				setFont(fontType::mainFont);
 				setFontSize(12);
 				for (int i = 0; i < 8; i++)
 				{
 					int dx, dy;
 					dir2Coord(i, dx, dy);
-					drawTextCenter(col2Str(col::black)+L"100 / 100"
-						, headInGaugeRect.x + headInGaugeRect.w / 2 + dx
-						, headInGaugeRect.y + headInGaugeRect.h / 2 + dy);
-
+					drawTextCenter(col2Str(col::black) + hpText
+						, inGaugeRect.x + inGaugeRect.w / 2 + dx
+						, inGaugeRect.y + inGaugeRect.h / 2 + dy);
 				}
+				drawTextCenter(hpText, inGaugeRect.x + inGaugeRect.w / 2, inGaugeRect.y + inGaugeRect.h / 2);
 
-				drawTextCenter(L"100 / 100", headInGaugeRect.x+ headInGaugeRect.w/2, headInGaugeRect.y + headInGaugeRect.h / 2);
-			
-				//구분선 (오른쪽으로 페이드아웃)
+				// 구분선 (오른쪽으로 페이드아웃)
 				for (int px = 0; px <= 98; px++)
 				{
 					Uint8 a = (Uint8)(255.0 * (1.0 - (double)px / 98.0));
-					drawPoint(headRect.x + 3 + px, headRect.y + 21, col::gray, a);
+					drawPoint(partRect.x + 3 + px, partRect.y + 21, col::gray, a);
 				}
 
-				
-				drawSprite(spr::icon16, 116, headRect.x + 3, headRect.y + 26);
-				setFontSize(12);
-				drawText(L"Nerve Boost", headRect.x + 3 + 19, headRect.y + 26);
+				// 해당 부위의 바이오닉/돌연변이 스킬 수집
+				struct PartSkillEntry { int sprIndex; std::wstring name; };
+				std::vector<PartSkillEntry> bionicEntries;
+				std::vector<PartSkillEntry> mutationEntries;
 
-				drawSprite(spr::icon16, 116, headRect.x + 3, headRect.y + 26 + 19);
-				setFontSize(12);
-				drawText(L"Nerve Boost", headRect.x + 3 + 19, headRect.y + 26 + 19);
-
-				drawSprite(spr::icon16, 116, headRect.x + 3, headRect.y + 26 + 38);
-				setFontSize(12);
-				drawText(L"Nerve Boost", headRect.x + 3 + 19, headRect.y + 26 + 38);
-
-
-				drawSprite(spr::icon16, 117, headRect.x + 3 + 114, headRect.y + 26);
-				setFontSize(12);
-				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 114, headRect.y + 26);
-
-				drawSprite(spr::icon16, 117, headRect.x + 3 + 114, headRect.y + 26 + 19);
-				setFontSize(12);
-				drawText(L"Spore Emitter", headRect.x + 3 + 19 + 114, headRect.y + 26 + 19);
-
-				if(0) //바이오닉+돌연변이 합이 6개를 초과했을 때 그려지는 스크롤 기믹
+				for (auto& sd : PlayerPtr->entityInfo.skillList)
 				{
-					SDL_Rect scrollRect = { headRect.x + 232,headRect.y + 23,2,56 };
-					SDL_Rect scrollInRect = { headRect.x + 232,headRect.y + 23,2,28 };
+					if (!sd.isLearned) continue;
+					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+					if (!bhv) continue;
+					if (bhv->bodyPart != part) continue;
+					if (bhv->src == skillSrc::BIONIC)
+						bionicEntries.push_back({ 116, bhv->name });
+					else if (bhv->src == skillSrc::MUTATION)
+						mutationEntries.push_back({ 117, bhv->name });
+				}
+
+				// 좌측 열: 바이오닉(IC 아이콘), 우측 열: 돌연변이(이중나선 아이콘)
+				if (bionicEntries.empty() && mutationEntries.empty())
+				{
+					setFontSize(18);
+					setFont(fontType::mainFontSemiBold);
+					drawTextCenter(col2Str(col::gray) + L"No Data", partRect.x + partRect.w / 2, partRect.y + 52);
+					return;
+				}
+
+				setFontSize(12);
+				setFont(fontType::mainFont);
+				constexpr int maxRows = 3;
+				int maxListLen = std::max((int)bionicEntries.size(), (int)mutationEntries.size());
+				int maxScroll = std::max(0, maxListLen - maxRows);
+				scroll = std::clamp(scroll, 0, maxScroll);
+
+				for (int i = scroll; i < (int)bionicEntries.size() && i < scroll + maxRows; i++)
+				{
+					int row = i - scroll;
+					drawSprite(spr::icon16, bionicEntries[i].sprIndex, partRect.x + 3, partRect.y + 26 + 19 * row);
+					drawText(bionicEntries[i].name, partRect.x + 3 + 19, partRect.y + 26 + 19 * row);
+				}
+				for (int i = scroll; i < (int)mutationEntries.size() && i < scroll + maxRows; i++)
+				{
+					int row = i - scroll;
+					drawSprite(spr::icon16, mutationEntries[i].sprIndex, partRect.x + 3 + 114, partRect.y + 26 + 19 * row);
+					drawText(mutationEntries[i].name, partRect.x + 3 + 19 + 114, partRect.y + 26 + 19 * row);
+				}
+
+				// 스크롤이 필요할 때만 스크롤바 표시
+				if (maxListLen > maxRows)
+				{
+					constexpr int sW = 2, sH = 56;
+					int thumbH = std::max(10, sH * maxRows / maxListLen);
+					int thumbTravel = sH - thumbH;
+					int thumbY = (maxScroll > 0) ? thumbTravel * scroll / maxScroll : 0;
+
+					SDL_Rect scrollRect = { partRect.x + 232, partRect.y + 23, sW, sH };
+					SDL_Rect scrollInRect = { partRect.x + 232, partRect.y + 23 + thumbY, sW, thumbH };
 					drawFillRect(scrollRect, col::gray);
 					drawFillRect(scrollInRect, col::white);
 				}
-			}
+			};
 
+			// 좌측 열: Head, R.Arm, R.Leg
+			SDL_Rect headRect = { statusBase.x + 298, statusBase.y + 206, 236, 83 };
+			drawBodyPart(headRect, L"Head", PlayerPtr->headHP, PART_MAX_HP, humanPartFlag::head, partScroll[(int)humanPartFlag::head]);
 
-			{
-				SDL_Rect rArmRect = { statusBase.x + 298,statusBase.y + 206 + 91 * 1,236,83 };
-				drawStadium(rArmRect, col::black, 150, 4);
-				setFontSize(18);
-				setFont(fontType::mainFontSemiBold);
-				drawText(L"Right Arm", rArmRect.x + 6, rArmRect.y - 2);
-				//구분선 (오른쪽으로 페이드아웃)
-				for (int px = 0; px <= 98; px++)
-				{
-					Uint8 a = (Uint8)(255.0 * (1.0 - (double)px / 98.0));
-					drawPoint(rArmRect.x + 3 + px, rArmRect.y + 21, col::gray, a);
-				}
-				setFontSize(18);
-				setFont(fontType::mainFontSemiBold);
-				drawTextCenter(col2Str(col::gray) + L"No Data", rArmRect.x + rArmRect.w / 2, rArmRect.y + 45);
-			}
+			SDL_Rect rArmRect = { statusBase.x + 298, statusBase.y + 206 + 91 * 1, 236, 83 };
+			drawBodyPart(rArmRect, L"Right Arm", PlayerPtr->rArmHP, PART_MAX_HP, humanPartFlag::rArm, partScroll[(int)humanPartFlag::rArm]);
 
-			SDL_Rect rLegRect = { statusBase.x + 298,statusBase.y + 206 + 91*2,236,83 };
-			drawStadium(rLegRect, col::black, 150, 4);
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawText(L"Right Leg", rLegRect.x + 6, rLegRect.y - 2);
+			SDL_Rect rLegRect = { statusBase.x + 298, statusBase.y + 206 + 91 * 2, 236, 83 };
+			drawBodyPart(rLegRect, L"Right Leg", PlayerPtr->rLegHP, PART_MAX_HP, humanPartFlag::rLeg, partScroll[(int)humanPartFlag::rLeg]);
 
-			//우측 열: Torso, L.Arm, L.Leg
-			SDL_Rect torsoRect = { statusBase.x + 298 + 335,statusBase.y + 206,236,83 };
-			drawStadium(torsoRect, col::black, 150, 4);
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawText(L"Torso", torsoRect.x + 6, torsoRect.y - 2);
+			// 우측 열: Torso, L.Arm, L.Leg
+			SDL_Rect torsoRect = { statusBase.x + 298 + 335, statusBase.y + 206, 236, 83 };
+			drawBodyPart(torsoRect, L"Torso", PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.maxHP, humanPartFlag::torso, partScroll[(int)humanPartFlag::torso]);
 
-			SDL_Rect lArmRect = { statusBase.x + 298 + 335,statusBase.y + 206 + 91 * 1,236,83 };
-			drawStadium(lArmRect, col::black, 150, 4);
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawText(L"Left Arm", lArmRect.x + 6, lArmRect.y - 2);
+			SDL_Rect lArmRect = { statusBase.x + 298 + 335, statusBase.y + 206 + 91 * 1, 236, 83 };
+			drawBodyPart(lArmRect, L"Left Arm", PlayerPtr->lArmHP, PART_MAX_HP, humanPartFlag::lArm, partScroll[(int)humanPartFlag::lArm]);
 
-			SDL_Rect lLegRect = { statusBase.x + 298 + 335,statusBase.y + 206 + 91 * 2,236,83 };
-			drawStadium(lLegRect, col::black, 150, 4);
-			setFontSize(18);
-			setFont(fontType::mainFontSemiBold);
-			drawText(L"Left Leg", lLegRect.x + 6, lLegRect.y - 2);
+			SDL_Rect lLegRect = { statusBase.x + 298 + 335, statusBase.y + 206 + 91 * 2, 236, 83 };
+			drawBodyPart(lLegRect, L"Left Leg", PlayerPtr->lLegHP, PART_MAX_HP, humanPartFlag::lLeg, partScroll[(int)humanPartFlag::lLeg]);
 
 			setFont(fontType::mainFont);
 
@@ -535,6 +652,39 @@ public:
 		}
 		else
 		{
+		}
+	}
+
+	void mouseWheel()
+	{
+		// 상태이상 패널 영역 위에서만 스크롤 반응
+		SDL_Rect efctArea = { statusBase.x + 872, statusBase.y + 35, 121, 455 };
+		if (checkCursor(&efctArea))
+		{
+			if (event.wheel.y > 0 && statusScroll > 0) statusScroll--;
+			else if (event.wheel.y < 0) statusScroll++;
+			return;
+		}
+
+		// 바디파트 스크롤: 각 파트 영역 위에서 휠 반응
+		struct PartArea { SDL_Rect rect; humanPartFlag part; };
+		PartArea parts[] = {
+			{ { statusBase.x + 298, statusBase.y + 206, 236, 83 }, humanPartFlag::head },
+			{ { statusBase.x + 298, statusBase.y + 206 + 91, 236, 83 }, humanPartFlag::rArm },
+			{ { statusBase.x + 298, statusBase.y + 206 + 91 * 2, 236, 83 }, humanPartFlag::rLeg },
+			{ { statusBase.x + 298 + 335, statusBase.y + 206, 236, 83 }, humanPartFlag::torso },
+			{ { statusBase.x + 298 + 335, statusBase.y + 206 + 91, 236, 83 }, humanPartFlag::lArm },
+			{ { statusBase.x + 298 + 335, statusBase.y + 206 + 91 * 2, 236, 83 }, humanPartFlag::lLeg },
+		};
+		for (auto& p : parts)
+		{
+			if (checkCursor(&p.rect))
+			{
+				int& s = partScroll[(int)p.part];
+				if (event.wheel.y > 0 && s > 0) s--;
+				else if (event.wheel.y < 0) s++;
+				return;
+			}
 		}
 	}
 

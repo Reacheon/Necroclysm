@@ -30,18 +30,18 @@ private:
 	int sleepDuration = 480; // 8시간 (60분 * 8)
 	bool negateMonster = false;
 
-	// 추가: 피로도 회복 관련 변수
-	float fatigueRecoveryPerMinute = 0.01f; // 분당 피로도 회복량
-	float initialFatigue = 0.0f; // 수면 시작시 피로도
+	// 피로도 회복 관련 변수
+	double fatigueRecoveryPerMinute = 0.01; // 분당 피로도 회복량 (%)
+	double initialFatigue = 0.0; // 수면 시작시 피로도 (%)
 
 	// 수면 확률 계산
 	float getSleepProbability()
 	{
-		float fatigueRatio = fatigue / (float)PLAYER_MAX_FATIGUE;
+		float fatigueRatio = (float)(fatigue / 100.0); // 0.0~1.0 (높을수록 피곤)
 
-		// 피로도가 낮을수록 잠들 확률이 높아짐
-		// 0% 피로도 = 9.5% 확률, 100% 피로도 = 0.01% 확률
-		float probability = 0.095f - (fatigueRatio * 0.09f);
+		// 피로도가 높을수록 잠들 확률이 높아짐
+		// 100% 피로 = 9.5% 확률, 0% 피로 = 0.01% 확률
+		float probability = 0.005f + (fatigueRatio * 0.09f);
 		return myMax(0.0001f, myMin(0.095f, probability));
 	}
 
@@ -259,10 +259,9 @@ public:
 				isAsleep = true;
 				PlayerInfo().isEyesClose = true; // 눈을 감음
 
-				// 피로도 회복 관련 초기화
+				// 피로도 회복 관련 초기화: 0%까지 회복 목표
 				initialFatigue = fatigue;
-				float targetFatigue = PLAYER_MAX_FATIGUE; // 완전 회복 목표
-				fatigueRecoveryPerMinute = (targetFatigue - initialFatigue) / sleepDuration;
+				fatigueRecoveryPerMinute = initialFatigue / sleepDuration;
 
 				break;
 			}
@@ -280,9 +279,9 @@ public:
 
 			sleepTime++;
 
-			fatigue += FATIGUE_SPEED;
-			fatigue += fatigueRecoveryPerMinute;
-			if (fatigue > PLAYER_MAX_FATIGUE) fatigue = PLAYER_MAX_FATIGUE;
+			fatigue += FATIGUE_SPEED;        // 시간 경과에 의한 피로 증가
+			fatigue -= fatigueRecoveryPerMinute; // 수면에 의한 피로 회복 (감소)
+			if (fatigue < 0.0) fatigue = 0.0;
 		}
 
 		// 수면 완료

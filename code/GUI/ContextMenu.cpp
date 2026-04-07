@@ -516,11 +516,11 @@ void ContextMenu::executeContextAct(act inputAct)
 		int floorCode = TileFloor(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 		if (floorCode == itemID::shallowFreshWater || floorCode == itemID::deepFreshWater)
 		{
-			thirst = PLAYER_MAX_HYDRATION;
+			thirst = 0.0; // 민물: 갈증 완전 해소
 		}
 		else if (floorCode == itemID::shallowSeaWater || floorCode == itemID::deepSeaWater)
 		{
-			thirst -= 100;
+			thirst += 100.0 * HYDRATION_TO_PERCENT; // 바닷물: 오히려 갈증 증가
 		}
 	}
 	else if (inputAct == act::propCarry)

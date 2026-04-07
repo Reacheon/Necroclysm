@@ -50,6 +50,8 @@ namespace csvEntity
     constexpr int atkCut = 34;
     constexpr int atkBash = 35;
     constexpr int atkBalance = 36;
+    constexpr int age = 37;
+    constexpr int mbti = 38;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -263,6 +265,12 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::atkBalance:
                             entityDex[tgtIndex].atkBalance = wtof(strFragment.c_str());
+                            break;
+                        case csvEntity::age:
+                            entityDex[tgtIndex].age = wtoi(strFragment.c_str());
+                            break;
+                        case csvEntity::mbti:
+                            entityDex[tgtIndex].mbti = strFragment;
                             break;
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

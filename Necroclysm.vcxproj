@@ -289,6 +289,8 @@
     <ClCompile Include="code\skill\SkillFocusHeal.ixx" />
     <ClCompile Include="code\skill\SkillSuperRegen.ixx" />
     <ClCompile Include="code\skill\SkillLivingWard.ixx" />
+    <ClCompile Include="code\skill\SkillNerveBoost.ixx" />
+    <ClCompile Include="code\skill\SkillInfravision.ixx" />
     <ClCompile Include="code\god\GodBehavior.ixx" />
     <ClCompile Include="code\god\GodRegistry.ixx" />
     <ClCompile Include="code\god\GodRegistry.cpp" />

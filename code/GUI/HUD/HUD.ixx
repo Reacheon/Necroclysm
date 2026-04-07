@@ -75,9 +75,9 @@ private:
 
 	int dragQuickSlotTarget = -1;//HUD에서 스킬창 옮길 때 용도(Skill GUI랑 기능 동일)
 
-	int fakeHunger = hunger;
-	int fakeThirst = thirst;
-	int fakeFatigue = fatigue;
+	double fakeHunger = hunger;
+	double fakeThirst = thirst;
+	double fakeFatigue = fatigue;
 
 
 public:

@@ -58,6 +58,7 @@ export void debugConsole()
 	prt(L"27. Lua 스크립트 실행\n");
 	prt(L"28. 게임오버\n");
 	prt(L"29. 신앙도 변경\n");
+	prt(L"30. 스킬 추가\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -415,6 +416,47 @@ export void debugConsole()
 			auto* bhv = SkillRegistry::get(sd.skillCode);
 			prt(L"  - 스킬코드 %d: %ls\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)");
 		}
+		break;
+	}
+	case 30://스킬 추가
+	{
+		prt(L"현재 보유 스킬 목록:\n");
+		for (auto& sd : PlayerInfo().skillList)
+		{
+			auto* bhv = SkillRegistry::get(sd.skillCode);
+			prt(L"  - 코드 %d: %ls (Lv%d)\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
+		}
+		prt(L"추가할 스킬 코드를 입력해주세요. (-1: 취소)\n");
+		int skillCode;
+		std::cin >> skillCode;
+		if (skillCode == -1) break;
+
+		auto* bhv = SkillRegistry::get(skillCode);
+		if (!bhv)
+		{
+			prt(L"[에러] 스킬 코드 %d는 SkillRegistry에 등록되지 않았습니다.\n", skillCode);
+			break;
+		}
+
+		// 이미 보유 중인지 확인
+		for (auto& sd : PlayerInfo().skillList)
+		{
+			if (sd.skillCode == skillCode)
+			{
+				prt(L"[에러] 이미 보유 중인 스킬입니다: %ls\n", bhv->name.c_str());
+				goto debugSkillEnd;
+			}
+		}
+
+		{
+			SkillData newSD;
+			newSD.skillCode = skillCode;
+			newSD.isLearned = true;
+			PlayerInfo().skillList.push_back(newSD);
+			prt(L"[디버그] 스킬 추가 완료: %ls (코드 %d, src=%d, bodyPart=%d)\n",
+				bhv->name.c_str(), skillCode, (int)bhv->src, (int)bhv->bodyPart);
+		}
+		debugSkillEnd:
 		break;
 	}
 	case 99://콘솔 출력 초기화

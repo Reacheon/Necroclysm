@@ -123,9 +123,9 @@ export void turnWait(float waitTime)
     PlayerInfo().STA += 2;
     if (PlayerInfo().STA > PlayerInfo().maxSTA) PlayerInfo().STA = PlayerInfo().maxSTA;
 
-    hunger -= waitTime * HUNGRY_SPPED;
-    thirst -= waitTime * THIRST_SPEED;
-    fatigue -= waitTime * FATIGUE_SPEED;
+    hunger  += waitTime * HUNGER_SPEED;
+    thirst  += waitTime * THIRST_SPEED;
+    fatigue += waitTime * FATIGUE_SPEED;
 
     timeGift = waitTime;
     turnCycle = turn::playerAnime;

@@ -191,7 +191,7 @@ __int64 playerInputTurn()
 
 	//턴 시작
 	{
-		if (hunger <= 0)
+		if (hunger >= 100.0)
 		{
 			if (GUI::getLastGUI() == Sleep::ins())
 			{
@@ -203,7 +203,7 @@ __int64 playerInputTurn()
 			aStarTrail.clear();
 		}
 
-		if (thirst <= 0)
+		if (thirst >= 100.0)
 		{
 			if (GUI::getLastGUI() == Sleep::ins())
 			{
@@ -215,7 +215,7 @@ __int64 playerInputTurn()
 			aStarTrail.clear();
 		}
 
-		if (fatigue <= 0)
+		if (fatigue >= 100.0)
 		{
 			GameOver::create(L"극심한 피로로 사망했다.");
 			PlayerPtr->deactAStarDst();

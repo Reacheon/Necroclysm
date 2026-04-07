@@ -1197,15 +1197,15 @@ void HUD::drawStatusEffects()
 {
 	std::vector<statusEffect>& myEfcts = PlayerInfo().statusEffectVec;
 
-	// 페이크값 업데이트 람다 함수
-	auto updateFakeValue = [](int& fakeValue, int realValue) {
-		int diff = std::abs(fakeValue - realValue);
-		if (diff == 0) return;
+	// 페이크값 업데이트 람다 함수 (퍼센트 단위)
+	auto updateFakeValue = [](double& fakeValue, double realValue) {
+		double diff = std::abs(fakeValue - realValue);
+		if (diff < 0.001) { fakeValue = realValue; return; }
 
-		int speed = 1;
-		if (diff > 100) speed = 8;
-		else if (diff > 50) speed = 4;
-		else if (diff > 20) speed = 2;
+		double speed = 0.05;
+		if (diff > 5.0) speed = 0.5;
+		else if (diff > 2.0) speed = 0.2;
+		else if (diff > 1.0) speed = 0.1;
 
 		if (fakeValue < realValue) fakeValue += std::min(speed, realValue - fakeValue);
 		else if (fakeValue > realValue) fakeValue -= std::min(speed, fakeValue - realValue);
@@ -1232,17 +1232,17 @@ void HUD::drawStatusEffects()
 		switch (myEfcts[i].effectType)
 		{
 		case statusEffectFlag::hungry:
-			if (fakeHunger < PLAYER_STARVE_CALORIE)
+			if (fakeHunger >= PLAYER_STARVE_PERCENT)
 			{
 				statEfctName = sysStr[220]; // 영양실조 (Starving)
 				textColor = lowCol::red;
 			}
-			else if (fakeHunger < PLAYER_VERY_HUNGRY_CALORIE)
+			else if (fakeHunger >= PLAYER_VERY_HUNGRY_PERCENT)
 			{
 				statEfctName = sysStr[219]; // 굶주림 (Famished)
 				textColor = lowCol::orange;
 			}
-			else if (fakeHunger < PLAYER_HUNGRY_CALORIE)
+			else if (fakeHunger >= PLAYER_HUNGRY_PERCENT)
 			{
 				statEfctName = sysStr[218]; // 배고픔 (Hungry)
 				textColor = lowCol::yellow;
@@ -1255,17 +1255,17 @@ void HUD::drawStatusEffects()
 			break;
 
 		case statusEffectFlag::dehydrated:
-			if (fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
+			if (fakeThirst >= PLAYER_DEHYDRATION_PERCENT)
 			{
 				statEfctName = sysStr[224]; // 탈수 상태 (Dehydrated)
 				textColor = lowCol::red;
 			}
-			else if (fakeThirst < PLAYER_VERY_THIRSTY_HYDRATION)
+			else if (fakeThirst >= PLAYER_VERY_THIRSTY_PERCENT)
 			{
 				statEfctName = sysStr[223]; // 심한 갈증 (Parched)
 				textColor = lowCol::orange;
 			}
-			else if (fakeThirst < PLAYER_THIRSTY_HYDRATION)
+			else if (fakeThirst >= PLAYER_THIRSTY_PERCENT)
 			{
 				statEfctName = sysStr[222]; // 목마름 (Thirsty)
 				textColor = lowCol::yellow;
@@ -1278,17 +1278,17 @@ void HUD::drawStatusEffects()
 			break;
 
 		case statusEffectFlag::tired:
-			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
+			if (fakeFatigue >= PLAYER_EXHAUSTED_PERCENT)
 			{
 				statEfctName = sysStr[228]; // 탈진 상태 (Exhausted)
 				textColor = lowCol::red;
 			}
-			else if (fakeFatigue < PLAYER_VERY_TIRED_FATIGUE)
+			else if (fakeFatigue >= PLAYER_VERY_TIRED_PERCENT)
 			{
 				statEfctName = sysStr[227]; // 심한 피로 (Weary)
 				textColor = lowCol::orange;
 			}
-			else if (fakeFatigue < PLAYER_TIRED_FATIGUE)
+			else if (fakeFatigue >= PLAYER_TIRED_PERCENT)
 			{
 				statEfctName = sysStr[226]; // 피곤함 (Tired)
 				textColor = lowCol::yellow;
@@ -1342,28 +1342,29 @@ void HUD::drawStatusEffects()
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
-			if (fakeHunger < PLAYER_STARVE_CALORIE)
+			// 높을수록 나쁨 → 구간 내 비율 (0→1: 구간 시작→끝)
+			if (fakeHunger >= PLAYER_STARVE_PERCENT)
 			{
 				gaugeCol = lowCol::red;
-				gaugeRatio = fakeHunger / static_cast<float>(PLAYER_STARVE_CALORIE);
+				gaugeRatio = (fakeHunger - PLAYER_STARVE_PERCENT) / static_cast<float>(100.0 - PLAYER_STARVE_PERCENT);
 			}
-			else if (fakeHunger < PLAYER_VERY_HUNGRY_CALORIE)
+			else if (fakeHunger >= PLAYER_VERY_HUNGRY_PERCENT)
 			{
 				gaugeCol = lowCol::orange;
-				gaugeRatio = (fakeHunger - PLAYER_STARVE_CALORIE) / static_cast<float>(PLAYER_VERY_HUNGRY_CALORIE - PLAYER_STARVE_CALORIE);
+				gaugeRatio = (fakeHunger - PLAYER_VERY_HUNGRY_PERCENT) / static_cast<float>(PLAYER_STARVE_PERCENT - PLAYER_VERY_HUNGRY_PERCENT);
 			}
-			else if (fakeHunger < PLAYER_HUNGRY_CALORIE)
+			else if (fakeHunger >= PLAYER_HUNGRY_PERCENT)
 			{
 				gaugeCol = lowCol::yellow;
-				gaugeRatio = (fakeHunger - PLAYER_VERY_HUNGRY_CALORIE) / static_cast<float>(PLAYER_HUNGRY_CALORIE - PLAYER_VERY_HUNGRY_CALORIE);
+				gaugeRatio = (fakeHunger - PLAYER_HUNGRY_PERCENT) / static_cast<float>(PLAYER_VERY_HUNGRY_PERCENT - PLAYER_HUNGRY_PERCENT);
 			}
 			else
 			{
 				gaugeCol = col::green;
-				gaugeRatio = (fakeHunger - PLAYER_HUNGRY_CALORIE) / static_cast<float>(PLAYER_MAX_CALORIE - PLAYER_HUNGRY_CALORIE);
+				gaugeRatio = fakeHunger / static_cast<float>(PLAYER_HUNGRY_PERCENT);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
+			int sprIndex = static_cast<int>(gaugeRatio * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
@@ -1375,28 +1376,28 @@ void HUD::drawStatusEffects()
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
-			if (fakeThirst < PLAYER_DEHYDRATION_HYDRATION)
+			if (fakeThirst >= PLAYER_DEHYDRATION_PERCENT)
 			{
 				gaugeCol = lowCol::red;
-				gaugeRatio = fakeThirst / static_cast<float>(PLAYER_DEHYDRATION_HYDRATION);
+				gaugeRatio = (fakeThirst - PLAYER_DEHYDRATION_PERCENT) / static_cast<float>(100.0 - PLAYER_DEHYDRATION_PERCENT);
 			}
-			else if (fakeThirst < PLAYER_VERY_THIRSTY_HYDRATION)
+			else if (fakeThirst >= PLAYER_VERY_THIRSTY_PERCENT)
 			{
 				gaugeCol = lowCol::orange;
-				gaugeRatio = (fakeThirst - PLAYER_DEHYDRATION_HYDRATION) / static_cast<float>(PLAYER_VERY_THIRSTY_HYDRATION - PLAYER_DEHYDRATION_HYDRATION);
+				gaugeRatio = (fakeThirst - PLAYER_VERY_THIRSTY_PERCENT) / static_cast<float>(PLAYER_DEHYDRATION_PERCENT - PLAYER_VERY_THIRSTY_PERCENT);
 			}
-			else if (fakeThirst < PLAYER_THIRSTY_HYDRATION)
+			else if (fakeThirst >= PLAYER_THIRSTY_PERCENT)
 			{
 				gaugeCol = lowCol::yellow;
-				gaugeRatio = (fakeThirst - PLAYER_VERY_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_THIRSTY_HYDRATION - PLAYER_VERY_THIRSTY_HYDRATION);
+				gaugeRatio = (fakeThirst - PLAYER_THIRSTY_PERCENT) / static_cast<float>(PLAYER_VERY_THIRSTY_PERCENT - PLAYER_THIRSTY_PERCENT);
 			}
 			else
 			{
 				gaugeCol = lowCol::skyBlue;
-				gaugeRatio = (fakeThirst - PLAYER_THIRSTY_HYDRATION) / static_cast<float>(PLAYER_MAX_HYDRATION - PLAYER_THIRSTY_HYDRATION);
+				gaugeRatio = fakeThirst / static_cast<float>(PLAYER_THIRSTY_PERCENT);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 53);
+			int sprIndex = static_cast<int>(gaugeRatio * 53);
 			sprIndex = std::max(0, std::min(53, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);
@@ -1408,28 +1409,28 @@ void HUD::drawStatusEffects()
 			float gaugeRatio = 0.0f;
 			SDL_Color gaugeCol = col::white;
 
-			if (fakeFatigue < PLAYER_EXHAUSTED_FATIGUE)
+			if (fakeFatigue >= PLAYER_EXHAUSTED_PERCENT)
 			{
 				gaugeCol = lowCol::red;
-				gaugeRatio = fakeFatigue / static_cast<float>(PLAYER_EXHAUSTED_FATIGUE);
+				gaugeRatio = (fakeFatigue - PLAYER_EXHAUSTED_PERCENT) / static_cast<float>(100.0 - PLAYER_EXHAUSTED_PERCENT);
 			}
-			else if (fakeFatigue < PLAYER_VERY_TIRED_FATIGUE)
+			else if (fakeFatigue >= PLAYER_VERY_TIRED_PERCENT)
 			{
 				gaugeCol = lowCol::orange;
-				gaugeRatio = (fakeFatigue - PLAYER_EXHAUSTED_FATIGUE) / static_cast<float>(PLAYER_VERY_TIRED_FATIGUE - PLAYER_EXHAUSTED_FATIGUE);
+				gaugeRatio = (fakeFatigue - PLAYER_VERY_TIRED_PERCENT) / static_cast<float>(PLAYER_EXHAUSTED_PERCENT - PLAYER_VERY_TIRED_PERCENT);
 			}
-			else if (fakeFatigue < PLAYER_TIRED_FATIGUE)
+			else if (fakeFatigue >= PLAYER_TIRED_PERCENT)
 			{
 				gaugeCol = lowCol::yellow;
-				gaugeRatio = (fakeFatigue - PLAYER_VERY_TIRED_FATIGUE) / static_cast<float>(PLAYER_TIRED_FATIGUE - PLAYER_VERY_TIRED_FATIGUE);
+				gaugeRatio = (fakeFatigue - PLAYER_TIRED_PERCENT) / static_cast<float>(PLAYER_VERY_TIRED_PERCENT - PLAYER_TIRED_PERCENT);
 			}
 			else
 			{
 				gaugeCol = lowCol::green;
-				gaugeRatio = (fakeFatigue - PLAYER_TIRED_FATIGUE) / static_cast<float>(PLAYER_MAX_FATIGUE - PLAYER_TIRED_FATIGUE);
+				gaugeRatio = fakeFatigue / static_cast<float>(PLAYER_TIRED_PERCENT);
 			}
 
-			int sprIndex = static_cast<int>((1.0f - gaugeRatio) * 73);
+			int sprIndex = static_cast<int>(gaugeRatio * 73);
 			sprIndex = std::max(0, std::min(73, sprIndex));
 
 			SDL_SetTextureColorMod(spr::statusEffectGaugeCircle->getTexture(), gaugeCol.r, gaugeCol.g, gaugeCol.b);

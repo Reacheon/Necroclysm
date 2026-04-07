@@ -20,9 +20,7 @@ namespace actFunc
 		errorBox(inputData.pocketPtr == nullptr, L"drinkBottle: inputData.pocketPtr is nullptr.");
 		errorBox(inputData.pocketPtr->itemInfo.size() == 0, L"drinkBottle: inputData.pocketPtr->itemInfo.size() is 0.");
 
-		int needHydration = PLAYER_MAX_HYDRATION - thirst;
-
-		if (needHydration <= 0)
+		if (thirst <= 0.0)
 		{
 			updateLog(L"You're not thirsty.");
 			return;
@@ -34,13 +32,15 @@ namespace actFunc
 			{
 				int hydrationPerWater = inputData.pocketPtr->itemInfo[i].hydrationPerML;
 				int waterCount = inputData.pocketPtr->itemInfo[i].number;
-				int waterNeeded = (needHydration + hydrationPerWater - 1) / hydrationPerWater; //올림 나눗셈
+				double needPercent = thirst; // 현재 갈증%만큼 해소 필요
+				double percentPerWater = hydrationPerWater * HYDRATION_TO_PERCENT;
+				int waterNeeded = (int)std::ceil(needPercent / percentPerWater);
 				int waterToConsume = myMin(waterNeeded, waterCount);
-				int actualHydration = waterToConsume * hydrationPerWater;
-				actualHydration = myMin(actualHydration, needHydration);
+				double actualPercent = waterToConsume * percentPerWater;
+				if (actualPercent > thirst) actualPercent = thirst;
 
-				thirst += actualHydration;
-				if (thirst > PLAYER_MAX_HYDRATION) thirst = PLAYER_MAX_HYDRATION;
+				thirst -= actualPercent;
+				if (thirst < 0.0) thirst = 0.0;
 
 				inputData.pocketPtr->subtractItemIndex(i, waterToConsume);
 				updateLog(L"You drink from the bottle. Your thirst is quenched.");
@@ -57,25 +57,19 @@ namespace actFunc
 		errorBox(inputCursor < 0 || inputCursor >= inputPocket->itemInfo.size(), L"eatFood: inputCursor is out of bounds.");
 
 		ItemData& targetItem = inputPocket->itemInfo[inputCursor];
-		// 아이템의 칼로리 확인
 		int itemCalorie = targetItem.calorie;
-		// 현재 허기 상태와 최대 허기 수치 확인
-		int needCalorie = PLAYER_MAX_CALORIE - hunger;
+		double caloriePercent = itemCalorie * CALORIE_TO_PERCENT;
 
-		if (needCalorie <= 0)
+		if (hunger <= 0.0)
 		{
 			updateLog(L"You're too full to eat anymore.");
 			return;
 		}
 
-		// 칼로리 회복
-		hunger += itemCalorie;
-		if (hunger > PLAYER_MAX_CALORIE)
-		{
-			hunger = PLAYER_MAX_CALORIE;
-		}
+		// 허기% 감소 (음식을 먹으면 허기가 줄어듦)
+		hunger -= caloriePercent;
+		if (hunger < 0.0) hunger = 0.0;
 
-		// 아이템 1개 제거
 		inputPocket->subtractItemIndex(inputCursor, 1);
 		updateLog(L"You eat the food. Your hunger is satisfied.");
 	}

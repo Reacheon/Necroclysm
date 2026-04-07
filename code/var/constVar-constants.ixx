@@ -58,28 +58,28 @@ export constexpr int CHAR_TEXTURE_WIDTH = 288;
 export constexpr int CHAR_TEXTURE_HEIGHT = 384;
 
 
-export constexpr int PLAYER_MAX_CALORIE = 17280;//10일 버팀
-export constexpr int PLAYER_HUNGRY_CALORIE = 4320 * 3;
-export constexpr int PLAYER_VERY_HUNGRY_CALORIE = 4320 * 2;
-export constexpr int PLAYER_STARVE_CALORIE = 4320;
+// 허기/갈증/피로: double 퍼센트 (0.0% = 최상, 100.0% = 사망)
+// 임계값 (낮을수록 좋음)
+export constexpr double PLAYER_HUNGRY_PERCENT       = 25.0; // 배고픔
+export constexpr double PLAYER_VERY_HUNGRY_PERCENT  = 50.0; // 굶주림
+export constexpr double PLAYER_STARVE_PERCENT       = 75.0; // 영양실조
 
-export constexpr float HUNGRY_SPPED = 1.2;
+export constexpr double PLAYER_THIRSTY_PERCENT          = 25.0; // 목마름
+export constexpr double PLAYER_VERY_THIRSTY_PERCENT     = 50.0; // 심한 갈증
+export constexpr double PLAYER_DEHYDRATION_PERCENT      = 75.0; // 탈수
 
+export constexpr double PLAYER_TIRED_PERCENT        = 25.0; // 피곤함
+export constexpr double PLAYER_VERY_TIRED_PERCENT   = 50.0; // 심한 피로
+export constexpr double PLAYER_EXHAUSTED_PERCENT    = 75.0; // 탈진
 
-export constexpr int PLAYER_MAX_HYDRATION = 8640;//4일 버팀
-export constexpr int PLAYER_THIRSTY_HYDRATION = 2160 * 3;
-export constexpr int PLAYER_VERY_THIRSTY_HYDRATION = 2160 * 2;
-export constexpr int PLAYER_DEHYDRATION_HYDRATION = 2160 * 1;
+// 분당 증가 속도 (%/분), 기존 실제 단위 기반 역산
+export constexpr double HUNGER_SPEED  = 1.2 / 17280.0 * 100.0; // ≈0.00694%/분 (10일)
+export constexpr double THIRST_SPEED  = 1.5 / 8640.0  * 100.0; // ≈0.01736%/분 (4일)
+export constexpr double FATIGUE_SPEED = 1.0 / 4320.0  * 100.0; // ≈0.02315%/분 (3일)
 
-export constexpr float THIRST_SPEED = 1.5;
-
-
-export constexpr int PLAYER_MAX_FATIGUE = 4320;//최대 3일 안 자고 버팀
-export constexpr int PLAYER_TIRED_FATIGUE = 3360;//16시간 지나면 피곤해짐
-export constexpr int PLAYER_VERY_TIRED_FATIGUE = 2400;
-export constexpr int PLAYER_EXHAUSTED_FATIGUE = 1440;
-
-export constexpr float FATIGUE_SPEED = 1.0;
+// 아이템 칼로리/수분→퍼센트 변환용 상수 (기존 최대값 보존)
+export constexpr double CALORIE_TO_PERCENT   = 100.0 / 17280.0;
+export constexpr double HYDRATION_TO_PERCENT = 100.0 / 8640.0;
 
 export constexpr int MAX_BATCH = 4096;
 

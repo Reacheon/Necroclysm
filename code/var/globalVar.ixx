@@ -21,6 +21,7 @@ import Prop;
 
 export godFlag playerGod = godFlag::none;
 export int godPiety = 0;
+export int loopCount = 1; // 메타 세이브: 현재 루프 번호 (죽을 때마다 +1)
 
 /////////////////////////////////////////////////////////////////
 export namespace actSet
@@ -176,9 +177,9 @@ export inline int fluidTypeToCode(fluidType inputType)
         return itemID::water;
     }
 }
-export float hunger = PLAYER_MAX_CALORIE / 2;
-export float thirst = PLAYER_MAX_HYDRATION / 2 + 1000;
-export float fatigue = PLAYER_MAX_FATIGUE / 2;
+export double hunger  = 50.0; // 0.0% = 포만, 100.0% = 아사
+export double thirst  = 50.0; // 0.0% = 해갈, 100.0% = 탈수사
+export double fatigue = 50.0; // 0.0% = 개운, 100.0% = 과로사
 
 export bool gestureInitialized = false;
 export bool isPinchActive = false;

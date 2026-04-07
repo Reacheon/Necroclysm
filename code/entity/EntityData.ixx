@@ -50,6 +50,9 @@ export struct EntityData_Base
 
     __int8 hpBarHeight = -12;
 
+    unsigned __int8 age = 0;
+    std::wstring mbti;
+
     relationFlag relation = relationFlag::hostile;
     creatureType creature = creatureType::human;
     bool isHumanCustomSprite = false;
