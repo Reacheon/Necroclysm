@@ -225,4 +225,7 @@ export namespace itemID
     constexpr int assaultRifle = 12;
 
     constexpr int altarOfRehylion = 543;
+
+    constexpr int mutagen = 544;
+    constexpr int autodoc = 545;
 };

@@ -1182,6 +1182,9 @@ export void startArea()
 	createItemStack({ -2, -12, 0 }, { {itemID::woodenPlate,1},{itemID::ceramicPlate,1} });
 
 		
+	createProp({ 15,-8,0 }, itemID::autodoc);
+	createItemStack({ 16, -8, 0 }, { {itemID::mutagen,20}});
+
 
 
 	World::ins()->createSector(0, 0, 0);
