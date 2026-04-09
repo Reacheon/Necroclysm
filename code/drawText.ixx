@@ -540,6 +540,21 @@ export int drawTextCenterWidth(std::wstring text, int x, int y, int width, int h
     return drawTextCenterWidth(text, x, y, width, height, 999);
 }
 
+//그리지 않고 줄 수만 계산
+export int queryLineCount(const std::wstring& text, int width)
+{
+    std::wstring remaining = text;
+    int count = 0;
+    while (!remaining.empty())
+    {
+        auto pair = textSplitter(remaining, width);
+        count++;
+        if (pair[1].empty()) break;
+        remaining = pair[1];
+    }
+    return count;
+}
+
 // Cache cleanup function - call this when shutting down
 export void clearTextCache()
 {

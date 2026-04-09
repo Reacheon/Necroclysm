@@ -294,6 +294,12 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniToPlayerTurn(PlayerPtr, aniFlag::harvesting);
 				}
+				else if (tgtProp->leadItem.pocketPtr != nullptr) //컨테이너 클릭 시 루팅창 오픈
+				{
+					Point3 containerPos = { touchX, touchY, PlayerZ() };
+					new Loot(tgtProp->leadItem.pocketPtr.get(), &(tgtProp->leadItem), containerPos);
+					click = false;
+				}
 			}
 			else if (TileEntity(touchX, touchY, PlayerZ()) != nullptr && TileEntity(touchX, touchY, PlayerZ())->entityInfo.relation == relationFlag::friendly)
 			{

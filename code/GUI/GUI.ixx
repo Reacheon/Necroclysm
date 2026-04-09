@@ -36,7 +36,7 @@ public:
 	{
 		activeGUIList.erase(std::find(activeGUIList.begin(), activeGUIList.end(), this));
 		prt(L"★ GUI : 소멸자가 호출되었습니다.. actvieGUIList의 크기는 %d입니다.\n", activeGUIList.size());
-		if (isCorouter) Corouter::current->run();
+		if (isCorouter && Corouter::current) Corouter::current->run();
 	};
 	static std::vector<GUI*> getActiveGUIList() { return activeGUIList; }
 	static GUI* getLastGUI() { return activeGUIList[activeGUIList.size() - 1]; }

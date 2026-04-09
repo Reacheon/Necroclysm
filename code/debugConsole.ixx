@@ -20,6 +20,7 @@ import ItemStack;
 import GameOver;
 import GodService;
 import SkillRegistry;
+import Lst;
 
 export void debugConsole()
 {
@@ -59,6 +60,7 @@ export void debugConsole()
 	prt(L"28. 게임오버\n");
 	prt(L"29. 신앙도 변경\n");
 	prt(L"30. 스킬 추가\n");
+	prt(L"31. 테스트 Lst 띄우기\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -457,6 +459,26 @@ export void debugConsole()
 				bhv->name.c_str(), skillCode, (int)bhv->src, (int)bhv->bodyPart);
 		}
 		debugSkillEnd:
+		break;
+	}
+	case 31://테스트 Lst 띄우기
+	{
+		int optionCount;
+		prt(L"생성할 옵션의 개수를 입력해주세요.\n");
+		std::cin >> optionCount;
+		if (optionCount <= 0) { prt(L"1 이상의 값을 입력해주세요.\n"); break; }
+
+		std::wstring lstText;
+		prt(L"안내 문자열을 입력해주세요. (Lst 상단에 표시됨)\n");
+		std::wcin.ignore();
+		std::getline(std::wcin, lstText);
+
+		std::vector<std::wstring> options;
+		for (int i = 0; i < optionCount; i++)
+			options.push_back(L"Option " + std::to_wstring(i + 1));
+
+		new Lst(L"Test List", lstText, options, false);
+		prt(L"[디버그] 옵션 %d개의 테스트 Lst를 띄웠다!\n", optionCount);
 		break;
 	}
 	case 99://콘솔 출력 초기화
