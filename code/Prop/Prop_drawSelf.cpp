@@ -379,12 +379,12 @@ void Prop::drawSelf()
     }
     else if (iCode == itemID::solenoidValveRL || iCode == itemID::solenoidValveUD)
     {
-        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON))
-        {
-            sprIndex += 1;
-        }
-        }
-
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
+    }
+    else if (iCode == itemID::autodoc)
+    {
+        if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
+    }
 
     if (leadItem.checkFlag(itemFlag::CABLE) && leadItem.checkFlag(itemFlag::CROSSED_CABLE))
     {

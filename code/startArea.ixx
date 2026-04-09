@@ -1182,8 +1182,22 @@ export void startArea()
 	createItemStack({ -2, -12, 0 }, { {itemID::woodenPlate,1},{itemID::ceramicPlate,1} });
 
 		
+	//테크 도구들
 	createProp({ 15,-8,0 }, itemID::autodoc);
-	createItemStack({ 16, -8, 0 }, { {itemID::mutagen,20}});
+
+	createProp({ 13,-10,0 }, itemID::gasolineGeneratorB);
+	TileProp({ 13,-10,0 })->leadItem.pocketPtr->addItemFromDex(itemID::gasoline, 1000);
+	createProp({ 13,-9,0 }, itemID::leverUD);
+	createProp({ 13,-8,0 }, itemID::copperCable);
+	createProp({ 14,-8,0 }, itemID::copperCable);
+
+
+
+	createItemStack({ 16, -8, 0 }, { 
+		{itemID::cbm_nervedrive,1},
+		{itemID::cbm_powerStorage,10},
+		{itemID::cbm_metabExchange,1},
+		{itemID::mutagen,20}});
 
 
 

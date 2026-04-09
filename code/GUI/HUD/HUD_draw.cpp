@@ -1744,11 +1744,26 @@ void HUD::drawBodyParts()
 
 void HUD::drawCircuitInfo()
 {
-	if (ContextMenu::ins() == nullptr) return;
+	if (ContextMenu::ins() != nullptr) return;
 
+	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };
+	static int hoverTime = 0;
+	Point2 currentHoverGrid = getAbsMouseGrid();
+
+	if (option::inputMethod == input::mouse) currentHoverGrid = getAbsMouseGrid();
+
+	if (prevHoverGrid != currentHoverGrid || click)
 	{
-		Point2 tgtGrid = contextMenuTargetGrid;
-		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerZ());
+		hoverTime = 0;
+		prevHoverGrid = currentHoverGrid;
+	}
+	else hoverTime += 1;
+
+	if (hoverTime > 30)
+	{
+		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
+
+		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
 		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) && tgtProp->isChargeFlowing())
 			|| tgtProp->leadItem.checkFlag(itemFlag::VOLTAGE_SOURCE))
@@ -1927,7 +1942,13 @@ void HUD::drawCircuitInfo()
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 			SDL_SetRenderTarget(renderer, nullptr);
 
-			Point2 windowCoord = { cameraW - 20 - window.w, 220 };
+			Point2 mouseCoord = getAbsMouseGrid();
+			SDL_Rect dst;
+			dst.x = cameraW / 2 + zoomScale * ((16 * mouseCoord.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+			dst.y = cameraH / 2 + zoomScale * ((16 * mouseCoord.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+			Point2 windowCoord = { dst.x, dst.y };
+
+			if (windowCoord.y + window.h >= cameraH) windowCoord.y = cameraH - window.h;
 
 			SDL_SetTextureAlphaMod(texture::circuitInfo, windowAlpha);
 			drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);
@@ -1938,11 +1959,26 @@ void HUD::drawCircuitInfo()
 
 void HUD::drawFluidCircuitInfo()
 {
-	if (ContextMenu::ins() == nullptr) return;
+	if (ContextMenu::ins() != nullptr) return;
 
+	static Point2 prevHoverGrid = { std::numeric_limits<int>::min(), std::numeric_limits<int>::min() };
+	static int hoverTime = 0;
+	Point2 currentHoverGrid = getAbsMouseGrid();
+
+	if (option::inputMethod == input::mouse) currentHoverGrid = getAbsMouseGrid();
+
+	if (prevHoverGrid != currentHoverGrid || click)
 	{
-		Point2 tgtGrid = contextMenuTargetGrid;
-		Prop* tgtProp = TileProp(tgtGrid.x, tgtGrid.y, PlayerZ());
+		hoverTime = 0;
+		prevHoverGrid = currentHoverGrid;
+	}
+	else hoverTime += 1;
+
+	if (hoverTime > 30)
+	{
+		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
+
+		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
 		if (!(tgtProp->leadItem.checkFlag(itemFlag::FLUID_CIRCUIT))) return;
 
@@ -2138,7 +2174,13 @@ void HUD::drawFluidCircuitInfo()
 		SDL_SetRenderTarget(renderer, nullptr);
 
 		// 화면 위치 계산
-		Point2 windowCoord = { cameraW - 20 - window.w, 220 };
+		Point2 mouseCoord = getAbsMouseGrid();
+		SDL_Rect dst;
+		dst.x = cameraW / 2 + zoomScale * ((16 * mouseCoord.x + 8) - cameraX) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+		dst.y = cameraH / 2 + zoomScale * ((16 * mouseCoord.y + 8) - cameraY) - ((16 * zoomScale) / 2) + 16 * zoomScale;
+		Point2 windowCoord = { dst.x, dst.y };
+
+		if (windowCoord.y + window.h >= cameraH) windowCoord.y = cameraH - window.h;
 
 		SDL_SetTextureAlphaMod(texture::circuitInfo, windowAlpha);
 		drawTexture(texture::circuitInfo, windowCoord.x, windowCoord.y);

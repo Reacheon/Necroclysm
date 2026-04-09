@@ -228,4 +228,8 @@ export namespace itemID
 
     constexpr int mutagen = 544;
     constexpr int autodoc = 545;
+    
+    constexpr int cbm_nervedrive = 546;
+    constexpr int cbm_powerStorage = 547;
+    constexpr int cbm_metabExchange = 548;
 };
