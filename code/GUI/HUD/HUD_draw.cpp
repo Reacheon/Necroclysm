@@ -149,7 +149,7 @@ void HUD::drawGUI()
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
 
-			std::wstring titleText = L"Nekbung, ";
+			std::wstring titleText = L"Nekdol, ";
 			auto* god = GodService::getCurrentGod();
 			if (god)
 			{

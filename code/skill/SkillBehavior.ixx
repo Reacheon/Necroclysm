@@ -26,8 +26,6 @@ public:
 	int maxSkillLevel = 5;
 	float maxCooldown = 30.0f;
 	std::wstring skillRank = L"F";
-	humanPartFlag bodyPart = humanPartFlag::torso; // 돌연변이/바이오닉 장착 부위
-
 	// 랭크 문자열을 난이도 숫자로 변환 (F=1, E=2, D=3, C=4, B=5, A=6, S=7)
 	int getRankDifficulty() const
 	{

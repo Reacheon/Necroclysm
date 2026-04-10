@@ -36,22 +36,21 @@ namespace csvEntity
     constexpr int rElec = 20;
     constexpr int rCorr = 21;
     constexpr int rRad = 22;
-    constexpr int bionicList = 23;
-    constexpr int corpseItemCode = 24;
-    constexpr int statStr = 25;
-    constexpr int statInt = 26;
-    constexpr int statDex = 27;
-    constexpr int hpBarHeight = 28;
-    constexpr int relation = 29;
-    constexpr int isHumanCustomSprite = 30;
-    constexpr int atkSpr1 = 31;
-    constexpr int atkSpr2 = 32;
-    constexpr int atkPierce = 33;
-    constexpr int atkCut = 34;
-    constexpr int atkBash = 35;
-    constexpr int atkBalance = 36;
-    constexpr int age = 37;
-    constexpr int mbti = 38;
+    constexpr int corpseItemCode = 23;
+    constexpr int statStr = 24;
+    constexpr int statInt = 25;
+    constexpr int statDex = 26;
+    constexpr int hpBarHeight = 27;
+    constexpr int relation = 28;
+    constexpr int isHumanCustomSprite = 29;
+    constexpr int atkSpr1 = 30;
+    constexpr int atkSpr2 = 31;
+    constexpr int atkPierce = 32;
+    constexpr int atkCut = 33;
+    constexpr int atkBash = 34;
+    constexpr int atkBalance = 35;
+    constexpr int age = 36;
+    constexpr int mbti = 37;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -201,24 +200,6 @@ export int readEntityDex(const wchar_t* file)
                         case csvEntity::rRad:
                             entityDex[tgtIndex].rRad = wtoi(strFragment.c_str());
                             break;
-                        case csvEntity::bionicList:
-                        {
-                            int val;
-                            for (int j = 0; j < strFragment.size(); j++)
-                            {
-                                if (strFragment[j] == UNI::UNDERSCORE || j == strFragment.size() - 1)
-                                {
-                                    if (j == strFragment.size() - 1) { j++; } //마지막이면 j값을 1 더하여 보정
-
-                                    val = wtoi(strFragment.substr(0, j).c_str());
-                                    strFragment.erase(0, j + 1);
-                                    j = 0;
-
-                                    entityDex[tgtIndex].bionicList.push_back(val);
-                                }
-                            }
-                            break;
-                        }
                         case csvEntity::corpseItemCode:
                             entityDex[tgtIndex].corpseItemCode = wtoi(strFragment.c_str());
                             break;

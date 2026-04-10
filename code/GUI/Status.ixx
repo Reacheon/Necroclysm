@@ -28,6 +28,8 @@ private:
 	SDL_Rect statusBase;
 	int statusCursor = -1;
 	int statusScroll = 0;
+	int bionicScroll = 0;
+	int mutationScroll = 0;
 	int partScroll[6] = { 0, }; // 부위별 바이오닉/돌연변이 스크롤
 public:
 	Status() : GUI(false)
@@ -98,9 +100,9 @@ public:
 			setFont(fontType::mainFontSemiBold);
 			if (loopCount > 1)
 				drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"(Loop #" + std::to_wstring(loopCount) + L")", statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
-			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung (Loop #7)", statusBase.x + 139, statusBase.y + 44);
+			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol (Loop #7)", statusBase.x + 139, statusBase.y + 44);
 
-			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekbung, Survivor", statusBase.x + 139, statusBase.y + 44);
+			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol, Survivor", statusBase.x + 139, statusBase.y + 44);
 			setFont(fontType::mainFont);
 
 			setFontSize(16);
@@ -492,135 +494,242 @@ public:
 			drawTextCenter(L"123 / 500 kJ", gaugeRect.x + gaugeRect.w/2, gaugeRect.y + gaugeRect.h/2);
 
 
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
-			// 부위별 스타디움 공통 그리기 람다
-			auto drawBodyPart = [&](SDL_Rect partRect, const wchar_t* partName, int curHP, int maxHP, humanPartFlag part, int& scroll)
+			//세로 구분선 (하단 실선 + 상단 페이드아웃)
 			{
-				drawStadium(partRect, stadiumCol(partRect), 150, 4);
-				setFontSize(18);
-				setFont(fontType::mainFontSemiBold);
-				drawText(partName, partRect.x + 6, partRect.y - 2);
+				int lx = statusBase.x + 445;
+				int yBottom = statusBase.y + 490;
+				int yFadeStart = statusBase.y + 490 - 275;
+				int yTop = statusBase.y + 490 - 310;
+				SDL_Color lineCol = { 0x63, 0x63, 0x63 };
 
-				// HP 게이지
-				SDL_Rect gaugeRect = { partRect.x + 109, partRect.y + 3, 122, 15 };
-				SDL_Rect inGaugeRect = { partRect.x + 112, partRect.y + 6, 116, 9 };
-				drawRect(gaugeRect, col::white);
+				//하단 실선 구간
+				drawLine(lx, yBottom, lx, yFadeStart, lineCol);
+
+				//상단 페이드아웃 구간
+				int fadeLen = yFadeStart - yTop;
+				for (int py = yFadeStart; py >= yTop; py--)
+				{
+					Uint8 a = (Uint8)(255.0 * (py - yTop) / fadeLen);
+					drawPoint(lx, py, lineCol, a);
+				}
+			}
+
+			setZoom(2.0);
+			drawSprite(spr::icon16, 116, statusBase.x + 305, statusBase.y + 190);
+			setZoom(1.0);
+			setFont(fontType::mainFontSemiBold);
+			setFontSize(18);
+			drawText(L"Bionics", statusBase.x + 305 + 38, statusBase.y + 190 + 4);
+			
+			{
+				constexpr int bionicMaxVisible = 13; // 252 / 19
+
+				// 바이오닉 필터링 (skillSrc::BIONIC)
+				std::vector<const SkillData*> bionicEntries;
+				for (const auto& sd : PlayerPtr->entityInfo.skillList)
+				{
+					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+					if (bhv && bhv->src == skillSrc::BIONIC)
+						bionicEntries.push_back(&sd);
+				}
+
+				int bionicTotal = (int)bionicEntries.size();
+
+				SDL_Rect bionicRect = { statusBase.x + 302,statusBase.y + 229,136,252 };
+				bool bionicNeedScroll = bionicTotal > bionicMaxVisible;
+
+				//스크롤이 필요한 경우 박스를 살짝 좁혀 스크롤바 공간 확보
+				if (bionicNeedScroll)
+					bionicRect.x -= 3;
+
+				drawStadium(bionicRect, col::black, 255, 4);
+
+				if (bionicTotal == 0)
+				{
+					setFontSize(18);
+					setFont(fontType::mainFontSemiBold);
+					drawTextCenter(col2Str(col::gray) + L"No Data", bionicRect.x + bionicRect.w / 2, bionicRect.y + bionicRect.h / 2 - 26);
+				}
+				else
+				{
+					// 스크롤 범위 클램프
+					int bionicMaxScroll = std::max(0, bionicTotal - bionicMaxVisible);
+					bionicScroll = std::clamp(bionicScroll, 0, bionicMaxScroll);
+
+					int drawEnd = std::min(bionicScroll + bionicMaxVisible, bionicTotal);
+					setFont(fontType::mainFont);
+					setFontSize(12);
+					for (int i = bionicScroll; i < drawEnd; i++)
+					{
+						int drawIdx = i - bionicScroll;
+						SkillBehavior* bhv = SkillRegistry::get(bionicEntries[i]->skillCode);
+						if (!bhv) continue;
+
+						SDL_Rect eachBionicRect = { bionicRect.x + 5, bionicRect.y + 4 + 19 * drawIdx , 128, 16 };
+						drawStadium(eachBionicRect, stadiumCol(eachBionicRect), 255, 4);
+
+						drawSprite(spr::icon16, 116, bionicRect.x + 5, bionicRect.y + 4 + 19 * drawIdx);
+						drawText(bhv->name, bionicRect.x + 5 + 20, bionicRect.y + 4 + 19 * drawIdx);
+					}
+
+					// 스크롤바
+					if (bionicNeedScroll)
+					{
+						SDL_Rect scrollTrack = { bionicRect.x + 139, bionicRect.y, 2, 252 };
+						int thumbH = std::max(20, 252 * bionicMaxVisible / bionicTotal);
+						int thumbTravel = 252 - thumbH;
+						int thumbY = (bionicMaxScroll > 0) ? scrollTrack.y + thumbTravel * bionicScroll / bionicMaxScroll : scrollTrack.y;
+						SDL_Rect scrollThumb = { scrollTrack.x, thumbY, 2, thumbH };
+						drawFillRect(scrollTrack, col::gray);
+						drawFillRect(scrollThumb, col::white);
+					}
+				}
+			}
+
+
+			//세로 구분선 (하단 실선 + 상단 페이드아웃)
+			{
+				int lx = statusBase.x + 721;
+				int yBottom = statusBase.y + 490;
+				int yFadeStart = statusBase.y + 490 - 275;
+				int yTop = statusBase.y + 490 - 310;
+				SDL_Color lineCol = { 0x63, 0x63, 0x63 };
+
+				//하단 실선 구간
+				drawLine(lx, yBottom, lx, yFadeStart, lineCol);
+
+				//상단 페이드아웃 구간
+				int fadeLen = yFadeStart - yTop;
+				for (int py = yFadeStart; py >= yTop; py--)
+				{
+					Uint8 a = (Uint8)(255.0 * (py - yTop) / fadeLen);
+					drawPoint(lx, py, lineCol, a);
+				}
+			}
+
+
+			setZoom(2.0);
+			drawSprite(spr::icon16, 117, statusBase.x + 731, statusBase.y + 190);
+			setZoom(1.0);
+			setFont(fontType::mainFontSemiBold);
+			setFontSize(18);
+			drawText(L"Mutations", statusBase.x + 731 + 38, statusBase.y + 190 + 4);
+
+			{
+				constexpr int mutMaxVisible = 13; // 252 / 19
+
+				// 돌연변이 필터링
+				std::vector<const SkillData*> mutList;
+				for (const auto& sd : PlayerPtr->entityInfo.skillList)
+				{
+					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+					if (bhv && bhv->src == skillSrc::MUTATION)
+						mutList.push_back(&sd);
+				}
+				int mutTotal = (int)mutList.size();
+
+				SDL_Rect mutationRect = { statusBase.x + 729,statusBase.y + 229,136,252 };
+				bool mutNeedScroll = mutTotal > mutMaxVisible;
+
+				if (mutNeedScroll)
+					mutationRect.x -= 3;
+
+				drawStadium(mutationRect, col::black, 255, 4);
+
+				if (mutTotal == 0)
+				{
+					setFontSize(18);
+					setFont(fontType::mainFontSemiBold);
+					drawTextCenter(col2Str(col::gray) + L"No Data", mutationRect.x + mutationRect.w / 2, mutationRect.y + mutationRect.h / 2 - 26);
+				}
+				else
+				{
+					// 스크롤 범위 클램프
+					int mutMaxScroll = std::max(0, mutTotal - mutMaxVisible);
+					mutationScroll = std::clamp(mutationScroll, 0, mutMaxScroll);
+
+					int drawEnd = std::min(mutationScroll + mutMaxVisible, mutTotal);
+					setFont(fontType::mainFont);
+					setFontSize(12);
+					for (int i = mutationScroll; i < drawEnd; i++)
+					{
+						int drawIdx = i - mutationScroll;
+						SkillBehavior* bhv = SkillRegistry::get(mutList[i]->skillCode);
+						if (!bhv) continue;
+
+						SDL_Rect eachMutationRect = { mutationRect.x + 5, mutationRect.y + 4 + 19 * drawIdx , 128, 16 };
+						drawStadium(eachMutationRect, stadiumCol(eachMutationRect), 255, 4);
+
+						drawSprite(spr::icon16, 117, mutationRect.x + 5, mutationRect.y + 4 + 19 * drawIdx);
+						drawText(bhv->name, mutationRect.x + 5 + 20, mutationRect.y + 4 + 19 * drawIdx);
+
+					}
+
+					// 스크롤바
+					if (mutNeedScroll)
+					{
+						SDL_Rect scrollTrack = { mutationRect.x + 139, mutationRect.y, 2, 252 };
+						int thumbH = std::max(20, 252 * mutMaxVisible / mutTotal);
+						int thumbTravel = 252 - thumbH;
+						int thumbY = (mutMaxScroll > 0) ? scrollTrack.y + thumbTravel * mutationScroll / mutMaxScroll : scrollTrack.y;
+						SDL_Rect scrollThumb = { scrollTrack.x, thumbY, 2, thumbH };
+						drawFillRect(scrollTrack, col::gray);
+						drawFillRect(scrollThumb, col::white);
+					}
+				}
+			}
+
+			auto drawBlankGauge = [](int x, int y)
+				{
+					drawPoint(x + 1, y + 1, col::white);
+					drawLine(x + 2, y, x + 83, y, col::white);
+					drawPoint(x + 84, y + 1, col::white);
+					drawLine(x + 85, y + 2, x + 85, y + 8, col::white);
+					drawPoint(x + 84, y + 9, col::white);
+					drawLine(x + 83, y + 10, x + 2, y + 10, col::white);
+					drawPoint(x + 1, y + 9, col::white);
+					drawLine(x, y + 8, x, y + 2, col::white);
+				};
+
+			// 부위별 HP 박스 그리기 람다
+			auto drawPartBox = [&](int px, int py, const wchar_t* partName, int curHP, int maxHP)
+			{
+				SDL_Rect partRect = { statusBase.x + px, statusBase.y + py, 90, 48 };
+				drawStadium(partRect, stadiumCol(partRect), 255, 4);
+				setFont(fontType::mainFontBold);
+				setFontSize(14);
+				drawText(partName, partRect.x + 4, partRect.y + 1);
+				drawBlankGauge(partRect.x + 2, partRect.y + 20);
 
 				float hpRatio = (maxHP > 0) ? std::clamp((float)curHP / (float)maxHP, 0.0f, 1.0f) : 0.0f;
 				SDL_Color gaugeCol = { 0x5b, 0xbf, 0x75 };
 				if (hpRatio <= 0.25f) gaugeCol = { 0xff, 0x44, 0x44 };
 				else if (hpRatio <= 0.5f) gaugeCol = { 0xff, 0xc1, 0x07 };
-				SDL_Rect fillRect = { inGaugeRect.x, inGaugeRect.y, (int)(inGaugeRect.w * hpRatio), inGaugeRect.h };
-				drawFillRect(fillRect, gaugeCol);
+				int fillW = (int)(80 * hpRatio);
+				drawFillRect(SDL_Rect{ partRect.x + 5, partRect.y + 23, fillW, 5 }, gaugeCol);
 
 				std::wstring hpText = std::to_wstring(curHP) + L" / " + std::to_wstring(maxHP);
 				setFont(fontType::mainFont);
 				setFontSize(12);
-				for (int i = 0; i < 8; i++)
-				{
-					int dx, dy;
-					dir2Coord(i, dx, dy);
-					drawTextCenter(col2Str(col::black) + hpText
-						, inGaugeRect.x + inGaugeRect.w / 2 + dx
-						, inGaugeRect.y + inGaugeRect.h / 2 + dy);
-				}
-				drawTextCenter(hpText, inGaugeRect.x + inGaugeRect.w / 2, inGaugeRect.y + inGaugeRect.h / 2);
-
-				// 구분선 (오른쪽으로 페이드아웃)
-				for (int px = 0; px <= 98; px++)
-				{
-					Uint8 a = (Uint8)(255.0 * (1.0 - (double)px / 98.0));
-					drawPoint(partRect.x + 3 + px, partRect.y + 21, col::gray, a);
-				}
-
-				// 해당 부위의 바이오닉/돌연변이 스킬 수집
-				struct PartSkillEntry { int sprIndex; std::wstring name; };
-				std::vector<PartSkillEntry> bionicEntries;
-				std::vector<PartSkillEntry> mutationEntries;
-
-				for (auto& sd : PlayerPtr->entityInfo.skillList)
-				{
-					if (!sd.isLearned) continue;
-					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
-					if (!bhv) continue;
-					if (bhv->bodyPart != part) continue;
-					if (bhv->src == skillSrc::BIONIC)
-						bionicEntries.push_back({ 116, bhv->name });
-					else if (bhv->src == skillSrc::MUTATION)
-						mutationEntries.push_back({ 117, bhv->name });
-				}
-
-				// 좌측 열: 바이오닉(IC 아이콘), 우측 열: 돌연변이(이중나선 아이콘)
-				if (bionicEntries.empty() && mutationEntries.empty())
-				{
-					setFontSize(18);
-					setFont(fontType::mainFontSemiBold);
-					drawTextCenter(col2Str(col::gray) + L"No Data", partRect.x + partRect.w / 2, partRect.y + 52);
-					return;
-				}
-
-				setFontSize(12);
-				setFont(fontType::mainFont);
-				constexpr int maxRows = 3;
-				int maxListLen = std::max((int)bionicEntries.size(), (int)mutationEntries.size());
-				int maxScroll = std::max(0, maxListLen - maxRows);
-				scroll = std::clamp(scroll, 0, maxScroll);
-
-				for (int i = scroll; i < (int)bionicEntries.size() && i < scroll + maxRows; i++)
-				{
-					int row = i - scroll;
-					drawSprite(spr::icon16, bionicEntries[i].sprIndex, partRect.x + 3, partRect.y + 26 + 19 * row);
-					drawText(bionicEntries[i].name, partRect.x + 3 + 19, partRect.y + 26 + 19 * row);
-				}
-				for (int i = scroll; i < (int)mutationEntries.size() && i < scroll + maxRows; i++)
-				{
-					int row = i - scroll;
-					drawSprite(spr::icon16, mutationEntries[i].sprIndex, partRect.x + 3 + 114, partRect.y + 26 + 19 * row);
-					drawText(mutationEntries[i].name, partRect.x + 3 + 19 + 114, partRect.y + 26 + 19 * row);
-				}
-
-				// 스크롤이 필요할 때만 스크롤바 표시
-				if (maxListLen > maxRows)
-				{
-					constexpr int sW = 2, sH = 56;
-					int thumbH = std::max(10, sH * maxRows / maxListLen);
-					int thumbTravel = sH - thumbH;
-					int thumbY = (maxScroll > 0) ? thumbTravel * scroll / maxScroll : 0;
-
-					SDL_Rect scrollRect = { partRect.x + 232, partRect.y + 23, sW, sH };
-					SDL_Rect scrollInRect = { partRect.x + 232, partRect.y + 23 + thumbY, sW, thumbH };
-					drawFillRect(scrollRect, col::gray);
-					drawFillRect(scrollInRect, col::white);
-				}
+				drawTextCenter(hpText, partRect.x + 59, partRect.y + 38);
 			};
 
-			// 좌측 열: Head, R.Arm, R.Leg
-			SDL_Rect headRect = { statusBase.x + 298, statusBase.y + 206, 236, 83 };
-			drawBodyPart(headRect, L"Head", PlayerPtr->headHP, PART_MAX_HP, humanPartFlag::head, partScroll[(int)humanPartFlag::head]);
-
-			SDL_Rect rArmRect = { statusBase.x + 298, statusBase.y + 206 + 91 * 1, 236, 83 };
-			drawBodyPart(rArmRect, L"Right Arm", PlayerPtr->rArmHP, PART_MAX_HP, humanPartFlag::rArm, partScroll[(int)humanPartFlag::rArm]);
-
-			SDL_Rect rLegRect = { statusBase.x + 298, statusBase.y + 206 + 91 * 2, 236, 83 };
-			drawBodyPart(rLegRect, L"Right Leg", PlayerPtr->rLegHP, PART_MAX_HP, humanPartFlag::rLeg, partScroll[(int)humanPartFlag::rLeg]);
-
-			// 우측 열: Torso, L.Arm, L.Leg
-			SDL_Rect torsoRect = { statusBase.x + 298 + 335, statusBase.y + 206, 236, 83 };
-			drawBodyPart(torsoRect, L"Torso", PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.maxHP, humanPartFlag::torso, partScroll[(int)humanPartFlag::torso]);
-
-			SDL_Rect lArmRect = { statusBase.x + 298 + 335, statusBase.y + 206 + 91 * 1, 236, 83 };
-			drawBodyPart(lArmRect, L"Left Arm", PlayerPtr->lArmHP, PART_MAX_HP, humanPartFlag::lArm, partScroll[(int)humanPartFlag::lArm]);
-
-			SDL_Rect lLegRect = { statusBase.x + 298 + 335, statusBase.y + 206 + 91 * 2, 236, 83 };
-			drawBodyPart(lLegRect, L"Left Leg", PlayerPtr->lLegHP, PART_MAX_HP, humanPartFlag::lLeg, partScroll[(int)humanPartFlag::lLeg]);
+			drawPartBox(467, 209, L"Torso", PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.maxHP);
+			drawPartBox(608, 194, L"Head", PlayerPtr->headHP, PART_MAX_HP);
+			drawPartBox(451, 287, L"R.Arm", PlayerPtr->rArmHP, PART_MAX_HP);
+			drawPartBox(465, 395, L"R.Leg", PlayerPtr->rLegHP, PART_MAX_HP);
+			drawPartBox(625, 287, L"L.Arm", PlayerPtr->lArmHP, PART_MAX_HP);
+			drawPartBox(610, 393, L"L.Leg", PlayerPtr->lLegHP, PART_MAX_HP);
 
 			setFont(fontType::mainFont);
 
 			
 			SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 70);
-			drawSpriteCenter(spr::bodyShape, 0, statusBase.x + 583, statusBase.y + 338);
+			drawSpriteCenter(spr::bodyShape, 0, statusBase.x + 583, statusBase.y + 340);
 			SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
 
 		}
@@ -663,6 +772,24 @@ public:
 		{
 			if (event.wheel.y > 0 && statusScroll > 0) statusScroll--;
 			else if (event.wheel.y < 0) statusScroll++;
+			return;
+		}
+
+		// 바이오닉 박스 스크롤
+		SDL_Rect bionicArea = { statusBase.x + 299, statusBase.y + 229, 142, 252 };
+		if (checkCursor(&bionicArea))
+		{
+			if (event.wheel.y > 0 && bionicScroll > 0) bionicScroll--;
+			else if (event.wheel.y < 0) bionicScroll++;
+			return;
+		}
+
+		// 돌연변이 박스 스크롤
+		SDL_Rect mutationArea = { statusBase.x + 726, statusBase.y + 229, 142, 252 };
+		if (checkCursor(&mutationArea))
+		{
+			if (event.wheel.y > 0 && mutationScroll > 0) mutationScroll--;
+			else if (event.wheel.y < 0) mutationScroll++;
 			return;
 		}
 

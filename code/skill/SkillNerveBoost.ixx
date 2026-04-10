@@ -20,7 +20,6 @@ public:
 		descript = L"Activates an implanted neural booster, temporarily enhancing reaction speed.";
 		src = skillSrc::BIONIC;
 		type = skillType::ACTIVE;
-		bodyPart = humanPartFlag::head;
 		skillRank = L"F";
 		maxCooldown = 30.0f;
 		energyPerAct = 20.0f;

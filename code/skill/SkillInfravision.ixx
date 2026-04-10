@@ -20,7 +20,6 @@ public:
 		descript = L"Mutated eyes grant the ability to perceive heat signatures, revealing warm-blooded creatures in darkness.";
 		src = skillSrc::MUTATION;
 		type = skillType::PASSIVE;
-		bodyPart = humanPartFlag::head;
 		maxCooldown = 0.0f;
 	}
 

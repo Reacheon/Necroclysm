@@ -455,8 +455,8 @@ export void debugConsole()
 			newSD.skillCode = skillCode;
 			newSD.isLearned = true;
 			PlayerInfo().skillList.push_back(newSD);
-			prt(L"[디버그] 스킬 추가 완료: %ls (코드 %d, src=%d, bodyPart=%d)\n",
-				bhv->name.c_str(), skillCode, (int)bhv->src, (int)bhv->bodyPart);
+			prt(L"[디버그] 스킬 추가 완료: %ls (코드 %d, src=%d)\n",
+				bhv->name.c_str(), skillCode, (int)bhv->src);
 		}
 		debugSkillEnd:
 		break;
