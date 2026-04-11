@@ -39,6 +39,21 @@ public:
     ridingFlag ridingType = ridingFlag::none;
     std::vector<Point2> aStarData;
     SDL_Color flash = { 0,0,0,0 };
+
+    // Nervedrive 잔상 데이터
+    struct AfterImage {
+        int worldX, worldY;
+        int fakeX, fakeY;
+        int sprIndex;
+        bool flip;
+        float angle;
+        int jumpOffsetY;
+        int offsetX, offsetY;
+        Uint32 captureTime;
+    };
+    std::deque<AfterImage> afterImages;
+    Uint32 lastAfterImageTime = 0;
+
     EntityData entityInfo;
     Entity(int newEntityIndex, int gridX, int gridY, int gridZ);
     virtual ~Entity();

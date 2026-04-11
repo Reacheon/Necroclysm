@@ -350,6 +350,22 @@ void Entity::drawSelf()
 	int drawingX = originX + zoomScale * (offsetX);
 	int drawingY = originY + zoomScale * (offsetY);
 
+	// Nervedrive 잔상 캡처 (애니메이션 중일 때만)
+	if (entityInfo.isPlayer && nervedriveOn && getAniType() != aniFlag::null)
+	{
+		Uint32 now = SDL_GetTicks();
+		if (now - lastAfterImageTime >= 16)
+		{
+			afterImages.push_back({ getX(), getY(), getIntegerFakeX(), getIntegerFakeY(),
+				localSprIndex, entityInfo.sprFlip, PlayerInfo().sprAngle,
+				entityInfo.jumpOffsetY, offsetX, offsetY, now });
+			lastAfterImageTime = now;
+			while (afterImages.size() > 12) afterImages.pop_front();
+		}
+	}
+	// 오래된 잔상 제거 (350ms 경과)
+	while (!afterImages.empty() && SDL_GetTicks() - afterImages.front().captureTime > 350)
+		afterImages.pop_front();
 
 	//캐릭터 그림자 그리기
 	if (itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_SHALLOW) == false && itemDex[TileFloor(getGridX(), getGridY(), getGridZ())].checkFlag(itemFlag::WATER_DEEP) == false)
@@ -402,6 +418,40 @@ void Entity::drawSelf()
 		}
 	}
 
+
+	// Nervedrive 잔상 렌더링 (플레이어 스프라이트보다 먼저 그려서 뒤에 깔리게)
+	if (entityInfo.isPlayer && playerSprite != nullptr && !afterImages.empty())
+	{
+		Uint32 now = SDL_GetTicks();
+		for (auto& ghost : afterImages)
+		{
+			Uint32 age = now - ghost.captureTime;
+			if (age > 350) continue;
+
+			// 페이드아웃: 새로운 잔상은 밝고 오래된 잔상은 서서히 사라짐
+			float lifeRatio = 1.0f - (float)age / 350.0f;
+			Uint8 alpha = (Uint8)(lifeRatio * 255.0f);
+			if (alpha < 3) continue;
+
+			// 월드좌표 → 현재 카메라 기준 스크린좌표 변환
+			int gOriginX = (cameraW / 2) + zoomScale * (ghost.worldX - cameraX + ghost.fakeX);
+			int gOriginY = (cameraH / 2) + zoomScale * (ghost.worldY - cameraY + ghost.fakeY);
+			int gDrawX = gOriginX + zoomScale * ghost.offsetX;
+			int gDrawY = gOriginY + zoomScale * ghost.offsetY;
+
+			// 전기빛 푸른색 틴트 + 가산 블렌딩으로 네온 발광 효과
+			setFlip(ghost.flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+			SDL_SetTextureColorMod(playerSprite.get()->getTexture(), 40, 140, 255);
+			SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), alpha);
+			SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_ADD);
+			drawSpriteCenter(playerSprite.get(), ghost.sprIndex, gDrawX, gDrawY + zoomScale * ghost.jumpOffsetY, ghost.angle);
+		}
+		// 텍스처 상태 복원
+		SDL_SetTextureColorMod(playerSprite.get()->getTexture(), 255, 255, 255);
+		SDL_SetTextureAlphaMod(playerSprite.get()->getTexture(), 255);
+		SDL_SetTextureBlendMode(playerSprite.get()->getTexture(), SDL_BLENDMODE_BLEND);
+		setFlip(entityInfo.sprFlip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+	}
 
 	//캐릭터 커스타미이징 그리기
 	if (entityInfo.isPlayer)

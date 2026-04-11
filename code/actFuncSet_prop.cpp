@@ -296,9 +296,12 @@ namespace actFunc
 								updateLog(std::format(L"The autodoc successfully installs {}.", behavior->name));
 							}
 
-							//Power Storage 설치 시 maxEnergy 증가
+							//Power Storage 설치 시 maxEnergy & energy 증가
 							if (skillCode == 52)
+							{
 								PlayerInfo().maxEnergy += 500;
+								PlayerInfo().energy += 500;
+							}
 
 							//CBM 아이템 소모
 							pockets[j].pocket->subtractItemIndex(i, 1);

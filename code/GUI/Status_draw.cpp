@@ -283,7 +283,7 @@ void Status::drawGUI()
 			int curEnergy = PlayerInfo().energy;
 			int maxEnergy = PlayerInfo().maxEnergy;
 			double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
-			int gaugeW = static_cast<int>(134 * energyRatio);
+			int gaugeW = static_cast<int>(176 * energyRatio);
 
 			SDL_Rect inGaugeRect = { statusBase.x + 666,statusBase.y + 57,gaugeW,15 };
 			drawFillRect(inGaugeRect, {0x5b,0xbf,0x75});
