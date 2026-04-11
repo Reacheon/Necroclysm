@@ -27,6 +27,9 @@ export void turnWait(float waitTime)
 {
     errorBox(turnCycle != turn::playerInput && turnCycle != turn::playerAnime, L"turnWait() was called outside of the player's turn.");
 
+    // Nervedrive 작동 중이면 턴소모 0
+    if (nervedriveOn) waitTime = 0;
+
     //240708기준 2ms 정도의 실행속도
 
     //prt(L"[대기] %f분을 대기했다.\n", waitTime);

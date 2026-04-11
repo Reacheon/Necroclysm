@@ -826,6 +826,19 @@ void HUD::drawQuickSlot()
 			auto* skillBhvIcon = SkillRegistry::get(quickSlot[i].second);
 			drawSprite(spr::icon24, skillBhvIcon ? skillBhvIcon->iconIndex : 0, pivotX + 7, pivotY + 1);
 			setZoom(1.0);
+
+			// 토글 활성 이펙트
+			if (quickSlot[i].first == quickSlotFlag::SKILL && skillBhvIcon && skillBhvIcon->type == skillType::TOGGLE)
+			{
+				for (const auto& sd : PlayerInfo().skillList)
+				{
+					if (sd.skillCode == quickSlot[i].second && sd.toggle)
+					{
+						drawToggleSnakeEffect(pivotX + 7, pivotY + 1, 48, 48);
+						break;
+					}
+				}
+			}
 		}
 		setFont(fontType::pixel);
 		setFontSize(12);

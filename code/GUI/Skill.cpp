@@ -199,10 +199,20 @@ void Skill::drawGUI()
 				drawSprite(spr::icon24, tgtBhv ? tgtBhv->iconIndex : 0, skillBtn[i].x, skillBtn[i].y);
 				setZoom(1.0);
 
+				// 토글 활성 이펙트
+				if (tgtBhv && tgtBhv->type == skillType::TOGGLE && tgtData.toggle)
+				{
+					drawToggleSnakeEffect(skillBtn[i].x, skillBtn[i].y, 48, 48);
+				}
+
 				std::wstring skillName = tgtBhv ? tgtBhv->name : L"?";
 				setFontSize(22);
 				setFont(fontType::mainFontMedium);
-				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
+				// 패시브 스킬은 회색으로 표시
+				if (tgtBhv && tgtBhv->type == skillType::PASSIVE)
+					drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3, { 0x70, 0x70, 0x70 });
+				else
+					drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
 
 				drawLine(skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y, skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y + skillBtn[i].h - 1, col::gray);
 
@@ -336,8 +346,34 @@ void Skill::clickUpGUI()
 			{
 				if (dragSkillTarget != -1 && filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
 				{
+					auto* clickedBhv = SkillRegistry::get(dragSkillTarget);
+
+					// 패시브 스킬은 사용 불가 → 무시
+					if (clickedBhv && clickedBhv->type == skillType::PASSIVE)
+						break;
+
 					useSkill(dragSkillTarget);
-					delete this;
+
+					// 토글 스킬은 GUI 유지 (filteredSkills의 toggle 상태 동기화)
+					if (clickedBhv && clickedBhv->type == skillType::TOGGLE)
+					{
+						for (auto& sd : PlayerInfo().skillList)
+						{
+							if (sd.skillCode == dragSkillTarget)
+							{
+								filteredSkills[skillScroll + i].toggle = sd.toggle;
+								break;
+							}
+						}
+						break;
+					}
+
+					// 액티브 스킬: 실제 발동(코루틴 시작)됐을 때만 GUI 닫기
+					if (currentUsingSkill != -1)
+					{
+						delete this;
+						return;
+					}
 				}
 			}
 		}

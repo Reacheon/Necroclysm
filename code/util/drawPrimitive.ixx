@@ -348,6 +348,71 @@ export void drawRectBatch(int rectW, int rectH, SDL_Color* cols, const Point2* p
 	SDL_RenderGeometry(localRenderer, nullptr, vertices, count * 4, indices, count * 6);
 }
 
+// 토글 활성 상태 스네이크 이펙트 (아이콘 가장자리에 흰색 빛이 돌아다니는 효과)
+// x, y, w, h: 아이콘의 스크린 좌표 및 크기 (줌 적용 후 픽셀 단위)
+export void drawToggleSnakeEffect(int x, int y, int w, int h)
+{
+	// 둘레 길이 (각 코너 픽셀은 한 번만 포함)
+	int perim = 2 * w + 2 * h - 4;
+	if (perim <= 0) return;
+
+	Uint64 ticks = SDL_GetTicks();
+	// 초당 80px 이동 → 48x48(perim=188) 기준 약 2.35초/바퀴
+	float headPos = std::fmod(ticks * 80.0f / 1000.0f, (float)perim);
+	float snakeLen = perim * 0.30f;
+
+	SDL_SetRenderDrawBlendMode(localRenderer, SDL_BLENDMODE_BLEND);
+
+	// 둘레 위치(t) → 스크린 좌표 변환 (시계방향: 상→우→하→좌)
+	auto toXY = [&](float t) -> std::pair<int, int> {
+		int it = ((int)t % perim + perim) % perim;
+		if (it < w) return { x + it, y };
+		it -= w;
+		if (it < h - 1) return { x + w - 1, y + 1 + it };
+		it -= (h - 1);
+		if (it < w - 1) return { x + w - 2 - it, y + h - 1 };
+		it -= (w - 1);
+		return { x, y + h - 2 - it };
+	};
+
+	// 안쪽 1px 오프셋 방향 (두께 2px용)
+	auto inward = [&](float t) -> std::pair<int, int> {
+		int it = ((int)t % perim + perim) % perim;
+		if (it < w) return { 0, 1 };
+		it -= w;
+		if (it < h - 1) return { -1, 0 };
+		it -= (h - 1);
+		if (it < w - 1) return { 0, -1 };
+		return { 1, 0 };
+	};
+
+	// 스네이크 2마리 (180도 간격으로 배치)
+	int steps = (int)snakeLen;
+	for (int s = 0; s < 2; s++)
+	{
+		float base = headPos + s * (perim * 0.5f);
+		for (int i = 0; i <= steps; i++)
+		{
+			float t = base - i;
+			auto [px, py] = toXY(t);
+			auto [dx, dy] = inward(t);
+
+			// 머리 쪽이 밝고 꼬리 쪽으로 페이드아웃
+			float ratio = 1.0f - (float)i / snakeLen;
+			Uint8 alpha = (Uint8)(220 * ratio * ratio);
+			if (alpha < 8) continue;
+
+			SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, alpha);
+			SDL_RenderPoint(localRenderer, (float)px, (float)py);
+			SDL_RenderPoint(localRenderer, (float)(px + dx), (float)(py + dy));
+		}
+	}
+
+	SDL_SetRenderDrawColor(localRenderer, 0xff, 0xff, 0xff, 0xff);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 export void draw3pxGauge(int x, int y, float zoomScale, float ratio, float alpha, SDL_Color inputGaugeCol = { 0,0,0 }, float fakeRatio = 0, float alphaFake = 0)
 {
 	SDL_Rect dst = { x, y, (int)(16 * zoomScale),(int)(3 * zoomScale) };
