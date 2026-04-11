@@ -531,8 +531,11 @@ void HUD::drawGUI()
 	if (option::inputMethod != input::gamepad) drawTab();
 	if (option::inputMethod != input::gamepad) drawQuickSlot();
 	drawQuest();
-	drawCircuitInfo();
-	drawFluidCircuitInfo();
+	if (getLastGUI() == this)
+	{
+		drawCircuitInfo();
+		drawFluidCircuitInfo();
+	}
 
 
 }

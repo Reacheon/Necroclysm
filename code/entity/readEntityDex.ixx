@@ -51,6 +51,7 @@ namespace csvEntity
     constexpr int atkBalance = 35;
     constexpr int age = 36;
     constexpr int mbti = 37;
+    constexpr int maxEnergy = 38;
 };
 
 export int readEntityDex(const wchar_t* file)
@@ -252,6 +253,9 @@ export int readEntityDex(const wchar_t* file)
                             break;
                         case csvEntity::mbti:
                             entityDex[tgtIndex].mbti = strFragment;
+                            break;
+                        case csvEntity::maxEnergy:
+                            entityDex[tgtIndex].maxEnergy = wtoi(strFragment.c_str());
                             break;
                         default:
                             prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");

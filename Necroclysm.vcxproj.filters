@@ -570,6 +570,12 @@
     <ClCompile Include="code\GUI\Status.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\Status_draw.cpp">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\Status_radar.cpp">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\GUI\Sleep.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
@@ -708,7 +714,13 @@
     <ClCompile Include="code\skill\SkillLivingWard.ixx">
       <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillNerveBoost.ixx">
+    <ClCompile Include="code\skill\SkillNervedrive.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillPowerStorage.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillMetabExchange.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillInfravision.ixx">

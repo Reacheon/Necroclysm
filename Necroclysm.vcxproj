@@ -234,6 +234,8 @@
     <ClCompile Include="code\GUI\Quest.ixx" />
     <ClCompile Include="code\GUI\Sample.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
+    <ClCompile Include="code\GUI\Status_draw.cpp" />
+    <ClCompile Include="code\GUI\Status_radar.cpp" />
     <ClCompile Include="code\GUI\Skill.cpp" />
     <ClCompile Include="code\GUI\Skill.ixx" />
     <ClCompile Include="code\GUI\Sleep.ixx" />
@@ -289,7 +291,9 @@
     <ClCompile Include="code\skill\SkillFocusHeal.ixx" />
     <ClCompile Include="code\skill\SkillSuperRegen.ixx" />
     <ClCompile Include="code\skill\SkillLivingWard.ixx" />
-    <ClCompile Include="code\skill\SkillNerveBoost.ixx" />
+    <ClCompile Include="code\skill\SkillNervedrive.ixx" />
+    <ClCompile Include="code\skill\SkillPowerStorage.ixx" />
+    <ClCompile Include="code\skill\SkillMetabExchange.ixx" />
     <ClCompile Include="code\skill\SkillInfravision.ixx" />
     <ClCompile Include="code\god\GodBehavior.ixx" />
     <ClCompile Include="code\god\GodRegistry.ixx" />

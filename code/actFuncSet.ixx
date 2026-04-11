@@ -47,4 +47,6 @@ export namespace actFunc
 	export Corouter selectItemEx(ItemPocket* pocket, int index);
 	//아이템 검색 (Loot, Inventory 공통)
 	export Corouter searchItems(ItemPocket* pocket, int& scroll);
+	//오토닥 인터페이스 사용
+	export Corouter useAutodoc(int tgtX, int tgtY, int tgtZ);
 };

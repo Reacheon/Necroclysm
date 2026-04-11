@@ -64,6 +64,8 @@ export struct EntityData_Base
     __int16 atkCut = 0;
     __int16 atkBash = 1; // 기본 맨손 타격
     float atkBalance = 0.5f;
+
+    __int32 maxEnergy = 0; // 바이오닉 에너지 최대 용량 (kJ)
 };
 
 export struct EntityData : public EntityData_Base
@@ -79,6 +81,7 @@ export struct EntityData : public EntityData_Base
 
     __int16 MP = 100;
     __int16 STA = 60;
+    __int32 energy = 0; // 바이오닉 에너지 현재값 (kJ)
     __int16 fakeMP = 100;
     unsigned __int8 fakeMPAlpha = 255;
     __int16 recentDmg = 0;

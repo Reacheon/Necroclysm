@@ -14,6 +14,7 @@ import Loot;
 import Prop;
 import ItemData;
 import GodPanel;
+import actFuncSet;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {
@@ -281,8 +282,20 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
+				else if (tgtProp->leadItem.itemCode == itemID::autodoc)
+				{
+					if (tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON))
+					{
+						if (touchX > PlayerX()) PlayerPtr->setDirection(0);
+						else if (touchX < PlayerX()) PlayerPtr->setDirection(4);
+						Corouter::start(actFunc::useAutodoc(touchX, touchY, PlayerZ()));
+						click = false;
+					}
+				}
 				else if (tgtProp->leadItem.itemCode == itemID::altarOfRehylion)
 				{
+					if (touchX > PlayerX()) PlayerPtr->setDirection(0);
+					else if (touchX < PlayerX()) PlayerPtr->setDirection(4);
 					if (GodPanel::ins() == nullptr)
 					{
 						new GodPanel(godFlag::rehylion, { touchX, touchY, PlayerZ() });
@@ -296,6 +309,8 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 				}
 				else if (tgtProp->leadItem.pocketPtr != nullptr) //컨테이너 클릭 시 루팅창 오픈
 				{
+					if (touchX > PlayerX()) PlayerPtr->setDirection(0);
+					else if (touchX < PlayerX()) PlayerPtr->setDirection(4);
 					Point3 containerPos = { touchX, touchY, PlayerZ() };
 					new Loot(tgtProp->leadItem.pocketPtr.get(), &(tgtProp->leadItem), containerPos);
 					click = false;

@@ -64,8 +64,8 @@ public:
 	// 스킬 실행 코루틴 (CoordSelect, LstEx 등 자유롭게 co_await 가능)
 	virtual Corouter execute(Entity* caster, SkillData& data) = 0;
 
-	// 패시브: 매 턴 호출
-	virtual void onTurnTick(Entity* caster, const SkillData& data) {}
+	// 패시브/토글: 매 턴 호출
+	virtual void onTurnTick(Entity* caster, SkillData& data) {}
 
 	// 패시브: 스탯 보정
 	virtual void modifyStats(Entity* caster, const SkillData& data) {}

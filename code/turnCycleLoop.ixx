@@ -28,6 +28,9 @@ import Sleep;
 import Prop;
 import globalVar;
 import statusEffect;
+import SkillData;
+import SkillBehavior;
+import SkillRegistry;
 
 constexpr double EPSILON = 0.000001;
 
@@ -652,6 +655,18 @@ __int64 entityAITurn()
 				PlayerPtr->lLegHP = myMin(maxHP, PlayerPtr->lLegHP + healTick);
 				PlayerPtr->rLegHP = myMin(maxHP, PlayerPtr->rLegHP + healTick);
 				PlayerPtr->entityInfo.HP = myMin(maxHP, PlayerPtr->entityInfo.HP + healTick);
+			}
+		}
+
+		// 토글/패시브 스킬 턴 틱 처리
+		{
+			Entity* playerEntity = static_cast<Entity*>(PlayerPtr);
+			for (auto& sd : PlayerInfo().skillList)
+			{
+				auto* bhv = SkillRegistry::get(sd.skillCode);
+				if (!bhv) continue;
+				if (sd.toggle || bhv->type == skillType::PASSIVE)
+					bhv->onTurnTick(playerEntity, sd);
 			}
 		}
 

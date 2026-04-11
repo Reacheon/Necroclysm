@@ -11,7 +11,9 @@ import SkillPurify;
 import SkillFocusHeal;
 import SkillSuperRegen;
 import SkillLivingWard;
-import SkillNerveBoost;
+import SkillNervedrive;
+import SkillPowerStorage;
+import SkillMetabExchange;
 import SkillInfravision;
 
 void SkillRegistry::init()
@@ -25,6 +27,8 @@ void SkillRegistry::init()
 	registerSkill(std::make_unique<SkillFocusHeal>());
 	registerSkill(std::make_unique<SkillSuperRegen>());
 	registerSkill(std::make_unique<SkillLivingWard>());
-	registerSkill(std::make_unique<SkillNerveBoost>());
+	registerSkill(std::make_unique<SkillNervedrive>());
+	registerSkill(std::make_unique<SkillPowerStorage>());
+	registerSkill(std::make_unique<SkillMetabExchange>());
 	registerSkill(std::make_unique<SkillInfravision>());
 }

@@ -17,7 +17,7 @@ public:
 	{
 		name = L"Infravision";
 		iconIndex = 117;
-		descript = L"Mutated eyes grant the ability to perceive heat signatures, revealing warm-blooded creatures in darkness.";
+		descript = L"";
 		src = skillSrc::MUTATION;
 		type = skillType::PASSIVE;
 		maxCooldown = 0.0f;

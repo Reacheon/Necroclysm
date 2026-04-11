@@ -1,4 +1,4 @@
-export module SkillNerveBoost;
+export module SkillNervedrive;
 
 import std;
 import util;
@@ -9,15 +9,15 @@ import globalVar;
 import World;
 import Entity;
 
-// 액티브 바이오닉: 신경 부스터 (머리 부위)
-export class SkillNerveBoost : public SkillBehavior
+// 액티브 바이오닉: 신경 가속 (머리 부위)
+export class SkillNervedrive : public SkillBehavior
 {
 public:
-	SkillNerveBoost()
+	SkillNervedrive()
 	{
-		name = L"Nerve Boost";
-		iconIndex = 116;
-		descript = L"Activates an implanted neural booster, temporarily enhancing reaction speed.";
+		name = L"Nervedrive";
+		iconIndex = 10;
+		descript = L"";
 		src = skillSrc::BIONIC;
 		type = skillType::ACTIVE;
 		skillRank = L"F";

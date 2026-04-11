@@ -8,6 +8,12 @@ import Player;
 import log;
 import Prop;
 import Vehicle;
+import Lst;
+import LstEx;
+import ItemStack;
+import textureVar;
+import SkillBehavior;
+import SkillRegistry;
 
 namespace actFunc
 {
@@ -129,4 +135,186 @@ namespace actFunc
 
 	void hideWire(Point3 tgtPoint) { setWireVisibility(tgtPoint, true); }
 	void showWire(Point3 tgtPoint) { setWireVisibility(tgtPoint, false); }
+
+	//──────────────────────────────────────────────────────────────
+	//  오토닥 인터페이스
+	//──────────────────────────────────────────────────────────────
+
+	//서브포켓을 재귀적으로 수집 (출처 = 컨테이너 아이템 이름)
+	struct AutodocPocketSource
+	{
+		ItemPocket* pocket;
+		std::wstring source;
+	};
+
+	void collectSubPocketsAutodoc(ItemPocket* pocket, std::vector<AutodocPocketSource>& outVec)
+	{
+		for (auto& item : pocket->itemInfo)
+		{
+			if (item.pocketPtr != nullptr)
+			{
+				outVec.push_back({ item.pocketPtr.get(), item.name });
+				collectSubPocketsAutodoc(item.pocketPtr.get(), outVec);
+			}
+		}
+	}
+
+	std::wstring autodocDirLabel(int dir)
+	{
+		static const std::wstring labels[] = { L"E", L"NE", L"N", L"NW", L"W", L"SW", L"S", L"SE" };
+		if (dir < 0) return L"Floor";
+		return labels[dir];
+	}
+
+	//플레이어 주변에서 CBM 아이템을 수집해서 LstEx 옵션으로 반환
+	std::vector<AutodocPocketSource> gatherNearbyPocketsAutodoc()
+	{
+		std::vector<AutodocPocketSource> result;
+		ItemPocket* equipPtr = PlayerEquip();
+
+		//1. 장비 포켓 + 서브포켓
+		result.push_back({ equipPtr, L"Equip" });
+		collectSubPocketsAutodoc(equipPtr, result);
+
+		//2. 주변 9타일 순회
+		for (int dir = -1; dir < 8; dir++)
+		{
+			int dx = 0, dy = 0;
+			dir2Coord(dir, dx, dy);
+			int x = PlayerX() + dx;
+			int y = PlayerY() + dy;
+			int z = PlayerZ();
+
+			std::wstring tileLabel = autodocDirLabel(dir);
+
+			//바닥 ItemStack + 서브포켓
+			ItemStack* stack = TileItemStack(x, y, z);
+			if (stack != nullptr)
+			{
+				result.push_back({ stack->getPocket(), tileLabel });
+				collectSubPocketsAutodoc(stack->getPocket(), result);
+			}
+
+			//Prop 내부 포켓 + 서브포켓
+			Prop* prop = TileProp(x, y, z);
+			if (prop != nullptr && prop->leadItem.pocketPtr != nullptr)
+			{
+				std::wstring propLabel = prop->leadItem.name;
+				if (dir >= 0) propLabel += L" (" + tileLabel + L")";
+				result.push_back({ prop->leadItem.pocketPtr.get(), propLabel });
+				collectSubPocketsAutodoc(prop->leadItem.pocketPtr.get(), result);
+			}
+		}
+
+		return result;
+	}
+
+	Corouter useAutodoc(int tgtX, int tgtY, int tgtZ)
+	{
+		//메인 메뉴 표시
+		new Lst(
+			L"AUTODOC #00FF80[ONLINE]",
+			L"Bionic implant procedure standing by...",
+			{ L"Implant Bionic", L"Extract Bionic" }
+		);
+		co_await std::suspend_always();
+		if (coAnswer.empty()) co_return;
+
+		int selected = wtoi(coAnswer.c_str());
+
+		if (selected == 0) //Implant Bionic
+		{
+			//주변에서 CBM 아이템 수집
+			std::vector<AutodocPocketSource> pockets = gatherNearbyPocketsAutodoc();
+
+			std::vector<LstExOption> cbmList;
+			for (int j = 0; j < pockets.size(); j++)
+			{
+				for (int i = 0; i < pockets[j].pocket->itemInfo.size(); i++)
+				{
+					ItemData& item = pockets[j].pocket->itemInfo[i];
+					if (item.subcategory == itemSubcategory::tech_bionics)
+					{
+						cbmList.push_back({ item.getSprIndex(), item.name, pockets[j].source });
+					}
+				}
+			}
+
+			if (cbmList.size() == 0)
+			{
+				updateLog(L"No bionic modules found nearby.");
+				co_return;
+			}
+
+			new LstEx(L"Implant Bionic", L"Select a CBM to implant.", cbmList, spr::itemset);
+			co_await std::suspend_always();
+
+			if (coAnswer.empty()) co_return;
+
+			//선택된 CBM 찾기
+			int counter = 0;
+			for (int j = 0; j < pockets.size(); j++)
+			{
+				for (int i = 0; i < pockets[j].pocket->itemInfo.size(); i++)
+				{
+					ItemData& item = pockets[j].pocket->itemInfo[i];
+					if (item.subcategory == itemSubcategory::tech_bionics)
+					{
+						if (counter == wtoi(coAnswer.c_str()))
+						{
+							int skillCode = item.bionicIndex;
+							auto* behavior = SkillRegistry::get(skillCode);
+							if (!behavior)
+							{
+								updateLog(L"Error: Invalid bionic module.");
+								co_return;
+							}
+
+							//중복 설치 체크 - skillList에서 동일 스킬코드 검색
+							auto& skillList = PlayerInfo().skillList;
+							auto it = std::find_if(skillList.begin(), skillList.end(),
+								[skillCode](const SkillData& sd) { return sd.skillCode == skillCode; });
+
+							if (it != skillList.end())
+							{
+								//중첩 설치 가능한 바이오닉 하드코딩
+								if (skillCode == 52) // Power Storage
+								{
+									it->skillLevel++;
+									updateLog(std::format(L"The autodoc installs an additional {}. (x{})", behavior->name, it->skillLevel));
+								}
+								else
+								{
+									updateLog(std::format(L"You already have {} installed.", behavior->name));
+									co_return;
+								}
+							}
+							else
+							{
+								//신규 설치
+								PlayerPtr->addSkill(skillCode);
+								updateLog(std::format(L"The autodoc successfully installs {}.", behavior->name));
+							}
+
+							//Power Storage 설치 시 maxEnergy 증가
+							if (skillCode == 52)
+								PlayerInfo().maxEnergy += 1000;
+
+							//CBM 아이템 소모
+							pockets[j].pocket->subtractItemIndex(i, 1);
+							co_return;
+						}
+						counter++;
+					}
+				}
+			}
+		}
+		else if (selected == 1) //Extract Bionic
+		{
+			//TODO: 바이오닉 추출 로직
+			updateLog(L"The autodoc begins the bionic extraction procedure...");
+		}
+
+		co_return;
+	}
 }

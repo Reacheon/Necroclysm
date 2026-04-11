@@ -123,6 +123,7 @@ void Entity::loadDataFromDex(int index)
 	entityInfo = entityDex[index].cloneEntity();
 	entityInfo.HP = entityInfo.maxHP;
 	entityInfo.fakeHP = entityInfo.maxHP;
+	entityInfo.energy = entityInfo.maxEnergy;
 }
 
 //@brief 해당 파츠에 데미지를 추가하고 메인 HP에는 절반만 전달합니다.
