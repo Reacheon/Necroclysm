@@ -26,6 +26,13 @@ public:
 	int maxSkillLevel = 5;
 	float maxCooldown = 30.0f;
 	std::wstring skillRank = L"F";
+
+	//돌연변이 외형 메타 (src == MUTATION인 경우에만 사용)
+	//mutLayer == none이면 외형 없음 (적외선시각 등)
+	mutDrawLayer mutLayer = mutDrawLayer::none;
+	std::wstring mutSprBaseName = L"";              //예: L"MUT_RABBIT_EARS". 색 접미사가 뒤에 자동 부착됨
+	mutColorSource mutColorSrc = mutColorSource::none; //색 접미사 소스 (fur/horn/none)
+	int mutDrawPriority = 0;                        //같은 레이어 내 그리기 순서 (오름차순)
 	// 랭크 문자열을 난이도 숫자로 변환 (F=1, E=2, D=3, C=4, B=5, A=6, S=7)
 	int getRankDifficulty() const
 	{

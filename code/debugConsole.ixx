@@ -61,6 +61,7 @@ export void debugConsole()
 	prt(L"29. 신앙도 변경\n");
 	prt(L"30. 스킬 추가\n");
 	prt(L"31. 테스트 Lst 띄우기\n");
+	prt(L"32. 플레이어 털/뿔 색 변경\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -479,6 +480,41 @@ export void debugConsole()
 
 		new Lst(L"Test List", lstText, options, false);
 		prt(L"[디버그] 옵션 %d개의 테스트 Lst를 띄웠다!\n", optionCount);
+		break;
+	}
+	case 32://플레이어 털/뿔 색 변경
+	{
+		prt(L"변경할 부위를 선택해주세요.\n");
+		prt(L"1. 털 색 (fur)   현재: %ls\n", PlayerPtr->entityInfo.furColor.c_str());
+		prt(L"2. 뿔 색 (horn)  현재: %ls\n", PlayerPtr->entityInfo.hornColor.c_str());
+		int part;
+		std::cin >> part;
+		if (part != 1 && part != 2)
+		{
+			prt(L"잘못된 값입니다.\n");
+			break;
+		}
+
+		prt(L"새 색상명을 입력해주세요 (예: GRAY, WHITE, BROWN). palette/*.tsv의 헤더와 일치해야 함.\n");
+		std::wstring colorName;
+		std::wcin.ignore();
+		std::getline(std::wcin, colorName);
+		if (colorName.empty())
+		{
+			prt(L"빈 문자열은 허용되지 않습니다.\n");
+			break;
+		}
+
+		if (part == 1)
+		{
+			PlayerPtr->entityInfo.furColor = colorName;
+			prt(L"[디버그] 털 색을 %ls로 변경했다.\n", colorName.c_str());
+		}
+		else
+		{
+			PlayerPtr->entityInfo.hornColor = colorName;
+			prt(L"[디버그] 뿔 색을 %ls로 변경했다.\n", colorName.c_str());
+		}
 		break;
 	}
 	case 99://콘솔 출력 초기화

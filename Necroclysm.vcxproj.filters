@@ -109,8 +109,17 @@
     <Filter Include="소스 파일\01_system\04_GUI\GOD">
       <UniqueIdentifier>{b4c5d6e7-2f3a-4b5c-8d9e-0f1a2b3c4d5e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\00_var\Skill\GodSkill">
+    <Filter Include="소스 파일\00_var\Skill\BIONIC">
+      <UniqueIdentifier>{c1d2e3f4-5a6b-47c8-9d0e-1f2a3b4c5d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00_var\Skill\MUTATION">
+      <UniqueIdentifier>{d2e3f4a5-6b7c-48d9-8e1f-2a3b4c5d6e7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00_var\Skill\INVOCATION">
       <UniqueIdentifier>{badb3356-b475-4df9-bd0e-c2c1384510dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\00_var\Skill\INVOCATION\REHYLION">
+      <UniqueIdentifier>{19b97f97-56e4-4cc6-b1d8-69513ea57ae4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -708,35 +717,77 @@
     <ClCompile Include="code\GUI\GOD\GodPanel_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillLivingWard.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
-    </ClCompile>
     <ClCompile Include="code\skill\SkillNervedrive.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill\BIONIC</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillPowerStorage.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill\BIONIC</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillMetabExchange.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill\BIONIC</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillInfravision.ixx">
-      <Filter>소스 파일\00_var\Skill</Filter>
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+    <ClCompile Include="code\skill\SkillFur.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillPurify.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+    <ClCompile Include="code\skill\SkillTail.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
     </ClCompile>
-    <ClCompile Include="code\skill\SkillHealOther.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+    <ClCompile Include="code\skill\SkillRabbitTail.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRatTail.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillMuzzle.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillShortMuzzle.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillFloppyEars.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillPrickEars.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRatEars.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRabbitEars.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillHorn.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillRoundEars.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillBushyTail.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillEyeMask.ixx">
+      <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
     </ClCompile>
     <ClCompile Include="code\skill\SkillFocusHeal.ixx">
-      <Filter>소스 파일\00_var\Skill\GodSkill</Filter>
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillHealOther.ixx">
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillLivingWard.ixx">
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillPurify.ixx">
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
+      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

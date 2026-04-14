@@ -11,6 +11,60 @@ import drawSprite;
 import drawText;
 import util;
 import drawPrimitive;
+import SkillBehavior;
+import SkillRegistry;
+import Sprite;
+import EntityData;
+
+// 돌연변이 스프라이트 조회. 없으면 nullptr.
+// 색 소스가 지정된 경우 "<base>_<색>" -> "<base>_<기본색>" -> "<base>" 순서로 폴백.
+// 색상명은 palette/*.tsv의 헤더와 일치해야 함 (팔레트 스왑 결과가 spriteMapper에 등록됨).
+static Sprite* resolveMutSprite(const std::wstring& base, const EntityData& info, mutColorSource src)
+{
+	if (base.empty()) return nullptr;
+
+	auto tryFind = [](const std::wstring& key) -> Sprite* {
+		auto it = spr::spriteMapper.find(key);
+		return (it != spr::spriteMapper.end()) ? it->second : nullptr;
+	};
+
+	switch (src)
+	{
+	case mutColorSource::none:
+		return tryFind(base);
+
+	case mutColorSource::fur:
+		if (Sprite* s = tryFind(base + L"_" + info.furColor)) return s;
+		if (Sprite* s = tryFind(base + L"_GRAY")) return s;
+		return tryFind(base);
+
+	case mutColorSource::horn:
+		if (Sprite* s = tryFind(base + L"_" + info.hornColor)) return s;
+		if (Sprite* s = tryFind(base + L"_BROWN")) return s;
+		return tryFind(base);
+	}
+	return nullptr;
+}
+
+// 지정 레이어에 속한 돌연변이 스프라이트를 우선도순으로 현재 렌더타겟에 그림.
+static void drawMutationLayer(EntityData& info, mutDrawLayer layer)
+{
+	std::map<int, Sprite*, std::less<int>> order;
+	for (const auto& sd : info.skillList)
+	{
+		SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+		if (bhv == nullptr) continue;
+		if (bhv->src != skillSrc::MUTATION) continue;
+		if (bhv->mutLayer != layer) continue;
+		Sprite* s = resolveMutSprite(bhv->mutSprBaseName, info, bhv->mutColorSrc);
+		if (s == nullptr) continue;
+		order[bhv->mutDrawPriority] = s;
+	}
+	for (auto& [prio, s] : order)
+	{
+		drawTexture(s->getTexture(), 0, 0);
+	}
+}
 
 constexpr std::array<std::array<int, 2>, 48> equipCoordLArm =
 { {
@@ -69,6 +123,9 @@ void Entity::drawSelf()
 		{
 			if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
 		}
+
+		//돌연변이 레이어: 전신 털, 꼬리 (skin 위, eyes 아래)
+		drawMutationLayer(entityInfo, mutDrawLayer::underEyes);
 
 		if (entityInfo.eyes != humanCustom::eyes::null)
 		{
@@ -265,6 +322,9 @@ void Entity::drawSelf()
 			}
 
 		}
+
+		//돌연변이 레이어: 주둥이, 귀 (모든 장비 위)
+		drawMutationLayer(entityInfo, mutDrawLayer::aboveEquip);
 
 		SDL_SetRenderTarget(renderer, nullptr);
 		playerSprite = std::make_unique<Sprite>(renderer, playerTexture, 48, 48);

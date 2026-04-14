@@ -185,6 +185,25 @@ export namespace humanCustom
         null,
         coverRed,
     };
+
+    //돌연변이 털/뿔 색상은 wstring으로 저장 (palette/fur.tsv, palette/horn.tsv의 색상명과 매칭).
+    //enum을 쓰지 않는 이유: 색상 추가를 TSV 한 파일 수정으로 끝내기 위함.
+};
+
+//돌연변이 외형이 그려지는 레이어. SkillBehavior.mutLayer로 사용됨.
+export enum class mutDrawLayer
+{
+    none,       //외형 없는 돌연변이 (적외선시각 등)
+    underEyes,  //skin 위, eyes 아래 (전신 털, 꼬리)
+    aboveEquip, //모든 장비 위 (주둥이, 귀, 뿔)
+};
+
+//돌연변이 스프라이트 색상 소스. resolveMutSprite에서 접미사 결정에 사용.
+export enum class mutColorSource
+{
+    none,  //접미사 안 붙임 (예: MUT_RAT_TAIL.png)
+    fur,   //entityInfo.furColor 사용
+    horn,  //entityInfo.hornColor 사용
 };
 
 export enum class fovFlag

@@ -106,6 +106,8 @@ export struct EntityData : public EntityData_Base
     humanCustom::beard beard = humanCustom::beard::null;
     humanCustom::hair hair = humanCustom::hair::null;
     humanCustom::horn horn = humanCustom::horn::null;
+    std::wstring furColor = L"GRAY";   //palette/fur.tsv의 색상명과 매칭
+    std::wstring hornColor = L"BROWN"; //palette/horn.tsv의 색상명과 매칭
 
     std::vector<statusEffect> statusEffectVec;
 

@@ -38,6 +38,14 @@ public:
         h = inputH;
         notOwned = true;
     }
+    //ownership 제어용 오버로드. takeOwnership=true면 소멸 시 SDL_DestroyTexture 호출.
+    Sprite(SDL_Renderer* renderer, SDL_Texture* inputTexture, int inputW, int inputH, bool takeOwnership)
+    {
+        texturePtr = inputTexture;
+        w = inputW;
+        h = inputH;
+        notOwned = !takeOwnership;
+    }
     ~Sprite()
     {
         //prt(L"Sprite : 소멸자가 호출되었습니다..\n");

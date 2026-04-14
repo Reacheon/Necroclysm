@@ -15,6 +15,20 @@ import SkillNervedrive;
 import SkillPowerStorage;
 import SkillMetabExchange;
 import SkillInfravision;
+import SkillFur;
+import SkillTail;
+import SkillRabbitTail;
+import SkillRatTail;
+import SkillMuzzle;
+import SkillShortMuzzle;
+import SkillFloppyEars;
+import SkillPrickEars;
+import SkillRatEars;
+import SkillRabbitEars;
+import SkillHorn;
+import SkillRoundEars;
+import SkillBushyTail;
+import SkillEyeMask;
 
 void SkillRegistry::init()
 {
@@ -31,4 +45,18 @@ void SkillRegistry::init()
 	registerSkill(std::make_unique<SkillPowerStorage>());
 	registerSkill(std::make_unique<SkillMetabExchange>());
 	registerSkill(std::make_unique<SkillInfravision>());
+	registerSkill(std::make_unique<SkillFur>());
+	registerSkill(std::make_unique<SkillTail>());
+	registerSkill(std::make_unique<SkillRabbitTail>());
+	registerSkill(std::make_unique<SkillRatTail>());
+	registerSkill(std::make_unique<SkillMuzzle>());
+	registerSkill(std::make_unique<SkillShortMuzzle>());
+	registerSkill(std::make_unique<SkillFloppyEars>());
+	registerSkill(std::make_unique<SkillPrickEars>());
+	registerSkill(std::make_unique<SkillRatEars>());
+	registerSkill(std::make_unique<SkillRabbitEars>());
+	registerSkill(std::make_unique<SkillHorn>());
+	registerSkill(std::make_unique<SkillRoundEars>());
+	registerSkill(std::make_unique<SkillBushyTail>());
+	registerSkill(std::make_unique<SkillEyeMask>());
 }
