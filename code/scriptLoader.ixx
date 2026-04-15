@@ -1,5 +1,5 @@
 module;
-#include "var/luaState.h"
+#include "lua/luaState.h"
 
 export module scriptLoader;
 
