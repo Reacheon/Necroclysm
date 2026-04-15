@@ -500,6 +500,12 @@ public:
 			{
 				barAct.push_back(act::extractSeed);
 			}
+
+			//염색 앰플 추가
+			if (targetItem.itemCode == itemID::dyeAmpule)
+			{
+				barAct.push_back(act::dye);
+			}
 		}
 	}
 };

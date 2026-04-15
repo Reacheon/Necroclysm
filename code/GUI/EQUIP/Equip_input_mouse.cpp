@@ -124,6 +124,9 @@ void Equip::clickUpGUI()
 					actFunc::removeBattery(equipPtr, panel.cursor);
 					updateBarAct();
 					return;
+				case act::dye:
+					Corouter::start(actFunc::executeDye(equipPtr, panel.cursor));
+					return;
 				}
 
 				if (Equip::ins() != nullptr)

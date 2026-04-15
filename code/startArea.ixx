@@ -1,6 +1,5 @@
 module;
 #define SNOW(x, y, z) (World::ins()->getTile(x, y, z).hasSnow = true)
-#include <sol/sol.hpp>
 
 export module startArea;
 
@@ -1115,7 +1114,7 @@ export void startArea()
 		{
 			for (int y = 12; y <= 26; y++)
 			{
-				float distFromRail = abs(y - 19) + abs(x - 7.5f) * 0.5f;
+				float distFromRail = std::abs(y - 19) + std::abs(x - 7.5f) * 0.5f;
 				if (distFromRail <= 8)
 				{
 					setFloor({ x, y, 0 }, itemID::dirt);
@@ -1193,11 +1192,12 @@ export void startArea()
 
 
 
-	createItemStack({ 16, -8, 0 }, { 
+	createItemStack({ 16, -8, 0 }, {
 		{itemID::cbm_nervedrive,1},
 		{itemID::cbm_powerStorage,10},
 		{itemID::cbm_metabExchange,1},
-		{itemID::mutagen,20}});
+		{itemID::mutagen,20},
+		{itemID::dyeAmpule,5}});
 
 
 

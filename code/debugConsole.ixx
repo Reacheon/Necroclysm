@@ -1,5 +1,5 @@
 module;
-#include <sol/sol.hpp>
+#include "var/luaState.h"
 
 export module debugConsole;
 

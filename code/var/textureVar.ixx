@@ -178,4 +178,5 @@ export namespace spr
 	Sprite* bodyPartEncLine = nullptr;
 
 	Sprite* btnGuideBackground = nullptr;
+	Sprite* statusPortraitBackground = nullptr;
 }

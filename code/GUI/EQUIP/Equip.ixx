@@ -230,6 +230,12 @@ public:
 				if (targetItem.pocketPtr->itemInfo.size() >= 1) barAct.push_back(act::removeBattery);
 				else barAct.push_back(act::insertBattery);
 			}
+
+			//염색 앰플 추가
+			if (targetItem.itemCode == itemID::dyeAmpule)
+			{
+				barAct.push_back(act::dye);
+			}
 		}
 	}
 

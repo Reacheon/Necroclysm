@@ -124,5 +124,8 @@ public:
 
     virtual void drawSelf() override;
 
+    // 플레이어 캐릭터 합성 텍스처 생성 (스킨/눈/머리/장비/돌연변이 전 레이어). 반환된 텍스처는 호출자가 SDL_DestroyTexture로 해제.
+    SDL_Texture* composePlayerTexture();
+
     bool hitAnimation(bool shutdown, const std::function<void()>);
 };

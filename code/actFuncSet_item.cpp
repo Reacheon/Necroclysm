@@ -12,6 +12,10 @@ import textureVar;
 import CoordSelect;
 import CoordSelectCraft;
 import GUI;
+import Lst;
+import LstEx;
+import SkillRegistry;
+import SkillBehavior;
 
 namespace actFunc
 {
@@ -321,6 +325,80 @@ namespace actFunc
 			updateLog(replaceStr(sysStr[329], L"(%item)", itemDex[targetItemCode].name));
 		}
 		else co_return;
+	}
+
+	//염색 앰플 사용 : 2단계 선택으로 염색 대상/색상을 결정
+	// 1단계 - 대상 : 머리카락 / 털 / 뿔 (해당 부위가 존재할 때만 노출)
+	// 2단계 - 색상 : 현재는 '털' 대상에 한해 GRAY/WHITE 2종만 지원
+	// 취소 시 앰플은 소모되지 않는다.
+	Corouter executeDye(ItemPocket* tgtPocket, int tgtIndex)
+	{
+		errorBox(tgtPocket == nullptr, L"executeDye: tgtPocket is nullptr.");
+		errorBox(tgtIndex < 0 || tgtIndex >= (int)tgtPocket->itemInfo.size(), L"executeDye: tgtIndex out of bounds.");
+
+		// 1단계 : 플레이어의 현재 외형 상태를 조회해 가능한 선택지 목록 구성
+		enum class dyeTarget { hair, fur, horn };
+
+		bool hasHair = PlayerInfo().hair != humanCustom::hair::null;
+		bool hasFur = false;
+		bool hasHorn = false;
+		for (const SkillData& sd : PlayerInfo().skillList)
+		{
+			if (sd.isLearned == false) continue;
+			SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+			if (bhv == nullptr) continue;
+			if (bhv->src != skillSrc::MUTATION) continue;
+			if (bhv->mutColorSrc == mutColorSource::fur) hasFur = true;
+			else if (bhv->mutColorSrc == mutColorSource::horn) hasHorn = true;
+		}
+
+		std::vector<std::wstring> targetLabels;
+		std::vector<dyeTarget> targetMap;
+		if (hasHair) { targetLabels.push_back(L"Dye hair"); targetMap.push_back(dyeTarget::hair); }
+		if (hasFur)  { targetLabels.push_back(L"Dye fur");  targetMap.push_back(dyeTarget::fur); }
+		if (hasHorn) { targetLabels.push_back(L"Dye horn"); targetMap.push_back(dyeTarget::horn); }
+
+		if (targetLabels.empty())
+		{
+			updateLog(L"There is nothing you can dye.");
+			co_return;
+		}
+
+		new Lst(L"Dye Ampoule", L"Select what to dye.", targetLabels);
+		co_await std::suspend_always();
+		if (coAnswer.empty()) co_return;
+
+		int targetSel = wtoi(coAnswer.c_str());
+		if (targetSel < 0 || targetSel >= (int)targetMap.size()) co_return;
+		dyeTarget selected = targetMap[targetSel];
+
+		// 2단계 : 부위별 색상 선택. 현재는 털만 실제 염색을 지원한다.
+		// (머리카락/뿔은 후속 작업 예정이며 선택지만 표시 후 즉시 종료)
+		if (selected != dyeTarget::fur)
+		{
+			co_return;
+		}
+
+		// 털 색상 선택지 : palette/fur.tsv의 헤더명(GRAY/WHITE)과 1:1 매칭
+		std::vector<LstExOption> colorOptions = {
+			{ 560, L"Gray",  L"" },
+			{ 561, L"White", L"" },
+		};
+
+		new LstEx(L"Dye Fur", L"Select a fur color.", colorOptions, spr::itemset, false);
+		co_await std::suspend_always();
+		if (coAnswer.empty()) co_return;
+
+		int colorSel = wtoi(coAnswer.c_str());
+		std::wstring newColor;
+		if (colorSel == 0) newColor = L"GRAY";
+		else if (colorSel == 1) newColor = L"WHITE";
+		else co_return;
+
+		PlayerInfo().furColor = newColor;
+		tgtPocket->subtractItemIndex(tgtIndex, 1);
+		PlayerPtr->updateStatus();
+		updateLog(L"You dye your fur.");
 	}
 
 	void extractSeed(actEnv envType, ItemPocket* tgtPocket, int tgtIndex, int pocketMaxVolume)

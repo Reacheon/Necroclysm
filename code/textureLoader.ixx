@@ -394,4 +394,5 @@ export void textureLoader()
 	spr::bodyPartEncLine = new Sprite(renderer, "image/UI/GUI/HUD/bodyPartEncLine.png", 106, 28);
 
 	spr::btnGuideBackground = new  Sprite(renderer, "image/UI/GUI/btnGuideBackground.png", 426, 66);
+	spr::statusPortraitBackground = new  Sprite(renderer, "image/UI/GUI/statusPortraitBackground.png", 110, 110);
 }

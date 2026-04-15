@@ -112,223 +112,10 @@ void Entity::drawSelf()
 
 	if (entityInfo.isPlayer)
 	{
-		playerTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
-		SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
-
-		SDL_SetRenderTarget(renderer, playerTexture);
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-		SDL_RenderClear(renderer);
-
-		if (entityInfo.skin != humanCustom::skin::null)
-		{
-			if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
-		}
-
-		//돌연변이 레이어: 전신 털, 꼬리 (skin 위, eyes 아래)
-		drawMutationLayer(entityInfo, mutDrawLayer::underEyes);
-
-		if (entityInfo.eyes != humanCustom::eyes::null)
-		{
-			if (entityInfo.isEyesClose == false)
-			{
-				if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-				else if (entityInfo.eyes == humanCustom::eyes::blueHalf) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-				else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
-
-				if(entityInfo.isEyesHalf)  drawTexture(spr::eyesHalf->getTexture(), 0, 0);
-			}
-			else drawTexture(spr::eyesClosed->getTexture(), 0, 0);
-		}
-
-		if (entityInfo.scar != humanCustom::scar::null)
-		{
-		}
-
-		if (entityInfo.beard != humanCustom::beard::null)
-		{
-			if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
-		}
-
-		if (entityInfo.hair != humanCustom::hair::null)
-		{
-			bool noHair = false;
-			for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
-			{
-				ItemData& tgtItem = getEquipPtr()->itemInfo[i];
-				if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true
-					&& tgtItem.equipState == equipHandFlag::normal)
-				{
-					noHair = true;
-					break;
-				}
-			}
-
-			if (noHair == false)
-			{
-				switch (entityInfo.hair)
-				{
-				case humanCustom::hair::commaBlack:
-					drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
-					break;
-				case humanCustom::hair::bob1Black:
-					drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
-					break;
-				case humanCustom::hair::ponytail:
-					drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
-					break;
-				case humanCustom::hair::middlePart:
-					drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
-					break;
-				}
-			}
-		}
-
-		if (entityInfo.horn != humanCustom::horn::null)
-		{
-			switch (entityInfo.horn)
-			{
-			case humanCustom::horn::coverRed:
-				drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
-				break;
-			}
-		}
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		//캐릭터 장비 그리기
-		if (getEquipPtr()->itemInfo.size() > 0)
-		{
-			std::map<int, Sprite*, std::less<int>> drawOrder;
-
-			for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
-			{
-				int priority = 0;
-				Sprite* tgtSpr = nullptr;
-				ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
-				switch (getEquipPtr()->itemInfo[equipCounter].equipState)
-				{
-				case equipHandFlag::left:
-				case equipHandFlag::both:
-					if (entityInfo.sprFlip == false)
-					{
-						priority = tgtItem.leftWieldPriority;
-						tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
-					}
-					else
-					{
-						priority = tgtItem.rightWieldPriority;
-						tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
-					}
-
-					break;
-				case equipHandFlag::right:
-					if (entityInfo.sprFlip == false)
-					{
-						priority = tgtItem.rightWieldPriority;
-						tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
-					}
-					else
-					{
-						priority = tgtItem.leftWieldPriority;
-						tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
-					}
-					break;
-				case equipHandFlag::normal:
-					if (entityInfo.sprFlip == false)
-					{
-						priority = tgtItem.equipPriority;
-						tgtSpr = (Sprite*)tgtItem.equipSpr;
-						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
-					}
-					else
-					{
-						priority = tgtItem.flipEquipPriority;
-						tgtSpr = (Sprite*)tgtItem.flipEquipSpr;
-						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.flipEquipSprToggleOn;
-					}
-					break;
-				default:
-					errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
-					break;
-				}
-				//errorBox(drawOrder.find(priority) != drawOrder.end(), L"이미 존재하는 우선도의 장비가 추가됨 :" + std::to_wstring(priority) + L" 이름: " + getEquipPtr()->itemInfo[equipCounter].name);
-				drawOrder[priority] = tgtSpr;
-			}
-
-			for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
-			{
-				if (it->second != nullptr)
-				{
-					drawTexture(it->second->getTexture(), 0, 0);
-				}
-			}
-
-			//개별 아이템을 들었을 때의 범용 스프라이트
-			for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
-			{
-				Sprite* tgtSpr = nullptr;
-				ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
-				if (getEquipPtr()->itemInfo[equipCounter].leftWieldSpr == nullptr && getEquipPtr()->itemInfo[equipCounter].rightWieldSpr == nullptr)
-				{
-					switch (getEquipPtr()->itemInfo[equipCounter].equipState)
-					{
-					case equipHandFlag::both:
-						for (int i = 0; i < 48; i++)
-						{
-							Point2 itemCoor = equipCoordTwoHanded[i];
-							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-
-						}
-						break;
-					case equipHandFlag::left:
-						if (entityInfo.sprFlip == false)
-						{
-							for (int i = 0; i < 48; i++)
-							{
-								Point2 itemCoor = equipCoordLArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-							}
-						}
-						else
-						{
-							for (int i = 0; i < 48; i++)
-							{
-								Point2 itemCoor = equipCoordRArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-							}
-						}
-						break;
-
-					case equipHandFlag::right:
-						if (entityInfo.sprFlip == false)
-						{
-							for (int i = 0; i < 48; i++)
-							{
-								Point2 itemCoor = equipCoordRArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-							}
-						}
-						else
-						{
-							for (int i = 0; i < 48; i++)
-							{
-								Point2 itemCoor = equipCoordLArm[i];
-								if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
-							}
-						}
-						break;
-					}
-				}
-			}
-
-		}
-
-		//돌연변이 레이어: 주둥이, 귀 (모든 장비 위)
-		drawMutationLayer(entityInfo, mutDrawLayer::aboveEquip);
-
-		SDL_SetRenderTarget(renderer, nullptr);
+		playerTexture = composePlayerTexture();
 		playerSprite = std::make_unique<Sprite>(renderer, playerTexture, 48, 48);
 	}
+
 
 
 
@@ -698,3 +485,217 @@ void Entity::drawSelf()
 
 	SDL_DestroyTexture(playerTexture);
 };
+
+// 플레이어 외형 전 레이어(스킨/눈/머리/수염/뿔/장비/돌연변이)를 288x384 텍스처로 합성.
+// 반환된 SDL_Texture*는 호출자가 SDL_DestroyTexture로 해제.
+SDL_Texture* Entity::composePlayerTexture()
+{
+	SDL_Texture* playerTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
+	SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
+
+	SDL_SetRenderTarget(renderer, playerTexture);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+	SDL_RenderClear(renderer);
+
+	if (entityInfo.skin != humanCustom::skin::null)
+	{
+		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
+	}
+
+	//돌연변이 레이어: 전신 털, 꼬리 (skin 위, eyes 아래)
+	drawMutationLayer(entityInfo, mutDrawLayer::underEyes);
+
+	if (entityInfo.eyes != humanCustom::eyes::null)
+	{
+		if (entityInfo.isEyesClose == false)
+		{
+			if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+			else if (entityInfo.eyes == humanCustom::eyes::blueHalf) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
+			else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+
+			if (entityInfo.isEyesHalf)  drawTexture(spr::eyesHalf->getTexture(), 0, 0);
+		}
+		else drawTexture(spr::eyesClosed->getTexture(), 0, 0);
+	}
+
+	if (entityInfo.scar != humanCustom::scar::null)
+	{
+	}
+
+	if (entityInfo.beard != humanCustom::beard::null)
+	{
+		if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
+	}
+
+	if (entityInfo.hair != humanCustom::hair::null)
+	{
+		bool noHair = false;
+		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+		{
+			ItemData& tgtItem = getEquipPtr()->itemInfo[i];
+			if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true
+				&& tgtItem.equipState == equipHandFlag::normal)
+			{
+				noHair = true;
+				break;
+			}
+		}
+
+		if (noHair == false)
+		{
+			switch (entityInfo.hair)
+			{
+			case humanCustom::hair::commaBlack:
+				drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::bob1Black:
+				drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::ponytail:
+				drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
+				break;
+			case humanCustom::hair::middlePart:
+				drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
+				break;
+			}
+		}
+	}
+
+	if (entityInfo.horn != humanCustom::horn::null)
+	{
+		switch (entityInfo.horn)
+		{
+		case humanCustom::horn::coverRed:
+			drawTexture(spr::hornCoverRed->getTexture(), 0, 0);
+			break;
+		}
+	}
+
+	//캐릭터 장비 그리기
+	if (getEquipPtr()->itemInfo.size() > 0)
+	{
+		std::map<int, Sprite*, std::less<int>> drawOrder;
+
+		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
+		{
+			int priority = 0;
+			Sprite* tgtSpr = nullptr;
+			ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
+			switch (getEquipPtr()->itemInfo[equipCounter].equipState)
+			{
+			case equipHandFlag::left:
+			case equipHandFlag::both:
+				if (entityInfo.sprFlip == false)
+				{
+					priority = tgtItem.leftWieldPriority;
+					tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
+				}
+				else
+				{
+					priority = tgtItem.rightWieldPriority;
+					tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
+				}
+				break;
+			case equipHandFlag::right:
+				if (entityInfo.sprFlip == false)
+				{
+					priority = tgtItem.rightWieldPriority;
+					tgtSpr = (Sprite*)tgtItem.rightWieldSpr;
+				}
+				else
+				{
+					priority = tgtItem.leftWieldPriority;
+					tgtSpr = (Sprite*)tgtItem.leftWieldSpr;
+				}
+				break;
+			case equipHandFlag::normal:
+				if (entityInfo.sprFlip == false)
+				{
+					priority = tgtItem.equipPriority;
+					tgtSpr = (Sprite*)tgtItem.equipSpr;
+					if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
+				}
+				else
+				{
+					priority = tgtItem.flipEquipPriority;
+					tgtSpr = (Sprite*)tgtItem.flipEquipSpr;
+					if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.flipEquipSprToggleOn;
+				}
+				break;
+			default:
+				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
+				break;
+			}
+			drawOrder[priority] = tgtSpr;
+		}
+
+		for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
+		{
+			if (it->second != nullptr)
+			{
+				drawTexture(it->second->getTexture(), 0, 0);
+			}
+		}
+
+		//개별 아이템을 들었을 때의 범용 스프라이트
+		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
+		{
+			ItemData& tgtItem = getEquipPtr()->itemInfo[equipCounter];
+			if (getEquipPtr()->itemInfo[equipCounter].leftWieldSpr == nullptr && getEquipPtr()->itemInfo[equipCounter].rightWieldSpr == nullptr)
+			{
+				switch (getEquipPtr()->itemInfo[equipCounter].equipState)
+				{
+				case equipHandFlag::both:
+					for (int i = 0; i < 48; i++)
+					{
+						Point2 itemCoor = equipCoordTwoHanded[i];
+						if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+					}
+					break;
+				case equipHandFlag::left:
+					if (entityInfo.sprFlip == false)
+					{
+						for (int i = 0; i < 48; i++)
+						{
+							Point2 itemCoor = equipCoordLArm[i];
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						}
+					}
+					else
+					{
+						for (int i = 0; i < 48; i++)
+						{
+							Point2 itemCoor = equipCoordRArm[i];
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						}
+					}
+					break;
+				case equipHandFlag::right:
+					if (entityInfo.sprFlip == false)
+					{
+						for (int i = 0; i < 48; i++)
+						{
+							Point2 itemCoor = equipCoordRArm[i];
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						}
+					}
+					else
+					{
+						for (int i = 0; i < 48; i++)
+						{
+							Point2 itemCoor = equipCoordLArm[i];
+							if (itemCoor.x != 0 && itemCoor.y != 0) drawSpriteCenter(spr::itemset, tgtItem.getSprIndex(), 48 * (i % 6) + itemCoor.x, 48 * (i / 6) + itemCoor.y);
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	//돌연변이 레이어: 주둥이, 귀 (모든 장비 위)
+	drawMutationLayer(entityInfo, mutDrawLayer::aboveEquip);
+
+	SDL_SetRenderTarget(renderer, nullptr);
+	return playerTexture;
+}

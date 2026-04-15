@@ -20,6 +20,8 @@ import SkillRegistry;
 import statusEffect;
 import GodRegistry;
 import GodBehavior;
+import Sprite;
+import Entity;
 
 void Status::drawGUI()
 	{
@@ -37,8 +39,25 @@ void Status::drawGUI()
 				return checkCursor(&r) ? hoverBlue : col::black;
 			};
 
-			drawFillRect(SDL_Rect{ statusBase.x + 12,statusBase.y + 46, 118, 110 }, col::black);
-			drawRect(SDL_Rect{ statusBase.x+12,statusBase.y + 46, 118, 110 }, col::white);
+
+			// 초상화: 배경 스프라이트 위에 플레이어 합성 스프라이트를 4배 확대하여 그림
+			{
+				const SDL_Rect portraitBox = { statusBase.x + 12, statusBase.y + 46, 110, 110 };
+				drawSprite(spr::statusPortraitBackground, 0, portraitBox.x, portraitBox.y);
+
+				SDL_SetRenderClipRect(renderer, &portraitBox);
+
+				SDL_Texture* portraitTex = PlayerPtr->composePlayerTexture();
+				Sprite portraitSpr(renderer, portraitTex, 48, 48, true);
+
+				setZoom(4.0);
+				drawSpriteCenter(&portraitSpr, 0,
+					portraitBox.x + portraitBox.w / 2 + 2,
+					portraitBox.y + portraitBox.h / 2 + 22);
+				setZoom(1.0);
+
+				SDL_SetRenderClipRect(renderer, nullptr);
+			}
 
 
 

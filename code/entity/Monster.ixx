@@ -1,5 +1,4 @@
 module;
-#include <sol/sol.hpp>
 
 export module Monster;
 

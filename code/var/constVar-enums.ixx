@@ -131,6 +131,8 @@ export enum class act
     extractSeed, //과일에서 씨앗을 여러개 추출함(원래 과일은 사라짐)
 
     pray, //기도(제단 상호작용)
+
+    dye, //염색(염색 앰플 사용)
 };
 
 export namespace humanCustom

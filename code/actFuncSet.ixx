@@ -49,4 +49,6 @@ export namespace actFunc
 	export Corouter searchItems(ItemPocket* pocket, int& scroll);
 	//오토닥 인터페이스 사용
 	export Corouter useAutodoc(int tgtX, int tgtY, int tgtZ);
+	//염색 앰플 사용 : 털/뿔/머리 색상 변경 (현재는 털만 실제 적용)
+	export Corouter executeDye(ItemPocket* tgtPocket, int tgtIndex);
 };

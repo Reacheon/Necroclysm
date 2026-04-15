@@ -189,6 +189,9 @@ public:
 						actFunc::extractSeed(actEnv::Inventory, inventoryPocket, panel.cursor, inventoryItemData->pocketMaxVolume);
 						updateBarAct();
 						return;
+					case act::dye:
+						Corouter::start(actFunc::executeDye(inventoryPocket, panel.cursor));
+						return;
 					}
 
 					// 아이템이 삭제되었을 때 처리
@@ -306,6 +309,12 @@ public:
 			if (targetItem.checkFlag(itemFlag::SEED_FRUIT))
 			{
 				barAct.push_back(act::extractSeed);
+			}
+
+			//염색 앰플 추가
+			if (targetItem.itemCode == itemID::dyeAmpule)
+			{
+				barAct.push_back(act::dye);
 			}
 		}
 	}

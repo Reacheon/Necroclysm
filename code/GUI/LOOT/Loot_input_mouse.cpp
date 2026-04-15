@@ -145,6 +145,9 @@ void Loot::clickUpGUI()
 					actFunc::extractSeed(actEnv::Loot, panel.pocket, panel.cursor);
 					updateBarAct();
 					return;
+				case act::dye:
+					Corouter::start(actFunc::executeDye(panel.pocket, panel.cursor));
+					return;
 				}
 			}
 		}

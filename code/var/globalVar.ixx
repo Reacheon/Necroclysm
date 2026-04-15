@@ -2,7 +2,6 @@ module;
 
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
-#include <sol/sol.hpp>
 
 export module globalVar;
 
@@ -69,7 +68,7 @@ export namespace timer
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
 export SDL_Gamepad* controller; //메인컨트롤러
-export sol::state lua; //루아스크립트
+// sol::state lua 는 var/luaState.h 로 이동됨 (모듈 호환성 문제 회피)
 
 export turn turnCycle = turn::playerInput;//0:플레이어 입력_1:플레이어 애니메이션 재생_2:모든 엔티티 AI 작동(하나라도 false 반환시 3으로, 없으면 0으로)_3:엔티티 애니메이션 재생
 export bool quit = false;// true일 경우 게임을 종료시킴

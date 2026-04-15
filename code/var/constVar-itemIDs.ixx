@@ -232,4 +232,6 @@ export namespace itemID
     constexpr int cbm_nervedrive = 546;
     constexpr int cbm_powerStorage = 547;
     constexpr int cbm_metabExchange = 548;
+
+    constexpr int dyeAmpule = 556;
 };
