@@ -36,6 +36,7 @@ export namespace spr
 	Sprite* weather = nullptr;
 	Sprite* weatherCloud = nullptr;
 	Sprite* itemset = nullptr;
+	Sprite* colorPaletteOption = nullptr; //16x16 타일. 염색앰플 등 색상 선택 UI용 컬러 칩 시트
 	Sprite* windowArrow = nullptr;
 	Sprite* whiteMarker = nullptr;
 	Sprite* yellowMarker = nullptr;
@@ -78,10 +79,8 @@ export namespace spr
 	Sprite* eyesClosed = nullptr;
 	Sprite* eyesHalf = nullptr;
 	Sprite* beardMustacheBlack = nullptr;
-	Sprite* hairCommaBlack = nullptr;
-	Sprite* hairBob1Black = nullptr;
-	Sprite* hairPonytailBlack = nullptr;
-	Sprite* hairMiddlePart = nullptr;
+	// 헤어 스프라이트는 image/charset/body/hair/ 재귀 로드 + palette/hair.tsv 팔레트 스왑으로
+	// spr::spriteMapper[L"<stem>_<색>"]에 등록됨 (예: L"HAIR_BOB_BLACK"). 전용 포인터 없음.
 	Sprite* shadow = nullptr;
 	Sprite* vehicleHUD = nullptr;
 	Sprite* dashboard = nullptr;

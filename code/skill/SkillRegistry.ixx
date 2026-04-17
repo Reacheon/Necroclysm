@@ -20,5 +20,15 @@ public:
 		return (it != behaviors.end()) ? it->second.get() : nullptr;
 	}
 
+	// 등록된 모든 스킬 코드를 오름차순으로 반환. 디버그 리스팅 용도.
+	static std::vector<int> getAllCodes()
+	{
+		std::vector<int> codes;
+		codes.reserve(behaviors.size());
+		for (const auto& [code, _] : behaviors) codes.push_back(code);
+		std::sort(codes.begin(), codes.end());
+		return codes;
+	}
+
 	static void init();
 };

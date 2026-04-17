@@ -28,7 +28,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	entityInfo.skin = humanCustom::skin::yellow;
 	entityInfo.eyes = humanCustom::eyes::blue;
-	entityInfo.hair = humanCustom::hair::bob1Black;
+	entityInfo.hairStyle = L"HAIR_SHAG";
 
 	entityInfo.isPlayer = true;
 

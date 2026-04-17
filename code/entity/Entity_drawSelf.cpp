@@ -527,40 +527,6 @@ SDL_Texture* Entity::composePlayerTexture()
 		if (entityInfo.beard == humanCustom::beard::mustache) drawTexture(spr::beardMustacheBlack->getTexture(), 0, 0);
 	}
 
-	if (entityInfo.hair != humanCustom::hair::null)
-	{
-		bool noHair = false;
-		for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
-		{
-			ItemData& tgtItem = getEquipPtr()->itemInfo[i];
-			if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true
-				&& tgtItem.equipState == equipHandFlag::normal)
-			{
-				noHair = true;
-				break;
-			}
-		}
-
-		if (noHair == false)
-		{
-			switch (entityInfo.hair)
-			{
-			case humanCustom::hair::commaBlack:
-				drawTexture(spr::hairCommaBlack->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::bob1Black:
-				drawTexture(spr::hairBob1Black->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::ponytail:
-				drawTexture(spr::hairPonytailBlack->getTexture(), 0, 0);
-				break;
-			case humanCustom::hair::middlePart:
-				drawTexture(spr::hairMiddlePart->getTexture(), 0, 0);
-				break;
-			}
-		}
-	}
-
 	if (entityInfo.horn != humanCustom::horn::null)
 	{
 		switch (entityInfo.horn)
@@ -571,10 +537,40 @@ SDL_Texture* Entity::composePlayerTexture()
 		}
 	}
 
+	// 머리카락 렌더를 스킵해야 하는지 먼저 판정 (NO_HAIR_HELMET: 풀페이스 투구 등).
+	// DRAW_ABOVE_HAIR과는 독립적인 플래그임에 유의. 후자는 순서만 제어하고 전자는 hair 자체를 숨긴다.
+	bool noHair = false;
+	for (int i = 0; i < getEquipPtr()->itemInfo.size(); i++)
+	{
+		ItemData& tgtItem = getEquipPtr()->itemInfo[i];
+		if (tgtItem.checkFlag(itemFlag::NO_HAIR_HELMET) == true
+			&& tgtItem.equipState == equipHandFlag::normal)
+		{
+			noHair = true;
+			break;
+		}
+	}
+
+	// hair 레이어 draw 람다. 장비 pass 사이에서 정확히 한 번 호출된다.
+	auto drawHairLayer = [&]() {
+		if (entityInfo.hairStyle.empty()) return;
+		if (noHair) return;
+		// spriteMapper["<스타일>_<색>"] 조회. 색 매칭 실패 시 BLACK 폴백.
+		std::wstring key = entityInfo.hairStyle + L"_" + entityInfo.hairColor;
+		auto it = spr::spriteMapper.find(key);
+		if (it == spr::spriteMapper.end())
+			it = spr::spriteMapper.find(entityInfo.hairStyle + L"_BLACK");
+		if (it != spr::spriteMapper.end())
+			drawTexture(it->second->getTexture(), 0, 0);
+	};
+
 	//캐릭터 장비 그리기
+	// 레이어 순서: (horn 위에) 일반장비 → hair → DRAW_ABOVE_HAIR 장비(투구 등) → 손에 든 무기.
+	// 아이템은 DRAW_ABOVE_HAIR 플래그 유무로 두 버킷에 분배되며, 각 버킷 안에서는 기존 우선도 정렬을 유지한다.
 	if (getEquipPtr()->itemInfo.size() > 0)
 	{
-		std::map<int, Sprite*, std::less<int>> drawOrder;
+		std::map<int, Sprite*, std::less<int>> drawOrderBelowHair;
+		std::map<int, Sprite*, std::less<int>> drawOrderAboveHair;
 
 		for (int equipCounter = 0; equipCounter < getEquipPtr()->itemInfo.size(); equipCounter++)
 		{
@@ -626,10 +622,25 @@ SDL_Texture* Entity::composePlayerTexture()
 				errorBox(L"장비 그리기 중에 equipState가 비정상적인 값인 장비를 발견");
 				break;
 			}
-			drawOrder[priority] = tgtSpr;
+
+			auto& bucket = tgtItem.checkFlag(itemFlag::DRAW_ABOVE_HAIR) ? drawOrderAboveHair : drawOrderBelowHair;
+			bucket[priority] = tgtSpr;
 		}
 
-		for (auto it = drawOrder.begin(); it != drawOrder.end(); it++)
+		// Pass 1: hair 아래에 그릴 장비 (옷/바지/신발 등)
+		for (auto it = drawOrderBelowHair.begin(); it != drawOrderBelowHair.end(); it++)
+		{
+			if (it->second != nullptr)
+			{
+				drawTexture(it->second->getTexture(), 0, 0);
+			}
+		}
+
+		// hair
+		drawHairLayer();
+
+		// Pass 2: hair 위에 그릴 장비 (투구/모자 등)
+		for (auto it = drawOrderAboveHair.begin(); it != drawOrderAboveHair.end(); it++)
 		{
 			if (it->second != nullptr)
 			{
@@ -691,6 +702,11 @@ SDL_Texture* Entity::composePlayerTexture()
 				}
 			}
 		}
+	}
+	else
+	{
+		// 장비가 하나도 없어도 hair는 그려야 한다.
+		drawHairLayer();
 	}
 
 	//돌연변이 레이어: 주둥이, 귀 (모든 장비 위)

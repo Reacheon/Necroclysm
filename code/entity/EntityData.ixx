@@ -104,8 +104,9 @@ export struct EntityData : public EntityData_Base
     humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;
     humanCustom::beard beard = humanCustom::beard::null;
-    humanCustom::hair hair = humanCustom::hair::null;
     humanCustom::horn horn = humanCustom::horn::null;
+    std::wstring hairStyle = L"";      //image/charset/body/hair/ 파일명 stem과 매칭. 빈 문자열=헤어 없음
+    std::wstring hairColor = L"BLACK"; //palette/hair.tsv의 색상명과 매칭
     std::wstring furColor = L"GRAY";   //palette/fur.tsv의 색상명과 매칭
     std::wstring hornColor = L"BROWN"; //palette/horn.tsv의 색상명과 매칭
 

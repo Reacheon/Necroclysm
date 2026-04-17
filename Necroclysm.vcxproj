@@ -332,6 +332,7 @@
     <ClCompile Include="code\Sprite.ixx" />
     <ClCompile Include="code\startArea.ixx" />
     <ClCompile Include="code\stepEvent.ixx" />
+    <ClCompile Include="code\paletteLoader.ixx" />
     <ClCompile Include="code\textureLoader.ixx" />
     <ClCompile Include="code\turnCycleLoop.ixx" />
     <ClCompile Include="code\turnWait.ixx" />

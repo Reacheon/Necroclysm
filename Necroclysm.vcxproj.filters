@@ -135,6 +135,9 @@
     <ClCompile Include="code\displayLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
     </ClCompile>
+    <ClCompile Include="code\paletteLoader.ixx">
+      <Filter>소스 파일\01_system\05_Loader</Filter>
+    </ClCompile>
     <ClCompile Include="code\textureLoader.ixx">
       <Filter>소스 파일\01_system\05_Loader</Filter>
     </ClCompile>

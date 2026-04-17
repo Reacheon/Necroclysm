@@ -9,74 +9,7 @@ import globalVar;
 import constVar;
 import textureVar;
 import Sprite;
-
-// ===== 팔레트 스왑 유틸 =====
-// 팔레트 파일 형식 (palette/fur.tsv, palette/horn.tsv):
-//   첫 줄: #<TAB>COLOR1<TAB>COLOR2...  (첫 열은 무시용 placeholder)
-//   이후 줄: <슬롯번호><TAB><hex>... (슬롯번호 1~N, 파싱 시 1-based → 0-based로 변환)
-//   셀은 6자리 RGB hex (알파 없음, 전부 불투명 처리).
-// 색상명(헤더)이 그대로 spriteMapper 키의 접미사가 됨.
-//   예: MUT_FUR_FURCOL.png + fur.tsv의 WHITE 열 -> spriteMapper[L"MUT_FUR_WHITE"]
-
-struct PaletteTable
-{
-	std::vector<std::wstring> colorNames;                 // 헤더 순서대로
-	std::map<std::wstring, std::vector<SDL_Color>> table; // colorName -> 슬롯 배열
-};
-
-static std::wstring str2wstr(const std::string& s)
-{
-	return std::wstring(s.begin(), s.end());
-}
-
-// TSV 팔레트 로드. 실패 시 빈 테이블 반환.
-static PaletteTable loadPaletteTable(const std::string& path)
-{
-	PaletteTable p;
-	std::ifstream f(path);
-	if (!f.is_open()) return p;
-
-	std::string line;
-	bool headerParsed = false;
-	while (std::getline(f, line))
-	{
-		if (!line.empty() && line.back() == '\r') line.pop_back();
-		if (line.empty()) continue;
-
-		std::vector<std::string> cols;
-		std::stringstream ss(line);
-		std::string cell;
-		while (std::getline(ss, cell, '\t')) cols.push_back(cell);
-		if (cols.size() < 2) continue;
-
-		if (!headerParsed)
-		{
-			headerParsed = true;
-			for (size_t i = 1; i < cols.size(); i++)
-			{
-				std::wstring name = str2wstr(cols[i]);
-				p.colorNames.push_back(name);
-				p.table[name] = {};
-			}
-			continue;
-		}
-
-		for (size_t i = 1; i < cols.size() && (i - 1) < p.colorNames.size(); i++)
-		{
-			unsigned int rgb = 0;
-			try { rgb = std::stoul(cols[i], nullptr, 16); }
-			catch (...) { continue; }
-			SDL_Color c{
-				(Uint8)((rgb >> 16) & 0xFF),
-				(Uint8)((rgb >> 8) & 0xFF),
-				(Uint8)(rgb & 0xFF),
-				255
-			};
-			p.table[p.colorNames[i - 1]].push_back(c);
-		}
-	}
-	return p;
-}
+import paletteLoader; // PaletteTable, loadPaletteTable
 
 // source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
 // 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
@@ -114,6 +47,39 @@ static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src,
 	SDL_DestroySurface(dst);
 	if (tex) SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
 	return tex;
+}
+
+// 헤어 폴더 재귀 로드. 각 PNG는 palette/hair.tsv의 BLACK 팔레트를 소스로 가정하고,
+// 모든 색상 컬럼에 대해 팔레트 스왑 결과를 spriteMapper[L"<stem>_<색>"]로 등록.
+// (BLACK 컬럼은 원본과 동일한 결과를 만들지만 일관성 위해 동일 경로로 처리.)
+static void loadHairSprites(SDL_Renderer* renderer)
+{
+	PaletteTable hairPal = loadPaletteTable("palette/hair.tsv");
+	const std::wstring sourceColor = L"BLACK";
+	auto fromIt = hairPal.table.find(sourceColor);
+	if (fromIt == hairPal.table.end()) return;
+
+	namespace fs = std::filesystem;
+	for (const auto& entry : fs::recursive_directory_iterator("image/charset/body/hair"))
+	{
+		if (!entry.is_regular_file()) continue;
+		if (entry.path().extension() != ".png") continue;
+
+		std::wstring stem = entry.path().stem();
+		SDL_Surface* src = IMG_Load(entry.path().string().c_str());
+		if (src == nullptr) continue;
+
+		for (const auto& colorName : hairPal.colorNames)
+		{
+			auto toIt = hairPal.table.find(colorName);
+			if (toIt == hairPal.table.end()) continue;
+
+			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
+			if (tex == nullptr) continue;
+			spr::spriteMapper[stem + L"_" + colorName] = new Sprite(renderer, tex, 48, 48, true);
+		}
+		SDL_DestroySurface(src);
+	}
 }
 
 // 돌연변이 폴더 재귀 로드. _FURCOL / _HORNCOL 접미사면 팔레트 스왑하여 색상별 변종 등록.
@@ -211,6 +177,7 @@ export void textureLoader()
 	spr::weather = new Sprite(renderer, "image/UI/weather.png", 48, 48);
 	spr::weatherCloud = new Sprite(renderer, "image/UI/weatherCloud.png", 48, 48);
 	spr::itemset = new Sprite(renderer, "image/item/itemset.png", 48, 48);
+	spr::colorPaletteOption = new Sprite(renderer, "image/UI/GUI/colorPaletteOption.png", 16, 16);
 	spr::windowArrow = new Sprite(renderer, "image/UI/windowArrow.png", 16, 16);
 	spr::whiteMarker = new Sprite(renderer, "image/UI/whiteMarker.png", 16, 16);
 	spr::yellowMarker = new Sprite(renderer, "image/UI/yellowMarker.png", 16, 16);
@@ -257,10 +224,6 @@ export void textureLoader()
 	spr::eyesClosed = new Sprite(renderer, "image/charset/body/eyesClosed.png", 48, 48);
 	spr::beardMustacheBlack = new Sprite(renderer, "image/charset/body/beardMustacheBlack.png", 48, 48);
 
-	spr::hairCommaBlack = new Sprite(renderer, "image/charset/body/hairCommaBlack.png", 48, 48);
-	spr::hairBob1Black = new Sprite(renderer, "image/charset/body/hairBob1Black.png", 48, 48);
-	spr::hairPonytailBlack = new Sprite(renderer, "image/charset/body/hairPonytailBlack.png", 48, 48);
-	spr::hairMiddlePart = new Sprite(renderer, "image/charset/body/hairMiddlePart.png", 48, 48);
 	spr::hornCoverRed = new Sprite(renderer, "image/charset/body/hornCoverRed.png", 48, 48);
 
 	spr::shadow = new Sprite(renderer, "image/charset/shadow.png", 48, 48);
@@ -299,6 +262,7 @@ export void textureLoader()
 		}
 	}
 
+	loadHairSprites(renderer);
 	loadMutationSprites(renderer);
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset"))

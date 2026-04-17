@@ -16,6 +16,7 @@ import Lst;
 import LstEx;
 import SkillRegistry;
 import SkillBehavior;
+import paletteLoader;
 
 namespace actFunc
 {
@@ -329,7 +330,7 @@ namespace actFunc
 
 	//염색 앰플 사용 : 2단계 선택으로 염색 대상/색상을 결정
 	// 1단계 - 대상 : 머리카락 / 털 / 뿔 (해당 부위가 존재할 때만 노출)
-	// 2단계 - 색상 : 현재는 '털' 대상에 한해 GRAY/WHITE 2종만 지원
+	// 2단계 - 색상 : 대상별 팔레트(palette/hair.tsv, fur.tsv, horn.tsv)의 헤더명과 1:1 매칭
 	// 취소 시 앰플은 소모되지 않는다.
 	Corouter executeDye(ItemPocket* tgtPocket, int tgtIndex)
 	{
@@ -339,7 +340,7 @@ namespace actFunc
 		// 1단계 : 플레이어의 현재 외형 상태를 조회해 가능한 선택지 목록 구성
 		enum class dyeTarget { hair, fur, horn };
 
-		bool hasHair = PlayerInfo().hair != humanCustom::hair::null;
+		bool hasHair = PlayerInfo().hairStyle.empty() == false;
 		bool hasFur = false;
 		bool hasHorn = false;
 		for (const SkillData& sd : PlayerInfo().skillList)
@@ -372,33 +373,70 @@ namespace actFunc
 		if (targetSel < 0 || targetSel >= (int)targetMap.size()) co_return;
 		dyeTarget selected = targetMap[targetSel];
 
-		// 2단계 : 부위별 색상 선택. 현재는 털만 실제 염색을 지원한다.
-		// (머리카락/뿔은 후속 작업 예정이며 선택지만 표시 후 즉시 종료)
-		if (selected != dyeTarget::fur)
+		// 2단계 : 부위별 색상 선택. 뿔은 후속 작업 예정이라 선택지만 표시 후 종료한다.
+		// palette TSV를 읽어 LstEx용 색상 선택지를 구성한다.
+		// TSV에 색상 컬럼을 추가하면 UI가 자동 확장됨 (하드코딩 없음).
+		auto buildDyeOptions = [](const std::string& palettePath)
+			-> std::pair<PaletteTable, std::vector<LstExOption>>
 		{
+			PaletteTable pal = loadPaletteTable(palettePath);
+			std::vector<LstExOption> opts;
+			opts.reserve(pal.colorNames.size());
+			for (const std::wstring& key : pal.colorNames)
+			{
+				opts.push_back({ paletteKeyToSprIndex(key), paletteKeyToDisplayName(key), L"" });
+			}
+			return { std::move(pal), std::move(opts) };
+		};
+
+		if (selected == dyeTarget::fur)
+		{
+			auto [pal, colorOptions] = buildDyeOptions("palette/fur.tsv");
+			if (colorOptions.empty())
+			{
+				updateLog(L"Failed to load fur palette.");
+				co_return;
+			}
+
+			new LstEx(L"Dye Fur", L"Select a fur color.", colorOptions, spr::colorPaletteOption, false);
+			co_await std::suspend_always();
+			if (coAnswer.empty()) co_return;
+
+			int colorSel = wtoi(coAnswer.c_str());
+			if (colorSel < 0 || colorSel >= (int)pal.colorNames.size()) co_return;
+
+			PlayerInfo().furColor = pal.colorNames[colorSel];
+			tgtPocket->subtractItemIndex(tgtIndex, 1);
+			PlayerPtr->updateStatus();
+			updateLog(L"You dye your fur.");
 			co_return;
 		}
 
-		// 털 색상 선택지 : palette/fur.tsv의 헤더명(GRAY/WHITE)과 1:1 매칭
-		std::vector<LstExOption> colorOptions = {
-			{ 560, L"Gray",  L"" },
-			{ 561, L"White", L"" },
-		};
+		if (selected == dyeTarget::hair)
+		{
+			auto [pal, colorOptions] = buildDyeOptions("palette/hair.tsv");
+			if (colorOptions.empty())
+			{
+				updateLog(L"Failed to load hair palette.");
+				co_return;
+			}
 
-		new LstEx(L"Dye Fur", L"Select a fur color.", colorOptions, spr::itemset, false);
-		co_await std::suspend_always();
-		if (coAnswer.empty()) co_return;
+			new LstEx(L"Dye Hair", L"Select a hair color.", colorOptions, spr::colorPaletteOption, false);
+			co_await std::suspend_always();
+			if (coAnswer.empty()) co_return;
 
-		int colorSel = wtoi(coAnswer.c_str());
-		std::wstring newColor;
-		if (colorSel == 0) newColor = L"GRAY";
-		else if (colorSel == 1) newColor = L"WHITE";
-		else co_return;
+			int colorSel = wtoi(coAnswer.c_str());
+			if (colorSel < 0 || colorSel >= (int)pal.colorNames.size()) co_return;
 
-		PlayerInfo().furColor = newColor;
-		tgtPocket->subtractItemIndex(tgtIndex, 1);
-		PlayerPtr->updateStatus();
-		updateLog(L"You dye your fur.");
+			PlayerInfo().hairColor = pal.colorNames[colorSel];
+			tgtPocket->subtractItemIndex(tgtIndex, 1);
+			PlayerPtr->updateStatus();
+			updateLog(L"You dye your hair.");
+			co_return;
+		}
+
+		// dyeTarget::horn : 선택지만 표시, 실제 염색 미구현
+		co_return;
 	}
 
 	void extractSeed(actEnv envType, ItemPocket* tgtPocket, int tgtIndex, int pocketMaxVolume)

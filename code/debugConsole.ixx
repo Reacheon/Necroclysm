@@ -61,7 +61,7 @@ export void debugConsole()
 	prt(L"29. 신앙도 변경\n");
 	prt(L"30. 스킬 추가\n");
 	prt(L"31. 테스트 Lst 띄우기\n");
-	prt(L"32. 플레이어 털/뿔 색 변경\n");
+	prt(L"32. 플레이어 헤어스타일 변경\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -424,11 +424,42 @@ export void debugConsole()
 	case 30://스킬 추가
 	{
 		prt(L"현재 보유 스킬 목록:\n");
+		std::unordered_set<int> ownedCodes;
 		for (auto& sd : PlayerInfo().skillList)
 		{
 			auto* bhv = SkillRegistry::get(sd.skillCode);
 			prt(L"  - 코드 %d: %ls (Lv%d)\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
+			ownedCodes.insert(sd.skillCode);
 		}
+
+		// 등록된 모든 스킬을 src별로 그룹화해 나열. 이미 보유한 스킬은 [OWNED] 태그.
+		prt(L"\n========== 등록된 모든 스킬 ==========\n");
+		std::vector<int> allCodes = SkillRegistry::getAllCodes();
+		const std::array<std::pair<skillSrc, const wchar_t*>, 5> srcOrder = { {
+			{ skillSrc::GENERAL,  L"GENERAL"  },
+			{ skillSrc::BIONIC,   L"BIONIC"   },
+			{ skillSrc::MUTATION, L"MUTATION" },
+			{ skillSrc::MAGIC,    L"MAGIC"    },
+			{ skillSrc::GOD,      L"GOD"      },
+		} };
+		for (const auto& [src, label] : srcOrder)
+		{
+			bool headerPrinted = false;
+			for (int code : allCodes)
+			{
+				auto* bhv = SkillRegistry::get(code);
+				if (bhv == nullptr || bhv->src != src) continue;
+				if (headerPrinted == false)
+				{
+					prt(L"[%ls]\n", label);
+					headerPrinted = true;
+				}
+				const wchar_t* ownedTag = ownedCodes.count(code) ? L" [OWNED]" : L"";
+				prt(L"  %d: %ls%ls\n", code, bhv->name.c_str(), ownedTag);
+			}
+		}
+		prt(L"=====================================\n");
+
 		prt(L"추가할 스킬 코드를 입력해주세요. (-1: 취소)\n");
 		int skillCode;
 		std::cin >> skillCode;
@@ -458,6 +489,17 @@ export void debugConsole()
 			PlayerInfo().skillList.push_back(newSD);
 			prt(L"[디버그] 스킬 추가 완료: %ls (코드 %d, src=%d)\n",
 				bhv->name.c_str(), skillCode, (int)bhv->src);
+
+			// 추가된 스킬을 인게임 로그에도 노출 (디버그 테스트 시 무엇이 들어갔는지 확인용).
+			// src에 따라 라벨을 바꾼다: MUTATION="mutation", BIONIC="bionic", 그 외="skill".
+			std::wstring srcLabel;
+			switch (bhv->src)
+			{
+			case skillSrc::MUTATION: srcLabel = L"mutation"; break;
+			case skillSrc::BIONIC:   srcLabel = L"bionic";   break;
+			default:                 srcLabel = L"skill";    break;
+			}
+			updateLog(L"[Debug] You gained a new " + srcLabel + L": " + bhv->name + L".");
 		}
 		debugSkillEnd:
 		break;
@@ -482,39 +524,39 @@ export void debugConsole()
 		prt(L"[디버그] 옵션 %d개의 테스트 Lst를 띄웠다!\n", optionCount);
 		break;
 	}
-	case 32://플레이어 털/뿔 색 변경
+	case 32://플레이어 헤어스타일 변경
 	{
-		prt(L"변경할 부위를 선택해주세요.\n");
-		prt(L"1. 털 색 (fur)   현재: %ls\n", PlayerPtr->entityInfo.furColor.c_str());
-		prt(L"2. 뿔 색 (horn)  현재: %ls\n", PlayerPtr->entityInfo.hornColor.c_str());
-		int part;
-		std::cin >> part;
-		if (part != 1 && part != 2)
+		// image/charset/body/hair/의 PNG stem을 그대로 스타일명으로 사용.
+		// 빈 문자열(0번)을 선택하면 대머리로 설정.
+		std::vector<std::wstring> styles;
+		styles.push_back(L""); // 0: 헤어 없음
+		for (const auto& entry : std::filesystem::directory_iterator("image/charset/body/hair"))
+		{
+			if (entry.is_regular_file() == false) continue;
+			if (entry.path().extension() != ".png") continue;
+			styles.push_back(entry.path().stem().wstring());
+		}
+
+		prt(L"현재 헤어: %ls (색: %ls)\n",
+			PlayerPtr->entityInfo.hairStyle.empty() ? L"(없음)" : PlayerPtr->entityInfo.hairStyle.c_str(),
+			PlayerPtr->entityInfo.hairColor.c_str());
+		prt(L"변경할 헤어스타일 번호를 선택해주세요.\n");
+		for (int i = 0; i < (int)styles.size(); i++)
+		{
+			prt(L"%d. %ls\n", i, styles[i].empty() ? L"(없음)" : styles[i].c_str());
+		}
+
+		int sel;
+		std::cin >> sel;
+		if (sel < 0 || sel >= (int)styles.size())
 		{
 			prt(L"잘못된 값입니다.\n");
 			break;
 		}
 
-		prt(L"새 색상명을 입력해주세요 (예: GRAY, WHITE, BROWN). palette/*.tsv의 헤더와 일치해야 함.\n");
-		std::wstring colorName;
-		std::wcin.ignore();
-		std::getline(std::wcin, colorName);
-		if (colorName.empty())
-		{
-			prt(L"빈 문자열은 허용되지 않습니다.\n");
-			break;
-		}
-
-		if (part == 1)
-		{
-			PlayerPtr->entityInfo.furColor = colorName;
-			prt(L"[디버그] 털 색을 %ls로 변경했다.\n", colorName.c_str());
-		}
-		else
-		{
-			PlayerPtr->entityInfo.hornColor = colorName;
-			prt(L"[디버그] 뿔 색을 %ls로 변경했다.\n", colorName.c_str());
-		}
+		PlayerPtr->entityInfo.hairStyle = styles[sel];
+		prt(L"[디버그] 헤어스타일을 %ls로 변경했다.\n",
+			styles[sel].empty() ? L"(없음)" : styles[sel].c_str());
 		break;
 	}
 	case 99://콘솔 출력 초기화

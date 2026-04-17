@@ -23,7 +23,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 
 			entityInfo.skin = humanCustom::skin::yellow;
 			entityInfo.eyes = humanCustom::eyes::red;
-			entityInfo.hair = humanCustom::hair::ponytail;
+			entityInfo.hairStyle = L"HAIR_PONY_TAIL";
 			entityInfo.horn = humanCustom::horn::coverRed;
 
 			int i = 0;

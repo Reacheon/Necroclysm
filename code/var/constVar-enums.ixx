@@ -173,14 +173,8 @@ export namespace humanCustom
         mustache
     };
 
-    enum class hair
-    {
-        null,
-        commaBlack,
-        bob1Black,
-        ponytail,
-        middlePart,
-    };
+    //머리카락은 wstring(EntityData.hairStyle)으로 저장. image/charset/body/hair/*.png의 stem과 매칭.
+    //빈 문자열이면 헤어 없음. enum을 쓰지 않는 이유: 헤어 추가를 PNG 한 장 드롭으로 끝내기 위함.
 
     enum class horn
     {
@@ -579,6 +573,21 @@ export enum class gasFlag
     SMALL,
     NORMAL,
     BIG,
+};
+
+//image/UI/GUI/colorPaletteOption.png (16x16 타일)의 sprIndex 매핑.
+//염색앰플 등 "색상만 선택하는 UI"에서 LstExOption.sprIndex로 사용.
+export enum colorPaletteSprIndex
+{
+    COLOR_EMPTY     = 0,
+    COLOR_GRAY      = 1,
+    COLOR_WHITE     = 2,
+    COLOR_BLACK     = 3,
+    COLOR_ASH_GRAY  = 4,
+    COLOR_CREAM     = 5,
+    COLOR_ORANGE    = 6,
+    COLOR_BROWN     = 7,
+    COLOR_KHAKI     = 8,
 };
 
 export enum charSprIndex
