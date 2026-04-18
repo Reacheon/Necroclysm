@@ -497,25 +497,45 @@ SDL_Texture* Entity::composePlayerTexture()
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 	SDL_RenderClear(renderer);
 
-	if (entityInfo.skin != humanCustom::skin::null)
+	// 피부 레이어
+	// - skinColor 빈 문자열이면 피부 없음 (해골 등)
+	// - 키 컨벤션: SKIN_<gender>_<skinColor> (예: SKIN_MALE_LIGHT, SKIN_FEMALE_TAN)
+	//   gender PNG 추가(예: SKIN_CHILD.png) + skin.tsv 컬럼 추가만으로 자동 확장됨
+	if (entityInfo.skinColor.empty() == false)
 	{
-		if (entityInfo.skin == humanCustom::skin::yellow) drawTexture(spr::skinYellow->getTexture(), 0, 0);
+		auto it = spr::spriteMapper.find(L"SKIN_" + entityInfo.gender + L"_" + entityInfo.skinColor);
+		if (it != spr::spriteMapper.end()) drawTexture(it->second->getTexture(), 0, 0);
 	}
 
 	//돌연변이 레이어: 전신 털, 꼬리 (skin 위, eyes 아래)
 	drawMutationLayer(entityInfo, mutDrawLayer::underEyes);
 
-	if (entityInfo.eyes != humanCustom::eyes::null)
+	// 눈 레이어
+	// - eyeColor 빈 문자열이면 눈 없음 (해골/특수 종 등)
+	// - isEyesClose / isEyesHalf 는 수면 / 기절 등에서 외부가 강제하는 영구 상태
+	// - 두 플래그가 모두 false일 때만 자연 깜빡임(BLINK)을 합성
+	// - 자연 깜빡임 주기: BLINK_PERIOD_MS. 2300~2500ms 구간이 HALF→CLOSE→HALF의 짧은 닫힘
+	// - 엔티티별 phase offset(this 포인터 기반)으로 다수 NPC가 동시에 깜빡이는 것을 방지
+	if (entityInfo.eyeColor.empty() == false)
 	{
-		if (entityInfo.isEyesClose == false)
-		{
-			if (entityInfo.eyes == humanCustom::eyes::blue) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::blueHalf) drawTexture(spr::eyesBlue->getTexture(), 0, 0);
-			else if (entityInfo.eyes == humanCustom::eyes::red) drawTexture(spr::eyesRed->getTexture(), 0, 0);
+		constexpr Uint32 BLINK_PERIOD_MS    = 5000;
+		constexpr Uint32 BLINK_HALF_IN_MS   = 4800; // [4800,4870) 감기 시작 (HALF)
+		constexpr Uint32 BLINK_CLOSE_MS     = 4870; // [4870,4930) 완전히 감김 (CLOSE)
+		constexpr Uint32 BLINK_HALF_OUT_MS  = 4930; // [4930,5000) 다시 뜨는 중 (HALF)
 
-			if (entityInfo.isEyesHalf)  drawTexture(spr::eyesHalf->getTexture(), 0, 0);
+		const wchar_t* stateStem = L"EYES_OPEN";
+		if (entityInfo.isEyesClose) stateStem = L"EYES_CLOSE";
+		else if (entityInfo.isEyesHalf) stateStem = L"EYES_HALF";
+		else
+		{
+			Uint32 phaseOffset = (Uint32)((uintptr_t)this % BLINK_PERIOD_MS);
+			Uint32 phase = (SDL_GetTicks() + phaseOffset) % BLINK_PERIOD_MS;
+			if      (phase >= BLINK_CLOSE_MS    && phase < BLINK_HALF_OUT_MS) stateStem = L"EYES_CLOSE";
+			else if (phase >= BLINK_HALF_IN_MS) stateStem = L"EYES_HALF"; // HALF_IN, HALF_OUT 모두 커버
 		}
-		else drawTexture(spr::eyesClosed->getTexture(), 0, 0);
+
+		auto it = spr::spriteMapper.find(std::wstring(stateStem) + L"_" + entityInfo.eyeColor);
+		if (it != spr::spriteMapper.end()) drawTexture(it->second->getTexture(), 0, 0);
 	}
 
 	if (entityInfo.scar != humanCustom::scar::null)

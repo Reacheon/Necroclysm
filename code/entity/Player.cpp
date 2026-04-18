@@ -26,8 +26,9 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	static Player* ptr = this;
 	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
 
-	entityInfo.skin = humanCustom::skin::yellow;
-	entityInfo.eyes = humanCustom::eyes::blue;
+	entityInfo.skinColor = L"LIGHT";
+	entityInfo.gender = L"MALE";
+	entityInfo.eyeColor = L"BLUE";
 	entityInfo.hairStyle = L"HAIR_SHAG";
 
 	entityInfo.isPlayer = true;

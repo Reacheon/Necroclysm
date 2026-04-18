@@ -137,29 +137,10 @@ export enum class act
 
 export namespace humanCustom
 {
-    enum class skin
-    {
-        null,
-        white,
-        yellow,
-        brown,
-        black,
-        closed,
-    };
-
-    enum class eyes
-    {
-        null,
-        closed,
-        red,
-        redHalf,
-        blue,
-        blueHalf,
-        black,
-        blackHalf,
-
-    };
-
+    //피부/눈 색상은 wstring(EntityData.skinColor / eyeColor)으로 저장. 각각 palette/skin.tsv,
+    //palette/eyes.tsv 헤더와 매칭. 빈 문자열이면 해당 부위 없음 (해골/특수 종 대응).
+    //성별(EntityData.gender)도 wstring으로 저장하며 image/charset/body/skin/SKIN_<gender>.png stem과 매칭.
+    //enum을 쓰지 않는 이유는 헤어와 동일: 팔레트 컬럼 / PNG 한 장 추가만으로 확장이 끝나도록 하기 위함.
 
     enum class scar
     {
@@ -588,6 +569,11 @@ export enum colorPaletteSprIndex
     COLOR_ORANGE    = 6,
     COLOR_BROWN     = 7,
     COLOR_KHAKI     = 8,
+    COLOR_RED       = 9,
+    COLOR_SKY       = 10,
+    COLOR_PURPLE    = 11,
+    COLOR_GREEN     = 12,
+    COLOR_AMBER     = 13,
 };
 
 export enum charSprIndex

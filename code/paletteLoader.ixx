@@ -101,6 +101,11 @@ export int paletteKeyToSprIndex(const std::wstring& key)
 		{ L"ORANGE",   COLOR_ORANGE   },
 		{ L"BROWN",    COLOR_BROWN    },
 		{ L"KHAKI",    COLOR_KHAKI    },
+		{ L"RED",      COLOR_RED      },
+		{ L"SKY",      COLOR_SKY      },
+		{ L"PURPLE",   COLOR_PURPLE   },
+		{ L"GREEN",    COLOR_GREEN    },
+		{ L"AMBER",    COLOR_AMBER    },
 	};
 	auto it = m.find(key);
 	return (it != m.end()) ? it->second : (int)COLOR_EMPTY;

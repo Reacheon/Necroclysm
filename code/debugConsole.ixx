@@ -21,6 +21,7 @@ import GameOver;
 import GodService;
 import SkillRegistry;
 import Lst;
+import paletteLoader;
 
 export void debugConsole()
 {
@@ -62,6 +63,9 @@ export void debugConsole()
 	prt(L"30. 스킬 추가\n");
 	prt(L"31. 테스트 Lst 띄우기\n");
 	prt(L"32. 플레이어 헤어스타일 변경\n");
+	prt(L"33. 플레이어 눈 색상 변경\n");
+	prt(L"34. 플레이어 피부색 변경\n");
+	prt(L"35. 플레이어 성별 변경\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -557,6 +561,108 @@ export void debugConsole()
 		PlayerPtr->entityInfo.hairStyle = styles[sel];
 		prt(L"[디버그] 헤어스타일을 %ls로 변경했다.\n",
 			styles[sel].empty() ? L"(없음)" : styles[sel].c_str());
+		break;
+	}
+	case 33://플레이어 눈 색상 변경
+	{
+		// palette/eyes.tsv의 헤더(BLUE/RED/SKY/...)를 그대로 선택지로 노출.
+		// 새 색상은 TSV 컬럼 추가만으로 자동 반영됨 (하드코딩 없음).
+		PaletteTable pal = loadPaletteTable("palette/eyes.tsv");
+		if (pal.colorNames.empty())
+		{
+			prt(L"[디버그] palette/eyes.tsv 로드 실패.\n");
+			break;
+		}
+
+		prt(L"현재 눈 색상: %ls\n",
+			PlayerPtr->entityInfo.eyeColor.empty() ? L"(없음)" : PlayerPtr->entityInfo.eyeColor.c_str());
+		prt(L"변경할 눈 색상 번호를 선택해주세요.\n");
+		for (int i = 0; i < (int)pal.colorNames.size(); i++)
+		{
+			prt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
+		}
+
+		int sel;
+		std::cin >> sel;
+		if (sel < 0 || sel >= (int)pal.colorNames.size())
+		{
+			prt(L"잘못된 값입니다.\n");
+			break;
+		}
+
+		PlayerPtr->entityInfo.eyeColor = pal.colorNames[sel];
+		prt(L"[디버그] 눈 색상을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
+		break;
+	}
+	case 34://플레이어 피부색 변경
+	{
+		// palette/skin.tsv의 헤더(LIGHT/FAIR/TAN/...)를 그대로 선택지로 노출.
+		// 새 색상은 TSV 컬럼 추가만으로 자동 반영됨 (하드코딩 없음).
+		PaletteTable pal = loadPaletteTable("palette/skin.tsv");
+		if (pal.colorNames.empty())
+		{
+			prt(L"[디버그] palette/skin.tsv 로드 실패.\n");
+			break;
+		}
+
+		prt(L"현재 피부색: %ls\n",
+			PlayerPtr->entityInfo.skinColor.empty() ? L"(없음)" : PlayerPtr->entityInfo.skinColor.c_str());
+		prt(L"변경할 피부색 번호를 선택해주세요.\n");
+		for (int i = 0; i < (int)pal.colorNames.size(); i++)
+		{
+			prt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
+		}
+
+		int sel;
+		std::cin >> sel;
+		if (sel < 0 || sel >= (int)pal.colorNames.size())
+		{
+			prt(L"잘못된 값입니다.\n");
+			break;
+		}
+
+		PlayerPtr->entityInfo.skinColor = pal.colorNames[sel];
+		prt(L"[디버그] 피부색을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
+		break;
+	}
+	case 35://플레이어 성별 변경
+	{
+		// image/charset/body/skin/SKIN_<gender>.png 의 stem에서 "SKIN_" 접두 제거한 부분을 선택지로 사용.
+		// 새 신체 타입은 SKIN_<NAME>.png 한 장 추가만으로 자동 반영됨 (하드코딩 없음).
+		std::vector<std::wstring> genders;
+		for (const auto& entry : std::filesystem::directory_iterator("image/charset/body/skin"))
+		{
+			if (entry.is_regular_file() == false) continue;
+			if (entry.path().extension() != ".png") continue;
+			std::wstring stem = entry.path().stem().wstring();
+			const std::wstring prefix = L"SKIN_";
+			if (stem.starts_with(prefix) == false) continue;
+			genders.push_back(stem.substr(prefix.size()));
+		}
+
+		if (genders.empty())
+		{
+			prt(L"[디버그] image/charset/body/skin 에서 SKIN_*.png를 찾지 못했다.\n");
+			break;
+		}
+
+		prt(L"현재 성별: %ls\n", PlayerPtr->entityInfo.gender.c_str());
+		prt(L"변경할 성별 번호를 선택해주세요.\n");
+		for (int i = 0; i < (int)genders.size(); i++)
+		{
+			prt(L"%d. %ls\n", i, genders[i].c_str());
+		}
+
+		int sel;
+		std::cin >> sel;
+		if (sel < 0 || sel >= (int)genders.size())
+		{
+			prt(L"잘못된 값입니다.\n");
+			break;
+		}
+
+		PlayerPtr->entityInfo.gender = genders[sel];
+		prt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
 		break;
 	}
 	case 99://콘솔 출력 초기화

@@ -49,18 +49,21 @@ static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src,
 	return tex;
 }
 
-// 헤어 폴더 재귀 로드. 각 PNG는 palette/hair.tsv의 BLACK 팔레트를 소스로 가정하고,
-// 모든 색상 컬럼에 대해 팔레트 스왑 결과를 spriteMapper[L"<stem>_<색>"]로 등록.
-// (BLACK 컬럼은 원본과 동일한 결과를 만들지만 일관성 위해 동일 경로로 처리.)
-static void loadHairSprites(SDL_Renderer* renderer)
+// 지정 폴더(재귀)의 모든 PNG를 sourceColor 팔레트로 가정하고, palette TSV의 모든 색상 컬럼에
+// 대해 팔레트 스왑 결과를 spriteMapper[L"<stem>_<색>"]로 등록.
+// (sourceColor 컬럼은 원본과 동일한 결과를 만들지만 일관성 위해 동일 경로로 처리.)
+//   - 헤어:  imageDir="image/charset/body/hair", palettePath="palette/hair.tsv", sourceColor=L"BLACK"
+//   - 눈:    imageDir="image/charset/body/eyes", palettePath="palette/eyes.tsv", sourceColor=L"BLUE"
+//   - 피부:  imageDir="image/charset/body/skin", palettePath="palette/skin.tsv", sourceColor=L"LIGHT"
+static void loadPaletteSwappedSprites(SDL_Renderer* renderer,
+	const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor)
 {
-	PaletteTable hairPal = loadPaletteTable("palette/hair.tsv");
-	const std::wstring sourceColor = L"BLACK";
-	auto fromIt = hairPal.table.find(sourceColor);
-	if (fromIt == hairPal.table.end()) return;
+	PaletteTable pal = loadPaletteTable(palettePath);
+	auto fromIt = pal.table.find(sourceColor);
+	if (fromIt == pal.table.end()) return;
 
 	namespace fs = std::filesystem;
-	for (const auto& entry : fs::recursive_directory_iterator("image/charset/body/hair"))
+	for (const auto& entry : fs::recursive_directory_iterator(imageDir))
 	{
 		if (!entry.is_regular_file()) continue;
 		if (entry.path().extension() != ".png") continue;
@@ -69,10 +72,10 @@ static void loadHairSprites(SDL_Renderer* renderer)
 		SDL_Surface* src = IMG_Load(entry.path().string().c_str());
 		if (src == nullptr) continue;
 
-		for (const auto& colorName : hairPal.colorNames)
+		for (const auto& colorName : pal.colorNames)
 		{
-			auto toIt = hairPal.table.find(colorName);
-			if (toIt == hairPal.table.end()) continue;
+			auto toIt = pal.table.find(colorName);
+			if (toIt == pal.table.end()) continue;
 
 			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
 			if (tex == nullptr) continue;
@@ -217,11 +220,6 @@ export void textureLoader()
 	spr::itemSlotPocketArrow = new Sprite(renderer, "image/UI/item/itemSlotBtn.png", 8, 40);
 	spr::lstSelectBox = new Sprite(renderer, "image/UI/GUI/lstSelectBox.png", 360, 44);// (240, 29)->(360,44)
 
-	spr::skinYellow = new Sprite(renderer, "image/charset/body/skinYellow.png", 48, 48);
-	spr::eyesBlue = new Sprite(renderer, "image/charset/body/eyesBlue.png", 48, 48);
-	spr::eyesRed = new Sprite(renderer, "image/charset/body/eyesRed.png", 48, 48);
-	spr::eyesHalf = new Sprite(renderer, "image/charset/body/eyesHalf.png", 48, 48);
-	spr::eyesClosed = new Sprite(renderer, "image/charset/body/eyesClosed.png", 48, 48);
 	spr::beardMustacheBlack = new Sprite(renderer, "image/charset/body/beardMustacheBlack.png", 48, 48);
 
 	spr::hornCoverRed = new Sprite(renderer, "image/charset/body/hornCoverRed.png", 48, 48);
@@ -262,7 +260,9 @@ export void textureLoader()
 		}
 	}
 
-	loadHairSprites(renderer);
+	loadPaletteSwappedSprites(renderer, "image/charset/body/hair", "palette/hair.tsv", L"BLACK");
+	loadPaletteSwappedSprites(renderer, "image/charset/body/eyes", "palette/eyes.tsv", L"BLUE");
+	loadPaletteSwappedSprites(renderer, "image/charset/body/skin", "palette/skin.tsv", L"LIGHT");
 	loadMutationSprites(renderer);
 
 	for (const auto& entry : std::filesystem::directory_iterator("image/charset"))

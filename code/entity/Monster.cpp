@@ -21,8 +21,9 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 		if (entityInfo.entityCode == 6)
 		{
 
-			entityInfo.skin = humanCustom::skin::yellow;
-			entityInfo.eyes = humanCustom::eyes::red;
+			entityInfo.skinColor = L"LIGHT";
+			entityInfo.gender = L"MALE";
+			entityInfo.eyeColor = L"RED";
 			entityInfo.hairStyle = L"HAIR_PONY_TAIL";
 			entityInfo.horn = humanCustom::horn::coverRed;
 

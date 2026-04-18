@@ -73,14 +73,11 @@ export namespace spr
 	Sprite* itemSlotBtn = nullptr;
 	Sprite* itemSlotPocketArrow = nullptr;
 	Sprite* lstSelectBox = nullptr;
-	Sprite* skinYellow = nullptr;
-	Sprite* eyesBlue = nullptr;
-	Sprite* eyesRed = nullptr;
-	Sprite* eyesClosed = nullptr;
-	Sprite* eyesHalf = nullptr;
 	Sprite* beardMustacheBlack = nullptr;
-	// 헤어 스프라이트는 image/charset/body/hair/ 재귀 로드 + palette/hair.tsv 팔레트 스왑으로
-	// spr::spriteMapper[L"<stem>_<색>"]에 등록됨 (예: L"HAIR_BOB_BLACK"). 전용 포인터 없음.
+	// 헤어/눈/피부 스프라이트는 각각 image/charset/body/hair/, body/eyes/, body/skin/ 재귀 로드 +
+	// palette/hair.tsv / palette/eyes.tsv / palette/skin.tsv 팔레트 스왑으로
+	// spr::spriteMapper[L"<stem>_<색>"]에 등록됨
+	// (예: L"HAIR_BOB_BLACK", L"EYES_OPEN_BLUE", L"SKIN_MALE_LIGHT"). 전용 포인터 없음.
 	Sprite* shadow = nullptr;
 	Sprite* vehicleHUD = nullptr;
 	Sprite* dashboard = nullptr;

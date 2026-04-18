@@ -100,8 +100,6 @@ export struct EntityData : public EntityData_Base
     bool sprFlip = false;
     float sprAngle = 0.0f; //스프라이트의 회전각도
     int jumpOffsetY = 0;
-    humanCustom::skin skin = humanCustom::skin::null;
-    humanCustom::eyes eyes = humanCustom::eyes::null;
     humanCustom::scar scar = humanCustom::scar::null;
     humanCustom::beard beard = humanCustom::beard::null;
     humanCustom::horn horn = humanCustom::horn::null;
@@ -109,6 +107,9 @@ export struct EntityData : public EntityData_Base
     std::wstring hairColor = L"BLACK"; //palette/hair.tsv의 색상명과 매칭
     std::wstring furColor = L"GRAY";   //palette/fur.tsv의 색상명과 매칭
     std::wstring hornColor = L"BROWN"; //palette/horn.tsv의 색상명과 매칭
+    std::wstring eyeColor = L"";       //palette/eyes.tsv의 색상명과 매칭. 빈 문자열=눈 없음
+    std::wstring skinColor = L"";      //palette/skin.tsv의 색상명과 매칭. 빈 문자열=피부 없음(스켈레톤 등)
+    std::wstring gender = L"MALE";     //image/charset/body/skin/SKIN_<gender>.png stem과 매칭 (MALE/FEMALE)
 
     std::vector<statusEffect> statusEffectVec;
 
