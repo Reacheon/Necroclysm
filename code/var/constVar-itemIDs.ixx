@@ -234,4 +234,11 @@ export namespace itemID
     constexpr int cbm_metabExchange = 548;
 
     constexpr int dyeAmpule = 556;
+
+    constexpr int tshirt = 557; //EQUIP_SPR_GENDERED 적용 티셔츠. 착용 시 entityInfo.gender에 따라 T-SHIRT_MALE / T-SHIRT_FEMALE 스프라이트로 표시
+
+    //속옷 3종. 외피보다 낮은 priority로 안쪽에 그려짐. 성별 무관 단일 스프라이트.
+    constexpr int bra = 558;
+    constexpr int panties = 559;
+    constexpr int briefs = 560;
 };

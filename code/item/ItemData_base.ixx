@@ -121,6 +121,11 @@ export struct ItemDataBase
     void* equipSprToggleOn = nullptr;
     void* flipEquipSpr = nullptr;
     void* flipEquipSprToggleOn = nullptr;
+    // EQUIP_SPR_GENDERED 시에만 사용. 로드 시점엔 포인터 해석을 못하므로(착용자 성별이 미정),
+    // TSV의 베이스명을 그대로 보관해두고 그릴 때 "<base>_<gender>"로 spriteMapper에서 조회한다.
+    // 일반 장비는 빈 문자열.
+    std::wstring equipSprName;
+    std::wstring flipEquipSprName;
     unsigned __int32 equipPriority = 0;
     unsigned __int32 flipEquipPriority = 0;
     void* leftWieldSpr = nullptr;

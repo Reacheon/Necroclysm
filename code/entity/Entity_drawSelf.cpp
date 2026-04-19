@@ -625,17 +625,35 @@ SDL_Texture* Entity::composePlayerTexture()
 				}
 				break;
 			case equipHandFlag::normal:
+				// EQUIP_SPR_GENDERED: 로드 시점에 포인터를 해석하지 않은 장비. 매 프레임 착용자
+				// 성별로 spriteMapper에서 "<base>_<gender>"를 조회한다 (TOGGLE과 결합 케이스는 현재 없음).
 				if (entityInfo.sprFlip == false)
 				{
 					priority = tgtItem.equipPriority;
-					tgtSpr = (Sprite*)tgtItem.equipSpr;
-					if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
+					if (tgtItem.checkFlag(itemFlag::EQUIP_SPR_GENDERED))
+					{
+						auto it = spr::spriteMapper.find(tgtItem.equipSprName + L"_" + entityInfo.gender);
+						tgtSpr = (it != spr::spriteMapper.end()) ? it->second : nullptr;
+					}
+					else
+					{
+						tgtSpr = (Sprite*)tgtItem.equipSpr;
+						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.equipSprToggleOn;
+					}
 				}
 				else
 				{
 					priority = tgtItem.flipEquipPriority;
-					tgtSpr = (Sprite*)tgtItem.flipEquipSpr;
-					if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.flipEquipSprToggleOn;
+					if (tgtItem.checkFlag(itemFlag::EQUIP_SPR_GENDERED))
+					{
+						auto it = spr::spriteMapper.find(tgtItem.flipEquipSprName + L"_" + entityInfo.gender);
+						tgtSpr = (it != spr::spriteMapper.end()) ? it->second : nullptr;
+					}
+					else
+					{
+						tgtSpr = (Sprite*)tgtItem.flipEquipSpr;
+						if (tgtItem.checkFlag(itemFlag::HAS_TOGGLE_SPRITE) && tgtItem.checkFlag(itemFlag::TOGGLE_ON)) tgtSpr = (Sprite*)tgtItem.flipEquipSprToggleOn;
+					}
 				}
 				break;
 			default:

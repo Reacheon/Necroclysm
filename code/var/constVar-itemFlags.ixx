@@ -121,6 +121,7 @@ export enum class itemFlag
     SPR_TH_WEAPON,
     NO_HAIR_HELMET,//머리카락이 안보이는 헬멧
     DRAW_ABOVE_HAIR,//머리카락 위에 그려지는 장비 (투구/모자/헤어밴드 등). NO_HAIR_HELMET과 독립 — 후자는 hair 렌더를 스킵하고, 전자는 draw 순서만 제어한다.
+    EQUIP_SPR_GENDERED,//착용 스프라이트가 성별별로 다른 장비. equipSprName/flipEquipSprName을 베이스명으로 보고 런타임에 "<base>_<gender>"로 조회.
 
     BOW,
     CROSSBOW,

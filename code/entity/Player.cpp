@@ -53,6 +53,10 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	getEquipPtr()->addItemFromDex(107);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
+	//남자 시작 캐릭터 기본 속옷
+	getEquipPtr()->addItemFromDex(itemID::briefs);
+	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
+
 	updateStatus();
 
 	//방독면

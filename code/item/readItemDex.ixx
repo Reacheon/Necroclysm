@@ -492,6 +492,7 @@ export int readItemDex(const wchar_t* file)
                             { L"SPR_TH_WEAPON", itemFlag::SPR_TH_WEAPON },
                             { L"NO_HAIR_HELMET", itemFlag::NO_HAIR_HELMET },
                             { L"DRAW_ABOVE_HAIR", itemFlag::DRAW_ABOVE_HAIR },
+                            { L"EQUIP_SPR_GENDERED", itemFlag::EQUIP_SPR_GENDERED },
                             { L"BOW", itemFlag::BOW },
                             { L"CROSSBOW", itemFlag::CROSSBOW },
                             { L"TOGGLE_ON", itemFlag::TOGGLE_ON },
@@ -958,24 +959,44 @@ export int readItemDex(const wchar_t* file)
                         break;
 
                     case csvItem::equipSprName:
-                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
-                        itemDex[tgtIndex].equipSpr = spr::spriteMapper[strFragment.c_str()];
-
-                        if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
+                        // EQUIP_SPR_GENDERED: 착용자 성별을 모르는 로드 시점엔 포인터 해석을 미루고
+                        // 베이스명만 저장. 베이스명+"_MALE"/"_FEMALE" 등이 모두 등록돼있는지 검증.
+                        if (itemDex[tgtIndex].checkFlag(itemFlag::EQUIP_SPR_GENDERED))
                         {
-                            itemDex[tgtIndex].equipSprToggleOn = spr::spriteMapper[(strFragment + L"On").c_str()];
+                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_MALE");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_FEMALE");
+                            itemDex[tgtIndex].equipSprName = strFragment;
+                        }
+                        else
+                        {
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            itemDex[tgtIndex].equipSpr = spr::spriteMapper[strFragment.c_str()];
+
+                            if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
+                            {
+                                itemDex[tgtIndex].equipSprToggleOn = spr::spriteMapper[(strFragment + L"On").c_str()];
+                            }
                         }
                         break;
                     case csvItem::equipPriority:
                         itemDex[tgtIndex].equipPriority = wtoi(strFragment.c_str());
                         break;
                     case csvItem::flipEquipSprName:
-                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
-                        itemDex[tgtIndex].flipEquipSpr = spr::spriteMapper[strFragment.c_str()];
-
-                        if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
+                        if (itemDex[tgtIndex].checkFlag(itemFlag::EQUIP_SPR_GENDERED))
                         {
-                            itemDex[tgtIndex].flipEquipSprToggleOn = spr::spriteMapper[(strFragment + L"On").c_str()];
+                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_MALE");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_FEMALE");
+                            itemDex[tgtIndex].flipEquipSprName = strFragment;
+                        }
+                        else
+                        {
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            itemDex[tgtIndex].flipEquipSpr = spr::spriteMapper[strFragment.c_str()];
+
+                            if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
+                            {
+                                itemDex[tgtIndex].flipEquipSprToggleOn = spr::spriteMapper[(strFragment + L"On").c_str()];
+                            }
                         }
                         break;
                     case csvItem::flipEquipPriority:
