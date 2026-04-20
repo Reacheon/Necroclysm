@@ -151,8 +151,8 @@ private:
 				auto it = behavior->rankSkills.find(r);
 				if (it != behavior->rankSkills.end())
 				{
-					for (int skillCode : it->second)
-						player->addSkill(skillCode);
+					for (const std::wstring& skillId : it->second)
+						player->addSkill(skillId);
 				}
 			}
 		}
@@ -164,8 +164,8 @@ private:
 				auto it = behavior->rankSkills.find(r);
 				if (it != behavior->rankSkills.end())
 				{
-					for (int skillCode : it->second)
-						player->removeSkill(skillCode);
+					for (const std::wstring& skillId : it->second)
+						player->removeSkill(skillId);
 				}
 			}
 		}
@@ -180,8 +180,8 @@ private:
 		Entity* player = static_cast<Entity*>(PlayerPtr);
 		for (auto& [rank, skills] : behavior->rankSkills)
 		{
-			for (int skillCode : skills)
-				player->removeSkill(skillCode);
+			for (const std::wstring& skillId : skills)
+				player->removeSkill(skillId);
 		}
 	}
 };

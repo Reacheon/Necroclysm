@@ -12,16 +12,18 @@ import SkillRegistry;
 import log;
 import turnWait;
 
-export void useSkill(int skillCode)
+export void useSkill(const std::wstring& skillId)
 {
 	PlayerPtr->deactAStarDst();
 	if (turnCycle != turn::playerInput) return;
 
-	auto* behavior = SkillRegistry::get(skillCode);
+	// 빈 ID는 빈 슬롯을 의미. 조용히 무시한다.
+	if (skillId.empty()) return;
+
+	auto* behavior = SkillRegistry::get(skillId);
 	if (!behavior)
 	{
-		if (skillCode == 0 || skillCode == 1) return; // 빈 슬롯
-		std::wstring errorMsg = replaceStr(L"Player used an unknown skill: %d", L"%d", std::to_wstring(skillCode));
+		std::wstring errorMsg = L"Player used an unknown skill: " + skillId;
 		errorBox(errorMsg);
 		return;
 	}
@@ -30,7 +32,7 @@ export void useSkill(int skillCode)
 	SkillData* skillDataPtr = nullptr;
 	for (auto& sd : PlayerInfo().skillList)
 	{
-		if (sd.skillCode == skillCode)
+		if (sd.skillId == skillId)
 		{
 			skillDataPtr = &sd;
 			break;
@@ -64,6 +66,6 @@ export void useSkill(int skillCode)
 		}
 	}
 
-	currentUsingSkill = skillCode;
+	currentUsingSkill = skillId;
 	Corouter::start(behavior->execute(caster, *skillDataPtr));
 }

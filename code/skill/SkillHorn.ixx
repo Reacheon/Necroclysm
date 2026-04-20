@@ -15,6 +15,7 @@ export class SkillHorn : public SkillBehavior
 public:
 	SkillHorn()
 	{
+		id = L"MUT_HORN";
 		name = L"Horn";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 30; //귀(20)보다 위
 	}
 
-	int getSkillCode() const override { return 62; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

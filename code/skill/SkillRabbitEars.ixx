@@ -15,6 +15,7 @@ export class SkillRabbitEars : public SkillBehavior
 public:
 	SkillRabbitEars()
 	{
+		id = L"MUT_RABBIT_EARS";
 		name = L"Rabbit Ears";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 20;
 	}
 
-	int getSkillCode() const override { return 61; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

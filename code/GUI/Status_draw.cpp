@@ -359,7 +359,7 @@ void Status::drawGUI()
 				std::vector<const SkillData*> bionicEntries;
 				for (const auto& sd : PlayerPtr->entityInfo.skillList)
 				{
-					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+					SkillBehavior* bhv = SkillRegistry::get(sd.skillId);
 					if (bhv && bhv->src == skillSrc::BIONIC)
 						bionicEntries.push_back(&sd);
 				}
@@ -393,7 +393,7 @@ void Status::drawGUI()
 					for (int i = bionicScroll; i < drawEnd; i++)
 					{
 						int drawIdx = i - bionicScroll;
-						SkillBehavior* bhv = SkillRegistry::get(bionicEntries[i]->skillCode);
+						SkillBehavior* bhv = SkillRegistry::get(bionicEntries[i]->skillId);
 						if (!bhv) continue;
 
 						SDL_Rect eachBionicRect = { bionicRect.x + 5, bionicRect.y + 4 + 19 * drawIdx , 128, 16 };
@@ -456,7 +456,7 @@ void Status::drawGUI()
 				std::vector<const SkillData*> mutList;
 				for (const auto& sd : PlayerPtr->entityInfo.skillList)
 				{
-					SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+					SkillBehavior* bhv = SkillRegistry::get(sd.skillId);
 					if (bhv && bhv->src == skillSrc::MUTATION)
 						mutList.push_back(&sd);
 				}
@@ -488,7 +488,7 @@ void Status::drawGUI()
 					for (int i = mutationScroll; i < drawEnd; i++)
 					{
 						int drawIdx = i - mutationScroll;
-						SkillBehavior* bhv = SkillRegistry::get(mutList[i]->skillCode);
+						SkillBehavior* bhv = SkillRegistry::get(mutList[i]->skillId);
 						if (!bhv) continue;
 
 						SDL_Rect eachMutationRect = { mutationRect.x + 5, mutationRect.y + 4 + 19 * drawIdx , 128, 16 };

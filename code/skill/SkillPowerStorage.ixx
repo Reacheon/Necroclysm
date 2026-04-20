@@ -15,6 +15,7 @@ export class SkillPowerStorage : public SkillBehavior
 public:
 	SkillPowerStorage()
 	{
+		id = L"BION_POWER_STORAGE";
 		name = L"Power Storage";
 		iconIndex = 12;
 		descript = L"";
@@ -23,12 +24,10 @@ public:
 		maxCooldown = 0.0f;
 	}
 
-	int getSkillCode() const override { return 52; }
-
 	// TODO: 효과 구현
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

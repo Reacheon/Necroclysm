@@ -346,7 +346,7 @@ namespace actFunc
 		for (const SkillData& sd : PlayerInfo().skillList)
 		{
 			if (sd.isLearned == false) continue;
-			SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+			SkillBehavior* bhv = SkillRegistry::get(sd.skillId);
 			if (bhv == nullptr) continue;
 			if (bhv->src != skillSrc::MUTATION) continue;
 			if (bhv->mutColorSrc == mutColorSource::fur) hasFur = true;

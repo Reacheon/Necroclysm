@@ -118,7 +118,7 @@ void HUD::clickUpGUI()
 		if (checkCursor(&quickSlotRegion) == false)
 		{
 			quickSlot[dragQuickSlotTarget].first = quickSlotFlag::NONE;
-			quickSlot[dragQuickSlotTarget].second = -1;
+			quickSlot[dragQuickSlotTarget].second.clear();
 		}
 		else
 		{
@@ -128,11 +128,11 @@ void HUD::clickUpGUI()
 				{
 					// 드래그한 슬롯의 정보 백업
 					quickSlotFlag dragFlag = quickSlot[dragQuickSlotTarget].first;
-					int dragIndex = quickSlot[dragQuickSlotTarget].second;
+					std::wstring dragIndex = quickSlot[dragQuickSlotTarget].second;
 
 					// 드롭 대상 슬롯의 정보 백업
 					quickSlotFlag targetFlag = quickSlot[i].first;
-					int targetIndex = quickSlot[i].second;
+					std::wstring targetIndex = quickSlot[i].second;
 
 					// 드롭 대상 슬롯에 스킬이 있으면 교환, 없으면 단순 이동
 					if (targetFlag != quickSlotFlag::NONE)
@@ -152,7 +152,7 @@ void HUD::clickUpGUI()
 							if (quickSlot[j].first == dragFlag && quickSlot[j].second == dragIndex)
 							{
 								quickSlot[j].first = quickSlotFlag::NONE;
-								quickSlot[j].second = -1;
+								quickSlot[j].second.clear();
 							}
 						}
 
@@ -202,7 +202,7 @@ void HUD::clickRightGUI()
 			if (checkCursor(&quickSlotBtn[i]))
 			{
 				quickSlot[i].first = quickSlotFlag::NONE;
-				quickSlot[i].second = -1;
+				quickSlot[i].second.clear();
 			}
 		}
 	}

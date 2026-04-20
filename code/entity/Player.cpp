@@ -63,14 +63,14 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	//getEquipPtr()->addItemFromDex(374);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	addSkill(30);
-	quickSlot[2] = { quickSlotFlag::SKILL, 30 };
+	addSkill(L"SKILL_FIRESTORM");
+	quickSlot[2] = { quickSlotFlag::SKILL, L"SKILL_FIRESTORM" };
 
-	addSkill(32);
-	quickSlot[0] = { quickSlotFlag::SKILL,32 };
+	addSkill(L"SKILL_ROLL");
+	quickSlot[0] = { quickSlotFlag::SKILL, L"SKILL_ROLL" };
 
-	addSkill(33);
-	quickSlot[1] = { quickSlotFlag::SKILL, 33 };
+	addSkill(L"SKILL_LEAP");
+	quickSlot[1] = { quickSlotFlag::SKILL, L"SKILL_LEAP" };
 
 	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }

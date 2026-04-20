@@ -15,6 +15,7 @@ export class SkillRatTail : public SkillBehavior
 public:
 	SkillRatTail()
 	{
+		id = L"MUT_RAT_TAIL";
 		name = L"Rat Tail";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 20;
 	}
 
-	int getSkillCode() const override { return 55; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

@@ -420,25 +420,25 @@ export void debugConsole()
 		prt(L"변경 후 스킬 수: %d\n", (int)PlayerInfo().skillList.size());
 		for (auto& sd : PlayerInfo().skillList)
 		{
-			auto* bhv = SkillRegistry::get(sd.skillCode);
-			prt(L"  - 스킬코드 %d: %ls\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)");
+			auto* bhv = SkillRegistry::get(sd.skillId);
+			prt(L"  - %ls: %ls\n", sd.skillId.c_str(), bhv ? bhv->name.c_str() : L"(미등록)");
 		}
 		break;
 	}
 	case 30://스킬 추가
 	{
 		prt(L"현재 보유 스킬 목록:\n");
-		std::unordered_set<int> ownedCodes;
+		std::unordered_set<std::wstring> ownedIds;
 		for (auto& sd : PlayerInfo().skillList)
 		{
-			auto* bhv = SkillRegistry::get(sd.skillCode);
-			prt(L"  - 코드 %d: %ls (Lv%d)\n", sd.skillCode, bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
-			ownedCodes.insert(sd.skillCode);
+			auto* bhv = SkillRegistry::get(sd.skillId);
+			prt(L"  - %ls: %ls (Lv%d)\n", sd.skillId.c_str(), bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
+			ownedIds.insert(sd.skillId);
 		}
 
-		// 등록된 모든 스킬을 src별로 그룹화해 나열. 이미 보유한 스킬은 [OWNED] 태그.
+		// 등록된 모든 스킬을 src별로 그룹화해 번호와 함께 나열. 사용자는 번호로 선택.
 		prt(L"\n========== 등록된 모든 스킬 ==========\n");
-		std::vector<int> allCodes = SkillRegistry::getAllCodes();
+		std::vector<std::wstring> allIds = SkillRegistry::getAllIds();
 		const std::array<std::pair<skillSrc, const wchar_t*>, 5> srcOrder = { {
 			{ skillSrc::GENERAL,  L"GENERAL"  },
 			{ skillSrc::BIONIC,   L"BIONIC"   },
@@ -446,40 +446,51 @@ export void debugConsole()
 			{ skillSrc::MAGIC,    L"MAGIC"    },
 			{ skillSrc::GOD,      L"GOD"      },
 		} };
+		// 번호 -> id 매핑을 만들어 입력 편의 제공. 번호는 전체 목록 순서대로 1-base.
+		std::vector<std::wstring> indexedIds;
+		int menuIdx = 1;
 		for (const auto& [src, label] : srcOrder)
 		{
 			bool headerPrinted = false;
-			for (int code : allCodes)
+			for (const std::wstring& id : allIds)
 			{
-				auto* bhv = SkillRegistry::get(code);
+				auto* bhv = SkillRegistry::get(id);
 				if (bhv == nullptr || bhv->src != src) continue;
 				if (headerPrinted == false)
 				{
 					prt(L"[%ls]\n", label);
 					headerPrinted = true;
 				}
-				const wchar_t* ownedTag = ownedCodes.count(code) ? L" [OWNED]" : L"";
-				prt(L"  %d: %ls%ls\n", code, bhv->name.c_str(), ownedTag);
+				const wchar_t* ownedTag = ownedIds.count(id) ? L" [OWNED]" : L"";
+				prt(L"  %d) %ls (%ls)%ls\n", menuIdx, bhv->name.c_str(), id.c_str(), ownedTag);
+				indexedIds.push_back(id);
+				menuIdx++;
 			}
 		}
 		prt(L"=====================================\n");
 
-		prt(L"추가할 스킬 코드를 입력해주세요. (-1: 취소)\n");
-		int skillCode;
-		std::cin >> skillCode;
-		if (skillCode == -1) break;
+		prt(L"추가할 스킬 번호를 입력해주세요. (-1: 취소)\n");
+		int menuChoice;
+		std::cin >> menuChoice;
+		if (menuChoice == -1) break;
+		if (menuChoice < 1 || menuChoice > (int)indexedIds.size())
+		{
+			prt(L"[에러] 번호 %d는 범위를 벗어났습니다.\n", menuChoice);
+			break;
+		}
 
-		auto* bhv = SkillRegistry::get(skillCode);
+		const std::wstring& pickedId = indexedIds[menuChoice - 1];
+		auto* bhv = SkillRegistry::get(pickedId);
 		if (!bhv)
 		{
-			prt(L"[에러] 스킬 코드 %d는 SkillRegistry에 등록되지 않았습니다.\n", skillCode);
+			prt(L"[에러] 스킬 %ls는 SkillRegistry에 등록되지 않았습니다.\n", pickedId.c_str());
 			break;
 		}
 
 		// 이미 보유 중인지 확인
 		for (auto& sd : PlayerInfo().skillList)
 		{
-			if (sd.skillCode == skillCode)
+			if (sd.skillId == pickedId)
 			{
 				prt(L"[에러] 이미 보유 중인 스킬입니다: %ls\n", bhv->name.c_str());
 				goto debugSkillEnd;
@@ -488,11 +499,11 @@ export void debugConsole()
 
 		{
 			SkillData newSD;
-			newSD.skillCode = skillCode;
+			newSD.skillId = pickedId;
 			newSD.isLearned = true;
 			PlayerInfo().skillList.push_back(newSD);
-			prt(L"[디버그] 스킬 추가 완료: %ls (코드 %d, src=%d)\n",
-				bhv->name.c_str(), skillCode, (int)bhv->src);
+			prt(L"[디버그] 스킬 추가 완료: %ls (%ls, src=%d)\n",
+				bhv->name.c_str(), pickedId.c_str(), (int)bhv->src);
 
 			// 추가된 스킬을 인게임 로그에도 노출 (디버그 테스트 시 무엇이 들어갔는지 확인용).
 			// src에 따라 라벨을 바꾼다: MUTATION="mutation", BIONIC="bionic", 그 외="skill".

@@ -15,6 +15,7 @@ export class SkillFur : public SkillBehavior
 public:
 	SkillFur()
 	{
+		id = L"MUT_FUR";
 		name = L"Fur";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 10;
 	}
 
-	int getSkillCode() const override { return 52; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

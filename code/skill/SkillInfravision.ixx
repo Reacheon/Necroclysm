@@ -15,6 +15,7 @@ export class SkillInfravision : public SkillBehavior
 public:
 	SkillInfravision()
 	{
+		id = L"MUT_INFRAVISION";
 		name = L"Infravision";
 		iconIndex = 117;
 		descript = L"";
@@ -23,12 +24,10 @@ public:
 		maxCooldown = 0.0f;
 	}
 
-	int getSkillCode() const override { return 51; }
-
 	// 패시브 스킬이므로 execute는 빈 코루틴
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 

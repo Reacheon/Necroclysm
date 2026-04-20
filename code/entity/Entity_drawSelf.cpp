@@ -52,7 +52,7 @@ static void drawMutationLayer(EntityData& info, mutDrawLayer layer)
 	std::map<int, Sprite*, std::less<int>> order;
 	for (const auto& sd : info.skillList)
 	{
-		SkillBehavior* bhv = SkillRegistry::get(sd.skillCode);
+		SkillBehavior* bhv = SkillRegistry::get(sd.skillId);
 		if (bhv == nullptr) continue;
 		if (bhv->src != skillSrc::MUTATION) continue;
 		if (bhv->mutLayer != layer) continue;

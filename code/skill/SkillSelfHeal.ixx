@@ -22,6 +22,7 @@ export class SkillSelfHeal : public SkillBehavior
 public:
 	SkillSelfHeal()
 	{
+		id = L"SKILL_SELF_HEAL";
 		name = L"Self Heal";
 		iconIndex = 5;
 		descript = L"Instantly recover a small amount of HP for all body parts.";
@@ -31,8 +32,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"F";
 	}
-
-	int getSkillCode() const override { return 40; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -63,7 +62,7 @@ public:
 
 		updateLog(L"You feel a warm light healing your wounds.");
 		turnWait(1.0);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

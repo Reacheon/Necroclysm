@@ -262,23 +262,23 @@ namespace actFunc
 					{
 						if (counter == wtoi(coAnswer.c_str()))
 						{
-							int skillCode = item.bionicIndex;
-							auto* behavior = SkillRegistry::get(skillCode);
+							const std::wstring& skillId = item.bionicId;
+							auto* behavior = SkillRegistry::get(skillId);
 							if (!behavior)
 							{
 								updateLog(L"Error: Invalid bionic module.");
 								co_return;
 							}
 
-							//중복 설치 체크 - skillList에서 동일 스킬코드 검색
+							//중복 설치 체크 - skillList에서 동일 ID 검색
 							auto& skillList = PlayerInfo().skillList;
 							auto it = std::find_if(skillList.begin(), skillList.end(),
-								[skillCode](const SkillData& sd) { return sd.skillCode == skillCode; });
+								[&skillId](const SkillData& sd) { return sd.skillId == skillId; });
 
 							if (it != skillList.end())
 							{
-								//중첩 설치 가능한 바이오닉 하드코딩
-								if (skillCode == 52) // Power Storage
+								//중첩 설치 가능한 바이오닉
+								if (skillId == L"BION_POWER_STORAGE")
 								{
 									it->skillLevel++;
 									updateLog(std::format(L"The autodoc installs an additional {}. (x{})", behavior->name, it->skillLevel));
@@ -292,12 +292,12 @@ namespace actFunc
 							else
 							{
 								//신규 설치
-								PlayerPtr->addSkill(skillCode);
+								PlayerPtr->addSkill(skillId);
 								updateLog(std::format(L"The autodoc successfully installs {}.", behavior->name));
 							}
 
 							//Power Storage 설치 시 maxEnergy & energy 증가
-							if (skillCode == 52)
+							if (skillId == L"BION_POWER_STORAGE")
 							{
 								PlayerInfo().maxEnergy += 500;
 								PlayerInfo().energy += 500;

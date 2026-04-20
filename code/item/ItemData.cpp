@@ -139,7 +139,7 @@ bool ItemData::itemOverlay(const ItemData& tgtItem) const
     if (rElec != tgtItem.rElec) { return false; }
     if (rCorr != tgtItem.rCorr) { return false; }
     if (rRad != tgtItem.rRad) { return false; }
-    if (bionicIndex != tgtItem.bionicIndex) { return false; }
+    if (bionicId != tgtItem.bionicId) { return false; }
 
     if (pocketVolume != tgtItem.pocketVolume) { return false; }
     //if (number != tgtItem.number) { return false; }

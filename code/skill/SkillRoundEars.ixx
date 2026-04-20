@@ -16,6 +16,7 @@ export class SkillRoundEars : public SkillBehavior
 public:
 	SkillRoundEars()
 	{
+		id = L"MUT_ROUND_EARS";
 		name = L"Round Ears";
 		iconIndex = 117;
 		descript = L"";
@@ -29,11 +30,9 @@ public:
 		mutDrawPriority = 20;
 	}
 
-	int getSkillCode() const override { return 63; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

@@ -51,7 +51,7 @@ Skill::Skill() : GUI(false)
 	filteredSkills.clear();
 	for (auto& sd : PlayerInfo().skillList)
 	{
-		auto* bhv = SkillRegistry::get(sd.skillCode);
+		auto* bhv = SkillRegistry::get(sd.skillId);
 		if (bhv && bhv->src == skillSrc::GENERAL)
 			filteredSkills.push_back(sd);
 	}
@@ -193,7 +193,7 @@ void Skill::drawGUI()
 				drawFillRect(skillBtn[i], skillBtnColor);
 				drawRect(skillBtn[i], skillOutlineColor);
 				SkillData& tgtData = filteredSkills[skillScroll + i];
-				auto* tgtBhv = SkillRegistry::get(tgtData.skillCode);
+				auto* tgtBhv = SkillRegistry::get(tgtData.skillId);
 				setZoom(2.0);
 				drawSprite(spr::icon24, tgtBhv ? tgtBhv->iconIndex : 0, skillBtn[i].x, skillBtn[i].y);
 				setZoom(1.0);
@@ -250,14 +250,14 @@ void Skill::drawGUI()
 			}
 		}
 
-		if (dragSkillTarget != -1)
+		if (!dragSkillTarget.empty())
 		{
 			bool cursorIconDraw = true;
 			for (int i = 0; i < 7; i++)
 			{
 				if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 				{
-					if (filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
+					if (filteredSkills[skillScroll + i].skillId == dragSkillTarget)
 					{
 						cursorIconDraw = false;
 					}
@@ -323,14 +323,14 @@ void Skill::clickUpGUI()
 	{
 		for (int i = 0; i < QUICK_SLOT_MAX; i++)
 		{
-			if (checkCursor(&quickSlotBtn[i]) && dragSkillTarget != -1)
+			if (checkCursor(&quickSlotBtn[i]) && !dragSkillTarget.empty())
 			{
 				for (int j = 0; j < QUICK_SLOT_MAX; j++)
 				{
 					if (quickSlot[j].first == quickSlotFlag::SKILL && quickSlot[j].second == dragSkillTarget)
 					{
 						quickSlot[j].first = quickSlotFlag::NONE;
-						quickSlot[j].second = -1;
+						quickSlot[j].second.clear();
 					}
 				}
 
@@ -343,7 +343,7 @@ void Skill::clickUpGUI()
 		{
 			if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 			{
-				if (dragSkillTarget != -1 && filteredSkills[skillScroll + i].skillCode == dragSkillTarget)
+				if (!dragSkillTarget.empty() && filteredSkills[skillScroll + i].skillId == dragSkillTarget)
 				{
 					auto* clickedBhv = SkillRegistry::get(dragSkillTarget);
 
@@ -358,7 +358,7 @@ void Skill::clickUpGUI()
 					{
 						for (auto& sd : PlayerInfo().skillList)
 						{
-							if (sd.skillCode == dragSkillTarget)
+							if (sd.skillId == dragSkillTarget)
 							{
 								filteredSkills[skillScroll + i].toggle = sd.toggle;
 								break;
@@ -368,7 +368,7 @@ void Skill::clickUpGUI()
 					}
 
 					// 액티브 스킬: 실제 발동(코루틴 시작)됐을 때만 GUI 닫기
-					if (currentUsingSkill != -1)
+					if (!currentUsingSkill.empty())
 					{
 						delete this;
 						return;
@@ -387,7 +387,7 @@ void Skill::clickUpGUI()
 		}
 		else
 		{
-			auto* bhv = SkillRegistry::get(sd.skillCode);
+			auto* bhv = SkillRegistry::get(sd.skillId);
 			if (!bhv) continue;
 			if (categoryCursor == skillCategory::general && bhv->src == skillSrc::GENERAL) filteredSkills.push_back(sd);
 			else if (categoryCursor == skillCategory::mutation && bhv->src == skillSrc::MUTATION) filteredSkills.push_back(sd);
@@ -396,18 +396,18 @@ void Skill::clickUpGUI()
 		}
 	}
 
-	dragSkillTarget = -1;
+	dragSkillTarget.clear();
 }
 
 void Skill::clickDownGUI()
 {
 	for (int i = 0; i < SKILL_GUI_MAX; i++)
 	{
-		if (dragSkillTarget == -1)
+		if (dragSkillTarget.empty())
 		{
 			if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 			{
-				dragSkillTarget = filteredSkills[skillScroll + i].skillCode;
+				dragSkillTarget = filteredSkills[skillScroll + i].skillId;
 			}
 		}
 	}

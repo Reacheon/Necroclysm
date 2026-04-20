@@ -663,7 +663,7 @@ __int64 entityAITurn()
 			Entity* playerEntity = static_cast<Entity*>(PlayerPtr);
 			for (auto& sd : PlayerInfo().skillList)
 			{
-				auto* bhv = SkillRegistry::get(sd.skillCode);
+				auto* bhv = SkillRegistry::get(sd.skillId);
 				if (!bhv) continue;
 				if (sd.toggle || bhv->type == skillType::PASSIVE)
 					bhv->onTurnTick(playerEntity, sd);

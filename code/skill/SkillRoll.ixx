@@ -17,6 +17,7 @@ export class SkillRoll : public SkillBehavior
 public:
 	SkillRoll()
 	{
+		id = L"SKILL_ROLL";
 		name = L"Roll";
 		iconIndex = 1;
 		descript = L"Roll toward an adjacent tile. Increases evasion chance against attacks for the rest of the turn. ";
@@ -26,8 +27,6 @@ public:
 		reqProfic = { proficFlag::dodging };
 		skillRank = L"F";
 	}
-
-	int getSkillCode() const override { return 32; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -64,7 +63,7 @@ public:
 		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[319]);
 		co_await std::suspend_always();
 		rangeSet.clear();
-		if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
+		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
@@ -97,6 +96,6 @@ public:
 		}
 
 		addAniToPlayerTurn(caster, aniFlag::roll);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 	}
 };

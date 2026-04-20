@@ -835,7 +835,7 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].rRad = wtoi(strFragment.c_str());
                         break;
                     case csvItem::bionicIndex:
-                        itemDex[tgtIndex].bionicIndex = wtoi(strFragment.c_str());
+                        itemDex[tgtIndex].bionicId = strFragment;
                         break;
                     case csvItem::durability:
                         itemDex[tgtIndex].durablility = wtoi(strFragment.c_str());

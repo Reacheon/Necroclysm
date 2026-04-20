@@ -23,6 +23,7 @@ export class SkillFocusHeal : public SkillBehavior
 public:
 	SkillFocusHeal()
 	{
+		id = L"SKILL_FOCUS_HEAL";
 		name = L"Focused Heal";
 		iconIndex = 7;
 		descript = L"Greatly heal a specific body part of your choice.";
@@ -32,8 +33,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"C";
 	}
-
-	int getSkillCode() const override { return 43; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -56,7 +55,7 @@ public:
 			L"Torso"
 		});
 		co_await std::suspend_always();
-		if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
+		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 
 		int selected = wtoi(coAnswer.c_str());
 		int cost = randomRange(PIETY_COST_MIN, PIETY_COST_MAX);
@@ -79,7 +78,7 @@ public:
 
 		updateLog(L"Concentrated healing light mends your body.");
 		turnWait(1.0);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

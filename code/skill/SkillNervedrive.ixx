@@ -19,6 +19,7 @@ public:
 
 	SkillNervedrive()
 	{
+		id = L"BION_NERVEDRIVE";
 		name = L"Nervedrive";
 		iconIndex = 10;
 		descript = L"Accelerates neural processing to extreme speeds. All actions cost 0 turns while active. Drains 500 kJ per turn.";
@@ -29,8 +30,6 @@ public:
 		energyPerAct = 0.0f;
 		energyPerTurn = 500.0f;
 	}
-
-	int getSkillCode() const override { return 50; }
 
 	// 에너지가 500kJ 미만이면 토글 ON 불가
 	bool canUse(Entity* caster, const SkillData& data) const override
@@ -75,7 +74,7 @@ public:
 	// execute는 토글 스킬이므로 사용되지 않지만 순수가상함수 구현 필요
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

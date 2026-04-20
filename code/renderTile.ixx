@@ -31,6 +31,7 @@ import Particle;
 import Footprint;
 import Wave;
 import Wake;
+import nervedriveFilter;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -977,6 +978,8 @@ void drawEntities()
     {
         if (entityCache.find(elem) == entityCache.end())
         {
+            // Nervedrive 필터 월드패스: 플레이어는 틴트 이후 디폴트 타겟에 따로 그림.
+            if (nervedriveFilter::shouldSkipPlayerInWorld() && elem == (Drawable*)PlayerPtr) { entityCache.insert(elem); continue; }
             elem->drawSelf();
             entityCache.insert(elem);
         }

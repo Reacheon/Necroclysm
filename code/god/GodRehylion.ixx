@@ -29,11 +29,11 @@ public:
 			L"Converting others through healing"
 		};
 
-		rankSkills[0] = { 45 };          // 생체결계 (패시브, 입교 즉시)
-		rankSkills[1] = { 40, 41 };      // 자가치료, 타인치료
-		rankSkills[2] = { 42 };      // 정화
-		rankSkills[3] = { 43 };      // 집중치료
-		rankSkills[4] = { 44 };      // 초재생
+		rankSkills[0] = { L"SKILL_LIVING_WARD" };                     // 생체결계 (패시브, 입교 즉시)
+		rankSkills[1] = { L"SKILL_SELF_HEAL", L"SKILL_HEAL_OTHER" }; // 자가치료, 타인치료
+		rankSkills[2] = { L"SKILL_PURIFY" };                          // 정화
+		rankSkills[3] = { L"SKILL_FOCUS_HEAL" };                      // 집중치료
+		rankSkills[4] = { L"SKILL_SUPER_REGEN" };                     // 초재생
 	}
 
 	godFlag getGodFlag() const override { return godFlag::rehylion; }

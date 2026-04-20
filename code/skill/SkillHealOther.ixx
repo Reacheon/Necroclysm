@@ -24,6 +24,7 @@ export class SkillHealOther : public SkillBehavior
 public:
 	SkillHealOther()
 	{
+		id = L"SKILL_HEAL_OTHER";
 		name = L"Heal Other";
 		iconIndex = 6;
 		descript = L"Heal target's HP. Deals damage to undead instead.";
@@ -33,8 +34,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"E";
 	}
-
-	int getSkillCode() const override { return 41; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -68,14 +67,14 @@ public:
 		if (rangeSet.empty())
 		{
 			updateLog(L"No target nearby.");
-			currentUsingSkill = -1;
+			currentUsingSkill.clear();
 			co_return;
 		}
 
 		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, L"Select target to heal");
 		co_await std::suspend_always();
 		rangeSet.clear();
-		if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
+		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
@@ -85,7 +84,7 @@ public:
 		int targetZ = wtoi(targetStr.c_str());
 
 		Entity* target = TileEntity(targetX, targetY, targetZ);
-		if (target == nullptr) { currentUsingSkill = -1; co_return; }
+		if (target == nullptr) { currentUsingSkill.clear(); co_return; }
 
 		int cost = randomRange(PIETY_COST_MIN, PIETY_COST_MAX);
 		GodService::changePiety(-cost);
@@ -103,7 +102,7 @@ public:
 		}
 
 		turnWait(1.0);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

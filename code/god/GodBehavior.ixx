@@ -69,7 +69,7 @@ public:
 
 	// ─── 스킬 부여 헬퍼 ───
 
-	// 특정 신앙도 단계에서 부여할 스킬 코드 목록
-	// key: pietyRank, value: 해당 단계에서 부여되는 skillCode 목록
-	std::map<int, std::vector<int>> rankSkills;
+	// 특정 신앙도 단계에서 부여할 스킬 ID 목록
+	// key: pietyRank, value: 해당 단계에서 부여되는 skillId 목록
+	std::map<int, std::vector<std::wstring>> rankSkills;
 };

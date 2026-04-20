@@ -47,26 +47,26 @@ void Entity::setSkillTarget(int gridX, int gridY, int gridZ)
 	skillTarget.z = gridZ;
 }
 Point3 Entity::getSkillTarget() { return skillTarget; }
-void Entity::addSkill(int skillCode)
+void Entity::addSkill(const std::wstring& skillId)
 {
-	auto* behavior = SkillRegistry::get(skillCode);
+	auto* behavior = SkillRegistry::get(skillId);
 	if (behavior)
 	{
 		prt(L"스킬 %ls를 추가했다.\n", behavior->name.c_str());
 	}
 	SkillData newSkill;
-	newSkill.skillCode = skillCode;
+	newSkill.skillId = skillId;
 	entityInfo.skillList.push_back(newSkill);
 }
 
-void Entity::removeSkill(int skillCode)
+void Entity::removeSkill(const std::wstring& skillId)
 {
 	auto& list = entityInfo.skillList;
 	auto it = std::find_if(list.begin(), list.end(),
-		[skillCode](const SkillData& sd) { return sd.skillCode == skillCode; });
+		[&skillId](const SkillData& sd) { return sd.skillId == skillId; });
 	if (it != list.end())
 	{
-		auto* behavior = SkillRegistry::get(skillCode);
+		auto* behavior = SkillRegistry::get(skillId);
 		if (behavior)
 		{
 			prt(L"스킬 %ls를 잃었다.\n", behavior->name.c_str());

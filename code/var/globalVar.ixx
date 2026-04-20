@@ -222,7 +222,7 @@ export int extraCameraLength = 0;
 export std::vector<Drawable*> extraRenderVehList;
 export std::vector<Drawable*> extraRenderEntityList;
 
-export std::array<std::pair<quickSlotFlag, int>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , -1), };
+export std::array<std::pair<quickSlotFlag, std::wstring>, 8> quickSlot = { std::pair(quickSlotFlag::NONE , std::wstring{}), };
 
 export SDL_Rect quickSlotRegion;
 export SDL_Rect minimapRegion;
@@ -242,7 +242,7 @@ export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을
 
 export bool drawHUD = true;
 
-export int currentUsingSkill = -1;
+export std::wstring currentUsingSkill = L""; //현재 사용 중인 스킬 ID. 비어있으면 미사용.
 
 export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위) | Writer: CoordSelect, Equip(propInstall), Craft | Reader: HUD_draw(타일 하이라이트)
 

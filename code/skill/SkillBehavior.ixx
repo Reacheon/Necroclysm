@@ -12,6 +12,9 @@ public:
 	virtual ~SkillBehavior() = default;
 
 	// 정적 메타데이터 (서브클래스 생성자에서 설정)
+	// 스킬 고유 ID. SkillData.skillId와 매칭. 접두어 규칙:
+	//   SKILL_xxx → GENERAL/MAGIC, BION_xxx → BIONIC, MUT_xxx → MUTATION
+	std::wstring id = L"";
 	std::wstring name = L"UNNAMED SKILL";
 	int iconIndex = 0;
 	std::wstring descript = L"";
@@ -61,9 +64,6 @@ public:
 		int rawFail = 15 * getRankDifficulty() - 5 - static_cast<int>(avgLevel * 25.0f / 6.0f);
 		return std::clamp(rawFail, 0, 100);
 	}
-
-	// 스킬 코드 (SkillData.skillCode와 매칭)
-	virtual int getSkillCode() const = 0;
 
 	// 사용 가능 여부 (쿨다운/자원과 별개로, 스킬 고유 조건)
 	virtual bool canUse(Entity* caster, const SkillData& data) const { return true; }

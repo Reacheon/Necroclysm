@@ -78,12 +78,12 @@ void GodPanel::drawGUI()
 		curY += 24;
 
 		// rankSkills를 flat한 리스트로 전개 (rank 순서대로)
-		struct SkillEntry { int skillCode; int rank; };
+		struct SkillEntry { std::wstring skillId; int rank; };
 		std::vector<SkillEntry> skillList;
-		for (auto& [rank, codes] : behavior->rankSkills)
+		for (auto& [rank, ids] : behavior->rankSkills)
 		{
-			for (int code : codes)
-				skillList.push_back({ code, rank });
+			for (const std::wstring& id : ids)
+				skillList.push_back({ id, rank });
 		}
 
 		setFont(fontType::mainFont);
@@ -99,7 +99,7 @@ void GodPanel::drawGUI()
 			int sx = px + 17 + col * colWidth;
 			int sy = curY + row * rowH;
 
-			auto* skill = SkillRegistry::get(skillList[i].skillCode);
+			auto* skill = SkillRegistry::get(skillList[i].skillId);
 			if (!skill) continue;
 
 			// 스킬 아이콘

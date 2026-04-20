@@ -10,6 +10,7 @@ import constVar;
 import textureVar;
 import Sprite;
 import paletteLoader; // PaletteTable, loadPaletteTable
+import nervedriveFilter;
 
 // source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
 // 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
@@ -164,6 +165,9 @@ export void textureLoader()
 	SDL_SetTextureScaleMode(texture::hpGaugeWhiteShadow, SDL_SCALEMODE_NEAREST);
 
 	texture::circuitInfo = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 450, 69);
+
+	// 너브드라이브 초록 틴트용 오프스크린 RT 생성
+	nervedriveFilter::init();
 
 	spr::charsetHero = new Sprite(renderer, "image/charset/baseCharset.png", 48, 48);//new Sprite(renderer, "image/charset/baseCharset.png");
 	spr::defaultMonster = new Sprite(renderer, "image/charset/zombie1.png", 48, 48);

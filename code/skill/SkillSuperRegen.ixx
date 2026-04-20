@@ -22,6 +22,7 @@ export class SkillSuperRegen : public SkillBehavior
 public:
 	SkillSuperRegen()
 	{
+		id = L"SKILL_SUPER_REGEN";
 		name = L"Divine Regeneration";
 		iconIndex = 4;
 		descript = L"Grant divine regeneration and status immunity for a period of time.";
@@ -31,8 +32,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"B";
 	}
-
-	int getSkillCode() const override { return 44; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -58,7 +57,7 @@ public:
 
 		updateLog(L"Divine energy surges through your body!");
 		turnWait(1.0);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

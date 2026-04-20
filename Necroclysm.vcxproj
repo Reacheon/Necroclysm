@@ -326,6 +326,7 @@
     <ClCompile Include="code\Light.ixx" />
     <ClCompile Include="code\log.ixx" />
     <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\nervedriveFilter.ixx" />
     <ClCompile Include="code\renderLog.ixx" />
     <ClCompile Include="code\renderTile.ixx" />
     <ClCompile Include="code\renderUI.ixx" />

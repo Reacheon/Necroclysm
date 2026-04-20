@@ -15,6 +15,7 @@ export class SkillFireStorm : public SkillBehavior
 public:
 	SkillFireStorm()
 	{
+		id = L"SKILL_FIRESTORM";
 		name = L"Firestorm";
 		iconIndex = 3;
 		descript = L"스킬 설명";
@@ -24,8 +25,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"F";
 	}
-
-	int getSkillCode() const override { return 30; }
 
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
@@ -45,7 +44,7 @@ public:
 		}
 		new CoordSelect(CoordSelectFlag::FIRESTORM, sysStr[321], coordList);
 		co_await std::suspend_always();
-		if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
+		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
@@ -56,6 +55,6 @@ public:
 
 		caster->setSkillTarget(targetX, targetY, targetZ);
 		addAniToPlayerTurn(caster, aniFlag::fireStorm);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 	}
 };

@@ -1,5 +1,7 @@
 export module constVar:names;
 
+import std;
+
 
 export namespace partType
 {
@@ -389,8 +391,9 @@ export namespace entityRefCode
 
 export namespace skillRefCode
 {
-    constexpr int roll = 32;
-    constexpr int leap = 33;
+    // 자주 비교되는 스킬 ID 상수. 직접 L"SKILL_ROLL" 같은 리터럴 대신 이걸 사용.
+    inline const std::wstring roll = L"SKILL_ROLL";
+    inline const std::wstring leap = L"SKILL_LEAP";
 }
 
 export namespace connectFlag

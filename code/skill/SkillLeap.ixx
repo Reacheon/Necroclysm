@@ -17,6 +17,7 @@ export class SkillLeap : public SkillBehavior
 public:
 	SkillLeap()
 	{
+		id = L"SKILL_LEAP";
 		name = L"Leap";
 		iconIndex = 2;
 		descript = L"Jump to any tile within 2 spaces. Consumes twice as much time as normal movement. ";
@@ -26,8 +27,6 @@ public:
 		reqProfic = { proficFlag::dodging };
 		skillRank = L"E";
 	}
-
-	int getSkillCode() const override { return 33; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -67,7 +66,7 @@ public:
 		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[320]);
 		co_await std::suspend_always();
 		rangeSet.clear();
-		if (coAnswer.empty()) { currentUsingSkill = -1; co_return; }
+		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 
 		std::wstring targetStr = coAnswer;
 		int targetX = wtoi(targetStr.substr(0, targetStr.find(L",")).c_str());
@@ -100,6 +99,6 @@ public:
 		}
 
 		addAniToPlayerTurn(caster, aniFlag::leap);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 	}
 };

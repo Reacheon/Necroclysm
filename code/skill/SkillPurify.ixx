@@ -23,6 +23,7 @@ export class SkillPurify : public SkillBehavior
 public:
 	SkillPurify()
 	{
+		id = L"SKILL_PURIFY";
 		name = L"Purify";
 		iconIndex = 8;
 		descript = L"Cure all negative status effects and grant status immunity for a short time.";
@@ -32,8 +33,6 @@ public:
 		reqProfic = { proficFlag::invocations };
 		skillRank = L"D";
 	}
-
-	int getSkillCode() const override { return 42; }
 
 	bool canUse(Entity* caster, const SkillData& data) const override
 	{
@@ -60,7 +59,7 @@ public:
 
 		updateLog(L"A purifying light cleanses your body.");
 		turnWait(1.0);
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

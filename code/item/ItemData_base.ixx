@@ -80,7 +80,7 @@ export struct ItemDataBase
     __int16 rElec = 0;
     __int16 rCorr = 0;
     __int16 rRad = 0;
-    unsigned __int16 bionicIndex = static_cast<unsigned __int16>(-1);
+    std::wstring bionicId = L"";  //바이오닉 CBM 아이템이 설치하는 스킬 ID. 비어있으면 CBM 아니다.
     __int16 durablility = 100;
     __int16 pierce = 0;
     __int16 cut = 0;

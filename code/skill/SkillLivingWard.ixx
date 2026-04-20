@@ -15,6 +15,7 @@ export class SkillLivingWard : public SkillBehavior
 public:
 	SkillLivingWard()
 	{
+		id = L"SKILL_LIVING_WARD";
 		name = L"Living Ward";
 		iconIndex = 9;
 		descript = L"A divine ward that reduces damage taken from undead, scaling with your piety.";
@@ -25,12 +26,10 @@ public:
 		skillRank = L"D";
 	}
 
-	int getSkillCode() const override { return 45; }
-
 	// 패시브 스킬이므로 execute는 빈 코루틴
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 

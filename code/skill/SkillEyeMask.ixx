@@ -16,6 +16,7 @@ export class SkillEyeMask : public SkillBehavior
 public:
 	SkillEyeMask()
 	{
+		id = L"MUT_EYE_MASK";
 		name = L"Eye Mask";
 		iconIndex = 117;
 		descript = L"";
@@ -29,11 +30,9 @@ public:
 		mutDrawPriority = 15; //주둥이(10) 위, 귀(20) 아래
 	}
 
-	int getSkillCode() const override { return 65; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

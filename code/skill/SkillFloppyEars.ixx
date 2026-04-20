@@ -15,6 +15,7 @@ export class SkillFloppyEars : public SkillBehavior
 public:
 	SkillFloppyEars()
 	{
+		id = L"MUT_FLOPPY_EARS";
 		name = L"Floppy Ears";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 20;
 	}
 
-	int getSkillCode() const override { return 58; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

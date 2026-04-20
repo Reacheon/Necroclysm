@@ -431,11 +431,16 @@ void HUD::drawGUI()
 			drawRect(pivotX + 1, pivotY + 1, 60, 32, col::lightGray);
 			drawFillRect(pivotX + 61, pivotY + 12, 6, 8, col::lightGray);
 
-			drawFillRect(pivotX + 5, pivotY + 5, 52 * 0.72, 24, lowCol::green);
+			int curEnergy = PlayerInfo().energy;
+			int maxEnergy = PlayerInfo().maxEnergy;
+			double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
+			int energyPct = static_cast<int>(energyRatio * 100.0 + 0.5);
+
+			drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(52 * energyRatio), 24, lowCol::green);
 
 			setFont(fontType::mainFontExtraBold);
 			setFontSize(18);
-			drawTextOutlineCenter(L"72%", pivotX + 31, pivotY + 16);
+			drawTextOutlineCenter(std::to_wstring(energyPct) + L"%", pivotX + 31, pivotY + 16);
 			setFont(fontType::mainFont);
 		}
 
@@ -750,7 +755,7 @@ void HUD::drawQuickSlot()
 			}
 		}
 
-		if (currentUsingSkill == -1)
+		if (currentUsingSkill.empty())
 		{
 			if (checkCursor(&quickSlotBtn[i]) && quickSlot[i].first != quickSlotFlag::NONE && getLastGUI() == this)
 			{
@@ -832,7 +837,7 @@ void HUD::drawQuickSlot()
 			{
 				for (const auto& sd : PlayerInfo().skillList)
 				{
-					if (sd.skillCode == quickSlot[i].second && sd.toggle)
+					if (sd.skillId == quickSlot[i].second && sd.toggle)
 					{
 						drawToggleSnakeEffect(pivotX + 7, pivotY + 1, 48, 48);
 						break;

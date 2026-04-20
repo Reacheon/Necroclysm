@@ -24,6 +24,7 @@ import stepEvent;
 import turnCycleLoop;
 import startArea;
 import initCoordTransform;
+import nervedriveFilter;
 #define SDL_GESTURE_IMPLEMENTATION 1
 #include "SDL_gesture.h"
 
@@ -91,9 +92,17 @@ int main(int argc, char** argv)
 		}
 
 		//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
+		// nervedriveOn이면 월드 렌더를 오프스크린 RT로 우회 → 초록 틴트 후 블릿 → 플레이어 덧그림.
+		// 비활성일 때는 아무 효과 없이 평소처럼 진행됨.
+		const bool nervedriveFilterActive = nervedriveFilter::beginWorldPass();
 		dur::renderTile = renderTile();
 		dur::renderWeather = renderWeather();
 		dur::renderSticker = renderSticker(cameraX, cameraY);
+		if (nervedriveFilterActive)
+		{
+			nervedriveFilter::endWorldPassAndBlit();
+			PlayerPtr->drawSelf();
+		}
 		dur::renderUI = renderUI();
 		dur::renderLog = renderLog(renderer);
 		dur::totalDelay = getNanoTimer() - loopStart;

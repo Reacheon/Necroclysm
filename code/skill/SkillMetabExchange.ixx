@@ -21,6 +21,7 @@ public:
 
 	SkillMetabExchange()
 	{
+		id = L"BION_METAB_EXCHANGE";
 		name = L"Metab Exchange";
 		iconIndex = 11;
 		descript = L"Converts metabolic energy into bionic power. Increases hunger over time.";
@@ -30,8 +31,6 @@ public:
 		maxCooldown = 0.0f;
 		energyPerAct = 0.0f;
 	}
-
-	int getSkillCode() const override { return 53; }
 
 	// 허기 75% 이상이면 토글 ON 불가
 	bool canUse(Entity* caster, const SkillData& data) const override
@@ -76,7 +75,7 @@ public:
 	// execute는 토글 스킬이므로 사용되지 않지만 순수가상함수 구현 필요
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

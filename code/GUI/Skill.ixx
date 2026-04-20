@@ -35,7 +35,7 @@ private:
 
 	std::vector<SkillData> filteredSkills;
 
-	int dragSkillTarget = -1;
+	std::wstring dragSkillTarget;  //드래그 중인 스킬 ID. 비어있으면 드래그 중 아님.
 public:
 	Skill();
 	~Skill();

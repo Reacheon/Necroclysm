@@ -63,8 +63,8 @@ public:
 
     void setSkillTarget(int gridX, int gridY, int gridZ);
     Point3 getSkillTarget();
-    void addSkill(int index);
-    void removeSkill(int skillCode);
+    void addSkill(const std::wstring& skillId);
+    void removeSkill(const std::wstring& skillId);
 
     unsigned __int8 getAimStack();
     void initAimStack();

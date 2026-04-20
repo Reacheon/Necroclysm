@@ -15,6 +15,7 @@ export class SkillMuzzle : public SkillBehavior
 public:
 	SkillMuzzle()
 	{
+		id = L"MUT_MUZZLE";
 		name = L"Muzzle";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 10;
 	}
 
-	int getSkillCode() const override { return 56; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };

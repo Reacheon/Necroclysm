@@ -15,6 +15,7 @@ export class SkillBushyTail : public SkillBehavior
 public:
 	SkillBushyTail()
 	{
+		id = L"MUT_BUSHY_TAIL";
 		name = L"Bushy Tail";
 		iconIndex = 117;
 		descript = L"";
@@ -28,11 +29,9 @@ public:
 		mutDrawPriority = 20;
 	}
 
-	int getSkillCode() const override { return 64; }
-
 	Corouter execute(Entity* caster, SkillData& data) override
 	{
-		currentUsingSkill = -1;
+		currentUsingSkill.clear();
 		co_return;
 	}
 };
