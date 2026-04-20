@@ -2,7 +2,7 @@
 
 Necroclysm is an open-source roguelike inspired by *Dungeon Crawl: Stone Soup* and *Cataclysm: Dark Days Ahead*.
 
-Your goal is to wander a post-apocalyptic world and collect at least three of the runes hidden across 15 branches, opening the way into the depths of the Abyss. Each additional rune lets you descend further, and gathering enough reveals the game's ending.
+Your goal is to wander a post-apocalyptic world and collect at least three of the runes hidden across 15 branches. Each rune opens the path deeper into the Abyss, and gathering enough reveals the game's ending.
 
 ## License
 
