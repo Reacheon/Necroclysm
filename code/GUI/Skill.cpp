@@ -27,8 +27,7 @@ static std::wstring getProficName(int index)
 	return L"?";
 }
 
-// 실패율에 따른 DCSS 스타일 색상 반환
-// 0%: 밝은 초록, 1-25%: 흰색, 26-50%: 노랑, 51-75%: 주황, 76-100%: 빨강
+//스킬 실패율에 따른 확률 텍스트 색상 변경
 static SDL_Color getFailColor(int failRate)
 {
 	if (failRate <= 4) return col::yellowGreen;
