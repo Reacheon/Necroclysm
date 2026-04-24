@@ -1502,13 +1502,13 @@ void drawDebug()
             dst.w = tileSize;
             dst.h = tileSize;
 
-            if (tgtX % 13 == 0) drawLine(dst.x, dst.y, dst.x, dst.y + dst.h, col::red);
-            else if (tgtX % 13 == 12)  drawLine(dst.x + dst.w, dst.y, dst.x + dst.w, dst.y + dst.h, col::red);
+            if (tgtX % CHUNK_SIZE_X == 0) drawLine(dst.x, dst.y, dst.x, dst.y + dst.h, col::red);
+            else if (tgtX % CHUNK_SIZE_X == CHUNK_SIZE_X - 1)  drawLine(dst.x + dst.w, dst.y, dst.x + dst.w, dst.y + dst.h, col::red);
 
-            if (tgtY % 13 == 0) drawLine(dst.x, dst.y, dst.x + dst.w, dst.y, col::red);
-            else if (tgtY % 13 == 12)  drawLine(dst.x, dst.y + dst.h, dst.x + dst.w, dst.y + dst.h, col::red);
+            if (tgtY % CHUNK_SIZE_Y == 0) drawLine(dst.x, dst.y, dst.x + dst.w, dst.y, col::red);
+            else if (tgtY % CHUNK_SIZE_Y == CHUNK_SIZE_Y - 1)  drawLine(dst.x, dst.y + dst.h, dst.x + dst.w, dst.y + dst.h, col::red);
 
-            if (std::abs(tgtX % 13) == 6 && std::abs(tgtY % 13) == 6)
+            if (std::abs(tgtX % CHUNK_SIZE_X) == CHUNK_SIZE_X / 2 && std::abs(tgtY % CHUNK_SIZE_Y) == CHUNK_SIZE_Y / 2)
             {
                 setFontSize(20);
 

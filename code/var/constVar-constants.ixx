@@ -7,8 +7,8 @@ export constexpr int DARK_VISION_RADIUS = 13;
 export constexpr double MAX_ZOOM = 5.0;
 export constexpr double MIN_ZOOM = 2.0;
 
-export constexpr int CHUNK_SIZE_X = 13; //청크의 x길이
-export constexpr int CHUNK_SIZE_Y = 13; //청크의 y길이
+export constexpr int CHUNK_SIZE_X = 16; //청크의 x길이 (2의 거듭제곱)
+export constexpr int CHUNK_SIZE_Y = 16; //청크의 y길이 (2의 거듭제곱)
 export constexpr int CHUNK_SIZE_Z = 1; //청크의 z길이, 현재 1로 미사용됨
 export constexpr int MAX_FONT_SIZE = 50;
 export constexpr int EX_INPUT_TEXT_MAX = 30;
@@ -18,8 +18,8 @@ export constexpr int INVENTORY_ITEM_MAX = 9;
 export constexpr int DMG_FLAG_SIZE = 3;
 export constexpr int TALENT_SIZE = 20;
 
-// 13칸이 한 청크니까 걸칠 수 있는 정도로, 차량의 왼쪽끝(코어)이 청크의 오른쪽끝 그러면... 7청크*7청크 분석해야한다.
-// ●|○○○○○○○○○○○○○|○○○○○○○○○○○○○|○○○○×××××××××|
+// 16칸이 한 청크니까 걸칠 수 있는 정도로, 차량의 왼쪽끝(코어)이 청크의 오른쪽끝 그러면... 5청크*5청크 분석해야한다.
+// ●|○○○○○○○○○○○○○○○○|○○○○○○○○○○○○○○○×|
 export constexpr int MAX_VEHICLE_SIZE = 31;
 
 

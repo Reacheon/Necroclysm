@@ -4,7 +4,6 @@ module;
 export module checkCursor;
 
 import globalVar;
-import World;
 import util;
 
 export Point2 getTouchXY()
