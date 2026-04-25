@@ -477,8 +477,9 @@ export enum class chunkFlag
     meadow,//초원
     underground,//지하
     dirt,//흙
-    //도로
-    //도시
+    city,//도시 영역 (지면 = 흙, 도로/건물은 CityGen이 오버레이)
+    bridge,//다리 (지면 = 흙, 도로는 CityGen이 오버레이)
+    portal,//도시 중심 포탈 지점 (지면 = 흙)
 };
 
 export enum class seasonFlag

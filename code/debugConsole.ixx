@@ -22,6 +22,7 @@ import GodService;
 import SkillRegistry;
 import Lst;
 import paletteLoader;
+import CityGen;
 
 export void debugConsole()
 {
@@ -66,6 +67,7 @@ export void debugConsole()
 	prt(L"33. 플레이어 눈 색상 변경\n");
 	prt(L"34. 플레이어 피부색 변경\n");
 	prt(L"35. 플레이어 성별 변경\n");
+	prt(L"36. 월드 생성 프로토타입 (현재 섹터 도시)\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -342,17 +344,83 @@ export void debugConsole()
 		int py = PlayerY();
 		int pz = PlayerZ();
 
-		int tgtGridX, tgtGridY, tgtGridZ;
-		prt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");
-		std::cin >> tgtGridX;
+		// 프리셋 정의 — 새 도시 추가 시 여기에 한 줄 추가하면 자동으로 메뉴에 노출됨
+		struct TeleportPreset
+		{
+			const wchar_t* name;
+			int x;
+			int y;
+			int z;
+		};
+		const std::array<TeleportPreset, 1> presets = { {
+			{ L"인천", 762025, -225325, 0 },
+		} };
 
-		prt(L"텔레포트할 위치의 gridY 좌표를 입력해주세요.\n");
-		std::cin >> tgtGridY;
+		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;
 
-		prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
-		std::cin >> tgtGridZ;
+		prt(L"텔레포트 모드를 선택해주세요.\n");
+		prt(L"1. 수동 좌표 입력\n");
+		prt(L"2. 프리셋 위치\n");
+		int teleMode;
+		std::cin >> teleMode;
 
-        EntityPtrMove({ px,py,pz }, { tgtGridX,tgtGridY,tgtGridZ });
+		if (teleMode == 2)
+		{
+			prt(L"프리셋 번호를 선택해주세요.\n");
+			for (int i = 0; i < (int)presets.size(); i++)
+			{
+				prt(L"%d. %ls (%d, %d, %d)\n", i + 1, presets[i].name, presets[i].x, presets[i].y, presets[i].z);
+			}
+			int psel;
+			std::cin >> psel;
+			if (psel < 1 || psel >(int)presets.size())
+			{
+				prt(L"잘못된 값을 입력하였습니다.\n");
+				break;
+			}
+			tgtGridX = presets[psel - 1].x;
+			tgtGridY = presets[psel - 1].y;
+			tgtGridZ = presets[psel - 1].z;
+		}
+		else if (teleMode == 1)
+		{
+			prt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");
+			std::cin >> tgtGridX;
+
+			prt(L"텔레포트할 위치의 gridY 좌표를 입력해주세요.\n");
+			std::cin >> tgtGridY;
+
+			prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
+			std::cin >> tgtGridZ;
+		}
+		else
+		{
+			prt(L"잘못된 값을 입력하였습니다.\n");
+			break;
+		}
+
+		// 목적지 섹터/청크 선행 생성 — 먼 좌표로 텔레포트 시 out_of_range 방지
+		Point2 tgtSec = World::ins()->changeToSectorCoord(tgtGridX, tgtGridY);
+		if (World::ins()->isEmptySector(tgtSec.x, tgtSec.y, tgtGridZ))
+		{
+			World::ins()->createSector(tgtSec.x, tgtSec.y, tgtGridZ);
+		}
+		int tgtChunkX, tgtChunkY;
+		World::ins()->changeToChunkCoord(tgtGridX, tgtGridY, tgtChunkX, tgtChunkY);
+		// 목적지 주변 3x3 청크를 미리 만들어 이동/시야 계산 안전 확보
+		for (int dy = -1; dy <= 1; dy++)
+		{
+			for (int dx = -1; dx <= 1; dx++)
+			{
+				if (World::ins()->existChunk(tgtChunkX + dx, tgtChunkY + dy, tgtGridZ) == false)
+				{
+					World::ins()->createChunk(tgtChunkX + dx, tgtChunkY + dy, tgtGridZ);
+				}
+			}
+		}
+
+		EntityPtrMove({ px,py,pz }, { tgtGridX,tgtGridY,tgtGridZ });
+		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 		break;
 	}
 	case 25://청크라인 그리기
@@ -674,6 +742,49 @@ export void debugConsole()
 
 		PlayerPtr->entityInfo.gender = genders[sel];
 		prt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
+		break;
+	}
+	case 36://월드 생성 프로토타입
+	{
+		Point2 sec = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
+		int sz = PlayerZ();
+		prt(L"[월드젠] 섹터 (%d, %d, %d) 처리 시작.\n", sec.x, sec.y, sz);
+
+		std::vector<MissingPortalCity> missing;
+		std::vector<GeneratedCity> cities = generateCitiesInSector(sec.x, sec.y, sz, missing);
+
+		// 중심 누락 도시 보고 — errorBox 발생
+		if (!missing.empty())
+		{
+			std::wstring msg = L"도시 중심(빨간 픽셀)이 없는 회색 영역 발견:\n";
+			for (const auto& m : missing)
+			{
+				int tminX = m.minPixelX * TILE_PER_PIXEL;
+				int tminY = m.minPixelY * TILE_PER_PIXEL;
+				int tmaxX = (m.maxPixelX + 1) * TILE_PER_PIXEL - 1;
+				int tmaxY = (m.maxPixelY + 1) * TILE_PER_PIXEL - 1;
+				msg += L"  픽셀 박스 (" + std::to_wstring(m.minPixelX) + L"," + std::to_wstring(m.minPixelY)
+					+ L")~(" + std::to_wstring(m.maxPixelX) + L"," + std::to_wstring(m.maxPixelY) + L")";
+				msg += L" / 타일 박스 (" + std::to_wstring(tminX) + L"," + std::to_wstring(tminY)
+					+ L")~(" + std::to_wstring(tmaxX) + L"," + std::to_wstring(tmaxY) + L")";
+				msg += L" / " + std::to_wstring(m.pixelCount) + L"픽셀\n";
+				prt(L"%ls", msg.c_str());
+			}
+			errorBox(true, msg);
+		}
+
+		// 생성 결과 출력
+		prt(L"[월드젠] %zu개 도시 생성 완료.\n", cities.size());
+		for (size_t i = 0; i < cities.size(); i++)
+		{
+			const GeneratedCity& c = cities[i];
+			prt(L"  도시 #%zu: 포탈 타일(%d, %d) 픽셀(%d, %d) / 바운드 타일(%d,%d)~(%d,%d) / %d픽셀, %d다리, %d간선, %d건물\n",
+				i + 1,
+				c.portalTile.x, c.portalTile.y,
+				c.portalPixel.x, c.portalPixel.y,
+				c.minTileX, c.minTileY, c.maxTileX, c.maxTileY,
+				c.cityPixelCount, c.bridgeCount, c.arterialCount, c.buildingCount);
+		}
 		break;
 	}
 	case 99://콘솔 출력 초기화

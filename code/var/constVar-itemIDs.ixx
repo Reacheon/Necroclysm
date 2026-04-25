@@ -7,6 +7,7 @@ export namespace itemID
     constexpr int grass = 220;
     constexpr int blackAsphalt = 296;
     constexpr int yellowAsphalt = 377;
+    constexpr int whiteAsphalt = 562;
 
     constexpr int railRL = 320;
     constexpr int railTB = 321;
@@ -241,4 +242,33 @@ export namespace itemID
     constexpr int bra = 558;
     constexpr int panties = 559;
     constexpr int briefs = 560;
+    constexpr int concreteWall = 561;
+
+    ///////////////////////나무//////////////////////
+
+    constexpr int oakTree = 115;
+    constexpr int mapleTree = 116;
+    constexpr int spruceTree = 117;
+    constexpr int birchTree = 236;
+    constexpr int cherryTree = 237;
+    constexpr int pineTree = 238;
+    constexpr int ginkgoTree = 239;
+    constexpr int jungleTree = 240;
+    constexpr int umbrellaAcaciaTree = 241;
+    constexpr int palmTree = 242;
+    constexpr int bamboo = 243;
+    constexpr int appleTree = 244;
+    constexpr int orangeTree = 245;
+    constexpr int persimmonTree = 246;
+    constexpr int lemonTree = 247;
+    constexpr int peachTree = 248;
+    constexpr int dogwoodTree = 249;
+    constexpr int pearTree = 250;
+    constexpr int juniperTree = 251;
+    constexpr int magnoliaTree = 252;
+    constexpr int bananaTree = 253;
+    constexpr int willowTree = 254;
+
+    constexpr int treeStump = 282;
+    constexpr int paver = 563;
 };

@@ -46,6 +46,9 @@
     <Filter Include="소스 파일\05_Class\03_World">
       <UniqueIdentifier>{302ba4a0-09e0-4217-9d85-316efabc0e2f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\03_World\ProcGen">
+      <UniqueIdentifier>{8f3a1b6e-2c4d-4e5f-9a8b-1c2d3e4f5a6b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="소스 파일\05_Class\02_Item">
       <UniqueIdentifier>{aa20156a-2393-4ab1-89d8-d62b7c3faf01}</UniqueIdentifier>
     </Filter>
@@ -567,8 +570,47 @@
     <ClCompile Include="code\world\Chunk.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\world\Mapmaker.ixx">
+    <ClCompile Include="code\world\SectorBiome.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\BuildingTemplate.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\WorldLandmark.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen_Common.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen_PixelGrid.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen_RoadPlan.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen_Paint.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityGen_Lots.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityPlan.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityPlan_RoadProfile.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityPlan_Builder.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityPlan_LaneMap.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\procgen\CityPlan_Renderer.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>
     <ClCompile Include="code\var\globalVar.ixx">
       <Filter>소스 파일\00_var</Filter>

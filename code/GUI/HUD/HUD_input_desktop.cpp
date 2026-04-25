@@ -20,6 +20,7 @@ import ItemData;
 import ItemPocket;
 import SystemMenu;
 import debugConsole;
+import Map;
 
 static bool btnPressed = false;
 
@@ -274,6 +275,10 @@ void HUD::keyUpGUI()
 		break;
 	case SDLK_GRAVE:
 		debugConsole();
+		break;
+	case SDLK_M:
+		// 이미 열려있으면 아무 것도 안 함 (중복 생성 방지). 닫기는 Tab으로 처리됨
+		if (Map::ins() == nullptr) new Map();
 		break;
 	case SDLK_ESCAPE:
 		new SystemMenu();

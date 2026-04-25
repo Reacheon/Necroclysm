@@ -27,7 +27,12 @@ export constexpr int CHUNK_LOADING_RANGE = 5;
 export constexpr int MINIMAP_DIAMETER = 41; //미니맵의 지름 (홀수)
 export constexpr int NAVIMAP_WIDTH = 99;//167;
 export constexpr int NAVIMAP_HEIGHT = 58;//99;
-export constexpr int SECTOR_SIZE = 400; // 절차적 맵 생성할 때 작용하는 범위
+// 월드 생성 좌표계 (완전 디커플링 — 픽셀과 청크는 무관)
+// 섹터 PNG는 400x400 픽셀, 픽셀 하나당 50타일이 실세계 영역을 표현
+// 1섹터 = 400*50 = 20000타일 변길이 = 20000/16 = 1250청크 변길이
+export constexpr int TILE_PER_PIXEL = 50;     // 픽셀 1칸이 표현하는 타일 길이
+export constexpr int PIXEL_PER_SECTOR = 400;  // 섹터 PNG 한 변의 픽셀 수
+export constexpr int TILE_PER_SECTOR = TILE_PER_PIXEL * PIXEL_PER_SECTOR; // 20000
 export constexpr int TOLERANCE_LSTICK = 10000; //LStick이 이 값을 넘어야 판정이 일어남
 export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 이벤트가 일어나지 않음
 

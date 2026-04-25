@@ -6,7 +6,7 @@ export module World;
 import std;
 import util;
 import Chunk;
-import Mapmaker;
+import SectorBiome;
 import constVar;
 import TileData;
 
@@ -23,6 +23,7 @@ private:
 	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
 	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
+	std::unordered_map<Point3, std::unique_ptr<SectorBiome>, Point3::Hash> sectorBiomeMap;
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
 
@@ -85,8 +86,24 @@ public:
 		chunkFlag inputFlag = chunkFlag::seawater;
 		if (chunkZ > 0) inputFlag = chunkFlag::none;
 		else if (chunkZ < 0) inputFlag = chunkFlag::underground;
-
-		if (Mapmaker::ins()->isEmptyProphecy(chunkX, chunkY, chunkZ) == false) inputFlag = Mapmaker::ins()->getProphecy(chunkX, chunkY, chunkZ);
+		else
+		{
+			// z=0: 섹터 바이옴 맵에서 청크 중심 픽셀의 바이옴 조회
+			int centerTileX = chunkX * CHUNK_SIZE_X + CHUNK_SIZE_X / 2;
+			int centerTileY = chunkY * CHUNK_SIZE_Y + CHUNK_SIZE_Y / 2;
+			int sx = sectorFromTile(centerTileX);
+			int sy = sectorFromTile(centerTileY);
+			auto it = sectorBiomeMap.find({ sx, sy, chunkZ });
+			if (it != sectorBiomeMap.end())
+			{
+				int localTileX = centerTileX - sx * TILE_PER_SECTOR;
+				int localTileY = centerTileY - sy * TILE_PER_SECTOR;
+				int localPxX = localTileX / TILE_PER_PIXEL;
+				int localPxY = localTileY / TILE_PER_PIXEL;
+				chunkFlag f = it->second->get(localPxX, localPxY);
+				if (f != chunkFlag::none) inputFlag = f;
+			}
+		}
 
 		chunkPtr[{chunkX, chunkY, chunkZ}] = std::make_unique<Chunk>(inputFlag);
 	}
@@ -193,29 +210,10 @@ public:
 	}
 
 	//섹터 관련
+	// 타일 좌표를 섹터 좌표로 직접 변환 (1섹터 = TILE_PER_SECTOR = 20000타일)
 	Point2 changeToSectorCoord(int inputGridX, int inputGridY)
 	{
-		//-1200 ~ -801 : -3
-		//-800 ~ -401 : -2
-		//-400~ -1 : -1
-		//0~399 : 0
-		//400~799 : 1
-		//800~1199 : 2
-
-		int sectorX, sectorY;
-		int chunkX, chunkY;
-
-		//그리드 좌표를 청크로 변환
-		changeToChunkCoord(inputGridX, inputGridY, chunkX, chunkY);
-
-		//청크 좌표를 섹터 좌표로 변환
-		if (chunkX > 0) sectorX = chunkX / SECTOR_SIZE;
-		else sectorX = (chunkX + 1) / SECTOR_SIZE - 1;
-
-		if (chunkY > 0) sectorY = chunkY / SECTOR_SIZE;
-		else sectorY = (chunkY + 1) / SECTOR_SIZE - 1;
-
-		return { sectorX,sectorY };
+		return { sectorFromTile(inputGridX), sectorFromTile(inputGridY) };
 	}
 
 	bool isEmptySector(int sectorX, int sectorY, int sectorZ)
@@ -225,6 +223,31 @@ public:
 	}
 
 	void createSector(int sectorX, int sectorY, int sectorZ);
+
+	// 섹터 바이옴 맵 소유 이전/조회 (월드젠 계층이 주입)
+	void setSectorBiome(int sectorX, int sectorY, int sectorZ, std::unique_ptr<SectorBiome> biome)
+	{
+		sectorBiomeMap[{ sectorX, sectorY, sectorZ }] = std::move(biome);
+	}
+	const SectorBiome* getSectorBiome(int sectorX, int sectorY, int sectorZ) const
+	{
+		auto it = sectorBiomeMap.find({ sectorX, sectorY, sectorZ });
+		return (it == sectorBiomeMap.end()) ? nullptr : it->second.get();
+	}
+
+	// 임의 타일 좌표에서 바이옴 조회 (미니맵/GUI 등에서 사용)
+	chunkFlag queryBiomeAtTile(int tileX, int tileY, int z) const
+	{
+		int sx = sectorFromTile(tileX);
+		int sy = sectorFromTile(tileY);
+		auto it = sectorBiomeMap.find({ sx, sy, z });
+		if (it == sectorBiomeMap.end()) return chunkFlag::none;
+		int localTileX = tileX - sx * TILE_PER_SECTOR;
+		int localTileY = tileY - sy * TILE_PER_SECTOR;
+		int localPxX = localTileX / TILE_PER_PIXEL;
+		int localPxY = localTileY / TILE_PER_PIXEL;
+		return it->second->get(localPxX, localPxY);
+	}
 
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{

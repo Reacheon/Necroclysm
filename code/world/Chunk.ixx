@@ -39,10 +39,15 @@ public:
 		switch (inputChunk)
 		{
 		case chunkFlag::seawater:    floorVal = itemID::deepSeaWater; break;
+		case chunkFlag::freshwater:  floorVal = itemID::deepFreshWater; break;
 		case chunkFlag::none:        floorVal = 0; break;
 		case chunkFlag::underground: floorVal = 109; wallVal = 302; break;
 		case chunkFlag::meadow:      floorVal = 220; break;
 		case chunkFlag::dirt:        floorVal = 109; break;
+		// 도시/다리/포탈은 지면 자체는 흙 — CityGen이 도로/건물을 위에 덮어씀
+		case chunkFlag::city:        floorVal = 109; break;
+		case chunkFlag::bridge:      floorVal = 109; break;
+		case chunkFlag::portal:      floorVal = 109; break;
 		default: break;
 		}
 

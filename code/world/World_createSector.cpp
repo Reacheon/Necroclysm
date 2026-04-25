@@ -5,13 +5,17 @@ module World;
 
 import std;
 import util;
-import Mapmaker;
+import SectorBiome;
 import constVar;
 
+// 섹터 PNG를 로드해 픽셀별 바이옴을 SectorBiome에 채움
+// 1픽셀 = 50타일. 청크와는 완전 분리
+// 도시/도로/건물 등의 세부 생성은 별도(디버그 커맨드에서 트리거)로 수행
 void World::createSector(int sectorX, int sectorY, int sectorZ)
 {
 	if (sectorZ == 0)
 	{
+		// 섹터 범위 체크: 기존 PNG 라인업 보존
 		if ((sectorY <= 26 && sectorY >= -27) && (sectorX <= 53 && sectorX >= -54))
 		{
 			std::string filePath = "map/worldSector-";
@@ -20,15 +24,12 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 			filePath += std::to_string(number);
 			filePath += ".png";
 			std::wstring wPath(filePath.begin(), filePath.end());
-			//std::wprintf(L"[World] Sector : %ls의 파일을 읽어내었다.\n", wPath.c_str());
+
 			SDL_Surface* refSector = IMG_Load(filePath.c_str());
 
-			if (!refSector)   // 디버깅: 로드 실패 이유 출력
+			if (!refSector)
 			{
-				// SDL_GetError() → std::string → std::wstring
 				std::wstring sdlErr = stringToWstring(std::string(SDL_GetError()));
-
-				// 실행 중의 작업 디렉터리 (char→wstring)
 				std::wstring cwd = std::filesystem::current_path().wstring();
 
 				std::wstring msg =
@@ -37,55 +38,50 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 					L"\n  시도한 경로   : " + wPath +
 					L"\n  현재 CWD      : " + cwd + L'\n';
 
-				prt(L"%ls", msg.c_str());               // 콘솔/디버그 출력
+				prt(L"%ls", msg.c_str());
 			}
 
-			errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :" + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
+			errorBox(refSector == NULL, L"섹터의 파일 읽기가 실패하였습니다. :"
+				+ std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY) + L"," + std::to_wstring(sectorZ));
+
 			Uint32* pixels = (Uint32*)refSector->pixels;
 
+			auto biome = std::make_unique<SectorBiome>();
 
-			for (int x = 0; x < 400; x++)
-			{
-				for (int y = 0; y < 400; y++)
+			auto isSameCol = [](SDL_Color col1, SDL_Color col2) -> bool
 				{
-					chunkFlag targetFlag = chunkFlag::none;
+					return col1.r == col2.r && col1.g == col2.g && col1.b == col2.b;
+				};
 
-					Uint32 pixel = pixels[(y * refSector->w) + x];
+			// 다리 색상 (#777777) — 색상 상수에 없어서 로컬 정의
+			constexpr SDL_Color bridgeCol = { 0x77, 0x77, 0x77, 0xFF };
+			constexpr SDL_Color portalCol = { 0xFF, 0x00, 0x00, 0xFF };
+
+			for (int px = 0; px < PIXEL_PER_SECTOR; px++)
+			{
+				for (int py = 0; py < PIXEL_PER_SECTOR; py++)
+				{
+					Uint32 pixel = pixels[(py * refSector->w) + px];
 					SDL_Color pixelCol;
 					SDL_GetRGB(pixel,
 						SDL_GetPixelFormatDetails(refSector->format),
 						SDL_GetSurfacePalette(refSector),
 						&pixelCol.r, &pixelCol.g, &pixelCol.b);
 
-					auto isSameCol = [](SDL_Color col1, SDL_Color col2)->bool
-						{
-							if (col1.r == col2.r)
-							{
-								if (col1.g == col2.g)
-								{
-									if (col1.b == col2.b)
-									{
-										return true;
-									}
-								}
-							}
+					chunkFlag targetFlag = chunkFlag::none;
 
-							return false;
-						};
+					if      (isSameCol(pixelCol, chunkCol::seawater)) targetFlag = chunkFlag::seawater;
+					else if (isSameCol(pixelCol, chunkCol::land))     targetFlag = chunkFlag::dirt;
+					else if (isSameCol(pixelCol, chunkCol::city))     targetFlag = chunkFlag::city;
+					else if (isSameCol(pixelCol, chunkCol::river))    targetFlag = chunkFlag::freshwater;
+					else if (isSameCol(pixelCol, bridgeCol))          targetFlag = chunkFlag::bridge;
+					else if (isSameCol(pixelCol, portalCol))          targetFlag = chunkFlag::portal;
 
-					if (isSameCol(pixelCol, chunkCol::seawater)) targetFlag = chunkFlag::seawater;
-					else if (isSameCol(pixelCol, chunkCol::land)) targetFlag = chunkFlag::dirt;
-					else if (isSameCol(pixelCol, chunkCol::city)) targetFlag = chunkFlag::dirt;
-					else if (isSameCol(pixelCol, chunkCol::river)) targetFlag = chunkFlag::seawater;
-
-					//섹터 좌표로 청크 좌표 구하기
-					int chunkOriginX, chunkOriginY;
-					chunkOriginX = 400 * sectorX;
-					chunkOriginY = 400 * sectorY;
-
-					Mapmaker::ins()->addProphecy(chunkOriginX + x, chunkOriginY + y, sectorZ, targetFlag);
+					biome->set(px, py, targetFlag);
 				}
 			}
+
+			sectorBiomeMap[{ sectorX, sectorY, sectorZ }] = std::move(biome);
 
 			SDL_DestroySurface(refSector);
 		}

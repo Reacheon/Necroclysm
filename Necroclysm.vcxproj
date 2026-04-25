@@ -386,11 +386,24 @@
     <ClCompile Include="code\Wake.ixx" />
     <ClCompile Include="code\Wave.ixx" />
     <ClCompile Include="code\world\Chunk.ixx" />
-    <ClCompile Include="code\world\Mapmaker.ixx" />
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
     <ClCompile Include="code\world\World_tile.cpp" />
     <ClCompile Include="code\world\World_createSector.cpp" />
+    <ClCompile Include="code\world\SectorBiome.ixx" />
+    <ClCompile Include="code\world\procgen\BuildingTemplate.ixx" />
+    <ClCompile Include="code\world\procgen\WorldLandmark.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen_Common.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen_PixelGrid.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen_RoadPlan.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen_Paint.ixx" />
+    <ClCompile Include="code\world\procgen\CityGen_Lots.ixx" />
+    <ClCompile Include="code\world\procgen\CityPlan.ixx" />
+    <ClCompile Include="code\world\procgen\CityPlan_RoadProfile.ixx" />
+    <ClCompile Include="code\world\procgen\CityPlan_Builder.ixx" />
+    <ClCompile Include="code\world\procgen\CityPlan_LaneMap.ixx" />
+    <ClCompile Include="code\world\procgen\CityPlan_Renderer.ixx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />
