@@ -141,14 +141,7 @@ export void startArea()
 				setFloor({ dx,dy,0 }, itemID::grass);
 			}
 		}
-		for (int dx = -6; dx >= -14; dx--)
-		{
-			for (int dy = -30; dy <= 30; dy++)
-			{
-				if (dx == -10 && ((dy + 30) % 6 < 3)) setFloor({ dx,dy,0 }, itemID::yellowAsphalt); //노랑아스팔트
-				else setFloor({ dx,dy,0 }, itemID::blackAsphalt); //검정아스팔트
-			}
-		}
+
 
 		//집 바닥 타일
 		for (int dx = 0; dx < 5; dx++)
@@ -833,7 +826,7 @@ export void startArea()
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	int vX = -8;
+	int vX = -9;
 	int vY = +3;
 	Vehicle* myCar = World::ins()->createVehicle(vX, vY, 0, itemID::metalFrame);//차량 설치
 	myCar->name = L"SUV";
@@ -1091,13 +1084,163 @@ export void startArea()
 			}
 		}
 
-		// 도로 다시 설정 (기존 도로를 위로 1칸 이동)
-		for (int dx = -6; dx >= -14; dx--)
+		// 수직 도로
+		// 기본 4차선 도로
+		// 너비 15칸
+		for (int dx = -6; dx >= -20; dx--)
 		{
-			for (int dy = -31; dy <= 29; dy++)
+			for (int dy = -60; dy <= 29; dy++)
 			{
-				if (dx == -10 && ((dy + 31) % 6 < 3)) setFloor({ dx, dy, 0 }, itemID::yellowAsphalt);
+				if (dx == -13 && ((((dy + 21) % 6) + 6) % 6 < 3)) setFloor({ dx, dy, 0 }, itemID::yellowAsphalt);
 				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
+			}
+		}
+
+		// 수평 도로
+		// 기본 4차선 도로
+		// 너비 15칸
+		for (int dy = -36; dy <= -22; dy++)
+		{
+			for (int dx = -32; dx <= 32; dx++)
+			{
+				bool inIntersection = (dx >= -20 && dx <= -6);
+				bool isYellow = false;
+				if (!inIntersection && dy == -29)
+				{
+					if (dx < -20)     isYellow = (((-21 - dx) % 6 + 6) % 6) < 3;
+					else isYellow = (((dx + 5) % 6 + 6) % 6) < 3;
+				}
+				if (isYellow) setFloor({ dx, dy, 0 }, itemID::yellowAsphalt);
+				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
+			}
+		}
+
+		{
+			//setFloor({ -20, -21, 0 }, itemID::whiteAsphaltArrowR);
+			//setFloor({ -20, -21 + 2, 0 }, itemID::whiteAsphaltArrowR);
+
+
+			for (int i = 0; i < 7; i++)
+			{
+				setFloor({ -19 + 2*i, -21, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -21 + 1, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -21 + 2, 0 }, itemID::whiteAsphalt);
+			}
+
+
+
+			//setFloor({ -6, -18, 0 }, itemID::whiteAsphaltArrowL);
+			//setFloor({ -6, -18 + 2, 0 }, itemID::whiteAsphaltArrowL);
+
+			for (int i = 0; i < 8; i++)
+			{
+				setFloor({ -6-2*i, -18, 0 }, itemID::whiteAsphalt);
+				setFloor({ -6 - 2 * i, -18 + 1, 0 }, itemID::whiteAsphalt);
+				setFloor({ -6 - 2 * i, -18 + 2, 0 }, itemID::whiteAsphalt);
+			}
+
+			//북쪽 횡단보도
+			for (int i = 0; i < 7; i++)
+			{
+				setFloor({ -19 + 2 * i, -37, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -38, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -39, 0 }, itemID::whiteAsphalt);
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				setFloor({ -6 - 2 * i, -40, 0 }, itemID::whiteAsphalt);
+				setFloor({ -6 - 2 * i, -41, 0 }, itemID::whiteAsphalt);
+				setFloor({ -6 - 2 * i, -42, 0 }, itemID::whiteAsphalt);
+			}
+
+			//동쪽 횡단보도
+			for (int i = 0; i < 7; i++)
+			{
+				int y = -35 + 2 * i;
+				setFloor({ -5, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -4, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -3, y, 0 }, itemID::whiteAsphalt);
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				int y = -22 - 2 * i;
+				setFloor({ -2, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -1, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ 0, y, 0 }, itemID::whiteAsphalt);
+			}
+
+			//서쪽 횡단보도
+			for (int i = 0; i < 7; i++)
+			{
+				int y = -35 + 2 * i;
+				setFloor({ -21, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -22, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -23, y, 0 }, itemID::whiteAsphalt);
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				int y = -22 - 2 * i;
+				setFloor({ -24, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -25, y, 0 }, itemID::whiteAsphalt);
+				setFloor({ -26, y, 0 }, itemID::whiteAsphalt);
+			}
+			
+			// 1. [대각선 횡단보도] 좌하단에서 중앙으로
+			for (int i = 0; i < 4; i++)
+			{
+				int pivotX = -20 + i;
+				int pivotY = -33 + i;
+				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltTopQuarter);
+				setFloor({ pivotX, pivotY - 1, 0 }, itemID::whiteAsphaltDiagLR);
+				setFloor({ pivotX + 1, pivotY - 1, 0 }, itemID::whiteAsphaltDiagUL);
+				setFloor({ pivotX + 1, pivotY - 2, 0 }, itemID::whiteAsphaltDiagLR);
+				setFloor({ pivotX + 2, pivotY - 2, 0 }, itemID::whiteAsphaltDiagUL);
+				setFloor({ pivotX + 2, pivotY - 3, 0 }, itemID::whiteAsphaltDiagLR);
+				setFloor({ pivotX + 3, pivotY - 3, 0 }, itemID::whiteAsphaltLeftQuarter);
+			}
+
+			// 2. [대각선 횡단보도] 우상단에서 중앙으로
+			for (int i = 0; i < 4; i++)
+			{
+				int pivotX = -6 - i;
+				int pivotY = -25 - i;
+
+				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltBottomQuarter);
+				setFloor({ pivotX, pivotY + 1, 0 }, itemID::whiteAsphaltDiagUL);
+				setFloor({ pivotX - 1, pivotY + 1, 0 }, itemID::whiteAsphaltDiagLR);
+				setFloor({ pivotX - 1, pivotY + 2, 0 }, itemID::whiteAsphaltDiagUL);
+				setFloor({ pivotX - 2, pivotY + 2, 0 }, itemID::whiteAsphaltDiagLR);
+				setFloor({ pivotX - 2, pivotY + 3, 0 }, itemID::whiteAsphaltDiagUL);
+				setFloor({ pivotX - 3, pivotY + 3, 0 }, itemID::whiteAsphaltRightQuarter);
+			}
+
+			// 3. [대각선 횡단보도] 좌상단에서 중앙으로
+			for (int i = 0; i < 4; i++)
+			{
+				int pivotX = -20 + i;
+				int pivotY = -25 - i;
+				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltBottomQuarter);
+				setFloor({ pivotX, pivotY + 1, 0 }, itemID::whiteAsphaltDiagUR);
+				setFloor({ pivotX + 1, pivotY + 1, 0 }, itemID::whiteAsphaltDiagLL);
+				setFloor({ pivotX + 1, pivotY + 2, 0 }, itemID::whiteAsphaltDiagUR);
+				setFloor({ pivotX + 2, pivotY + 2, 0 }, itemID::whiteAsphaltDiagLL);
+				setFloor({ pivotX + 2, pivotY + 3, 0 }, itemID::whiteAsphaltDiagUR);
+				setFloor({ pivotX + 3, pivotY + 3, 0 }, itemID::whiteAsphaltLeftQuarter);
+			}
+
+			// 4. [대각선 횡단보도] 우하단에서 중앙으로
+			for (int i = 0; i < 4; i++)
+			{
+				int pivotX = -6 - i;
+				int pivotY = -33 + i;
+
+				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltTopQuarter);
+				setFloor({ pivotX, pivotY - 1, 0 }, itemID::whiteAsphaltDiagLL);
+				setFloor({ pivotX - 1, pivotY - 1, 0 }, itemID::whiteAsphaltDiagUR);
+				setFloor({ pivotX - 1, pivotY - 2, 0 }, itemID::whiteAsphaltDiagLL);
+				setFloor({ pivotX - 2, pivotY - 2, 0 }, itemID::whiteAsphaltDiagUR);
+				setFloor({ pivotX - 2, pivotY - 3, 0 }, itemID::whiteAsphaltDiagLL);
+				setFloor({ pivotX - 3, pivotY - 3, 0 }, itemID::whiteAsphaltRightQuarter);
 			}
 		}
 

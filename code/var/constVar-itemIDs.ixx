@@ -287,6 +287,12 @@ export namespace itemID
     constexpr int whiteAsphaltDiagUR     = 570;  //     (\-cut, upper-right filled)
     constexpr int whiteAsphaltDiagLL     = 571;  //     (\-cut, lower-left filled)
 
+    // ── White Asphalt 쿼터(1/4) 채움 — 가운데 1/4 사각형만 흰색, 가는 횡단보도용 ──
+    constexpr int whiteAsphaltRightQuarter  = 596;  // ▕  (우측 쿼터만 채움)
+    constexpr int whiteAsphaltTopQuarter    = 597;  // ▔  (상단 쿼터만 채움)
+    constexpr int whiteAsphaltLeftQuarter   = 598;  // ▏  (좌측 쿼터만 채움)
+    constexpr int whiteAsphaltBottomQuarter = 599;  // ▁  (하단 쿼터만 채움)
+
     // ── White Asphalt 화살표 (8방향) ──
     constexpr int whiteAsphaltArrowR  = 572;  // →
     constexpr int whiteAsphaltArrowUR = 573;  // ↗
