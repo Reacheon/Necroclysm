@@ -22,7 +22,6 @@ import GodService;
 import SkillRegistry;
 import Lst;
 import paletteLoader;
-import CityGen;
 
 export void debugConsole()
 {
@@ -353,7 +352,7 @@ export void debugConsole()
 			int z;
 		};
 		const std::array<TeleportPreset, 1> presets = { {
-			{ L"인천", 762025, -225325, 0 },
+			{ L"SEOUL", 762025, -225325, 0 },
 		} };
 
 		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;
@@ -749,42 +748,6 @@ export void debugConsole()
 		Point2 sec = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
 		int sz = PlayerZ();
 		prt(L"[월드젠] 섹터 (%d, %d, %d) 처리 시작.\n", sec.x, sec.y, sz);
-
-		std::vector<MissingPortalCity> missing;
-		std::vector<GeneratedCity> cities = generateCitiesInSector(sec.x, sec.y, sz, missing);
-
-		// 중심 누락 도시 보고 — errorBox 발생
-		if (!missing.empty())
-		{
-			std::wstring msg = L"도시 중심(빨간 픽셀)이 없는 회색 영역 발견:\n";
-			for (const auto& m : missing)
-			{
-				int tminX = m.minPixelX * TILE_PER_PIXEL;
-				int tminY = m.minPixelY * TILE_PER_PIXEL;
-				int tmaxX = (m.maxPixelX + 1) * TILE_PER_PIXEL - 1;
-				int tmaxY = (m.maxPixelY + 1) * TILE_PER_PIXEL - 1;
-				msg += L"  픽셀 박스 (" + std::to_wstring(m.minPixelX) + L"," + std::to_wstring(m.minPixelY)
-					+ L")~(" + std::to_wstring(m.maxPixelX) + L"," + std::to_wstring(m.maxPixelY) + L")";
-				msg += L" / 타일 박스 (" + std::to_wstring(tminX) + L"," + std::to_wstring(tminY)
-					+ L")~(" + std::to_wstring(tmaxX) + L"," + std::to_wstring(tmaxY) + L")";
-				msg += L" / " + std::to_wstring(m.pixelCount) + L"픽셀\n";
-				prt(L"%ls", msg.c_str());
-			}
-			errorBox(true, msg);
-		}
-
-		// 생성 결과 출력
-		prt(L"[월드젠] %zu개 도시 생성 완료.\n", cities.size());
-		for (size_t i = 0; i < cities.size(); i++)
-		{
-			const GeneratedCity& c = cities[i];
-			prt(L"  도시 #%zu: 포탈 타일(%d, %d) 픽셀(%d, %d) / 바운드 타일(%d,%d)~(%d,%d) / %d픽셀, %d다리, %d간선, %d건물\n",
-				i + 1,
-				c.portalTile.x, c.portalTile.y,
-				c.portalPixel.x, c.portalPixel.y,
-				c.minTileX, c.minTileY, c.maxTileX, c.maxTileY,
-				c.cityPixelCount, c.bridgeCount, c.arterialCount, c.buildingCount);
-		}
 		break;
 	}
 	case 99://콘솔 출력 초기화

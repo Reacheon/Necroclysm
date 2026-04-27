@@ -262,7 +262,7 @@ export namespace itemID
     constexpr int persimmonTree = 246;
     constexpr int lemonTree = 247;
     constexpr int peachTree = 248;
-    constexpr int dogwoodTree = 249;
+    constexpr int figTree = 249;
     constexpr int pearTree = 250;
     constexpr int juniperTree = 251;
     constexpr int magnoliaTree = 252;
@@ -271,4 +271,49 @@ export namespace itemID
 
     constexpr int treeStump = 282;
     constexpr int paver = 563;
+
+    ///////////////////////아스팔트 변형 (페인트용 절반·대각·화살표) //////////////////////
+    //   whiteAsphalt(562) / yellowAsphalt(377) 의 시각 변형 타일들. 도로 페인팅에서
+    //   직사각/대각 줄무늬, 차선 화살표 등을 표현. 색상은 베이스와 동일 — Map.ixx
+    //   floorOverlay 가 베이스 색으로 동일 처리.
+
+    // ── White Asphalt 절반 채움 (4면 axis + 4 대각) ──
+    constexpr int whiteAsphaltLeftHalf   = 564;  // ◧
+    constexpr int whiteAsphaltRightHalf  = 565;  // ◨
+    constexpr int whiteAsphaltTopHalf    = 566;  // ⬒
+    constexpr int whiteAsphaltBottomHalf = 567;  // ⬓
+    constexpr int whiteAsphaltDiagUL     = 568;  // ◩  (/-cut, upper-left filled)
+    constexpr int whiteAsphaltDiagLR     = 569;  // ◪  (/-cut, lower-right filled)
+    constexpr int whiteAsphaltDiagUR     = 570;  //     (\-cut, upper-right filled)
+    constexpr int whiteAsphaltDiagLL     = 571;  //     (\-cut, lower-left filled)
+
+    // ── White Asphalt 화살표 (8방향) ──
+    constexpr int whiteAsphaltArrowR  = 572;  // →
+    constexpr int whiteAsphaltArrowUR = 573;  // ↗
+    constexpr int whiteAsphaltArrowU  = 574;  // ↑
+    constexpr int whiteAsphaltArrowUL = 575;  // ↖
+    constexpr int whiteAsphaltArrowL  = 576;  // ←
+    constexpr int whiteAsphaltArrowLL = 577;  // ↙
+    constexpr int whiteAsphaltArrowD  = 578;  // ↓
+    constexpr int whiteAsphaltArrowLR = 579;  // ↘
+
+    // ── Yellow Asphalt 절반 채움 ──
+    constexpr int yellowAsphaltLeftHalf   = 580;  // ◧
+    constexpr int yellowAsphaltRightHalf  = 581;  // ◨
+    constexpr int yellowAsphaltTopHalf    = 582;  // ⬒
+    constexpr int yellowAsphaltBottomHalf = 583;  // ⬓
+    constexpr int yellowAsphaltDiagUL     = 584;  // ◩
+    constexpr int yellowAsphaltDiagLR     = 585;  // ◪
+    constexpr int yellowAsphaltDiagUR     = 586;  //     (\-cut, UR filled)
+    constexpr int yellowAsphaltDiagLL     = 587;  //     (\-cut, LL filled)
+
+    // ── Yellow Asphalt 화살표 ──
+    constexpr int yellowAsphaltArrowR  = 588;  // →
+    constexpr int yellowAsphaltArrowUR = 589;  // ↗
+    constexpr int yellowAsphaltArrowU  = 590;  // ↑
+    constexpr int yellowAsphaltArrowUL = 591;  // ↖
+    constexpr int yellowAsphaltArrowL  = 592;  // ←
+    constexpr int yellowAsphaltArrowLL = 593;  // ↙
+    constexpr int yellowAsphaltArrowD  = 594;  // ↓
+    constexpr int yellowAsphaltArrowLR = 595;  // ↘
 };

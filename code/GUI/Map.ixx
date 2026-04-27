@@ -16,8 +16,6 @@ import Player;
 import World;
 import SectorBiome;
 import TileData;
-import BuildingTemplate;
-import WorldLandmark;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
@@ -28,7 +26,7 @@ import WorldLandmark;
 //     §3  텍스처 캐시        — SectorBiomeTextureCache, ChunkTextureCache
 //     §4  데이터 로딩        — SectorAutoLoader (PNG 바이옴 백그라운드 로드)
 //     §5  렌더링 계층        — drawBiomeLayer, drawChunkOverlay,
-//                              drawLandmarkLabels, drawPlayerMarker
+//                              drawPlayerMarker
 //     §6  UI 크롬             — drawCoordPanel, drawZoomPanel, drawTabButton,
 //                              drawLoadingPanel
 //     §7  Map 클래스         — 입력 처리 + 레이아웃 합성
@@ -55,9 +53,6 @@ namespace mapcfg
 
     // 청크 디테일 오버레이 표시 임계 줌
     inline constexpr double CHUNK_OVERLAY_MIN_ZOOM = 0.25;
-
-    // 랜드마크 라벨 표시 임계 줌
-    inline constexpr double LANDMARK_MIN_ZOOM      = 0.30;
 
     // 마우스 휠 한 칸당 줌 배율
     inline constexpr double WHEEL_ZOOM_FACTOR      = 1.18;
@@ -95,23 +90,34 @@ namespace mappal
     }
 
     // 청크 floor 오버레이 색. nullopt 면 바이옴 색 유지.
+    //   dirt 는 의도적으로 미오버레이 — 도시 안의 dirt 는 "비페인트 잔여
+    //   영역"(건물 내부/vacant lot 등) 이라 덮어쓰면 거대한 갈색 사각형이
+    //   떠보인다. 도시/황무지 바이옴이 비치게 두는 게 가독성에 더 좋음.
+    //   포탈 픽셀(50타일) 안에서만 red 가 비치는데, 그건 포탈 위치 표시.
     inline std::optional<SDL_Color> floorOverlay(int floorId)
     {
         if (floorId == itemID::blackAsphalt)  return SDL_Color{  90,  92,  95, 255 };
         if (floorId == itemID::yellowAsphalt) return SDL_Color{ 220, 200,  90, 255 };
         if (floorId == itemID::whiteAsphalt)  return SDL_Color{ 235, 235, 235, 255 };
+        // White Asphalt 변형 16종(564~579) → 베이스 흰색 동일 처리.
+        //   세부 형태(절반/대각/화살표)는 월드맵 줌에서 1px 이하라 무의미.
+        if (floorId >= itemID::whiteAsphaltLeftHalf && floorId <= itemID::whiteAsphaltArrowLR)
+            return SDL_Color{ 235, 235, 235, 255 };
+        // Yellow Asphalt 변형 16종(580~595) → 베이스 노란색 동일 처리.
+        if (floorId >= itemID::yellowAsphaltLeftHalf && floorId <= itemID::yellowAsphaltArrowLR)
+            return SDL_Color{ 220, 200,  90, 255 };
         if (floorId == itemID::paver)         return SDL_Color{ 200, 200, 195, 255 };
+        if (floorId == itemID::grass)         return SDL_Color{ 150, 175, 110, 255 };
         return std::nullopt;
     }
+
+    // prop(가로수/표지판/소품) 이 있는 타일의 오버레이.
+    //   wallOverlay 와 같은 톤이지만 약간 더 옅게 — 벽과 시각 구분.
+    inline SDL_Color propOverlay() { return {  95,  95,  85, 255 }; }
 
     inline SDL_Color wallOverlay()  { return {  60,  60,  62, 255 }; }
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
-
-    // 라벨
-    inline SDL_Color labelText()    { return {  35,  35,  35, 255 }; }
-    inline SDL_Color labelBg()      { return { 245, 240, 230, 235 }; }
-    inline SDL_Color labelStroke()  { return { 110, 105,  95, 255 }; }
 
     // UI 크롬
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
@@ -300,6 +306,11 @@ private:
                     SDL_Color c = mappal::wallOverlay();
                     row[lx] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
                 }
+                else if (td.PropPtr != nullptr)
+                {
+                    SDL_Color c = mappal::propOverlay();
+                    row[lx] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
+                }
                 else if (auto fc = mappal::floorOverlay(td.floor))
                     row[lx] = SDL_MapRGBA(fmt, nullptr, fc->r, fc->g, fc->b, fc->a);
                 else
@@ -339,7 +350,7 @@ private:
 // §4  데이터 로딩 (PNG 바이옴 자동 로드)
 // ════════════════════════════════════════════════════════════════════════
 
-// 가시 영역의 미로드 섹터를 PNG 만 로드 (CityGen 미트리거 — 안전).
+// 가시 영역의 미로드 섹터를 PNG 만 로드.
 //   프레임당 한도 (FRAME_BUDGET_SECTOR_LOAD) 로 휠 스파이크 방지.
 //   pendingCount() 로 아직 로드 안 된 섹터 수 조회 → 스피너 트리거.
 class SectorAutoLoader
@@ -456,65 +467,7 @@ static void drawChunkOverlay(const MapView& v)
     }
 }
 
-// (3) 라벨 — 단일 박스 그리기 도우미
-static void drawLabelBox(int sx, int sy, const std::wstring& text)
-{
-    int textW = queryTextWidth(text);
-    constexpr int textH = 13, padX = 5, padY = 2;
-    SDL_Rect bg{ sx - textW / 2 - padX, sy - textH / 2 - padY, textW + 2 * padX, textH + 2 * padY };
-    drawFillRect(bg, mappal::labelBg());
-    drawRect(bg, mappal::labelStroke());
-    drawTextCenter(text, sx, sy, mappal::labelText());
-}
-
-// (3) 랜드마크 라벨 — 가시 + 줌 + 건물 크기 임계값 모두 통과한 것만
-static void drawLandmarkLabels(const MapView& v)
-{
-    if (v.pxPerTile < mapcfg::LANDMARK_MIN_ZOOM) return;
-
-    double minTX, minTY, maxTX, maxTY;
-    v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
-
-    int minTXi = (int)std::floor(minTX) - 64;
-    int minTYi = (int)std::floor(minTY) - 64;
-    int maxTXi = (int)std::ceil (maxTX) + 64;
-    int maxTYi = (int)std::ceil (maxTY) + 64;
-
-    setFontSize(11);
-
-    // 라벨 겹침 방지 — 단순 AABB 검사
-    std::vector<SDL_Rect> placed;
-    placed.reserve(64);
-
-    LandmarkRegistry::ins().forEachIn(minTXi, minTYi, maxTXi, maxTYi, v.z,
-        [&](const Landmark& lm)
-        {
-            if (lm.name.empty()) return;
-
-            int minDim = std::min(lm.w, lm.h);
-            int screenSize = (int)(minDim * v.pxPerTile);
-            if (screenSize < 22) return;  // 화면상 너무 작은 건물은 스킵
-
-            double centerTX = lm.tileX + lm.w * 0.5;
-            double centerTY = lm.tileY + lm.h * 0.5;
-            int sx = (int)std::round(v.screenXFromTileX(centerTX));
-            int sy = (int)std::round(v.screenYFromTileY(centerTY));
-
-            int tw = queryTextWidth(lm.name);
-            SDL_Rect myBox{ sx - tw / 2 - 5, sy - 13 / 2 - 2, tw + 10, 17 };
-
-            for (const auto& p : placed)
-            {
-                if (myBox.x < p.x + p.w && myBox.x + myBox.w > p.x &&
-                    myBox.y < p.y + p.h && myBox.y + myBox.h > p.y) return;
-            }
-            placed.push_back(myBox);
-
-            drawLabelBox(sx, sy, lm.name);
-        });
-}
-
-// (4) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
+// (3) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
 static void drawPlayerMarker(const MapView& v)
 {
     double sxd = v.screenXFromTileX(PlayerX());
@@ -804,14 +757,13 @@ public:
         SectorBiomeTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_SECTORS);
         ChunkTextureCache     ::ins().resetFrame(mapcfg::FRAME_BUDGET_CHUNKS);
 
-        // 가시 미로드 섹터 자동 로드 (PNG 만, CityGen 미트리거)
+        // 가시 미로드 섹터 자동 로드 (PNG 만)
         int sectorsLoadPending = SectorAutoLoader::loadVisible(view);
 
         // ── 렌더 ──
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
         drawBiomeLayer    (view);  // 내부에서 cache.getOrBuild 호출 (budget 안에서 빌드)
         drawChunkOverlay  (view);
-        drawLandmarkLabels(view);
         drawPlayerMarker  (view);
 
         drawCoordPanel();
