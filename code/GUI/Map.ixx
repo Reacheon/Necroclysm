@@ -19,24 +19,8 @@ import TileData;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
-//
-//   파일 구성 (위→아래)
-//     §1  설정/팔레트       — mapcfg, mappal
-//     §2  카메라             — MapView
-//     §3  텍스처 캐시        — SectorBiomeTextureCache, ChunkTextureCache
-//     §4  데이터 로딩        — SectorAutoLoader (PNG 바이옴 백그라운드 로드)
-//     §5  렌더링 계층        — drawBiomeLayer, drawChunkOverlay,
-//                              drawPlayerMarker
-//     §6  UI 크롬             — drawCoordPanel, drawZoomPanel, drawTabButton,
-//                              drawLoadingPanel
-//     §7  Map 클래스         — 입력 처리 + 레이아웃 합성
-//
-//   디자인 원칙
-//     · 게으른 빌드 (lazy build): Map 열릴 때 일괄 빌드 ❌. 매 프레임
-//       프레임-budget 만큼만 점진 빌드. 사용자는 점차 채워지는 시각 피드백.
-//     · 영속 캐시: Map 닫혀도 텍스처 유지 → 다시 열어도 즉시 풀 디테일.
-//     · 명시적 진행 표시: 미완 빌드가 있는 동안 우하단에 로딩 스피너.
-//     · 단일 스레드 안전: 모든 SDL 호출은 메인 스레드. 멀티스레드 미사용.
+//   §1 설정/팔레트  §2 카메라  §3 텍스처 캐시  §4 데이터 로딩
+//   §5 렌더링       §6 UI 크롬  §7 Map 클래스
 // ════════════════════════════════════════════════════════════════════════
 
 
@@ -46,22 +30,21 @@ import TileData;
 
 namespace mapcfg
 {
-    // 줌 한계 — pxPerTile = 스크린 픽셀 / 월드 타일
-    inline constexpr double MIN_PX_PER_TILE      = 0.04;  // 1 sector px ≈ 2 screen px
-    inline constexpr double MAX_PX_PER_TILE      = 6.0;   // 1 tile = 6 screen px
-    inline constexpr double DEFAULT_PX_PER_TILE  = 0.6;
+    // 픽셀 퍼펙트 줌 레벨 — pxPerTile = 스크린 픽셀 / 월드 타일.
+    //   조건1: 50*pxPerTile 가 정수 → 섹터 텍스처 (1 sector px = 50 tiles) 가
+    //          모든 화면 픽셀에 정수 비율로 매핑 → 띠/뭉개짐 없음.
+    //   조건2: pxPerTile 가 ≥1 일 때 정수 → 16px 타일 스프라이트가 모든
+    //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
+    inline constexpr double ZOOM_LEVELS[] = {
+        0.04, 0.06, 0.08, 0.10, 0.12, 0.16, 0.20, 0.24, 0.32, 0.40,
+        0.50, 0.60, 0.80, 1.0,  2.0,  3.0,  4.0,  5.0,  6.0
+    };
+    inline constexpr int    ZOOM_LEVEL_COUNT   = (int)(sizeof(ZOOM_LEVELS) / sizeof(ZOOM_LEVELS[0]));
+    inline constexpr int    DEFAULT_ZOOM_LEVEL = 11;  // 0.60
+    inline constexpr double DEFAULT_PX_PER_TILE = ZOOM_LEVELS[DEFAULT_ZOOM_LEVEL];
 
-    // 청크 디테일 오버레이 표시 임계 줌
-    inline constexpr double CHUNK_OVERLAY_MIN_ZOOM = 0.25;
-
-    // 마우스 휠 한 칸당 줌 배율
-    inline constexpr double WHEEL_ZOOM_FACTOR      = 1.18;
-
-    // 프레임당 신규 빌드 한도 (영속 캐시이므로 첫 방문 영역에만 쓰임).
-    //   값을 키우면 더 빠르게 채워지지만 프레임 시간 증가.
-    //   현재 값: 60fps 한 프레임(≈16ms) 안에 안전히 들어갈 정도.
+    // 프레임당 신규 텍스처 빌드 한도 (영속 캐시 — 첫 방문 영역에만 쓰임).
     inline constexpr int FRAME_BUDGET_SECTORS = 2;     // 섹터 1개 ≈ 5~8ms
-    inline constexpr int FRAME_BUDGET_CHUNKS  = 32;    // 청크 1개 ≈ 0.2ms
 
     // 가시 미로드 섹터 자동 로드 한도
     inline constexpr int FRAME_BUDGET_SECTOR_LOAD = 2;
@@ -89,33 +72,6 @@ namespace mappal
         }
     }
 
-    // 청크 floor 오버레이 색. nullopt 면 바이옴 색 유지.
-    //   dirt 는 의도적으로 미오버레이 — 도시 안의 dirt 는 "비페인트 잔여
-    //   영역"(건물 내부/vacant lot 등) 이라 덮어쓰면 거대한 갈색 사각형이
-    //   떠보인다. 도시/황무지 바이옴이 비치게 두는 게 가독성에 더 좋음.
-    //   포탈 픽셀(50타일) 안에서만 red 가 비치는데, 그건 포탈 위치 표시.
-    inline std::optional<SDL_Color> floorOverlay(int floorId)
-    {
-        if (floorId == itemID::blackAsphalt)  return SDL_Color{  90,  92,  95, 255 };
-        if (floorId == itemID::yellowAsphalt) return SDL_Color{ 220, 200,  90, 255 };
-        if (floorId == itemID::whiteAsphalt)  return SDL_Color{ 235, 235, 235, 255 };
-        // White Asphalt 변형 16종(564~579) → 베이스 흰색 동일 처리.
-        //   세부 형태(절반/대각/화살표)는 월드맵 줌에서 1px 이하라 무의미.
-        if (floorId >= itemID::whiteAsphaltLeftHalf && floorId <= itemID::whiteAsphaltArrowLR)
-            return SDL_Color{ 235, 235, 235, 255 };
-        // Yellow Asphalt 변형 16종(580~595) → 베이스 노란색 동일 처리.
-        if (floorId >= itemID::yellowAsphaltLeftHalf && floorId <= itemID::yellowAsphaltArrowLR)
-            return SDL_Color{ 220, 200,  90, 255 };
-        if (floorId == itemID::paver)         return SDL_Color{ 200, 200, 195, 255 };
-        if (floorId == itemID::grass)         return SDL_Color{ 150, 175, 110, 255 };
-        return std::nullopt;
-    }
-
-    // prop(가로수/표지판/소품) 이 있는 타일의 오버레이.
-    //   wallOverlay 와 같은 톤이지만 약간 더 옅게 — 벽과 시각 구분.
-    inline SDL_Color propOverlay() { return {  95,  95,  85, 255 }; }
-
-    inline SDL_Color wallOverlay()  { return {  60,  60,  62, 255 }; }
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
 
@@ -154,11 +110,27 @@ struct MapView
         maxTY = tileYFromScreenY(viewH);
     }
 
-    void zoomAround(int anchorScreenX, int anchorScreenY, double factor)
+    // 현재 pxPerTile 에 가장 가까운 ZOOM_LEVELS 인덱스 (로그 거리 — 비례 척도).
+    int currentZoomLevel() const
     {
+        int best = 0;
+        double bestDiff = std::numeric_limits<double>::infinity();
+        double cur = std::log(pxPerTile);
+        for (int i = 0; i < mapcfg::ZOOM_LEVEL_COUNT; i++)
+        {
+            double d = std::abs(cur - std::log(mapcfg::ZOOM_LEVELS[i]));
+            if (d < bestDiff) { bestDiff = d; best = i; }
+        }
+        return best;
+    }
+
+    // 이산 줌 — delta 만큼 레벨 이동 후 anchor 화면 위치 고정.
+    void zoomAround(int anchorScreenX, int anchorScreenY, int delta)
+    {
+        int level = std::clamp(currentZoomLevel() + delta, 0, mapcfg::ZOOM_LEVEL_COUNT - 1);
         double anchorTX = tileXFromScreenX(anchorScreenX);
         double anchorTY = tileYFromScreenY(anchorScreenY);
-        pxPerTile = std::clamp(pxPerTile * factor, mapcfg::MIN_PX_PER_TILE, mapcfg::MAX_PX_PER_TILE);
+        pxPerTile = mapcfg::ZOOM_LEVELS[level];
         centerTileX = anchorTX + (viewW * 0.5 - anchorScreenX) / pxPerTile;
         centerTileY = anchorTY + (viewH * 0.5 - anchorScreenY) / pxPerTile;
     }
@@ -168,14 +140,11 @@ struct MapView
 // ════════════════════════════════════════════════════════════════════════
 // §3  텍스처 캐시
 //
-//   두 캐시는 같은 인터페이스 패턴을 따름:
-//     resetFrame(budget) — 매 프레임 시작에 호출. budget 한도 + 카운터 초기화.
-//     getOrBuild(key)    — hit 시 즉시 반환. miss 면 budget 소진까지 빌드 시도.
-//                          budget 0 이면 nullptr + pendingThisFrame() 증가.
-//                          underlying data 부재면 nullptr (pending 카운트 안 함).
-//     pendingThisFrame() — 이번 프레임에 budget 부족으로 미룬 빌드 수.
-//                          → 0 보다 크면 로딩 진행 중.
-//     clear()            — 모든 텍스처 파괴 (월드 리셋 등).
+//   resetFrame(budget) — 매 프레임 시작 호출. budget + pending 카운터 초기화.
+//   getOrBuild(key)    — hit 즉시 반환. miss 시 budget 안에서 빌드, 0 이면
+//                        nullptr + pending++. 데이터 부재 시 nullptr (pending X).
+//   pendingThisFrame() — 이번 프레임 budget 부족으로 미룬 빌드 수.
+//   clear()            — 모든 텍스처 파괴 (월드 리셋 등).
 // ════════════════════════════════════════════════════════════════════════
 
 // 섹터 한 장 = PIXEL_PER_SECTOR × PIXEL_PER_SECTOR 텍스처 (1 px = 1 sector pixel).
@@ -251,108 +220,13 @@ private:
     int pending_ = 0;
 };
 
-// 청크 한 칸 = CHUNK_SIZE_X × CHUNK_SIZE_Y 텍스처 (1 px = 1 tile).
-//   투명 픽셀 → 바이옴 베이스가 비쳐 보임 (BLEND 모드).
-class ChunkTextureCache
-{
-public:
-    static ChunkTextureCache& ins() { static ChunkTextureCache c; return c; }
-
-    void resetFrame(int budget) { budget_ = budget; pending_ = 0; }
-    int  pendingThisFrame() const { return pending_; }
-
-    SDL_Texture* getOrBuild(int cx, int cy, int cz)
-    {
-        Key k{ cx, cy, cz };
-        if (auto it = textures_.find(k); it != textures_.end()) return it->second;
-
-        if (!World::ins()->existChunk(cx, cy, cz)) return nullptr;  // 데이터 부재
-
-        if (budget_ <= 0) { pending_++; return nullptr; }
-
-        SDL_Texture* tex = build(cx, cy, cz);
-        if (!tex) return nullptr;
-        textures_[k] = tex;
-        budget_--;
-        return tex;
-    }
-
-    void clear()
-    {
-        for (auto& [k, t] : textures_) if (t) SDL_DestroyTexture(t);
-        textures_.clear();
-    }
-
-private:
-    static SDL_Texture* build(int cx, int cy, int cz)
-    {
-        SDL_Surface* surf = SDL_CreateSurface(CHUNK_SIZE_X, CHUNK_SIZE_Y, SDL_PIXELFORMAT_RGBA32);
-        if (!surf) return nullptr;
-
-        SDL_LockSurface(surf);
-        const SDL_PixelFormatDetails* fmt = SDL_GetPixelFormatDetails(surf->format);
-        const std::uint32_t transparent = SDL_MapRGBA(fmt, nullptr, 0, 0, 0, 0);
-
-        int originTX = cx * CHUNK_SIZE_X;
-        int originTY = cy * CHUNK_SIZE_Y;
-        for (int ly = 0; ly < CHUNK_SIZE_Y; ly++)
-        {
-            std::uint32_t* row = (std::uint32_t*)((std::uint8_t*)surf->pixels + ly * surf->pitch);
-            for (int lx = 0; lx < CHUNK_SIZE_X; lx++)
-            {
-                const TileData& td = World::ins()->getTile(originTX + lx, originTY + ly, cz);
-                if (td.wall != 0)
-                {
-                    SDL_Color c = mappal::wallOverlay();
-                    row[lx] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
-                }
-                else if (td.PropPtr != nullptr)
-                {
-                    SDL_Color c = mappal::propOverlay();
-                    row[lx] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
-                }
-                else if (auto fc = mappal::floorOverlay(td.floor))
-                    row[lx] = SDL_MapRGBA(fmt, nullptr, fc->r, fc->g, fc->b, fc->a);
-                else
-                    row[lx] = transparent;
-            }
-        }
-        SDL_UnlockSurface(surf);
-
-        SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
-        SDL_DestroySurface(surf);
-        if (tex)
-        {
-            SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
-            SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-        }
-        return tex;
-    }
-
-    struct Key { int cx, cy, cz; bool operator==(const Key&) const = default; };
-    struct KeyHash
-    {
-        std::size_t operator()(const Key& k) const noexcept
-        {
-            std::size_t h = (std::size_t)(k.cx + 65536) * 1000003ull;
-            h ^= (std::size_t)(k.cy + 65536) * 65537ull;
-            h ^= (std::size_t)(k.cz + 8) * 31ull;
-            return h;
-        }
-    };
-    std::unordered_map<Key, SDL_Texture*, KeyHash> textures_;
-    int budget_  = 0;
-    int pending_ = 0;
-};
-
 
 // ════════════════════════════════════════════════════════════════════════
 // §4  데이터 로딩 (PNG 바이옴 자동 로드)
 // ════════════════════════════════════════════════════════════════════════
 
-// 가시 영역의 미로드 섹터를 PNG 만 로드.
-//   프레임당 한도 (FRAME_BUDGET_SECTOR_LOAD) 로 휠 스파이크 방지.
-//   pendingCount() 로 아직 로드 안 된 섹터 수 조회 → 스피너 트리거.
+// 가시 영역의 미로드 섹터를 PNG 만 로드. 프레임당 한도로 휠 스파이크 방지.
+//   loadVisible() 의 반환값 = 아직 로드 안 된 섹터 수 → 스피너 트리거.
 class SectorAutoLoader
 {
 public:
@@ -393,9 +267,6 @@ public:
 
 // ════════════════════════════════════════════════════════════════════════
 // §5  렌더링 계층
-//
-//   각 함수는 MapView 만 받아 화면에 그림. 모듈 내부 자유함수.
-//   layer 그리기 도중 cache.getOrBuild 가 호출되며, budget 안에서 빌드.
 // ════════════════════════════════════════════════════════════════════════
 
 // (1) 바이옴 베이스 — 가시 섹터 텍스처를 적절히 스케일해 blit
@@ -431,40 +302,131 @@ static void drawBiomeLayer(const MapView& v)
     }
 }
 
-// (2) 청크 디테일 오버레이 — 가시 청크 텍스처를 blit (충분한 줌일 때만)
-static void drawChunkOverlay(const MapView& v)
+// (2) 타일 스프라이트 레이어 — 생성된 청크의 floor / wall 을 spr::tileset 으로 직접 그림.
+//   SDL_RenderGeometry 직접 사용: drawSpriteBatchCenter 는 위치를 Point2(int) 로
+//   받아 정수 픽셀에 스냅 → 분수 줌에서 누적 트런케이션 드리프트로 ~1/frac
+//   타일마다 1 px 갭 발생. 여기서는 모서리 4개 모두 screenXFromTileX/(Y) 로
+//   직접 도출해 인접 타일 quad 가 비트 동일한 float 경계를 공유 → 갭 X.
+namespace
 {
-    if (v.pxPerTile < mapcfg::CHUNK_OVERLAY_MIN_ZOOM) return;
+    struct TileBatchEntry { float left, top, right, bottom; int sprIdx; };
 
+    inline void flushTileBatch(TileBatchEntry* entries, int count)
+    {
+        if (count <= 0) return;
+
+        SDL_Texture* tex = spr::tileset->getTexture();
+        float texW, texH;
+        SDL_GetTextureSize(tex, &texW, &texH);
+
+        const int   srcSize = spr::tileset->getW();           // 16
+        const float uW      = (float)srcSize / texW;
+        const float vH      = (float)srcSize / texH;
+        const int   atlasW  = (int)texW;
+
+        // atlas bleeding 방지 — UV 를 0.5 텍셀 안쪽으로 inset 해서 샘플이 항상
+        //   픽셀 중심을 향하게 함. 분수 줌에서 옆 스프라이트의 첫 텍셀이 새는
+        //   것 (예: 화면 가로로 한 줄 초록 띠) 차단.
+        const float insetU = 0.5f / texW;
+        const float insetV = 0.5f / texH;
+
+        static SDL_Vertex vertices[MAX_BATCH * 4];
+        static int        indices [MAX_BATCH * 6];
+        const SDL_FColor white = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+        for (int i = 0; i < count; i++)
+        {
+            const int sprIdx = entries[i].sprIdx;
+            const float u  = (float)((srcSize * sprIdx) % atlasW) / texW;
+            const float vY = (float)(srcSize * ((srcSize * sprIdx) / atlasW)) / texH;
+
+            const float u0 = u + insetU,        u1 = u + uW - insetU;
+            const float v0 = vY + insetV,       v1 = vY + vH - insetV;
+
+            const float l = entries[i].left;
+            const float t = entries[i].top;
+            const float r = entries[i].right;
+            const float b = entries[i].bottom;
+
+            const int vBase = i * 4;
+            vertices[vBase    ] = { { l, t }, white, { u0, v0 } };
+            vertices[vBase + 1] = { { r, t }, white, { u1, v0 } };
+            vertices[vBase + 2] = { { r, b }, white, { u1, v1 } };
+            vertices[vBase + 3] = { { l, b }, white, { u0, v1 } };
+
+            const int iBase = i * 6;
+            indices[iBase    ] = vBase;
+            indices[iBase + 1] = vBase + 1;
+            indices[iBase + 2] = vBase + 2;
+            indices[iBase + 3] = vBase;
+            indices[iBase + 4] = vBase + 2;
+            indices[iBase + 5] = vBase + 3;
+        }
+
+        SDL_RenderGeometry(renderer, tex, vertices, count * 4, indices, count * 6);
+    }
+}
+
+static void drawTileSpriteLayer(const MapView& v)
+{
     double minTX, minTY, maxTX, maxTY;
     v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
 
-    int minCX = (int)std::floor(minTX / CHUNK_SIZE_X);
-    int minCY = (int)std::floor(minTY / CHUNK_SIZE_Y);
-    int maxCX = (int)std::ceil (maxTX / CHUNK_SIZE_X);
-    int maxCY = (int)std::ceil (maxTY / CHUNK_SIZE_Y);
+    static thread_local TileBatchEntry batch[MAX_BATCH];
+    int count = 0;
 
-    double chunkScreenW = (double)CHUNK_SIZE_X * v.pxPerTile;
-    double chunkScreenH = (double)CHUNK_SIZE_Y * v.pxPerTile;
-
-    for (int cy = minCY; cy <= maxCY; cy++)
+    auto flush  = [&]() { flushTileBatch(batch, count); count = 0; };
+    auto submit = [&](int sprIdx, int tx, int ty)
     {
-        for (int cx = minCX; cx <= maxCX; cx++)
-        {
-            SDL_Texture* tex = ChunkTextureCache::ins().getOrBuild(cx, cy, v.z);
-            if (!tex) continue;  // 미빌드 → 다음 프레임에 채워짐 (바이옴이 비침)
+        if (count >= MAX_BATCH) flush();
+        // 인접 타일이 비트 동일한 float 경계를 공유하도록 모서리를 직접 도출.
+        //   (tx+1) 호출은 다음 타일의 left 와 비트 동일 (같은 함수, 같은 입력).
+        batch[count].left   = (float)v.screenXFromTileX((double)tx);
+        batch[count].top    = (float)v.screenYFromTileY((double)ty);
+        batch[count].right  = (float)v.screenXFromTileX((double)(tx + 1));
+        batch[count].bottom = (float)v.screenYFromTileY((double)(ty + 1));
+        batch[count].sprIdx = sprIdx;
+        count++;
+    };
 
-            double dstX = v.screenXFromTileX((double)cx * CHUNK_SIZE_X);
-            double dstY = v.screenYFromTileY((double)cy * CHUNK_SIZE_Y);
-            SDL_FRect dst{
-                (float)std::floor(dstX),
-                (float)std::floor(dstY),
-                (float)std::ceil(chunkScreenW) + 1.0f,
-                (float)std::ceil(chunkScreenH) + 1.0f
-            };
-            SDL_RenderTexture(renderer, tex, nullptr, &dst);
+    World::ins()->forEachChunkAtZ(v.z, [&](int cx, int cy)
+    {
+        // 청크 바운딩으로 가시 컬링
+        double tx0 = (double)cx * CHUNK_SIZE_X;
+        double ty0 = (double)cy * CHUNK_SIZE_Y;
+        if (tx0 + CHUNK_SIZE_X < minTX || tx0 > maxTX) return;
+        if (ty0 + CHUNK_SIZE_Y < minTY || ty0 > maxTY) return;
+
+        for (int ly = 0; ly < CHUNK_SIZE_Y; ly++)
+        {
+            for (int lx = 0; lx < CHUNK_SIZE_X; lx++)
+            {
+                int tx = (int)tx0 + lx;
+                int ty = (int)ty0 + ly;
+                const TileData& td = World::ins()->getTile(tx, ty, v.z);
+
+                int floorId = td.floor;
+                if (floorId != 0)
+                {
+                    int sprIdx = itemDex[floorId].tileSprIndex
+                               + itemDex[floorId].extraSprIndexSingle
+                               + 16 * itemDex[floorId].extraSprIndex16;
+                    submit(sprIdx, tx, ty);
+                }
+
+                int wallId = td.wall;
+                if (wallId != 0)
+                {
+                    int sprIdx = itemDex[wallId].tileSprIndex
+                               + itemDex[wallId].extraSprIndexSingle
+                               + 16 * itemDex[wallId].extraSprIndex16;
+                    submit(sprIdx, tx, ty);
+                }
+            }
         }
-    }
+    });
+
+    flush();
 }
 
 // (3) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
@@ -596,7 +558,6 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
 }
 
 // 우상단 Tab 버튼 — HUD::drawTab 의 tabFlag::back 케이스 재현
-//   알파 220 으로 좌측 패널들과 톤 일치, 베이스 색은 uiPanel 과 동일.
 static void drawTabButton()
 {
     SDL_Color btnColor = mappal::uiPanel();
@@ -617,18 +578,15 @@ static void drawTabButton()
         tab.x + 164, tab.y + 8);
 }
 
-// 우하단 로딩 패널 — 스피너 + 진행 카운트.
-//   pending 합계가 0 이면 호출자가 그리지 않음 (이 함수는 항상 그리는 것을 가정).
+// 우하단 로딩 패널 — 스피너 + 진행 카운트. pending 0 이면 호출자가 스킵.
 struct LoadingStats
 {
     int sectorsLoading    = 0;  // PNG 바이옴 미로드 (자동 로드 대기)
     int sectorsBuilding   = 0;  // 바이옴 텍스처 빌드 대기
-    int chunksBuilding    = 0;  // 청크 오버레이 텍스처 빌드 대기
-    int total() const { return sectorsLoading + sectorsBuilding + chunksBuilding; }
+    int total() const { return sectorsLoading + sectorsBuilding; }
 };
 
-// 12개 사각 픽셀이 원형으로 배치, 시간에 따라 밝기가 회전 (혜성 트레일).
-//   12개로 늘려 팔각형 느낌 제거 + 충분한 반지름 + 정사각 픽셀로 깔끔하게.
+// 12개 사각 픽셀이 원형 배치, 시간에 따라 밝기 회전 (혜성 트레일).
 static void drawLoadingSpinner(int cx, int cy)
 {
     constexpr int    N        = 12;
@@ -688,13 +646,12 @@ private:
     MapView view;
 
     // 드래그 상태
-    bool   dragging = false;
-    bool   dragMoved = false;
+    bool   dragging        = false;
+    bool   dragMoved       = false;
     double dragAnchorTileX = 0.0;
     double dragAnchorTileY = 0.0;
 
-    // 줌은 Map 인스턴스 수명을 넘어 유지 (텍스처 캐시 영속과 동일 철학).
-    // 센터/Z 는 매 열기마다 플레이어 기준으로 리셋.
+    // 줌은 Map 인스턴스 수명 넘어 영속. 센터/Z 는 매 열기마다 플레이어 기준으로 리셋.
     inline static double persistedPxPerTile = mapcfg::DEFAULT_PX_PER_TILE;
 
 public:
@@ -721,7 +678,7 @@ public:
                     World::ins()->createSector(sx, sy, PlayerZ());
             }
 
-        // 텍스처 캐시는 영속 — clear() 안 함. 다시 열어도 즉시 풀 디테일.
+        // 텍스처 캐시 영속 — clear() 안 함. 다시 열어도 즉시 풀 디테일.
 
         deactInput();
         deactDraw();
@@ -753,28 +710,26 @@ public:
         view.viewW = cameraW;
         view.viewH = cameraH;
 
-        // ── 매 프레임 작업 예산 초기화 ──
+        // 매 프레임 작업 예산 초기화
         SectorBiomeTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_SECTORS);
-        ChunkTextureCache     ::ins().resetFrame(mapcfg::FRAME_BUDGET_CHUNKS);
 
         // 가시 미로드 섹터 자동 로드 (PNG 만)
         int sectorsLoadPending = SectorAutoLoader::loadVisible(view);
 
-        // ── 렌더 ──
+        // 렌더
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
-        drawBiomeLayer    (view);  // 내부에서 cache.getOrBuild 호출 (budget 안에서 빌드)
-        drawChunkOverlay  (view);
-        drawPlayerMarker  (view);
+        drawBiomeLayer       (view);  // 내부에서 cache.getOrBuild → budget 안에서 빌드
+        drawTileSpriteLayer  (view);
+        drawPlayerMarker     (view);
 
         drawCoordPanel();
         drawZoomPanel(view, computeZoomButtons());
         drawTabButton();
 
-        // ── 진행 표시 — 이 프레임에 budget 부족으로 미룬 작업이 있으면 ──
+        // 진행 표시 — 이번 프레임 budget 부족으로 미룬 작업이 있으면
         LoadingStats stats{
             sectorsLoadPending,
-            SectorBiomeTextureCache::ins().pendingThisFrame(),
-            ChunkTextureCache     ::ins().pendingThisFrame()
+            SectorBiomeTextureCache::ins().pendingThisFrame()
         };
         if (stats.total() > 0) drawLoadingPanel(stats);
     }
@@ -816,14 +771,12 @@ public:
         ZoomButtons zb = computeZoomButtons();
         if (checkCursor(&zb.zoomIn))
         {
-            view.zoomAround(view.viewW / 2, view.viewH / 2,
-                mapcfg::WHEEL_ZOOM_FACTOR * mapcfg::WHEEL_ZOOM_FACTOR);
+            view.zoomAround(view.viewW / 2, view.viewH / 2, +2);
             return;
         }
         if (checkCursor(&zb.zoomOut))
         {
-            view.zoomAround(view.viewW / 2, view.viewH / 2,
-                1.0 / (mapcfg::WHEEL_ZOOM_FACTOR * mapcfg::WHEEL_ZOOM_FACTOR));
+            view.zoomAround(view.viewW / 2, view.viewH / 2, -2);
             return;
         }
         if (checkCursor(&zb.home))
@@ -838,9 +791,9 @@ public:
     {
         if (getStateInput() == false) return;
         if (event.wheel.y > 0)
-            view.zoomAround((int)getMouseX(), (int)getMouseY(), mapcfg::WHEEL_ZOOM_FACTOR);
+            view.zoomAround((int)getMouseX(), (int)getMouseY(), +1);
         else if (event.wheel.y < 0)
-            view.zoomAround((int)getMouseX(), (int)getMouseY(), 1.0 / mapcfg::WHEEL_ZOOM_FACTOR);
+            view.zoomAround((int)getMouseX(), (int)getMouseY(), -1);
     }
 
     void keyDownGUI() override

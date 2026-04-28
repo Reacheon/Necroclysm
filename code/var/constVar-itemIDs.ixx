@@ -303,6 +303,9 @@ export namespace itemID
     constexpr int whiteAsphaltArrowD  = 578;  // ↓
     constexpr int whiteAsphaltArrowLR = 579;  // ↘
 
+    constexpr int whiteAsphaltBowtiePattern = 600; //▶◀
+    constexpr int whiteAsphaltHourglassPattern = 601; //⧗
+
     // ── Yellow Asphalt 절반 채움 ──
     constexpr int yellowAsphaltLeftHalf   = 580;  // ◧
     constexpr int yellowAsphaltRightHalf  = 581;  // ◨

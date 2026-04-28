@@ -112,6 +112,14 @@ public:
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
 		else return false;
 	}
+	// 주어진 z 의 모든 생성 청크 좌표를 콜백. 가시 그리드 스캔 대신
+	//   생성된 청크만 순회할 때 사용 (월드맵에서 줌아웃 시 비용 폭주 방지).
+	template<typename F>
+	void forEachChunkAtZ(int z, F&& fn) const
+	{
+		for (auto& kv : chunkPtr)
+			if (kv.first.z == z) fn(kv.first.x, kv.first.y);
+	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
 		chunkX = (x >= 0)
