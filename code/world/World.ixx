@@ -6,7 +6,7 @@ export module World;
 import std;
 import util;
 import Chunk;
-import SectorBiome;
+import Sector;
 import constVar;
 import TileData;
 
@@ -23,7 +23,7 @@ private:
 	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
 	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
-	std::unordered_map<Point3, std::unique_ptr<SectorBiome>, Point3::Hash> sectorBiomeMap;
+	std::unordered_map<Point3, std::unique_ptr<Sector>, Point3::Hash> sectorMap;
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
 
@@ -93,8 +93,8 @@ public:
 			int centerTileY = chunkY * CHUNK_SIZE_Y + CHUNK_SIZE_Y / 2;
 			int sx = sectorFromTile(centerTileX);
 			int sy = sectorFromTile(centerTileY);
-			auto it = sectorBiomeMap.find({ sx, sy, chunkZ });
-			if (it != sectorBiomeMap.end())
+			auto it = sectorMap.find({ sx, sy, chunkZ });
+			if (it != sectorMap.end())
 			{
 				int localTileX = centerTileX - sx * TILE_PER_SECTOR;
 				int localTileY = centerTileY - sy * TILE_PER_SECTOR;
@@ -232,15 +232,19 @@ public:
 
 	void createSector(int sectorX, int sectorY, int sectorZ);
 
-	// 섹터 바이옴 맵 소유 이전/조회 (월드젠 계층이 주입)
-	void setSectorBiome(int sectorX, int sectorY, int sectorZ, std::unique_ptr<SectorBiome> biome)
+	// 섹터 강제 로딩 — PNG 바이옴 로드 + 도시간/도시-경계 도로망 생성
+	// 디버그/월드젠 트리거. 도시 내부는 만들지 않고 외부 도로만 깔음
+	void loadSector(int sectorX, int sectorY, int sectorZ);
+
+	// 섹터 데이터 소유 이전/조회 (월드젠 계층이 주입)
+	void setSector(int sectorX, int sectorY, int sectorZ, std::unique_ptr<Sector> sector)
 	{
-		sectorBiomeMap[{ sectorX, sectorY, sectorZ }] = std::move(biome);
+		sectorMap[{ sectorX, sectorY, sectorZ }] = std::move(sector);
 	}
-	const SectorBiome* getSectorBiome(int sectorX, int sectorY, int sectorZ) const
+	const Sector* getSector(int sectorX, int sectorY, int sectorZ) const
 	{
-		auto it = sectorBiomeMap.find({ sectorX, sectorY, sectorZ });
-		return (it == sectorBiomeMap.end()) ? nullptr : it->second.get();
+		auto it = sectorMap.find({ sectorX, sectorY, sectorZ });
+		return (it == sectorMap.end()) ? nullptr : it->second.get();
 	}
 
 	// 임의 타일 좌표에서 바이옴 조회 (미니맵/GUI 등에서 사용)
@@ -248,8 +252,8 @@ public:
 	{
 		int sx = sectorFromTile(tileX);
 		int sy = sectorFromTile(tileY);
-		auto it = sectorBiomeMap.find({ sx, sy, z });
-		if (it == sectorBiomeMap.end()) return chunkFlag::none;
+		auto it = sectorMap.find({ sx, sy, z });
+		if (it == sectorMap.end()) return chunkFlag::none;
 		int localTileX = tileX - sx * TILE_PER_SECTOR;
 		int localTileY = tileY - sy * TILE_PER_SECTOR;
 		int localPxX = localTileX / TILE_PER_PIXEL;

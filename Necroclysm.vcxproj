@@ -390,7 +390,8 @@
     <ClCompile Include="code\world\World.ixx" />
     <ClCompile Include="code\world\World_tile.cpp" />
     <ClCompile Include="code\world\World_createSector.cpp" />
-    <ClCompile Include="code\world\SectorBiome.ixx" />
+    <ClCompile Include="code\world\World_loadSector.cpp" />
+    <ClCompile Include="code\world\Sector.ixx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />

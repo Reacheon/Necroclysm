@@ -570,7 +570,7 @@
     <ClCompile Include="code\world\Chunk.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\world\SectorBiome.ixx">
+    <ClCompile Include="code\world\Sector.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\var\globalVar.ixx">
@@ -718,6 +718,9 @@
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
     <ClCompile Include="code\world\World_createSector.cpp">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\World_loadSector.cpp">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\GOD\GodPanel.ixx">

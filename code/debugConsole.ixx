@@ -66,7 +66,7 @@ export void debugConsole()
 	prt(L"33. 플레이어 눈 색상 변경\n");
 	prt(L"34. 플레이어 피부색 변경\n");
 	prt(L"35. 플레이어 성별 변경\n");
-	prt(L"36. 월드 생성 프로토타입 (현재 섹터 도시)\n");
+	prt(L"36. 현재 섹터 강제 로딩\n");
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
 	int select;
@@ -743,11 +743,13 @@ export void debugConsole()
 		prt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
 		break;
 	}
-	case 36://월드 생성 프로토타입
+	case 36://현재 섹터 강제 로딩
 	{
 		Point2 sec = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
 		int sz = PlayerZ();
-		prt(L"[월드젠] 섹터 (%d, %d, %d) 처리 시작.\n", sec.x, sec.y, sz);
+		prt(L"[loadSector] 섹터 (%d, %d, %d) 강제 로딩 시작.\n", sec.x, sec.y, sz);
+		World::ins()->loadSector(sec.x, sec.y, sz);
+		prt(L"[loadSector] 완료.\n");
 		break;
 	}
 	case 99://콘솔 출력 초기화

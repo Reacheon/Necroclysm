@@ -5,12 +5,11 @@ module World;
 
 import std;
 import util;
-import SectorBiome;
+import Sector;
 import constVar;
 
-// 섹터 PNG를 로드해 픽셀별 바이옴을 SectorBiome에 채움
+// 섹터 PNG를 로드해 픽셀별 지형을 Sector에 채움
 // 1픽셀 = 50타일. 청크와는 완전 분리
-// 도시/도로/건물 등의 세부 생성은 별도(디버그 커맨드에서 트리거)로 수행
 void World::createSector(int sectorX, int sectorY, int sectorZ)
 {
 	if (sectorZ == 0)
@@ -46,16 +45,12 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 
 			Uint32* pixels = (Uint32*)refSector->pixels;
 
-			auto biome = std::make_unique<SectorBiome>();
+			auto babySector = std::make_unique<Sector>();
 
 			auto isSameCol = [](SDL_Color col1, SDL_Color col2) -> bool
 				{
 					return col1.r == col2.r && col1.g == col2.g && col1.b == col2.b;
 				};
-
-			// 다리 색상 (#777777) — 색상 상수에 없어서 로컬 정의
-			constexpr SDL_Color bridgeCol = { 0x77, 0x77, 0x77, 0xFF };
-			constexpr SDL_Color portalCol = { 0xFF, 0x00, 0x00, 0xFF };
 
 			for (int px = 0; px < PIXEL_PER_SECTOR; px++)
 			{
@@ -74,14 +69,13 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 					else if (isSameCol(pixelCol, chunkCol::land))     targetFlag = chunkFlag::dirt;
 					else if (isSameCol(pixelCol, chunkCol::city))     targetFlag = chunkFlag::city;
 					else if (isSameCol(pixelCol, chunkCol::river))    targetFlag = chunkFlag::freshwater;
-					else if (isSameCol(pixelCol, bridgeCol))          targetFlag = chunkFlag::bridge;
-					else if (isSameCol(pixelCol, portalCol))          targetFlag = chunkFlag::portal;
+					else if (isSameCol(pixelCol, chunkCol::bridge))   targetFlag = chunkFlag::bridge;
 
-					biome->set(px, py, targetFlag);
+					babySector->set(px, py, targetFlag);
 				}
 			}
 
-			sectorBiomeMap[{ sectorX, sectorY, sectorZ }] = std::move(biome);
+			sectorMap[{ sectorX, sectorY, sectorZ }] = std::move(babySector);
 
 			SDL_DestroySurface(refSector);
 		}

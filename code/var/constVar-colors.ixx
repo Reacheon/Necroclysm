@@ -57,4 +57,5 @@ export namespace chunkCol
     constexpr SDL_Color river = { 0x9d,0xa2,0xfb };
     constexpr SDL_Color city = { 0xa2,0xa2,0xa2 };
     constexpr SDL_Color land = { 0x59,0xc6,0x82 };
+    constexpr SDL_Color bridge = { 0x77,0x77,0x77 };
 };

@@ -14,7 +14,7 @@ import globalVar;
 import checkCursor;
 import Player;
 import World;
-import SectorBiome;
+import Sector;
 import TileData;
 
 // ════════════════════════════════════════════════════════════════════════
@@ -66,7 +66,6 @@ namespace mappal
         case chunkFlag::meadow:      return { 192, 215, 168, 255 };
         case chunkFlag::city:        return { 230, 226, 218, 255 };
         case chunkFlag::bridge:      return { 200, 195, 188, 255 };
-        case chunkFlag::portal:      return { 220, 100, 110, 255 };
         case chunkFlag::underground: return { 130, 130, 130, 255 };
         default:                     return {  18,  18,  22, 255 };
         }
@@ -148,10 +147,10 @@ struct MapView
 // ════════════════════════════════════════════════════════════════════════
 
 // 섹터 한 장 = PIXEL_PER_SECTOR × PIXEL_PER_SECTOR 텍스처 (1 px = 1 sector pixel).
-class SectorBiomeTextureCache
+class SectorTextureCache
 {
 public:
-    static SectorBiomeTextureCache& ins() { static SectorBiomeTextureCache c; return c; }
+    static SectorTextureCache& ins() { static SectorTextureCache c; return c; }
 
     void resetFrame(int budget) { budget_ = budget; pending_ = 0; }
     int  pendingThisFrame() const { return pending_; }
@@ -161,7 +160,7 @@ public:
         Key k{ sx, sy, sz };
         if (auto it = textures_.find(k); it != textures_.end()) return it->second;
 
-        const SectorBiome* biome = World::ins()->getSectorBiome(sx, sy, sz);
+        const Sector* biome = World::ins()->getSector(sx, sy, sz);
         if (!biome) return nullptr;  // 데이터 부재 — pending 아님
 
         if (budget_ <= 0) { pending_++; return nullptr; }
@@ -180,7 +179,7 @@ public:
     }
 
 private:
-    static SDL_Texture* build(const SectorBiome* biome)
+    static SDL_Texture* build(const Sector* biome)
     {
         SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_SECTOR, PIXEL_PER_SECTOR, SDL_PIXELFORMAT_RGBA32);
         if (!surf) return nullptr;
@@ -286,7 +285,7 @@ static void drawBiomeLayer(const MapView& v)
     {
         for (int sx = minSX; sx <= maxSX; sx++)
         {
-            SDL_Texture* tex = SectorBiomeTextureCache::ins().getOrBuild(sx, sy, v.z);
+            SDL_Texture* tex = SectorTextureCache::ins().getOrBuild(sx, sy, v.z);
             if (!tex) continue;  // 미빌드 → 다음 프레임에 채워짐
 
             double dstX = v.screenXFromTileX((double)sx * TILE_PER_SECTOR);
@@ -711,7 +710,7 @@ public:
         view.viewH = cameraH;
 
         // 매 프레임 작업 예산 초기화
-        SectorBiomeTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_SECTORS);
+        SectorTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_SECTORS);
 
         // 가시 미로드 섹터 자동 로드 (PNG 만)
         int sectorsLoadPending = SectorAutoLoader::loadVisible(view);
@@ -729,7 +728,7 @@ public:
         // 진행 표시 — 이번 프레임 budget 부족으로 미룬 작업이 있으면
         LoadingStats stats{
             sectorsLoadPending,
-            SectorBiomeTextureCache::ins().pendingThisFrame()
+            SectorTextureCache::ins().pendingThisFrame()
         };
         if (stats.total() > 0) drawLoadingPanel(stats);
     }

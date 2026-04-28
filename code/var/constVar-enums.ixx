@@ -479,7 +479,6 @@ export enum class chunkFlag
     dirt,//흙
     city,//도시 영역 (지면 = 흙)
     bridge,//다리 (지면 = 흙)
-    portal,//도시 중심 포탈 지점 (지면 = 흙)
 };
 
 export enum class seasonFlag
