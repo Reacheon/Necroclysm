@@ -41,6 +41,7 @@ int main(int argc, char** argv)
 	threadPoolPtr = std::make_unique<ThreadPool>(numThreads);
 	SDL_AddGamepadMappingsFromFile("gamecontrollerdb.txt");
 
+	initRandomEngine();//게임 전체에서 공용으로 사용할 단일 시드 확정
 	initCircle();
 	displayLoader();//실행시킨 디바이스의 해상도에 따라 게임의 해상도를 조정
 	textureLoader(); //프로그램에 사용될 텍스쳐들을 image 폴더에서 로드

@@ -269,6 +269,10 @@
     <ClCompile Include="code\Cook.ixx" />
     <ClCompile Include="code\mouseInput.ixx" />
     <ClCompile Include="code\Particle.ixx" />
+    <ClCompile Include="code\procGen.ixx" />
+    <ClCompile Include="code\procGen_buildRoadNetwork.cpp" />
+    <ClCompile Include="code\procGen_loadWorldGrid.cpp" />
+    <ClCompile Include="code\procGen_placeCities.cpp" />
     <ClCompile Include="code\Prop\Prop.cpp" />
     <ClCompile Include="code\Prop\Prop.ixx" />
     <ClCompile Include="code\Prop\Prop_circuit.ixx" />
