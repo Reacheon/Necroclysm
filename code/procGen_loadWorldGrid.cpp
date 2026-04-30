@@ -42,6 +42,7 @@ namespace procGen
         constexpr std::uint32_t COL_SUBARCTIC = packRGB(0x56, 0x7f, 0xc2);
         constexpr std::uint32_t COL_MONSOON = packRGB(0x85, 0x8f, 0x3f);
         constexpr std::uint32_t COL_SABANNA = packRGB(0x11, 0x58, 0x2c);
+        constexpr std::uint32_t COL_DESERT = packRGB(0xd3, 0xc6, 0x37);
 
         constexpr Terrain colorToTerrain(std::uint32_t rgb) noexcept
         {
@@ -60,6 +61,7 @@ namespace procGen
             case COL_SUBARCTIC: return Terrain::Subarctic;
             case COL_MONSOON: return Terrain::Monsoon;
             case COL_SABANNA: return Terrain::Sabanna;
+            case COL_DESERT:  return Terrain::Desert;
 
             default:           return Terrain::Sea;  //매칭 실패는 보수적으로 Sea
             }
@@ -112,8 +114,10 @@ namespace procGen
     }
 
     //@brief 작업 폴더의 map 경로에 존재하는 위성사진 png들을 지형 데이터(색)을 포함하는 그리드로 반환한다. 순수 블랙박스 함수이다.
+    //@param onSector 옵션 진행 콜백 (loaded, total, sectorX, sectorY, grid). 섹터 1장 완료마다 호출.
+    //                 default no-op = 출력 영향 X. grid는 그 시점까지의 부분 로드 상태가 그대로 보임.
     //@return 위성사진의 지형데이터(Uint8)가 유니크포인터로 저장된 933MB가량의 대형 구조체
-    PixelCostGrid loadWorldGrid()
+    PixelCostGrid loadWorldGrid(SectorLoadSink onSector)
     {
         const __int64 tStart = getNanoTimer();
 
@@ -129,19 +133,24 @@ namespace procGen
         //--- 2. 섹터 PNG 5832장 디코드 ---
         int loadOk = 0;
         int loadFail = 0;
+        const int totalSectors =
+            (SECTOR_Y_MAX - SECTOR_Y_MIN + 1) * (SECTOR_X_MAX - SECTOR_X_MIN + 1);
+        int doneSectors = 0;
         for (int sy = SECTOR_Y_MIN; sy <= SECTOR_Y_MAX; ++sy)
         {
             for (int sx = SECTOR_X_MIN; sx <= SECTOR_X_MAX; ++sx)
             {
                 if (blitSectorInto(sx, sy, grid.data.get(), PixelCostGrid::W)) ++loadOk;
                 else ++loadFail;
+                ++doneSectors;
+                if (onSector) onSector(doneSectors, totalSectors, sx, sy, grid);
             }
         }
 
         const __int64 tLoaded = getNanoTimer();
 
         //--- 3. 디버그 히스토그램 (Terrain 분포 검증) ---
-        constexpr int TERRAIN_COUNT = 12;
+        constexpr int TERRAIN_COUNT = 13;
         std::array<std::uint64_t, TERRAIN_COUNT> hist{};
         for (std::size_t i = 0; i < total; ++i)
         {
@@ -173,7 +182,8 @@ namespace procGen
 
         const wchar_t* const names[TERRAIN_COUNT] = {
             L"Land", L"Sea", L"FreshWater", L"Bridge", L"CityZone", L"CityCenter",
-            L"Mountain", L"Polar", L"Tundra", L"Subarctic", L"Monsoon", L"Sabanna"
+            L"Mountain", L"Polar", L"Tundra", L"Subarctic", L"Monsoon", L"Sabanna",
+            L"Desert"
         };
         prt(L"  pixel terrain distribution:\n");
         for (int i = 0; i < TERRAIN_COUNT; ++i)

@@ -22,6 +22,7 @@ import GodService;
 import SkillRegistry;
 import Lst;
 import paletteLoader;
+import worldGenState;
 
 export void debugConsole()
 {
@@ -68,7 +69,7 @@ export void debugConsole()
 	prt(L"35. 플레이어 성별 변경\n");
 	prt(L"36. 현재 섹터 강제 로딩\n");
 
-	prt(L"37. 월드 도시 배치\n");
+	prt(L"37. 월드 생성 (PNG 로드 → 도시 3000개 → 도로망)\n");
 	prt(L"38. 도로망 네트워크 형성\n");
 	
 	prt(L"99. 콘솔 클리어\n");
@@ -754,6 +755,17 @@ export void debugConsole()
 		prt(L"[loadSector] 섹터 (%d, %d, %d) 강제 로딩 시작.\n", sec.x, sec.y, sz);
 		World::ins()->loadSector(sec.x, sec.y, sz);
 		prt(L"[loadSector] 완료.\n");
+		break;
+	}
+	case 37://월드 생성 (PNG 로드 → 도시 배치 → 도로망)
+	{
+		if (worldGenInProgress)
+		{
+			prt(L"[worldGen] 이미 진행 중이다.\n");
+			break;
+		}
+		prt(L"[worldGen] WorldGenScreen 띄우고 워커 스레드 기동.\n");
+		startWorldGen();
 		break;
 	}
 	case 99://콘솔 출력 초기화

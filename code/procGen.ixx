@@ -22,6 +22,7 @@ namespace procGen
         Subarctic,
         Monsoon,
         Sabanna,
+        Desert,
     };
 
     struct PixelCostGrid
@@ -60,6 +61,10 @@ export namespace procGen
     inline constexpr int WORLD_PIXEL_W   = 43200;
     inline constexpr int WORLD_PIXEL_H   = 21600;
 
+    //--- 로딩 화면 미리보기 RGBA 다운샘플 해상도(가로). 세로는 비율로 자동 계산 ---
+    inline constexpr int PREVIEW_W = 1080;                                       // 43200 / 40
+    inline constexpr int PREVIEW_H = PREVIEW_W * WORLD_PIXEL_H / WORLD_PIXEL_W;  //  540
+
     enum class CityTier : std::uint8_t { T1, T2, T3 };
 
     struct CityNode
@@ -73,38 +78,83 @@ export namespace procGen
         std::vector<Point3> verts;  //실타일 좌표
     };
 
-    struct WorldGenResult //오로지 generateWorld 함수의 반환값을 위한 페어 구조체
+    struct WorldGenResult //generateWorld 결과 — WorldGenProgress::result에 채워짐
     {
         std::vector<CityNode> cities;
         std::vector<RoadPolyLine> roads;
     };
 
+    //--- 진행 단계 ---
+    enum class GenPhase : int
+    {
+        idle      = 0, //워커 시작 전
+        loadPng   = 1, //위성 PNG 디코드 중
+        placeCity = 2, //도시 좌표 배치 중
+        buildRoad = 3, //도로망 폴리라인 생성 중
+        done      = 4, //모든 단계 완료(result에 채워짐)
+    };
 
-    PixelCostGrid loadWorldGrid();
-    std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid);
-    std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities);
+    //--- 워커 스레드와 WorldGenScreen GUI가 공유하는 진행 상태 ---
+    //  워커: 매 단계 시작/끝/각 도시·도로 추가 시점에 갱신
+    //  메인(GUI): 매 프레임 스냅샷 락 잡고 읽기만
+    struct WorldGenProgress
+    {
+        std::atomic<GenPhase> phase{ GenPhase::idle };
+        std::atomic<bool>     done { false };
+
+        //PNG 진행 (5832장 기준)
+        std::atomic<int> sectorsLoadedTotal{ 0 };
+        std::atomic<int> sectorsLoadedDone { 0 };
+
+        //도시 누적 스냅샷
+        std::mutex             citiesMtx;
+        std::vector<CityNode>  citiesSnap;
+
+        //도로 누적 스냅샷
+        std::mutex                  roadsMtx;
+        std::vector<RoadPolyLine>   roadsSnap;
+
+        //위성 미리보기 RGBA(PREVIEW_W * PREVIEW_H, R8 G8 B8 A8 little-endian).
+        //  초기 alpha=0(전면 투명) → 섹터 1장 로드 끝날 때마다 해당 10×10 블록만
+        //  alpha=0xff 색으로 갱신 → 메인 스레드가 SDL_UpdateTexture로 부분 반영.
+        //  미로드 영역은 alpha=0이라 BLEND 모드에서 자연스럽게 투명 처리됨.
+        std::mutex                       previewMtx;
+        std::vector<std::uint32_t>       previewRGBA;
+        std::atomic<bool>                previewReady   { false };  //버퍼 alloc 완료 시 true
+        std::atomic<int>                 previewVersion { 0     };  //섹터 갱신 1번마다 +1
+
+        //최종 결과 — done == true 직전에 채움. done 이후에는 read-only.
+        std::optional<WorldGenResult>    result;
+    };
+
+    //--- 콜백 타입(default = no-op). 내부에서 출력에 영향 X = 순수성 유지 ---
+    using CitySink = std::function<void(const CityNode&)>;
+    using RoadSink = std::function<void(const RoadPolyLine&)>;
+
+    //onSector(loaded, total, sectorX, sectorY, grid) — 섹터 1장 디코드 직후 호출.
+    //  grid는 그 시점까지 로드된 부분만 유효(나머지는 Sea 디폴트). 콜백 내에서
+    //  방금 채워진 섹터 영역 픽셀을 즉시 읽어 미리보기 점진 갱신에 사용 가능.
+    using SectorLoadSink = std::function<void(int loaded, int total, int sectorX, int sectorY, const PixelCostGrid& grid)>;
+    PixelCostGrid loadWorldGrid(SectorLoadSink onSector = {});
+    std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid, CitySink onPlaced = {});
+    std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
     /*
-     * @brief 월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 초기 1회 절차적 생성
+     * @brief 월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 1회 절차적 생성.
      *
-     * 도시 내부 도로/타일 페인팅/랜덤 인카운터 등은 청크로드 시점에 지연 생성
+     *  3단계(PNG 로드 → 도시 배치 → 도로망)를 순차 실행하면서 progress의
+     *  phase / 카운터 / 누적 스냅샷 / 미리보기 RGBA를 갱신한다. 완료 시점에
+     *  progress.result에 최종 결과가 들어가고 progress.done = true가 된다.
+     *
+     *  WorldGenScreen은 이 함수를 std::jthread로 백그라운드 실행하면서
+     *  매 프레임 progress의 atomic/mutex 보호 스냅샷을 읽어 화면에 그린다.
+     *  도시 내부 도로 / 타일 페인팅 / 랜덤 인카운터 등은 청크로드 시점에 지연 생성.
+     *
+     *  prt() 등 std::wprintf 계열은 스레드 안전이 보장되지 않으므로 워커
+     *  스레드에서는 호출하지 않는다 — 각 phase 함수 내부의 prt만 사용.
      *
      * @param seed 난수 시드
-     * @return 도시 노드와 도로 폴리라인 묶음 (실타일 좌표)
+     * @param progress 단계별 진행/누적 스냅샷이 채워질 공유 상태
      */
-    WorldGenResult generateWorld(std::uint64_t seed)
-    {
-        //1. PNG 데이터 로드
-        PixelCostGrid grid = loadWorldGrid();
-
-        //2. 도시 위치 배열
-        std::vector<CityNode> cities = placeCities(seed,grid);
-
-        //3. 도로망 생성
-        std::vector<RoadPolyLine> roadNetwork = buildRoadNetwork(seed, grid, cities);
-
-        //4. 결과값 반환
-        return { cities , roadNetwork};
-    }
-
+    void generateWorld(std::uint64_t seed, WorldGenProgress& progress);
 }

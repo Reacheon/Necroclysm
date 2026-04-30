@@ -233,6 +233,7 @@
     <ClCompile Include="code\GUI\Profic.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />
     <ClCompile Include="code\GUI\Sample.ixx" />
+    <ClCompile Include="code\GUI\WorldGenScreen.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
     <ClCompile Include="code\GUI\Status_draw.cpp" />
     <ClCompile Include="code\GUI\Status_radar.cpp" />
@@ -273,6 +274,8 @@
     <ClCompile Include="code\procGen_buildRoadNetwork.cpp" />
     <ClCompile Include="code\procGen_loadWorldGrid.cpp" />
     <ClCompile Include="code\procGen_placeCities.cpp" />
+    <ClCompile Include="code\procGen_generateWorld.cpp" />
+    <ClCompile Include="code\worldGenState.ixx" />
     <ClCompile Include="code\Prop\Prop.cpp" />
     <ClCompile Include="code\Prop\Prop.ixx" />
     <ClCompile Include="code\Prop\Prop_circuit.ixx" />

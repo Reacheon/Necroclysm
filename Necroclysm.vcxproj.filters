@@ -336,6 +336,9 @@
     <ClCompile Include="code\GUI\Map.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\WorldGenScreen.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\GUI\Profic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
@@ -811,6 +814,12 @@
       <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>
     <ClCompile Include="code\procGen_buildRoadNetwork.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_generateWorld.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\worldGenState.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,6 +3,7 @@ module;
 
 export module startArea;
 
+import std;
 import util;
 import constVar;
 import globalVar;

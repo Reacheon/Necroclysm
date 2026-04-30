@@ -25,6 +25,8 @@ import turnCycleLoop;
 import startArea;
 import initCoordTransform;
 import nervedriveFilter;
+import WorldGenScreen;
+import worldGenState;
 #define SDL_GESTURE_IMPLEMENTATION 1
 #include "SDL_gesture.h"
 
@@ -49,7 +51,7 @@ int main(int argc, char** argv)
 	dataLoader();
 	initNanoTimer();
 	initCoordTransform();
-	startArea();//스타트 세팅
+	startArea();//스타트 세팅(월드 생성은 디버그 콘솔에서 수동 트리거 — startWorldGen)
 
 	if (Gesture_Init() == 0) 
 	{
@@ -82,30 +84,47 @@ int main(int argc, char** argv)
 		else { timer::cursorHightlight = 0; }
 		if (timer::timer600 != 599) { timer::timer600++; }
 		else { timer::timer600 = 0; }
-		dur::turnCycle = turnCycleLoop();
-		dur::stepEvent = stepEvent();
-		//▲이동 관련 코드는 전부 이 위에 적혀야 함. 아니면 화면이 흔들림▲
-		
-		if (cameraFix == true)
-		{
-			cameraX = (PlayerPtr)->getX();
-			cameraY = (PlayerPtr)->getY();
-		}
 
-		//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
-		// nervedriveOn이면 월드 렌더를 오프스크린 RT로 우회 → 초록 틴트 후 블릿 → 플레이어 덧그림.
-		// 비활성일 때는 아무 효과 없이 평소처럼 진행됨.
-		const bool nervedriveFilterActive = nervedriveFilter::beginWorldPass();
-		dur::renderTile = renderTile();
-		dur::renderWeather = renderWeather();
-		dur::renderSticker = renderSticker(cameraX, cameraY);
-		if (nervedriveFilterActive)
+		if (worldGenInProgress)
 		{
-			nervedriveFilter::endWorldPassAndBlit();
-			PlayerPtr->drawSelf();
+			//월드 생성 중 — Player 의존 코드 전부 스킵. SDL 이벤트만 최소한으로 폴링하고
+			//창 닫기(QUIT)에만 반응. WorldGenScreen은 입력 비활성이라 다른 입력 이벤트는 버려도 됨.
+			while (SDL_PollEvent(&event))
+			{
+				if (event.type == SDL_EVENT_QUIT) quit = true;
+			}
+			if (auto* wgs = WorldGenScreen::ins()) wgs->step();
+			drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, SDL_Color{ 10, 10, 14, 255 });
+			dur::renderUI = renderUI();
+			dur::renderLog = renderLog(renderer);
 		}
-		dur::renderUI = renderUI();
-		dur::renderLog = renderLog(renderer);
+		else
+		{
+			dur::turnCycle = turnCycleLoop();
+			dur::stepEvent = stepEvent();
+			//▲이동 관련 코드는 전부 이 위에 적혀야 함. 아니면 화면이 흔들림▲
+
+			if (cameraFix == true)
+			{
+				cameraX = (PlayerPtr)->getX();
+				cameraY = (PlayerPtr)->getY();
+			}
+
+			//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
+			// nervedriveOn이면 월드 렌더를 오프스크린 RT로 우회 → 초록 틴트 후 블릿 → 플레이어 덧그림.
+			// 비활성일 때는 아무 효과 없이 평소처럼 진행됨.
+			const bool nervedriveFilterActive = nervedriveFilter::beginWorldPass();
+			dur::renderTile = renderTile();
+			dur::renderWeather = renderWeather();
+			dur::renderSticker = renderSticker(cameraX, cameraY);
+			if (nervedriveFilterActive)
+			{
+				nervedriveFilter::endWorldPassAndBlit();
+				PlayerPtr->drawSelf();
+			}
+			dur::renderUI = renderUI();
+			dur::renderLog = renderLog(renderer);
+		}
 		dur::totalDelay = getNanoTimer() - loopStart;
 		const int constDelay = 16000000;
 		__int64 delayTime = constDelay - dur::totalDelay;
@@ -126,7 +145,7 @@ int main(int argc, char** argv)
 		//renderFPS(getNanoTimer() - loopStart);
 		SDL_RenderPresent(renderer);
 
-		if (hasInitMinimap == false)
+		if (hasInitMinimap == false && !worldGenInProgress && PlayerPtr != nullptr)
 		{
 			PlayerPtr->updateMinimap();
 			hasInitMinimap = true;
