@@ -3,19 +3,25 @@ export module procGen;
 import std;
 import util;
 
-//내부 연산 용도 구조체들 (외부로 빠져나가면 절대 안됨)
+//============================================================
+// 내부 전용 타입 — 외부로 노출되면 절대 안됨
+//============================================================
 namespace procGen
 {
-    struct PixelCoord { int x, y, z; }; //강타입 제약용
-
     enum class Terrain : std::uint8_t
     {
         Land,
         Sea,
-        River,
+        FreshWater, //강이나 호수 모두 포함
         Bridge,
-        CityZone,
-        Mountain
+        CityZone, //사전 마킹된 도시의 영역
+        CityCenter, //사전 마킹된 도시의 중심점
+        Mountain,
+        Polar,
+        Tundra,
+        Subarctic,
+        Monsoon,
+        Sabanna,
     };
 
     struct PixelCostGrid
@@ -29,21 +35,42 @@ namespace procGen
             return data[static_cast<std::size_t>(py) * W + px];
         }
     };
+
+    //픽셀 좌표 (1픽셀 = 50타일). 절차적 생성 알고리즘 내부 전용.
+    //타일 좌표 Point3와 강타입 분리 — 함수 파라미터에서 절대 혼용 불가능.
+    //(Point3는 게임 전반에서 쓰는 실타일 좌표이므로 도시/폴리라인 등 외부 데이터는 그대로 Point3 사용)
+    struct PixelCoord
+    {
+        int x{}, y{}, z{};
+
+        PixelCoord() = default;
+        constexpr PixelCoord(int x_, int y_, int z_) noexcept
+            : x(x_), y(y_), z(z_) {}
+
+        friend constexpr bool operator==(PixelCoord, PixelCoord) noexcept = default;
+    };
 }
 
+//============================================================
+// 외부 인터페이스
+//============================================================
 export namespace procGen
 {
+    inline constexpr int TILES_PER_PIXEL = 50;//1픽셀당 실타일 수
+    inline constexpr int WORLD_PIXEL_W   = 43200;
+    inline constexpr int WORLD_PIXEL_H   = 21600;
+
     enum class CityTier : std::uint8_t { T1, T2, T3 };
 
-    struct CityNode 
+    struct CityNode
     {
-        Point3 center;
+        Point3 center;     //실타일 좌표
         CityTier tier;
     };
 
-    struct RoadPolyLine 
+    struct RoadPolyLine
     {
-        std::vector<Point3> verts;
+        std::vector<Point3> verts;  //실타일 좌표
     };
 
     struct WorldGenResult //오로지 generateWorld 함수의 반환값을 위한 페어 구조체
@@ -55,7 +82,7 @@ export namespace procGen
 
     PixelCostGrid loadWorldGrid();
     std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid);
-    std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, std::vector<CityNode>& cities);
+    std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities);
 
     /*
      * @brief 월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 초기 1회 절차적 생성

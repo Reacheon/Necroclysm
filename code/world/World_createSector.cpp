@@ -65,11 +65,12 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 
 					chunkFlag targetFlag = chunkFlag::none;
 
-					if      (isSameCol(pixelCol, chunkCol::seawater)) targetFlag = chunkFlag::seawater;
-					else if (isSameCol(pixelCol, chunkCol::land))     targetFlag = chunkFlag::dirt;
-					else if (isSameCol(pixelCol, chunkCol::city))     targetFlag = chunkFlag::city;
-					else if (isSameCol(pixelCol, chunkCol::river))    targetFlag = chunkFlag::freshwater;
-					else if (isSameCol(pixelCol, chunkCol::bridge))   targetFlag = chunkFlag::bridge;
+					if      (isSameCol(pixelCol, pngSectorPixelCol::seawater)) targetFlag = chunkFlag::seawater;
+					else if (isSameCol(pixelCol, pngSectorPixelCol::land))     targetFlag = chunkFlag::dirt;
+					else if (isSameCol(pixelCol, pngSectorPixelCol::city))     targetFlag = chunkFlag::city;
+					else if (isSameCol(pixelCol, pngSectorPixelCol::river))    targetFlag = chunkFlag::freshwater;
+					else if (isSameCol(pixelCol, pngSectorPixelCol::bridge))   targetFlag = chunkFlag::bridge;
+					else if (isSameCol(pixelCol, pngSectorPixelCol::mountain))     targetFlag = chunkFlag::dirt;
 
 					babySector->set(px, py, targetFlag);
 				}

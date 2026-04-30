@@ -51,11 +51,12 @@ export namespace lowCol
     constexpr SDL_Color crimson = { 0xd0,0x3f,0x89 };
 };
 
-export namespace chunkCol
+export namespace pngSectorPixelCol
 {
     constexpr SDL_Color seawater = { 0x16,0x21,0xff };
     constexpr SDL_Color river = { 0x9d,0xa2,0xfb };
     constexpr SDL_Color city = { 0xa2,0xa2,0xa2 };
     constexpr SDL_Color land = { 0x59,0xc6,0x82 };
     constexpr SDL_Color bridge = { 0x77,0x77,0x77 };
+    constexpr SDL_Color mountain = { 0xc4,0x65,0x48 };
 };
