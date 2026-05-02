@@ -810,6 +810,9 @@
     <ClCompile Include="code\procGen_loadWorldGrid.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>
+    <ClCompile Include="code\procGen_worldGridCache.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
     <ClCompile Include="code\procGen_placeCities.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>

@@ -273,6 +273,7 @@
     <ClCompile Include="code\procGen.ixx" />
     <ClCompile Include="code\procGen_buildRoadNetwork.cpp" />
     <ClCompile Include="code\procGen_loadWorldGrid.cpp" />
+    <ClCompile Include="code\procGen_worldGridCache.cpp" />
     <ClCompile Include="code\procGen_placeCities.cpp" />
     <ClCompile Include="code\procGen_generateWorld.cpp" />
     <ClCompile Include="code\worldGenState.ixx" />
