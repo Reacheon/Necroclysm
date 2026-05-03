@@ -91,10 +91,10 @@ namespace procGen
             a[static_cast<std::size_t>(Terrain::Polar     )] =   6.0f;
             a[static_cast<std::size_t>(Terrain::Tundra    )] =   2.0f;
             a[static_cast<std::size_t>(Terrain::Subarctic )] =   0.7f;   //캐나다식 장거리 직선도로 — Land보다 싸게.
-            a[static_cast<std::size_t>(Terrain::Monsoon   )] =   1.2f;
-            a[static_cast<std::size_t>(Terrain::Sabanna   )] =   1.3f;
-            a[static_cast<std::size_t>(Terrain::Desert    )] =   0.6f;   //라스베가스식 장거리 직선도로 — Land보다 싸게.
-            a[static_cast<std::size_t>(Terrain::RainForest)] =  11.0f;   //우거짐·습지·홍수 — Mountain(8)보다 비싸게. A*가 안데스/연안 우회 선호.
+            a[static_cast<std::size_t>(Terrain::Monsoon              )] =   1.2f;
+            a[static_cast<std::size_t>(Terrain::InsularRainforest    )] =   1.3f;   //동남아 군도 — 도시·도로 연결 가능. 옛 Sabanna 코스트 계승.
+            a[static_cast<std::size_t>(Terrain::Desert               )] =   0.6f;   //라스베가스식 장거리 직선도로 — Land보다 싸게.
+            a[static_cast<std::size_t>(Terrain::ContinentalRainforest)] =  11.0f;   //우거짐·습지·홍수 — Mountain(8)보다 비싸게. A*가 안데스/연안 우회 선호.
             return a;
         }
         constexpr std::array<float, 14> kCostLUT = makeCostLUT();
@@ -234,7 +234,7 @@ namespace procGen
         //  사막/Subarctic 판정용 — 후보 엣지 KNN 반경 확장에만 사용됨.
         Terrain sampleCityBiome(const PixelCostGrid& grid, int px, int py) noexcept
         {
-            int counts[13] = {};
+            int counts[14] = {};   //Terrain enum 크기와 동일(LUT 14와 정합)
             constexpr int R    = 20;
             constexpr int STEP = 4;
             const Terrain* gridData = grid.data.get();
@@ -263,7 +263,7 @@ namespace procGen
             }
             int bestIdx   = static_cast<int>(Terrain::Land);
             int bestCount = 0;
-            for (int i = 0; i < 13; ++i)
+            for (int i = 0; i < 14; ++i)
             {
                 if (counts[i] > bestCount) { bestCount = counts[i]; bestIdx = i; }
             }
@@ -355,9 +355,10 @@ namespace procGen
             //  절대 증가량은 미미(T3 500→3000, T2 1200→7200).
             if (biome == Terrain::Desert || biome == Terrain::Subarctic)
                 base *= 6;
-            //우림은 정반대 — 우거짐/습지로 장거리 도로 거의 불가능. 강 따라 가까운
-            //  이웃하고만 후보 형성. 마나우스가 외부와 도로로 거의 안 이어진 현실 반영.
-            if (biome == Terrain::RainForest)
+            //대륙성 우림은 정반대 — 우거짐/습지로 장거리 도로 거의 불가능. 강 따라
+            //  가까운 이웃하고만 후보 형성. 마나우스가 외부와 도로로 거의 안 이어진 현실 반영.
+            //  도서성 우림(동남아)은 페리/단거리 도로로 연결되므로 적용 안 함.
+            if (biome == Terrain::ContinentalRainforest)
                 base = base * 7 / 10;
             return base;
         }

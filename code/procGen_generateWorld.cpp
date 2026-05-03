@@ -41,10 +41,10 @@ namespace procGen
             case Terrain::Polar:       return packPreviewRGBA(0xf2, 0xf6, 0xff);
             case Terrain::Tundra:      return packPreviewRGBA(0x8e, 0xc6, 0xcd);
             case Terrain::Subarctic:   return packPreviewRGBA(0x6e, 0x9b, 0xc8);
-            case Terrain::Monsoon:     return packPreviewRGBA(0x96, 0xa3, 0x55);
-            case Terrain::Sabanna:     return packPreviewRGBA(0x35, 0x77, 0x49);
-            case Terrain::Desert:      return packPreviewRGBA(0xe8, 0xd9, 0x7a);
-            case Terrain::RainForest:  return packPreviewRGBA(0x1f, 0x4a, 0x1a);
+            case Terrain::Monsoon:               return packPreviewRGBA(0x96, 0xa3, 0x55);
+            case Terrain::InsularRainforest:     return packPreviewRGBA(0x35, 0x77, 0x49);
+            case Terrain::Desert:                return packPreviewRGBA(0xe8, 0xd9, 0x7a);
+            case Terrain::ContinentalRainforest: return packPreviewRGBA(0x1f, 0x4a, 0x1a);
             }
             return packPreviewRGBA(0x10, 0x10, 0x10);
         }

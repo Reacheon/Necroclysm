@@ -21,9 +21,9 @@ namespace procGen
         Tundra,
         Subarctic,
         Monsoon,
-        Sabanna,
+        InsularRainforest,     //해양/도서성 열대우림 — 동남아 군도. 도서 형태라 도시·도로 연결 가능
         Desert,
-        RainForest, //열대우림 — Monsoon보다 조밀, 절차생성 도시 거의 차단
+        ContinentalRainforest, //대륙성 열대우림 — 아마존/콩고 내륙. Monsoon보다 조밀, 절차생성 도시 거의 차단
     };
 
     struct PixelCostGrid

@@ -42,9 +42,9 @@ namespace procGen
         constexpr std::uint32_t COL_TUNDRA = packRGB(0x56, 0xb9, 0xc2);
         constexpr std::uint32_t COL_SUBARCTIC = packRGB(0x56, 0x7f, 0xc2);
         constexpr std::uint32_t COL_MONSOON = packRGB(0x85, 0x8f, 0x3f);
-        constexpr std::uint32_t COL_SABANNA = packRGB(0x11, 0x58, 0x2c);
+        constexpr std::uint32_t COL_INSULAR_RAINFOREST = packRGB(0x1a, 0x6c, 0x25); //해양/도서성 — 동남아 군도(옛 Sabanna 자리)
         constexpr std::uint32_t COL_DESERT = packRGB(0xd3, 0xc6, 0x37);
-        constexpr std::uint32_t COL_RAIN_FOREST = packRGB(0x29, 0x42, 0x09);
+        constexpr std::uint32_t COL_CONT_RAINFOREST = packRGB(0x11, 0x58, 0x2c);    //대륙성 — 아마존/콩고(옛 Sabanna 색상 재할당)
 
         constexpr Terrain colorToTerrain(std::uint32_t rgb) noexcept
         {
@@ -62,9 +62,9 @@ namespace procGen
             case COL_TUNDRA: return Terrain::Tundra;
             case COL_SUBARCTIC: return Terrain::Subarctic;
             case COL_MONSOON: return Terrain::Monsoon;
-            case COL_SABANNA: return Terrain::Sabanna;
+            case COL_INSULAR_RAINFOREST: return Terrain::InsularRainforest;
             case COL_DESERT:  return Terrain::Desert;
-            case COL_RAIN_FOREST: return Terrain::RainForest;
+            case COL_CONT_RAINFOREST: return Terrain::ContinentalRainforest;
 
             default:           return Terrain::Sea;  //매칭 실패는 보수적으로 Sea
             }
@@ -184,15 +184,15 @@ namespace procGen
 
         const wchar_t* const names[TERRAIN_COUNT] = {
             L"Land", L"Sea", L"FreshWater", L"Bridge", L"CityZone", L"CityCenter",
-            L"Mountain", L"Polar", L"Tundra", L"Subarctic", L"Monsoon", L"Sabanna",
-            L"Desert", L"RainForest"
+            L"Mountain", L"Polar", L"Tundra", L"Subarctic", L"Monsoon", L"InsularRainforest",
+            L"Desert", L"ContinentalRainforest"
         };
         prt(L"  pixel terrain distribution:\n");
         for (int i = 0; i < TERRAIN_COUNT; ++i)
         {
             const double pct = 100.0 * static_cast<double>(hist[i])
                                      / static_cast<double>(total);
-            prt(L"    %-10ls: %12llu  (%6.2f%%)\n", names[i], hist[i], pct);
+            prt(L"    %-22ls: %12llu  (%6.2f%%)\n", names[i], hist[i], pct);
         }
 
         return grid;
