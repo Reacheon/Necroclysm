@@ -78,15 +78,17 @@ namespace procGen
         //  sea 10픽셀 이상은 ratio가 100+ 로 폭증 → 호주↔인도네시아 같은 장거리 횡단 컷.
         constexpr float kMaxCostPerPixel = 30.0f;
 
-        consteval std::array<float, 14> makeCostLUT()
+        consteval std::array<float, 16> makeCostLUT()
         {
-            std::array<float, 14> a{};
+            std::array<float, 16> a{};
             a[static_cast<std::size_t>(Terrain::Land      )] =   1.0f;
             a[static_cast<std::size_t>(Terrain::Sea       )] = 5000.0f;
-            a[static_cast<std::size_t>(Terrain::FreshWater)] = 150.0f;
-            a[static_cast<std::size_t>(Terrain::Bridge    )] =   0.5f;   //Bridge는 도시 내 강분단 1픽셀 한정. 강/바다 횡단 다리는 사후 자동 형성.
+            a[static_cast<std::size_t>(Terrain::River     )] =  20.0f;   //강(폭 1~2px) — 옛 FreshWater 150에서 대폭 인하. 다리/도로가 자연스럽게 가로지르도록.
+            a[static_cast<std::size_t>(Terrain::Lake      )] = 800.0f;   //호수 — 가로지르기 거의 불가. Sea보다 싸 비상시 횡단 가능 정도.
             a[static_cast<std::size_t>(Terrain::CityZone  )] =   0.6f;
             a[static_cast<std::size_t>(Terrain::CityCenter)] =   0.5f;
+            a[static_cast<std::size_t>(Terrain::CityRiver )] =   2.0f;   //도시 내 강 — 사후 도시 분할이 다리 위치를 자유 결정하도록 저렴하게.
+            a[static_cast<std::size_t>(Terrain::CitySea   )] =   3.0f;   //도시 내 바다(이스탄불·홍콩 해협) — 강보다 약간 비싸지만 도시 횡단 다리 자유 형성.
             a[static_cast<std::size_t>(Terrain::Mountain  )] =   8.0f;
             a[static_cast<std::size_t>(Terrain::Polar     )] =   6.0f;
             a[static_cast<std::size_t>(Terrain::Tundra    )] =   2.0f;
@@ -97,7 +99,7 @@ namespace procGen
             a[static_cast<std::size_t>(Terrain::ContinentalRainforest)] =  11.0f;   //우거짐·습지·홍수 — Mountain(8)보다 비싸게. A*가 안데스/연안 우회 선호.
             return a;
         }
-        constexpr std::array<float, 14> kCostLUT = makeCostLUT();
+        constexpr std::array<float, 16> kCostLUT = makeCostLUT();
 
         //============================================================
         // Coarse 그리드 — 8× 다운샘플, top-K=4 mean 집계.
@@ -234,7 +236,7 @@ namespace procGen
         //  사막/Subarctic 판정용 — 후보 엣지 KNN 반경 확장에만 사용됨.
         Terrain sampleCityBiome(const PixelCostGrid& grid, int px, int py) noexcept
         {
-            int counts[14] = {};   //Terrain enum 크기와 동일(LUT 14와 정합)
+            int counts[16] = {};   //Terrain enum 크기와 동일(LUT 16과 정합)
             constexpr int R    = 20;
             constexpr int STEP = 4;
             const Terrain* gridData = grid.data.get();
@@ -252,9 +254,11 @@ namespace procGen
                     {
                     case Terrain::CityCenter:
                     case Terrain::CityZone:
+                    case Terrain::CityRiver:
+                    case Terrain::CitySea:
                     case Terrain::Sea:
-                    case Terrain::FreshWater:
-                    case Terrain::Bridge:
+                    case Terrain::River:
+                    case Terrain::Lake:
                         continue;
                     default: break;
                     }
@@ -263,7 +267,7 @@ namespace procGen
             }
             int bestIdx   = static_cast<int>(Terrain::Land);
             int bestCount = 0;
-            for (int i = 0; i < 14; ++i)
+            for (int i = 0; i < 16; ++i)
             {
                 if (counts[i] > bestCount) { bestCount = counts[i]; bestIdx = i; }
             }

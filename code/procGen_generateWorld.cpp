@@ -33,10 +33,12 @@ namespace procGen
             {
             case Terrain::Land:        return packPreviewRGBA(0xc0, 0xd7, 0xa8);
             case Terrain::Sea:         return packPreviewRGBA(0x55, 0x84, 0xad);
-            case Terrain::FreshWater:  return packPreviewRGBA(0x89, 0xb4, 0xc8);
-            case Terrain::Bridge:      return packPreviewRGBA(0xc8, 0xc3, 0xbc);
+            case Terrain::River:       return packPreviewRGBA(0x89, 0xb4, 0xc8);
+            case Terrain::Lake:        return packPreviewRGBA(0x6f, 0x6a, 0xb8);   //#9384e5의 미리보기 톤 — 강과 구분되는 보라빛
             case Terrain::CityZone:    return packPreviewRGBA(0xe6, 0xe2, 0xda);
             case Terrain::CityCenter:  return packPreviewRGBA(0xff, 0x60, 0x60);
+            case Terrain::CityRiver:   return packPreviewRGBA(0xa6, 0xc1, 0xea);   //#a2bfef의 미리보기 톤 — 도시 내 강 강조
+            case Terrain::CitySea:     return packPreviewRGBA(0x73, 0x70, 0xb8);   //#6d6abd의 미리보기 톤 — 도시 내 해협 강조
             case Terrain::Mountain:    return packPreviewRGBA(0x8a, 0x6a, 0x52);
             case Terrain::Polar:       return packPreviewRGBA(0xf2, 0xf6, 0xff);
             case Terrain::Tundra:      return packPreviewRGBA(0x8e, 0xc6, 0xcd);

@@ -97,12 +97,14 @@ namespace procGen
             case Terrain::Tundra:                return 0.02;
             // 절대 불가 영역
             case Terrain::Sea:
-            case Terrain::FreshWater:
-            case Terrain::Bridge:
+            case Terrain::River:
+            case Terrain::Lake:
             case Terrain::Mountain:
             case Terrain::Polar:
             case Terrain::CityZone:
             case Terrain::CityCenter:
+            case Terrain::CityRiver:
+            case Terrain::CitySea:
             default:                   return 0.0;
             }
         }
@@ -172,7 +174,7 @@ namespace procGen
         }
 
         //로컬 물 스캔 — (px,py) 주변 chebyshev shell을 1씩 확장하며 가장 가까운
-        //  Sea/FreshWater 픽셀까지의 squared Euclidean distance를 반환.
+        //  Sea/River/Lake/CityRiver/CitySea 픽셀까지의 squared Euclidean distance를 반환.
         //    - 중심이 물이면 0
         //    - LOCAL_SCAN_R 안에 물이 없으면 MAX_DSQ + 1 (호출자가 보너스 1.0 처리)
         //    - early break: r×r ≥ bestSq 시 더 가까워질 수 없으므로 종료
@@ -186,7 +188,11 @@ namespace procGen
             const Terrain* td = grid.data.get();
             auto isWater = [td](int x, int y) noexcept {
                 const Terrain t = td[static_cast<std::size_t>(y) * W + x];
-                return t == Terrain::Sea || t == Terrain::FreshWater;
+                return t == Terrain::Sea
+                    || t == Terrain::River
+                    || t == Terrain::Lake
+                    || t == Terrain::CityRiver
+                    || t == Terrain::CitySea;
             };
 
             //중심 픽셀(호출자가 보장하지만 안전상 유지).
@@ -321,8 +327,10 @@ namespace procGen
             }
         };
 
-        //사전배치 도시 추출 — 8-connected 클러스터링(CityZone ∪ CityCenter).
+        //사전배치 도시 추출 — 8-connected 클러스터링(CityZone ∪ CityCenter ∪ CityRiver ∪ CitySea).
         //  1 클러스터 = 1 도시. centroid는 클러스터 안의 CityCenter 픽셀 평균(없으면 전체 평균).
+        //  CityRiver/CitySea(도시 내 강·해협)도 클러스터에 포함 — 강·바다가 도시를 가로지르는
+        //  경우(이스탄불·홍콩·런던 등)에도 하나의 도시로 묶이고 bbox/면적이 수역까지 정확히 반영됨.
         struct PreMarkedExtract
         {
             std::vector<CityRec> cities;
@@ -346,7 +354,8 @@ namespace procGen
             for (std::size_t i = 0; i < total; ++i)
             {
                 const Terrain t = grid.data[i];
-                if (t == Terrain::CityZone || t == Terrain::CityCenter)
+                if (t == Terrain::CityZone || t == Terrain::CityCenter
+                    || t == Terrain::CityRiver || t == Terrain::CitySea)
                 {
                     cityPixels.insert(i);
                 }

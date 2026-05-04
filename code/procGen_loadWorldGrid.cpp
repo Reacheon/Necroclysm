@@ -31,11 +31,13 @@ namespace procGen
         }
 
         constexpr std::uint32_t COL_SEAWATER    = packRGB(0x16, 0x21, 0xff);
-        constexpr std::uint32_t COL_FRESHWATER  = packRGB(0x9d, 0xa2, 0xfb);
+        constexpr std::uint32_t COL_RIVER       = packRGB(0x9d, 0xa2, 0xfb);   //강 — 폭 1~2px, 도로 가로지름 허용
+        constexpr std::uint32_t COL_LAKE        = packRGB(0x93, 0x84, 0xe5);   //호수 — 도로 거의 차단
         constexpr std::uint32_t COL_CITY        = packRGB(0xa2, 0xa2, 0xa2);
         constexpr std::uint32_t COL_CITY_CENTER = packRGB(0xff, 0x00, 0x00);
+        constexpr std::uint32_t COL_CITY_RIVER  = packRGB(0xa2, 0xbf, 0xef);   //도시 내 강 — CityZone과 함께 도시 범위 산정
+        constexpr std::uint32_t COL_CITY_SEA    = packRGB(0x6d, 0x6a, 0xbd);   //도시 내 바다(소금물) — 이스탄불/홍콩식 해협. 도시 범위 포함.
         constexpr std::uint32_t COL_LAND        = packRGB(0x59, 0xc6, 0x82);
-        constexpr std::uint32_t COL_BRIDGE      = packRGB(0x77, 0x77, 0x77);
         constexpr std::uint32_t COL_MOUNTAIN    = packRGB(0xc4, 0x65, 0x48);
 
         constexpr std::uint32_t COL_POLAR = packRGB(0xff, 0xff, 0xff);
@@ -51,11 +53,13 @@ namespace procGen
             switch (rgb)
             {
             case COL_SEAWATER:    return Terrain::Sea;
-            case COL_FRESHWATER:  return Terrain::FreshWater;
+            case COL_RIVER:       return Terrain::River;
+            case COL_LAKE:        return Terrain::Lake;
             case COL_CITY:        return Terrain::CityZone;
             case COL_CITY_CENTER: return Terrain::CityCenter;
+            case COL_CITY_RIVER:  return Terrain::CityRiver;
+            case COL_CITY_SEA:    return Terrain::CitySea;
             case COL_LAND:        return Terrain::Land;
-            case COL_BRIDGE:      return Terrain::Bridge;
             case COL_MOUNTAIN:    return Terrain::Mountain;
 
             case COL_POLAR: return Terrain::Polar;
@@ -72,12 +76,11 @@ namespace procGen
 
         std::string buildSectorPath(int sectorX, int sectorY)
         {
+            //파일명은 3자리 0-padding (worldSector-001.png ~ worldSector-5832.png).
+            //과거 1자리 패딩 분기는 number 1~9에서 -01.png를 만들어 sy=-27 끝줄 9장이
+            //통째로 누락되던 버그가 있어 폐기.
             int number = NUMBER_BIAS + sectorX + 108 * sectorY;
-            std::string path = "map/worldSector-";
-            if (number < 100) path += "0";  //createSector 기존 네이밍 규칙 보존
-            path += std::to_string(number);
-            path += ".png";
-            return path;
+            return std::format("map/worldSector-{:03d}.png", number);
         }
 
         //섹터 1장을 글로벌 그리드의 정해진 위치로 직접 디코드. 실패 시 false(Sea 디폴트 유지).
@@ -152,7 +155,7 @@ namespace procGen
         const __int64 tLoaded = getNanoTimer();
 
         //--- 3. 디버그 히스토그램 (Terrain 분포 검증) ---
-        constexpr int TERRAIN_COUNT = 14;
+        constexpr int TERRAIN_COUNT = 16;
         std::array<std::uint64_t, TERRAIN_COUNT> hist{};
         for (std::size_t i = 0; i < total; ++i)
         {
@@ -183,7 +186,7 @@ namespace procGen
         }
 
         const wchar_t* const names[TERRAIN_COUNT] = {
-            L"Land", L"Sea", L"FreshWater", L"Bridge", L"CityZone", L"CityCenter",
+            L"Land", L"Sea", L"River", L"Lake", L"CityZone", L"CityCenter", L"CityRiver", L"CitySea",
             L"Mountain", L"Polar", L"Tundra", L"Subarctic", L"Monsoon", L"InsularRainforest",
             L"Desert", L"ContinentalRainforest"
         };

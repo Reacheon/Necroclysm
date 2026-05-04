@@ -17,11 +17,8 @@ void World::createSector(int sectorX, int sectorY, int sectorZ)
 		// 섹터 범위 체크: 기존 PNG 라인업 보존
 		if ((sectorY <= 26 && sectorY >= -27) && (sectorX <= 53 && sectorX >= -54))
 		{
-			std::string filePath = "map/worldSector-";
 			int number = 2971 + sectorX + 108 * sectorY;
-			if (number < 100) filePath += "0";
-			filePath += std::to_string(number);
-			filePath += ".png";
+			std::string filePath = std::format("map/worldSector-{:03d}.png", number);
 			std::wstring wPath(filePath.begin(), filePath.end());
 
 			SDL_Surface* refSector = IMG_Load(filePath.c_str());

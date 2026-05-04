@@ -30,7 +30,7 @@ namespace procGen
 
         //캐시 파일 포맷.
         constexpr std::uint32_t kCacheMagic    = 0x4757434EU;         //'NCWG' little-endian
-        constexpr std::uint32_t kCacheVersion  = 1;
+        constexpr std::uint32_t kCacheVersion  = 3;                   //v3: CitySea 추가로 Terrain enum 바이트 값 재배치(이스탄불·홍콩식 도시 내 해협).
         constexpr std::size_t   kChunkBytes    = 16ULL * 1024 * 1024; //16MB / 청크
         //신뢰 못 할 헤더 값에 대한 sanity 상한 — chunk당 최대 32MB로 제한.
         constexpr std::size_t   kMaxChunkBytes = 32ULL * 1024 * 1024;
@@ -55,12 +55,10 @@ namespace procGen
 
         std::string buildSectorPathLocal(int sx, int sy)
         {
+            //buildSectorPath와 완전 동일한 규칙 — fingerprint가 실제 로더와 같은
+            //파일 집합을 보도록 3자리 0-padding 사용.
             int number = NUMBER_BIAS_C + sx + 108 * sy;
-            std::string path = "map/worldSector-";
-            if (number < 100) path += "0";
-            path += std::to_string(number);
-            path += ".png";
-            return path;
+            return std::format("map/worldSector-{:03d}.png", number);
         }
 
         //5832장 PNG의 mtime+size를 FNV-1a 64비트로 폴딩 — stale 검증용.

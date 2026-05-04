@@ -12,10 +12,12 @@ namespace procGen
     {
         Land,
         Sea,
-        FreshWater, //강/호수 모두 포함
-        Bridge,
+        River,      //강 — 폭 1~2px. 도로가 비교적 수월히 가로질러 다리 형성.
+        Lake,       //호수 — 도로가 거의 가로지를 수 없는 큰 수역.
         CityZone,   //사전 마킹된 도시의 영역
         CityCenter, //사전 마킹된 도시의 중심점
+        CityRiver,  //사전 마킹된 도시 내부의 강 — 도시 범위 계산에 포함, 도시 분할용 다리 자유 배치.
+        CitySea,    //사전 마킹된 도시 내부의 바다(소금물) — 이스탄불·홍콩처럼 도시를 가르는 좁은 해협. 도시 범위 포함, 도로 건설 편이.
         Mountain,
         Polar,
         Tundra,
