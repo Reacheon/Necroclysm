@@ -570,6 +570,9 @@
     <ClCompile Include="code\world\Patch.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
+    <ClCompile Include="code\world\Sector.ixx">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
     <ClCompile Include="code\var\globalVar.ixx">
       <Filter>소스 파일\00_var</Filter>
     </ClCompile>

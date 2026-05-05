@@ -585,30 +585,50 @@ struct LoadingStats
     int total() const { return patchesLoading + patchesBuilding; }
 };
 
-// 12개 사각 픽셀이 원형 배치, 시간에 따라 밝기 회전 (혜성 트레일).
+// 두 개의 75도 호가 180도 간격으로 회전 — 머리는 또렷하고 꼬리는 제곱 페이드.
+// 호 한 개당 36개의 라디얼 라인을 쌓아서 2px 두께를 만들고, 머리 끝에는
+// 작은 글로우 점을 더해 회전 방향을 강조한다.
 static void drawLoadingSpinner(int cx, int cy)
 {
-    constexpr int    N        = 12;
-    constexpr double RADIUS   = 16.0;
-    constexpr int    DOT      = 3;            // 3×3 사각형
-    constexpr double TWO_PI   = 6.28318530718;
-    constexpr double START    = -TWO_PI / 4;  // 12시 방향에서 시작
-    constexpr double SPIN_MS  = 1000.0;       // 1 회전당 1초
+    constexpr float PI    = 3.14159265f;
+    constexpr float TWOPI = 6.28318531f;
+    constexpr float ARC   = 1.30f;          // ≈ 75°
+    constexpr float SPIN  = 3.0f;           // rad/sec ≈ 0.48 회전/초
+    constexpr float R_IN  = 12.0f;
+    constexpr float R_OUT = 14.0f;
+    constexpr int   N     = 36;             // 호당 라디얼 분할
 
-    double phase = (double)SDL_GetTicks() * (double)N / SPIN_MS;
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    for (int i = 0; i < N; i++)
+    const float t   = (float)SDL_GetTicks() / 1000.0f;
+    const float rot = std::fmod(t * SPIN, TWOPI);
+    const SDL_Color col = mappal::uiText();
+
+    for (int k = 0; k < 2; ++k)
     {
-        double angle = START + (double)i / (double)N * TWO_PI;
-        int dx = (int)std::round(std::cos(angle) * RADIUS);
-        int dy = (int)std::round(std::sin(angle) * RADIUS);
-
-        // 헤드와의 거리(시계방향 진행) → 페이드
-        double dist = std::fmod(phase - (double)i + (double)N * 2.0, (double)N);
-        Uint8 alpha = (Uint8)std::clamp(255.0 - dist * (200.0 / (double)N), 70.0, 255.0);
-
-        drawFillRect(SDL_Rect{ cx + dx - DOT / 2, cy + dy - DOT / 2, DOT, DOT },
-                     mappal::uiText(), alpha);
+        const float head = rot + (float)k * PI;
+        for (int s = 0; s < N; ++s)
+        {
+            const float frac = (float)s / (float)(N - 1);   // 0=머리, 1=꼬리
+            const float ang  = head - frac * ARC;
+            const float fade = 1.0f - frac;
+            const Uint8 a = (Uint8)(245.0f * fade * fade);
+            if (a < 6) continue;
+            const float c = std::cos(ang), si = std::sin(ang);
+            drawLine(
+                (int)std::round((float)cx + R_IN  * c),
+                (int)std::round((float)cy + R_IN  * si),
+                (int)std::round((float)cx + R_OUT * c),
+                (int)std::round((float)cy + R_OUT * si),
+                col, a);
+        }
+        // 머리 끝 글로우 점 — 회전 방향성 강조
+        const float c = std::cos(head), si = std::sin(head);
+        const float rMid = (R_IN + R_OUT) * 0.5f;
+        drawFillCircle(
+            (int)std::round((float)cx + rMid * c),
+            (int)std::round((float)cy + rMid * si),
+            2, col, 220);
     }
 }
 

@@ -91,7 +91,7 @@ namespace procGen
             case Terrain::Land:                  return 1.00;
             case Terrain::Monsoon:               return 0.75;
             case Terrain::InsularRainforest:     return 0.70;  //수라바야·세부·반둥·다낭급 2차 도시. 수도(자카르타·마닐라 등)는 PNG 사전배치 별개
-            case Terrain::Subarctic:             return 0.15;
+            case Terrain::Subarctic:             return 0.3;
             case Terrain::ContinentalRainforest: return 0.08;  //아마존/콩고 내륙 — 강가 사전배치(마나우스 등)는 별개
             case Terrain::Desert:                return 0.10;
             case Terrain::Tundra:                return 0.02;

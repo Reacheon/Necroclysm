@@ -10,7 +10,7 @@ import util;
 //
 //   파이프라인:
 //     1) tile→pixel 역변환 + spatial hash
-//     2) 후보 엣지 생성 — 티어별 KNN + T1↔T1 트렁크
+//     2) 후보 엣지 생성 — 3-layer Gabriel 그래프 (전체 / T1∪T2 / T1)
 //     3) 중복 제거 + Union-Find로 컴포넌트 봉합
 //     4) Coarse 그리드 1회 빌드 (8× 다운샘플, top-4 mean)
 //     5) ThreadPool 병렬 hierarchical bidirectional A*:
@@ -23,7 +23,11 @@ import util;
 //   픽셀좌표(1px=50타일)는 알고리즘 내부 전용, 반환값은 실타일 좌표.
 //
 //   핵심 설계 결정:
-//   - 위상은 KNN 격자 메쉬 유지 (T1↔T1 트렁크, T2 K=4, T3 K=2 → 시각적 격자감 보존)
+//   - 위상은 Gabriel 그래프 — 두 도시 잇는 disc(지름=두 도시 거리)에 다른 도시가 없는
+//     엣지만 존재. 사이에 도시가 끼면 자동으로 a→c→b 두 엣지로 분할 → 클립스루/그라징
+//     원천 차단. 사막처럼 도시 밀도 낮으면 disc가 자연히 비어 장거리 엣지 생성.
+//   - 3-layer 계층: 전체(지역도로) / T1∪T2(광역) / T1(트렁크). 상위 layer는 하위 티어를
+//     blocker로 무시 → 트렁크가 작은 도시 건너뜀 (인터스테이트가 마을 우회하듯).
 //   - Hierarchical corridor: coarse A*로 corridor 추출, fine A*는 corridor 셀만 expand
 //   - Bidirectional: forward(start→) + backward(end→) 동시 expand → ~2× 가속
 //   - Coarse 집계는 top-4 mean. 순수 min은 sea + CityCenter false positive로 바다 위
@@ -222,57 +226,14 @@ namespace procGen
         };
 
         //도시 표현 + 공간 해시 (placeCities 패턴 재사용).
+        //  Gabriel 위상은 도시 분포(밀도/희소) 자체에서 자동 적응하므로 biome 필요 없음.
         struct CityPixel
         {
             int      px;
             int      py;
             int      z;
             CityTier tier;
-            Terrain  biome;   //도시 주변 우세 biome — 사막/Subarctic은 KNN 반경 확장
         };
-
-        //도시 biome 샘플링 — 도시 중심 픽셀은 CityCenter라 정보 없음.
-        //  주변 ±20px(=1000타일) 11×11 그리드에서 도시/수역 제외하고 우세 biome 결정.
-        //  사막/Subarctic 판정용 — 후보 엣지 KNN 반경 확장에만 사용됨.
-        Terrain sampleCityBiome(const PixelCostGrid& grid, int px, int py) noexcept
-        {
-            int counts[16] = {};   //Terrain enum 크기와 동일(LUT 16과 정합)
-            constexpr int R    = 20;
-            constexpr int STEP = 4;
-            const Terrain* gridData = grid.data.get();
-            for (int dy = -R; dy <= R; dy += STEP)
-            {
-                const int sy = py + dy;
-                if (sy < 0 || sy >= PixelCostGrid::H) continue;
-                const Terrain* row = gridData + static_cast<std::size_t>(sy) * PixelCostGrid::W;
-                for (int dx = -R; dx <= R; dx += STEP)
-                {
-                    const int sx = px + dx;
-                    if (sx < 0 || sx >= PixelCostGrid::W) continue;
-                    const Terrain t = row[sx];
-                    switch (t)
-                    {
-                    case Terrain::CityCenter:
-                    case Terrain::CityZone:
-                    case Terrain::CityRiver:
-                    case Terrain::CitySea:
-                    case Terrain::Sea:
-                    case Terrain::River:
-                    case Terrain::Lake:
-                        continue;
-                    default: break;
-                    }
-                    ++counts[static_cast<std::size_t>(t)];
-                }
-            }
-            int bestIdx   = static_cast<int>(Terrain::Land);
-            int bestCount = 0;
-            for (int i = 0; i < 16; ++i)
-            {
-                if (counts[i] > bestCount) { bestCount = counts[i]; bestIdx = i; }
-            }
-            return static_cast<Terrain>(bestIdx);
-        }
 
         struct SpatialHash
         {
@@ -318,8 +279,20 @@ namespace procGen
         };
 
         //============================================================
-        // 후보 엣지 생성 — 티어별 KNN.
-        //   T1=6, T2=4, T3=2 — 시각적 격자 메쉬 형성.
+        // 후보 엣지 생성 — 3-layer Gabriel 그래프.
+        //   엣지 (a,b) 존재 ⇔ a·b 잇는 지름의 disc 안에 (필터된) 다른 도시 없음.
+        //
+        //   레이어:
+        //     - Gabriel(전체)        : 기본 메쉬 — 모든 티어가 blocker
+        //     - Gabriel(T1∪T2)       : 광역도로 — T3는 blocker에서 제외 (광역 도시들이
+        //                              사이의 작은 마을에 막히지 않게)
+        //     - Gabriel(T1)          : 트렁크 — T2/T3 모두 blocker에서 제외 (대도시간 직결)
+        //
+        //   사막/Subarctic처럼 도시 밀도 낮은 지역은 disc가 자연히 비어 장거리 엣지 자동 형성.
+        //   biome-aware 튜닝 불필요 — 위상이 분포에서 직접 적응.
+        //
+        //   복잡도: 후보 N=3000, 평균 디스크 안 도시 수 ~10 → ~3000 × 200 후보 × 10 테스트
+        //   = O(NM_avg · D) ≈ 6M 연산. SpatialHash 기반이라 캐시 친화적.
         //============================================================
         struct EdgeCand
         {
@@ -328,128 +301,75 @@ namespace procGen
             double dist;
         };
 
-        constexpr int knnK(CityTier t, Terrain biome) noexcept
+        using TierMask = std::uint8_t;
+        constexpr TierMask kTierAll = 0b111;
+        constexpr TierMask kTierTop = 1u << static_cast<int>(CityTier::T1);
+        constexpr TierMask kTierMid = (1u << static_cast<int>(CityTier::T1))
+                                    | (1u << static_cast<int>(CityTier::T2));
+
+        constexpr bool tierIn(CityTier t, TierMask m) noexcept
         {
-            int base;
-            switch (t)
-            {
-            case CityTier::T1: base = 6; break;
-            case CityTier::T2: base = 4; break;
-            case CityTier::T3: base = 2; break;
-            default:           base = 2; break;
-            }
-            //사막/Subarctic은 가까운 도시 자체가 적어서 K 작게 잡으면 단일 실패가
-            //곧 컴포넌트 절단으로 이어짐 → 이웃 수 자체를 늘려 redundancy 확보.
-            if (biome == Terrain::Desert || biome == Terrain::Subarctic)
-                base += 2;
-            return base;
-        }
-        constexpr int knnMaxDist(CityTier t, Terrain biome) noexcept
-        {
-            int base;
-            switch (t)
-            {
-            case CityTier::T1: base = 1500; break;
-            case CityTier::T2: base = 1200; break;
-            case CityTier::T3: base = 500;  break;
-            default:           base = 500;  break;
-            }
-            //사막/Subarctic은 도시 밀도 낮고 도로 건설 쉬움 → 후보 반경 6배.
-            //  라스베가스/캐나다식 장거리 도로 표현. 도시 자체가 적어서 엣지 후보
-            //  절대 증가량은 미미(T3 500→3000, T2 1200→7200).
-            if (biome == Terrain::Desert || biome == Terrain::Subarctic)
-                base *= 6;
-            //대륙성 우림은 정반대 — 우거짐/습지로 장거리 도로 거의 불가능. 강 따라
-            //  가까운 이웃하고만 후보 형성. 마나우스가 외부와 도로로 거의 안 이어진 현실 반영.
-            //  도서성 우림(동남아)은 페리/단거리 도로로 연결되므로 적용 안 함.
-            if (biome == Terrain::ContinentalRainforest)
-                base = base * 7 / 10;
-            return base;
+            return (m & (1u << static_cast<int>(t))) != 0;
         }
 
-        constexpr int T1_TRUNK_K        = 4;
-        constexpr int T1_TRUNK_MAX_DIST = 1500;
+        //레이어별 후보 거리 상한 — 디스크 안 도시 수가 적어질수록 엣지가 길어질 수 있음.
+        //  hard cap이 없으면 호주↔동남아처럼 sea만 끼고 직선거리 가까운 페어가
+        //  무의미한 장거리 엣지를 만들 수 있어 차단. (A* 단계에서 sea 비용으로도 걸리지만
+        //  후보 단계에서 잘라내는 게 빠름.)
+        constexpr double kGabrielMaxDistAll = 3000.0;   //전체 — 도시 밀도 높아 짧은 엣지 위주
+        constexpr double kGabrielMaxDistMid = 5000.0;   //T1∪T2 — 광역
+        constexpr double kGabrielMaxDistTop = 8000.0;   //T1 — 트렁크 (대륙간)
 
-        std::vector<EdgeCand> buildKnnEdges(const std::vector<CityPixel>& cities,
-                                            const SpatialHash& hash)
+        std::vector<EdgeCand> buildGabrielEdges(const std::vector<CityPixel>& cities,
+                                                 const SpatialHash& hash,
+                                                 TierMask mask,
+                                                 double maxDist)
         {
             std::vector<EdgeCand> out;
-            out.reserve(cities.size() * 6);
+            out.reserve(cities.size() * 4);
 
-            std::vector<std::pair<double, int>> nearest;
-            nearest.reserve(64);
+            const double maxD2 = maxDist * maxDist;
+            const int    maxR  = static_cast<int>(maxDist);
 
             for (int i = 0; i < static_cast<int>(cities.size()); ++i)
             {
-                const auto& c = cities[i];
-                const int K = knnK(c.tier, c.biome);
-                const int R = knnMaxDist(c.tier, c.biome);
+                const auto& a = cities[i];
+                if (!tierIn(a.tier, mask)) continue;
 
-                nearest.clear();
-                hash.forEachInRadius(c.px, c.py, R, [&](int j)
+                hash.forEachInRadius(a.px, a.py, maxR, [&](int j)
                 {
-                    if (j == i) return;
-                    const auto& o = cities[j];
-                    const double dx = static_cast<double>(c.px - o.px);
-                    const double dy = static_cast<double>(c.py - o.py);
+                    if (j <= i) return;   //중복 방지: i<j만 처리
+                    const auto& b = cities[j];
+                    if (!tierIn(b.tier, mask)) return;
+
+                    const double dx = static_cast<double>(a.px - b.px);
+                    const double dy = static_cast<double>(a.py - b.py);
                     const double d2 = dx * dx + dy * dy;
-                    if (d2 > static_cast<double>(R) * R) return;
-                    nearest.emplace_back(d2, j);
+                    if (d2 > maxD2 || d2 < 1.0) return;
+
+                    //Gabriel test: AB의 disc(중심=중점, 반지름=|AB|/2) 안에
+                    //마스크된 다른 도시가 strictly inside 인가?
+                    const double mx = (a.px + b.px) * 0.5;
+                    const double my = (a.py + b.py) * 0.5;
+                    const double r2 = d2 * 0.25;
+                    const int    sR = static_cast<int>(std::sqrt(r2)) + 1;
+
+                    bool blocked = false;
+                    hash.forEachInRadius(static_cast<int>(mx), static_cast<int>(my), sR, [&](int k)
+                    {
+                        if (blocked) return;
+                        if (k == i || k == j) return;
+                        const auto& c = cities[k];
+                        if (!tierIn(c.tier, mask)) return;
+                        const double cdx = static_cast<double>(c.px) - mx;
+                        const double cdy = static_cast<double>(c.py) - my;
+                        const double cd2 = cdx * cdx + cdy * cdy;
+                        if (cd2 < r2) blocked = true;
+                    });
+
+                    if (!blocked)
+                        out.push_back(EdgeCand{ i, j, std::sqrt(d2) });
                 });
-
-                if (static_cast<int>(nearest.size()) > K)
-                {
-                    std::partial_sort(nearest.begin(), nearest.begin() + K, nearest.end(),
-                        [](const auto& a, const auto& b) { return a.first < b.first; });
-                    nearest.resize(K);
-                }
-
-                for (const auto& [d2, j] : nearest)
-                {
-                    const int a = std::min(i, j);
-                    const int b = std::max(i, j);
-                    out.push_back(EdgeCand{ a, b, std::sqrt(d2) });
-                }
-            }
-            return out;
-        }
-
-        std::vector<EdgeCand> buildT1Trunks(const std::vector<CityPixel>& cities)
-        {
-            std::vector<int> t1Idx;
-            for (int i = 0; i < static_cast<int>(cities.size()); ++i)
-                if (cities[i].tier == CityTier::T1) t1Idx.push_back(i);
-
-            std::vector<EdgeCand> out;
-            out.reserve(t1Idx.size() * T1_TRUNK_K);
-            std::vector<std::pair<double, int>> nearest;
-
-            for (int ii : t1Idx)
-            {
-                const auto& c = cities[ii];
-                nearest.clear();
-                for (int jj : t1Idx)
-                {
-                    if (jj == ii) continue;
-                    const auto& o = cities[jj];
-                    const double dx = static_cast<double>(c.px - o.px);
-                    const double dy = static_cast<double>(c.py - o.py);
-                    const double d2 = dx * dx + dy * dy;
-                    if (d2 > static_cast<double>(T1_TRUNK_MAX_DIST) * T1_TRUNK_MAX_DIST) continue;
-                    nearest.emplace_back(d2, jj);
-                }
-                if (static_cast<int>(nearest.size()) > T1_TRUNK_K)
-                {
-                    std::partial_sort(nearest.begin(), nearest.begin() + T1_TRUNK_K, nearest.end(),
-                        [](const auto& a, const auto& b) { return a.first < b.first; });
-                    nearest.resize(T1_TRUNK_K);
-                }
-                for (const auto& [d2, jj] : nearest)
-                {
-                    const int a = std::min(ii, jj);
-                    const int b = std::max(ii, jj);
-                    out.push_back(EdgeCand{ a, b, std::sqrt(d2) });
-                }
             }
             return out;
         }
@@ -1299,20 +1219,22 @@ namespace procGen
 
         if (cities.size() < 2) return {};
 
-        //--- 1) tile → pixel 역변환 + biome 샘플링 ---
+        //--- 1) tile → pixel 역변환 ---
         std::vector<CityPixel> cps;
         cps.reserve(cities.size());
-        int biomeDesert = 0, biomeSubarctic = 0;
+        int t1n = 0, t2n = 0, t3n = 0;
         for (const auto& cn : cities)
         {
             const PixelCoord p = tileToPixel(cn.center);
-            const Terrain biome = sampleCityBiome(grid, p.x, p.y);
-            if      (biome == Terrain::Desert   ) ++biomeDesert;
-            else if (biome == Terrain::Subarctic) ++biomeSubarctic;
-            cps.push_back(CityPixel{ p.x, p.y, p.z, cn.tier, biome });
+            cps.push_back(CityPixel{ p.x, p.y, p.z, cn.tier });
+            switch (cn.tier)
+            {
+            case CityTier::T1: ++t1n; break;
+            case CityTier::T2: ++t2n; break;
+            case CityTier::T3: ++t3n; break;
+            }
         }
-        prt(L"  biome (sparse-net cities): desert=%d subarctic=%d (KNN radius x4)\n",
-            biomeDesert, biomeSubarctic);
+        prt(L"  tier counts: T1=%d T2=%d T3=%d\n", t1n, t2n, t3n);
 
         //--- 2) 공간 해시 ---
         SpatialHash hash(PixelCostGrid::W, PixelCostGrid::H, 80);
@@ -1321,16 +1243,23 @@ namespace procGen
 
         const __int64 tHash = getNanoTimer();
 
-        //--- 3) 후보 엣지 (KNN + T1 트렁크) ---
-        std::vector<EdgeCand> knn   = buildKnnEdges(cps, hash);
-        const std::size_t     knnN  = knn.size();
-        std::vector<EdgeCand> trunk = buildT1Trunks(cps);
-        knn.insert(knn.end(), trunk.begin(), trunk.end());
-        std::vector<EdgeCand> edges = dedupEdges(std::move(knn));
+        //--- 3) 후보 엣지 — 3-layer Gabriel ---
+        std::vector<EdgeCand> base = buildGabrielEdges(cps, hash, kTierAll, kGabrielMaxDistAll);
+        std::vector<EdgeCand> mid  = buildGabrielEdges(cps, hash, kTierMid, kGabrielMaxDistMid);
+        std::vector<EdgeCand> top  = buildGabrielEdges(cps, hash, kTierTop, kGabrielMaxDistTop);
+        const std::size_t baseN = base.size();
+        const std::size_t midN  = mid.size();
+        const std::size_t topN  = top.size();
+
+        base.insert(base.end(), mid.begin(), mid.end());
+        base.insert(base.end(), top.begin(), top.end());
+        std::vector<EdgeCand> edges = dedupEdges(std::move(base));
 
         const __int64 tEdges = getNanoTimer();
 
         //--- 4) 연결성 봉합 ---
+        //  Gabriel ⊇ MST 라 단일 컴포넌트가 정상이지만, 도시 클러스터가 sea로
+        //  완전히 고립된 경우(예: 외딴 섬 도시) 추가 엣지가 필요할 수 있음.
         std::vector<EdgeCand> extras = ensureConnectivity(edges, cps);
         const std::size_t     extrasN = extras.size();
         if (!extras.empty())
@@ -1341,8 +1270,8 @@ namespace procGen
 
         const __int64 tConn = getNanoTimer();
 
-        prt(L"  edges: knn=%zu trunk=%zu connectivity=%zu => final=%zu\n",
-            knnN, trunk.size(), extrasN, edges.size());
+        prt(L"  edges: gabriel(all)=%zu (T1+T2)=%zu (T1)=%zu connectivity=%zu => final=%zu\n",
+            baseN, midN, topN, extrasN, edges.size());
 
         //--- 4-1) 엣지 거리 히스토그램 ---
         {

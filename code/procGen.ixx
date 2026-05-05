@@ -4,9 +4,9 @@ import std;
 import util;
 
 //============================================================
-// 내부 전용 타입 — 외부로 노출되면 안 됨.
+// 외부 노출 — Terrain은 Sector 등에서 픽셀 색 분기용으로 필요.
 //============================================================
-namespace procGen
+export namespace procGen
 {
     enum class Terrain : std::uint8_t
     {
@@ -27,7 +27,13 @@ namespace procGen
         Desert,
         ContinentalRainforest, //대륙성 열대우림 — 아마존/콩고 내륙. Monsoon보다 조밀, 절차생성 도시 거의 차단
     };
+}
 
+//============================================================
+// 내부 전용 타입 — 외부로 노출되면 안 됨.
+//============================================================
+namespace procGen
+{
     struct PixelCostGrid
     {
         static constexpr int W = 43200;
@@ -159,6 +165,34 @@ export namespace procGen
     //  prt() 등 std::wprintf 계열은 스레드 안전이 보장되지 않으므로 워커 스레드에서는
     //  호출하지 않는다 — 각 phase 함수 내부의 prt만 사용.
     void generateWorld(std::uint64_t seed, WorldGenProgress& progress);
+
+    //============================================================
+    // mmap 픽셀 그리드 — Phase 1 종료 후 진입, Phase 2 게임플레이 단일 접근점.
+    //   Phase 1 동안에는 heap PixelCostGrid를 직접 사용 (전역 A* 빠름).
+    //   Phase 1 끝나면 transitionToMmap이:
+    //     1) heap grid 933MB를 디스크 임시 파일에 기록 (압축 없음)
+    //     2) heap free
+    //     3) 파일을 read-only mmap → 가상 주소만 매핑, RAM 사용 0
+    //   이후 worldPixel(px, py)이 mmap된 데이터에서 페이지 폴트 기반 lazy 로드로 반환.
+    //   게임 종료 시 shutdownWorldPixelMmap이 mmap 해제 + 임시 파일 삭제.
+    //
+    //   세션 임시 파일이라 다음 실행에는 worldPatch.cache(압축, 영구)에서 다시 풀어
+    //   새 mmap 파일을 만든다.
+    //============================================================
+
+    //Phase 1 직후 호출. heapGrid를 디스크에 기록 → mmap 진입 → heapGrid는 호출자가 free.
+    //  실패 시 false 반환 (이 경우 호출자가 heapGrid를 그대로 유지하는 폴백 가능).
+    bool transitionToMmap(const PixelCostGrid& heapGrid);
+
+    //게임 종료 시 호출. mmap 해제 + 임시 파일 삭제.
+    void shutdownWorldPixelMmap() noexcept;
+
+    //픽셀 1개 조회. mmap 진입 후에만 유효.
+    //  범위 밖이면 Sea를 반환 (방어적 — 섹터 경계 외곽에서 조회 시 안전).
+    Terrain worldPixel(int px, int py) noexcept;
+
+    //mmap 활성 여부 — 디버그/스모크 테스트용.
+    bool worldPixelMmapActive() noexcept;
 }
 
 //============================================================

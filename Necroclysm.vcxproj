@@ -276,6 +276,7 @@
     <ClCompile Include="code\procGen_worldGridCache.cpp" />
     <ClCompile Include="code\procGen_placeCities.cpp" />
     <ClCompile Include="code\procGen_generateWorld.cpp" />
+    <ClCompile Include="code\procGen_mmapGrid.cpp" />
     <ClCompile Include="code\worldGenState.ixx" />
     <ClCompile Include="code\Prop\Prop.cpp" />
     <ClCompile Include="code\Prop\Prop.ixx" />
@@ -400,6 +401,7 @@
     <ClCompile Include="code\world\World_createPatch.cpp" />
     <ClCompile Include="code\world\World_loadPatch.cpp" />
     <ClCompile Include="code\world\Patch.ixx" />
+    <ClCompile Include="code\world\Sector.ixx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />

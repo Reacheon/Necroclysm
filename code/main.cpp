@@ -27,6 +27,7 @@ import initCoordTransform;
 import nervedriveFilter;
 import WorldGenScreen;
 import worldGenState;
+import procGen;
 #define SDL_GESTURE_IMPLEMENTATION 1
 #include "SDL_gesture.h"
 
@@ -159,6 +160,7 @@ int main(int argc, char** argv)
 		Gesture_Quit();
 		gestureInitialized = false;
 	}
+	procGen::shutdownWorldPixelMmap();
 	TTF_Quit();
 	SDL_Quit();
 	//_CrtDumpMemoryLeaks();

@@ -143,8 +143,18 @@ namespace procGen
             progress.roadsSnap.push_back(r);
         });
 
-        //--- 결과 저장 후 done ---
+        //--- Phase 1 산출물 저장 ---
         progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
+
+        //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
+        //  성공 시: Phase 2 게임플레이는 procGen::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
+        //  실패 시: heap grid 그대로 유지 (워커 스레드 종료 시 RAII로 free) — 폴백.
+        //          worldPixel은 Sea 반환하므로 게임은 동작하나 색상 데이터 무효.
+        if (transitionToMmap(grid))
+        {
+            grid.data.reset();   //933MB heap 즉시 회수
+        }
+
         progress.phase.store(GenPhase::done, std::memory_order_release);
         progress.done .store(true,           std::memory_order_release);
     }

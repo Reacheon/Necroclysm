@@ -31,6 +31,7 @@ import statusEffect;
 import SkillData;
 import SkillBehavior;
 import SkillRegistry;
+import procGen;
 
 constexpr double EPSILON = 0.000001;
 
@@ -333,6 +334,7 @@ __int64 playerInputTurn()
 					break;
 				case SDL_EVENT_QUIT:
 					//IMG_Quit();
+					procGen::shutdownWorldPixelMmap();
 					TTF_Quit();
 					SDL_Quit();
 					exit(0);

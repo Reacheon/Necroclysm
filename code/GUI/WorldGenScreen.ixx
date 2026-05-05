@@ -130,6 +130,136 @@ private:
         return L"";
     }
 
+    //--- 좌측 하단 로딩 로드맵 ---------------------------------------------
+    //   3단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
+    //   회전 스피너(머리/꼬리 페이드 아크)로 강조.
+    void drawRoadmap(procGen::GenPhase ph) const
+    {
+        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad
+        int activeStep = 0;
+        bool stepDone[3] = { false, false, false };
+        switch (ph)
+        {
+        case procGen::GenPhase::idle:      activeStep = 0; break;
+        case procGen::GenPhase::loadPng:   activeStep = 1; break;
+        case procGen::GenPhase::placeCity: activeStep = 2; stepDone[0] = true; break;
+        case procGen::GenPhase::buildRoad: activeStep = 3; stepDone[0] = stepDone[1] = true; break;
+        case procGen::GenPhase::done:      stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        }
+
+        constexpr SDL_Color C_PENDING = { 105, 105, 110, 255 };
+        constexpr SDL_Color C_DONE    = { 175, 175, 180, 255 };
+        constexpr SDL_Color C_ACTIVE  = { 245, 245, 240, 255 };
+
+        constexpr int R_OUTER = 17;   // 본 링 바깥 반지름
+        constexpr int R_INNER = 15;   // 본 링 안쪽 (두께 2px)
+        constexpr int SPACING = 74;   // 단계 간 세로 간격 (원 중심 기준)
+        const int cx       = 64;
+        const int firstCy  = cameraH - 226;   // 최상단 원 중심 Y
+        const int textX    = cx + 36;
+
+        static const wchar_t* labels[3] = {
+            L"Loading satellite imagery",
+            L"Placing cities",
+            L"Building road network",
+        };
+
+        // 단계 사이를 잇는 도트 라인 (3px 점, 4px 간격)
+        for (int i = 0; i < 2; ++i)
+        {
+            const int yA = firstCy +  i      * SPACING + R_OUTER + 4;
+            const int yB = firstCy + (i + 1) * SPACING - R_OUTER - 4;
+            const SDL_Color lineCol = stepDone[i] ? C_DONE : C_PENDING;
+            for (int y = yA; y <= yB; y += 5)
+            {
+                drawLine(cx, y, cx, std::min(yB, y + 2), lineCol);
+            }
+        }
+
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+        // 각 단계 그리기
+        for (int i = 0; i < 3; ++i)
+        {
+            const int cy = firstCy + i * SPACING;
+            const bool isActive = (activeStep == (i + 1));
+            const SDL_Color col = isActive ? C_ACTIVE : (stepDone[i] ? C_DONE : C_PENDING);
+
+            // 두께 2px 링 (스캔라인 방식 — 외곽-내곽 사이만 채움)
+            for (int dy = -R_OUTER; dy <= R_OUTER; ++dy)
+            {
+                const int oxSpan = (int)std::sqrt((float)(R_OUTER * R_OUTER - dy * dy));
+                const int absdy  = (dy < 0) ? -dy : dy;
+                if (absdy <= R_INNER)
+                {
+                    const int ixSpan = (int)std::sqrt((float)(R_INNER * R_INNER - dy * dy));
+                    drawLine(cx - oxSpan, cy + dy, cx - ixSpan, cy + dy, col);
+                    drawLine(cx + ixSpan + 1, cy + dy, cx + oxSpan, cy + dy, col);
+                }
+                else
+                {
+                    drawLine(cx - oxSpan, cy + dy, cx + oxSpan, cy + dy, col);
+                }
+            }
+
+            // 숫자 — 원 중심에 정확히 정렬
+            setFont(fontType::mainFontBold);
+            setFontSize(18);
+            const std::wstring numStr = std::to_wstring(i + 1);
+            drawTextCenter(numStr, cx, cy, col);
+
+            // 라벨 — 원 우측, 세로 중앙
+            setFont(fontType::mainFont);
+            setFontSize(15);
+            drawTextCenter(labels[i], textX + queryTextWidth(labels[i]) / 2, cy, col);
+
+            // 활성 단계: 두 개의 회전 아크 스피너
+            //   본 링 바깥(R_OUTER+2.5 ~ R_OUTER+4.5)에 75도짜리 호 두 개를
+            //   180도 간격으로 띄우고, 각 호는 머리에서 꼬리 방향으로 페이드.
+            //   라디얼 라인을 촘촘히 쌓아서 2px 두께를 만든다.
+            if (isActive)
+            {
+                constexpr float PI    = 3.14159265f;
+                constexpr float TWOPI = 6.28318531f;
+                const float t   = (float)SDL_GetTicks() / 1000.0f;
+                const float rot = std::fmod(t * 3.0f, TWOPI);   // ≈ 0.48 회전/초
+                constexpr float ARC = 1.30f;                    // ≈ 75도
+
+                const float rIn  = (float)R_OUTER + 2.5f;
+                const float rOut = (float)R_OUTER + 4.5f;
+
+                constexpr int N = 36;  // 호당 라디얼 분할
+                for (int k = 0; k < 2; ++k)
+                {
+                    const float head = rot + (float)k * PI;
+                    for (int s = 0; s < N; ++s)
+                    {
+                        const float frac = (float)s / (float)(N - 1);  // 0=머리, 1=꼬리
+                        const float ang  = head - frac * ARC;
+                        // 머리 가까이는 밝고, 꼬리는 빠르게 페이드
+                        const float fade = 1.0f - frac;
+                        const Uint8 a = (Uint8)(245.0f * fade * fade);
+                        if (a < 6) continue;
+                        const float c = std::cos(ang), si = std::sin(ang);
+                        drawLine(
+                            (int)std::round((float)cx + rIn  * c),
+                            (int)std::round((float)cy + rIn  * si),
+                            (int)std::round((float)cx + rOut * c),
+                            (int)std::round((float)cy + rOut * si),
+                            C_ACTIVE, a);
+                    }
+                    // 머리 끝에 살짝 굵은 글로우 점 — 회전 방향성을 강조
+                    const float c = std::cos(head), si = std::sin(head);
+                    const float rMid = (rIn + rOut) * 0.5f;
+                    drawFillCircle(
+                        (int)std::round((float)cx + rMid * c),
+                        (int)std::round((float)cy + rMid * si),
+                        2, C_ACTIVE, 220);
+                }
+            }
+        }
+    }
+
 public:
     //onWorldReady 콜백은 done 시점에 메인 스레드에서 호출됨(WorldGenResult 결과 인계).
     WorldGenScreen(std::uint64_t seed, std::function<void(procGen::WorldGenResult)> onWorldReady)
@@ -361,5 +491,8 @@ public:
             const int subW = queryTextWidth(subStr);
             drawText(subStr, (cameraW - subW) / 2, subY, wgcfg::TEXT_SUB);
         }
+
+        //--- 좌측 하단 로딩 로드맵 ---
+        drawRoadmap(ph);
     }
 };
