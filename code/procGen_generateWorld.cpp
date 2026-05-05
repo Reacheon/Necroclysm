@@ -51,52 +51,52 @@ namespace procGen
             return packPreviewRGBA(0x10, 0x10, 0x10);
         }
 
-        //섹터 ↔ 미리보기 블록 매핑 상수.
-        //  43200 = 108 sector * 400px. 1080 / 108 = 10 → 섹터 1장 = 미리보기 10×10.
-        //  21600 =  54 sector * 400px.  540 /  54 = 10 → 정확히 정합.
-        constexpr int SECTOR_X_MIN_LOCAL  = -54;
-        constexpr int SECTOR_Y_MIN_LOCAL  = -27;
-        constexpr int SECTOR_PIXEL_LOCAL  = 400;
-        constexpr int PREVIEW_PER_SECTOR  = SECTOR_PIXEL_LOCAL * PREVIEW_W / PixelCostGrid::W;  // = 10
-        static_assert(SECTOR_PIXEL_LOCAL * PREVIEW_W % PixelCostGrid::W == 0,
-                      "섹터 픽셀이 미리보기 해상도와 정합되지 않음 — 비율 어긋남");
+        //패치 ↔ 미리보기 블록 매핑 상수.
+        //  43200 = 108 patch * 400px. 1080 / 108 = 10 → 패치 1장 = 미리보기 10×10.
+        //  21600 =  54 patch * 400px.  540 /  54 = 10 → 정확히 정합.
+        constexpr int PATCH_X_MIN_LOCAL  = -54;
+        constexpr int PATCH_Y_MIN_LOCAL  = -27;
+        constexpr int PATCH_PIXEL_LOCAL  = 400;
+        constexpr int PREVIEW_PER_PATCH  = PATCH_PIXEL_LOCAL * PREVIEW_W / PixelCostGrid::W;  // = 10
+        static_assert(PATCH_PIXEL_LOCAL * PREVIEW_W % PixelCostGrid::W == 0,
+                      "패치 픽셀이 미리보기 해상도와 정합되지 않음 — 비율 어긋남");
 
-        //방금 로드된 섹터 1장(400×400 source) → 미리보기 10×10 블록 갱신.
+        //방금 로드된 패치 1장(400×400 source) → 미리보기 10×10 블록 갱신.
         //  각 미리보기 픽셀은 40×40 source 블록의 center 1픽셀을 nearest 샘플.
         //  (평균을 안 쓰는 이유: CityCenter 같은 단일 픽셀 마커가 사라짐.)
         //  로컬 스택 버퍼에 먼저 계산 → 짧게 락 잡고 메인 버퍼에 복사. 락 시간 < 1µs.
-        void updateSectorPreview(const PixelCostGrid& grid,
-                                 int sectorX, int sectorY,
-                                 std::mutex& mtx,
-                                 std::vector<std::uint32_t>& dstRGBA)
+        void updatePatchPreview(const PixelCostGrid& grid,
+                                int patchX, int patchY,
+                                std::mutex& mtx,
+                                std::vector<std::uint32_t>& dstRGBA)
         {
-            const int sIdxX = sectorX - SECTOR_X_MIN_LOCAL;     // 0..107
-            const int sIdxY = sectorY - SECTOR_Y_MIN_LOCAL;     // 0..53
-            const int blkX0 = sIdxX * PREVIEW_PER_SECTOR;       // preview x 시작
-            const int blkY0 = sIdxY * PREVIEW_PER_SECTOR;       // preview y 시작
+            const int sIdxX = patchX - PATCH_X_MIN_LOCAL;       // 0..107
+            const int sIdxY = patchY - PATCH_Y_MIN_LOCAL;       // 0..53
+            const int blkX0 = sIdxX * PREVIEW_PER_PATCH;        // preview x 시작
+            const int blkY0 = sIdxY * PREVIEW_PER_PATCH;        // preview y 시작
 
             //로컬 버퍼에 색 미리 계산 (락 밖에서 grid 읽기 — grid는 워커 단일 소유라 안전)
-            std::uint32_t local[PREVIEW_PER_SECTOR * PREVIEW_PER_SECTOR];
-            for (int dy = 0; dy < PREVIEW_PER_SECTOR; ++dy)
+            std::uint32_t local[PREVIEW_PER_PATCH * PREVIEW_PER_PATCH];
+            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
             {
                 const int srcY = (blkY0 + dy) * (PixelCostGrid::H / PREVIEW_H)
                                + (PixelCostGrid::H / PREVIEW_H) / 2;
-                for (int dx = 0; dx < PREVIEW_PER_SECTOR; ++dx)
+                for (int dx = 0; dx < PREVIEW_PER_PATCH; ++dx)
                 {
                     const int srcX = (blkX0 + dx) * (PixelCostGrid::W / PREVIEW_W)
                                    + (PixelCostGrid::W / PREVIEW_W) / 2;
-                    local[dy * PREVIEW_PER_SECTOR + dx] = terrainPreviewColor(grid.at(srcX, srcY));
+                    local[dy * PREVIEW_PER_PATCH + dx] = terrainPreviewColor(grid.at(srcX, srcY));
                 }
             }
 
             //짧게 락 잡고 메인 버퍼에 줄단위 복사
             std::lock_guard<std::mutex> lk(mtx);
-            for (int dy = 0; dy < PREVIEW_PER_SECTOR; ++dy)
+            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
             {
                 std::uint32_t* dstRow = dstRGBA.data()
                     + static_cast<std::size_t>(blkY0 + dy) * PREVIEW_W + blkX0;
-                std::memcpy(dstRow, &local[dy * PREVIEW_PER_SECTOR],
-                            PREVIEW_PER_SECTOR * sizeof(std::uint32_t));
+                std::memcpy(dstRow, &local[dy * PREVIEW_PER_PATCH],
+                            PREVIEW_PER_PATCH * sizeof(std::uint32_t));
             }
         }
     }
@@ -107,7 +107,7 @@ namespace procGen
         progress.phase.store(GenPhase::loadPng, std::memory_order_release);
 
         //미리보기 버퍼를 alpha=0(투명)으로 미리 alloc → 즉시 표시 가능 상태로 진입.
-        //sectorLoadSink에서 섹터 1장씩 부분 갱신 → 위성이 점진적으로 그려지는 효과.
+        //patchLoadSink에서 패치 1장씩 부분 갱신 → 위성이 점진적으로 그려지는 효과.
         {
             std::lock_guard<std::mutex> lk(progress.previewMtx);
             progress.previewRGBA.assign(
@@ -117,11 +117,11 @@ namespace procGen
 
         PixelCostGrid grid = loadWorldGrid([&](int loaded, int total, int sx, int sy, const PixelCostGrid& g)
         {
-            progress.sectorsLoadedDone .store(loaded, std::memory_order_relaxed);
-            progress.sectorsLoadedTotal.store(total , std::memory_order_relaxed);
+            progress.patchesLoadedDone .store(loaded, std::memory_order_relaxed);
+            progress.patchesLoadedTotal.store(total , std::memory_order_relaxed);
 
-            //방금 로드된 섹터의 10×10 블록만 미리보기에 반영 + 버전 bump.
-            updateSectorPreview(g, sx, sy, progress.previewMtx, progress.previewRGBA);
+            //방금 로드된 패치의 10×10 블록만 미리보기에 반영 + 버전 bump.
+            updatePatchPreview(g, sx, sy, progress.previewMtx, progress.previewRGBA);
             progress.previewVersion.fetch_add(1, std::memory_order_release);
         });
 
@@ -142,14 +142,6 @@ namespace procGen
             std::lock_guard<std::mutex> lk(progress.roadsMtx);
             progress.roadsSnap.push_back(r);
         });
-
-        //도로망 튜닝용 디버그 가드. true면 done을 set하지 않고 return → WorldGenScreen이
-        //닫히지 않고 도시+도로가 그려진 상태로 멈춤(QUIT으로만 종료). 튜닝 끝나면 제거.
-        constexpr bool kDebugStopAfterRoads = true;
-        if constexpr (kDebugStopAfterRoads)
-        {
-            return;
-        }
 
         //--- 결과 저장 후 done ---
         progress.result = WorldGenResult{ std::move(cities), std::move(roads) };

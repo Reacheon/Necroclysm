@@ -107,8 +107,8 @@ export namespace procGen
         std::atomic<bool>     done { false };
 
         //PNG 진행 (5832장 기준)
-        std::atomic<int> sectorsLoadedTotal{ 0 };
-        std::atomic<int> sectorsLoadedDone { 0 };
+        std::atomic<int> patchesLoadedTotal{ 0 };
+        std::atomic<int> patchesLoadedDone { 0 };
 
         //도시 누적 스냅샷
         std::mutex             citiesMtx;
@@ -119,13 +119,13 @@ export namespace procGen
         std::vector<RoadPolyLine>   roadsSnap;
 
         //위성 미리보기 RGBA (PREVIEW_W * PREVIEW_H, R8 G8 B8 A8 little-endian).
-        //  초기 alpha=0(전면 투명). 섹터 1장 로드 끝날 때마다 해당 10×10 블록을
+        //  초기 alpha=0(전면 투명). 패치 1장 로드 끝날 때마다 해당 10×10 블록을
         //  alpha=0xff 색으로 갱신, 메인 스레드가 SDL_UpdateTexture로 부분 반영.
         //  미로드 영역은 alpha=0이라 BLEND 모드에서 자연스럽게 투명 처리됨.
         std::mutex                       previewMtx;
         std::vector<std::uint32_t>       previewRGBA;
         std::atomic<bool>                previewReady   { false };  //버퍼 alloc 완료 시 true
-        std::atomic<int>                 previewVersion { 0     };  //섹터 갱신 1번마다 +1
+        std::atomic<int>                 previewVersion { 0     };  //패치 갱신 1번마다 +1
 
         //최종 결과 — done == true 직전에 채움. done 이후에는 read-only.
         std::optional<WorldGenResult>    result;
@@ -135,15 +135,15 @@ export namespace procGen
     using CitySink = std::function<void(const CityNode&)>;
     using RoadSink = std::function<void(const RoadPolyLine&)>;
 
-    //onSector(loaded, total, sectorX, sectorY, grid) — 섹터 1장 디코드 직후 호출.
+    //onPatch(loaded, total, patchX, patchY, grid) — 패치 1장 디코드 직후 호출.
     //  grid는 그 시점까지 로드된 부분만 유효(나머지는 Sea 디폴트). 콜백 내에서
-    //  방금 채워진 섹터 영역 픽셀을 즉시 읽어 미리보기 점진 갱신에 사용 가능.
-    using SectorLoadSink = std::function<void(int loaded, int total, int sectorX, int sectorY, const PixelCostGrid& grid)>;
+    //  방금 채워진 패치 영역 픽셀을 즉시 읽어 미리보기 점진 갱신에 사용 가능.
+    using PatchLoadSink = std::function<void(int loaded, int total, int patchX, int patchY, const PixelCostGrid& grid)>;
 
     //공개 진입점 — procGen_worldGridCache.cpp에서 정의.
-    //  캐시(map/worldSector.cache)가 있고 PNG fingerprint가 일치하면 압축 해제로 로드,
+    //  캐시(map/worldPatch.cache)가 있고 PNG fingerprint가 일치하면 압축 해제로 로드,
     //  아니면 PNG 디코드 후 캐시 기록 (loadWorldGridFromPng를 내부 호출).
-    PixelCostGrid loadWorldGrid(SectorLoadSink onSector = {});
+    PixelCostGrid loadWorldGrid(PatchLoadSink onPatch = {});
     std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid, CitySink onPlaced = {});
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
@@ -166,5 +166,5 @@ export namespace procGen
 //============================================================
 namespace procGen
 {
-    PixelCostGrid loadWorldGridFromPng(SectorLoadSink onSector);
+    PixelCostGrid loadWorldGridFromPng(PatchLoadSink onPatch);
 }

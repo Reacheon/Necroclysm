@@ -35,13 +35,13 @@ namespace procGen
 {
     namespace
     {
-        //좌표 변환 — procGen 픽셀(0,0) = 섹터(-54,-27) 좌상단.
-        //  loadWorldGrid의 SECTOR_X_MIN / SECTOR_Y_MIN과 정합. 바뀌면 같이 변경 필요.
-        constexpr int SECTOR_X_MIN_LOCAL = -54;
-        constexpr int SECTOR_Y_MIN_LOCAL = -27;
-        constexpr int PIXEL_PER_SECTOR_LOCAL = 400;
-        constexpr int TILE_BASE_X = SECTOR_X_MIN_LOCAL * PIXEL_PER_SECTOR_LOCAL * TILES_PER_PIXEL; // -1,080,000
-        constexpr int TILE_BASE_Y = SECTOR_Y_MIN_LOCAL * PIXEL_PER_SECTOR_LOCAL * TILES_PER_PIXEL; //   -540,000
+        //좌표 변환 — procGen 픽셀(0,0) = 패치(-54,-27) 좌상단.
+        //  loadWorldGrid의 PATCH_X_MIN / PATCH_Y_MIN과 정합. 바뀌면 같이 변경 필요.
+        constexpr int PATCH_X_MIN_LOCAL = -54;
+        constexpr int PATCH_Y_MIN_LOCAL = -27;
+        constexpr int PIXEL_PER_PATCH_LOCAL = 400;
+        constexpr int TILE_BASE_X = PATCH_X_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL; // -1,080,000
+        constexpr int TILE_BASE_Y = PATCH_Y_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL; //   -540,000
 
         Point3 pixelToTileCenter(int px, int py) noexcept
         {
@@ -56,7 +56,7 @@ namespace procGen
 
         //티어별 최소 간격(픽셀). 충돌 검사는 min(R_A, R_B)이므로 작은 도시는 자기 R만큼만
         //떨어지면 됨(큰 도시 옆에 위성 마을 허용). 1px ≈ 1km.
-        constexpr int R_T1 = 200;   // 30,000 타일 (≈ 1.5 섹터). 대도시 간 600km
+        constexpr int R_T1 = 200;   // 30,000 타일 (≈ 1.5 패치). 대도시 간 600km
         constexpr int R_T2 = 100;   // 10,000 타일. 중도시 간 200km
         constexpr int R_T3 = 50;    //  2,500 타일. 마을 간 / 위성도시 50km.
                                     //   한 도(道) 안에 마을 5~10개 정도 분포되는 값.

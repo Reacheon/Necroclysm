@@ -27,12 +27,12 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
-	Point2 sectorXY = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
+	Point2 patchXY = World::ins()->changeToPatchCoord(PlayerX(), PlayerY());
 	for (int dx = -2; dx <= 2; dx++)
 	{
 		for (int dy = -2; dy <= 2; dy++)
 		{
-			if (World::ins()->isEmptySector(sectorXY.x + dx, sectorXY.y + dy, PlayerZ()) == true) World::ins()->createSector(sectorXY.x + dx, sectorXY.y + dy, PlayerZ());
+			if (World::ins()->isEmptyPatch(patchXY.x + dx, patchXY.y + dy, PlayerZ()) == true) World::ins()->createPatch(patchXY.x + dx, patchXY.y + dy, PlayerZ());
 		}
 	}
 
@@ -1395,7 +1395,7 @@ export void startArea()
 
 
 
-	World::ins()->createSector(0, 0, 0);
+	World::ins()->createPatch(0, 0, 0);
 
 	PlayerPtr->updateVision(PlayerInfo().eyeSight);
 

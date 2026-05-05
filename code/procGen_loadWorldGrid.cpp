@@ -7,8 +7,8 @@ import std;
 import util;
 
 //============================================================
-// 월드 PNG 로딩 (내부 백엔드) — 5832개 섹터 PNG를 읽어 43200×21600 Terrain 그리드 구성.
-//   섹터 번호 공식 / 색 매핑은 World::createSector와 동일.
+// 월드 PNG 로딩 (내부 백엔드) — 5832개 패치 PNG를 읽어 43200×21600 Terrain 그리드 구성.
+//   패치 번호 공식 / 색 매핑은 World::createPatch와 동일.
 //   순수 블랙박스: 외부 상태 무관, grid만 반환.
 //   공개 진입점은 procGen_worldGridCache.cpp의 loadWorldGrid가 담당. 이 함수는
 //   캐시 miss 시에만 호출되므로 export하지 않음.
@@ -17,12 +17,12 @@ namespace procGen
 {
     namespace
     {
-        constexpr int SECTOR_X_MIN  = -54;
-        constexpr int SECTOR_X_MAX  =  53;
-        constexpr int SECTOR_Y_MIN  = -27;
-        constexpr int SECTOR_Y_MAX  =  26;
-        constexpr int SECTOR_PIXEL  = 400;     //섹터 1장의 픽셀 변 (400×400)
-        constexpr int NUMBER_BIAS   = 2971;    //number = NUMBER_BIAS + sectorX + 108*sectorY
+        constexpr int PATCH_X_MIN  = -54;
+        constexpr int PATCH_X_MAX  =  53;
+        constexpr int PATCH_Y_MIN  = -27;
+        constexpr int PATCH_Y_MAX  =  26;
+        constexpr int PATCH_PIXEL  = 400;     //패치 1장의 픽셀 변 (400×400)
+        constexpr int NUMBER_BIAS  = 2971;    //number = NUMBER_BIAS + patchX + 108*patchY
 
         //RGB 24비트 패킹 — switch 비교 한 번으로 컬러 매칭.
         constexpr std::uint32_t packRGB(std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept
@@ -74,19 +74,19 @@ namespace procGen
             }
         }
 
-        std::string buildSectorPath(int sectorX, int sectorY)
+        std::string buildPatchPath(int patchX, int patchY)
         {
-            //파일명은 3자리 0-padding (worldSector-001.png ~ worldSector-5832.png).
+            //파일명은 3자리 0-padding (worldPatch-001.png ~ worldPatch-5832.png).
             //과거 1자리 패딩 분기는 number 1~9에서 -01.png를 만들어 sy=-27 끝줄 9장이
             //통째로 누락되던 버그가 있어 폐기.
-            int number = NUMBER_BIAS + sectorX + 108 * sectorY;
-            return std::format("map/worldSector-{:03d}.png", number);
+            int number = NUMBER_BIAS + patchX + 108 * patchY;
+            return std::format("map/worldPatch-{:03d}.png", number);
         }
 
-        //섹터 1장을 글로벌 그리드의 정해진 위치로 직접 디코드. 실패 시 false(Sea 디폴트 유지).
-        bool blitSectorInto(int sectorX, int sectorY, Terrain* dst, int dstStride)
+        //패치 1장을 글로벌 그리드의 정해진 위치로 직접 디코드. 실패 시 false(Sea 디폴트 유지).
+        bool blitPatchInto(int patchX, int patchY, Terrain* dst, int dstStride)
         {
-            std::string path = buildSectorPath(sectorX, sectorY);
+            std::string path = buildPatchPath(patchX, patchY);
             SDL_Surface* surf = IMG_Load(path.c_str());
             if (!surf) return false;
 
@@ -94,20 +94,20 @@ namespace procGen
             //32bpp 가정. 8/24bpp가 들어오면 uint32* 캐스팅이 픽셀 4개를 1개로 묶어
             //통째로 Sea가 되는 사일런트 버그 방지.
             errorBox(fmt->bytes_per_pixel != 4,
-                L"worldSector PNG가 32bpp가 아님: " + std::to_wstring(sectorX) + L"," + std::to_wstring(sectorY));
+                L"worldPatch PNG가 32bpp가 아님: " + std::to_wstring(patchX) + L"," + std::to_wstring(patchY));
             const SDL_Palette* pal = SDL_GetSurfacePalette(surf);
             const std::uint32_t* pixels = static_cast<const std::uint32_t*>(surf->pixels);
             const int srcStride = surf->w;
 
-            //글로벌 그리드 좌상단 기준의 이 섹터 시작 픽셀 좌표
-            const int baseX = (sectorX - SECTOR_X_MIN) * SECTOR_PIXEL;
-            const int baseY = (sectorY - SECTOR_Y_MIN) * SECTOR_PIXEL;
+            //글로벌 그리드 좌상단 기준의 이 패치 시작 픽셀 좌표
+            const int baseX = (patchX - PATCH_X_MIN) * PATCH_PIXEL;
+            const int baseY = (patchY - PATCH_Y_MIN) * PATCH_PIXEL;
 
-            for (int py = 0; py < SECTOR_PIXEL; ++py)
+            for (int py = 0; py < PATCH_PIXEL; ++py)
             {
                 Terrain* row = dst + static_cast<std::size_t>(baseY + py) * dstStride + baseX;
                 const std::uint32_t* srcRow = pixels + static_cast<std::size_t>(py) * srcStride;
-                for (int px = 0; px < SECTOR_PIXEL; ++px)
+                for (int px = 0; px < PATCH_PIXEL; ++px)
                 {
                     std::uint8_t r, g, b;
                     SDL_GetRGB(srcRow[px], fmt, pal, &r, &g, &b);
@@ -120,9 +120,9 @@ namespace procGen
         }
     }
 
-    //PNG 5832장을 디코드해 933MB 그리드 구성. onSector default no-op이면 출력 영향 없음.
+    //PNG 5832장을 디코드해 933MB 그리드 구성. onPatch default no-op이면 출력 영향 없음.
     //grid는 콜백 시점까지의 부분 로드 상태가 그대로 노출됨(미리보기 점진 갱신용).
-    PixelCostGrid loadWorldGridFromPng(SectorLoadSink onSector)
+    PixelCostGrid loadWorldGridFromPng(PatchLoadSink onPatch)
     {
         const __int64 tStart = getNanoTimer();
 
@@ -135,20 +135,20 @@ namespace procGen
 
         const __int64 tAlloc = getNanoTimer();
 
-        //--- 2. 섹터 PNG 5832장 디코드 ---
+        //--- 2. 패치 PNG 5832장 디코드 ---
         int loadOk = 0;
         int loadFail = 0;
-        const int totalSectors =
-            (SECTOR_Y_MAX - SECTOR_Y_MIN + 1) * (SECTOR_X_MAX - SECTOR_X_MIN + 1);
-        int doneSectors = 0;
-        for (int sy = SECTOR_Y_MIN; sy <= SECTOR_Y_MAX; ++sy)
+        const int totalPatches =
+            (PATCH_Y_MAX - PATCH_Y_MIN + 1) * (PATCH_X_MAX - PATCH_X_MIN + 1);
+        int donePatches = 0;
+        for (int sy = PATCH_Y_MIN; sy <= PATCH_Y_MAX; ++sy)
         {
-            for (int sx = SECTOR_X_MIN; sx <= SECTOR_X_MAX; ++sx)
+            for (int sx = PATCH_X_MIN; sx <= PATCH_X_MAX; ++sx)
             {
-                if (blitSectorInto(sx, sy, grid.data.get(), PixelCostGrid::W)) ++loadOk;
+                if (blitPatchInto(sx, sy, grid.data.get(), PixelCostGrid::W)) ++loadOk;
                 else ++loadFail;
-                ++doneSectors;
-                if (onSector) onSector(doneSectors, totalSectors, sx, sy, grid);
+                ++donePatches;
+                if (onPatch) onPatch(donePatches, totalPatches, sx, sy, grid);
             }
         }
 
@@ -173,7 +173,7 @@ namespace procGen
 
         prt(L"[procGen] loadWorldGridFromPng done\n");
         prt(L"  alloc+fill : %8.2f ms\n", allocMs);
-        prt(L"  sector load: %8.2f ms  (ok=%d fail=%d / %d)\n",
+        prt(L"  patch load : %8.2f ms  (ok=%d fail=%d / %d)\n",
             loadMs, loadOk, loadFail, loadOk + loadFail);
         prt(L"  histogram  : %8.2f ms\n", histMs);
         prt(L"  total      : %8.2f ms  (%.2f s)\n", totalMs, totalMs / 1000.0);
@@ -182,7 +182,7 @@ namespace procGen
         if (loadFail > 0)
         {
             const SDL_Color warn{ 0xff, 0x60, 0x60, 0xff };
-            prt(warn, L"  [WARN] %d sector PNG(s) missing/failed - filled with Sea\n", loadFail);
+            prt(warn, L"  [WARN] %d patch PNG(s) missing/failed - filled with Sea\n", loadFail);
         }
 
         const wchar_t* const names[TERRAIN_COUNT] = {

@@ -6,7 +6,7 @@ export module World;
 import std;
 import util;
 import Chunk;
-import Sector;
+import Patch;
 import constVar;
 import TileData;
 
@@ -22,8 +22,8 @@ export class World
 private:
 	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
-	std::unordered_set<Point3, Point3::Hash> isSectorCreated;
-	std::unordered_map<Point3, std::unique_ptr<Sector>, Point3::Hash> sectorMap;
+	std::unordered_set<Point3, Point3::Hash> isPatchCreated;
+	std::unordered_map<Point3, std::unique_ptr<Patch>, Point3::Hash> patchMap;
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
 
@@ -88,16 +88,16 @@ public:
 		else if (chunkZ < 0) inputFlag = chunkFlag::underground;
 		else
 		{
-			// z=0: 섹터 바이옴 맵에서 청크 중심 픽셀의 바이옴 조회
+			// z=0: 패치 바이옴 맵에서 청크 중심 픽셀의 바이옴 조회
 			int centerTileX = chunkX * CHUNK_SIZE_X + CHUNK_SIZE_X / 2;
 			int centerTileY = chunkY * CHUNK_SIZE_Y + CHUNK_SIZE_Y / 2;
-			int sx = sectorFromTile(centerTileX);
-			int sy = sectorFromTile(centerTileY);
-			auto it = sectorMap.find({ sx, sy, chunkZ });
-			if (it != sectorMap.end())
+			int sx = patchFromTile(centerTileX);
+			int sy = patchFromTile(centerTileY);
+			auto it = patchMap.find({ sx, sy, chunkZ });
+			if (it != patchMap.end())
 			{
-				int localTileX = centerTileX - sx * TILE_PER_SECTOR;
-				int localTileY = centerTileY - sy * TILE_PER_SECTOR;
+				int localTileX = centerTileX - sx * TILE_PER_PATCH;
+				int localTileY = centerTileY - sy * TILE_PER_PATCH;
 				int localPxX = localTileX / TILE_PER_PIXEL;
 				int localPxY = localTileY / TILE_PER_PIXEL;
 				chunkFlag f = it->second->get(localPxX, localPxY);
@@ -217,45 +217,45 @@ public:
 		return totalStackSet;
 	}
 
-	//섹터 관련
-	// 타일 좌표를 섹터 좌표로 직접 변환 (1섹터 = TILE_PER_SECTOR = 20000타일)
-	Point2 changeToSectorCoord(int inputGridX, int inputGridY)
+	//패치 관련
+	// 타일 좌표를 패치 좌표로 직접 변환 (1패치 = TILE_PER_PATCH = 20000타일)
+	Point2 changeToPatchCoord(int inputGridX, int inputGridY)
 	{
-		return { sectorFromTile(inputGridX), sectorFromTile(inputGridY) };
+		return { patchFromTile(inputGridX), patchFromTile(inputGridY) };
 	}
 
-	bool isEmptySector(int sectorX, int sectorY, int sectorZ)
+	bool isEmptyPatch(int patchX, int patchY, int patchZ)
 	{
-		if (isSectorCreated.find({ sectorX,sectorY,sectorZ }) == isSectorCreated.end()) return true;
+		if (isPatchCreated.find({ patchX,patchY,patchZ }) == isPatchCreated.end()) return true;
 		else return false;
 	}
 
-	void createSector(int sectorX, int sectorY, int sectorZ);
+	void createPatch(int patchX, int patchY, int patchZ);
 
-	// 섹터 강제 로딩 — PNG 바이옴 로드 + 도시간/도시-경계 도로망 생성
+	// 패치 강제 로딩 — PNG 바이옴 로드 + 도시간/도시-경계 도로망 생성
 	// 디버그/월드젠 트리거. 도시 내부는 만들지 않고 외부 도로만 깔음
-	void loadSector(int sectorX, int sectorY, int sectorZ);
+	void loadPatch(int patchX, int patchY, int patchZ);
 
-	// 섹터 데이터 소유 이전/조회 (월드젠 계층이 주입)
-	void setSector(int sectorX, int sectorY, int sectorZ, std::unique_ptr<Sector> sector)
+	// 패치 데이터 소유 이전/조회 (월드젠 계층이 주입)
+	void setPatch(int patchX, int patchY, int patchZ, std::unique_ptr<Patch> patch)
 	{
-		sectorMap[{ sectorX, sectorY, sectorZ }] = std::move(sector);
+		patchMap[{ patchX, patchY, patchZ }] = std::move(patch);
 	}
-	const Sector* getSector(int sectorX, int sectorY, int sectorZ) const
+	const Patch* getPatch(int patchX, int patchY, int patchZ) const
 	{
-		auto it = sectorMap.find({ sectorX, sectorY, sectorZ });
-		return (it == sectorMap.end()) ? nullptr : it->second.get();
+		auto it = patchMap.find({ patchX, patchY, patchZ });
+		return (it == patchMap.end()) ? nullptr : it->second.get();
 	}
 
 	// 임의 타일 좌표에서 바이옴 조회 (미니맵/GUI 등에서 사용)
 	chunkFlag queryBiomeAtTile(int tileX, int tileY, int z) const
 	{
-		int sx = sectorFromTile(tileX);
-		int sy = sectorFromTile(tileY);
-		auto it = sectorMap.find({ sx, sy, z });
-		if (it == sectorMap.end()) return chunkFlag::none;
-		int localTileX = tileX - sx * TILE_PER_SECTOR;
-		int localTileY = tileY - sy * TILE_PER_SECTOR;
+		int sx = patchFromTile(tileX);
+		int sy = patchFromTile(tileY);
+		auto it = patchMap.find({ sx, sy, z });
+		if (it == patchMap.end()) return chunkFlag::none;
+		int localTileX = tileX - sx * TILE_PER_PATCH;
+		int localTileY = tileY - sy * TILE_PER_PATCH;
 		int localPxX = localTileX / TILE_PER_PIXEL;
 		int localPxY = localTileY / TILE_PER_PIXEL;
 		return it->second->get(localPxX, localPxY);

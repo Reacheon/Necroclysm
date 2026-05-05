@@ -400,11 +400,11 @@ export void debugConsole()
 			break;
 		}
 
-		// 목적지 섹터/청크 선행 생성 — 먼 좌표로 텔레포트 시 out_of_range 방지
-		Point2 tgtSec = World::ins()->changeToSectorCoord(tgtGridX, tgtGridY);
-		if (World::ins()->isEmptySector(tgtSec.x, tgtSec.y, tgtGridZ))
+		// 목적지 패치/청크 선행 생성 — 먼 좌표로 텔레포트 시 out_of_range 방지
+		Point2 tgtPatch = World::ins()->changeToPatchCoord(tgtGridX, tgtGridY);
+		if (World::ins()->isEmptyPatch(tgtPatch.x, tgtPatch.y, tgtGridZ))
 		{
-			World::ins()->createSector(tgtSec.x, tgtSec.y, tgtGridZ);
+			World::ins()->createPatch(tgtPatch.x, tgtPatch.y, tgtGridZ);
 		}
 		int tgtChunkX, tgtChunkY;
 		World::ins()->changeToChunkCoord(tgtGridX, tgtGridY, tgtChunkX, tgtChunkY);

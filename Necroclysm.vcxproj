@@ -397,9 +397,9 @@
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
     <ClCompile Include="code\world\World_tile.cpp" />
-    <ClCompile Include="code\world\World_createSector.cpp" />
-    <ClCompile Include="code\world\World_loadSector.cpp" />
-    <ClCompile Include="code\world\Sector.ixx" />
+    <ClCompile Include="code\world\World_createPatch.cpp" />
+    <ClCompile Include="code\world\World_loadPatch.cpp" />
+    <ClCompile Include="code\world\Patch.ixx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />

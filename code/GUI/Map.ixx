@@ -14,7 +14,7 @@ import globalVar;
 import checkCursor;
 import Player;
 import World;
-import Sector;
+import Patch;
 import TileData;
 
 // ════════════════════════════════════════════════════════════════════════
@@ -31,7 +31,7 @@ import TileData;
 namespace mapcfg
 {
     // 픽셀 퍼펙트 줌 레벨 — pxPerTile = 스크린 픽셀 / 월드 타일.
-    //   조건1: 50*pxPerTile 가 정수 → 섹터 텍스처 (1 sector px = 50 tiles) 가
+    //   조건1: 50*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 50 tiles) 가
     //          모든 화면 픽셀에 정수 비율로 매핑 → 띠/뭉개짐 없음.
     //   조건2: pxPerTile 가 ≥1 일 때 정수 → 16px 타일 스프라이트가 모든
     //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
@@ -44,12 +44,12 @@ namespace mapcfg
     inline constexpr double DEFAULT_PX_PER_TILE = ZOOM_LEVELS[DEFAULT_ZOOM_LEVEL];
 
     // 프레임당 신규 텍스처 빌드 한도 (영속 캐시 — 첫 방문 영역에만 쓰임).
-    inline constexpr int FRAME_BUDGET_SECTORS = 2;     // 섹터 1개 ≈ 5~8ms
+    inline constexpr int FRAME_BUDGET_PATCHES = 2;     // 패치 1개 ≈ 5~8ms
 
-    // 가시 미로드 섹터 자동 로드 한도
-    inline constexpr int FRAME_BUDGET_SECTOR_LOAD = 2;
+    // 가시 미로드 패치 자동 로드 한도
+    inline constexpr int FRAME_BUDGET_PATCH_LOAD = 2;
 
-    // 가시 영역 pxPerTile 이 이 값 이하일 때만 섹터 자동 로드
+    // 가시 영역 pxPerTile 이 이 값 이하일 때만 패치 자동 로드
     inline constexpr double AUTOLOAD_MAX_ZOOM = 1.5;
 }
 
@@ -146,11 +146,11 @@ struct MapView
 //   clear()            — 모든 텍스처 파괴 (월드 리셋 등).
 // ════════════════════════════════════════════════════════════════════════
 
-// 섹터 한 장 = PIXEL_PER_SECTOR × PIXEL_PER_SECTOR 텍스처 (1 px = 1 sector pixel).
-class SectorTextureCache
+// 패치 한 장 = PIXEL_PER_PATCH × PIXEL_PER_PATCH 텍스처 (1 px = 1 patch pixel).
+class PatchTextureCache
 {
 public:
-    static SectorTextureCache& ins() { static SectorTextureCache c; return c; }
+    static PatchTextureCache& ins() { static PatchTextureCache c; return c; }
 
     void resetFrame(int budget) { budget_ = budget; pending_ = 0; }
     int  pendingThisFrame() const { return pending_; }
@@ -160,7 +160,7 @@ public:
         Key k{ sx, sy, sz };
         if (auto it = textures_.find(k); it != textures_.end()) return it->second;
 
-        const Sector* biome = World::ins()->getSector(sx, sy, sz);
+        const Patch* biome = World::ins()->getPatch(sx, sy, sz);
         if (!biome) return nullptr;  // 데이터 부재 — pending 아님
 
         if (budget_ <= 0) { pending_++; return nullptr; }
@@ -179,17 +179,17 @@ public:
     }
 
 private:
-    static SDL_Texture* build(const Sector* biome)
+    static SDL_Texture* build(const Patch* biome)
     {
-        SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_SECTOR, PIXEL_PER_SECTOR, SDL_PIXELFORMAT_RGBA32);
+        SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_PATCH, PIXEL_PER_PATCH, SDL_PIXELFORMAT_RGBA32);
         if (!surf) return nullptr;
 
         SDL_LockSurface(surf);
         const SDL_PixelFormatDetails* fmt = SDL_GetPixelFormatDetails(surf->format);
-        for (int py = 0; py < PIXEL_PER_SECTOR; py++)
+        for (int py = 0; py < PIXEL_PER_PATCH; py++)
         {
             std::uint32_t* row = (std::uint32_t*)((std::uint8_t*)surf->pixels + py * surf->pitch);
-            for (int px = 0; px < PIXEL_PER_SECTOR; px++)
+            for (int px = 0; px < PIXEL_PER_PATCH; px++)
             {
                 SDL_Color c = mappal::biomeColor(biome->get(px, py));
                 row[px] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
@@ -224,9 +224,9 @@ private:
 // §4  데이터 로딩 (PNG 바이옴 자동 로드)
 // ════════════════════════════════════════════════════════════════════════
 
-// 가시 영역의 미로드 섹터를 PNG 만 로드. 프레임당 한도로 휠 스파이크 방지.
-//   loadVisible() 의 반환값 = 아직 로드 안 된 섹터 수 → 스피너 트리거.
-class SectorAutoLoader
+// 가시 영역의 미로드 패치를 PNG 만 로드. 프레임당 한도로 휠 스파이크 방지.
+//   loadVisible() 의 반환값 = 아직 로드 안 된 패치 수 → 스피너 트리거.
+class PatchAutoLoader
 {
 public:
     static int loadVisible(const MapView& v)
@@ -236,10 +236,10 @@ public:
         double minTX, minTY, maxTX, maxTY;
         v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
 
-        int minSX = (int)std::floor(minTX / TILE_PER_SECTOR);
-        int minSY = (int)std::floor(minTY / TILE_PER_SECTOR);
-        int maxSX = (int)std::floor(maxTX / TILE_PER_SECTOR);
-        int maxSY = (int)std::floor(maxTY / TILE_PER_SECTOR);
+        int minSX = (int)std::floor(minTX / TILE_PER_PATCH);
+        int minSY = (int)std::floor(minTY / TILE_PER_PATCH);
+        int maxSX = (int)std::floor(maxTX / TILE_PER_PATCH);
+        int maxSY = (int)std::floor(maxTY / TILE_PER_PATCH);
 
         int loaded = 0;
         int stillPending = 0;
@@ -247,10 +247,10 @@ public:
         {
             for (int sx = minSX; sx <= maxSX; sx++)
             {
-                if (!World::ins()->isEmptySector(sx, sy, v.z)) continue;
-                if (loaded < mapcfg::FRAME_BUDGET_SECTOR_LOAD)
+                if (!World::ins()->isEmptyPatch(sx, sy, v.z)) continue;
+                if (loaded < mapcfg::FRAME_BUDGET_PATCH_LOAD)
                 {
-                    World::ins()->createSector(sx, sy, v.z);
+                    World::ins()->createPatch(sx, sy, v.z);
                     loaded++;
                 }
                 else
@@ -268,33 +268,33 @@ public:
 // §5  렌더링 계층
 // ════════════════════════════════════════════════════════════════════════
 
-// (1) 바이옴 베이스 — 가시 섹터 텍스처를 적절히 스케일해 blit
+// (1) 바이옴 베이스 — 가시 패치 텍스처를 적절히 스케일해 blit
 static void drawBiomeLayer(const MapView& v)
 {
     double minTX, minTY, maxTX, maxTY;
     v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
 
-    int minSX = (int)std::floor(minTX / TILE_PER_SECTOR);
-    int minSY = (int)std::floor(minTY / TILE_PER_SECTOR);
-    int maxSX = (int)std::floor(maxTX / TILE_PER_SECTOR);
-    int maxSY = (int)std::floor(maxTY / TILE_PER_SECTOR);
+    int minSX = (int)std::floor(minTX / TILE_PER_PATCH);
+    int minSY = (int)std::floor(minTY / TILE_PER_PATCH);
+    int maxSX = (int)std::floor(maxTX / TILE_PER_PATCH);
+    int maxSY = (int)std::floor(maxTY / TILE_PER_PATCH);
 
-    double sectorScreenSize = (double)TILE_PER_SECTOR * v.pxPerTile;
+    double patchScreenSize = (double)TILE_PER_PATCH * v.pxPerTile;
 
     for (int sy = minSY; sy <= maxSY; sy++)
     {
         for (int sx = minSX; sx <= maxSX; sx++)
         {
-            SDL_Texture* tex = SectorTextureCache::ins().getOrBuild(sx, sy, v.z);
+            SDL_Texture* tex = PatchTextureCache::ins().getOrBuild(sx, sy, v.z);
             if (!tex) continue;  // 미빌드 → 다음 프레임에 채워짐
 
-            double dstX = v.screenXFromTileX((double)sx * TILE_PER_SECTOR);
-            double dstY = v.screenYFromTileY((double)sy * TILE_PER_SECTOR);
+            double dstX = v.screenXFromTileX((double)sx * TILE_PER_PATCH);
+            double dstY = v.screenYFromTileY((double)sy * TILE_PER_PATCH);
             SDL_FRect dst{
                 (float)std::floor(dstX),
                 (float)std::floor(dstY),
-                (float)std::ceil(sectorScreenSize) + 1.0f,
-                (float)std::ceil(sectorScreenSize) + 1.0f
+                (float)std::ceil(patchScreenSize) + 1.0f,
+                (float)std::ceil(patchScreenSize) + 1.0f
             };
             SDL_RenderTexture(renderer, tex, nullptr, &dst);
         }
@@ -580,9 +580,9 @@ static void drawTabButton()
 // 우하단 로딩 패널 — 스피너 + 진행 카운트. pending 0 이면 호출자가 스킵.
 struct LoadingStats
 {
-    int sectorsLoading    = 0;  // PNG 바이옴 미로드 (자동 로드 대기)
-    int sectorsBuilding   = 0;  // 바이옴 텍스처 빌드 대기
-    int total() const { return sectorsLoading + sectorsBuilding; }
+    int patchesLoading    = 0;  // PNG 바이옴 미로드 (자동 로드 대기)
+    int patchesBuilding   = 0;  // 바이옴 텍스처 빌드 대기
+    int total() const { return patchesLoading + patchesBuilding; }
 };
 
 // 12개 사각 픽셀이 원형 배치, 시간에 따라 밝기 회전 (혜성 트레일).
@@ -667,14 +667,14 @@ public:
         view.pxPerTile = persistedPxPerTile;
         x = 0; y = 0;
 
-        // 플레이어 주변 3x3 섹터 PNG 선행 로드 (자동로드가 못 따라잡는 즉시 영역)
-        Point2 ps = World::ins()->changeToSectorCoord(PlayerX(), PlayerY());
+        // 플레이어 주변 3x3 패치 PNG 선행 로드 (자동로드가 못 따라잡는 즉시 영역)
+        Point2 ps = World::ins()->changeToPatchCoord(PlayerX(), PlayerY());
         for (int dy = -1; dy <= 1; dy++)
             for (int dx = -1; dx <= 1; dx++)
             {
                 int sx = ps.x + dx, sy = ps.y + dy;
-                if (World::ins()->isEmptySector(sx, sy, PlayerZ()))
-                    World::ins()->createSector(sx, sy, PlayerZ());
+                if (World::ins()->isEmptyPatch(sx, sy, PlayerZ()))
+                    World::ins()->createPatch(sx, sy, PlayerZ());
             }
 
         // 텍스처 캐시 영속 — clear() 안 함. 다시 열어도 즉시 풀 디테일.
@@ -710,10 +710,10 @@ public:
         view.viewH = cameraH;
 
         // 매 프레임 작업 예산 초기화
-        SectorTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_SECTORS);
+        PatchTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_PATCHES);
 
-        // 가시 미로드 섹터 자동 로드 (PNG 만)
-        int sectorsLoadPending = SectorAutoLoader::loadVisible(view);
+        // 가시 미로드 패치 자동 로드 (PNG 만)
+        int patchesLoadPending = PatchAutoLoader::loadVisible(view);
 
         // 렌더
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
@@ -727,8 +727,8 @@ public:
 
         // 진행 표시 — 이번 프레임 budget 부족으로 미룬 작업이 있으면
         LoadingStats stats{
-            sectorsLoadPending,
-            SectorTextureCache::ins().pendingThisFrame()
+            patchesLoadPending,
+            PatchTextureCache::ins().pendingThisFrame()
         };
         if (stats.total() > 0) drawLoadingPanel(stats);
     }

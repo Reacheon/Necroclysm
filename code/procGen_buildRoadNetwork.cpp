@@ -34,11 +34,11 @@ namespace procGen
     namespace
     {
         //좌표 변환 — placeCities와 동일 베이스.
-        constexpr int SECTOR_X_MIN_LOCAL     = -54;
-        constexpr int SECTOR_Y_MIN_LOCAL     = -27;
-        constexpr int PIXEL_PER_SECTOR_LOCAL = 400;
-        constexpr int TILE_BASE_X = SECTOR_X_MIN_LOCAL * PIXEL_PER_SECTOR_LOCAL * TILES_PER_PIXEL;
-        constexpr int TILE_BASE_Y = SECTOR_Y_MIN_LOCAL * PIXEL_PER_SECTOR_LOCAL * TILES_PER_PIXEL;
+        constexpr int PATCH_X_MIN_LOCAL     = -54;
+        constexpr int PATCH_Y_MIN_LOCAL     = -27;
+        constexpr int PIXEL_PER_PATCH_LOCAL = 400;
+        constexpr int TILE_BASE_X = PATCH_X_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL;
+        constexpr int TILE_BASE_Y = PATCH_Y_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL;
 
         PixelCoord tileToPixel(Point3 t) noexcept
         {

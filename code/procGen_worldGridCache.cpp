@@ -21,12 +21,12 @@ namespace procGen
 {
     namespace
     {
-        //섹터 그리드 상수 (procGen_loadWorldGrid.cpp와 동일 — fingerprint 계산용).
-        constexpr int SECTOR_X_MIN_C = -54;
-        constexpr int SECTOR_X_MAX_C =  53;
-        constexpr int SECTOR_Y_MIN_C = -27;
-        constexpr int SECTOR_Y_MAX_C =  26;
-        constexpr int NUMBER_BIAS_C  = 2971;
+        //패치 그리드 상수 (procGen_loadWorldGrid.cpp와 동일 — fingerprint 계산용).
+        constexpr int PATCH_X_MIN_C = -54;
+        constexpr int PATCH_X_MAX_C =  53;
+        constexpr int PATCH_Y_MIN_C = -27;
+        constexpr int PATCH_Y_MAX_C =  26;
+        constexpr int NUMBER_BIAS_C = 2971;
 
         //캐시 파일 포맷.
         constexpr std::uint32_t kCacheMagic    = 0x4757434EU;         //'NCWG' little-endian
@@ -50,15 +50,15 @@ namespace procGen
 
         std::filesystem::path cacheFilePath()
         {
-            return std::filesystem::path("map") / "worldSector.cache";
+            return std::filesystem::path("map") / "worldPatch.cache";
         }
 
-        std::string buildSectorPathLocal(int sx, int sy)
+        std::string buildPatchPathLocal(int sx, int sy)
         {
-            //buildSectorPath와 완전 동일한 규칙 — fingerprint가 실제 로더와 같은
+            //buildPatchPath와 완전 동일한 규칙 — fingerprint가 실제 로더와 같은
             //파일 집합을 보도록 3자리 0-padding 사용.
             int number = NUMBER_BIAS_C + sx + 108 * sy;
-            return std::format("map/worldSector-{:03d}.png", number);
+            return std::format("map/worldPatch-{:03d}.png", number);
         }
 
         //5832장 PNG의 mtime+size를 FNV-1a 64비트로 폴딩 — stale 검증용.
@@ -79,11 +79,11 @@ namespace procGen
                 }
             };
 
-            for (int sy = SECTOR_Y_MIN_C; sy <= SECTOR_Y_MAX_C; ++sy)
+            for (int sy = PATCH_Y_MIN_C; sy <= PATCH_Y_MAX_C; ++sy)
             {
-                for (int sx = SECTOR_X_MIN_C; sx <= SECTOR_X_MAX_C; ++sx)
+                for (int sx = PATCH_X_MIN_C; sx <= PATCH_X_MAX_C; ++sx)
                 {
-                    std::string path = buildSectorPathLocal(sx, sy);
+                    std::string path = buildPatchPathLocal(sx, sy);
                     std::error_code ec;
 
                     auto sz = std::filesystem::file_size(path, ec);
@@ -102,19 +102,19 @@ namespace procGen
 
         //캐시 hit 후 미리보기 콜백 일괄 재생 — GUI 미리보기 RGBA가 채워지도록.
         //  메인 GUI는 previewVersion만 보고 다음 프레임에 한 번에 텍스처 갱신함.
-        void replaySectorPreview(const PixelCostGrid& grid, SectorLoadSink& onSector)
+        void replayPatchPreview(const PixelCostGrid& grid, PatchLoadSink& onPatch)
         {
-            if (!onSector) return;
-            const int totalSectors =
-                (SECTOR_Y_MAX_C - SECTOR_Y_MIN_C + 1) *
-                (SECTOR_X_MAX_C - SECTOR_X_MIN_C + 1);
+            if (!onPatch) return;
+            const int totalPatches =
+                (PATCH_Y_MAX_C - PATCH_Y_MIN_C + 1) *
+                (PATCH_X_MAX_C - PATCH_X_MIN_C + 1);
             int done = 0;
-            for (int sy = SECTOR_Y_MIN_C; sy <= SECTOR_Y_MAX_C; ++sy)
+            for (int sy = PATCH_Y_MIN_C; sy <= PATCH_Y_MAX_C; ++sy)
             {
-                for (int sx = SECTOR_X_MIN_C; sx <= SECTOR_X_MAX_C; ++sx)
+                for (int sx = PATCH_X_MIN_C; sx <= PATCH_X_MAX_C; ++sx)
                 {
                     ++done;
-                    onSector(done, totalSectors, sx, sy, grid);
+                    onPatch(done, totalPatches, sx, sy, grid);
                 }
             }
         }
@@ -271,8 +271,8 @@ namespace procGen
     }
 
     //공개 진입점 — 캐시 우선 로드. miss 시 PNG 디코드 + 캐시 기록.
-    //캐시 hit 시에도 onSector 콜백을 5832회 재생해 미리보기 RGBA를 채운다.
-    PixelCostGrid loadWorldGrid(SectorLoadSink onSector)
+    //캐시 hit 시에도 onPatch 콜백을 5832회 재생해 미리보기 RGBA를 채운다.
+    PixelCostGrid loadWorldGrid(PatchLoadSink onPatch)
     {
         const __int64 tStart = getNanoTimer();
         const std::uint64_t pngHash = computePngFingerprint();
@@ -286,7 +286,7 @@ namespace procGen
             const __int64 tDecomp = getNanoTimer();
 
             //미리보기 갱신 — 5832회 콜백 (GUI는 다음 프레임에 한 번에 반영).
-            replaySectorPreview(grid, onSector);
+            replayPatchPreview(grid, onPatch);
 
             const __int64 tEnd = getNanoTimer();
             prt(L"[procGen] loadWorldGrid: cache HIT\n");
@@ -302,7 +302,7 @@ namespace procGen
         prt(L"[procGen] loadWorldGrid: cache MISS — PNG decode + write\n");
         prt(L"  png fingerprint: %8.2f ms\n", hashMs);
 
-        grid = loadWorldGridFromPng(onSector);
+        grid = loadWorldGridFromPng(onPatch);
 
         const __int64 tBeforeWrite = getNanoTimer();
         writeCache(pngHash, grid);

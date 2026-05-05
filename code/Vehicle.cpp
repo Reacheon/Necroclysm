@@ -41,7 +41,7 @@ Vehicle::~Vehicle()
         TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
     }
 
-    //청크에서 등록 해제 (changeToSectorCoord -> changeToChunkCoord 버그 수정)
+    //청크에서 등록 해제 (changeToPatchCoord -> changeToChunkCoord 버그 수정)
     Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
     Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
     currentChunk.eraseVehicle(this);

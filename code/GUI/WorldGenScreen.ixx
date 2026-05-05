@@ -48,7 +48,7 @@ private:
     std::shared_ptr<procGen::WorldGenProgress> progress;
     std::jthread worker;
 
-    //미리보기 텍스처 — 워커가 섹터별로 채우는 RGBA를 메인이 점진 반영.
+    //미리보기 텍스처 — 워커가 패치별로 채우는 RGBA를 메인이 점진 반영.
     //  최초 생성: previewReady가 true가 된 직후 1회.
     //  이후 갱신: progress->previewVersion이 lastUploadedPreviewVersion과
     //  다르면 SDL_UpdateTexture로 전체 픽셀 재업로드.
@@ -95,14 +95,14 @@ private:
 
     SDL_FPoint tileToScreen(const Point3& t) const
     {
-        // procGen 픽셀 베이스: 섹터 (-54,-27) 좌상단이 픽셀(0,0)
-        constexpr int SECTOR_X_MIN = -54;
-        constexpr int SECTOR_Y_MIN = -27;
-        constexpr int PIXEL_PER_SECTOR = 400;
+        // procGen 픽셀 베이스: 패치 (-54,-27) 좌상단이 픽셀(0,0)
+        constexpr int PATCH_X_MIN = -54;
+        constexpr int PATCH_Y_MIN = -27;
+        constexpr int PIXEL_PER_PATCH = 400;
         constexpr int TILE_BASE_X =
-            SECTOR_X_MIN * PIXEL_PER_SECTOR * procGen::TILES_PER_PIXEL;
+            PATCH_X_MIN * PIXEL_PER_PATCH * procGen::TILES_PER_PIXEL;
         constexpr int TILE_BASE_Y =
-            SECTOR_Y_MIN * PIXEL_PER_SECTOR * procGen::TILES_PER_PIXEL;
+            PATCH_Y_MIN * PIXEL_PER_PATCH * procGen::TILES_PER_PIXEL;
 
         const double pxd = (double)(t.x - TILE_BASE_X) / (double)procGen::TILES_PER_PIXEL;
         const double pyd = (double)(t.y - TILE_BASE_Y) / (double)procGen::TILES_PER_PIXEL;
@@ -340,10 +340,10 @@ public:
         {
         case procGen::GenPhase::loadPng:
         {
-            const int loaded = progress ? progress->sectorsLoadedDone .load() : 0;
-            const int total  = progress ? progress->sectorsLoadedTotal.load() : 0;
+            const int loaded = progress ? progress->patchesLoadedDone .load() : 0;
+            const int total  = progress ? progress->patchesLoadedTotal.load() : 0;
             if (total > 0)
-                sub << L"sectors " << loaded << L" / " << total;
+                sub << L"patches " << loaded << L" / " << total;
             break;
         }
         case procGen::GenPhase::placeCity:

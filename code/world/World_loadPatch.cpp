@@ -4,8 +4,8 @@ import std;
 import util;
 import constVar;
 import randomEngine;
-import Sector;
+import Patch;
 
-void World::loadSector(int sectorX, int sectorY, int sectorZ)
+void World::loadPatch(int patchX, int patchY, int patchZ)
 {
 }

@@ -361,12 +361,12 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
 	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 
-	Point2 sectorXY = World::ins()->changeToSectorCoord(getGridX(), getGridY());
+	Point2 patchXY = World::ins()->changeToPatchCoord(getGridX(), getGridY());
 	for (int dir = -1; dir <= 7; dir++)
 	{
 		int dx, dy;
 		dir2Coord(dir, dx, dy);
-		if (World::ins()->isEmptySector(sectorXY.x + dx, sectorXY.y + dy, getGridZ()) == true) World::ins()->createSector(sectorXY.x + dx, sectorXY.y + dy, getGridZ());
+		if (World::ins()->isEmptyPatch(patchXY.x + dx, patchXY.y + dy, getGridZ()) == true) World::ins()->createPatch(patchXY.x + dx, patchXY.y + dy, getGridZ());
 	}
 	updateNearbyChunk(CHUNK_LOADING_RANGE);
 }
