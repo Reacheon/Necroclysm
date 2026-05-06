@@ -20,7 +20,7 @@ import util;
 //     6) RDP 단순화 + 실타일 변환 + ±20타일 결정론적 jitter
 //
 //   순수 블랙박스 함수 — 외부 상태 무관.
-//   픽셀좌표(1px=50타일)는 알고리즘 내부 전용, 반환값은 실타일 좌표.
+//   픽셀좌표(1px=48타일)는 알고리즘 내부 전용, 반환값은 실타일 좌표.
 //
 //   핵심 설계 결정:
 //   - 위상은 Gabriel 그래프 — 두 도시 잇는 disc(지름=두 도시 거리)에 다른 도시가 없는
@@ -43,33 +43,6 @@ namespace procGen
         constexpr int PIXEL_PER_PATCH_LOCAL = 400;
         constexpr int TILE_BASE_X = PATCH_X_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL;
         constexpr int TILE_BASE_Y = PATCH_Y_MIN_LOCAL * PIXEL_PER_PATCH_LOCAL * TILES_PER_PIXEL;
-
-        PixelCoord tileToPixel(Point3 t) noexcept
-        {
-            return PixelCoord{
-                (t.x - TILE_BASE_X) / TILES_PER_PIXEL,
-                (t.y - TILE_BASE_Y) / TILES_PER_PIXEL,
-                t.z
-            };
-        }
-
-        Point3 pixelToTileJitter(int px, int py, int z, std::uint64_t seed, bool isEndpoint) noexcept
-        {
-            const int baseX = px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2;
-            const int baseY = py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2;
-            if (isEndpoint) return Point3{ baseX, baseY, z };
-
-            std::uint64_t h = seed ^ 0xD6E8FEB86659FD93ULL;
-            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(px)) * 0x9E3779B97F4A7C15ULL;
-            h = (h ^ (h >> 30)) * 0xBF58476D1CE4E5B9ULL;
-            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(py)) * 0x94D049BB133111EBULL;
-            h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
-            h ^= h >> 31;
-
-            const int jx = static_cast<int>(h % 41u) - 20;        // -20 .. +20
-            const int jy = static_cast<int>((h >> 16) % 41u) - 20;
-            return Point3{ baseX + jx, baseY + jy, z };
-        }
 
         //비용 LUT — Terrain enum 값을 인덱스로 사용.
         constexpr float kMinCost = 0.5f;
@@ -128,61 +101,6 @@ namespace procGen
         };
 
         constexpr int kCoarseAggK = 4;
-
-        CoarseGrid buildCoarseGrid(const PixelCostGrid& fine)
-        {
-            CoarseGrid c;
-            const std::size_t total = static_cast<std::size_t>(CoarseGrid::W) * CoarseGrid::H;
-            c.cost = std::make_unique<float[]>(total);
-
-            const Terrain* fineData = fine.data.get();
-            const int Wf = PixelCostGrid::W;
-            const int Hf = PixelCostGrid::H;
-            constexpr int F = CoarseGrid::F;
-
-            const int nT = std::max<int>(2, static_cast<int>(std::thread::hardware_concurrency()));
-            std::vector<std::thread> threads;
-            threads.reserve(nT);
-            const int rowsPerT = (CoarseGrid::H + nT - 1) / nT;
-
-            for (int t = 0; t < nT; ++t)
-            {
-                const int r0 = t * rowsPerT;
-                const int r1 = std::min(r0 + rowsPerT, CoarseGrid::H);
-                if (r0 >= r1) break;
-                threads.emplace_back([&, r0, r1]()
-                {
-                    float buf[F * F];
-                    for (int cy = r0; cy < r1; ++cy)
-                    {
-                        const int y0 = cy * F;
-                        const int y1 = std::min(y0 + F, Hf);
-                        float* dstRow = &c.cost[static_cast<std::size_t>(cy) * CoarseGrid::W];
-                        for (int cx = 0; cx < CoarseGrid::W; ++cx)
-                        {
-                            const int x0 = cx * F;
-                            const int x1 = std::min(x0 + F, Wf);
-                            int n = 0;
-                            for (int y = y0; y < y1; ++y)
-                            {
-                                const Terrain* row = fineData + static_cast<std::size_t>(y) * Wf;
-                                for (int x = x0; x < x1; ++x)
-                                {
-                                    buf[n++] = kCostLUT[static_cast<std::size_t>(row[x])];
-                                }
-                            }
-                            const int kk = std::min(kCoarseAggK, n);
-                            std::nth_element(buf, buf + kk - 1, buf + n);
-                            float sum = 0.0f;
-                            for (int i = 0; i < kk; ++i) sum += buf[i];
-                            dstRow[cx] = sum / kk;
-                        }
-                    }
-                });
-            }
-            for (auto& th : threads) th.join();
-            return c;
-        }
 
         //============================================================
         // Corridor mask — coarse 셀 단위 비트셋, O(marked) 클리어.
@@ -409,52 +327,6 @@ namespace procGen
                 return true;
             }
         };
-
-        std::vector<EdgeCand> ensureConnectivity(const std::vector<EdgeCand>& edges,
-                                                  const std::vector<CityPixel>& cities)
-        {
-            DSU dsu(static_cast<int>(cities.size()));
-            for (const auto& e : edges) dsu.unite(e.a, e.b);
-
-            std::unordered_map<int, std::vector<int>> comps;
-            for (int i = 0; i < static_cast<int>(cities.size()); ++i)
-                comps[dsu.find(i)].push_back(i);
-
-            std::vector<EdgeCand> extras;
-            if (comps.size() <= 1) return extras;
-
-            std::vector<std::vector<int>*> sortedComps;
-            sortedComps.reserve(comps.size());
-            for (auto& [_, mem] : comps) sortedComps.push_back(&mem);
-            std::sort(sortedComps.begin(), sortedComps.end(),
-                [](const auto* a, const auto* b) { return a->size() > b->size(); });
-
-            const auto& mainComp = *sortedComps[0];
-            for (std::size_t k = 1; k < sortedComps.size(); ++k)
-            {
-                const auto& sub = *sortedComps[k];
-                double best = std::numeric_limits<double>::infinity();
-                int bestA = -1, bestB = -1;
-                for (int s : sub)
-                {
-                    for (int m : mainComp)
-                    {
-                        const double dx = static_cast<double>(cities[s].px - cities[m].px);
-                        const double dy = static_cast<double>(cities[s].py - cities[m].py);
-                        const double d2 = dx * dx + dy * dy;
-                        if (d2 < best)
-                        {
-                            best  = d2;
-                            bestA = std::min(s, m);
-                            bestB = std::max(s, m);
-                        }
-                    }
-                }
-                if (bestA >= 0)
-                    extras.push_back(EdgeCand{ bestA, bestB, std::sqrt(best) });
-            }
-            return extras;
-        }
 
         //============================================================
         // A* 공통 인프라
@@ -684,59 +556,6 @@ namespace procGen
             R.cells = std::move(rev);
             R.found = true;
             return R;
-        }
-
-        //============================================================
-        // Corridor 마킹 — coarse 경로 + halo R coarse cells 만큼 mask에 set.
-        //   halo=3 → 7×7 stamp = 56 fine pixel 폭 corridor (≈2800타일 폭).
-        //============================================================
-        void markCorridor(const std::vector<std::uint32_t>& path,
-                          int halo,
-                          CorridorMask& mask)
-        {
-            mask.prepare();
-            for (std::uint32_t idx : path)
-            {
-                const int cy = static_cast<int>(idx / CoarseGrid::W);
-                const int cx = static_cast<int>(idx % CoarseGrid::W);
-                const int x0 = std::max(0, cx - halo);
-                const int x1 = std::min(CoarseGrid::W - 1, cx + halo);
-                const int y0 = std::max(0, cy - halo);
-                const int y1 = std::min(CoarseGrid::H - 1, cy + halo);
-                for (int yy = y0; yy <= y1; ++yy)
-                {
-                    const std::uint32_t base = static_cast<std::uint32_t>(yy) * CoarseGrid::W;
-                    for (int xx = x0; xx <= x1; ++xx)
-                    {
-                        mask.mark(base + static_cast<std::uint32_t>(xx));
-                    }
-                }
-            }
-        }
-
-        //corridor 셀 bbox 계산 (fine 박스 사이즈 결정용).
-        struct CoarseBBox { int minX, minY, maxX, maxY; };
-        CoarseBBox coarseBBox(const std::vector<std::uint32_t>& path, int halo)
-        {
-            int minX = std::numeric_limits<int>::max();
-            int minY = std::numeric_limits<int>::max();
-            int maxX = std::numeric_limits<int>::min();
-            int maxY = std::numeric_limits<int>::min();
-            for (std::uint32_t idx : path)
-            {
-                const int cy = static_cast<int>(idx / CoarseGrid::W);
-                const int cx = static_cast<int>(idx % CoarseGrid::W);
-                if (cx < minX) minX = cx;
-                if (cx > maxX) maxX = cx;
-                if (cy < minY) minY = cy;
-                if (cy > maxY) maxY = cy;
-            }
-            return CoarseBBox{
-                std::max(0, minX - halo),
-                std::max(0, minY - halo),
-                std::min(CoarseGrid::W - 1, maxX + halo),
-                std::min(CoarseGrid::H - 1, maxY + halo)
-            };
         }
 
         //============================================================
@@ -1058,51 +877,39 @@ namespace procGen
                 std::min(PixelCostGrid::H - 1, std::max(A.y, B.y) + marginPx)
             };
         }
-        FineBox boxFromCoarseBBox(const CoarseBBox& cb, PixelCoord A, PixelCoord B) noexcept
-        {
-            //coarse bbox(halo 포함) → fine 픽셀로 확장. start/end도 반드시 포함.
-            const int fminX = cb.minX * CoarseGrid::F;
-            const int fminY = cb.minY * CoarseGrid::F;
-            const int fmaxX = (cb.maxX + 1) * CoarseGrid::F - 1;
-            const int fmaxY = (cb.maxY + 1) * CoarseGrid::F - 1;
-            return FineBox{
-                std::max(0,                    std::min({fminX, A.x, B.x})),
-                std::max(0,                    std::min({fminY, A.y, B.y})),
-                std::min(PixelCostGrid::W - 1, std::max({fmaxX, A.x, B.x})),
-                std::min(PixelCostGrid::H - 1, std::max({fmaxY, A.y, B.y}))
-            };
-        }
-
         //--- RDP 단순화 ---
-        double perpDist2(int px, int py, int ax, int ay, int bx, int by) noexcept
-        {
-            const double dx = static_cast<double>(bx - ax);
-            const double dy = static_cast<double>(by - ay);
-            const double len2 = dx * dx + dy * dy;
-            if (len2 == 0.0)
-            {
-                const double ex = px - ax, ey = py - ay;
-                return ex * ex + ey * ey;
-            }
-            const double t  = ((px - ax) * dx + (py - ay) * dy) / len2;
-            const double tc = std::clamp(t, 0.0, 1.0);
-            const double cx = ax + tc * dx;
-            const double cy = ay + tc * dy;
-            const double ex = px - cx, ey = py - cy;
-            return ex * ex + ey * ey;
-        }
-
+        //  segment AB 위 perpendicular 거리² 최대인 점을 찾아 eps² 초과면 분할 재귀.
+        //  segment 길이 0이면 endpoint 거리. dx/dy/len2는 (lo,hi) 페어당 1회 hoisting.
         void rdpRecurse(const std::vector<PixelCoord>& in, int lo, int hi,
                         double eps2, std::vector<int>& keep)
         {
             if (hi <= lo + 1) return;
-            int    maxIdx = -1;
-            double maxD2  = 0.0;
             const auto& A = in[lo];
             const auto& B = in[hi];
+            const double sdx  = static_cast<double>(B.x - A.x);
+            const double sdy  = static_cast<double>(B.y - A.y);
+            const double slen2 = sdx * sdx + sdy * sdy;
+
+            int    maxIdx = -1;
+            double maxD2  = 0.0;
             for (int i = lo + 1; i < hi; ++i)
             {
-                const double d2 = perpDist2(in[i].x, in[i].y, A.x, A.y, B.x, B.y);
+                const double px = in[i].x, py = in[i].y;
+                double d2;
+                if (slen2 == 0.0)
+                {
+                    const double ex = px - A.x, ey = py - A.y;
+                    d2 = ex * ex + ey * ey;
+                }
+                else
+                {
+                    const double t  = ((px - A.x) * sdx + (py - A.y) * sdy) / slen2;
+                    const double tc = std::clamp(t, 0.0, 1.0);
+                    const double cx = A.x + tc * sdx;
+                    const double cy = A.y + tc * sdy;
+                    const double ex = px - cx, ey = py - cy;
+                    d2 = ex * ex + ey * ey;
+                }
                 if (d2 > maxD2) { maxD2 = d2; maxIdx = i; }
             }
             if (maxD2 > eps2 && maxIdx > 0)
@@ -1111,21 +918,6 @@ namespace procGen
                 keep.push_back(maxIdx);
                 rdpRecurse(in, maxIdx, hi, eps2, keep);
             }
-        }
-
-        std::vector<PixelCoord> rdpSimplify(const std::vector<PixelCoord>& in, double eps)
-        {
-            if (in.size() <= 2) return in;
-            std::vector<int> keep;
-            keep.reserve(in.size() / 4 + 2);
-            keep.push_back(0);
-            rdpRecurse(in, 0, static_cast<int>(in.size()) - 1, eps * eps, keep);
-            keep.push_back(static_cast<int>(in.size()) - 1);
-
-            std::vector<PixelCoord> out;
-            out.reserve(keep.size());
-            for (int i : keep) out.push_back(in[i]);
-            return out;
         }
 
         //============================================================
@@ -1191,14 +983,49 @@ namespace procGen
 
             if (!cr.found || cr.cells.empty()) return {};
 
+            //Corridor 마킹 + bbox 동시 산출 — coarse 경로 + halo coarse cells 만큼 mask에 set.
+            //  halo=3 → 7×7 stamp = 56 fine pixel 폭 corridor (≈2800타일 폭).
+            //  bbox와 mask 둘 다 cr.cells 1회 순회로 같이 산출 (이전엔 별도 함수 2번 순회).
             constexpr int kHalo = 3;
-            markCorridor(cr.cells, kHalo, ws.mask);
+            ws.mask.prepare();
+            int cMinX = std::numeric_limits<int>::max();
+            int cMinY = std::numeric_limits<int>::max();
+            int cMaxX = std::numeric_limits<int>::min();
+            int cMaxY = std::numeric_limits<int>::min();
+            for (std::uint32_t idx : cr.cells)
+            {
+                const int cy = static_cast<int>(idx / CoarseGrid::W);
+                const int cx = static_cast<int>(idx % CoarseGrid::W);
+                if (cx < cMinX) cMinX = cx;
+                if (cx > cMaxX) cMaxX = cx;
+                if (cy < cMinY) cMinY = cy;
+                if (cy > cMaxY) cMaxY = cy;
+                const int x0 = std::max(0, cx - kHalo);
+                const int x1 = std::min(CoarseGrid::W - 1, cx + kHalo);
+                const int y0 = std::max(0, cy - kHalo);
+                const int y1 = std::min(CoarseGrid::H - 1, cy + kHalo);
+                for (int yy = y0; yy <= y1; ++yy)
+                {
+                    const std::uint32_t base = static_cast<std::uint32_t>(yy) * CoarseGrid::W;
+                    for (int xx = x0; xx <= x1; ++xx)
+                    {
+                        ws.mask.mark(base + static_cast<std::uint32_t>(xx));
+                    }
+                }
+            }
 
-            //Fine 박스를 corridor bbox에 딱 맞춤 — corridor 외부 셀은 다 prune되니 박스 메모리 낭비 없음.
-            const CoarseBBox cb = coarseBBox(cr.cells, kHalo);
-            const FineBox fb = boxFromCoarseBBox(cb, A, B);
+            //Fine 박스 = corridor bbox(halo 포함) → fine 픽셀 확장 + 시작/끝점 강제 포함.
+            //  corridor 외부 셀은 mask로 다 prune되니 박스 메모리 낭비 없음.
+            const int cbMinX = std::max(0, cMinX - kHalo);
+            const int cbMinY = std::max(0, cMinY - kHalo);
+            const int cbMaxX = std::min(CoarseGrid::W - 1, cMaxX + kHalo);
+            const int cbMaxY = std::min(CoarseGrid::H - 1, cMaxY + kHalo);
+            const int fbX0 = std::max(0,                    std::min({ cbMinX * CoarseGrid::F,         A.x, B.x }));
+            const int fbY0 = std::max(0,                    std::min({ cbMinY * CoarseGrid::F,         A.y, B.y }));
+            const int fbX1 = std::min(PixelCostGrid::W - 1, std::max({ (cbMaxX + 1) * CoarseGrid::F - 1, A.x, B.x }));
+            const int fbY1 = std::min(PixelCostGrid::H - 1, std::max({ (cbMaxY + 1) * CoarseGrid::F - 1, A.y, B.y }));
 
-            AStarOut r = astarPathBidir(A, B, grid, fb.x0, fb.y0, fb.x1, fb.y1, ws, &ws.mask);
+            AStarOut r = astarPathBidir(A, B, grid, fbX0, fbY0, fbX1, fbY1, ws, &ws.mask);
             fineExpanded += r.expanded;
             if (r.maxHeapSize > maxHeap) maxHeap = r.maxHeapSize;
             if (r.path.empty() || r.totalCost > costCap) return {};
@@ -1220,13 +1047,18 @@ namespace procGen
         if (cities.size() < 2) return {};
 
         //--- 1) tile → pixel 역변환 ---
+        //  placeCities의 pixelToTileCenter 역연산. TILE_BASE는 동일 베이스(상단 상수).
         std::vector<CityPixel> cps;
         cps.reserve(cities.size());
         int t1n = 0, t2n = 0, t3n = 0;
         for (const auto& cn : cities)
         {
-            const PixelCoord p = tileToPixel(cn.center);
-            cps.push_back(CityPixel{ p.x, p.y, p.z, cn.tier });
+            cps.push_back(CityPixel{
+                (cn.center.x - TILE_BASE_X) / TILES_PER_PIXEL,
+                (cn.center.y - TILE_BASE_Y) / TILES_PER_PIXEL,
+                cn.center.z,
+                cn.tier
+            });
             switch (cn.tier)
             {
             case CityTier::T1: ++t1n; break;
@@ -1260,12 +1092,57 @@ namespace procGen
         //--- 4) 연결성 봉합 ---
         //  Gabriel ⊇ MST 라 단일 컴포넌트가 정상이지만, 도시 클러스터가 sea로
         //  완전히 고립된 경우(예: 외딴 섬 도시) 추가 엣지가 필요할 수 있음.
-        std::vector<EdgeCand> extras = ensureConnectivity(edges, cps);
-        const std::size_t     extrasN = extras.size();
-        if (!extras.empty())
+        //  알고리즘: DSU로 컴포넌트 분할 → main(=가장 큰) 외 각 sub에서 main까지
+        //  가장 가까운 페어로 1엣지 추가 → 최종 dedup.
+        std::size_t extrasN = 0;
         {
-            edges.insert(edges.end(), extras.begin(), extras.end());
-            edges = dedupEdges(std::move(edges));
+            DSU dsu(static_cast<int>(cps.size()));
+            for (const auto& e : edges) dsu.unite(e.a, e.b);
+
+            std::unordered_map<int, std::vector<int>> comps;
+            for (int i = 0; i < static_cast<int>(cps.size()); ++i)
+                comps[dsu.find(i)].push_back(i);
+
+            if (comps.size() > 1)
+            {
+                std::vector<std::vector<int>*> sortedComps;
+                sortedComps.reserve(comps.size());
+                for (auto& [_, mem] : comps) sortedComps.push_back(&mem);
+                std::sort(sortedComps.begin(), sortedComps.end(),
+                    [](const auto* a, const auto* b) { return a->size() > b->size(); });
+
+                const auto& mainComp = *sortedComps[0];
+                std::vector<EdgeCand> extras;
+                for (std::size_t k = 1; k < sortedComps.size(); ++k)
+                {
+                    const auto& sub = *sortedComps[k];
+                    double best = std::numeric_limits<double>::infinity();
+                    int bestA = -1, bestB = -1;
+                    for (int s : sub)
+                    {
+                        for (int m : mainComp)
+                        {
+                            const double dx = static_cast<double>(cps[s].px - cps[m].px);
+                            const double dy = static_cast<double>(cps[s].py - cps[m].py);
+                            const double d2 = dx * dx + dy * dy;
+                            if (d2 < best)
+                            {
+                                best  = d2;
+                                bestA = std::min(s, m);
+                                bestB = std::max(s, m);
+                            }
+                        }
+                    }
+                    if (bestA >= 0)
+                        extras.push_back(EdgeCand{ bestA, bestB, std::sqrt(best) });
+                }
+                extrasN = extras.size();
+                if (!extras.empty())
+                {
+                    edges.insert(edges.end(), extras.begin(), extras.end());
+                    edges = dedupEdges(std::move(edges));
+                }
+            }
         }
 
         const __int64 tConn = getNanoTimer();
@@ -1295,8 +1172,61 @@ namespace procGen
         }
 
         //--- 4-2) Coarse 그리드 1회 빌드 ---
+        //  8× 다운샘플 (5400×2700 float = 58MB), top-K=4 mean 집계.
+        //  병렬: 행을 nT 등분하여 각 스레드가 자기 행 영역만 처리.
         const __int64 tCoarseStart = getNanoTimer();
-        CoarseGrid coarse = buildCoarseGrid(grid);
+        CoarseGrid coarse;
+        {
+            constexpr std::size_t total = static_cast<std::size_t>(CoarseGrid::W) * CoarseGrid::H;
+            coarse.cost = std::make_unique<float[]>(total);
+
+            const Terrain* fineData = grid.data.get();
+            constexpr int Wf = PixelCostGrid::W;
+            constexpr int Hf = PixelCostGrid::H;
+            constexpr int F  = CoarseGrid::F;
+
+            const int nT = std::max<int>(2, static_cast<int>(std::thread::hardware_concurrency()));
+            std::vector<std::thread> threads;
+            threads.reserve(nT);
+            const int rowsPerT = (CoarseGrid::H + nT - 1) / nT;
+
+            for (int t = 0; t < nT; ++t)
+            {
+                const int r0 = t * rowsPerT;
+                const int r1 = std::min(r0 + rowsPerT, CoarseGrid::H);
+                if (r0 >= r1) break;
+                threads.emplace_back([&, r0, r1]()
+                {
+                    float buf[F * F];
+                    for (int cy = r0; cy < r1; ++cy)
+                    {
+                        const int y0 = cy * F;
+                        const int y1 = std::min(y0 + F, Hf);
+                        float* dstRow = &coarse.cost[static_cast<std::size_t>(cy) * CoarseGrid::W];
+                        for (int cx = 0; cx < CoarseGrid::W; ++cx)
+                        {
+                            const int x0 = cx * F;
+                            const int x1 = std::min(x0 + F, Wf);
+                            int n = 0;
+                            for (int y = y0; y < y1; ++y)
+                            {
+                                const Terrain* row = fineData + static_cast<std::size_t>(y) * Wf;
+                                for (int x = x0; x < x1; ++x)
+                                {
+                                    buf[n++] = kCostLUT[static_cast<std::size_t>(row[x])];
+                                }
+                            }
+                            const int kk = std::min(kCoarseAggK, n);
+                            std::nth_element(buf, buf + kk - 1, buf + n);
+                            float sum = 0.0f;
+                            for (int i = 0; i < kk; ++i) sum += buf[i];
+                            dstRow[cx] = sum / kk;
+                        }
+                    }
+                });
+            }
+            for (auto& th : threads) th.join();
+        }
         const __int64 tCoarseEnd = getNanoTimer();
         prt(L"  coarse grid build  : %8.2f ms  (5400x2700 = 58MB float, top-%d mean)\n",
             (tCoarseEnd - tCoarseStart) / 1.0e6, kCoarseAggK);
@@ -1395,16 +1325,53 @@ namespace procGen
                     return;
                 }
 
-                std::vector<PixelCoord> simp = rdpSimplify(raw, 1.5);
+                //RDP 단순화 — eps=1.5px (eps²=2.25). perpendicular 거리 이하 정점 제거.
+                //  본체는 재귀라 rdpRecurse는 파일 스코프 유지.
+                std::vector<PixelCoord> simp;
+                if (raw.size() <= 2)
+                {
+                    simp = std::move(raw);
+                }
+                else
+                {
+                    std::vector<int> keep;
+                    keep.reserve(raw.size() / 4 + 2);
+                    keep.push_back(0);
+                    rdpRecurse(raw, 0, static_cast<int>(raw.size()) - 1, 1.5 * 1.5, keep);
+                    keep.push_back(static_cast<int>(raw.size()) - 1);
+                    simp.reserve(keep.size());
+                    for (int i : keep) simp.push_back(raw[i]);
+                }
                 vertsTotal.fetch_add(simp.size(), std::memory_order_relaxed);
+
+                //픽셀 → 실타일 + 결정론적 jitter.
+                //  endpoint(시작/끝) 정점은 도시 좌표 정렬용으로 jitter 없이 픽셀 중심.
+                //  중간 정점은 (seed, px, py) splitmix64 해시로 ±20타일 jitter — 동일 seed면
+                //  동일 결과(결정론), 픽셀 단위로 무관(파편화).
+                auto pxToTile = [seed](int px, int py, int z, bool endpoint) noexcept -> Point3
+                {
+                    const int baseX = px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2;
+                    const int baseY = py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2;
+                    if (endpoint) return Point3{ baseX, baseY, z };
+
+                    std::uint64_t h = seed ^ 0xD6E8FEB86659FD93ULL;
+                    h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(px)) * 0x9E3779B97F4A7C15ULL;
+                    h = (h ^ (h >> 30)) * 0xBF58476D1CE4E5B9ULL;
+                    h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(py)) * 0x94D049BB133111EBULL;
+                    h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+                    h ^= h >> 31;
+
+                    const int jx = static_cast<int>(h % 41u) - 20;        // -20 .. +20
+                    const int jy = static_cast<int>((h >> 16) % 41u) - 20;
+                    return Point3{ baseX + jx, baseY + jy, z };
+                };
 
                 RoadPolyLine line;
                 line.verts.reserve(simp.size());
                 for (std::size_t k = 0; k < simp.size(); ++k)
                 {
                     const bool endpoint = (k == 0) || (k + 1 == simp.size());
-                    line.verts.push_back(
-                        pixelToTileJitter(simp[k].x, simp[k].y, simp[k].z, seed, endpoint));
+                    line.verts.push_back(pxToTile(simp[k].x, simp[k].y, simp[k].z, endpoint));
                 }
 
                 {

@@ -23,6 +23,7 @@ import SkillRegistry;
 import Lst;
 import paletteLoader;
 import worldGenState;
+import Teleport;
 
 export void debugConsole()
 {
@@ -341,10 +342,6 @@ export void debugConsole()
 	}
 	case 24:
 	{
-		int px = PlayerX();
-		int py = PlayerY();
-		int pz = PlayerZ();
-
 		// 프리셋 정의 — 새 도시 추가 시 여기에 한 줄 추가하면 자동으로 메뉴에 노출됨
 		struct TeleportPreset
 		{
@@ -354,7 +351,7 @@ export void debugConsole()
 			int z;
 		};
 		const std::array<TeleportPreset, 1> presets = { {
-			{ L"SEOUL", 762025, -225325, 0 },
+			{ L"SEOUL", 731544, -216312, 0 },   // 픽셀 (36840, 6293) 센터 기준 (48타일/px)
 		} };
 
 		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;
@@ -400,28 +397,8 @@ export void debugConsole()
 			break;
 		}
 
-		// 목적지 패치/청크 선행 생성 — 먼 좌표로 텔레포트 시 out_of_range 방지
-		Point2 tgtPatch = World::ins()->changeToPatchCoord(tgtGridX, tgtGridY);
-		if (World::ins()->isEmptyPatch(tgtPatch.x, tgtPatch.y, tgtGridZ))
-		{
-			World::ins()->createPatch(tgtPatch.x, tgtPatch.y, tgtGridZ);
-		}
-		int tgtChunkX, tgtChunkY;
-		World::ins()->changeToChunkCoord(tgtGridX, tgtGridY, tgtChunkX, tgtChunkY);
-		// 목적지 주변 3x3 청크를 미리 만들어 이동/시야 계산 안전 확보
-		for (int dy = -1; dy <= 1; dy++)
-		{
-			for (int dx = -1; dx <= 1; dx++)
-			{
-				if (World::ins()->existChunk(tgtChunkX + dx, tgtChunkY + dy, tgtGridZ) == false)
-				{
-					World::ins()->createChunk(tgtChunkX + dx, tgtChunkY + dy, tgtGridZ);
-				}
-			}
-		}
-
-		EntityPtrMove({ px,py,pz }, { tgtGridX,tgtGridY,tgtGridZ });
-		PlayerPtr->updateVision(PlayerInfo().eyeSight);
+		// Teleport 모듈 통합 함수 — 패치·섹터·청크 동기 ensure + 로딩 화면 + 이동.
+		teleportPlayer(Point3{ tgtGridX, tgtGridY, tgtGridZ });
 		break;
 	}
 	case 25://청크라인 그리기

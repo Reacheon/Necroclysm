@@ -6,7 +6,6 @@ export module World;
 import std;
 import util;
 import Chunk;
-import Patch;
 import constVar;
 import TileData;
 
@@ -22,8 +21,6 @@ export class World
 private:
 	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
-	std::unordered_set<Point3, Point3::Hash> isPatchCreated;
-	std::unordered_map<Point3, std::unique_ptr<Patch>, Point3::Hash> patchMap;
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
 
@@ -81,32 +78,9 @@ public:
 		return getTile(inputCoor.x, inputCoor.y, inputCoor.z);
 	}
 
-	void createChunk(int chunkX, int chunkY, int chunkZ)
-	{
-		chunkFlag inputFlag = chunkFlag::seawater;
-		if (chunkZ > 0) inputFlag = chunkFlag::none;
-		else if (chunkZ < 0) inputFlag = chunkFlag::underground;
-		else
-		{
-			// z=0: 패치 바이옴 맵에서 청크 중심 픽셀의 바이옴 조회
-			int centerTileX = chunkX * CHUNK_SIZE_X + CHUNK_SIZE_X / 2;
-			int centerTileY = chunkY * CHUNK_SIZE_Y + CHUNK_SIZE_Y / 2;
-			int sx = patchFromTile(centerTileX);
-			int sy = patchFromTile(centerTileY);
-			auto it = patchMap.find({ sx, sy, chunkZ });
-			if (it != patchMap.end())
-			{
-				int localTileX = centerTileX - sx * TILE_PER_PATCH;
-				int localTileY = centerTileY - sy * TILE_PER_PATCH;
-				int localPxX = localTileX / TILE_PER_PIXEL;
-				int localPxY = localTileY / TILE_PER_PIXEL;
-				chunkFlag f = it->second->get(localPxX, localPxY);
-				if (f != chunkFlag::none) inputFlag = f;
-			}
-		}
-
-		chunkPtr[{chunkX, chunkY, chunkZ}] = std::make_unique<Chunk>(inputFlag);
-	}
+	// 청크 1개 생성 + (Phase 2 진입 후) Sector 데이터 기반 per-tile 페인트.
+	// 정의는 World_createChunk.cpp.
+	void createChunk(int chunkX, int chunkY, int chunkZ);
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
 	{
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
@@ -217,49 +191,9 @@ public:
 		return totalStackSet;
 	}
 
-	//패치 관련
-	// 타일 좌표를 패치 좌표로 직접 변환 (1패치 = TILE_PER_PATCH = 20000타일)
-	Point2 changeToPatchCoord(int inputGridX, int inputGridY)
-	{
-		return { patchFromTile(inputGridX), patchFromTile(inputGridY) };
-	}
-
-	bool isEmptyPatch(int patchX, int patchY, int patchZ)
-	{
-		if (isPatchCreated.find({ patchX,patchY,patchZ }) == isPatchCreated.end()) return true;
-		else return false;
-	}
-
-	void createPatch(int patchX, int patchY, int patchZ);
-
-	// 패치 강제 로딩 — PNG 바이옴 로드 + 도시간/도시-경계 도로망 생성
-	// 디버그/월드젠 트리거. 도시 내부는 만들지 않고 외부 도로만 깔음
-	void loadPatch(int patchX, int patchY, int patchZ);
-
-	// 패치 데이터 소유 이전/조회 (월드젠 계층이 주입)
-	void setPatch(int patchX, int patchY, int patchZ, std::unique_ptr<Patch> patch)
-	{
-		patchMap[{ patchX, patchY, patchZ }] = std::move(patch);
-	}
-	const Patch* getPatch(int patchX, int patchY, int patchZ) const
-	{
-		auto it = patchMap.find({ patchX, patchY, patchZ });
-		return (it == patchMap.end()) ? nullptr : it->second.get();
-	}
-
-	// 임의 타일 좌표에서 바이옴 조회 (미니맵/GUI 등에서 사용)
-	chunkFlag queryBiomeAtTile(int tileX, int tileY, int z) const
-	{
-		int sx = patchFromTile(tileX);
-		int sy = patchFromTile(tileY);
-		auto it = patchMap.find({ sx, sy, z });
-		if (it == patchMap.end()) return chunkFlag::none;
-		int localTileX = tileX - sx * TILE_PER_PATCH;
-		int localTileY = tileY - sy * TILE_PER_PATCH;
-		int localPxX = localTileX / TILE_PER_PIXEL;
-		int localPxY = localTileY / TILE_PER_PIXEL;
-		return it->second->get(localPxX, localPxY);
-	}
+	// (Patch 시스템 제거됨 — 픽셀 데이터는 procGen mmap이 단일 진리원천.
+	//  타이틀/Phase 1 미진입에는 createChunk가 chunkFlag::seawater 디폴트로 채움.
+	//  Phase 1 이후엔 Sector 모듈이 mmap 경유로 per-tile 페인트 결정.)
 
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{
@@ -285,6 +219,13 @@ public:
 		return *chunkPtr.at({chunkX, chunkY, chunkZ});
 	}
 
+	// 청크 누락 시 nullptr 반환. 핫 루프에서 .at() 예외 비용 없이 안전하게 룩업할 때 사용
+	Chunk* tryGetChunk(int chunkX, int chunkY, int chunkZ)
+	{
+		auto it = chunkPtr.find({chunkX, chunkY, chunkZ});
+		return (it != chunkPtr.end()) ? it->second.get() : nullptr;
+	}
+
 	Vehicle* createVehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 	{
 		uint32_t id = vehicleIdCounter++;
@@ -307,6 +248,26 @@ public:
 	void destroyVehicle(Vehicle* target)
 	{
 		if (target != nullptr) destroyVehicle(target->vehicleId);
+	}
+
+	// 플레이어로부터 *radius* 청크 너머의 모든 청크를 제거. activeChunk도 클리어.
+	//   WorldGen 후 startArea 잔여 청크를 날리는 용도.
+	//   activeChunk는 클리어 후 다음 setGrid에서 재구성됨.
+	void wipeOrphanedChunks(int playerChunkX, int playerChunkY, int playerZ, int radius)
+	{
+		auto it = chunkPtr.begin();
+		while (it != chunkPtr.end())
+		{
+			const Point3& c = it->first;
+			const bool farX  = std::abs(c.x - playerChunkX) > radius;
+			const bool farY  = std::abs(c.y - playerChunkY) > radius;
+			const bool diffZ = c.z != playerZ;
+			if (farX || farY || diffZ)
+				it = chunkPtr.erase(it);
+			else
+				++it;
+		}
+		activeChunk.clear();   // 남은 chunkPtr 기준으로 다음 setGrid가 재구성
 	}
 };
 

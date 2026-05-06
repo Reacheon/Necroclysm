@@ -143,7 +143,7 @@ namespace procGen
             progress.roadsSnap.push_back(r);
         });
 
-        //--- Phase 1 산출물 저장 ---
+        //--- Phase 1~3 산출물 저장 ---
         progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
 
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
@@ -155,7 +155,8 @@ namespace procGen
             grid.data.reset();   //933MB heap 즉시 회수
         }
 
-        progress.phase.store(GenPhase::done, std::memory_order_release);
-        progress.done .store(true,           std::memory_order_release);
+        //  Phase 4 (prepareSpawn) + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
+        //  procGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → procGen 단방향 의존),
+        //  스폰 주변 섹터 사전 절차생성은 호출자 측 책임.
     }
 }

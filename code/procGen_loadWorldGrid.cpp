@@ -8,7 +8,6 @@ import util;
 
 //============================================================
 // 월드 PNG 로딩 (내부 백엔드) — 5832개 패치 PNG를 읽어 43200×21600 Terrain 그리드 구성.
-//   패치 번호 공식 / 색 매핑은 World::createPatch와 동일.
 //   순수 블랙박스: 외부 상태 무관, grid만 반환.
 //   공개 진입점은 procGen_worldGridCache.cpp의 loadWorldGrid가 담당. 이 함수는
 //   캐시 miss 시에만 호출되므로 export하지 않음.

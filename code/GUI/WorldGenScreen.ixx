@@ -10,6 +10,7 @@ import GUI;
 import drawText;
 import globalVar;
 import procGen;
+import Sector;
 
 // ════════════════════════════════════════════════════════════════════════
 // WorldGenScreen — 게임 시작 1회 절차생성 진행 화면
@@ -121,30 +122,32 @@ private:
     {
         switch (ph)
         {
-        case procGen::GenPhase::idle:      return L"Initializing";
-        case procGen::GenPhase::loadPng:   return L"Loading satellite imagery";
-        case procGen::GenPhase::placeCity: return L"Placing cities";
-        case procGen::GenPhase::buildRoad: return L"Building road network";
-        case procGen::GenPhase::done:      return L"Finalizing world";
+        case procGen::GenPhase::idle:         return L"Initializing";
+        case procGen::GenPhase::loadPng:      return L"Loading satellite imagery";
+        case procGen::GenPhase::placeCity:    return L"Placing cities";
+        case procGen::GenPhase::buildRoad:    return L"Building road network";
+        case procGen::GenPhase::prepareSpawn: return L"Preparing spawn area";
+        case procGen::GenPhase::done:         return L"Finalizing world";
         }
         return L"";
     }
 
     //--- 좌측 하단 로딩 로드맵 ---------------------------------------------
-    //   3단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
+    //   4단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
     //   회전 스피너(머리/꼬리 페이드 아크)로 강조.
     void drawRoadmap(procGen::GenPhase ph) const
     {
-        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad
+        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=prepareSpawn
         int activeStep = 0;
-        bool stepDone[3] = { false, false, false };
+        bool stepDone[4] = { false, false, false, false };
         switch (ph)
         {
-        case procGen::GenPhase::idle:      activeStep = 0; break;
-        case procGen::GenPhase::loadPng:   activeStep = 1; break;
-        case procGen::GenPhase::placeCity: activeStep = 2; stepDone[0] = true; break;
-        case procGen::GenPhase::buildRoad: activeStep = 3; stepDone[0] = stepDone[1] = true; break;
-        case procGen::GenPhase::done:      stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case procGen::GenPhase::idle:         activeStep = 0; break;
+        case procGen::GenPhase::loadPng:      activeStep = 1; break;
+        case procGen::GenPhase::placeCity:    activeStep = 2; stepDone[0] = true; break;
+        case procGen::GenPhase::buildRoad:    activeStep = 3; stepDone[0] = stepDone[1] = true; break;
+        case procGen::GenPhase::prepareSpawn: activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case procGen::GenPhase::done:         stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
         }
 
         constexpr SDL_Color C_PENDING = { 105, 105, 110, 255 };
@@ -155,17 +158,18 @@ private:
         constexpr int R_INNER = 15;   // 본 링 안쪽 (두께 2px)
         constexpr int SPACING = 74;   // 단계 간 세로 간격 (원 중심 기준)
         const int cx       = 64;
-        const int firstCy  = cameraH - 226;   // 최상단 원 중심 Y
+        const int firstCy  = cameraH - 300;   // 최상단 원 중심 Y (4단계로 확장하면서 위로)
         const int textX    = cx + 36;
 
-        static const wchar_t* labels[3] = {
+        static const wchar_t* labels[4] = {
             L"Loading satellite imagery",
             L"Placing cities",
             L"Building road network",
+            L"Preparing spawn area",
         };
 
         // 단계 사이를 잇는 도트 라인 (3px 점, 4px 간격)
-        for (int i = 0; i < 2; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             const int yA = firstCy +  i      * SPACING + R_OUTER + 4;
             const int yB = firstCy + (i + 1) * SPACING - R_OUTER - 4;
@@ -179,7 +183,7 @@ private:
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
         // 각 단계 그리기
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 4; ++i)
         {
             const int cy = firstCy + i * SPACING;
             const bool isActive = (activeStep == (i + 1));
@@ -262,7 +266,8 @@ private:
 
 public:
     //onWorldReady 콜백은 done 시점에 메인 스레드에서 호출됨(WorldGenResult 결과 인계).
-    WorldGenScreen(std::uint64_t seed, std::function<void(procGen::WorldGenResult)> onWorldReady)
+    //  spawnTile은 Phase 4에서 사전 절차생성할 섹터 윈도우의 중심 (보통 SPAWN_DEFAULT).
+    WorldGenScreen(std::uint64_t seed, Point3 spawnTile, std::function<void(procGen::WorldGenResult)> onWorldReady)
         : GUI(false)
         , progress(std::make_shared<procGen::WorldGenProgress>())
         , onCompleted(std::move(onWorldReady))
@@ -275,10 +280,30 @@ public:
         deactInput();
 
         //워커 스레드 기동 — shared_ptr 캡처로 수명 안전(jthread 소멸자가 join)
+        //  Phase 1~3은 procGen::generateWorld가 처리.
+        //  Phase 4 (prepareSpawn)는 본 워커가 generateWorld 후 직접 처리 — Sector 모듈 의존성을
+        //  procGen 모듈에 넣지 않기 위함 (Sector → procGen 단방향 유지).
         auto progPtr = progress;
-        worker = std::jthread([seed, progPtr]
+        worker = std::jthread([seed, spawnTile, progPtr]
         {
+            //--- Phase 1~3: PNG 로드 + 도시 + 도로망 ---
             procGen::generateWorld(seed, *progPtr);
+
+            //--- Phase 4: 스폰 주변 9 섹터 사전 절차생성 (동기) ---
+            progPtr->phase.store(procGen::GenPhase::prepareSpawn, std::memory_order_release);
+            const SectorCoord cur = sectorFromTile(spawnTile);
+            for (int dy = -1; dy <= 1; ++dy)
+            {
+                for (int dx = -1; dx <= 1; ++dx)
+                {
+                    SectorCache::ins().getOrCompute(
+                        SectorCoord{ cur.x + dx, cur.y + dy, cur.z }, seed);
+                }
+            }
+
+            //--- Done ---
+            progPtr->phase.store(procGen::GenPhase::done, std::memory_order_release);
+            progPtr->done .store(true,                    std::memory_order_release);
         });
     }
 

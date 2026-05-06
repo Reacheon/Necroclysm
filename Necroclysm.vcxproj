@@ -150,7 +150,7 @@
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <BuildStlModules>true</BuildStlModules>
-      <AdditionalIncludeDirectories>C:\SDL\SDL2-2.0.14\include;C:\SDL\SDL2_image-2.0.5\include;C:\SDL\SDL2_ttf-2.0.15\include;C:\SDL\SDL2_mixer-2.0.4\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\SDL\SDL_gesture-main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <EnableModules>true</EnableModules>
@@ -162,8 +162,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\SDL\SDL2-2.0.14\lib\x64;C:\SDL\SDL2_image-2.0.5\lib\x64;C:\SDL\SDL2_ttf-2.0.15\lib\x64;C:\SDL\SDL2_mixer-2.0.4\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -278,6 +278,7 @@
     <ClCompile Include="code\procGen_generateWorld.cpp" />
     <ClCompile Include="code\procGen_mmapGrid.cpp" />
     <ClCompile Include="code\worldGenState.ixx" />
+    <ClCompile Include="code\Teleport.ixx" />
     <ClCompile Include="code\Prop\Prop.cpp" />
     <ClCompile Include="code\Prop\Prop.ixx" />
     <ClCompile Include="code\Prop\Prop_circuit.ixx" />
@@ -372,6 +373,7 @@
     <ClCompile Include="code\util\sgn.ixx" />
     <ClCompile Include="code\util\stringToWstring.ixx" />
     <ClCompile Include="code\util\ThreadPool.ixx" />
+    <ClCompile Include="code\util\ProcGenWorker.ixx" />
     <ClCompile Include="code\util\timeKeeper.ixx" />
     <ClCompile Include="code\util\utf8Decoder.ixx" />
     <ClCompile Include="code\util\util.ixx" />
@@ -398,10 +400,9 @@
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
     <ClCompile Include="code\world\World_tile.cpp" />
-    <ClCompile Include="code\world\World_createPatch.cpp" />
-    <ClCompile Include="code\world\World_loadPatch.cpp" />
-    <ClCompile Include="code\world\Patch.ixx" />
     <ClCompile Include="code\world\Sector.ixx" />
+    <ClCompile Include="code\world\Sector_procGenerate.cpp" />
+    <ClCompile Include="code\world\World_createChunk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />

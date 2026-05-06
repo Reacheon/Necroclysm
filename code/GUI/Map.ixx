@@ -14,8 +14,8 @@ import globalVar;
 import checkCursor;
 import Player;
 import World;
-import Patch;
 import TileData;
+import procGen;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
@@ -31,16 +31,26 @@ import TileData;
 namespace mapcfg
 {
     // 픽셀 퍼펙트 줌 레벨 — pxPerTile = 스크린 픽셀 / 월드 타일.
-    //   조건1: 50*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 50 tiles) 가
+    //   조건1: 48*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 48 tiles) 가
     //          모든 화면 픽셀에 정수 비율로 매핑 → 띠/뭉개짐 없음.
     //   조건2: pxPerTile 가 ≥1 일 때 정수 → 16px 타일 스프라이트가 모든
     //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
+    //
+    //   48 약수: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48.
+    //   조건1 만족: pxPerTile = n/48 꼴. 1/24, 1/16, 1/12, 1/8, 1/6, 1/4, 1/3, 1/2, 1.0, ...
     inline constexpr double ZOOM_LEVELS[] = {
-        0.04, 0.06, 0.08, 0.10, 0.12, 0.16, 0.20, 0.24, 0.32, 0.40,
-        0.50, 0.60, 0.80, 1.0,  2.0,  3.0,  4.0,  5.0,  6.0
+        1.0/24,    // ≈ 0.0417  (48× = 2)
+        1.0/16,    // = 0.0625  (48× = 3)
+        1.0/12,    // ≈ 0.0833  (48× = 4)
+        1.0/8,     // = 0.125   (48× = 6)
+        1.0/6,     // ≈ 0.1667  (48× = 8)
+        1.0/4,     // = 0.25    (48× = 12)
+        1.0/3,     // ≈ 0.3333  (48× = 16)
+        1.0/2,     // = 0.5     (48× = 24)
+        1.0, 2.0, 3.0, 4.0, 5.0, 6.0
     };
     inline constexpr int    ZOOM_LEVEL_COUNT   = (int)(sizeof(ZOOM_LEVELS) / sizeof(ZOOM_LEVELS[0]));
-    inline constexpr int    DEFAULT_ZOOM_LEVEL = 11;  // 0.60
+    inline constexpr int    DEFAULT_ZOOM_LEVEL = 7;  // 0.5
     inline constexpr double DEFAULT_PX_PER_TILE = ZOOM_LEVELS[DEFAULT_ZOOM_LEVEL];
 
     // 프레임당 신규 텍스처 빌드 한도 (영속 캐시 — 첫 방문 영역에만 쓰임).
@@ -55,20 +65,30 @@ namespace mapcfg
 
 namespace mappal
 {
-    // 바이옴 색 — 구글맵 톤
-    inline SDL_Color biomeColor(chunkFlag f)
+    // Terrain 색 — 구글맵 톤. mmap 픽셀 (procGen::Terrain 16종) 기반.
+    //   procGen_generateWorld의 terrainPreviewColor와 톤 일관 (월드젠 미리보기와 같은 색).
+    inline SDL_Color terrainColor(procGen::Terrain t)
     {
-        switch (f)
+        switch (t)
         {
-        case chunkFlag::seawater:    return {  85, 132, 173, 255 };
-        case chunkFlag::freshwater:  return { 137, 180, 200, 255 };
-        case chunkFlag::dirt:        return { 219, 211, 187, 255 };
-        case chunkFlag::meadow:      return { 192, 215, 168, 255 };
-        case chunkFlag::city:        return { 230, 226, 218, 255 };
-        case chunkFlag::bridge:      return { 200, 195, 188, 255 };
-        case chunkFlag::underground: return { 130, 130, 130, 255 };
-        default:                     return {  18,  18,  22, 255 };
+        case procGen::Terrain::Land:                  return { 192, 215, 168, 255 };  // grass green
+        case procGen::Terrain::Sea:                   return {  85, 132, 173, 255 };  // sea blue
+        case procGen::Terrain::River:                 return { 137, 180, 200, 255 };  // light blue
+        case procGen::Terrain::Lake:                  return { 111, 106, 184, 255 };  // purple-blue
+        case procGen::Terrain::CityZone:              return { 230, 226, 218, 255 };  // city light
+        case procGen::Terrain::CityCenter:            return { 255,  96,  96, 255 };  // city center red
+        case procGen::Terrain::CityRiver:             return { 166, 193, 234, 255 };  // city river
+        case procGen::Terrain::CitySea:               return { 115, 112, 184, 255 };  // city sea (strait)
+        case procGen::Terrain::Mountain:              return { 138, 106,  82, 255 };  // brown
+        case procGen::Terrain::Polar:                 return { 242, 246, 255, 255 };  // ice white
+        case procGen::Terrain::Tundra:                return { 142, 198, 205, 255 };  // pale teal
+        case procGen::Terrain::Subarctic:             return { 110, 155, 200, 255 };  // cold blue
+        case procGen::Terrain::Monsoon:               return { 150, 163,  85, 255 };  // olive
+        case procGen::Terrain::InsularRainforest:     return {  53, 119,  73, 255 };  // SE-Asia green
+        case procGen::Terrain::Desert:                return { 232, 217, 122, 255 };  // sand
+        case procGen::Terrain::ContinentalRainforest: return {  31,  74,  26, 255 };  // dense jungle
         }
+        return { 18, 18, 22, 255 };
     }
 
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
@@ -146,11 +166,13 @@ struct MapView
 //   clear()            — 모든 텍스처 파괴 (월드 리셋 등).
 // ════════════════════════════════════════════════════════════════════════
 
-// 패치 한 장 = PIXEL_PER_PATCH × PIXEL_PER_PATCH 텍스처 (1 px = 1 patch pixel).
-class PatchTextureCache
+// 패치 그리드 셀 1개 = 400×400 픽셀 텍스처 (1 px = 1 mmap pixel).
+//   데이터 소스는 mmap (procGen::worldPixel) — Phase 1 미진입 시 텍스처 빌드 안 함.
+//   캐시는 패치 그리드 좌표(sx, sy, sz)로 인덱싱. 빌드된 텍스처는 영구 보관.
+class PixelTextureCache
 {
 public:
-    static PatchTextureCache& ins() { static PatchTextureCache c; return c; }
+    static PixelTextureCache& ins() { static PixelTextureCache c; return c; }
 
     void resetFrame(int budget) { budget_ = budget; pending_ = 0; }
     int  pendingThisFrame() const { return pending_; }
@@ -160,12 +182,12 @@ public:
         Key k{ sx, sy, sz };
         if (auto it = textures_.find(k); it != textures_.end()) return it->second;
 
-        const Patch* biome = World::ins()->getPatch(sx, sy, sz);
-        if (!biome) return nullptr;  // 데이터 부재 — pending 아님
+        //mmap 미진입(월드젠 전)에는 빌드 불가 — pending 아님, 그냥 nullptr.
+        if (!procGen::worldPixelMmapActive()) return nullptr;
 
         if (budget_ <= 0) { pending_++; return nullptr; }
 
-        SDL_Texture* tex = build(biome);
+        SDL_Texture* tex = build(sx, sy, sz);
         if (!tex) return nullptr;
         textures_[k] = tex;
         budget_--;
@@ -179,19 +201,28 @@ public:
     }
 
 private:
-    static SDL_Texture* build(const Patch* biome)
+    //패치 그리드 셀 (sx, sy)에 해당하는 mmap 픽셀 영역을 400×400 텍스처로 빌드.
+    //  글로벌 픽셀 좌표 = sx*400+px (단, mmap은 [0, 43200) × [0, 21600) 범위만 유효).
+    //  범위 밖은 procGen::worldPixel이 Sea 반환 → 자연스럽게 Sea로 처리됨.
+    static SDL_Texture* build(int sx, int sy, int /*sz*/)
     {
         SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_PATCH, PIXEL_PER_PATCH, SDL_PIXELFORMAT_RGBA32);
         if (!surf) return nullptr;
 
         SDL_LockSurface(surf);
         const SDL_PixelFormatDetails* fmt = SDL_GetPixelFormatDetails(surf->format);
+
+        //글로벌 픽셀 시작점. patch 좌표는 World의 patch 그리드와 동일 인덱싱.
+        const int globalPx0 = (sx + 54) * PIXEL_PER_PATCH;   // sx=-54가 픽셀 0
+        const int globalPy0 = (sy + 27) * PIXEL_PER_PATCH;   // sy=-27이 픽셀 0
+
         for (int py = 0; py < PIXEL_PER_PATCH; py++)
         {
             std::uint32_t* row = (std::uint32_t*)((std::uint8_t*)surf->pixels + py * surf->pitch);
             for (int px = 0; px < PIXEL_PER_PATCH; px++)
             {
-                SDL_Color c = mappal::biomeColor(biome->get(px, py));
+                const procGen::Terrain t = procGen::worldPixel(globalPx0 + px, globalPy0 + py);
+                const SDL_Color c = mappal::terrainColor(t);
                 row[px] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
             }
         }
@@ -221,56 +252,17 @@ private:
 
 
 // ════════════════════════════════════════════════════════════════════════
-// §4  데이터 로딩 (PNG 바이옴 자동 로드)
+// §4  렌더링 계층
+//   (PatchAutoLoader는 mmap 도입 후 폐지 — Phase 1 완료 시점에 모든 픽셀이
+//    이미 mmap으로 즉시 접근 가능. 별도 로딩 절차 불필요.)
 // ════════════════════════════════════════════════════════════════════════
 
-// 가시 영역의 미로드 패치를 PNG 만 로드. 프레임당 한도로 휠 스파이크 방지.
-//   loadVisible() 의 반환값 = 아직 로드 안 된 패치 수 → 스피너 트리거.
-class PatchAutoLoader
-{
-public:
-    static int loadVisible(const MapView& v)
-    {
-        if (v.pxPerTile > mapcfg::AUTOLOAD_MAX_ZOOM) return 0;
-
-        double minTX, minTY, maxTX, maxTY;
-        v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
-
-        int minSX = (int)std::floor(minTX / TILE_PER_PATCH);
-        int minSY = (int)std::floor(minTY / TILE_PER_PATCH);
-        int maxSX = (int)std::floor(maxTX / TILE_PER_PATCH);
-        int maxSY = (int)std::floor(maxTY / TILE_PER_PATCH);
-
-        int loaded = 0;
-        int stillPending = 0;
-        for (int sy = minSY; sy <= maxSY; sy++)
-        {
-            for (int sx = minSX; sx <= maxSX; sx++)
-            {
-                if (!World::ins()->isEmptyPatch(sx, sy, v.z)) continue;
-                if (loaded < mapcfg::FRAME_BUDGET_PATCH_LOAD)
-                {
-                    World::ins()->createPatch(sx, sy, v.z);
-                    loaded++;
-                }
-                else
-                {
-                    stillPending++;
-                }
-            }
-        }
-        return stillPending;
-    }
-};
-
-
-// ════════════════════════════════════════════════════════════════════════
-// §5  렌더링 계층
-// ════════════════════════════════════════════════════════════════════════
-
-// (1) 바이옴 베이스 — 가시 패치 텍스처를 적절히 스케일해 blit
+// (1) 바이옴 베이스 — mmap 활성 시 가시 픽셀 텍스처를 적절히 스케일해 blit.
+//     mmap 미진입(타이틀/Phase 1 미완료): 호출 자체가 스킵됨 → 검은 배경 + 타일 스프라이트 + 마커만.
 static void drawBiomeLayer(const MapView& v)
 {
+    if (!procGen::worldPixelMmapActive()) return;
+
     double minTX, minTY, maxTX, maxTY;
     v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
 
@@ -285,7 +277,7 @@ static void drawBiomeLayer(const MapView& v)
     {
         for (int sx = minSX; sx <= maxSX; sx++)
         {
-            SDL_Texture* tex = PatchTextureCache::ins().getOrBuild(sx, sy, v.z);
+            SDL_Texture* tex = PixelTextureCache::ins().getOrBuild(sx, sy, v.z);
             if (!tex) continue;  // 미빌드 → 다음 프레임에 채워짐
 
             double dstX = v.screenXFromTileX((double)sx * TILE_PER_PATCH);
@@ -580,8 +572,8 @@ static void drawTabButton()
 // 우하단 로딩 패널 — 스피너 + 진행 카운트. pending 0 이면 호출자가 스킵.
 struct LoadingStats
 {
-    int patchesLoading    = 0;  // PNG 바이옴 미로드 (자동 로드 대기)
-    int patchesBuilding   = 0;  // 바이옴 텍스처 빌드 대기
+    int patchesLoading    = 0;  // (deprecated, 항상 0 — Patch 자동로드 시스템 폐지)
+    int patchesBuilding   = 0;  // 픽셀 텍스처 빌드 대기 (frame budget 초과)
     int total() const { return patchesLoading + patchesBuilding; }
 };
 
@@ -687,16 +679,7 @@ public:
         view.pxPerTile = persistedPxPerTile;
         x = 0; y = 0;
 
-        // 플레이어 주변 3x3 패치 PNG 선행 로드 (자동로드가 못 따라잡는 즉시 영역)
-        Point2 ps = World::ins()->changeToPatchCoord(PlayerX(), PlayerY());
-        for (int dy = -1; dy <= 1; dy++)
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                int sx = ps.x + dx, sy = ps.y + dy;
-                if (World::ins()->isEmptyPatch(sx, sy, PlayerZ()))
-                    World::ins()->createPatch(sx, sy, PlayerZ());
-            }
-
+        // mmap 기반 — 패치 사전 로드 불필요 (Phase 1 완료면 모든 픽셀 즉시 접근).
         // 텍스처 캐시 영속 — clear() 안 함. 다시 열어도 즉시 풀 디테일.
 
         deactInput();
@@ -729,26 +712,23 @@ public:
         view.viewW = cameraW;
         view.viewH = cameraH;
 
-        // 매 프레임 작업 예산 초기화
-        PatchTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_PATCHES);
-
-        // 가시 미로드 패치 자동 로드 (PNG 만)
-        int patchesLoadPending = PatchAutoLoader::loadVisible(view);
+        // 매 프레임 작업 예산 초기화 (텍스처 빌드 한도)
+        PixelTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_PATCHES);
 
         // 렌더
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
-        drawBiomeLayer       (view);  // 내부에서 cache.getOrBuild → budget 안에서 빌드
-        drawTileSpriteLayer  (view);
+        drawBiomeLayer       (view);  // mmap 활성 시에만 — 내부에서 cache.getOrBuild → budget 안에서 빌드
+        drawTileSpriteLayer  (view);  // 항상 — 로드된 청크의 실제 타일 스프라이트
         drawPlayerMarker     (view);
 
         drawCoordPanel();
         drawZoomPanel(view, computeZoomButtons());
         drawTabButton();
 
-        // 진행 표시 — 이번 프레임 budget 부족으로 미룬 작업이 있으면
+        // 진행 표시 — 이번 프레임 budget 부족으로 미룬 텍스처 빌드가 있으면
         LoadingStats stats{
-            patchesLoadPending,
-            PatchTextureCache::ins().pendingThisFrame()
+            0,
+            PixelTextureCache::ins().pendingThisFrame()
         };
         if (stats.total() > 0) drawLoadingPanel(stats);
     }

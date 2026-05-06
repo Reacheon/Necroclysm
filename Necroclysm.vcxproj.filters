@@ -121,6 +121,9 @@
     <Filter Include="소스 파일\00_var\Skill\INVOCATION\REHYLION">
       <UniqueIdentifier>{19b97f97-56e4-4cc6-b1d8-69513ea57ae4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\03_World\ProcGen">
+      <UniqueIdentifier>{518355f2-b5f8-4d54-8138-9f4ea72cc1f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -196,6 +199,9 @@
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
     <ClCompile Include="code\debugConsole.ixx">
+      <Filter>소스 파일\05_Class\06_Static</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Teleport.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
     <ClCompile Include="code\renderFPS.ixx">
@@ -567,10 +573,13 @@
     <ClCompile Include="code\world\Chunk.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\world\Patch.ixx">
+    <ClCompile Include="code\world\Sector.ixx">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
-    <ClCompile Include="code\world\Sector.ixx">
+    <ClCompile Include="code\world\Sector_procGenerate.cpp">
+      <Filter>소스 파일\05_Class\03_World</Filter>
+    </ClCompile>
+    <ClCompile Include="code\world\World_createChunk.cpp">
       <Filter>소스 파일\05_Class\03_World</Filter>
     </ClCompile>
     <ClCompile Include="code\var\globalVar.ixx">
@@ -622,6 +631,9 @@
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
     <ClCompile Include="code\util\ThreadPool.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\ProcGenWorker.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\var\textureVar.ixx">
@@ -794,6 +806,33 @@
     </ClCompile>
     <ClCompile Include="code\skill\SkillSuperRegen.ixx">
       <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\WorldGenScreen.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_worldGridCache.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_buildRoadNetwork.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_generateWorld.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_loadWorldGrid.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_mmapGrid.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen_placeCities.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\procGen.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\worldGenState.ixx">
+      <Filter>소스 파일\05_Class\03_World\ProcGen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

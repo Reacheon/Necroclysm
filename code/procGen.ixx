@@ -46,7 +46,7 @@ namespace procGen
         }
     };
 
-    //픽셀 좌표 (1픽셀 = 50타일). 절차적 생성 알고리즘 내부 전용.
+    //픽셀 좌표 (1픽셀 = 48타일). 절차적 생성 알고리즘 내부 전용.
     //타일 좌표 Point3와 강타입 분리 — 함수 파라미터에서 혼용 불가.
     //(Point3는 게임 전반에서 쓰는 실타일 좌표이므로 도시/폴리라인 등 외부 데이터는 그대로 Point3 사용.)
     struct PixelCoord
@@ -66,7 +66,7 @@ namespace procGen
 //============================================================
 export namespace procGen
 {
-    inline constexpr int TILES_PER_PIXEL = 50;//1픽셀당 실타일 수
+    inline constexpr int TILES_PER_PIXEL = 48;//1픽셀당 실타일 수 (청크 16과 정합 위해 16×3=48)
     inline constexpr int WORLD_PIXEL_W   = 43200;
     inline constexpr int WORLD_PIXEL_H   = 21600;
 
@@ -97,11 +97,12 @@ export namespace procGen
     //진행 단계.
     enum class GenPhase : int
     {
-        idle      = 0, //워커 시작 전
-        loadPng   = 1, //위성 PNG 디코드 중
-        placeCity = 2, //도시 좌표 배치 중
-        buildRoad = 3, //도로망 폴리라인 생성 중
-        done      = 4, //모든 단계 완료(result에 채워짐)
+        idle         = 0, //워커 시작 전
+        loadPng      = 1, //위성 PNG 디코드 중
+        placeCity    = 2, //도시 좌표 배치 중
+        buildRoad    = 3, //도로망 폴리라인 생성 중
+        prepareSpawn = 4, //스폰 지점 주변 섹터 사전 절차생성 중 (Phase 4 — generateWorld 외부, WorldGenScreen 워커가 처리)
+        done         = 5, //모든 단계 완료(result에 채워짐)
     };
 
     //워커 스레드와 WorldGenScreen GUI가 공유하는 진행 상태.

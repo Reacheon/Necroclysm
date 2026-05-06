@@ -28,6 +28,8 @@ import nervedriveFilter;
 import WorldGenScreen;
 import worldGenState;
 import procGen;
+import ProcGenWorker;
+import Teleport;
 #define SDL_GESTURE_IMPLEMENTATION 1
 #include "SDL_gesture.h"
 
@@ -53,6 +55,19 @@ int main(int argc, char** argv)
 	initNanoTimer();
 	initCoordTransform();
 	startArea();//스타트 세팅(월드 생성은 디버그 콘솔에서 수동 트리거 — startWorldGen)
+
+	// 월드 생성(Phase 1~4) 완료 후 자동 후처리: 타이틀 청크 wipe + SPAWN으로 텔레포트.
+	//   worldGenState 자체는 World/Teleport import 안 함 (cycle 회피) → 콜백 주입.
+	onWorldGenComplete = []()
+	{
+		// 1) 텔레포트 — Phase 4가 SPAWN_DEFAULT 주변 9 섹터를 사전 ensure했으므로 즉각 진입.
+		teleportPlayer(SPAWN_DEFAULT);
+
+		// 2) 텔레포트 후 플레이어 청크 위치 기준으로 startArea 잔여 청크 wipe.
+		int playerChunkX, playerChunkY;
+		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), playerChunkX, playerChunkY);
+		World::ins()->wipeOrphanedChunks(playerChunkX, playerChunkY, PlayerZ(), CHUNK_LOADING_RANGE);
+	};
 
 	if (Gesture_Init() == 0) 
 	{
@@ -160,6 +175,7 @@ int main(int argc, char** argv)
 		Gesture_Quit();
 		gestureInitialized = false;
 	}
+	ProcGenWorker::ins().shutdown();
 	procGen::shutdownWorldPixelMmap();
 	TTF_Quit();
 	SDL_Quit();

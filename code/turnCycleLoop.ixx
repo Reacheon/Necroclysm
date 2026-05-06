@@ -32,6 +32,7 @@ import SkillData;
 import SkillBehavior;
 import SkillRegistry;
 import procGen;
+import ProcGenWorker;
 
 constexpr double EPSILON = 0.000001;
 
@@ -334,6 +335,7 @@ __int64 playerInputTurn()
 					break;
 				case SDL_EVENT_QUIT:
 					//IMG_Quit();
+					ProcGenWorker::ins().shutdown();
 					procGen::shutdownWorldPixelMmap();
 					TTF_Quit();
 					SDL_Quit();

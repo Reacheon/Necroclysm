@@ -11,6 +11,8 @@ import constVar;
 import statusEffect;
 import log;
 import TileData;
+import Chunk;
+import Prop;
 import ItemPocket;
 import ItemData;
 import nanoTimer;
@@ -20,6 +22,8 @@ import GameOver;
 import turnWait;
 import Wave;
 import Wake;
+import Sector;
+import worldGenState;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -240,59 +244,165 @@ void Player::updateMinimap()
 
 void Player::updateVision(int range, int cx, int cy)
 {
-	__int64 timeStampStart = getNanoTimer();
-	//prt(L"[updateVision] %d,%d에서 시야업데이트가 진행되었다.\n",cx,cy);
+	__int64 tStart = getNanoTimer();
 
 	int correctionRange = range;
 	if (getHour() >= 6 && getHour() < 18) correctionRange = range;
-	else correctionRange = myMax(1,range - 2);
+	else correctionRange = myMax(1, range - 2);
 
-	//줌스케일이 최대일 때 45칸 정도가 최대로 들어옴
-	for (int i = cx - DARK_VISION_RADIUS; i <= cx + DARK_VISION_RADIUS; i++)
+	const int z = getGridZ();
+	World* world = World::ins();
+
+	// 청크 포인터 캐시: ray와 gray 루프 모두 공간적으로 인접한 타일에 연쇄 접근하므로
+	// 같은 청크 안에서는 unordered_map 룩업을 회피한다.
+	int cachedCX = 0;
+	int cachedCY = 0;
+	Chunk* cachedChunk = nullptr;
+	bool cacheValid = false;
+
+	auto fetchTile = [&](int x, int y) -> TileData*
 	{
-		for (int j = cy - DARK_VISION_RADIUS; j <= cy + DARK_VISION_RADIUS; j++)
+		int chunkX, chunkY;
+		world->changeToChunkCoord(x, y, chunkX, chunkY);
+		if (!cacheValid || chunkX != cachedCX || chunkY != cachedCY)
 		{
-			if (TileFov(i, j, getGridZ()) == fovFlag::white) TileFov(i, j, getGridZ()) = fovFlag::gray;
+			cachedChunk = world->tryGetChunk(chunkX, chunkY, z);
+			cachedCX = chunkX;
+			cachedCY = chunkY;
+			cacheValid = true;
+		}
+		if (cachedChunk == nullptr) return nullptr;
+		int localX = x - chunkX * CHUNK_SIZE_X;
+		int localY = y - chunkY * CHUNK_SIZE_Y;
+		return &cachedChunk->getChunkTile(localX, localY);
+	};
+
+	// Phase 1: 시야권 내 white → gray (이전 프레임 기억 다운그레이드)
+	for (int j = cy - DARK_VISION_RADIUS; j <= cy + DARK_VISION_RADIUS; j++)
+	{
+		for (int i = cx - DARK_VISION_RADIUS; i <= cx + DARK_VISION_RADIUS; i++)
+		{
+			TileData* t = fetchTile(i, j);
+			if (t != nullptr && t->fov == fovFlag::white) t->fov = fovFlag::gray;
 		}
 	}
 
-	std::vector<Point2> tasksVec;
-	tasksVec.reserve((2 * DARK_VISION_RADIUS + 1) * (2 * DARK_VISION_RADIUS + 1));
-	for (int tgtX = cx - DARK_VISION_RADIUS; tgtX <= cx + DARK_VISION_RADIUS; tgtX++)
-	{
-		for (int tgtY = cy - DARK_VISION_RADIUS; tgtY <= cy + DARK_VISION_RADIUS; tgtY++)
-		{
-			tasksVec.push_back({ tgtX,tgtY });
-		}
-	}
+	__int64 tAfterGray = getNanoTimer();
 
-	auto rayCastingWorker = [=](int cx, int cy, const std::vector<Point2>& points, int correctionRange)
+	// Phase 2: 단일 스레드 인라인 Bresenham + 캐시된 타일 접근
+	// markStep은 타일을 visible 마킹하고, blocker면 true를 반환해 ray를 종료시킴.
+	auto castRay = [&](int x2, int y2, bool darkMode)
+	{
+		int x1 = cx;
+		int y1 = cy;
+		const int xo = cx;
+		const int yo = cy;
+		int delx = std::abs(x2 - x1);
+		int dely = std::abs(y2 - y1);
+
+		// origin은 무조건 visible
+		TileData* originTile = fetchTile(x1, y1);
+		if (originTile != nullptr) originTile->fov = fovFlag::white;
+
+		if (delx == 0 && dely == 0) return;
+
+		auto markStep = [&](int sx, int sy) -> bool
 		{
-			for (const auto& point : points)
+			TileData* t = fetchTile(sx, sy);
+			if (t == nullptr) return true; // 청크 누락 → ray 종료
+			if (darkMode)
 			{
-				if (isCircle(correctionRange, point.x - cx, point.y - cy)) rayCasting(cx, cy, point.x, point.y);
-				else if (isCircle(DARK_VISION_RADIUS, point.x - cx, point.y - cy)) rayCastingDark(cx, cy, point.x, point.y);
+				if (!t->lightVec.empty()) t->fov = fovFlag::white;
 			}
+			else
+			{
+				t->fov = fovFlag::white;
+			}
+			// 인라인 isRayBlocker — 동일 TileData 참조에서 wall + prop을 한 번에 판정
+			if (t->wall != 0 && itemDex[t->wall].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
+			if (t->PropPtr != nullptr && t->PropPtr->leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true) return true;
+			return false;
 		};
 
-	int numThreads = threadPoolPtr->getAvailableThreads();
-	int chunkSize = tasksVec.size() / numThreads;
-	for (int i = 0; i < numThreads; i++) {
-		std::vector<Point2>::iterator startPoint = tasksVec.begin() + i * chunkSize;
+		if (delx > dely)
+		{
+			// slope < 1: x를 매 step 진행, y는 가끔
+			int p = 2 * dely - delx;
+			for (int i = 0; i < delx; ++i)
+			{
+				if (p < 0)
+				{
+					if (x2 > xo) ++x1; else --x1;
+					p += 2 * dely;
+				}
+				else
+				{
+					if (x2 > xo) ++x1; else --x1;
+					if (y2 > yo) ++y1; else if (y2 < yo) --y1;
+					p += 2 * (dely - delx);
+				}
+				if (markStep(x1, y1)) return;
+			}
+		}
+		else if (dely > delx)
+		{
+			// slope > 1: y를 매 step 진행, x는 가끔
+			int p = 2 * delx - dely;
+			for (int i = 0; i < dely; ++i)
+			{
+				if (p < 0)
+				{
+					if (y2 > yo) ++y1; else --y1;
+					p += 2 * delx;
+				}
+				else
+				{
+					if (x2 > xo) ++x1; else if (x2 < xo) --x1;
+					if (y2 > yo) ++y1; else --y1;
+					p += 2 * (delx - dely);
+				}
+				if (markStep(x1, y1)) return;
+			}
+		}
+		else
+		{
+			// slope == 1: 매 step 대각 진행
+			for (int i = 0; i < delx; ++i)
+			{
+				if (x2 > x1) ++x1; else --x1;
+				if (y2 > y1) ++y1; else --y1;
+				if (markStep(x1, y1)) return;
+			}
+		}
+	};
 
-		std::vector<Point2>::iterator endPoint;
-		if (i == numThreads - 1) endPoint = tasksVec.end(); //만약 마지막 스레드일 경우 벡터의 끝을 강제로 설정
-		else endPoint = startPoint + chunkSize;
-		std::vector<Point2> chunk(startPoint, endPoint);
-
-		threadPoolPtr->addTask([=]() {
-			rayCastingWorker(cx, cy, chunk, correctionRange);
-			});
+	// Phase 3: 시야권 그리드를 직접 순회 (tasksVec / dispatch 제거)
+	int rayCount = 0;
+	for (int dy = -DARK_VISION_RADIUS; dy <= DARK_VISION_RADIUS; ++dy)
+	{
+		for (int dx = -DARK_VISION_RADIUS; dx <= DARK_VISION_RADIUS; ++dx)
+		{
+			if (isCircle(correctionRange, dx, dy))
+			{
+				castRay(cx + dx, cy + dy, false);
+				++rayCount;
+			}
+			else if (isCircle(DARK_VISION_RADIUS, dx, dy))
+			{
+				castRay(cx + dx, cy + dy, true);
+				++rayCount;
+			}
+		}
 	}
 
-	threadPoolPtr->waitForThreads();
+	__int64 tEnd = getNanoTimer();
 
-    //std::wprintf(L"[updateVision] %d,%d에서 시야업데이트가 완료되었다. 소요시간 : %lf ms\n", cx, cy, (getNanoTimer() - timeStampStart) / 1000000.0);
+	double total = (tEnd - tStart)       / 1000000.0;
+	double gray  = (tAfterGray - tStart) / 1000000.0;
+	double work  = (tEnd - tAfterGray)   / 1000000.0;
+
+	//prt(L"[updateVision perf] (%d,%d) total=%.3fms | gray=%.3fms work=%.3fms | rays=%d (single-thread)\n",
+	//	cx, cy, total, gray, work, rayCount);
 }
 
 
@@ -361,14 +471,14 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
 	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 
-	Point2 patchXY = World::ins()->changeToPatchCoord(getGridX(), getGridY());
-	for (int dir = -1; dir <= 7; dir++)
-	{
-		int dx, dy;
-		dir2Coord(dir, dx, dy);
-		if (World::ins()->isEmptyPatch(patchXY.x + dx, patchXY.y + dy, getGridZ()) == true) World::ins()->createPatch(patchXY.x + dx, patchXY.y + dy, getGridZ());
-	}
+	// (Patch 시스템 제거됨 — 청크 페인트는 mmap 활성 시 Sector 경유, 그 외 chunkFlag 디폴트.)
 	updateNearbyChunk(CHUNK_LOADING_RANGE);
+
+	// 월드젠 완료 후에만 섹터 ensure — 시작 영역(startArea)에서는 worldSeed=0이라 의미 없음
+	if (worldGenResult.has_value())
+	{
+		loadNearbySectors(Point3{ getGridX(), getGridY(), getGridZ() }, worldSeed);
+	}
 }
 
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우

@@ -27,14 +27,8 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
-	Point2 patchXY = World::ins()->changeToPatchCoord(PlayerX(), PlayerY());
-	for (int dx = -2; dx <= 2; dx++)
-	{
-		for (int dy = -2; dy <= 2; dy++)
-		{
-			if (World::ins()->isEmptyPatch(patchXY.x + dx, patchXY.y + dy, PlayerZ()) == true) World::ins()->createPatch(patchXY.x + dx, patchXY.y + dy, PlayerZ());
-		}
-	}
+	// (Patch 시스템 제거됨 — 타이틀 영역은 createChunk가 chunkFlag::seawater 디폴트로 채움.
+	//  startArea가 그 위에 home base 영역 props/items를 배치.)
 
 	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
 	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::dehydrated, -1 });
@@ -1395,7 +1389,7 @@ export void startArea()
 
 
 
-	World::ins()->createPatch(0, 0, 0);
+	// (Patch 시스템 제거됨 — createPatch 호출 불필요)
 
 	PlayerPtr->updateVision(PlayerInfo().eyeSight);
 
