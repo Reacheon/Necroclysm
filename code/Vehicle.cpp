@@ -35,16 +35,29 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 
 Vehicle::~Vehicle()
 {
-    //점유 타일에서 Vehicle 포인터 제거
+    // 광역 청크 소멸(게임 종료 등) 도중에는 청크가 이미 unordered_map에서 분리됨 →
+    // TileVehicle()/getChunk()의 .at()이 throw. 부품마다 다른 청크에 걸쳐 있을 수 있어
+    // 각 위치마다 tryGetChunk로 확인 후 접근.
+    const int gz = getGridZ();
+
+    //점유 타일에서 Vehicle 포인터 제거 (청크별 안전 접근)
     for (const auto& [pos, pocket] : partInfo)
     {
-        TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
+        Point2 partCC = World::ins()->changeToChunkCoord(pos.x, pos.y);
+        if (Chunk* partChunk = World::ins()->tryGetChunk(partCC.x, partCC.y, gz))
+        {
+            int localX = pos.x - (partCC.x * CHUNK_SIZE_X);
+            int localY = pos.y - (partCC.y * CHUNK_SIZE_Y);
+            partChunk->getChunkTile(localX, localY).VehiclePtr = nullptr;
+        }
     }
 
-    //청크에서 등록 해제
+    //청크에서 등록 해제 (현재 위치 청크)
     Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
-    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
-    currentChunk.eraseVehicle(this);
+    if (Chunk* currentChunk = World::ins()->tryGetChunk(currentChunkCoord.x, currentChunkCoord.y, gz))
+    {
+        currentChunk->eraseVehicle(this);
+    }
 
     prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
 }

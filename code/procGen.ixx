@@ -70,6 +70,19 @@ export namespace procGen
     inline constexpr int WORLD_PIXEL_W   = 43200;
     inline constexpr int WORLD_PIXEL_H   = 21600;
 
+    //패치(=위성 PNG 1장) 격자 — 파일 포맷 사실. 5832장 = (53-(-54)+1) × (26-(-27)+1) = 108 × 54.
+    //  파일명 규칙: number = PATCH_NUMBER_BIAS + patchX + 108·patchY → worldPatch-{number:03d}.png
+    inline constexpr int PATCH_X_MIN       = -54;
+    inline constexpr int PATCH_X_MAX       =  53;
+    inline constexpr int PATCH_Y_MIN       = -27;
+    inline constexpr int PATCH_Y_MAX       =  26;
+    inline constexpr int PATCH_PIXEL       = 400;    //패치 1장의 픽셀 변 (400×400)
+    inline constexpr int PATCH_NUMBER_BIAS = 2971;
+
+    //픽셀 좌표 → 실타일 좌표 원점. 좌상단 패치(-54, -27)의 (0,0)이 어떤 실타일이 되는지.
+    inline constexpr int TILE_BASE_X = PATCH_X_MIN * PATCH_PIXEL * TILES_PER_PIXEL; // -1,036,800
+    inline constexpr int TILE_BASE_Y = PATCH_Y_MIN * PATCH_PIXEL * TILES_PER_PIXEL; //   -518,400
+
     //로딩 화면 미리보기 RGBA 다운샘플 해상도. 세로는 비율로 자동 계산.
     inline constexpr int PREVIEW_W = 1080;                                       // 43200 / 40
     inline constexpr int PREVIEW_H = PREVIEW_W * WORLD_PIXEL_H / WORLD_PIXEL_W;  //   540

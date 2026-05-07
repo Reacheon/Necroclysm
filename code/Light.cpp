@@ -88,10 +88,21 @@ void Light::releaseLight()
 		int x = (*it).x;
 		int y = (*it).y;
 		int z = (*it).z;
+
+		// 광역 청크 소멸(wipeOrphanedChunks, 게임 종료) 중 — Light 소유자(Prop의 ItemData 등)
+		// 가 멤버 소멸로 ~Light를 호출할 때, lit 타일의 청크가 이미 사라져있을 수 있음.
+		// getTile()의 .at()이 throw하므로 청크별 안전 조회로 우회 — 청크가 없으면 정리 불필요.
+		int chunkX, chunkY;
+		World::ins()->changeToChunkCoord(x, y, chunkX, chunkY);
+		Chunk* chunk = World::ins()->tryGetChunk(chunkX, chunkY, z);
+		if (chunk == nullptr) continue;
+
 		float dist = sqrt(pow(x - getGridX(), 2) + pow(y - getGridY(), 2) + pow(z - getGridZ(), 2));
 		Uint8 brightness = (float)bright * pow(1 - ((dist) / (float)lightRange), 2);
 
-		auto& lightVec = World::ins()->getTile(x, y, z).lightVec;
+		int localX = x - (chunkX * CHUNK_SIZE_X);
+		int localY = y - (chunkY * CHUNK_SIZE_Y);
+		auto& lightVec = chunk->getChunkTile(localX, localY).lightVec;
 		for (int i = 0; i < lightVec.size(); i++)
 		{
 			if (lightVec[i].r == lightColor.r &&

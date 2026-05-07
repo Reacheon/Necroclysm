@@ -56,9 +56,19 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
 
 Prop::~Prop()
 {
+    // 광역 청크 소멸(wipeOrphanedChunks, 게임 종료) 도중에는 자신을 담은 청크가 이미
+    // unordered_map에서 분리된 채로 ~Chunk가 호출됨 → getChunk()/TileProp()가 .at()로
+    // 던짐. tryGetChunk로 본인 청크 존재 여부를 먼저 확인하고, 없으면 즉시 종료 —
+    // 컨테이너 자체가 소멸되니 eraseProp도, 이웃 CABLE 플래그 정리도 의미 없음.
     Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
-    Chunk& currentChunk = World::ins()->getChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
-    currentChunk.eraseProp(this);
+    Chunk* currentChunk = World::ins()->tryGetChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
+    if (currentChunk == nullptr)
+    {
+        prt(L"[Prop:destructor] 청크 광역 소멸 중 — 정리 생략.\n");
+        return;
+    }
+
+    currentChunk->eraseProp(this);
 
     if (leadItem.checkFlag(itemFlag::CABLE))
     {

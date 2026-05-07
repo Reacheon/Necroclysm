@@ -226,6 +226,19 @@ public:
 		return (it != chunkPtr.end()) ? it->second.get() : nullptr;
 	}
 
+	// 타일이 속한 청크가 없으면 nullptr 반환. 렌더링 등 로드 영역 경계를 넘어 이웃 타일을
+	// 조회할 가능성이 있는 read-only 경로에서 사용 — 쓰기에는 getTile() 사용 (청크 보장).
+	TileData* tryGetTile(int x, int y, int z)
+	{
+		int chunkX, chunkY;
+		changeToChunkCoord(x, y, chunkX, chunkY);
+		Chunk* chunk = tryGetChunk(chunkX, chunkY, z);
+		if (chunk == nullptr) return nullptr;
+		int localX = x - (chunkX * CHUNK_SIZE_X);
+		int localY = y - (chunkY * CHUNK_SIZE_Y);
+		return &chunk->getChunkTile(localX, localY);
+	}
+
 	Vehicle* createVehicle(int inputX, int inputY, int inputZ, int leadItemCode)
 	{
 		uint32_t id = vehicleIdCounter++;

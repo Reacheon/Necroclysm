@@ -14,8 +14,7 @@ import nervedriveFilter;
 
 // source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
 // 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
-static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src,
-	const std::vector<SDL_Color>& from, const std::vector<SDL_Color>& to)
+static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src, const std::vector<SDL_Color>& from, const std::vector<SDL_Color>& to)
 {
 	SDL_Surface* dst = SDL_ConvertSurface(src, SDL_PIXELFORMAT_RGBA32);
 	if (dst == nullptr) return nullptr;
@@ -56,8 +55,7 @@ static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src,
 //   - 헤어:  imageDir="image/charset/body/hair", palettePath="palette/hair.tsv", sourceColor=L"BLACK"
 //   - 눈:    imageDir="image/charset/body/eyes", palettePath="palette/eyes.tsv", sourceColor=L"BLUE"
 //   - 피부:  imageDir="image/charset/body/skin", palettePath="palette/skin.tsv", sourceColor=L"LIGHT"
-static void loadPaletteSwappedSprites(SDL_Renderer* renderer,
-	const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor)
+static void loadPaletteSwappedSprites(SDL_Renderer* renderer, const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor)
 {
 	PaletteTable pal = loadPaletteTable(palettePath);
 	auto fromIt = pal.table.find(sourceColor);
@@ -112,8 +110,7 @@ static void loadMutationSprites(SDL_Renderer* renderer)
 	}
 
 	// 2패스: 템플릿 PNG들을 팔레트 스왑하여 색상별 변종 생성
-	auto processTemplate = [&](const fs::path& path, const PaletteTable& pal,
-		const std::wstring& suffix, const std::wstring& sourceColor)
+	auto processTemplate = [&](const fs::path& path, const PaletteTable& pal, const std::wstring& suffix, const std::wstring& sourceColor)
 	{
 		std::wstring stem = path.stem();
 		std::wstring base = stem.substr(0, stem.size() - suffix.size()); // "_FURCOL" 제거

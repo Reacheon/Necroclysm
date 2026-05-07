@@ -1512,8 +1512,7 @@ void HUD::drawBodyParts()
 	updateFakeHP(PlayerInfo().fakeHP, PlayerInfo().HP, PlayerInfo().fakeHPAlpha);
 
 	//x와 y 좌표는 게이지 좌측 상단 기준
-	auto drawSingleBodyPartGauge = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName,
-		int realHP, int fakeHP, int maxHP, unsigned char fakeHPAlpha)
+	auto drawSingleBodyPartGauge = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName, int realHP, int fakeHP, int maxHP, unsigned char fakeHPAlpha)
 		{
 			drawSprite(spr::hpGauge, gaugeFlip ? 1 : 0, inputX, inputY);
 

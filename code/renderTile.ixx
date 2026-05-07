@@ -171,7 +171,9 @@ void analyseRender()
                     {
                         int dx, dy;
                         dir2Coord(dir, dx, dy);
-                        if (World::ins()->getTile(tgtX + dx, tgtY + dy, pZ).floor != itemID::deepSeaWater)
+                        // 이웃이 로드 영역 밖이면 wave 등록 생략 — 어차피 그쪽 경계는 렌더 안 함.
+                        const TileData* nb = World::ins()->tryGetTile(tgtX + dx, tgtY + dy, pZ);
+                        if (nb && nb->floor != itemID::deepSeaWater)
                         {
                             shallowSeaWaves.insert({ tgtX + dx, tgtY + dy });
                         }
@@ -182,7 +184,8 @@ void analyseRender()
                     {
                         int dx, dy;
                         dir2Coord(dir, dx, dy);
-                        if (World::ins()->getTile(tgtX + dx, tgtY + dy, pZ).floor != itemID::deepSeaWater)
+                        const TileData* nb = World::ins()->tryGetTile(tgtX + dx, tgtY + dy, pZ);
+                        if (nb && nb->floor != itemID::deepSeaWater)
                         {
                             deepSeaWaves.insert({ tgtX + dx, tgtY + dy });
                         }
@@ -193,7 +196,8 @@ void analyseRender()
                     {
                         int dx, dy;
                         dir2Coord(dir, dx, dy);
-                        if (World::ins()->getTile(tgtX + dx, tgtY + dy, pZ).floor == itemID::shallowFreshWater)
+                        const TileData* nb = World::ins()->tryGetTile(tgtX + dx, tgtY + dy, pZ);
+                        if (nb && nb->floor == itemID::shallowFreshWater)
                         {
                             deepFreshWaves.insert({ tgtX + dx, tgtY + dy });
                         }
@@ -574,11 +578,13 @@ void drawTiles()
     {
         int tgtX = elem.x;
         int tgtY = elem.y;
-        const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
-        const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
-        const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());
-        const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
-        const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
+        // wave 항목은 로드 영역 경계를 벗어난 이웃 타일이 들어올 수 있음 — 청크 누락 시 스킵.
+        const TileData* thisTile  = World::ins()->tryGetTile(tgtX,     tgtY,     PlayerZ());
+        const TileData* topTile   = World::ins()->tryGetTile(tgtX,     tgtY - 1, PlayerZ());
+        const TileData* botTile   = World::ins()->tryGetTile(tgtX,     tgtY + 1, PlayerZ());
+        const TileData* leftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY,     PlayerZ());
+        const TileData* rightTile = World::ins()->tryGetTile(tgtX + 1, tgtY,     PlayerZ());
+        if (!thisTile || !topTile || !botTile || !leftTile || !rightTile) continue;
         int animeExtraIndex = 32 * ((SDL_GetTicks() / 300) % 7);
 
         if(thisTile->floor != itemID::shallowSeaWater)
@@ -619,15 +625,16 @@ void drawTiles()
             else if (rightCheck)addWave(1504);
 
 
-            const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
-            const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
-            const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
-            const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+            const TileData* topRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY - 1, PlayerZ());
+            const TileData* topLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY - 1, PlayerZ());
+            const TileData* botLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY + 1, PlayerZ());
+            const TileData* botRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY + 1, PlayerZ());
 
-            bool topRightCheck = topRightTile->floor == itemID::shallowSeaWater;
-            bool topLeftCheck = topLeftTile->floor == itemID::shallowSeaWater;
-            bool botLeftCheck = botLeftTile->floor == itemID::shallowSeaWater;
-            bool botRightCheck = botRightTile->floor == itemID::shallowSeaWater;
+            // 대각선 이웃은 누락 시 false (해안 코너 렌더 생략)
+            bool topRightCheck = topRightTile && topRightTile->floor == itemID::shallowSeaWater;
+            bool topLeftCheck  = topLeftTile  && topLeftTile->floor  == itemID::shallowSeaWater;
+            bool botLeftCheck  = botLeftTile  && botLeftTile->floor  == itemID::shallowSeaWater;
+            bool botRightCheck = botRightTile && botRightTile->floor == itemID::shallowSeaWater;
 
             if (topRightCheck && !topCheck && !rightCheck) addWave(1514);
             if (topLeftCheck && !topCheck && !leftCheck) addWave(1515);
@@ -641,11 +648,12 @@ void drawTiles()
         int tgtX = elem.x;
         int tgtY = elem.y;
 
-        const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
-        const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
-        const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());
-        const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
-        const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
+        const TileData* thisTile  = World::ins()->tryGetTile(tgtX,     tgtY,     PlayerZ());
+        const TileData* topTile   = World::ins()->tryGetTile(tgtX,     tgtY - 1, PlayerZ());
+        const TileData* botTile   = World::ins()->tryGetTile(tgtX,     tgtY + 1, PlayerZ());
+        const TileData* leftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY,     PlayerZ());
+        const TileData* rightTile = World::ins()->tryGetTile(tgtX + 1, tgtY,     PlayerZ());
+        if (!thisTile || !topTile || !botTile || !leftTile || !rightTile) continue;
         int animeExtraIndex = 32 * ((SDL_GetTicks() / 300) % 7);
         if (thisTile->floor == itemID::shallowSeaWater) animeExtraIndex = 0;
 
@@ -682,15 +690,15 @@ void drawTiles()
             else if (leftCheck) addWave(1508);
             else if (rightCheck)addWave(1504);
 
-            const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
-            const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
-            const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
-            const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+            const TileData* topRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY - 1, PlayerZ());
+            const TileData* topLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY - 1, PlayerZ());
+            const TileData* botLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY + 1, PlayerZ());
+            const TileData* botRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY + 1, PlayerZ());
 
-            bool topRightCheck = topRightTile->floor == itemID::deepSeaWater;
-            bool topLeftCheck = topLeftTile->floor == itemID::deepSeaWater;
-            bool botLeftCheck = botLeftTile->floor == itemID::deepSeaWater;
-            bool botRightCheck = botRightTile->floor == itemID::deepSeaWater;
+            bool topRightCheck = topRightTile && topRightTile->floor == itemID::deepSeaWater;
+            bool topLeftCheck  = topLeftTile  && topLeftTile->floor  == itemID::deepSeaWater;
+            bool botLeftCheck  = botLeftTile  && botLeftTile->floor  == itemID::deepSeaWater;
+            bool botRightCheck = botRightTile && botRightTile->floor == itemID::deepSeaWater;
 
             bool topCheckSw = topTile->floor == itemID::shallowSeaWater;
             bool botCheckSw = botTile->floor == itemID::shallowSeaWater;
@@ -708,11 +716,12 @@ void drawTiles()
         int tgtX = elem.x;
         int tgtY = elem.y;
 
-        const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
-        const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
-        const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());
-        const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
-        const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
+        const TileData* thisTile  = World::ins()->tryGetTile(tgtX,     tgtY,     PlayerZ());
+        const TileData* topTile   = World::ins()->tryGetTile(tgtX,     tgtY - 1, PlayerZ());
+        const TileData* botTile   = World::ins()->tryGetTile(tgtX,     tgtY + 1, PlayerZ());
+        const TileData* leftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY,     PlayerZ());
+        const TileData* rightTile = World::ins()->tryGetTile(tgtX + 1, tgtY,     PlayerZ());
+        if (!thisTile || !topTile || !botTile || !leftTile || !rightTile) continue;
         int animeExtraIndex = 0;
 
         {
@@ -748,15 +757,15 @@ void drawTiles()
             else if (leftCheck) addWave(1508);
             else if (rightCheck)addWave(1504);
 
-            const TileData* topRightTile = &World::ins()->getTile(tgtX + 1, tgtY - 1, PlayerZ());
-            const TileData* topLeftTile = &World::ins()->getTile(tgtX - 1, tgtY - 1, PlayerZ());
-            const TileData* botLeftTile = &World::ins()->getTile(tgtX - 1, tgtY + 1, PlayerZ());
-            const TileData* botRightTile = &World::ins()->getTile(tgtX + 1, tgtY + 1, PlayerZ());
+            const TileData* topRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY - 1, PlayerZ());
+            const TileData* topLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY - 1, PlayerZ());
+            const TileData* botLeftTile  = World::ins()->tryGetTile(tgtX - 1, tgtY + 1, PlayerZ());
+            const TileData* botRightTile = World::ins()->tryGetTile(tgtX + 1, tgtY + 1, PlayerZ());
 
-            bool topRightCheck = topRightTile->floor == itemID::deepFreshWater;
-            bool topLeftCheck = topLeftTile->floor == itemID::deepFreshWater;
-            bool botLeftCheck = botLeftTile->floor == itemID::deepFreshWater;
-            bool botRightCheck = botRightTile->floor == itemID::deepFreshWater;
+            bool topRightCheck = topRightTile && topRightTile->floor == itemID::deepFreshWater;
+            bool topLeftCheck  = topLeftTile  && topLeftTile->floor  == itemID::deepFreshWater;
+            bool botLeftCheck  = botLeftTile  && botLeftTile->floor  == itemID::deepFreshWater;
+            bool botRightCheck = botRightTile && botRightTile->floor == itemID::deepFreshWater;
 
             bool topCheckSw = topTile->floor == itemID::shallowFreshWater;
             bool botCheckSw = botTile->floor == itemID::shallowFreshWater;

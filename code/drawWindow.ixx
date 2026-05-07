@@ -84,8 +84,7 @@ export void drawWindow(const SDL_Rect* r, std::wstring title, int sprIndex)
 //─────────────────────────────────────────────────────────────
 //  아이템셋 창
 //─────────────────────────────────────────────────────────────
-export void drawWindowItemset(int x, int y, int w, int h,
-    std::wstring title, int titleSprIndex)
+export void drawWindowItemset(int x, int y, int w, int h, std::wstring title, int titleSprIndex)
 {
     drawWindow(x, y, w, h);
 
@@ -120,9 +119,7 @@ static inline void renderLine(int x1, int y1, int x2, int y2)
         static_cast<float>(x2), static_cast<float>(y2));
 }
 
-export void drawEdgeWindow(int x, int y, int w, int h,
-    int edgeWidth,
-    dir16 arrowDir)
+export void drawEdgeWindow(int x, int y, int w, int h, int edgeWidth, dir16 arrowDir)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, windowAlpha);
     renderFillRect(x, y, w, h);
@@ -193,8 +190,7 @@ export void drawEdgeWindow(int x, int y, int w, int h,
     light(r - 1, b, r - 1, b - edgeWidth + 1);
 }
 
-export void drawEdgeWindow(int x, int y, int w, int h,
-    int edgeWidth)           // ← 5개
+export void drawEdgeWindow(int x, int y, int w, int h, int edgeWidth)           // ← 5개
 {
     drawEdgeWindow(x, y, w, h, edgeWidth, dir16::dir0_5);
 }

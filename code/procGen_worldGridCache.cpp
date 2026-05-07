@@ -21,13 +21,6 @@ namespace procGen
 {
     namespace
     {
-        //패치 그리드 상수 (procGen_loadWorldGrid.cpp와 동일 — fingerprint 계산용).
-        constexpr int PATCH_X_MIN_C = -54;
-        constexpr int PATCH_X_MAX_C =  53;
-        constexpr int PATCH_Y_MIN_C = -27;
-        constexpr int PATCH_Y_MAX_C =  26;
-        constexpr int NUMBER_BIAS_C = 2971;
-
         //캐시 파일 포맷.
         constexpr std::uint32_t kCacheMagic    = 0x4757434EU;         //'NCWG' little-endian
         constexpr std::uint32_t kCacheVersion  = 3;                   //v3: CitySea 추가로 Terrain enum 바이트 값 재배치(이스탄불·홍콩식 도시 내 해협).
@@ -57,7 +50,7 @@ namespace procGen
         {
             //buildPatchPath와 완전 동일한 규칙 — fingerprint가 실제 로더와 같은
             //파일 집합을 보도록 3자리 0-padding 사용.
-            int number = NUMBER_BIAS_C + sx + 108 * sy;
+            int number = PATCH_NUMBER_BIAS + sx + 108 * sy;
             return std::format("map/worldPatch-{:03d}.png", number);
         }
 
@@ -79,9 +72,9 @@ namespace procGen
                 }
             };
 
-            for (int sy = PATCH_Y_MIN_C; sy <= PATCH_Y_MAX_C; ++sy)
+            for (int sy = PATCH_Y_MIN; sy <= PATCH_Y_MAX; ++sy)
             {
-                for (int sx = PATCH_X_MIN_C; sx <= PATCH_X_MAX_C; ++sx)
+                for (int sx = PATCH_X_MIN; sx <= PATCH_X_MAX; ++sx)
                 {
                     std::string path = buildPatchPathLocal(sx, sy);
                     std::error_code ec;
@@ -106,12 +99,12 @@ namespace procGen
         {
             if (!onPatch) return;
             const int totalPatches =
-                (PATCH_Y_MAX_C - PATCH_Y_MIN_C + 1) *
-                (PATCH_X_MAX_C - PATCH_X_MIN_C + 1);
+                (PATCH_Y_MAX - PATCH_Y_MIN + 1) *
+                (PATCH_X_MAX - PATCH_X_MIN + 1);
             int done = 0;
-            for (int sy = PATCH_Y_MIN_C; sy <= PATCH_Y_MAX_C; ++sy)
+            for (int sy = PATCH_Y_MIN; sy <= PATCH_Y_MAX; ++sy)
             {
-                for (int sx = PATCH_X_MIN_C; sx <= PATCH_X_MAX_C; ++sx)
+                for (int sx = PATCH_X_MIN; sx <= PATCH_X_MAX; ++sx)
                 {
                     ++done;
                     onPatch(done, totalPatches, sx, sy, grid);

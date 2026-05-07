@@ -17,88 +17,10 @@ namespace procGen
 {
     namespace
     {
-        //Terrain → 미리보기 RGBA 색 매핑 (Map.ixx의 biomeColor 톤 참조).
-        //  little-endian RGBA32 = 0xAABBGGRR. SDL_PIXELFORMAT_RGBA32와 정합.
-        constexpr std::uint32_t packPreviewRGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept
-        {
-            return (std::uint32_t(0xff) << 24)
-                 | (std::uint32_t(b)    << 16)
-                 | (std::uint32_t(g)    <<  8)
-                 |  std::uint32_t(r);
-        }
-
-        constexpr std::uint32_t terrainPreviewColor(Terrain t) noexcept
-        {
-            switch (t)
-            {
-            case Terrain::Land:        return packPreviewRGBA(0xc0, 0xd7, 0xa8);
-            case Terrain::Sea:         return packPreviewRGBA(0x55, 0x84, 0xad);
-            case Terrain::River:       return packPreviewRGBA(0x89, 0xb4, 0xc8);
-            case Terrain::Lake:        return packPreviewRGBA(0x6f, 0x6a, 0xb8);   //#9384e5의 미리보기 톤 — 강과 구분되는 보라빛
-            case Terrain::CityZone:    return packPreviewRGBA(0xe6, 0xe2, 0xda);
-            case Terrain::CityCenter:  return packPreviewRGBA(0xff, 0x60, 0x60);
-            case Terrain::CityRiver:   return packPreviewRGBA(0xa6, 0xc1, 0xea);   //#a2bfef의 미리보기 톤 — 도시 내 강 강조
-            case Terrain::CitySea:     return packPreviewRGBA(0x73, 0x70, 0xb8);   //#6d6abd의 미리보기 톤 — 도시 내 해협 강조
-            case Terrain::Mountain:    return packPreviewRGBA(0x8a, 0x6a, 0x52);
-            case Terrain::Polar:       return packPreviewRGBA(0xf2, 0xf6, 0xff);
-            case Terrain::Tundra:      return packPreviewRGBA(0x8e, 0xc6, 0xcd);
-            case Terrain::Subarctic:   return packPreviewRGBA(0x6e, 0x9b, 0xc8);
-            case Terrain::Monsoon:               return packPreviewRGBA(0x96, 0xa3, 0x55);
-            case Terrain::InsularRainforest:     return packPreviewRGBA(0x35, 0x77, 0x49);
-            case Terrain::Desert:                return packPreviewRGBA(0xe8, 0xd9, 0x7a);
-            case Terrain::ContinentalRainforest: return packPreviewRGBA(0x1f, 0x4a, 0x1a);
-            }
-            return packPreviewRGBA(0x10, 0x10, 0x10);
-        }
-
-        //패치 ↔ 미리보기 블록 매핑 상수.
-        //  43200 = 108 patch * 400px. 1080 / 108 = 10 → 패치 1장 = 미리보기 10×10.
-        //  21600 =  54 patch * 400px.  540 /  54 = 10 → 정확히 정합.
-        constexpr int PATCH_X_MIN_LOCAL  = -54;
-        constexpr int PATCH_Y_MIN_LOCAL  = -27;
-        constexpr int PATCH_PIXEL_LOCAL  = 400;
-        constexpr int PREVIEW_PER_PATCH  = PATCH_PIXEL_LOCAL * PREVIEW_W / PixelCostGrid::W;  // = 10
-        static_assert(PATCH_PIXEL_LOCAL * PREVIEW_W % PixelCostGrid::W == 0,
-                      "패치 픽셀이 미리보기 해상도와 정합되지 않음 — 비율 어긋남");
-
-        //방금 로드된 패치 1장(400×400 source) → 미리보기 10×10 블록 갱신.
-        //  각 미리보기 픽셀은 40×40 source 블록의 center 1픽셀을 nearest 샘플.
-        //  (평균을 안 쓰는 이유: CityCenter 같은 단일 픽셀 마커가 사라짐.)
-        //  로컬 스택 버퍼에 먼저 계산 → 짧게 락 잡고 메인 버퍼에 복사. 락 시간 < 1µs.
-        void updatePatchPreview(const PixelCostGrid& grid,
-                                int patchX, int patchY,
-                                std::mutex& mtx,
-                                std::vector<std::uint32_t>& dstRGBA)
-        {
-            const int sIdxX = patchX - PATCH_X_MIN_LOCAL;       // 0..107
-            const int sIdxY = patchY - PATCH_Y_MIN_LOCAL;       // 0..53
-            const int blkX0 = sIdxX * PREVIEW_PER_PATCH;        // preview x 시작
-            const int blkY0 = sIdxY * PREVIEW_PER_PATCH;        // preview y 시작
-
-            //로컬 버퍼에 색 미리 계산 (락 밖에서 grid 읽기 — grid는 워커 단일 소유라 안전)
-            std::uint32_t local[PREVIEW_PER_PATCH * PREVIEW_PER_PATCH];
-            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
-            {
-                const int srcY = (blkY0 + dy) * (PixelCostGrid::H / PREVIEW_H)
-                               + (PixelCostGrid::H / PREVIEW_H) / 2;
-                for (int dx = 0; dx < PREVIEW_PER_PATCH; ++dx)
-                {
-                    const int srcX = (blkX0 + dx) * (PixelCostGrid::W / PREVIEW_W)
-                                   + (PixelCostGrid::W / PREVIEW_W) / 2;
-                    local[dy * PREVIEW_PER_PATCH + dx] = terrainPreviewColor(grid.at(srcX, srcY));
-                }
-            }
-
-            //짧게 락 잡고 메인 버퍼에 줄단위 복사
-            std::lock_guard<std::mutex> lk(mtx);
-            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
-            {
-                std::uint32_t* dstRow = dstRGBA.data()
-                    + static_cast<std::size_t>(blkY0 + dy) * PREVIEW_W + blkX0;
-                std::memcpy(dstRow, &local[dy * PREVIEW_PER_PATCH],
-                            PREVIEW_PER_PATCH * sizeof(std::uint32_t));
-            }
-        }
+        //--- forward declarations (Stepdown — 정의는 generateWorld 아래) ---
+        void updatePatchPreview(const PixelCostGrid& grid, int patchX, int patchY, std::mutex& mtx, std::vector<std::uint32_t>& dstRGBA);
+        constexpr std::uint32_t terrainPreviewColor(Terrain t) noexcept;
+        constexpr std::uint32_t packPreviewRGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept;
     }
 
     void generateWorld(std::uint64_t seed, WorldGenProgress& progress)
@@ -158,5 +80,85 @@ namespace procGen
         //  Phase 4 (prepareSpawn) + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
         //  procGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → procGen 단방향 의존),
         //  스폰 주변 섹터 사전 절차생성은 호출자 측 책임.
+    }
+
+    namespace
+    {
+        //패치 ↔ 미리보기 블록 매핑 상수.
+        //  43200 = 108 patch * 400px. 1080 / 108 = 10 → 패치 1장 = 미리보기 10×10.
+        //  21600 =  54 patch * 400px.  540 /  54 = 10 → 정확히 정합.
+        constexpr int PREVIEW_PER_PATCH = PATCH_PIXEL * PREVIEW_W / PixelCostGrid::W;  // = 10
+        static_assert(PATCH_PIXEL * PREVIEW_W % PixelCostGrid::W == 0,
+                      "패치 픽셀이 미리보기 해상도와 정합되지 않음 — 비율 어긋남");
+
+        //방금 로드된 패치 1장(400×400 source) → 미리보기 10×10 블록 갱신.
+        //  각 미리보기 픽셀은 40×40 source 블록의 center 1픽셀을 nearest 샘플.
+        //  (평균을 안 쓰는 이유: CityCenter 같은 단일 픽셀 마커가 사라짐.)
+        //  로컬 스택 버퍼에 먼저 계산 → 짧게 락 잡고 메인 버퍼에 복사. 락 시간 < 1µs.
+        void updatePatchPreview(const PixelCostGrid& grid, int patchX, int patchY, std::mutex& mtx, std::vector<std::uint32_t>& dstRGBA)
+        {
+            const int sIdxX = patchX - PATCH_X_MIN;             // 0..107
+            const int sIdxY = patchY - PATCH_Y_MIN;             // 0..53
+            const int blkX0 = sIdxX * PREVIEW_PER_PATCH;        // preview x 시작
+            const int blkY0 = sIdxY * PREVIEW_PER_PATCH;        // preview y 시작
+
+            //로컬 버퍼에 색 미리 계산 (락 밖에서 grid 읽기 — grid는 워커 단일 소유라 안전)
+            std::uint32_t local[PREVIEW_PER_PATCH * PREVIEW_PER_PATCH];
+            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
+            {
+                const int srcY = (blkY0 + dy) * (PixelCostGrid::H / PREVIEW_H)
+                               + (PixelCostGrid::H / PREVIEW_H) / 2;
+                for (int dx = 0; dx < PREVIEW_PER_PATCH; ++dx)
+                {
+                    const int srcX = (blkX0 + dx) * (PixelCostGrid::W / PREVIEW_W)
+                                   + (PixelCostGrid::W / PREVIEW_W) / 2;
+                    local[dy * PREVIEW_PER_PATCH + dx] = terrainPreviewColor(grid.at(srcX, srcY));
+                }
+            }
+
+            //짧게 락 잡고 메인 버퍼에 줄단위 복사
+            std::lock_guard<std::mutex> lk(mtx);
+            for (int dy = 0; dy < PREVIEW_PER_PATCH; ++dy)
+            {
+                std::uint32_t* dstRow = dstRGBA.data()
+                    + static_cast<std::size_t>(blkY0 + dy) * PREVIEW_W + blkX0;
+                std::memcpy(dstRow, &local[dy * PREVIEW_PER_PATCH],
+                            PREVIEW_PER_PATCH * sizeof(std::uint32_t));
+            }
+        }
+
+        //Terrain → 미리보기 RGBA 색 매핑 (Map.ixx의 biomeColor 톤 참조).
+        constexpr std::uint32_t terrainPreviewColor(Terrain t) noexcept
+        {
+            switch (t)
+            {
+            case Terrain::Land:        return packPreviewRGBA(0xc0, 0xd7, 0xa8);
+            case Terrain::Sea:         return packPreviewRGBA(0x55, 0x84, 0xad);
+            case Terrain::River:       return packPreviewRGBA(0x89, 0xb4, 0xc8);
+            case Terrain::Lake:        return packPreviewRGBA(0x6f, 0x6a, 0xb8);   //#9384e5의 미리보기 톤 — 강과 구분되는 보라빛
+            case Terrain::CityZone:    return packPreviewRGBA(0xe6, 0xe2, 0xda);
+            case Terrain::CityCenter:  return packPreviewRGBA(0xff, 0x60, 0x60);
+            case Terrain::CityRiver:   return packPreviewRGBA(0xa6, 0xc1, 0xea);   //#a2bfef의 미리보기 톤 — 도시 내 강 강조
+            case Terrain::CitySea:     return packPreviewRGBA(0x73, 0x70, 0xb8);   //#6d6abd의 미리보기 톤 — 도시 내 해협 강조
+            case Terrain::Mountain:    return packPreviewRGBA(0x8a, 0x6a, 0x52);
+            case Terrain::Polar:       return packPreviewRGBA(0xf2, 0xf6, 0xff);
+            case Terrain::Tundra:      return packPreviewRGBA(0x8e, 0xc6, 0xcd);
+            case Terrain::Subarctic:   return packPreviewRGBA(0x6e, 0x9b, 0xc8);
+            case Terrain::Monsoon:               return packPreviewRGBA(0x96, 0xa3, 0x55);
+            case Terrain::InsularRainforest:     return packPreviewRGBA(0x35, 0x77, 0x49);
+            case Terrain::Desert:                return packPreviewRGBA(0xe8, 0xd9, 0x7a);
+            case Terrain::ContinentalRainforest: return packPreviewRGBA(0x1f, 0x4a, 0x1a);
+            }
+            return packPreviewRGBA(0x10, 0x10, 0x10);
+        }
+
+        //little-endian RGBA32 = 0xAABBGGRR. SDL_PIXELFORMAT_RGBA32와 정합.
+        constexpr std::uint32_t packPreviewRGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept
+        {
+            return (std::uint32_t(0xff) << 24)
+                 | (std::uint32_t(b)    << 16)
+                 | (std::uint32_t(g)    <<  8)
+                 |  std::uint32_t(r);
+        }
     }
 }

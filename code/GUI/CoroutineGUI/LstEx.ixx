@@ -50,10 +50,7 @@ private:
 	std::vector<SDL_Rect> lstBtn;
 
 public:
-	LstEx(std::wstring inputTitle, std::wstring inputText,
-		std::vector<LstExOption> options,
-		Sprite* inputSprSet = nullptr,
-		bool inputShowSource = true) : GUI(true)
+	LstEx(std::wstring inputTitle, std::wstring inputText, std::vector<LstExOption> options, Sprite* inputSprSet = nullptr, bool inputShowSource = true) : GUI(true)
 	{
 		coAnswer.clear();
 		prt(L"LstEx 객체가 생성되었다.\n");
