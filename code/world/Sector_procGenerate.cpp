@@ -132,13 +132,17 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
     //   접근법: 47-piece autotile prefab 룩업. 알고리즘 기반 SDF/사분면 룰을 모두
     //   포기 — 본질적 트레이드오프(경계 일관 vs 변 디테일 vs 코너 둥글기)가
-    //   해결 불가. 대신 사용자가 직접 그린 PNG (image/spline/splineShore0.png,
-    //   8×6 그리드의 48×48 셀 47개)를 마스크로 변환해 룩업.
+    //   해결 불가. 대신 사용자가 직접 그린 PNG (image/spline/shoreSpline{0..N}.png,
+    //   각 8×6 그리드의 48×48 셀 47개)를 마스크로 변환해 룩업.
     //
-    //   각 water 픽셀에서 8 이웃 land 마스크 → 47 인덱스 (GameMaker autotile47
-    //   컨벤션) → procGen::shoreSplineMask[idx] 룩업 → 픽셀 내부 (lx,ly) 위치의
-    //   bool 값이 true면 그 타일을 dirt로 덮어씀. 마스크 데이터는 textureLoader가
-    //   게임 시작 시 PNG 픽셀 색상(#5b4940=land, #3899ff=water)을 분석해 채움.
+    //   각 water 픽셀에서:
+    //     1) (seed, rawPx, rawPy) hash → variant 선택 (해안선 패턴 다양화)
+    //     2) 8 이웃 land 마스크 → 47 인덱스 (GameMaker autotile47 컨벤션)
+    //     3) procGen::shoreSplineMask[variant][idx] 룩업 → 픽셀 내부 (lx,ly) 위치의
+    //        bool 값이 true면 그 타일을 dirt로 덮어씀.
+    //   마스크 데이터는 textureLoader가 게임 시작 시 PNG 픽셀 색상(#5b4940=land,
+    //   #3899ff=water)을 분석해 채움. variant끼리 변/코너 경계 패턴이 동일해야
+    //   인접 픽셀에서 매끄럽게 연결됨.
     //
     //   인덱스 매핑 (47 = 16 + 16 + 2 + 8 + 4 + 1):
     //     0..15 — 변 0 + 외각 코너 16조합 (NW=1, NE=2, SE=4, SW=8 raw 비트 합)
@@ -190,6 +194,19 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
         default:
             return true;
         }
+    };
+
+    //   픽셀 좌표 + seed hash → variant 선택. 결정론(같은 seed/좌표 → 항상 같은 variant)
+    //   유지하면서 인접 픽셀별로 다른 prefab variant가 선택돼 해안선 패턴 다양화.
+    //   shoreSplineVariantCount=0이면 graceful fallback (페이즈 2 미적용 — 1단계 결과만).
+    auto pickVariant = [seed](int rawPx, int rawPy, int variantCount) -> int {
+        if (variantCount <= 1) return 0;
+        std::uint64_t h = seed ^ 0x9E3779B97F4A7C15ULL;
+        h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(rawPx)) * 0xBF58476D1CE4E5B9ULL;
+        h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+        h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(rawPy)) * 0x94D049BB133111EBULL;
+        h ^= h >> 31;
+        return static_cast<int>(h % static_cast<std::uint64_t>(variantCount));
     };
 
     //   8 이웃 land 마스크 → 47 prefab 인덱스. GameMaker autotile47 컨벤션.
@@ -262,9 +279,12 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const bool sw = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx - 1]);
 
             const int idx = autotile47(n, e, s, w, nw, ne, sw, se);
+            const int variant = pickVariant(rawPx, rawPy, procGen::shoreSplineVariantCount);
 
             //   prefab 마스크 룩업: 자기 픽셀 내부 (localX, localY) 위치가 land이면 dirt 채움.
-            if (procGen::shoreSplineMask[static_cast<std::size_t>(idx)][static_cast<std::size_t>(localY) * procGen::SHORE_TILE_SIZE + localX])
+            //   variantCount=0이면 페이즈 2 적용 X (PNG 로드 실패한 경우 graceful fallback).
+            if (procGen::shoreSplineVariantCount > 0 &&
+                procGen::shoreSplineMask[static_cast<std::size_t>(variant)][static_cast<std::size_t>(idx)][static_cast<std::size_t>(localY) * procGen::SHORE_TILE_SIZE + localX])
             {
                 const std::size_t tileIdx = static_cast<std::size_t>(dy) * SectorCoord::TILES + dx;
                 plan.tiles[tileIdx].floor = itemID::dirt;

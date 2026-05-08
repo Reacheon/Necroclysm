@@ -210,17 +210,21 @@ export namespace procGen
 
     //============================================================
     // 47-piece autotile prefab 마스크 — Sector_procGenerate 페이즈 2가 사용.
-    //   PNG (image/spline/splineShore*.png) 8×6 그리드의 각 48×48 셀을 land(true)/
-    //   water(false) bool 마스크로 변환. 게임 시작 시 textureLoader가 PNG를 읽어
-    //   shoreSplineMask 채움. procGenerate는 8 이웃 land 마스크 → 47 인덱스 →
-    //   shoreSplineMask[idx] 룩업 → 각 타일 dirt/water 결정.
+    //   PNG (image/spline/shoreSpline{0..N}.png) 각각이 8×6 그리드 47 셀로
+    //   land(true)/water(false) bool 마스크. 게임 시작 시 textureLoader가 PNG를
+    //   순회 로드해 shoreSplineMask 채움. 로드 성공한 PNG 수가 shoreSplineVariantCount.
     //
+    //   procGenerate는 (seed + rawPx + rawPy) hash로 variant 선택 → 8 이웃 land
+    //   마스크 → 47 인덱스 → shoreSplineMask[variant][idx] 룩업 → 타일 dirt/water 결정.
+    //   variant끼리 *변/코너 경계 패턴은 동일*하게 그려져야 인접 픽셀에서 점프 X.
     //   인덱스 매핑은 GameMaker autotile47 컨벤션 (Sector_procGenerate.cpp 참조).
     //============================================================
-    inline constexpr int SHORE_TILE_SIZE   = 48;
-    inline constexpr int SHORE_INDEX_COUNT = 47;
+    inline constexpr int SHORE_TILE_SIZE     = 48;
+    inline constexpr int SHORE_INDEX_COUNT   = 47;
+    inline constexpr int SHORE_VARIANT_MAX   = 3;   // 시도하는 PNG 최대 개수 (실제 로드 수는 shoreSplineVariantCount)
 
-    inline std::array<std::array<bool, SHORE_TILE_SIZE * SHORE_TILE_SIZE>, SHORE_INDEX_COUNT> shoreSplineMask{};
+    inline std::array<std::array<std::array<bool, SHORE_TILE_SIZE * SHORE_TILE_SIZE>, SHORE_INDEX_COUNT>, SHORE_VARIANT_MAX> shoreSplineMask{};
+    inline int shoreSplineVariantCount = 0;   // 로드 성공한 variant 수 — procGenerate가 modulo에 사용
 }
 
 //============================================================

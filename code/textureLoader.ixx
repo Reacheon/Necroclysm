@@ -169,56 +169,61 @@ export void textureLoader()
 
 	// shoreSpline PNG 픽셀 → procGen::shoreSplineMask bool 마스크로 변환 (Sector_procGenerate 페이즈 2가 룩업).
 	//   #5b4940 = land (B=0x40), #3899ff = water (B=0xff). B 채널만 비교 (안티앨리어싱 견고).
-	//   8×6 그리드 47 셀 (마지막 1칸 공백).
+	//   각 PNG 8×6 그리드 47 셀 (마지막 1칸 공백). variant N개 순회 로드 — 파일 없으면 graceful skip.
+	procGen::shoreSplineVariantCount = 0;
+	for (int variant = 0; variant < procGen::SHORE_VARIANT_MAX; ++variant)
 	{
-		SDL_Surface* surf = IMG_Load("image/spline/shoreSpline0.png");
+		char path[64];
+		std::snprintf(path, sizeof(path), "image/spline/shoreSpline%d.png", variant);
+
+		SDL_Surface* surf = IMG_Load(path);
 		if (surf == nullptr)
 		{
-			prt(L"[shoreSpline] IMG_Load FAILED: %S\n", SDL_GetError());
+			prt(L"[shoreSpline] variant %d skip (IMG_Load: %S)\n", variant, SDL_GetError());
+			continue;
 		}
-		else
+
+		// 항상 RGBA32로 변환 (포맷 균일화).
+		SDL_Surface* rgba = SDL_ConvertSurface(surf, SDL_PIXELFORMAT_RGBA32);
+		SDL_DestroySurface(surf);
+		if (rgba == nullptr)
 		{
-			// 항상 RGBA32로 변환 (포맷 균일화). 이미 RGBA32여도 문제 없음.
-			SDL_Surface* rgba = SDL_ConvertSurface(surf, SDL_PIXELFORMAT_RGBA32);
-			SDL_DestroySurface(surf);
-			if (rgba == nullptr)
-			{
-				prt(L"[shoreSpline] SDL_ConvertSurface FAILED: %S\n", SDL_GetError());
-			}
-			else
-			{
-				SDL_LockSurface(rgba);
-				const std::uint8_t* bytes = static_cast<const std::uint8_t*>(rgba->pixels);
-				const int pitch = rgba->pitch;
-				int landCount = 0;
+			prt(L"[shoreSpline] variant %d SDL_ConvertSurface FAILED: %S\n", variant, SDL_GetError());
+			continue;
+		}
 
-				for (int idx = 0; idx < procGen::SHORE_INDEX_COUNT; ++idx)
+		SDL_LockSurface(rgba);
+		const std::uint8_t* bytes = static_cast<const std::uint8_t*>(rgba->pixels);
+		const int pitch = rgba->pitch;
+		int landCount = 0;
+
+		for (int idx = 0; idx < procGen::SHORE_INDEX_COUNT; ++idx)
+		{
+			const int cellX = idx % 8;
+			const int cellY = idx / 8;
+			const int baseX = cellX * procGen::SHORE_TILE_SIZE;
+			const int baseY = cellY * procGen::SHORE_TILE_SIZE;
+
+			for (int ly = 0; ly < procGen::SHORE_TILE_SIZE; ++ly)
+			{
+				for (int lx = 0; lx < procGen::SHORE_TILE_SIZE; ++lx)
 				{
-					const int cellX = idx % 8;
-					const int cellY = idx / 8;
-					const int baseX = cellX * procGen::SHORE_TILE_SIZE;
-					const int baseY = cellY * procGen::SHORE_TILE_SIZE;
-
-					for (int ly = 0; ly < procGen::SHORE_TILE_SIZE; ++ly)
-					{
-						for (int lx = 0; lx < procGen::SHORE_TILE_SIZE; ++lx)
-						{
-							const std::uint8_t* p = bytes + (baseY + ly) * pitch + (baseX + lx) * 4;
-							// B 채널 단순 비교: land(B=0x40) vs water(B=0xff). 차이가 커 안티앨리어싱 견고.
-							const bool isLand = (p[2] < 128);
-							procGen::shoreSplineMask[idx][ly * procGen::SHORE_TILE_SIZE + lx] = isLand;
-							if (isLand) ++landCount;
-						}
-					}
+					const std::uint8_t* p = bytes + (baseY + ly) * pitch + (baseX + lx) * 4;
+					// B 채널 단순 비교: land(B=0x40) vs water(B=0xff). 차이가 커 안티앨리어싱 견고.
+					const bool isLand = (p[2] < 128);
+					procGen::shoreSplineMask[variant][idx][ly * procGen::SHORE_TILE_SIZE + lx] = isLand;
+					if (isLand) ++landCount;
 				}
-				const int imgW = rgba->w;
-				const int imgH = rgba->h;
-				SDL_UnlockSurface(rgba);
-				prt(L"[shoreSpline] loaded: %d land tiles in 47 cells (image %dx%d, pitch %d)\n", landCount, imgW, imgH, pitch);
-				SDL_DestroySurface(rgba);
 			}
 		}
+		const int imgW = rgba->w;
+		const int imgH = rgba->h;
+		SDL_UnlockSurface(rgba);
+		SDL_DestroySurface(rgba);
+		prt(L"[shoreSpline] variant %d loaded: %d land tiles (image %dx%d)\n", variant, landCount, imgW, imgH);
+		++procGen::shoreSplineVariantCount;
 	}
+	prt(L"[shoreSpline] total variants loaded: %d\n", procGen::shoreSplineVariantCount);
 
 	// 너브드라이브 초록 틴트용 오프스크린 RT 생성
 	nervedriveFilter::init();
