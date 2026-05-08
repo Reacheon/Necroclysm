@@ -207,6 +207,20 @@ export namespace procGen
 
     //mmap 활성 여부 — 디버그/스모크 테스트용.
     bool worldPixelMmapActive() noexcept;
+
+    //============================================================
+    // 47-piece autotile prefab 마스크 — Sector_procGenerate 페이즈 2가 사용.
+    //   PNG (image/spline/splineShore*.png) 8×6 그리드의 각 48×48 셀을 land(true)/
+    //   water(false) bool 마스크로 변환. 게임 시작 시 textureLoader가 PNG를 읽어
+    //   shoreSplineMask 채움. procGenerate는 8 이웃 land 마스크 → 47 인덱스 →
+    //   shoreSplineMask[idx] 룩업 → 각 타일 dirt/water 결정.
+    //
+    //   인덱스 매핑은 GameMaker autotile47 컨벤션 (Sector_procGenerate.cpp 참조).
+    //============================================================
+    inline constexpr int SHORE_TILE_SIZE   = 48;
+    inline constexpr int SHORE_INDEX_COUNT = 47;
+
+    inline std::array<std::array<bool, SHORE_TILE_SIZE * SHORE_TILE_SIZE>, SHORE_INDEX_COUNT> shoreSplineMask{};
 }
 
 //============================================================

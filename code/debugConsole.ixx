@@ -350,9 +350,10 @@ export void debugConsole()
 			int y;
 			int z;
 		};
-		const std::array<TeleportPreset, 2> presets = { {
-			{ L"SEOUL",       731544, -216312, 0 },   // 픽셀 (36840, 6293) 센터 기준 (48타일/px)
-			{ L"SEOUL_WEST",  729160, -216312, 0 },   // 픽셀 (36832, 6293) — 서울 서쪽 ~7km (서쪽 시가지 경계 근처, 수계 테스트용)
+		const std::array<TeleportPreset, 3> presets = { {
+			{ L"SEOUL",       731544, -216312, 0 },
+			{ L"YELLOW_SEA",  729160, -216312, 0 }, 
+			{ L"SEOUL_RIVER",  730942,-216107, 0 },
 		} };
 
 		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;

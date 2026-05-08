@@ -15,6 +15,14 @@ export namespace texture
 	SDL_Texture* mainGaugeWhiteShadow = nullptr;
 	SDL_Texture* hpGaugeWhiteShadow = nullptr;
 	SDL_Texture* circuitInfo = nullptr;
+
+	std::array<SDL_Texture*, 10> shoreSpline = { nullptr, };
+	// 47타일의 오토타일 스프라이트 시트
+	// 384px*288px의 파일, 한 오토타일 당 48px*48px
+	// 한 행에 8개의 타일로 총 6개의 행으로 구성 (마지막 칸은 공백)
+	// 나중에는 복수 갯수로 확장해서 경계의 다양성을 추구할 예정
+	// #3899ff -> 물,   #5b4940 -> 땅
+	// 비트마스크 값 오름차순, 첫번째는 흙채우기 없는 정사각형 물타일, 마지막 타일은 주변이 흙으로 둘러쌓인 물 타일
 }
 
 export namespace spr
@@ -175,4 +183,5 @@ export namespace spr
 
 	Sprite* btnGuideBackground = nullptr;
 	Sprite* statusPortraitBackground = nullptr;
+
 }

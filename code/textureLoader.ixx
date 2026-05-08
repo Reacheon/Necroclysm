@@ -5,12 +5,14 @@ module;
 export module textureLoader;
 
 import std;
+import util;
 import globalVar;
 import constVar;
 import textureVar;
 import Sprite;
 import paletteLoader; // PaletteTable, loadPaletteTable
 import nervedriveFilter;
+import procGen;       // procGen::shoreSplineMask 데이터 채우기 위함
 
 // source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
 // 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
@@ -162,6 +164,61 @@ export void textureLoader()
 	SDL_SetTextureScaleMode(texture::hpGaugeWhiteShadow, SDL_SCALEMODE_NEAREST);
 
 	texture::circuitInfo = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 450, 69);
+
+	texture::shoreSpline[0] = IMG_LoadTexture(renderer, "image/spline/shoreSpline0.png");
+
+	// shoreSpline PNG 픽셀 → procGen::shoreSplineMask bool 마스크로 변환 (Sector_procGenerate 페이즈 2가 룩업).
+	//   #5b4940 = land (B=0x40), #3899ff = water (B=0xff). B 채널만 비교 (안티앨리어싱 견고).
+	//   8×6 그리드 47 셀 (마지막 1칸 공백).
+	{
+		SDL_Surface* surf = IMG_Load("image/spline/shoreSpline0.png");
+		if (surf == nullptr)
+		{
+			prt(L"[shoreSpline] IMG_Load FAILED: %S\n", SDL_GetError());
+		}
+		else
+		{
+			// 항상 RGBA32로 변환 (포맷 균일화). 이미 RGBA32여도 문제 없음.
+			SDL_Surface* rgba = SDL_ConvertSurface(surf, SDL_PIXELFORMAT_RGBA32);
+			SDL_DestroySurface(surf);
+			if (rgba == nullptr)
+			{
+				prt(L"[shoreSpline] SDL_ConvertSurface FAILED: %S\n", SDL_GetError());
+			}
+			else
+			{
+				SDL_LockSurface(rgba);
+				const std::uint8_t* bytes = static_cast<const std::uint8_t*>(rgba->pixels);
+				const int pitch = rgba->pitch;
+				int landCount = 0;
+
+				for (int idx = 0; idx < procGen::SHORE_INDEX_COUNT; ++idx)
+				{
+					const int cellX = idx % 8;
+					const int cellY = idx / 8;
+					const int baseX = cellX * procGen::SHORE_TILE_SIZE;
+					const int baseY = cellY * procGen::SHORE_TILE_SIZE;
+
+					for (int ly = 0; ly < procGen::SHORE_TILE_SIZE; ++ly)
+					{
+						for (int lx = 0; lx < procGen::SHORE_TILE_SIZE; ++lx)
+						{
+							const std::uint8_t* p = bytes + (baseY + ly) * pitch + (baseX + lx) * 4;
+							// B 채널 단순 비교: land(B=0x40) vs water(B=0xff). 차이가 커 안티앨리어싱 견고.
+							const bool isLand = (p[2] < 128);
+							procGen::shoreSplineMask[idx][ly * procGen::SHORE_TILE_SIZE + lx] = isLand;
+							if (isLand) ++landCount;
+						}
+					}
+				}
+				const int imgW = rgba->w;
+				const int imgH = rgba->h;
+				SDL_UnlockSurface(rgba);
+				prt(L"[shoreSpline] loaded: %d land tiles in 47 cells (image %dx%d, pitch %d)\n", landCount, imgW, imgH, pitch);
+				SDL_DestroySurface(rgba);
+			}
+		}
+	}
 
 	// 너브드라이브 초록 틴트용 오프스크린 RT 생성
 	nervedriveFilter::init();
@@ -360,4 +417,5 @@ export void textureLoader()
 
 	spr::btnGuideBackground = new  Sprite(renderer, "image/UI/GUI/btnGuideBackground.png", 426, 66);
 	spr::statusPortraitBackground = new  Sprite(renderer, "image/UI/GUI/statusPortraitBackground.png", 110, 110);
+
 }

@@ -121,35 +121,42 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     }
 
     //═══════════════════════════════════════════════════════════════════════
-    // 2) 곡선 강·해안 — 8-이웃 픽셀 단위 land 채우기 (사분면 룰)
-    //
-    //   픽셀 베이스(1단계) 위에 land로만 곡선 채우기. 즉 *water 픽셀의 내부*
-    //   타일 일부를 dirt로 덮어 쓴다. land 픽셀은 *절대* 손대지 않음.
-    //
-    //   왜 단방향: 이전 bilinear 보간은 land와 water가 *양방향* 침투 →
-    //     - land가 깎이면 도시·도로 페인트와 충돌, 결과 모양 예측 불가
-    //     - 룰이 암묵적이라 패턴별 의도 표현 불가
-    //   한 방향(water → land)으로만 변형하면 land 영역 보존 + 룰 명료.
-    //
-    //   사분면 처리: 각 픽셀을 NE/NW/SE/SW 4 사분면(24×24)으로 분할.
-    //     각 사분면에 영향 주는 3 이웃(예: NE → N, NE, E)의 land 마스크
-    //     8가지 패턴별로 채우기 모양 결정. 다른 3 사분면은 좌표 미러로 동일 처리.
-    //
-    //   패턴별 모양 (A=수직변 이웃, B=대각 이웃, C=수평변 이웃):
-    //     000 - 모두 water        → 채우기 없음
-    //     100 - A만 land          → A변 따라 띠, 외각 코너로 갈수록 두께 0
-    //     001 - C만 land          → C변 따라 띠, 외각 코너로 갈수록 두께 0
-    //     010 - B만 land          → 외각 코너에 작은 점
-    //     110 - A+B               → A변 따라 균일 두께 띠 (외각까지 유지)
-    //     011 - B+C               → C변 따라 균일 두께 띠
-    //     101 - A+C, B water      → 두 띠 합집합 (드문 패턴)
-    //     111 - 모두 land         → 4분원 (안쪽 사분원 water, 그 밖 land)
-    //
-    //   노이즈: 띠 두께에 저주파 ±2 wave 추가. world 좌표 hash + 4타일 스케일
-    //     선형 보간 → 픽셀 경계에서 자동 연속.
-    //
-    //   섹터 경계 연속성: 마진 1px 포함 마스크 채집 → 8 이웃 모두 안전.
+    // 2) 곡선 강·해안 — 47 Autotile
+    // 강이나 해안선은 픽셀(48타일)로 양자화되어 있기에 월드맵에서 보면 불연속적으로 보인다.
+    // 기존에 물이 있던 자리를 땅으로 채우는 47 오토타일링을 공격적으로 해서 해안선이나 강가를 자연스럽게 만드려고 한다.
+    // 오토타일링이므로 인접한 8개의 픽셀들이 어떤 픽셀인지를 참조해서 자기 위치의 픽셀(48타일) 내의 타일들을 흙으로 채워야 한다. 주변을 오염시키면 안된다.
+    // 가능하면 자연스럽게 이어져야 한다.
+    // 채우는 타일은 일단 dirt로 한다. 나중에 모래나 이런 걸로 바꿀 수도 있으나 지금은 이 정도로 하자.
+    // 따로 헬퍼 함수를 만들지 말고 딥모듈 원칙을 따라서 이 함수 내에서 코드를 끝낼 것 (람다 함수가 중간에 필요하면 사용하여도 OK)
     //═══════════════════════════════════════════════════════════════════════
+
+    //   접근법: 47-piece autotile prefab 룩업. 알고리즘 기반 SDF/사분면 룰을 모두
+    //   포기 — 본질적 트레이드오프(경계 일관 vs 변 디테일 vs 코너 둥글기)가
+    //   해결 불가. 대신 사용자가 직접 그린 PNG (image/spline/splineShore0.png,
+    //   8×6 그리드의 48×48 셀 47개)를 마스크로 변환해 룩업.
+    //
+    //   각 water 픽셀에서 8 이웃 land 마스크 → 47 인덱스 (GameMaker autotile47
+    //   컨벤션) → procGen::shoreSplineMask[idx] 룩업 → 픽셀 내부 (lx,ly) 위치의
+    //   bool 값이 true면 그 타일을 dirt로 덮어씀. 마스크 데이터는 textureLoader가
+    //   게임 시작 시 PNG 픽셀 색상(#5b4940=land, #3899ff=water)을 분석해 채움.
+    //
+    //   인덱스 매핑 (47 = 16 + 16 + 2 + 8 + 4 + 1):
+    //     0..15 — 변 0 + 외각 코너 16조합 (NW=1, NE=2, SE=4, SW=8 raw 비트 합)
+    //     16..19 — L-Edge(W) + 외각 NE/SE 0/1조합
+    //     20..23 — T-Edge(N) + 외각 SE/SW
+    //     24..27 — R-Edge(E) + 외각 SW/NW
+    //     28..31 — B-Edge(S) + 외각 NW/NE
+    //     32 — L+R (수직 일자통로)
+    //     33 — T+B (수평 일자통로)
+    //     34..41 — 변 2 인접 (T+L, T+R, R+B, L+B) + 외각 코너 0/1
+    //     42..45 — 변 3 (데드엔드 4가지)
+    //     46 — 변 4 (둘러쌓인 물)
+    //
+    //   외각 코너는 *양변 모두 water*일 때만 raw 비트 의미. 양변 land 코너는
+    //   prefab에서 자동 land 처리 (raw 비트 무관). 한쪽 변만 land인 코너는 변에
+    //   흡수되어 raw 비트 무관. 이 마스킹 룰로 raw 8비트 → 47 인덱스 압축.
+    //
+    //   섹터 경계 연속성: 마진 1px 포함 Terrain 채집 → 8 이웃 안전 룩업.
 
     constexpr int MARGIN_PX = 1;
     constexpr int SECTOR_PX = SectorCoord::TILES / TILE_PER_PIXEL;
@@ -160,7 +167,6 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     const int fieldOriginPxX  = sectorOriginPxX - MARGIN_PX;
     const int fieldOriginPxY  = sectorOriginPxY - MARGIN_PX;
 
-    //─── 2-A) 마진 포함 픽셀 Terrain 채집 ──────────────────────────────────
     std::vector<procGen::Terrain> terr(static_cast<std::size_t>(FIELD_SZ) * FIELD_SZ);
     for (int fy = 0; fy < FIELD_SZ; ++fy)
     {
@@ -186,59 +192,47 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
         }
     };
 
-    //─── 2-B) 저주파 1D wave (world 좌표 기반, ±2 타일) ────────────────────
-    //   인접 픽셀과 자동 연속: 같은 world 좌표 → 같은 wave 값.
-    auto wave1D = [](int worldCoord) -> int {
-        constexpr int SCALE = 4;
-        const int g0 = (worldCoord >= 0) ? (worldCoord / SCALE) : ((worldCoord - SCALE + 1) / SCALE);
-        const int g1 = g0 + 1;
-        const int t  = worldCoord - g0 * SCALE;
-        auto hash = [](int g) {
-            std::uint32_t v = static_cast<std::uint32_t>(g) ^ 0x9E3779B9u;
-            v *= 0x85EBCA6Bu; v ^= v >> 13;
-            v *= 0xC2B2AE35u; v ^= v >> 16;
-            return static_cast<int>(v % 5) - 2;
-        };
-        const int a = hash(g0);
-        const int b = hash(g1);
-        return (a * (SCALE - t) + b * t) / SCALE;
-    };
+    //   8 이웃 land 마스크 → 47 prefab 인덱스. GameMaker autotile47 컨벤션.
+    //   외각 코너는 양변 water일 때만 raw 비트 의미. 양변 land 코너는 prefab에서
+    //   자동 처리되므로 raw 무관. 한쪽 변 land 코너도 raw 무관 (변에 흡수).
+    auto autotile47 = [](bool n, bool e, bool s, bool w, bool nw, bool ne, bool sw, bool se) -> int {
+        const bool oNW = nw && !n && !w;
+        const bool oNE = ne && !n && !e;
+        const bool oSW = sw && !s && !w;
+        const bool oSE = se && !s && !e;
+        const int edges = (n ? 1 : 0) + (e ? 1 : 0) + (s ? 1 : 0) + (w ? 1 : 0);
 
-    //─── 2-C) 사분면 채우기 룰 ─────────────────────────────────────────────
-    //   NE 사분면 좌표: qx ∈ [0, Q), qy ∈ [0, Q).
-    //     qx=0 → 픽셀 중앙 수직 라인,    qx=Q-1 → 픽셀 우측 변 (외각)
-    //     qy=0 → 픽셀 상단 변 (외각),    qy=Q-1 → 픽셀 중앙 수평 라인
-    //   dN = qy (A변까지 거리),  dE = (Q-1)-qx (C변까지 거리)
-    //   외각 코너 = (qx=Q-1, qy=0),     안쪽 코너 = (qx=0, qy=Q-1)
-    constexpr int Q       = TILE_PER_PIXEL / 2;   // 24
-    constexpr int D_THIN  = 6;                    // 단일 변 최대 두께
-    constexpr int D_BAND  = 10;                   // 변+코너 균일 띠 두께
-    constexpr int R_SMALL = 5;                    // 코너만 있을 때 작은 점 반경
-    constexpr int R_DISK  = Q - 1;                // 4분원 반경
-
-    auto fillQuadrant = [&](bool A, bool B, bool C, int qx, int qy, int waveA, int waveC) -> bool {
-        const int dN       = qy;
-        const int dE       = (Q - 1) - qx;
-        const int dInnerSq = qx * qx + (Q - 1 - qy) * (Q - 1 - qy);
-        const int dOuterSq = dN * dN + dE * dE;
-        const int p = (A ? 4 : 0) | (B ? 2 : 0) | (C ? 1 : 0);
-
-        switch (p)
+        if (edges == 0)
         {
-        case 0b000: return false;
-        case 0b100: { const int t = D_THIN * (Q - 1 - qx) / (Q - 1) + waveA; return dN < t; }
-        case 0b001: { const int t = D_THIN * (Q - 1 - qy) / (Q - 1) + waveC; return dE < t; }
-        case 0b010: return dOuterSq < R_SMALL * R_SMALL;
-        case 0b110: { const int t = D_BAND + waveA; return dN < t; }
-        case 0b011: { const int t = D_BAND + waveC; return dE < t; }
-        case 0b101: { const int tA = (D_THIN + 2) + waveA; const int tC = (D_THIN + 2) + waveC; return dN < tA || dE < tC; }
-        case 0b111: { const int r = R_DISK + waveA; return dInnerSq >= r * r; }
+            //   변 0: 외각 코너 16조합. NW=1, NE=2, SE=4, SW=8 비트 합.
+            return (oNW ? 1 : 0) | (oNE ? 2 : 0) | (oSE ? 4 : 0) | (oSW ? 8 : 0);
         }
-        return false;
+        if (edges == 4) return 46;
+        if (edges == 1)
+        {
+            //   변 1 + 외각 코너 (변 인접 코너 2개는 한쪽 land라 흡수, 나머지 2개만 외각 가능).
+            if (w) return 16 + ((oNE ? 1 : 0) | (oSE ? 2 : 0));
+            if (n) return 20 + ((oSE ? 1 : 0) | (oSW ? 2 : 0));
+            if (e) return 24 + ((oSW ? 1 : 0) | (oNW ? 2 : 0));
+            return 28 + ((oNW ? 1 : 0) | (oNE ? 2 : 0));   // s
+        }
+        if (edges == 2)
+        {
+            if (w && e) return 32;   // L+R 수직 통로
+            if (n && s) return 33;   // T+B 수평 통로
+            //   변 2 인접: 양변 land 코너 1개(자동 처리), 양변 water 코너 1개(외각 가능).
+            if (n && w) return oSE ? 35 : 34;   // T+L, 외각 SE
+            if (n && e) return oSW ? 37 : 36;   // T+R, 외각 SW
+            if (e && s) return oNW ? 39 : 38;   // R+B, 외각 NW
+            return oNE ? 41 : 40;               // L+B, 외각 NE
+        }
+        //   edges == 3: 데드엔드. 양변 land 코너 2개 자동 처리, 외각 가능 0개.
+        if (!s) return 42;   // L+T+R
+        if (!e) return 43;   // L+T+B
+        if (!n) return 44;   // L+B+R
+        return 45;           // T+R+B
     };
 
-    //─── 2-D) 타일별 처리 ──────────────────────────────────────────────────
-    //   water 픽셀에 한해 사분면 룰 적용. land 픽셀은 1단계 결과 그대로 유지.
     for (int dy = 0; dy < SectorCoord::TILES; ++dy)
     {
         const int wty    = sectorOriginTileY + dy;
@@ -255,8 +249,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const int localX = relX - rawPx * TILE_PER_PIXEL;
             const int fx     = rawPx - fieldOriginPxX;
 
-            const std::size_t centerIdx = static_cast<std::size_t>(fy) * FIELD_SZ + fx;
-            if (isLandTerrain(terr[centerIdx])) continue;
+            //   자기 픽셀이 land이면 1단계 결과 그대로 (주변 오염 X).
+            if (isLandTerrain(terr[static_cast<std::size_t>(fy) * FIELD_SZ + fx])) continue;
 
             const bool n  = isLandTerrain(terr[static_cast<std::size_t>(fy - 1) * FIELD_SZ + fx]);
             const bool s  = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx]);
@@ -267,19 +261,10 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const bool se = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx + 1]);
             const bool sw = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx - 1]);
 
-            //   사분면 결정 + 좌표 미러 → 모든 사분면을 NE 형태(qx,qy ∈ [0,Q))로 통일
-            int qx, qy;
-            bool A, B, C;
-            if      (localX >= Q && localY <  Q) { qx = localX - Q;          qy = localY;                          A = n; B = ne; C = e; }
-            else if (localX <  Q && localY <  Q) { qx = (Q - 1) - localX;    qy = localY;                          A = n; B = nw; C = w; }
-            else if (localX >= Q && localY >= Q) { qx = localX - Q;          qy = (TILE_PER_PIXEL - 1) - localY;   A = s; B = se; C = e; }
-            else                                 { qx = (Q - 1) - localX;    qy = (TILE_PER_PIXEL - 1) - localY;   A = s; B = sw; C = w; }
+            const int idx = autotile47(n, e, s, w, nw, ne, sw, se);
 
-            //   wave 입력: A변(수평변)은 변 따라 wtx 변화, C변(수직변)은 변 따라 wty 변화.
-            const int waveA = wave1D(wtx);
-            const int waveC = wave1D(wty);
-
-            if (fillQuadrant(A, B, C, qx, qy, waveA, waveC))
+            //   prefab 마스크 룩업: 자기 픽셀 내부 (localX, localY) 위치가 land이면 dirt 채움.
+            if (procGen::shoreSplineMask[static_cast<std::size_t>(idx)][static_cast<std::size_t>(localY) * procGen::SHORE_TILE_SIZE + localX])
             {
                 const std::size_t tileIdx = static_cast<std::size_t>(dy) * SectorCoord::TILES + dx;
                 plan.tiles[tileIdx].floor = itemID::dirt;
