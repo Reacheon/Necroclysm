@@ -405,6 +405,9 @@
     <ClCompile Include="code\util\Vec3.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\worldWrap.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
     <ClCompile Include="code\util\wstring2Number.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>

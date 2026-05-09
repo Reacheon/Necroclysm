@@ -67,11 +67,15 @@ private:
 public:
 	TileData& getTile(int x, int y, int z)
 	{
+		// chunkX/Y는 raw input(음수·W 초과 가능)으로 floorDiv. localX 계산은
+		// raw chunkX 기준이어야 [0,16) 로컬 좌표가 제대로 나온다 — render-space
+		// 에서 들어온 tgtX=-50도 localX=14처럼 올바르게 매핑.
+		// chunkPtr 룩업 직전에만 wrapChunkX로 X축 시암 정규화.
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
 		int localX = x - (chunkX * CHUNK_SIZE_X);
 		int localY = y - (chunkY * CHUNK_SIZE_Y);
-		return chunkPtr.at({chunkX, chunkY, z})->getChunkTile(localX, localY);
+		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, z})->getChunkTile(localX, localY);
 	}
 	TileData& getTile(Point3 inputCoor)
 	{
@@ -83,6 +87,8 @@ public:
 	void createChunk(int chunkX, int chunkY, int chunkZ);
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
 	{
+		// X축 wrap — 시암 너머 chunkX(예: -3, W+5)도 같은 키로 룩업.
+		chunkX = worldWrap::wrapChunkX(chunkX);
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
 		else return false;
 	}
@@ -119,7 +125,7 @@ public:
 	}
 	void activate(int x, int y, int z)
 	{
-		activeChunk.push_back(chunkPtr.at({x, y, z}).get());
+		activeChunk.push_back(chunkPtr.at({worldWrap::wrapChunkX(x), y, z}).get());
 	}
 	void deactivate()
 	{
@@ -197,32 +203,32 @@ public:
 
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr.at({chunkX, chunkY, chunkZ})->getChunkFlag();
+		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->getChunkFlag();
 	}
 	weatherFlag getChunkWeather(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr.at({chunkX, chunkY, chunkZ})->getWeather();
+		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->getWeather();
 	}
 
 	void setChunkWeather(int chunkX, int chunkY, int chunkZ, weatherFlag input)
 	{
-		chunkPtr.at({chunkX, chunkY, chunkZ})->setWeather(input);
+		chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->setWeather(input);
 	}
 
 	void chunkOverwrite(int chunkX, int chunkY, int chunkZ, chunkFlag inputChunk)
 	{
-		chunkPtr.at({chunkX, chunkY, chunkZ})->chunkLoad(inputChunk);
+		chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->chunkLoad(inputChunk);
 	}
 
 	Chunk& getChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		return *chunkPtr.at({chunkX, chunkY, chunkZ});
+		return *chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ});
 	}
 
 	// 청크 누락 시 nullptr 반환. 핫 루프에서 .at() 예외 비용 없이 안전하게 룩업할 때 사용
 	Chunk* tryGetChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		auto it = chunkPtr.find({chunkX, chunkY, chunkZ});
+		auto it = chunkPtr.find({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ});
 		return (it != chunkPtr.end()) ? it->second.get() : nullptr;
 	}
 
@@ -268,11 +274,14 @@ public:
 	//   activeChunk는 클리어 후 다음 setGrid에서 재구성됨.
 	void wipeOrphanedChunks(int playerChunkX, int playerChunkY, int playerZ, int radius)
 	{
+		// X축은 시암 wrap을 고려한 부호 있는 최단거리.
+		const int normPlayerCX = worldWrap::wrapChunkX(playerChunkX);
 		auto it = chunkPtr.begin();
 		while (it != chunkPtr.end())
 		{
 			const Point3& c = it->first;
-			const bool farX  = std::abs(c.x - playerChunkX) > radius;
+			const int dxWrap = worldWrap::signedDeltaChunkX(normPlayerCX, c.x);
+			const bool farX  = std::abs(dxWrap)         > radius;
 			const bool farY  = std::abs(c.y - playerChunkY) > radius;
 			const bool diffZ = c.z != playerZ;
 			if (farX || farY || diffZ)

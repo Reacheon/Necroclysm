@@ -191,7 +191,9 @@ void Entity::drawSelf()
 		}
 	}
 
-	int originX = (cameraW / 2) + zoomScale * (getX() - cameraX + getIntegerFakeX());
+	// X축은 시암 wrap. 시암 너머 엔티티(예: 서쪽 끝 cam, 동쪽 끝 mob)도
+	// 부호 있는 최단거리로 화면 좌측에 자연스럽게 그림.
+	int originX = (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, getX()) + getIntegerFakeX());
 	int originY = (cameraH / 2) + zoomScale * (getY() - cameraY + getIntegerFakeY());
 
 	int drawingX = originX + zoomScale * (offsetX);

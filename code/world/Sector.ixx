@@ -63,7 +63,11 @@ export SectorCoord sectorFromTile(Point3 tile) noexcept
         return (v >= 0) ? (v / SectorCoord::TILES)
                         : ((v - (SectorCoord::TILES - 1)) / SectorCoord::TILES);
     };
-    return SectorCoord{ floorDiv(tile.x), floorDiv(tile.y), tile.z };
+    // X축은 시암 wrap. tile.x가 render-space(음수/W 초과)일 수 있으니
+    // 섹터 인덱스 단계에서 정규화 — SectorCache 키가 [0, W/3840) 범위 유지.
+    const int rawSx = floorDiv(tile.x);
+    const int sx    = worldWrap::wrapSectorX(rawSx, SectorCoord::TILES);
+    return SectorCoord{ sx, floorDiv(tile.y), tile.z };
 }
 
 export Point3 sectorOriginTile(SectorCoord sc) noexcept

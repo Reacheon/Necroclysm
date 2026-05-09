@@ -881,7 +881,7 @@ void drawCorpses()
         if (pZ == adr->getZ()) // 플레이어의 z축과 시체의 z축이 같을 경우
         {
             setZoom(zoomScale);
-            drawSpriteCenter(adr->getSprite(), adr->getSprIndex(), (cameraW / 2) + zoomScale * (adr->getX() - cameraX), (cameraH / 2) + zoomScale * (adr->getY() - cameraY));
+            drawSpriteCenter(adr->getSprite(), adr->getSprIndex(), (cameraW / 2) + zoomScale * worldWrap::signedDeltaRenderX(cameraX, adr->getX()), (cameraH / 2) + zoomScale * (adr->getY() - cameraY));
             setZoom(1.0);
         }
     }
@@ -921,7 +921,7 @@ void drawItems()
                 (
                     spr::itemset,
                     pocketInfo[pocketInfo.size() - 1].getSprIndex(),
-                    (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+                    (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
                     (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
                 );
                 setZoom(1.0);
@@ -1129,7 +1129,7 @@ void drawDamages()
     for (int i = 0; i < Damage::list.size(); i++)
     {
         Damage* address = Damage::list[i];
-        int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
+        int drawingX = (cameraW / 2) + zoomScale * worldWrap::signedDeltaRenderX(cameraX, address->getX());
         int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
 
         if(zoomScale == 3.0f || zoomScale == 2.0f) setZoom(2.0f);
@@ -1150,7 +1150,7 @@ void drawBullets()
         (
             address->sprite,
             address->sprIndex,
-            (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+            (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );
         setZoom(1.0);
@@ -1168,7 +1168,7 @@ void drawParticles()
         (
             address->sprite,
             address->sprIndex,
-            (cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+            (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );
         SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);

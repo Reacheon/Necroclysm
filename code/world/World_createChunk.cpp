@@ -41,8 +41,11 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
     //   16×16 = 256 타일을 SectorPlan.tiles에서 직접 복사. 결정 0, 매핑 0.
     if (chunkZ == 0 && procGen::worldPixelMmapActive())
     {
-        const int chunkOriginTileX = chunkX * CHUNK_SIZE_X;
-        const int chunkOriginTileY = chunkY * CHUNK_SIZE_Y;
+        // chunkX는 음수/W 초과(render-space)일 수 있으므로 wrap 후 sector 계산.
+        // 그렇지 않으면 sectorFromTile이 음수 sectorX를 반환해 캐시 키 충돌 발생.
+        const int wrapChunkX        = worldWrap::wrapChunkX(chunkX);
+        const int chunkOriginTileX  = wrapChunkX * CHUNK_SIZE_X;
+        const int chunkOriginTileY  = chunkY * CHUNK_SIZE_Y;
 
         const SectorCoord sc = sectorFromTile(
             Point3{ chunkOriginTileX, chunkOriginTileY, chunkZ });
@@ -75,5 +78,5 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
         }
     }
 
-    chunkPtr[{chunkX, chunkY, chunkZ}] = std::move(chunk);
+    chunkPtr[{worldWrap::wrapChunkX(chunkX), chunkY, chunkZ}] = std::move(chunk);
 }

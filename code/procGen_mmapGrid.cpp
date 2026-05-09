@@ -170,8 +170,9 @@ namespace procGen
     {
         const MmapState& s = state();
         if (!s.base) return Terrain::Sea;
-        if (px < 0 || px >= PixelCostGrid::W) return Terrain::Sea;
+        // Y는 양극(보이지않는 벽)이므로 범위 밖 = Sea. X는 시암 wrap.
         if (py < 0 || py >= PixelCostGrid::H) return Terrain::Sea;
+        px = worldWrap::wrapPixelX(px);
         return s.base[static_cast<std::size_t>(py) * PixelCostGrid::W + px];
     }
 

@@ -378,6 +378,7 @@
     <ClCompile Include="code\util\utf8Decoder.ixx" />
     <ClCompile Include="code\util\util.ixx" />
     <ClCompile Include="code\util\Vec3.ixx" />
+    <ClCompile Include="code\util\worldWrap.ixx" />
     <ClCompile Include="code\util\wstring2Number.ixx" />
     <ClCompile Include="code\var\constVar-colors.ixx" />
     <ClCompile Include="code\var\constVar-constants.ixx" />
