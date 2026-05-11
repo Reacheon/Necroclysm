@@ -8,36 +8,47 @@ import util;
 
 using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
 
-//============================================================
-// 도시 좌표 배열 — 게임 시작 1회 절차생성의 1단계.
-//   입력: seed + PixelCostGrid (사전 PNG 디코딩 결과)
-//   출력: 실타일 Point3 좌표를 가진 CityNode 약 3000개
+// ════════════════════════════════════════════════════════════════════════
+// placeCities — 도시 좌표 배열 절차생성 (월드 1회 부트의 1단계).
 //
-//   순수 블랙박스 함수 — 외부 상태 무관.
-//   픽셀 좌표(1px=48타일)는 알고리즘 내부 전용,
-//   반환값은 반드시 실타일 좌표로 변환되어 나감.
+//   책임: 사전배치 도시(PNG 클러스터링) + 절차생성 도시(rejection sampling)를 합쳐
+//        실타일 좌표 CityNode 약 3000개 반환. 외부 상태 무관 — 순수 블랙박스.
 //
-// 통계 기반 도시 입지 모델 (로컬 검사 + rejection sampling):
-//   픽셀 1개 무작위 선택 → 주변을 즉석 스캔해 가장 가까운 물까지 거리 산출
-//   → 점수 계산 후 비례 확률로 accept/reject. 거리장 사전계산 없음.
+//   픽셀 좌표(1px=48타일)는 알고리즘 내부 전용, 반환값은 반드시 실타일 좌표로 변환.
 //
-//   점수 = baseTerrain × waterBonus(d, tier) × latitudeBand(py)
+//   통계 기반 도시 입지 모델 (로컬 검사 + rejection sampling):
+//     픽셀 1개 무작위 선택 → 주변을 즉석 스캔해 가장 가까운 물까지 거리 산출
+//     → 점수 계산 후 비례 확률로 accept/reject. 거리장 사전계산 없음.
 //
-//   waterBonus: 해안/대하천 가까울수록 지수감쇠 보너스. 티어별 비대칭으로
-//     T1(대도시) 거의 항상 물가, T3(소도시) 내륙 평지도 OK.
+//     점수 = baseTerrain × waterBonus(d, tier) × latitudeBand(py)
 //
-//   latitudeBand: 위도 40°에서 피크, σ=25°. py=10800이 적도(0°),
-//     py=0이 북극(+90°), py=21600이 남극(-90°). 적도/극지방 자연 감산.
+//     waterBonus: 해안/대하천 가까울수록 지수감쇠 보너스. 티어별 비대칭으로
+//       T1(대도시) 거의 항상 물가, T3(소도시) 내륙 평지도 OK.
 //
-//   거리장 사전계산을 안 쓰는 이유: 도시 ~3K개 vs 픽셀 933M개로 도시 수가
-//   압도적으로 적음 → 사전계산 비용(O(N))이 다트 비용(O(R²)×다트수)을 크게 초과.
-//   로컬 검사가 ~10× 빠름. 통계적으론 등가.
-//============================================================
+//     latitudeBand: 위도 40°에서 피크, σ=25°. py=10800이 적도(0°),
+//       py=0이 북극(+90°), py=21600이 남극(-90°). 적도/극지방 자연 감산.
+//
+//     거리장 사전계산을 안 쓰는 이유: 도시 ~3K개 vs 픽셀 933M개로 도시 수가
+//     압도적으로 적음 → 사전계산 비용(O(N))이 다트 비용(O(R²)×다트수)을 크게 초과.
+//     로컬 검사가 ~10× 빠름. 통계적으론 등가.
+//
+//   헬퍼 분리 안 함 (CLAUDE.md): 모든 로직이 본 함수 안에 인라인. 티어별 다트는
+//   placeTier 람다로 3번 호출. 향후 *2곳 이상*에서 필요해지거나 *교체 가능성*이
+//   명확해지면 그때 추출.
+// ════════════════════════════════════════════════════════════════════════
+
 namespace worldGen
 {
-    namespace
+    std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid, CitySink onPlaced)
     {
-        //--- 도시 배치 파라미터 (모든 튜닝 포인트 집중) ---
+        const __int64 tStart = getNanoTimer();
+
+        prt(L"[worldGen] placeCities start (seed=%llu)\n",
+            static_cast<unsigned long long>(seed));
+
+        //══════════════════════════════════════════════════════════════════
+        // 파라미터 — 모든 튜닝 포인트 집중
+        //══════════════════════════════════════════════════════════════════
 
         //티어별 최소 간격(픽셀). 충돌 검사는 min(R_A, R_B)이므로 작은 도시는 자기 R만큼만
         //떨어지면 됨(큰 도시 옆에 위성 마을 허용). 1px ≈ 1km.
@@ -64,8 +75,23 @@ namespace worldGen
         constexpr int LOCAL_SCAN_R = 50;
 
         //티어별 waterBonus 파라미터 — peak/tau는 LUT 빌드와 maxScore 계산에 공유.
-        constexpr double WATER_PEAK[3] = { 1.5, 1.0, 0.4 };   // T1, T2, T3
-        constexpr double WATER_TAU [3] = { 8.0, 14.0, 25.0 }; // 실픽셀 단위
+        //  static 키워드 필요: 로컬 struct(WaterBonusLut)의 멤버 함수가 enclosing scope의
+        //  배열에 runtime 인덱스로 접근하므로, static storage 보장으로 접근 합법성 확보.
+        static constexpr double WATER_PEAK[3] = { 1.5, 1.0, 0.4 };   // T1, T2, T3
+        static constexpr double WATER_TAU [3] = { 8.0, 14.0, 25.0 }; // 실픽셀 단위
+
+        //══════════════════════════════════════════════════════════════════
+        // 내부 타입 — placeCities 안에서만 사용
+        //══════════════════════════════════════════════════════════════════
+
+        //내부 도시 표현 — 픽셀 좌표 + 충돌 반경 + 티어. 최종 단계에서 CityNode로 변환.
+        struct CityRec
+        {
+            int px;
+            int py;
+            int radius;     //자신의 충돌 영역(픽셀)
+            CityTier tier;
+        };
 
         //해안/강 보너스 LUT — squared Euclidean distance(실픽셀²)로 인덱싱.
         //  인덱스 = dSq ∈ [0, LOCAL_SCAN_R²] = [0, 2500]. 초과는 호출자가 1.0으로 처리.
@@ -73,9 +99,13 @@ namespace worldGen
         //    T1: peak=1.5, tau=8 px  → d=0에서 2.5x, d=15에서 ~1.2x
         //    T2: peak=1.0, tau=14 px → d=0에서 2.0x, 완만하게 1로 수렴
         //    T3: peak=0.4, tau=25 px → d=0에서 1.4x, 거의 평탄(내륙도 OK)
+        //
+        //  MAX_DSQ는 함수 스코프에 — MSVC가 로컬 class의 static 데이터 멤버를 금지하므로
+        //  struct 안에 둘 수 없다(C2246). enclosing constexpr은 array size 등 constant
+        //  expression 위치에서 로컬 class도 자유롭게 참조 가능.
+        constexpr int MAX_DSQ = LOCAL_SCAN_R * LOCAL_SCAN_R;
         struct WaterBonusLut
         {
-            static constexpr int MAX_DSQ = LOCAL_SCAN_R * LOCAL_SCAN_R;
             double table[3][MAX_DSQ + 1]{};
 
             WaterBonusLut() noexcept
@@ -95,15 +125,6 @@ namespace worldGen
                 if (dSq > MAX_DSQ) return 1.0;
                 return table[static_cast<int>(tier)][dSq];
             }
-        };
-
-        //내부 도시 표현 — 픽셀 좌표 + 충돌 반경 + 티어. 최종 단계에서 CityNode로 변환.
-        struct CityRec
-        {
-            int px;
-            int py;
-            int radius;     //자신의 충돌 영역(픽셀)
-            CityTier tier;
         };
 
         //균등 격자 공간 해시 — 셀 크기 = R_T3.
@@ -143,7 +164,7 @@ namespace worldGen
             //
             //  사전배치(CityZone)는 terrainWeight=0이라 절차생성이 그 위로 안 떨어지므로
             //  물리적 겹침은 자동 방지. radius=boundR+buffer는 사전배치끼리의 클러스터 분리용.
-            bool conflicts(int px, int py, int R, int /*unusedMaxR*/, const std::vector<CityRec>& cities) const
+            bool conflicts(int px, int py, int R, const std::vector<CityRec>& cities) const
             {
                 //min 룰이라 충돌 거리 ≤ R. 검색 범위도 R로 충분 — 멀리 있는 T1은
                 //min(R_candidate, R_T1) 안에 못 들어옴, T3 다트가 T1의 600px 영역을
@@ -177,17 +198,7 @@ namespace worldGen
             }
         };
 
-        //티어별 다트 던지기(rejection sampling):
-        //  1. 균등 무작위 (px, py) 선택
-        //  2. terrainWeight ≤ 0이면 즉시 reject (가장 빠른 컷)
-        //  3. scanForWaterSq로 가장 가까운 물까지 거리² 산출
-        //  4. score = base × waterBonus(dSq, tier) × latLut[py]
-        //  5. accept 확률 = score / maxScore[tier]  (uniform [0,1) 비교)
-        //  6. SpatialHash 충돌 검사
-        //  7. 통과 시 등록 + 콜백 발사
-        //
-        //  maxScore[tier] = max(base) × max(waterBonus) × max(lat)
-        //                 = 1.0 × (1 + WATER_PEAK[tier]) × 1.0
+        //티어별 다트 던지기 결과 누적.
         struct DartResult
         {
             int placed{};
@@ -197,25 +208,27 @@ namespace worldGen
             int rejectConflict{};
         };
 
-        //--- 헬퍼 함수 forward declarations (stepdown 순서) ---
-        DartResult placeTier(CityTier tier, int targetCount, std::vector<CityRec>& cities, SpatialHash& hash, int& currentMaxR, std::mt19937_64& rng, const PixelCostGrid& grid, const std::vector<double>& latLut, const WaterBonusLut& waterLut, const CitySink& onPlaced);
-        Point3 pixelToTileCenter(int px, int py) noexcept;
-    }
+        //══════════════════════════════════════════════════════════════════
+        // 공용 람다 — 픽셀 좌표 → 실타일 좌표 변환
+        //══════════════════════════════════════════════════════════════════
 
-    //도시 좌표 약 3000개를 절차적으로 배치(사전배치 + 절차생성). 순수 블랙박스 함수.
-    //onPlaced default no-op이면 출력 영향 없음. 반환은 실타일 Point3 좌표.
-    std::vector<CityNode> placeCities(std::uint64_t seed, const PixelCostGrid& grid, CitySink onPlaced)
-    {
-        const __int64 tStart = getNanoTimer();
+        //픽셀(0,0) = 패치(PATCH_X_MIN, PATCH_Y_MIN) 좌상단.
+        auto pixelToTileCenter = [](int px, int py) noexcept -> Point3
+        {
+            return Point3{
+                px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2,
+                py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2,
+                0
+            };
+        };
 
-        prt(L"[worldGen] placeCities start (seed=%llu)\n",
-            static_cast<unsigned long long>(seed));
-
-        //--- Phase 0 : 사전배치 도시 추출 ---
-        //  8-connected 클러스터링(CityZone ∪ CityCenter ∪ CityRiver ∪ CitySea).
-        //  1 클러스터 = 1 도시. centroid는 클러스터 안의 CityCenter 픽셀 평균(없으면 전체 평균).
-        //  CityRiver/CitySea(도시 내 강·해협)도 클러스터에 포함 — 강·바다가 도시를 가로지르는
-        //  경우(이스탄불·홍콩·런던 등)에도 하나의 도시로 묶이고 bbox/면적이 수역까지 정확히 반영됨.
+        //══════════════════════════════════════════════════════════════════
+        // Phase 0 : 사전배치 도시 추출
+        //   8-connected 클러스터링(CityZone ∪ CityCenter ∪ CityRiver ∪ CitySea).
+        //   1 클러스터 = 1 도시. centroid는 클러스터 안의 CityCenter 픽셀 평균(없으면 전체 평균).
+        //   CityRiver/CitySea(도시 내 강·해협)도 클러스터에 포함 — 강·바다가 도시를 가로지르는
+        //   경우(이스탄불·홍콩·런던 등)에도 하나의 도시로 묶이고 bbox/면적이 수역까지 정확히 반영됨.
+        //══════════════════════════════════════════════════════════════════
         std::vector<CityRec> cities;
         cities.reserve(TARGET_T1 + TARGET_T2 + TARGET_T3 + 100);
         int preT1Count = 0, preT2Count = 0, preT3Count = 0;
@@ -360,14 +373,14 @@ namespace worldGen
         }
         const __int64 tPre = getNanoTimer();
 
-        //--- Phase 1 : 공간 해시 + 사전배치 등록 ---
+        //══════════════════════════════════════════════════════════════════
+        // Phase 1 : 공간 해시 + 사전배치 등록
+        //══════════════════════════════════════════════════════════════════
         SpatialHash hash(PixelCostGrid::W, PixelCostGrid::H, R_T3);
 
-        int currentMaxR = 0;
         for (int i = 0; i < static_cast<int>(cities.size()); ++i)
         {
             hash.insert(i, cities[i].px, cities[i].py);
-            if (cities[i].radius > currentMaxR) currentMaxR = cities[i].radius;
 
             //사전배치 도시도 진행 통지 — 화면에 같이 등장하도록.
             if (onPlaced)
@@ -380,7 +393,9 @@ namespace worldGen
         }
         const __int64 tHash = getNanoTimer();
 
-        //--- Phase 2 : LUT 빌드 (waterBonus + latitudeBand) ---
+        //══════════════════════════════════════════════════════════════════
+        // Phase 2 : LUT 빌드 (waterBonus + latitudeBand)
+        //══════════════════════════════════════════════════════════════════
         const WaterBonusLut waterLut;                            // 3 × 2501 × 8B ≈ 60KB
 
         //위도 belt LUT — py(0..H-1) → 위도 가중치(0.5..1.0). H × 8B ≈ 168KB.
@@ -405,79 +420,23 @@ namespace worldGen
         }
         const __int64 tLut = getNanoTimer();
 
-        //--- Phase 3 : 티어별 rejection sampling ---
+        //══════════════════════════════════════════════════════════════════
+        // Phase 3 : 티어별 rejection sampling
+        //   1. 균등 무작위 (px, py) 선택
+        //   2. terrainWeight ≤ 0이면 즉시 reject (가장 빠른 컷)
+        //   3. scanForWaterSq로 가장 가까운 물까지 거리² 산출
+        //   4. score = base × waterBonus(dSq, tier) × latLut[py]
+        //   5. accept 확률 = score / maxScore[tier]  (uniform [0,1) 비교)
+        //   6. SpatialHash 충돌 검사
+        //   7. 통과 시 등록 + 콜백 발사
+        //
+        //   maxScore[tier] = max(base) × max(waterBonus) × max(lat)
+        //                  = 1.0 × (1 + WATER_PEAK[tier]) × 1.0
+        //══════════════════════════════════════════════════════════════════
         std::mt19937_64 rng(seed);
 
-        const int needT1 = std::max(0, TARGET_T1 - preT1Count);
-        const int needT2 = std::max(0, TARGET_T2 - preT2Count);
-        const int needT3 = std::max(0, TARGET_T3 - preT3Count);
-
-        const DartResult d1 = placeTier(CityTier::T1, needT1, cities, hash,
-                                        currentMaxR, rng, grid, latLut, waterLut, onPlaced);
-        const DartResult d2 = placeTier(CityTier::T2, needT2, cities, hash,
-                                        currentMaxR, rng, grid, latLut, waterLut, onPlaced);
-        const DartResult d3 = placeTier(CityTier::T3, needT3, cities, hash,
-                                        currentMaxR, rng, grid, latLut, waterLut, onPlaced);
-
-        const __int64 tProc = getNanoTimer();
-
-        //--- Phase 4 : 픽셀 → 실타일 변환 ---
-        std::vector<CityNode> result;
-        result.reserve(cities.size());
-        for (const auto& c : cities)
-        {
-            result.push_back(CityNode{
-                pixelToTileCenter(c.px, c.py),
-                c.tier
-            });
-        }
-
-        const __int64 tDone = getNanoTimer();
-
-        //--- 리포트 ---
-        const double preMs   = (tPre   - tStart) / 1.0e6;
-        const double hashMs  = (tHash  - tPre  ) / 1.0e6;
-        const double lutMs   = (tLut   - tHash ) / 1.0e6;
-        const double procMs  = (tProc  - tLut  ) / 1.0e6;
-        const double convMs  = (tDone  - tProc ) / 1.0e6;
-        const double totalMs = (tDone  - tStart) / 1.0e6;
-
-        prt(L"  pre-marked extract : %8.2f ms  (T1=%d T2=%d T3=%d, total=%zu)\n",
-            preMs, preT1Count, preT2Count, preT3Count,
-            static_cast<std::size_t>(preT1Count + preT2Count + preT3Count));
-        prt(L"  hash + register    : %8.2f ms\n", hashMs);
-        prt(L"  LUT build          : %8.2f ms\n", lutMs);
-        prt(L"  procedural place   : %8.2f ms\n", procMs);
-
-        auto reportTier = [](const wchar_t* name, int target, const DartResult& d) {
-            prt(L"    %ls: target=%4d placed=%4d  (att=%d rTerrain=%d rScore=%d rConflict=%d)\n",
-                name, target, d.placed, d.attempts,
-                d.rejectTerrain, d.rejectScore, d.rejectConflict);
-        };
-        reportTier(L"T1", needT1, d1);
-        reportTier(L"T2", needT2, d2);
-        reportTier(L"T3", needT3, d3);
-
-        prt(L"  finalize           : %8.2f ms\n", convMs);
-        prt(L"  total              : %8.2f ms  (%.2f s)\n", totalMs, totalMs / 1000.0);
-        prt(L"  total cities       : %zu  (target≈%d)\n",
-            result.size(), TARGET_T1 + TARGET_T2 + TARGET_T3);
-
-        //목표 90% 미만이면 경고 (3000은 근사치).
-        const int placedTotal = static_cast<int>(result.size());
-        const int targetTotal = TARGET_T1 + TARGET_T2 + TARGET_T3;
-        if (placedTotal < targetTotal * 0.9)
-        {
-            const SDL_Color warn{ 0xff, 0x60, 0x60, 0xff };
-            prt(warn, L"  [WARN] city count below 90%% of target — radii too large or terrain budget tight\n");
-        }
-
-        return result;
-    }
-
-    namespace
-    {
-        DartResult placeTier(CityTier tier, int targetCount, std::vector<CityRec>& cities, SpatialHash& hash, int& currentMaxR, std::mt19937_64& rng, const PixelCostGrid& grid, const std::vector<double>& latLut, const WaterBonusLut& waterLut, const CitySink& onPlaced)
+        //티어별 다트 람다 — T1/T2/T3에 동일 알고리즘 적용, 3번 호출.
+        auto placeTier = [&](CityTier tier, int targetCount) -> DartResult
         {
             DartResult dr{};
             if (targetCount <= 0) return dr;
@@ -505,7 +464,7 @@ namespace worldGen
             //  shell 크기 = 8r 픽셀. 평균적으로 해안 픽셀은 ~10픽셀 안에서 끝남.
             auto scanForWaterSq = [td](int px, int py) noexcept -> int
             {
-                constexpr int SENTINEL = WaterBonusLut::MAX_DSQ + 1;
+                constexpr int SENTINEL = MAX_DSQ + 1;
                 auto isWater = [td](int x, int y) noexcept {
                     const Terrain t = td[static_cast<std::size_t>(y) * W + x];
                     return t == Terrain::Sea
@@ -607,7 +566,7 @@ namespace worldGen
                 }
 
                 //4. 충돌 검사
-                if (hash.conflicts(px, py, R, currentMaxR, cities))
+                if (hash.conflicts(px, py, R, cities))
                 {
                     ++dr.rejectConflict;
                     continue;
@@ -617,7 +576,6 @@ namespace worldGen
                 const int idx = static_cast<int>(cities.size());
                 cities.push_back(CityRec{px, py, R, tier});
                 hash.insert(idx, px, py);
-                if (R > currentMaxR) currentMaxR = R;
                 ++dr.placed;
 
                 if (onPlaced)
@@ -627,16 +585,73 @@ namespace worldGen
             }
 
             return dr;
+        };
+
+        const int needT1 = std::max(0, TARGET_T1 - preT1Count);
+        const int needT2 = std::max(0, TARGET_T2 - preT2Count);
+        const int needT3 = std::max(0, TARGET_T3 - preT3Count);
+
+        const DartResult d1 = placeTier(CityTier::T1, needT1);
+        const DartResult d2 = placeTier(CityTier::T2, needT2);
+        const DartResult d3 = placeTier(CityTier::T3, needT3);
+
+        const __int64 tProc = getNanoTimer();
+
+        //══════════════════════════════════════════════════════════════════
+        // Phase 4 : 픽셀 → 실타일 변환
+        //══════════════════════════════════════════════════════════════════
+        std::vector<CityNode> result;
+        result.reserve(cities.size());
+        for (const auto& c : cities)
+        {
+            result.push_back(CityNode{
+                pixelToTileCenter(c.px, c.py),
+                c.tier
+            });
         }
 
-        //좌표 변환 — worldGen 픽셀(0,0) = 패치(PATCH_X_MIN, PATCH_Y_MIN) 좌상단.
-        Point3 pixelToTileCenter(int px, int py) noexcept
+        const __int64 tDone = getNanoTimer();
+
+        //══════════════════════════════════════════════════════════════════
+        // 리포트
+        //══════════════════════════════════════════════════════════════════
+        const double preMs   = (tPre   - tStart) / 1.0e6;
+        const double hashMs  = (tHash  - tPre  ) / 1.0e6;
+        const double lutMs   = (tLut   - tHash ) / 1.0e6;
+        const double procMs  = (tProc  - tLut  ) / 1.0e6;
+        const double convMs  = (tDone  - tProc ) / 1.0e6;
+        const double totalMs = (tDone  - tStart) / 1.0e6;
+
+        prt(L"  pre-marked extract : %8.2f ms  (T1=%d T2=%d T3=%d, total=%zu)\n",
+            preMs, preT1Count, preT2Count, preT3Count,
+            static_cast<std::size_t>(preT1Count + preT2Count + preT3Count));
+        prt(L"  hash + register    : %8.2f ms\n", hashMs);
+        prt(L"  LUT build          : %8.2f ms\n", lutMs);
+        prt(L"  procedural place   : %8.2f ms\n", procMs);
+
+        auto reportTier = [](const wchar_t* name, int target, const DartResult& d) {
+            prt(L"    %ls: target=%4d placed=%4d  (att=%d rTerrain=%d rScore=%d rConflict=%d)\n",
+                name, target, d.placed, d.attempts,
+                d.rejectTerrain, d.rejectScore, d.rejectConflict);
+        };
+        reportTier(L"T1", needT1, d1);
+        reportTier(L"T2", needT2, d2);
+        reportTier(L"T3", needT3, d3);
+
+        prt(L"  finalize           : %8.2f ms\n", convMs);
+        prt(L"  total              : %8.2f ms  (%.2f s)\n", totalMs, totalMs / 1000.0);
+        prt(L"  total cities       : %zu  (target≈%d)\n",
+            result.size(), TARGET_T1 + TARGET_T2 + TARGET_T3);
+
+        //목표 90% 미만이면 경고 (3000은 근사치).
+        const int placedTotal = static_cast<int>(result.size());
+        const int targetTotal = TARGET_T1 + TARGET_T2 + TARGET_T3;
+        if (placedTotal < targetTotal * 0.9)
         {
-            return Point3{
-                px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2,
-                py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2,
-                0
-            };
+            const SDL_Color warn{ 0xff, 0x60, 0x60, 0xff };
+            prt(warn, L"  [WARN] city count below 90%% of target — radii too large or terrain budget tight\n");
         }
+
+        return result;
     }
 }
