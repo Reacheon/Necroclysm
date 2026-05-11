@@ -108,9 +108,8 @@ export namespace worldGrid
     //  방금 채워진 패치 영역 픽셀을 즉시 읽어 미리보기 점진 갱신에 사용 가능.
     using PatchLoadSink = std::function<void(int loaded, int total, int patchX, int patchY, const PixelCostGrid& grid)>;
 
-    //공개 진입점 — worldGrid_cache.cpp에서 정의.
-    //  캐시(map/worldPatch.cache)가 있고 PNG fingerprint가 일치하면 압축 해제로 로드,
-    //  아니면 PNG 디코드 후 캐시 기록 (loadWorldGridFromPng를 내부 호출).
+    //공개 진입점 — worldGrid_load.cpp에서 정의.
+    //  5832장 패치 PNG를 디코드해 933MB Terrain 그리드를 구성한다.
     PixelCostGrid loadWorldGrid(PatchLoadSink onPatch = {});
 
     //============================================================
@@ -158,12 +157,4 @@ export namespace worldGrid
 
     inline std::array<std::array<std::array<bool, SHORE_TILE_SIZE * SHORE_TILE_SIZE>, SHORE_INDEX_COUNT>, SHORE_VARIANT_MAX> shoreSplineMask{};
     inline int shoreSplineVariantCount = 0;   // 로드 성공한 variant 수 — procGenerate가 modulo에 사용
-}
-
-//============================================================
-// 내부 백엔드 (export 안 함) — worldGrid_load.cpp에서 정의, 캐시 모듈에서만 호출.
-//============================================================
-namespace worldGrid
-{
-    PixelCostGrid loadWorldGridFromPng(PatchLoadSink onPatch);
 }

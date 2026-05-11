@@ -7,10 +7,9 @@ import std;
 import util;
 
 //============================================================
-// 월드 PNG 로딩 (내부 백엔드) — 5832개 패치 PNG를 읽어 43200×21600 Terrain 그리드 구성.
+// 월드 PNG 로딩 (공개 진입점) — 5832개 패치 PNG를 읽어 43200×21600 Terrain 그리드 구성.
 //   순수 블랙박스: 외부 상태 무관, grid만 반환.
-//   공개 진입점은 worldGrid_cache.cpp의 loadWorldGrid가 담당. 이 함수는
-//   캐시 miss 시에만 호출되므로 export하지 않음.
+//   onPatch 콜백으로 패치별 진행 상황 노출 (미리보기 점진 갱신용).
 //============================================================
 namespace worldGrid
 {
@@ -21,7 +20,7 @@ namespace worldGrid
 
     //PNG 5832장을 디코드해 933MB 그리드 구성. onPatch default no-op이면 출력 영향 없음.
     //grid는 콜백 시점까지의 부분 로드 상태가 그대로 노출됨(미리보기 점진 갱신용).
-    PixelCostGrid loadWorldGridFromPng(PatchLoadSink onPatch)
+    PixelCostGrid loadWorldGrid(PatchLoadSink onPatch)
     {
         const __int64 tStart = getNanoTimer();
 
@@ -70,7 +69,7 @@ namespace worldGrid
         const double totalMs = (tHist   - tStart ) / 1.0e6;
         const double memMB   = static_cast<double>(total) / (1024.0 * 1024.0);
 
-        prt(L"[worldGrid] loadWorldGridFromPng done\n");
+        prt(L"[worldGrid] loadWorldGrid done\n");
         prt(L"  alloc+fill : %8.2f ms\n", allocMs);
         prt(L"  patch load : %8.2f ms  (ok=%d fail=%d / %d)\n",
             loadMs, loadOk, loadFail, loadOk + loadFail);

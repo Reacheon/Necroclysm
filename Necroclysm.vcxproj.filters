@@ -837,9 +837,6 @@
     <ClCompile Include="code\worldGrid_load.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
     </ClCompile>
-    <ClCompile Include="code\worldGrid_cache.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
-    </ClCompile>
     <ClCompile Include="code\worldGrid_mmap.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
     </ClCompile>
