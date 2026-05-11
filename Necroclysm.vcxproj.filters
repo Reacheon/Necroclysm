@@ -133,6 +133,9 @@
     <Filter Include="소스 파일\05_Class\03_World\ProcGen\WorldGrid">
       <UniqueIdentifier>{a8c4e7f1-9d3b-4e62-8c1a-7f5b3d2e9a04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\03_World\City">
+      <UniqueIdentifier>{b3d8e2f5-7c1a-4f6e-9b04-1d8c3e5a7f02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -839,6 +842,9 @@
     </ClCompile>
     <ClCompile Include="code\worldGrid_mmap.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
+    </ClCompile>
+    <ClCompile Include="code\city.ixx">
+      <Filter>소스 파일\05_Class\03_World\City</Filter>
     </ClCompile>
     <ClCompile Include="code\world\Sector_procGenerate.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>

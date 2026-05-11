@@ -3,6 +3,7 @@ export module worldGen;
 import std;
 import util;
 import worldGrid;
+import city;
 
 //============================================================
 // worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
@@ -22,8 +23,15 @@ export namespace worldGen
 
     struct CityNode
     {
-        Point3 center;     //실타일 좌표
+        Point3 center;            //실타일 좌표
         CityTier tier;
+        worldGrid::Terrain climate = worldGrid::Terrain::Land;
+        //  도시 입지 기후. 절차생성 도시는 placeCities가 주변 픽셀 다수결로 결정.
+        //  사전배치 도시는 PRESET_CITIES에서 매칭된 값 사용 (미매칭이면 Land).
+
+        city::CityName codename = city::CityName::none;
+        //  사전배치 도시 식별자. 매칭된 preset의 codename, 또는 절차생성/미매칭이면 none.
+        //  displayName/landmark 등 도시별 메타데이터는 city::PRESET_CITIES에서 룩업.
     };
 
     struct RoadPolyLine
@@ -86,7 +94,9 @@ export namespace worldGen
     using CitySink = std::function<void(const CityNode&)>;
     using RoadSink = std::function<void(const RoadPolyLine&)>;
 
-    std::vector<CityNode> placeCities(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, CitySink onPlaced = {});
+    //placeCities는 grid를 mutate — 절차생성 도시의 폴리곤을 CityZone 픽셀로 그려 넣음.
+    //  사전배치 도시는 PNG에 이미 있으니 건드리지 않음. buildRoadNetwork는 painted 결과를 봄.
+    std::vector<CityNode> placeCities(std::uint64_t seed, worldGrid::PixelCostGrid& grid, CitySink onPlaced = {});
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
     //월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 1회 절차적 생성.

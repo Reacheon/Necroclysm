@@ -37,8 +37,17 @@ namespace mapcfg
     //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
     //
     //   48 약수: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48.
-    //   조건1 만족: pxPerTile = n/48 꼴. 1/24, 1/16, 1/12, 1/8, 1/6, 1/4, 1/3, 1/2, 1.0, ...
+    //   조건1 만족: pxPerTile = n/48 꼴. 1/48부터 1/24, 1/16, ..., 1.0, ...
+    //
+    //   1/48 미만 (광역 조망): 조건1 위배 — 패치 텍스처가 nearest scale로
+    //   다운샘플링되어 약간 뭉개지지만, 한 패치가 화면에서 ≤1px 정도라 시각적 무관.
+    //   최소값 1/96 ≈ 0.01 px/tile — 대륙 1개 정도 한 화면에 표시.
     inline constexpr double ZOOM_LEVELS[] = {
+        // 광역 조망 (sub-pixel-perfect — 텍스처 다운샘플)
+        1.0/96,    // ≈ 0.01042
+        1.0/64,    // = 0.015625
+        // 픽셀 퍼펙트 단계 (조건1 만족)
+        1.0/48,    // ≈ 0.0208  (48× = 1)
         1.0/24,    // ≈ 0.0417  (48× = 2)
         1.0/16,    // = 0.0625  (48× = 3)
         1.0/12,    // ≈ 0.0833  (48× = 4)
@@ -50,7 +59,7 @@ namespace mapcfg
         1.0, 2.0, 3.0, 4.0, 5.0, 6.0
     };
     inline constexpr int    ZOOM_LEVEL_COUNT   = (int)(sizeof(ZOOM_LEVELS) / sizeof(ZOOM_LEVELS[0]));
-    inline constexpr int    DEFAULT_ZOOM_LEVEL = 7;  // 0.5
+    inline constexpr int    DEFAULT_ZOOM_LEVEL = 10;  // 0.5 (위 배열에서 1/2 위치)
     inline constexpr double DEFAULT_PX_PER_TILE = ZOOM_LEVELS[DEFAULT_ZOOM_LEVEL];
 
     // 프레임당 신규 텍스처 빌드 한도 (영속 캐시 — 첫 방문 영역에만 쓰임).
@@ -152,6 +161,25 @@ struct MapView
         pxPerTile = mapcfg::ZOOM_LEVELS[level];
         centerTileX = anchorTX + (viewW * 0.5 - anchorScreenX) / pxPerTile;
         centerTileY = anchorTY + (viewH * 0.5 - anchorScreenY) / pxPerTile;
+    }
+
+    // 카메라 Y를 월드 영역 안으로 클램프 — 남/북극 너머로 못 나가게.
+    //   월드 가장자리가 화면 가장자리에 닿으면 멈춤 (Google Maps 스타일).
+    //   X는 cylindrical wrap이라 클램프 안 함.
+    //   뷰포트가 월드보다 큰 경우(극단 줌아웃) 월드를 화면 정중앙 정렬.
+    void clampCenterY()
+    {
+        const double worldMinY = static_cast<double>(worldGrid::TILE_BASE_Y);
+        const double worldMaxY = worldMinY + static_cast<double>(worldGrid::WORLD_PIXEL_H) * worldGrid::TILES_PER_PIXEL;
+        const double viewHalfTiles = viewH * 0.5 / pxPerTile;
+        if (viewHalfTiles * 2.0 >= worldMaxY - worldMinY)
+        {
+            centerTileY = (worldMinY + worldMaxY) * 0.5;
+        }
+        else
+        {
+            centerTileY = std::clamp(centerTileY, worldMinY + viewHalfTiles, worldMaxY - viewHalfTiles);
+        }
     }
 };
 
@@ -711,6 +739,7 @@ public:
 
         view.viewW = cameraW;
         view.viewH = cameraH;
+        view.clampCenterY();   // 드래그/줌/리사이즈로 카메라가 남/북극 너머로 갔으면 되돌림
 
         // 매 프레임 작업 예산 초기화 (텍스처 빌드 한도)
         PixelTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_PATCHES);
