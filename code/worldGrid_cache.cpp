@@ -5,7 +5,7 @@ module;
 #include <compressapi.h>
 #pragma comment(lib, "Cabinet.lib")  //compressapi 링크 — vcxproj 수정 회피
 
-module procGen;
+module worldGrid;
 
 import std;
 import util;
@@ -17,7 +17,7 @@ import util;
 //   압축은 Windows 내장 compressapi (XPRESS_HUFF, Cabinet.lib).
 //   16MB 청크 단위 — 단일 거대 버퍼 회피, 청크별 진행 표시도 가능한 구조.
 //============================================================
-namespace procGen
+namespace worldGrid
 {
     namespace
     {
@@ -282,7 +282,7 @@ namespace procGen
             replayPatchPreview(grid, onPatch);
 
             const __int64 tEnd = getNanoTimer();
-            prt(L"[procGen] loadWorldGrid: cache HIT\n");
+            prt(L"[worldGrid] loadWorldGrid: cache HIT\n");
             prt(L"  png fingerprint: %8.2f ms\n", hashMs);
             prt(L"  decompress     : %8.2f ms\n", (tDecomp - tHash ) / 1.0e6);
             prt(L"  preview replay : %8.2f ms\n", (tEnd    - tDecomp) / 1.0e6);
@@ -292,7 +292,7 @@ namespace procGen
         }
 
         //--- 캐시 miss → PNG 디코드 → 캐시 기록 ---
-        prt(L"[procGen] loadWorldGrid: cache MISS — PNG decode + write\n");
+        prt(L"[worldGrid] loadWorldGrid: cache MISS — PNG decode + write\n");
         prt(L"  png fingerprint: %8.2f ms\n", hashMs);
 
         grid = loadWorldGridFromPng(onPatch);

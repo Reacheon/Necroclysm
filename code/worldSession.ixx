@@ -1,8 +1,8 @@
-export module worldGenState;
+export module worldSession;
 
 import std;
 import util;
-import procGen;
+import worldGen;
 import WorldGenScreen;
 
 //============================================================
@@ -15,10 +15,10 @@ import WorldGenScreen;
 //   호출해야 시작됨 — 실행 직후 자동 진입으로 인한 장시간 대기 방지.
 //
 //   별도 모듈인 이유: debugConsole → startArea → HUD → debugConsole 순환
-//   의존성 회피. 본 모듈은 procGen + WorldGenScreen만 import.
+//   의존성 회피. 본 모듈은 worldGen + WorldGenScreen만 import.
 //============================================================
 export bool worldGenInProgress = false;
-export std::optional<procGen::WorldGenResult> worldGenResult;
+export std::optional<worldGen::WorldGenResult> worldGenResult;
 
 //월드 절차생성에 사용된 시드. 0 = 미생성 상태.
 //  Sector procGenerate / CityLayout BCP 등 모든 후속 절차생성이 이 시드를 참조.
@@ -33,7 +33,7 @@ export inline const Point3 SPAWN_DEFAULT{ 731544, -216312, 0 };
 
 //Phase 1~4 완료 후 호출되는 후처리 콜백. main.cpp가 부팅 시 설정.
 //  내용: 타이틀/startArea 청크 wipe → SPAWN_DEFAULT로 텔레포트.
-//  worldGenState 자체는 World/Teleport import 안 함 (의존성 cycle 회피) — 콜백 주입으로 우회.
+//  worldSession 자체는 World/Teleport import 안 함 (의존성 cycle 회피) — 콜백 주입으로 우회.
 export std::function<void()> onWorldGenComplete;
 
 //WorldGenScreen 띄우고 워커 스레드에서 generateWorld 실행. 디버그 콘솔에서 수동 호출.
@@ -48,7 +48,7 @@ export void startWorldGen()
     worldSeed =
         (static_cast<std::uint64_t>(rd()) << 32) | static_cast<std::uint64_t>(rd());
 
-    new WorldGenScreen(worldSeed, SPAWN_DEFAULT, [](procGen::WorldGenResult result)
+    new WorldGenScreen(worldSeed, SPAWN_DEFAULT, [](worldGen::WorldGenResult result)
     {
         worldGenResult = std::move(result);
         worldGenInProgress = false;

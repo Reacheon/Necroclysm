@@ -51,5 +51,5 @@ export namespace lowCol
     constexpr SDL_Color crimson = { 0xd0,0x3f,0x89 };
 };
 
-// pngPatchPixelCol namespace 제거됨 — Patch 시스템 폐지로 PNG 색상 매핑은 procGen 모듈
-// 내부(procGen_loadWorldGrid.cpp의 colorToTerrain)에서 직접 처리.
+// pngPatchPixelCol namespace 제거됨 — Patch 시스템 폐지로 PNG 색상 매핑은 worldGrid 모듈
+// 내부(worldGrid_load.cpp의 colorToTerrain)에서 직접 처리.

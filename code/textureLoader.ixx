@@ -12,7 +12,7 @@ import textureVar;
 import Sprite;
 import paletteLoader; // PaletteTable, loadPaletteTable
 import nervedriveFilter;
-import procGen;       // procGen::shoreSplineMask 데이터 채우기 위함
+import worldGrid;     // worldGrid::shoreSplineMask 데이터 채우기 위함
 
 // source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
 // 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
@@ -167,11 +167,11 @@ export void textureLoader()
 
 	texture::shoreSpline[0] = IMG_LoadTexture(renderer, "image/spline/shoreSpline0.png");
 
-	// shoreSpline PNG 픽셀 → procGen::shoreSplineMask bool 마스크로 변환 (Sector_procGenerate 페이즈 2가 룩업).
+	// shoreSpline PNG 픽셀 → worldGrid::shoreSplineMask bool 마스크로 변환 (Sector_procGenerate 페이즈 2가 룩업).
 	//   #5b4940 = land (B=0x40), #3899ff = water (B=0xff). B 채널만 비교 (안티앨리어싱 견고).
 	//   각 PNG 8×6 그리드 47 셀 (마지막 1칸 공백). variant N개 순회 로드 — 파일 없으면 graceful skip.
-	procGen::shoreSplineVariantCount = 0;
-	for (int variant = 0; variant < procGen::SHORE_VARIANT_MAX; ++variant)
+	worldGrid::shoreSplineVariantCount = 0;
+	for (int variant = 0; variant < worldGrid::SHORE_VARIANT_MAX; ++variant)
 	{
 		char path[64];
 		std::snprintf(path, sizeof(path), "image/spline/shoreSpline%d.png", variant);
@@ -197,21 +197,21 @@ export void textureLoader()
 		const int pitch = rgba->pitch;
 		int landCount = 0;
 
-		for (int idx = 0; idx < procGen::SHORE_INDEX_COUNT; ++idx)
+		for (int idx = 0; idx < worldGrid::SHORE_INDEX_COUNT; ++idx)
 		{
 			const int cellX = idx % 8;
 			const int cellY = idx / 8;
-			const int baseX = cellX * procGen::SHORE_TILE_SIZE;
-			const int baseY = cellY * procGen::SHORE_TILE_SIZE;
+			const int baseX = cellX * worldGrid::SHORE_TILE_SIZE;
+			const int baseY = cellY * worldGrid::SHORE_TILE_SIZE;
 
-			for (int ly = 0; ly < procGen::SHORE_TILE_SIZE; ++ly)
+			for (int ly = 0; ly < worldGrid::SHORE_TILE_SIZE; ++ly)
 			{
-				for (int lx = 0; lx < procGen::SHORE_TILE_SIZE; ++lx)
+				for (int lx = 0; lx < worldGrid::SHORE_TILE_SIZE; ++lx)
 				{
 					const std::uint8_t* p = bytes + (baseY + ly) * pitch + (baseX + lx) * 4;
 					// B 채널 단순 비교: land(B=0x40) vs water(B=0xff). 차이가 커 안티앨리어싱 견고.
 					const bool isLand = (p[2] < 128);
-					procGen::shoreSplineMask[variant][idx][ly * procGen::SHORE_TILE_SIZE + lx] = isLand;
+					worldGrid::shoreSplineMask[variant][idx][ly * worldGrid::SHORE_TILE_SIZE + lx] = isLand;
 					if (isLand) ++landCount;
 				}
 			}
@@ -221,9 +221,9 @@ export void textureLoader()
 		SDL_UnlockSurface(rgba);
 		SDL_DestroySurface(rgba);
 		prt(L"[shoreSpline] variant %d loaded: %d land tiles (image %dx%d)\n", variant, landCount, imgW, imgH);
-		++procGen::shoreSplineVariantCount;
+		++worldGrid::shoreSplineVariantCount;
 	}
-	prt(L"[shoreSpline] total variants loaded: %d\n", procGen::shoreSplineVariantCount);
+	prt(L"[shoreSpline] total variants loaded: %d\n", worldGrid::shoreSplineVariantCount);
 
 	// 너브드라이브 초록 틴트용 오프스크린 RT 생성
 	nervedriveFilter::init();

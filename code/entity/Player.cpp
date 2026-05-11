@@ -23,7 +23,7 @@ import turnWait;
 import Wave;
 import Wake;
 import Sector;
-import worldGenState;
+import worldSession;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {

@@ -15,7 +15,7 @@ import checkCursor;
 import Player;
 import World;
 import TileData;
-import procGen;
+import worldGrid;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
@@ -65,28 +65,28 @@ namespace mapcfg
 
 namespace mappal
 {
-    // Terrain 색 — 구글맵 톤. mmap 픽셀 (procGen::Terrain 16종) 기반.
-    //   procGen_generateWorld의 terrainPreviewColor와 톤 일관 (월드젠 미리보기와 같은 색).
-    inline SDL_Color terrainColor(procGen::Terrain t)
+    // Terrain 색 — 구글맵 톤. mmap 픽셀 (worldGrid::Terrain 16종) 기반.
+    //   worldGen_generateWorld.cpp의 terrainPreviewColor와 톤 일관 (월드젠 미리보기와 같은 색).
+    inline SDL_Color terrainColor(worldGrid::Terrain t)
     {
         switch (t)
         {
-        case procGen::Terrain::Land:                  return { 192, 215, 168, 255 };  // grass green
-        case procGen::Terrain::Sea:                   return {  85, 132, 173, 255 };  // sea blue
-        case procGen::Terrain::River:                 return { 137, 180, 200, 255 };  // light blue
-        case procGen::Terrain::Lake:                  return { 111, 106, 184, 255 };  // purple-blue
-        case procGen::Terrain::CityZone:              return { 230, 226, 218, 255 };  // city light
-        case procGen::Terrain::CityCenter:            return { 255,  96,  96, 255 };  // city center red
-        case procGen::Terrain::CityRiver:             return { 166, 193, 234, 255 };  // city river
-        case procGen::Terrain::CitySea:               return { 115, 112, 184, 255 };  // city sea (strait)
-        case procGen::Terrain::Mountain:              return { 138, 106,  82, 255 };  // brown
-        case procGen::Terrain::Polar:                 return { 242, 246, 255, 255 };  // ice white
-        case procGen::Terrain::Tundra:                return { 142, 198, 205, 255 };  // pale teal
-        case procGen::Terrain::Subarctic:             return { 110, 155, 200, 255 };  // cold blue
-        case procGen::Terrain::Monsoon:               return { 150, 163,  85, 255 };  // olive
-        case procGen::Terrain::InsularRainforest:     return {  53, 119,  73, 255 };  // SE-Asia green
-        case procGen::Terrain::Desert:                return { 232, 217, 122, 255 };  // sand
-        case procGen::Terrain::ContinentalRainforest: return {  31,  74,  26, 255 };  // dense jungle
+        case worldGrid::Terrain::Land:                  return { 192, 215, 168, 255 };  // grass green
+        case worldGrid::Terrain::Sea:                   return {  85, 132, 173, 255 };  // sea blue
+        case worldGrid::Terrain::River:                 return { 137, 180, 200, 255 };  // light blue
+        case worldGrid::Terrain::Lake:                  return { 111, 106, 184, 255 };  // purple-blue
+        case worldGrid::Terrain::CityZone:              return { 230, 226, 218, 255 };  // city light
+        case worldGrid::Terrain::CityCenter:            return { 255,  96,  96, 255 };  // city center red
+        case worldGrid::Terrain::CityRiver:             return { 166, 193, 234, 255 };  // city river
+        case worldGrid::Terrain::CitySea:               return { 115, 112, 184, 255 };  // city sea (strait)
+        case worldGrid::Terrain::Mountain:              return { 138, 106,  82, 255 };  // brown
+        case worldGrid::Terrain::Polar:                 return { 242, 246, 255, 255 };  // ice white
+        case worldGrid::Terrain::Tundra:                return { 142, 198, 205, 255 };  // pale teal
+        case worldGrid::Terrain::Subarctic:             return { 110, 155, 200, 255 };  // cold blue
+        case worldGrid::Terrain::Monsoon:               return { 150, 163,  85, 255 };  // olive
+        case worldGrid::Terrain::InsularRainforest:     return {  53, 119,  73, 255 };  // SE-Asia green
+        case worldGrid::Terrain::Desert:                return { 232, 217, 122, 255 };  // sand
+        case worldGrid::Terrain::ContinentalRainforest: return {  31,  74,  26, 255 };  // dense jungle
         }
         return { 18, 18, 22, 255 };
     }
@@ -167,7 +167,7 @@ struct MapView
 // ════════════════════════════════════════════════════════════════════════
 
 // 패치 그리드 셀 1개 = 400×400 픽셀 텍스처 (1 px = 1 mmap pixel).
-//   데이터 소스는 mmap (procGen::worldPixel) — Phase 1 미진입 시 텍스처 빌드 안 함.
+//   데이터 소스는 mmap (worldGrid::worldPixel) — Phase 1 미진입 시 텍스처 빌드 안 함.
 //   캐시는 패치 그리드 좌표(sx, sy, sz)로 인덱싱. 빌드된 텍스처는 영구 보관.
 class PixelTextureCache
 {
@@ -183,7 +183,7 @@ public:
         if (auto it = textures_.find(k); it != textures_.end()) return it->second;
 
         //mmap 미진입(월드젠 전)에는 빌드 불가 — pending 아님, 그냥 nullptr.
-        if (!procGen::worldPixelMmapActive()) return nullptr;
+        if (!worldGrid::worldPixelMmapActive()) return nullptr;
 
         if (budget_ <= 0) { pending_++; return nullptr; }
 
@@ -203,7 +203,7 @@ public:
 private:
     //패치 그리드 셀 (sx, sy)에 해당하는 mmap 픽셀 영역을 400×400 텍스처로 빌드.
     //  글로벌 픽셀 좌표 = sx*400+px (단, mmap은 [0, 43200) × [0, 21600) 범위만 유효).
-    //  범위 밖은 procGen::worldPixel이 Sea 반환 → 자연스럽게 Sea로 처리됨.
+    //  범위 밖은 worldGrid::worldPixel이 Sea 반환 → 자연스럽게 Sea로 처리됨.
     static SDL_Texture* build(int sx, int sy, int /*sz*/)
     {
         SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_PATCH, PIXEL_PER_PATCH, SDL_PIXELFORMAT_RGBA32);
@@ -221,7 +221,7 @@ private:
             std::uint32_t* row = (std::uint32_t*)((std::uint8_t*)surf->pixels + py * surf->pitch);
             for (int px = 0; px < PIXEL_PER_PATCH; px++)
             {
-                const procGen::Terrain t = procGen::worldPixel(globalPx0 + px, globalPy0 + py);
+                const worldGrid::Terrain t = worldGrid::worldPixel(globalPx0 + px, globalPy0 + py);
                 const SDL_Color c = mappal::terrainColor(t);
                 row[px] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
             }
@@ -261,7 +261,7 @@ private:
 //     mmap 미진입(타이틀/Phase 1 미완료): 호출 자체가 스킵됨 → 검은 배경 + 타일 스프라이트 + 마커만.
 static void drawBiomeLayer(const MapView& v)
 {
-    if (!procGen::worldPixelMmapActive()) return;
+    if (!worldGrid::worldPixelMmapActive()) return;
 
     double minTX, minTY, maxTX, maxTY;
     v.visibleTileBounds(minTX, minTY, maxTX, maxTY);

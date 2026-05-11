@@ -1,7 +1,9 @@
-module procGen;
+module worldGen;
 
 import std;
 import util;
+
+using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
 
 //============================================================
 // 도로망 폴리라인 생성 — 게임 시작 1회 절차생성의 3단계.
@@ -33,7 +35,7 @@ import util;
 //   - Coarse 집계는 top-4 mean. 순수 min은 sea + CityCenter false positive로 바다 위
 //     "징검다리" corridor를 만들어 fine A*가 못 따라감.
 //============================================================
-namespace procGen
+namespace worldGen
 {
     namespace
     {
@@ -357,7 +359,7 @@ namespace procGen
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad)
     {
         const __int64 tStart = getNanoTimer();
-        prt(L"[procGen] buildRoadNetwork start (N=%zu cities, seed=%llu)\n",
+        prt(L"[worldGen] buildRoadNetwork start (N=%zu cities, seed=%llu)\n",
             cities.size(), static_cast<unsigned long long>(seed));
 
         if (cities.size() < 2) return {};

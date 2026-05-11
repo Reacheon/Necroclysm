@@ -26,8 +26,8 @@ import startArea;
 import initCoordTransform;
 import nervedriveFilter;
 import WorldGenScreen;
-import worldGenState;
-import procGen;
+import worldSession;
+import worldGrid;
 import ProcGenWorker;
 import Teleport;
 #define SDL_GESTURE_IMPLEMENTATION 1
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 	startArea();//스타트 세팅(월드 생성은 디버그 콘솔에서 수동 트리거 — startWorldGen)
 
 	// 월드 생성(Phase 1~4) 완료 후 자동 후처리: 타이틀 청크 wipe + SPAWN으로 텔레포트.
-	//   worldGenState 자체는 World/Teleport import 안 함 (cycle 회피) → 콜백 주입.
+	//   worldSession 자체는 World/Teleport import 안 함 (cycle 회피) → 콜백 주입.
 	onWorldGenComplete = []()
 	{
 		// 1) 텔레포트 — Phase 4가 SPAWN_DEFAULT 주변 9 섹터를 사전 ensure했으므로 즉각 진입.
@@ -176,7 +176,7 @@ int main(int argc, char** argv)
 		gestureInitialized = false;
 	}
 	ProcGenWorker::ins().shutdown();
-	procGen::shutdownWorldPixelMmap();
+	worldGrid::shutdownWorldPixelMmap();
 	TTF_Quit();
 	SDL_Quit();
 	//_CrtDumpMemoryLeaks();

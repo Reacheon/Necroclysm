@@ -1,7 +1,7 @@
 module;
 #include <SDL3_image/SDL_image.h>
 
-module procGen;
+module worldGrid;
 
 import std;
 import util;
@@ -9,10 +9,10 @@ import util;
 //============================================================
 // 월드 PNG 로딩 (내부 백엔드) — 5832개 패치 PNG를 읽어 43200×21600 Terrain 그리드 구성.
 //   순수 블랙박스: 외부 상태 무관, grid만 반환.
-//   공개 진입점은 procGen_worldGridCache.cpp의 loadWorldGrid가 담당. 이 함수는
+//   공개 진입점은 worldGrid_cache.cpp의 loadWorldGrid가 담당. 이 함수는
 //   캐시 miss 시에만 호출되므로 export하지 않음.
 //============================================================
-namespace procGen
+namespace worldGrid
 {
     namespace
     {
@@ -70,7 +70,7 @@ namespace procGen
         const double totalMs = (tHist   - tStart ) / 1.0e6;
         const double memMB   = static_cast<double>(total) / (1024.0 * 1024.0);
 
-        prt(L"[procGen] loadWorldGridFromPng done\n");
+        prt(L"[worldGrid] loadWorldGridFromPng done\n");
         prt(L"  alloc+fill : %8.2f ms\n", allocMs);
         prt(L"  patch load : %8.2f ms  (ok=%d fail=%d / %d)\n",
             loadMs, loadOk, loadFail, loadOk + loadFail);

@@ -20,7 +20,7 @@ import constVar;
 //   wrap이 적용되는 진입점 (이 함수들만 호출):
 //     - World 모듈 chunk map 룩업    — 청크 인덱스 wrap (chunk map key)
 //     - sectorFromTile               — 섹터 인덱스 wrap (sector cache key)
-//     - procGen::worldPixel          — 픽셀 좌표 wrap (mmap 인덱스, [0, W_PIXEL))
+//     - worldGrid::worldPixel        — 픽셀 좌표 wrap (mmap 인덱스, [0, W_PIXEL))
 //     - Coord::setGrid / setXY       — 플레이어/엔티티 저장 좌표 정규화
 //     - 엔티티/스프라이트 화면 좌표 계산 — signedDeltaRenderX 사용
 //

@@ -1,7 +1,9 @@
-module procGen;
+module worldGen;
 
 import std;
 import util;
+
+using namespace worldGrid;  // Terrain, PixelCostGrid, loadWorldGrid, transitionToMmap 등 unqualified 접근
 
 //============================================================
 // generateWorld — 월드 생성 워커 스레드 진입점.
@@ -13,7 +15,7 @@ import util;
 //   prt() 등 std::wprintf 계열은 스레드 안전이 보장되지 않으므로 워커에서는
 //   호출하지 않음. 로그는 각 phase 함수 내부의 prt가 처리.
 //============================================================
-namespace procGen
+namespace worldGen
 {
     namespace
     {
@@ -69,7 +71,7 @@ namespace procGen
         progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
 
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
-        //  성공 시: Phase 2 게임플레이는 procGen::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
+        //  성공 시: Phase 2 게임플레이는 worldGrid::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
         //  실패 시: heap grid 그대로 유지 (워커 스레드 종료 시 RAII로 free) — 폴백.
         //          worldPixel은 Sea 반환하므로 게임은 동작하나 색상 데이터 무효.
         if (transitionToMmap(grid))
@@ -78,7 +80,7 @@ namespace procGen
         }
 
         //  Phase 4 (prepareSpawn) + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
-        //  procGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → procGen 단방향 의존),
+        //  worldGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → worldGen 단방향 의존),
         //  스폰 주변 섹터 사전 절차생성은 호출자 측 책임.
     }
 

@@ -3,7 +3,7 @@ module Sector;
 import std;
 import util;
 import constVar;
-import procGen;
+import worldGrid;
 
 // ════════════════════════════════════════════════════════════════════════
 // procGenerate — Sector-level 절차생성의 단일 슈퍼함수.
@@ -57,7 +57,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const int wtx = sectorOriginTileX + dx;
             const int rawPx = (wtx - TILE_BASE_X) / TILE_PER_PIXEL;
 
-            const procGen::Terrain pixelTerrain = procGen::worldPixel(rawPx, rawPy);
+            const worldGrid::Terrain pixelTerrain = worldGrid::worldPixel(rawPx, rawPy);
 
             //per-tile 결정론 randomVal — (seed, worldTile) 해시 16비트.
             //  세이브/로드 후에도 같은 시드면 같은 스프라이트 변형 보장.
@@ -75,43 +75,43 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
             switch (pixelTerrain)
             {
-            case procGen::Terrain::Sea:
-            case procGen::Terrain::CitySea:
+            case worldGrid::Terrain::Sea:
+            case worldGrid::Terrain::CitySea:
                 cell.floor = itemID::deepSeaWater;
                 cell.flags = 0;               //walkable false
                 break;
 
-            case procGen::Terrain::River:
-            case procGen::Terrain::Lake:
-            case procGen::Terrain::CityRiver:
+            case worldGrid::Terrain::River:
+            case worldGrid::Terrain::Lake:
+            case worldGrid::Terrain::CityRiver:
                 cell.floor = itemID::deepFreshWater;
                 cell.flags = 0;
                 break;
 
-            case procGen::Terrain::Land:
-            case procGen::Terrain::Monsoon:
-            case procGen::Terrain::InsularRainforest:
-            case procGen::Terrain::Subarctic:
-            case procGen::Terrain::ContinentalRainforest:
+            case worldGrid::Terrain::Land:
+            case worldGrid::Terrain::Monsoon:
+            case worldGrid::Terrain::InsularRainforest:
+            case worldGrid::Terrain::Subarctic:
+            case worldGrid::Terrain::ContinentalRainforest:
                 cell.floor = itemID::dirt;
                 break;
 
-            case procGen::Terrain::Desert:
+            case worldGrid::Terrain::Desert:
                 cell.floor = itemID::sandFloor;
                 break;
 
-            case procGen::Terrain::Mountain:
+            case worldGrid::Terrain::Mountain:
                 cell.floor = itemID::dirt;    //(TODO: mountain wall + 등반)
                 break;
 
-            case procGen::Terrain::Tundra:
-            case procGen::Terrain::Polar:
+            case worldGrid::Terrain::Tundra:
+            case worldGrid::Terrain::Polar:
                 cell.floor = itemID::dirt;
                 cell.flags |= TILE_FLAG_HAS_SNOW;
                 break;
 
-            case procGen::Terrain::CityZone:
-            case procGen::Terrain::CityCenter:
+            case worldGrid::Terrain::CityZone:
+            case worldGrid::Terrain::CityCenter:
                 cell.floor = itemID::paver;   //도시 기본 보도블럭 (TODO: BCP layout이 도로/건물 페인트)
                 break;
             }
@@ -138,7 +138,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     //   각 water 픽셀에서:
     //     1) (seed, rawPx, rawPy) hash → variant 선택 (해안선 패턴 다양화)
     //     2) 8 이웃 land 마스크 → 47 인덱스 (GameMaker autotile47 컨벤션)
-    //     3) procGen::shoreSplineMask[variant][idx] 룩업 → 픽셀 내부 (lx,ly) 위치의
+    //     3) worldGrid::shoreSplineMask[variant][idx] 룩업 → 픽셀 내부 (lx,ly) 위치의
     //        bool 값이 true면 그 타일을 dirt로 덮어씀.
     //   마스크 데이터는 textureLoader가 게임 시작 시 PNG 픽셀 색상(#5b4940=land,
     //   #3899ff=water)을 분석해 채움. variant끼리 변/코너 경계 패턴이 동일해야
@@ -171,25 +171,25 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     const int fieldOriginPxX  = sectorOriginPxX - MARGIN_PX;
     const int fieldOriginPxY  = sectorOriginPxY - MARGIN_PX;
 
-    std::vector<procGen::Terrain> terr(static_cast<std::size_t>(FIELD_SZ) * FIELD_SZ);
+    std::vector<worldGrid::Terrain> terr(static_cast<std::size_t>(FIELD_SZ) * FIELD_SZ);
     for (int fy = 0; fy < FIELD_SZ; ++fy)
     {
         const int rawPy = fieldOriginPxY + fy;
         for (int fx = 0; fx < FIELD_SZ; ++fx)
         {
             const int rawPx = fieldOriginPxX + fx;
-            terr[static_cast<std::size_t>(fy) * FIELD_SZ + fx] = procGen::worldPixel(rawPx, rawPy);
+            terr[static_cast<std::size_t>(fy) * FIELD_SZ + fx] = worldGrid::worldPixel(rawPx, rawPy);
         }
     }
 
-    auto isLandTerrain = [](procGen::Terrain t) -> bool {
+    auto isLandTerrain = [](worldGrid::Terrain t) -> bool {
         switch (t)
         {
-        case procGen::Terrain::Sea:
-        case procGen::Terrain::CitySea:
-        case procGen::Terrain::River:
-        case procGen::Terrain::Lake:
-        case procGen::Terrain::CityRiver:
+        case worldGrid::Terrain::Sea:
+        case worldGrid::Terrain::CitySea:
+        case worldGrid::Terrain::River:
+        case worldGrid::Terrain::Lake:
+        case worldGrid::Terrain::CityRiver:
             return false;
         default:
             return true;
@@ -279,12 +279,12 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const bool sw = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx - 1]);
 
             const int idx = autotile47(n, e, s, w, nw, ne, sw, se);
-            const int variant = pickVariant(rawPx, rawPy, procGen::shoreSplineVariantCount);
+            const int variant = pickVariant(rawPx, rawPy, worldGrid::shoreSplineVariantCount);
 
             //   prefab 마스크 룩업: 자기 픽셀 내부 (localX, localY) 위치가 land이면 dirt 채움.
             //   variantCount=0이면 페이즈 2 적용 X (PNG 로드 실패한 경우 graceful fallback).
-            if (procGen::shoreSplineVariantCount > 0 &&
-                procGen::shoreSplineMask[static_cast<std::size_t>(variant)][static_cast<std::size_t>(idx)][static_cast<std::size_t>(localY) * procGen::SHORE_TILE_SIZE + localX])
+            if (worldGrid::shoreSplineVariantCount > 0 &&
+                worldGrid::shoreSplineMask[static_cast<std::size_t>(variant)][static_cast<std::size_t>(idx)][static_cast<std::size_t>(localY) * worldGrid::SHORE_TILE_SIZE + localX])
             {
                 const std::size_t tileIdx = static_cast<std::size_t>(dy) * SectorCoord::TILES + dx;
                 plan.tiles[tileIdx].floor = itemID::dirt;

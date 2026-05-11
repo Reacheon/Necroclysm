@@ -3,7 +3,7 @@ export module Sector;
 import std;
 import util;
 import constVar;
-import procGen;
+import worldGrid;
 import ProcGenWorker;
 
 // ════════════════════════════════════════════════════════════════════════

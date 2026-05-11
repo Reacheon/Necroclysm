@@ -5,9 +5,9 @@ import util;
 import constVar;
 import Chunk;
 import TileData;
-import procGen;
+import worldGrid;
 import Sector;
-import worldGenState;
+import worldSession;
 
 // ════════════════════════════════════════════════════════════════════════
 // World::createChunk — 청크 1개 생성 + (Phase 2 진입 후) Sector 데이터 *블릿*.
@@ -39,7 +39,7 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
 
     //--- 2) Phase 2 진입 후: Sector PaintCell 블릿 ---
     //   16×16 = 256 타일을 SectorPlan.tiles에서 직접 복사. 결정 0, 매핑 0.
-    if (chunkZ == 0 && procGen::worldPixelMmapActive())
+    if (chunkZ == 0 && worldGrid::worldPixelMmapActive())
     {
         // chunkX는 음수/W 초과(render-space)일 수 있으므로 wrap 후 sector 계산.
         // 그렇지 않으면 sectorFromTile이 음수 sectorX를 반환해 캐시 키 충돌 발생.

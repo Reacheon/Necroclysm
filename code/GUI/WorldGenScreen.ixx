@@ -9,7 +9,8 @@ import constVar;
 import GUI;
 import drawText;
 import globalVar;
-import procGen;
+import worldGen;
+import worldGrid;
 import Sector;
 
 // ════════════════════════════════════════════════════════════════════════
@@ -46,7 +47,7 @@ export class WorldGenScreen : public GUI
 private:
     inline static WorldGenScreen* ptr = nullptr;
 
-    std::shared_ptr<procGen::WorldGenProgress> progress;
+    std::shared_ptr<worldGen::WorldGenProgress> progress;
     std::jthread worker;
 
     //미리보기 텍스처 — 워커가 패치별로 채우는 RGBA를 메인이 점진 반영.
@@ -62,7 +63,7 @@ private:
     double displayedRoadCount = 0.0;
 
     //월드 생성 완료 후 startArea 후속 처리를 호출할 콜백
-    std::function<void(procGen::WorldGenResult)> onCompleted;
+    std::function<void(worldGen::WorldGenResult)> onCompleted;
     bool completedFired = false;
 
     //--- 좌표 변환 헬퍼: 픽셀 좌표(0..43200) → 스크린 좌표 ---
@@ -86,8 +87,8 @@ private:
     SDL_FPoint pixelToScreen(int px, int py) const
     {
         const SDL_Rect r = mapRect();
-        const double fx = (double)px / (double)procGen::WORLD_PIXEL_W;
-        const double fy = (double)py / (double)procGen::WORLD_PIXEL_H;
+        const double fx = (double)px / (double)worldGrid::WORLD_PIXEL_W;
+        const double fy = (double)py / (double)worldGrid::WORLD_PIXEL_H;
         return SDL_FPoint{
             (float)(r.x + fx * r.w),
             (float)(r.y + fy * r.h)
@@ -96,21 +97,21 @@ private:
 
     SDL_FPoint tileToScreen(const Point3& t) const
     {
-        // procGen 픽셀 베이스: 패치 (-54,-27) 좌상단이 픽셀(0,0)
+        // worldGrid 픽셀 베이스: 패치 (-54,-27) 좌상단이 픽셀(0,0)
         constexpr int PATCH_X_MIN = -54;
         constexpr int PATCH_Y_MIN = -27;
         constexpr int PIXEL_PER_PATCH = 400;
         constexpr int TILE_BASE_X =
-            PATCH_X_MIN * PIXEL_PER_PATCH * procGen::TILES_PER_PIXEL;
+            PATCH_X_MIN * PIXEL_PER_PATCH * worldGrid::TILES_PER_PIXEL;
         constexpr int TILE_BASE_Y =
-            PATCH_Y_MIN * PIXEL_PER_PATCH * procGen::TILES_PER_PIXEL;
+            PATCH_Y_MIN * PIXEL_PER_PATCH * worldGrid::TILES_PER_PIXEL;
 
-        const double pxd = (double)(t.x - TILE_BASE_X) / (double)procGen::TILES_PER_PIXEL;
-        const double pyd = (double)(t.y - TILE_BASE_Y) / (double)procGen::TILES_PER_PIXEL;
+        const double pxd = (double)(t.x - TILE_BASE_X) / (double)worldGrid::TILES_PER_PIXEL;
+        const double pyd = (double)(t.y - TILE_BASE_Y) / (double)worldGrid::TILES_PER_PIXEL;
 
         const SDL_Rect r = mapRect();
-        const double fx = pxd / (double)procGen::WORLD_PIXEL_W;
-        const double fy = pyd / (double)procGen::WORLD_PIXEL_H;
+        const double fx = pxd / (double)worldGrid::WORLD_PIXEL_W;
+        const double fy = pyd / (double)worldGrid::WORLD_PIXEL_H;
         return SDL_FPoint{
             (float)(r.x + fx * r.w),
             (float)(r.y + fy * r.h)
@@ -118,16 +119,16 @@ private:
     }
 
     //--- phase별 표시 텍스트 ---
-    static const wchar_t* phaseLabel(procGen::GenPhase ph)
+    static const wchar_t* phaseLabel(worldGen::GenPhase ph)
     {
         switch (ph)
         {
-        case procGen::GenPhase::idle:         return L"Initializing";
-        case procGen::GenPhase::loadPng:      return L"Loading satellite imagery";
-        case procGen::GenPhase::placeCity:    return L"Placing cities";
-        case procGen::GenPhase::buildRoad:    return L"Building road network";
-        case procGen::GenPhase::prepareSpawn: return L"Preparing spawn area";
-        case procGen::GenPhase::done:         return L"Finalizing world";
+        case worldGen::GenPhase::idle:         return L"Initializing";
+        case worldGen::GenPhase::loadPng:      return L"Loading satellite imagery";
+        case worldGen::GenPhase::placeCity:    return L"Placing cities";
+        case worldGen::GenPhase::buildRoad:    return L"Building road network";
+        case worldGen::GenPhase::prepareSpawn: return L"Preparing spawn area";
+        case worldGen::GenPhase::done:         return L"Finalizing world";
         }
         return L"";
     }
@@ -135,19 +136,19 @@ private:
     //--- 좌측 하단 로딩 로드맵 ---------------------------------------------
     //   4단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
     //   회전 스피너(머리/꼬리 페이드 아크)로 강조.
-    void drawRoadmap(procGen::GenPhase ph) const
+    void drawRoadmap(worldGen::GenPhase ph) const
     {
         // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=prepareSpawn
         int activeStep = 0;
         bool stepDone[4] = { false, false, false, false };
         switch (ph)
         {
-        case procGen::GenPhase::idle:         activeStep = 0; break;
-        case procGen::GenPhase::loadPng:      activeStep = 1; break;
-        case procGen::GenPhase::placeCity:    activeStep = 2; stepDone[0] = true; break;
-        case procGen::GenPhase::buildRoad:    activeStep = 3; stepDone[0] = stepDone[1] = true; break;
-        case procGen::GenPhase::prepareSpawn: activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
-        case procGen::GenPhase::done:         stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
+        case worldGen::GenPhase::idle:         activeStep = 0; break;
+        case worldGen::GenPhase::loadPng:      activeStep = 1; break;
+        case worldGen::GenPhase::placeCity:    activeStep = 2; stepDone[0] = true; break;
+        case worldGen::GenPhase::buildRoad:    activeStep = 3; stepDone[0] = stepDone[1] = true; break;
+        case worldGen::GenPhase::prepareSpawn: activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case worldGen::GenPhase::done:         stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
         }
 
         constexpr SDL_Color C_PENDING = { 105, 105, 110, 255 };
@@ -267,9 +268,9 @@ private:
 public:
     //onWorldReady 콜백은 done 시점에 메인 스레드에서 호출됨(WorldGenResult 결과 인계).
     //  spawnTile은 Phase 4에서 사전 절차생성할 섹터 윈도우의 중심 (보통 SPAWN_DEFAULT).
-    WorldGenScreen(std::uint64_t seed, Point3 spawnTile, std::function<void(procGen::WorldGenResult)> onWorldReady)
+    WorldGenScreen(std::uint64_t seed, Point3 spawnTile, std::function<void(worldGen::WorldGenResult)> onWorldReady)
         : GUI(false)
-        , progress(std::make_shared<procGen::WorldGenProgress>())
+        , progress(std::make_shared<worldGen::WorldGenProgress>())
         , onCompleted(std::move(onWorldReady))
     {
         errorBox(ptr != nullptr, L"More than one WorldGenScreen instance was generated.");
@@ -280,17 +281,17 @@ public:
         deactInput();
 
         //워커 스레드 기동 — shared_ptr 캡처로 수명 안전(jthread 소멸자가 join)
-        //  Phase 1~3은 procGen::generateWorld가 처리.
+        //  Phase 1~3은 worldGen::generateWorld가 처리.
         //  Phase 4 (prepareSpawn)는 본 워커가 generateWorld 후 직접 처리 — Sector 모듈 의존성을
-        //  procGen 모듈에 넣지 않기 위함 (Sector → procGen 단방향 유지).
+        //  worldGen 모듈에 넣지 않기 위함 (Sector → worldGrid 단방향 유지).
         auto progPtr = progress;
         worker = std::jthread([seed, spawnTile, progPtr]
         {
             //--- Phase 1~3: PNG 로드 + 도시 + 도로망 ---
-            procGen::generateWorld(seed, *progPtr);
+            worldGen::generateWorld(seed, *progPtr);
 
             //--- Phase 4: 스폰 주변 9 섹터 사전 절차생성 (동기) ---
-            progPtr->phase.store(procGen::GenPhase::prepareSpawn, std::memory_order_release);
+            progPtr->phase.store(worldGen::GenPhase::prepareSpawn, std::memory_order_release);
             const SectorCoord cur = sectorFromTile(spawnTile);
             for (int dy = -1; dy <= 1; ++dy)
             {
@@ -302,7 +303,7 @@ public:
             }
 
             //--- Done ---
-            progPtr->phase.store(procGen::GenPhase::done, std::memory_order_release);
+            progPtr->phase.store(worldGen::GenPhase::done, std::memory_order_release);
             progPtr->done .store(true,                    std::memory_order_release);
         });
     }
@@ -333,7 +334,7 @@ public:
                 previewTex = SDL_CreateTexture(renderer,
                     SDL_PIXELFORMAT_RGBA32,
                     SDL_TEXTUREACCESS_STREAMING,
-                    procGen::PREVIEW_W, procGen::PREVIEW_H);
+                    worldGrid::PREVIEW_W, worldGrid::PREVIEW_H);
                 if (previewTex)
                 {
                     SDL_SetTextureBlendMode(previewTex, SDL_BLENDMODE_BLEND);
@@ -349,7 +350,7 @@ public:
                 {
                     SDL_UpdateTexture(previewTex, nullptr,
                         progress->previewRGBA.data(),
-                        procGen::PREVIEW_W * 4);
+                        worldGrid::PREVIEW_W * 4);
                     lastUploadedPreviewVersion = curVer;
                 }
             }
@@ -369,7 +370,7 @@ public:
             if (deficit > 0)
                 rate = std::max(rate, deficit / wgcfg::CITY_DEFICIT_DIV);
             //phase가 도시 단계를 지났으면 잔여분 빠르게 정리
-            if (ph == procGen::GenPhase::buildRoad || ph == procGen::GenPhase::done)
+            if (ph == worldGen::GenPhase::buildRoad || ph == worldGen::GenPhase::done)
                 rate = std::max(rate, deficit / wgcfg::CITY_FINAL_DIV);
             displayedCityCount = std::min((double)cityActual, displayedCityCount + rate);
         }
@@ -456,9 +457,9 @@ public:
                 int s = 1;
                 switch (progress->citiesSnap[i].tier)
                 {
-                case procGen::CityTier::T1: s = 3; break;
-                case procGen::CityTier::T2: s = 2; break;
-                case procGen::CityTier::T3: s = 1; break;
+                case worldGen::CityTier::T1: s = 3; break;
+                case worldGen::CityTier::T2: s = 2; break;
+                case worldGen::CityTier::T3: s = 1; break;
                 }
                 drawFillRect(SDL_Rect{ (int)sp.x - s/2, (int)sp.y - s/2, s, s },
                              wgcfg::CITY_DOT);
@@ -467,7 +468,7 @@ public:
 
         //--- 하단 phase 텍스트 + 점 . .. ... 애니메이션 ---
         const auto ph = progress ? progress->phase.load(std::memory_order_acquire)
-                                 : procGen::GenPhase::idle;
+                                 : worldGen::GenPhase::idle;
         const wchar_t* lbl = phaseLabel(ph);
 
         const int dotCount = (int)((SDL_GetTicks() / 400) % 3) + 1;
@@ -493,7 +494,7 @@ public:
         std::wostringstream sub;
         switch (ph)
         {
-        case procGen::GenPhase::loadPng:
+        case worldGen::GenPhase::loadPng:
         {
             const int loaded = progress ? progress->patchesLoadedDone .load() : 0;
             const int total  = progress ? progress->patchesLoadedTotal.load() : 0;
@@ -501,10 +502,10 @@ public:
                 sub << L"patches " << loaded << L" / " << total;
             break;
         }
-        case procGen::GenPhase::placeCity:
+        case worldGen::GenPhase::placeCity:
             sub << L"cities " << (int)displayedCityCount;
             break;
-        case procGen::GenPhase::buildRoad:
+        case worldGen::GenPhase::buildRoad:
             sub << L"roads " << (int)displayedRoadCount;
             break;
         default:

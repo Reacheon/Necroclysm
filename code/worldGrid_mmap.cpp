@@ -3,7 +3,7 @@ module;
 #define NOMINMAX
 #include <windows.h>
 
-module procGen;
+module worldGrid;
 
 import std;
 import util;
@@ -13,7 +13,7 @@ import util;
 //   세션 임시 파일 (map/worldPixels.bin) → CreateFileMapping → MapViewOfFile.
 //   접근 패턴: 플레이어 주변 페이지(4KB)만 OS가 lazy 로드, 콜드 페이지 자동 evict.
 //============================================================
-namespace procGen
+namespace worldGrid
 {
     namespace
     {
@@ -132,7 +132,7 @@ namespace procGen
         //--- 1. 디스크 기록 ---
         if (!writeUncompressedFile(heapGrid, path))
         {
-            prt(L"[procGen] transitionToMmap: write failed\n");
+            prt(L"[worldGrid] transitionToMmap: write failed\n");
             return false;
         }
         const __int64 tWrote = getNanoTimer();
@@ -140,7 +140,7 @@ namespace procGen
         //--- 2. mmap 진입 ---
         if (!openMmap(path, state()))
         {
-            prt(L"[procGen] transitionToMmap: openMmap failed\n");
+            prt(L"[worldGrid] transitionToMmap: openMmap failed\n");
             //손상된 파일이면 다음 시도 위해 삭제.
             std::error_code ec;
             std::filesystem::remove(path, ec);
@@ -151,7 +151,7 @@ namespace procGen
         const double writeMs  = (tWrote  - tStart ) / 1.0e6;
         const double mapMs    = (tMapped - tWrote ) / 1.0e6;
         const double totalMs  = (tMapped - tStart ) / 1.0e6;
-        prt(L"[procGen] transitionToMmap: ok\n");
+        prt(L"[worldGrid] transitionToMmap: ok\n");
         prt(L"  write 933MB    : %8.2f ms\n", writeMs);
         prt(L"  CreateFileMap  : %8.2f ms\n", mapMs);
         prt(L"  total          : %8.2f ms\n", totalMs);

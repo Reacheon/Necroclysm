@@ -197,7 +197,7 @@ public:
 		return totalStackSet;
 	}
 
-	// (Patch 시스템 제거됨 — 픽셀 데이터는 procGen mmap이 단일 진리원천.
+	// (Patch 시스템 제거됨 — 픽셀 데이터는 worldGrid mmap이 단일 진리원천.
 	//  타이틀/Phase 1 미진입에는 createChunk가 chunkFlag::seawater 디폴트로 채움.
 	//  Phase 1 이후엔 Sector 모듈이 mmap 경유로 per-tile 페인트 결정.)
 

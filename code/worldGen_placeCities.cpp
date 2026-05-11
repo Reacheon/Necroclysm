@@ -1,10 +1,12 @@
 module;
 #include <SDL3/SDL.h>
 
-module procGen;
+module worldGen;
 
 import std;
 import util;
+
+using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
 
 //============================================================
 // 도시 좌표 배열 — 게임 시작 1회 절차생성의 1단계.
@@ -31,7 +33,7 @@ import util;
 //   압도적으로 적음 → 사전계산 비용(O(N))이 다트 비용(O(R²)×다트수)을 크게 초과.
 //   로컬 검사가 ~10× 빠름. 통계적으론 등가.
 //============================================================
-namespace procGen
+namespace worldGen
 {
     namespace
     {
@@ -206,7 +208,7 @@ namespace procGen
     {
         const __int64 tStart = getNanoTimer();
 
-        prt(L"[procGen] placeCities start (seed=%llu)\n",
+        prt(L"[worldGen] placeCities start (seed=%llu)\n",
             static_cast<unsigned long long>(seed));
 
         //--- Phase 0 : 사전배치 도시 추출 ---
@@ -627,7 +629,7 @@ namespace procGen
             return dr;
         }
 
-        //좌표 변환 — procGen 픽셀(0,0) = 패치(PATCH_X_MIN, PATCH_Y_MIN) 좌상단.
+        //좌표 변환 — worldGen 픽셀(0,0) = 패치(PATCH_X_MIN, PATCH_Y_MIN) 좌상단.
         Point3 pixelToTileCenter(int px, int py) noexcept
         {
             return Point3{

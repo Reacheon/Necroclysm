@@ -10,7 +10,7 @@ import globalVar;
 import drawPrimitive;
 import World;
 import Player;
-import worldGenState;
+import worldSession;
 import Sector;
 
 // ════════════════════════════════════════════════════════════════════════

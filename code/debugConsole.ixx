@@ -22,7 +22,7 @@ import GodService;
 import SkillRegistry;
 import Lst;
 import paletteLoader;
-import worldGenState;
+import worldSession;
 import Teleport;
 
 export void debugConsole()

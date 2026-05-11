@@ -44,7 +44,7 @@ export __int64 renderSticker(int cameraX, int cameraY)
 					(
 						address->getSprite(),
 						address->getSpriteIndex(),
-						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
 						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 					);
 					setZoom(1.0);
@@ -56,7 +56,7 @@ export __int64 renderSticker(int cameraX, int cameraY)
 					(
 						address->getSprite(),
 						address->getSpriteIndex(),
-						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
 						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
 					);
 					setZoom(1.0);
@@ -72,7 +72,7 @@ export __int64 renderSticker(int cameraX, int cameraY)
 					(
 						address->getSprite(),
 						address->getSpriteIndex(),
-						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
 						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY()),
 						address->rotateAngle,
 						&rCenter
@@ -87,7 +87,7 @@ export __int64 renderSticker(int cameraX, int cameraY)
 					(
 						address->getSprite(),
 						address->getSpriteIndex(),
-						(cameraW / 2) + zoomScale * (address->getX() - cameraX + address->getIntegerFakeX()),
+						(cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
 						(cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY()),
 						address->rotateAngle,
 						&rCenter
@@ -104,8 +104,8 @@ export __int64 renderSticker(int cameraX, int cameraY)
 			if (address->getFont() != nullptr)
 			{
 				setFontSize(address->getFontSize());
-				if (address->getIsCenter()) drawTextCenter(address->getString(), cameraW / 2 + address->getX() - cameraX, cameraH / 2 + address->getY() - cameraY);
-				else  drawText(address->getString(), cameraW / 2 + address->getX() - cameraX, cameraH / 2 + address->getY() - cameraY);
+				if (address->getIsCenter()) drawTextCenter(address->getString(), cameraW / 2 + worldWrap::signedDeltaRenderX(cameraX, address->getX()), cameraH / 2 + address->getY() - cameraY);
+				else  drawText(address->getString(), cameraW / 2 + worldWrap::signedDeltaRenderX(cameraX, address->getX()), cameraH / 2 + address->getY() - cameraY);
 			}
 		}
 	}
