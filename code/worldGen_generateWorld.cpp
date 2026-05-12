@@ -2,6 +2,7 @@ module worldGen;
 
 import std;
 import util;
+import cityLayout;
 
 using namespace worldGrid;  // Terrain, PixelCostGrid, loadWorldGrid, transitionToMmap 등 unqualified 접근
 
@@ -58,7 +59,16 @@ namespace worldGen
             progress.citiesSnap.push_back(c);
         });
 
-        //--- Phase 3: 도로망 ---
+        //--- Phase 3: 도시 layout (BCP + 외곽 도로 + 진입점 + 다리) ---
+        progress.phase.store(GenPhase::cityLayout, std::memory_order_release);
+        progress.layoutsTotal.store(static_cast<int>(cities.size()), std::memory_order_release);
+
+        std::vector<cityLayout::CityLayout> layouts = buildCityLayouts(seed, grid, cities, [&](std::uint32_t /*idx*/)
+        {
+            progress.layoutsDone.fetch_add(1, std::memory_order_relaxed);
+        });
+
+        //--- Phase 4: 도로망 ---
         progress.phase.store(GenPhase::buildRoad, std::memory_order_release);
 
         std::vector<RoadPolyLine> roads = buildRoadNetwork(seed, grid, cities, [&](const RoadPolyLine& r)
@@ -67,8 +77,14 @@ namespace worldGen
             progress.roadsSnap.push_back(r);
         });
 
-        //--- Phase 1~3 산출물 저장 ---
-        progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
+        //--- Phase 1~4 산출물 저장 ---
+        progress.result = WorldGenResult{ std::move(cities), std::move(roads), std::move(layouts) };
+
+        //  activeLayouts 즉시 세팅 — WorldGenScreen worker가 본 함수 직후 prepareSpawn에서
+        //  9 sector를 getOrCompute로 동기 생성한다. 이 procGenerate들이 activeLayouts를
+        //  읽어 도로 페인트 → spawn 주변 캐시에 도로가 들어가야 한다.
+        //  worldSession 콜백은 result를 move한 후 worldGenResult->layouts 주소로 재설정.
+        cityLayout::activeLayouts = &progress.result->layouts;
 
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
         //  성공 시: Phase 2 게임플레이는 worldGrid::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.

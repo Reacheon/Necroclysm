@@ -126,6 +126,7 @@ private:
         case worldGen::GenPhase::idle:         return L"Initializing";
         case worldGen::GenPhase::loadPng:      return L"Loading satellite imagery";
         case worldGen::GenPhase::placeCity:    return L"Placing cities";
+        case worldGen::GenPhase::cityLayout:   return L"Partitioning cities";
         case worldGen::GenPhase::buildRoad:    return L"Building road network";
         case worldGen::GenPhase::prepareSpawn: return L"Preparing spawn area";
         case worldGen::GenPhase::done:         return L"Finalizing world";
@@ -134,21 +135,23 @@ private:
     }
 
     //--- 좌측 하단 로딩 로드맵 ---------------------------------------------
-    //   4단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
+    //   5단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
     //   회전 스피너(머리/꼬리 페이드 아크)로 강조.
     void drawRoadmap(worldGen::GenPhase ph) const
     {
-        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=prepareSpawn
+        // 단계 번호: 1=loadPng, 2=placeCity, 3=cityLayout, 4=buildRoad, 5=prepareSpawn
+        constexpr int N_STEPS = 5;
         int activeStep = 0;
-        bool stepDone[4] = { false, false, false, false };
+        bool stepDone[N_STEPS] = { false, false, false, false, false };
         switch (ph)
         {
         case worldGen::GenPhase::idle:         activeStep = 0; break;
         case worldGen::GenPhase::loadPng:      activeStep = 1; break;
         case worldGen::GenPhase::placeCity:    activeStep = 2; stepDone[0] = true; break;
-        case worldGen::GenPhase::buildRoad:    activeStep = 3; stepDone[0] = stepDone[1] = true; break;
-        case worldGen::GenPhase::prepareSpawn: activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
-        case worldGen::GenPhase::done:         stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
+        case worldGen::GenPhase::cityLayout:   activeStep = 3; stepDone[0] = stepDone[1] = true; break;
+        case worldGen::GenPhase::buildRoad:    activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case worldGen::GenPhase::prepareSpawn: activeStep = 5; stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
+        case worldGen::GenPhase::done:         for (auto& d : stepDone) d = true; break;
         }
 
         constexpr SDL_Color C_PENDING = { 105, 105, 110, 255 };
@@ -157,20 +160,21 @@ private:
 
         constexpr int R_OUTER = 17;   // 본 링 바깥 반지름
         constexpr int R_INNER = 15;   // 본 링 안쪽 (두께 2px)
-        constexpr int SPACING = 74;   // 단계 간 세로 간격 (원 중심 기준)
+        constexpr int SPACING = 64;   // 단계 간 세로 간격 (5단계 맞추려고 74→64로 축소)
         const int cx       = 64;
-        const int firstCy  = cameraH - 300;   // 최상단 원 중심 Y (4단계로 확장하면서 위로)
+        const int firstCy  = cameraH - 364;   // 최상단 원 중심 Y (5단계로 확장하면서 위로)
         const int textX    = cx + 36;
 
-        static const wchar_t* labels[4] = {
+        static const wchar_t* labels[N_STEPS] = {
             L"Loading satellite imagery",
             L"Placing cities",
+            L"Partitioning cities",
             L"Building road network",
             L"Preparing spawn area",
         };
 
         // 단계 사이를 잇는 도트 라인 (3px 점, 4px 간격)
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < N_STEPS - 1; ++i)
         {
             const int yA = firstCy +  i      * SPACING + R_OUTER + 4;
             const int yB = firstCy + (i + 1) * SPACING - R_OUTER - 4;
@@ -184,7 +188,7 @@ private:
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
         // 각 단계 그리기
-        for (int i = 0; i < 4; ++i)
+        for (int i = 0; i < N_STEPS; ++i)
         {
             const int cy = firstCy + i * SPACING;
             const bool isActive = (activeStep == (i + 1));
@@ -370,7 +374,7 @@ public:
             if (deficit > 0)
                 rate = std::max(rate, deficit / wgcfg::CITY_DEFICIT_DIV);
             //phase가 도시 단계를 지났으면 잔여분 빠르게 정리
-            if (ph == worldGen::GenPhase::buildRoad || ph == worldGen::GenPhase::done)
+            if (ph == worldGen::GenPhase::cityLayout || ph == worldGen::GenPhase::buildRoad || ph == worldGen::GenPhase::done)
                 rate = std::max(rate, deficit / wgcfg::CITY_FINAL_DIV);
             displayedCityCount = std::min((double)cityActual, displayedCityCount + rate);
         }
@@ -505,6 +509,13 @@ public:
         case worldGen::GenPhase::placeCity:
             sub << L"cities " << (int)displayedCityCount;
             break;
+        case worldGen::GenPhase::cityLayout:
+        {
+            const int d = progress ? progress->layoutsDone .load() : 0;
+            const int t = progress ? progress->layoutsTotal.load() : 0;
+            if (t > 0) sub << L"layouts " << d << L" / " << t;
+            break;
+        }
         case worldGen::GenPhase::buildRoad:
             sub << L"roads " << (int)displayedRoadCount;
             break;

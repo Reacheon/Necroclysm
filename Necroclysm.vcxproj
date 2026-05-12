@@ -274,6 +274,9 @@
     <ClCompile Include="code\worldGen_buildRoadNetwork.cpp" />
     <ClCompile Include="code\worldGen_placeCities.cpp" />
     <ClCompile Include="code\worldGen_generateWorld.cpp" />
+    <ClCompile Include="code\worldGen_buildCityLayouts.cpp" />
+    <ClCompile Include="code\cityLayout.ixx" />
+    <ClCompile Include="code\cityLayout_build.cpp" />
     <ClCompile Include="code\worldGrid.ixx" />
     <ClCompile Include="code\worldGrid_load.cpp" />
     <ClCompile Include="code\worldGrid_mmap.cpp" />

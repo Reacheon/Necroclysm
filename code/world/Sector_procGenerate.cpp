@@ -4,6 +4,7 @@ import std;
 import util;
 import constVar;
 import worldGrid;
+import cityLayout;
 
 // ════════════════════════════════════════════════════════════════════════
 // procGenerate — Sector-level 절차생성의 단일 슈퍼함수.
@@ -294,11 +295,192 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     }
 
     //═══════════════════════════════════════════════════════════════════════
+    // 3) 도시 layout 소비 — buildCityLayouts가 결정한 도로/사이드워크 페인트.
+    //
+    //   cityLayout::activeLayouts가 nullptr이면 (월드젠 전 startArea 등) 스킵.
+    //   각 layout의 bbox와 섹터 tile 범위가 교차할 때만 처리.
+    //
+    //   페인트 룰:
+    //     - asphalt 15타일 + sidewalk 3타일×2 = 총 21타일 너비 밴드
+    //     - Interior/Boundary: 대칭 (sidewalk + asphalt + sidewalk)
+    //     - Coast/Riverside: 단방향 (asphalt 15 + sidewalk 3, interiorSide 방향으로)
+    //     - 다리: 5타일 너비 asphalt만 (사이드워크 없음)
+    //     - Entry point: yellowAsphalt 마커 5×5 (시각 확인용)
+    //═══════════════════════════════════════════════════════════════════════
+    if (cityLayout::activeLayouts != nullptr)
+    {
+        const int tileMinX = sectorOriginTileX;
+        const int tileMinY = sectorOriginTileY;
+        const int tileMaxX = tileMinX + SectorCoord::TILES;   // exclusive
+        const int tileMaxY = tileMinY + SectorCoord::TILES;
+
+        // 도로 밴드 치수 (실타일 단위).
+        //   대칭 도로(Interior/Boundary): 3 paver + 15 asphalt + 3 paver = 21타일, 중심 정렬.
+        //   비대칭 도로(Coast/Riverside): 같은 21타일이지만 직사각형 안쪽으로 전부 시프트 —
+        //     변 바로 안쪽 3 paver (강변/해안 인도) + 15 asphalt + 안쪽 3 paver.
+        //     아스팔트는 변에서 3타일 안쪽에서 시작 → water 픽셀 침범 0.
+        //   다리: 21타일 풀 폭 (사이드워크 포함). water 위를 가로지르는 게 본분.
+        constexpr int ROAD_ASPHALT      = 15;
+        constexpr int ROAD_SIDEWALK     =  3;
+        constexpr int ROAD_HALF         = (ROAD_ASPHALT + 2 * ROAD_SIDEWALK) / 2;  // 10
+        constexpr int ROAD_ASPHALT_HALF =  ROAD_ASPHALT / 2;                       //  7
+        constexpr int ROAD_BAND         = ROAD_ASPHALT + 2 * ROAD_SIDEWALK;        // 21
+        constexpr int BRIDGE_HALF       = ROAD_HALF;                               // 10 → 21타일 폭
+
+        //  섹터-로컬 (dx, dy) 타일에 페인트.
+        //   paintAsphalt: 무조건 덮어쓰기 — 교차점에서 아스팔트가 우선.
+        //   paintPaver  : 기존이 이미 blackAsphalt면 skip — 도로 교차 시 paver가
+        //                 아스팔트를 잘라먹지 않게 함. (도로 A asphalt × 도로 B paver →
+        //                 paint 순서 무관하게 asphalt 살아남음)
+        auto paintAsphalt = [&](int wtx, int wty) noexcept
+        {
+            if (wtx < tileMinX || wtx >= tileMaxX) return;
+            if (wty < tileMinY || wty >= tileMaxY) return;
+            const std::size_t idx = static_cast<std::size_t>(wty - tileMinY) * SectorCoord::TILES + (wtx - tileMinX);
+            plan.tiles[idx].floor = itemID::blackAsphalt;
+            plan.tiles[idx].flags = TILE_FLAG_WALKABLE;
+        };
+        auto paintPaver = [&](int wtx, int wty) noexcept
+        {
+            if (wtx < tileMinX || wtx >= tileMaxX) return;
+            if (wty < tileMinY || wty >= tileMaxY) return;
+            const std::size_t idx = static_cast<std::size_t>(wty - tileMinY) * SectorCoord::TILES + (wtx - tileMinX);
+            if (plan.tiles[idx].floor == itemID::blackAsphalt) return;   // 아스팔트 위에 paver X
+            plan.tiles[idx].floor = itemID::paver;
+            plan.tiles[idx].flags = TILE_FLAG_WALKABLE;
+        };
+        auto paintMarker = [&](int wtx, int wty) noexcept   // 진입점 마커(yellow). 도로 위에 덮어쓰기 OK.
+        {
+            if (wtx < tileMinX || wtx >= tileMaxX) return;
+            if (wty < tileMinY || wty >= tileMaxY) return;
+            const std::size_t idx = static_cast<std::size_t>(wty - tileMinY) * SectorCoord::TILES + (wtx - tileMinX);
+            plan.tiles[idx].floor = itemID::yellowAsphalt;
+            plan.tiles[idx].flags = TILE_FLAG_WALKABLE;
+        };
+
+        //  하나의 road segment를 페인트. a→b는 cardinal(수평 또는 수직).
+        //   interiorSide=None이면 대칭, 아니면 그 방향으로만 사이드워크.
+        auto paintRoad = [&](const cityLayout::CityRoadSegment& s) noexcept
+        {
+            const bool horizontal = (s.a.y == s.b.y);
+            const int  lo  = horizontal ? std::min(s.a.x, s.b.x) : std::min(s.a.y, s.b.y);
+            const int  hi  = horizontal ? std::max(s.a.x, s.b.x) : std::max(s.a.y, s.b.y);
+            const int  perpC = horizontal ? s.a.y : s.a.x;   // 수직 좌표(밴드 중심 기준)
+
+            // 밴드 perpendicular 범위 결정 — paver 양쪽 + asphalt 중앙.
+            //   layout: [swLo) [asphalt) [swHi)  →  총 21타일.
+            int aLo, aHi, swLoLo, swLoHi, swHiLo, swHiHi;
+            if (s.interiorSide == cityLayout::Dir4::None)
+            {
+                // 대칭: 3 paver + 15 asphalt + 3 paver, segment 중심
+                aLo   = perpC - ROAD_ASPHALT_HALF;
+                aHi   = perpC + ROAD_ASPHALT_HALF + 1;          // exclusive (15 = 7+1+7)
+                swLoLo = aLo - ROAD_SIDEWALK; swLoHi = aLo;
+                swHiLo = aHi;                 swHiHi = aHi + ROAD_SIDEWALK;
+            }
+            else
+            {
+                // Coast/Riverside: 21타일 밴드를 *직사각형 안으로 전부* 시프트.
+                //   외측 paver 3 (변 바로 안쪽, 강변/해안 인도) + asphalt 15 + 내측 paver 3.
+                //   asphalt는 변에서 3타일 안쪽에서 시작 → 절대 water 침범 없음.
+                const bool interiorIsHi =
+                    (horizontal && s.interiorSide == cityLayout::Dir4::S) ||
+                    (!horizontal && s.interiorSide == cityLayout::Dir4::E);
+                if (interiorIsHi)
+                {
+                    // 변(perpC)에서 +방향으로 21타일 전체
+                    swLoLo = perpC;                                  swLoHi = perpC + ROAD_SIDEWALK;       // 강변 paver
+                    aLo    = perpC + ROAD_SIDEWALK;                  aHi    = aLo + ROAD_ASPHALT;          // asphalt 15
+                    swHiLo = aHi;                                    swHiHi = aHi + ROAD_SIDEWALK;         // 내측 paver
+                }
+                else
+                {
+                    // 변(perpC)에서 -방향으로 21타일 전체
+                    swHiLo = perpC - ROAD_SIDEWALK;                  swHiHi = perpC;                       // 강변 paver
+                    aHi    = perpC - ROAD_SIDEWALK;                  aLo    = aHi - ROAD_ASPHALT;          // asphalt 15
+                    swLoLo = aLo - ROAD_SIDEWALK;                    swLoHi = aLo;                         // 내측 paver
+                }
+            }
+
+            // 길이 방향으로 walking, 각 perpC 슬라이스마다 asphalt/sidewalk 페인트.
+            // paver는 paintPaver(아스팔트 위 skip), asphalt는 paintAsphalt(무조건).
+            for (int along = lo; along < hi; ++along)
+            {
+                for (int p = swLoLo; p < swLoHi; ++p)
+                {
+                    if (horizontal) paintPaver(along, p);
+                    else            paintPaver(p, along);
+                }
+                for (int p = aLo; p < aHi; ++p)
+                {
+                    if (horizontal) paintAsphalt(along, p);
+                    else            paintAsphalt(p, along);
+                }
+                for (int p = swHiLo; p < swHiHi; ++p)
+                {
+                    if (horizontal) paintPaver(along, p);
+                    else            paintPaver(p, along);
+                }
+            }
+        };
+
+        //  다리: 21타일 풀 도로 폭 (3 paver + 15 asphalt + 3 paver) 직선.
+        //   water 위를 덮음 — 다리의 본분이 강/바다 가로지르기.
+        auto paintBridge = [&](const cityLayout::CityBridge& br) noexcept
+        {
+            const bool horizontal = (br.a.y == br.b.y);
+            const int  lo  = horizontal ? std::min(br.a.x, br.b.x) : std::min(br.a.y, br.b.y);
+            const int  hi  = horizontal ? std::max(br.a.x, br.b.x) : std::max(br.a.y, br.b.y);
+            const int  perpC = horizontal ? br.a.y : br.a.x;
+            for (int along = lo; along <= hi; ++along)
+            {
+                for (int dp = -BRIDGE_HALF; dp <= BRIDGE_HALF; ++dp)
+                {
+                    // perpC 기준 ±7는 asphalt, |dp|>7은 paver. 대칭 21타일.
+                    if (std::abs(dp) <= ROAD_ASPHALT_HALF)
+                    {
+                        if (horizontal) paintAsphalt(along, perpC + dp);
+                        else            paintAsphalt(perpC + dp, along);
+                    }
+                    else
+                    {
+                        if (horizontal) paintPaver(along, perpC + dp);
+                        else            paintPaver(perpC + dp, along);
+                    }
+                }
+            }
+        };
+
+        //  진입점 마커: 5×5 yellowAsphalt — 자동 도로 그래프 봉합 단계 이전 시각 확인용.
+        auto paintEntryMarker = [&](const cityLayout::CityEntryPoint& ep) noexcept
+        {
+            for (int dy = -2; dy <= 2; ++dy)
+                for (int dx = -2; dx <= 2; ++dx)
+                    paintMarker(ep.tile.x + dx, ep.tile.y + dy);
+        };
+
+        // bbox cull 후 페인트.
+        for (const auto& layout : *cityLayout::activeLayouts)
+        {
+            if (layout.empty()) continue;
+            // 도로 밴드/마커가 bbox 바깥까지 ROAD_HALF만큼 비져나갈 수 있으니 약간 여유.
+            constexpr int CULL_MARGIN = ROAD_HALF + 4;
+            if (layout.bboxMaxTile.x + CULL_MARGIN <= tileMinX) continue;
+            if (layout.bboxMinTile.x - CULL_MARGIN >= tileMaxX) continue;
+            if (layout.bboxMaxTile.y + CULL_MARGIN <= tileMinY) continue;
+            if (layout.bboxMinTile.y - CULL_MARGIN >= tileMaxY) continue;
+
+            for (const auto& seg : layout.roads)     paintRoad(seg);
+            for (const auto& br  : layout.bridges)   paintBridge(br);
+            for (const auto& ep  : layout.entries)   paintEntryMarker(ep);
+        }
+    }
+
+    //═══════════════════════════════════════════════════════════════════════
     // TODO 향후 단계 (모두 본 함수에 누적)
-    //   3) 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
-    //   4) T1 도로 폴리라인이 sector 통과 시 분기 국도 생성
-    //   5) 도시 layout (BCP) — 블록·도로·건물 페인트
-    //   6) Bridge 후처리 (도로↔수계)
+    //   4) 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
+    //   5) T1 도로 폴리라인이 sector 통과 시 분기 국도 생성
+    //   6) 도시 layout BCP 본격화 — 블록·건물 prefab 페인트
     //═══════════════════════════════════════════════════════════════════════
 
     return plan;

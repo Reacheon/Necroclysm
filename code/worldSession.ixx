@@ -3,6 +3,7 @@ export module worldSession;
 import std;
 import util;
 import worldGen;
+import cityLayout;
 import WorldGenScreen;
 
 //============================================================
@@ -51,6 +52,9 @@ export void startWorldGen()
     new WorldGenScreen(worldSeed, SPAWN_DEFAULT, [](worldGen::WorldGenResult result)
     {
         worldGenResult = std::move(result);
+        //  Sector_procGenerate가 cityLayout::activeLayouts를 통해 도시 layout 조회.
+        //  worldGenResult가 optional이라 주소가 안정적 — clear 전까지 유효.
+        cityLayout::activeLayouts = &worldGenResult->layouts;
         worldGenInProgress = false;
 
         //타이틀 청크 wipe + SPAWN_DEFAULT 텔레포트.
