@@ -1784,13 +1784,6 @@ void HUD::drawCircuitInfo()
 	{
 		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
 
-		// 호버 좌표가 아직 미생성 청크면 getTile()의 unordered_map::at()이 던지는
-		// std::out_of_range로 종료되므로 청크 존재 여부 가드. 월드 생성 중에도
-		// HUD가 그려지기 때문에 필수.
-		int hoverChunkX, hoverChunkY;
-		World::ins()->changeToChunkCoord(prevHoverGrid.x, prevHoverGrid.y, hoverChunkX, hoverChunkY);
-		if (!World::ins()->existChunk(hoverChunkX, hoverChunkY, PlayerZ())) return;
-
 		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
 		if (((tgtProp->leadItem.checkFlag(itemFlag::CIRCUIT) || tgtProp->leadItem.checkFlag(itemFlag::CABLE)) && tgtProp->isChargeFlowing())
@@ -2005,13 +1998,6 @@ void HUD::drawFluidCircuitInfo()
 	if (hoverTime > 30)
 	{
 		if (prevHoverGrid == Point2{ std::numeric_limits<int>::min(), std::numeric_limits<int>::min() }) return;
-
-		// 호버 좌표가 아직 미생성 청크면 getTile()의 unordered_map::at()이 던지는
-		// std::out_of_range로 종료되므로 청크 존재 여부 가드. 월드 생성 중에도
-		// HUD가 그려지기 때문에 필수.
-		int hoverChunkX, hoverChunkY;
-		World::ins()->changeToChunkCoord(prevHoverGrid.x, prevHoverGrid.y, hoverChunkX, hoverChunkY);
-		if (!World::ins()->existChunk(hoverChunkX, hoverChunkY, PlayerZ())) return;
 
 		Prop* tgtProp = TileProp(prevHoverGrid.x, prevHoverGrid.y, PlayerZ());
 		if (tgtProp == nullptr) return;
