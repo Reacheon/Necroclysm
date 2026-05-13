@@ -2,7 +2,6 @@ module worldGen;
 
 import std;
 import util;
-import cityLayout;
 
 using namespace worldGrid;  // Terrain, PixelCostGrid, loadWorldGrid, transitionToMmap 등 unqualified 접근
 
@@ -20,7 +19,6 @@ namespace worldGen
 {
     namespace
     {
-        //--- forward declarations (Stepdown — 정의는 generateWorld 아래) ---
         void updatePatchPreview(const PixelCostGrid& grid, int patchX, int patchY, std::mutex& mtx, std::vector<std::uint32_t>& dstRGBA);
         constexpr std::uint32_t terrainPreviewColor(Terrain t) noexcept;
         constexpr std::uint32_t packPreviewRGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept;
@@ -59,16 +57,7 @@ namespace worldGen
             progress.citiesSnap.push_back(c);
         });
 
-        //--- Phase 3: 도시 layout (BCP + 외곽 도로 + 진입점 + 다리) ---
-        progress.phase.store(GenPhase::cityLayout, std::memory_order_release);
-        progress.layoutsTotal.store(static_cast<int>(cities.size()), std::memory_order_release);
-
-        std::vector<cityLayout::CityLayout> layouts = buildCityLayouts(seed, grid, cities, [&](std::uint32_t /*idx*/)
-        {
-            progress.layoutsDone.fetch_add(1, std::memory_order_relaxed);
-        });
-
-        //--- Phase 4: 도로망 ---
+        //--- Phase 3: 도로망 ---
         progress.phase.store(GenPhase::buildRoad, std::memory_order_release);
 
         std::vector<RoadPolyLine> roads = buildRoadNetwork(seed, grid, cities, [&](const RoadPolyLine& r)
@@ -77,14 +66,14 @@ namespace worldGen
             progress.roadsSnap.push_back(r);
         });
 
-        //--- Phase 1~4 산출물 저장 ---
-        progress.result = WorldGenResult{ std::move(cities), std::move(roads), std::move(layouts) };
+        //--- Phase 1~3 산출물 저장 ---
+        progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
 
-        //  activeLayouts 즉시 세팅 — WorldGenScreen worker가 본 함수 직후 prepareSpawn에서
-        //  9 sector를 getOrCompute로 동기 생성한다. 이 procGenerate들이 activeLayouts를
-        //  읽어 도로 페인트 → spawn 주변 캐시에 도로가 들어가야 한다.
-        //  worldSession 콜백은 result를 move한 후 worldGenResult->layouts 주소로 재설정.
-        cityLayout::activeLayouts = &progress.result->layouts;
+        //  activePolyLines 즉시 세팅 — WorldGenScreen worker가 본 함수 직후 prepareSpawn 에서
+        //  9 sector를 getOrCompute로 동기 생성. 이 procGenerate들이 광역 폴리라인을 읽어 도로
+        //  페인트 → spawn 주변 캐시에 도로가 들어가야 한다.
+        //  worldSession 콜백은 result를 move한 후 worldGenResult-> 주소로 재설정.
+        worldGen::activePolyLines = &progress.result->roads;
 
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
         //  성공 시: Phase 2 게임플레이는 worldGrid::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
@@ -95,7 +84,7 @@ namespace worldGen
             grid.data.reset();   //933MB heap 즉시 회수
         }
 
-        //  Phase 4 (prepareSpawn) + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
+        //  prepareSpawn + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
         //  worldGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → worldGen 단방향 의존),
         //  스폰 주변 섹터 사전 절차생성은 호출자 측 책임.
     }

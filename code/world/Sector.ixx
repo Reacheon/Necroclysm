@@ -219,7 +219,6 @@ private:
 //
 //   3×3 섹터: SectorCache::requestAsync — sector procgen 비동기 큐잉
 //             섹터 한 변 3840타일 마진 → 워커가 끝낼 시간 충분.
-//   5×5 섹터 내 도시 layout: TODO (CityLayoutCache 추가 시)
 //
 //   idempotent — 매 호출 캐시 히트가 정상.
 
@@ -237,6 +236,4 @@ export void loadNearbySectors(Point3 playerTile, std::uint64_t worldSeed)
                 worldSeed);
         }
     }
-
-    //5×5 외곽 — 도시 layout precompute (TODO: CityLayoutCache)
 }

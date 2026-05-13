@@ -402,6 +402,12 @@
     <ClCompile Include="code\util\sgn.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\spatialHash.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\dsu.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
     <ClCompile Include="code\util\stringToWstring.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -851,9 +857,6 @@
     </ClCompile>
     <ClCompile Include="code\cityLayout_build.cpp">
       <Filter>소스 파일\05_Class\03_World\City</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen_buildCityLayouts.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
     </ClCompile>
     <ClCompile Include="code\world\Sector_procGenerate.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>

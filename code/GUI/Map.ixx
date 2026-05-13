@@ -16,6 +16,7 @@ import Player;
 import World;
 import TileData;
 import worldGrid;
+import worldGen;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
@@ -102,6 +103,7 @@ namespace mappal
 
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
+    inline SDL_Color roadLine()     { return { 255, 140,  30, 255 }; }  // 광역 도로 폴리라인 오버레이
 
     // UI 크롬
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
@@ -448,7 +450,73 @@ static void drawTileSpriteLayer(const MapView& v)
     flush();
 }
 
-// (3) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
+// (3) 도로 폴리라인 오버레이 — buildRoadNetwork 가 생성한 도시간 광역 도로.
+//     worldGen::activePolyLines 가 nullptr 이면 (월드젠 전) 스킵.
+//
+//     wrap 보정: 첫 정점만 카메라 기준 signedDeltaTileX 로 화면 좌표로 끌어오고,
+//     이후 정점은 "직전 정점 기준" signedDeltaTileX 로 누적 — 폴리라인 전체가
+//     단일 분기에서 일관되게 그려짐. (각 정점을 카메라 기준으로 독립 계산하면
+//     인접 정점이 카메라 기준 ±W/2 경계를 사이에 둘 때 한쪽은 동쪽, 다른쪽은
+//     서쪽으로 분기되어 화면을 가로지르는 가짜 선이 생긴다.)
+//
+//     verts.z == view.z 인 폴리라인만 그림 (도로는 표면 z 평면).
+static void drawRoadOverlay(const MapView& v)
+{
+    const auto* polys = worldGen::activePolyLines;
+    if (!polys || polys->empty()) return;
+
+    const SDL_Color road = mappal::roadLine();
+    const float vw = static_cast<float>(v.viewW);
+    const float vh = static_cast<float>(v.viewH);
+    constexpr float marginPx = 8.0f;
+
+    const int camX = static_cast<int>(std::floor(v.centerTileX));
+
+    auto tileYToScreen = [&](int py) -> double
+    {
+        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
+    };
+
+    for (const auto& poly : *polys)
+    {
+        if (poly.verts.size() < 2) continue;
+        if (poly.verts[0].z != v.z) continue;
+
+        //첫 정점 — 카메라 기준 최단 wrap 분기.
+        double prevSx = static_cast<double>(worldWrap::signedDeltaTileX(camX, poly.verts[0].x))
+                      * v.pxPerTile + v.viewW * 0.5;
+        double prevSy = tileYToScreen(poly.verts[0].y);
+
+        for (std::size_t i = 1; i < poly.verts.size(); ++i)
+        {
+            //직전 정점 기준 누적 — seam 가로지름 방지.
+            const int dxSeg = worldWrap::signedDeltaTileX(poly.verts[i - 1].x, poly.verts[i].x);
+            const double curSx = prevSx + static_cast<double>(dxSeg) * v.pxPerTile;
+            const double curSy = tileYToScreen(poly.verts[i].y);
+
+            //AABB 컬링 — 양 끝 모두 화면 밖이면 스킵.
+            const float minX = (float)std::min(prevSx, curSx);
+            const float maxX = (float)std::max(prevSx, curSx);
+            const float minY = (float)std::min(prevSy, curSy);
+            const float maxY = (float)std::max(prevSy, curSy);
+            if (maxX >= -marginPx && minX <= vw + marginPx &&
+                maxY >= -marginPx && minY <= vh + marginPx)
+            {
+                drawLine(
+                    static_cast<int>(std::round(prevSx)),
+                    static_cast<int>(std::round(prevSy)),
+                    static_cast<int>(std::round(curSx)),
+                    static_cast<int>(std::round(curSy)),
+                    road);
+            }
+
+            prevSx = curSx;
+            prevSy = curSy;
+        }
+    }
+}
+
+// (4) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
 static void drawPlayerMarker(const MapView& v)
 {
     double sxd = v.screenXFromTileX(PlayerX());
@@ -748,6 +816,7 @@ public:
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
         drawBiomeLayer       (view);  // mmap 활성 시에만 — 내부에서 cache.getOrBuild → budget 안에서 빌드
         drawTileSpriteLayer  (view);  // 항상 — 로드된 청크의 실제 타일 스프라이트
+        drawRoadOverlay      (view);  // 도시간 광역 도로 폴리라인 (worldGen 결과)
         drawPlayerMarker     (view);
 
         drawCoordPanel();

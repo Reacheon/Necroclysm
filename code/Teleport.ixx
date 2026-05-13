@@ -22,7 +22,6 @@ import Sector;
 //     1) 월드젠 미완료 (시작 영역) → 로딩 화면 없이 직접 이동
 //     2) 월드젠 완료 → 로딩 화면 표시 + 동기 ensure:
 //          - 섹터 절차생성 (3×3, SectorCache::getOrCompute)
-//          - 도시 layout (5×5) — TODO (CityLayoutCache)
 //          - 목적지 청크 선행 생성
 //        → EntityPtrMove → setGrid → updateVision
 //
@@ -153,17 +152,14 @@ export void teleportPlayer(Point3 dst)
     if (worldgenDone)
     {
         teleport::ensureSectorsAround(dst, worldSeed, true);
-
-        //--- 2) 도시 layout precompute (5×5) — TODO ---
-        //  CityLayoutCache가 추가되면 여기서 5×5 범위 도시 BCP 동기 실행.
     }
 
-    //--- 3) 목적지 청크 선행 생성 ---
+    //--- 2) 목적지 청크 선행 생성 ---
     teleport::ensureChunksAround(dst);
 
-    //--- 4) 이동 (EntityPtrMove → setGrid → updateNearbyChunk → ChunkPainter) ---
+    //--- 3) 이동 (EntityPtrMove → setGrid → updateNearbyChunk → ChunkPainter) ---
     EntityPtrMove(Point3{ PlayerX(), PlayerY(), PlayerZ() }, dst);
 
-    //--- 5) 시야 갱신 ---
+    //--- 4) 시야 갱신 ---
     PlayerPtr->updateVision(PlayerInfo().eyeSight);
 }

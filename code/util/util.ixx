@@ -31,3 +31,5 @@ export import timeKeeper;
 export import stringToWstring;
 export import sequenceCounter;
 export import worldWrap;
+export import spatialHash;
+export import dsu;

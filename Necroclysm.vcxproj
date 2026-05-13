@@ -274,7 +274,6 @@
     <ClCompile Include="code\worldGen_buildRoadNetwork.cpp" />
     <ClCompile Include="code\worldGen_placeCities.cpp" />
     <ClCompile Include="code\worldGen_generateWorld.cpp" />
-    <ClCompile Include="code\worldGen_buildCityLayouts.cpp" />
     <ClCompile Include="code\cityLayout.ixx" />
     <ClCompile Include="code\cityLayout_build.cpp" />
     <ClCompile Include="code\worldGrid.ixx" />
@@ -375,6 +374,8 @@
     <ClCompile Include="code\util\replaceStr.ixx" />
     <ClCompile Include="code\util\sequenceCounter.ixx" />
     <ClCompile Include="code\util\sgn.ixx" />
+    <ClCompile Include="code\util\spatialHash.ixx" />
+    <ClCompile Include="code\util\dsu.ixx" />
     <ClCompile Include="code\util\stringToWstring.ixx" />
     <ClCompile Include="code\util\ThreadPool.ixx" />
     <ClCompile Include="code\util\ProcGenWorker.ixx" />

@@ -10,12 +10,15 @@ import cityLayout;
 // worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
 //   책임:
 //     - placeCities: 3000개 도시 좌표 절차생성 (사전배치 + rejection sampling)
-//     - buildRoadNetwork: Gabriel 그래프 + hierarchical bidirectional A*로 도로 폴리라인
+//     - buildRoadNetwork: 도시간 도로 폴리라인 생성 (절차)
 //     - generateWorld: 위 단계 + worldGrid PNG 로드 + mmap 진입 순차 실행
 //   사용처:
 //     - WorldGenScreen: 워커 스레드에서 generateWorld 실행
 //     - worldSession: 결과 (WorldGenResult) 보관
 //   의존: worldGrid (Terrain, PixelCostGrid, loadWorldGrid, transitionToMmap 등)
+//
+//   참고: 도시 내부 BCP(블록 분할/내부 도로/진입점/다리)는 현재 worldGen 단계에 없음.
+//   향후 sector 단계에서 lazy 재구현 예정.
 //============================================================
 
 export namespace worldGen
@@ -37,7 +40,7 @@ export namespace worldGen
         std::vector<cityLayout::CityRect> rectangles;
         //  도시의 직사각형 분해 결과(픽셀 좌표). 절차생성 도시는 placeCities Phase 4에서
         //  쌓은 1~5개 직사각형 그대로, 사전배치 도시는 PNG 클러스터에서 역분해된 1~N개.
-        //  비어 있으면 buildCityLayouts가 layout 생략(점만 남는 도시).
+        //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음.
     };
 
     struct RoadPolyLine
@@ -45,14 +48,19 @@ export namespace worldGen
         std::vector<Point3> verts;  //실타일 좌표
     };
 
+    //활성 폴리라인 글로벌 view 포인터.
+    //  worldSession이 generateWorld 완료 후 worldGenResult.roads 주소로 세팅.
+    //  Sector_procGenerate가 도시간 도로 페인트(15타일 asphalt, 사이드워크 없음)에
+    //  사용. nullptr면 페인트 스킵 (월드젠 전 startArea 시점).
+    //
+    //  쓰기는 메인 스레드 1회, 읽기는 worker 스레드 read-only — 동기화 불필요.
+    inline const std::vector<RoadPolyLine>* activePolyLines = nullptr;
+
     //generateWorld 결과 — WorldGenProgress::result에 채워짐.
     struct WorldGenResult
     {
         std::vector<CityNode> cities;
         std::vector<RoadPolyLine> roads;
-        std::vector<cityLayout::CityLayout> layouts;
-        //  도시별 layout. cities와 1:1 대응 (인덱스 = cityIndex).
-        //  rectangles 비어 있는 도시는 layout도 비어 있음 (점만 남음).
     };
 
     //진행 단계.
@@ -61,10 +69,9 @@ export namespace worldGen
         idle         = 0, //워커 시작 전
         loadPng      = 1, //위성 PNG 디코드 중
         placeCity    = 2, //도시 좌표 배치 중
-        cityLayout   = 3, //도시 내부 BCP/도로/진입점 계산 중
-        buildRoad    = 4, //도로망 폴리라인 생성 중
-        prepareSpawn = 5, //스폰 지점 주변 섹터 사전 절차생성 중 (외부, WorldGenScreen 워커가 처리)
-        done         = 6, //모든 단계 완료(result에 채워짐)
+        buildRoad    = 3, //도로망 폴리라인 생성 중
+        prepareSpawn = 4, //스폰 지점 주변 섹터 사전 절차생성 중 (외부, WorldGenScreen 워커가 처리)
+        done         = 5, //모든 단계 완료(result에 채워짐)
     };
 
     //워커 스레드와 WorldGenScreen GUI가 공유하는 진행 상태.
@@ -87,10 +94,6 @@ export namespace worldGen
         std::mutex                  roadsMtx;
         std::vector<RoadPolyLine>   roadsSnap;
 
-        //도시 layout 진행도 — 병렬 처리라 카운터만 필요. 스냅샷은 미사용(데이터 크기 큼).
-        std::atomic<int> layoutsDone { 0 };
-        std::atomic<int> layoutsTotal{ 0 };
-
         //위성 미리보기 RGBA (worldGrid::PREVIEW_W * PREVIEW_H, R8 G8 B8 A8 little-endian).
         //  초기 alpha=0(전면 투명). 패치 1장 로드 끝날 때마다 해당 10×10 블록을
         //  alpha=0xff 색으로 갱신, 메인 스레드가 SDL_UpdateTexture로 부분 반영.
@@ -105,21 +108,15 @@ export namespace worldGen
     };
 
     //콜백 타입. default no-op — 내부에서 출력에 영향 없음(순수성 유지).
-    using CitySink   = std::function<void(const CityNode&)>;
-    using RoadSink   = std::function<void(const RoadPolyLine&)>;
-    using LayoutSink = std::function<void(std::uint32_t cityIndex)>;
-    //  layout sink는 layout 자체를 넘기지 않음 — 데이터 크기가 크고 결과는 layouts[idx]에
-    //  직접 슬롯 쓰기로 끝남. 콜백은 진행도 카운터 증가만 담당.
+    using CitySink = std::function<void(const CityNode&)>;
+    using RoadSink = std::function<void(const RoadPolyLine&)>;
 
     //placeCities는 grid를 mutate — 절차생성 도시의 폴리곤을 CityZone 픽셀로 그려 넣음.
     //  사전배치 도시는 PNG에 이미 있으니 건드리지 않음. buildRoadNetwork는 painted 결과를 봄.
     std::vector<CityNode> placeCities(std::uint64_t seed, worldGrid::PixelCostGrid& grid, CitySink onPlaced = {});
 
-    //도시별 layout(BCP 블록, 도로, 진입점, 다리)을 ThreadPool로 병렬 계산.
-    //  cities[i].rectangles가 비어 있으면 layouts[i]도 빈 CityLayout으로 채움.
-    //  cities 순서와 layouts 순서가 1:1 대응 — buildRoadNetwork가 같은 인덱스로 참조 가능.
-    std::vector<cityLayout::CityLayout> buildCityLayouts(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, LayoutSink onLayout = {});
-
+    //buildRoadNetwork — 도시간 광역 도로 폴리라인 생성.
+    //  도시 진입은 cityRegion 경계로 직교 (cardinal) 진입. BCP/진입점 의존 없음.
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
     //월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 1회 절차적 생성.

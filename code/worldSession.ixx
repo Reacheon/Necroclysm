@@ -3,7 +3,6 @@ export module worldSession;
 import std;
 import util;
 import worldGen;
-import cityLayout;
 import WorldGenScreen;
 
 //============================================================
@@ -22,7 +21,7 @@ export bool worldGenInProgress = false;
 export std::optional<worldGen::WorldGenResult> worldGenResult;
 
 //월드 절차생성에 사용된 시드. 0 = 미생성 상태.
-//  Sector procGenerate / CityLayout BCP 등 모든 후속 절차생성이 이 시드를 참조.
+//  Sector procGenerate 등 모든 후속 절차생성이 이 시드를 참조.
 //  결정론 보장 — 같은 시드면 세이브/로드 후에도 같은 plan 재생성.
 export std::uint64_t worldSeed = 0;
 
@@ -52,9 +51,9 @@ export void startWorldGen()
     new WorldGenScreen(worldSeed, SPAWN_DEFAULT, [](worldGen::WorldGenResult result)
     {
         worldGenResult = std::move(result);
-        //  Sector_procGenerate가 cityLayout::activeLayouts를 통해 도시 layout 조회.
+        //  Sector_procGenerate가 worldGen::activePolyLines 를 통해 광역 도로 폴리라인을 조회.
         //  worldGenResult가 optional이라 주소가 안정적 — clear 전까지 유효.
-        cityLayout::activeLayouts = &worldGenResult->layouts;
+        worldGen::activePolyLines = &worldGenResult->roads;
         worldGenInProgress = false;
 
         //타이틀 청크 wipe + SPAWN_DEFAULT 텔레포트.

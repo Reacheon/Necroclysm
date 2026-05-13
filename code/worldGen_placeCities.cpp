@@ -100,7 +100,7 @@ namespace worldGen
             std::vector<cityLayout::CityRect> rectangles;
             //  사전배치: Phase 0의 decomposeClusterToRects 결과. 분해 실패 시 비어 있음.
             //  절차생성: Phase 4가 페인트하면서 채움. 페인트 실패 시 비어 있음.
-            //  비어 있는 도시는 buildCityLayouts가 layout 생략 (CityNode 점만 남음).
+            //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음 (현재는 BCP 자체가 미구현).
         };
 
         //해안/강 보너스 LUT — squared Euclidean distance(실픽셀²)로 인덱싱.
@@ -137,76 +137,7 @@ namespace worldGen
             }
         };
 
-        //균등 격자 공간 해시 — 셀 크기 = R_T3.
-        //  삽입은 O(1), 충돌검사는 검색반경/셀크기 만큼의 셀만 훑음.
-        struct SpatialHash
-        {
-            int cellSize;
-            int gridW;
-            int gridH;
-            std::vector<std::vector<int>> cells;
-
-            SpatialHash(int worldW, int worldH, int cellSize_)
-                : cellSize(cellSize_)
-                , gridW((worldW + cellSize_ - 1) / cellSize_)
-                , gridH((worldH + cellSize_ - 1) / cellSize_)
-                , cells(static_cast<std::size_t>(gridW) * gridH)
-            {}
-
-            std::size_t cellIdx(int cx, int cy) const noexcept
-            {
-                return static_cast<std::size_t>(cy) * gridW + cx;
-            }
-
-            void insert(int idx, int px, int py)
-            {
-                const int cx = px / cellSize;
-                const int cy = py / cellSize;
-                cells[cellIdx(cx, cy)].push_back(idx);
-            }
-
-            //후보 (px,py,R)이 기존 도시들과 충돌하면 true.
-            //  판정: dist(A,B) < min(R_A, R_B)이면 충돌.
-            //
-            //  min을 쓰는 이유: 큰 도시(T1)는 자기 R만큼 같은 티어와 떨어져야 하지만,
-            //  작은 도시(T3)가 T1 옆에 위성으로 붙는 건 허용해야 함. min이면 각 도시가
-            //  "자기 영역만" 주장하는 셈이라 큰-작은 페어는 작은 쪽 R로 결정됨.
-            //
-            //  사전배치(CityZone)는 terrainWeight=0이라 절차생성이 그 위로 안 떨어지므로
-            //  물리적 겹침은 자동 방지. radius=boundR+buffer는 사전배치끼리의 클러스터 분리용.
-            bool conflicts(int px, int py, int R, const std::vector<CityRec>& cities) const
-            {
-                //min 룰이라 충돌 거리 ≤ R. 검색 범위도 R로 충분 — 멀리 있는 T1은
-                //min(R_candidate, R_T1) 안에 못 들어옴, T3 다트가 T1의 600px 영역을
-                //훑는 낭비를 제거(10× 이상 빨라짐).
-                const int searchCells = (R + cellSize - 1) / cellSize;
-                const int cxC = px / cellSize;
-                const int cyC = py / cellSize;
-
-                const int x0 = std::max(0, cxC - searchCells);
-                const int x1 = std::min(gridW - 1, cxC + searchCells);
-                const int y0 = std::max(0, cyC - searchCells);
-                const int y1 = std::min(gridH - 1, cyC + searchCells);
-
-                for (int cy = y0; cy <= y1; ++cy)
-                {
-                    for (int cx = x0; cx <= x1; ++cx)
-                    {
-                        for (int idx : cells[cellIdx(cx, cy)])
-                        {
-                            const CityRec& c = cities[idx];
-                            const long long dx = static_cast<long long>(c.px) - px;
-                            const long long dy = static_cast<long long>(c.py) - py;
-                            const long long d2 = dx * dx + dy * dy;
-                            //작은 R 기준 — 위성도시 패턴 허용
-                            const long long minD = std::min(R, c.radius);
-                            if (d2 < minD * minD) return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        };
+        //공간 해시는 util::SpatialHash 사용 (cellSize = R_T3). 충돌검사는 호출부 인라인.
 
         //티어별 다트 던지기 결과 누적.
         struct DartResult
@@ -728,8 +659,24 @@ namespace worldGen
                     continue;
                 }
 
-                //4. 충돌 검사
-                if (hash.conflicts(px, py, R, cities))
+                //4. 충돌 검사 — dist(A,B) < min(R_A, R_B)이면 충돌.
+                //  min 룰: 큰 도시(T1)는 자기 R만큼 같은 티어와 떨어져야 하지만, 작은 도시
+                //  (T3)가 T1 옆에 위성으로 붙는 건 허용. min이면 각 도시가 "자기 영역만"
+                //  주장 → 큰-작은 페어는 작은 쪽 R로 결정. 검색 반경 R로 충분 (멀리 있는
+                //  T1은 min(R_cand, R_T1) 안에 못 들어옴 → T3 다트가 T1의 큰 영역을
+                //  훑는 낭비 제거, 10× 이상 빠름).
+                bool conflictHit = false;
+                hash.forEachInRadius(px, py, R, [&](int idx)
+                {
+                    if (conflictHit) return;
+                    const CityRec& c = cities[idx];
+                    const long long dx = static_cast<long long>(c.px) - px;
+                    const long long dy = static_cast<long long>(c.py) - py;
+                    const long long d2 = dx * dx + dy * dy;
+                    const long long minD = std::min(R, c.radius);
+                    if (d2 < minD * minD) conflictHit = true;
+                });
+                if (conflictHit)
                 {
                     ++dr.rejectConflict;
                     continue;
