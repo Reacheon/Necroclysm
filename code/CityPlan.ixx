@@ -8,7 +8,7 @@ import city;
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
 //
 //   SectorPlan과 한 쌍: SectorPlan은 섹터 단위 PaintCell 버퍼,
-//   CityPlan은 도시 단위 추상 스켈레톤(향후 도로/블록/다리 지오메트리).
+//   CityPlan은 도시 단위 타일 래스터 — buildCityPlan이 도로/블록/다리를 타일로 구움.
 //
 //   왜 섹터가 아니라 도시 단위인가:
 //     T1 도시(베이징)는 ~120px = 5760타일 > 3840타일 섹터 → 도시가 섹터를 가로지름.
@@ -43,8 +43,8 @@ export struct CityPlan
 
     //  buildCityPlan이 채우는 "깔 타일 목록" — 플랜을 설정한다 = 여기에 push.
     //  procGenerate 4단계가 자기 섹터 범위만 잘라서 PaintCell에 블릿 (클리핑 OK).
-    //  현재 골격은 이 단순 리스트만. 향후 도로/블록/다리 지오메트리가 추가되면
-    //  도시 본체는 그쪽에서 래스터화되고 이 리스트는 특수 타일(랜드마크 등)용.
+    //  도시 본체 전체가 이 리스트 — buildCityPlan이 BCP·도로·블록·다리를 전부
+    //  타일로 구워서 push. 지오메트리 표현 없음, 래스터(타일 목록)가 곧 산출물.
     std::vector<CityTile> tiles;
 
     CityPlan() = default;
@@ -69,8 +69,8 @@ export CityPlan buildCityPlan(city::CityId id, std::uint64_t seed);
 //   설계: getOrCompute 단일 진입점 — miss면 *호출 스레드에서 즉시* buildCityPlan
 //   계산 후 캐시. 워커 위임(requestAsync) 없음 → procGenerate가 ProcGenWorker
 //   단일 스레드에서 호출해도 "자기 자신이 채울 future를 기다리는" 데드락이 원천
-//   불가능. 도시 플랜은 ~수 KB라 동기 계산으로 충분 (SectorCache의 147MB miss
-//   경로도 lock 잡고 동기 계산 — 같은 패턴).
+//   불가능. 도시 플랜은 래스터라 MB 단위(T1은 수십 MB)지만 동기 계산으로 충분
+//   (SectorCache의 147MB miss 경로도 lock 잡고 동기 계산 — 같은 패턴).
 
 export class CityPlanCache
 {
