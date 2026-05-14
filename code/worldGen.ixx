@@ -4,7 +4,6 @@ import std;
 import util;
 import worldGrid;
 import city;
-import cityLayout;
 
 //============================================================
 // worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
@@ -37,7 +36,7 @@ export namespace worldGen
         //  사전배치 도시 식별자. 매칭된 preset의 codename, 또는 절차생성/미매칭이면 none.
         //  displayName/landmark 등 도시별 메타데이터는 city::PRESET_CITIES에서 룩업.
 
-        std::vector<cityLayout::CityRect> rectangles;
+        std::vector<city::CityRect> rectangles;
         //  도시의 직사각형 분해 결과(픽셀 좌표). 절차생성 도시는 placeCities Phase 4에서
         //  쌓은 1~5개 직사각형 그대로, 사전배치 도시는 PNG 클러스터에서 역분해된 1~N개.
         //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음.
@@ -55,6 +54,12 @@ export namespace worldGen
     //
     //  쓰기는 메인 스레드 1회, 읽기는 worker 스레드 read-only — 동기화 불필요.
     inline const std::vector<RoadPolyLine>* activePolyLines = nullptr;
+
+    //활성 도시 목록 글로벌 view 포인터 — activePolyLines와 동일 패턴.
+    //  worldSession이 generateWorld 완료 후 worldGenResult.cities 주소로 세팅.
+    //  loadNearbySectors(비동기) / teleportPlayer(동기)가 CityPlan lazy 생성 트리거에 사용.
+    //  CityId = 이 벡터의 인덱스. nullptr면 스킵 (월드젠 전 startArea 시점).
+    inline const std::vector<CityNode>* activeCities = nullptr;
 
     //generateWorld 결과 — WorldGenProgress::result에 채워짐.
     struct WorldGenResult

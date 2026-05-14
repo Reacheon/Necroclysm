@@ -54,6 +54,7 @@ export void startWorldGen()
         //  Sector_procGenerate가 worldGen::activePolyLines 를 통해 광역 도로 폴리라인을 조회.
         //  worldGenResult가 optional이라 주소가 안정적 — clear 전까지 유효.
         worldGen::activePolyLines = &worldGenResult->roads;
+        worldGen::activeCities    = &worldGenResult->cities;
         worldGenInProgress = false;
 
         //타이틀 청크 wipe + SPAWN_DEFAULT 텔레포트.

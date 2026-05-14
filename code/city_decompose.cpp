@@ -1,23 +1,22 @@
-module cityLayout;
+module city;
 
 import std;
 import util;
 
 // ════════════════════════════════════════════════════════════════════════
-// cityLayout_build.cpp — decomposeClusterToRects 구현 (스텁).
+// city_decompose.cpp — decomposeClusterToRects 구현.
 //
-//   책임: 임의 모양 도시 클러스터(픽셀 마스크)를 4×4 이상 직사각형들로 분해.
-//   BCP/CityLayout/buildCityLayout 등 도시 내부 절차생성 코드는 모두 제거 — 향후 sector
-//   단계에서 lazy 재구현 예정.
+//   책임: 임의 모양 도시 클러스터(픽셀 마스크)를 minSize 이상 직사각형들로 분해.
+//        worldGen placeCities가 사전배치 도시 layout 입력으로 사용.
 //
 //   알고리즘:
 //     1단계: 수평 슬랩 분해 (O(W*H), 인라인). 사용자 painted 도형 대부분 즉시 성공.
 //     2단계: 슬랩 실패 시 백트래킹 폴백 (complete but 지수시간, budget 10M 보호).
 //
-//   결정론: 같은 입력 마스크 → 같은 직사각형 리스트.
+//   결정론: 같은 입력 마스크 -> 같은 직사각형 리스트.
 // ════════════════════════════════════════════════════════════════════════
 
-namespace cityLayout
+namespace city
 {
     namespace
     {

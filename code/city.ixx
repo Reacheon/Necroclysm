@@ -10,12 +10,13 @@ import worldGrid;
 //     - CityName: 사전배치 도시 codename enum (소스코드 식별자)
 //     - PresetCity: 사전배치 도시 메타데이터 (좌표, 이름, 기후)
 //     - PRESET_CITIES: PNG에 마킹한 ~40개 도시 하드코딩 테이블
+//     - CityId: 런타임 도시 식별자 강타입 (worldGenResult.cities 인덱스 래퍼)
+//     - CityRect + decomposeClusterToRects: 도시 픽셀 footprint 직사각형 분해
 //
 //   책임 (향후):
 //     - LandmarkType + 도시별 랜드마크 매핑 (콜로세움, 빅벤 등)
-//     - CityId 강타입 + 런타임 ID 부여
 //     - CityIndex 공간 인덱스 (sector 쿼리)
-//     - CityPolygon 추출, BCP 분할, 건물 배치 함수들
+//     - 건물 배치 함수들 (도시 내부 BCP/도로/블록은 CityPlan 모듈이 담당)
 //
 //   의존성: worldGrid (Terrain enum). worldGen 아님 — city는 worldGen *옆에서*
 //   도시 의미를 책임. worldGen이 city를 import (CityNode가 codename 필드 가짐).
@@ -82,6 +83,8 @@ export namespace city
         losAngeles,
         mexicoCity,
         saoPaulo,
+        rovaniemi,
+        oulu,
     };
 
     struct PresetCity
@@ -128,7 +131,7 @@ export namespace city
         PresetCity{ CityName::bangkok,          "Bangkok",         33673,   9150,   worldGrid::Terrain::InsularRainforest },
         PresetCity{ CityName::jakarta,          "Jakarta",         34420,  11544,   worldGrid::Terrain::InsularRainforest },
         PresetCity{ CityName::mumbai,           "Mumbai",          30346,   8519,   worldGrid::Terrain::Monsoon },
-        PresetCity{ CityName::istanbul,         "Istanbul",        25081,   5879,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::istanbul,         "Istanbul",        25081,   5869,   worldGrid::Terrain::Land },
         PresetCity{ CityName::cairo,            "Cairo",           25347,   7187,   worldGrid::Terrain::Land },
         PresetCity{ CityName::johannesburg,     "Johannesburg",    24954,  13937,   worldGrid::Terrain::Land },
         PresetCity{ CityName::moscow,           "Moscow",          25858,   3919,   worldGrid::Terrain::Land },
@@ -151,5 +154,32 @@ export namespace city
         PresetCity{ CityName::losAngeles,       "Los Angeles",      7387,   6705,   worldGrid::Terrain::Land },
         PresetCity{ CityName::mexicoCity,       "Mexico City",      9711,   8475,   worldGrid::Terrain::Land },
         PresetCity{ CityName::saoPaulo,         "Sao Paulo",       16005,  13623,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::rovaniemi,         "Rovaniemi",       24703,  2816,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::oulu,         "Oulu",       24662,  2971,   worldGrid::Terrain::Land },
     };
+
+    // ─── 런타임 도시 식별자 ───────────────────────────────────────────────
+    // worldGenResult.cities 인덱스의 강타입 래퍼. CityPlanCache 키 / CityIndex 조회에 사용.
+    // enum class라 정수·다른 인덱스와 혼용 불가. std::hash<enum>가 자동 지원 → 맵 키로 바로 사용.
+    enum class CityId : std::uint32_t {};
+
+    // ─── 직사각형 (픽셀 좌표) ─────────────────────────────────────────────
+    // 도시를 구성하는 직사각형. w/h는 항상 ≥ minSize (계획서 보장).
+    // 픽셀 좌표(1px=48타일), raw — X 시암 wrap은 호출자가 처리.
+    struct CityRect
+    {
+        int px = 0, py = 0;   // 좌상단 픽셀 좌표 (raw)
+        int w  = 0, h  = 0;   // 폭/높이 픽셀
+
+        constexpr int x1() const noexcept { return px + w; }  // exclusive
+        constexpr int y1() const noexcept { return py + h; }
+    };
+
+    // ─── 클러스터 → 직사각형 분해 ─────────────────────────────────────────
+    // PNG 클러스터링 결과(임의 모양의 City* 픽셀 집합)를 minSize 이상 직사각형들로 분해.
+    //   입력: inMask[(py-py0)*bboxW + (px-px0)] = (그 픽셀이 클러스터 소속이면 1)
+    //         (bboxPxX, bboxPxY) = bbox 좌상단 raw 픽셀 좌표.
+    //   출력: 클러스터를 완전히 덮는 (오버랩 없는) 직사각형 리스트. 분해 실패 시 빈 리스트.
+    //   알고리즘: 수평 슬랩 분해 → 실패 시 백트래킹 폴백. 결정론적. 정의는 city_decompose.cpp.
+    std::vector<CityRect> decomposeClusterToRects(const std::uint8_t* inMask, int bboxPxX, int bboxPxY, int bboxW, int bboxH, int minSize = 4);
 }

@@ -5,6 +5,8 @@ import util;
 import constVar;
 import worldGrid;
 import ProcGenWorker;
+import worldGen;
+import city;
 
 // ════════════════════════════════════════════════════════════════════════
 // Sector — 지역 절차생성 단위 (3840×3840 타일).
@@ -214,11 +216,50 @@ private:
     std::unordered_map<SectorCoord, std::shared_future<SectorPlan>, SectorCoord::Hash> cache_;
 };
 
+// ── citiesInRangeOf ─────────────────────────────────────────────────────
+// 주어진 타일 위치 기준 5×5 섹터 범위 안에 중심이 있는 도시 id 수집 (X 시암 wrap 처리).
+//
+//   T1 도시(베이징)는 ~120px = 5760타일 > 3840타일 섹터 → 도시가 섹터를 가로지름.
+//   procGenerate 4단계가 자기 섹터 중심 기준으로 호출 — 도시 footprint(≤~1섹터)가
+//   이 섹터에 닿으면 중심은 반드시 5×5 범위 안. 과다 조회분은 per-tile 클립이 거름.
+//
+//   worldGen::activeCities가 nullptr면 (월드젠 전 startArea) 빈 리스트.
+//   CityId = activeCities 인덱스. 현재 선형 스캔(~3000개) — 향후 CityIndex로 교체 가능.
+
+export std::vector<city::CityId> citiesInRangeOf(Point3 centerTile)
+{
+    std::vector<city::CityId> result;
+    if (worldGen::activeCities == nullptr) return result;
+
+    const SectorCoord cur = sectorFromTile(centerTile);
+    const auto& cities = *worldGen::activeCities;
+    for (std::size_t i = 0; i < cities.size(); ++i)
+    {
+        const Point3 c = cities[i].center;
+        if (c.z != centerTile.z) continue;
+
+        //X는 시암 wrap — 섹터 원점 타일 간 부호 거리를 섹터 폭으로 나눠 섹터 델타 산출.
+        const SectorCoord cs = sectorFromTile(c);
+        const int dSecX = worldWrap::signedDeltaTileX(
+            cur.x * SectorCoord::TILES, cs.x * SectorCoord::TILES) / SectorCoord::TILES;
+        const int dSecY = cs.y - cur.y;
+        if (std::abs(dSecX) <= 2 && std::abs(dSecY) <= 2)
+        {
+            result.push_back(static_cast<city::CityId>(i));
+        }
+    }
+    return result;
+}
+
 // ── loadNearbySectors ───────────────────────────────────────────────────
 // 플레이어 위치 변경 지점(Player::setGrid 등)에서 호출되는 통합 로딩 함수.
 //
 //   3×3 섹터: SectorCache::requestAsync — sector procgen 비동기 큐잉
 //             섹터 한 변 3840타일 마진 → 워커가 끝낼 시간 충분.
+//
+//   도시 CityPlan은 별도 프리워밍 안 함 — procGenerate 4단계가 섹터 생성 중
+//   citiesInRangeOf로 찾아 CityPlanCache::getOrCompute로 lazy 생성하므로,
+//   3×3 섹터 ensure만으로 근처 도시 플랜이 자동 커버됨.
 //
 //   idempotent — 매 호출 캐시 히트가 정상.
 

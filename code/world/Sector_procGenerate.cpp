@@ -5,6 +5,8 @@ import util;
 import constVar;
 import worldGrid;
 import worldGen;
+import city;
+import CityPlan;
 
 // ════════════════════════════════════════════════════════════════════════
 // procGenerate — Sector-level 절차생성의 단일 슈퍼함수.
@@ -388,12 +390,53 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     }
 
     //═══════════════════════════════════════════════════════════════════════
+    // 4) 도시 CityPlan 소비 — CityPlan.tiles의 floor/wall을 PaintCell에 적층 페인트.
+    //
+    //   이 섹터 근처 도시 각각의 CityPlan을 CityPlanCache::getOrCompute로 조회 —
+    //   miss면 호출 스레드(여기선 ProcGenWorker)에서 즉시 buildCityPlan 계산 후 캐시.
+    //   워커 위임이 없는 캐시라 "자기 자신이 채울 future를 기다리는" 데드락 없음.
+    //   단일 워커라 같은 도시는 1번만 계산되고 이후 섹터들은 캐시 hit.
+    //
+    //   각 CityTile을 자기 섹터 타일 범위로 클립해서 페인트 — 도시가 섹터를
+    //   가로질러도 각 섹터가 자기 부분만 칠함 (클리핑 OK). floor/wall == 0 은 스킵.
+    //
+    //   citiesInRangeOf(섹터 중심)은 5×5 섹터 범위 — 도시 footprint(≤~1섹터)가 이
+    //   섹터에 닿으면 중심은 반드시 이 범위 안. 과다 조회분은 per-tile 클립이 거름.
+    //
+    //   현재 buildCityPlan은 골격(tiles 비어 있음) — 본 루프는 동작하지만 칠할 게
+    //   아직 없음. buildCityPlan이 도로 CityTile을 채우기 시작하면 자동으로 깔린다.
+    //═══════════════════════════════════════════════════════════════════════
+    {
+        const Point3 sectorCenter{
+            sectorOriginTileX + SectorCoord::TILES / 2,
+            sectorOriginTileY + SectorCoord::TILES / 2,
+            sc.z };
+
+        for (city::CityId id : citiesInRangeOf(sectorCenter))
+        {
+            const CityPlan& cp = CityPlanCache::ins().getOrCompute(id, seed);
+            for (const CityTile& t : cp.tiles)
+            {
+                if (t.pos.z != sc.z) continue;
+                const int dx = t.pos.x - sectorOriginTileX;
+                const int dy = t.pos.y - sectorOriginTileY;
+                if (dx < 0 || dx >= SectorCoord::TILES) continue;
+                if (dy < 0 || dy >= SectorCoord::TILES) continue;
+
+                PaintCell& cell = plan.tiles[static_cast<std::size_t>(dy) * SectorCoord::TILES + dx];
+                if (t.floor) cell.floor = t.floor;
+                if (t.wall)  cell.wall  = t.wall;
+            }
+        }
+    }
+
+    //═══════════════════════════════════════════════════════════════════════
     // TODO 향후 단계 (모두 본 함수에 누적)
-    //   4) 도시 BCP — lazy 재구현 예정. cityNode.rectangles 를 이 sector 가 처음 진입할 때
-    //      BCP 실행 후 결과 캐시. 도로/사이드워크/다리/진입점 페인트는 그 결과 소비.
+    //   - buildCityPlan 본체 — BCP로 rect→블록 분할, 도로/다리 CityTile 생성
+    //     (현재 골격이라 위 4단계 루프가 실제로 칠하는 건 아직 없음)
     //   5) 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
     //   6) 폴리라인 주변 국도 분기 — 1티어 도로에서 갈라지는 마이너 도로망
-    //   7) 도시 BCP 블록 → 건물 prefab 페인트
+    //   7) CityPlan에 itemStack/vehicle/prop/entity 스폰 레인 추가
     //   8) Bridge 후처리 보강 — 폴리라인↔수계 교차 시 다리 텍스처
     //═══════════════════════════════════════════════════════════════════════
 

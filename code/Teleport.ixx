@@ -149,6 +149,8 @@ export void teleportPlayer(Point3 dst)
     }
 
     //--- 1) 섹터 절차생성 동기 (3×3) — 월드젠 완료 시만 ---
+    //   도시 CityPlan은 ensureSectorsAround 안의 procGenerate 4단계가 lazy 생성하므로
+    //   별도 ensure 불필요.
     if (worldgenDone)
     {
         teleport::ensureSectorsAround(dst, worldSeed, true);

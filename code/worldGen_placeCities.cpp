@@ -5,7 +5,6 @@ module worldGen;
 
 import std;
 import util;
-import cityLayout;
 
 using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
 
@@ -63,7 +62,7 @@ namespace worldGen
         //절차생성 + 사전배치 합산 목표 도시 수 (≈ 3000, 근사치).
         constexpr int TARGET_T1 = 50;
         constexpr int TARGET_T2 = 350;
-        constexpr int TARGET_T3 = 2600;
+        constexpr int TARGET_T3 = 4000;
 
         //사전배치 도시의 티어 분류 (CityZone 픽셀 면적 기준).
         constexpr int PRE_MARKED_T1_AREA = 800;   // 약 28×28 픽셀 이상 → 대도시
@@ -97,7 +96,7 @@ namespace worldGen
             Terrain climate;
             city::CityName codename;   // 사전배치 매칭된 codename, 절차생성/미매칭은 none.
 
-            std::vector<cityLayout::CityRect> rectangles;
+            std::vector<city::CityRect> rectangles;
             //  사전배치: Phase 0의 decomposeClusterToRects 결과. 분해 실패 시 비어 있음.
             //  절차생성: Phase 4가 페인트하면서 채움. 페인트 실패 시 비어 있음.
             //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음 (현재는 BCP 자체가 미구현).
@@ -361,7 +360,7 @@ namespace worldGen
                 //   "강이나 바다 픽셀은 사각형 분리에 안 써도 됨"). CityRiver/CitySea는 BFS 클러스터링
                 //   에서 두 직사각형을 묶는 역할이지만 decomposition에서는 제외 — 강이 가로지르는
                 //   Seoul/NY/Hongkong 같은 도시도 north/south 직사각형으로 깔끔히 분리됨.
-                std::vector<cityLayout::CityRect> rects;
+                std::vector<city::CityRect> rects;
                 const int bboxW = maxX - minX + 1;
                 const int bboxH = maxY - minY + 1;
                 if (bboxW >= 4 && bboxH >= 4)
@@ -387,7 +386,7 @@ namespace worldGen
                             mask[static_cast<std::size_t>(cy - minY) * bboxW + (cx - minX)] = 1;
                         }
                     }
-                    rects = cityLayout::decomposeClusterToRects(mask.data(), minX, minY, bboxW, bboxH, 4);
+                    rects = city::decomposeClusterToRects(mask.data(), minX, minY, bboxW, bboxH, 4);
                     if (rects.empty())
                     {
                         const SDL_Color warn{ 0xff, 0xa0, 0x60, 0xff };
@@ -636,7 +635,7 @@ namespace worldGen
                 case Terrain::Land:                  base = 1.00; break;
                 case Terrain::Monsoon:               base = 0.75; break;
                 case Terrain::InsularRainforest:     base = 0.70; break;  //수라바야·세부·반둥·다낭급 2차 도시. 수도(자카르타·마닐라 등)는 PNG 사전배치 별개
-                case Terrain::Subarctic:             base = 0.30; break;
+                case Terrain::Subarctic:             base = 0.60; break;
                 case Terrain::ContinentalRainforest: base = 0.08; break;  //아마존/콩고 내륙 — 강가 사전배치(마나우스 등)는 별개
                 case Terrain::Desert:                base = 0.10; break;
                 case Terrain::Tundra:                base = 0.02; break;
@@ -958,13 +957,13 @@ namespace worldGen
                 for (const Rect& r : mine) doPaint(r);
                 totalRectsPainted += mine.size();
 
-                //  cityLayout 입력용 — mine을 CityRec.rectangles에 복사 (Rect → cityLayout::CityRect).
-                //  X wrap은 후속 cityLayout 단계가 raw 좌표 그대로 처리하므로 여기서는 변환 X.
+                //  CityPlan 입력용 — mine을 CityRec.rectangles에 복사 (Rect → city::CityRect).
+                //  X wrap은 후속 CityPlan 단계가 raw 좌표 그대로 처리하므로 여기서는 변환 X.
                 auto& dstRects = cities[i].rectangles;
                 dstRects.reserve(mine.size());
                 for (const Rect& r : mine)
                 {
-                    dstRects.push_back(cityLayout::CityRect{ r.x, r.y, r.w, r.h });
+                    dstRects.push_back(city::CityRect{ r.x, r.y, r.w, r.h });
                 }
 
                 //중심 픽셀 = CityCenter (방금 칠한 CityZone 위에만)
