@@ -256,7 +256,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
-    // 5. 물타일과 인접한 세그먼트들 제거
+    // 5. 물타일과 인접한 세그먼트들 제거 (진입점은 보존)
     //══════════════════════════════════════════════════════════════════
 
     auto terrainAtTile = [&](Point3 tile) -> worldGrid::Terrain {
@@ -265,6 +265,8 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         return cityPixelAt({ px, py, tile.z });
         };
 
+    std::unordered_set<Point3, Point3::Hash> entrySet;
+    for (const auto& [ep, cd] : entryPoints) entrySet.insert(ep);
 
     for (int i = 0; i <= 1; i++)
     {
@@ -272,6 +274,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         {
 
             std::erase_if(segments, [&](const worldGen::RoadPolyLine& seg) {
+                if (entrySet.contains(seg.verts[0]) || entrySet.contains(seg.verts[1])) return false;
                 const Point3 outside{ seg.verts[i].x + del, seg.verts[i].y, seg.verts[i].z };
                 const auto t = terrainAtTile(outside);
                 return t == worldGrid::Terrain::CityRiver
@@ -283,6 +286,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
 
             std::erase_if(segments, [&](const worldGen::RoadPolyLine& seg) {
+                if (entrySet.contains(seg.verts[0]) || entrySet.contains(seg.verts[1])) return false;
                 const Point3 outside{ seg.verts[i].x, seg.verts[i].y + del, seg.verts[i].z };
                 const auto t = terrainAtTile(outside);
                 return t == worldGrid::Terrain::CityRiver
@@ -295,8 +299,226 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
-    // 6. 블록 생성 시작
+    // 6. 그래프 생성 및 플래그 할당
     //══════════════════════════════════════════════════════════════════
+
+    struct Graph 
+    {
+        std::vector<Point3> nodeCoord;                       //노드점 위치들
+        std::vector<std::array<int, 2>> edgeToNodes;         //입력한 엣지의 양끝 노드점
+        std::vector<std::vector<int>> adjacency;             //특정 점에서 뻗어나가는(연결된) 엣지들
+        std::vector<bool> edgeAlive;                         // 임시 제거용 플래그
+        std::vector<bool> edgePreserved;                     // 보존대상 마킹
+    };
+
+    Graph graph;
+    
+    // 좌표 → 노드ID 매핑 (중복 좌표 통합)
+    std::unordered_map<Point3, int, Point3::Hash> coordToNode;
+    auto getOrCreateNode = [&](Point3 p) {
+        auto [it, inserted] = coordToNode.try_emplace(p, static_cast<int>(graph.nodeCoord.size()));
+        if (inserted) {
+            graph.nodeCoord.push_back(p);
+            graph.adjacency.emplace_back();
+        }
+        return it->second;
+        };
+
+    // segments → 그래프 변환
+    for (size_t i = 0; i < segments.size(); ++i)
+    {
+        const int a = getOrCreateNode(segments[i].verts[0]);
+        const int b = getOrCreateNode(segments[i].verts[1]);
+        const int e = static_cast<int>(graph.edgeToNodes.size());
+        graph.edgeToNodes.push_back({ a, b });
+        graph.adjacency[a].push_back(e);
+        graph.adjacency[b].push_back(e);
+        graph.edgeAlive.push_back(true);
+        graph.edgePreserved.push_back(false);
+    }
+
+    //── 6.2 강변/해안 도로 보존 플래그 설정 ──────────────────────────────────────
+
+    auto isWater = [](worldGrid::Terrain t) {
+        return t == worldGrid::Terrain::River
+            || t == worldGrid::Terrain::Sea
+            || t == worldGrid::Terrain::Lake
+            || t == worldGrid::Terrain::CityRiver
+            || t == worldGrid::Terrain::CitySea;
+        };
+
+    for (size_t e = 0; e < segments.size(); ++e)
+    {
+        const auto& seg = segments[e];
+        const Point3& a = seg.verts[0];
+        const Point3& b = seg.verts[1];
+        const bool horizontal = (a.y == b.y);
+
+        //세그먼트가 지나는 픽셀 범위 산출
+        const int x0 = std::min(a.x, b.x);
+        const int x1 = std::max(a.x, b.x);
+        const int y0 = std::min(a.y, b.y);
+        const int y1 = std::max(a.y, b.y);
+        const int px0 = (x0 - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
+        const int px1 = (x1 - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
+        const int py0 = (y0 - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+        const int py1 = (y1 - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+
+        bool preserve = false;
+        if (horizontal)
+        {
+            //수평선: 픽셀 행 py0의 상하 픽셀(py-1, py+1) 검사
+            for (int px = px0; px <= px1 && !preserve; ++px)
+            {
+                if (isWater(cityPixelAt({ px, py0 - 1, a.z }))) preserve = true;
+                if (isWater(cityPixelAt({ px, py0 + 1, a.z }))) preserve = true;
+            }
+        }
+        else
+        {
+            //수직선: 픽셀 컬럼 px0의 좌우 픽셀(px-1, px+1) 검사
+            for (int py = py0; py <= py1 && !preserve; ++py)
+            {
+                if (isWater(cityPixelAt({ px0 - 1, py, a.z }))) preserve = true;
+                if (isWater(cityPixelAt({ px0 + 1, py, a.z }))) preserve = true;
+            }
+        }
+
+        if (preserve) graph.edgePreserved[e] = true;
+    }
+
+    //── 6.3 진입점 연결 도로 보존 플래그 설정 ────────────────────────────────────
+    // 진입점 분할선은 지터링이 발생하지 않으므로 완전 일치만 파악하면 OK
+
+    for (const auto& [ep, cd] : entryPoints)
+    {
+        auto it = coordToNode.find(ep);
+        if (it == coordToNode.end()) continue;
+        for (int e : graph.adjacency[it->second])
+        {
+            graph.edgePreserved[e] = true;
+        }
+    }
+
+    //══════════════════════════════════════════════════════════════════
+    // 7. 다트던지기로 세그먼트 제거 시작
+    //══════════════════════════════════════════════════════════════════
+
+    //── 7.1 주요 상수 설정 ────────────────────────────────────
+
+    constexpr double CITY_OUTSKIRTS_REMOVE_P = 0.05; //도시 외곽의 세그먼트 제거확률
+    constexpr double CITY_CENTER_REMOVE_P = 0.40; //도시 중심의 세그먼트 제거확률
+    constexpr double CITY_REMOVE_FALLOFF_COEFF = 2.0; //도시 외곽-중심 사이의 감쇠상수
+    constexpr double CITY_RECT_MIN_SEG_RATIO = 0.50; //사각형 하나의 최소 세그먼트 비율
+
+    std::vector<size_t> order(segments.size());
+    std::iota(order.begin(), order.end(), 0);
+    std::shuffle(order.begin(), order.end(), rng);
+    
+    const int maxDist = std::max(cityWidth, cityHeight) * worldGrid::TILES_PER_PIXEL;
+
+
+
+    //── 7.2 사각형별 카운트 파라미터 설정 ────────────────────────────────────
+
+    std::vector<int> rectInitSegCount(node.rectangles.size(), 0);    // 초기 세그먼트 수
+    std::vector<int> rectRemovedSegCount(node.rectangles.size(), 0); // 제거 누적 카운트
+
+    //@brief 세그먼트를 입력하면 어느 직사각형인지를 반환, 없으면 -1
+    auto segToRectIndex = [&](const worldGen::RoadPolyLine& seg) -> int {
+        const int midX = (seg.verts[0].x + seg.verts[1].x) / 2;
+        const int midY = (seg.verts[0].y + seg.verts[1].y) / 2;
+        const int px = (midX - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
+        const int py = (midY - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+        for (size_t i = 0; i < node.rectangles.size(); ++i)
+        {
+            const auto& r = node.rectangles[i];
+            if (px >= r.px && px < r.x1() && py >= r.py && py < r.y1())
+                return static_cast<int>(i);
+        }
+        return -1;
+        };
+
+    for (const auto& seg : segments)
+    {
+        const int ri = segToRectIndex(seg);
+        if (ri >= 0) ++rectInitSegCount[ri];
+    }
+
+
+    //── 7.3 엣지 제거 시 끝점 간 연결성 검사 람다 ────────────────────────────────────
+
+    auto removalKeepsEndpointsConnected = [&](int e) -> bool {
+        const int u = graph.edgeToNodes[e][0];
+        const int v = graph.edgeToNodes[e][1];
+
+        std::vector<bool> visited(graph.nodeCoord.size(), false);
+        std::queue<int> q;
+        q.push(u);
+        visited[u] = true;
+
+        while (!q.empty())
+        {
+            const int cur = q.front(); q.pop();
+            if (cur == v) return true;
+
+            for (int ei : graph.adjacency[cur])
+            {
+                if (ei == e) continue;             //제거 후보 엣지 무시
+                if (!graph.edgeAlive[ei]) continue; //이미 제거된 엣지 무시
+                const int next = (graph.edgeToNodes[ei][0] == cur) ? graph.edgeToNodes[ei][1] : graph.edgeToNodes[ei][0];
+                if (!visited[next]) { visited[next] = true; q.push(next); }
+            }
+        }
+        return false;
+        };
+
+    //── 7.4 세그먼트 랜덤 제거 플래그 설정 ────────────────────────────────────
+    for (size_t idx : order)
+    {
+        const size_t e = idx;  // edgeId == segments 인덱스
+
+        //── 게이트 ① 보존대상 ──
+        if (graph.edgePreserved[e]) continue;
+
+        //── 게이트 ② rect 인덱스 + 최소 비율 ──
+        const int ri = segToRectIndex(segments[idx]);
+        if (ri < 0) continue;
+        const int alive = rectInitSegCount[ri] - rectRemovedSegCount[ri];
+        const int minAlive = static_cast<int>(rectInitSegCount[ri] * CITY_RECT_MIN_SEG_RATIO);
+        if (alive <= minAlive) continue;
+
+        //── 게이트 ③ 거리 기반 확률 ──
+        const double midX = (segments[idx].verts[0].x + segments[idx].verts[1].x) * 0.5;
+        const double midY = (segments[idx].verts[0].y + segments[idx].verts[1].y) * 0.5;
+        const double dx = midX - node.center.x;
+        const double dy = midY - node.center.y;
+        const double d = std::sqrt(dx * dx + dy * dy);
+        const double t = std::clamp(d / maxDist, 0.0, 1.0);
+        const double p = CITY_OUTSKIRTS_REMOVE_P + (CITY_CENTER_REMOVE_P - CITY_OUTSKIRTS_REMOVE_P) * std::pow(1.0 - t, CITY_REMOVE_FALLOFF_COEFF);
+        if (std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= p)  continue;
+
+        //── 게이트 ④ 연결성 검사 ──
+        //  엣지 e 제거 시 끝점 두 노드가 여전히 다른 경로로 연결되어 있으면 제거 OK.
+        if (removalKeepsEndpointsConnected(static_cast<int>(e)))
+        {
+            graph.edgeAlive[e] = false;  // 제거 확정
+            ++rectRemovedSegCount[ri];
+        }
+    }
+
+
+    //── 7.5 제거 플래그 있는 도로 제거(동기화) ────────────────────────────────────
+    {
+        std::vector<worldGen::RoadPolyLine> alive;
+        alive.reserve(segments.size());
+        for (size_t i = 0; i < segments.size(); ++i)
+        {
+            if (graph.edgeAlive[i]) alive.push_back(std::move(segments[i]));
+        }
+        plan.segments = std::move(alive);
+    }
+
 
     return plan;
 }

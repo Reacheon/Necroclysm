@@ -17,6 +17,9 @@ import World;
 import TileData;
 import worldGrid;
 import worldGen;
+import city;
+import CityPlan;
+import worldSession;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
@@ -85,7 +88,7 @@ namespace mappal
         case worldGrid::Terrain::Sea:                   return {  85, 132, 173, 255 };  // sea blue
         case worldGrid::Terrain::River:                 return { 137, 180, 200, 255 };  // light blue
         case worldGrid::Terrain::Lake:                  return { 111, 106, 184, 255 };  // purple-blue
-        case worldGrid::Terrain::CityZone:              return { 230, 226, 218, 255 };  // city light
+        case worldGrid::Terrain::CityZone:              return { 162, 162, 162, 255 };  // city gray (#a2a2a2)
         case worldGrid::Terrain::CityCenter:            return { 255,  96,  96, 255 };  // city center red
         case worldGrid::Terrain::CityRiver:             return { 166, 193, 234, 255 };  // city river
         case worldGrid::Terrain::CitySea:               return { 115, 112, 184, 255 };  // city sea (strait)
@@ -104,6 +107,7 @@ namespace mappal
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
     inline SDL_Color roadLine()     { return { 255, 140,  30, 255 }; }  // 광역 도로 폴리라인 오버레이
+    inline SDL_Color cityRoadLine() { return { 255, 220,  80, 255 }; }  // 도시 내부 도로 세그먼트 (debug)
 
     // UI 크롬
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
@@ -516,6 +520,116 @@ static void drawRoadOverlay(const MapView& v)
     }
 }
 
+// (3.5) 도시 내부 도로 오버레이 (debug) — buildCityPlan이 생성한 살아남은 segments.
+//       이미 캐시된 도시(CityPlanCache::peek 성공)만 그림. 미캐시 도시는 스킵 —
+//       대도시 일괄 계산은 비용 크니까 플레이어가 근처로 갈 때 자동 캐시되는 패턴 유지.
+//
+//       각 세그먼트는 2점 라인. 광역 도로처럼 누적 wrap 불필요 — 한 도시 안의
+//       세그먼트라 길이가 짧고 seam을 가로지를 일 거의 없음. 단순히 양 끝점을
+//       카메라 기준으로 각각 wrap-clamp 해서 그림.
+static void drawCityRoadOverlay(const MapView& v)
+{
+    const auto* cities = worldGen::activeCities;
+    if (!cities || cities->empty()) return;
+
+    const SDL_Color color = mappal::cityRoadLine();
+    const float vw = static_cast<float>(v.viewW);
+    const float vh = static_cast<float>(v.viewH);
+    constexpr float marginPx = 8.0f;
+
+    const int camX = static_cast<int>(std::floor(v.centerTileX));
+
+    auto tileYToScreen = [&](int py) -> double
+    {
+        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
+    };
+
+    //── 디버그 카운터 (60프레임당 1회 콘솔 출력) ──
+    static int dbgFrameCount = 0;
+    const bool dbgPrint = (++dbgFrameCount % 60 == 0);
+    int dbgCached = 0;
+    int dbgTotalSegs = 0;
+    int dbgDrawn = 0;
+    int dbgWrongZ = 0;
+    int dbgClipped = 0;
+    int dbgComputedThisFrame = 0;
+
+    //── 가시 도시 force-compute (프레임당 1개 한도) ──
+    //  가시 영역 안 city.center 가까이 있고 캐시 없으면 즉시 buildCityPlan.
+    //  T1 도시는 수십~수백 ms 소요 가능 — 프레임당 1개로 stutter 제한.
+    //  플레이어가 도시 근처로 이동하면 자연 캐시되니까 이건 디버그 시각화 보조용.
+    constexpr int COMPUTE_BUDGET_PER_FRAME = 1;
+    constexpr int CITY_VIS_MARGIN_TILES = 8000;  // 가장 큰 도시 베이징(~5760타일) 커버
+
+    for (std::size_t i = 0; i < cities->size(); ++i)
+    {
+        const auto cityId = static_cast<city::CityId>(i);
+        const auto& cn = (*cities)[i];
+
+        //가시 검사 — city.center가 view 영역 (+margin) 안인지
+        const int dxFromCam = worldWrap::signedDeltaTileX(camX, cn.center.x);
+        const double sxd = static_cast<double>(dxFromCam) * v.pxPerTile + v.viewW * 0.5;
+        const double syd = (static_cast<double>(cn.center.y) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
+        const double marginPxScreen = CITY_VIS_MARGIN_TILES * v.pxPerTile;
+        const bool inView = (sxd + marginPxScreen >= 0) && (sxd - marginPxScreen <= v.viewW)
+                         && (syd + marginPxScreen >= 0) && (syd - marginPxScreen <= v.viewH);
+        if (!inView) continue;
+
+        const CityPlan* plan = CityPlanCache::ins().peek(cityId);
+        if (!plan)
+        {
+            if (dbgComputedThisFrame >= COMPUTE_BUDGET_PER_FRAME) continue;  // 예산 초과
+            plan = &CityPlanCache::ins().getOrCompute(cityId, worldSeed);
+            ++dbgComputedThisFrame;
+        }
+        ++dbgCached;
+        dbgTotalSegs += static_cast<int>(plan->segments.size());
+
+        for (const auto& seg : plan->segments)
+        {
+            if (seg.verts.size() < 2) continue;
+            if (seg.verts[0].z != v.z) { ++dbgWrongZ; continue; }
+
+            //양 끝점을 카메라 기준 최단 wrap 분기로 화면 좌표 산출.
+            //  세그먼트가 짧아서 양 끝이 모두 같은 wrap 분기로 떨어짐 → 누적 보정 불필요.
+            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, seg.verts[0].x))
+                             * v.pxPerTile + v.viewW * 0.5;
+            const double syA = tileYToScreen(seg.verts[0].y);
+
+            const int dxSeg = worldWrap::signedDeltaTileX(seg.verts[0].x, seg.verts[1].x);
+            const double sxB = sxA + static_cast<double>(dxSeg) * v.pxPerTile;
+            const double syB = tileYToScreen(seg.verts[1].y);
+
+            //AABB 컬링
+            const float minX = (float)std::min(sxA, sxB);
+            const float maxX = (float)std::max(sxA, sxB);
+            const float minY = (float)std::min(syA, syB);
+            const float maxY = (float)std::max(syA, syB);
+            if (maxX >= -marginPx && minX <= vw + marginPx &&
+                maxY >= -marginPx && minY <= vh + marginPx)
+            {
+                drawLine(
+                    static_cast<int>(std::round(sxA)),
+                    static_cast<int>(std::round(syA)),
+                    static_cast<int>(std::round(sxB)),
+                    static_cast<int>(std::round(syB)),
+                    color);
+                ++dbgDrawn;
+            }
+            else
+            {
+                ++dbgClipped;
+            }
+        }
+    }
+
+    if (dbgPrint)
+    {
+        prt(L"[CityRoadOverlay] visCities=%d  segs(total=%d drawn=%d wrongZ=%d clipped=%d)  view.z=%d  computed_this_frame=%d  cache.total=%zu\n",
+            dbgCached, dbgTotalSegs, dbgDrawn, dbgWrongZ, dbgClipped, v.z, dbgComputedThisFrame, CityPlanCache::ins().size());
+    }
+}
+
 // (4) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
 static void drawPlayerMarker(const MapView& v)
 {
@@ -817,6 +931,7 @@ public:
         drawBiomeLayer       (view);  // mmap 활성 시에만 — 내부에서 cache.getOrBuild → budget 안에서 빌드
         drawTileSpriteLayer  (view);  // 항상 — 로드된 청크의 실제 타일 스프라이트
         drawRoadOverlay      (view);  // 도시간 광역 도로 폴리라인 (worldGen 결과)
+        drawCityRoadOverlay  (view);  // 도시 내부 도로 세그먼트 (CityPlan 캐시된 도시만)
         drawPlayerMarker     (view);
 
         drawCoordPanel();

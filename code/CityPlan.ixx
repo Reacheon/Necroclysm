@@ -3,6 +3,7 @@ export module CityPlan;
 import std;
 import util;
 import city;
+import worldGen;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
@@ -46,6 +47,12 @@ export struct CityPlan
     //  도시 본체 전체가 이 리스트 — buildCityPlan이 BCP·도로·블록·다리를 전부
     //  타일로 구워서 push. 지오메트리 표현 없음, 래스터(타일 목록)가 곧 산출물.
     std::vector<CityTile> tiles;
+
+    //  살아남은 도시 내부 도로 세그먼트 — Map 오버레이 디버그 시각화용.
+    //  buildCityPlan 7.5에서 다트 던지기 후 남은 segments를 그대로 이동.
+    //  각 segment.verts는 항상 2점 (양 끝). 도시당 수천 개라 메모리 추가는 있지만
+    //  도로 분할 알고리즘 디버깅에 시각 확인이 필수라 보관.
+    std::vector<worldGen::RoadPolyLine> segments;
 
     CityPlan() = default;
     explicit CityPlan(city::CityId id_) noexcept : id(id_) {}
@@ -95,6 +102,17 @@ public:
             it = cache_.emplace(id, buildCityPlan(id, seed)).first;
         }
         return it->second;
+    }
+
+    //비계산 조회 — 캐시에 있으면 포인터, 없으면 nullptr. miss여도 *생성 안 함*.
+    //  Map 오버레이가 "이미 생성된 도시만" 그리는 용도. peek 결과 ref는
+    //  evict/clear 전까지 valid (unordered_map 원소 주소 안정성 보장).
+    const CityPlan* peek(city::CityId id) const
+    {
+        std::lock_guard lk(mtx_);
+        auto it = cache_.find(id);
+        if (it == cache_.end()) return nullptr;
+        return &it->second;
     }
 
     void evict(city::CityId id)

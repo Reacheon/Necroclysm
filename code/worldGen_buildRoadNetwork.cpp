@@ -1247,30 +1247,36 @@ namespace worldGen
                         };
                     };
 
-                //도시 픽셀 안 진입쪽 가장자리 타일 — 폴리라인 양 끝 vert 가 도시 픽셀 안까지 닿게 연장.
-                //  진입축(step!=0)은 픽셀 가장자리(0 또는 47), 직교축은 픽셀 중심 anchor(24)로
-                //  일반 vert(=pxToTile) 와 동일 anchor 유지 → strut 직각성과 정합.
-                //  TILES_PER_PIXEL 이 짝수라 "정확한 중심" 은 없지만 모든 vert 가 동일 anchor 를
-                //  쓰는 한 직각 격자 정합은 보장됨.
-                auto entryTileInCity = [](int cityPx, int cityPy, int z, int stepX, int stepY) noexcept -> Point3
+                //도시 가장자리 1타일 안쪽 — 외부 도로가 도시 안으로 정확히 1타일만 진입.
+                //  ce.pixel = 첫 비-도시 픽셀(도시 바깥 1픽셀). 한 픽셀 안쪽(step 반대 방향)으로
+                //  들어가면 도시의 가장자리 픽셀(마지막 city 픽셀). 그 픽셀의 바깥쪽(step 방향)
+                //  끝 타일에 vert 배치 → 도로 끝점이 도시 가장자리 1타일에 정확히 박힘.
+                //
+                //  CityPlan_build의 entryPoints가 이 좌표를 받아 도시 내부 segment의 노드와
+                //  좌표 정합 → 6.3 진입점 보존이 정상 동작 → 내부 도로망이 광역 도로와 자연 연결.
+                //
+                //  직교축(step==0)은 픽셀 중심 anchor(24) — 일반 vert(=pxToTile) 와 정합.
+                auto cityEdgeTileForRoad = [](const CityEntry& ce) noexcept -> Point3
                     {
-                        const int localX = (stepX > 0) ? 0 : (stepX < 0) ? (TILES_PER_PIXEL - 1) : TILES_PER_PIXEL / 2;
-                        const int localY = (stepY > 0) ? 0 : (stepY < 0) ? (TILES_PER_PIXEL - 1) : TILES_PER_PIXEL / 2;
+                        const int cityPx = ce.pixel.x - ce.stepX;
+                        const int cityPy = ce.pixel.y - ce.stepY;
+                        const int localX = (ce.stepX > 0) ? (TILES_PER_PIXEL - 1) : (ce.stepX < 0) ? 0 : TILES_PER_PIXEL / 2;
+                        const int localY = (ce.stepY > 0) ? (TILES_PER_PIXEL - 1) : (ce.stepY < 0) ? 0 : TILES_PER_PIXEL / 2;
                         return Point3{
                             cityPx * TILES_PER_PIXEL + TILE_BASE_X + localX,
                             cityPy * TILES_PER_PIXEL + TILE_BASE_Y + localY,
-                            z
+                            ce.pixel.z
                         };
                     };
 
                 RoadPolyLine line;
                 line.verts.reserve(simp.size() + 2);
-                line.verts.push_back(entryTileInCity(cps[e.a].px, cps[e.a].py, cps[e.a].z, ceA.stepX, ceA.stepY));
+                line.verts.push_back(cityEdgeTileForRoad(ceA));
                 for (std::size_t k = 0; k < simp.size(); ++k)
                 {
                     line.verts.push_back(pxToTile(simp[k].x, simp[k].y, simp[k].z));
                 }
-                line.verts.push_back(entryTileInCity(cps[e.b].px, cps[e.b].py, cps[e.b].z, ceB.stepX, ceB.stepY));
+                line.verts.push_back(cityEdgeTileForRoad(ceB));
 
                 {
                     std::lock_guard<std::mutex> lk(resultsMtx);
