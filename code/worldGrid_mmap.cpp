@@ -1,7 +1,14 @@
 module;
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
+#ifdef _WIN32
+    #define WIN32_LEAN_AND_MEAN
+    #define NOMINMAX
+    #include <windows.h>
+#else
+    #include <sys/mman.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
 
 module worldGrid;
 
@@ -10,8 +17,10 @@ import util;
 
 //============================================================
 // mmap 픽셀 그리드 — Phase 1 후 진입, Phase 2 게임플레이 픽셀 접근.
-//   세션 임시 파일 (map/worldPixels.bin) → CreateFileMapping → MapViewOfFile.
-//   접근 패턴: 플레이어 주변 페이지(4KB)만 OS가 lazy 로드, 콜드 페이지 자동 evict.
+//   세션 임시 파일 (map/worldPixels.bin) → 파일 매핑 → 가상메모리 뷰.
+//   Windows: CreateFileMapping + MapViewOfFile / POSIX: mmap(2).
+//   동일한 OS 페이지 캐시 메커니즘 — 플레이어 주변 페이지(4KB)만 lazy 로드,
+//   콜드 페이지 자동 evict. 성능 특성은 두 플랫폼 동일.
 //============================================================
 namespace worldGrid
 {
@@ -26,10 +35,16 @@ namespace worldGrid
         }
 
         //전역 mmap 상태. shutdown 시까지 유지.
+        //Windows: 파일/매핑 핸들 두 개 / POSIX: fd 하나 + munmap에 필요한 size.
         struct MmapState
         {
+#ifdef _WIN32
             HANDLE         hFile   = INVALID_HANDLE_VALUE;
             HANDLE         hMap    = nullptr;
+#else
+            int            fd      = -1;
+            std::size_t    size    = 0;     //munmap 인자용 (POSIX는 length 명시 필수)
+#endif
             const Terrain* base    = nullptr;
 
             bool active() const noexcept { return base != nullptr; }
@@ -69,6 +84,7 @@ namespace worldGrid
         //파일을 read-only mmap 진입. 실패 시 모든 핸들 정리 후 false.
         bool openMmap(const std::filesystem::path& path, MmapState& s)
         {
+#ifdef _WIN32
             const std::wstring wpath = path.wstring();
 
             s.hFile = CreateFileW(
@@ -106,10 +122,37 @@ namespace worldGrid
 
             s.base = static_cast<const Terrain*>(view);
             return true;
+#else
+            //POSIX: open → fstat(size) → mmap. 핸들 하나(fd)만 유지.
+            s.fd = ::open(path.c_str(), O_RDONLY);
+            if (s.fd < 0) return false;
+
+            struct stat st{};
+            if (::fstat(s.fd, &st) != 0)
+            {
+                ::close(s.fd);
+                s.fd = -1;
+                return false;
+            }
+            s.size = static_cast<std::size_t>(st.st_size);
+
+            void* view = ::mmap(nullptr, s.size, PROT_READ, MAP_SHARED, s.fd, 0);
+            if (view == MAP_FAILED)
+            {
+                ::close(s.fd);
+                s.fd   = -1;
+                s.size = 0;
+                return false;
+            }
+
+            s.base = static_cast<const Terrain*>(view);
+            return true;
+#endif
         }
 
         void closeMmap(MmapState& s) noexcept
         {
+#ifdef _WIN32
             if (s.base)   { UnmapViewOfFile(s.base); s.base = nullptr; }
             if (s.hMap)   { CloseHandle(s.hMap);     s.hMap = nullptr; }
             if (s.hFile != INVALID_HANDLE_VALUE)
@@ -117,12 +160,17 @@ namespace worldGrid
                 CloseHandle(s.hFile);
                 s.hFile = INVALID_HANDLE_VALUE;
             }
+#else
+            if (s.base) { ::munmap(const_cast<Terrain*>(s.base), s.size); s.base = nullptr; }
+            if (s.fd >= 0) { ::close(s.fd); s.fd = -1; }
+            s.size = 0;
+#endif
         }
     }
 
     bool transitionToMmap(const PixelCostGrid& heapGrid)
     {
-        const __int64 tStart = getNanoTimer();
+        const std::int64_t tStart = getNanoTimer();
 
         //이미 mmap 진입 상태면 한 번 닫고 재진입 (월드 재생성 케이스 대비).
         closeMmap(state());
@@ -135,7 +183,7 @@ namespace worldGrid
             prt(L"[worldGrid] transitionToMmap: write failed\n");
             return false;
         }
-        const __int64 tWrote = getNanoTimer();
+        const std::int64_t tWrote = getNanoTimer();
 
         //--- 2. mmap 진입 ---
         if (!openMmap(path, state()))
@@ -146,14 +194,14 @@ namespace worldGrid
             std::filesystem::remove(path, ec);
             return false;
         }
-        const __int64 tMapped = getNanoTimer();
+        const std::int64_t tMapped = getNanoTimer();
 
         const double writeMs  = (tWrote  - tStart ) / 1.0e6;
         const double mapMs    = (tMapped - tWrote ) / 1.0e6;
         const double totalMs  = (tMapped - tStart ) / 1.0e6;
         prt(L"[worldGrid] transitionToMmap: ok\n");
         prt(L"  write 933MB    : %8.2f ms\n", writeMs);
-        prt(L"  CreateFileMap  : %8.2f ms\n", mapMs);
+        prt(L"  mmap setup     : %8.2f ms\n", mapMs);
         prt(L"  total          : %8.2f ms\n", totalMs);
 
         return true;

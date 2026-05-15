@@ -114,7 +114,7 @@ export int dxClickStack = 0; //x 좌표의 이동값
 export int dyClickStack = 0; //y 좌표의 이동값
 export int dtClickStackStart = 0; //클릭 시간 측정 시작한 시간
 export int dtClickStack = -1; //총 시간, 단 측정 중이지 않을 때에는 값이 -1
-export __int64 clickStartTime = std::numeric_limits<__int64>::max(); //밀리초로 저장되는 클릭을 시작한 시간
+export std::int64_t clickStartTime = std::numeric_limits<std::int64_t>::max(); //밀리초로 저장되는 클릭을 시작한 시간
 export bool deactHold = false; //홀드이벤트를 비활성화, 예를 들어 카메라를 일정 값만큼 이동했을 경우 홀드 이벤트가 발생하지않음
 
 export int selectMode = 0; // 선택모드 0일 경우 전체선택, 1이면 정밀선택
@@ -190,30 +190,30 @@ export Point2 touchStartGrid = { 0, 0 };
 
 export namespace dur
 {
-    __int64 turnCycle = 0;
-    __int64 stepEvent = 0;
-    __int64 renderTile = 0;
-    __int64 renderWeather = 0;
-    __int64 renderSticker = 0;
-    __int64 renderUI = 0;
-    __int64 renderLog = 0;
+    std::int64_t turnCycle = 0;
+    std::int64_t stepEvent = 0;
+    std::int64_t renderTile = 0;
+    std::int64_t renderWeather = 0;
+    std::int64_t renderSticker = 0;
+    std::int64_t renderUI = 0;
+    std::int64_t renderLog = 0;
 
-    __int64 analysis = 0;
-    __int64 tile = 0;
-    __int64 corpse = 0;
-    __int64 floorProp = 0;
-    __int64 item = 0;
-    __int64 entity = 0;
-    __int64 damage = 0;
-    __int64 bullet = 0;
-    __int64 particle = 0;
-    __int64 sprinklerSpray = 0;
-    __int64 mulFog = 0;
-    __int64 fog = 0;
-    __int64 marker = 0;
-    __int64 debug = 0;
+    std::int64_t analysis = 0;
+    std::int64_t tile = 0;
+    std::int64_t corpse = 0;
+    std::int64_t floorProp = 0;
+    std::int64_t item = 0;
+    std::int64_t entity = 0;
+    std::int64_t damage = 0;
+    std::int64_t bullet = 0;
+    std::int64_t particle = 0;
+    std::int64_t sprinklerSpray = 0;
+    std::int64_t mulFog = 0;
+    std::int64_t fog = 0;
+    std::int64_t marker = 0;
+    std::int64_t debug = 0;
 
-    __int64 totalDelay = 0;
+    std::int64_t totalDelay = 0;
 }
 
 export int extraCameraLength = 0;

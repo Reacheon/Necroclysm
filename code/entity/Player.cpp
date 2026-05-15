@@ -244,7 +244,7 @@ void Player::updateMinimap()
 
 void Player::updateVision(int range, int cx, int cy)
 {
-	__int64 tStart = getNanoTimer();
+	std::int64_t tStart = getNanoTimer();
 
 	int correctionRange = range;
 	if (getHour() >= 6 && getHour() < 18) correctionRange = range;
@@ -287,7 +287,7 @@ void Player::updateVision(int range, int cx, int cy)
 		}
 	}
 
-	__int64 tAfterGray = getNanoTimer();
+	std::int64_t tAfterGray = getNanoTimer();
 
 	// Phase 2: 단일 스레드 인라인 Bresenham + 캐시된 타일 접근
 	// markStep은 타일을 visible 마킹하고, blocker면 true를 반환해 ray를 종료시킴.
@@ -395,7 +395,7 @@ void Player::updateVision(int range, int cx, int cy)
 		}
 	}
 
-	__int64 tEnd = getNanoTimer();
+	std::int64_t tEnd = getNanoTimer();
 
 	double total = (tEnd - tStart)       / 1000000.0;
 	double gray  = (tAfterGray - tStart) / 1000000.0;

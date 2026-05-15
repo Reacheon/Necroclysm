@@ -65,9 +65,9 @@ std::unordered_set<Point2, Point2::Hash> raySet;
 std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
 std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
 
-export __int64 renderTile()
+export std::int64_t renderTile()
 {
-    __int64 timeStampStart = getNanoTimer();
+    std::int64_t timeStampStart = getNanoTimer();
 
     tileSize = 16 * zoomScale;
     cameraGridX = (cameraX - 8) / (16);
@@ -114,9 +114,9 @@ export __int64 renderTile()
         
     }
 
-    auto PROFILE = [](auto&& f) -> __int64
+    auto PROFILE = [](auto&& f) -> std::int64_t
         {
-            const __int64 start = getNanoTimer();
+            const std::int64_t start = getNanoTimer();
             std::forward<decltype(f)>(f)();
             return getNanoTimer() - start;
         };

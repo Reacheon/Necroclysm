@@ -5,7 +5,7 @@ import globalVar;
 import Prop;
 import World;
 
-__int64 propTurn()
+std::int64_t propTurn()
 {
 	debug::printCircuitLog = false;
 

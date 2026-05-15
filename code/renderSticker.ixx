@@ -11,9 +11,9 @@ import constVar;
 import drawText;
 import globalVar;
 
-export __int64 renderSticker(int cameraX, int cameraY)
+export std::int64_t renderSticker(int cameraX, int cameraY)
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	/*
 	고정텍스쳐의 깊이(Depth)

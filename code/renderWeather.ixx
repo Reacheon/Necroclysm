@@ -4,6 +4,7 @@ module;
 
 export module renderWeather;
 
+import std;
 import util;
 import globalVar;
 import constVar;
@@ -12,9 +13,9 @@ import Player;
 import textureVar;
 import drawSprite;
 
-export __int64 renderWeather()
+export std::int64_t renderWeather()
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	int cx, cy;
 	int pz = PlayerZ();

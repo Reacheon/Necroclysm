@@ -1,12 +1,9 @@
-module;
-#include <string>
-#include <codecvt>
-#include <locale>
-
 export module stringToWstring;
 
-export std::wstring stringToWstring(const std::string& str) 
+import std;
+import utf8Decoder; //자체 UTF-8 디코더 사용, <codecvt>(C++26 제거 예정) 대체
+
+export std::wstring stringToWstring(const std::string& str)
 {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    return converter.from_bytes(str);
+    return utf8Decoder(str);
 }

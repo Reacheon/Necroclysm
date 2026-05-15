@@ -3,6 +3,7 @@ module;
 
 export module stepEvent;
 
+import std;
 import globalVar;
 import constVar;
 import util;
@@ -23,9 +24,9 @@ import Wake;
 
 //GUI의 스텝이벤트를 실행시키는 함수
 
-export __int64 stepEvent()
+export std::int64_t stepEvent()
 {
-    __int64 timeStampStart = getNanoTimer();
+    std::int64_t timeStampStart = getNanoTimer();
 
 	//게임패드 감지 및 입력방식 변경
 	int numJoy = 0;

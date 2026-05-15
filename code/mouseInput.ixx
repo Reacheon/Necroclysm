@@ -29,7 +29,7 @@ export void clickHold()
 {
 	click = false;
 	prt(L"1초 이상 눌렀다.\n");
-	clickStartTime = std::numeric_limits<__int64>::max();
+	clickStartTime = std::numeric_limits<std::int64_t>::max();
 	deactClickUp = true;
 
 	if (option::inputMethod == input::mouse) clickHoldPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
@@ -72,7 +72,7 @@ export void clickRight()
 	dxClickStack = 0;
 	dyClickStack = 0;
 	dtClickStack = -1;
-	clickStartTime = std::numeric_limits<__int64>::max(); //clickHold 오발동 방지
+	clickStartTime = std::numeric_limits<std::int64_t>::max(); //clickHold 오발동 방지
 
 
 	switch (option::inputMethod)
@@ -105,7 +105,7 @@ export void clickUp()
 	dxClickStack = 0;
 	dyClickStack = 0;
 	dtClickStack = -1;
-	clickStartTime = std::numeric_limits<__int64>::max();
+	clickStartTime = std::numeric_limits<std::int64_t>::max();
 
 	if (option::inputMethod == input::mouse) clickUpPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 	else if (option::inputMethod == input::touch) clickUpPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };

@@ -1,3 +1,4 @@
+import std;
 import util;
 import Entity;
 import globalVar;
@@ -160,7 +161,7 @@ bool Entity::runAnimation(bool shutdown)
 		}
 
 		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"BASEATK" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
@@ -329,7 +330,7 @@ bool Entity::runAnimation(bool shutdown)
 		}
 
 		Prop* address = TileProp(PlayerX()+dx, PlayerY()+dy, PlayerZ());
-		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"BASEATK" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
@@ -458,7 +459,7 @@ bool Entity::runAnimation(bool shutdown)
 		case 7: dx = 1; dy = 1; break;
 		}
 
-		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"BASEATK" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
@@ -610,7 +611,7 @@ bool Entity::runAnimation(bool shutdown)
 		}
 
 		Entity* address = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"BASEATK" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
@@ -694,7 +695,7 @@ bool Entity::runAnimation(bool shutdown)
 		dir2Coord(entityInfo.direction, dx, dy);
 
 		Entity* ePtr = TileEntity(atkTarget.x, atkTarget.y, atkTarget.z);
-		std::wstring stickerID = L"BASEATK" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"BASEATK" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 
 		if (shutdown == true)//사망으로 인한 강제종료
 		{
@@ -898,7 +899,7 @@ bool Entity::runAnimation(bool shutdown)
 		static Point3 prevCoor;
 
 		Sticker* stickerPtr = nullptr;
-		std::wstring stickerID = L"THROW" + std::to_wstring((unsigned __int64)this);
+		std::wstring stickerID = L"THROW" + std::to_wstring(reinterpret_cast<std::uintptr_t>(this));
 		if (getTimer() == 1)
 		{
 			int gX = getGridX();

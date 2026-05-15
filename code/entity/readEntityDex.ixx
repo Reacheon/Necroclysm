@@ -56,19 +56,33 @@ namespace csvEntity
 
 export int readEntityDex(const wchar_t* file)
 {
-    std::wifstream in(file);
+    //파일은 UTF-8(BOM optional)로 저장된 TSV. binary 모드 ifstream으로 raw 바이트 읽고
+    //utf8Decoder로 wstring 변환 — <codecvt>/wifstream::imbue(C++26 제거 예정) 대체.
+    std::ifstream in(std::filesystem::path(file), std::ios::binary);
     std::wstring str;
     std::wstring strFragment;//표 한 칸의 문자열이 저장되는 객체, 매번 초기화됨
 
     if (in.is_open())
     {
-        in.imbue(std::locale(in.getloc(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
         in.seekg(0, std::ios::end);
-        long long size = in.tellg();
-        str.resize(size);
+        std::int64_t size = in.tellg();
+        std::string raw(static_cast<std::size_t>(size), '\0');
         in.seekg(0, std::ios::beg);
-        in.read(&str[0], size);
+        in.read(raw.data(), size);
         in.close();
+
+        //UTF-8 BOM(EF BB BF) 스킵 — 기존 std::consume_header 동등
+        std::size_t skip = 0;
+        if (raw.size() >= 3 && static_cast<unsigned char>(raw[0]) == 0xEF
+                            && static_cast<unsigned char>(raw[1]) == 0xBB
+                            && static_cast<unsigned char>(raw[2]) == 0xBF)
+        {
+            skip = 3;
+        }
+        str = utf8Decoder(raw.c_str() + skip);
+        //CRLF → LF 정규화 — binary 모드라 \r이 그대로 살아 있음.
+        //기존 wifstream(text 모드)이 자동 처리하던 부분. 미처리 시 마지막 셀에 \r이 붙어 wtoi 실패.
+        std::erase(str, L'\r');
         //읽기 종료
 
         //배열의 가로 사이즈를 구한다.

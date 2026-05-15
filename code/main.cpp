@@ -36,7 +36,10 @@ import Teleport;
 int main(int argc, char** argv)
 {
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	std::locale::global(std::locale("korean"));
+	//시스템 기본 로케일 설정 — wprintf의 wchar_t→multibyte 변환이 ASCII 외 문자(한글 등)를 스킵하지 않게 함.
+	//"korean"(Windows 전용) 대신 ""(시스템 기본)을 사용하여 크로스플랫폼 호환:
+	//  Windows 한국어: ko_KR/CP949, Linux/macOS: LC_ALL 환경변수 기준.
+	try { std::locale::global(std::locale("")); } catch (...) { /*최소환경 폴백*/ }
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD);
 	TTF_Init();
 
@@ -93,7 +96,7 @@ int main(int argc, char** argv)
 	bool hasInitMinimap = false; //실행 초기에 미니맵이 생성되지않는 버그를 고치기위해(startArea에 추가하면 왜 안되는거지?)
 	while (!quit)
 	{
-		__int64 loopStart = getNanoTimer();
+		std::int64_t loopStart = getNanoTimer();
 
 		//■Timer 변수
 		if (timer::cursorHightlight < 23) { timer::cursorHightlight++; }
@@ -143,7 +146,7 @@ int main(int argc, char** argv)
 		}
 		dur::totalDelay = getNanoTimer() - loopStart;
 		const int constDelay = 16000000;
-		__int64 delayTime = constDelay - dur::totalDelay;
+		std::int64_t delayTime = constDelay - dur::totalDelay;
 		if (delayTime >= constDelay) delayTime = constDelay; // 만약 루프 시간이 음수(오류)가 나왔을 경우
 		else if (delayTime < 0)
 		{

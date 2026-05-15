@@ -6,9 +6,9 @@ import globalVar;
 import constVar;
 import GUI;
 
-export __int64 renderUI()
+export std::int64_t renderUI()
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	for (int i = 0; i < GUI::getActiveGUIList().size(); i++) { GUI::getActiveGUIList()[i]->drawGUI(); }
 

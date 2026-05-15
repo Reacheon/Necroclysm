@@ -41,11 +41,11 @@ export int randomRange(int a, int b)
     return dis(rng());
 }
 
-export long long randomRangeLL(long long a, long long b)
+export std::int64_t randomRangeLL(std::int64_t a, std::int64_t b)
 {
     if (a > b) std::swap(a, b);
     std::lock_guard lock(rngMutex());
-    std::uniform_int_distribution<long long> dis(a, b);
+    std::uniform_int_distribution<std::int64_t> dis(a, b);
     return dis(rng());
 }
 
@@ -69,7 +69,7 @@ void randomVectorShuffle(std::vector<T>& vec)
 
     for (size_t i = vec.size() - 1; i > 0; --i)
     {
-        size_t j = static_cast<size_t>(randomRangeLL(0, static_cast<long long>(i)));
+        size_t j = static_cast<size_t>(randomRangeLL(0, static_cast<std::int64_t>(i)));
         std::swap(vec[i], vec[j]);
     }
 }

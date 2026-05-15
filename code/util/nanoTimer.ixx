@@ -9,13 +9,13 @@ export void initNanoTimer()
     programStartTime = std::chrono::high_resolution_clock::now();
 }
 
-export __int64 getNanoTimer()
+export std::int64_t getNanoTimer()
 {
     auto now = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::nanoseconds>(now - programStartTime).count();
 }
 
-export __int64 getMilliTimer()
+export std::int64_t getMilliTimer()
 {
     auto now = std::chrono::high_resolution_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(now - programStartTime).count();

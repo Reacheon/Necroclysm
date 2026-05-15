@@ -15,10 +15,10 @@ enum class FPSMode
     hiscore
 };
 
-export void renderFPS(__int64 loopTime)
+export void renderFPS(std::int64_t loopTime)
 {
 
-    __int64 startTime = getNanoTimer();
+    std::int64_t startTime = getNanoTimer();
 
     FPSMode mode = FPSMode::avg;
 
@@ -34,10 +34,10 @@ export void renderFPS(__int64 loopTime)
     static float loopFPS, avgFPS;
 
     static std::deque<float> turnCycleArr, stepEventArr, renderTileArr, renderWeatherArr, renderStickerArr, renderUIArr, renderLogArr, loopTimeArr;
-    static __int64 turnCycleAvg, stepEventAvg, renderTileAvg, renderWeatherAvg, renderStickerAvg, renderUIAvg, renderLogAvg, loopTimeAvg;
+    static std::int64_t turnCycleAvg, stepEventAvg, renderTileAvg, renderWeatherAvg, renderStickerAvg, renderUIAvg, renderLogAvg, loopTimeAvg;
 
     static std::deque<float> analysisArr, tileArr, corpseArr, itemArr, entityArr, damageArr, fogArr, markerArr;
-    static __int64 analysisAvg, tileAvg, corpseAvg, itemAvg, entityAvg, damageAvg, fogAvg, markerAvg;
+    static std::int64_t analysisAvg, tileAvg, corpseAvg, itemAvg, entityAvg, damageAvg, fogAvg, markerAvg;
 
     auto updateAvg = [](std::deque<float>& arr, float newVal) -> float {
         if (arr.size() >= samplingSize) arr.pop_front();

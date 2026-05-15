@@ -11,9 +11,9 @@ import log;
 import drawSprite;
 
 
-export __int64 renderLog(SDL_Renderer* renderer)
+export std::int64_t renderLog(SDL_Renderer* renderer)
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	const auto& magazine = getLogMagazine();
 

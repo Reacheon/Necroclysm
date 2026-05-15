@@ -9,7 +9,7 @@ import prt;
 //  @param byte3 세번째 바이트
 //  @param byte4 네번째 바이트
 //  @return 부호없는 4바이트의 유니코드 정수 반환
-export unsigned long utf8Decoder(char byte1, char byte2, char byte3, char byte4)
+export std::uint32_t utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 {
 	int strByte = -1;
 	std::string bit[4];
@@ -112,7 +112,7 @@ export unsigned long utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 		}
 	}
 
-	unsigned long unicode = 0;
+	std::uint32_t unicode = 0;
 	for (int i = 0; i < bitSize; i++)
 	{
 		if (decode[i] - 48 == 1)
@@ -140,7 +140,7 @@ export std::wstring utf8Decoder(const char* utf8Str)
 		char byte3 = (i + 2 < len) ? utf8Str[i + 2] : 0;
 		char byte4 = (i + 3 < len) ? utf8Str[i + 3] : 0;
 
-		unsigned long unicode = utf8Decoder(byte1, byte2, byte3, byte4);
+		std::uint32_t unicode = utf8Decoder(byte1, byte2, byte3, byte4);
 
 		if (unicode != 0)
 		{
@@ -162,4 +162,87 @@ export std::wstring utf8Decoder(const char* utf8Str)
 export std::wstring utf8Decoder(const std::string& utf8Str)
 {
 	return utf8Decoder(utf8Str.c_str());
+}
+
+//============================================================
+// utf8Encoder : std::wstring(또는 wstring_view) → UTF-8 std::string.
+//   <codecvt>/std::wstring_convert(C++26 제거 예정) 대체 — 자체 구현, 플랫폼 무관.
+//   sizeof(wchar_t)에 따라:
+//     Windows(2바이트, UTF-16): surrogate pair → 코드포인트 → UTF-8
+//     Linux/macOS(4바이트, UTF-32): wchar_t = 코드포인트 그대로
+//   잘못된 surrogate / 범위 외 코드포인트(>0x10FFFF)는 U+FFFD로 대체.
+//============================================================
+export std::string utf8Encoder(std::wstring_view wide)
+{
+	std::string out;
+	out.reserve(wide.size() * 2); //대략 한글 평균 3바이트, ASCII 1바이트
+
+	auto appendCodepoint = [&out](std::uint32_t cp)
+	{
+		if (cp <= 0x7F)
+		{
+			out.push_back(static_cast<char>(cp));
+		}
+		else if (cp <= 0x7FF)
+		{
+			out.push_back(static_cast<char>(0xC0 | (cp >> 6)));
+			out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+		}
+		else if (cp <= 0xFFFF)
+		{
+			out.push_back(static_cast<char>(0xE0 | (cp >> 12)));
+			out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+			out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+		}
+		else if (cp <= 0x10FFFF)
+		{
+			out.push_back(static_cast<char>(0xF0 | (cp >> 18)));
+			out.push_back(static_cast<char>(0x80 | ((cp >> 12) & 0x3F)));
+			out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
+			out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
+		}
+		//범위 외(>0x10FFFF)는 무시 — appendCodepoint에서 받지 않도록 호출측에서 가드
+	};
+
+	for (std::size_t i = 0; i < wide.size(); ++i)
+	{
+		std::uint32_t cp = 0;
+
+		if constexpr (sizeof(wchar_t) == 2)
+		{
+			//UTF-16: surrogate pair 디코드
+			std::uint32_t hi = static_cast<std::uint16_t>(wide[i]);
+			if (hi >= 0xD800 && hi <= 0xDBFF && i + 1 < wide.size())
+			{
+				std::uint32_t lo = static_cast<std::uint16_t>(wide[i + 1]);
+				if (lo >= 0xDC00 && lo <= 0xDFFF)
+				{
+					cp = 0x10000 + ((hi - 0xD800) << 10) + (lo - 0xDC00);
+					++i; //low surrogate 소비
+				}
+				else
+				{
+					cp = 0xFFFD; //orphan high surrogate
+				}
+			}
+			else if (hi >= 0xDC00 && hi <= 0xDFFF)
+			{
+				cp = 0xFFFD; //orphan low surrogate
+			}
+			else
+			{
+				cp = hi;
+			}
+		}
+		else
+		{
+			//UTF-32: wchar_t가 코드포인트 그 자체
+			cp = static_cast<std::uint32_t>(wide[i]);
+			if (cp > 0x10FFFF) cp = 0xFFFD;
+		}
+
+		appendCodepoint(cp);
+	}
+
+	return out;
 }

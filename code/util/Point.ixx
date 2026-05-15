@@ -40,8 +40,8 @@ export Point2 calcMidpoint(std::vector<Point2> vec)
 {
     if (vec.empty()) return Point2();
 
-    long long totalX = 0;
-    long long totalY = 0;
+    std::int64_t totalX = 0;
+    std::int64_t totalY = 0;
 
     for (const auto& p : vec)
     {
@@ -100,9 +100,9 @@ export Point3 calcMidpoint(std::vector<Point3> vec)
 {
     if (vec.empty()) return Point3();
 
-    long long totalX = 0;
-    long long totalY = 0;
-    long long totalZ = 0;
+    std::int64_t totalX = 0;
+    std::int64_t totalY = 0;
+    std::int64_t totalZ = 0;
 
     for (const auto& p : vec)
     {

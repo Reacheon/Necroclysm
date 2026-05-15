@@ -45,9 +45,9 @@ namespace worldGen
     //  호출되는 옵션 콜백 (no-op default).
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad)
     {
-        const __int64 tStart = getNanoTimer();
+        const std::int64_t tStart = getNanoTimer();
         prt(L"[worldGen] buildRoadNetwork start (N=%zu cities, seed=%llu)\n",
-            cities.size(), static_cast<unsigned long long>(seed));
+            cities.size(), static_cast<std::uint64_t>(seed));
 
         if (cities.size() < 2) return {};
 
@@ -339,7 +339,7 @@ namespace worldGen
         //══════════════════════════════════════════════════════════════════
         //  N=3000 → 9M iter, ~50ms. 메모리 O(N). N-1 city-city 엣지, 트리 = 평행/중복 없음.
         //  거리 desc 정렬 → 긴 엣지 먼저 dispatch (threadpool tail latency 감소).
-        const __int64 tMstStart = getNanoTimer();
+        const std::int64_t tMstStart = getNanoTimer();
         std::vector<EdgeCand> edges;
         {
             const int N = static_cast<int>(cps.size());
@@ -380,7 +380,7 @@ namespace worldGen
             std::sort(edges.begin(), edges.end(),
                 [](const EdgeCand& a, const EdgeCand& b) { return a.dist > b.dist; });
         }
-        const __int64 tMstEnd = getNanoTimer();
+        const std::int64_t tMstEnd = getNanoTimer();
         prt(L"  MST build          : %8.2f ms  (N=%zu cities, %zu edges)\n",
             (tMstEnd - tMstStart) / 1.0e6, cps.size(), edges.size());
 
@@ -409,7 +409,7 @@ namespace worldGen
         //══════════════════════════════════════════════════════════════════
         //  5400×2700 float = 58MB. 행 영역 nT 등분 병렬. top-4 mean → 단일 city 픽셀이 sea 위
         //  false positive corridor 만드는 것 차단 ("최소 4픽셀 폭 통로" 요구).
-        const __int64 tCoarseStart = getNanoTimer();
+        const std::int64_t tCoarseStart = getNanoTimer();
         CoarseGrid coarse;
         {
             constexpr std::size_t total = static_cast<std::size_t>(kCoarseW) * kCoarseH;
@@ -462,7 +462,7 @@ namespace worldGen
             }
             for (auto& th : threads) th.join();
         }
-        const __int64 tCoarseEnd = getNanoTimer();
+        const std::int64_t tCoarseEnd = getNanoTimer();
         prt(L"  coarse grid build  : %8.2f ms  (5400x2700 = 58MB float, top-%d mean)\n",
             (tCoarseEnd - tCoarseStart) / 1.0e6, kCoarseAggK);
 
@@ -1079,7 +1079,7 @@ namespace worldGen
         std::atomic<std::uint64_t> fineExpTotal{ 0 };
         std::atomic<std::uint64_t> coarseExpTotal{ 0 };
         std::atomic<std::uint64_t> vertsTotal{ 0 };
-        std::atomic<long long>     maxEdgeNs{ 0 };
+        std::atomic<std::int64_t>     maxEdgeNs{ 0 };
         std::atomic<int>           maxEdgeIdx{ -1 };
         std::atomic<std::uint64_t> maxFineExp{ 0 };
         std::atomic<std::uint64_t> maxHeapSeen{ 0 };
@@ -1088,7 +1088,7 @@ namespace worldGen
         std::vector<RoadPolyLine> results;
         results.reserve(edges.size());
 
-        const __int64 tPathStart = getNanoTimer();
+        const std::int64_t tPathStart = getNanoTimer();
 
         //진행 워치 스레드 — 2초마다 ok/fail/경과시간 출력. worldgen 이 수십초 걸려서 모니터링 필요.
         std::atomic<bool> watcherStop{ false };
@@ -1101,7 +1101,7 @@ namespace worldGen
                     const int ok = successCount.load(std::memory_order_relaxed);
                     const int fn = failCount.load(std::memory_order_relaxed);
                     const int tot = static_cast<int>(edges.size());
-                    const __int64 nowNs = getNanoTimer();
+                    const std::int64_t nowNs = getNanoTimer();
                     const double secs = (nowNs - tPathStart) / 1.0e9;
                     prt(L"  ... A* %d/%d  (ok=%d fail=%d)  %.1fs elapsed\n",
                         ok + fn, tot, ok, fn, secs);
@@ -1116,7 +1116,7 @@ namespace worldGen
             {
                 thread_local AStarWorkspace ws;
 
-                const __int64 tEdgeStart = getNanoTimer();
+                const std::int64_t tEdgeStart = getNanoTimer();
 
                 const CityEntry ceA = boundaryEntryFor(e.a, cps[e.b].px, cps[e.b].py);
                 const CityEntry ceB = boundaryEntryFor(e.b, cps[e.a].px, cps[e.a].py);
@@ -1166,9 +1166,9 @@ namespace worldGen
                     }
                 }
 
-                const __int64 tEdgeEnd = getNanoTimer();
-                const long long ns = tEdgeEnd - tEdgeStart;
-                long long prevNs = maxEdgeNs.load(std::memory_order_relaxed);
+                const std::int64_t tEdgeEnd = getNanoTimer();
+                const std::int64_t ns = tEdgeEnd - tEdgeStart;
+                std::int64_t prevNs = maxEdgeNs.load(std::memory_order_relaxed);
                 while (ns > prevNs && !maxEdgeNs.compare_exchange_weak(
                     prevNs, ns, std::memory_order_relaxed)) {
                 }
@@ -1247,12 +1247,30 @@ namespace worldGen
                         };
                     };
 
+                //도시 픽셀 안 진입쪽 가장자리 타일 — 폴리라인 양 끝 vert 가 도시 픽셀 안까지 닿게 연장.
+                //  진입축(step!=0)은 픽셀 가장자리(0 또는 47), 직교축은 픽셀 중심 anchor(24)로
+                //  일반 vert(=pxToTile) 와 동일 anchor 유지 → strut 직각성과 정합.
+                //  TILES_PER_PIXEL 이 짝수라 "정확한 중심" 은 없지만 모든 vert 가 동일 anchor 를
+                //  쓰는 한 직각 격자 정합은 보장됨.
+                auto entryTileInCity = [](int cityPx, int cityPy, int z, int stepX, int stepY) noexcept -> Point3
+                    {
+                        const int localX = (stepX > 0) ? 0 : (stepX < 0) ? (TILES_PER_PIXEL - 1) : TILES_PER_PIXEL / 2;
+                        const int localY = (stepY > 0) ? 0 : (stepY < 0) ? (TILES_PER_PIXEL - 1) : TILES_PER_PIXEL / 2;
+                        return Point3{
+                            cityPx * TILES_PER_PIXEL + TILE_BASE_X + localX,
+                            cityPy * TILES_PER_PIXEL + TILE_BASE_Y + localY,
+                            z
+                        };
+                    };
+
                 RoadPolyLine line;
-                line.verts.reserve(simp.size());
+                line.verts.reserve(simp.size() + 2);
+                line.verts.push_back(entryTileInCity(cps[e.a].px, cps[e.a].py, cps[e.a].z, ceA.stepX, ceA.stepY));
                 for (std::size_t k = 0; k < simp.size(); ++k)
                 {
                     line.verts.push_back(pxToTile(simp[k].x, simp[k].y, simp[k].z));
                 }
+                line.verts.push_back(entryTileInCity(cps[e.b].px, cps[e.b].py, cps[e.b].z, ceB.stepX, ceB.stepY));
 
                 {
                     std::lock_guard<std::mutex> lk(resultsMtx);
@@ -1275,7 +1293,7 @@ namespace worldGen
         //watcher.request_stop();
         //if (watcher.joinable()) watcher.join();
 
-        const __int64 tDone = getNanoTimer();
+        const std::int64_t tDone = getNanoTimer();
 
         //--- 리포트 ---
         const double mstMs = (tMstEnd - tMstStart) / 1.0e6;
@@ -1288,7 +1306,7 @@ namespace worldGen
         const std::uint64_t fExp = fineExpTotal.load();
         const std::uint64_t cExp = coarseExpTotal.load();
         const std::uint64_t vts = vertsTotal.load();
-        const long long maxNs = maxEdgeNs.load();
+        const std::int64_t maxNs = maxEdgeNs.load();
         const int       maxIx = maxEdgeIdx.load();
 
         prt(L"  MST                : %8.2f ms\n", mstMs);
@@ -1297,8 +1315,8 @@ namespace worldGen
             numThreads, pathMs, okN, fnN);
         if (okN > 0)
         {
-            prt(L"    avg fine exp/road  : %llu\n", static_cast<unsigned long long>(fExp / okN));
-            prt(L"    avg coarse exp/road: %llu\n", static_cast<unsigned long long>(cExp / okN));
+            prt(L"    avg fine exp/road  : %llu\n", static_cast<std::uint64_t>(fExp / okN));
+            prt(L"    avg coarse exp/road: %llu\n", static_cast<std::uint64_t>(cExp / okN));
             prt(L"    avg verts/road     : %.1f\n", static_cast<double>(vts) / okN);
         }
         if (maxIx >= 0 && maxIx < static_cast<int>(edges.size()))
@@ -1308,9 +1326,9 @@ namespace worldGen
                 maxNs / 1.0e9, me.dist);
         }
         prt(L"    max fine expanded  : %llu cells\n",
-            static_cast<unsigned long long>(maxFineExp.load()));
+            static_cast<std::uint64_t>(maxFineExp.load()));
         prt(L"    max heap size      : %llu\n",
-            static_cast<unsigned long long>(maxHeapSeen.load()));
+            static_cast<std::uint64_t>(maxHeapSeen.load()));
         prt(L"  total              : %8.2f ms  (%.2f s)\n", totalMs, totalMs / 1000.0);
         prt(L"  total roads        : %zu\n", results.size());
 

@@ -110,8 +110,7 @@ static std::list<TextCacheKey> lruList;
 
 static std::string toUTF8(const std::wstring& w)
 {
-    static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> cvt;
-    return cvt.to_bytes(w);
+    return utf8Encoder(w); //util 모듈을 통해 노출, <codecvt>(C++26 제거 예정) 대체
 }
 
 // 컬러코드 파싱 함수

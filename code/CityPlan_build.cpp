@@ -32,19 +32,28 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //   향후 BCP가 도시 rect/도로 지오메트리로부터 이 리스트를 채우게 됨.
     //   procGenerate 4단계가 이 리스트를 읽어 PaintCell.floor/wall에 블릿.
 
+
+
     plan.tiles.push_back(CityTile{
         .pos = Point3{ 20322, 32012, 1 },
         .floor = static_cast<std::uint16_t>(itemID::blackAsphalt),
         });
 
     prt(L"[CityPlan] buildCityPlan id=%u seed=%llu tiles=%zu\n",
-        static_cast<unsigned>(id), static_cast<unsigned long long>(seed),
+        static_cast<unsigned>(id), static_cast<std::uint64_t>(seed),
         plan.tiles.size());
 
 
     const worldGen::CityNode& node = (*worldGen::activeCities)[static_cast<std::uint32_t>(id)];
    
     if (node.rectangles.empty()) return plan;
+
+    std::mt19937_64 rng{ seed ^ (static_cast<std::uint64_t>(id) * 0x9E3779B97F4A7C15ULL) };
+    auto localRandom = [&](int a, int b) { return std::uniform_int_distribution<int>{a, b}(rng); };
+
+    //══════════════════════════════════════════════════════════════════
+    // 1. 도시의 픽셀 데이터를 로컬 변수에 저장 (주변픽셀 감지 위해 +1px 마진) ▶ cityPixelAt
+    //══════════════════════════════════════════════════════════════════
 
     int minX = node.rectangles[0].px, minY = node.rectangles[0].py;
     int maxX = node.rectangles[0].x1(), maxY = node.rectangles[0].y1();
@@ -69,10 +78,14 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         for (int dx = 0; dx < patchW; ++dx)
             cityTerrainBox[static_cast<std::size_t>(dy) * patchW + dx] = worldGrid::worldPixel(patchPxX + dx, patchPxY + dy);
 
-    auto cityPixelAt = [&](int px, int py) -> worldGrid::Terrain {
-        return cityTerrainBox[static_cast<std::size_t>(py - patchPxY) * patchW + (px - patchPxX)];
+    auto cityPixelAt = [&](worldGrid::PixelCoord p) -> worldGrid::Terrain {
+        return cityTerrainBox[static_cast<std::size_t>(p.y - patchPxY) * patchW + (p.x - patchPxX)];
         };
 
+
+    //══════════════════════════════════════════════════════════════════
+    // 2. 도시의 진입점과 절단방향 설정 ▶ entryPoints
+    //══════════════════════════════════════════════════════════════════
 
     enum class cutDir
     {
@@ -81,45 +94,37 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     };
 
     std::vector<std::pair<Point3, cutDir>> entryPoints;
+
     if (worldGen::activePolyLines != nullptr)
     {
         for (const worldGen::RoadPolyLine& line : *worldGen::activePolyLines)
         {
             if (line.verts.size() < 2) continue;
 
-            for (const Point3& endpoint : { line.verts.front(), line.verts.back() })
+            for (int endIdx = 0; endIdx < 2; ++endIdx)
             {
+                const Point3 endpoint = (endIdx == 0) ? line.verts.front() : line.verts.back();
+                const Point3 adjacent = (endIdx == 0) ? line.verts[1] : line.verts[line.verts.size() - 2];
+
                 const int epx = (endpoint.x - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
                 const int epy = (endpoint.y - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
 
+                bool inCity = false;
                 for (const city::CityRect& r : node.rectangles)
                 {
-                    const bool besideN = (epx >= r.px && epx < r.x1()) && (epy == r.py - 1);
-                    const bool besideS = (epx >= r.px && epx < r.x1()) && (epy == r.y1());
-                    const bool besideW = (epy >= r.py && epy < r.y1()) && (epx == r.px - 1);
-                    const bool besideE = (epy >= r.py && epy < r.y1()) && (epx == r.x1());
-
-                    if (besideN)
+                    if (epx >= r.px && epx < r.x1() && epy >= r.py && epy < r.y1())
                     {
-                        entryPoints.push_back({ Point3{ endpoint.x, endpoint.y + 1, 0},cutDir::vertical });
-                        break;
-                    }
-                    else if (besideS)
-                    {
-                        entryPoints.push_back({ Point3{ endpoint.x, endpoint.y - 1, 0 }, cutDir::vertical });
-                        break;
-                    }
-                    else if (besideE)
-                    {
-                        entryPoints.push_back({ Point3{ endpoint.x - 1, endpoint.y, 0 }, cutDir::horizontal });
-                        break;
-                    }
-                    else if (besideW)
-                    {
-                        entryPoints.push_back({Point3{ endpoint.x + 1, endpoint.y, 0 }, cutDir::horizontal});
+                        inCity = true;
                         break;
                     }
                 }
+                if (!inCity) continue;
+
+                const int dx = endpoint.x - adjacent.x;
+                const int dy = endpoint.y - adjacent.y;
+                const cutDir cd = (std::abs(dx) >= std::abs(dy)) ? cutDir::horizontal : cutDir::vertical;
+
+                entryPoints.push_back({ endpoint, cd });
             }
         }
     }
@@ -138,6 +143,16 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         //   for (int x = tileX; x < tileX + tileW; ++x)
         //       plan.tiles.push_back(CityTile{ .pos = Point3{x, tileY, node.center.z},
         //                                      .floor = (uint16_t)itemID::blackAsphalt });
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
+    // 3. 가능한 모든 도로들 긋기
+    //══════════════════════════════════════════════════════════════════
+
+    for (const city::CityRect& rect : node.rectangles)
+    {
+
     }
 
     return plan;

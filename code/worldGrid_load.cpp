@@ -22,7 +22,7 @@ namespace worldGrid
     //grid는 콜백 시점까지의 부분 로드 상태가 그대로 노출됨(미리보기 점진 갱신용).
     PixelCostGrid loadWorldGrid(PatchLoadSink onPatch)
     {
-        const __int64 tStart = getNanoTimer();
+        const std::int64_t tStart = getNanoTimer();
 
         //--- 1. alloc + Sea 디폴트 fill ---
         PixelCostGrid grid;
@@ -31,7 +31,7 @@ namespace worldGrid
         grid.data = std::make_unique<Terrain[]>(total);
         std::fill_n(grid.data.get(), total, Terrain::Sea);
 
-        const __int64 tAlloc = getNanoTimer();
+        const std::int64_t tAlloc = getNanoTimer();
 
         //--- 2. 패치 PNG 5832장 디코드 ---
         int loadOk = 0;
@@ -50,7 +50,7 @@ namespace worldGrid
             }
         }
 
-        const __int64 tLoaded = getNanoTimer();
+        const std::int64_t tLoaded = getNanoTimer();
 
         //--- 3. 디버그 히스토그램 (Terrain 분포 검증) ---
         constexpr int TERRAIN_COUNT = 16;
@@ -60,7 +60,7 @@ namespace worldGrid
             ++hist[static_cast<std::size_t>(grid.data[i])];
         }
 
-        const __int64 tHist = getNanoTimer();
+        const std::int64_t tHist = getNanoTimer();
 
         //--- 4. 리포트 ---
         const double allocMs = (tAlloc  - tStart ) / 1.0e6;

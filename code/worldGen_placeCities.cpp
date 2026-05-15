@@ -43,10 +43,10 @@ namespace worldGen
 {
     std::vector<CityNode> placeCities(std::uint64_t seed, PixelCostGrid& grid, CitySink onPlaced)
     {
-        const __int64 tStart = getNanoTimer();
+        const std::int64_t tStart = getNanoTimer();
 
         prt(L"[worldGen] placeCities start (seed=%llu)\n",
-            static_cast<unsigned long long>(seed));
+            static_cast<std::uint64_t>(seed));
 
         //══════════════════════════════════════════════════════════════════
         // 파라미터 — 모든 튜닝 포인트 집중
@@ -179,7 +179,7 @@ namespace worldGen
 
             //1단계: 단일 시퀀셜 스캔으로 City 픽셀 인덱스만 수집.
             //  933M 비트 visited 배열 대신 sparse set 사용(도시 픽셀은 0.001%).
-            const __int64 t0 = getNanoTimer();
+            const std::int64_t t0 = getNanoTimer();
 
             std::unordered_set<std::size_t> cityPixels;
             cityPixels.reserve(8192);
@@ -193,7 +193,7 @@ namespace worldGen
                 }
             }
 
-            const __int64 t1 = getNanoTimer();
+            const std::int64_t t1 = getNanoTimer();
             prt(L"  [extract] city pixels = %zu  (scan %.1f ms)\n",
                 cityPixels.size(), (t1 - t0) / 1.0e6);
 
@@ -227,10 +227,10 @@ namespace worldGen
                 const std::size_t startIdx = *cityPixels.begin();
                 cityPixels.erase(cityPixels.begin());
 
-                long long sumCenterX = 0, sumCenterY = 0;
+                std::int64_t sumCenterX = 0, sumCenterY = 0;
                 int centerCount = 0;
                 int areaCount = 0;
-                long long sumX = 0, sumY = 0;
+                std::int64_t sumX = 0, sumY = 0;
                 const int sx0 = static_cast<int>(startIdx % W);
                 const int sy0 = static_cast<int>(startIdx / W);
                 int minX = sx0, maxX = sx0, minY = sy0, maxY = sy0;
@@ -413,11 +413,11 @@ namespace worldGen
                     name.c_str(), p.pixelX, p.pixelY);
             }
 
-            const __int64 t2 = getNanoTimer();
+            const std::int64_t t2 = getNanoTimer();
             prt(L"  [extract] clusters = %zu  (BFS %.1f ms)\n",
                 cities.size(), (t2 - t1) / 1.0e6);
         }
-        const __int64 tPre = getNanoTimer();
+        const std::int64_t tPre = getNanoTimer();
 
         //Phase 0 끝난 시점의 cities.size()를 기억 — Phase 4(폴리곤 페인트)는 인덱스 이후 절차생성분만 처리.
         //  사전배치 도시는 PNG에 이미 칠해져 있어 페인트할 필요 없음.
@@ -443,7 +443,7 @@ namespace worldGen
                 });
             }
         }
-        const __int64 tHash = getNanoTimer();
+        const std::int64_t tHash = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
         // Phase 2 : LUT 빌드 (waterBonus + latitudeBand)
@@ -470,7 +470,7 @@ namespace worldGen
                 latLut[py] = std::max(0.5, band);
             }
         }
-        const __int64 tLut = getNanoTimer();
+        const std::int64_t tLut = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
         // Phase 3 : 티어별 rejection sampling
@@ -669,10 +669,10 @@ namespace worldGen
                 {
                     if (conflictHit) return;
                     const CityRec& c = cities[idx];
-                    const long long dx = static_cast<long long>(c.px) - px;
-                    const long long dy = static_cast<long long>(c.py) - py;
-                    const long long d2 = dx * dx + dy * dy;
-                    const long long minD = std::min(R, c.radius);
+                    const std::int64_t dx = static_cast<std::int64_t>(c.px) - px;
+                    const std::int64_t dy = static_cast<std::int64_t>(c.py) - py;
+                    const std::int64_t d2 = dx * dx + dy * dy;
+                    const std::int64_t minD = std::min(R, c.radius);
                     if (d2 < minD * minD) conflictHit = true;
                 });
                 if (conflictHit)
@@ -705,7 +705,7 @@ namespace worldGen
         const DartResult d2 = placeTier(CityTier::T2, needT2);
         const DartResult d3 = placeTier(CityTier::T3, needT3);
 
-        const __int64 tProc = getNanoTimer();
+        const std::int64_t tProc = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
         // Phase 4 : 절차생성 도시 영역 페인트
@@ -978,7 +978,7 @@ namespace worldGen
             prt(L"  [paint] procgen cities painted = %d, skipped = %d  (%zu rects, %zu attempts)\n",
                 paintedCount, skippedCount, totalRectsPainted, totalAttempts);
         }
-        const __int64 tPaint = getNanoTimer();
+        const std::int64_t tPaint = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
         // Phase 5 : 픽셀 → 실타일 변환
@@ -996,7 +996,7 @@ namespace worldGen
             });
         }
 
-        const __int64 tDone = getNanoTimer();
+        const std::int64_t tDone = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
         // 리포트

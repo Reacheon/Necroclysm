@@ -58,11 +58,11 @@ extern "C"
 static int minutesPassed = 0;
 static bool firstPlayerInput = true, firstPlayerAnime = true, firstMonsterAI = true, firstMonsterAnime = true;
 
-__int64 playerInputTurn(), animationTurn(), entityAITurn(), propTurn(), itemTurn();
+std::int64_t playerInputTurn(), animationTurn(), entityAITurn(), propTurn(), itemTurn();
 
-export __int64 turnCycleLoop()
+export std::int64_t turnCycleLoop()
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	if (dtClickStack != -1)
 	{
@@ -77,7 +77,7 @@ export __int64 turnCycleLoop()
 		}
 	}
 
-	__int64 playerInputTime = 0, animationTime = 0, entityAITime = 0;
+	std::int64_t playerInputTime = 0, animationTime = 0, entityAITime = 0;
 	if (turnCycle == turn::playerInput)
 	{
 		playerInputTime = playerInputTurn();
@@ -130,7 +130,7 @@ void handlePinchGesture(const SDL_Event& event)
 				pinchStartPos.y = static_cast<int>(mgesture.y * cameraH);
 				deactClickUp = true;
 				deactHold = true;
-				clickStartTime = std::numeric_limits<__int64>::max();//clickHold 무효화 용도
+				clickStartTime = std::numeric_limits<std::int64_t>::max();//clickHold 무효화 용도
 				return;
 			}
 
@@ -190,9 +190,9 @@ bool handleTouchEnd() {
 	return false; // 핀치가 아니었음
 }
 
-__int64 playerInputTurn()
+std::int64_t playerInputTurn()
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 
 	//턴 시작
 	{
@@ -458,13 +458,13 @@ __int64 playerInputTurn()
 	return (getNanoTimer() - timeStampStart);
 }
 
-__int64 animationTurn()
+std::int64_t animationTurn()
 {
 	//AniManager
 	//Ani 클래스를 상속받은 클래스는 aniManager에 추가될 경우
 	//루프마다 그 인스턴스의 runAnimation 메소드를 실행시킴. 만약 runAnimation이 true를 반환할 경우
 	//aniManager에서 제거하고 만약 모든 애니메이션을 실행시켰을 경우 turnCycle을 monsterAI로 넘김
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 	if (turnCycle == turn::playerAnime)
 	{
 		if (firstPlayerAnime)
@@ -581,9 +581,9 @@ __int64 animationTurn()
 	return (getNanoTimer() - timeStampStart);
 }
 
-__int64 entityAITurn()
+std::int64_t entityAITurn()
 {
-	__int64 timeStampStart = getNanoTimer();
+	std::int64_t timeStampStart = getNanoTimer();
 	if (firstMonsterAI)
 	{
 		firstPlayerInput = true;
@@ -682,11 +682,11 @@ __int64 entityAITurn()
 }
 
 
-__int64 propTurn();
+std::int64_t propTurn();
 
 //턴의 시간 흐름에 따라 변하는 아이템들(ex : 광부헬멧의 배터리 잔량에 따른 턴온오프)
 //활성화 범위 내의 stack들 + 활성화 범위 내의 Prop pocket + 활성화 범위 내의 Vehicle pocket + Player Equip
-__int64 itemTurn() 
+std::int64_t itemTurn() 
 {
 	std::vector<ItemPocket*> targetPockets;
 	targetPockets.push_back(PlayerEquip());

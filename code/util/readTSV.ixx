@@ -1,11 +1,11 @@
 module;
 
 #include <SDL3/SDL.h>
-#include <codecvt>
 
 export module readTSV;
 import std;
 import wstring2Number;
+import utf8Decoder; //자체 UTF-8 디코더 사용, <codecvt>(C++26 제거 예정) 대체
 
 template <typename T1, typename T2>
 struct isSame { enum { value = false }; };
@@ -15,22 +15,38 @@ struct isSame<T0, T0> { enum { value = true }; };
 export template<std::size_t SIZEW, typename T>
 int readTSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
 {
-    std::wifstream fin(file);
+    //binary 모드로 raw 바이트 읽기 — 줄별로 utf8Decoder 적용.
+    //wifstream + codecvt facet 패턴을 자체 디코더로 대체.
+    std::ifstream fin(std::filesystem::path(file), std::ios::binary);
     if (!fin.is_open())
         return 0;
-    fin.imbue(std::locale(fin.getloc(),
-        new std::codecvt_utf8<wchar_t, 0x10ffff, std::consume_header>));
 
+    std::string  rawLine;
     std::wstring line;
     std::size_t  row = 0;
+    bool firstLine = true;
 
     auto ensure_row = [&]() {
         if (row == arr.size())
             arr.emplace_back();
         };
 
-    while (std::getline(fin, line))
+    while (std::getline(fin, rawLine))
     {
+        //첫 줄 UTF-8 BOM(EF BB BF) 스킵
+        if (firstLine)
+        {
+            firstLine = false;
+            if (rawLine.size() >= 3 && static_cast<unsigned char>(rawLine[0]) == 0xEF
+                                    && static_cast<unsigned char>(rawLine[1]) == 0xBB
+                                    && static_cast<unsigned char>(rawLine[2]) == 0xBF)
+            {
+                rawLine.erase(0, 3);
+            }
+        }
+
+        line = utf8Decoder(rawLine.c_str());
+
         if (!line.empty() && line.back() == L'\r')
             line.pop_back();
 
