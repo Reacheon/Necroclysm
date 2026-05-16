@@ -120,7 +120,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
-    // 3. 가능한 모든 도로들 긋기부
+    // 3. 가능한 모든 도로들 긋기
     //══════════════════════════════════════════════════════════════════
 
     std::vector<worldGen::RoadPolyLine> divLines; //분할선들
@@ -227,6 +227,8 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         }
         segments.push_back(worldGen::RoadPolyLine{ .verts = { {vX, prev, z}, {vX, vY1, z} } });
     }
+
+
 
     //══════════════════════════════════════════════════════════════════
     // 5. 물타일과 인접한 세그먼트들 제거 (진입점은 보존)
@@ -481,7 +483,90 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
 
-    //── 7.5 제거 플래그 있는 도로 제거(동기화) ────────────────────────────────────
+    //══════════════════════════════════════════════════════════════════
+    // 8. 세그먼트 지터링 — 블록 크기/모양 다양화
+    //══════════════════════════════════════════════════════════════════
+    //   살아있는 세그먼트를 직교 방향으로 평행이동 (수평→Y, 수직→X, 대각선 X).
+    //   - 한 세그먼트 흔들면 양 끝점의 *직교* 살아있는 세그먼트만 잠금
+    //     → 같은 분할선 인접 세그먼트는 독립으로 다른 양만큼 흔들기 가능
+    //   - 흔든 끝점이 잠긴 직교 도로 위에 정확히 닿아야 함 (갭 방지)
+    //     → 흔들기 전 직교 도로 길이 검사 → 양/단방향/스킵 결정
+    //   - 진입점/강변 보존 세그먼트(edgePreserved)는 위치 고정 (잠금만 적용)
+    //══════════════════════════════════════════════════════════════════
+
+    constexpr int JITTER_MIN = 4;
+    constexpr int JITTER_MAX = 9;
+    constexpr double CITY_SEGMENT_JITTER_P = 0.5; //세그먼트 지터링 발동 확률 (조건 충족 시)
+
+    //@brief 노드에서 직교 방향으로 signedJ 타일 이상 뻗은 살아있는 직교 도로 존재 여부
+    auto canExtendOrtho = [&](int nodeId, bool segH, int signedJ) -> bool {
+        const Point3 nodePos = graph.nodeCoord[nodeId];
+        for (int e : graph.adjacency[nodeId])
+        {
+            if (!graph.edgeAlive[e]) continue;
+            if (isHorizontal(segments[e]) == segH) continue; // 직교 아닌 것 제외
+
+            const int otherNode = (graph.edgeToNodes[e][0] == nodeId)
+                ? graph.edgeToNodes[e][1] : graph.edgeToNodes[e][0];
+            const Point3 otherPos = graph.nodeCoord[otherNode];
+
+            //직교 도로가 nodePos에서 signedJ와 같은 부호로 |signedJ| 이상 뻗어 있어야 함
+            const int span = segH ? (otherPos.y - nodePos.y) : (otherPos.x - nodePos.x);
+            if (signedJ > 0 && span >= signedJ) return true;
+            if (signedJ < 0 && span <= signedJ) return true;
+        }
+        return false;
+        };
+
+    std::vector<bool> jitterLocked(segments.size(), false);
+    for (size_t e = 0; e < segments.size(); ++e)
+        if (graph.edgePreserved[e]) jitterLocked[e] = true;
+
+    std::vector<size_t> jitterOrder;
+    jitterOrder.reserve(segments.size());
+    for (size_t e = 0; e < segments.size(); ++e)
+        if (graph.edgeAlive[e] && !graph.edgePreserved[e]) jitterOrder.push_back(e);
+    std::shuffle(jitterOrder.begin(), jitterOrder.end(), rng);
+
+    for (size_t e : jitterOrder)
+    {
+        if (jitterLocked[e]) continue;
+
+        //── 확률 게이트 (스킵돼도 잠그지 않음 — 다른 세그먼트의 직교 도로 역할 유지) ──
+        if (std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= CITY_SEGMENT_JITTER_P) continue;
+
+        const bool h = isHorizontal(segments[e]);
+        const int n0 = graph.edgeToNodes[e][0];
+        const int n1 = graph.edgeToNodes[e][1];
+
+        const int mag = localRandom(JITTER_MIN, JITTER_MAX);
+        const bool canPos = canExtendOrtho(n0, h, +mag) && canExtendOrtho(n1, h, +mag);
+        const bool canNeg = canExtendOrtho(n0, h, -mag) && canExtendOrtho(n1, h, -mag);
+
+        int j;
+        if (canPos && canNeg) j = (localRandom(0, 1) == 0) ? +mag : -mag;
+        else if (canPos)      j = +mag;
+        else if (canNeg)      j = -mag;
+        else                  continue; // 양 방향 모두 불가 — 스킵
+
+        //평행이동 (수평선은 Y축, 수직선은 X축)
+        if (h) { segments[e].verts[0].y += j; segments[e].verts[1].y += j; }
+        else   { segments[e].verts[0].x += j; segments[e].verts[1].x += j; }
+
+        //양 끝점에 연결된 *직교* 살아있는 세그먼트만 잠금 (같은 방향은 자유)
+        for (int n : { n0, n1 })
+            for (int adjE : graph.adjacency[n])
+            {
+                if (adjE == static_cast<int>(e)) continue;
+                if (!graph.edgeAlive[adjE]) continue;
+                if (isHorizontal(segments[adjE]) != h) jitterLocked[adjE] = true;
+            }
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
+    // 9. 살아남은 세그먼트(지터링 반영) plan.segments에 저장
+    //══════════════════════════════════════════════════════════════════
     {
         std::vector<worldGen::RoadPolyLine> alive;
         alive.reserve(segments.size());
@@ -490,6 +575,91 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             if (graph.edgeAlive[i]) alive.push_back(std::move(segments[i]));
         }
         plan.segments = std::move(alive);
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
+    // 10. 다리 추가 — 강(CityRiver/CitySea)을 가로지르는 도로
+    //══════════════════════════════════════════════════════════════════
+    //   도시 픽셀을 셔플 순회하며 강 픽셀의 위아래/좌우 도시 인접을 검사.
+    //   - 강 두께 1픽셀만 지원 (위↔아래 또는 좌↔우가 바로 도시인 경우)
+    //     TODO: 강 두께 ≥ 2픽셀 지원 — 연속 강 픽셀 추적 후 양 끝 도시까지 잇기
+    //   - BRIDGE_MIN_GAP_PX 이내에 이미 다리 있으면 스킵 → 간격 균등
+    //   - 확률 게이트 (첫 다리는 면제 → 강 전체 0개 다리 케이스 회피)
+    //   - 다리 본체는 격자 정렬 96타일 직선 — 양 끝이 강변 도로 노드(6.2 보존)에 자연 연결
+    //══════════════════════════════════════════════════════════════════
+
+    constexpr double BRIDGE_P = 0.5;
+    constexpr int BRIDGE_MIN_GAP_PX = 4;
+
+    auto isCityWater = [&](worldGrid::PixelCoord p) -> bool {
+        const auto t = cityPixelAt(p);
+        return t == worldGrid::Terrain::CityRiver
+            || t == worldGrid::Terrain::CitySea;
+        };
+
+    auto isLand = [&](worldGrid::PixelCoord p) -> bool {
+        const auto t = cityPixelAt(p);
+        return t != worldGrid::Terrain::CityRiver
+            && t != worldGrid::Terrain::CitySea
+            && t != worldGrid::Terrain::Sea
+            && t != worldGrid::Terrain::River
+            && t != worldGrid::Terrain::Lake;
+        };
+
+    //도시 박스 내부(마진 1픽셀 제외) 픽셀 셔플 — 인접 ±1 검사가 마진 안에 머묾
+    std::vector<worldGrid::PixelCoord> bridgePixels;
+    for (int dy = 1; dy < patchH - 1; ++dy)
+        for (int dx = 1; dx < patchW - 1; ++dx)
+            bridgePixels.push_back({ patchPxX + dx, patchPxY + dy, node.center.z });
+    std::shuffle(bridgePixels.begin(), bridgePixels.end(), rng);
+
+    std::vector<worldGrid::PixelCoord> placedBridges;
+    bool firstBridge = true;
+
+    for (const auto& p : bridgePixels)
+    {
+        if (!isCityWater(p)) continue;
+
+        const bool ns = isLand({ p.x, p.y - 1, p.z }) && isLand({ p.x, p.y + 1, p.z });
+        const bool we = isLand({ p.x - 1, p.y, p.z }) && isLand({ p.x + 1, p.y, p.z });
+        if (!ns && !we) continue;
+
+        //같은 z에서 기존 다리와 최소 간격 검사
+        bool tooClose = false;
+        for (const auto& b : placedBridges)
+        {
+            if (b.z != p.z) continue;
+            if (std::abs(b.x - p.x) <= BRIDGE_MIN_GAP_PX &&
+                std::abs(b.y - p.y) <= BRIDGE_MIN_GAP_PX)
+            {
+                tooClose = true; break;
+            }
+        }
+        if (tooClose) continue;
+
+        //확률 게이트 (첫 다리는 면제)
+        if (!firstBridge && std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= BRIDGE_P) continue;
+        firstBridge = false;
+
+        //다리 본체 — 격자 정렬 직선 (양 옆 픽셀 중심까지 96타일)
+        const int z = p.z;
+        if (ns) //North-South 수직 다리
+        {
+            const int x = p.x * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
+            const int y0 = (p.y - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
+            const int y1 = (p.y + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
+            plan.segments.push_back(worldGen::RoadPolyLine{ .verts = { {x, y0, z}, {x, y1, z} } });
+        }
+        else //West-East 수평 다리
+        {
+            const int y = p.y * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
+            const int x0 = (p.x - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
+            const int x1 = (p.x + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
+            plan.segments.push_back(worldGen::RoadPolyLine{ .verts = { {x0, y, z}, {x1, y, z} } });
+        }
+
+        placedBridges.push_back(p);
     }
 
 
