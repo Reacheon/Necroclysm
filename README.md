@@ -6,5 +6,6 @@ Your goal is to wander a post-apocalyptic world and collect at least three of th
 
 ## License
 
-- **Source code**: Licensed under [GNU AGPL-3.0](LICENSE.txt).
+- **Source code**: Licensed under the [MIT License](LICENSE.txt).
+- **Fonts**: Each font retains its original license. See `font/gulim/OFL.txt` and `font/pretendard/LICENSE.txt`.
 - **Art and music**: © 2026 Doyoung Hong (Ignyter). All Rights Reserved.

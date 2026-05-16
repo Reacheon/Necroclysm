@@ -13,8 +13,6 @@ export enum class fontType
     mainFontBold,
     mainFontSemiBold,
     mainFontExtraBold,
-    notoSans,
-    notoSansBold,
     pixel,
 };
 
@@ -24,8 +22,6 @@ export TTF_Font* mainFontBold[MAX_FONT_SIZE] = { nullptr, };
 export TTF_Font* mainFontSemiBold[MAX_FONT_SIZE] = { nullptr, };
 export TTF_Font* mainFontExtraBold[MAX_FONT_SIZE] = { nullptr, };
 
-export TTF_Font* notoSansFont[MAX_FONT_SIZE] = { nullptr, };
-export TTF_Font* notoSansBoldFont[MAX_FONT_SIZE] = { nullptr, };
 export TTF_Font* pixelFont[MAX_FONT_SIZE] = { nullptr, };
 
 static TTF_Font** s_currentFont = nullptr;
@@ -41,9 +37,7 @@ void setFontSolidRender(bool useSolid) { s_useSolidRender = useSolid; }
 export void setFont(fontType inputFont)
 { 
     setFontSolidRender(false);
-    if (inputFont == fontType::notoSans) s_currentFont = notoSansFont;
-    else if (inputFont == fontType::notoSansBold) s_currentFont = notoSansBoldFont;
-    else if (inputFont == fontType::pixel)
+    if (inputFont == fontType::pixel)
     {
         s_currentFont = pixelFont;
         setFontSolidRender(true);

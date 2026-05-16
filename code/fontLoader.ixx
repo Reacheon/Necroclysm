@@ -16,8 +16,6 @@ export void fontLoader()
     {
         for (int i = 8; i < MAX_FONT_SIZE; i++)
         {
-            notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
-            notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
             pixelFont[i] = TTF_OpenFont("font/gulim/gulim-Regular.ttc", i);
 
             mainFont[i] = TTF_OpenFont("font/pretendard/Pretendard-Regular.ttf", i);
@@ -33,8 +31,6 @@ export void fontLoader()
     {
         for (int i = 8; i < MAX_FONT_SIZE; i++)
         {
-            notoSansFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Regular.ttf", i);
-            notoSansBoldFont[i] = TTF_OpenFont("font/notoSans/NotoSansKR-Bold.ttf", i);
             pixelFont[i] = TTF_OpenFont("font/gulim/gulim-Regular.ttc", i);
 
             mainFont[i] = TTF_OpenFont("font/pretendard/Pretendard-Regular.ttf", i);
