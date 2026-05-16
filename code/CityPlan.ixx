@@ -19,8 +19,8 @@ import worldGen;
 //   buildCityPlan은 순수 블랙박스 (id, seed) -> CityPlan.
 //   CityPlanCache가 CityId 키로 lazy 메모이즈 (miss 시 호출 스레드에서 동기 계산).
 //
-//   현재는 골격만 — buildCityPlan은 콘솔 1줄 출력 후 빈 CityPlan 반환.
-//   BCP/도로/블록/다리/CityPlanInput은 향후 단계에서 본 모듈에 누적됨.
+//   현재 buildCityPlan은 도로 세그먼트 랜덤 제거까지 구현됨 — 살아남은 세그먼트는
+//   plan.segments에 저장. 블록/건물/다리/CityPlanInput은 향후 단계에서 본 모듈에 누적됨.
 //
 //   의존성: city (CityId), util (Point3). 사이클 없음 —
 //   worldGen은 CityPlan을 import하지 않음 (Sector_procGenerate.cpp만 소비).
@@ -44,7 +44,7 @@ export struct CityPlan
 
     //  buildCityPlan이 채우는 "깔 타일 목록" — 플랜을 설정한다 = 여기에 push.
     //  procGenerate 4단계가 자기 섹터 범위만 잘라서 PaintCell에 블릿 (클리핑 OK).
-    //  도시 본체 전체가 이 리스트 — buildCityPlan이 BCP·도로·블록·다리를 전부
+    //  도시 본체 전체가 이 리스트 — buildCityPlan이 도로·블록·다리를 전부
     //  타일로 구워서 push. 지오메트리 표현 없음, 래스터(타일 목록)가 곧 산출물.
     std::vector<CityTile> tiles;
 

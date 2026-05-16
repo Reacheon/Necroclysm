@@ -7,32 +7,22 @@ import worldGen;
 import worldGrid;
 
 // ════════════════════════════════════════════════════════════════════════
-// CityPlan_build.cpp — buildCityPlan 구현 (골격).
+// CityPlan_build.cpp — buildCityPlan 구현.
 //
-//   현재는 골격 — 생성 단계 진입 시 콘솔 1줄 출력 후 빈 CityPlan 반환.
-//   향후 BCP·도로·블록·다리 생성 로직이 본 함수에 누적됨 (procGenerate 패턴).
+//   알고리즘: '도로 세그먼트 랜덤 제거' — 도시 직사각형들에 균일 격자 분할선
+//   생성 → 48타일 단위 세그먼트 분해 → 물 인접 세그먼트 제거 → 그래프 변환 →
+//   다트던지기로 랜덤 제거 (연결성 보존). 살아남은 세그먼트는 plan.segments에 저장.
+//
+//   향후 단계: 살아남은 세그먼트가 둘러싼 블록 분할 + 건물 prefab 배치 + 다리
+//   처리 — 본 함수에 누적 (procGenerate 패턴).
 //
 //   주의: procGenerate(ProcGenWorker 스레드)가 CityPlanCache::getOrCompute 경유로
-//   본 함수를 호출 — prt는 스레드 안전 보장 X. 골격 단계 디버그 출력 용도로만 사용.
+//   본 함수를 호출 — prt는 스레드 안전 보장 X. 디버그 출력 용도로만 사용.
 // ════════════════════════════════════════════════════════════════════════
 
 CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 {
     CityPlan plan{ id };
-
-
-
-    // ── 플랜 설정 = plan.tiles에 깔고 싶은 타일을 push ────────────────────
-    //   예) 도로 — x=20322, y=32012, z=1 에 아스팔트 바닥:
-    //
-    //     plan.tiles.push_back(CityTile{ Point3{ 20322, 32012, 1 },
-    //                                    itemID::blackAsphalt,  // floor (constVar import 필요)
-    //                                    0 });                  // wall: 0 = 안 건드림
-    //
-    //   향후 BCP가 도시 rect/도로 지오메트리로부터 이 리스트를 채우게 됨.
-    //   procGenerate 4단계가 이 리스트를 읽어 PaintCell.floor/wall에 블릿.
-
-
 
     plan.tiles.push_back(CityTile{
         .pos = Point3{ 20322, 32012, 1 },
@@ -128,23 +118,6 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             }
         }
     }
-
-    // node.rectangles: 이 도시를 이루는 직사각형들 (픽셀 좌표, 랜덤 배치 결과)
-    for (const city::CityRect& r : node.rectangles)
-    {
-        // 픽셀 → 절대 실타일 변환
-        const int tileX = r.px * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X;
-        const int tileY = r.py * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y;
-        const int tileW = r.w * worldGrid::TILES_PER_PIXEL;
-        const int tileH = r.h * worldGrid::TILES_PER_PIXEL;
-
-        // 이 직사각형 안에서 BCP/도로 로직 → 좌표는 전부 tileX/Y/W/H 에서 파생
-        // 예: 직사각형 둘레를 도로로
-        //   for (int x = tileX; x < tileX + tileW; ++x)
-        //       plan.tiles.push_back(CityTile{ .pos = Point3{x, tileY, node.center.z},
-        //                                      .floor = (uint16_t)itemID::blackAsphalt });
-    }
-
 
     //══════════════════════════════════════════════════════════════════
     // 3. 가능한 모든 도로들 긋기부

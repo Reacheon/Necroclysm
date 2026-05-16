@@ -7,12 +7,12 @@ using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqua
 
 //============================================================
 // 도로망 폴리라인 생성 — 평면 유클리드 MST.
-//   입력: seed + PixelCostGrid + 도시 좌표 약 3000개
-//   출력: 실타일 좌표 폴리라인 N-1
+//   입력: seed + PixelCostGrid + 도시 좌표 약 4400개
+//   출력: 실타일 좌표 폴리라인 (최대 N-1, A*/cost 필터 실패분만큼 적을 수 있음)
 //
 //   파이프라인:
 //     1) tile→pixel 역변환
-//     2) 도시 전체 평면 MST (dense Prim's O(N²)) — 정확히 N-1 city-city 엣지.
+//     2) 도시 전체 평면 MST (dense Prim's O(N²)) — N-1 city-city 엣지를 후보로 생성.
 //        트리 구조라 평행/중복 없음, 그래프 이론적 연결성 보장.
 //     3) Coarse 그리드 1회 빌드 (8× 다운샘플, top-4 mean)
 //     4) ThreadPool 병렬 hierarchical bidirectional A* (거리 desc 정렬, tail latency 감소):
@@ -108,7 +108,7 @@ namespace worldGen
             }();
 
         //4-방향 카디널 전용 — 대각도로 차단.
-        //  대각 step을 제거하면 폴리라인이 N/E/S/W 90° 회전만으로 구성. 도시 격자(BCP)와 정합.
+        //  대각 step을 제거하면 폴리라인이 N/E/S/W 90° 회전만으로 구성. 도시 격자와 정합.
         struct Step { int dx, dy; };
         static constexpr std::array<Step, 4> kSteps = { {
             { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }
@@ -337,7 +337,7 @@ namespace worldGen
         //══════════════════════════════════════════════════════════════════
         // 2) 평면 유클리드 MST — dense Prim's O(N²)
         //══════════════════════════════════════════════════════════════════
-        //  N=3000 → 9M iter, ~50ms. 메모리 O(N). N-1 city-city 엣지, 트리 = 평행/중복 없음.
+        //  N=4400 → ~19M iter, ~100ms. 메모리 O(N). N-1 city-city 엣지, 트리 = 평행/중복 없음.
         //  거리 desc 정렬 → 긴 엣지 먼저 dispatch (threadpool tail latency 감소).
         const std::int64_t tMstStart = getNanoTimer();
         std::vector<EdgeCand> edges;

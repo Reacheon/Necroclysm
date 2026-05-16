@@ -18,10 +18,8 @@ import CityPlan;
 //     1) raw 픽셀 기반 베이스 페인트 (현재 구현)
 //     2) 곡선 강·해안 — 47 autotile (현재 구현)
 //     3) 광역 도로 폴리라인 페인트 — 15타일 asphalt, 사이드워크 X (현재 구현)
-//     4) 도시 BCP 결과로 도로/사이드워크/다리 페인트 (TODO — lazy 재구현 예정)
-//     5) 인카운터 사이트 좌표
-//     6) 도시 BCP 블록 → 건물 prefab 페인트
-//     7) Bridge 후처리 (도로↔수계 교차 보강)
+//     4) 인카운터 사이트 좌표
+//     5) Bridge 후처리 (도로↔수계 교차 보강)
 //
 //   각 단계가 *같은 14.7M PaintCell 배열*에 *적층 페인트* (Painter's algorithm).
 //   순서가 중요 — 나중 단계가 앞 단계를 덮어씀.
@@ -116,7 +114,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
             case worldGrid::Terrain::CityZone:
             case worldGrid::Terrain::CityCenter:
-                cell.floor = itemID::paver;   //도시 기본 보도블럭 (TODO: BCP layout이 도로/건물 페인트)
+                cell.floor = itemID::paver;   //도시 기본 보도블럭
                 break;
             }
 
@@ -403,8 +401,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     //   citiesInRangeOf(섹터 중심)은 5×5 섹터 범위 — 도시 footprint(≤~1섹터)가 이
     //   섹터에 닿으면 중심은 반드시 이 범위 안. 과다 조회분은 per-tile 클립이 거름.
     //
-    //   현재 buildCityPlan은 골격(tiles 비어 있음) — 본 루프는 동작하지만 칠할 게
-    //   아직 없음. buildCityPlan이 도로 CityTile을 채우기 시작하면 자동으로 깔린다.
+    //   현재 buildCityPlan은 plan.tiles에 dummy 1개만 push (실 페인트는 plan.segments
+    //   경유). buildCityPlan이 블록/건물 CityTile을 채우기 시작하면 자동으로 깔린다.
     //═══════════════════════════════════════════════════════════════════════
     {
         const Point3 sectorCenter{
@@ -432,12 +430,10 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
     //═══════════════════════════════════════════════════════════════════════
     // TODO 향후 단계 (모두 본 함수에 누적)
-    //   - buildCityPlan 본체 — BCP로 rect→블록 분할, 도로/다리 CityTile 생성
-    //     (현재 골격이라 위 4단계 루프가 실제로 칠하는 건 아직 없음)
-    //   5) 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
-    //   6) 폴리라인 주변 국도 분기 — 1티어 도로에서 갈라지는 마이너 도로망
-    //   7) CityPlan에 itemStack/vehicle/prop/entity 스폰 레인 추가
-    //   8) Bridge 후처리 보강 — 폴리라인↔수계 교차 시 다리 텍스처
+    //   - 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
+    //   - 폴리라인 주변 국도 분기 — 1티어 도로에서 갈라지는 마이너 도로망
+    //   - CityPlan에 itemStack/vehicle/prop/entity 스폰 레인 추가
+    //   - Bridge 후처리 보강 — 폴리라인↔수계 교차 시 다리 텍스처
     //═══════════════════════════════════════════════════════════════════════
 
     return plan;

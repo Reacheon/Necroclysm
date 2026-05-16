@@ -8,7 +8,7 @@ import city;
 //============================================================
 // worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
 //   책임:
-//     - placeCities: 3000개 도시 좌표 절차생성 (사전배치 + rejection sampling)
+//     - placeCities: 약 4400개 도시 좌표 절차생성 (사전배치 + rejection sampling)
 //     - buildRoadNetwork: 도시간 도로 폴리라인 생성 (절차)
 //     - generateWorld: 위 단계 + worldGrid PNG 로드 + mmap 진입 순차 실행
 //   사용처:
@@ -16,8 +16,8 @@ import city;
 //     - worldSession: 결과 (WorldGenResult) 보관
 //   의존: worldGrid (Terrain, PixelCostGrid, loadWorldGrid, transitionToMmap 등)
 //
-//   참고: 도시 내부 BCP(블록 분할/내부 도로/진입점/다리)는 현재 worldGen 단계에 없음.
-//   향후 sector 단계에서 lazy 재구현 예정.
+//   참고: 도시 내부 layout(블록 분할/내부 도로/진입점/다리)은 worldGen 단계에서
+//   결정하지 않음. CityPlan 모듈이 lazy 생성 (현재 도로 세그먼트 랜덤 제거까지 구현).
 //============================================================
 
 export namespace worldGen
@@ -39,7 +39,7 @@ export namespace worldGen
         std::vector<city::CityRect> rectangles;
         //  도시의 직사각형 분해 결과(픽셀 좌표). 절차생성 도시는 placeCities Phase 4에서
         //  쌓은 1~5개 직사각형 그대로, 사전배치 도시는 PNG 클러스터에서 역분해된 1~N개.
-        //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음.
+        //  CityPlan_build가 이 rectangles를 입력으로 받아 도시 내부 layout 생성.
     };
 
     struct RoadPolyLine
@@ -121,7 +121,7 @@ export namespace worldGen
     std::vector<CityNode> placeCities(std::uint64_t seed, worldGrid::PixelCostGrid& grid, CitySink onPlaced = {});
 
     //buildRoadNetwork — 도시간 광역 도로 폴리라인 생성.
-    //  도시 진입은 cityRegion 경계로 직교 (cardinal) 진입. BCP/진입점 의존 없음.
+    //  도시 진입은 cityRegion 경계로 직교 (cardinal) 진입. 도시 내부 layout 의존 없음.
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
     //월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 1회 절차적 생성.

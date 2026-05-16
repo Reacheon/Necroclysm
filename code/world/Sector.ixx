@@ -224,7 +224,7 @@ private:
 //   이 섹터에 닿으면 중심은 반드시 5×5 범위 안. 과다 조회분은 per-tile 클립이 거름.
 //
 //   worldGen::activeCities가 nullptr면 (월드젠 전 startArea) 빈 리스트.
-//   CityId = activeCities 인덱스. 현재 선형 스캔(~3000개) — 향후 CityIndex로 교체 가능.
+//   CityId = activeCities 인덱스. 현재 선형 스캔(~4400개) — 향후 CityIndex로 교체 가능.
 
 export std::vector<city::CityId> citiesInRangeOf(Point3 centerTile)
 {

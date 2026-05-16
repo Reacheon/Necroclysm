@@ -16,7 +16,7 @@ import worldGrid;
 //   책임 (향후):
 //     - LandmarkType + 도시별 랜드마크 매핑 (콜로세움, 빅벤 등)
 //     - CityIndex 공간 인덱스 (sector 쿼리)
-//     - 건물 배치 함수들 (도시 내부 BCP/도로/블록은 CityPlan 모듈이 담당)
+//     - 건물 배치 함수들 (도시 내부 도로/블록은 CityPlan 모듈이 담당)
 //
 //   의존성: worldGrid (Terrain enum). worldGen 아님 — city는 worldGen *옆에서*
 //   도시 의미를 책임. worldGen이 city를 import (CityNode가 codename 필드 가짐).
@@ -181,5 +181,10 @@ export namespace city
     //         (bboxPxX, bboxPxY) = bbox 좌상단 raw 픽셀 좌표.
     //   출력: 클러스터를 완전히 덮는 (오버랩 없는) 직사각형 리스트. 분해 실패 시 빈 리스트.
     //   알고리즘: 수평 슬랩 분해 → 실패 시 백트래킹 폴백. 결정론적. 정의는 city_decompose.cpp.
+    //
+    //   입력 계약: PNG 마킹 규약상 사전배치 도시 클러스터는 항상 ≥minSize×minSize 픽셀
+    //             rect들의 합집합으로 분해 가능하도록 그려져 있음 (작가가 보장).
+    //   출력 보장: 반환되는 모든 CityRect는 w≥minSize ∧ h≥minSize. 호출자는 더 작은
+    //             rect를 가정하지 않아도 됨.
     std::vector<CityRect> decomposeClusterToRects(const std::uint8_t* inMask, int bboxPxX, int bboxPxY, int bboxW, int bboxH, int minSize = 4);
 }

@@ -12,7 +12,7 @@ using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqua
 // placeCities — 도시 좌표 배열 절차생성 (월드 1회 부트의 1단계).
 //
 //   책임: 사전배치 도시(PNG 클러스터링) + 절차생성 도시(rejection sampling)를 합쳐
-//        실타일 좌표 CityNode 약 3000개 반환. *grid를 mutate*: 절차생성 도시의
+//        실타일 좌표 CityNode 약 4400개 반환. *grid를 mutate*: 절차생성 도시의
 //        폴리곤(1~2 직사각형)을 CityZone 픽셀로 그려 넣어 Map.ixx/buildRoadNetwork/
 //        Sector_procGenerate가 사전배치 도시와 동일하게 인식하도록 한다.
 //
@@ -59,7 +59,7 @@ namespace worldGen
         constexpr int R_T3 = 100;    //  2,400 타일. 마을 간 / 위성도시 간격
                                     //   한 도(道) 안에 마을 5~10개 정도 분포되는 값.
 
-        //절차생성 + 사전배치 합산 목표 도시 수 (≈ 3000, 근사치).
+        //절차생성 + 사전배치 합산 목표 도시 수 (≈ 4400, 근사치).
         constexpr int TARGET_T1 = 50;
         constexpr int TARGET_T2 = 350;
         constexpr int TARGET_T3 = 4000;
@@ -99,7 +99,6 @@ namespace worldGen
             std::vector<city::CityRect> rectangles;
             //  사전배치: Phase 0의 decomposeClusterToRects 결과. 분해 실패 시 비어 있음.
             //  절차생성: Phase 4가 페인트하면서 채움. 페인트 실패 시 비어 있음.
-            //  향후 sector lazy BCP 가 이 rectangles 를 입력으로 받음 (현재는 BCP 자체가 미구현).
         };
 
         //해안/강 보너스 LUT — squared Euclidean distance(실픽셀²)로 인덱싱.
@@ -723,7 +722,7 @@ namespace worldGen
         //       (다른 도시 영역/Sea/River/Lake/Mountain/Polar 침범 시 reject)
         //     - 직사각형 둘레 1px 버퍼: water(Sea/River/Lake/CityRiver/CitySea) 금지
         //       (해안/강가 도시도 최소 1px 간격 유지 — 시각적 분리)
-        //   → 결과 폴리곤은 항상 완전한 직사각형 합집합 (carving 없음) → BCP 분할 보장.
+        //   → 결과 폴리곤은 항상 완전한 직사각형 합집합 (carving 없음).
         //
         //   1~5 직사각형 변동:
         //     - 첫 직사각형: 도시 중심 기준 중앙 정렬, MAX_FIRST_ATTEMPTS회 재시도
@@ -736,7 +735,7 @@ namespace worldGen
         //   프로토타입 — tier별 크기/직사각형 수는 게임 플레이 보고 조정.
         //══════════════════════════════════════════════════════════════════
         {
-            //tier별 직사각형 한 변 길이 분포 (픽셀). BCP min 4×4 보장 + R_T* 안에 들어오는 범위.
+            //tier별 직사각형 한 변 길이 분포 (픽셀). R_T* 안에 들어오는 범위.
             //  넓은 범위로 폭/높이 독립 롤 → 정사각형부터 가늘고 긴 모양까지 다양.
             auto tierRange = [](CityTier t) noexcept -> std::pair<int,int> {
                 switch (t) {
@@ -1031,7 +1030,7 @@ namespace worldGen
         prt(L"  total cities       : %zu  (target≈%d)\n",
             result.size(), TARGET_T1 + TARGET_T2 + TARGET_T3);
 
-        //목표 90% 미만이면 경고 (3000은 근사치).
+        //목표 90% 미만이면 경고 (4400은 근사치).
         const int placedTotal = static_cast<int>(result.size());
         const int targetTotal = TARGET_T1 + TARGET_T2 + TARGET_T3;
         if (placedTotal < targetTotal * 0.9)

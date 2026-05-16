@@ -34,7 +34,7 @@ namespace wgcfg
     inline constexpr SDL_Color TEXT_SUB    = { 150, 150, 155, 255 };
     inline constexpr SDL_Color MAP_BORDER  = {  60,  60,  70, 255 };
 
-    //페이싱 — 60fps 기준 초당 도시 ~1500개. 3000개는 약 2초에 다 등장.
+    //페이싱 — 60fps 기준 초당 도시 ~1500개. 4400개는 약 3초에 다 등장.
     inline constexpr double CITY_RATE_BASE     = 25.0;
     inline constexpr double CITY_DEFICIT_DIV   = 30.0;  // 0.5초 안에 따라잡기
     inline constexpr double CITY_FINAL_DIV     = 10.0;  // phase 진행되면 빨리 정리

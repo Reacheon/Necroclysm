@@ -11,7 +11,7 @@ import WorldGenScreen;
 //   WorldGenScreen->step()만 별도로 매 프레임 호출됨.
 //
 //   기본 게임 시작은 startArea()가 직접 처리(소형 홈베이스 + Player + HUD).
-//   3000개 도시 + 도로망 절차생성은 디버그 콘솔에서 startWorldGen()을 수동
+//   약 4400개 도시 + 도로망 절차생성은 디버그 콘솔에서 startWorldGen()을 수동
 //   호출해야 시작됨 — 실행 직후 자동 진입으로 인한 장시간 대기 방지.
 //
 //   별도 모듈인 이유: debugConsole → startArea → HUD → debugConsole 순환

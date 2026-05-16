@@ -17,7 +17,7 @@ import std;
 //     ProcGenWorker::ins().shutdown();
 //
 //   FIFO 큐, 우선순위 없음. 용도가 단순해 priority queue 불필요.
-//   향후 도시 layout BCP·강 폴리라인 추출 등도 같은 워커 공유 가능.
+//   향후 도시 layout 생성·강 폴리라인 추출 등도 같은 워커 공유 가능.
 // ════════════════════════════════════════════════════════════════════════
 
 export class ProcGenWorker
