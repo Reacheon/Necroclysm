@@ -552,13 +552,7 @@ static void drawCityRoadOverlay(const MapView& v)
     int dbgDrawn = 0;
     int dbgWrongZ = 0;
     int dbgClipped = 0;
-    int dbgComputedThisFrame = 0;
 
-    //── 가시 도시 force-compute (프레임당 1개 한도) ──
-    //  가시 영역 안 city.center 가까이 있고 캐시 없으면 즉시 buildCityPlan.
-    //  T1 도시는 수십~수백 ms 소요 가능 — 프레임당 1개로 stutter 제한.
-    //  플레이어가 도시 근처로 이동하면 자연 캐시되니까 이건 디버그 시각화 보조용.
-    constexpr int COMPUTE_BUDGET_PER_FRAME = 1;
     constexpr int CITY_VIS_MARGIN_TILES = 8000;  // 가장 큰 도시 베이징(~5760타일) 커버
 
     for (std::size_t i = 0; i < cities->size(); ++i)
@@ -575,13 +569,11 @@ static void drawCityRoadOverlay(const MapView& v)
                          && (syd + marginPxScreen >= 0) && (syd - marginPxScreen <= v.viewH);
         if (!inView) continue;
 
+        //이미 캐시된 도시만 그림 — 미캐시 도시는 스킵.
+        //  CityPlan 빌드는 무거우니 카메라 이동으로 강제 발동시키지 않음.
+        //  플레이어가 청크 생성 범위에 들어가면 자연스럽게 캐시됨.
         const CityPlan* plan = CityPlanCache::ins().peek(cityId);
-        if (!plan)
-        {
-            if (dbgComputedThisFrame >= COMPUTE_BUDGET_PER_FRAME) continue;  // 예산 초과
-            plan = &CityPlanCache::ins().getOrCompute(cityId, worldSeed);
-            ++dbgComputedThisFrame;
-        }
+        if (!plan) continue;
         ++dbgCached;
         dbgTotalSegs += static_cast<int>(plan->segments.size());
 
@@ -625,8 +617,8 @@ static void drawCityRoadOverlay(const MapView& v)
 
     if (dbgPrint)
     {
-        prt(L"[CityRoadOverlay] visCities=%d  segs(total=%d drawn=%d wrongZ=%d clipped=%d)  view.z=%d  computed_this_frame=%d  cache.total=%zu\n",
-            dbgCached, dbgTotalSegs, dbgDrawn, dbgWrongZ, dbgClipped, v.z, dbgComputedThisFrame, CityPlanCache::ins().size());
+        prt(L"[CityRoadOverlay] visCities=%d  segs(total=%d drawn=%d wrongZ=%d clipped=%d)  view.z=%d  cache.total=%zu\n",
+            dbgCached, dbgTotalSegs, dbgDrawn, dbgWrongZ, dbgClipped, v.z, CityPlanCache::ins().size());
     }
 }
 

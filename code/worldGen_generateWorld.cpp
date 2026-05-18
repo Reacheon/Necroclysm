@@ -69,11 +69,12 @@ namespace worldGen
         //--- Phase 1~3 산출물 저장 ---
         progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
 
-        //  activePolyLines 즉시 세팅 — WorldGenScreen worker가 본 함수 직후 prepareSpawn 에서
-        //  9 sector를 getOrCompute로 동기 생성. 이 procGenerate들이 광역 폴리라인을 읽어 도로
-        //  페인트 → spawn 주변 캐시에 도로가 들어가야 한다.
+        //  activePolyLines / activeCities 즉시 세팅 — WorldGenScreen worker가 본 함수 직후
+        //  prepareSpawn 에서 9 sector를 getOrCompute로 동기 생성. 이 procGenerate들이
+        //  광역 폴리라인을 읽어 도로 페인트, 도시 CityPlan을 lazy 생성해야 한다.
         //  worldSession 콜백은 result를 move한 후 worldGenResult-> 주소로 재설정.
         worldGen::activePolyLines = &progress.result->roads;
+        worldGen::activeCities    = &progress.result->cities;
 
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
         //  성공 시: Phase 2 게임플레이는 worldGrid::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
