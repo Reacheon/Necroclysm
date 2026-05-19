@@ -46,15 +46,32 @@ void EntityPtrMove(Point3 startCoor, Point3 endCoor)
         L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" +
         std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
 
-    // CDDA식 ramp: 도착 타일이 RAMP_UP/DOWN이면 같은 (x,y)의 z±1로 텔레포트
+    // CDDA식 ramp 짝맞춤: 진행 방향 2칸 앞 z±1에 floor 있고, 2칸 앞이 또 다른 ramp가 아니어야 z 전이.
+    // 역방향(짝 없음) 또는 같은 ramp 줄 측면 이동(2칸 앞도 ramp)은 그냥 통과
     Point3 finalCoor = endCoor;
     {
         Prop* arrivedProp = World::ins()->getTile(endCoor).PropPtr.get();
-        if (arrivedProp != nullptr)
+        int stepDx = endCoor.x - startCoor.x;
+        int stepDy = endCoor.y - startCoor.y;
+        if (arrivedProp != nullptr && (stepDx != 0 || stepDy != 0))
         {
+            Prop* nextProp = World::ins()->getTile(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z).PropPtr.get();
+            bool nextIsRamp = nextProp != nullptr &&
+                (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                    || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
             int dz = 0;
-            if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)) dz = 1;
-            else if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) dz = -1;
+            if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != 0
+                && !nextIsRamp)
+            {
+                dz = 1;
+            }
+            else if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != 0
+                && !nextIsRamp)
+            {
+                dz = -1;
+            }
             if (dz != 0)
             {
                 Point3 zCoor = { endCoor.x, endCoor.y, endCoor.z + dz };

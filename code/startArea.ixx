@@ -1363,6 +1363,7 @@ export void startArea()
 
 
 
+
 		// 집 바닥 타일 (기존 유지)
 		for (int dx = 0; dx < 5; dx++)
 		{

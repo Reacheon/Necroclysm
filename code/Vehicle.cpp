@@ -436,8 +436,24 @@ void Vehicle::shift(int dx, int dy)
             Prop* destProp = TileProp(pos.x + stepDx, pos.y + stepDy, pos.z);
             if (destProp != nullptr)
             {
-                if (destProp->leadItem.checkFlag(itemFlag::RAMP_UP)) newZ = pos.z + 1;
-                else if (destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) newZ = pos.z - 1;
+                // 짝맞춤: 진행 방향 2칸 앞 z±1에 floor 있고, 2칸 앞이 또 다른 ramp가 아니어야 트리거
+                // (같은 ramp 줄 측면 이동은 2칸 앞도 ramp라 트리거 X)
+                Prop* nextProp = TileProp(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z);
+                bool nextIsRamp = nextProp != nullptr &&
+                    (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                        || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
+                if (destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                    && TileFloor(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z + 1) != 0
+                    && !nextIsRamp)
+                {
+                    newZ = pos.z + 1;
+                }
+                else if (destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                    && TileFloor(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z - 1) != 0
+                    && !nextIsRamp)
+                {
+                    newZ = pos.z - 1;
+                }
             }
             partOldToNew[pos] = { pos.x + stepDx, pos.y + stepDy, newZ };
         }
@@ -521,8 +537,22 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
         if (destRampProp != nullptr)
         {
-            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)) arrZ = pos.z + 1;
-            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) arrZ = pos.z - 1;
+            Prop* nextProp = TileProp(pos.x + 2 * dx, pos.y + 2 * dy, pos.z);
+            bool nextIsRamp = nextProp != nullptr &&
+                (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                    || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
+            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z + 1) != 0
+                && !nextIsRamp)
+            {
+                arrZ = pos.z + 1;
+            }
+            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z - 1) != 0
+                && !nextIsRamp)
+            {
+                arrZ = pos.z - 1;
+            }
         }
 
         //벽 충돌 체크
@@ -551,8 +581,22 @@ bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때
         Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
         if (destRampProp != nullptr)
         {
-            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)) arrZ = pos.z + 1;
-            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) arrZ = pos.z - 1;
+            Prop* nextProp = TileProp(pos.x + 2 * dx, pos.y + 2 * dy, pos.z);
+            bool nextIsRamp = nextProp != nullptr &&
+                (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                    || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
+            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z + 1) != 0
+                && !nextIsRamp)
+            {
+                arrZ = pos.z + 1;
+            }
+            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z - 1) != 0
+                && !nextIsRamp)
+            {
+                arrZ = pos.z - 1;
+            }
         }
 
         //벽 충돌 체크

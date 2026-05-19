@@ -52,6 +52,7 @@ void drawBullets();
 void drawParticles();
 void drawSprinklerSpray();
 void drawRampArrows();
+void drawBridgeShadows();
 void drawMulFogs();
 void drawFogs();
 void drawMarkers();
@@ -67,6 +68,7 @@ std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
 std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
 std::unordered_set<Point2, Point2::Hash> rampUpSet;
 std::unordered_set<Point2, Point2::Hash> rampDownSet;
+std::vector<Point2> bridgeShadowList;
 
 export std::int64_t renderTile()
 {
@@ -99,6 +101,7 @@ export std::int64_t renderTile()
     sprinklerSpraySet55.clear();
     rampUpSet.clear();
     rampDownSet.clear();
+    bridgeShadowList.clear();
 
     if (rangeRay)
     {
@@ -132,6 +135,7 @@ export std::int64_t renderTile()
     dur::floorProp = PROFILE([] { drawFloorProp(); });
     dur::item = PROFILE([] { drawItems(); });
     dur::entity = PROFILE([] { drawEntities(); });
+    drawBridgeShadows(); // 다리 그림자 — 바닥/시체/프롭/아이템/엔티티 모두 위에 깔려서 같이 어두워짐
     dur::damage = PROFILE([] { drawDamages(); });
     dur::bullet = PROFILE([] { drawBullets(); });
     dur::particle = PROFILE([] { drawParticles(); });
@@ -255,6 +259,18 @@ void analyseRender()
                 else if (pPtr->leadItem.checkFlag(itemFlag::RAMP_DOWN)) rampDownSet.insert({ tgtX, tgtY });
             }
 
+            // 다리 그림자: 위 z에 floor 있고 ramp 아닌 경우 (다리 밑 어두운 효과)
+            // 단 이 타일에 광원 있으면 스킵 — 헤드라이트 등이 다리 밑 비추면 그림자 제거
+            const TileData* aboveTile = World::ins()->tryGetTile(tgtX, tgtY, pZ + 1);
+            if (aboveTile != nullptr && aboveTile->floor != 0 && thisTile->lightVec.size() == 0)
+            {
+                Prop* abovePropPtr = aboveTile->PropPtr.get();
+                bool aboveIsRamp = abovePropPtr != nullptr &&
+                    (abovePropPtr->leadItem.checkFlag(itemFlag::RAMP_UP) ||
+                     abovePropPtr->leadItem.checkFlag(itemFlag::RAMP_DOWN));
+                if (!aboveIsRamp) bridgeShadowList.push_back({ tgtX, tgtY });
+            }
+
             // 안개
             if (thisTile->fov == fovFlag::black) blackFogList.push_back({ tgtX, tgtY });
             else
@@ -308,6 +324,130 @@ void drawTiles()
         const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
 
         setZoom(zoomScale);
+
+        // 공허 캐스케이드: floor/wall 모두 비어 있으면 하늘색(sprite 506)을 베이스로 깔고
+        // 그 위에 아래 z 비공허 층을 흐릿한 알파로 오버레이한다.
+        // 다리 위·옥상 가장자리에서 하늘색 바탕에 아래 풍경이 살짝 비치는 효과.
+        const bool isVoidHere = (thisTile->floor == 0 && thisTile->wall == 0);
+        if (isVoidHere)
+        {
+            const int baseVx = cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX));
+            const int baseVy = cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY));
+
+            // 베이스: 공허(하늘색) 풀 알파
+            vertices[tileCounter] = { baseVx, baseVy };
+            indices[tileCounter] = 506;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
+
+            constexpr int MAX_DEPTH     = 3;
+            constexpr int OVERLAY_ALPHA = 80;   // 첫(d=1) 층 오버레이 알파
+            constexpr int FADE_PER_Z    = 25;   // 한 층 더 내려갈 때마다 추가 감쇠
+
+            for (int d = 1; d <= MAX_DEPTH; ++d)
+            {
+                const TileData* under = World::ins()->tryGetTile(tgtX, tgtY, pZ - d);
+                if (under == nullptr) break;
+                if (under->floor == 0 && under->wall == 0) continue; // 계속 공허 - 더 내려감
+
+                int alphaInt = OVERLAY_ALPHA - (d - 1) * FADE_PER_Z;
+                if (alphaInt <= 0) break;
+
+                const TileData* uTop   = World::ins()->tryGetTile(tgtX,     tgtY - 1, pZ - d);
+                const TileData* uBot   = World::ins()->tryGetTile(tgtX,     tgtY + 1, pZ - d);
+                const TileData* uLeft  = World::ins()->tryGetTile(tgtX - 1, tgtY,     pZ - d);
+                const TileData* uRight = World::ins()->tryGetTile(tgtX + 1, tgtY,     pZ - d);
+                const Uint8 alpha = static_cast<Uint8>(alphaInt);
+
+                // 아래층 floor
+                if (under->floor != 0)
+                {
+                    int uDir = 0;
+                    int uAni16 = 0;
+                    int uAniSingle = 0;
+                    if (itemDex[under->floor].tileConnectGroup != -1)
+                    {
+                        bool tC, bC, lC, rC;
+                        if (itemDex[under->floor].tileConnectGroup == 0)
+                        {
+                            tC = (uTop   != nullptr) && (under->floor == uTop->floor);
+                            bC = (uBot   != nullptr) && (under->floor == uBot->floor);
+                            lC = (uLeft  != nullptr) && (under->floor == uLeft->floor);
+                            rC = (uRight != nullptr) && (under->floor == uRight->floor);
+                        }
+                        else
+                        {
+                            int g = itemDex[under->floor].tileConnectGroup;
+                            tC = (uTop   != nullptr) && (g == itemDex[uTop->floor].tileConnectGroup);
+                            bC = (uBot   != nullptr) && (g == itemDex[uBot->floor].tileConnectGroup);
+                            lC = (uLeft  != nullptr) && (g == itemDex[uLeft->floor].tileConnectGroup);
+                            rC = (uRight != nullptr) && (g == itemDex[uRight->floor].tileConnectGroup);
+                        }
+                        uDir = connectGroupExtraIndex(tC, bC, lC, rC);
+
+                        if (itemDex[under->floor].animeSize > 1)
+                        {
+                            int fps = itemDex[under->floor].animeFPS;
+                            int sz  = itemDex[under->floor].animeSize;
+                            uAni16 = getMilliTimer() / fps % sz;
+                        }
+                    }
+                    else if (itemDex[under->floor].animeSize > 1)
+                    {
+                        int fps = itemDex[under->floor].animeFPS;
+                        int sz  = itemDex[under->floor].animeSize;
+                        uAniSingle = getMilliTimer() / fps % sz;
+                    }
+
+                    int uSpr = itemDex[under->floor].tileSprIndex + itemDex[under->floor].extraSprIndexSingle + 16 * itemDex[under->floor].extraSprIndex16;
+                    uSpr += 16 * uAni16 + uAniSingle;
+
+                    if (under->floor == 220)
+                    {
+                        if (getSeason() == seasonFlag::winter) uSpr += 16;
+                        else if (getSeason() == seasonFlag::summer) uSpr += 32;
+                    }
+
+                    vertices[tileCounter] = { baseVx, baseVy };
+                    indices[tileCounter] = uSpr + uDir;
+                    batchAlphas[tileCounter] = alpha;
+                    tileCounter++;
+                }
+
+                // 아래층 wall
+                if (under->wall != 0)
+                {
+                    int uDir = 0;
+                    if (itemDex[under->wall].tileConnectGroup != -1)
+                    {
+                        bool tC, bC, lC, rC;
+                        if (itemDex[under->wall].tileConnectGroup == 0)
+                        {
+                            tC = (uTop   != nullptr) && (under->wall == uTop->wall);
+                            bC = (uBot   != nullptr) && (under->wall == uBot->wall);
+                            lC = (uLeft  != nullptr) && (under->wall == uLeft->wall);
+                            rC = (uRight != nullptr) && (under->wall == uRight->wall);
+                        }
+                        else
+                        {
+                            int g = itemDex[under->wall].tileConnectGroup;
+                            tC = (uTop   != nullptr) && (g == itemDex[uTop->wall].tileConnectGroup);
+                            bC = (uBot   != nullptr) && (g == itemDex[uBot->wall].tileConnectGroup);
+                            lC = (uLeft  != nullptr) && (g == itemDex[uLeft->wall].tileConnectGroup);
+                            rC = (uRight != nullptr) && (g == itemDex[uRight->wall].tileConnectGroup);
+                        }
+                        uDir = connectGroupExtraIndex(tC, bC, lC, rC);
+                    }
+
+                    vertices[tileCounter] = { baseVx, baseVy };
+                    indices[tileCounter] = itemDex[under->wall].tileSprIndex + uDir;
+                    batchAlphas[tileCounter] = alpha;
+                    tileCounter++;
+                }
+
+                break;
+            }
+        }
 
         int dirCorrection = 0;
         int tileAniExtraIndex16 = 0;
@@ -374,14 +514,18 @@ void drawTiles()
 
         if (thisTile->floor == itemID::farmland && isWetTile({tgtX, tgtY,PlayerZ()})) sprIndex++;
 
-        vertices[tileCounter] = 
-        { 
-            cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)), 
-            cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY)) 
-        };
-        indices[tileCounter] = sprIndex + dirCorrection;
-        batchAlphas[tileCounter] = 255;
-        tileCounter++;
+        // 공허 타일은 위쪽 캐스케이드 블록에서 이미 처리됨 - 여기선 emit 생략
+        if (!isVoidHere)
+        {
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = sprIndex + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
+        }
 
 
 
@@ -1277,6 +1421,20 @@ void drawRampArrows()
     setFlip(SDL_FLIP_NONE);
 
     SDL_SetTextureAlphaMod(spr::rampUpTile->getTexture(), 255);
+}
+
+void drawBridgeShadows()
+{
+    int tile = 16 * zoomScale;
+    for (auto p : bridgeShadowList)
+    {
+        SDL_Rect dst;
+        dst.x = cameraW / 2 + zoomScale * ((16 * p.x) - cameraX);
+        dst.y = cameraH / 2 + zoomScale * ((16 * p.y) - cameraY);
+        dst.w = tile;
+        dst.h = tile;
+        drawFillRect(dst, col::black, 80);
+    }
 }
 
 void drawMulFogs()
