@@ -422,5 +422,5 @@ export void textureLoader()
 
 	spr::btnGuideBackground = new  Sprite(renderer, "image/UI/GUI/btnGuideBackground.png", 426, 66);
 	spr::statusPortraitBackground = new  Sprite(renderer, "image/UI/GUI/statusPortraitBackground.png", 110, 110);
-
+	spr::rampUpTile = new  Sprite(renderer, "image/tileset/rampUp.png", 16, 16);
 }

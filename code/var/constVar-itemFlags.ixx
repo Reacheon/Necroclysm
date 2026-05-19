@@ -103,6 +103,8 @@ export enum class itemFlag
     DOOR,
     UPSTAIR,
     DOWNSTAIR,
+    RAMP_UP, //진입 시 z+1
+    RAMP_DOWN, //진입 시 z-1
     SIGN,//나무표지판같이 문구를 저장하는 객체
 
 

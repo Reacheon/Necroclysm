@@ -492,6 +492,8 @@ export int readItemDex(const wchar_t* file)
                             { L"DOOR", itemFlag::DOOR },
                             { L"UPSTAIR", itemFlag::UPSTAIR },
                             { L"DOWNSTAIR", itemFlag::DOWNSTAIR },
+                            { L"RAMP_UP", itemFlag::RAMP_UP },
+                            { L"RAMP_DOWN", itemFlag::RAMP_DOWN },
                             { L"SIGN", itemFlag::SIGN },
                             { L"DOOR_CLOSE", itemFlag::DOOR_CLOSE },
                             { L"DOOR_OPEN", itemFlag::DOOR_OPEN },

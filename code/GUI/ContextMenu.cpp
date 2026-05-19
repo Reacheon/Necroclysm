@@ -285,13 +285,13 @@ void ContextMenu::drawGUI()
 
 					int newPivotY = pivotY + 24;
 
-					int vehSize = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo.size();
+					int vehSize = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y, PlayerZ()}]->itemInfo.size();
 					drawFillRect(pivotX, newPivotY, 288, 38 + 26 * (vehSize - 1), col::black, 200);
 					drawRect(pivotX, newPivotY, 288, 38 + 26 * (vehSize - 1), col::lightGray, 255);
 
 					for (int i = 0; i < vehSize; i++)
 					{
-						ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y}]->itemInfo[vehSize - 1 - i];
+						ItemData& tgtPart = vehPtr->partInfo[{tgtGrid.x, tgtGrid.y, PlayerZ()}]->itemInfo[vehSize - 1 - i];
 						//내구도
 						drawRect(pivotX + 9, newPivotY + 9 + 26 * i, 9, 20, col::white);
 						drawFillRect(pivotX + 12, newPivotY + 12 + 26 * i, 3, 14, lowCol::green);
@@ -421,11 +421,11 @@ void ContextMenu::executeContextAct(act inputAct)
 		else if (vPtr != nullptr)
 		{
 			Vehicle* vPtr = TileVehicle(containerPos.x, containerPos.y, PlayerZ());
-			for (int i = 0; i < vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo.size(); i++)
+			for (int i = 0; i < vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo.size(); i++)
 			{
-				if (vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+				if (vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i].checkFlag(itemFlag::POCKET))
 				{
-					new Loot(vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i].pocketPtr.get(), &(vPtr->partInfo[{containerPos.x, containerPos.y}]->itemInfo[i]), containerPos);
+					new Loot(vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i].pocketPtr.get(), &(vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i]), containerPos);
 					break;
 				}
 			}
@@ -450,7 +450,7 @@ void ContextMenu::executeContextAct(act inputAct)
 	else if (inputAct == act::vehicleRepair)
 	{
 		Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-		std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
+		std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()}]->itemInfo;
 		std::vector<std::wstring> partNames;
 		for (int i = 0; i < vParts.size(); i++)
 		{
@@ -461,7 +461,7 @@ void ContextMenu::executeContextAct(act inputAct)
 	else if (inputAct == act::vehicleDetach)
 	{
 		Vehicle* vPtr = TileVehicle(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-		std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y}]->itemInfo;
+		std::vector<ItemData>& vParts = vPtr->partInfo[{contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()}]->itemInfo;
 		std::vector<std::wstring> partNames;
 		for (int i = 0; i < vParts.size(); i++)
 		{

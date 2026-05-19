@@ -1008,9 +1008,9 @@ public:
 		{
 			Vehicle* vPtr = TileVehicle(targetGrid.x, targetGrid.y, PlayerZ());
 
-			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo.size(); i++)
+			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo.size(); i++)
 			{
-				if (vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+				if (vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo[i].checkFlag(itemFlag::POCKET))
 				{
 					inputOptions.push_back(act::unbox);
 					break;
@@ -1066,7 +1066,7 @@ public:
 		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			Vehicle* vPtr = TileVehicle(targetGrid.x, targetGrid.y, PlayerZ());
-			std::vector<ItemData>& tgtPocket = vPtr->partInfo[{targetGrid.x, targetGrid.y}]->itemInfo;
+			std::vector<ItemData>& tgtPocket = vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo;
 			if (tgtPocket.size()>0)
 			{
 				inputOptions.push_back(act::vehicleRepair);

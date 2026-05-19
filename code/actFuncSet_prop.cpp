@@ -37,7 +37,7 @@ namespace actFunc
 
 	void closeVDoor(int tgtX, int tgtY, int tgtZ)
 	{
-		ItemPocket* tgtPocket = TileVehicle(tgtX, tgtY, PlayerZ())->partInfo[{tgtX, tgtY }].get();
+		ItemPocket* tgtPocket = TileVehicle(tgtX, tgtY, PlayerZ())->partInfo[{tgtX, tgtY, PlayerZ() }].get();
 		for (int i = 0; i < tgtPocket->itemInfo.size(); i++)
 		{
 			if (tgtPocket->itemInfo[i].checkFlag(itemFlag::VPART_DOOR_OPEN))

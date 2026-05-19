@@ -33,7 +33,7 @@ public:
     std::wstring name = L"Vehicle";
     bool isEngineOn = false;
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도
-    std::unordered_map<Point2, std::unique_ptr<ItemPocket>, Point2::Hash> partInfo;
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> partInfo;
     vehFlag vehType = vehFlag::none;
     dir16 bodyDir = dir16::dir2;
     dir16 wheelDir = dir16::dir2;
@@ -86,7 +86,7 @@ public:
     void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
     int getSprIndex(int inputX, int inputY);
     void rotatePartInfo(dir16 inputDir16);
-    std::unordered_set<Point2, Point2::Hash> getRotateShadow(dir16 inputDir16);
+    std::unordered_set<Point3, Point3::Hash> getRotateShadow(dir16 inputDir16);
     void rotateEntityPtr(dir16 inputDir16);
     void rotate(dir16 inputDir16);
     void updateSpr();
@@ -96,6 +96,8 @@ public:
     bool colisionCheck(int dx, int dy);//해당 dx,dy만큼 이동했을 때 prop이 벽 또는 기존의 Vehicle과 충돌하는지
     void rush(int dx, int dy);
     void centerShift(int dx, int dy, int dz);
+    void flattenUnsupported(); // 지지 안 되는 파츠를 위/아래 floor 있는 z로 정렬 (transition 정리)
+    int computeDominantZ(); // 차량의 다수파 z (차량 단위 z 결정용)
     bool runAI();
     bool runAnimation(bool shutdown);
     void updateTrainCenter();

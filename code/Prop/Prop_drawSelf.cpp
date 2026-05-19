@@ -17,6 +17,9 @@ import ContextMenu;
 
 void Prop::drawSelf()
 {
+    // RAMP prop은 prop sprite를 그리지 않음 — 화살표 마커는 renderTile.ixx::drawRampArrows에서 별도 처리
+    if (leadItem.checkFlag(itemFlag::RAMP_UP) || leadItem.checkFlag(itemFlag::RAMP_DOWN)) return;
+
     constexpr Uint8 HIDE_WIRE_ALPHA = 120;
     constexpr int SHOW_WIRE_HOVER_TIME = 120;
 

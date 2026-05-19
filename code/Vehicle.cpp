@@ -26,8 +26,8 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
     errorBox(TileVehicle(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 프롭이 존재한다!");
     TileVehicle(inputX, inputY, inputZ) = this;
 
-    partInfo[{inputX, inputY}] = std::make_unique<ItemPocket>(storageType::null);
-    partInfo[{inputX, inputY}]->addItemFromDex(leadItemCode, 1);
+    partInfo[{inputX, inputY, inputZ}] = std::make_unique<ItemPocket>(storageType::null);
+    partInfo[{inputX, inputY, inputZ}]->addItemFromDex(leadItemCode, 1);
 
 
     deactivateAI();//차량을 제외하고 기본적으로 비활성화
@@ -66,10 +66,10 @@ Vehicle::~Vehicle()
 
 bool Vehicle::hasFrame(int inputX, int inputY)
 {
-    auto it = partInfo.find({ inputX, inputY });
+    auto it = partInfo.find({ inputX, inputY, getGridZ() });
     if (it != partInfo.end())
     {
-        std::vector<ItemData>& vParts = partInfo[{inputX, inputY}]->itemInfo;
+        std::vector<ItemData>& vParts = partInfo[{inputX, inputY, getGridZ()}]->itemInfo;
         for (int i = 0; i < vParts.size(); i++)
         {
             if (vParts[i].checkFlag(itemFlag::VFRAME)) return true;
@@ -82,14 +82,14 @@ bool Vehicle::hasFrame(int inputX, int inputY)
 /////////////////////////////////////////※ 기존 프레임에 부품 추가////////////////////////////////////////////////////
 void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 {
-    errorBox(partInfo.find({ inputX, inputY }) == partInfo.end(), L"[Vehicle:addPart] 입력한 위치에 프레임이 존재하지 않는다.");
+    errorBox(partInfo.find({ inputX, inputY, getGridZ() }) == partInfo.end(), L"[Vehicle:addPart] 입력한 위치에 프레임이 존재하지 않는다.");
 
     ItemData inputPart = cloneFromItemDex(itemDex[dexIndex], 1);
 
     // 타이어의 경우 맨 앞에 추가 (기존 로직 유지)
     if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))
     {
-        partInfo[{inputX, inputY}]->itemInfo.insert(partInfo[{inputX, inputY}]->itemInfo.begin(), std::move(inputPart));
+        partInfo[{inputX, inputY, getGridZ()}]->itemInfo.insert(partInfo[{inputX, inputY, getGridZ()}]->itemInfo.begin(), std::move(inputPart));
     }
     else
     {
@@ -97,7 +97,7 @@ void Vehicle::addPart(int inputX, int inputY, int dexIndex)
         int newPriority = inputPart.propDrawPriority;
 
         // priority에 따른 삽입 위치 찾기
-        auto& itemVec = partInfo[{inputX, inputY}]->itemInfo;
+        auto& itemVec = partInfo[{inputX, inputY, getGridZ()}]->itemInfo;
         auto insertPos = itemVec.end();
 
         // 뒤에서부터 탐색하여 새 부품보다 낮거나 같은 priority를 가진 위치 찾기
@@ -125,9 +125,9 @@ void Vehicle::addPart(int inputX, int inputY, std::vector<int> dexVec)
 
 void Vehicle::erasePart(int inputX, int inputY, int index)
 {
-    if (partInfo[{ inputX, inputY }]->itemInfo[index].checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
+    if (partInfo[{ inputX, inputY, getGridZ() }]->itemInfo[index].checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
 
-    partInfo[{ inputX, inputY }]->eraseItemInfo(index);
+    partInfo[{ inputX, inputY, getGridZ() }]->eraseItemInfo(index);
 }
 
 //////////////////////////////////////////////※ 프레임 확장/////////////////////////////////////////////////////////
@@ -140,13 +140,13 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
         int dx, dy;
         dir2Coord(dir, dx, dy);
         //존재할 경우
-        if (partInfo.find({ inputX + dx, inputY + dy }) != partInfo.end()) break;
+        if (partInfo.find({ inputX + dx, inputY + dy, getGridZ() }) != partInfo.end()) break;
         errorBox(i == 3, L"[Vehicle:extendPart] 상하좌우에 프레임이 없는데 해당 타일로 확장을 시도했다.");
     }
-    errorBox(partInfo.find({ inputX, inputY }) != partInfo.end(), L"[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
+    errorBox(partInfo.find({ inputX, inputY, getGridZ() }) != partInfo.end(), L"[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
 
-    partInfo[{inputX, inputY}] = std::make_unique<ItemPocket>(storageType::null);
-    partInfo[{inputX, inputY}]->addItemFromDex(inputItemCode);
+    partInfo[{inputX, inputY, getGridZ()}] = std::make_unique<ItemPocket>(storageType::null);
+    partInfo[{inputX, inputY, getGridZ()}]->addItemFromDex(inputItemCode);
     TileVehicle(inputX, inputY, getGridZ()) = this;
 
     //prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공다.\n", inputX, inputY, inputItemCode);
@@ -168,22 +168,22 @@ void Vehicle::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
-    errorBox(partInfo[{inputX, inputY}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
-    return partInfo[{inputX, inputY}]->itemInfo[0].getSprIndex();
+    errorBox(partInfo[{inputX, inputY, getGridZ()}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
+    return partInfo[{inputX, inputY, getGridZ()}]->itemInfo[0].getSprIndex();
 }
 
 void Vehicle::rotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<Point2, std::unique_ptr<ItemPocket>, Point2::Hash> newPartInfo;
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
         {
             for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
             {
-                if (partInfo.find({ x,y }) != partInfo.end())
+                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
@@ -195,7 +195,7 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
                             break;
                         }
                     }
-                    newPartInfo[{dstCoord.x + getGridX(), dstCoord.y + getGridY()}] = std::move(partInfo[{x, y}]);
+                    newPartInfo[{dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ()}] = std::move(partInfo[{x, y, getGridZ()}]);
                 }
             }
         }
@@ -203,18 +203,18 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
     }
 }
 
-std::unordered_set<Point2, Point2::Hash> Vehicle::getRotateShadow(dir16 inputDir16)
+std::unordered_set<Point3, Point3::Hash> Vehicle::getRotateShadow(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_set<Point2, Point2::Hash> newPartInfo;
+        std::unordered_set<Point3, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
         {
             for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
             {
-                if (partInfo.find({ x,y }) != partInfo.end())
+                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
@@ -226,7 +226,7 @@ std::unordered_set<Point2, Point2::Hash> Vehicle::getRotateShadow(dir16 inputDir
                             break;
                         }
                     }
-                    newPartInfo.insert({ dstCoord.x + getGridX(), dstCoord.y + getGridY() });
+                    newPartInfo.insert({ dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ() });
                 }
             }
         }
@@ -234,10 +234,10 @@ std::unordered_set<Point2, Point2::Hash> Vehicle::getRotateShadow(dir16 inputDir
     }
     else
     {
-        std::unordered_set<Point2, Point2::Hash> newPartInfo;
+        std::unordered_set<Point3, Point3::Hash> newPartInfo;
         for (const auto& [pos, pocket] : partInfo)
         {
-            newPartInfo.insert({ pos.x, pos.y });
+            newPartInfo.insert({ pos.x, pos.y, pos.z });
         }
         return newPartInfo;
     }
@@ -262,7 +262,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
         {
             for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
             {
-                if (partInfo.find({ x,y }) != partInfo.end())
+                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
                 {
                     Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
                     Point2 dstCoord;
@@ -380,9 +380,9 @@ void Vehicle::updateSpr()
                                 key2 = coord;
                             }
                         }
-                        if (partInfo.find({ getGridX() + key2.x, getGridY() + key2.y }) != partInfo.end())
+                        if (partInfo.find({ getGridX() + key2.x, getGridY() + key2.y, getGridZ() }) != partInfo.end())
                         {
-                            std::vector<ItemData>& tgtItemInfo = partInfo[{getGridX() + key2.x, getGridY() + key2.y}]->itemInfo;
+                            std::vector<ItemData>& tgtItemInfo = partInfo[{getGridX() + key2.x, getGridY() + key2.y, getGridZ()}]->itemInfo;
                             for (int i = 0; i < tgtItemInfo.size(); i++)
                             {
                                 if (/*tgtItemInfo[i].checkFlag(itemFlag::PROP_WALL_CONNECT) && */tgtItemInfo[i].tileConnectGroup == currentGroup)
@@ -415,36 +415,64 @@ void Vehicle::updateSpr()
 
 void Vehicle::shift(int dx, int dy)
 {
-    std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    if (dx == 0 && dy == 0) return;
 
-    for (const auto& [pos, pocket] : partInfo)
+    // 큰 점프(가속페달)도 한 칸씩 분해 — 경유 ramp 무시 방지
+    std::vector<Point2> path;
+    makeLine(path, dx, dy);
+
+    Point2 prev = { 0, 0 };
+    for (const auto& pt : path)
     {
-        TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
-        if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
+        int stepDx = pt.x - prev.x;
+        int stepDy = pt.y - prev.y;
+        prev = pt;
+        if (stepDx == 0 && stepDy == 0) continue;
+
+        std::unordered_map<Point3, Point3, Point3::Hash> partOldToNew;
+        for (const auto& [pos, pocket] : partInfo)
         {
-            entityWormhole[{pos.x, pos.y}] = std::move(World::ins()->getTile(pos.x, pos.y, getGridZ()).EntityPtr);
+            int newZ = pos.z;
+            Prop* destProp = TileProp(pos.x + stepDx, pos.y + stepDy, pos.z);
+            if (destProp != nullptr)
+            {
+                if (destProp->leadItem.checkFlag(itemFlag::RAMP_UP)) newZ = pos.z + 1;
+                else if (destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) newZ = pos.z - 1;
+            }
+            partOldToNew[pos] = { pos.x + stepDx, pos.y + stepDy, newZ };
         }
-    }
 
-    //엔티티 옮기기
-    for (const auto& [pos, pocket] : partInfo)
-    {
-        TileVehicle(pos.x + dx, pos.y + dy, getGridZ()) = this;
-        if (entityWormhole.find({ pos.x, pos.y }) != entityWormhole.end())
+        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
+        for (const auto& [oldPos, newPos] : partOldToNew)
         {
-            EntityPtrMove(std::move(entityWormhole[{pos.x, pos.y}]), { pos.x + dx, pos.y + dy, getGridZ() });
+            TileVehicle(oldPos.x, oldPos.y, oldPos.z) = nullptr;
+            if (TileEntity(oldPos.x, oldPos.y, oldPos.z) != nullptr)
+            {
+                entityWormhole[oldPos] = std::move(World::ins()->getTile(oldPos.x, oldPos.y, oldPos.z).EntityPtr);
+            }
         }
+
+        // unique_ptr 오버로드 — 차량과 함께 옮기는 entity의 ramp 재트리거 방지
+        for (const auto& [oldPos, newPos] : partOldToNew)
+        {
+            TileVehicle(newPos.x, newPos.y, newPos.z) = this;
+            if (entityWormhole.find(oldPos) != entityWormhole.end())
+            {
+                EntityPtrMove(std::move(entityWormhole[oldPos]), { newPos.x, newPos.y, newPos.z });
+            }
+        }
+
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
+        for (auto& [pos, pocket] : partInfo)
+        {
+            shiftPartInfo[partOldToNew[pos]] = std::move(pocket);
+        }
+        partInfo = std::move(shiftPartInfo);
+
+        flattenUnsupported();
     }
 
-    std::unordered_map<Point2, std::unique_ptr<ItemPocket>, Point2::Hash> shiftPartInfo;
-    for (auto& [pos, pocket] : partInfo)
-    {
-        shiftPartInfo[{pos.x + dx, pos.y + dy}] = std::move(pocket);
-    }
-    partInfo = std::move(shiftPartInfo);
-
-
-    setGrid(getGridX() + dx, getGridY() + dy, getGridZ());
+    setGrid(getGridX() + dx, getGridY() + dy, computeDominantZ());
     updateHeadlight();
 }
 
@@ -472,6 +500,13 @@ void Vehicle::zShift(int dz)
         }
     }
 
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
+    for (auto& [pos, pocket] : partInfo)
+    {
+        shiftPartInfo[{pos.x, pos.y, pos.z + dz}] = std::move(pocket);
+    }
+    partInfo = std::move(shiftPartInfo);
+
     setGrid(getGridX(), getGridY(), getGridZ() + dz);
     updateHeadlight();
 
@@ -482,19 +517,27 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
     auto rotatedPartInfo = getRotateShadow(inputDir16);
     for (const auto& pos : rotatedPartInfo)
     {
-        //벽 충돌 체크
-        if (TileWall(pos.x + dx, pos.y + dy, getGridZ()) != 0) return true;
-
-        if (TileProp(pos.x + dx, pos.y + dy, getGridZ()) != nullptr)
+        int arrZ = pos.z;
+        Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
+        if (destRampProp != nullptr)
         {
-            if (TileProp(pos.x + dx, pos.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)) arrZ = pos.z + 1;
+            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) arrZ = pos.z - 1;
+        }
+
+        //벽 충돌 체크
+        if (TileWall(pos.x + dx, pos.y + dy, arrZ) != 0) return true;
+
+        if (TileProp(pos.x + dx, pos.y + dy, arrZ) != nullptr)
+        {
+            if (TileProp(pos.x + dx, pos.y + dy, arrZ)->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
             {
                 return true;
             }
         }
 
-        //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, getGridZ());
+        //차량 충돌 체크
+        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, arrZ);
         if (targetPtr != nullptr && targetPtr != this) return true;
     }
     return false;
@@ -504,19 +547,27 @@ bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때
 {
     for (const auto& [pos, pocket] : partInfo)
     {
-        //벽 충돌 체크
-        if (TileWall(pos.x + dx, pos.y + dy, getGridZ()) != 0) return true;
-
-        if (TileProp(pos.x + dx, pos.y + dy, getGridZ()) != nullptr)
+        int arrZ = pos.z;
+        Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
+        if (destRampProp != nullptr)
         {
-            if (TileProp(pos.x + dx, pos.y + dy, getGridZ())->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)) arrZ = pos.z + 1;
+            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) arrZ = pos.z - 1;
+        }
+
+        //벽 충돌 체크
+        if (TileWall(pos.x + dx, pos.y + dy, arrZ) != 0) return true;
+
+        if (TileProp(pos.x + dx, pos.y + dy, arrZ) != nullptr)
+        {
+            if (TileProp(pos.x + dx, pos.y + dy, arrZ)->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
             {
                 return true;
             }
         }
 
-        //프롭 충돌 체크
-        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, getGridZ());
+        //차량 충돌 체크
+        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, arrZ);
         if (targetPtr != nullptr && targetPtr != this)
         {
             prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, targetPtr);
@@ -562,6 +613,64 @@ void Vehicle::centerShift(int dx, int dy, int dz)
 {
 }
 
+// 지지 안 되는 파츠(자기 z에 floor 없음)를 위/아래 한 칸의 floor 있는 z로 정렬.
+// CDDA PR #41135 패턴: ramp 통과 후 transitional 상태가 무한 지속되지 않도록 안정화.
+// 이게 없으면 차량이 다리 진입 시 z=0/z=1 시시각각 진동함.
+void Vehicle::flattenUnsupported()
+{
+    // iteration 중 partInfo 변경 방지 위해 미리 수집
+    std::vector<std::pair<Point3, Point3>> repositions;
+    for (const auto& [pos, pocket] : partInfo)
+    {
+        if (TileFloor(pos.x, pos.y, pos.z) != 0) continue; // 지지됨
+
+        int newZ = pos.z;
+        if (TileFloor(pos.x, pos.y, pos.z - 1) != 0) newZ = pos.z - 1; // 아래 우선 (중력)
+        else if (TileFloor(pos.x, pos.y, pos.z + 1) != 0) newZ = pos.z + 1;
+        else continue; // 위아래 둘 다 floor 없으면 그대로 둠
+
+        repositions.push_back({ pos, { pos.x, pos.y, newZ } });
+    }
+
+    for (const auto& [oldPos, newPos] : repositions)
+    {
+        TileVehicle(oldPos.x, oldPos.y, oldPos.z) = nullptr;
+        TileVehicle(newPos.x, newPos.y, newPos.z) = this;
+
+        auto& oldTile = World::ins()->getTile(oldPos.x, oldPos.y, oldPos.z);
+        if (oldTile.EntityPtr != nullptr)
+        {
+            EntityPtrMove(std::move(oldTile.EntityPtr), newPos);
+        }
+
+        auto it = partInfo.find(oldPos);
+        if (it != partInfo.end())
+        {
+            std::unique_ptr<ItemPocket> pocket = std::move(it->second);
+            partInfo.erase(it);
+            partInfo[newPos] = std::move(pocket);
+        }
+    }
+}
+
+int Vehicle::computeDominantZ()
+{
+    if (partInfo.empty()) return getGridZ();
+
+    std::unordered_map<int, int> zCount;
+    for (const auto& [pos, pocket] : partInfo)
+    {
+        zCount[pos.z]++;
+    }
+    int dominantZ = partInfo.begin()->first.z;
+    int maxCount = 0;
+    for (const auto& [z, cnt] : zCount)
+    {
+        if (cnt > maxCount) { maxCount = cnt; dominantZ = z; }
+    }
+    return dominantZ;
+}
+
 void Vehicle::updateHeadlight()
 {
     for (const auto& [pos, pocket] : partInfo)
@@ -576,7 +685,7 @@ void Vehicle::updateHeadlight()
                     {
                         Light* thisLight = pocket->itemInfo[i].lightPtr.get();
                         thisLight->dir = bodyDir;
-                        thisLight->moveLight(pos.x, pos.y, getGridZ());
+                        thisLight->moveLight(pos.x, pos.y, pos.z);
                     }
                 }
             }
@@ -601,7 +710,7 @@ void Vehicle::updateHeadlight(Point3 fakeCoor) //코어가 해당 위치에 가�
                         int revX = pos.x - getGridX();
                         int revY = pos.y - getGridY();
 
-                        thisLight->moveLight(fakeCoor.x + revX, fakeCoor.y + revY, getGridZ());
+                        thisLight->moveLight(fakeCoor.x + revX, fakeCoor.y + revY, pos.z);
                     }
                 }
             }
@@ -620,9 +729,10 @@ void Vehicle::updateTrainCenter()
         {
             if (pocketPtr->itemInfo[i].checkFlag(itemFlag::TRAIN_WHEEL))
             {
-                if (std::find(trainWheelList.begin(), trainWheelList.end(), pos) == trainWheelList.end()) //열차 바퀴 좌표가 중복된 값이 없으면
+                Point2 pos2{ pos.x, pos.y };
+                if (std::find(trainWheelList.begin(), trainWheelList.end(), pos2) == trainWheelList.end()) //열차 바퀴 좌표가 중복된 값이 없으면
                 {
-                    trainWheelList.push_back({ pos.x, pos.y });
+                    trainWheelList.push_back(pos2);
                 }
             }
         }

@@ -139,7 +139,7 @@ public:
 
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
-		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y, maintCoor.z });
 		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
 		std::vector<ItemData>& items = partIter->second->itemInfo;
 
@@ -236,7 +236,7 @@ public:
 
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
-		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y, maintCoor.z });
 		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
 		std::vector<ItemData>& items = partIter->second->itemInfo;
 
@@ -279,7 +279,7 @@ public:
 	{
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
-		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y, maintCoor.z });
 		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
 		std::vector<ItemData>& items = partIter->second->itemInfo;
 
@@ -296,7 +296,7 @@ public:
 
 		Vehicle* vPtr = TileVehicle(maintCoor.x, maintCoor.y, maintCoor.z);
 		if (!vPtr) return;
-		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y });
+		auto partIter = vPtr->partInfo.find({ maintCoor.x, maintCoor.y, maintCoor.z });
 		if (partIter == vPtr->partInfo.end() || !partIter->second) return;
 		std::vector<ItemData>& items = partIter->second->itemInfo;
 

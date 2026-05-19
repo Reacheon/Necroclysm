@@ -184,4 +184,6 @@ export namespace spr
 	Sprite* btnGuideBackground = nullptr;
 	Sprite* statusPortraitBackground = nullptr;
 
+	Sprite* rampUpTile = nullptr;
+
 }

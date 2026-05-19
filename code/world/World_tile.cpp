@@ -46,23 +46,43 @@ void EntityPtrMove(Point3 startCoor, Point3 endCoor)
         L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" +
         std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
 
-    // 2단계: 목적지 좌표의 EntityPtr이 비어있는지 확인
-    auto& endTile = World::ins()->getTile(endCoor);
-    errorBox(endTile.EntityPtr != nullptr,
-        L"EntityPtrMove: 목적지에 이미 EntityPtr이 있습니다. endCoor=(" +
-        std::to_wstring(endCoor.x) + L"," + std::to_wstring(endCoor.y) + L"," + std::to_wstring(endCoor.z) + L")");
+    // CDDA식 ramp: 도착 타일이 RAMP_UP/DOWN이면 같은 (x,y)의 z±1로 텔레포트
+    Point3 finalCoor = endCoor;
+    {
+        Prop* arrivedProp = World::ins()->getTile(endCoor).PropPtr.get();
+        if (arrivedProp != nullptr)
+        {
+            int dz = 0;
+            if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)) dz = 1;
+            else if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)) dz = -1;
+            if (dz != 0)
+            {
+                Point3 zCoor = { endCoor.x, endCoor.y, endCoor.z + dz };
+                if (World::ins()->getTile(zCoor).EntityPtr == nullptr)
+                {
+                    finalCoor = zCoor;
+                }
+            }
+        }
+    }
+
+    // 2단계: 최종 목적지의 EntityPtr이 비어있는지 확인
+    auto& finalTile = World::ins()->getTile(finalCoor);
+    errorBox(finalTile.EntityPtr != nullptr,
+        L"EntityPtrMove: 목적지에 이미 EntityPtr이 있습니다. finalCoor=(" +
+        std::to_wstring(finalCoor.x) + L"," + std::to_wstring(finalCoor.y) + L"," + std::to_wstring(finalCoor.z) + L")");
 
     // 3단계: 이동 실행
-    endTile.EntityPtr = std::move(startTile.EntityPtr);
+    finalTile.EntityPtr = std::move(startTile.EntityPtr);
 
     // 4단계: 이동 후 EntityPtr 존재 확인
-    errorBox(endTile.EntityPtr == nullptr,
-        L"EntityPtrMove: 이동 후 EntityPtr이 nullptr입니다. endCoor=(" +
-        std::to_wstring(endCoor.x) + L"," + std::to_wstring(endCoor.y) + L"," + std::to_wstring(endCoor.z) + L")");
+    errorBox(finalTile.EntityPtr == nullptr,
+        L"EntityPtrMove: 이동 후 EntityPtr이 nullptr입니다. finalCoor=(" +
+        std::to_wstring(finalCoor.x) + L"," + std::to_wstring(finalCoor.y) + L"," + std::to_wstring(finalCoor.z) + L")");
 
     // 5단계: setGrid 호출
-    endTile.EntityPtr->setGrid(endCoor.x, endCoor.y, endCoor.z);
-    endTile.EntityPtr->pullEquipLights();
+    finalTile.EntityPtr->setGrid(finalCoor.x, finalCoor.y, finalCoor.z);
+    finalTile.EntityPtr->pullEquipLights();
 }
 
 void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
@@ -140,10 +160,16 @@ bool isWalkable(Point3 coord)
     else if (TileEntity(coord.x, coord.y, coord.z) != nullptr) return false;
     else if (TileVehicle(coord.x, coord.y, coord.z) != nullptr)
     {
-        ItemPocket* targetPocket = TileVehicle(coord.x, coord.y, coord.z)->partInfo[{coord.x, coord.y}].get();
-        for (int i = 0; i < targetPocket->itemInfo.size(); i++)
+        // partInfo와 TileVehicle 등록 불일치 케이스 방어 (transition 중에 발생 가능)
+        auto& vehPartInfo = TileVehicle(coord.x, coord.y, coord.z)->partInfo;
+        auto it = vehPartInfo.find({ coord.x, coord.y, coord.z });
+        if (it != vehPartInfo.end() && it->second != nullptr)
         {
-            if (targetPocket->itemInfo[i].checkFlag(itemFlag::VPART_NOT_WALKABLE)) return false;
+            ItemPocket* targetPocket = it->second.get();
+            for (int i = 0; i < targetPocket->itemInfo.size(); i++)
+            {
+                if (targetPocket->itemInfo[i].checkFlag(itemFlag::VPART_NOT_WALKABLE)) return false;
+            }
         }
     }
     else if (TileFloor(coord.x, coord.y, coord.z) == 0) return false; //바닥이 없는 경우

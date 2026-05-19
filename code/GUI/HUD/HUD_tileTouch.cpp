@@ -46,10 +46,10 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			{
 				Vehicle* belowVehicle = TileVehicle(touchX, touchY, PlayerZ());
 				bool findController = false;
-				prt(L"below prop의 사이즈는 %d이다.\n", belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size());
-				for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY}]->itemInfo.size(); i++)
+				prt(L"below prop의 사이즈는 %d이다.\n", belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo.size());
+				for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo.size(); i++)
 				{
-					if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 99)//차량 조종장치
+					if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 99)//차량 조종장치
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -68,7 +68,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							PlayerPtr->updateMinimap();
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 311)//헬기 조종장치
+					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 311)//헬기 조종장치
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -83,7 +83,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							typeHUD = vehFlag::none;;
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == 313)//열차 조종장치
+					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 313)//열차 조종장치
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -98,7 +98,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							typeHUD = vehFlag::none;;
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY}]->itemInfo[i].itemCode == itemID::minecartController) //열차 조종장치
+					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == itemID::minecartController) //열차 조종장치
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -196,7 +196,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 			}
 			else if (TileVehicle(touchX, touchY, PlayerZ()) != nullptr)
 			{
-				ItemPocket* tgtPocket = TileVehicle(touchX, touchY, PlayerZ())->partInfo[{touchX, touchY }].get();
+				ItemPocket* tgtPocket = TileVehicle(touchX, touchY, PlayerZ())->partInfo[{touchX, touchY, PlayerZ() }].get();
 				for (int i = 0; i < tgtPocket->itemInfo.size(); i++)
 				{
 					if (tgtPocket->itemInfo[i].checkFlag(itemFlag::VPART_DOOR_CLOSE))

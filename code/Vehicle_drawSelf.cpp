@@ -18,7 +18,7 @@ void Vehicle::drawSelf()
 {
     std::vector<Point2> rotorList;
     int tileSize = 16 * zoomScale;
-    auto drawVehicleComponent = [=](Vehicle* vPtr, int tgtX, int tgtY, int layer, int alpha)
+    auto drawVehicleComponent = [=](Vehicle* vPtr, int tgtX, int tgtY, int tgtZ, int layer, int alpha)
         {
             SDL_Rect dst;
             dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -29,9 +29,9 @@ void Vehicle::drawSelf()
             setZoom(zoomScale);
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //텍스쳐 투명도 설정
             SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-            int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
+            int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
 
-            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].itemCode == itemID::minecart)
+            if (vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].itemCode == itemID::minecart)
             {
                 if (bodyDir == dir16::dir0 || bodyDir == dir16::dir4) sprIndex += 0;
                 else sprIndex += 1;
@@ -48,9 +48,9 @@ void Vehicle::drawSelf()
             SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
 
 
-            if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].pocketPtr != nullptr)
+            if (vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].pocketPtr != nullptr)
             {
-                ItemPocket* pocketPtr = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].pocketPtr.get();
+                ItemPocket* pocketPtr = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].pocketPtr.get();
                 if (pocketPtr->itemInfo.size() > 0)
                 {
                     drawSpriteCenter
@@ -69,13 +69,15 @@ void Vehicle::drawSelf()
 
     for (const auto& [pos, pocket] : this->partInfo)
     {
+        if (pos.z != PlayerZ()) continue; // 다른 z 파츠는 플레이어 시야에 안 보임
+
         ////////////////////////////////일반 차량부품/////////////////////////////////////////////////
         for (int layer = 0; layer < pocket->itemInfo.size(); layer++)
         {
             //바닥프롭,천장프롭 플래그가 없는 일반 프롭일 경우
             if (!pocket->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
             {
-                drawVehicleComponent(this, pos.x, pos.y, layer, 255);
+                drawVehicleComponent(this, pos.x, pos.y, pos.z, layer, 255);
             }
         }
 
@@ -91,7 +93,7 @@ void Vehicle::drawSelf()
                 {
                     rotorList.push_back({ pos.x, pos.y });
                 }
-                else drawVehicleComponent(this, pos.x, pos.y, layer, propCeilAlpha);
+                else drawVehicleComponent(this, pos.x, pos.y, pos.z, layer, propCeilAlpha);
             }
         }
     }

@@ -271,6 +271,9 @@ export namespace itemID
 
     constexpr int treeStump = 282;
     constexpr int paver = 563;
+    constexpr int rampUp = 603;
+    constexpr int rampDown = 604;
+    constexpr int guardrail = 605;
 
     ///////////////////////아스팔트 변형 (페인트용 절반·대각·화살표) //////////////////////
     //   whiteAsphalt(562) / yellowAsphalt(377) 의 시각 변형 타일들. 도로 페인팅에서

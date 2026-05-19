@@ -879,7 +879,7 @@ export void startArea()
 	///////////////////////////////▼뒷자석 4타일/////////////////////
 	myCar->addPart(vX - 1, vY + 2, { 120, 101 });
 	{
-		ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2}].get();
+		ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2, myCar->getGridZ()}].get();
 		for (int i = 0; i < partPocket->itemInfo.size(); i++)
 		{
 			if (partPocket->itemInfo[i].itemCode == 101)
@@ -1287,6 +1287,81 @@ export void startArea()
 			setFloor({ -16, -29, 0 }, itemID::whiteAsphaltHourglassPattern);
 			setFloor({ -10, -29, 0 }, itemID::whiteAsphaltHourglassPattern);
 		}
+
+		// 다리 끝 반대편 섬을 먼저 깔아둠 — 다리가 위에 덮어씌어지면서 끝부분이 섬에 박힘
+		// 섬 반경 17 ≥ 다리 폭 19/2 → 다리 끝 19타일 전체가 섬 안에 들어옴
+		for (int dx = -32; dx <= 6; dx++)
+		{
+			for (int dy = 54; dy <= 92; dy++)
+			{
+				float ldx = dx + 13.0f;
+				float ldy = dy - 73.0f;
+				float dist = sqrt(ldx * ldx + ldy * ldy);
+				if (dist <= 17)
+				{
+					if (dist <= 12) setFloor({ dx, dy, 0 }, itemID::grass);
+					else setFloor({ dx, dy, 0 }, itemID::dirt);
+				}
+			}
+		}
+
+		// 남쪽 다리 (z=1) — 밑 z=0의 바다/섬은 그대로 보존되어 보트 통과 가능
+		// 도로 15타일 + 양쪽 paver 인도 2타일 = 폭 19타일
+		for (int dy = 29; dy <= 60; dy++)
+		{
+			for (int dx = -22; dx <= -4; dx++)
+			{
+				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 1 }, itemID::paver);
+				else setFloor({ dx, dy, 1 }, itemID::blackAsphalt);
+			}
+		}
+
+		// 진입측 / 출구측 양방향 ramp — 같은 (x, y)의 두 z에 RAMP_UP/RAMP_DOWN 쌍으로 배치
+		for (int dx = -21; dx <= -5; dx++)
+		{
+			createProp({ dx, 29, 0 }, itemID::rampUp);   // 도로 → 다리
+			createProp({ dx, 29, 1 }, itemID::rampDown); // 다리 → 도로
+			createProp({ dx, 60, 1 }, itemID::rampDown); // 다리 → 섬
+			createProp({ dx, 60, 0 }, itemID::rampUp);   // 섬 → 다리
+		}
+
+		// 다리 가장자리 가드레일 (paver 바깥쪽 위, ramp 위치는 비워서 차량 진입 가능)
+		for (int dy = 29; dy <= 60; dy++)
+		{
+			setWall({ -22, dy, 1 }, itemID::guardrail);
+			setWall({ -4, dy, 1 }, itemID::guardrail);
+		}
+
+		// z=0 진입측/출구측 다리 연장 — 도로가 다리로 전환되는 시각 단서 + 가드레일로 진입 방향 유도
+		// 양쪽 paver만 깔아서 가운데(진입 차선 / 섬 가장자리)는 그대로 보이게
+		for (int dy = 25; dy <= 29; dy++)
+		{
+			setFloor({ -22, dy, 0 }, itemID::paver);
+			setFloor({ -21, dy, 0 }, itemID::paver);
+			setFloor({ -5, dy, 0 }, itemID::paver);
+			setFloor({ -4, dy, 0 }, itemID::paver);
+		}
+		// 출구측은 섬 위라 가운데도 blackAsphalt로 채워줘야 다리 모양 (진입측은 기존 도로가 가운데 채움)
+		for (int dy = 60; dy <= 64; dy++)
+		{
+			for (int dx = -22; dx <= -4; dx++)
+			{
+				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 0 }, itemID::paver);
+				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
+			}
+		}
+		for (int dy = 25; dy <= 29; dy++)
+		{
+			setWall({ -22, dy, 0 }, itemID::guardrail);
+			setWall({ -4, dy, 0 }, itemID::guardrail);
+		}
+		for (int dy = 60; dy <= 64; dy++)
+		{
+			setWall({ -22, dy, 0 }, itemID::guardrail);
+			setWall({ -4, dy, 0 }, itemID::guardrail);
+		}
+
+
 
 		// 집 바닥 타일 (기존 유지)
 		for (int dx = 0; dx < 5; dx++)

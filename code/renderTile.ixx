@@ -51,6 +51,7 @@ void drawDamages();
 void drawBullets();
 void drawParticles();
 void drawSprinklerSpray();
+void drawRampArrows();
 void drawMulFogs();
 void drawFogs();
 void drawMarkers();
@@ -64,6 +65,8 @@ std::vector<Drawable*> renderVehList, renderEntityList;
 std::unordered_set<Point2, Point2::Hash> raySet;
 std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
 std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
+std::unordered_set<Point2, Point2::Hash> rampUpSet;
+std::unordered_set<Point2, Point2::Hash> rampDownSet;
 
 export std::int64_t renderTile()
 {
@@ -94,6 +97,8 @@ export std::int64_t renderTile()
     wallHPList.clear();
     sprinklerSpraySet33.clear();
     sprinklerSpraySet55.clear();
+    rampUpSet.clear();
+    rampDownSet.clear();
 
     if (rangeRay)
     {
@@ -131,6 +136,7 @@ export std::int64_t renderTile()
     dur::bullet = PROFILE([] { drawBullets(); });
     dur::particle = PROFILE([] { drawParticles(); });
     dur::sprinklerSpray = PROFILE([] { drawSprinklerSpray(); });
+    drawRampArrows();
     dur::mulFog = PROFILE([] { drawMulFogs(); });
     dur::fog = PROFILE([] { drawFogs(); });
     dur::marker = PROFILE([] { drawMarkers(); });
@@ -241,6 +247,12 @@ void analyseRender()
                     if (pPtr->sinkFluidAmount >= pPtr->leadItem.fluidDemand) sprinklerSpraySet55.insert({ tgtX,tgtY });
                     else if (pPtr->sinkFluidAmount >= (double)(pPtr->leadItem.fluidDemand)/2.0) sprinklerSpraySet33.insert({ tgtX,tgtY });
                 }
+            }
+
+            if (pPtr != nullptr)
+            {
+                if (pPtr->leadItem.checkFlag(itemFlag::RAMP_UP)) rampUpSet.insert({ tgtX, tgtY });
+                else if (pPtr->leadItem.checkFlag(itemFlag::RAMP_DOWN)) rampDownSet.insert({ tgtX, tgtY });
             }
 
             // 안개
@@ -1032,10 +1044,12 @@ void drawEntities()
         {
             int tgtX = it->first.x;
             int tgtY = it->first.y;
+            int tgtZ = it->first.z;
+            if (tgtZ != PlayerZ()) continue;
 
-            for (int layer = 0; layer < vPtr->partInfo[{tgtX, tgtY}]->itemInfo.size(); layer++)
+            for (int layer = 0; layer < vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo.size(); layer++)
             {
-                if (vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].checkFlag(itemFlag::TIRE_STEER))
+                if (vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].checkFlag(itemFlag::TIRE_STEER))
                 {
                     SDL_Rect dst;
                     dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
@@ -1046,7 +1060,7 @@ void drawEntities()
                     setZoom(zoomScale);
                     SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
                     SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND);
-                    int sprIndex = vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY}]->itemInfo[layer].extraSprIndex16;
+                    int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
                     drawSpriteCenter
                     (
                         spr::propset,
@@ -1227,6 +1241,42 @@ void drawSprinklerSpray()
         SDL_SetTextureAlphaMod(spr::sprinkler55->getTexture(), 255);
         setZoom(1.0);
     }
+}
+
+void drawRampArrows()
+{
+    if (rampUpSet.empty() && rampDownSet.empty()) return;
+
+    Uint32 t = SDL_GetTicks();
+    float phase = std::fmod(t / 2500.0f, 1.0f);
+    float floatOffset = std::sin(phase * 3.14159f * 2.0f) * 3.0f; // 2.5초 부유
+
+    SDL_SetTextureAlphaMod(spr::rampUpTile->getTexture(), 150);
+    SDL_SetTextureBlendMode(spr::rampUpTile->getTexture(), SDL_BLENDMODE_BLEND);
+
+    // RAMP_UP은 그대로, RAMP_DOWN은 수직 반전으로 그림
+    auto drawArrow = [&](int tgtX, int tgtY)
+        {
+            SDL_Rect dst;
+            dst.x = cameraW / 2 + zoomScale * ((16 * tgtX + 8) - cameraX) - ((16 * zoomScale) / 2);
+            dst.y = cameraH / 2 + zoomScale * ((16 * tgtY + 8) - cameraY) - ((16 * zoomScale) / 2);
+            dst.w = tileSize;
+            dst.h = tileSize;
+
+            setZoom(zoomScale);
+            drawSpriteCenter(spr::rampUpTile, 0,
+                dst.x + dst.w / 2,
+                dst.y + dst.h / 2 + (int)(zoomScale * floatOffset));
+            setZoom(1.0);
+        };
+
+    for (const auto& pos : rampUpSet) drawArrow(pos.x, pos.y);
+
+    setFlip(SDL_FLIP_VERTICAL);
+    for (const auto& pos : rampDownSet) drawArrow(pos.x, pos.y);
+    setFlip(SDL_FLIP_NONE);
+
+    SDL_SetTextureAlphaMod(spr::rampUpTile->getTexture(), 255);
 }
 
 void drawMulFogs()

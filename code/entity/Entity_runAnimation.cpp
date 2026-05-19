@@ -961,16 +961,21 @@ bool Entity::runAnimation(bool shutdown)
 			ItemPocket* throwTargetPocket = nullptr;
 			if (vPtr != nullptr)
 			{
-				ItemPocket* vParts = vPtr->partInfo[{ dstGrid.x, dstGrid.y }].get();
-				for (int i = vParts->itemInfo.size() - 1; i >= 0; i--)
-				{
-					if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + totalVolume)
+					// 차량 transition 중에는 dstGrid.z의 파츠가 partInfo에 없을 수 있음
+					auto vehIt = vPtr->partInfo.find({ dstGrid.x, dstGrid.y, dstGrid.z });
+					if (vehIt != vPtr->partInfo.end() && vehIt->second != nullptr)
 					{
-						throwToVehicle = true;
-						throwTargetPocket = vParts->itemInfo[i].pocketPtr.get();
-						break;
+						ItemPocket* vParts = vehIt->second.get();
+						for (int i = vParts->itemInfo.size() - 1; i >= 0; i--)
+						{
+							if (vParts->itemInfo[i].pocketMaxVolume > vParts->getPocketVolume() + totalVolume)
+							{
+								throwToVehicle = true;
+								throwTargetPocket = vParts->itemInfo[i].pocketPtr.get();
+								break;
+							}
+						}
 					}
-				}
 			}
 
 			if (throwToVehicle)

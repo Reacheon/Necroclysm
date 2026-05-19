@@ -68,7 +68,7 @@ namespace
 			Vehicle* veh = TileVehicle(x, y, z);
 			if (veh != nullptr)
 			{
-				auto it = veh->partInfo.find({ x, y });
+				auto it = veh->partInfo.find({ x, y, z });
 				if (it != veh->partInfo.end())
 				{
 					for (auto& item : it->second->itemInfo)
@@ -159,7 +159,7 @@ namespace
 			Vehicle* veh = TileVehicle(x, y, z);
 			if (veh != nullptr)
 			{
-				auto it = veh->partInfo.find({ x, y });
+				auto it = veh->partInfo.find({ x, y, z });
 				if (it != veh->partInfo.end())
 				{
 					for (auto& item : it->second->itemInfo)
