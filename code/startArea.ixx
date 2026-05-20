@@ -222,7 +222,7 @@ export void startArea()
 	//집 우측 4타일
 	setWall({ -1,-3,0 }, 375);
 	setWall({ -1,-4,0 }, 114);
-	setWall({ -1,-5,0 }, 375);c
+	setWall({ -1,-5,0 }, 375);
 	setWall({ -1,-6,0 }, 375);
 	//집 좌측 4타일
 	setWall({ -5,-3,0 }, 375);
