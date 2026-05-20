@@ -96,8 +96,6 @@ public:
     bool colisionCheck(int dx, int dy);//해당 dx,dy만큼 이동했을 때 prop이 벽 또는 기존의 Vehicle과 충돌하는지
     void rush(int dx, int dy);
     void centerShift(int dx, int dy, int dz);
-    void flattenUnsupported(); // 지지 안 되는 파츠를 위/아래 floor 있는 z로 정렬 (transition 정리)
-    int computeDominantZ(); // 차량의 다수파 z (차량 단위 z 결정용)
     bool runAI();
     bool runAnimation(bool shutdown);
     void updateTrainCenter();

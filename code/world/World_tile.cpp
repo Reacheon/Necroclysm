@@ -16,9 +16,17 @@ import Monster;
 import log;
 import globalTime;
 
-unsigned __int16 TileFloor(int x, int y, int z) { return World::ins()->getTile(x, y, z).floor; }
+unsigned __int16 TileFloor(int x, int y, int z)
+{
+    TileData* t = World::ins()->tryGetTile(x, y, z);
+    return t != nullptr ? t->floor : 0;
+}
 
-unsigned __int16 TileFloor(Point3 coord) { return World::ins()->getTile(coord.x, coord.y, coord.z).floor; }
+unsigned __int16 TileFloor(Point3 coord)
+{
+    TileData* t = World::ins()->tryGetTile(coord.x, coord.y, coord.z);
+    return t != nullptr ? t->floor : 0;
+}
 
 bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
 
@@ -46,31 +54,48 @@ void EntityPtrMove(Point3 startCoor, Point3 endCoor)
         L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" +
         std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
 
-    // CDDA식 ramp 짝맞춤: 진행 방향 2칸 앞 z±1에 floor 있고, 2칸 앞이 또 다른 ramp가 아니어야 z 전이.
-    // 역방향(짝 없음) 또는 같은 ramp 줄 측면 이동(2칸 앞도 ramp)은 그냥 통과
+    // CDDA식 ramp 짝맞춤 + 양방향 전이.
+    // 정방향: 진행 방향 2칸 앞 z±1에 floor + 2칸 앞이 ramp 아님 → z 전이
+    // 역방향: 다리 위/하층에서 ramp 통과 시 다리/하층이 끝나면 자동 합류
     Point3 finalCoor = endCoor;
     {
-        Prop* arrivedProp = World::ins()->getTile(endCoor).PropPtr.get();
         int stepDx = endCoor.x - startCoor.x;
         int stepDy = endCoor.y - startCoor.y;
-        if (arrivedProp != nullptr && (stepDx != 0 || stepDy != 0))
+        if (stepDx != 0 || stepDy != 0)
         {
-            Prop* nextProp = World::ins()->getTile(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z).PropPtr.get();
+            Prop* arrivedProp = TileProp(endCoor.x, endCoor.y, endCoor.z);
+            Prop* belowProp = TileProp(endCoor.x, endCoor.y, endCoor.z - 1);
+            Prop* aboveProp = TileProp(endCoor.x, endCoor.y, endCoor.z + 1);
+            Prop* nextProp = TileProp(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z);
             bool nextIsRamp = nextProp != nullptr &&
                 (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
                     || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
             int dz = 0;
-            if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+            if (arrivedProp != nullptr && arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)
                 && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != 0
                 && !nextIsRamp)
             {
                 dz = 1;
             }
-            else if (arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+            else if (arrivedProp != nullptr && arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
                 && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != 0
                 && !nextIsRamp)
             {
                 dz = -1;
+            }
+            // 역방향 하강: 위쪽 z 이동 중, 아래에 RAMP_UP, 진행 2칸 앞 다리 끝
+            else if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == 0
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != 0)
+            {
+                dz = -1;
+            }
+            // 역방향 상승: 아래쪽 z 이동 중, 위에 RAMP_DOWN, 진행 2칸 앞 하층 끝
+            else if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == 0
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != 0)
+            {
+                dz = 1;
             }
             if (dz != 0)
             {
@@ -109,8 +134,16 @@ void EntityPtrMove(std::unique_ptr<Entity> inputPtr, Point3 endCoor)
     World::ins()->getTile(endCoor).EntityPtr->pullEquipLights();
 }
 
-Prop* TileProp(int x, int y, int z) { return World::ins()->getTile(x, y, z).PropPtr.get(); }
-Prop* TileProp(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).PropPtr.get(); }
+Prop* TileProp(int x, int y, int z)
+{
+    TileData* t = World::ins()->tryGetTile(x, y, z);
+    return t != nullptr ? t->PropPtr.get() : nullptr;
+}
+Prop* TileProp(Point3 pt)
+{
+    TileData* t = World::ins()->tryGetTile(pt.x, pt.y, pt.z);
+    return t != nullptr ? t->PropPtr.get() : nullptr;
+}
 Vehicle*& TileVehicle(int x, int y, int z) { return World::ins()->getTile(x, y, z).VehiclePtr; }
 Vehicle*& TileVehicle(Point3 pt) { return World::ins()->getTile(pt.x, pt.y, pt.z).VehiclePtr; }
 

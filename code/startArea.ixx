@@ -222,7 +222,7 @@ export void startArea()
 	//집 우측 4타일
 	setWall({ -1,-3,0 }, 375);
 	setWall({ -1,-4,0 }, 114);
-	setWall({ -1,-5,0 }, 375);
+	setWall({ -1,-5,0 }, 375);c
 	setWall({ -1,-6,0 }, 375);
 	//집 좌측 4타일
 	setWall({ -5,-3,0 }, 375);
@@ -1317,7 +1317,7 @@ export void startArea()
 		}
 
 		// 진입측 / 출구측 양방향 ramp — 같은 (x, y)의 두 z에 RAMP_UP/RAMP_DOWN 쌍으로 배치
-		for (int dx = -21; dx <= -5; dx++)
+		for (int dx = -22; dx <= -4; dx++)
 		{
 			createProp({ dx, 29, 0 }, itemID::rampUp);   // 도로 → 다리
 			createProp({ dx, 29, 1 }, itemID::rampDown); // 다리 → 도로
@@ -1330,6 +1330,13 @@ export void startArea()
 		{
 			setWall({ -22, dy, 1 }, itemID::guardrail);
 			setWall({ -4, dy, 1 }, itemID::guardrail);
+		}
+
+		// ramp 뒤(다리 안쪽 z=0)에 기둥벽 — 다리 밑에서 ramp 역방향 진입 차단 + 시야 차단
+		for (int dx = -22; dx <= -4; dx++)
+		{
+			setWall({ dx, 30, 0 }, itemID::pillarWall); // 북쪽 ramp 뒤
+			setWall({ dx, 59, 0 }, itemID::pillarWall); // 남쪽 ramp 뒤
 		}
 
 		// z=0 진입측/출구측 다리 연장 — 도로가 다리로 전환되는 시각 단서 + 가드레일로 진입 방향 유도

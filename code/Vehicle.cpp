@@ -179,25 +179,20 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
         std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
-        for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
+        // straddle 시 z가 섞여있을 수 있어 partInfo 직접 순회 (xy 스캔 X) + z 보존
+        for (auto& [pos, pocket] : partInfo)
         {
-            for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
+            Point2 originCoord = currentCoordTransform[{pos.x - getGridX(), pos.y - getGridY()}];
+            Point2 dstCoord;
+            for (const auto& [coord, transformedCoord] : targetCoordTransform)
             {
-                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
+                if (transformedCoord == originCoord)
                 {
-                    Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
-                    Point2 dstCoord;
-                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
-                    {
-                        if (transformedCoord == originCoord)
-                        {
-                            dstCoord = coord;
-                            break;
-                        }
-                    }
-                    newPartInfo[{dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ()}] = std::move(partInfo[{x, y, getGridZ()}]);
+                    dstCoord = coord;
+                    break;
                 }
             }
+            newPartInfo[{dstCoord.x + getGridX(), dstCoord.y + getGridY(), pos.z}] = std::move(pocket);
         }
         partInfo = std::move(newPartInfo);
     }
@@ -210,25 +205,19 @@ std::unordered_set<Point3, Point3::Hash> Vehicle::getRotateShadow(dir16 inputDir
         std::unordered_set<Point3, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
-        for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
+            Point2 originCoord = currentCoordTransform[{pos.x - getGridX(), pos.y - getGridY()}];
+            Point2 dstCoord;
+            for (const auto& [coord, transformedCoord] : targetCoordTransform)
             {
-                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
+                if (transformedCoord == originCoord)
                 {
-                    Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
-                    Point2 dstCoord;
-                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
-                    {
-                        if (transformedCoord == originCoord)
-                        {
-                            dstCoord = coord;
-                            break;
-                        }
-                    }
-                    newPartInfo.insert({ dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ() });
+                    dstCoord = coord;
+                    break;
                 }
             }
+            newPartInfo.insert({ dstCoord.x + getGridX(), dstCoord.y + getGridY(), pos.z });
         }
         return newPartInfo;
     }
@@ -247,39 +236,34 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole; //엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+        // straddle 대응: (x,y) 충돌 가능성이 있어도 z 다르면 별개. Point3 키로 wormhole.
+        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
         for (const auto& [pos, pocket] : partInfo)
         {
-            if (TileEntity(pos.x, pos.y, getGridZ()) != nullptr)
+            if (TileEntity(pos.x, pos.y, pos.z) != nullptr)
             {
-                entityWormhole[{pos.x, pos.y}] = std::move(World::ins()->getTile(pos.x, pos.y, getGridZ()).EntityPtr);
+                entityWormhole[pos] = std::move(World::ins()->getTile(pos.x, pos.y, pos.z).EntityPtr);
             }
         }
 
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
-        for (int x = getGridX() - MAX_VEHICLE_SIZE / 2; x <= getGridX() + MAX_VEHICLE_SIZE / 2; x++)
+        for (const auto& [pos, pocket] : partInfo)
         {
-            for (int y = getGridY() - MAX_VEHICLE_SIZE / 2; y <= getGridY() + MAX_VEHICLE_SIZE / 2; y++)
+            Point2 originCoord = currentCoordTransform[{pos.x - getGridX(), pos.y - getGridY()}];
+            Point2 dstCoord;
+            for (const auto& [coord, transformedCoord] : targetCoordTransform)
             {
-                if (partInfo.find({ x, y, getGridZ() }) != partInfo.end())
+                if (transformedCoord == originCoord)
                 {
-                    Point2 originCoord = currentCoordTransform[{x - getGridX(), y - getGridY()}];
-                    Point2 dstCoord;
-                    for (const auto& [coord, transformedCoord] : targetCoordTransform)
-                    {
-                        if (transformedCoord == originCoord)
-                        {
-                            dstCoord = coord;
-                            break;
-                        }
-                    }
-
-                    if (entityWormhole.find({ x, y }) != entityWormhole.end())
-                    {
-                        EntityPtrMove(std::move(entityWormhole[{x, y}]), { dstCoord.x + getGridX(), dstCoord.y + getGridY(), getGridZ() });
-                    }
+                    dstCoord = coord;
+                    break;
                 }
+            }
+
+            if (entityWormhole.find(pos) != entityWormhole.end())
+            {
+                EntityPtrMove(std::move(entityWormhole[pos]), { dstCoord.x + getGridX(), dstCoord.y + getGridY(), pos.z });
             }
         }
     }
@@ -291,7 +275,7 @@ void Vehicle::rotate(dir16 inputDir16)
     {
         for (const auto& [pos, pocket] : partInfo)
         {
-            TileVehicle(pos.x, pos.y, getGridZ()) = nullptr;
+            TileVehicle(pos.x, pos.y, pos.z) = nullptr;
         }
 
         rotateEntityPtr(inputDir16);
@@ -299,7 +283,7 @@ void Vehicle::rotate(dir16 inputDir16)
 
         for (const auto& [pos, pocket] : partInfo)
         {
-            TileVehicle(pos.x, pos.y, getGridZ()) = this;
+            TileVehicle(pos.x, pos.y, pos.z) = this;
         }
 
         //회전하는 방향에 대해 바퀴 방향 재설정
@@ -417,11 +401,14 @@ void Vehicle::shift(int dx, int dy)
 {
     if (dx == 0 && dy == 0) return;
 
-    // 큰 점프(가속페달)도 한 칸씩 분해 — 경유 ramp 무시 방지
+    // 큰 점프도 한 칸씩 분해 — 경유 ramp 무시 방지
     std::vector<Point2> path;
     makeLine(path, dx, dy);
 
     Point2 prev = { 0, 0 };
+    int totalDx = 0, totalDy = 0;
+    int currentZ = getGridZ();
+
     for (const auto& pt : path)
     {
         int stepDx = pt.x - prev.x;
@@ -429,35 +416,104 @@ void Vehicle::shift(int dx, int dy)
         prev = pt;
         if (stepDx == 0 && stepDy == 0) continue;
 
-        std::unordered_map<Point3, Point3, Point3::Hash> partOldToNew;
+        // ramp 트리거 검사: 어떤 파츠든 ramp 타일에 닿으면 텔레포트 발동
+        // 정방향(ramp 같은 z 진입) + 역방향(ramp 위 z+1 타일 진입 = 다리 끝 도달 시 하강) 모두 처리
+        int dz = 0;
+        Point2 rampHitXY{ 0, 0 };
+        bool triggered = false;
         for (const auto& [pos, pocket] : partInfo)
         {
-            int newZ = pos.z;
-            Prop* destProp = TileProp(pos.x + stepDx, pos.y + stepDy, pos.z);
-            if (destProp != nullptr)
+            int destX = pos.x + stepDx;
+            int destY = pos.y + stepDy;
+            Prop* destProp = TileProp(destX, destY, pos.z);
+            Prop* belowProp = TileProp(destX, destY, pos.z - 1);
+            Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
+            if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != 0)
             {
-                // 짝맞춤: 진행 방향 2칸 앞 z±1에 floor 있고, 2칸 앞이 또 다른 ramp가 아니어야 트리거
-                // (같은 ramp 줄 측면 이동은 2칸 앞도 ramp라 트리거 X)
-                Prop* nextProp = TileProp(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z);
-                bool nextIsRamp = nextProp != nullptr &&
-                    (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                        || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
-                if (destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                    && TileFloor(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z + 1) != 0
-                    && !nextIsRamp)
-                {
-                    newZ = pos.z + 1;
-                }
-                else if (destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                    && TileFloor(pos.x + 2 * stepDx, pos.y + 2 * stepDy, pos.z - 1) != 0
-                    && !nextIsRamp)
-                {
-                    newZ = pos.z - 1;
-                }
+                rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
             }
-            partOldToNew[pos] = { pos.x + stepDx, pos.y + stepDy, newZ };
+            if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != 0)
+            {
+                rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+            }
+            if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != 0)
+            {
+                rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+            }
+            if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != 0)
+            {
+                rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
+            }
         }
 
+        std::unordered_map<Point3, Point3, Point3::Hash> partOldToNew;
+        int appliedDx = stepDx, appliedDy = stepDy;
+        int appliedZ = currentZ;
+
+        if (triggered)
+        {
+            // 후미: step 방향 dot 최소인 파츠
+            int minDot = std::numeric_limits<int>::max();
+            int rearX = 0, rearY = 0;
+            for (const auto& [pos, pocket] : partInfo)
+            {
+                int dot = pos.x * stepDx + pos.y * stepDy;
+                if (dot < minDot) { minDot = dot; rearX = pos.x; rearY = pos.y; }
+            }
+            // 후미 새 위치 = rampHit + step (즉 ramp 1칸 앞에 후미)
+            int offsetX = (rampHitXY.x + stepDx) - rearX;
+            int offsetY = (rampHitXY.y + stepDy) - rearY;
+            appliedDx = offsetX; appliedDy = offsetY; appliedZ = currentZ + dz;
+            for (const auto& [pos, pocket] : partInfo)
+            {
+                partOldToNew[pos] = { pos.x + offsetX, pos.y + offsetY, appliedZ };
+            }
+
+            // 텔레포트 도착지 전 범위 장애물 검사 — 하나라도 막히면 ramp 진입 자체 차단
+            bool blocked = false;
+            Point3 blockPos{ 0,0,0 };
+            const wchar_t* blockReason = L"";
+            for (const auto& [oldPos, newPos] : partOldToNew)
+            {
+                if (TileFloor(newPos.x, newPos.y, newPos.z) == 0)
+                {
+                    blocked = true; blockPos = newPos; blockReason = L"floor 없음"; break;
+                }
+                if (TileWall(newPos.x, newPos.y, newPos.z) != 0)
+                {
+                    blocked = true; blockPos = newPos; blockReason = L"wall"; break;
+                }
+                Prop* p = TileProp(newPos.x, newPos.y, newPos.z);
+                if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+                {
+                    blocked = true; blockPos = newPos; blockReason = L"prop"; break;
+                }
+                Vehicle* v = TileVehicle(newPos.x, newPos.y, newPos.z);
+                if (v != nullptr && v != this)
+                {
+                    blocked = true; blockPos = newPos; blockReason = L"vehicle"; break;
+                }
+            }
+            if (blocked)
+            {
+                prt(L"[Vehicle:shift] ramp 텔레포트 막힘 - %s 도착지(%d,%d,%d)\n",
+                    blockReason, blockPos.x, blockPos.y, blockPos.z);
+                break;
+            }
+        }
+        else
+        {
+            for (const auto& [pos, pocket] : partInfo)
+            {
+                partOldToNew[pos] = { pos.x + stepDx, pos.y + stepDy, pos.z };
+            }
+        }
+
+        // 이동 적용
         std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
         for (const auto& [oldPos, newPos] : partOldToNew)
         {
@@ -467,17 +523,14 @@ void Vehicle::shift(int dx, int dy)
                 entityWormhole[oldPos] = std::move(World::ins()->getTile(oldPos.x, oldPos.y, oldPos.z).EntityPtr);
             }
         }
-
-        // unique_ptr 오버로드 — 차량과 함께 옮기는 entity의 ramp 재트리거 방지
         for (const auto& [oldPos, newPos] : partOldToNew)
         {
             TileVehicle(newPos.x, newPos.y, newPos.z) = this;
             if (entityWormhole.find(oldPos) != entityWormhole.end())
             {
-                EntityPtrMove(std::move(entityWormhole[oldPos]), { newPos.x, newPos.y, newPos.z });
+                EntityPtrMove(std::move(entityWormhole[oldPos]), newPos);
             }
         }
-
         std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
         for (auto& [pos, pocket] : partInfo)
         {
@@ -485,10 +538,14 @@ void Vehicle::shift(int dx, int dy)
         }
         partInfo = std::move(shiftPartInfo);
 
-        flattenUnsupported();
+        totalDx += appliedDx;
+        totalDy += appliedDy;
+        currentZ = appliedZ;
+
+        if (triggered) break; // 텔레포트로 이동 완료, 잔여 path 무시
     }
 
-    setGrid(getGridX() + dx, getGridY() + dy, computeDominantZ());
+    setGrid(getGridX() + totalDx, getGridY() + totalDy, currentZ);
     updateHeadlight();
 }
 
@@ -531,90 +588,177 @@ void Vehicle::zShift(int dz)
 bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 {
     auto rotatedPartInfo = getRotateShadow(inputDir16);
+
+    // ramp 트리거 검사 (정방향 + 역방향)
+    int dz = 0;
+    Point2 rampHitXY{ 0, 0 };
+    bool triggered = false;
     for (const auto& pos : rotatedPartInfo)
     {
-        int arrZ = pos.z;
-        Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
-        if (destRampProp != nullptr)
+        int destX = pos.x + dx, destY = pos.y + dy;
+        Prop* destProp = TileProp(destX, destY, pos.z);
+        Prop* belowProp = TileProp(destX, destY, pos.z - 1);
+        Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
+        if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
         {
-            Prop* nextProp = TileProp(pos.x + 2 * dx, pos.y + 2 * dy, pos.z);
-            bool nextIsRamp = nextProp != nullptr &&
-                (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                    || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
-            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z + 1) != 0
-                && !nextIsRamp)
-            {
-                arrZ = pos.z + 1;
-            }
-            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z - 1) != 0
-                && !nextIsRamp)
-            {
-                arrZ = pos.z - 1;
-            }
+            rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
-
-        //벽 충돌 체크
-        if (TileWall(pos.x + dx, pos.y + dy, arrZ) != 0) return true;
-
-        if (TileProp(pos.x + dx, pos.y + dy, arrZ) != nullptr)
+        if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
         {
-            if (TileProp(pos.x + dx, pos.y + dy, arrZ)->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+        }
+        if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+        {
+            rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+        }
+        if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+        {
+            rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
+        }
+    }
+
+    if (triggered)
+    {
+        // 텔레포트 후 위치 계산 — 후미 = rampHit + step
+        int minDot = std::numeric_limits<int>::max();
+        int rearX = 0, rearY = 0;
+        for (const auto& pos : rotatedPartInfo)
+        {
+            int dot = pos.x * dx + pos.y * dy;
+            if (dot < minDot) { minDot = dot; rearX = pos.x; rearY = pos.y; }
+        }
+        int offsetX = (rampHitXY.x + dx) - rearX;
+        int offsetY = (rampHitXY.y + dy) - rearY;
+        for (const auto& pos : rotatedPartInfo)
+        {
+            int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
+            if (TileFloor(nx, ny, nz) == 0)
             {
+                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            if (TileWall(nx, ny, nz) != 0)
+            {
+                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            Prop* p = TileProp(nx, ny, nz);
+            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+            {
+                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            Vehicle* v = TileVehicle(nx, ny, nz);
+            if (v != nullptr && v != this)
+            {
+                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
         }
+        return false;
+    }
 
-        //차량 충돌 체크
-        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, arrZ);
-        if (targetPtr != nullptr && targetPtr != this) return true;
+    // 정규 이동 충돌 체크
+    for (const auto& pos : rotatedPartInfo)
+    {
+        int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
+        if (TileWall(nx, ny, nz) != 0) return true;
+        Prop* p = TileProp(nx, ny, nz);
+        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
+        Vehicle* v = TileVehicle(nx, ny, nz);
+        if (v != nullptr && v != this) return true;
     }
     return false;
 }
 
-bool Vehicle::colisionCheck(int dx, int dy)//해당 dx,dy만큼 이동했을 때 prop이 벽 또는 기존의 Vehicle과 충돌하는지
+bool Vehicle::colisionCheck(int dx, int dy)
 {
+    // ramp 트리거 검사 (정방향 + 역방향)
+    int dz = 0;
+    Point2 rampHitXY{ 0, 0 };
+    bool triggered = false;
     for (const auto& [pos, pocket] : partInfo)
     {
-        int arrZ = pos.z;
-        Prop* destRampProp = TileProp(pos.x + dx, pos.y + dy, pos.z);
-        if (destRampProp != nullptr)
+        int destX = pos.x + dx, destY = pos.y + dy;
+        Prop* destProp = TileProp(destX, destY, pos.z);
+        Prop* belowProp = TileProp(destX, destY, pos.z - 1);
+        Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
+        if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
         {
-            Prop* nextProp = TileProp(pos.x + 2 * dx, pos.y + 2 * dy, pos.z);
-            bool nextIsRamp = nextProp != nullptr &&
-                (nextProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                    || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
-            if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z + 1) != 0
-                && !nextIsRamp)
-            {
-                arrZ = pos.z + 1;
-            }
-            else if (destRampProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(pos.x + 2 * dx, pos.y + 2 * dy, pos.z - 1) != 0
-                && !nextIsRamp)
-            {
-                arrZ = pos.z - 1;
-            }
+            rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
-
-        //벽 충돌 체크
-        if (TileWall(pos.x + dx, pos.y + dy, arrZ) != 0) return true;
-
-        if (TileProp(pos.x + dx, pos.y + dy, arrZ) != nullptr)
+        if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
         {
-            if (TileProp(pos.x + dx, pos.y + dy, arrZ)->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+        }
+        if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+        {
+            rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
+        }
+        if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+        {
+            rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
+        }
+    }
+
+    if (triggered)
+    {
+        int minDot = std::numeric_limits<int>::max();
+        int rearX = 0, rearY = 0;
+        for (const auto& [pos, pocket] : partInfo)
+        {
+            int dot = pos.x * dx + pos.y * dy;
+            if (dot < minDot) { minDot = dot; rearX = pos.x; rearY = pos.y; }
+        }
+        int offsetX = (rampHitXY.x + dx) - rearX;
+        int offsetY = (rampHitXY.y + dy) - rearY;
+        for (const auto& [pos, pocket] : partInfo)
+        {
+            int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
+            if (TileFloor(nx, ny, nz) == 0)
             {
+                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            if (TileWall(nx, ny, nz) != 0)
+            {
+                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            Prop* p = TileProp(nx, ny, nz);
+            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+            {
+                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
+                return true;
+            }
+            Vehicle* v = TileVehicle(nx, ny, nz);
+            if (v != nullptr && v != this)
+            {
+                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
         }
+        return false;
+    }
 
-        //차량 충돌 체크
-        Vehicle* targetPtr = TileVehicle(pos.x + dx, pos.y + dy, arrZ);
-        if (targetPtr != nullptr && targetPtr != this)
+    for (const auto& [pos, pocket] : partInfo)
+    {
+        int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
+        if (TileWall(nx, ny, nz) != 0) return true;
+        Prop* p = TileProp(nx, ny, nz);
+        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
+        Vehicle* v = TileVehicle(nx, ny, nz);
+        if (v != nullptr && v != this)
         {
-            prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, targetPtr);
+            prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, v);
             return true;
         }
     }
@@ -655,64 +799,6 @@ void Vehicle::rush(int dx, int dy)
 
 void Vehicle::centerShift(int dx, int dy, int dz)
 {
-}
-
-// 지지 안 되는 파츠(자기 z에 floor 없음)를 위/아래 한 칸의 floor 있는 z로 정렬.
-// CDDA PR #41135 패턴: ramp 통과 후 transitional 상태가 무한 지속되지 않도록 안정화.
-// 이게 없으면 차량이 다리 진입 시 z=0/z=1 시시각각 진동함.
-void Vehicle::flattenUnsupported()
-{
-    // iteration 중 partInfo 변경 방지 위해 미리 수집
-    std::vector<std::pair<Point3, Point3>> repositions;
-    for (const auto& [pos, pocket] : partInfo)
-    {
-        if (TileFloor(pos.x, pos.y, pos.z) != 0) continue; // 지지됨
-
-        int newZ = pos.z;
-        if (TileFloor(pos.x, pos.y, pos.z - 1) != 0) newZ = pos.z - 1; // 아래 우선 (중력)
-        else if (TileFloor(pos.x, pos.y, pos.z + 1) != 0) newZ = pos.z + 1;
-        else continue; // 위아래 둘 다 floor 없으면 그대로 둠
-
-        repositions.push_back({ pos, { pos.x, pos.y, newZ } });
-    }
-
-    for (const auto& [oldPos, newPos] : repositions)
-    {
-        TileVehicle(oldPos.x, oldPos.y, oldPos.z) = nullptr;
-        TileVehicle(newPos.x, newPos.y, newPos.z) = this;
-
-        auto& oldTile = World::ins()->getTile(oldPos.x, oldPos.y, oldPos.z);
-        if (oldTile.EntityPtr != nullptr)
-        {
-            EntityPtrMove(std::move(oldTile.EntityPtr), newPos);
-        }
-
-        auto it = partInfo.find(oldPos);
-        if (it != partInfo.end())
-        {
-            std::unique_ptr<ItemPocket> pocket = std::move(it->second);
-            partInfo.erase(it);
-            partInfo[newPos] = std::move(pocket);
-        }
-    }
-}
-
-int Vehicle::computeDominantZ()
-{
-    if (partInfo.empty()) return getGridZ();
-
-    std::unordered_map<int, int> zCount;
-    for (const auto& [pos, pocket] : partInfo)
-    {
-        zCount[pos.z]++;
-    }
-    int dominantZ = partInfo.begin()->first.z;
-    int maxCount = 0;
-    for (const auto& [z, cnt] : zCount)
-    {
-        if (cnt > maxCount) { maxCount = cnt; dominantZ = z; }
-    }
-    return dominantZ;
 }
 
 void Vehicle::updateHeadlight()
