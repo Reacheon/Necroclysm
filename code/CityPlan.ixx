@@ -30,12 +30,14 @@ import worldGen;
 // buildCityPlan이 "깔 타일"을 기록하는 단위. 실타일 좌표 + 무엇을 깔지.
 //   PaintCell(Sector 모듈)을 직접 쓰면 import 사이클이 생기므로, 여기선 raw id
 //   필드만 보유 → procGenerate 4단계가 PaintCell로 번역해서 블릿.
-//   floor/wall == 0 이면 "그 레이어는 안 건드림".
+//   floor/wall/prop == 0 이면 "그 레이어는 안 건드림".
+//   prop: createProp 호출 대상 — ramp 등 z 다리 시스템에 쓰임.
 export struct CityTile
 {
     Point3        pos;          // 실타일 좌표 (x, y, z)
     std::uint16_t floor = 0;
     std::uint16_t wall  = 0;
+    std::uint16_t prop  = 0;
 };
 
 export struct CityPlan
@@ -53,6 +55,11 @@ export struct CityPlan
     //  각 segment.verts는 항상 2점 (양 끝). 도시당 수천 개라 메모리 추가는 있지만
     //  도로 분할 알고리즘 디버깅에 시각 확인이 필수라 보관.
     std::vector<worldGen::RoadPolyLine> segments;
+
+    //  강을 가로지르는 다리 폴리라인 — z+1 deck + ramp 시스템 (16단계 페인트).
+    //  segments와 분리: 11-15단계의 평면 도로 페인트 대상이 아니어야 하고, Map에선
+    //  다른 색/스타일로 그릴 수 있게 채널 분리. 각 폴리라인 verts는 양 끝점 2개.
+    std::vector<worldGen::RoadPolyLine> bridges;
 
     CityPlan() = default;
     explicit CityPlan(city::CityId id_) noexcept : id(id_) {}

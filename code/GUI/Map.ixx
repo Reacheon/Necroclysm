@@ -108,6 +108,7 @@ namespace mappal
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
     inline SDL_Color roadLine()     { return { 255, 140,  30, 255 }; }  // 광역 도로 폴리라인 오버레이
     inline SDL_Color cityRoadLine() { return { 255, 220,  80, 255 }; }  // 도시 내부 도로 세그먼트 (debug)
+    inline SDL_Color bridgeLine()   { return { 120, 220, 255, 255 }; }  // 도시 내부 다리 (16단계 z+1 deck)
 
     // UI 크롬
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
@@ -606,6 +607,41 @@ static void drawCityRoadOverlay(const MapView& v)
                     static_cast<int>(std::round(sxB)),
                     static_cast<int>(std::round(syB)),
                     color);
+                ++dbgDrawn;
+            }
+            else
+            {
+                ++dbgClipped;
+            }
+        }
+
+        //── 다리 (segments와 분리 채널, z+1 deck — segments와 같은 view.z에서 그림) ──
+        const SDL_Color bridgeColor = mappal::bridgeLine();
+        for (const auto& br : plan->bridges)
+        {
+            if (br.verts.size() < 2) continue;
+            if (br.verts[0].z != v.z) { ++dbgWrongZ; continue; }
+
+            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, br.verts[0].x))
+                             * v.pxPerTile + v.viewW * 0.5;
+            const double syA = tileYToScreen(br.verts[0].y);
+            const int dxSeg = worldWrap::signedDeltaTileX(br.verts[0].x, br.verts[1].x);
+            const double sxB = sxA + static_cast<double>(dxSeg) * v.pxPerTile;
+            const double syB = tileYToScreen(br.verts[1].y);
+
+            const float minX = (float)std::min(sxA, sxB);
+            const float maxX = (float)std::max(sxA, sxB);
+            const float minY = (float)std::min(syA, syB);
+            const float maxY = (float)std::max(syA, syB);
+            if (maxX >= -marginPx && minX <= vw + marginPx &&
+                maxY >= -marginPx && minY <= vh + marginPx)
+            {
+                drawLine(
+                    static_cast<int>(std::round(sxA)),
+                    static_cast<int>(std::round(syA)),
+                    static_cast<int>(std::round(sxB)),
+                    static_cast<int>(std::round(syB)),
+                    bridgeColor);
                 ++dbgDrawn;
             }
             else

@@ -114,7 +114,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
             case worldGrid::Terrain::CityZone:
             case worldGrid::Terrain::CityCenter:
-                cell.floor = itemID::paver;   //도시 기본 보도블럭
+                //도시 픽셀은 그냥 dirt(기본값) — paver는 CityPlan stage 15가 도로 주변에만 깔음
                 break;
             }
 
@@ -388,21 +388,21 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     }
 
     //═══════════════════════════════════════════════════════════════════════
-    // 4) 도시 CityPlan 소비 — CityPlan.tiles의 floor/wall을 PaintCell에 적층 페인트.
+    // 4) 도시 CityPlan 소비 — CityPlan.tiles의 floor/wall/prop을 PaintCell/sparse에 페인트.
     //
     //   이 섹터 근처 도시 각각의 CityPlan을 CityPlanCache::getOrCompute로 조회 —
     //   miss면 호출 스레드(여기선 ProcGenWorker)에서 즉시 buildCityPlan 계산 후 캐시.
-    //   워커 위임이 없는 캐시라 "자기 자신이 채울 future를 기다리는" 데드락 없음.
-    //   단일 워커라 같은 도시는 1번만 계산되고 이후 섹터들은 캐시 hit.
     //
-    //   각 CityTile을 자기 섹터 타일 범위로 클립해서 페인트 — 도시가 섹터를
-    //   가로질러도 각 섹터가 자기 부분만 칠함 (클리핑 OK). floor/wall == 0 은 스킵.
+    //   각 CityTile 라우팅:
+    //     - t.pos.z == sc.z + floor/wall: 본 z층 dense PaintCell에 페인트
+    //     - t.pos.z != sc.z + floor/wall: sparse skyTiles에 push (다리 deck 등 다른 z층)
+    //     - t.prop != 0: 모든 z를 sparse props에 push (createChunk가 createProp 호출)
     //
-    //   citiesInRangeOf(섹터 중심)은 5×5 섹터 범위 — 도시 footprint(≤~1섹터)가 이
-    //   섹터에 닿으면 중심은 반드시 이 범위 안. 과다 조회분은 per-tile 클립이 거름.
+    //   섹터 단일 조회 정책: createChunk는 chunkZ가 무엇이든 sc.z=0 섹터 1개만 조회.
+    //   본 sector(z=0)에 모든 z의 sparse 데이터가 모이므로 z=±1 청크도 같은 SectorPlan
+    //   에서 자기 z 데이터를 추출 → z층마다 따로 14.7M 평면 안 깔아도 됨.
     //
-    //   현재 buildCityPlan은 plan.tiles에 dummy 1개만 push (실 페인트는 plan.segments
-    //   경유). buildCityPlan이 블록/건물 CityTile을 채우기 시작하면 자동으로 깔린다.
+    //   클리핑: 각 CityTile을 자기 섹터 타일 범위로 클립 (도시가 섹터 가로질러도 OK).
     //═══════════════════════════════════════════════════════════════════════
     {
         const Point3 sectorCenter{
@@ -415,15 +415,35 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const CityPlan& cp = CityPlanCache::ins().getOrCompute(id, seed);
             for (const CityTile& t : cp.tiles)
             {
-                if (t.pos.z != sc.z) continue;
                 const int dx = t.pos.x - sectorOriginTileX;
                 const int dy = t.pos.y - sectorOriginTileY;
-                if (dx < 0 || dx >= SectorCoord::TILES) continue;
-                if (dy < 0 || dy >= SectorCoord::TILES) continue;
+                const bool inSectorXY = (dx >= 0 && dx < SectorCoord::TILES
+                                      && dy >= 0 && dy < SectorCoord::TILES);
+                if (!inSectorXY) continue;
 
-                PaintCell& cell = plan.tiles[static_cast<std::size_t>(dy) * SectorCoord::TILES + dx];
-                if (t.floor) cell.floor = t.floor;
-                if (t.wall)  cell.wall  = t.wall;
+                if (t.pos.z == sc.z)
+                {
+                    if (t.floor || t.wall)
+                    {
+                        PaintCell& cell = plan.tiles[static_cast<std::size_t>(dy) * SectorCoord::TILES + dx];
+                        if (t.floor) cell.floor = t.floor;
+                        if (t.wall)  cell.wall  = t.wall;
+                    }
+                }
+                else
+                {
+                    if (t.floor || t.wall)
+                    {
+                        plan.skyTiles.push_back(SectorSkyTile{
+                            .pos   = t.pos,
+                            .floor = t.floor,
+                            .wall  = t.wall,
+                            .flags = static_cast<std::uint8_t>(t.floor ? TILE_FLAG_WALKABLE : 0),
+                            });
+                    }
+                }
+
+                if (t.prop) plan.props.push_back(SectorProp{ .pos = t.pos, .itemId = t.prop });
             }
         }
     }

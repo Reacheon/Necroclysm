@@ -579,14 +579,19 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
 
     //══════════════════════════════════════════════════════════════════
-    // 10. 다리 추가 — 강(CityRiver/CitySea)을 가로지르는 도로
+    // 10. 다리 후보 수집 — 강(CityRiver/CitySea) 가로지르는 픽셀 좌표 + 방향
     //══════════════════════════════════════════════════════════════════
     //   도시 픽셀을 셔플 순회하며 강 픽셀의 위아래/좌우 도시 인접을 검사.
     //   - 강 두께 1픽셀만 지원 (위↔아래 또는 좌↔우가 바로 도시인 경우)
     //     TODO: 강 두께 ≥ 2픽셀 지원 — 연속 강 픽셀 추적 후 양 끝 도시까지 잇기
     //   - BRIDGE_MIN_GAP_PX 이내에 이미 다리 있으면 스킵 → 간격 균등
     //   - 확률 게이트 (첫 다리는 면제 → 강 전체 0개 다리 케이스 회피)
-    //   - 다리 본체는 격자 정렬 96타일 직선 — 양 끝이 강변 도로 노드(6.2 보존)에 자연 연결
+    //
+    //   plan.segments에 push하지 *않음* — 다리는 z+1 deck + ramp 시스템(16단계)으로
+    //   페인트하므로 11-15단계의 평면 도로 페인트(z=0 아스팔트 일자) 대상이 아님.
+    //   대신 plan.bridges에 폴리라인으로 수집 (Map.ixx 시각화도 본 채널 소비).
+    //   NS 다리: 수직 폴리라인 (verts[0].x == verts[1].x)
+    //   WE 다리: 수평 폴리라인 (verts[0].y == verts[1].y)
     //══════════════════════════════════════════════════════════════════
 
     constexpr double BRIDGE_P = 0.5;
@@ -648,21 +653,21 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         if (!firstBridge && std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= BRIDGE_P) continue;
         firstBridge = false;
 
-        //다리 본체 — 격자 정렬 직선 (양 옆 픽셀 중심까지 96타일)
+        //plan.bridges 폴리라인 — 양 옆 픽셀 중심까지 96타일 직선
         const int z = p.z;
-        if (ns) //North-South 수직 다리
+        if (ns)
         {
             const int x = p.x * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
             const int y0 = (p.y - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
             const int y1 = (p.y + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
-            plan.segments.push_back(worldGen::RoadPolyLine{ .verts = { {x, y0, z}, {x, y1, z} } });
+            plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {x, y0, z}, {x, y1, z} } });
         }
-        else //West-East 수평 다리
+        else
         {
             const int y = p.y * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
             const int x0 = (p.x - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
             const int x1 = (p.x + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
-            plan.segments.push_back(worldGen::RoadPolyLine{ .verts = { {x0, y, z}, {x1, y, z} } });
+            plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {x0, y, z}, {x1, y, z} } });
         }
 
         placedBridges.push_back(p);
@@ -978,6 +983,383 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                     .pos = pos,
                     .floor = static_cast<std::uint16_t>(itemID::yellowAsphalt),
                     });
+            }
+        }
+    }
+
+    //══════════════════════════════════════════════════════════════════
+    // 15. 도로 주변 3타일 paver 보도 — 인도/연석 영역
+    //══════════════════════════════════════════════════════════════════
+    //   12단계 도로 본체(15폭 + 양끝 square cap) 외곽 3타일을 paver로 채움.
+    //   T-junction/+자에서 다른 도로 본체에 paver가 닿는 부분은 스킵 → asphalt 보존
+    //   (지금까지 push된 도로 타일 위치 집합으로 판정).
+    //
+    //   stage 15이므로 stage 12-14 이후 실행 — 도로 타일 위로 paver가 덮어쓰지
+    //   않도록 명시적 필터링 필요. 12-14가 push한 모든 타일(아스팔트/횡단보도/노란선)
+    //   위치를 set으로 모아 룩업.
+    //══════════════════════════════════════════════════════════════════
+
+    constexpr int PAVER_BORDER = 3;
+    constexpr int PAVER_EXPAND = 7 + PAVER_BORDER;  // = 10, 도로 반폭 + 보도
+
+    std::unordered_set<Point3, Point3::Hash> roadTiles;
+    roadTiles.reserve(plan.tiles.size());
+    for (const auto& t : plan.tiles) roadTiles.insert(t.pos);
+
+    for (const worldGen::RoadPolyLine& seg : plan.segments)
+    {
+        const Point3& a = seg.verts[0];
+        const Point3& b = seg.verts[1];
+        const bool horizontal = (a.y == b.y);
+
+        const int x0 = std::min(a.x, b.x);
+        const int x1 = std::max(a.x, b.x);
+        const int y0 = std::min(a.y, b.y);
+        const int y1 = std::max(a.y, b.y);
+        const int z = a.z;
+
+        if (horizontal)
+        {
+            for (int x = x0 - PAVER_EXPAND; x <= x1 + PAVER_EXPAND; ++x)
+                for (int dy = -PAVER_EXPAND; dy <= PAVER_EXPAND; ++dy)
+                {
+                    const Point3 pos{ x, y0 + dy, z };
+                    if (roadTiles.contains(pos)) continue;
+                    plan.tiles.push_back(CityTile{
+                        .pos = pos,
+                        .floor = static_cast<std::uint16_t>(itemID::paver),
+                        });
+                }
+        }
+        else
+        {
+            for (int y = y0 - PAVER_EXPAND; y <= y1 + PAVER_EXPAND; ++y)
+                for (int dx = -PAVER_EXPAND; dx <= PAVER_EXPAND; ++dx)
+                {
+                    const Point3 pos{ x0 + dx, y, z };
+                    if (roadTiles.contains(pos)) continue;
+                    plan.tiles.push_back(CityTile{
+                        .pos = pos,
+                        .floor = static_cast<std::uint16_t>(itemID::paver),
+                        });
+                }
+        }
+    }
+
+    //══════════════════════════════════════════════════════════════════
+    // 16. 다리 페인트 — z+1 deck + ramp + guardrail + pillar wall + z=0 진입
+    //══════════════════════════════════════════════════════════════════
+    //   startArea의 ramp 다리 시스템을 도시 자동생성에 통합 (10단계가 수집한
+    //   plan.bridges 소비). 폴리라인 endpoint(yA/yB 또는 xA/xB)는 도시 도로 그리드의
+    //   T-junction node(픽셀 중심) — 거기서 ramp까지 15타일 떨어진 위치에 배치한다.
+    //
+    //     T-junction node (yA)            ← 동서 도로 본체 중심 (12단계 cap이 ±7 연장)
+    //         │ cap end (yA+7)             ← 동서 도로 body의 남쪽 끝
+    //         │     ... (15단계 paver 보도 cap, 3행)
+    //         │ 진입로 시작 (yA+11)        ← z=0 5타일 진입 zone (paver 사이드 + 아스팔트 센터)
+    //         │     ...
+    //         │ ramp (yA+15)               ← rampUp 프롭 (21폭), z=0/z+1 전환
+    //         │ pillar wall (yA+16)        ← 21폭 wall, 다리 밑 진입 차단
+    //         │ deck interior (z+1)        ← 길이 yB-yA-30
+    //         │ pillar wall (yB-16)
+    //         │ ramp (yB-15)
+    //         │ 진입로 끝 (yB-11)
+    //         │ ...
+    //         │ T-junction node (yB)
+    //
+    //   왜 endpoint에서 15 떨어뜨리는가:
+    //     ramp/pillar wall을 endpoint(yA)에 두면 양쪽 동서 도로 body(yA-7 ~ yA+7)에
+    //     겹쳐 차량 통행 차단. cap end(7) + 진입 5 + 추가 3(다리 본체 6타일 축소) = 15.
+    //
+    //   가드레일 위치:
+    //     outermost paver 타일(xc±10)에 배치 — startArea 패턴. 3타일 축소로 진입로가
+    //     stage 15의 perpendicular paver cap(yA+8~yA+10)을 침범하지 않으므로 직교
+    //     인도 통행 방해 없음.
+    //
+    //   진입로와 동서 도로 사이 갭 처리:
+    //     stage 15 paver cap이 yA+8~yA+10에 3행 paver를 깔아 도로가 끊긴 듯 보임.
+    //     → 다리 endpoint 방향으로 black asphalt 센터(15폭) 연장 + 13단계와 동일한
+    //       횡단보도 1세트 그려서 자연스러운 T-junction 형성.
+    //
+    //   T-junction 그래프 연결:
+    //     bridges는 plan.segments에 없으므로 11단계 그래프 노드로 안 잡힘. 즉 yA는
+    //     E+W+북쪽 연결 도로 = degree 3 T-junction (또는 +가 되면 degree 4). 다리는
+    //     ramp prop이 z 전환을 담당하므로 그래프 노드 등록 불필요.
+    //
+    //   주의: CityPlan 4단계가 z=groundZ tile은 dense PaintCell, z=deckZ tile은
+    //   sparse SectorSkyTile로 라우팅 (Sector.ixx 참조).
+    //══════════════════════════════════════════════════════════════════
+
+    constexpr int BRIDGE_HALF_WIDTH = 7;    //도로폭 절반 (12단계와 동일)
+    constexpr int BRIDGE_PAVER = 3;          //paver 보도 (15단계와 동일)
+    constexpr int BRIDGE_TOTAL_HALF = BRIDGE_HALF_WIDTH + BRIDGE_PAVER;  // = 10, 가드레일 위치 = outermost paver 타일
+    constexpr int BRIDGE_APPROACH_LEN = 5;  //z=0 진입 zone 5타일 (startArea와 동일)
+    constexpr int BRIDGE_RAMP_OFFSET = BRIDGE_HALF_WIDTH + BRIDGE_APPROACH_LEN + 3;  // = 15, 본체 6타일 축소
+
+    for (const worldGen::RoadPolyLine& bridge : plan.bridges)
+    {
+        if (bridge.verts.size() < 2) continue;
+        const Point3& va = bridge.verts[0];
+        const Point3& vb = bridge.verts[1];
+        const bool bridgeNS = (va.x == vb.x);  // 수직 = NS
+        const int groundZ = va.z;
+        const int deckZ   = va.z + 1;
+
+        //@brief deck floor — 중심 asphalt + 사이드 paver
+        auto pushDeckFloor = [&](int x, int y, int crossOff) {
+            const std::uint16_t floor = (std::abs(crossOff) > BRIDGE_HALF_WIDTH)
+                ? static_cast<std::uint16_t>(itemID::paver)
+                : static_cast<std::uint16_t>(itemID::blackAsphalt);
+            plan.tiles.push_back(CityTile{ .pos = {x, y, deckZ}, .floor = floor });
+            };
+
+        //@brief 다리 T-junction 횡단보도 — 13단계와 동일 로직, 다리 방향용
+        //   bridge polyline endpoint(yA/yB)에서 다리 방향(sx,sy)으로 횡단보도 1세트.
+        //   bridges는 plan.segments에 없어서 13단계가 다리 방향 crosswalk를 안 그리므로
+        //   여기서 직접 페인트. 위치/sprite 선택 룰은 13단계와 동일.
+        auto paintBridgeCrosswalk = [&](Point3 c, int sx, int sy) {
+            constexpr int CW_ROAD_HALF = 7;
+            constexpr int CW_INT_GAP = 1;
+            constexpr int CW_BAND_DEPTH = 3;
+
+            const int px = -sy;
+            const int py = sx;
+
+            std::uint16_t highSide, lowSide;
+            if      (px > 0) { highSide = static_cast<std::uint16_t>(itemID::whiteAsphaltRightHalf);  lowSide = static_cast<std::uint16_t>(itemID::whiteAsphaltLeftHalf); }
+            else if (px < 0) { highSide = static_cast<std::uint16_t>(itemID::whiteAsphaltLeftHalf);   lowSide = static_cast<std::uint16_t>(itemID::whiteAsphaltRightHalf); }
+            else if (py > 0) { highSide = static_cast<std::uint16_t>(itemID::whiteAsphaltBottomHalf); lowSide = static_cast<std::uint16_t>(itemID::whiteAsphaltTopHalf); }
+            else             { highSide = static_cast<std::uint16_t>(itemID::whiteAsphaltTopHalf);    lowSide = static_cast<std::uint16_t>(itemID::whiteAsphaltBottomHalf); }
+
+            for (int band = 0; band < 2; ++band)
+            {
+                const int alongBase = CW_ROAD_HALF + CW_INT_GAP + band * CW_BAND_DEPTH;
+                const int walkSign = (band == 0) ? +1 : -1;
+                const int wx = walkSign * px;
+                const int wy = walkSign * py;
+                const int arrowCrossOff = -walkSign * CW_ROAD_HALF;
+
+                std::uint16_t arrowSprite;
+                if      (wx > 0) arrowSprite = static_cast<std::uint16_t>(itemID::whiteAsphaltArrowR);
+                else if (wx < 0) arrowSprite = static_cast<std::uint16_t>(itemID::whiteAsphaltArrowL);
+                else if (wy > 0) arrowSprite = static_cast<std::uint16_t>(itemID::whiteAsphaltArrowD);
+                else             arrowSprite = static_cast<std::uint16_t>(itemID::whiteAsphaltArrowU);
+
+                for (int alongIdx = 0; alongIdx < CW_BAND_DEPTH; ++alongIdx)
+                {
+                    for (int crossOff = -CW_ROAD_HALF; crossOff <= CW_ROAD_HALF; ++crossOff)
+                    {
+                        std::uint16_t sprite;
+                        if (crossOff == arrowCrossOff)
+                        {
+                            if (alongIdx == 1) continue;
+                            sprite = arrowSprite;
+                        }
+                        else
+                        {
+                            const bool isHigh = (walkSign > 0) == ((crossOff & 1) == 0);
+                            sprite = isHigh ? highSide : lowSide;
+                        }
+
+                        const int tx = c.x + (alongBase + alongIdx) * sx + crossOff * px;
+                        const int ty = c.y + (alongBase + alongIdx) * sy + crossOff * py;
+                        plan.tiles.push_back(CityTile{ .pos = { tx, ty, c.z }, .floor = sprite });
+                    }
+                }
+            }
+            };
+
+        //@brief z=0 진입로 한 줄 — paver 사이드 + asphalt 센터 + outermost paver 위 가드레일
+        //   진입로가 3타일 안쪽으로 당겨졌으므로 perpendicular 인도(stage 15 paver cap)에는
+        //   영향 없음 → 가드레일은 다시 outermost paver 타일(xc±10)에 배치 가능.
+        auto pushApproachRowNS = [&](int xc, int y) {
+            for (int dx = -BRIDGE_TOTAL_HALF; dx <= BRIDGE_TOTAL_HALF; ++dx)
+            {
+                const std::uint16_t floor = (std::abs(dx) > BRIDGE_HALF_WIDTH)
+                    ? static_cast<std::uint16_t>(itemID::paver)
+                    : static_cast<std::uint16_t>(itemID::blackAsphalt);
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, y, groundZ}, .floor = floor });
+            }
+            plan.tiles.push_back(CityTile{ .pos = {xc - BRIDGE_TOTAL_HALF, y, groundZ},
+                                           .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            plan.tiles.push_back(CityTile{ .pos = {xc + BRIDGE_TOTAL_HALF, y, groundZ},
+                                           .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            };
+        auto pushApproachRowWE = [&](int yc, int x) {
+            for (int dy = -BRIDGE_TOTAL_HALF; dy <= BRIDGE_TOTAL_HALF; ++dy)
+            {
+                const std::uint16_t floor = (std::abs(dy) > BRIDGE_HALF_WIDTH)
+                    ? static_cast<std::uint16_t>(itemID::paver)
+                    : static_cast<std::uint16_t>(itemID::blackAsphalt);
+                plan.tiles.push_back(CityTile{ .pos = {x, yc + dy, groundZ}, .floor = floor });
+            }
+            plan.tiles.push_back(CityTile{ .pos = {x, yc - BRIDGE_TOTAL_HALF, groundZ},
+                                           .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            plan.tiles.push_back(CityTile{ .pos = {x, yc + BRIDGE_TOTAL_HALF, groundZ},
+                                           .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            };
+
+        if (bridgeNS)  //North-South 수직 다리
+        {
+            const int xc = va.x;
+            const int yA = std::min(va.y, vb.y);
+            const int yB = std::max(va.y, vb.y);
+            const int rampN_y = yA + BRIDGE_RAMP_OFFSET;
+            const int rampS_y = yB - BRIDGE_RAMP_OFFSET;
+
+            //── Deck floor (z+1) — rampN_y ~ rampS_y ──
+            for (int y = rampN_y; y <= rampS_y; ++y)
+                for (int dx = -BRIDGE_TOTAL_HALF; dx <= BRIDGE_TOTAL_HALF; ++dx)
+                    pushDeckFloor(xc + dx, y, dx);
+
+            //── Guardrail walls (z+1) — deck 전길이 양 사이드 (outermost paver 타일) ──
+            for (int y = rampN_y; y <= rampS_y; ++y)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {xc - BRIDGE_TOTAL_HALF, y, deckZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+                plan.tiles.push_back(CityTile{ .pos = {xc + BRIDGE_TOTAL_HALF, y, deckZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            }
+
+            //── Ramps (양 끝, 21폭) — z=0 rampUp + z+1 rampDown ──
+            for (int dx = -BRIDGE_TOTAL_HALF; dx <= BRIDGE_TOTAL_HALF; ++dx)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampN_y, groundZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampUp) });
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampN_y, deckZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampDown) });
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampS_y, groundZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampUp) });
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampS_y, deckZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampDown) });
+            }
+
+            //── Pillar walls (z=0) — ramp 안쪽 1타일, 21폭 ──
+            for (int dx = -BRIDGE_TOTAL_HALF; dx <= BRIDGE_TOTAL_HALF; ++dx)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampN_y + 1, groundZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::pillarWall) });
+                plan.tiles.push_back(CityTile{ .pos = {xc + dx, rampS_y - 1, groundZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::pillarWall) });
+            }
+
+            //── z=0 진입로 (5타일, ramp 행 포함) — paver 사이드 + asphalt 센터 + 가드레일 ──
+            //   북쪽: yA+11 ~ rampN_y(=yA+15). 진입로가 3타일 안쪽으로 당겨짐.
+            //   남쪽: rampS_y(=yB-15) ~ yB-11. 대칭.
+            for (int y = rampN_y - BRIDGE_APPROACH_LEN + 1; y <= rampN_y; ++y)
+                pushApproachRowNS(xc, y);
+            for (int y = rampS_y; y <= rampS_y + BRIDGE_APPROACH_LEN - 1; ++y)
+                pushApproachRowNS(xc, y);
+
+            //── Asphalt 연장 (yA+8~yA+10, yB-10~yB-8) — endpoint 방향 도로 연속성 ──
+            //   stage 15 paver cap이 깔린 3행을 black asphalt 센터(15폭)로 덮어 도로
+            //   연속성 확보. paver 사이드(xc±10..xc±8)는 그대로 (stage 15가 유지).
+            for (int y = yA + BRIDGE_HALF_WIDTH + 1; y <= yA + BRIDGE_HALF_WIDTH + 3; ++y)
+                for (int dx = -BRIDGE_HALF_WIDTH; dx <= BRIDGE_HALF_WIDTH; ++dx)
+                    plan.tiles.push_back(CityTile{ .pos = {xc + dx, y, groundZ},
+                                                    .floor = static_cast<std::uint16_t>(itemID::blackAsphalt) });
+            for (int y = yB - BRIDGE_HALF_WIDTH - 3; y <= yB - BRIDGE_HALF_WIDTH - 1; ++y)
+                for (int dx = -BRIDGE_HALF_WIDTH; dx <= BRIDGE_HALF_WIDTH; ++dx)
+                    plan.tiles.push_back(CityTile{ .pos = {xc + dx, y, groundZ},
+                                                    .floor = static_cast<std::uint16_t>(itemID::blackAsphalt) });
+
+            //── T-junction 횡단보도 — 다리 방향 1세트씩 ──
+            paintBridgeCrosswalk(Point3{ xc, yA, groundZ }, 0, +1);   // 북 endpoint → 남쪽 방향
+            paintBridgeCrosswalk(Point3{ xc, yB, groundZ }, 0, -1);   // 남 endpoint → 북쪽 방향
+
+            //── Deck 노란 중앙 분리선 (z+1) — 14단계와 동일 6타일 주기(3 dash + 3 gap) ──
+            //   x=xc 한 줄, y는 rampN_y ~ rampS_y. 월드좌표 6의 배수 정렬해 도로 grid와 호환.
+            {
+                constexpr int DASH_PERIOD = 6;
+                constexpr int DASH_YELLOW_LEN = 3;
+                const int firstDash = static_cast<int>(std::ceil(static_cast<double>(rampN_y) / DASH_PERIOD)) * DASH_PERIOD;
+                for (int ds = firstDash; ds + DASH_YELLOW_LEN - 1 <= rampS_y; ds += DASH_PERIOD)
+                {
+                    for (int k = 0; k < DASH_YELLOW_LEN; ++k)
+                    {
+                        plan.tiles.push_back(CityTile{ .pos = { xc, ds + k, deckZ },
+                                                       .floor = static_cast<std::uint16_t>(itemID::yellowAsphalt) });
+                    }
+                }
+            }
+        }
+        else  //West-East 수평 다리
+        {
+            const int yc = va.y;
+            const int xA = std::min(va.x, vb.x);
+            const int xB = std::max(va.x, vb.x);
+            const int rampW_x = xA + BRIDGE_RAMP_OFFSET;
+            const int rampE_x = xB - BRIDGE_RAMP_OFFSET;
+
+            //── Deck floor (z+1) ──
+            for (int x = rampW_x; x <= rampE_x; ++x)
+                for (int dy = -BRIDGE_TOTAL_HALF; dy <= BRIDGE_TOTAL_HALF; ++dy)
+                    pushDeckFloor(x, yc + dy, dy);
+
+            //── Guardrail walls (z+1) — deck 전길이 양 사이드 (outermost paver 타일) ──
+            for (int x = rampW_x; x <= rampE_x; ++x)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {x, yc - BRIDGE_TOTAL_HALF, deckZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+                plan.tiles.push_back(CityTile{ .pos = {x, yc + BRIDGE_TOTAL_HALF, deckZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::guardrail) });
+            }
+
+            //── Ramps (양 끝, 21폭) ──
+            for (int dy = -BRIDGE_TOTAL_HALF; dy <= BRIDGE_TOTAL_HALF; ++dy)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {rampW_x, yc + dy, groundZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampUp) });
+                plan.tiles.push_back(CityTile{ .pos = {rampW_x, yc + dy, deckZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampDown) });
+                plan.tiles.push_back(CityTile{ .pos = {rampE_x, yc + dy, groundZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampUp) });
+                plan.tiles.push_back(CityTile{ .pos = {rampE_x, yc + dy, deckZ},
+                                               .prop = static_cast<std::uint16_t>(itemID::rampDown) });
+            }
+
+            //── Pillar walls (z=0) — ramp 안쪽 1타일 ──
+            for (int dy = -BRIDGE_TOTAL_HALF; dy <= BRIDGE_TOTAL_HALF; ++dy)
+            {
+                plan.tiles.push_back(CityTile{ .pos = {rampW_x + 1, yc + dy, groundZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::pillarWall) });
+                plan.tiles.push_back(CityTile{ .pos = {rampE_x - 1, yc + dy, groundZ},
+                                               .wall = static_cast<std::uint16_t>(itemID::pillarWall) });
+            }
+
+            //── z=0 진입로 (5타일, ramp 열 포함) ──
+            for (int x = rampW_x - BRIDGE_APPROACH_LEN + 1; x <= rampW_x; ++x)
+                pushApproachRowWE(yc, x);
+            for (int x = rampE_x; x <= rampE_x + BRIDGE_APPROACH_LEN - 1; ++x)
+                pushApproachRowWE(yc, x);
+
+            //── Asphalt 연장 (xA+8~xA+10, xB-10~xB-8) — endpoint 방향 도로 연속성 ──
+            for (int x = xA + BRIDGE_HALF_WIDTH + 1; x <= xA + BRIDGE_HALF_WIDTH + 3; ++x)
+                for (int dy = -BRIDGE_HALF_WIDTH; dy <= BRIDGE_HALF_WIDTH; ++dy)
+                    plan.tiles.push_back(CityTile{ .pos = {x, yc + dy, groundZ},
+                                                    .floor = static_cast<std::uint16_t>(itemID::blackAsphalt) });
+            for (int x = xB - BRIDGE_HALF_WIDTH - 3; x <= xB - BRIDGE_HALF_WIDTH - 1; ++x)
+                for (int dy = -BRIDGE_HALF_WIDTH; dy <= BRIDGE_HALF_WIDTH; ++dy)
+                    plan.tiles.push_back(CityTile{ .pos = {x, yc + dy, groundZ},
+                                                    .floor = static_cast<std::uint16_t>(itemID::blackAsphalt) });
+
+            //── T-junction 횡단보도 — 다리 방향 1세트씩 ──
+            paintBridgeCrosswalk(Point3{ xA, yc, groundZ }, +1, 0);   // 서 endpoint → 동쪽 방향
+            paintBridgeCrosswalk(Point3{ xB, yc, groundZ }, -1, 0);   // 동 endpoint → 서쪽 방향
+
+            //── Deck 노란 중앙 분리선 (z+1) — y=yc 한 줄, x는 rampW_x ~ rampE_x ──
+            {
+                constexpr int DASH_PERIOD = 6;
+                constexpr int DASH_YELLOW_LEN = 3;
+                const int firstDash = static_cast<int>(std::ceil(static_cast<double>(rampW_x) / DASH_PERIOD)) * DASH_PERIOD;
+                for (int ds = firstDash; ds + DASH_YELLOW_LEN - 1 <= rampE_x; ds += DASH_PERIOD)
+                {
+                    for (int k = 0; k < DASH_YELLOW_LEN; ++k)
+                    {
+                        plan.tiles.push_back(CityTile{ .pos = { ds + k, yc, deckZ },
+                                                       .floor = static_cast<std::uint16_t>(itemID::yellowAsphalt) });
+                    }
+                }
             }
         }
     }

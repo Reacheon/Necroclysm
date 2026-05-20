@@ -100,11 +100,36 @@ export inline constexpr std::uint8_t TILE_FLAG_HAS_SNOW = 0x02;
 export inline constexpr std::uint8_t TILE_FLAG_BLOCKER  = 0x04;
 export inline constexpr std::uint8_t TILE_FLAG_IS_WET   = 0x08;
 
+// ── SectorProp / SectorSkyTile ──────────────────────────────────────────
+// 희소(sparse) 채널 — sector 평면 14.7M PaintCell에 들어가지 않는 데이터.
+//   props: 어느 z층에서든 createProp 호출 대상. ramp 등.
+//   skyTiles: sector의 본 z층(sc.z)과 다른 z의 floor/wall (다리 deck z+1 등).
+//             14.7M 평면을 z층마다 따로 깔면 메모리 폭발이라 sparse로 보관.
+//
+//   호출 측(World::createChunk): sc.z=0 SectorPlan 단일 조회로 본 z층은 dense
+//   tiles, 그 외 z는 skyTiles 필터링해 적용. props는 모든 z를 대상으로 필터링.
+
+export struct SectorProp
+{
+    Point3        pos;
+    std::uint16_t itemId = 0;
+};
+
+export struct SectorSkyTile
+{
+    Point3        pos;          // z는 sc.z와 다른 값
+    std::uint16_t floor = 0;
+    std::uint16_t wall  = 0;
+    std::uint8_t  flags = 0;    //TILE_FLAG_* 비트 (walkable 등)
+};
+
 // ── SectorPlan ──────────────────────────────────────────────────────────
 // 한 섹터의 *모든* 절차생성 산출물. 청크가 소비하는 단일 진리원천.
 //
 //   tiles: 14.7M (3840×3840) PaintCell. procGenerate가 모두 채움. ~147MB/sector.
 //          [dy * SectorCoord::TILES + dx]로 인덱싱 (row-major).
+//   props: 어느 z층의 prop 좌표/itemId든 모두 담긴 sparse 리스트.
+//   skyTiles: sc.z와 다른 z의 floor/wall sparse 리스트 (다리 deck 등).
 //
 //   향후 추가 (모두 procGenerate에서 채움):
 //     std::vector<EncounterSite>  encounters;
@@ -113,8 +138,10 @@ export inline constexpr std::uint8_t TILE_FLAG_IS_WET   = 0x08;
 
 export struct SectorPlan
 {
-    SectorCoord            coord;
-    std::vector<PaintCell> tiles;   //3840 × 3840 = 14,745,600개
+    SectorCoord                  coord;
+    std::vector<PaintCell>       tiles;     //3840 × 3840 = 14,745,600개 (본 z층)
+    std::vector<SectorProp>      props;     //sparse, 모든 z
+    std::vector<SectorSkyTile>   skyTiles;  //sparse, sc.z 외 z만
 
     SectorPlan() = default;
     explicit SectorPlan(SectorCoord c) noexcept : coord(c) {}

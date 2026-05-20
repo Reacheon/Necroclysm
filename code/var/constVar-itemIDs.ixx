@@ -89,6 +89,23 @@ export namespace itemID
 
     constexpr int bollardLight = 118;
 
+    ///////////////////////차량 부품//////////////////////
+    constexpr int vehicleControl = 99;
+    constexpr int engineV2Gasoline = 100;
+    constexpr int fuelTank10L = 101;
+    constexpr int vehicleWall = 119;
+    constexpr int vehicleDoor = 120;
+    constexpr int vehicleGlass = 121;
+    constexpr int vehiclePassage = 122;
+    constexpr int vehicleSeat = 123;
+    constexpr int trunkDoor = 124;
+    constexpr int headlight = 126;
+    constexpr int tailLight = 127;
+    constexpr int vehicleRoof = 128;
+    constexpr int vehicleTurret = 129;
+    constexpr int steelBumper = 130;
+    constexpr int steerableTire = 142;
+
     constexpr int leverRL = 149;
     constexpr int leverUD = 150;
 

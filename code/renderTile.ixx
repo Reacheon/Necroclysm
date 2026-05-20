@@ -634,100 +634,6 @@ void drawTiles()
 
 
 
-        if(thisTile->wall!=0)
-        {
-            setZoom(zoomScale);
-            int dirCorrection = 0;
-            if (itemDex[thisTile->wall].tileConnectGroup != -1)
-            {
-                bool topCheck, botCheck, leftCheck, rightCheck;
-                if (itemDex[thisTile->wall].tileConnectGroup == 0)
-                {
-                    int currentTileWall = thisTile->wall;
-                    int topTileWall = topTile->wall;
-                    int botTileWall = botTile->wall;
-                    int leftTileWall = leftTile->wall;
-                    int rightTileWall = rightTile->wall;
-
-                    topCheck = currentTileWall == topTileWall;
-                    botCheck = currentTileWall == botTileWall;
-                    leftCheck = currentTileWall == leftTileWall;
-                    rightCheck = currentTileWall == rightTileWall;
-                }
-                else
-                {
-                    int currentTileGroup = itemDex[thisTile->wall].tileConnectGroup;
-                    int topTileGroup = itemDex[topTile->wall].tileConnectGroup;
-                    int botTileGroup = itemDex[botTile->wall].tileConnectGroup;
-                    int leftTileGroup = itemDex[leftTile->wall].tileConnectGroup;
-                    int rightTileGroup = itemDex[rightTile->wall].tileConnectGroup;
-
-                    topCheck = (currentTileGroup == topTileGroup);
-                    botCheck = (currentTileGroup == botTileGroup);
-                    leftCheck = (currentTileGroup == leftTileGroup);
-                    rightCheck = (currentTileGroup == rightTileGroup);
-                }
-
-                dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
-            }
-
-            vertices[tileCounter] =
-            {
-                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
-            };
-            indices[tileCounter] = itemDex[thisTile->wall].tileSprIndex + dirCorrection;
-            batchAlphas[tileCounter] = 255;
-            tileCounter++;
-
-
-        }
-
-        // 스킬 범위 그리기
-        if (rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
-        {
-            bool rightCheck = rangeSet.find({ tgtX + 1, tgtY }) != rangeSet.end();
-            bool topCheck = rangeSet.find({ tgtX, tgtY - 1 }) != rangeSet.end();
-            bool leftCheck = rangeSet.find({ tgtX - 1, tgtY }) != rangeSet.end();
-            bool botCheck = rangeSet.find({ tgtX, tgtY + 1 }) != rangeSet.end();
-            int dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
-
-            vertices[tileCounter] =
-            {
-                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
-            };
-            indices[tileCounter] = 1440 + dirCorrection;
-            batchAlphas[tileCounter] = 255;
-            tileCounter++;
-        }
-
-        if (rangeRay && raySet.find({ tgtX - PlayerX(),tgtY - PlayerY() }) != raySet.end())
-        {
-            vertices[tileCounter] =
-            {
-                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
-            };
-            indices[tileCounter] = 0;
-            batchAlphas[tileCounter] = 150;
-            tileCounter++;
-        }
-
-        if (rangeSet.size() > 0 && rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
-        {
-            if (getAbsMouseGrid().x == tgtX && getAbsMouseGrid().y == tgtY)
-            {
-                vertices[tileCounter] =
-                {
-                    cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
-                    cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
-                };
-                indices[tileCounter] = 0;
-                batchAlphas[tileCounter] = 150;
-                tileCounter++;
-            }
-        }
     }
 
     for(auto elem : shallowSeaWaves)
@@ -975,6 +881,112 @@ void drawTiles()
 
         batchAlphas[tileCounter] = elem->alpha;
         tileCounter++;
+    }
+
+    // wall과 스킬 범위 UI는 파도 위에 그림 — floor < wave < wall 순서 유지
+    for (const auto& elem : tileList)
+    {
+        int tgtX = elem.x;
+        int tgtY = elem.y;
+        const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
+
+        if (thisTile->wall != 0)
+        {
+            const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
+            const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());
+            const TileData* leftTile = &World::ins()->getTile(tgtX - 1, tgtY, PlayerZ());
+            const TileData* rightTile = &World::ins()->getTile(tgtX + 1, tgtY, PlayerZ());
+
+            setZoom(zoomScale);
+            int dirCorrection = 0;
+            if (itemDex[thisTile->wall].tileConnectGroup != -1)
+            {
+                bool topCheck, botCheck, leftCheck, rightCheck;
+                if (itemDex[thisTile->wall].tileConnectGroup == 0)
+                {
+                    int currentTileWall = thisTile->wall;
+                    int topTileWall = topTile->wall;
+                    int botTileWall = botTile->wall;
+                    int leftTileWall = leftTile->wall;
+                    int rightTileWall = rightTile->wall;
+
+                    topCheck = currentTileWall == topTileWall;
+                    botCheck = currentTileWall == botTileWall;
+                    leftCheck = currentTileWall == leftTileWall;
+                    rightCheck = currentTileWall == rightTileWall;
+                }
+                else
+                {
+                    int currentTileGroup = itemDex[thisTile->wall].tileConnectGroup;
+                    int topTileGroup = itemDex[topTile->wall].tileConnectGroup;
+                    int botTileGroup = itemDex[botTile->wall].tileConnectGroup;
+                    int leftTileGroup = itemDex[leftTile->wall].tileConnectGroup;
+                    int rightTileGroup = itemDex[rightTile->wall].tileConnectGroup;
+
+                    topCheck = (currentTileGroup == topTileGroup);
+                    botCheck = (currentTileGroup == botTileGroup);
+                    leftCheck = (currentTileGroup == leftTileGroup);
+                    rightCheck = (currentTileGroup == rightTileGroup);
+                }
+
+                dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+            }
+
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = itemDex[thisTile->wall].tileSprIndex + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
+        }
+
+        // 스킬 범위 그리기
+        if (rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
+        {
+            bool rightCheck = rangeSet.find({ tgtX + 1, tgtY }) != rangeSet.end();
+            bool topCheck = rangeSet.find({ tgtX, tgtY - 1 }) != rangeSet.end();
+            bool leftCheck = rangeSet.find({ tgtX - 1, tgtY }) != rangeSet.end();
+            bool botCheck = rangeSet.find({ tgtX, tgtY + 1 }) != rangeSet.end();
+            int dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
+
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = 1440 + dirCorrection;
+            batchAlphas[tileCounter] = 255;
+            tileCounter++;
+        }
+
+        if (rangeRay && raySet.find({ tgtX - PlayerX(),tgtY - PlayerY() }) != raySet.end())
+        {
+            vertices[tileCounter] =
+            {
+                cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+            };
+            indices[tileCounter] = 0;
+            batchAlphas[tileCounter] = 150;
+            tileCounter++;
+        }
+
+        if (rangeSet.size() > 0 && rangeSet.find({ tgtX, tgtY }) != rangeSet.end())
+        {
+            if (getAbsMouseGrid().x == tgtX && getAbsMouseGrid().y == tgtY)
+            {
+                vertices[tileCounter] =
+                {
+                    cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX)),
+                    cameraH / 2 + static_cast<int>(zoomScale * (16 * tgtY + 8 - cameraY))
+                };
+                indices[tileCounter] = 0;
+                batchAlphas[tileCounter] = 150;
+                tileCounter++;
+            }
+        }
     }
 
     drawSpriteBatchCenter(spr::tileset, vertices, indices, batchAlphas, tileCounter);

@@ -90,9 +90,13 @@ Prop::~Prop()
 
 void Prop::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
+    // 생성자 첫 호출이면 getGridX/Y/Z가 디폴트(0,0,0) — 그 청크가 안 로드된 곳에서
+    // createProp 호출 시 .at() throw. tryGetChunk로 안전 처리 — 소멸자와 동일 패턴.
     Point2 prevChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
-    Chunk& prevChunk = World::ins()->getChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ());
-    prevChunk.eraseProp(this);
+    if (Chunk* prevChunk = World::ins()->tryGetChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ()))
+    {
+        prevChunk->eraseProp(this);
+    }
 
     Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 

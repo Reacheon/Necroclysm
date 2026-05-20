@@ -852,50 +852,50 @@ export void startArea()
 	myCar->extendPart(vX + 1, vY + 3, itemID::metalFrame);
 	myCar->extendPart(vX + 2, vY + 3, itemID::metalFrame);
 
-	myCar->extendPart(vX - 1, vY - 3, 130);
-	myCar->extendPart(vX, vY - 3, 130);
-	myCar->extendPart(vX + 1, vY - 3, 130);
-	myCar->extendPart(vX + 2, vY - 3, 130);
+	myCar->extendPart(vX - 1, vY - 3, itemID::steelBumper);
+	myCar->extendPart(vX, vY - 3, itemID::steelBumper);
+	myCar->extendPart(vX + 1, vY - 3, itemID::steelBumper);
+	myCar->extendPart(vX + 2, vY - 3, itemID::steelBumper);
 	//////////////////////////▼최상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 2, { 142,119,126 });
-	myCar->addPart(vX, vY - 2, { 119 });
-	myCar->addPart(vX + 1, vY - 2, { 119 });
-	myCar->addPart(vX + 2, vY - 2, { 142,119,126 });
+	myCar->addPart(vX - 1, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
+	myCar->addPart(vX, vY - 2, { itemID::vehicleWall });
+	myCar->addPart(vX + 1, vY - 2, { itemID::vehicleWall });
+	myCar->addPart(vX + 2, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
 	//////////////////////////▼중상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 1, 121);
-	myCar->addPart(vX, vY - 1, { 121,100 });
-	myCar->addPart(vX + 1, vY - 1, 121);
-	myCar->addPart(vX + 2, vY - 1, 121);
+	myCar->addPart(vX - 1, vY - 1, itemID::vehicleGlass);
+	myCar->addPart(vX, vY - 1, { itemID::vehicleGlass, itemID::engineV2Gasoline });
+	myCar->addPart(vX + 1, vY - 1, itemID::vehicleGlass);
+	myCar->addPart(vX + 2, vY - 1, itemID::vehicleGlass);
 	////////////////////////////////▼운전석 4타일///////////////////////////////
-	myCar->addPart(vX - 1, vY, { 120 });
-	myCar->addPart(vX, vY, { 122, 123, 99, 128 });
-	myCar->addPart(vX + 1, vY, { 122, 123, 128 });
-	myCar->addPart(vX + 2, vY, { 120 });
+	myCar->addPart(vX - 1, vY, { itemID::vehicleDoor });
+	myCar->addPart(vX, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleControl, itemID::vehicleRoof });
+	myCar->addPart(vX + 1, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+	myCar->addPart(vX + 2, vY, { itemID::vehicleDoor });
 	//////////////////////////▼운전석 아래 통로 4타일/////////////////////////////
-	myCar->addPart(vX - 1, vY + 1, { 119 });
-	myCar->addPart(vX, vY + 1, { 122, 128 });
-	myCar->addPart(vX + 1, vY + 1, { 122, 128,129 });
-	myCar->addPart(vX + 2, vY + 1, { 119 });
+	myCar->addPart(vX - 1, vY + 1, { itemID::vehicleWall });
+	myCar->addPart(vX, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof });
+	myCar->addPart(vX + 1, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof, itemID::vehicleTurret });
+	myCar->addPart(vX + 2, vY + 1, { itemID::vehicleWall });
 	///////////////////////////////▼뒷자석 4타일/////////////////////
-	myCar->addPart(vX - 1, vY + 2, { 120, 101 });
+	myCar->addPart(vX - 1, vY + 2, { itemID::vehicleDoor, itemID::fuelTank10L });
 	{
 		ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2, myCar->getGridZ()}].get();
 		for (int i = 0; i < partPocket->itemInfo.size(); i++)
 		{
-			if (partPocket->itemInfo[i].itemCode == 101)
+			if (partPocket->itemInfo[i].itemCode == itemID::fuelTank10L)
 			{
 				partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemID::gasoline, 900);
 			}
 		}
 	}
-	myCar->addPart(vX, vY + 2, { 122, 123, 128 });
-	myCar->addPart(vX + 1, vY + 2, { 122, 123, 128 });
-	myCar->addPart(vX + 2, vY + 2, { 120 });
+	myCar->addPart(vX, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+	myCar->addPart(vX + 1, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+	myCar->addPart(vX + 2, vY + 2, { itemID::vehicleDoor });
 	///////////////////////////////▼최후방 4타일///////////////////////////
-	myCar->addPart(vX - 1, vY + 3, { 119,127 });
-	myCar->addPart(vX, vY + 3, { 124 });
-	myCar->addPart(vX + 1, vY + 3, { 124 });
-	myCar->addPart(vX + 2, vY + 3, { 119,127 });
+	myCar->addPart(vX - 1, vY + 3, { itemID::vehicleWall, itemID::tailLight });
+	myCar->addPart(vX, vY + 3, { itemID::trunkDoor });
+	myCar->addPart(vX + 1, vY + 3, { itemID::trunkDoor });
+	myCar->addPart(vX + 2, vY + 3, { itemID::vehicleWall, itemID::tailLight });
 
 
 
@@ -1289,27 +1289,27 @@ export void startArea()
 		}
 
 		// 다리 끝 반대편 섬을 먼저 깔아둠 — 다리가 위에 덮어씌어지면서 끝부분이 섬에 박힘
-		// 섬 반경 17 ≥ 다리 폭 19/2 → 다리 끝 19타일 전체가 섬 안에 들어옴
-		for (int dx = -32; dx <= 6; dx++)
+		// 섬 반경 18 ≥ 다리 폭 21/2 → 다리 끝 21타일 전체가 섬 안에 들어옴
+		for (int dx = -33; dx <= 7; dx++)
 		{
-			for (int dy = 54; dy <= 92; dy++)
+			for (int dy = 53; dy <= 93; dy++)
 			{
 				float ldx = dx + 13.0f;
 				float ldy = dy - 73.0f;
 				float dist = sqrt(ldx * ldx + ldy * ldy);
-				if (dist <= 17)
+				if (dist <= 18)
 				{
-					if (dist <= 12) setFloor({ dx, dy, 0 }, itemID::grass);
+					if (dist <= 13) setFloor({ dx, dy, 0 }, itemID::grass);
 					else setFloor({ dx, dy, 0 }, itemID::dirt);
 				}
 			}
 		}
 
 		// 남쪽 다리 (z=1) — 밑 z=0의 바다/섬은 그대로 보존되어 보트 통과 가능
-		// 도로 15타일 + 양쪽 paver 인도 2타일 = 폭 19타일
+		// 도로 15타일 + 양쪽 paver 인도 3타일(가드레일 1 + 보행 2) = 폭 21타일
 		for (int dy = 29; dy <= 60; dy++)
 		{
-			for (int dx = -22; dx <= -4; dx++)
+			for (int dx = -23; dx <= -3; dx++)
 			{
 				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 1 }, itemID::paver);
 				else setFloor({ dx, dy, 1 }, itemID::blackAsphalt);
@@ -1317,7 +1317,7 @@ export void startArea()
 		}
 
 		// 진입측 / 출구측 양방향 ramp — 같은 (x, y)의 두 z에 RAMP_UP/RAMP_DOWN 쌍으로 배치
-		for (int dx = -22; dx <= -4; dx++)
+		for (int dx = -23; dx <= -3; dx++)
 		{
 			createProp({ dx, 29, 0 }, itemID::rampUp);   // 도로 → 다리
 			createProp({ dx, 29, 1 }, itemID::rampDown); // 다리 → 도로
@@ -1328,12 +1328,12 @@ export void startArea()
 		// 다리 가장자리 가드레일 (paver 바깥쪽 위, ramp 위치는 비워서 차량 진입 가능)
 		for (int dy = 29; dy <= 60; dy++)
 		{
-			setWall({ -22, dy, 1 }, itemID::guardrail);
-			setWall({ -4, dy, 1 }, itemID::guardrail);
+			setWall({ -23, dy, 1 }, itemID::guardrail);
+			setWall({ -3, dy, 1 }, itemID::guardrail);
 		}
 
 		// ramp 뒤(다리 안쪽 z=0)에 기둥벽 — 다리 밑에서 ramp 역방향 진입 차단 + 시야 차단
-		for (int dx = -22; dx <= -4; dx++)
+		for (int dx = -23; dx <= -3; dx++)
 		{
 			setWall({ dx, 30, 0 }, itemID::pillarWall); // 북쪽 ramp 뒤
 			setWall({ dx, 59, 0 }, itemID::pillarWall); // 남쪽 ramp 뒤
@@ -1343,15 +1343,17 @@ export void startArea()
 		// 양쪽 paver만 깔아서 가운데(진입 차선 / 섬 가장자리)는 그대로 보이게
 		for (int dy = 25; dy <= 29; dy++)
 		{
+			setFloor({ -23, dy, 0 }, itemID::paver);
 			setFloor({ -22, dy, 0 }, itemID::paver);
 			setFloor({ -21, dy, 0 }, itemID::paver);
 			setFloor({ -5, dy, 0 }, itemID::paver);
 			setFloor({ -4, dy, 0 }, itemID::paver);
+			setFloor({ -3, dy, 0 }, itemID::paver);
 		}
 		// 출구측은 섬 위라 가운데도 blackAsphalt로 채워줘야 다리 모양 (진입측은 기존 도로가 가운데 채움)
 		for (int dy = 60; dy <= 64; dy++)
 		{
-			for (int dx = -22; dx <= -4; dx++)
+			for (int dx = -23; dx <= -3; dx++)
 			{
 				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 0 }, itemID::paver);
 				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
@@ -1359,13 +1361,13 @@ export void startArea()
 		}
 		for (int dy = 25; dy <= 29; dy++)
 		{
-			setWall({ -22, dy, 0 }, itemID::guardrail);
-			setWall({ -4, dy, 0 }, itemID::guardrail);
+			setWall({ -23, dy, 0 }, itemID::guardrail);
+			setWall({ -3, dy, 0 }, itemID::guardrail);
 		}
 		for (int dy = 60; dy <= 64; dy++)
 		{
-			setWall({ -22, dy, 0 }, itemID::guardrail);
-			setWall({ -4, dy, 0 }, itemID::guardrail);
+			setWall({ -23, dy, 0 }, itemID::guardrail);
+			setWall({ -3, dy, 0 }, itemID::guardrail);
 		}
 
 
