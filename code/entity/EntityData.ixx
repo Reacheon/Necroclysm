@@ -42,7 +42,7 @@ export struct EntityData_Base
     __int16 rCorr = 0;
     __int16 rRad = 0;
     unsigned __int16 corpseItemCode = 0;
-    int eyeSight = 8; //기본 시야
+    int eyeSight = 12; //기본 시야
 
 
     std::vector<SkillData> skillList;

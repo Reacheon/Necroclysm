@@ -24,6 +24,9 @@ import Wave;
 import Wake;
 import Sector;
 import worldSession;
+import Sprite;
+import drawSprite;
+import Vehicle;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -147,47 +150,109 @@ void Player::updateMinimap()
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
-		for (int dx = -(MINIMAP_DIAMETER / 2); dx <= (MINIMAP_DIAMETER / 2); dx++)
+		// Map.ixx의 타일 스프라이트 레이어와 동일한 방식 — floor + wall을 실제 spr::tileset으로 그림.
+		// 타일 1개 = MINIMAP_TILE_PX × MINIMAP_TILE_PX 픽셀 (예: 6×6). 16×16 스프라이트를 축소(NEAREST)해서 표시.
+		const int R = MINIMAP_DIAMETER / 2;
+		const int TPX = MINIMAP_TILE_PX;
+		const int pgx = getGridX();
+		const int pgy = getGridY();
+		const int pgz = getGridZ();
+
+		// 16×16 타일 스프라이트를 TPX×TPX로 축소 렌더 — drawSprite는 s_zoomScale을 사용.
+		setZoom(static_cast<float>(TPX) / 16.0f);
+
+		auto drawTileSpr = [&](int sprIdx, int destX, int destY)
 		{
-			for (int dy = -(MINIMAP_DIAMETER / 2); dy <= (MINIMAP_DIAMETER / 2); dy++)
+			drawSprite(spr::tileset, sprIdx, destX, destY);
+		};
+
+		for (int dy = -R; dy <= R; dy++)
+		{
+			for (int dx = -R; dx <= R; dx++)
 			{
-				if (isCircle(MINIMAP_DIAMETER / 2, dx, dy))
+				if (isCircle(R, dx, dy) == false) continue;
+
+				const int destX = (dx + R) * TPX;
+				const int destY = (dy + R) * TPX;
+				SDL_FRect cell = { static_cast<float>(destX), static_cast<float>(destY),
+				                   static_cast<float>(TPX), static_cast<float>(TPX) };
+
+				const TileData* tgtTile = &World::ins()->getTile(pgx + dx, pgy + dy, pgz);
+				if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 				{
-					SDL_Color ptCol;
-					const TileData* tgtTile = &World::ins()->getTile(getGridX() + dx, getGridY() + dy, getGridZ());
-					if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
+					if (tgtTile->floor != 0)
 					{
-						//floor
-						switch (tgtTile->floor)
-						{
-						case 0:
-							break;
-						default:
-							ptCol = { 112,112, 112 };
-							break;
-						}
-						//wall
-						switch (tgtTile->wall)
-						{
-						case 0:
-							break;
-						default:
-							ptCol = { 29,29, 29 };
-							break;
-						}
-						//prop
-						if (tgtTile->PropPtr != nullptr) ptCol = lowCol::yellow;
-						//vehicle
-						if (tgtTile->VehiclePtr != nullptr) ptCol = lowCol::orange;
-						drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), ptCol);
-						if (tgtTile->fov == fovFlag::gray) drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black, 100);
+						int sprIdx = itemDex[tgtTile->floor].tileSprIndex
+							+ itemDex[tgtTile->floor].extraSprIndexSingle
+							+ 16 * itemDex[tgtTile->floor].extraSprIndex16;
+						drawTileSpr(sprIdx, destX, destY);
 					}
-					else drawPoint(dx + (MINIMAP_DIAMETER / 2), dy + (MINIMAP_DIAMETER / 2), col::black);
+					if (tgtTile->wall != 0)
+					{
+						int sprIdx = itemDex[tgtTile->wall].tileSprIndex
+							+ itemDex[tgtTile->wall].extraSprIndexSingle
+							+ 16 * itemDex[tgtTile->wall].extraSprIndex16;
+						drawTileSpr(sprIdx, destX, destY);
+					}
+					//prop / vehicle도 실제 스프라이트로 그림. propset(48×48)의 중앙 16×16만 잘라
+					//floor/wall과 동일한 6×6 셀로 렌더 — 트리/대형 prop의 over-tile 부분은 잘림.
+					const int cellCx = destX + TPX / 2;
+					const int cellCy = destY + TPX / 2;
+					if (tgtTile->PropPtr != nullptr)
+					{
+						const ItemData& propItem = tgtTile->PropPtr->leadItem;
+						//RAMP는 메인뷰에서도 prop sprite를 안 그리고 별도 화살표로 표시 → 미니맵에서도 스킵.
+						if (propItem.checkFlag(itemFlag::RAMP_UP) == false
+						 && propItem.checkFlag(itemFlag::RAMP_DOWN) == false)
+						{
+							int sprIdx = propItem.propSprIndex
+								+ propItem.extraSprIndexSingle
+								+ 16 * propItem.extraSprIndex16;
+							drawSpriteCenterExSrc(spr::propset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
+						}
+					}
+					if (tgtTile->VehiclePtr != nullptr)
+					{
+						auto it = tgtTile->VehiclePtr->partInfo.find({ pgx + dx, pgy + dy, pgz });
+						if (it != tgtTile->VehiclePtr->partInfo.end())
+						{
+							for (const ItemData& part : it->second->itemInfo)
+							{
+								int sprIdx = part.propSprIndex
+									+ part.extraSprIndexSingle
+									+ 16 * part.extraSprIndex16;
+								drawSpriteCenterExSrc(spr::propset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
+							}
+						}
+					}
+					if (tgtTile->fov == fovFlag::gray)
+					{
+						SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+						SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
+						SDL_RenderFillRect(renderer, &cell);
+					}
+				}
+				else
+				{
+					SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+					SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+					SDL_RenderFillRect(renderer, &cell);
 				}
 			}
 		}
+
+		setZoom(1.0f);
+
+		// 플레이어 마커 (중앙 타일)
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderPoint(renderer, (MINIMAP_DIAMETER / 2), (MINIMAP_DIAMETER / 2));
+		SDL_FRect playerRect = {
+			static_cast<float>(R * TPX),
+			static_cast<float>(R * TPX),
+			static_cast<float>(TPX),
+			static_cast<float>(TPX)
+		};
+		SDL_RenderFillRect(renderer, &playerRect);
 	}
 	else
 	{

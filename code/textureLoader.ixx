@@ -151,7 +151,7 @@ static void loadMutationSprites(SDL_Renderer* renderer)
 export void textureLoader()
 {
 	//load texture
-	texture::minimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, MINIMAP_DIAMETER, MINIMAP_DIAMETER);
+	texture::minimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, MINIMAP_DIAMETER * MINIMAP_TILE_PX, MINIMAP_DIAMETER * MINIMAP_TILE_PX);
 	SDL_SetTextureScaleMode(texture::minimap, SDL_SCALEMODE_NEAREST);
 	texture::navimap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, NAVIMAP_WIDTH, NAVIMAP_HEIGHT);
 	SDL_SetTextureScaleMode(texture::navimap, SDL_SCALEMODE_NEAREST);

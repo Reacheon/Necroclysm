@@ -1364,5 +1364,106 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         }
     }
 
+
+    //══════════════════════════════════════════════════════════════════
+    // 17. 가로수 — 도로변 인도(paver) 안쪽 타일에 식수, dirt 바닥
+    //══════════════════════════════════════════════════════════════════
+    //   사이드워크 3타일(perp ±8..±10) 중 도로에 가장 가까운 ±8 paver 위에 가로수.
+    //   floor 교체: paver → dirt, prop: 가로수 종 RNG 추첨 (은행/벚/단풍/목련/참나무/향나무).
+    //
+    //   배치 의도: 가로수가 인도 바깥 경계(=도로 쪽)에 줄지어 차량이 인도로 돌진하는
+    //   것을 물리적으로 차단. 교차로/횡단보도/다리 진입은 통행 살리도록 비워둠.
+    //
+    //   배제 처리 — 별도 분기 없이 점유 검사로 통합:
+    //     - degree ≥ 3 노드(교차로) 근처: 노드에서 TREE_NODE_CLEARANCE 만큼 잘라냄
+    //       → 교차로 코너/13단계 횡단보도 영역 비움
+    //     - 다리 진입로·asphalt 연장·16단계 횡단보도: 16단계에서 paver를 덮어썼으므로
+    //       finalFloor가 paver가 아님 → 자동 배제
+    //     - 가드레일/필러월/램프 등 prop/wall 점유 타일도 occupiedPropWall로 자동 배제
+    //
+    //   다리 본체(z+1 deck)에는 어차피 paver가 ±8 위치에 없음(가드레일 자리) → 자동 배제.
+    //══════════════════════════════════════════════════════════════════
+
+    constexpr int TREE_PERIOD = 6;                          // 식수 주기 (도로 dash와 같은 6타일)
+    constexpr int TREE_PERP_OFFSET = CW_ROAD_HALF + 1;      // = 8, 도로에 가장 가까운 paver 타일
+    constexpr int TREE_NODE_CLEARANCE = CW_REACH + 2;       // = 15, 교차점에서 거리 (횡단보도 + 가드 버퍼)
+
+    constexpr std::array<std::uint16_t, 6> STREET_TREE_KINDS = {
+        static_cast<std::uint16_t>(itemID::ginkgoTree),
+        static_cast<std::uint16_t>(itemID::cherryTree),
+        static_cast<std::uint16_t>(itemID::mapleTree),
+        static_cast<std::uint16_t>(itemID::magnoliaTree),
+        static_cast<std::uint16_t>(itemID::oakTree),
+        static_cast<std::uint16_t>(itemID::juniperTree),
+    };
+
+    //최종 floor + prop/wall 점유 맵 — 다리·교차·횡단보도가 paver 위에 덮은 자리 식별용.
+    //  plan.tiles는 stage 순서대로 push되므로 마지막 floor 값이 그 위치의 최종 floor.
+    std::unordered_map<Point3, std::uint16_t, Point3::Hash> finalFloor;
+    std::unordered_set<Point3, Point3::Hash> occupiedPropWall;
+    finalFloor.reserve(plan.tiles.size());
+    for (const auto& t : plan.tiles)
+    {
+        if (t.floor != 0) finalFloor[t.pos] = t.floor;
+        if (t.prop != 0 || t.wall != 0) occupiedPropWall.insert(t.pos);
+    }
+
+    for (size_t ei = 0; ei < plan.segments.size(); ++ei)
+    {
+        const auto& seg = plan.segments[ei];
+        const Point3& a = seg.verts[0];
+        const Point3& b = seg.verts[1];
+        const bool horizontal = (a.y == b.y);
+        const int z = a.z;
+
+        const int axisStart = horizontal ? std::min(a.x, b.x) : std::min(a.y, b.y);
+        const int axisEnd   = horizontal ? std::max(a.x, b.x) : std::max(a.y, b.y);
+        const int perpCoord = horizontal ? a.y : a.x;
+
+        //양 끝 노드 식별 — 14단계 laneOffsetAt와 동일 패턴
+        const int n0 = graph.edgeToNodes[ei][0];
+        const int n1 = graph.edgeToNodes[ei][1];
+        const int n0Axis = horizontal ? graph.nodeCoord[n0].x : graph.nodeCoord[n0].y;
+        const int startNode = (n0Axis == axisStart) ? n0 : n1;
+        const int endNode   = (n0Axis == axisStart) ? n1 : n0;
+
+        //교차점(degree ≥ 3)이면 clearance, 아니면 0 (직진/L자/막다른 길/진입점은 통과)
+        const int clearStart = (graph.adjacency[startNode].size() >= 3) ? TREE_NODE_CLEARANCE : 0;
+        const int clearEnd   = (graph.adjacency[endNode].size()   >= 3) ? TREE_NODE_CLEARANCE : 0;
+        const int axisMin = axisStart + clearStart;
+        const int axisMax = axisEnd   - clearEnd;
+        if (axisMin > axisMax) continue;  // 짧은 세그먼트 — 클리어런스로 다 잘림
+
+        //월드좌표 TREE_PERIOD 정렬 — 인접 세그먼트와 가로수 위치가 자연스럽게 연속
+        const int firstAt = static_cast<int>(std::ceil(static_cast<double>(axisMin) / TREE_PERIOD)) * TREE_PERIOD;
+        for (int axis = firstAt; axis <= axisMax; axis += TREE_PERIOD)
+        {
+            for (int side : { -1, +1 })
+            {
+                const int perp = perpCoord + side * TREE_PERP_OFFSET;
+                const Point3 pos = horizontal ? Point3{ axis, perp, z } : Point3{ perp, axis, z };
+
+                //paver 위에서만 식수 (다리·교차로 중심·횡단보도가 덮어쓴 자리는 paver 아님 → 자동 배제)
+                auto it = finalFloor.find(pos);
+                if (it == finalFloor.end() || it->second != static_cast<std::uint16_t>(itemID::paver)) continue;
+                if (occupiedPropWall.contains(pos)) continue;
+
+                const std::uint16_t kind = STREET_TREE_KINDS[
+                    std::uniform_int_distribution<size_t>{0, STREET_TREE_KINDS.size() - 1}(rng)];
+
+                plan.tiles.push_back(CityTile{
+                    .pos = pos,
+                    .floor = static_cast<std::uint16_t>(itemID::dirt),
+                    .prop = kind,
+                    });
+
+                //같은 단계 내 중복 방지 — 두 colinear 세그먼트가 공유하는 노드 좌표에서
+                //양쪽 모두 firstAt 글로벌 정렬 때문에 같은 (axis, side)를 시도할 수 있음.
+                //createProp은 동일 좌표 두 번 호출 시 errorBox로 죽으므로 즉시 점유 등록.
+                occupiedPropWall.insert(pos);
+            }
+        }
+    }
+
     return plan;
 }

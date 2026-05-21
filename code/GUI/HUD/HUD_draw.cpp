@@ -116,9 +116,8 @@ void HUD::drawGUI()
 		{
 			SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
 			SDL_SetTextureAlphaMod(texture::minimap, 160);
-			setZoom(6.0);
-			drawTexture(texture::minimap, 13, 13);
 			setZoom(1.0);
+			drawTexture(texture::minimap, 13, 13);
 
 			drawSprite(spr::minimapEdge, 0, 14, 14);
 

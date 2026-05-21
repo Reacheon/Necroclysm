@@ -25,6 +25,7 @@ export constexpr int MAX_VEHICLE_SIZE = 31;
 
 export constexpr int CHUNK_LOADING_RANGE = 5;
 export constexpr int MINIMAP_DIAMETER = 41; //미니맵의 지름 (홀수)
+export constexpr int MINIMAP_TILE_PX = 6;   //미니맵에서 타일 1개의 픽셀 크기 (HUD draw가 zoom 6.0로 그리던 것과 동일한 화면 점유)
 export constexpr int NAVIMAP_WIDTH = 99;//167;
 export constexpr int NAVIMAP_HEIGHT = 58;//99;
 // 월드 생성 좌표계 (픽셀 ↔ 청크 정합 정렬)

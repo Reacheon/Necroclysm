@@ -69,6 +69,7 @@ export void debugConsole()
 	prt(L"34. 플레이어 피부색 변경\n");
 	prt(L"35. 플레이어 성별 변경\n");
 	prt(L"36. 월드 생성 (PNG 로드 → 도시 4400개 → 도로망)\n");
+	prt(L"37. SUV 소환\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -733,6 +734,105 @@ export void debugConsole()
 		}
 		prt(L"[worldGen] WorldGenScreen 띄우고 워커 스레드 기동.\n");
 		startWorldGen();
+		break;
+	}
+	case 37://SUV 소환
+	{
+		// SUV는 [vX-1..vX+2] × [vY-3..vY+3] (4×7=28 타일)를 차지한다.
+		// 플레이어 우측으로 3타일 떨어진 지점부터 점유하도록 vX = xp+4 로 잡는다.
+		int vX = xp + 4;
+		int vY = yp;
+		int vZ = zp;
+
+		bool blocked = false;
+		for (int tx = vX - 1; tx <= vX + 2 && blocked == false; tx++)
+		{
+			for (int ty = vY - 3; ty <= vY + 3 && blocked == false; ty++)
+			{
+				if (TileVehicle(tx, ty, vZ) != nullptr)
+				{
+					prt(L"[디버그] (%d,%d,%d) 위치에 이미 차량이 있어 SUV를 소환할 수 없다.\n", tx, ty, vZ);
+					blocked = true;
+				}
+			}
+		}
+		if (blocked) break;
+
+		Vehicle* myCar = World::ins()->createVehicle(vX, vY, vZ, itemID::metalFrame);
+		myCar->name = L"SUV";
+		myCar->vehType = vehFlag::car;
+
+		///////////////////////차량 기초 프레임//////////////////////////////////////
+		myCar->extendPart(vX, vY - 1, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY - 1, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY - 1, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY - 1, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY - 2, itemID::metalFrame);
+		myCar->extendPart(vX, vY - 2, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY - 2, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY - 2, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY + 1, itemID::metalFrame);
+		myCar->extendPart(vX, vY + 1, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY + 1, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY + 1, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY + 2, itemID::metalFrame);
+		myCar->extendPart(vX, vY + 2, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY + 2, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY + 2, itemID::metalFrame);
+		myCar->extendPart(vX - 1, vY + 3, itemID::metalFrame);
+		myCar->extendPart(vX, vY + 3, itemID::metalFrame);
+		myCar->extendPart(vX + 1, vY + 3, itemID::metalFrame);
+		myCar->extendPart(vX + 2, vY + 3, itemID::metalFrame);
+
+		myCar->extendPart(vX - 1, vY - 3, itemID::steelBumper);
+		myCar->extendPart(vX, vY - 3, itemID::steelBumper);
+		myCar->extendPart(vX + 1, vY - 3, itemID::steelBumper);
+		myCar->extendPart(vX + 2, vY - 3, itemID::steelBumper);
+		//////////////////////////▼최상단 4타일////////////////////////////////////
+		myCar->addPart(vX - 1, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
+		myCar->addPart(vX, vY - 2, { itemID::vehicleWall });
+		myCar->addPart(vX + 1, vY - 2, { itemID::vehicleWall });
+		myCar->addPart(vX + 2, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
+		//////////////////////////▼중상단 4타일////////////////////////////////////
+		myCar->addPart(vX - 1, vY - 1, itemID::vehicleGlass);
+		myCar->addPart(vX, vY - 1, { itemID::vehicleGlass, itemID::engineV2Gasoline });
+		myCar->addPart(vX + 1, vY - 1, itemID::vehicleGlass);
+		myCar->addPart(vX + 2, vY - 1, itemID::vehicleGlass);
+		////////////////////////////////▼운전석 4타일///////////////////////////////
+		myCar->addPart(vX - 1, vY, { itemID::vehicleDoor });
+		myCar->addPart(vX, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleControl, itemID::vehicleRoof });
+		myCar->addPart(vX + 1, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+		myCar->addPart(vX + 2, vY, { itemID::vehicleDoor });
+		//////////////////////////▼운전석 아래 통로 4타일/////////////////////////////
+		myCar->addPart(vX - 1, vY + 1, { itemID::vehicleWall });
+		myCar->addPart(vX, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof });
+		myCar->addPart(vX + 1, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof, itemID::vehicleTurret });
+		myCar->addPart(vX + 2, vY + 1, { itemID::vehicleWall });
+		///////////////////////////////▼뒷자석 4타일/////////////////////
+		myCar->addPart(vX - 1, vY + 2, { itemID::vehicleDoor, itemID::fuelTank10L });
+		{
+			ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2, myCar->getGridZ()}].get();
+			for (int i = 0; i < partPocket->itemInfo.size(); i++)
+			{
+				if (partPocket->itemInfo[i].itemCode == itemID::fuelTank10L)
+				{
+					partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemID::gasoline, 900);
+				}
+			}
+		}
+		myCar->addPart(vX, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+		myCar->addPart(vX + 1, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
+		myCar->addPart(vX + 2, vY + 2, { itemID::vehicleDoor });
+		///////////////////////////////▼최후방 4타일///////////////////////////
+		myCar->addPart(vX - 1, vY + 3, { itemID::vehicleWall, itemID::tailLight });
+		myCar->addPart(vX, vY + 3, { itemID::trunkDoor });
+		myCar->addPart(vX + 1, vY + 3, { itemID::trunkDoor });
+		myCar->addPart(vX + 2, vY + 3, { itemID::vehicleWall, itemID::tailLight });
+
+		prt(L"[디버그] SUV를 (%d,%d,%d) 위치에 소환했다.\n", vX, vY, vZ);
 		break;
 	}
 	case 99://콘솔 출력 초기화
