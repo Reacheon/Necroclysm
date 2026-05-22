@@ -3,7 +3,7 @@ module worldGen;
 import std;
 import util;
 
-using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
+using namespace worldGrid;  // Terrain, PixelCostGrid, TILE_PER_PIXEL 등 unqualified 접근
 
 //============================================================
 // 도로망 폴리라인 생성 — 평면 유클리드 MST.
@@ -267,8 +267,8 @@ namespace worldGen
         for (const auto& cn : cities)
         {
             cps.push_back(CityPixel{
-                (cn.center.x - TILE_BASE_X) / TILES_PER_PIXEL,
-                (cn.center.y - TILE_BASE_Y) / TILES_PER_PIXEL,
+                (cn.center.x - TILE_BASE_X) / TILE_PER_PIXEL,
+                (cn.center.y - TILE_BASE_Y) / TILE_PER_PIXEL,
                 cn.center.z
                 });
         }
@@ -1241,8 +1241,8 @@ namespace worldGen
                 auto pxToTile = [](int px, int py, int z) noexcept -> Point3
                     {
                         return Point3{
-                            px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2,
-                            py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2,
+                            px * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2,
+                            py * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2,
                             z
                         };
                     };
@@ -1260,11 +1260,11 @@ namespace worldGen
                     {
                         const int cityPx = ce.pixel.x - ce.stepX;
                         const int cityPy = ce.pixel.y - ce.stepY;
-                        const int localX = (ce.stepX > 0) ? (TILES_PER_PIXEL - 1) : (ce.stepX < 0) ? 0 : TILES_PER_PIXEL / 2;
-                        const int localY = (ce.stepY > 0) ? (TILES_PER_PIXEL - 1) : (ce.stepY < 0) ? 0 : TILES_PER_PIXEL / 2;
+                        const int localX = (ce.stepX > 0) ? (TILE_PER_PIXEL - 1) : (ce.stepX < 0) ? 0 : TILE_PER_PIXEL / 2;
+                        const int localY = (ce.stepY > 0) ? (TILE_PER_PIXEL - 1) : (ce.stepY < 0) ? 0 : TILE_PER_PIXEL / 2;
                         return Point3{
-                            cityPx * TILES_PER_PIXEL + TILE_BASE_X + localX,
-                            cityPy * TILES_PER_PIXEL + TILE_BASE_Y + localY,
+                            cityPx * TILE_PER_PIXEL + TILE_BASE_X + localX,
+                            cityPy * TILE_PER_PIXEL + TILE_BASE_Y + localY,
                             ce.pixel.z
                         };
                     };

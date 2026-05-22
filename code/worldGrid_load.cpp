@@ -173,14 +173,14 @@ namespace worldGrid
             const int srcStride = surf->w;
 
             //글로벌 그리드 좌상단 기준의 이 패치 시작 픽셀 좌표
-            const int baseX = (patchX - PATCH_X_MIN) * PATCH_PIXEL;
-            const int baseY = (patchY - PATCH_Y_MIN) * PATCH_PIXEL;
+            const int baseX = (patchX - PATCH_X_MIN) * PIXEL_PER_PATCH;
+            const int baseY = (patchY - PATCH_Y_MIN) * PIXEL_PER_PATCH;
 
-            for (int py = 0; py < PATCH_PIXEL; ++py)
+            for (int py = 0; py < PIXEL_PER_PATCH; ++py)
             {
                 Terrain* row = dst + static_cast<std::size_t>(baseY + py) * dstStride + baseX;
                 const std::uint32_t* srcRow = pixels + static_cast<std::size_t>(py) * srcStride;
-                for (int px = 0; px < PATCH_PIXEL; ++px)
+                for (int px = 0; px < PIXEL_PER_PATCH; ++px)
                 {
                     std::uint8_t r, g, b;
                     SDL_GetRGB(srcRow[px], fmt, pal, &r, &g, &b);

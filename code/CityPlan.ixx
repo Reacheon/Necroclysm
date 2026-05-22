@@ -12,7 +12,7 @@ import worldGen;
 //   CityPlan은 도시 단위 타일 래스터 — buildCityPlan이 도로/블록/다리를 타일로 구움.
 //
 //   왜 섹터가 아니라 도시 단위인가:
-//     T1 도시(베이징)는 ~120px = 5760타일 > 3840타일 섹터 → 도시가 섹터를 가로지름.
+//     T1 도시(베이징)는 ~120px = 2880타일 > 1920타일 섹터 → 도시가 섹터를 가로지름.
 //     섹터마다 따로 생성하면 경계에서 결정이 어긋남. 도시 1개당 1번 전역 생성 →
 //     procGenerate가 자기 섹터 범위만큼 잘라서 페인트(클리핑 OK).
 //
@@ -84,7 +84,7 @@ export CityPlan buildCityPlan(city::CityId id, std::uint64_t seed);
 //   계산 후 캐시. 워커 위임(requestAsync) 없음 → procGenerate가 ProcGenWorker
 //   단일 스레드에서 호출해도 "자기 자신이 채울 future를 기다리는" 데드락이 원천
 //   불가능. 도시 플랜은 래스터라 MB 단위(T1은 수십 MB)지만 동기 계산으로 충분
-//   (SectorCache의 147MB miss 경로도 lock 잡고 동기 계산 — 같은 패턴).
+//   (SectorCache의 37MB miss 경로도 lock 잡고 동기 계산 — 같은 패턴).
 
 export class CityPlanCache
 {

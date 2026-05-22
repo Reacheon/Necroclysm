@@ -352,9 +352,9 @@ export void debugConsole()
 			int z;
 		};
 		const std::array<TeleportPreset, 3> presets = { {
-			{ L"SEOUL",       731544, -216312, 0 },
-			{ L"YELLOW_SEA",  729160, -216312, 0 }, 
-			{ L"SEOUL_RIVER",  730942,-216107, 0 },
+			{ L"SEOUL",       365772, -108156, 0 },
+			{ L"YELLOW_SEA",  364580, -108156, 0 },
+			{ L"SEOUL_RIVER", 365471, -108054, 0 },
 		} };
 
 		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;

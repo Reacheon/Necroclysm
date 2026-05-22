@@ -87,8 +87,8 @@ private:
     SDL_FPoint pixelToScreen(int px, int py) const
     {
         const SDL_Rect r = mapRect();
-        const double fx = (double)px / (double)worldGrid::WORLD_PIXEL_W;
-        const double fy = (double)py / (double)worldGrid::WORLD_PIXEL_H;
+        const double fx = (double)px / (double)WORLD_PIXEL_W;
+        const double fy = (double)py / (double)WORLD_PIXEL_H;
         return SDL_FPoint{
             (float)(r.x + fx * r.w),
             (float)(r.y + fy * r.h)
@@ -97,21 +97,13 @@ private:
 
     SDL_FPoint tileToScreen(const Point3& t) const
     {
-        // worldGrid 픽셀 베이스: 패치 (-54,-27) 좌상단이 픽셀(0,0)
-        constexpr int PATCH_X_MIN = -54;
-        constexpr int PATCH_Y_MIN = -27;
-        constexpr int PIXEL_PER_PATCH = 400;
-        constexpr int TILE_BASE_X =
-            PATCH_X_MIN * PIXEL_PER_PATCH * worldGrid::TILES_PER_PIXEL;
-        constexpr int TILE_BASE_Y =
-            PATCH_Y_MIN * PIXEL_PER_PATCH * worldGrid::TILES_PER_PIXEL;
-
-        const double pxd = (double)(t.x - TILE_BASE_X) / (double)worldGrid::TILES_PER_PIXEL;
-        const double pyd = (double)(t.y - TILE_BASE_Y) / (double)worldGrid::TILES_PER_PIXEL;
+        // 월드 좌표계 상수는 constVar에서 가져옴 (TILE_BASE_X/Y, WORLD_PIXEL_W/H, TILE_PER_PIXEL)
+        const double pxd = (double)(t.x - TILE_BASE_X) / (double)TILE_PER_PIXEL;
+        const double pyd = (double)(t.y - TILE_BASE_Y) / (double)TILE_PER_PIXEL;
 
         const SDL_Rect r = mapRect();
-        const double fx = pxd / (double)worldGrid::WORLD_PIXEL_W;
-        const double fy = pyd / (double)worldGrid::WORLD_PIXEL_H;
+        const double fx = pxd / (double)WORLD_PIXEL_W;
+        const double fy = pyd / (double)WORLD_PIXEL_H;
         return SDL_FPoint{
             (float)(r.x + fx * r.w),
             (float)(r.y + fy * r.h)

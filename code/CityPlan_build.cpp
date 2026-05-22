@@ -10,7 +10,7 @@ import worldGrid;
 // CityPlan_build.cpp — buildCityPlan 구현.
 //
 //   알고리즘: '도로 세그먼트 랜덤 제거' — 도시 직사각형들에 균일 격자 분할선
-//   생성 → 48타일 단위 세그먼트 분해 → 물 인접 세그먼트 제거 → 그래프 변환 →
+//   생성 → 24타일 단위 세그먼트 분해 → 물 인접 세그먼트 제거 → 그래프 변환 →
 //   다트던지기로 랜덤 제거 (연결성 보존). 살아남은 세그먼트는 plan.segments에 저장.
 //
 //   향후 단계: 살아남은 세그먼트가 둘러싼 블록 분할 + 건물 prefab 배치 + 다리
@@ -96,8 +96,8 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 const Point3 endpoint = (endIdx == 0) ? line.verts.front() : line.verts.back();
                 const Point3 adjacent = (endIdx == 0) ? line.verts[1] : line.verts[line.verts.size() - 2];
 
-                const int epx = (endpoint.x - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
-                const int epy = (endpoint.y - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+                const int epx = (endpoint.x - TILE_BASE_X) / TILE_PER_PIXEL;
+                const int epy = (endpoint.y - TILE_BASE_Y) / TILE_PER_PIXEL;
 
                 bool inCity = false;
                 for (const city::CityRect& r : node.rectangles)
@@ -133,9 +133,9 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             {
                 if (dx == 0) //수평 분할선
                 {
-                    const int tileX0 = rect.px * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X;
-                    const int tileX1 = (rect.px + rect.w) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X;
-                    const int y = (rect.py + dy) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
+                    const int tileX0 = rect.px * TILE_PER_PIXEL + TILE_BASE_X;
+                    const int tileX1 = (rect.px + rect.w) * TILE_PER_PIXEL + TILE_BASE_X;
+                    const int y = (rect.py + dy) * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2;
                     const int z = node.center.z;
 
                     divLines.push_back(worldGen::RoadPolyLine{ .verts = { {tileX0, y, z}, {tileX1 - 1, y, z} } });
@@ -143,9 +143,9 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
                 if (dy == 0) // 수직 분할선
                 {
-                    const int tileY0 = rect.py * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y;
-                    const int tileY1 = (rect.py + rect.h) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y;
-                    const int x = (rect.px + dx) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
+                    const int tileY0 = rect.py * TILE_PER_PIXEL + TILE_BASE_Y;
+                    const int tileY1 = (rect.py + rect.h) * TILE_PER_PIXEL + TILE_BASE_Y;
+                    const int x = (rect.px + dx) * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2;
                     const int z = node.center.z;
 
                     divLines.push_back(worldGen::RoadPolyLine{ .verts = { {x, tileY0, z}, {x, tileY1 - 1, z} } });
@@ -155,7 +155,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
-    // 4. 세그먼트 단위(48타일)로 분해 시작
+    // 4. 세그먼트 단위(24타일)로 분해 시작
     //══════════════════════════════════════════════════════════════════
 
     std::vector<worldGen::RoadPolyLine> segments; //세그먼트들
@@ -235,8 +235,8 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //══════════════════════════════════════════════════════════════════
 
     auto terrainAtTile = [&](Point3 tile) -> worldGrid::Terrain {
-        const int px = (tile.x - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
-        const int py = (tile.y - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+        const int px = (tile.x - TILE_BASE_X) / TILE_PER_PIXEL;
+        const int py = (tile.y - TILE_BASE_Y) / TILE_PER_PIXEL;
         return cityPixelAt({ px, py, tile.z });
         };
 
@@ -334,10 +334,10 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         const int x1 = std::max(a.x, b.x);
         const int y0 = std::min(a.y, b.y);
         const int y1 = std::max(a.y, b.y);
-        const int px0 = (x0 - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
-        const int px1 = (x1 - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
-        const int py0 = (y0 - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
-        const int py1 = (y1 - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+        const int px0 = (x0 - TILE_BASE_X) / TILE_PER_PIXEL;
+        const int px1 = (x1 - TILE_BASE_X) / TILE_PER_PIXEL;
+        const int py0 = (y0 - TILE_BASE_Y) / TILE_PER_PIXEL;
+        const int py1 = (y1 - TILE_BASE_Y) / TILE_PER_PIXEL;
 
         bool preserve = false;
         if (horizontal)
@@ -390,7 +390,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     std::iota(order.begin(), order.end(), 0);
     std::shuffle(order.begin(), order.end(), rng);
     
-    const int maxDist = std::max(cityWidth, cityHeight) * worldGrid::TILES_PER_PIXEL;
+    const int maxDist = std::max(cityWidth, cityHeight) * TILE_PER_PIXEL;
 
 
 
@@ -403,8 +403,8 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     auto segToRectIndex = [&](const worldGen::RoadPolyLine& seg) -> int {
         const int midX = (seg.verts[0].x + seg.verts[1].x) / 2;
         const int midY = (seg.verts[0].y + seg.verts[1].y) / 2;
-        const int px = (midX - worldGrid::TILE_BASE_X) / worldGrid::TILES_PER_PIXEL;
-        const int py = (midY - worldGrid::TILE_BASE_Y) / worldGrid::TILES_PER_PIXEL;
+        const int px = (midX - TILE_BASE_X) / TILE_PER_PIXEL;
+        const int py = (midY - TILE_BASE_Y) / TILE_PER_PIXEL;
         for (size_t i = 0; i < node.rectangles.size(); ++i)
         {
             const auto& r = node.rectangles[i];
@@ -657,16 +657,16 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         const int z = p.z;
         if (ns)
         {
-            const int x = p.x * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
-            const int y0 = (p.y - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
-            const int y1 = (p.y + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
+            const int x = p.x * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2;
+            const int y0 = (p.y - 1) * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2;
+            const int y1 = (p.y + 1) * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2;
             plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {x, y0, z}, {x, y1, z} } });
         }
         else
         {
-            const int y = p.y * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_Y + worldGrid::TILES_PER_PIXEL / 2;
-            const int x0 = (p.x - 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
-            const int x1 = (p.x + 1) * worldGrid::TILES_PER_PIXEL + worldGrid::TILE_BASE_X + worldGrid::TILES_PER_PIXEL / 2;
+            const int y = p.y * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2;
+            const int x0 = (p.x - 1) * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2;
+            const int x1 = (p.x + 1) * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2;
             plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {x0, y, z}, {x1, y, z} } });
         }
 

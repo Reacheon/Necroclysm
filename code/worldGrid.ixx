@@ -2,6 +2,7 @@ export module worldGrid;
 
 import std;
 import util;
+import constVar;
 
 //============================================================
 // worldGrid — 월드 픽셀 그리드 데이터·접근 단일 책임 모듈.
@@ -52,8 +53,8 @@ export namespace worldGrid
 {
     struct PixelCostGrid
     {
-        static constexpr int W = 43200;
-        static constexpr int H = 21600;
+        static constexpr int W = WORLD_PIXEL_W;   //constVar 단일 진리원천
+        static constexpr int H = WORLD_PIXEL_H;
         std::unique_ptr<Terrain[]> data;
 
         Terrain at(int px, int py) const noexcept
@@ -62,7 +63,7 @@ export namespace worldGrid
         }
     };
 
-    //픽셀 좌표 (1픽셀 = 48타일). 절차적 생성 알고리즘 내부 전용.
+    //픽셀 좌표 (1픽셀 = 24타일 = 1청크). 절차적 생성 알고리즘 내부 전용.
     //타일 좌표 Point3와 강타입 분리 — 함수 파라미터에서 혼용 불가.
     //(Point3는 게임 전반에서 쓰는 실타일 좌표이므로 도시/폴리라인 등 외부 데이터는 그대로 Point3 사용.)
     struct PixelCoord
@@ -82,22 +83,11 @@ export namespace worldGrid
 //============================================================
 export namespace worldGrid
 {
-    inline constexpr int TILES_PER_PIXEL = 48;//1픽셀당 실타일 수 (청크 16과 정합 위해 16×3=48)
-    inline constexpr int WORLD_PIXEL_W   = 43200;
-    inline constexpr int WORLD_PIXEL_H   = 21600;
-
-    //패치(=위성 PNG 1장) 격자 — 파일 포맷 사실. 5832장 = (53-(-54)+1) × (26-(-27)+1) = 108 × 54.
+    //패치(=위성 PNG 1장) 파일명 그리드 BIAS. 5832장 = 108 × 54.
     //  파일명 규칙: number = PATCH_NUMBER_BIAS + patchX + 108·patchY → worldPatch-{number:03d}.png
-    inline constexpr int PATCH_X_MIN       = -54;
-    inline constexpr int PATCH_X_MAX       =  53;
-    inline constexpr int PATCH_Y_MIN       = -27;
-    inline constexpr int PATCH_Y_MAX       =  26;
-    inline constexpr int PATCH_PIXEL       = 400;    //패치 1장의 픽셀 변 (400×400)
+    //  ★ TILE_PER_PIXEL / PIXEL_PER_PATCH / WORLD_PIXEL_W/H / PATCH_X/Y_MIN/MAX /
+    //    TILE_BASE_X/Y 는 모두 constVar에 통합 (이 모듈에서는 import constVar로 가져와 사용).
     inline constexpr int PATCH_NUMBER_BIAS = 2971;
-
-    //픽셀 좌표 → 실타일 좌표 원점. 좌상단 패치(-54, -27)의 (0,0)이 어떤 실타일이 되는지.
-    inline constexpr int TILE_BASE_X = PATCH_X_MIN * PATCH_PIXEL * TILES_PER_PIXEL; // -1,036,800
-    inline constexpr int TILE_BASE_Y = PATCH_Y_MIN * PATCH_PIXEL * TILES_PER_PIXEL; //   -518,400
 
     //로딩 화면 미리보기 RGBA 다운샘플 해상도. 세로는 비율로 자동 계산.
     inline constexpr int PREVIEW_W = 1080;                                       // 43200 / 40
@@ -151,7 +141,7 @@ export namespace worldGrid
     //   variant끼리 *변/코너 경계 패턴은 동일*하게 그려져야 인접 픽셀에서 점프 X.
     //   인덱스 매핑은 GameMaker autotile47 컨벤션 (Sector_procGenerate.cpp 참조).
     //============================================================
-    inline constexpr int SHORE_TILE_SIZE     = 48;
+    inline constexpr int SHORE_TILE_SIZE     = 24;
     inline constexpr int SHORE_INDEX_COUNT   = 47;
     inline constexpr int SHORE_VARIANT_MAX   = 3;   // 시도하는 PNG 최대 개수 (실제 로드 수는 shoreSplineVariantCount)
 

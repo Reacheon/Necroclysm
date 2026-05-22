@@ -96,10 +96,10 @@ export namespace city
     };
 
     // 하드코딩 테이블 — PNG에 마킹한 도시들. 사용자가 PNG 보면서 좌표/이름/기후 채움.
-    //   픽셀 좌표 계산: pixelX = (tileX - TILE_BASE_X) / TILES_PER_PIXEL
-    //                  TILE_BASE_X = -54 * 400 * 48 = -1,036,800
-    //                  TILES_PER_PIXEL = 48
-    //   예: Seoul SPAWN_DEFAULT 타일 (731544, -216312) → 픽셀 (36840, 6293).
+    //   픽셀 좌표 계산: pixelX = (tileX - TILE_BASE_X) / TILE_PER_PIXEL
+    //                  TILE_BASE_X = -54 * 400 * 24 = -518,400
+    //                  TILE_PER_PIXEL = 24
+    //   예: Seoul SPAWN_DEFAULT 타일 (365772, -108156) → 픽셀 (36840, 6293).
     //
     //   매칭 정확도: PNG의 CityCenter 적색 픽셀 좌표를 정확히 입력하면 BFS centroid와
     //   1픽셀 이내로 매칭. 다수 CityCenter 픽셀 클러스터면 centroid가 평균 위치라

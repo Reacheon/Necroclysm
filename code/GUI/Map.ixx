@@ -35,31 +35,32 @@ import worldSession;
 namespace mapcfg
 {
     // 픽셀 퍼펙트 줌 레벨 — pxPerTile = 스크린 픽셀 / 월드 타일.
-    //   조건1: 48*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 48 tiles) 가
+    //   조건1: 24*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 24 tiles) 가
     //          모든 화면 픽셀에 정수 비율로 매핑 → 띠/뭉개짐 없음.
     //   조건2: pxPerTile 가 ≥1 일 때 정수 → 16px 타일 스프라이트가 모든
     //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
     //
-    //   48 약수: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48.
-    //   조건1 만족: pxPerTile = n/48 꼴. 1/48부터 1/24, 1/16, ..., 1.0, ...
+    //   24 약수: 1, 2, 3, 4, 6, 8, 12, 24.
+    //   조건1 만족: pxPerTile = n/24 꼴. 1/24부터 1/12, 1/8, ..., 1.0, ...
     //
-    //   1/48 미만 (광역 조망): 조건1 위배 — 패치 텍스처가 nearest scale로
+    //   1/24 미만 (광역 조망): 조건1 위배 — 패치 텍스처가 nearest scale로
     //   다운샘플링되어 약간 뭉개지지만, 한 패치가 화면에서 ≤1px 정도라 시각적 무관.
     //   최소값 1/96 ≈ 0.01 px/tile — 대륙 1개 정도 한 화면에 표시.
+    //   1/48, 1/16은 24-약수 아님 → 약한 sub-pixel (시각 거의 무관).
     inline constexpr double ZOOM_LEVELS[] = {
         // 광역 조망 (sub-pixel-perfect — 텍스처 다운샘플)
         1.0/96,    // ≈ 0.01042
         1.0/64,    // = 0.015625
+        1.0/48,    // ≈ 0.0208  (24× = 0.5, 약한 sub-pixel)
         // 픽셀 퍼펙트 단계 (조건1 만족)
-        1.0/48,    // ≈ 0.0208  (48× = 1)
-        1.0/24,    // ≈ 0.0417  (48× = 2)
-        1.0/16,    // = 0.0625  (48× = 3)
-        1.0/12,    // ≈ 0.0833  (48× = 4)
-        1.0/8,     // = 0.125   (48× = 6)
-        1.0/6,     // ≈ 0.1667  (48× = 8)
-        1.0/4,     // = 0.25    (48× = 12)
-        1.0/3,     // ≈ 0.3333  (48× = 16)
-        1.0/2,     // = 0.5     (48× = 24)
+        1.0/24,    // ≈ 0.0417  (24× = 1)
+        1.0/16,    // = 0.0625  (24× = 1.5, 약한 sub-pixel)
+        1.0/12,    // ≈ 0.0833  (24× = 2)
+        1.0/8,     // = 0.125   (24× = 3)
+        1.0/6,     // ≈ 0.1667  (24× = 4)
+        1.0/4,     // = 0.25    (24× = 6)
+        1.0/3,     // ≈ 0.3333  (24× = 8)
+        1.0/2,     // = 0.5     (24× = 12)
         1.0, 2.0, 3.0, 4.0, 5.0, 6.0
     };
     inline constexpr int    ZOOM_LEVEL_COUNT   = (int)(sizeof(ZOOM_LEVELS) / sizeof(ZOOM_LEVELS[0]));
@@ -176,8 +177,8 @@ struct MapView
     //   뷰포트가 월드보다 큰 경우(극단 줌아웃) 월드를 화면 정중앙 정렬.
     void clampCenterY()
     {
-        const double worldMinY = static_cast<double>(worldGrid::TILE_BASE_Y);
-        const double worldMaxY = worldMinY + static_cast<double>(worldGrid::WORLD_PIXEL_H) * worldGrid::TILES_PER_PIXEL;
+        const double worldMinY = static_cast<double>(TILE_BASE_Y);
+        const double worldMaxY = worldMinY + static_cast<double>(WORLD_TILE_H);
         const double viewHalfTiles = viewH * 0.5 / pxPerTile;
         if (viewHalfTiles * 2.0 >= worldMaxY - worldMinY)
         {
@@ -248,8 +249,8 @@ private:
         const SDL_PixelFormatDetails* fmt = SDL_GetPixelFormatDetails(surf->format);
 
         //글로벌 픽셀 시작점. patch 좌표는 World의 patch 그리드와 동일 인덱싱.
-        const int globalPx0 = (sx + 54) * PIXEL_PER_PATCH;   // sx=-54가 픽셀 0
-        const int globalPy0 = (sy + 27) * PIXEL_PER_PATCH;   // sy=-27이 픽셀 0
+        const int globalPx0 = (sx - PATCH_X_MIN) * PIXEL_PER_PATCH;   // PATCH_X_MIN(-54)가 픽셀 0
+        const int globalPy0 = (sy - PATCH_Y_MIN) * PIXEL_PER_PATCH;   // PATCH_Y_MIN(-27)가 픽셀 0
 
         for (int py = 0; py < PIXEL_PER_PATCH; py++)
         {
@@ -554,7 +555,7 @@ static void drawCityRoadOverlay(const MapView& v)
     int dbgWrongZ = 0;
     int dbgClipped = 0;
 
-    constexpr int CITY_VIS_MARGIN_TILES = 8000;  // 가장 큰 도시 베이징(~5760타일) 커버
+    constexpr int CITY_VIS_MARGIN_TILES = 4000;  // 가장 큰 도시 베이징(~2880타일) 커버
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {

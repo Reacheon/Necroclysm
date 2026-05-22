@@ -1081,106 +1081,98 @@ export void startArea()
 
 		// 수직 도로
 		// 기본 4차선 도로
-		// 너비 15칸
-		for (int dx = -6; dx >= -20; dx--)
+		// 너비 16칸 (중앙선은 dx=-14|-13 이음새에 반쪽 타일로 폭 1타일 형성)
+		for (int dx = -6; dx >= -21; dx--)
 		{
 			for (int dy = -60; dy <= 29; dy++)
 			{
 				// 횡단보도 위치는 검은 아스팔트로 미리 깔아 노란 중앙선과 섞이지 않게 함
-				bool inCrosswalkBand = (dy >= -42 && dy <= -37) || (dy >= -21 && dy <= -16);
-				if (dx == -13 && !inCrosswalkBand && ((((dy + 24) % 6) + 6) % 6 < 3)) setFloor({ dx, dy, 0 }, itemID::yellowAsphalt);
+				bool inCrosswalkBand = (dy >= -43 && dy <= -38) || (dy >= -21 && dy <= -16);
+				bool dashOn = ((((dy + 24) % 6) + 6) % 6 < 3);
+				if (dx == -14 && !inCrosswalkBand && dashOn) setFloor({ dx, dy, 0 }, itemID::yellowAsphaltRightHalf);
+				else if (dx == -13 && !inCrosswalkBand && dashOn) setFloor({ dx, dy, 0 }, itemID::yellowAsphaltLeftHalf);
 				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
 			}
 		}
 
 		// 수평 도로
 		// 기본 4차선 도로
-		// 너비 15칸
-		for (int dy = -36; dy <= -22; dy++)
+		// 너비 16칸 (중앙선은 dy=-30|-29 이음새에 반쪽 타일로 폭 1타일 형성)
+		for (int dy = -37; dy <= -22; dy++)
 		{
 			for (int dx = -32; dx <= 32; dx++)
 			{
-				bool inIntersection = (dx >= -20 && dx <= -6);
+				bool inIntersection = (dx >= -21 && dx <= -6);
 				// 횡단보도 위치는 검은 아스팔트로 미리 깔아 노란 중앙선과 섞이지 않게 함
-				bool inCrosswalkBand = (dx >= -26 && dx <= -21) || (dx >= -5 && dx <= 0);
-				bool isYellow = false;
-				if (!inIntersection && !inCrosswalkBand && dy == -29)
+				bool inCrosswalkBand = (dx >= -27 && dx <= -22) || (dx >= -5 && dx <= 0);
+				bool dashOn = false;
+				if (!inIntersection && !inCrosswalkBand)
 				{
-					if (dx < -20)     isYellow = (((-18 - dx) % 6 + 6) % 6) < 3;
-					else isYellow = (((dx + 8) % 6 + 6) % 6) < 3;
+					if (dx < -21)     dashOn = (((-19 - dx) % 6 + 6) % 6) < 3;
+					else dashOn = (((dx + 8) % 6 + 6) % 6) < 3;
 				}
-				if (isYellow) setFloor({ dx, dy, 0 }, itemID::yellowAsphalt);
+				if (dashOn && dy == -30) setFloor({ dx, dy, 0 }, itemID::yellowAsphaltBottomHalf);
+				else if (dashOn && dy == -29) setFloor({ dx, dy, 0 }, itemID::yellowAsphaltTopHalf);
 				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
 			}
 		}
 
 		{
 			//남쪽 횡단보도 (우측보행: 안쪽 띠 서쪽방향, 바깥쪽 띠 동쪽방향)
+			//   16타일 도로 = 화살표 1 + stripe 7쌍(14) + lone 1 타일
 			setFloor({ -6, -19, 0 }, itemID::whiteAsphaltArrowL);
 			setFloor({ -6, -21, 0 }, itemID::whiteAsphaltArrowL);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -7 - 2 * i, -19, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i, -20, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i, -21, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i - 1, -19, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -7 - 2 * i - 1, -20, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -7 - 2 * i - 1, -21, 0 }, itemID::whiteAsphaltRightHalf);
+				setFloor({ -8 - 2 * i, -19, 0 }, itemID::whiteAsphalt);
+				setFloor({ -8 - 2 * i, -20, 0 }, itemID::whiteAsphalt);
+				setFloor({ -8 - 2 * i, -21, 0 }, itemID::whiteAsphalt);
 			}
 
-			setFloor({ -20, -16, 0 }, itemID::whiteAsphaltArrowR);
-			setFloor({ -20, -18, 0 }, itemID::whiteAsphaltArrowR);
+
+
+			setFloor({ -21, -16, 0 }, itemID::whiteAsphaltArrowR);
+			setFloor({ -21, -18, 0 }, itemID::whiteAsphaltArrowR);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -19 + 2*i, -16, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i, -17, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i, -18, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i + 1, -16, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -19 + 2 * i + 1, -17, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -19 + 2 * i + 1, -18, 0 }, itemID::whiteAsphaltLeftHalf);
+				setFloor({ -19 + 2*i, -16, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -17, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -18, 0 }, itemID::whiteAsphalt);
 			}
 
-			//북쪽 횡단보도
-			setFloor({ -20, -37, 0 }, itemID::whiteAsphaltArrowR);
-			setFloor({ -20, -39, 0 }, itemID::whiteAsphaltArrowR);
+
+			//북쪽 횡단보도 (도로가 1타일 북쪽 확장됨에 따라 dy도 1북상)
+			setFloor({ -21, -38, 0 }, itemID::whiteAsphaltArrowR);
+			setFloor({ -21, -40, 0 }, itemID::whiteAsphaltArrowR);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -19 + 2 * i, -37, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i, -38, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i, -39, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -19 + 2 * i + 1, -37, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -19 + 2 * i + 1, -38, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -19 + 2 * i + 1, -39, 0 }, itemID::whiteAsphaltLeftHalf);
+				setFloor({ -19 + 2 * i, -38, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -39, 0 }, itemID::whiteAsphalt);
+				setFloor({ -19 + 2 * i, -40, 0 }, itemID::whiteAsphalt);
 			}
 
-			setFloor({ -6, -40, 0 }, itemID::whiteAsphaltArrowL);
-			setFloor({ -6, -42, 0 }, itemID::whiteAsphaltArrowL);
+			setFloor({ -6, -41, 0 }, itemID::whiteAsphaltArrowL);
+			setFloor({ -6, -43, 0 }, itemID::whiteAsphaltArrowL);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -7 - 2 * i, -40, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i, -41, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i, -42, 0 }, itemID::whiteAsphaltLeftHalf);
-				setFloor({ -7 - 2 * i - 1, -40, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -7 - 2 * i - 1, -41, 0 }, itemID::whiteAsphaltRightHalf);
-				setFloor({ -7 - 2 * i - 1, -42, 0 }, itemID::whiteAsphaltRightHalf);
+				setFloor({ -8 - 2 * i, -41, 0 }, itemID::whiteAsphalt);
+				setFloor({ -8 - 2 * i, -42, 0 }, itemID::whiteAsphalt);
+				setFloor({ -8 - 2 * i, -43, 0 }, itemID::whiteAsphalt);
 			}
 
-			//동쪽 횡단보도
-			setFloor({ -5, -36, 0 }, itemID::whiteAsphaltArrowD);
-			setFloor({ -3, -36, 0 }, itemID::whiteAsphaltArrowD);
+			//동쪽 횡단보도 (도로 북쪽 끝 dy=-37로 확장됨에 따라 화살표 위치 1북상)
+			setFloor({ -5, -37, 0 }, itemID::whiteAsphaltArrowD);
+			setFloor({ -3, -37, 0 }, itemID::whiteAsphaltArrowD);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -5, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -4, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -3, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -5, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -4, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -3, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
+				setFloor({ -5, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -4, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -3, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
 			}
 
 			setFloor({ -2, -22, 0 }, itemID::whiteAsphaltArrowU);
@@ -1188,46 +1180,37 @@ export void startArea()
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -2, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -1, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ 0, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -2, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -1, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ 0, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
+				setFloor({ -2, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -1, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ 0, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
 			}
 
-			//서쪽 횡단보도 (우측보행: 안쪽 띠 북쪽방향, 바깥쪽 띠 남쪽방향)
-			setFloor({ -21, -22, 0 }, itemID::whiteAsphaltArrowU);
-			setFloor({ -23, -22, 0 }, itemID::whiteAsphaltArrowU);
+			//서쪽 횡단보도 (우측보행: 안쪽 띠 북쪽방향, 바깥쪽 띠 남쪽방향. 도로 서쪽 확장으로 dx 1서쪽 이동)
+			setFloor({ -22, -22, 0 }, itemID::whiteAsphaltArrowU);
+			setFloor({ -24, -22, 0 }, itemID::whiteAsphaltArrowU);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -21, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -22, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -23, -23 - 2 * i, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -21, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -22, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -23, -23 - 2 * i - 1, 0 }, itemID::whiteAsphaltBottomHalf);
+				setFloor({ -22, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -23, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -24, -24 - 2 * i, 0 }, itemID::whiteAsphalt);
 			}
 
-			setFloor({ -24, -36, 0 }, itemID::whiteAsphaltArrowD);
-			setFloor({ -26, -36, 0 }, itemID::whiteAsphaltArrowD);
+			setFloor({ -25, -37, 0 }, itemID::whiteAsphaltArrowD);
+			setFloor({ -27, -37, 0 }, itemID::whiteAsphaltArrowD);
 
 			for (int i = 0; i < 7; i++)
 			{
-				setFloor({ -24, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -25, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -26, -35 + 2 * i, 0 }, itemID::whiteAsphaltBottomHalf);
-				setFloor({ -24, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -25, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
-				setFloor({ -26, -35 + 2 * i + 1, 0 }, itemID::whiteAsphaltTopHalf);
+				setFloor({ -25, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -26, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
+				setFloor({ -27, -35 + 2 * i, 0 }, itemID::whiteAsphalt);
 			}
 
-			// 1. [대각선 횡단보도] 좌하단에서 중앙으로
+			// 1. [대각선 횡단보도] 좌하단에서 중앙으로 (교차로 NW 모서리 (-1,-1) 이동)
 			for (int i = 0; i < 5; i++)
 			{
-				int pivotX = -20 + i;
-				int pivotY = -33 + i;
+				int pivotX = -21 + i;
+				int pivotY = -34 + i;
 				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltTopQuarter);
 				setFloor({ pivotX, pivotY - 1, 0 }, itemID::whiteAsphaltDiagLR);
 				setFloor({ pivotX + 1, pivotY - 1, 0 }, itemID::whiteAsphaltDiagUL);
@@ -1237,7 +1220,7 @@ export void startArea()
 				setFloor({ pivotX + 3, pivotY - 3, 0 }, itemID::whiteAsphaltLeftQuarter);
 			}
 
-			// 2. [대각선 횡단보도] 우상단에서 중앙으로
+			// 2. [대각선 횡단보도] 우상단에서 중앙으로 (SE 모서리 변동 없음)
 			for (int i = 0; i < 5; i++)
 			{
 				int pivotX = -6 - i;
@@ -1252,10 +1235,10 @@ export void startArea()
 				setFloor({ pivotX - 3, pivotY + 3, 0 }, itemID::whiteAsphaltRightQuarter);
 			}
 
-			// 3. [대각선 횡단보도] 좌상단에서 중앙으로
+			// 3. [대각선 횡단보도] 좌상단에서 중앙으로 (SW 모서리 (-1,0) 이동)
 			for (int i = 0; i < 5; i++)
 			{
-				int pivotX = -20 + i;
+				int pivotX = -21 + i;
 				int pivotY = -25 - i;
 				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltBottomQuarter);
 				setFloor({ pivotX, pivotY + 1, 0 }, itemID::whiteAsphaltDiagUR);
@@ -1266,11 +1249,11 @@ export void startArea()
 				setFloor({ pivotX + 3, pivotY + 3, 0 }, itemID::whiteAsphaltLeftQuarter);
 			}
 
-			// 4. [대각선 횡단보도] 우하단에서 중앙으로
+			// 4. [대각선 횡단보도] 우하단에서 중앙으로 (NE 모서리 (0,-1) 이동)
 			for (int i = 0; i < 5; i++)
 			{
 				int pivotX = -6 - i;
-				int pivotY = -33 + i;
+				int pivotY = -34 + i;
 
 				setFloor({ pivotX, pivotY, 0 }, itemID::whiteAsphaltTopQuarter);
 				setFloor({ pivotX, pivotY - 1, 0 }, itemID::whiteAsphaltDiagLL);
@@ -1281,15 +1264,11 @@ export void startArea()
 				setFloor({ pivotX - 3, pivotY - 3, 0 }, itemID::whiteAsphaltRightQuarter);
 			}
 
-			//5. 대각선 횡단보도 엣지케이스 보정
-			setFloor({ -13, -32, 0 }, itemID::whiteAsphaltBowtiePattern);
-			setFloor({ -13, -26, 0 }, itemID::whiteAsphaltBowtiePattern);
-			setFloor({ -16, -29, 0 }, itemID::whiteAsphaltHourglassPattern);
-			setFloor({ -10, -29, 0 }, itemID::whiteAsphaltHourglassPattern);
+
 		}
 
 		// 다리 끝 반대편 섬을 먼저 깔아둠 — 다리가 위에 덮어씌어지면서 끝부분이 섬에 박힘
-		// 섬 반경 18 ≥ 다리 폭 21/2 → 다리 끝 21타일 전체가 섬 안에 들어옴
+		// 섬 반경 18 ≥ 다리 폭 24/2 → 다리 끝 24타일 전체가 섬 안에 들어옴
 		for (int dx = -33; dx <= 7; dx++)
 		{
 			for (int dy = 53; dy <= 93; dy++)
@@ -1306,18 +1285,18 @@ export void startArea()
 		}
 
 		// 남쪽 다리 (z=1) — 밑 z=0의 바다/섬은 그대로 보존되어 보트 통과 가능
-		// 도로 15타일 + 양쪽 paver 인도 3타일(가드레일 1 + 보행 2) = 폭 21타일
+		// 도로 16타일 + 양쪽 paver 인도 4타일(가드레일 1 + 보행 3) = 폭 24타일
 		for (int dy = 29; dy <= 60; dy++)
 		{
-			for (int dx = -23; dx <= -3; dx++)
+			for (int dx = -25; dx <= -2; dx++)
 			{
-				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 1 }, itemID::paver);
+				if (dx <= -22 || dx >= -5) setFloor({ dx, dy, 1 }, itemID::paver);
 				else setFloor({ dx, dy, 1 }, itemID::blackAsphalt);
 			}
 		}
 
 		// 진입측 / 출구측 양방향 ramp — 같은 (x, y)의 두 z에 RAMP_UP/RAMP_DOWN 쌍으로 배치
-		for (int dx = -23; dx <= -3; dx++)
+		for (int dx = -25; dx <= -2; dx++)
 		{
 			createProp({ dx, 29, 0 }, itemID::rampUp);   // 도로 → 다리
 			createProp({ dx, 29, 1 }, itemID::rampDown); // 다리 → 도로
@@ -1328,12 +1307,12 @@ export void startArea()
 		// 다리 가장자리 가드레일 (paver 바깥쪽 위, ramp 위치는 비워서 차량 진입 가능)
 		for (int dy = 29; dy <= 60; dy++)
 		{
-			setWall({ -23, dy, 1 }, itemID::guardrail);
-			setWall({ -3, dy, 1 }, itemID::guardrail);
+			setWall({ -25, dy, 1 }, itemID::guardrail);
+			setWall({ -2, dy, 1 }, itemID::guardrail);
 		}
 
 		// ramp 뒤(다리 안쪽 z=0)에 기둥벽 — 다리 밑에서 ramp 역방향 진입 차단 + 시야 차단
-		for (int dx = -23; dx <= -3; dx++)
+		for (int dx = -25; dx <= -2; dx++)
 		{
 			setWall({ dx, 30, 0 }, itemID::pillarWall); // 북쪽 ramp 뒤
 			setWall({ dx, 59, 0 }, itemID::pillarWall); // 남쪽 ramp 뒤
@@ -1343,31 +1322,33 @@ export void startArea()
 		// 양쪽 paver만 깔아서 가운데(진입 차선 / 섬 가장자리)는 그대로 보이게
 		for (int dy = 25; dy <= 29; dy++)
 		{
+			setFloor({ -25, dy, 0 }, itemID::paver);
+			setFloor({ -24, dy, 0 }, itemID::paver);
 			setFloor({ -23, dy, 0 }, itemID::paver);
 			setFloor({ -22, dy, 0 }, itemID::paver);
-			setFloor({ -21, dy, 0 }, itemID::paver);
 			setFloor({ -5, dy, 0 }, itemID::paver);
 			setFloor({ -4, dy, 0 }, itemID::paver);
 			setFloor({ -3, dy, 0 }, itemID::paver);
+			setFloor({ -2, dy, 0 }, itemID::paver);
 		}
 		// 출구측은 섬 위라 가운데도 blackAsphalt로 채워줘야 다리 모양 (진입측은 기존 도로가 가운데 채움)
 		for (int dy = 60; dy <= 64; dy++)
 		{
-			for (int dx = -23; dx <= -3; dx++)
+			for (int dx = -25; dx <= -2; dx++)
 			{
-				if (dx <= -21 || dx >= -5) setFloor({ dx, dy, 0 }, itemID::paver);
+				if (dx <= -22 || dx >= -5) setFloor({ dx, dy, 0 }, itemID::paver);
 				else setFloor({ dx, dy, 0 }, itemID::blackAsphalt);
 			}
 		}
 		for (int dy = 25; dy <= 29; dy++)
 		{
-			setWall({ -23, dy, 0 }, itemID::guardrail);
-			setWall({ -3, dy, 0 }, itemID::guardrail);
+			setWall({ -25, dy, 0 }, itemID::guardrail);
+			setWall({ -2, dy, 0 }, itemID::guardrail);
 		}
 		for (int dy = 60; dy <= 64; dy++)
 		{
-			setWall({ -23, dy, 0 }, itemID::guardrail);
-			setWall({ -3, dy, 0 }, itemID::guardrail);
+			setWall({ -25, dy, 0 }, itemID::guardrail);
+			setWall({ -2, dy, 0 }, itemID::guardrail);
 		}
 
 

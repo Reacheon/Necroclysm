@@ -7,7 +7,7 @@ import constVar;
 // 월드 X축 원기둥 wrap — 메르카토르 세계지도 동/서 경계 심리스 연결.
 //
 //   좌표계는 Null Island(서아프리카 기니만, 경도 0°·위도 0°)를 원점으로 함.
-//     - 타일 X 범위: [-WORLD_TILE_W/2, +WORLD_TILE_W/2) = [-1,036,800, +1,036,800)
+//     - 타일 X 범위: [-WORLD_TILE_W/2, +WORLD_TILE_W/2) = [-518,400, +518,400)
 //     - 시암 (wrap 경계) 은 X = ±WORLD_TILE_W/2 = 반대 자오선(180°) = 태평양 한가운데
 //     - Y축은 양극(보이지않는 벽)이라 wrap 안 함
 //
@@ -29,14 +29,8 @@ import constVar;
 //     - PolyLine 정점 raw 좌표 (그릴 때 첫점 기준 누적 변환)
 // ════════════════════════════════════════════════════════════════════════
 
-export namespace worldWrap
-{
-    inline constexpr int WORLD_PIXEL_W = 43200;
-    inline constexpr int WORLD_PIXEL_H = 21600;
-    inline constexpr int WORLD_TILE_W  = WORLD_PIXEL_W * TILE_PER_PIXEL; // 2,073,600
-    inline constexpr int WORLD_TILE_H  = WORLD_PIXEL_H * TILE_PER_PIXEL; // 1,036,800
-    inline constexpr int WORLD_CHUNK_W = WORLD_TILE_W / CHUNK_SIZE_X;    //   129,600
-}
+// WORLD_PIXEL_W/H, WORLD_TILE_W/H, WORLD_CHUNK_W, RENDER_X_SPAN, TILE_BASE_X/Y 등
+// 월드 좌표계 상수는 constVar(단일 진리원천)에서 가져옴 — 본 모듈은 wrap 함수만 제공.
 
 namespace worldWrap
 {
@@ -108,8 +102,8 @@ export namespace worldWrap
 
     //렌더 X 공간(= 16 * gridX + 8) 부호 있는 최단 거리.
     //  cameraX, Coord::getX() 등이 사용하는 스케일.
+    //  RENDER_X_SPAN은 constVar에서 가져옴 (= WORLD_TILE_W × 16).
     //  엔티티 그릴 때: drawX = (cameraW/2) + zoomScale * signedDeltaRenderX(cameraX, entity.getX())
-    constexpr int RENDER_X_SPAN = WORLD_TILE_W * 16;
     constexpr int signedDeltaRenderX(int cameraX, int worldX) noexcept
     {
         return signedDeltaMod(cameraX, worldX, RENDER_X_SPAN);

@@ -175,6 +175,10 @@
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\AniManager.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
+    <ClCompile Include="code\Cell\cell-infra.ixx" />
+    <ClCompile Include="code\Cell\cell.ixx" />
+    <ClCompile Include="code\Cell\Template\cell-Sample.ixx" />
+    <ClCompile Include="code\Cell\Template\cell-School.ixx" />
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />

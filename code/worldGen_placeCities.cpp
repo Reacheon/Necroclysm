@@ -6,7 +6,7 @@ module worldGen;
 import std;
 import util;
 
-using namespace worldGrid;  // Terrain, PixelCostGrid, TILES_PER_PIXEL 등 unqualified 접근
+using namespace worldGrid;  // Terrain, PixelCostGrid, TILE_PER_PIXEL 등 unqualified 접근
 
 // ════════════════════════════════════════════════════════════════════════
 // placeCities — 도시 좌표 배열 절차생성 (월드 1회 부트의 1단계).
@@ -155,8 +155,8 @@ namespace worldGen
         auto pixelToTileCenter = [](int px, int py) noexcept -> Point3
         {
             return Point3{
-                px * TILES_PER_PIXEL + TILE_BASE_X + TILES_PER_PIXEL / 2,
-                py * TILES_PER_PIXEL + TILE_BASE_Y + TILES_PER_PIXEL / 2,
+                px * TILE_PER_PIXEL + TILE_BASE_X + TILE_PER_PIXEL / 2,
+                py * TILE_PER_PIXEL + TILE_BASE_Y + TILE_PER_PIXEL / 2,
                 0
             };
         };

@@ -2,6 +2,7 @@ export module worldGen;
 
 import std;
 import util;
+import constVar;
 import worldGrid;
 import city;
 

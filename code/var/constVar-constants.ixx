@@ -7,8 +7,8 @@ export constexpr int DARK_VISION_RADIUS = 13;
 export constexpr double MAX_ZOOM = 5.0;
 export constexpr double MIN_ZOOM = 2.0;
 
-export constexpr int CHUNK_SIZE_X = 16; //청크의 x길이 (2의 거듭제곱)
-export constexpr int CHUNK_SIZE_Y = 16; //청크의 y길이 (2의 거듭제곱)
+export constexpr int CHUNK_SIZE_X = 24; //청크의 x길이 (건물 양자화 그리드와 정합: 24타일 = 1픽셀 / 2 = 최소 건물 footprint)
+export constexpr int CHUNK_SIZE_Y = 24; //청크의 y길이 (건물 양자화 그리드와 정합: 24타일 = 1픽셀 / 2 = 최소 건물 footprint)
 export constexpr int CHUNK_SIZE_Z = 1; //청크의 z길이, 현재 1로 미사용됨
 export constexpr int MAX_FONT_SIZE = 50;
 export constexpr int EX_INPUT_TEXT_MAX = 30;
@@ -18,8 +18,8 @@ export constexpr int INVENTORY_ITEM_MAX = 9;
 export constexpr int DMG_FLAG_SIZE = 3;
 export constexpr int TALENT_SIZE = 20;
 
-// 16칸이 한 청크니까 걸칠 수 있는 정도로, 차량의 왼쪽끝(코어)이 청크의 오른쪽끝 그러면... 5청크*5청크 분석해야한다.
-// ●|○○○○○○○○○○○○○○○○|○○○○○○○○○○○○○○○×|
+// 24칸이 한 청크니까 차량의 왼쪽끝(코어)이 청크의 오른쪽끝에 있어도 최대 2청크만 걸침 → 3*3 분석으로 충분.
+// (청크가 16일 땐 31차량이 3청크 걸쳐 5*5 분석이 필요했으나, 24청크 전환으로 여유 확보)
 export constexpr int MAX_VEHICLE_SIZE = 31;
 
 
@@ -29,11 +29,37 @@ export constexpr int MINIMAP_TILE_PX = 6;   //미니맵에서 타일 1개의 픽
 export constexpr int NAVIMAP_WIDTH = 99;//167;
 export constexpr int NAVIMAP_HEIGHT = 58;//99;
 // 월드 생성 좌표계 (픽셀 ↔ 청크 정합 정렬)
-// 패치 PNG는 400x400 픽셀, 픽셀 1칸 = 48타일 (= 16 × 3 → 픽셀 1개 = 3×3 청크 = 9청크)
-// 1패치 = 400*48 = 19200타일 변길이 = 19200/16 = 1200청크 변길이
-export constexpr int TILE_PER_PIXEL = 48;     // 픽셀 1칸이 표현하는 타일 길이 (청크 정합 위해 48 = 16×3)
+// 패치 PNG는 400x400 픽셀, 픽셀 1칸 = 24타일 (= 24 × 1 → 픽셀 1개 = 1×1 청크 = 정확히 1청크)
+// 1패치 = 400*24 = 9600타일 변길이 = 9600/24 = 400청크 변길이
+//
+// ★ 본 블록의 모든 상수는 월드 좌표계의 단일 진리원천(SSOT).
+//   worldGrid / worldWrap / Sector / CityPlan 등 모듈은 본 상수를 import해 사용 —
+//   같은 의미의 별도 상수를 모듈 내에 두지 말 것 (이중 상수 드리프트 방지).
+export constexpr int TILE_PER_PIXEL = 24;     // 픽셀 1칸이 표현하는 타일 길이 (청크 크기와 동일 — 1픽셀 = 1청크 완전 정합)
 export constexpr int PIXEL_PER_PATCH = 400;   // 패치 PNG 한 변의 픽셀 수
-export constexpr int TILE_PER_PATCH = TILE_PER_PIXEL * PIXEL_PER_PATCH; // 19200
+export constexpr int TILE_PER_PATCH = TILE_PER_PIXEL * PIXEL_PER_PATCH; // 9600
+
+// 월드 픽셀 해상도 (위성 PNG 그리드 차원 — 108×54 패치)
+export constexpr int WORLD_PIXEL_W = 43200;   // = 108 patch × 400 px
+export constexpr int WORLD_PIXEL_H = 21600;   // =  54 patch × 400 px
+
+// 패치 격자 좌표 범위 (worldPatch-XXX.png 파일명 그리드)
+export constexpr int PATCH_X_MIN = -54;
+export constexpr int PATCH_X_MAX =  53;
+export constexpr int PATCH_Y_MIN = -27;
+export constexpr int PATCH_Y_MAX =  26;
+
+// 파생: 월드 전체 타일 차원
+export constexpr int WORLD_TILE_W  = WORLD_PIXEL_W * TILE_PER_PIXEL;       // 1,036,800
+export constexpr int WORLD_TILE_H  = WORLD_PIXEL_H * TILE_PER_PIXEL;       //   518,400
+export constexpr int WORLD_CHUNK_W = WORLD_TILE_W / CHUNK_SIZE_X;          //    43,200
+
+// 파생: 픽셀 좌표 (0,0) ↔ 타일 좌표 변환 원점 (좌상단 패치 기준)
+export constexpr int TILE_BASE_X = PATCH_X_MIN * PIXEL_PER_PATCH * TILE_PER_PIXEL; // -518,400
+export constexpr int TILE_BASE_Y = PATCH_Y_MIN * PIXEL_PER_PATCH * TILE_PER_PIXEL; // -259,200
+
+// 렌더 X 공간 (= WORLD_TILE_W × 16) — Coord 저장 좌표계 단위 (1 타일 = 16 렌더 유닛)
+export constexpr int RENDER_X_SPAN = WORLD_TILE_W * 16;
 export constexpr int TOLERANCE_LSTICK = 10000; //LStick이 이 값을 넘어야 판정이 일어남
 export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경우 홀드 이벤트가 일어나지 않음
 

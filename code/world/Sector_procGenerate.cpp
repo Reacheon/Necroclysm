@@ -11,7 +11,7 @@ import CityPlan;
 // ════════════════════════════════════════════════════════════════════════
 // procGenerate — Sector-level 절차생성의 단일 슈퍼함수.
 //
-//   책임: SectorPlan.tiles (3840×3840 PaintCell) 전부를 결정해서 채움.
+//   책임: SectorPlan.tiles (1920×1920 PaintCell) 전부를 결정해서 채움.
 //        청크는 본 산출물을 *블릿만* — 자체 결정 0.
 //
 //   향후 단계는 모두 본 함수에 누적됨:
@@ -21,7 +21,7 @@ import CityPlan;
 //     4) 인카운터 사이트 좌표
 //     5) Bridge 후처리 (도로↔수계 교차 보강)
 //
-//   각 단계가 *같은 14.7M PaintCell 배열*에 *적층 페인트* (Painter's algorithm).
+//   각 단계가 *같은 3.7M PaintCell 배열*에 *적층 페인트* (Painter's algorithm).
 //   순서가 중요 — 나중 단계가 앞 단계를 덮어씀.
 //
 //   결정론: 같은 seed + sc → 같은 SectorPlan. 세이브/로드 후 재현 보장.
@@ -38,16 +38,15 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     SectorPlan plan(sc);
     plan.tiles.resize(static_cast<std::size_t>(SectorCoord::TILES) * SectorCoord::TILES);
 
-    constexpr int TILE_BASE_X = -54 * PIXEL_PER_PATCH * TILE_PER_PIXEL;   // -1,036,800
-    constexpr int TILE_BASE_Y = -27 * PIXEL_PER_PATCH * TILE_PER_PIXEL;   //   -518,400
+    // TILE_BASE_X/Y는 constVar에서 가져옴 (단일 진리원천 — 픽셀→타일 변환 원점)
 
     const int sectorOriginTileX = sc.x * SectorCoord::TILES;
     const int sectorOriginTileY = sc.y * SectorCoord::TILES;
 
     //═══════════════════════════════════════════════════════════════════════
     // 1) Raw 픽셀 기반 베이스 페인트
-    //   각 타일의 raw 픽셀(48타일 블록)을 Terrain으로 받아 PaintCell로 변환.
-    //   픽셀 양자화(48-tile 계단)는 2단계가 수계 경계에 한해 곡선으로 덮어씀.
+    //   각 타일의 raw 픽셀(24타일 블록 = 1청크)을 Terrain으로 받아 PaintCell로 변환.
+    //   픽셀 양자화(24-tile 계단)는 2단계가 수계 경계에 한해 곡선으로 덮어씀.
     //═══════════════════════════════════════════════════════════════════════
     for (int dy = 0; dy < SectorCoord::TILES; ++dy)
     {

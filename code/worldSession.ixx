@@ -25,11 +25,12 @@ export std::optional<worldGen::WorldGenResult> worldGenResult;
 //  결정론 보장 — 같은 시드면 세이브/로드 후에도 같은 plan 재생성.
 export std::uint64_t worldSeed = 0;
 
-//Phase 1 종료 후 자동 텔레포트 대상. 한반도 서울 픽셀(36840, 6293) 센터 (48타일/px).
+//Phase 1 종료 후 자동 텔레포트 대상. 한반도 서울 픽셀(36840, 6293) 센터 (24타일/px).
 //  Phase 4가 이 좌표 주변 9 섹터를 사전 절차생성하므로 텔레포트 즉시 진입 가능.
 //  향후 캐릭터 생성 화면에서 선택 도시 좌표로 대체 예정.
+//  공식: tile = px * TILE_PER_PIXEL + TILE_BASE + TILE_PER_PIXEL/2 (placeCities의 pixelToTileCenter와 동일)
 //  (Point3 ctor가 constexpr 아니라 inline const로 정의 — module interface에서 안전.)
-export inline const Point3 SPAWN_DEFAULT{ 731544, -216312, 0 };
+export inline const Point3 SPAWN_DEFAULT{ 365772, -108156, 0 };
 
 //Phase 1~4 완료 후 호출되는 후처리 콜백. main.cpp가 부팅 시 설정.
 //  내용: 타이틀/startArea 청크 wipe → SPAWN_DEFAULT로 텔레포트.

@@ -95,8 +95,8 @@ namespace worldGen
         //패치 ↔ 미리보기 블록 매핑 상수.
         //  43200 = 108 patch * 400px. 1080 / 108 = 10 → 패치 1장 = 미리보기 10×10.
         //  21600 =  54 patch * 400px.  540 /  54 = 10 → 정확히 정합.
-        constexpr int PREVIEW_PER_PATCH = PATCH_PIXEL * PREVIEW_W / PixelCostGrid::W;  // = 10
-        static_assert(PATCH_PIXEL * PREVIEW_W % PixelCostGrid::W == 0,
+        constexpr int PREVIEW_PER_PATCH = PIXEL_PER_PATCH * PREVIEW_W / PixelCostGrid::W;  // = 10
+        static_assert(PIXEL_PER_PATCH * PREVIEW_W % PixelCostGrid::W == 0,
                       "패치 픽셀이 미리보기 해상도와 정합되지 않음 — 비율 어긋남");
 
         //방금 로드된 패치 1장(400×400 source) → 미리보기 10×10 블록 갱신.

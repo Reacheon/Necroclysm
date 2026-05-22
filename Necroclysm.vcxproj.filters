@@ -136,6 +136,12 @@
     <Filter Include="소스 파일\05_Class\03_World\City">
       <UniqueIdentifier>{b3d8e2f5-7c1a-4f6e-9b04-1d8c3e5a7f02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\03_World\Cell">
+      <UniqueIdentifier>{f5ad29c9-fb75-400c-9ee1-3c5406373aea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\05_Class\03_World\Cell\Template">
+      <UniqueIdentifier>{e1a0146e-35ff-4dac-aef2-70b003266cbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -866,6 +872,18 @@
     </ClCompile>
     <ClCompile Include="code\world\Sector.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Cell\cell-infra.ixx">
+      <Filter>소스 파일\05_Class\03_World\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Cell\cell.ixx">
+      <Filter>소스 파일\05_Class\03_World\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Cell\Template\cell-Sample.ixx">
+      <Filter>소스 파일\05_Class\03_World\Cell\Template</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Cell\Template\cell-School.ixx">
+      <Filter>소스 파일\05_Class\03_World\Cell\Template</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
