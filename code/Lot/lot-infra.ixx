@@ -1,5 +1,5 @@
 module;
-export module cell:Infra;
+export module lot:Infra;
 
 import std;
 
@@ -9,16 +9,16 @@ export struct Context
     int baseTileY;
 };
 
-export struct KindMeta
+export struct Footprint
 {
-    int cellsW;
-    int cellsH;
+    int lotsW;
+    int lotsH;
 };
 
 export template<typename T>
-concept BuildingDef = requires
+concept LotDef = requires
 {
     { T::SIZE_W } -> std::convertible_to<int>;
     { T::SIZE_H } -> std::convertible_to<int>;
-    { T::emit(std::declval<Context&>()) };
+    { T::generate(std::declval<Context&>()) };
 };
