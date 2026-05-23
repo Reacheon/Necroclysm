@@ -89,7 +89,6 @@ export struct PaintCell
 {
     std::uint16_t floor     = 0;
     std::uint16_t wall      = 0;
-    std::uint16_t ceil      = 0;
     std::uint16_t randomVal = 0;
     std::uint8_t  flags     = 0;   //bit0 walkable, bit1 hasSnow, bit2 blocker, bit3 isWet
     std::uint8_t  _pad      = 0;

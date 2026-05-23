@@ -193,8 +193,7 @@ public:
 				case 6: // 건축물
 					if (selectSubcategory == 1) targetSubcategory = itemSubcategory::structure_walls;
 					else if (selectSubcategory == 2) targetSubcategory = itemSubcategory::structure_floors;
-					else if (selectSubcategory == 3) targetSubcategory = itemSubcategory::structure_ceilings;
-					else if (selectSubcategory == 4) targetSubcategory = itemSubcategory::structure_props;
+					else if (selectSubcategory == 3) targetSubcategory = itemSubcategory::structure_props;
 					break;
 				case 7: // 재료
 					if (selectSubcategory == 1) targetSubcategory = itemSubcategory::material_metals;

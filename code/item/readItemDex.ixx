@@ -382,7 +382,6 @@ export int readItemDex(const wchar_t* file)
                         {
                             if (strFragment == L"STRUCTURE_WALLS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_walls; }
                             else if (strFragment == L"STRUCTURE_FLOORS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floors; }
-                            else if (strFragment == L"STRUCTURE_CEILINGS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_ceilings; }
                             else if (strFragment == L"STRUCTURE_PROPS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_props; }
                             else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structures)"); }
                         }

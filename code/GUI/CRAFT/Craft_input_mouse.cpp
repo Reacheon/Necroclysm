@@ -168,7 +168,7 @@ void Craft::clickUpGUI()
 				maxSubcategorySize = 5;
 				break;
 			case 6://건축물
-				maxSubcategorySize = 5;
+				maxSubcategorySize = 4;
 				break;
 			case 7://재료
 				maxSubcategorySize = 6;
@@ -297,8 +297,7 @@ void Craft::clickUpGUI()
 							{
 								if (selectSubcategory == 1) { targetSubcategory = itemSubcategory::structure_walls; }
 								else if (selectSubcategory == 2) { targetSubcategory = itemSubcategory::structure_floors; }
-								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_ceilings; }
-								else if (selectSubcategory == 4) { targetSubcategory = itemSubcategory::structure_props; }
+								else if (selectSubcategory == 3) { targetSubcategory = itemSubcategory::structure_props; }
 								matchCount = recipePtr->searchSubcategory(targetSubcategory);
 							}
 							break;

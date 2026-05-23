@@ -76,7 +76,6 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
                     TileData& tile = chunk->getChunkTile(x, y);
                     tile.floor     = c.floor;
                     tile.wall      = c.wall;
-                    tile.ceil      = c.ceil;
                     tile.randomVal = c.randomVal;
                     tile.walkable  = (c.flags & TILE_FLAG_WALKABLE) != 0;
                     tile.hasSnow   = (c.flags & TILE_FLAG_HAS_SNOW) != 0;

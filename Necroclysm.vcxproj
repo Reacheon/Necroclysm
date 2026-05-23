@@ -175,10 +175,11 @@
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\AniManager.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
-    <ClCompile Include="code\Lot\lot-infra.ixx" />
+    <ClCompile Include="code\Lot\kinds\lot-StreetNS.ixx" />
+    <ClCompile Include="code\Lot\kinds\lot-Sample.ixx" />
+    <ClCompile Include="code\Lot\kinds\lot-School.ixx" />
     <ClCompile Include="code\Lot\lot.ixx" />
-    <ClCompile Include="code\Lot\Template\lot-Sample.ixx" />
-    <ClCompile Include="code\Lot\Template\lot-School.ixx" />
+    <ClCompile Include="code\Lot\lot-base.ixx" />
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
     <ClCompile Include="code\Drawable.ixx" />

@@ -19,13 +19,12 @@ import gasData;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
-export struct TileData //총용량 29바이트
+export struct TileData //총용량 27바이트
 {
     std::vector<gasData> gasVec;
 
     unsigned __int16 floor = 1;
     unsigned __int16 wall = 0;
-    unsigned __int16 ceil = 0;
 
     __int16 temperature = 25;//섭씨온도
 
@@ -64,7 +63,6 @@ export struct TileData //총용량 29바이트
     void destoryWall() { wall = 0; }
     void setWall(int inputIndex) { wall = inputIndex; }
     void setFloor(int inputIndex) { floor = inputIndex; }
-    void setCeil(int inputIndex) { ceil = inputIndex; }
 
     int checkGas(int inputCode)
     {

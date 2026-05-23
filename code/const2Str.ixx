@@ -59,7 +59,6 @@ export std::wstring itemSubcategory2String(itemSubcategory input)
 	// 구조물
 	else if (input == itemSubcategory::structure_walls) return sysStr[266]; // 벽
 	else if (input == itemSubcategory::structure_floors) return sysStr[267]; // 바닥
-	else if (input == itemSubcategory::structure_ceilings) return sysStr[268]; // 천장
 	else if (input == itemSubcategory::structure_props) return sysStr[269]; // 설치물
 
 	// 재료

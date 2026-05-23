@@ -873,16 +873,19 @@
     <ClCompile Include="code\world\Sector.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\lot-infra.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
-    </ClCompile>
     <ClCompile Include="code\Lot\lot.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\Template\lot-Sample.ixx">
+    <ClCompile Include="code\Lot\lot-base.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\lot-Sample.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\Template\lot-School.ixx">
+    <ClCompile Include="code\Lot\kinds\lot-School.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\lot-StreetNS.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
   </ItemGroup>

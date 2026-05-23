@@ -399,7 +399,6 @@ export enum class itemSubcategory
 
     structure_walls,
     structure_floors,
-    structure_ceilings,
     structure_props,
 
     material_metals,       // 금속류 (철, 납, 아연 등)
