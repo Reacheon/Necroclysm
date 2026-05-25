@@ -40,6 +40,17 @@ export struct CityTile
     std::uint16_t prop  = 0;
 };
 
+// ── CityBuildingPixel (debug) ───────────────────────────────────────────
+// buildCityPlan 4단계가 산출한 건물의 픽셀 단위 점유 정보 (Map 오버레이 시각화용).
+//   pos: 픽셀의 top-left 실타일 좌표. 픽셀 1개 = TILE_PER_PIXEL × TILE_PER_PIXEL 타일.
+//   memberIndex: 같은 건물에 속한 픽셀끼리 동일 값 — 색상 해시 키. 2x2 건물이면
+//   4개 픽셀이 같은 index를 공유.
+export struct CityBuildingPixel
+{
+    Point3 pos;
+    int    memberIndex = -1;
+};
+
 export struct CityPlan
 {
     city::CityId id{};
@@ -60,6 +71,11 @@ export struct CityPlan
     //  segments와 분리: 11-15단계의 평면 도로 페인트 대상이 아니어야 하고, Map에선
     //  다른 색/스타일로 그릴 수 있게 채널 분리. 각 폴리라인 verts는 양 끝점 2개.
     std::vector<worldGen::RoadPolyLine> bridges;
+
+    //  건물 픽셀 분포 (debug) — buildCityPlan 4단계 다트던지기 산출물 시각화용.
+    //  픽셀 1개 = TILE_PER_PIXEL 타일 정사각형. 같은 건물의 모든 픽셀은 동일 memberIndex
+    //  보유 → Map 오버레이가 memberIndex 해시 색상으로 칠하면 건물 단위가 한 덩어리로 보임.
+    std::vector<CityBuildingPixel> buildings;
 
     CityPlan() = default;
     explicit CityPlan(city::CityId id_) noexcept : id(id_) {}

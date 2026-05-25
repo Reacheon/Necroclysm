@@ -522,6 +522,79 @@ static void drawRoadOverlay(const MapView& v)
     }
 }
 
+// (3.4) 도시 건물 분포 오버레이 (debug) — buildCityPlan 4단계의 건물 픽셀.
+//       memberIndex 해시 색상으로 칠해서 같은 건물의 픽셀들이 한 덩어리로 보이게.
+//       1픽셀당 24x24 타일 정사각형. 도로 오버레이보다 먼저 그려서 도로가 위에 얹힘.
+static void drawCityBuildingOverlay(const MapView& v)
+{
+    const auto* cities = worldGen::activeCities;
+    if (!cities || cities->empty()) return;
+
+    const float vw = static_cast<float>(v.viewW);
+    const float vh = static_cast<float>(v.viewH);
+    const int camX = static_cast<int>(std::floor(v.centerTileX));
+
+    auto tileYToScreen = [&](int py) -> double
+    {
+        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
+    };
+
+    //memberIndex 해시 → 색상. golden ratio 곱셈으로 인접 index끼리 대비.
+    //비트 마스크로 어두운 색 회피 + 알파로 반투명 → 밑의 지형 보이게.
+    auto colorForIndex = [](int idx) -> SDL_Color
+    {
+        if (idx < 0) return SDL_Color{ 128, 128, 128, 140 };
+        const std::uint32_t h = static_cast<std::uint32_t>(idx) * 2654435761u;
+        return SDL_Color{
+            static_cast<Uint8>(((h >>  0) & 0x9F) | 0x60),
+            static_cast<Uint8>(((h >>  8) & 0x9F) | 0x60),
+            static_cast<Uint8>(((h >> 16) & 0x9F) | 0x60),
+            150
+        };
+    };
+
+    constexpr int CITY_VIS_MARGIN_TILES = 4000;
+
+    for (std::size_t i = 0; i < cities->size(); ++i)
+    {
+        const auto cityId = static_cast<city::CityId>(i);
+        const auto& cn = (*cities)[i];
+
+        const int dxFromCam = worldWrap::signedDeltaTileX(camX, cn.center.x);
+        const double sxd = static_cast<double>(dxFromCam) * v.pxPerTile + v.viewW * 0.5;
+        const double syd = (static_cast<double>(cn.center.y) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
+        const double marginPxScreen = CITY_VIS_MARGIN_TILES * v.pxPerTile;
+        const bool inView = (sxd + marginPxScreen >= 0) && (sxd - marginPxScreen <= v.viewW)
+                         && (syd + marginPxScreen >= 0) && (syd - marginPxScreen <= v.viewH);
+        if (!inView) continue;
+
+        const CityPlan* plan = CityPlanCache::ins().peek(cityId);
+        if (!plan) continue;
+
+        const double rectW = static_cast<double>(TILE_PER_PIXEL) * v.pxPerTile;
+        const double rectH = rectW;
+
+        for (const auto& bp : plan->buildings)
+        {
+            if (bp.pos.z != v.z) continue;
+
+            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, bp.pos.x))
+                             * v.pxPerTile + v.viewW * 0.5;
+            const double syA = tileYToScreen(bp.pos.y);
+
+            if (sxA + rectW < 0 || sxA > vw || syA + rectH < 0 || syA > vh) continue;
+
+            const SDL_Rect rect{
+                static_cast<int>(std::round(sxA)),
+                static_cast<int>(std::round(syA)),
+                static_cast<int>(std::round(rectW)),
+                static_cast<int>(std::round(rectH))
+            };
+            drawFillRect(rect, colorForIndex(bp.memberIndex));
+        }
+    }
+}
+
 // (3.5) 도시 내부 도로 오버레이 (debug) — buildCityPlan이 생성한 살아남은 segments.
 //       이미 캐시된 도시(CityPlanCache::peek 성공)만 그림. 미캐시 도시는 스킵 —
 //       대도시 일괄 계산은 비용 크니까 플레이어가 근처로 갈 때 자동 캐시되는 패턴 유지.
@@ -960,6 +1033,7 @@ public:
         drawBiomeLayer       (view);  // mmap 활성 시에만 — 내부에서 cache.getOrBuild → budget 안에서 빌드
         drawTileSpriteLayer  (view);  // 항상 — 로드된 청크의 실제 타일 스프라이트
         drawRoadOverlay      (view);  // 도시간 광역 도로 폴리라인 (worldGen 결과)
+        drawCityBuildingOverlay(view);  // 도시 내부 건물 분포 디버그 (memberIndex 해시 색상)
         drawCityRoadOverlay  (view);  // 도시 내부 도로 세그먼트 (CityPlan 캐시된 도시만)
         drawPlayerMarker     (view);
 
