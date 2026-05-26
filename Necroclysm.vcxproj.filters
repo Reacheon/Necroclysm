@@ -885,7 +885,10 @@
     <ClCompile Include="code\Lot\kinds\lot-School.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\kinds\lot-StreetNS.ixx">
+    <ClCompile Include="code\Lot\kinds\lot-Street.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\lot-Bridge.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
   </ItemGroup>

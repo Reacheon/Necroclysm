@@ -33,14 +33,14 @@ public:
 
 	void chunkLoad(chunkFlag inputChunk)
 	{
-		unsigned __int16 floorVal = itemID::grass;
-		unsigned __int16 wallVal = 0;
+		int floorVal = itemID::grass;
+		int wallVal  = itemID::none;
 
 		switch (inputChunk)
 		{
 		case chunkFlag::seawater:    floorVal = itemID::deepSeaWater; break;
 		case chunkFlag::freshwater:  floorVal = itemID::deepFreshWater; break;
-		case chunkFlag::none:        floorVal = 0; break;
+		case chunkFlag::none:        floorVal = itemID::none; break;
 		case chunkFlag::underground: floorVal = 109; wallVal = 302; break;
 		case chunkFlag::meadow:      floorVal = 220; break;
 		case chunkFlag::dirt:        floorVal = 109; break;
@@ -55,7 +55,7 @@ public:
 			{
 				singleTile[x][y].randomVal = randomRange(0, 65535);
 				singleTile[x][y].floor = floorVal;
-				if (wallVal != 0) singleTile[x][y].setWall(wallVal);
+				if (wallVal != itemID::none) singleTile[x][y].setWall(wallVal);
 			}
 		}
 

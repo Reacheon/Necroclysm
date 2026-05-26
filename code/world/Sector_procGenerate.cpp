@@ -395,7 +395,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     //   각 CityTile 라우팅:
     //     - t.pos.z == sc.z + floor/wall: 본 z층 dense PaintCell에 페인트
     //     - t.pos.z != sc.z + floor/wall: sparse skyTiles에 push (다리 deck 등 다른 z층)
-    //     - t.prop != 0: 모든 z를 sparse props에 push (createChunk가 createProp 호출)
+    //     - t.prop != itemID::none: 모든 z를 sparse props에 push (createChunk가 createProp 호출)
     //
     //   섹터 단일 조회 정책: createChunk는 chunkZ가 무엇이든 sc.z=0 섹터 1개만 조회.
     //   본 sector(z=0)에 모든 z의 sparse 데이터가 모이므로 z=±1 청크도 같은 SectorPlan
@@ -422,27 +422,27 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
                 if (t.pos.z == sc.z)
                 {
-                    if (t.floor || t.wall)
+                    if (t.floor != itemID::none || t.wall != itemID::none)
                     {
                         PaintCell& cell = plan.tiles[static_cast<std::size_t>(dy) * SectorCoord::TILES + dx];
-                        if (t.floor) cell.floor = t.floor;
-                        if (t.wall)  cell.wall  = t.wall;
+                        if (t.floor != itemID::none) cell.floor = t.floor;
+                        if (t.wall  != itemID::none) cell.wall  = t.wall;
                     }
                 }
                 else
                 {
-                    if (t.floor || t.wall)
+                    if (t.floor != itemID::none || t.wall != itemID::none)
                     {
                         plan.skyTiles.push_back(SectorSkyTile{
                             .pos   = t.pos,
                             .floor = t.floor,
                             .wall  = t.wall,
-                            .flags = static_cast<std::uint8_t>(t.floor ? TILE_FLAG_WALKABLE : 0),
+                            .flags = static_cast<std::uint8_t>(t.floor != itemID::none ? TILE_FLAG_WALKABLE : 0),
                             });
                     }
                 }
 
-                if (t.prop) plan.props.push_back(SectorProp{ .pos = t.pos, .itemId = t.prop });
+                if (t.prop != itemID::none) plan.props.push_back(SectorProp{ .pos = t.pos, .itemId = t.prop });
             }
         }
     }

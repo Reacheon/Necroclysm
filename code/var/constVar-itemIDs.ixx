@@ -2,6 +2,9 @@ export module constVar:itemIDs;
 
 export namespace itemID
 {
+    //sentinel — "미설정" / "이 레이어 안 건드림". LotBuilder 등에서 vector 기본값(0)과 의미 일치.
+    constexpr int none = 0;
+
     constexpr int metalFrame = 48;
     constexpr int dirt = 109;
     constexpr int grass = 220;

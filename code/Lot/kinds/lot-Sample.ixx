@@ -7,8 +7,8 @@ import :base;
 export class Sample final : public Lot
 {
 public:
-    int sizeW() const override { return 1; }
-    int sizeH() const override { return 1; }
+    int sizeChunkW() const override { return 1; }
+    int sizeChunkH() const override { return 1; }
 
 protected:
     void build(LotBuilder& b, std::uint64_t seed) const override

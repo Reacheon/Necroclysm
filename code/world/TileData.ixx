@@ -19,12 +19,12 @@ import gasData;
 //__int16 : -32768 ~32767
 //__int32 : –2,147,483,648 ~2,147,483,647
 
-export struct TileData //총용량 27바이트
+export struct TileData
 {
     std::vector<gasData> gasVec;
 
-    unsigned __int16 floor = 1;
-    unsigned __int16 wall = 0;
+    int floor = 1;
+    int wall  = itemID::none;
 
     __int16 temperature = 25;//섭씨온도
 

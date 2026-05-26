@@ -434,22 +434,22 @@ void Vehicle::shift(int dx, int dy)
             Prop* belowProp = TileProp(destX, destY, pos.z - 1);
             Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
             if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != 0)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != itemID::none)
             {
                 rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
             }
             if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != 0)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != itemID::none)
             {
                 rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
             }
             if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != 0)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z - 1) != itemID::none)
             {
                 rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
             }
             if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != 0)
+                && TileFloor(destX + stepDx, destY + stepDy, pos.z + 1) != itemID::none)
             {
                 rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
             }
@@ -484,11 +484,11 @@ void Vehicle::shift(int dx, int dy)
             const wchar_t* blockReason = L"";
             for (const auto& [oldPos, newPos] : partOldToNew)
             {
-                if (TileFloor(newPos.x, newPos.y, newPos.z) == 0)
+                if (TileFloor(newPos.x, newPos.y, newPos.z) == itemID::none)
                 {
                     blocked = true; blockPos = newPos; blockReason = L"floor 없음"; break;
                 }
-                if (TileWall(newPos.x, newPos.y, newPos.z) != 0)
+                if (TileWall(newPos.x, newPos.y, newPos.z) != itemID::none)
                 {
                     blocked = true; blockPos = newPos; blockReason = L"wall"; break;
                 }
@@ -605,22 +605,22 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         Prop* belowProp = TileProp(destX, destY, pos.z - 1);
         Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
         if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
         if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
         }
         if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
         }
         if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
@@ -641,12 +641,12 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         for (const auto& pos : rotatedPartInfo)
         {
             int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
-            if (TileFloor(nx, ny, nz) == 0)
+            if (TileFloor(nx, ny, nz) == itemID::none)
             {
                 prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
-            if (TileWall(nx, ny, nz) != 0)
+            if (TileWall(nx, ny, nz) != itemID::none)
             {
                 prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
                 return true;
@@ -671,7 +671,7 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
     for (const auto& pos : rotatedPartInfo)
     {
         int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
-        if (TileWall(nx, ny, nz) != 0) return true;
+        if (TileWall(nx, ny, nz) != itemID::none) return true;
         Prop* p = TileProp(nx, ny, nz);
         if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
         Vehicle* v = TileVehicle(nx, ny, nz);
@@ -693,22 +693,22 @@ bool Vehicle::colisionCheck(int dx, int dy)
         Prop* belowProp = TileProp(destX, destY, pos.z - 1);
         Prop* aboveProp = TileProp(destX, destY, pos.z + 1);
         if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
         if (destProp != nullptr && destProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
         }
         if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-            && TileFloor(destX + dx, destY + dy, pos.z - 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z - 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = -1; triggered = true; break;
         }
         if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-            && TileFloor(destX + dx, destY + dy, pos.z + 1) != 0)
+            && TileFloor(destX + dx, destY + dy, pos.z + 1) != itemID::none)
         {
             rampHitXY = { destX, destY }; dz = 1; triggered = true; break;
         }
@@ -728,12 +728,12 @@ bool Vehicle::colisionCheck(int dx, int dy)
         for (const auto& [pos, pocket] : partInfo)
         {
             int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
-            if (TileFloor(nx, ny, nz) == 0)
+            if (TileFloor(nx, ny, nz) == itemID::none)
             {
                 prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
-            if (TileWall(nx, ny, nz) != 0)
+            if (TileWall(nx, ny, nz) != itemID::none)
             {
                 prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
                 return true;
@@ -757,7 +757,7 @@ bool Vehicle::colisionCheck(int dx, int dy)
     for (const auto& [pos, pocket] : partInfo)
     {
         int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
-        if (TileWall(nx, ny, nz) != 0) return true;
+        if (TileWall(nx, ny, nz) != itemID::none) return true;
         Prop* p = TileProp(nx, ny, nz);
         if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
         Vehicle* v = TileVehicle(nx, ny, nz);

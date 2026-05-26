@@ -175,7 +175,8 @@
     <ClCompile Include="code\Ani.ixx" />
     <ClCompile Include="code\AniManager.ixx" />
     <ClCompile Include="code\Bullet.ixx" />
-    <ClCompile Include="code\Lot\kinds\lot-StreetNS.ixx" />
+    <ClCompile Include="code\Lot\kinds\lot-Street.ixx" />
+    <ClCompile Include="code\Lot\kinds\lot-Bridge.ixx" />
     <ClCompile Include="code\Lot\kinds\lot-Sample.ixx" />
     <ClCompile Include="code\Lot\kinds\lot-School.ixx" />
     <ClCompile Include="code\Lot\lot.ixx" />

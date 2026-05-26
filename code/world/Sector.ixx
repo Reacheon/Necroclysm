@@ -87,8 +87,8 @@ export Point3 sectorOriginTile(SectorCoord sc) noexcept
 
 export struct PaintCell
 {
-    std::uint16_t floor     = 0;
-    std::uint16_t wall      = 0;
+    int           floor     = itemID::none;
+    int           wall      = itemID::none;
     std::uint16_t randomVal = 0;
     std::uint8_t  flags     = 0;   //bit0 walkable, bit1 hasSnow, bit2 blocker, bit3 isWet
     std::uint8_t  _pad      = 0;
@@ -111,16 +111,16 @@ export inline constexpr std::uint8_t TILE_FLAG_IS_WET   = 0x08;
 
 export struct SectorProp
 {
-    Point3        pos;
-    std::uint16_t itemId = 0;
+    Point3 pos;
+    int    itemId = itemID::none;
 };
 
 export struct SectorSkyTile
 {
-    Point3        pos;          // z는 sc.z와 다른 값
-    std::uint16_t floor = 0;
-    std::uint16_t wall  = 0;
-    std::uint8_t  flags = 0;    //TILE_FLAG_* 비트 (walkable 등)
+    Point3       pos;           // z는 sc.z와 다른 값
+    int          floor = itemID::none;
+    int          wall  = itemID::none;
+    std::uint8_t flags = 0;     //TILE_FLAG_* 비트 (walkable 등)
 };
 
 // ── SectorPlan ──────────────────────────────────────────────────────────

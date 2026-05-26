@@ -87,7 +87,7 @@ export void turnWait(float waitTime)
                     int dx, dy;
                     dir2Coord(dir, dx, dy);
                     TileData* thisTile = &World::ins()->getTile(tgtX + dx, tgtY + dy, pz);
-                    if (thisTile->wall == 0 || itemDex[thisTile->wall].checkFlag(itemFlag::WALL_GAS_PERMEABLE))
+                    if (thisTile->wall == itemID::none || itemDex[thisTile->wall].checkFlag(itemFlag::WALL_GAS_PERMEABLE))
                     {
                         Prop* pPtr = thisTile->PropPtr.get();
                         if (pPtr == nullptr || pPtr->leadItem.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON) == false)

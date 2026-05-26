@@ -169,7 +169,7 @@ void analyseRender()
             if (thisTile->fov != fovFlag::black)
             {
                 tileList.push_back({ tgtX, tgtY });
-                if (thisTile->wall != 0 && thisTile->displayHPBarCount>0)
+                if (thisTile->wall != itemID::none && thisTile->displayHPBarCount>0)
                 {
                     wallHPList.push_back({ tgtX, tgtY });
                 }
@@ -262,7 +262,7 @@ void analyseRender()
             // 다리 그림자: 위 z에 floor 있고 ramp 아닌 경우 (다리 밑 어두운 효과)
             // 단 이 타일에 광원 있으면 스킵 — 헤드라이트 등이 다리 밑 비추면 그림자 제거
             const TileData* aboveTile = World::ins()->tryGetTile(tgtX, tgtY, pZ + 1);
-            if (aboveTile != nullptr && aboveTile->floor != 0 && thisTile->lightVec.size() == 0)
+            if (aboveTile != nullptr && aboveTile->floor != itemID::none && thisTile->lightVec.size() == 0)
             {
                 Prop* abovePropPtr = aboveTile->PropPtr.get();
                 bool aboveIsRamp = abovePropPtr != nullptr &&
@@ -328,7 +328,7 @@ void drawTiles()
         // 공허 캐스케이드: floor/wall 모두 비어 있으면 하늘색(sprite 506)을 베이스로 깔고
         // 그 위에 아래 z 비공허 층을 흐릿한 알파로 오버레이한다.
         // 다리 위·옥상 가장자리에서 하늘색 바탕에 아래 풍경이 살짝 비치는 효과.
-        const bool isVoidHere = (thisTile->floor == 0 && thisTile->wall == 0);
+        const bool isVoidHere = (thisTile->floor == itemID::none && thisTile->wall == itemID::none);
         if (isVoidHere)
         {
             const int baseVx = cameraW / 2 + static_cast<int>(zoomScale * (16 * tgtX + 8 - cameraX));
@@ -348,7 +348,7 @@ void drawTiles()
             {
                 const TileData* under = World::ins()->tryGetTile(tgtX, tgtY, pZ - d);
                 if (under == nullptr) break;
-                if (under->floor == 0 && under->wall == 0) continue; // 계속 공허 - 더 내려감
+                if (under->floor == itemID::none && under->wall == itemID::none) continue; // 계속 공허 - 더 내려감
 
                 int alphaInt = OVERLAY_ALPHA - (d - 1) * FADE_PER_Z;
                 if (alphaInt <= 0) break;
@@ -360,7 +360,7 @@ void drawTiles()
                 const Uint8 alpha = static_cast<Uint8>(alphaInt);
 
                 // 아래층 floor
-                if (under->floor != 0)
+                if (under->floor != itemID::none)
                 {
                     int uDir = 0;
                     int uAni16 = 0;
@@ -415,7 +415,7 @@ void drawTiles()
                 }
 
                 // 아래층 wall
-                if (under->wall != 0)
+                if (under->wall != itemID::none)
                 {
                     int uDir = 0;
                     if (itemDex[under->wall].tileConnectGroup != -1)
@@ -503,7 +503,7 @@ void drawTiles()
 
         int sprIndex = itemDex[thisTile->floor].tileSprIndex + itemDex[thisTile->floor].extraSprIndexSingle + 16 * itemDex[thisTile->floor].extraSprIndex16;
         sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
-        if (thisTile->floor == 0) sprIndex = 506;
+        if (thisTile->floor == itemID::none) sprIndex = 506;
 
         if (thisTile->floor == 220)
         {
@@ -890,7 +890,7 @@ void drawTiles()
         int tgtY = elem.y;
         const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
 
-        if (thisTile->wall != 0)
+        if (thisTile->wall != itemID::none)
         {
             const TileData* topTile = &World::ins()->getTile(tgtX, tgtY - 1, PlayerZ());
             const TileData* botTile = &World::ins()->getTile(tgtX, tgtY + 1, PlayerZ());

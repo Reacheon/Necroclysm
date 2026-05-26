@@ -7,4 +7,5 @@ export import :base;
 //각 Lot 모듈들
 export import :Sample;
 export import :School;
-export import :StreetNS;
+export import :Street;
+export import :Bridge;

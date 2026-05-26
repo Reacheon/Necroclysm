@@ -4,6 +4,7 @@ import std;
 import util;
 import city;
 import worldGen;
+import constVar;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
@@ -34,10 +35,10 @@ import worldGen;
 //   prop: createProp 호출 대상 — ramp 등 z 다리 시스템에 쓰임.
 export struct CityTile
 {
-    Point3        pos;          // 실타일 좌표 (x, y, z)
-    std::uint16_t floor = 0;
-    std::uint16_t wall  = 0;
-    std::uint16_t prop  = 0;
+    Point3 pos;          // 실타일 좌표 (x, y, z)
+    int    floor = itemID::none;
+    int    wall  = itemID::none;
+    int    prop  = itemID::none;
 };
 
 // ── CityBuildingPixel (debug) ───────────────────────────────────────────

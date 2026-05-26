@@ -123,7 +123,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					int tgtItemCode = tgtProp->leadItem.itemCode;
 					if (tgtProp->leadItem.checkFlag(itemFlag::UPSTAIR))
 					{
-						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == 0)
+						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == itemID::none)
 						{
 							updateLog(L"There is no floor above these stairs.");
 						}
@@ -145,7 +145,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					}
 					else if (tgtProp->leadItem.checkFlag(itemFlag::DOWNSTAIR))
 					{
-						if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != 0)
+						if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != itemID::none)
 						{
 							updateLog(L"The stairs going down are blocked by a wall.");
 						}
@@ -178,7 +178,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 		}
 		else if ((std::abs(touchX - PlayerX()) <= 1 && std::abs(touchY - PlayerY()) <= 1) && isWalkable({ touchX, touchY, PlayerZ() }) == false)//1칸 이내(이동불가타일)
 		{
-			if (TileWall(touchX, touchY, PlayerZ()) != 0) //곡괭이 벽 굴착 액션
+			if (TileWall(touchX, touchY, PlayerZ()) != itemID::none) //곡괭이 벽 굴착 액션
 			{
 				auto ePtr = PlayerEquip();
 				for (int i = 0; i < ePtr->itemInfo.size(); i++)

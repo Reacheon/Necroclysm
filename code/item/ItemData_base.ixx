@@ -8,7 +8,7 @@ export struct ItemDataBase
 {
     std::wstring name; //기본 이름을 지정해두면 인텔리센스 오류가 발생함
     std::wstring dir; //프롭의 방향을 표시하는 특수문자
-    unsigned __int16 itemCode = 1;
+    int itemCode = 1;
     unsigned __int16 itemSprIndex = 1;
     unsigned __int16 tooltipIndex = 0;
     itemCategory category = itemCategory::materials;
@@ -162,8 +162,8 @@ export struct ItemDataBase
 
     __int32 propWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
 
-    unsigned __int16 propInstallCode = 0; //이게 0이 아닐 경우 주변 타일에 설치 가능
-    unsigned __int16 propUninstallCode = 0; //이게 0이 아닐 경우 주변 타일에 해체 가능
+    int propInstallCode = itemID::none;   //이게 none이 아닐 경우 주변 타일에 설치 가능
+    int propUninstallCode = itemID::none; //이게 none이 아닐 경우 주변 타일에 해체 가능
 
     double electricResistance = 0; //전자기기 저항 (Ω)
 

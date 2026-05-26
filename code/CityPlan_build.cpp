@@ -5,6 +5,7 @@ import util;
 import constVar;
 import worldGen;
 import worldGrid;
+import lot;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan_build.cpp — buildCityPlan 구현.
@@ -15,9 +16,13 @@ import worldGrid;
 //     3. 강가/해안 픽셀에 평행 도로 비트 (1px 평행 충돌 회피, lock)
 //     4. 도시 내부 다트던지기로 건물 픽셀 배치 (Phase 1 무작위 + Phase 2 결정적
 //        anti-2x2-road 채움) — 매 가설 배치마다 연결성 BFS 검증.
+//     5. 고립 건물 도로 확장 — 사방이 건물인 1x1 건물의 이웃 1x1을 빈 셀로 되돌려
+//        stage 6이 도로화하게 위임 (Fixed-point, 2x2 도로 사전 차단).
 //     6. 비건물 도시 셀을 도로 픽셀로 변환 (4방향 이웃과 비트 결합).
 //     7. degree==1 도로를 일직선(degree==2)으로 대칭화.
-//     Ex. 도로 비트를 polyline 세그먼트로 환산 (Map.ixx 디버그 오버레이).
+//     8. CityRiver/CitySea 다리 결정 — roads[]에 NS/EW + isBridge 박기, 양 강변 출구 추가.
+//     9. 도로 픽셀 → Lot 페인트 — Street/Bridge 라우팅(isBridge 분기), LotResult를 plan.tiles에 push.
+//     Ex. 도로 비트를 polyline 세그먼트로 환산 (Map.ixx 디버그 오버레이 — stage 9 lot 검증용).
 //
 //   산출물: plan.tiles, plan.segments(도로), plan.bridges, plan.buildings(debug).
 //
@@ -31,7 +36,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
     plan.tiles.push_back(CityTile{
         .pos = Point3{ 20322, 32012, 1 },
-        .floor = static_cast<std::uint16_t>(itemID::blackAsphalt),
+        .floor = itemID::blackAsphalt,
         });
 
     prt(L"[CityPlan] buildCityPlan id=%u seed=%llu tiles=%zu\n",
@@ -89,6 +94,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
         std::uint8_t openBits = 0;
         std::uint8_t lockBits = 0;
+        bool         isBridge = false;   //다리 결정 stage가 강 픽셀에 박음. stage 8 lot 라우팅 분기 키.
 
         bool isOpen  (Dir d) const { return openBits & std::uint8_t(d); }
         bool isLocked(Dir d) const { return lockBits & std::uint8_t(d); }
@@ -229,7 +235,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //══════════════════════════════════════════════════════════════════
     // 4. 도시 내부 건물 픽셀 다트던지기
     //══════════════════════════════════════════════════════════════════
-    //   Phase 1 — 무작위 좌표 + 1x1/2x2/3x3 블록 가설 배치 → checkPoints 전셀의
+    //   Phase 1 — 무작위 좌표 + 1x1/2x1/1x2/2x2/3x3 블록 가설 배치 → checkPoints 전셀의
     //             점유/지면/도로 검사 + 연결성 BFS → 통과 시 확정, 실패면 ++failStreak.
     //             failStreak >= MAX_FAIL_STREAK 이면 Phase 2로 이행.
     //   Phase 2 — 결정적 채움. "미래 도로 2x2" (= 기존 도로 OR 빈 도시 셀의 4셀 결합)을
@@ -387,14 +393,20 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             0
         };
 
-        //블록 크기 추첨 — 큰 블록일수록 희귀. 분포 튜닝 시 임계값(3, 10) 조정.
+        //블록 크기 추첨 — 큰 블록일수록 희귀. 분포 튜닝 시 임계값 조정.
+        //  3x3:3% / 2x2:7% / 2x1:10% / 1x2:10% / 1x1:70%
         const int boxPr = localRandom(1, 100);
-        const int blockDim = (boxPr <= 3) ? 3 : (boxPr <= 10) ? 2 : 1;
+        int blockW, blockH;
+        if      (boxPr <=  3) { blockW = 3; blockH = 3; }
+        else if (boxPr <= 10) { blockW = 2; blockH = 2; }
+        else if (boxPr <= 20) { blockW = 2; blockH = 1; }
+        else if (boxPr <= 30) { blockW = 1; blockH = 2; }
+        else                  { blockW = 1; blockH = 1; }
 
         std::vector<worldGrid::PixelCoord> checkPoints;
-        checkPoints.reserve(static_cast<std::size_t>(blockDim) * blockDim);
-        for (int dy = 0; dy < blockDim; ++dy)
-            for (int dx = 0; dx < blockDim; ++dx)
+        checkPoints.reserve(static_cast<std::size_t>(blockW) * blockH);
+        for (int dy = 0; dy < blockH; ++dy)
+            for (int dx = 0; dx < blockW; ++dx)
                 checkPoints.push_back(worldGrid::PixelCoord{ targetCoord.x + dx, targetCoord.y + dy, 0 });
 
         //가설 배치 가능한지 검사 — patch bounds + 도시 지면 + 비점유 + 비도로 일체 확인.
@@ -427,6 +439,102 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
  
     //══════════════════════════════════════════════════════════════════
+    // 5. 고립 건물 도로 확장 (Fixed-point)
+    //══════════════════════════════════════════════════════════════════
+    //   인접한 도로가 없는, 사방이 건물로 둘러싸인 고립 건물 후보정.
+    //   stage 4 직후 위치 — 빈 도시 셀 = 미래 도로(stage 6이 채움)이므로
+    //   "빈 셀 이웃" 케이스는 자동 해결, 진짜 고립은 4방향 전부 건물인 경우뿐.
+    //
+    //   방법: 고립 건물 B 발견 시 4방향 1x1 건물 이웃 N 중 하나를 빈 셀로 되돌림
+    //         (= 건물 등록 취소). stage 6이 자동 도로 변환 + 비트 결합, stage 7이 직선화.
+    //   조건: (a) N이 1x1 — 다중 픽셀 건물 부분 변환 금지
+    //         (b) N의 4방향 이웃 중 B 제외 최소 1개가 traversable
+    //             — 새 도로가 기존 도로망에 연결됨 (고립 1x1 도로 포켓 방지)
+    //         (c) N 변환 후 2x2 미래 도로 패턴 생기지 X — Phase 2 invariant 보존
+    //   모든 후보 실패 시 방치 (추후 숲/산으로 대체 예정).
+    //
+    //   Fixed-point: 한 건물 해제가 옆 건물도 해제(캐스케이드)할 수 있으므로
+    //                한 건이라도 변환 발생 시 다시 — 0건이면 종료.
+
+    {
+        //건물별 점유 셀 수 — 1x1 판정용. 변환 시 0으로 감소시켜 동적 갱신.
+        std::vector<int> memberSize(buildingIndexCursor, 0);
+        for (int v : buildingIndexGrid)
+            if (v >= 0) ++memberSize[v];
+
+        constexpr int dxs[4] = {  0,  0, +1, -1 };
+        constexpr int dys[4] = { -1, +1,  0,  0 };
+
+        while (true)
+        {
+            bool converted = false;
+            for (int ly = 0; ly < patchH; ++ly)
+                for (int lx = 0; lx < patchW; ++lx)
+                {
+                    const std::size_t bidx = static_cast<std::size_t>(ly) * patchW + lx;
+                    if (buildingIndexGrid[bidx] < 0) continue;
+
+                    //isolation 검사 — 4방향 이웃이 전부 비-traversable인지 (건물 또는 OOB)
+                    bool isolated = true;
+                    for (int d = 0; d < 4; ++d)
+                        if (isTraversableCell(lx + dxs[d], ly + dys[d])) { isolated = false; break; }
+                    if (!isolated) continue;
+
+                    //1x1 건물 이웃을 변환 후보로 순회
+                    for (int d = 0; d < 4; ++d)
+                    {
+                        const int nx = lx + dxs[d];
+                        const int ny = ly + dys[d];
+                        if (nx < 0 || nx >= patchW || ny < 0 || ny >= patchH) continue;
+                        const std::size_t nidx = static_cast<std::size_t>(ny) * patchW + nx;
+                        const int memberN = buildingIndexGrid[nidx];
+                        if (memberN < 0) continue;
+                        if (memberSize[memberN] != 1) continue;
+
+                        //연결성 — N의 B 제외 이웃 중 traversable이 하나라도 있어야
+                        bool connects = false;
+                        for (int d2 = 0; d2 < 4; ++d2)
+                        {
+                            const int n2x = nx + dxs[d2];
+                            const int n2y = ny + dys[d2];
+                            if (n2x == lx && n2y == ly) continue;
+                            if (isTraversableCell(n2x, n2y)) { connects = true; break; }
+                        }
+                        if (!connects) continue;
+
+                        //2x2 미래 도로 사전 차단 — 가설 변환(grid=-1) 후 N 포함 4개 2x2 윈도우 검사
+                        buildingIndexGrid[nidx] = -1;
+                        bool creates2x2 = false;
+                        for (int oy = -1; oy <= 0 && !creates2x2; ++oy)
+                            for (int ox = -1; ox <= 0 && !creates2x2; ++ox)
+                            {
+                                const int wx = nx + ox;
+                                const int wy = ny + oy;
+                                if (isFutureRoadCell(wx,     wy    )
+                                 && isFutureRoadCell(wx + 1, wy    )
+                                 && isFutureRoadCell(wx,     wy + 1)
+                                 && isFutureRoadCell(wx + 1, wy + 1)) creates2x2 = true;
+                            }
+                        if (creates2x2) { buildingIndexGrid[nidx] = memberN; continue; }
+
+                        //커밋 — grid는 이미 -1, memberSize만 갱신
+                        memberSize[memberN] = 0;
+                        converted = true;
+                        break;
+                    }
+                }
+            if (!converted) break;
+        }
+
+        //buildings 벡터 정리 — 변환된 픽셀(grid -1) 항목 제거
+        std::erase_if(buildings, [&](const BuildingPixel& bp) {
+            const std::size_t idx = static_cast<std::size_t>(bp.coord.y - patchPxY) * patchW + (bp.coord.x - patchPxX);
+            return buildingIndexGrid[idx] == -1;
+        });
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
     // 6. 도시블록이 없는 칸에 도로 생성
     //══════════════════════════════════════════════════════════════════
     //   stage 4가 못 메운 빈 도시 픽셀(2x2 빈 채움 후 남은 고립 1x1, 건물 사이 갈래길 등)을
@@ -457,6 +565,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             }
     }
 
+
     //══════════════════════════════════════════════════════════════════
     // 7. 차수가 1인 도로를 차수2 일직선 도로로 변환(후처리)
     //══════════════════════════════════════════════════════════════════
@@ -480,9 +589,169 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
+    // 8. 다리 결정 — roads[]에 NS/EW + isBridge 박기, 양 강변 출구 추가
+    //══════════════════════════════════════════════════════════════════
+    //   CityRiver/CitySea 픽셀에 다리 결정 — 1픽셀 두께 직선 강 가정
+    //   ([[project_cityriver_internal]] 데이터 규약). 강변 도로는 stage 3에서
+    //   강제로 깔리므로 다리 끝점은 항상 도로 본체에 닿음.
+    //
+    //   알고리즘:
+    //     1) 도시 박스 내부(±1 마진 제외) 픽셀 셔플 순회
+    //     2) 물 픽셀의 N+S 또는 E+W가 모두 city land면 다리 후보 (NS / EW)
+    //     3) gap 검사 — 같은 z에서 BRIDGE_MIN_GAP_PX 이내 기존 다리 있으면 스킵
+    //     4) 확률 게이트 — 첫 다리는 면제 (강 전체 0개 다리 케이스 회피)
+    //     5) roads[]에 박기:
+    //          강 픽셀:  openBits = NS or EW, isBridge = true
+    //          양 강변:  강 쪽 출구 비트 OR — stage 3 강변 도로(평행) 마스크와 결합되면서
+    //                   강변 lot이 T자/십자로 자연 승격 (streetByOpenSides 정상 매칭).
+    //                   stage 3 lock은 강과 *평행한* 방향만 — 강 쪽 비트는 unlocked.
+    //     6) plan.bridges 폴리라인 push — Map.ixx 디버그 오버레이용 (stage 9 lot 페인트 검증)
+
+    {
+        constexpr double BRIDGE_P = 0.5;
+        constexpr int BRIDGE_MIN_GAP_PX = 4;
+        constexpr int HALF_PX = TILE_PER_PIXEL / 2;
+
+        std::vector<worldGrid::PixelCoord> waterPixels;
+        for (int ly = 1; ly < patchH - 1; ++ly)
+            for (int lx = 1; lx < patchW - 1; ++lx)
+                waterPixels.push_back({ patchPxX + lx, patchPxY + ly, node.center.z });
+        std::shuffle(waterPixels.begin(), waterPixels.end(), rng);
+
+        std::vector<worldGrid::PixelCoord> placed;
+        bool firstBridge = true;
+
+        for (const auto& p : waterPixels)
+        {
+            if (!isWater(cityPixelAt(p))) continue;
+
+            const bool nLand = isCityLandPixel(cityPixelAt({ p.x,     p.y - 1, p.z }));
+            const bool sLand = isCityLandPixel(cityPixelAt({ p.x,     p.y + 1, p.z }));
+            const bool wLand = isCityLandPixel(cityPixelAt({ p.x - 1, p.y,     p.z }));
+            const bool eLand = isCityLandPixel(cityPixelAt({ p.x + 1, p.y,     p.z }));
+            const bool ns = nLand && sLand;
+            const bool we = wLand && eLand;
+            if (!ns && !we) continue;
+
+            //같은 z에서 기존 다리와 최소 간격 — 강 따라 다리 밀집 방지
+            bool tooClose = false;
+            for (const auto& bp : placed)
+            {
+                if (bp.z != p.z) continue;
+                if (std::abs(bp.x - p.x) <= BRIDGE_MIN_GAP_PX &&
+                    std::abs(bp.y - p.y) <= BRIDGE_MIN_GAP_PX) { tooClose = true; break; }
+            }
+            if (tooClose) continue;
+
+            //확률 게이트 — 첫 다리는 면제 (강마다 최소 1개 다리 보장)
+            if (!firstBridge && std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= BRIDGE_P) continue;
+            firstBridge = false;
+
+            //roads[]에 박기 — 강 픽셀 마스크 + isBridge + 양 강변 출구 OR
+            const std::size_t bridgeRoadIdx = roadIdx(p.x, p.y);
+            if (ns)
+            {
+                roads[bridgeRoadIdx].openBits = std::uint8_t(RoadPixel::Dir::NORTH) | std::uint8_t(RoadPixel::Dir::SOUTH);
+                roads[bridgeRoadIdx].isBridge = true;
+                roads[roadIdx(p.x, p.y - 1)].open(RoadPixel::Dir::SOUTH);   //북쪽 강변 → 다리
+                roads[roadIdx(p.x, p.y + 1)].open(RoadPixel::Dir::NORTH);   //남쪽 강변 → 다리
+            }
+            else   //we
+            {
+                roads[bridgeRoadIdx].openBits = std::uint8_t(RoadPixel::Dir::EAST) | std::uint8_t(RoadPixel::Dir::WEST);
+                roads[bridgeRoadIdx].isBridge = true;
+                roads[roadIdx(p.x - 1, p.y)].open(RoadPixel::Dir::EAST);    //서쪽 강변 → 다리
+                roads[roadIdx(p.x + 1, p.y)].open(RoadPixel::Dir::WEST);    //동쪽 강변 → 다리
+            }
+
+            //plan.bridges 폴리라인 push (디버그 오버레이용)
+            const int bz = p.z;
+            if (ns)
+            {
+                const int bx  =  p.x      * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                const int by0 = (p.y - 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                const int by1 = (p.y + 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx, by0, bz}, {bx, by1, bz} } });
+            }
+            else
+            {
+                const int by  =  p.y      * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                const int bx0 = (p.x - 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                const int bx1 = (p.x + 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx0, by, bz}, {bx1, by, bz} } });
+            }
+
+            placed.push_back(p);
+        }
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
+    // 9. 도로 픽셀 → Lot 페인트
+    //══════════════════════════════════════════════════════════════════
+    //   stage 7까지 확정된 roads[].openBits를 픽셀별로 streetByOpenSides() 라우팅 →
+    //   각 픽셀(24×24타일)의 lot 결과를 plan.tiles에 push. procGenerate stage 4가
+    //   plan.tiles를 자기 섹터 범위로 클립해 SectorPlan에 페인트.
+    //
+    //   degree<2 마스크는 stage 7이 제거 보장 → streetByOpenSides가 nullptr 반환하면
+    //   stage 7 invariant 위반(호출자 버그). 일단 방어적으로 스킵.
+    //
+    //   픽셀별 시드 — (seed, pxX, pxY) 해시. 같은 (cityId, pixel) → 같은 lot 변형 보장.
+    //   가로수 종류 등이 픽셀마다 결정론적으로 다르게 나옴.
+
+    {
+        for (int ly = 0; ly < patchH; ++ly)
+            for (int lx = 0; lx < patchW; ++lx)
+            {
+                const std::size_t idx = static_cast<std::size_t>(ly) * patchW + lx;
+                const std::uint8_t mask = roads[idx].openBits;
+                if (mask == 0) continue;
+
+                const Lot* lot = roads[idx].isBridge
+                    ? static_cast<const Lot*>(bridgeByOpenSides(mask))
+                    : static_cast<const Lot*>(streetByOpenSides(mask));
+                if (lot == nullptr) continue;
+
+                std::uint64_t lotSeed = seed ^ 0x9E3779B97F4A7C15ULL;
+                lotSeed ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(patchPxX + lx)) * 0xBF58476D1CE4E5B9ULL;
+                lotSeed  = (lotSeed ^ (lotSeed >> 27)) * 0x94D049BB133111EBULL;
+                lotSeed ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(patchPxY + ly)) * 0x94D049BB133111EBULL;
+                lotSeed ^= lotSeed >> 31;
+
+                const LotResult r = lot->generate(lotSeed);
+
+                const int originX = (patchPxX + lx) * TILE_PER_PIXEL + TILE_BASE_X;
+                const int originY = (patchPxY + ly) * TILE_PER_PIXEL + TILE_BASE_Y;
+                const int baseZ   = node.center.z;
+
+                //LotResult.planes는 sparse z map (쓰여진 z만 존재). itemID::none 슬롯은 스킵.
+                for (const auto& [zLayer, plane] : r.planes)
+                {
+                    for (int y = 0; y < r.h; ++y)
+                        for (int x = 0; x < r.w; ++x)
+                        {
+                            const std::size_t pi = static_cast<std::size_t>(y) * r.w + x;
+                            const int f = plane.floor[pi];
+                            const int w = plane.wall[pi];
+                            const int p = plane.prop[pi];
+                            if (f == itemID::none && w == itemID::none && p == itemID::none) continue;
+
+                            plan.tiles.push_back(CityTile{
+                                .pos   = Point3{ originX + x, originY + y, baseZ + zLayer },
+                                .floor = f,
+                                .wall  = w,
+                                .prop  = p,
+                            });
+                        }
+                }
+            }
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
     // Ex. 중간 점검... 도시 내부 폴리라인 형성해서 Map.ixx에서 볼 수 있도록
     //══════════════════════════════════════════════════════════════════
-    //   stage 2, 3에서 세팅한 roads[] 비트를 plan.segments 폴리라인으로 변환.
+    //   stage 2, 3, 8에서 세팅한 roads[] 비트를 plan.segments 폴리라인으로 변환.
     //   각 픽셀의 4방향 비트마다 픽셀 중심 → 픽셀 경계 절반 길이(=12타일) 라인.
     //   양쪽 픽셀 모두 켜져 있으면 두 절반이 합쳐져 중심-중심 라인이 되고,
     //   한쪽만 켜져 있으면 절반 라인으로 남아 비대칭(stage 3의 한쪽 강변 비트 등) 감지 가능.

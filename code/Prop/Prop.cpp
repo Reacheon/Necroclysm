@@ -302,7 +302,7 @@ bool Prop::runAnimation(bool shutdown)
             Point3 itemPos;
             if (treeAngle >= 90.0)
             {
-                if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };
+                if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == itemID::none*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
                 createItemStack(itemPos, { {392,1} });
@@ -313,7 +313,7 @@ bool Prop::runAnimation(bool shutdown)
             }
             else
             {
-                if (1/*TileWall(getGridX() - 1, getGridY(), getGridZ()) == 0*/) itemPos = { getGridX() - 1, getGridY(), getGridZ() };
+                if (1/*TileWall(getGridX() - 1, getGridY(), getGridZ()) == itemID::none*/) itemPos = { getGridX() - 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
                 createItemStack(itemPos, { {392,1} });

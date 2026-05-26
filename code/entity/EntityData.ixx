@@ -41,7 +41,7 @@ export struct EntityData_Base
     __int16 rElec = 0;
     __int16 rCorr = 0;
     __int16 rRad = 0;
-    unsigned __int16 corpseItemCode = 0;
+    int corpseItemCode = itemID::none;
     int eyeSight = 12; //기본 시야
 
 

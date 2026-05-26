@@ -16,23 +16,23 @@ import Monster;
 import log;
 import globalTime;
 
-unsigned __int16 TileFloor(int x, int y, int z)
+int TileFloor(int x, int y, int z)
 {
     TileData* t = World::ins()->tryGetTile(x, y, z);
-    return t != nullptr ? t->floor : 0;
+    return t != nullptr ? t->floor : itemID::none;
 }
 
-unsigned __int16 TileFloor(Point3 coord)
+int TileFloor(Point3 coord)
 {
     TileData* t = World::ins()->tryGetTile(coord.x, coord.y, coord.z);
-    return t != nullptr ? t->floor : 0;
+    return t != nullptr ? t->floor : itemID::none;
 }
 
 bool TileSnow(int x, int y, int z) { return World::ins()->getTile(x, y, z).hasSnow; }
 
-unsigned __int16 TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }
+int TileWall(int x, int y, int z) { return World::ins()->getTile(x, y, z).wall; }
 
-bool ExistWall(int x, int y, int z) { return (World::ins()->getTile(x, y, z).wall != 0); }
+bool ExistWall(int x, int y, int z) { return (World::ins()->getTile(x, y, z).wall != itemID::none); }
 
 void setWall(Point3 coord, int val)
 {
@@ -72,28 +72,28 @@ void EntityPtrMove(Point3 startCoor, Point3 endCoor)
                     || nextProp->leadItem.checkFlag(itemFlag::RAMP_DOWN));
             int dz = 0;
             if (arrivedProp != nullptr && arrivedProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != 0
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != itemID::none
                 && !nextIsRamp)
             {
                 dz = 1;
             }
             else if (arrivedProp != nullptr && arrivedProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != 0
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != itemID::none
                 && !nextIsRamp)
             {
                 dz = -1;
             }
             // 역방향 하강: 위쪽 z 이동 중, 아래에 RAMP_UP, 진행 2칸 앞 다리 끝
             else if (belowProp != nullptr && belowProp->leadItem.checkFlag(itemFlag::RAMP_UP)
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == 0
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != 0)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == itemID::none
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z - 1) != itemID::none)
             {
                 dz = -1;
             }
             // 역방향 상승: 아래쪽 z 이동 중, 위에 RAMP_DOWN, 진행 2칸 앞 하층 끝
             else if (aboveProp != nullptr && aboveProp->leadItem.checkFlag(itemFlag::RAMP_DOWN)
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == 0
-                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != 0)
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z) == itemID::none
+                && TileFloor(endCoor.x + stepDx, endCoor.y + stepDy, endCoor.z + 1) != itemID::none)
             {
                 dz = 1;
             }
@@ -205,7 +205,7 @@ void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWa
 
 bool isWalkable(Point3 coord)
 {
-    if (TileWall(coord.x, coord.y, coord.z) != 0) return false;
+    if (TileWall(coord.x, coord.y, coord.z) != itemID::none) return false;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false) return false;
     else if (TileEntity(coord.x, coord.y, coord.z) != nullptr) return false;
     else if (TileVehicle(coord.x, coord.y, coord.z) != nullptr)
@@ -222,14 +222,14 @@ bool isWalkable(Point3 coord)
             }
         }
     }
-    else if (TileFloor(coord.x, coord.y, coord.z) == 0) return false; //바닥이 없는 경우
+    else if (TileFloor(coord.x, coord.y, coord.z) == itemID::none) return false; //바닥이 없는 경우
 
     return true;
 }
 
 bool isRayBlocker(Point3 coord)
 {
-    if (TileWall(coord.x, coord.y, coord.z) != 0 && itemDex[TileWall(coord.x, coord.y, coord.z)].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
+    if (TileWall(coord.x, coord.y, coord.z) != itemID::none && itemDex[TileWall(coord.x, coord.y, coord.z)].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true) return true;
     else return false;
 }

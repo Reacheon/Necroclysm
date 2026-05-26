@@ -297,10 +297,10 @@ public:
 // 타일 접근 자유함수
 ////////////////////////////////////////////////////////////////////////////////
 
-export unsigned __int16 TileFloor(int x, int y, int z);
-export unsigned __int16 TileFloor(Point3 coord);
+export int TileFloor(int x, int y, int z);
+export int TileFloor(Point3 coord);
 export bool TileSnow(int x, int y, int z);
-export unsigned __int16 TileWall(int x, int y, int z);
+export int TileWall(int x, int y, int z);
 export bool ExistWall(int x, int y, int z);
 
 export void setWall(Point3 coord, int val);

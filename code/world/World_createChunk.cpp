@@ -95,8 +95,8 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
             if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
 
             TileData& tile = chunk->getChunkTile(localX, localY);
-            if (st.floor) tile.floor = st.floor;
-            if (st.wall)  tile.wall  = st.wall;
+            if (st.floor != itemID::none) tile.floor = st.floor;
+            if (st.wall  != itemID::none) tile.wall  = st.wall;
             tile.walkable = (st.flags & TILE_FLAG_WALKABLE) != 0;
         }
 

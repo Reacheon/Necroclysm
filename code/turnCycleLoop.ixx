@@ -721,7 +721,7 @@ std::int64_t itemTurn()
 			Point3 tgtCoord = stack->getGrid() + Point3{ dx,dy,0 };
 
 			TileData* thisTile = &World::ins()->getTile(tgtCoord.x, tgtCoord.y, tgtCoord.z);
-			bool obstacleCondition = (thisTile->wall != 0 || thisTile->floor != itemID::farmland);
+			bool obstacleCondition = (thisTile->wall != itemID::none || thisTile->floor != itemID::farmland);
 
 			if (obstacleCondition) continue;
 

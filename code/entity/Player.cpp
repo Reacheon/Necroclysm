@@ -180,14 +180,14 @@ void Player::updateMinimap()
 				const TileData* tgtTile = &World::ins()->getTile(pgx + dx, pgy + dy, pgz);
 				if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 				{
-					if (tgtTile->floor != 0)
+					if (tgtTile->floor != itemID::none)
 					{
 						int sprIdx = itemDex[tgtTile->floor].tileSprIndex
 							+ itemDex[tgtTile->floor].extraSprIndexSingle
 							+ 16 * itemDex[tgtTile->floor].extraSprIndex16;
 						drawTileSpr(sprIdx, destX, destY);
 					}
-					if (tgtTile->wall != 0)
+					if (tgtTile->wall != itemID::none)
 					{
 						int sprIdx = itemDex[tgtTile->wall].tileSprIndex
 							+ itemDex[tgtTile->wall].extraSprIndexSingle
@@ -384,7 +384,7 @@ void Player::updateVision(int range, int cx, int cy)
 				t->fov = fovFlag::white;
 			}
 			// 인라인 isRayBlocker — 동일 TileData 참조에서 wall + prop을 한 번에 판정
-			if (t->wall != 0 && itemDex[t->wall].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
+			if (t->wall != itemID::none && itemDex[t->wall].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
 			if (t->PropPtr != nullptr && t->PropPtr->leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true) return true;
 			return false;
 		};
