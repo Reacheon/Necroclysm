@@ -1010,7 +1010,9 @@ public:
 
 			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo.size(); i++)
 			{
-				if (vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+				//pocketMaxNumber/Volume>0 이면 ItemData::cloneFromItemDex가 자동으로
+				//pocketPtr 생성 — 컨테이너 식별자로 pocketPtr 직접 검사.
+				if (vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo[i].pocketPtr != nullptr)
 				{
 					inputOptions.push_back(act::unbox);
 					break;

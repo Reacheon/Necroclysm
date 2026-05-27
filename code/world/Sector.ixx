@@ -7,6 +7,7 @@ import worldGrid;
 import ProcGenWorker;
 import worldGen;
 import city;
+import Blueprint;
 
 // ════════════════════════════════════════════════════════════════════════
 // Sector — 지역 절차생성 단위 (1920×1920 타일).
@@ -123,6 +124,37 @@ export struct SectorSkyTile
     std::uint8_t flags = 0;     //TILE_FLAG_* 비트 (walkable 등)
 };
 
+//spawn sparse 채널 (모든 z). 청크 로드 시 chunkZ 필터 후 createItemStack/createMonster.
+export struct SectorItemStack
+{
+    Point3 pos;
+    std::vector<std::pair<int, int>> items;
+};
+
+export struct SectorMonster
+{
+    Point3 pos;
+    int    entityCode = 0;
+};
+
+//차량 spawn sparse 채널 (모든 z). bp는 Blueprint inline const 전역.
+//  청크 로드 시 chunkZ 필터 후 createVehicleFromBlueprint — 다른 sparse spawn들
+//  다음 *마지막*에 호출되어 floor/wall/prop을 덮어쓰는 정책.
+export struct SectorVehicle
+{
+    Point3 pos;
+    const Blueprint* bp = nullptr;
+    dir16 orientation = dir16::dir2;
+};
+
+//Prop 내부 ItemPocket 후처리 채널 (sparse, 모든 z). createProp 직후 그 좌표의
+//  TileProp(pos)->leadItem.pocketPtr에 addItemFromDex 호출.
+export struct SectorPropContents
+{
+    Point3 pos;
+    std::vector<std::pair<int, int>> items;
+};
+
 // ── SectorPlan ──────────────────────────────────────────────────────────
 // 한 섹터의 *모든* 절차생성 산출물. 청크가 소비하는 단일 진리원천.
 //
@@ -142,6 +174,10 @@ export struct SectorPlan
     std::vector<PaintCell>       tiles;     //1920 × 1920 = 3,686,400개 (본 z층)
     std::vector<SectorProp>      props;     //sparse, 모든 z
     std::vector<SectorSkyTile>   skyTiles;  //sparse, sc.z 외 z만
+    std::vector<SectorItemStack> itemStacks;//sparse, 모든 z
+    std::vector<SectorMonster>   monsters;  //sparse, 모든 z
+    std::vector<SectorVehicle>   vehicles;  //sparse, 모든 z
+    std::vector<SectorPropContents>   propContents;   //sparse, 모든 z — prop 내부 채움
 
     SectorPlan() = default;
     explicit SectorPlan(SectorCoord c) noexcept : coord(c) {}

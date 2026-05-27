@@ -24,6 +24,7 @@ import Lst;
 import paletteLoader;
 import worldSession;
 import Teleport;
+import Lot;
 
 export void debugConsole()
 {
@@ -70,6 +71,7 @@ export void debugConsole()
 	prt(L"35. 플레이어 성별 변경\n");
 	prt(L"36. 월드 생성 (PNG 로드 → 도시 4400개 → 도로망)\n");
 	prt(L"37. SUV 소환\n");
+	prt(L"38. Lot으로 청크 페인트 (헬퍼 테스트)\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -833,6 +835,106 @@ export void debugConsole()
 		myCar->addPart(vX + 2, vY + 3, { itemID::vehicleWall, itemID::tailLight });
 
 		prt(L"[디버그] SUV를 (%d,%d,%d) 위치에 소환했다.\n", vX, vY, vZ);
+		break;
+	}
+	case 38://Lot으로 청크 페인트 (헬퍼 테스트)
+	{
+		//CityPlan/SectorPlan 파이프라인 우회. Lot의 LotResult를 지정 청크에 직접
+		//페인트해 5개 헬퍼가 실타일까지 도달하는지 확인. 캐시·결정성은 정상
+		//도시 진입 경로에서 별도 검증.
+		int pcx = 0, pcy = 0;
+		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), pcx, pcy);
+		prt(L"플레이어 현재 청크: (%d, %d, %d)\n", pcx, pcy, PlayerZ());
+
+		int chunkX, chunkY, chunkZ;
+		prt(L"chunkX를 입력해주세요.\n");
+		std::cin >> chunkX;
+		prt(L"chunkY를 입력해주세요.\n");
+		std::cin >> chunkY;
+		prt(L"chunkZ를 입력해주세요.\n");
+		std::cin >> chunkZ;
+
+		prt(L"페인트할 Lot을 선택해주세요.\n");
+		prt(L"1. SampleLot\n");
+		prt(L"2. Street NS\n");
+		prt(L"3. Street Cross\n");
+		prt(L"4. Bridge NS\n");
+		int lotSel;
+		std::cin >> lotSel;
+
+		const Lot* lot = nullptr;
+		if      (lotSel == 1) lot = &sampleLot;
+		else if (lotSel == 2) lot = &streetNS;
+		else if (lotSel == 3) lot = &streetCross;
+		else if (lotSel == 4) lot = &bridgeNS;
+		if (lot == nullptr)
+		{
+			prt(L"잘못된 값을 입력하였습니다.\n");
+			break;
+		}
+
+		//footprint 청크가 모두 로드돼 있어야 함 — 미로드면 setFloor의 getTile().at()이
+		//throw되면서 부분 페인트로 남아 진단이 꼬임. 미리 차단.
+		{
+			bool allLoaded = true;
+			for (int cw = 0; cw < lot->sizeChunkW() && allLoaded; ++cw)
+				for (int ch = 0; ch < lot->sizeChunkH() && allLoaded; ++ch)
+				{
+					if (World::ins()->existChunk(chunkX + cw, chunkY + ch, chunkZ) == false)
+					{
+						prt(L"[에러] 청크 (%d, %d, %d)가 로드돼 있지 않다. 페인트 중단.\n",
+							chunkX + cw, chunkY + ch, chunkZ);
+						allLoaded = false;
+					}
+				}
+			if (allLoaded == false) break;
+		}
+
+		LotResult r = lot->generate(0);   //고정 seed (테스트 재현성)
+
+		const int originX = chunkX * CHUNK_SIZE_X;
+		const int originY = chunkY * CHUNK_SIZE_Y;
+
+		//raster: floor/wall/prop을 절대 타일 좌표로 페인트
+		for (const auto& [zLayer, plane] : r.planes)
+		{
+			for (int ly = 0; ly < r.h; ++ly)
+				for (int lx = 0; lx < r.w; ++lx)
+				{
+					const std::size_t pi = static_cast<std::size_t>(ly) * r.w + lx;
+					const int f = plane.floor[pi];
+					const int w = plane.wall[pi];
+					const int p = plane.prop[pi];
+					const Point3 pos{ originX + lx, originY + ly, chunkZ + zLayer };
+					if (f != itemID::none) setFloor(pos, f);
+					if (w != itemID::none) setWall(pos, w);
+					if (p != itemID::none) createProp(pos, p);
+				}
+		}
+
+		//spawn: itemStack/monster를 절대 좌표로 생성
+		for (const auto& s : r.itemStacks)
+			createItemStack({ originX + s.x, originY + s.y, chunkZ + s.z }, s.items);
+		for (const auto& m : r.monsters)
+			createMonster({ originX + m.x, originY + m.y, chunkZ + m.z }, m.entityCode);
+		//vehicle: createChunk 파이프라인의 마지막 단계와 동일 — floor/wall/prop/spawn 다음.
+		for (const auto& v : r.vehicles)
+			createVehicleFromBlueprint({ originX + v.x, originY + v.y, chunkZ + v.z }, v.bp, v.orientation);
+
+		//후처리: prop 내부 ItemPocket 채움 — World_createChunk의 동기화 동등 경로.
+		//   createProp 인스턴스 후 같은 좌표의 TileProp(pos)->leadItem.pocketPtr에 아이템 주입.
+		//   prop 없거나 pocket 없으면 silent skip (lot 작성자가 setProp 안 한 경우).
+		for (const auto& c : r.propContents)
+		{
+			Point3 pos{ originX + c.x, originY + c.y, chunkZ + c.z };
+			Prop* prop = TileProp(pos);
+			if (prop == nullptr || prop->leadItem.pocketPtr == nullptr) continue;
+			for (const auto& [code, count] : c.items)
+				prop->leadItem.pocketPtr->addItemFromDex(code, count);
+		}
+		prt(L"[디버그] 청크 (%d,%d,%d) 페인트 완료. itemStack %d, monster %d, vehicle %d, propContents %d.\n",
+			chunkX, chunkY, chunkZ, (int)r.itemStacks.size(), (int)r.monsters.size(), (int)r.vehicles.size(),
+			(int)r.propContents.size());
 		break;
 	}
 	case 99://콘솔 출력 초기화

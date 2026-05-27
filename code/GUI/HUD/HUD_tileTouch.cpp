@@ -35,21 +35,39 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 		//화면에 있는 아이템 터치
 		if (touchX == PlayerX() && touchY == PlayerY()) //자신 위치 터치
 		{
-			if (TileItemStack(touchX, touchY, PlayerZ()) != nullptr)
+			//우선순위: Vehicle 운전대 > Vehicle storage(pocketPtr) > ItemStack.
+			//  같은 타일에 vehicle + itemStack 공존 시 vehicle이 먼저. vehicle 부품에
+			//  운전대 있으면 운전 모드 토글, 없고 storage(쇼핑바스켓 등)만 있으면 Loot 오픈.
+			Vehicle* belowVehicle = TileVehicle(touchX, touchY, PlayerZ());
+			bool handled = false;
+
+			if (belowVehicle != nullptr)
 			{
-				prt(L"루팅창 오픈 함수 실행\n");
-				ItemStack* targetStack = TileItemStack(PlayerX(), PlayerY(), PlayerZ());
-				new Loot(targetStack);
-				click = false;
-			}
-			else if (TileVehicle(touchX, touchY, PlayerZ()) != nullptr)
-			{
-				Vehicle* belowVehicle = TileVehicle(touchX, touchY, PlayerZ());
-				bool findController = false;
-				prt(L"below prop의 사이즈는 %d이다.\n", belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo.size());
-				for (int i = 0; i < belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo.size(); i++)
+				auto& partItems = belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo;
+
+				int controllerIdx = -1;
+				int storageIdx = -1;
+				for (int i = 0; i < (int)partItems.size(); i++)
 				{
-					if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 99)//차량 조종장치
+					int code = partItems[i].itemCode;
+					if (code == itemID::vehicleControl
+					 || code == itemID::helicopterController
+					 || code == 313  //열차 조종장치(Train Control). itemID 별칭 미정의 - 별도 정리 필요
+					 || code == itemID::minecartController)
+					{
+						controllerIdx = i;
+						break;
+					}
+					if (storageIdx == -1 && partItems[i].pocketPtr != nullptr)
+					{
+						storageIdx = i;
+					}
+				}
+
+				if (controllerIdx != -1)
+				{
+					int code = partItems[controllerIdx].itemCode;
+					if (code == itemID::vehicleControl)
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -68,7 +86,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							PlayerPtr->updateMinimap();
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 311)//헬기 조종장치
+					else if (code == itemID::helicopterController)
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -80,10 +98,10 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						{
 							ctrlVeh = nullptr;
 							barAct = actSet::null();
-							typeHUD = vehFlag::none;;
+							typeHUD = vehFlag::none;
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == 313)//열차 조종장치
+					else //313(Train Control) / itemID::minecartController - 둘 다 동일 train 모드
 					{
 						if (ctrlVeh == nullptr)
 						{
@@ -95,27 +113,27 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						{
 							ctrlVeh = nullptr;
 							barAct = actSet::null();
-							typeHUD = vehFlag::none;;
+							typeHUD = vehFlag::none;
 						}
 					}
-					else if (belowVehicle->partInfo[{touchX, touchY, PlayerZ()}]->itemInfo[i].itemCode == itemID::minecartController) //열차 조종장치
-					{
-						if (ctrlVeh == nullptr)
-						{
-							ctrlVeh = belowVehicle;
-							barAct = actSet::train;
-							typeHUD = vehFlag::minecart;
-						}
-						else
-						{
-							ctrlVeh = nullptr;
-							barAct = actSet::null();
-							typeHUD = vehFlag::none;;
-						}
-					}
+					handled = true;
+				}
+				else if (storageIdx != -1)
+				{
+					Point3 containerPos = { touchX, touchY, PlayerZ() };
+					new Loot(partItems[storageIdx].pocketPtr.get(), &partItems[storageIdx], containerPos);
+					click = false;
+					handled = true;
 				}
 			}
-			else
+
+			if (!handled && TileItemStack(touchX, touchY, PlayerZ()) != nullptr)
+			{
+				ItemStack* targetStack = TileItemStack(PlayerX(), PlayerY(), PlayerZ());
+				new Loot(targetStack);
+				click = false;
+			}
+			else if (!handled)
 			{
 				if (TileProp(touchX, touchY, PlayerZ()) != nullptr)
 				{

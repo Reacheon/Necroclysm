@@ -5,6 +5,7 @@ import util;
 import city;
 import worldGen;
 import constVar;
+import Blueprint;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
@@ -52,6 +53,38 @@ export struct CityBuildingPixel
     int    memberIndex = -1;
 };
 
+// ── CityItemStack / CityMonster ──────────────────────────────────────────
+// Lot이 깔 spawn (sparse). tiles와 평행 채널 — 페이로드 자료형이 달라
+// (items 리스트 / entityCode) prop처럼 단일 itemID로 합쳐지지 않음.
+export struct CityItemStack
+{
+    Point3 pos;
+    std::vector<std::pair<int, int>> items;
+};
+
+export struct CityMonster
+{
+    Point3 pos;
+    int    entityCode = 0;
+};
+
+//Lot이 깔 차량 spawn (sparse). bp는 Blueprint 모듈의 inline const 전역 가리킴.
+//  Lot 로컬 좌표를 절대 Point3로 옮긴 후 그대로 SectorPlan으로 흘러간다.
+export struct CityVehicle
+{
+    Point3 pos;
+    const Blueprint* bp = nullptr;
+    dir16 orientation = dir16::dir2;
+};
+
+//Prop 내부 ItemPocket에 채울 아이템 (sparse). pos는 prop이 깔린 절대 타일 좌표.
+//  CityTile.prop과 평행 채널 — 같은 pos에 prop이 있어야 인스턴스화가 매칭됨.
+export struct CityPropContents
+{
+    Point3 pos;
+    std::vector<std::pair<int, int>> items;
+};
+
 export struct CityPlan
 {
     city::CityId id{};
@@ -77,6 +110,11 @@ export struct CityPlan
     //  픽셀 1개 = TILE_PER_PIXEL 타일 정사각형. 같은 건물의 모든 픽셀은 동일 memberIndex
     //  보유 → Map 오버레이가 memberIndex 해시 색상으로 칠하면 건물 단위가 한 덩어리로 보임.
     std::vector<CityBuildingPixel> buildings;
+
+    std::vector<CityItemStack> itemStacks;   //sparse
+    std::vector<CityMonster>   monsters;     //sparse
+    std::vector<CityVehicle>   vehicles;     //sparse
+    std::vector<CityPropContents>   propContents;   //sparse — prop 내부 ItemPocket 채움
 
     CityPlan() = default;
     explicit CityPlan(city::CityId id_) noexcept : id(id_) {}

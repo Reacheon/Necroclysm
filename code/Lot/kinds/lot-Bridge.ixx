@@ -1,5 +1,5 @@
 module;
-export module lot:Bridge;
+export module Lot:Bridge;
 
 import std;
 import :base;

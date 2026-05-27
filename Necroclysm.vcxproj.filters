@@ -324,6 +324,18 @@
     <ClCompile Include="code\Vehicle.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
+    <ClCompile Include="code\Vehicle\Blueprint-base.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle\Blueprint-SUV.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle\Blueprint-bicycle.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Vehicle\Blueprint.ixx">
+      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
+    </ClCompile>
     <ClCompile Include="code\Flame.ixx">
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
@@ -873,22 +885,22 @@
     <ClCompile Include="code\world\Sector.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\lot.ixx">
+    <ClCompile Include="code\Lot\Lot.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\lot-base.ixx">
+    <ClCompile Include="code\Lot\Lot-base.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\kinds\lot-Sample.ixx">
+    <ClCompile Include="code\Lot\kinds\Lot-Sample.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\kinds\lot-School.ixx">
+    <ClCompile Include="code\Lot\kinds\Lot-School.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\kinds\lot-Street.ixx">
+    <ClCompile Include="code\Lot\kinds\Lot-Street.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\kinds\lot-Bridge.ixx">
+    <ClCompile Include="code\Lot\kinds\Lot-Bridge.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
   </ItemGroup>

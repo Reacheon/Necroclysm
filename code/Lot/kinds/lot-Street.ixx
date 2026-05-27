@@ -1,5 +1,5 @@
 module;
-export module lot:Street;
+export module Lot:Street;
 
 import std;
 import :base;
@@ -116,12 +116,13 @@ protected:
         //── 3) 가로수 — 직선 패턴 한정 ───────────────────────────────────
         //   paver-band 안쪽 끝(LO-1=3, HI+1=20)에 DASH 주기로 배치.
         //   paver → dirt 교체 후 tree prop. CityPlan_build와 동일 패턴.
-        constexpr int TREE_KINDS[6] = {
+        constexpr int TREE_KINDS[7] = {
             itemID::ginkgoTree,   itemID::cherryTree,  itemID::mapleTree,
             itemID::magnoliaTree, itemID::oakTree,     itemID::juniperTree,
+            itemID::zelkovaTree,
         };
         std::mt19937_64 rng(seed);
-        std::uniform_int_distribution<int> kindDist(0, 5);
+        std::uniform_int_distribution<int> kindDist(0, 6);
 
         if (n && s && !e && !w)
         {

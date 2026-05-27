@@ -8,6 +8,10 @@ import TileData;
 import worldGrid;
 import Sector;
 import worldSession;
+import Prop;
+import Vehicle;
+import ItemPocket;
+import ItemData;
 
 // ════════════════════════════════════════════════════════════════════════
 // World::createChunk — 청크 1개 생성 + (Phase 2 진입 후) Sector 데이터 *블릿*.
@@ -112,6 +116,57 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
             if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
             createProp(p.pos, p.itemId);
         }
+
+        //── 2c.1) sparse propContents — prop 인스턴스화 직후 leadItem.pocketPtr 채움.
+        //   prop이 없거나 pocketPtr 없으면 silent skip (lot 작성자가 setProp 안 한 경우 등).
+        for (const SectorPropContents& c : sp.propContents)
+        {
+            if (c.pos.z != chunkZ) continue;
+            const int localX = c.pos.x - chunkOriginTileX;
+            const int localY = c.pos.y - chunkOriginTileY;
+            if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
+            if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
+            Prop* prop = TileProp(c.pos);
+            if (prop == nullptr || prop->leadItem.pocketPtr == nullptr) continue;
+            for (const auto& [code, count] : c.items)
+            {
+                prop->leadItem.pocketPtr->addItemFromDex(code, count);
+            }
+        }
+
+        //── 2d) sparse itemStack/monster ── (props와 동일 chunk 필터 패턴)
+        for (const SectorItemStack& s : sp.itemStacks)
+        {
+            if (s.pos.z != chunkZ) continue;
+            const int localX = s.pos.x - chunkOriginTileX;
+            const int localY = s.pos.y - chunkOriginTileY;
+            if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
+            if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
+            createItemStack(s.pos, s.items);
+        }
+        for (const SectorMonster& m : sp.monsters)
+        {
+            if (m.pos.z != chunkZ) continue;
+            const int localX = m.pos.x - chunkOriginTileX;
+            const int localY = m.pos.y - chunkOriginTileY;
+            if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
+            if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
+            createMonster(m.pos, m.entityCode);
+        }
+
+        //── 2e) 차량 spawn — *반드시 마지막*. 차량 footprint가 floor/wall/prop/itemStack/
+        //   monster 위치를 덮어쓰는 정책. anchor가 이 청크 안일 때만 spawn하고, 인접 청크로
+        //   뻗는 footprint는 createVehicleFromBlueprint 내부에서 사전 ensure 처리.
+        for (const SectorVehicle& v : sp.vehicles)
+        {
+            if (v.pos.z != chunkZ) continue;
+            const int localX = v.pos.x - chunkOriginTileX;
+            const int localY = v.pos.y - chunkOriginTileY;
+            if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
+            if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
+            createVehicleFromBlueprint(v.pos, v.bp, v.orientation);
+        }
+
         return;
     }
 

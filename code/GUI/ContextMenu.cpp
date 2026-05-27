@@ -423,7 +423,7 @@ void ContextMenu::executeContextAct(act inputAct)
 			Vehicle* vPtr = TileVehicle(containerPos.x, containerPos.y, PlayerZ());
 			for (int i = 0; i < vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo.size(); i++)
 			{
-				if (vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i].checkFlag(itemFlag::POCKET))
+				if (vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i].pocketPtr != nullptr)
 				{
 					new Loot(vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i].pocketPtr.get(), &(vPtr->partInfo[{containerPos.x, containerPos.y, PlayerZ()}]->itemInfo[i]), containerPos);
 					break;

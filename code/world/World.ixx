@@ -15,6 +15,7 @@ import Monster;
 import ItemStack;
 import Entity;
 import ItemPocket;
+import Blueprint;
 
 export class World
 {
@@ -327,6 +328,11 @@ export void destroyItemStack(Point3 inputCoor);
 export void destroyProp(Point3 inputCoor);
 export void createProp(Point3 inputCoor, int inputItemCode);
 export void createFlame(Point3 inputCoor, flameFlag inputFlag);
+//차량 spawn 헬퍼 — Lot→createChunk 파이프라인의 마지막 단계에서 호출.
+//  World::createVehicle로 anchor에 leadItem만 깐 빈 차량 만든 후 bp->build로 부품 트리
+//  채우고, orientation으로 rotatePartInfo. 회전 후 partInfo가 가리키는 타일들의
+//  TileVehicle 포인터를 채워준다 (rotatePartInfo가 안 건드림).
+export void createVehicleFromBlueprint(Point3 anchor, const Blueprint* bp, dir16 orientation);
 
 export void DestroyWall(int x, int y, int z);
 

@@ -94,8 +94,10 @@ export namespace itemID
 
     ///////////////////////차량 부품//////////////////////
     constexpr int vehicleControl = 99;
+    constexpr int helicopterController = 311;
     constexpr int engineV2Gasoline = 100;
     constexpr int fuelTank10L = 101;
+    constexpr int tire = 102;
     constexpr int vehicleWall = 119;
     constexpr int vehicleDoor = 120;
     constexpr int vehicleGlass = 121;
@@ -107,6 +109,10 @@ export namespace itemID
     constexpr int vehicleRoof = 128;
     constexpr int vehicleTurret = 129;
     constexpr int steelBumper = 130;
+    constexpr int bicycleSaddle = 132;
+    constexpr int bicycleHandlebar = 133;
+    constexpr int bicyclePedal = 135;
+    constexpr int shoppingBasket = 136;
     constexpr int steerableTire = 142;
 
     constexpr int leverRL = 149;
@@ -186,7 +192,8 @@ export namespace itemID
     constexpr int verticalPipeRA = 190;
     constexpr int verticalPipeLA = 191;
 
-    constexpr int woodenDoor = 291;
+    constexpr int woodenDoorH = 213; //수직일자통로(y축방향 통로)를 막는 수평으로 펼쳐진 나무문
+    constexpr int woodenDoorV = 214; //수평일자통로(x축방향 통로)를 막는 수직으로 펼쳐진 나무문
 
     /////////////////////////////////////////////////
 
@@ -288,6 +295,7 @@ export namespace itemID
     constexpr int magnoliaTree = 252;
     constexpr int bananaTree = 253;
     constexpr int willowTree = 254;
+    constexpr int zelkovaTree = 602; //느티나무
 
     constexpr int treeStump = 282;
     constexpr int paver = 563;
@@ -349,4 +357,5 @@ export namespace itemID
     constexpr int yellowAsphaltArrowLL = 593;  // ↙
     constexpr int yellowAsphaltArrowD  = 594;  // ↓
     constexpr int yellowAsphaltArrowLR = 595;  // ↘
+
 };

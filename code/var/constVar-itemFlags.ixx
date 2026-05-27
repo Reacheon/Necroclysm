@@ -117,7 +117,6 @@ export enum class itemFlag
     PROP_GAS_OBSTACLE_OFF,
     WALL_GAS_PERMEABLE,
 
-    POCKET,
     CAN_CLIMB,
 
     SPR_TH_WEAPON,

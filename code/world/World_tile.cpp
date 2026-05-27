@@ -15,6 +15,7 @@ import Entity;
 import Monster;
 import log;
 import globalTime;
+import Blueprint;
 
 int TileFloor(int x, int y, int z)
 {
@@ -200,6 +201,52 @@ void createProp(Point3 inputCoor, int inputItemCode)
 }
 
 void createFlame(Point3 inputCoor, flameFlag inputFlag) { World::ins()->getTile(inputCoor).flamePtr = std::make_unique<Flame>(inputCoor, inputFlag); }
+
+void createVehicleFromBlueprint(Point3 anchor, const Blueprint* bp, dir16 orientation)
+{
+    if (bp == nullptr) return;
+
+    //차량 footprint가 anchor 청크 경계를 넘어 인접 청크 타일을 건드릴 때
+    //  Vehicle::extendPart → getTile.at()이 std::out_of_range throw. spawn 전에
+    //  anchor 주변 ±1 청크를 ensure (SUV 4×7은 ±1로 충분). tryGetChunk 선행 필수 —
+    //  무조건 createChunk면 기존 청크 데이터가 새 빈 청크로 덮여 날아감.
+    int anchorChunkX, anchorChunkY;
+    World::ins()->changeToChunkCoord(anchor.x, anchor.y, anchorChunkX, anchorChunkY);
+    for (int dy = -1; dy <= 1; ++dy)
+    {
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            if (World::ins()->tryGetChunk(anchorChunkX + dx, anchorChunkY + dy, anchor.z) == nullptr)
+            {
+                World::ins()->createChunk(anchorChunkX + dx, anchorChunkY + dy, anchor.z);
+            }
+        }
+    }
+
+    Vehicle* veh = World::ins()->createVehicle(anchor.x, anchor.y, anchor.z, bp->leadItem());
+    veh->name = bp->name();
+    veh->vehType = bp->type();
+
+    //build()는 anchor 절대좌표 기준 extendPart/addPart 호출 (blueprint 컨벤션).
+    //  extendPart가 각 부품 타일의 TileVehicle도 함께 채움.
+    bp->build(veh, anchor);
+
+    //회전 — Vehicle::rotate와 동일 패턴: TileVehicle 비우고 partInfo 회전 후 새 좌표에
+    //  재설정. rotatePartInfo 자체는 partInfo만 회전하므로 TileVehicle 갱신은 호출자 책임.
+    if (veh->bodyDir != orientation)
+    {
+        for (const auto& [pos, pocket] : veh->partInfo)
+        {
+            TileVehicle(pos.x, pos.y, pos.z) = nullptr;
+        }
+        veh->rotatePartInfo(orientation);
+        veh->bodyDir = orientation;
+        for (const auto& [pos, pocket] : veh->partInfo)
+        {
+            TileVehicle(pos.x, pos.y, pos.z) = veh;
+        }
+    }
+}
 
 void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
 

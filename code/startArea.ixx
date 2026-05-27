@@ -14,6 +14,7 @@ import ItemPocket;
 import ItemStack;
 import World;
 import Vehicle;
+import Blueprint;
 import Prop;
 import Monster;
 import statusEffect;
@@ -216,7 +217,7 @@ export void startArea()
 	//집 하단 5타일
 	setWall({ -1,-2,0 }, 375);
 	setWall({ -2,-2,0 }, 375);
-	createProp({ -3, -2, 0 }, 291);//나무문 설치
+	createProp({ -3, -2, 0 }, itemID::woodenDoorH);//집 하단 벽 가운데 수직문
 	setWall({ -4,-2,0 }, 375);
 	setWall({ -5,-2,0 }, 375);
 	//집 우측 4타일
@@ -314,12 +315,10 @@ export void startArea()
 			int cy = -1;
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx, cy + i, -1);
-			createProp({ cx, cy + 1, -1 }, itemID::woodenDoor);//나무문 설치
+			createProp({ cx, cy + 1, -1 }, itemID::woodenDoorH);//Y축 통로용 수직문
 
 			for (int i = 1; i < 9; i++) DestroyWall(cx + i, cy, -1);
-			createProp({ cx + 1, cy, -1 }, itemID::woodenDoor);
-			Prop* door2 = TileProp(cx + 1, cy, -1);//나무문 설치
-			door2->leadItem.extraSprIndexSingle = 2;
+			createProp({ cx + 1, cy, -1 }, itemID::woodenDoorV);//X축 통로용 수평문
 
 			int aisleEndX = cx + 8;
 			int aisleEndY = cy;
@@ -593,9 +592,7 @@ export void startArea()
 
 		destroyHLine({ -7, -5 }, -4);
 
-		createProp({ -4, -3, -1 }, itemID::woodenDoor);
-		Prop* door3 = TileProp(-4, -3, -1);//나무문 설치
-		door3->leadItem.extraSprIndexSingle = 2;
+		createProp({ -4, -3, -1 }, itemID::woodenDoorV);//destroyHLine 통로용 수평문
 
 		//담수호
 		{
@@ -823,79 +820,7 @@ export void startArea()
 
 	int vX = -9;
 	int vY = +3;
-	Vehicle* myCar = World::ins()->createVehicle(vX, vY, 0, itemID::metalFrame);//차량 설치
-	myCar->name = L"SUV";
-	myCar->vehType = vehFlag::car;
-
-	///////////////////////차량 기초 프레임//////////////////////////////////////
-	myCar->extendPart(vX, vY - 1, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY - 1, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY - 1, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY - 1, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY - 2, itemID::metalFrame);
-	myCar->extendPart(vX, vY - 2, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY - 2, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY - 2, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY + 1, itemID::metalFrame);
-	myCar->extendPart(vX, vY + 1, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY + 1, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY + 1, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY + 2, itemID::metalFrame);
-	myCar->extendPart(vX, vY + 2, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY + 2, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY + 2, itemID::metalFrame);
-	myCar->extendPart(vX - 1, vY + 3, itemID::metalFrame);
-	myCar->extendPart(vX, vY + 3, itemID::metalFrame);
-	myCar->extendPart(vX + 1, vY + 3, itemID::metalFrame);
-	myCar->extendPart(vX + 2, vY + 3, itemID::metalFrame);
-
-	myCar->extendPart(vX - 1, vY - 3, itemID::steelBumper);
-	myCar->extendPart(vX, vY - 3, itemID::steelBumper);
-	myCar->extendPart(vX + 1, vY - 3, itemID::steelBumper);
-	myCar->extendPart(vX + 2, vY - 3, itemID::steelBumper);
-	//////////////////////////▼최상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
-	myCar->addPart(vX, vY - 2, { itemID::vehicleWall });
-	myCar->addPart(vX + 1, vY - 2, { itemID::vehicleWall });
-	myCar->addPart(vX + 2, vY - 2, { itemID::steerableTire, itemID::vehicleWall, itemID::headlight });
-	//////////////////////////▼중상단 4타일////////////////////////////////////
-	myCar->addPart(vX - 1, vY - 1, itemID::vehicleGlass);
-	myCar->addPart(vX, vY - 1, { itemID::vehicleGlass, itemID::engineV2Gasoline });
-	myCar->addPart(vX + 1, vY - 1, itemID::vehicleGlass);
-	myCar->addPart(vX + 2, vY - 1, itemID::vehicleGlass);
-	////////////////////////////////▼운전석 4타일///////////////////////////////
-	myCar->addPart(vX - 1, vY, { itemID::vehicleDoor });
-	myCar->addPart(vX, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleControl, itemID::vehicleRoof });
-	myCar->addPart(vX + 1, vY, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
-	myCar->addPart(vX + 2, vY, { itemID::vehicleDoor });
-	//////////////////////////▼운전석 아래 통로 4타일/////////////////////////////
-	myCar->addPart(vX - 1, vY + 1, { itemID::vehicleWall });
-	myCar->addPart(vX, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof });
-	myCar->addPart(vX + 1, vY + 1, { itemID::vehiclePassage, itemID::vehicleRoof, itemID::vehicleTurret });
-	myCar->addPart(vX + 2, vY + 1, { itemID::vehicleWall });
-	///////////////////////////////▼뒷자석 4타일/////////////////////
-	myCar->addPart(vX - 1, vY + 2, { itemID::vehicleDoor, itemID::fuelTank10L });
-	{
-		ItemPocket* partPocket = myCar->partInfo[{vX - 1, vY + 2, myCar->getGridZ()}].get();
-		for (int i = 0; i < partPocket->itemInfo.size(); i++)
-		{
-			if (partPocket->itemInfo[i].itemCode == itemID::fuelTank10L)
-			{
-				partPocket->itemInfo[i].pocketPtr->addItemFromDex(itemID::gasoline, 900);
-			}
-		}
-	}
-	myCar->addPart(vX, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
-	myCar->addPart(vX + 1, vY + 2, { itemID::vehiclePassage, itemID::vehicleSeat, itemID::vehicleRoof });
-	myCar->addPart(vX + 2, vY + 2, { itemID::vehicleDoor });
-	///////////////////////////////▼최후방 4타일///////////////////////////
-	myCar->addPart(vX - 1, vY + 3, { itemID::vehicleWall, itemID::tailLight });
-	myCar->addPart(vX, vY + 3, { itemID::trunkDoor });
-	myCar->addPart(vX + 1, vY + 3, { itemID::trunkDoor });
-	myCar->addPart(vX + 2, vY + 3, { itemID::vehicleWall, itemID::tailLight });
+	createVehicleFromBlueprint({ vX, vY, 0 }, &suvBlueprint, dir16::dir2);
 
 
 

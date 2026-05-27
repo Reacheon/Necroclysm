@@ -502,7 +502,6 @@ export int readItemDex(const wchar_t* file)
                             { L"PROP_GAS_OBSTACLE_OFF", itemFlag::PROP_GAS_OBSTACLE_OFF },
                             { L"WALL_GAS_PERMEABLE", itemFlag::WALL_GAS_PERMEABLE },
 
-                            { L"POCKET", itemFlag::POCKET },
                             { L"CAN_CLIMB", itemFlag::CAN_CLIMB },
                             { L"SPR_TH_WEAPON", itemFlag::SPR_TH_WEAPON },
                             { L"NO_HAIR_HELMET", itemFlag::NO_HAIR_HELMET },

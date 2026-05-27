@@ -1,5 +1,5 @@
 module;
-export module lot;
+export module Lot;
 
 //공용 구현
 export import :base;

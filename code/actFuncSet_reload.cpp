@@ -64,7 +64,7 @@ namespace
 				collectSubPockets(prop->leadItem.pocketPtr.get(), result);
 			}
 
-			//2c. Vehicle 파트 중 POCKET 아이템의 포켓 + 서브포켓
+			//2c. Vehicle 파트 중 pocketPtr 보유 아이템의 포켓 + 서브포켓
 			Vehicle* veh = TileVehicle(x, y, z);
 			if (veh != nullptr)
 			{
@@ -73,7 +73,7 @@ namespace
 				{
 					for (auto& item : it->second->itemInfo)
 					{
-						if (item.checkFlag(itemFlag::POCKET) && item.pocketPtr != nullptr)
+						if (item.pocketPtr != nullptr)
 						{
 							result.push_back(item.pocketPtr.get());
 							collectSubPockets(item.pocketPtr.get(), result);
@@ -155,7 +155,7 @@ namespace
 				collectSubPocketsWithSource(prop->leadItem.pocketPtr.get(), result);
 			}
 
-			//2c. Vehicle 파트 중 POCKET 아이템의 포켓 + 서브포켓
+			//2c. Vehicle 파트 중 pocketPtr 보유 아이템의 포켓 + 서브포켓
 			Vehicle* veh = TileVehicle(x, y, z);
 			if (veh != nullptr)
 			{
@@ -164,7 +164,7 @@ namespace
 				{
 					for (auto& item : it->second->itemInfo)
 					{
-						if (item.checkFlag(itemFlag::POCKET) && item.pocketPtr != nullptr)
+						if (item.pocketPtr != nullptr)
 						{
 							std::wstring vehLabel = item.name;
 							if (dir >= 0) vehLabel += L" (" + tileLabel + L")";

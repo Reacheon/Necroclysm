@@ -145,6 +145,27 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
     }
     errorBox(partInfo.find({ inputX, inputY, getGridZ() }) != partInfo.end(), L"[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
 
+    //부품 footprint가 World의 다른 점유물과 충돌하는지 검사 — vehicle spawn 시점에만 발견되는 케이스.
+    //  벽: vehicle은 floor/prop을 덮어쓰는 정책이지만 wall은 침입 금지(일관성).
+    //  다른 vehicle: 같은 타일을 두 vehicle이 점유하면 TileVehicle 포인터가 한쪽으로 덮여 leak.
+    //                anchor 좌표를 메시지에 포함해 어느 vehicle과 충돌했는지 진단 용이.
+    errorBox(ExistWall(inputX, inputY, getGridZ()),
+        L"[Vehicle:extendPart] (" + std::to_wstring(inputX) + L"," +
+        std::to_wstring(inputY) + L"," + std::to_wstring(getGridZ()) +
+        L") 위치에 벽이 존재해 vehicle '" + name + L"' 부품 확장 불가.");
+
+    if (Vehicle* existing = TileVehicle(inputX, inputY, getGridZ()); existing != nullptr && existing != this)
+    {
+        errorBox(true,
+            L"[Vehicle:extendPart] (" + std::to_wstring(inputX) + L"," +
+            std::to_wstring(inputY) + L"," + std::to_wstring(getGridZ()) +
+            L") 위치에 다른 vehicle '" + existing->name + L"' (anchor=(" +
+            std::to_wstring(existing->getGridX()) + L"," +
+            std::to_wstring(existing->getGridY()) + L"," +
+            std::to_wstring(existing->getGridZ()) + L"))의 부품이 있어 vehicle '" +
+            name + L"' 부품 확장 불가.");
+    }
+
     partInfo[{inputX, inputY, getGridZ()}] = std::make_unique<ItemPocket>(storageType::null);
     partInfo[{inputX, inputY, getGridZ()}]->addItemFromDex(inputItemCode);
     TileVehicle(inputX, inputY, getGridZ()) = this;

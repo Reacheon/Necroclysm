@@ -444,6 +444,37 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
                 if (t.prop != itemID::none) plan.props.push_back(SectorProp{ .pos = t.pos, .itemId = t.prop });
             }
+
+            //spawn 채널 — XY만 섹터 클립. chunkZ 필터는 createChunk 단계.
+            for (const CityItemStack& s : cp.itemStacks)
+            {
+                const int dx = s.pos.x - sectorOriginTileX;
+                const int dy = s.pos.y - sectorOriginTileY;
+                if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
+                plan.itemStacks.push_back(SectorItemStack{ .pos = s.pos, .items = s.items });
+            }
+            for (const CityMonster& m : cp.monsters)
+            {
+                const int dx = m.pos.x - sectorOriginTileX;
+                const int dy = m.pos.y - sectorOriginTileY;
+                if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
+                plan.monsters.push_back(SectorMonster{ .pos = m.pos, .entityCode = m.entityCode });
+            }
+            for (const CityVehicle& v : cp.vehicles)
+            {
+                const int dx = v.pos.x - sectorOriginTileX;
+                const int dy = v.pos.y - sectorOriginTileY;
+                if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
+                plan.vehicles.push_back(SectorVehicle{ .pos = v.pos, .bp = v.bp, .orientation = v.orientation });
+            }
+            //ItemPocket 후처리 채널 — pos XY만 섹터 클립.
+            for (const CityPropContents& c : cp.propContents)
+            {
+                const int dx = c.pos.x - sectorOriginTileX;
+                const int dy = c.pos.y - sectorOriginTileY;
+                if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
+                plan.propContents.push_back(SectorPropContents{ .pos = c.pos, .items = c.items });
+            }
         }
     }
 
@@ -451,7 +482,6 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     // TODO 향후 단계 (모두 본 함수에 누적)
     //   - 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
     //   - 폴리라인 주변 국도 분기 — 1티어 도로에서 갈라지는 마이너 도로망
-    //   - CityPlan에 itemStack/vehicle/prop/entity 스폰 레인 추가
     //   - Bridge 후처리 보강 — 폴리라인↔수계 교차 시 다리 텍스처
     //═══════════════════════════════════════════════════════════════════════
 

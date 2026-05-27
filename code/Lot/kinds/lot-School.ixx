@@ -1,5 +1,5 @@
 module;
-export module lot:School;
+export module Lot:School;
 
 import std;
 import :base;

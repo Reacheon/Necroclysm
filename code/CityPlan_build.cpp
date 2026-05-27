@@ -5,7 +5,7 @@ import util;
 import constVar;
 import worldGen;
 import worldGrid;
-import lot;
+import Lot;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan_build.cpp — buildCityPlan 구현.
@@ -718,7 +718,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 lotSeed ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(patchPxY + ly)) * 0x94D049BB133111EBULL;
                 lotSeed ^= lotSeed >> 31;
 
-                const LotResult r = lot->generate(lotSeed);
+                LotResult r = lot->generate(lotSeed);
 
                 const int originX = (patchPxX + lx) * TILE_PER_PIXEL + TILE_BASE_X;
                 const int originY = (patchPxY + ly) * TILE_PER_PIXEL + TILE_BASE_Y;
@@ -743,6 +743,38 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                                 .prop  = p,
                             });
                         }
+                }
+
+                //── spawn 채널 — Lot 로컬 좌표를 절대 Point3로 옮겨 plan에 누적
+                for (auto& s : r.itemStacks)
+                {
+                    plan.itemStacks.push_back(CityItemStack{
+                        .pos   = Point3{ originX + s.x, originY + s.y, baseZ + s.z },
+                        .items = std::move(s.items),
+                    });
+                }
+                for (const auto& m : r.monsters)
+                {
+                    plan.monsters.push_back(CityMonster{
+                        .pos        = Point3{ originX + m.x, originY + m.y, baseZ + m.z },
+                        .entityCode = m.entityCode,
+                    });
+                }
+                for (const auto& v : r.vehicles)
+                {
+                    plan.vehicles.push_back(CityVehicle{
+                        .pos         = Point3{ originX + v.x, originY + v.y, baseZ + v.z },
+                        .bp          = v.bp,
+                        .orientation = v.orientation,
+                    });
+                }
+                //prop 인스턴스화 후 후처리로 ItemPocket 채울 데이터 — XY만 절대화.
+                for (auto& c : r.propContents)
+                {
+                    plan.propContents.push_back(CityPropContents{
+                        .pos   = Point3{ originX + c.x, originY + c.y, baseZ + c.z },
+                        .items = std::move(c.items),
+                    });
                 }
             }
     }
