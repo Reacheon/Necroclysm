@@ -407,10 +407,8 @@
     <ClCompile Include="code\Vehicle_runAI.cpp" />
     <ClCompile Include="code\Vehicle_runAnimation.cpp" />
     <ClCompile Include="code\Vehicle_drawSelf.cpp" />
-    <ClCompile Include="code\Vehicle\Blueprint-base.ixx" />
-    <ClCompile Include="code\Vehicle\Blueprint-SUV.ixx" />
-    <ClCompile Include="code\Vehicle\Blueprint-bicycle.ixx" />
-    <ClCompile Include="code\Vehicle\Blueprint.ixx" />
+    <ClCompile Include="code\Vehicle\VehiclePlan.ixx" />
+    <ClCompile Include="code\Vehicle\VehiclePrefab.ixx" />
     <ClCompile Include="code\Wake.ixx" />
     <ClCompile Include="code\Wave.ixx" />
     <ClCompile Include="code\world\Chunk.ixx" />

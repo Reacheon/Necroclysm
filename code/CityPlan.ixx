@@ -5,7 +5,7 @@ import util;
 import city;
 import worldGen;
 import constVar;
-import Blueprint;
+import VehiclePlan;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
@@ -68,13 +68,12 @@ export struct CityMonster
     int    entityCode = 0;
 };
 
-//Lot이 깔 차량 spawn (sparse). bp는 Blueprint 모듈의 inline const 전역 가리킴.
-//  Lot 로컬 좌표를 절대 Point3로 옮긴 후 그대로 SectorPlan으로 흘러간다.
+//Lot이 깔 차량 spawn (sparse). plan은 VehicleBuilder가 만든 불변 footprint(shared_ptr).
+//  Lot 로컬 좌표를 절대 Point3(anchor)로 옮긴 후 그대로 SectorPlan으로 흘러간다.
 export struct CityVehicle
 {
     Point3 pos;
-    const Blueprint* bp = nullptr;
-    dir16 orientation = dir16::dir2;
+    std::shared_ptr<const VehiclePlan> plan;
 };
 
 //Prop 내부 ItemPocket에 채울 아이템 (sparse). pos는 prop이 깔린 절대 타일 좌표.

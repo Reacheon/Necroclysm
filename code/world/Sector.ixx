@@ -7,7 +7,7 @@ import worldGrid;
 import ProcGenWorker;
 import worldGen;
 import city;
-import Blueprint;
+import VehiclePlan;
 
 // ════════════════════════════════════════════════════════════════════════
 // Sector — 지역 절차생성 단위 (1920×1920 타일).
@@ -137,14 +137,13 @@ export struct SectorMonster
     int    entityCode = 0;
 };
 
-//차량 spawn sparse 채널 (모든 z). bp는 Blueprint inline const 전역.
-//  청크 로드 시 chunkZ 필터 후 createVehicleFromBlueprint — 다른 sparse spawn들
+//차량 spawn sparse 채널 (모든 z). plan은 VehicleBuilder가 만든 불변 footprint(shared_ptr).
+//  청크 로드 시 chunkZ 필터 후 createVehicleFromPlan — 다른 sparse spawn들
 //  다음 *마지막*에 호출되어 floor/wall/prop을 덮어쓰는 정책.
 export struct SectorVehicle
 {
     Point3 pos;
-    const Blueprint* bp = nullptr;
-    dir16 orientation = dir16::dir2;
+    std::shared_ptr<const VehiclePlan> plan;
 };
 
 //Prop 내부 ItemPocket 후처리 채널 (sparse, 모든 z). createProp 직후 그 좌표의

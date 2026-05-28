@@ -45,19 +45,19 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	//getEquipPtr()->addItemFromDex(itemID::katana);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::both;
 
-	getEquipPtr()->addItemFromDex(2);
+	getEquipPtr()->addItemFromDex(itemID::backpack);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	getEquipPtr()->addItemFromDex(290);
+	getEquipPtr()->addItemFromDex(itemID::fieldJacket);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	getEquipPtr()->addItemFromDex(105);
+	getEquipPtr()->addItemFromDex(itemID::shoes);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	getEquipPtr()->addItemFromDex(106);
+	getEquipPtr()->addItemFromDex(itemID::jeans);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
-	getEquipPtr()->addItemFromDex(107);
+	getEquipPtr()->addItemFromDex(itemID::blackTshirt);
 	getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 	//남자 시작 캐릭터 기본 속옷

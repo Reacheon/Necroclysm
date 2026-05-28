@@ -14,7 +14,8 @@ import ItemPocket;
 import ItemStack;
 import World;
 import Vehicle;
-import Blueprint;
+import VehiclePlan;
+import VehiclePrefab;
 import Prop;
 import Monster;
 import statusEffect;
@@ -38,18 +39,18 @@ export void startArea()
 
 
 	createItemStack({ 2, 1, 0 }, {
-{2, 1}, {0, 5}, {23, 1}, {24, 10}, {1, 4}, {0, 1},
-{3, 1}, {12, 1}, {13, 1}, {14, 1}, {15, 1}, {16, 1},
-{17, 1}, {18, 1}, {4, 1}, {5, 8}, {88, 1}, {89, 1000},
-{91, 1000},{itemID::gasoline, 1000}, {82, 1},{389,1}, {386,2}, {387,1},
-{itemID::tshirt, 1}, {itemID::bra, 1}, {itemID::panties, 1},{441,99}
+{ itemID::backpack, 1},  { itemID::pipeSpear, 1}, { itemID::policeShield, 10}, { itemID::ne555, 4}, { itemID::none, 1},
+{ itemID::tripleSword, 1}, { itemID::assaultRifle, 1}, { itemID::rifleMagazine, 1}, { itemID::rifleDrumMagazine, 1}, { itemID::nato556Round, 1}, { itemID::nato556Tracer, 1},
+{ itemID::nato556AP, 1}, { itemID::rifleBayonet, 1}, { itemID::revolver, 1}, { itemID::magnum357Round, 8}, { itemID::fermentedEthanol, 1}, { itemID::ethanol, 1000},
+{ itemID::benzene, 1000},{itemID::gasoline, 1000}, { itemID::distiller, 1},{ itemID::crusaderHelmet,1}, { itemID::longsword,2}, { itemID::kiteShield,1},
+{itemID::tshirt, 1}, {itemID::bra, 1}, {itemID::panties, 1},{ itemID::bread,99}
 		}
 	);
 
 	createItemStack({ 12, 17, 0 }, {
-		{42, 1},{43, 1},
-		{454, 1}, {455, 1}, {456, 1}, {60, 10}, {61, 4}, {62, 1},
-		{63, 1}, {64, 1}, {65, 1}, {66, 1}, {67, 1}
+		{ itemID::battery, 1},{ itemID::batteryPack, 1},
+		{ itemID::nipper, 1}, { itemID::plier, 1}, { itemID::multimeter, 1}, { itemID::electricSwitch, 10}, { itemID::fuseCartridge, 4}, { itemID::transistor, 1},
+		{ itemID::relay, 1}, { itemID::inductor, 1}, { itemID::capacitor, 1}, { itemID::supercapacitor, 1}, { itemID::resistor, 1}
 		}
 	);
 
@@ -58,23 +59,23 @@ export void startArea()
 
 	//의약품 상자
 	{
-		createItemStack({ 0, -19, 0 }, { { 452,1 } });
+		createItemStack({ 0, -19, 0 }, { { itemID::firstAidKit,1 } });
 		ItemPocket* aidKitInside = TileItemStack({ 0, -19, 0 })->getPocket()->itemInfo[0].pocketPtr.get();
-		aidKitInside->addItemFromDex({ { 442, 1 }, { 443, 1 }, { 446, 4 }, { 447, 10 }, { 449, 1 }, { 451, 20 } });
+		aidKitInside->addItemFromDex({ { itemID::smallTube, 1 }, { itemID::tube, 1 }, { itemID::splint, 4 }, { itemID::bandage, 10 }, { itemID::medicineBottle, 1 }, { itemID::adhesiveBandage, 20 } });
 		std::vector<ItemData>& targetItemInfo = aidKitInside->itemInfo;
 		for (int i = 0; i < targetItemInfo.size(); i++)
 		{
-			if (targetItemInfo[i].itemCode == 442)
+			if (targetItemInfo[i].itemCode == itemID::smallTube)
 			{
-				targetItemInfo[i].pocketPtr->addItemFromDex(444, 9);
+				targetItemInfo[i].pocketPtr->addItemFromDex(itemID::healingOintment, 9);
 			}
-			else if (targetItemInfo[i].itemCode == 443)
+			else if (targetItemInfo[i].itemCode == itemID::tube)
 			{
-				targetItemInfo[i].pocketPtr->addItemFromDex(445, 100);
+				targetItemInfo[i].pocketPtr->addItemFromDex(itemID::toothpaste, 100);
 			}
-			else if (targetItemInfo[i].itemCode == 449)
+			else if (targetItemInfo[i].itemCode == itemID::medicineBottle)
 			{
-				targetItemInfo[i].pocketPtr->addItemFromDex(450, 30);
+				targetItemInfo[i].pocketPtr->addItemFromDex(itemID::povidoneIodine, 30);
 			}
 		}
 	}
@@ -82,27 +83,27 @@ export void startArea()
 
 
 
-	createItemStack({ -5, 2, 0 }, { {373, 1},{475, 1},{476, 1},{477, 1},{478, 1} });//페트병
+	createItemStack({ -5, 2, 0 }, { { itemID::plasticBottle, 1},{ itemID::largePlasticBottle, 1},{ itemID::gasCan, 1},{ itemID::milkJug, 1},{ itemID::glassBottle, 1} });//페트병
 	
 
 	createItemStack({ 2, 8, 0 }, { {itemID::arrowQuiver,1} });//화살통
 	createItemStack({ 2, 9, 0 }, { {itemID::boltQuiver,1} });//볼트통
 
 	//활과 석궁
-	createItemStack({ 3, 8, 0 }, { {383,1} });
-	createItemStack({ 4, 8, 0 }, { {385,30} });
-	createItemStack({ 3, 9, 0 }, { {382,1} });
-	createItemStack({ 4, 9, 0 }, { {384,30} });
+	createItemStack({ 3, 8, 0 }, { { itemID::bow,1} });
+	createItemStack({ 4, 8, 0 }, { { itemID::arrow,30} });
+	createItemStack({ 3, 9, 0 }, { { itemID::crossbow,1} });
+	createItemStack({ 4, 9, 0 }, { { itemID::bolt,30} });
 
 	createMonster({ 8,8,0 }, 5);//허수아비
 
-	createItemStack({ 7, -4, 0 }, { {391,1} }); //벌목도끼
+	createItemStack({ 7, -4, 0 }, { { itemID::fellingAxe,1} }); //벌목도끼
 
-	createItemStack({ -5, 1, 0 }, { {394,1} }); //낚시대
+	createItemStack({ -5, 1, 0 }, { { itemID::fishingRod,1} }); //낚시대
 
 	createItemStack({ -3, -4, -1 }, { {itemID::pickaxe,1} });//곡괭이
-	createItemStack({ -2, -4, -1 }, { {393,1} });//광부헬멧
-	createItemStack({ -1, -4, -1 }, { {395,1} });//삽
+	createItemStack({ -2, -4, -1 }, { { itemID::minerHelmet,1} });//광부헬멧
+	createItemStack({ -1, -4, -1 }, { { itemID::shovel,1} });//삽
 
 
 
@@ -144,16 +145,16 @@ export void startArea()
 		{
 			for (int dy = 0; dy < 4; dy++)
 			{
-				setFloor({ -5 + dx, -5 + dy, 0 }, 292);
+				setFloor({ -5 + dx, -5 + dy, 0 }, itemID::tileFloor);
 			}
 		}
-		createProp({ 2, -1, 0 }, 297);//표지판
+		createProp({ 2, -1, 0 }, itemID::woodenSign);//표지판
 		//유리벽 설치
-		setWall({ 2,-4,0 }, 114);
-		setWall({ 2,-3,0 }, 114);
-		setWall({ 2,-2,0 }, 114);
-		setWall({ 4,-4,0 }, 114);
-		setWall({ 4,-3,0 }, 114);
+		setWall({ 2,-4,0 }, itemID::glassWall);
+		setWall({ 2,-3,0 }, itemID::glassWall);
+		setWall({ 2,-2,0 }, itemID::glassWall);
+		setWall({ 4,-4,0 }, itemID::glassWall);
+		setWall({ 4,-3,0 }, itemID::glassWall);
 		//얕은 물 타일(연못)
 		setFloor({ -3,0,0 }, itemID::shallowFreshWater);
 		setFloor({ -4,0,0 }, itemID::deepFreshWater);
@@ -193,85 +194,85 @@ export void startArea()
 		}
 
 		//오솔길
-		setFloor({ -3,-1,0 }, 293);
-		setFloor({ -2,-1,0 }, 293);
-		setFloor({ -2,0,0 }, 293);
-		setFloor({ -1,0,0 }, 293);
-		setFloor({ 0,0,0 }, 293);
-		setFloor({ 1,0,0 }, 293);
-		setFloor({ 2,0,0 }, 293);
-		setFloor({ 2,1,0 }, 293);
-		setFloor({ 3,1,0 }, 293);
-		setFloor({ 4,1,0 }, 293);
-		setFloor({ 4,2,0 }, 293);
-		for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, 293);
+		setFloor({ -3,-1,0 }, itemID::trail);
+		setFloor({ -2,-1,0 }, itemID::trail);
+		setFloor({ -2,0,0 }, itemID::trail);
+		setFloor({ -1,0,0 }, itemID::trail);
+		setFloor({ 0,0,0 }, itemID::trail);
+		setFloor({ 1,0,0 }, itemID::trail);
+		setFloor({ 2,0,0 }, itemID::trail);
+		setFloor({ 2,1,0 }, itemID::trail);
+		setFloor({ 3,1,0 }, itemID::trail);
+		setFloor({ 4,1,0 }, itemID::trail);
+		setFloor({ 4,2,0 }, itemID::trail);
+		for (int i = 0; i < 9; i++) setFloor({ 5 + i,2,0 }, itemID::trail);
 	}
 
-	createProp({ 10, -8, 0 }, 96);//냉장고 설치
+	createProp({ 10, -8, 0 }, itemID::refrigerator);//냉장고 설치
 	ItemPocket* refri = TileProp(10, -8, 0)->leadItem.pocketPtr.get();
-	refri->addItemFromDex({ { 4, 1 },{ 12, 1 },{ 410, 1 },{ 414, 1 },{ 415, 1 },{ 417, 1 } });
-	createProp({ 9, -8, 0 }, 427);//탄통 설치
-	TileProp(9, -8, 0)->leadItem.pocketPtr->addItemFromDex({ { 5,99},{ 15,99},{ 16,99},{ 17,99} ,{ 411,99},{ 412,99},{ 413,99},{ 416,99} ,{ 418,99 },{ 419,99 },{ 420,99 },{ 421,99 },{ 422,99 },{ 423,99 },{ 424,30 },{ 425,30 },{ 426,30 },{ 13,1 },{ 14,1 },{ 428,1 },{ 429,1 },{ 430,1 } });
+	refri->addItemFromDex({ { itemID::revolver, 1 },{ itemID::assaultRifle, 1 },{ itemID::shotgun, 1 },{ itemID::pistol, 1 },{ itemID::smg, 1 },{ itemID::sniperRifle, 1 } });
+	createProp({ 9, -8, 0 }, itemID::ammoBox);//탄통 설치
+	TileProp(9, -8, 0)->leadItem.pocketPtr->addItemFromDex({ { itemID::magnum357Round,99},{ itemID::nato556Round,99},{ itemID::nato556Tracer,99},{ itemID::nato556AP,99} ,{ itemID::slugRound,99},{ itemID::buckshot,99},{ itemID::dragonsBreath,99},{ itemID::parabellum9mm,99} ,{ itemID::magnum357Rubber,99 },{ itemID::magnum357Blank,99 },{ itemID::magnum357Shotshell,99 },{ itemID::magnum357AP,99 },{ itemID::magnum357HotLoad,99 },{ itemID::nato556Blank,99 },{ itemID::bmg50Ball,30 },{ itemID::bmg50Tracer,30 },{ itemID::bmg50AP,30 },{ itemID::rifleMagazine,1 },{ itemID::rifleDrumMagazine,1 },{ itemID::magazine9mm,1 },{ itemID::magazine9mmExtended,1 },{ itemID::sniperBmg50Magazine,1 } });
 
 	//나무벽 설치
 	//집 하단 5타일
-	setWall({ -1,-2,0 }, 375);
-	setWall({ -2,-2,0 }, 375);
+	setWall({ -1,-2,0 }, itemID::wasteContainerWall);
+	setWall({ -2,-2,0 }, itemID::wasteContainerWall);
 	createProp({ -3, -2, 0 }, itemID::woodenDoorH);//집 하단 벽 가운데 수직문
-	setWall({ -4,-2,0 }, 375);
-	setWall({ -5,-2,0 }, 375);
+	setWall({ -4,-2,0 }, itemID::wasteContainerWall);
+	setWall({ -5,-2,0 }, itemID::wasteContainerWall);
 	//집 우측 4타일
-	setWall({ -1,-3,0 }, 375);
-	setWall({ -1,-4,0 }, 114);
-	setWall({ -1,-5,0 }, 375);
-	setWall({ -1,-6,0 }, 375);
+	setWall({ -1,-3,0 }, itemID::wasteContainerWall);
+	setWall({ -1,-4,0 }, itemID::glassWall);
+	setWall({ -1,-5,0 }, itemID::wasteContainerWall);
+	setWall({ -1,-6,0 }, itemID::wasteContainerWall);
 	//집 좌측 4타일
-	setWall({ -5,-3,0 }, 375);
-	setWall({ -5,-4,0 }, 114);
-	setWall({ -5,-5,0 }, 375);
-	setWall({ -5,-6,0 }, 375);
+	setWall({ -5,-3,0 }, itemID::wasteContainerWall);
+	setWall({ -5,-4,0 }, itemID::glassWall);
+	setWall({ -5,-5,0 }, itemID::wasteContainerWall);
+	setWall({ -5,-6,0 }, itemID::wasteContainerWall);
 	//잡 상단 중앙 3타일
-	setWall({ -2,-6,0 }, 375);
-	setWall({ -3,-6,0 }, 375);
-	setWall({ -4,-6,0 }, 375);
+	setWall({ -2,-6,0 }, itemID::wasteContainerWall);
+	setWall({ -3,-6,0 }, itemID::wasteContainerWall);
+	setWall({ -4,-6,0 }, itemID::wasteContainerWall);
 
-	createProp({ -4, -5, 0 }, 295);//책장
-	createProp({ -2, -5, 0 }, 294);//침대
+	createProp({ -4, -5, 0 }, itemID::bookshelf);//책장
+	createProp({ -2, -5, 0 }, itemID::bed);//침대
 
-	createProp({ -4, -3, 0 }, 298);//상승계단
+	createProp({ -4, -3, 0 }, itemID::upwardStairs);//상승계단
 	for (int dx = -1; dx <= 1; dx++)
 	{
 		for (int dy = -1; dy <= 1; dy++)
 		{
-			setFloor({ -3 + dx, -4 + dy, 1 }, 292);
+			setFloor({ -3 + dx, -4 + dy, 1 }, itemID::tileFloor);
 		}
 	}
 
-	createProp({ -2, -3, 0 }, 299);//하강계단
+	createProp({ -2, -3, 0 }, itemID::downwardStairs);//하강계단
 
 
 	//철조망
 	for (int i = 0; i < 17; i++)//상단
 	{
-		setWall({ -5 + i, -9, 0 }, 376);
+		setWall({ -5 + i, -9, 0 }, itemID::wireFence);
 	}
 
 	for (int i = 0; i < 20; i++)//우측
 	{
 		if (-8 + i != 1 && -8 + i != 2 && -8 + i != 3)
 		{
-			setWall({ 11, -8 + i, 0 }, 376);
+			setWall({ 11, -8 + i, 0 }, itemID::wireFence);
 		}
 	}
 
 	for (int i = 0; i < 17; i++)//상단
 	{
-		setWall({ 11 - i, 12, 0 }, 376);
+		setWall({ 11 - i, 12, 0 }, itemID::wireFence);
 	}
 
 	//철조망 우측 입구 전통등 2개
-	createProp({ 12, 0, 0 }, 118);//볼라드등
-	createProp({ 12, 4, 0 }, 118);//볼라드등
+	createProp({ 12, 0, 0 }, itemID::bollardLight);//볼라드등
+	createProp({ 12, 4, 0 }, itemID::bollardLight);//볼라드등
 
 
 	//철조망 아래 선로
@@ -305,11 +306,11 @@ export void startArea()
 		{
 			for (int dy = -6; dy <= 20; dy++)
 			{
-				setWall({ dx, dy, -1 }, 397);
+				setWall({ dx, dy, -1 }, itemID::stoneWall);
 			}
 		}
 
-		createProp({ - 2, - 5, -1 }, 211);//전통등
+		createProp({ - 2, - 5, -1 }, itemID::traditionalLamp);//전통등
 		{
 			int cx = -1;
 			int cy = -1;
@@ -432,33 +433,33 @@ export void startArea()
 					{
 						if ((x == topLeftX || x == topLeftX + 4) || (y == topLeftY || y == topLeftY + 7))
 						{
-							if (x == topLeftX + 2 && y == topLeftY + 7)  myTrainPower->addPart(x, y, { 120 });
-							else if (y == topLeftY + 4)  myTrainPower->addPart(x, y, { 120 });
-							else if (y == topLeftY) myTrainPower->addPart(x, y, { 121 });
-							else myTrainPower->addPart(x, y, { 119 });
+							if (x == topLeftX + 2 && y == topLeftY + 7)  myTrainPower->addPart(x, y, { itemID::vehicleDoor });
+							else if (y == topLeftY + 4)  myTrainPower->addPart(x, y, { itemID::vehicleDoor });
+							else if (y == topLeftY) myTrainPower->addPart(x, y, { itemID::vehicleGlass });
+							else myTrainPower->addPart(x, y, { itemID::vehicleWall });
 						}
 						else if ((y == topLeftY + 2))
 						{
-							if (x == topLeftX + 2) myTrainPower->addPart(x, y, { 120 });
-							else myTrainPower->addPart(x, y, { 119 });
+							if (x == topLeftX + 2) myTrainPower->addPart(x, y, { itemID::vehicleDoor });
+							else myTrainPower->addPart(x, y, { itemID::vehicleWall });
 						}
 						else
 						{
-							myTrainPower->addPart(x, y, { 122 });
+							myTrainPower->addPart(x, y, { itemID::vehiclePassage });
 						}
 					}
 				}
 
-				myTrainPower->addPart(topLeftX + 2, topLeftY + 1, { 313 });
+				myTrainPower->addPart(topLeftX + 2, topLeftY + 1, { itemID::trainControl });
 
 
-				myTrainPower->addPart(topLeftX + 1, topLeftY + 3, { 123 });
-				myTrainPower->addPart(topLeftX + 1, topLeftY + 5, { 123 });
-				myTrainPower->addPart(topLeftX + 1, topLeftY + 6, { 123 });
+				myTrainPower->addPart(topLeftX + 1, topLeftY + 3, { itemID::vehicleSeat });
+				myTrainPower->addPart(topLeftX + 1, topLeftY + 5, { itemID::vehicleSeat });
+				myTrainPower->addPart(topLeftX + 1, topLeftY + 6, { itemID::vehicleSeat });
 
-				myTrainPower->addPart(topLeftX + 3, topLeftY + 3, { 123 });
-				myTrainPower->addPart(topLeftX + 3, topLeftY + 5, { 123 });
-				myTrainPower->addPart(topLeftX + 3, topLeftY + 6, { 123 });
+				myTrainPower->addPart(topLeftX + 3, topLeftY + 3, { itemID::vehicleSeat });
+				myTrainPower->addPart(topLeftX + 3, topLeftY + 5, { itemID::vehicleSeat });
+				myTrainPower->addPart(topLeftX + 3, topLeftY + 6, { itemID::vehicleSeat });
 			}
 
 			//지하철(화물칸) 설치
@@ -512,28 +513,28 @@ export void startArea()
 					{
 						if ((x == topLeftX || x == topLeftX + 4) || (y == topLeftY || y == topLeftY + 7))
 						{
-							if (x == topLeftX + 2)  myTrain->addPart(x, y, { 120 });
-							else if (y == topLeftY + 4)  myTrain->addPart(x, y, { 120 });
-							else myTrain->addPart(x, y, { 119 });
+							if (x == topLeftX + 2)  myTrain->addPart(x, y, { itemID::vehicleDoor });
+							else if (y == topLeftY + 4)  myTrain->addPart(x, y, { itemID::vehicleDoor });
+							else myTrain->addPart(x, y, { itemID::vehicleWall });
 						}
 						else
 						{
-							myTrain->addPart(x, y, { 122 });
+							myTrain->addPart(x, y, { itemID::vehiclePassage });
 						}
 					}
 				}
 
-				myTrain->addPart(topLeftX + 1, topLeftY + 1, { 123 });
-				myTrain->addPart(topLeftX + 1, topLeftY + 2, { 123 });
-				myTrain->addPart(topLeftX + 1, topLeftY + 3, { 123 });
-				myTrain->addPart(topLeftX + 1, topLeftY + 5, { 123 });
-				myTrain->addPart(topLeftX + 1, topLeftY + 6, { 123 });
+				myTrain->addPart(topLeftX + 1, topLeftY + 1, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 1, topLeftY + 2, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 1, topLeftY + 3, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 1, topLeftY + 5, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 1, topLeftY + 6, { itemID::vehicleSeat });
 
-				myTrain->addPart(topLeftX + 3, topLeftY + 1, { 123 });
-				myTrain->addPart(topLeftX + 3, topLeftY + 2, { 123 });
-				myTrain->addPart(topLeftX + 3, topLeftY + 3, { 123 });
-				myTrain->addPart(topLeftX + 3, topLeftY + 5, { 123 });
-				myTrain->addPart(topLeftX + 3, topLeftY + 6, { 123 });
+				myTrain->addPart(topLeftX + 3, topLeftY + 1, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 3, topLeftY + 2, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 3, topLeftY + 3, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 3, topLeftY + 5, { itemID::vehicleSeat });
+				myTrain->addPart(topLeftX + 3, topLeftY + 6, { itemID::vehicleSeat });
 			}
 			myTrainPower->rearTrain = myTrain;
 
@@ -633,9 +634,9 @@ export void startArea()
 	createProp({ -3, -10, 0 }, itemID::verticalPipeRB);//지상으로 나오는 파이프
 	createItemStack({ -4, -12, 0 },
 		{ {itemID::hoe,1},
-		{itemID::scythe,1},
-		{itemID::rice,20},
-		{itemID::wheat,20},
+		{ itemID::scythe,1},
+		{ itemID::rice,20},
+		{ itemID::wheat,20},
 		{ itemID::potato,20 },
 		{ itemID::orange,20 },
 		{ itemID::strawHat,1 },
@@ -742,26 +743,26 @@ export void startArea()
 	//for (int y = -7; y <= -3; y++) SNOW(14, y, 0);
 
 
-	createProp({ 1, -3, 0 }, 117);//나무 설치
-	createProp({ 3, -2, 0 }, 239);//나무 설치
-	createProp({ 5, -1, 0 }, 247);//나무 설치
-	createProp({ 0, -5, 0 }, 238);//나무 설치
-	createProp({ 7, 1, 0 }, 237);//나무 설치
-	createProp({ 4, -5, 0 }, 248);//나무 설치
-	createProp({ 9, -4, 0 }, 237);//나무 설치
-	createProp({ 10, -1, 0 }, 244);//사과나무 설치
-	createProp({ -2, 39, 0 }, 242);//야자나무 설치
-	createProp({ 0, -20, 0 }, 237);//나무 설치
-	createProp({ -4, 5, 0 }, 245);//사과나무 설치
-	createProp({ 3, 3, 0 }, 338);//고철 설치
-	createProp({ 4, 3, 0 }, 338);//고철 설치
-	createProp({ 5, 3, 0 }, 338);//고철 설치
-	createProp({ 4, 4, 0 }, 338);//고철 설치
-	createProp({ 10, 11, 0 }, 338);//고철 설치
-	createProp({ 10, 10, 0 }, 338);//고철 설치
-	createProp({ 10, 9, 0 }, 338);//고철 설치
-	createProp({ 9, 11, 0 }, 338);//고철 설치
-	createProp({ 9, 10, 0 }, 338);//고철 설치
+	createProp({ 1, -3, 0 }, itemID::spruceTree);//나무 설치
+	createProp({ 3, -2, 0 }, itemID::ginkgoTree);//나무 설치
+	createProp({ 5, -1, 0 }, itemID::lemonTree);//나무 설치
+	createProp({ 0, -5, 0 }, itemID::pineTree);//나무 설치
+	createProp({ 7, 1, 0 }, itemID::cherryTree);//나무 설치
+	createProp({ 4, -5, 0 }, itemID::peachTree);//나무 설치
+	createProp({ 9, -4, 0 }, itemID::cherryTree);//나무 설치
+	createProp({ 10, -1, 0 }, itemID::appleTree);//사과나무 설치
+	createProp({ -2, 39, 0 }, itemID::palmTree);//야자나무 설치
+	createProp({ 0, -20, 0 }, itemID::cherryTree);//나무 설치
+	createProp({ -4, 5, 0 }, itemID::orangeTree);//사과나무 설치
+	createProp({ 3, 3, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 4, 3, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 5, 3, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 4, 4, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 10, 11, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 10, 10, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 10, 9, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 9, 11, 0 }, itemID::scrapMetalPile);//고철 설치
+	createProp({ 9, 10, 0 }, itemID::scrapMetalPile);//고철 설치
 	//잔디
 
 	setFloor({ -2, 3, 0 }, itemID::grass);
@@ -772,36 +773,36 @@ export void startArea()
 	setFloor({ -1, 4, 0 }, itemID::grass);
 	setFloor({ 0, 4, 0 }, itemID::grass);
 	setFloor({ 1, 4, 0 }, itemID::grass);
-	createProp({ -2, 3, 0 }, 270);//꽃 설치
-	createProp({ -1, 3, 0 }, 265);//꽃 설치
-	createProp({ 0, 3, 0 }, 266);//꽃 설치
-	createProp({ 1, 3, 0 }, 267);//꽃 설치
-	createProp({ -2, 4, 0 }, 271);//꽃 설치
-	createProp({ -1, 4, 0 }, 268);//꽃 설치
-	createProp({ 0, 4, 0 }, 269);//꽃 설치
-	createProp({ 1, 4, 0 }, 270);//꽃 설치
-	createProp({ 6, -4, 0 }, 270);//꽃 설치
-	createProp({ 0, -1, 0 }, 211);//전통 등 설치
-	createProp({ 4, 0, 0 }, 211);//볼라드 등 설치
+	createProp({ -2, 3, 0 }, itemID::lily);//꽃 설치
+	createProp({ -1, 3, 0 }, itemID::chrysanthemum);//꽃 설치
+	createProp({ 0, 3, 0 }, itemID::tulip);//꽃 설치
+	createProp({ 1, 3, 0 }, itemID::forsythia);//꽃 설치
+	createProp({ -2, 4, 0 }, itemID::lavender);//꽃 설치
+	createProp({ -1, 4, 0 }, itemID::freesia);//꽃 설치
+	createProp({ 0, 4, 0 }, itemID::azalea);//꽃 설치
+	createProp({ 1, 4, 0 }, itemID::lily);//꽃 설치
+	createProp({ 6, -4, 0 }, itemID::lily);//꽃 설치
+	createProp({ 0, -1, 0 }, itemID::traditionalLamp);//전통 등 설치
+	createProp({ 4, 0, 0 }, itemID::traditionalLamp);//볼라드 등 설치
 
 	//울타리 설치
-	createProp({ -3, 2, 0 }, 206);
-	createProp({ -2, 2, 0 }, 206);
-	createProp({ -1, 2, 0 }, 206);
-	createProp({ 0, 2, 0 }, 206);
-	createProp({ 1, 2, 0 }, 206);
-	createProp({ 2, 2, 0 }, 206);
-	createProp({ 3, 2, 0 }, 206);
-	createProp({ -3, 3, 0 }, 206);
-	createProp({ -3, 4, 0 }, 206);
-	createProp({ 2, 3, 0 }, 206);
-	createProp({ 2, 4, 0 }, 206);
-	createProp({ -3, 5, 0 }, 206);
-	createProp({ -2, 5, 0 }, 206);
-	createProp({ -1, 5, 0 }, 206);
-	createProp({ 0, 5, 0 }, 206);
-	createProp({ 1, 5, 0 }, 206);
-	createProp({ 2, 5, 0 }, 206);
+	createProp({ -3, 2, 0 }, itemID::woodenFence);
+	createProp({ -2, 2, 0 }, itemID::woodenFence);
+	createProp({ -1, 2, 0 }, itemID::woodenFence);
+	createProp({ 0, 2, 0 }, itemID::woodenFence);
+	createProp({ 1, 2, 0 }, itemID::woodenFence);
+	createProp({ 2, 2, 0 }, itemID::woodenFence);
+	createProp({ 3, 2, 0 }, itemID::woodenFence);
+	createProp({ -3, 3, 0 }, itemID::woodenFence);
+	createProp({ -3, 4, 0 }, itemID::woodenFence);
+	createProp({ 2, 3, 0 }, itemID::woodenFence);
+	createProp({ 2, 4, 0 }, itemID::woodenFence);
+	createProp({ -3, 5, 0 }, itemID::woodenFence);
+	createProp({ -2, 5, 0 }, itemID::woodenFence);
+	createProp({ -1, 5, 0 }, itemID::woodenFence);
+	createProp({ 0, 5, 0 }, itemID::woodenFence);
+	createProp({ 1, 5, 0 }, itemID::woodenFence);
+	createProp({ 2, 5, 0 }, itemID::woodenFence);
 
 
 
@@ -820,7 +821,13 @@ export void startArea()
 
 	int vX = -9;
 	int vY = +3;
-	createVehicleFromBlueprint({ vX, vY, 0 }, &suvBlueprint, dir16::dir2);
+	//SUV — VehiclePrefab helper로 footprint를 작성해 spawn. startArea는 Lot이 아니라
+	//  bounds가 없으므로 무경계(-1,-1) VehicleBuilder.
+	{
+		VehicleBuilder suvBuilder(vX, vY, -1, -1, itemID::metalFrame, vehFlag::car, L"SUV");
+		buildSUV(suvBuilder, vX, vY);
+		createVehicleFromPlan({ vX, vY, 0 }, *suvBuilder.finish());
+	}
 
 
 
@@ -829,18 +836,18 @@ export void startArea()
 	myMoto->extendPart(vX + 6, vY + 4, itemID::metalFrame);
 	myMoto->extendPart(vX + 6, vY + 6, itemID::metalFrame);
 
-	myMoto->addPart(vX + 6, vY + 4, { 102,134 });
-	myMoto->addPart(vX + 6, vY + 5, 132);
-	myMoto->addPart(vX + 6, vY + 6, 102);
+	myMoto->addPart(vX + 6, vY + 4, { itemID::tire,itemID::motorcycleWindshield });
+	myMoto->addPart(vX + 6, vY + 5, itemID::bicycleSaddle);
+	myMoto->addPart(vX + 6, vY + 6, itemID::tire);
 
 	////////////////////자전거////////////////////////////////////////////
 	Vehicle* myBike = World::ins()->createVehicle(vX + 9, vY + 4, 0, itemID::metalFrame);
 	myBike->extendPart(vX + 9, vY + 3, itemID::metalFrame);
 	myBike->extendPart(vX + 9, vY + 5, itemID::metalFrame);
 
-	myBike->addPart(vX + 9, vY + 3, { 102,133 });
-	myBike->addPart(vX + 9, vY + 4, { 135, 132 });
-	myBike->addPart(vX + 9, vY + 5, { 102,136 });
+	myBike->addPart(vX + 9, vY + 3, { itemID::tire,itemID::bicycleHandlebar });
+	myBike->addPart(vX + 9, vY + 4, { itemID::bicyclePedal, itemID::bicycleSaddle });
+	myBike->addPart(vX + 9, vY + 5, { itemID::tire,itemID::shoppingBasket });
 
 
 	////////////////////////////////////////////////////////////////////////////
@@ -850,7 +857,7 @@ export void startArea()
 		Vehicle* myHeli = World::ins()->createVehicle(cx, cy, 0, itemID::metalFrame);
 		myHeli->name = L"헬기";
 		myHeli->vehType = vehFlag::heli;
-		myHeli->addPart(cx, cy, { 311 });
+		myHeli->addPart(cx, cy, { itemID::helicopterController });
 
 		myHeli->extendPart(cx, cy - 1, itemID::metalFrame);
 		myHeli->extendPart(cx, cy + 1, itemID::metalFrame);
@@ -869,52 +876,52 @@ export void startArea()
 		myHeli->extendPart(cx - 1, cy + 1, itemID::metalFrame);
 		myHeli->extendPart(cx - 1, cy + 2, itemID::metalFrame);
 
-		myHeli->addPart(cx + 1, cy - 1, { 121 });
-		myHeli->addPart(cx, cy - 1, { 121 });
-		myHeli->addPart(cx - 1, cy - 1, { 121 });
+		myHeli->addPart(cx + 1, cy - 1, { itemID::vehicleGlass });
+		myHeli->addPart(cx, cy - 1, { itemID::vehicleGlass });
+		myHeli->addPart(cx - 1, cy - 1, { itemID::vehicleGlass });
 
-		myHeli->addPart(cx + 1, cy, { 120 });
-		myHeli->addPart(cx, cy, { 122,123, 128 });
-		myHeli->addPart(cx - 1, cy, { 120 });
+		myHeli->addPart(cx + 1, cy, { itemID::vehicleDoor });
+		myHeli->addPart(cx, cy, { itemID::vehiclePassage,itemID::vehicleSeat, itemID::vehicleRoof });
+		myHeli->addPart(cx - 1, cy, { itemID::vehicleDoor });
 
-		myHeli->addPart(cx + 1, cy + 1, { 119 });
-		myHeli->addPart(cx, cy + 1, { 122, 128, 314 });
-		myHeli->addPart(cx - 1, cy + 1, { 119 });
+		myHeli->addPart(cx + 1, cy + 1, { itemID::vehicleWall });
+		myHeli->addPart(cx, cy + 1, { itemID::vehiclePassage, itemID::vehicleRoof, itemID::helicopterRotor });
+		myHeli->addPart(cx - 1, cy + 1, { itemID::vehicleWall });
 
-		myHeli->addPart(cx + 1, cy + 2, { 119 });
-		myHeli->addPart(cx, cy + 2, { 119 });
-		myHeli->addPart(cx - 1, cy + 2, { 119 });
+		myHeli->addPart(cx + 1, cy + 2, { itemID::vehicleWall });
+		myHeli->addPart(cx, cy + 2, { itemID::vehicleWall });
+		myHeli->addPart(cx - 1, cy + 2, { itemID::vehicleWall });
 
-		myHeli->addPart(cx, cy + 3, { 119 });
-		myHeli->addPart(cx, cy + 4, { 119 });
-		myHeli->addPart(cx, cy + 5, { 119, 315 });
+		myHeli->addPart(cx, cy + 3, { itemID::vehicleWall });
+		myHeli->addPart(cx, cy + 4, { itemID::vehicleWall });
+		myHeli->addPart(cx, cy + 5, { itemID::vehicleWall, itemID::tailRotor });
 	}
 
 	//수레 3종
-	Vehicle* cart1 = World::ins()->createVehicle(10, 5, 0, 378);
+	Vehicle* cart1 = World::ins()->createVehicle(10, 5, 0, itemID::woodenCart);
 	cart1->vehType = vehFlag::car;
 
-	Vehicle* cart2 = World::ins()->createVehicle(8, 5, 0, 379);
+	Vehicle* cart2 = World::ins()->createVehicle(8, 5, 0, itemID::foldingWagon);
 	cart2->vehType = vehFlag::car;
 
-	Vehicle* cart3 = World::ins()->createVehicle(6, 5, 0, 137);
+	Vehicle* cart3 = World::ins()->createVehicle(6, 5, 0, itemID::shoppingCart);
 	cart3->vehType = vehFlag::car;
 
-	Vehicle* cart4 = World::ins()->createVehicle(7, -5, 0, 378);
+	Vehicle* cart4 = World::ins()->createVehicle(7, -5, 0, itemID::woodenCart);
 	cart4->vehType = vehFlag::car;
 
 	//광차
-	Vehicle* minecart1 = World::ins()->createVehicle(3, 15, 0, 405);
+	Vehicle* minecart1 = World::ins()->createVehicle(3, 15, 0, itemID::minecart);
 	minecart1->vehType = vehFlag::minecart;
 	minecart1->addPart(3, 15, { itemID::minecartController });
 	minecart1->bodyDir = dir16::dir0;
 	minecart1->isPowerCart = true;
 
-	Vehicle* minecart2 = World::ins()->createVehicle(2, 15, 0, 405);
+	Vehicle* minecart2 = World::ins()->createVehicle(2, 15, 0, itemID::minecart);
 	minecart2->vehType = vehFlag::minecart;
 	minecart2->bodyDir = dir16::dir0;
 
-	Vehicle* minecart3 = World::ins()->createVehicle(1, 15, 0, 405);
+	Vehicle* minecart3 = World::ins()->createVehicle(1, 15, 0, itemID::minecart);
 	minecart3->vehType = vehFlag::minecart;
 	minecart3->bodyDir = dir16::dir0;
 
@@ -1284,7 +1291,7 @@ export void startArea()
 		{
 			for (int dy = 0; dy < 4; dy++)
 			{
-				setFloor({ -5 + dx, -5 + dy, 0 }, 292);
+				setFloor({ -5 + dx, -5 + dy, 0 }, itemID::tileFloor);
 			}
 		}
 
@@ -1318,18 +1325,18 @@ export void startArea()
 		}
 
 		// 오솔길 유지
-		setFloor({ -3, -1, 0 }, 293);
-		setFloor({ -2, -1, 0 }, 293);
-		setFloor({ -2, 0, 0 }, 293);
-		setFloor({ -1, 0, 0 }, 293);
-		setFloor({ 0, 0, 0 }, 293);
-		setFloor({ 1, 0, 0 }, 293);
-		setFloor({ 2, 0, 0 }, 293);
-		setFloor({ 2, 1, 0 }, 293);
-		setFloor({ 3, 1, 0 }, 293);
-		setFloor({ 4, 1, 0 }, 293);
-		setFloor({ 4, 2, 0 }, 293);
-		for (int i = 0; i < 9; i++) setFloor({ 5 + i, 2, 0 }, 293);
+		setFloor({ -3, -1, 0 }, itemID::trail);
+		setFloor({ -2, -1, 0 }, itemID::trail);
+		setFloor({ -2, 0, 0 }, itemID::trail);
+		setFloor({ -1, 0, 0 }, itemID::trail);
+		setFloor({ 0, 0, 0 }, itemID::trail);
+		setFloor({ 1, 0, 0 }, itemID::trail);
+		setFloor({ 2, 0, 0 }, itemID::trail);
+		setFloor({ 2, 1, 0 }, itemID::trail);
+		setFloor({ 3, 1, 0 }, itemID::trail);
+		setFloor({ 4, 1, 0 }, itemID::trail);
+		setFloor({ 4, 2, 0 }, itemID::trail);
+		for (int i = 0; i < 9; i++) setFloor({ 5 + i, 2, 0 }, itemID::trail);
 	}
 
 	//상단 연못 및 농업펌프

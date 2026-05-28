@@ -25,6 +25,7 @@ import paletteLoader;
 import worldSession;
 import Teleport;
 import Lot;
+import VehiclePlan;
 
 export void debugConsole()
 {
@@ -919,7 +920,7 @@ export void debugConsole()
 			createMonster({ originX + m.x, originY + m.y, chunkZ + m.z }, m.entityCode);
 		//vehicle: createChunk 파이프라인의 마지막 단계와 동일 — floor/wall/prop/spawn 다음.
 		for (const auto& v : r.vehicles)
-			createVehicleFromBlueprint({ originX + v.x, originY + v.y, chunkZ + v.z }, v.bp, v.orientation);
+			createVehicleFromPlan({ originX + v.x, originY + v.y, chunkZ + v.z }, *v.plan);
 
 		//후처리: prop 내부 ItemPocket 채움 — World_createChunk의 동기화 동등 경로.
 		//   createProp 인스턴스 후 같은 좌표의 TileProp(pos)->leadItem.pocketPtr에 아이템 주입.

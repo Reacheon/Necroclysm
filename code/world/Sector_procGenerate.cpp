@@ -465,7 +465,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
                 const int dx = v.pos.x - sectorOriginTileX;
                 const int dy = v.pos.y - sectorOriginTileY;
                 if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
-                plan.vehicles.push_back(SectorVehicle{ .pos = v.pos, .bp = v.bp, .orientation = v.orientation });
+                plan.vehicles.push_back(SectorVehicle{ .pos = v.pos, .plan = v.plan });
             }
             //ItemPocket 후처리 채널 — pos XY만 섹터 클립.
             for (const CityPropContents& c : cp.propContents)

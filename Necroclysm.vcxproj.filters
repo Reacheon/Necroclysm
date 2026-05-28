@@ -324,16 +324,10 @@
     <ClCompile Include="code\Vehicle.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
-    <ClCompile Include="code\Vehicle\Blueprint-base.ixx">
+    <ClCompile Include="code\Vehicle\VehiclePlan.ixx">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
-    <ClCompile Include="code\Vehicle\Blueprint-SUV.ixx">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Vehicle\Blueprint-bicycle.ixx">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Vehicle\Blueprint.ixx">
+    <ClCompile Include="code\Vehicle\VehiclePrefab.ixx">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
     <ClCompile Include="code\Flame.ixx">

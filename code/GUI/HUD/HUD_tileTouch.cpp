@@ -157,7 +157,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							Prop* upProp = TileProp(touchX, touchY, PlayerZ());
 							if (upProp == nullptr)
 							{
-								createProp({ PlayerX(), PlayerY(), PlayerZ() }, 299);//하강계단
+								createProp({ PlayerX(), PlayerY(), PlayerZ() }, itemID::downwardStairs);//하강계단
 							}
 						}
 					}
@@ -179,7 +179,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							Prop* downProp = TileProp(touchX, touchY, PlayerZ());
 							if (downProp == nullptr)
 							{
-								createProp({ PlayerX(), PlayerY(), PlayerZ() }, 298);//상승계단
+								createProp({ PlayerX(), PlayerY(), PlayerZ() }, itemID::upwardStairs);//상승계단
 							}
 						}
 					}

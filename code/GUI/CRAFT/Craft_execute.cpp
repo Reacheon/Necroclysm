@@ -126,7 +126,7 @@ Corouter Craft::executeCraft()
 
 						buildLocation = { targetX,targetY,PlayerZ() };
 
-						createProp(buildLocation, 453);
+						createProp(buildLocation, itemID::craftingItem);
 
 						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].propWIPSprIndex;
 
@@ -220,7 +220,7 @@ Corouter Craft::executeCraft()
 
 						buildLocation = { targetX,targetY,PlayerZ() };
 
-						createProp(buildLocation, 453);
+						createProp(buildLocation, itemID::craftingItem);
 
 						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].propWIPSprIndex;
 

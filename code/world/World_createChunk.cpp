@@ -12,6 +12,7 @@ import Prop;
 import Vehicle;
 import ItemPocket;
 import ItemData;
+import VehiclePlan;
 
 // ════════════════════════════════════════════════════════════════════════
 // World::createChunk — 청크 1개 생성 + (Phase 2 진입 후) Sector 데이터 *블릿*.
@@ -118,7 +119,8 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
         }
 
         //── 2c.1) sparse propContents — prop 인스턴스화 직후 leadItem.pocketPtr 채움.
-        //   prop이 없거나 pocketPtr 없으면 silent skip (lot 작성자가 setProp 안 한 경우 등).
+        //   prop 미존재는 createProp가 거부했을 수 있어 관용 스킵. pocket 없는 prop(=컨테이너
+        //   아님)에 채우려는 건 lot 작성자 버그라 errorBox (빌더는 itemDex를 몰라 못 잡는 케이스).
         for (const SectorPropContents& c : sp.propContents)
         {
             if (c.pos.z != chunkZ) continue;
@@ -127,7 +129,11 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
             if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
             if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
             Prop* prop = TileProp(c.pos);
-            if (prop == nullptr || prop->leadItem.pocketPtr == nullptr) continue;
+            if (prop == nullptr) continue;   // createProp가 거부했을 수 있음 (벽 충돌 등) - 관용 스킵
+            errorBox(prop->leadItem.pocketPtr == nullptr,
+                L"[propContents] 컨테이너 아닌 prop에 내용물 지정 (pocket 없음): (x=" +
+                std::to_wstring(c.pos.x) + L", y=" + std::to_wstring(c.pos.y) +
+                L", z=" + std::to_wstring(c.pos.z) + L")");
             for (const auto& [code, count] : c.items)
             {
                 prop->leadItem.pocketPtr->addItemFromDex(code, count);
@@ -156,7 +162,7 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
 
         //── 2e) 차량 spawn — *반드시 마지막*. 차량 footprint가 floor/wall/prop/itemStack/
         //   monster 위치를 덮어쓰는 정책. anchor가 이 청크 안일 때만 spawn하고, 인접 청크로
-        //   뻗는 footprint는 createVehicleFromBlueprint 내부에서 사전 ensure 처리.
+        //   뻗는 footprint는 createVehicleFromPlan 내부에서 사전 ensure 처리.
         for (const SectorVehicle& v : sp.vehicles)
         {
             if (v.pos.z != chunkZ) continue;
@@ -164,7 +170,7 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
             const int localY = v.pos.y - chunkOriginTileY;
             if (localX < 0 || localX >= CHUNK_SIZE_X) continue;
             if (localY < 0 || localY >= CHUNK_SIZE_Y) continue;
-            createVehicleFromBlueprint(v.pos, v.bp, v.orientation);
+            createVehicleFromPlan(v.pos, *v.plan);
         }
 
         return;

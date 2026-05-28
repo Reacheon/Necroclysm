@@ -15,7 +15,7 @@ import Monster;
 import ItemStack;
 import Entity;
 import ItemPocket;
-import Blueprint;
+import VehiclePlan;
 
 export class World
 {
@@ -329,10 +329,10 @@ export void destroyProp(Point3 inputCoor);
 export void createProp(Point3 inputCoor, int inputItemCode);
 export void createFlame(Point3 inputCoor, flameFlag inputFlag);
 //차량 spawn 헬퍼 — Lot→createChunk 파이프라인의 마지막 단계에서 호출.
-//  World::createVehicle로 anchor에 leadItem만 깐 빈 차량 만든 후 bp->build로 부품 트리
-//  채우고, orientation으로 rotatePartInfo. 회전 후 partInfo가 가리키는 타일들의
-//  TileVehicle 포인터를 채워준다 (rotatePartInfo가 안 건드림).
-export void createVehicleFromBlueprint(Point3 anchor, const Blueprint* bp, dir16 orientation);
+//  anchor에 leadItem만 깐 빈 차량을 만든 뒤 plan.ops를 순서대로 replay한다
+//  (extendPart/addPart/addCargo). bodyDir은 plan에 기록된 facing 그대로 둔다.
+//  extendPart가 각 부품 타일의 TileVehicle도 함께 채우므로 별도 fixup 불필요.
+export void createVehicleFromPlan(Point3 anchor, const VehiclePlan& plan);
 
 export void DestroyWall(int x, int y, int z);
 

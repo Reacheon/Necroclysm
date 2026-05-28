@@ -179,10 +179,10 @@ bool ItemStack::runAnimation(bool shutdown)
 		{
 			for (int i = 0; i < storage->itemInfo.size(); i++)//만약 탄두가 있으면 그걸 납으로 바꿈
 			{
-				if (storage->itemInfo[i].itemCode == 25)
+				if (storage->itemInfo[i].itemCode == itemID::leadFragment)
 				{
 					storage->eraseItemInfo(i);
-					storage->addItemFromDex(11, 1);
+					storage->addItemFromDex(itemID::lead, 1);
 				}
 			}
 

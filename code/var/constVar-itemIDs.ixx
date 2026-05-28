@@ -358,4 +358,146 @@ export namespace itemID
     constexpr int yellowAsphaltArrowD  = 594;  // ↓
     constexpr int yellowAsphaltArrowLR = 595;  // ↘
 
+    ///////////////////////매직넘버 치환용 추가 상수 (itemDex.tsv 기준)//////////////////////
+    //  startArea/Lot/HUD/Craft 등에서 raw int로 쓰이던 itemCode를 명명. 코드값은 itemDex.tsv 권위.
+
+    //── 의류·소품 ──
+    constexpr int backpack = 2;            //배낭
+    constexpr int lead = 11;               //납
+    constexpr int leadFragment = 25;       //납 조각
+    constexpr int shoes = 105;             //신발
+    constexpr int jeans = 106;             //청바지
+    constexpr int blackTshirt = 107;       //검은색 티셔츠
+    constexpr int fieldJacket = 290;       //야상자켓
+    constexpr int hanbokSet = 390;         //한복세트
+
+    //── 가구·건물·계단 ──
+    constexpr int refrigerator = 96;       //냉장고
+    constexpr int woodenFence = 206;       //나무 울타리
+    constexpr int traditionalLamp = 211;   //전통등
+    constexpr int tileFloor = 292;         //타일 바닥
+    constexpr int trail = 293;             //오솔길
+    constexpr int bed = 294;               //침대
+    constexpr int bookshelf = 295;         //책장
+    constexpr int woodenSign = 297;        //나무 표지판
+    constexpr int upwardStairs = 298;      //올라가는 계단
+    constexpr int downwardStairs = 299;    //내려가는 계단
+    constexpr int wasteContainerWall = 375;//폐컨테이너벽
+    constexpr int scrapMetalPile = 338;    //고철더미
+
+    //── 꽃 (조경) ──
+    constexpr int chrysanthemum = 265;     //국화
+    constexpr int tulip = 266;             //튤립
+    constexpr int forsythia = 267;         //개나리
+    constexpr int freesia = 268;           //프리지아
+    constexpr int azalea = 269;            //진달래
+    constexpr int lily = 270;              //백합
+    constexpr int lavender = 271;          //라벤더
+
+    //── 차량·열차·헬기 부품 ──
+    constexpr int motorcycleWindshield = 134; //바이크 윈드실드
+    constexpr int shoppingCart = 137;      //쇼핑카트
+    constexpr int trainControl = 313;      //열차 조종장치
+    constexpr int helicopterRotor = 314;   //헬기 로터
+    constexpr int tailRotor = 315;         //테일 로터
+    constexpr int woodenCart = 378;        //나무 수레
+    constexpr int foldingWagon = 379;      //접이식 왜건
+
+    //── 무기·도구 ──
+    constexpr int crossbow = 382;          //석궁
+    constexpr int bow = 383;               //활
+    constexpr int bolt = 384;              //볼트
+    constexpr int arrow = 385;             //화살
+    constexpr int fishingRod = 394;        //낚시대
+    constexpr int shovel = 395;            //삽
+
+    //── 용기 ──
+    constexpr int plasticBottle = 373;     //페트병
+    constexpr int largePlasticBottle = 475;//큰 페트병
+    constexpr int gasCan = 476;            //연료통
+    constexpr int milkJug = 477;           //우유통
+    constexpr int glassBottle = 478;       //유리병
+
+    //── 탄약·의료·기타 ──
+    constexpr int ammoBox = 427;           //탄통
+    constexpr int firstAidKit = 452;       //구급상자
+    constexpr int healingOintment = 444;   //재생 연고
+    constexpr int toothpaste = 445;        //치약
+    constexpr int povidoneIodine = 450;    //포비돈 요오드
+    constexpr int craftingItem = 453;      //조합 중인 아이템
+
+    ///////////////////////시작 컨테이너/디버그 적재용 추가 상수 (itemDex.tsv 기준)//////////////////////
+    //  startArea의 구급상자/냉장고/탄통/디버그 적재 목록에서 raw int로 쓰이던 itemCode 명명.
+
+    //── 무기 ──
+    constexpr int tripleSword = 3;         //삼중검
+    constexpr int revolver = 4;            //리볼버
+    constexpr int rifleBayonet = 18;       //라이플용 대검
+    constexpr int pipeSpear = 23;          //파이프창
+    constexpr int policeShield = 24;       //경찰방패
+    constexpr int longsword = 386;         //롱소드
+    constexpr int kiteShield = 387;        //카이트 실드
+    constexpr int crusaderHelmet = 389;    //십자군 헬멧
+    constexpr int shotgun = 410;           //샷건
+    constexpr int pistol = 414;            //권총
+    constexpr int smg = 415;               //SMG
+    constexpr int sniperRifle = 417;       //스나이퍼 라이플
+
+    //── 탄약 ──
+    constexpr int magnum357Round = 5;          //.357 매그넘 탄
+    constexpr int nato556Round = 15;           //5.56 NATO 탄
+    constexpr int nato556Tracer = 16;          //5.56 NATO 예광탄
+    constexpr int nato556AP = 17;              //5.56 NATO 철갑탄
+    constexpr int slugRound = 411;             //슬러그탄
+    constexpr int buckshot = 412;              //벅샷
+    constexpr int dragonsBreath = 413;         //드래곤브레스
+    constexpr int parabellum9mm = 416;         //9mm 파라벨룸
+    constexpr int magnum357Rubber = 418;       //.357 매그넘 고무탄
+    constexpr int magnum357Blank = 419;        //.357 매그넘 공포탄
+    constexpr int magnum357Shotshell = 420;    //.357 매그넘 샷셀
+    constexpr int magnum357AP = 421;           //.357 매그넘 철갑탄
+    constexpr int magnum357HotLoad = 422;      //.357 매그넘 핫로드
+    constexpr int nato556Blank = 423;          //5.56 NATO 공포탄
+    constexpr int bmg50Ball = 424;             //.50 BMG 보통탄
+    constexpr int bmg50Tracer = 425;           //.50 BMG 예광탄
+    constexpr int bmg50AP = 426;               //.50 BMG 철갑탄
+
+    //── 탄창 ──
+    constexpr int rifleMagazine = 13;          //라이플 탄창
+    constexpr int rifleDrumMagazine = 14;      //라이플 드럼 탄창
+    constexpr int magazine9mm = 428;           //9mm 탄창
+    constexpr int magazine9mmExtended = 429;   //9mm 대용량 탄창
+    constexpr int sniperBmg50Magazine = 430;   //스나이퍼 .50 BMG 탄창
+
+    //── 의료 ──
+    constexpr int smallTube = 442;         //소형 튜브
+    constexpr int tube = 443;              //튜브
+    constexpr int splint = 446;            //부목
+    constexpr int bandage = 447;           //붕대
+    constexpr int medicineBottle = 449;    //약병
+    constexpr int adhesiveBandage = 451;   //반창고
+
+    //── 전자부품 (미설치 원자재) ──
+    constexpr int ne555 = 1;               //NE555
+    constexpr int electricSwitch = 60;     //스위치 (switch는 예약어 → electricSwitch)
+    constexpr int fuseCartridge = 61;      //퓨즈 카트리지
+    constexpr int transistor = 62;         //트랜지스터
+    constexpr int relay = 63;              //릴레이
+    constexpr int inductor = 64;           //인덕터
+    constexpr int capacitor = 65;          //커패시터
+    constexpr int supercapacitor = 66;     //슈퍼 커패시터
+    constexpr int resistor = 67;           //저항
+
+    //── 화학·도구 ──
+    constexpr int distiller = 82;          //증류기
+    constexpr int fermentedEthanol = 88;   //발효 에탄올
+    constexpr int ethanol = 89;            //에탄올
+    constexpr int benzene = 91;            //벤젠
+    constexpr int nipper = 454;            //니퍼
+    constexpr int plier = 455;             //플라이어
+    constexpr int multimeter = 456;        //멀티미터
+
+    //── 식량 ──
+    constexpr int bread = 441;             //빵
+
 };

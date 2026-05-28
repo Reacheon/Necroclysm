@@ -4,7 +4,7 @@ export module Lot:base;
 import std;
 import util;
 import constVar;
-import Blueprint;
+export import VehiclePlan; //차량 관련 헬퍼는 해당 모듈 파일 참조
 
 //한 z층 평면. 벡터는 y*w + x 인덱싱, itemID::none = 미설정.
 export struct LotPlane
@@ -31,15 +31,14 @@ export struct LotSpawnMonster
     int entityCode = 0;
 };
 
-//bp는 Blueprint 모듈의 inline const 전역을 가리킴 — lifetime 안전.
-//orientation은 build() 후 spawn 헬퍼가 rotatePartInfo로 적용.
+//plan은 VehicleBuilder.finish()가 만든 불변 footprint. createVehicleFromPlan가 replay.
+//  shared_ptr — CityPlan/SectorPlan 캐시 복사 시 깊은 복사 회피, const라 공유 안전.
 export struct LotSpawnVehicle
 {
     int x = 0;
     int y = 0;
     int z = 0;
-    const Blueprint* bp = nullptr;
-    dir16 orientation = dir16::dir2;
+    std::shared_ptr<const VehiclePlan> plan;
 };
 
 //setProp으로 깐 prop의 leadItem.pocketPtr에 채울 아이템 목록.
@@ -71,7 +70,10 @@ export class LotBuilder
     std::map<int, LotPlane> planes_;
     std::vector<LotSpawnItemStack> itemStacks_;
     std::vector<LotSpawnMonster>   monsters_;
-    std::vector<LotSpawnVehicle>   vehicles_;
+    //차량은 addVehicle가 VehicleBuilder&를 반환해 호출자가 부품을 채우므로, take()까지
+    //  살아있는 빌더를 deque로 보관(재할당 시 참조 무효 방지). x/y/z는 spawn anchor.
+    struct PendingVehicle { int x; int y; int z; VehicleBuilder builder; };
+    std::deque<PendingVehicle>     vehBuilders_;
     std::vector<LotSpawnPropContents>   propContents_;
 
     LotPlane& planeAt(int z)
@@ -147,31 +149,36 @@ public:
         monsters_.push_back({ x, y, z, entityCode });
     }
 
-    //차량 spawn 등록. bp는 Blueprint 모듈의 inline const 전역 가리켜야 함.
-    //  footprint(차량이 부품으로 점유하는 추가 칸)는 *검증하지 않음* — Lot 단계에선
-    //  blueprint별 부품 트리 미상이고, createChunk 시점에 덮어쓰기 정책으로 처리.
-    //  중복 검증은 anchor (x,y,z) 기준만.
-    void addVehicle(int x, int y, int z, const Blueprint* bp, dir16 orientation = dir16::dir2)
+    //차량 spawn 등록. anchor (x,y,z) + 코어(leadItem/type/name)로 VehicleBuilder를 만들어
+    //  참조를 반환 — 호출자가 extendPart/addPart/addCargo/setDir로 footprint를 채운다
+    //  (VehiclePrefab helper 또는 inline). 각 부품은 VehicleBuilder가 Lot 할당 범위(w_,h_)에
+    //  대해 bounds 검증. anchor (x,y,z) 중복만 여기서 검사. 반환 참조는 deque라 take()까지 유효.
+    VehicleBuilder& addVehicle(int x, int y, int z, int leadItem, vehFlag type, std::wstring name)
     {
         checkBounds(x, y, L"addVehicle");
-        errorBox(bp == nullptr, L"LotBuilder::addVehicle bp는 nullptr 불가");
-        for (const auto& v : vehicles_)
+        for (const auto& pv : vehBuilders_)
         {
-            errorBox(v.x == x && v.y == y && v.z == z,
+            errorBox(pv.x == x && pv.y == y && pv.z == z,
                 L"LotBuilder::addVehicle 중복 spawn: (x=" + std::to_wstring(x) +
                 L", y=" + std::to_wstring(y) + L", z=" + std::to_wstring(z) + L")");
         }
-        vehicles_.push_back({ x, y, z, bp, orientation });
+        vehBuilders_.push_back({ x, y, z, VehicleBuilder(x, y, w_, h_, leadItem, type, std::move(name)) });
+        return vehBuilders_.back().builder;
     }
 
     //setProp으로 깐 prop의 내부 ItemPocket(냉장고 안 등)에 아이템 채움.
     //  같은 (x,y,z) 중복 호출 금지 — append 의도면 한 호출에 items 묶어서 전달.
-    //  setProp 사전호출은 강제하지 않음 — 런타임에 prop이 없으면 silent skip.
+    //  setProp 선행 필수 — 같은 (x,y,z)에 prop이 없으면 작성 시점에 errorBox로 잡는다.
+    //  (단, prop이 컨테이너가 아닌 경우(pocket 없음)는 빌더가 itemDex를 모르므로 못 잡고,
+    //   런타임 인스턴스화 시점에서 검출한다 — World_createChunk.cpp 2c.1 참조.)
     //  startArea.ixx가 createProp 직후 TileProp(...)->leadItem.pocketPtr 직접 채우는
     //  우회 패턴을 Lot 데이터로 표현하기 위한 채널.
     void addPropContents(int x, int y, int z, std::vector<std::pair<int, int>> items)
     {
         checkBounds(x, y, L"addPropContents");
+        errorBox(planeAt(z).prop[y * w_ + x] == itemID::none,
+            L"LotBuilder::addPropContents: 같은 좌표에 prop이 없음 - setProp 선행 필요: (x=" +
+            std::to_wstring(x) + L", y=" + std::to_wstring(y) + L", z=" + std::to_wstring(z) + L")");
         for (const auto& c : propContents_)
         {
             errorBox(c.x == x && c.y == y && c.z == z,
@@ -183,8 +190,14 @@ public:
 
     LotResult take()
     {
+        std::vector<LotSpawnVehicle> vehicles;
+        vehicles.reserve(vehBuilders_.size());
+        for (auto& pv : vehBuilders_)
+        {
+            vehicles.push_back({ pv.x, pv.y, pv.z, pv.builder.finish() });
+        }
         return { w_, h_, std::move(planes_), std::move(itemStacks_), std::move(monsters_),
-                 std::move(vehicles_), std::move(propContents_) };
+                 std::move(vehicles), std::move(propContents_) };
     }
 };
 

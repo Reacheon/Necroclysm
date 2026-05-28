@@ -28,7 +28,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 			entityInfo.horn = humanCustom::horn::coverRed;
 
 			int i = 0;
-			getEquipPtr()->addItemFromDex(390);
+			getEquipPtr()->addItemFromDex(itemID::hanbokSet);
 			getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
 

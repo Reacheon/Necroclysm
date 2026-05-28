@@ -34,11 +34,6 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 {
     CityPlan plan{ id };
 
-    plan.tiles.push_back(CityTile{
-        .pos = Point3{ 20322, 32012, 1 },
-        .floor = itemID::blackAsphalt,
-        });
-
     prt(L"[CityPlan] buildCityPlan id=%u seed=%llu tiles=%zu\n",
         static_cast<unsigned>(id), static_cast<std::uint64_t>(seed),
         plan.tiles.size());
@@ -760,12 +755,11 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                         .entityCode = m.entityCode,
                     });
                 }
-                for (const auto& v : r.vehicles)
+                for (auto& v : r.vehicles)
                 {
                     plan.vehicles.push_back(CityVehicle{
-                        .pos         = Point3{ originX + v.x, originY + v.y, baseZ + v.z },
-                        .bp          = v.bp,
-                        .orientation = v.orientation,
+                        .pos  = Point3{ originX + v.x, originY + v.y, baseZ + v.z },
+                        .plan = std::move(v.plan),
                     });
                 }
                 //prop 인스턴스화 후 후처리로 ItemPocket 채울 데이터 — XY만 절대화.
