@@ -291,7 +291,7 @@ public:
 			else drawBtn(189, confirmBtn);
 			
 
-			if (itemDex[rotatedItemCode].dirChangeItemCode != 0)
+			if (itemDex[rotatedItemCode].rotatedCCW90ItemCode != 0)
 			{
 				drawBtn(187, rotateBtn);
 			}
@@ -373,7 +373,7 @@ public:
 									}
 								}
 
-								if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
+								if (itemDex[rotatedItemCode].rotatedCCW90ItemCode == 0)
 								{
 									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
 									cameraFix = true;
@@ -425,7 +425,7 @@ public:
 								}
 							}
 
-							if (itemDex[rotatedItemCode].dirChangeItemCode == 0)
+							if (itemDex[rotatedItemCode].rotatedCCW90ItemCode == 0)
 							{
 								coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
 								cameraFix = true;
@@ -457,9 +457,9 @@ public:
 					}
 					else if (checkCursor(&rotateBtn))
 					{
-						if (itemDex[rotatedItemCode].dirChangeItemCode != 0)
+						if (itemDex[rotatedItemCode].rotatedCCW90ItemCode != 0)
 						{
-							rotatedItemCode = itemDex[rotatedItemCode].dirChangeItemCode;
+							rotatedItemCode = itemDex[rotatedItemCode].rotatedCCW90ItemCode;
 						}
 					}
 					else if (checkCursor(&cancelBtn))

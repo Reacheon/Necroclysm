@@ -139,7 +139,7 @@ namespace csvItem
     constexpr int leftWieldPriority = 111;
     constexpr int rightWieldSpr = 112;
     constexpr int rightWieldPriority = 113;
-    constexpr int dirChangeItemCode = 114;
+    constexpr int rotatedCCW90ItemCode = 114;
     constexpr int lightRange = 115;
     constexpr int lightIntensity = 116;
     constexpr int lightR = 117;
@@ -1039,8 +1039,8 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::tileConnectGroup:
                         itemDex[tgtIndex].tileConnectGroup = wtoi(strFragment.c_str());
                         break;
-                    case csvItem::dirChangeItemCode:
-                        itemDex[tgtIndex].dirChangeItemCode = wtoi(strFragment.c_str());
+                    case csvItem::rotatedCCW90ItemCode:
+                        itemDex[tgtIndex].rotatedCCW90ItemCode = wtoi(strFragment.c_str());
                         break;
 
                     case csvItem::lightRange:

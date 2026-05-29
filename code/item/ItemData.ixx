@@ -32,7 +32,7 @@ export struct ItemData : public ItemDataBase
     unsigned __int8 extraSprIndexSingle = 0; //벽의 연결로 추가되는 sprIndex(일단은 차량만 구현)
     unsigned __int8 extraSprIndex16 = 0; //16단위로 움직이는 추가 sprIndex
 
-    unsigned __int16 dirChangeItemCode = 0;
+    unsigned __int16 rotatedCCW90ItemCode = 0;
     dir16 propDir16 = dir16::dir0;
 
     std::unique_ptr<Light> lightPtr;
