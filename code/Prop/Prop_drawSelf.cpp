@@ -341,15 +341,25 @@ void Prop::drawSelf()
         }
     }
     else if (iCode == itemID::andGateR
+        || iCode == itemID::andGateU
         || iCode == itemID::andGateL
+        || iCode == itemID::andGateD
         || iCode == itemID::orGateR
+        || iCode == itemID::orGateU
         || iCode == itemID::orGateL
+        || iCode == itemID::orGateD
         || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateU
         || iCode == itemID::xorGateL
+        || iCode == itemID::xorGateD
         || iCode == itemID::notGateR
+        || iCode == itemID::notGateU
         || iCode == itemID::notGateL
+        || iCode == itemID::notGateD
         || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchU
         || iCode == itemID::srLatchL
+        || iCode == itemID::srLatchD
         )
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
@@ -360,12 +370,10 @@ void Prop::drawSelf()
             else return;
         }
     }
-    else if (iCode == itemID::delayR || iCode == itemID::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayU || iCode == itemID::delayL || iCode == itemID::delayD)
     {
-        if (delayMaxStack == 0) sprIndex = 3089;
-        else sprIndex = 3089 + delayMaxStack;
-
-        if (iCode == itemID::delayL) sprIndex += 16;
+        //sprIndex는 이미 방향별 propSprIndex(스트립 시작)로 초기화됨 + delay 스택 프레임
+        sprIndex += delayMaxStack;
 
         if (leadItem.checkFlag(itemFlag::HIDE_WIRE))
         {
@@ -410,11 +418,13 @@ void Prop::drawSelf()
         if (isChargeFlowing())  sprIndex += 1;
     }
 
-    if (iCode == itemID::powerBankR || iCode == itemID::powerBankL)
+    if (iCode == itemID::powerBankR || iCode == itemID::powerBankT || iCode == itemID::powerBankL || iCode == itemID::powerBankB)
     {
         bool nowCharging = false;
         if (iCode == itemID::powerBankR && chargeFlux[dir16::left] > 0) nowCharging = true;
+        else if (iCode == itemID::powerBankT && chargeFlux[dir16::down] > 0) nowCharging = true;
         else if (iCode == itemID::powerBankL && chargeFlux[dir16::right] > 0) nowCharging = true;
+        else if (iCode == itemID::powerBankB && chargeFlux[dir16::up] > 0) nowCharging = true;
 
         double ratio = leadItem.powerStorage / static_cast<double>(leadItem.powerStorageMax);
 
@@ -471,59 +481,36 @@ void Prop::drawSelf()
         if (getInletCharge() > 0) sprIndex += 1;
     }
 
-    if (iCode == itemID::fluidTank)
-    {
-        bool rConnected = false;
-        bool lConnected = false;
-
-        Prop* rProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
-        Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
-
-        if (rProp != nullptr)
-        {
-            if (rProp->leadItem.checkFlag(itemFlag::PIPE) || rProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT))
-            {
-                rConnected = true;
-            }
-        }
-
-        if (lProp != nullptr)
-        {
-            if (lProp->leadItem.checkFlag(itemFlag::PIPE) || lProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT))
-            {
-                lConnected = true;
-            }
-        }
-
-        if (rConnected && lConnected) sprIndex += 3;
-        else if (rConnected) sprIndex += 1;
-        else if (lConnected) sprIndex += 2;
-    }
 
 
+    //엘보/취수배관은 자신의 평면 방향 이웃이 연결되면 sprIndex+1 (엘보는 below/above 무관하게 평면 방향으로 묶음)
     if (iCode == itemID::intakePipeR
-        || iCode == itemID::verticalPipeRB
-        || iCode == itemID::verticalPipeRA)
+        || iCode == itemID::verticalElbowRB
+        || iCode == itemID::verticalElbowRA)
     {
         Prop* nextProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
-        if(nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE)||nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT))) 
+        if(nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE)||nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_LEFT)))
             sprIndex += 1;
     }
     else if (iCode == itemID::intakePipeL
-        || iCode == itemID::verticalPipeLB
-        || iCode == itemID::verticalPipeLA)
+        || iCode == itemID::verticalElbowLB
+        || iCode == itemID::verticalElbowLA)
     {
         Prop* nextProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_RIGHT)))
             sprIndex += 1;
     }
-    else if (iCode == itemID::intakePipeU)
+    else if (iCode == itemID::intakePipeU
+        || iCode == itemID::verticalElbowUB
+        || iCode == itemID::verticalElbowUA)
     {
         Prop* nextProp = TileProp(getGridX(), getGridY() - 1, getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_DOWN)))
             sprIndex += 1;
     }
-    else if (iCode == itemID::intakePipeD)
+    else if (iCode == itemID::intakePipeD
+        || iCode == itemID::verticalElbowDB
+        || iCode == itemID::verticalElbowDA)
     {
         Prop* nextProp = TileProp(getGridX(), getGridY() + 1, getGridZ());
         if (nextProp && (nextProp->leadItem.checkFlag(itemFlag::PIPE) || nextProp->leadItem.checkFlag(itemFlag::PIPE_CNCT_UP)))
@@ -533,9 +520,7 @@ void Prop::drawSelf()
     if (iCode == itemID::intakePipeR
         || iCode == itemID::intakePipeU
         || iCode == itemID::intakePipeL
-        || iCode == itemID::intakePipeD
-        && (iCode != itemID::verticalPipeLA && iCode != itemID::verticalPipeLB
-            && iCode != itemID::verticalPipeRA && iCode != itemID::verticalPipeRB))
+        || iCode == itemID::intakePipeD)
     {
         int floorItemIndex = TileFloor(getGridX(), getGridY(), getGridZ());
         if(itemDex[floorItemIndex].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemIndex].checkFlag(itemFlag::WATER_DEEP))
@@ -678,10 +663,10 @@ void Prop::drawSelf()
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
     }
 
-    if (iCode == itemID::verticalPipeLA 
-        || iCode == itemID::verticalPipeLB
-        || iCode == itemID::verticalPipeRA 
-        || iCode == itemID::verticalPipeRB)
+    if (iCode == itemID::verticalElbowRB || iCode == itemID::verticalElbowUB
+        || iCode == itemID::verticalElbowLB || iCode == itemID::verticalElbowDB
+        || iCode == itemID::verticalElbowRA || iCode == itemID::verticalElbowUA
+        || iCode == itemID::verticalElbowLA || iCode == itemID::verticalElbowDA)
     {
         static Uint32 jetLastUpdateTime = 0;
         static int jetAnimFrame = 0;
@@ -696,11 +681,27 @@ void Prop::drawSelf()
 
         if (jetFluidDir == dir16::right)
         {
-            drawSpriteCenter(spr::propset, 3296 + (jetAnimFrame % 4), drawX + zoomScale*2, drawY);
+            drawSpriteCenter(spr::propset, 3296 + (jetAnimFrame % 4), drawX + zoomScale * 2, drawY);
+        }
+        else if (jetFluidDir == dir16::up)
+        {
+            drawSpriteCenter(spr::propset, 3300 + (jetAnimFrame % 3), drawX, drawY - zoomScale * 2);
+
+            // verticalElbowUA만 예외: 물줄기가 배관 몸체 위로 솟구쳐 배관을 가리므로, 배관 스프라이트를 물줄기 위에 다시 그림
+            if (iCode == itemID::verticalElbowUA)
+            {
+                SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
+                drawSpriteCenter(spr::propset, sprIndex, drawX, drawY);
+                SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
+            }
         }
         else if (jetFluidDir == dir16::left)
         {
             drawSpriteCenter(spr::propset, 3304 + (jetAnimFrame % 4), drawX - zoomScale * 2, drawY);
+        }
+        else if (jetFluidDir == dir16::down)
+        {
+            drawSpriteCenter(spr::propset, 3308 + (jetAnimFrame % 3), drawX, drawY + zoomScale * 2);
         }
 
         SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);

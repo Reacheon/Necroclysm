@@ -279,7 +279,7 @@ export void startArea()
 
 	createProp({ -2, 15, 0 }, itemID::railBR);
 	for (int i = 0; i < 11; i++)  createProp({ -1 + i, 15, 0 }, itemID::railRL);
-	createProp({ 10, 15, 0 }, itemID::railSwitchWS);
+	createProp({ 10, 15, 0 }, itemID::railSwitchRTurnLEnter);
 	for (int i = 0; i < 7; i++)  createProp({ 10, 16 + i, 0 }, itemID::railTB);
 	createProp({ 10, 23, 0 }, itemID::railTL);
 	for (int i = 0; i < 6; i++)  createProp({ 9 - i, 23, 0 }, itemID::railRL);
@@ -631,7 +631,7 @@ export void startArea()
 
 
 
-	createProp({ -3, -10, 0 }, itemID::verticalPipeRB);//지상으로 나오는 파이프
+	createProp({ -3, -10, 0 }, itemID::verticalElbowRB);//지상으로 나오는 파이프
 	createItemStack({ -4, -12, 0 },
 		{ {itemID::hoe,1},
 		{ itemID::scythe,1},

@@ -282,7 +282,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 					}
 				}
-				else if (tgtProp->leadItem.itemCode == itemID::delayR || tgtProp->leadItem.itemCode == itemID::delayL)
+				else if (tgtProp->leadItem.itemCode == itemID::delayR || tgtProp->leadItem.itemCode == itemID::delayU || tgtProp->leadItem.itemCode == itemID::delayL || tgtProp->leadItem.itemCode == itemID::delayD)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniToPlayerTurn(PlayerPtr, aniFlag::changePropDelay);

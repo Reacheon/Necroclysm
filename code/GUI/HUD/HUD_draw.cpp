@@ -1814,7 +1814,7 @@ void HUD::drawCircuitInfo()
 				firstUnit = L"kJ/turn";
 
 				secondString = L"Stored:";
-				if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankL)
+				if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankT || tgtProp->leadItem.itemCode == itemID::powerBankL || tgtProp->leadItem.itemCode == itemID::powerBankB)
 				{
 					secondNumber.clear();
 					double ratio = tgtProp->leadItem.powerStorage / static_cast<double>(tgtProp->leadItem.powerStorageMax);
@@ -1904,7 +1904,7 @@ void HUD::drawCircuitInfo()
 			setFontSize(22);
 			std::wstring title = tgtProp->leadItem.name;
 
-			if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankL)
+			if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankT || tgtProp->leadItem.itemCode == itemID::powerBankL || tgtProp->leadItem.itemCode == itemID::powerBankB)
 			{
 				int xOffset = -17;
 				drawTextCenter(title, window.w / 2 + xOffset, 14);
@@ -1944,7 +1944,9 @@ void HUD::drawCircuitInfo()
 				}
 
 				if ((tgtProp->leadItem.itemCode == itemID::powerBankR && tgtProp->chargeFlux[dir16::left] > 0)
-					|| tgtProp->leadItem.itemCode == itemID::powerBankL && tgtProp->chargeFlux[dir16::right] > 0)
+					|| (tgtProp->leadItem.itemCode == itemID::powerBankT && tgtProp->chargeFlux[dir16::down] > 0)
+					|| (tgtProp->leadItem.itemCode == itemID::powerBankL && tgtProp->chargeFlux[dir16::right] > 0)
+					|| (tgtProp->leadItem.itemCode == itemID::powerBankB && tgtProp->chargeFlux[dir16::up] > 0))
 				{
 					drawSpriteCenter(spr::icon16, 103, gaugePivotX + 22, gaugePivotY + 10);
 				}

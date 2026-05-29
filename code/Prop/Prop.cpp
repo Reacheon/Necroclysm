@@ -363,28 +363,40 @@ void Prop::propTurnOn()
         || iCode == itemID::transistorU
         || iCode == itemID::transistorD
         || iCode == itemID::andGateR
+        || iCode == itemID::andGateU
         || iCode == itemID::andGateL
+        || iCode == itemID::andGateD
         || iCode == itemID::orGateR
+        || iCode == itemID::orGateU
         || iCode == itemID::orGateL
+        || iCode == itemID::orGateD
         || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateU
         || iCode == itemID::xorGateL
+        || iCode == itemID::xorGateD
         || iCode == itemID::notGateR
+        || iCode == itemID::notGateU
         || iCode == itemID::notGateL
+        || iCode == itemID::notGateD
         || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchU
         || iCode == itemID::srLatchL
+        || iCode == itemID::srLatchD
         )
     {
         //현재 위치 추가
         nextCircuitStartQueue.push(currentCoord);
         initChargeBFS(nextCircuitStartQueue);
     }
-    else if (iCode == itemID::delayR || iCode == itemID::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayU || iCode == itemID::delayL || iCode == itemID::delayD)
     {
         //현재 위치 추가
         nextCircuitStartQueue.push(currentCoord);
         initChargeBFS(nextCircuitStartQueue);
         if (iCode == itemID::delayR) leadItem.gndUsePowerLeft = 0;
+        else if (iCode == itemID::delayU) leadItem.gndUsePowerDown = 0;
         else if (iCode == itemID::delayL) leadItem.gndUsePowerRight = 0;
+        else if (iCode == itemID::delayD) leadItem.gndUsePowerUp = 0;
     }
 }
 
@@ -409,19 +421,29 @@ void Prop::propTurnOff()
         || iCode == itemID::transistorU
         || iCode == itemID::transistorD
         || iCode == itemID::andGateR
+        || iCode == itemID::andGateU
         || iCode == itemID::andGateL
+        || iCode == itemID::andGateD
         || iCode == itemID::orGateR
+        || iCode == itemID::orGateU
         || iCode == itemID::orGateL
+        || iCode == itemID::orGateD
         || iCode == itemID::xorGateR
+        || iCode == itemID::xorGateU
         || iCode == itemID::xorGateL
+        || iCode == itemID::xorGateD
         || iCode == itemID::notGateR
+        || iCode == itemID::notGateU
         || iCode == itemID::notGateL
+        || iCode == itemID::notGateD
         || iCode == itemID::srLatchR
+        || iCode == itemID::srLatchU
         || iCode == itemID::srLatchL
+        || iCode == itemID::srLatchD
         )
     {
 
-        
+
         //접지가 아닌 메인라인 핀들 추가
         if (TileProp(rightCoord) != nullptr && leadItem.checkFlag(itemFlag::CABLE_CNCT_RIGHT) && leadItem.gndUsePowerRight == 0)
         {
@@ -456,11 +478,13 @@ void Prop::propTurnOff()
         initChargeBFS(nextCircuitStartQueue);
 
     }
-    else if (iCode == itemID::delayR || iCode == itemID::delayL)
+    else if (iCode == itemID::delayR || iCode == itemID::delayU || iCode == itemID::delayL || iCode == itemID::delayD)
     {
         //꺼질 때는 재계산 로직 필요없음 (신호선=전력입력)
         if (iCode == itemID::delayR) leadItem.gndUsePowerLeft = 1;
+        else if (iCode == itemID::delayU) leadItem.gndUsePowerDown = 1;
         else if (iCode == itemID::delayL) leadItem.gndUsePowerRight = 1;
-        
+        else if (iCode == itemID::delayD) leadItem.gndUsePowerUp = 1;
+
     }
 }

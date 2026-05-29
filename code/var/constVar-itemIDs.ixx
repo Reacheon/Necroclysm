@@ -22,14 +22,15 @@ export namespace itemID
     constexpr int water = 71;
 
 
-    constexpr int railSwitchEN = 326;
-    constexpr int railSwitchES = 327;
-    constexpr int railSwitchNW = 328;
-    constexpr int railSwitchNE = 329;
-    constexpr int railSwitchWN = 330;
-    constexpr int railSwitchWS = 331;
-    constexpr int railSwitchSW = 332;
-    constexpr int railSwitchSE = 333;
+    //철도 분기기 : {R/L}Turn=분기방향(우/좌), {R/U/L/D}Enter=진입방향. dc는 진입방향 R->U->L->D (CCW)
+    constexpr int railSwitchRTurnREnter = 326; //우회전, 진입 우
+    constexpr int railSwitchRTurnUEnter = 327; //우회전, 진입 상
+    constexpr int railSwitchRTurnLEnter = 328; //우회전, 진입 좌
+    constexpr int railSwitchRTurnDEnter = 329; //우회전, 진입 하
+    constexpr int railSwitchLTurnREnter = 330; //좌회전, 진입 우
+    constexpr int railSwitchLTurnUEnter = 331; //좌회전, 진입 상
+    constexpr int railSwitchLTurnLEnter = 332; //좌회전, 진입 좌
+    constexpr int railSwitchLTurnDEnter = 333; //좌회전, 진입 하
 
     constexpr int wideRailHTop = 399;
     constexpr int wideRailHMid = 400;
@@ -82,10 +83,15 @@ export namespace itemID
     constexpr int solarGeneratorL = 469;
     constexpr int solarGeneratorB = 470;
 
-    constexpr int steamGenerator = 471;
+    constexpr int steamGeneratorR = 197;
+    constexpr int steamGeneratorT = 198;
+    constexpr int steamGeneratorL = 199;
+    constexpr int steamGeneratorB = 200;
 
-    constexpr int powerBankR = 473;
-    constexpr int powerBankL = 474;
+    constexpr int powerBankR = 216;
+    constexpr int powerBankT = 217;
+    constexpr int powerBankL = 218;
+    constexpr int powerBankB = 219;
 
     constexpr int copperCable = 480;
     constexpr int silverCable = 482;
@@ -134,23 +140,35 @@ export namespace itemID
     constexpr int relayL = 167;
     constexpr int relayD = 168;
 
-    constexpr int andGateR = 488;
-    constexpr int andGateL = 489;
+    constexpr int andGateR = 607;
+    constexpr int andGateU = 608;
+    constexpr int andGateL = 609;
+    constexpr int andGateD = 610;
 
-    constexpr int orGateR = 490;
-    constexpr int orGateL = 491;
+    constexpr int orGateR = 611;
+    constexpr int orGateU = 612;
+    constexpr int orGateL = 613;
+    constexpr int orGateD = 614;
 
-    constexpr int xorGateR = 492;
-    constexpr int xorGateL = 493;
+    constexpr int xorGateR = 615;
+    constexpr int xorGateU = 616;
+    constexpr int xorGateL = 617;
+    constexpr int xorGateD = 618;
 
-    constexpr int notGateR = 494;
-    constexpr int notGateL = 495;
+    constexpr int notGateR = 619;
+    constexpr int notGateU = 620;
+    constexpr int notGateL = 621;
+    constexpr int notGateD = 622;
 
     constexpr int srLatchR = 496;
-    constexpr int srLatchL = 497;
+    constexpr int srLatchU = 497;
+    constexpr int srLatchL = 498;
+    constexpr int srLatchD = 499;
 
-    constexpr int delayR = 498;
-    constexpr int delayL = 499;
+    constexpr int delayR = 471;
+    constexpr int delayU = 472;
+    constexpr int delayL = 473;
+    constexpr int delayD = 474;
 
     constexpr int diodeR = 501;
     constexpr int diodeU = 502;
@@ -187,10 +205,16 @@ export namespace itemID
     constexpr int intakePipeD = 186;
 
     constexpr int verticalPipe = 187;
-    constexpr int verticalPipeRB = 188;
-    constexpr int verticalPipeLB = 189;
-    constexpr int verticalPipeRA = 190;
-    constexpr int verticalPipeLA = 191;
+    //아랫층(below) 연결 엘보 : 평면 방향 R/U/L/D
+    constexpr int verticalElbowRB = 188;
+    constexpr int verticalElbowUB = 189;
+    constexpr int verticalElbowLB = 190;
+    constexpr int verticalElbowDB = 191;
+    //윗층(above) 연결 엘보 : 평면 방향 R/U/L/D
+    constexpr int verticalElbowRA = 192;
+    constexpr int verticalElbowUA = 193;
+    constexpr int verticalElbowLA = 194;
+    constexpr int verticalElbowDA = 195;
 
     constexpr int woodenDoorH = 213; //수직일자통로(y축방향 통로)를 막는 수평으로 펼쳐진 나무문
     constexpr int woodenDoorV = 214; //수평일자통로(x축방향 통로)를 막는 수직으로 펼쳐진 나무문
