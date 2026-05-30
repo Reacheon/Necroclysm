@@ -10,6 +10,7 @@ import readItemDex;
 import readEntityDex;
 import SkillRegistry;
 import GodRegistry;
+import Lot;          //validateRotationChains (디버그 빌드 회전 체인 점검)
 
 export void dataLoader()
 {
@@ -19,6 +20,11 @@ export void dataLoader()
 	//아이템 데이터 로드
 	std::wstring itemPath = L"language/" + option::language + L"/itemDex.tsv";
 	readItemDex(itemPath.c_str());
+
+#ifndef NDEBUG
+	//디버그 빌드 전용 — itemDex 로드 직후 회전 체인 무결성 1회 점검.
+	validateRotationChains();
+#endif
 
 	//엔티티 데이터 로드
 	std::wstring entityPath = L"language/" + option::language + L"/entityDex.tsv";

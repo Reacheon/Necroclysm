@@ -885,6 +885,9 @@
     <ClCompile Include="code\Lot\Lot-base.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
+    <ClCompile Include="code\Lot\lot-rotate.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
+    </ClCompile>
     <ClCompile Include="code\Lot\kinds\Lot-Sample.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>

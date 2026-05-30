@@ -891,7 +891,15 @@ export void debugConsole()
 			if (allLoaded == false) break;
 		}
 
-		LotResult r = lot->generate(0);   //고정 seed (테스트 재현성)
+		prt(L"회전을 입력해주세요 (0=none, 1=ccw90, 2=ccw180, 3=ccw270).\n");
+		int rotSel = 0;
+		std::cin >> rotSel;
+		lotRot rot = lotRot::none;
+		if      (rotSel == 1) rot = lotRot::ccw90;
+		else if (rotSel == 2) rot = lotRot::ccw180;
+		else if (rotSel == 3) rot = lotRot::ccw270;
+
+		LotResult r = generateRotated(*lot, 0, rot);   //고정 seed (재현성) + CCW 회전
 
 		const int originX = chunkX * CHUNK_SIZE_X;
 		const int originY = chunkY * CHUNK_SIZE_Y;

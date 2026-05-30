@@ -291,7 +291,7 @@ public:
 			else drawBtn(189, confirmBtn);
 			
 
-			if (itemDex[rotatedItemCode].rotatedCCW90ItemCode != 0)
+			if (isCraftRotatable(rotatedItemCode))
 			{
 				drawBtn(187, rotateBtn);
 			}
@@ -357,13 +357,12 @@ public:
 						{
 							if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 							{
+								//pipe 특수: 물 위면 취수파이프로 시작(회전 사이클 진입), 땅이면 즉시 설치.
 								if (rotatedItemCode == itemID::pipe)
 								{
-									int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
+									const int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
 									if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
-									{
-                                        rotatedItemCode = itemID::intakePipeR;
-									}
+										rotatedItemCode = itemID::intakePipeR;
 									else
 									{
 										coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
@@ -373,18 +372,12 @@ public:
 									}
 								}
 
-								if (itemDex[rotatedItemCode].rotatedCCW90ItemCode == 0)
+								if (!isCraftRotatable(rotatedItemCode))
 								{
 									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
 									cameraFix = true;
 									delete this;
 									return;
-								}
-
-								if (rotatedItemCode == itemID::pipe)
-								{
-									bool isFluidTile = false;
-									int floorItemCode = TileFloor(throwingX, throwingY, throwingZ);
 								}
 
 								targetSelect = true;
@@ -409,13 +402,12 @@ public:
 
 						if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 						{
+							//pipe 특수: 물 위면 취수파이프로 시작(회전 사이클 진입), 땅이면 즉시 설치.
 							if (rotatedItemCode == itemID::pipe)
 							{
-								int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
+								const int floorItemCode = TileFloor(throwingX, throwingY, PlayerZ());
 								if (itemDex[floorItemCode].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[floorItemCode].checkFlag(itemFlag::WATER_DEEP))
-								{
 									rotatedItemCode = itemID::intakePipeR;
-								}
 								else
 								{
 									coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
@@ -425,7 +417,7 @@ public:
 								}
 							}
 
-							if (itemDex[rotatedItemCode].rotatedCCW90ItemCode == 0)
+							if (!isCraftRotatable(rotatedItemCode))
 							{
 								coAnswer = std::to_wstring(throwingX) + L"," + std::to_wstring(throwingY) + L"," + std::to_wstring(rotatedItemCode);
 								cameraFix = true;
@@ -457,10 +449,7 @@ public:
 					}
 					else if (checkCursor(&rotateBtn))
 					{
-						if (itemDex[rotatedItemCode].rotatedCCW90ItemCode != 0)
-						{
-							rotatedItemCode = itemDex[rotatedItemCode].rotatedCCW90ItemCode;
-						}
+						rotatedItemCode = craftRotateNext(rotatedItemCode);
 					}
 					else if (checkCursor(&cancelBtn))
 					{
@@ -475,5 +464,44 @@ public:
 	void step()
 	{
 		tabType = tabFlag::back;
+	}
+
+private:
+	//크래프트 회전 버튼용 *런타임* 사이클 — TSV의 rotatedCCW90ItemCode(분리된 기하 4-사이클)와는 별개로
+	//  제작 편의를 위해 그룹을 이어붙인 확장 사이클을 만든다.
+	//  · 취수 파이프 5-사이클: intakePipeR→U→L→D→pipe→R (물 위에 pipe 설치 시 취수파이프로 시작,
+	//    회전을 계속 누르면 일반 pipe로도 돌아가 물 위를 건너는 파이프도 만들 수 있다)
+	//  · 수직 파이프 9-사이클: verticalPipe→위엘보(RA→UA→LA→DA)→아래엘보(RB→UB→LB→DB)→verticalPipe
+	//  그 외 아이템은 TSV 체인을 그대로 따른다(논리게이트 등 기존 회전 유지).
+	//  TSV는 분리 유지 → LOT 자동회전/검증기는 깨끗한 4-사이클을 보고, 크래프트만 확장 사이클을 본다.
+	static int craftRotateNext(int code)
+	{
+		switch (code)
+		{
+		case itemID::intakePipeR: return itemID::intakePipeU;
+		case itemID::intakePipeU: return itemID::intakePipeL;
+		case itemID::intakePipeL: return itemID::intakePipeD;
+		case itemID::intakePipeD: return itemID::pipe;
+		case itemID::pipe:        return itemID::intakePipeR;
+
+		case itemID::verticalPipe:    return itemID::verticalElbowRA;
+		case itemID::verticalElbowRA: return itemID::verticalElbowUA;
+		case itemID::verticalElbowUA: return itemID::verticalElbowLA;
+		case itemID::verticalElbowLA: return itemID::verticalElbowDA;
+		case itemID::verticalElbowDA: return itemID::verticalElbowRB;
+		case itemID::verticalElbowRB: return itemID::verticalElbowUB;
+		case itemID::verticalElbowUB: return itemID::verticalElbowLB;
+		case itemID::verticalElbowLB: return itemID::verticalElbowDB;
+		case itemID::verticalElbowDB: return itemID::verticalPipe;
+
+		default: return itemDex[code].rotatedCCW90ItemCode;
+		}
+	}
+
+	//현재 코드가 크래프트 회전 버튼으로 다른 코드로 전환될 수 있는가(사이클 진입 가능 여부).
+	static bool isCraftRotatable(int code)
+	{
+		const int next = craftRotateNext(code);
+		return next != 0 && next != code;
 	}
 };
