@@ -179,6 +179,7 @@
     <ClCompile Include="code\Lot\kinds\Lot-Bridge.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-Sample.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-School.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-ConvenienceStore.ixx" />
     <ClCompile Include="code\Lot\Lot.ixx" />
     <ClCompile Include="code\Lot\Lot-base.ixx" />
     <ClCompile Include="code\Lot\lot-rotate.ixx" />

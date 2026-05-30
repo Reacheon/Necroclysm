@@ -210,6 +210,11 @@ public:
     virtual int sizeChunkW() const = 0;
     virtual int sizeChunkH() const = 0;
 
+    //회전 허용 여부. 모든 Lot이 명시적으로 결정하도록 순수 가상 — 깜빡 시 컴파일 에러.
+    //  대다수 건물은 true. 회전 시 형태가 깨지는 랜드마크/유니크 건물만 false를 반환,
+    //  배치기는 정규 방향(none)으로만 앉혀야 한다(회전 적용 지점에서 errorBox 가드).
+    virtual bool allowRotation() const = 0;
+
     LotResult generate(std::uint64_t seed) const
     {
         LotBuilder b(sizeChunkW() * TILE_PER_PIXEL, sizeChunkH() * TILE_PER_PIXEL);
@@ -218,5 +223,7 @@ public:
     }
 
 protected:
+    //Lot에 정의되는 건물들의 default 방향 컨벤션은 북향(남쪽에 문이 달린) 구조를 기본으로 함.
+    //  (정규 방향 하나로만 작성. 90/180/270°판은 rotateLotResult(Lot:rotate)가 CCW로 자동 생성)
     virtual void build(LotBuilder& b, std::uint64_t seed) const = 0;
 };

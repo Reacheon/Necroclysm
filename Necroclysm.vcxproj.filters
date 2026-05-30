@@ -900,6 +900,9 @@
     <ClCompile Include="code\Lot\kinds\Lot-Bridge.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-ConvenienceStore.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="vsDebug.natvis" />

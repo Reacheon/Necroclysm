@@ -10,3 +10,4 @@ export import :Sample;
 export import :School;
 export import :Street;
 export import :Bridge;
+export import :ConvenienceStore;
