@@ -241,6 +241,8 @@ export int delayR2 = 0;
 export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을때 커서위치(컨메뉴가 존재하는지 확인하고 쓸 것)
 
 export bool drawHUD = true;
+export bool lotEditorActive = false; //LotEditor 활성 중 - renderTile이 시야 전체공개+플레이어 숨김에 사용
+export void* lotEditorHoverVeh = nullptr; //LotEditor 커서가 올라간 차량(천장 반투명용). Vehicle*를 void*로 보관(순환 import 회피)
 
 export std::wstring currentUsingSkill = L""; //현재 사용 중인 스킬 ID. 비어있으면 미사용.
 

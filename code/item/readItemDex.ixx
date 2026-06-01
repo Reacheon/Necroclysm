@@ -565,6 +565,7 @@ export int readItemDex(const wchar_t* file)
                             { L"DISH", itemFlag::DISH },
                             { L"PLATE", itemFlag::PLATE },
                             { L"VAGETABLE", itemFlag::VEGETABLE },
+                            { L"NO_ITEM_FORM", itemFlag::NO_ITEM_FORM },
                         };
 
                         size_t pos = 0;

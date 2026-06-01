@@ -41,11 +41,11 @@ public:
 		case chunkFlag::seawater:    floorVal = itemID::deepSeaWater; break;
 		case chunkFlag::freshwater:  floorVal = itemID::deepFreshWater; break;
 		case chunkFlag::none:        floorVal = itemID::none; break;
-		case chunkFlag::underground: floorVal = 109; wallVal = 302; break;
-		case chunkFlag::meadow:      floorVal = 220; break;
-		case chunkFlag::dirt:        floorVal = 109; break;
-		case chunkFlag::city:        floorVal = 109; break;
-		case chunkFlag::bridge:      floorVal = 109; break;
+		case chunkFlag::underground: floorVal = itemID::dirt; wallVal = itemID::dirtWall; break;
+		case chunkFlag::meadow:      floorVal = itemID::grass; break;
+		case chunkFlag::dirt:        floorVal = itemID::dirt; break;
+		case chunkFlag::city:        floorVal = itemID::dirt; break;
+		case chunkFlag::bridge:      floorVal = itemID::dirt; break;
 		default: break;
 		}
 

@@ -79,6 +79,9 @@
     <Filter Include="소스 파일\01_system\04_GUI\HUD">
       <UniqueIdentifier>{22f9baed-4728-4fb7-8327-47dc9f1961ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\01_system\04_GUI\LotEditor">
+      <UniqueIdentifier>{7c3e1a90-2b4d-4f6a-9c11-5e8d0a7b2f33}</UniqueIdentifier>
+    </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\CRAFT">
       <UniqueIdentifier>{9d79e804-c248-4c63-a091-579272003866}</UniqueIdentifier>
     </Filter>
@@ -521,6 +524,30 @@
     </ClCompile>
     <ClCompile Include="code\GUI\HUD\HUD_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor.ixx">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_lifecycle.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_apply.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_input.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_draw.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_export.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_palette.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
+    </ClCompile>
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_menu.cpp">
+      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY</Filter>

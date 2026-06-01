@@ -165,6 +165,8 @@ void analyseRender()
             if (tgtX < renderRegion.x || tgtX >= renderRegion.x + renderRegion.w) continue;
             if (tgtY < renderRegion.y || tgtY >= renderRegion.y + renderRegion.h) continue;
 
+            if (lotEditorActive) thisTile->fov = fovFlag::white; //LotEditor: 카메라에 잡힌 전 영역을 밝혀 편집 가능하게
+
             // 바닥과 벽
             if (thisTile->fov != fovFlag::black)
             {
@@ -313,8 +315,22 @@ void drawTiles()
     
     int tileCounter = 0;
 
+    //가시 타일이 많아 배치 버퍼(MAX_BATCH)를 넘기 직전이면 중간 플러시 후 카운터 리셋.
+    //  (기존: 무경계 tileCounter++ -> vertices[] 오버플로우로 인접 static(파도 set 등) 손상 크래시.
+    //   LotEditor 전체공개/저배율에서 가시 타일 급증해 노출됨. Map.ixx의 flush 패턴과 동일.)
+    auto flushIfFull = [&]()
+    {
+        if (tileCounter >= MAX_BATCH - 64)
+        {
+            setZoom(zoomScale);
+            drawSpriteBatchCenter(spr::tileset, vertices, indices, batchAlphas, tileCounter);
+            tileCounter = 0;
+        }
+    };
+
     for (const auto& elem : tileList)
     {
+        flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
         const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
@@ -402,7 +418,7 @@ void drawTiles()
                     int uSpr = itemDex[under->floor].tileSprIndex + itemDex[under->floor].extraSprIndexSingle + 16 * itemDex[under->floor].extraSprIndex16;
                     uSpr += 16 * uAni16 + uAniSingle;
 
-                    if (under->floor == 220)
+                    if (under->floor == itemID::grass)
                     {
                         if (getSeason() == seasonFlag::winter) uSpr += 16;
                         else if (getSeason() == seasonFlag::summer) uSpr += 32;
@@ -505,7 +521,7 @@ void drawTiles()
         sprIndex += 16 * tileAniExtraIndex16 + tileAniExtraIndexSingle;
         if (thisTile->floor == itemID::none) sprIndex = 506;
 
-        if (thisTile->floor == 220)
+        if (thisTile->floor == itemID::grass)
         {
             if (getSeason() == seasonFlag::winter) sprIndex += 16;
             else if (getSeason() == seasonFlag::summer) sprIndex += 32;
@@ -638,6 +654,7 @@ void drawTiles()
 
     for(auto elem : shallowSeaWaves)
     {
+        flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
         // wave 항목은 로드 영역 경계를 벗어난 이웃 타일이 들어올 수 있음 — 청크 누락 시 스킵.
@@ -707,6 +724,7 @@ void drawTiles()
 
     for (auto elem : deepSeaWaves)
     {
+        flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
 
@@ -775,6 +793,7 @@ void drawTiles()
 
     for (auto elem : deepFreshWaves)
     {
+        flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
 
@@ -842,6 +861,7 @@ void drawTiles()
 
     for (auto elem : Wave::list)
     {
+        flushIfFull();
         int tgtX = elem->getGridX();
         int tgtY = elem->getGridY();
         vertices[tileCounter] =
@@ -864,6 +884,7 @@ void drawTiles()
 
     for (auto elem : Wake::list)
     {
+        flushIfFull();
         int tgtX = elem->getGridX();
         int tgtY = elem->getGridY();
         vertices[tileCounter] =
@@ -886,6 +907,7 @@ void drawTiles()
     // wall과 스킬 범위 UI는 파도 위에 그림 — floor < wave < wall 순서 유지
     for (const auto& elem : tileList)
     {
+        flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
         const TileData* thisTile = &World::ins()->getTile(tgtX, tgtY, PlayerZ());
@@ -1156,6 +1178,7 @@ void drawEntities()
         if (entityCache.find(elem) == entityCache.end())
         {
             // Nervedrive 필터 월드패스: 플레이어는 틴트 이후 디폴트 타겟에 따로 그림.
+            if (lotEditorActive && elem == (Drawable*)PlayerPtr) { entityCache.insert(elem); continue; } //LotEditor: 플레이어 스프라이트 숨김
             if (nervedriveFilter::shouldSkipPlayerInWorld() && elem == (Drawable*)PlayerPtr) { entityCache.insert(elem); continue; }
             elem->drawSelf();
             entityCache.insert(elem);
@@ -1497,6 +1520,13 @@ void drawMulFogs()
     int mulFogCounter = 0;
     for (const auto& fog : mulFogList)
     {
+        //LotEditor 전체공개 시 mulFogList=가시 전 타일 -> MAX_BATCH 초과 가능. 넘기 전 중간 플러시.
+        if (mulFogCounter >= MAX_BATCH - 4)
+        {
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+            drawRectBatch(16, 16, rectColors, vertices, mulFogCounter, zoomScale);
+            mulFogCounter = 0;
+        }
         if (lightFogSet.find({ fog.x,fog.y }) != lightFogSet.end()) continue;
 
         int screenX = cameraW / 2 + zoomScale * ((16 * fog.x + 8) - cameraX) - (8 * zoomScale);

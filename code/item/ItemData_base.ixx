@@ -158,7 +158,7 @@ export struct ItemDataBase
     __int8 propRBash = 0;
     __int16 propDrawPriority = 0;
 
-    __int32 codeID = 0; //랜덤으로 결정되는 ID값, Alchemy가 열릴 때 등... 일시적임(0인 경우 미할당)
+    __int32 codeID = 0; //아이템 생성 시 genItemID()로 부여되는 고유 ID값 (0인 경우 미할당)
 
     __int32 propWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
 

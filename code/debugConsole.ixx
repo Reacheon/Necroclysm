@@ -26,6 +26,7 @@ import worldSession;
 import Teleport;
 import Lot;
 import VehiclePlan;
+import LotEditor;
 
 export void debugConsole()
 {
@@ -73,6 +74,7 @@ export void debugConsole()
 	prt(L"36. 월드 생성 (PNG 로드 → 도시 4400개 → 도로망)\n");
 	prt(L"37. SUV 소환\n");
 	prt(L"38. Lot으로 청크 페인트 (헬퍼 테스트)\n");
+	prt(L"39. LotEditor 실행\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -105,8 +107,8 @@ export void debugConsole()
 	{
 		createItemStack({ PlayerX(), PlayerY(), PlayerZ() });
 		ItemPocket* itemPtr = TileItemStack(PlayerX(), PlayerY(), PlayerZ())->getPocket();
-		itemPtr->addItemFromDex(0, 2);
-		itemPtr->addItemFromDex(1, 4);
+		itemPtr->addItemFromDex(itemID::test, 2);
+		itemPtr->addItemFromDex(itemID::ne555, 4);
 		prt(L"[디버그]테스트 아이템을 생성했다!\n");
 		break;
 	}
@@ -169,7 +171,7 @@ export void debugConsole()
 		prt(L"생성할 벽의 z 좌표를 입력하세요.\n");
 		std::cin >> wallZ;
 		prt(L"[디버그](%d,%d,%d) 위치에 벽을 생성했다!\n", xp + wallX, yp + wallY, zp + wallZ);
-		setWall({ xp + wallX, yp + wallY, zp + wallZ }, 1);
+		setWall({ xp + wallX, yp + wallY, zp + wallZ }, itemID::ne555);
 		break;
 	}
 	case 8:
@@ -944,6 +946,11 @@ export void debugConsole()
 		prt(L"[디버그] 청크 (%d,%d,%d) 페인트 완료. itemStack %d, monster %d, vehicle %d, propContents %d.\n",
 			chunkX, chunkY, chunkZ, (int)r.itemStacks.size(), (int)r.monsters.size(), (int)r.vehicles.size(),
 			(int)r.propContents.size());
+		break;
+	}
+	case 39://LotEditor 실행
+	{
+		new LotEditor();
 		break;
 	}
 	case 99://콘솔 출력 초기화

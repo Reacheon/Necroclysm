@@ -196,4 +196,6 @@ export enum class itemFlag
     DISH, //요리된 결과물, 크림파스타나 치킨필라프 등등...
     PLATE, //완성된 요리를 담을 수 있는 접시
     VEGETABLE, //야채 플래그
+
+    NO_ITEM_FORM, //월드 전용 정의(나무/Ramp/타일 등) — 인벤토리 ItemStack으로 인스턴스화되지 않음
 };

@@ -615,3 +615,16 @@ export std::array<std::wstring, 2> wordSplitter(const std::wstring& text, int ma
     }
     return { text, L"" };
 }
+
+// wordSplitter를 두 번 적용해 최대 3줄로 분할. 3번째 줄은 남은 전체(여전히 maxWidth 초과 가능).
+export std::array<std::wstring, 3> wordSplitter3(const std::wstring& text, int maxWidth)
+{
+    auto first = wordSplitter(text, maxWidth); // { 1줄째, 나머지 }
+    if (queryTextWidth(removeColorCodes(first[1])) < maxWidth)
+    {
+        return { first[0], first[1], L"" };
+    }
+
+    auto second = wordSplitter(first[1], maxWidth); // { 2줄째, 3줄째 }
+    return { first[0], second[0], second[1] };
+}

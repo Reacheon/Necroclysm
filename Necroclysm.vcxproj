@@ -230,6 +230,14 @@
     <ClCompile Include="code\GUI\HUD\HUD_input_desktop.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_step.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor.ixx" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_lifecycle.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_apply.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_input.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_draw.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_export.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_palette.cpp" />
+    <ClCompile Include="code\GUI\LotEditor\LotEditor_menu.cpp" />
     <ClCompile Include="code\GUI\ItemListPanel.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory.ixx" />
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.cpp" />

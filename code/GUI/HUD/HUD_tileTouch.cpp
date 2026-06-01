@@ -52,7 +52,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					int code = partItems[i].itemCode;
 					if (code == itemID::vehicleControl
 					 || code == itemID::helicopterController
-					 || code == 313  //열차 조종장치(Train Control). itemID 별칭 미정의 - 별도 정리 필요
+					 || code == itemID::trainControl  //열차 조종장치(Train Control)
 					 || code == itemID::minecartController)
 					{
 						controllerIdx = i;

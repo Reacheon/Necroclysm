@@ -40,6 +40,7 @@ public:
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
 		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
+		errorBox(ptr != nullptr, L"More than one CoordSelect instance was generated.");
 		ptr = this;
 	}
 	CoordSelect(std::wstring inputTelepathyStr) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr) { }
@@ -52,6 +53,7 @@ public:
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
 		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
+		errorBox(ptr != nullptr, L"More than one CoordSelect instance was generated.");
 		ptr = this;
 
 		selectableCoord = inputSelectableCoord;

@@ -84,12 +84,13 @@ void Vehicle::drawSelf()
         ////////////////////////////////천장 차량부품////////////////////////////////////////////////////
         int propCeilAlpha = 255;
         if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
+        if (lotEditorActive && lotEditorHoverVeh == (void*)this) propCeilAlpha = 50; //LotEditor: 호버한 차량 천장 반투명
 
         for (int layer = 0; layer < pocket->itemInfo.size(); layer++)
         {
             if (pocket->itemInfo[layer].checkFlag(itemFlag::VEH_ROOF))
             {
-                if (pocket->itemInfo[layer].itemCode == 314)
+                if (pocket->itemInfo[layer].itemCode == itemID::helicopterRotor)
                 {
                     rotorList.push_back({ pos.x, pos.y });
                 }
@@ -102,6 +103,7 @@ void Vehicle::drawSelf()
     {
         int propCeilAlpha = 255;
         if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
+        if (lotEditorActive && lotEditorHoverVeh == (void*)this) propCeilAlpha = 50; //LotEditor: 호버한 차량 천장 반투명
 
         int tgtX = rotorList[i].x;
         int tgtY = rotorList[i].y;

@@ -305,7 +305,7 @@ bool Prop::runAnimation(bool shutdown)
                 if (1/*TileWall(getGridX() + 1, getGridY(), getGridZ()) == itemID::none*/) itemPos = { getGridX() + 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
-                createItemStack(itemPos, { {392,1} });
+                createItemStack(itemPos, { {itemID::log,1} });
                 for (int i = 0; i < 8; i++)
                 {
                     new Particle(getX() + 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
@@ -316,7 +316,7 @@ bool Prop::runAnimation(bool shutdown)
                 if (1/*TileWall(getGridX() - 1, getGridY(), getGridZ()) == itemID::none*/) itemPos = { getGridX() - 1, getGridY(), getGridZ() };
                 else  itemPos = { getGridX(), getGridY(), getGridZ() };
 
-                createItemStack(itemPos, { {392,1} });
+                createItemStack(itemPos, { {itemID::log,1} });
                 for (int i = 0; i < 8; i++)
                 {
                     new Particle(getX() - 16 + randomRange(-16, 16), getY() + randomRange(0, 8), randomRange(0, 7), randomRangeFloat(-1.2, 1.2), randomRangeFloat(-2.6, -3.2), 0.18, randomRange(25, 35));
