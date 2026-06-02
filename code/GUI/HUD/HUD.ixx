@@ -1191,4 +1191,6 @@ public:
 	void drawCircuitInfo();
 
 	void drawFluidCircuitInfo();
+
+	void drawVehiclePartInfo();
 };

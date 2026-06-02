@@ -32,7 +32,7 @@ namespace csvItem
     constexpr int propRPierce = 17;
     constexpr int propRCut = 18;
     constexpr int propRBash = 19;
-    constexpr int propDrawPriority = 20;
+    constexpr int vehPriority = 20;
     constexpr int propWIPSprIndex = 21;
     constexpr int calorie = 22;
     constexpr int hydration = 23;
@@ -1113,8 +1113,8 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::propRBash:
                         itemDex[tgtIndex].propRBash = wtoi(strFragment.c_str());
                         break;
-                    case csvItem::propDrawPriority:
-                        itemDex[tgtIndex].propDrawPriority = wtoi(strFragment.c_str());
+                    case csvItem::vehPriority:
+                        itemDex[tgtIndex].vehPriority = wtoi(strFragment.c_str());
                         break;
                     case csvItem::propWIPSprIndex:
                         itemDex[tgtIndex].propWIPSprIndex = wtoi(strFragment.c_str());

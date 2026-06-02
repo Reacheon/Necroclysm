@@ -198,10 +198,10 @@ void LotEditor::doExport()
         }
         out.close();
         std::wstring wpath(path.begin(), path.end());
-        prt(L"[LotEditor] export written: %ls (%d lines)\n", wpath.c_str(), (int)lines.size());
+        prt(L"export written: %ls (%d lines)\n", wpath.c_str(), (int)lines.size());
     }
     else
     {
-        prt(L"[LotEditor] file write failed\n");
+        prt(L"file write failed\n");
     }
 }

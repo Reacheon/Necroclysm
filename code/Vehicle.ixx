@@ -25,6 +25,21 @@ import Drawable;
 * 차량이 이동하는 경우 네가지 1.shift 2.rotation 3.플레이어에 의한 pull 4.zShift
 */
 
+//부품 설치 게이트 판정 결과. ok가 아니면 설치 불가이며, 사유별로 호출자가 안내 메시지를 고른다.
+export enum class vehAddResult
+{
+    ok,                //설치 가능
+    noFrame,           //프레임 없는 타일
+    wallRoofConflict,  //차벽<->천장 동시 설치 불가
+    belowTopBand       //최상단(가장 최근) 부품보다 낮은 밴드 — 그 위에 깔 수 없음
+};
+
+//checkAddPart 결과 묶음. blockerCode는 conflict/belowTopBand일 때 설치를 막은 기존 부품의 itemCode(메시지에 이름 표시용. ok/noFrame이면 none).
+export struct vehAddCheck
+{
+    vehAddResult result = vehAddResult::ok;
+    int blockerCode = itemID::none;
+};
 
 export class Vehicle : public Ani, public AI, public Coord, public Drawable
 {
@@ -79,6 +94,7 @@ public:
     void addPart(int inputX, int inputY, ItemData inputPart); //기본 부품추가 함수, 모든 함수들이 이 함수를 기본으로 들어감, 여기에 알고리즘 넣을 것
     void addPart(int inputX, int inputY, int dexIndex);
     void addPart(int inputX, int inputY, std::vector<int> dexVec);
+    vehAddCheck checkAddPart(int inputX, int inputY, int dexIndex); //설치 가능 여부+사유+막은부품(게임플레이 게이트). 플레이어 설치/에디터에서 사용
     void erasePart(int inputX, int inputY, int index);
     //////////////////////////////////////////////※ 프레임 확장/////////////////////////////////////////////////////////
     void extendPart(int inputX, int inputY, int inputItemCode);

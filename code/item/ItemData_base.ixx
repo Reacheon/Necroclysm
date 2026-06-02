@@ -156,7 +156,7 @@ export struct ItemDataBase
     __int8 propRPierce = 0;
     __int8 propRCut = 0;
     __int8 propRBash = 0;
-    __int16 propDrawPriority = 0;
+    __int16 vehPriority = 0; //차량부품 레이어 밴드 0=프레임 1=일반부품 2=차벽/천장 3=로터/라이트/터렛. 설치 게이트(canAddPart)에서만 사용, 렌더 순서는 설치순서(itemInfo 벡터)로 결정
 
     __int32 codeID = 0; //아이템 생성 시 genItemID()로 부여되는 고유 ID값 (0인 경우 미할당)
 

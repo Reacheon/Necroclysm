@@ -86,41 +86,67 @@ void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 
     ItemData inputPart = cloneFromItemDex(itemDex[dexIndex], 1);
 
-    // 타이어의 경우 맨 앞에 추가 (기존 로직 유지)
-    if (inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER))
-    {
-        partInfo[{inputX, inputY, getGridZ()}]->itemInfo.insert(partInfo[{inputX, inputY, getGridZ()}]->itemInfo.begin(), std::move(inputPart));
-    }
-    else
-    {
-        // 새로운 부품의 priority
-        int newPriority = inputPart.propDrawPriority;
+    // move 전에 필요한 플래그를 미리 읽어둔다 (move 후 flag 벡터는 비워짐)
+    const bool isTire = inputPart.checkFlag(itemFlag::TIRE_NORMAL) || inputPart.checkFlag(itemFlag::TIRE_STEER);
+    const bool isTrainWheel = inputPart.checkFlag(itemFlag::TRAIN_WHEEL);
 
-        // priority에 따른 삽입 위치 찾기
-        auto& itemVec = partInfo[{inputX, inputY, getGridZ()}]->itemInfo;
-        auto insertPos = itemVec.end();
+    auto& itemVec = partInfo[{inputX, inputY, getGridZ()}]->itemInfo;
 
-        // 뒤에서부터 탐색하여 새 부품보다 낮거나 같은 priority를 가진 위치 찾기
-        for (auto it = itemVec.rbegin(); it != itemVec.rend(); ++it)
-        {
-            if (it->propDrawPriority <= newPriority)
-            {
-                insertPos = it.base(); // reverse_iterator를 forward_iterator로 변환
-                break;
-            }
-        }
-
-        itemVec.insert(insertPos, std::move(inputPart));
-    }
+    // 타이어는 항상 맨 앞(렌더 최하단)에 — 설치 순서와 무관한 렌더 불변식
+    // 그 외 부품은 맨 뒤에 추가 → 설치 순서 = 그리기 순서. vehPriority 게이트는 canAddPart에서 사전 검증한다
+    if (isTire) itemVec.insert(itemVec.begin(), std::move(inputPart));
+    else        itemVec.push_back(std::move(inputPart));
 
     // 열차바퀴 중심 설정
-    if (inputPart.checkFlag(itemFlag::TRAIN_WHEEL)) updateTrainCenter();
+    if (isTrainWheel) updateTrainCenter();
 
     updateSpr();
 }
 void Vehicle::addPart(int inputX, int inputY, std::vector<int> dexVec)
 {
+    //일괄 배치(프리팹/월드생성)용. 밴드(vehPriority) 오름차순으로 안정 정렬한 뒤 추가하므로
+    //작성 순서가 밴드 순서와 어긋나도 레이어가 올바르게 쌓인다(같은 밴드는 작성 순서 유지).
+    //플레이어 단건 설치는 addPart(int)을 직접 호출하며 게이트(canAddPart)가 단조성을 보장한다.
+    std::stable_sort(dexVec.begin(), dexVec.end(),
+        [](int a, int b) { return itemDex[a].vehPriority < itemDex[b].vehPriority; });
     for (int i = 0; i < dexVec.size(); i++) addPart(inputX, inputY, dexVec[i]);
+}
+
+//////////////////////////////////////////////※ 설치 가능 여부+사유(게임플레이 게이트)/////////////////////////////////////////////////////////
+// 플레이어 설치/에디터에서 호출되는 사전 검증. 프리팹/월드생성 경로는 거치지 않는다(작성 순서를 그대로 신뢰).
+//   1) 프레임 없는 타일엔 불가 (noFrame)
+//   2) 타이어는 항상 맨 아래 예외 -> 항상 허용 (ok)
+//   3) 차벽<->천장 상호배제 (둘 다 밴드2 구조물. 헤드라이트=밴드3·WALL_CONNECT, 터렛=밴드3·VEH_ROOF는 밴드체크로 제외됨) (wallRoofConflict)
+//   4) 우선도 게이트: 새 부품이 최상단(가장 최근 설치) 부품보다 낮은 밴드면 불가 (belowTopBand)
+vehAddCheck Vehicle::checkAddPart(int inputX, int inputY, int dexIndex)
+{
+    auto it = partInfo.find({ inputX, inputY, getGridZ() });
+    if (it == partInfo.end()) return { vehAddResult::noFrame };
+
+    const ItemData& cand = itemDex[dexIndex];
+
+    //타이어는 게이트/상호배제와 무관하게 항상 맨 아래로 들어가므로 허용
+    if (cand.checkFlag(itemFlag::TIRE_NORMAL) || cand.checkFlag(itemFlag::TIRE_STEER)) return { vehAddResult::ok };
+
+    const std::vector<ItemData>& itemVec = it->second->itemInfo;
+
+    //차벽<->천장 상호배제 (밴드2 구조물끼리만)
+    const bool candWall = cand.vehPriority == 2 && cand.checkFlag(itemFlag::VPART_WALL_CONNECT);
+    const bool candRoof = cand.vehPriority == 2 && cand.checkFlag(itemFlag::VEH_ROOF);
+    if (candWall || candRoof)
+    {
+        for (const ItemData& part : itemVec)
+        {
+            const bool partWall = part.vehPriority == 2 && part.checkFlag(itemFlag::VPART_WALL_CONNECT);
+            const bool partRoof = part.vehPriority == 2 && part.checkFlag(itemFlag::VEH_ROOF);
+            if ((candWall && partRoof) || (candRoof && partWall)) return { vehAddResult::wallRoofConflict, part.itemCode };
+        }
+    }
+
+    //우선도 게이트: 최상단(맨 뒤=가장 최근 설치, 타이어는 항상 맨 앞이라 back()이 아님)보다 낮으면 불가
+    if (!itemVec.empty() && cand.vehPriority < itemVec.back().vehPriority) return { vehAddResult::belowTopBand, itemVec.back().itemCode };
+
+    return { vehAddResult::ok };
 }
 
 void Vehicle::erasePart(int inputX, int inputY, int index)

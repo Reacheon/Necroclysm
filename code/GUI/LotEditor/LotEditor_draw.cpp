@@ -327,8 +327,8 @@ void LotEditor::drawVehPanel()
     drawRect(vehTypeBtn_, SDL_Color{ 120, 170, 180, 255 }, 255);
     drawTextCenter(L"cycle", vehTypeBtn_.x + vehTypeBtn_.w / 2, vehTypeBtn_.y + vehTypeBtn_.h / 2 - 1, SDL_Color{ 235, 235, 240, 255 });
 
-    //방향을 방위(E/N/W/S, dir0=E, index 증가=반시계)로 표기 - 숫자보다 직관적.
-    const wchar_t* dn[16] = { L"E", L"ENE", L"NE", L"NNE", L"N", L"NNW", L"NW", L"WNW", L"W", L"WSW", L"SW", L"SSW", L"S", L"SSE", L"SE", L"ESE" };
+    //방향을 방위 풀네임(East/North/West/South, dir0=East, index 증가=반시계)으로 표기 - 숫자보다 직관적. 90도 회전만 가능해 실제로는 4방위만 표시됨.
+    const wchar_t* dn[16] = { L"East", L"East-northeast", L"Northeast", L"North-northeast", L"North", L"North-northwest", L"Northwest", L"West-northwest", L"West", L"West-southwest", L"Southwest", L"South-southwest", L"South", L"South-southeast", L"Southeast", L"East-southeast" };
     int di = (int)activeVeh_->bodyDir;
     drawText(L"Dir: " + std::wstring((di >= 0 && di < 16) ? dn[di] : L"?"), px + 8, py + 52, SDL_Color{ 210, 230, 230, 255 });
     drawFillRect(vehDirBtn_, SDL_Color{ 50, 80, 90, 255 }, 255);

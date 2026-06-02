@@ -86,7 +86,7 @@ void LotEditor::changeZ(int dz)
     ensureChunkAt(px, py, nz);
     if (TileEntity(px, py, nz) != nullptr)
     {
-        updateLog(L"[LotEditor] Z move blocked: entity there");
+        updateLog(L"Z move blocked: entity there");
         return;
     }
     EntityPtrMove({ px, py, pz }, { px, py, nz });
@@ -273,7 +273,7 @@ void LotEditor::applyItem(Point3 t)
     ItemPocket* pk = pocketAt(t); //컨테이너 프롭 / 차량 cargo / 바닥 스택
     if (pk != nullptr) { pk->addItemFromDex(selItem_, 1); return; }
     //컨테이너 없음: 차량 타일이면 바닥 스택 만들지 말고 안내(컨테이너 부품 필요).
-    if (TileVehicle(t.x, t.y, t.z) != nullptr) { updateLog(L"[LotEditor] No container part on this vehicle tile"); return; }
+    if (TileVehicle(t.x, t.y, t.z) != nullptr) { updateLog(L"No container part on this vehicle tile"); return; }
     addItemToTile(t, selItem_, 1); //스택 없으면 생성 후 추가(검증된 헬퍼)
 }
 
@@ -340,8 +340,8 @@ void LotEditor::applyVehicle(Point3 t)
     //새 차량 시작 대기 중: 빈 타일 + 프레임이면 생성.
     if (newVehPending_)
     {
-        if (vAt != nullptr) { updateLog(L"[LotEditor] Tile already has a vehicle"); return; }
-        if (isFrame == false) { updateLog(L"[LotEditor] New vehicle needs a frame selected"); return; }
+        if (vAt != nullptr) { updateLog(L"Tile already has a vehicle"); return; }
+        if (isFrame == false) { updateLog(L"New vehicle needs a frame selected"); return; }
         Vehicle* v = World::ins()->createVehicle(t.x, t.y, t.z, selVeh_);
         activeVeh_ = v;
         newVehPending_ = false;
@@ -356,8 +356,8 @@ void LotEditor::applyVehicle(Point3 t)
         return;
     }
 
-    if (activeVeh_ == nullptr) { updateLog(L"[LotEditor] Right-click New vehicle, or click a vehicle to select"); return; }
-    if (activeVeh_->getGridZ() != t.z) { updateLog(L"[LotEditor] Wrong Z layer for this vehicle (Q/E)"); return; }
+    if (activeVeh_ == nullptr) { updateLog(L"Right-click New vehicle, or click a vehicle to select"); return; }
+    if (activeVeh_->getGridZ() != t.z) { updateLog(L"Wrong Z layer for this vehicle (Q/E)"); return; }
 
     if (isFrame)
     {
@@ -365,15 +365,32 @@ void LotEditor::applyVehicle(Point3 t)
         //extendPart는 인접 프레임 없거나 벽 위면 errorBox -> 미리 가드해 조용히 로그.
         bool adj = activeVeh_->hasFrame(t.x + 1, t.y) || activeVeh_->hasFrame(t.x - 1, t.y)
             || activeVeh_->hasFrame(t.x, t.y + 1) || activeVeh_->hasFrame(t.x, t.y - 1);
-        if (adj == false) { updateLog(L"[LotEditor] Frame must be adjacent (right-click = new vehicle)"); return; }
-        if (ExistWall(t.x, t.y, t.z)) { updateLog(L"[LotEditor] Can't extend frame onto a wall"); return; }
+        if (adj == false) { updateLog(L"Frame must be adjacent (right-click = new vehicle)"); return; }
+        if (ExistWall(t.x, t.y, t.z)) { updateLog(L"Can't extend frame onto a wall"); return; }
         activeVeh_->extendPart(t.x, t.y, selVeh_);
         activeVeh_->updateSpr();
     }
     else //VPART
     {
-        if (activeVeh_->hasFrame(t.x, t.y)) { activeVeh_->addPart(t.x, t.y, selVeh_); activeVeh_->updateSpr(); }
-        else updateLog(L"[LotEditor] Parts go on frame tiles only");
+        //설치 게이트를 에디터에서도 강제 — 어긴 부품/막은 부품 이름을 로그로 알리고 배치 차단
+        const vehAddCheck chk = activeVeh_->checkAddPart(t.x, t.y, selVeh_);
+        const std::wstring partName = itemDex[selVeh_].name;
+        switch (chk.result)
+        {
+        case vehAddResult::ok:
+            activeVeh_->addPart(t.x, t.y, selVeh_);
+            activeVeh_->updateSpr();
+            break;
+        case vehAddResult::noFrame:
+            updateLog(L"" + partName + L" needs a frame tile");
+            break;
+        case vehAddResult::wallRoofConflict:
+            updateLog(L"" + partName + L" conflicts with " + itemDex[chk.blockerCode].name + L" (wall and roof can't share a tile)");
+            break;
+        case vehAddResult::belowTopBand:
+            updateLog(L"" + partName + L" can't go under " + itemDex[chk.blockerCode].name + L" (build lower layers first, or remove it)");
+            break;
+        }
     }
 }
 
@@ -381,7 +398,7 @@ void LotEditor::startNewVehicle()
 {
     newVehPending_ = true;
     activeVeh_ = nullptr;
-    updateLog(L"[LotEditor] New vehicle: click an empty tile with a frame");
+    updateLog(L"New vehicle: click an empty tile with a frame");
 }
 
 void LotEditor::cycleVehType()

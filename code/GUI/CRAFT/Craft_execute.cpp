@@ -152,7 +152,8 @@ Corouter Craft::executeCraft()
 					Vehicle* targetVehicle = TileVehicle(PlayerX() + dx, PlayerY() + dy, PlayerZ()); //차량부품이므로 이미 있는 프레임 위에 건설되어야 함
 					if (targetVehicle != nullptr)
 					{
-						if (targetVehicle->hasFrame(PlayerX() + dx, PlayerY() + dy))
+						//설치 게이트(프레임 유무/우선도/차벽-천장 상호배제)를 통과하는 타일만 선택지에 노출
+						if (targetVehicle->checkAddPart(PlayerX() + dx, PlayerY() + dy, targetItemCode).result == vehAddResult::ok)
 						{
 							selectableTile.push_back({ PlayerX() + dx, PlayerY() + dy });
 						}
