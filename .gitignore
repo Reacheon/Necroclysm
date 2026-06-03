@@ -368,6 +368,7 @@ language/
 Necroclysm/
 .vs/
 x64/
+lotExport/
 enc_temp_folder/
 /map/
 /.claude/
