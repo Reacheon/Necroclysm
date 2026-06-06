@@ -382,9 +382,6 @@ export namespace itemID
     constexpr int yellowAsphaltArrowD = 521;  // ↓
     constexpr int yellowAsphaltArrowLR = 522;  // ↘
 
-    ///////////////////////매직넘버 치환용 추가 상수 (itemDex.tsv 기준)//////////////////////
-    //  startArea/Lot/HUD/Craft 등에서 raw int로 쓰이던 itemCode를 명명. 코드값은 itemDex.tsv 권위.
-
     //── 의류·소품 ──
     constexpr int backpack = 2;            //배낭
     constexpr int lead = 11;               //납
@@ -449,9 +446,6 @@ export namespace itemID
     constexpr int toothpaste = 384;        //치약
     constexpr int povidoneIodine = 388;    //포비돈 요오드
     constexpr int craftingItem = 391;      //조합 중인 아이템
-
-    ///////////////////////시작 컨테이너/디버그 적재용 추가 상수 (itemDex.tsv 기준)//////////////////////
-    //  startArea의 구급상자/냉장고/탄통/디버그 적재 목록에서 raw int로 쓰이던 itemCode 명명.
 
     //── 무기 ──
     constexpr int tripleSword = 3;         //삼중검
@@ -524,10 +518,117 @@ export namespace itemID
     //── 식량 ──
     constexpr int bread = 380;             //빵
 
-    //── 매직넘버 치환용 (Prop/Entity 파괴 드롭, 디버그) ──
     constexpr int test = 0;                //테스트 아이템 (압축 후에도 0 고정)
     constexpr int log = 331;               //통나무 (Prop 파괴 시 드롭)
     constexpr int dirtItem = 335;          //흙 아이템 (흙벽 파괴 드롭). 바닥 dirt(109)와 다름
     constexpr int stone = 337;             //돌 아이템 (돌벽 파괴 드롭). rockWall(397)과 다름
+
+    ///////////////////////////////////////////////////////////////////////////////
+
+    constexpr int woodenStool = 550;          //스툴 나무 의자
+
+    constexpr int woodenChairR = 551;         //목재 의자
+    constexpr int woodenChairU = 552;
+    constexpr int woodenChairL = 553;
+    constexpr int woodenChairD = 554;
+
+    constexpr int cardboardBox = 555;         //골판지 상자
+    constexpr int woodenTable = 556;          //나무 테이블
+    constexpr int steelTable = 557;           //철제 테이블
+    constexpr int drawer = 558;               //서랍
+    constexpr int wardrobe = 559;             //장롱
+    constexpr int openWardrobe = 560;         //개방형 장롱
+    constexpr int roundWoodenTable = 561;     //원형 목재 테이블
+
+    constexpr int schoolChairR = 562;         //학교 의자
+    constexpr int schoolChairU = 563;
+    constexpr int schoolChairL = 564;
+    constexpr int schoolChairD = 565;
+
+    constexpr int officeChairR = 566;         //사무용 의자
+    constexpr int officeChairU = 567;
+    constexpr int officeChairL = 568;
+    constexpr int officeChairD = 569;
+
+    constexpr int headrestChairR = 570;       //헤드레스트 의자
+    constexpr int headrestChairU = 571;
+    constexpr int headrestChairL = 572;
+    constexpr int headrestChairD = 573;
+
+    constexpr int bluePlasticChair = 574;     //청색 플라스틱 의자
+    constexpr int redPlasticChair = 575;      //적색 플라스틱 의자
+    constexpr int cabinet = 576;              //캐비닛
+    constexpr int safe = 577;                 //금고
+    constexpr int window = 578;               //창문
+    constexpr int displayRefrigerator = 579;  //쇼케이스 냉장고
+    constexpr int checkoutCounter = 580;      //계산대
+    constexpr int coffeeMachine = 581;        //커피 머신
+    constexpr int flowerPot = 582;            //화분
+    constexpr int telephone = 583;            //전화기
+    constexpr int monitor = 584;              //모니터
+    constexpr int shelf = 585;                //선반
+    constexpr int computer = 586;             //컴퓨터
+    constexpr int printer = 587;              //프린터기
+    constexpr int centrifuge = 588;           //원심분리기
+    constexpr int electronicScale = 589;      //전자 저울
+    constexpr int operatingTable = 590;       //수술대
+    constexpr int dentalChair = 591;          //치과 의자
+    constexpr int drum = 592;                 //드럼통
+    constexpr int microscope = 593;           //현미경
+    constexpr int vacuumCleaner = 594;        //청소기
+    constexpr int autoclave = 595;            //오토클레이브
+    constexpr int atm = 596;                  //ATM
+    constexpr int tissueDispenser = 597;      //휴지 디스펜서
+    constexpr int ivStand = 598;              //링거 스탠드
+    constexpr int urinal = 599;               //소변기
+    constexpr int toilet = 600;               //좌변기
+    constexpr int washbasin = 601;            //세면대
+    constexpr int bathtub = 602;              //욕조
+    constexpr int shower = 603;               //샤워기
+
+    constexpr int glassDoorH = 604;           //유리문 (↔, 수직통로 차단)
+    constexpr int glassDoorV = 605;           //유리문 (↕, 수평통로 차단)
+
+    constexpr int ventilator = 606;           //인공호흡기
+
+    constexpr int blackSofaR = 607;           //검은색 소파
+    constexpr int blackSofaU = 608;
+    constexpr int blackSofaL = 609;
+    constexpr int blackSofaD = 610;
+
+    constexpr int greenSofaR = 611;           //녹색 소파
+    constexpr int greenSofaU = 612;
+    constexpr int greenSofaL = 613;
+    constexpr int greenSofaD = 614;
+
+    constexpr int redSofaR = 615;             //적색 소파
+    constexpr int redSofaU = 616;
+    constexpr int redSofaL = 617;
+    constexpr int redSofaD = 618;
+
+    constexpr int beigeSofaR = 619;           //베이지색 소파
+    constexpr int beigeSofaU = 620;
+    constexpr int beigeSofaL = 621;
+    constexpr int beigeSofaD = 622;
+
+    constexpr int cinemaSeatR = 623;          //영화관 의자
+    constexpr int cinemaSeatU = 624;
+    constexpr int cinemaSeatL = 625;
+    constexpr int cinemaSeatD = 626;
+
+    constexpr int ctScannerR = 627;           //CT 기계
+    constexpr int ctScannerU = 628;
+    constexpr int ctScannerL = 629;
+    constexpr int ctScannerD = 630;
+
+    constexpr int mriScannerR = 631;          //MRI 기계
+    constexpr int mriScannerU = 632;
+    constexpr int mriScannerL = 633;
+    constexpr int mriScannerD = 634;
+
+    constexpr int examinationTableR = 635;    //검사 테이블
+    constexpr int examinationTableU = 636;
+    constexpr int examinationTableL = 637;
+    constexpr int examinationTableD = 638;
 
 };
