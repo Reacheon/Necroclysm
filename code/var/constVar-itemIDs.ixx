@@ -631,4 +631,8 @@ export namespace itemID
     constexpr int examinationTableL = 637;
     constexpr int examinationTableD = 638;
 
+    constexpr int whiteboard = 639;           //화이트보드
+    constexpr int humidifier = 640;           //가습기
+    constexpr int controlPanel = 641; //제어반(공장)
+
 };

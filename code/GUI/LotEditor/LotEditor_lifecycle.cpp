@@ -34,7 +34,7 @@ LotEditor::LotEditor() : GUI(false)
     boxSet_ = true;
 
     ensureVisibleChunks();
-    updateLog(L"activated. WASD pan, Q/E z-level, wheel zoom, G grid, Enter export, Esc exit.");
+    updateLog(L"LotEditor activated.");
 }
 
 LotEditor::~LotEditor()

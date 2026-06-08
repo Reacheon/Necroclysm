@@ -48,8 +48,13 @@ ItemStack::~ItemStack()
 
 void ItemStack::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
+	// 이전 청크에서 제거 — 생성 직후(기본 좌표 0,0,0)거나 로드 영역 밖이면 청크가 없을 수 있어
+	// tryGetChunk로 안전 조회(소멸자와 동일 패턴). getChunk의 .at()는 미로드 청크에서 throw.
 	Point2 prevCC = World::ins()->changeToChunkCoord(getGridX(), getGridY());
-	World::ins()->getChunk(prevCC.x, prevCC.y, getGridZ()).eraseStack(this);
+	if (Chunk* prevChunk = World::ins()->tryGetChunk(prevCC.x, prevCC.y, getGridZ()))
+	{
+		prevChunk->eraseStack(this);
+	}
 
 	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 

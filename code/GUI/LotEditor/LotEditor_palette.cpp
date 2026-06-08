@@ -30,17 +30,21 @@ void LotEditor::buildPalettes()
     bucketVeh_.clear();
     for (int i = 0; i < (int)itemDex.size(); ++i)
     {
+        //스프라이트 미배정 플레이스홀더는 팔레트에서 숨김 - 아이템/차량은 sprIndex==1, 프롭은 propSprIndex==1이 기본 미배정값.
+        const bool itemUnassigned = (itemDex[i].itemSprIndex == 1);
+        const bool propUnassigned = (itemDex[i].propSprIndex == 1);
+
         //차량 버킷은 category로 전부 수집(VPART 플래그 없는 통로/트렁크/문 등 포함, 방향변형도 포함).
         //  NOT_RECIPE 필터보다 먼저 - 차량은 방향별 부품을 직접 골라야 하므로 변형을 다 보여줌.
-        if (i >= 1 && itemDex[i].category == itemCategory::vehicles) bucketVeh_.push_back(i);
+        if (i >= 1 && itemDex[i].category == itemCategory::vehicles && !itemUnassigned) bucketVeh_.push_back(i);
         //회전된 중복 설치물(NOT_RECIPE)은 나머지 팔레트에서 제외 - 대표 1개만, 변형은 R키/우클릭 회전(Craft와 동일).
         if (itemDex[i].checkFlag(itemFlag::NOT_RECIPE)) continue;
         if (itemDex[i].checkFlag(itemFlag::FLOOR)) bucketFloor_.push_back(i);
         else if (itemDex[i].checkFlag(itemFlag::WALL)) bucketWall_.push_back(i);
-        else if (itemDex[i].checkFlag(itemFlag::PROP)) bucketProp_.push_back(i);
+        else if (itemDex[i].checkFlag(itemFlag::PROP) && !propUnassigned) bucketProp_.push_back(i);
         //Item 버킷: 바닥/벽 아닌 아이템(프롭 포함 - 줍는 아이템으로도 배치 가능).
         //  NO_ITEM_FORM(나무/Ramp 등 월드 전용)은 ItemStack으로 인스턴스화 안 되므로 제외 - Prop으로 설치할 것.
-        if (i >= 1 && !itemDex[i].checkFlag(itemFlag::FLOOR) && !itemDex[i].checkFlag(itemFlag::WALL) && !itemDex[i].checkFlag(itemFlag::NO_ITEM_FORM)) bucketItem_.push_back(i);
+        if (i >= 1 && !itemDex[i].checkFlag(itemFlag::FLOOR) && !itemDex[i].checkFlag(itemFlag::WALL) && !itemDex[i].checkFlag(itemFlag::NO_ITEM_FORM) && !itemUnassigned) bucketItem_.push_back(i);
     }
     for (int i = 1; i < (int)entityDex.size(); ++i) bucketMonster_.push_back(i); //0번은 더미
 }

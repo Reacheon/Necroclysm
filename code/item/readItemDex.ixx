@@ -1117,8 +1117,25 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].vehPriority = wtoi(strFragment.c_str());
                         break;
                     case csvItem::propWIPSprIndex:
-                        itemDex[tgtIndex].propWIPSprIndex = wtoi(strFragment.c_str());
+                    {
+                        // 제작 중(WIP) 스프라이트 인덱스는 아틀라스 레이아웃에 묶인 상수라
+                        // TSV엔 이름으로 적고 숫자는 여기서 하드코딩한다. 모르는 이름이면 errorBox.
+                        static const std::unordered_map<std::wstring, int> wipSprMap{
+                            {L"WIP_PROP_WOOD",    80},
+                            {L"WIP_PROP_DEVICE",  84},
+                            {L"WIP_PROP_METAL",   88},
+                            {L"WIP_FLOOR_WOOD",   96},
+                            {L"WIP_FLOOR_METAL",  100},
+                            {L"WIP_WALL_WOOD",    104},
+                            {L"WIP_WALL_METAL",   108},
+                            {L"WIP_COPPER_CABLE", 112},
+                            {L"WIP_METAL_CABLE",  116},
+                        };
+                        auto it = wipSprMap.find(strFragment);
+                        if (it != wipSprMap.end()) { itemDex[tgtIndex].propWIPSprIndex = it->second; }
+                        else { errorBox(L"readItemDex.ixx csvItem::propWIPSprIndex: 알 수 없는 WIP 스프라이트 이름 '" + strFragment + L"'"); }
                         break;
+                    }
                     case csvItem::propInstallCode:
                         itemDex[tgtIndex].propInstallCode = wtoi(strFragment.c_str());
                         break;

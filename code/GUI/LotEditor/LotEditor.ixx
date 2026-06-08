@@ -10,7 +10,7 @@ import constVar;
 import ItemPocket;
 import Vehicle;
 
-//게임 내장 Lot 에디터. 디버그 콘솔(39번)에서 활성화. 마우스로 floor/wall/prop/item/monster를
+//게임 내장 Lot 에디터. F2로 활성화(디버그 콘솔 39번도 동일). 마우스로 floor/wall/prop/item/monster를
 //  실제 World에 직접 칠하고, 청크 정렬 영역을 Lot 작성용 텍스트로 Export 한다. 별도 그리기 레이어
 //  없이 게임 렌더 루프가 그대로 그려준다(World 데이터만 수정). 시간은 흐르지 않는다.
 //  편집 중 lotEditorActive로 시야 전체공개 + 플레이어 숨김. 카메라는 플레이어와 분리(자유 팬).
