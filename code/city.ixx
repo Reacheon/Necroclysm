@@ -132,7 +132,7 @@ export namespace city
         PresetCity{ CityName::jakarta,          "Jakarta",         34420,  11544,   worldGrid::Terrain::InsularRainforest },
         PresetCity{ CityName::mumbai,           "Mumbai",          30346,   8519,   worldGrid::Terrain::Monsoon },
         PresetCity{ CityName::istanbul,         "Istanbul",        25081,   5869,   worldGrid::Terrain::Land },
-        PresetCity{ CityName::cairo,            "Cairo",           25347,   7187,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::cairo,            "Cairo",           25346,   7187,   worldGrid::Terrain::Land },
         PresetCity{ CityName::johannesburg,     "Johannesburg",    24954,  13937,   worldGrid::Terrain::Land },
         PresetCity{ CityName::moscow,           "Moscow",          25858,   3919,   worldGrid::Terrain::Land },
         PresetCity{ CityName::berlin,           "Berlin",          23185,   4497,   worldGrid::Terrain::Land },

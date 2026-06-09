@@ -35,6 +35,82 @@ namespace actFunc
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
+	//바닥에 아이템을 떨구고 나무 벌목처럼 통통 튀는 드랍 애니메이션(aniFlag::drop)을 건다
+	void dropWithBounce(int tgtX, int tgtY, int tgtZ, int itemCode, int number)
+	{
+		addItemToTile({ tgtX, tgtY, tgtZ }, itemCode, number);
+		ItemStack* dropped = TileItemStack(tgtX, tgtY, tgtZ);
+		if (dropped != nullptr) addAniToPlayerTurn(dropped, aniFlag::drop);
+	}
+
+	//창문 닫기 — 열린 창문 유리를 닫음(통행 차단). 유리는 원래 시야 통과라 시야 변화 없음
+	void closeWindow(int tgtX, int tgtY, int tgtZ)
+	{
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
+		if (tgtProp == nullptr) return;
+		ItemData& w = tgtProp->leadItem;
+		w.eraseFlag(itemFlag::WINDOW_OPEN);
+		w.eraseFlag(itemFlag::PROP_WALKABLE);
+		PlayerPtr->updateVision(PlayerInfo().eyeSight);
+	}
+
+	//커튼 닫기 — 커튼을 닫으면 안쪽 창문도 닫힘(폐쇄)으로 간주, 커튼이 시야 차단
+	void closeCurtain(int tgtX, int tgtY, int tgtZ)
+	{
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
+		if (tgtProp == nullptr) return;
+		ItemData& w = tgtProp->leadItem;
+		if (w.checkFlag(itemFlag::CURTAIN) == false) return;
+		w.eraseFlag(itemFlag::CURTAIN_OPEN);
+		w.eraseFlag(itemFlag::WINDOW_OPEN);
+		w.eraseFlag(itemFlag::PROP_WALKABLE);
+		w.addFlag(itemFlag::PROP_BLOCKER);
+		PlayerPtr->updateVision(PlayerInfo().eyeSight);
+	}
+
+	//커튼 뜯기 — 커튼만 제거(창문 개폐 상태는 보존). 테스트 아이템 드롭(천 아이템 생기면 교체)
+	void tearCurtain(int tgtX, int tgtY, int tgtZ)
+	{
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
+		if (tgtProp == nullptr) return;
+		ItemData& w = tgtProp->leadItem;
+		if (w.checkFlag(itemFlag::CURTAIN) == false) return;
+		w.eraseFlag(itemFlag::CURTAIN);
+		w.eraseFlag(itemFlag::CURTAIN_OPEN);
+		w.eraseFlag(itemFlag::PROP_BLOCKER); //커튼이 사라졌으니 시야 차단 해제
+		dropWithBounce(tgtX, tgtY, tgtZ, itemID::test, 1);
+		PlayerPtr->updateVision(PlayerInfo().eyeSight);
+	}
+
+	//창문 깨트리기 — 커튼이 있으면 자동 해체(드롭) 후 파손. 깨진 창문은 통행 가능
+	void breakWindow(int tgtX, int tgtY, int tgtZ)
+	{
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
+		if (tgtProp == nullptr) return;
+		ItemData& w = tgtProp->leadItem;
+		//2단계 파손: 멀쩡 → 깨진 창문(149) → 창틀만(150). 창틀이면 더 못 부숨
+		if (w.checkFlag(itemFlag::WINDOW) == false || w.checkFlag(itemFlag::WINDOW_FRAME)) return;
+
+		if (w.checkFlag(itemFlag::WINDOW_BROKEN))
+		{
+			//2회차: 깨진 창문 → 창틀만 남김
+			w.eraseFlag(itemFlag::WINDOW_BROKEN);
+			w.addFlag(itemFlag::WINDOW_FRAME);
+		}
+		else
+		{
+			//1회차: 멀쩡한 창문 → 깨진 창문(커튼 자동 해체). 깨진 시점부터 통행 가능
+			w.eraseFlag(itemFlag::CURTAIN);
+			w.eraseFlag(itemFlag::CURTAIN_OPEN);
+			w.eraseFlag(itemFlag::WINDOW_OPEN);
+			w.addFlag(itemFlag::WINDOW_BROKEN);
+			w.eraseFlag(itemFlag::PROP_BLOCKER);
+			w.addFlag(itemFlag::PROP_WALKABLE);
+		}
+		dropWithBounce(tgtX, tgtY, tgtZ, itemID::test, 1); //임시: 부서진 잔해(천/유리/창틀). 천 아이템 생기면 분기
+		PlayerPtr->updateVision(PlayerInfo().eyeSight);
+	}
+
 	void closeVDoor(int tgtX, int tgtY, int tgtZ)
 	{
 		ItemPocket* tgtPocket = TileVehicle(tgtX, tgtY, PlayerZ())->partInfo[{tgtX, tgtY, PlayerZ() }].get();
@@ -51,7 +127,7 @@ namespace actFunc
 					tgtPocket->itemInfo[i].eraseFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 					tgtPocket->itemInfo[i].addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
 				}
-				tgtPocket->itemInfo[i].propSprIndex -= 16;
+				tgtPocket->itemInfo[i].vehSprIndex -= 16;
 				PlayerPtr->updateVision(PlayerInfo().eyeSight);
 			}
 		}

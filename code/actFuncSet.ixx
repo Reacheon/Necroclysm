@@ -24,6 +24,11 @@ export namespace actFunc
 	export void unload(ItemPocket* unloadItemPocket, int unloadItemCursor);
 	export void closeDoor(int tgtX, int tgtY, int tgtZ);
 	export void closeVDoor(int tgtX, int tgtY, int tgtZ);
+	//창문 액션 — 모두 단일 window 프롭의 런타임 플래그를 변경
+	export void closeWindow(int tgtX, int tgtY, int tgtZ);
+	export void closeCurtain(int tgtX, int tgtY, int tgtZ);
+	export void tearCurtain(int tgtX, int tgtY, int tgtZ);
+	export void breakWindow(int tgtX, int tgtY, int tgtZ);
 	export void toggle(ItemData& inputItem);
 	export void drinkBottle(ItemData& inputData);
 	export void eatFood(ItemPocket* inputPocket, int inputCursor);

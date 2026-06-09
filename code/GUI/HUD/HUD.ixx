@@ -1003,6 +1003,40 @@ public:
 			}
 		}
 
+		//창문 액션 추가 — 상태별로 노출(열린 창문엔 커튼 닫기 대신 창문 닫기만)
+		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
+		{
+			ItemData& w = TileProp(targetGrid.x, targetGrid.y, PlayerZ())->leadItem;
+			if (w.checkFlag(itemFlag::WINDOW))
+			{
+				if (w.checkFlag(itemFlag::WINDOW_FRAME))
+				{
+					//창틀만 남음 — 더 이상 액션 없음
+				}
+				else if (w.checkFlag(itemFlag::WINDOW_BROKEN))
+				{
+					//깨진 창문 — 한 번 더 부수면 창틀만 남음
+					inputOptions.push_back(act::breakWindow);
+				}
+				else
+				{
+					if (w.checkFlag(itemFlag::WINDOW_OPEN))
+					{
+						inputOptions.push_back(act::closeWindow);
+					}
+					else if (w.checkFlag(itemFlag::CURTAIN) && w.checkFlag(itemFlag::CURTAIN_OPEN))
+					{
+						inputOptions.push_back(act::closeCurtain);
+					}
+					if (w.checkFlag(itemFlag::CURTAIN))
+					{
+						inputOptions.push_back(act::tearCurtain);
+					}
+					inputOptions.push_back(act::breakWindow);
+				}
+			}
+		}
+
 		//열기 추가
 		if (TileVehicle(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{

@@ -239,18 +239,22 @@ public:
 		}
 		else//타겟 선택이 완료된 후
 		{
+			//차량 부품은 vehset/vehSprIndex, 그 외 프롭은 propset/propSprIndex로 미리보기.
+			const bool isVehPart = (itemDex[rotatedItemCode].category == itemCategory::vehicles);
+			auto* previewSpr = isVehPart ? spr::vehset : spr::propset;
+			int previewIndex = isVehPart ? itemDex[rotatedItemCode].vehSprIndex : itemDex[rotatedItemCode].propSprIndex;
 			setZoom(zoomScale);
-			SDL_SetTextureColorMod(spr::propset->getTexture(), 0, 255, 0);
-			SDL_SetTextureAlphaMod(spr::propset->getTexture(), 120);
+			SDL_SetTextureColorMod(previewSpr->getTexture(), 0, 255, 0);
+			SDL_SetTextureAlphaMod(previewSpr->getTexture(), 120);
 			drawSpriteCenter
 			(
-				spr::propset,
-				itemDex[rotatedItemCode].propSprIndex,
+				previewSpr,
+				previewIndex,
 				(cameraW / 2),
 				(cameraH / 2) + itemDex[rotatedItemCode].checkFlag(itemFlag::PROP_BIG)*zoomScale * (-16 * 1 + 8)
 			);
-			SDL_SetTextureColorMod(spr::propset->getTexture(), 255, 255, 255);
-			SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
+			SDL_SetTextureColorMod(previewSpr->getTexture(), 255, 255, 255);
+			SDL_SetTextureAlphaMod(previewSpr->getTexture(), 255);
 			setZoom(1.0);
 
 			//drawEdgeWindow(selectBox.x, selectBox.y, selectBox.w, selectBox.h, 16, dir16::dir2);

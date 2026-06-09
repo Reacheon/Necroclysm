@@ -133,6 +133,11 @@ export enum class act
     pray, //기도(제단 상호작용)
 
     dye, //염색(염색 앰플 사용)
+
+    closeWindow, //창문 닫기
+    closeCurtain, //커튼 닫기
+    tearCurtain, //커튼 뜯기
+    breakWindow, //창문 깨트리기
 };
 
 export namespace humanCustom

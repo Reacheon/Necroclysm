@@ -66,6 +66,7 @@ export namespace spr
 	Sprite* segment = nullptr;
 	Sprite* tileset = nullptr;
 	Sprite* propset = nullptr;
+	Sprite* vehset = nullptr; //차량 부품 전용 아틀라스(과거엔 propset 공용 -> 혼동 방지 위해 분리). 부품은 vehSprIndex로 색인
 	Sprite* icon32 = nullptr;
 	Sprite* ring24 = nullptr;
 	Sprite* bloodM = nullptr;

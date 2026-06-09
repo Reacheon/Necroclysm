@@ -90,6 +90,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         std::uint8_t openBits = 0;
         std::uint8_t lockBits = 0;
         bool         isBridge = false;   //다리 결정 stage가 강 픽셀에 박음. stage 8 lot 라우팅 분기 키.
+        BridgeRole   bridgeRole = BridgeRole::Single;   //N픽셀 강 세그먼트 위치 (isBridge일 때만 유효).
 
         bool isOpen  (Dir d) const { return openBits & std::uint8_t(d); }
         bool isLocked(Dir d) const { return lockBits & std::uint8_t(d); }
@@ -586,26 +587,36 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //══════════════════════════════════════════════════════════════════
     // 8. 다리 결정 — roads[]에 NS/EW + isBridge 박기, 양 강변 출구 추가
     //══════════════════════════════════════════════════════════════════
-    //   CityRiver/CitySea 픽셀에 다리 결정 — 1픽셀 두께 직선 강 가정
-    //   ([[project_cityriver_internal]] 데이터 규약). 강변 도로는 stage 3에서
-    //   강제로 깔리므로 다리 끝점은 항상 도로 본체에 닿음.
+    //   CityRiver/CitySea 픽셀에 다리 결정 — 2~4px 폭 직선 강 대응(N픽셀 횡단을
+    //   N개 세그먼트 lot으로 분해, [[project_cityriver_internal]] 데이터 규약).
+    //   강변 도로는 stage 3에서 강제로 깔리므로 다리 끝점은 항상 도로 본체에 닿음.
     //
     //   알고리즘:
-    //     1) 도시 박스 내부(±1 마진 제외) 픽셀 셔플 순회
-    //     2) 물 픽셀의 N+S 또는 E+W가 모두 city land면 다리 후보 (NS / EW)
-    //     3) gap 검사 — 같은 z에서 BRIDGE_MIN_GAP_PX 이내 기존 다리 있으면 스킵
+    //     1) 도시 박스 내부(±1 마진 제외) 픽셀 셔플 순회 (visited로 중복 횡단 차단)
+    //     2) 물 픽셀이 속한 수직 런 [yN..yS]·수평 런 [xW..xE]을 재고, 양끝 바로 밖이
+    //        city land이고 런 길이 ≤ MAX_BRIDGE_SPAN인 축이 유효한 횡단.
+    //        둘 다 유효면 짧은 축(진짜 횡단) 우선 — 긴 축은 강을 따라가는 방향.
+    //     3) gap 검사 — 같은 z에서 BRIDGE_MIN_GAP_PX 이내 기존 횡단(중심) 있으면 스킵
     //     4) 확률 게이트 — 첫 다리는 면제 (강 전체 0개 다리 케이스 회피)
-    //     5) roads[]에 박기:
-    //          강 픽셀:  openBits = NS or EW, isBridge = true
+    //     5) roads[]에 런 전체 박기:
+    //          런 각 픽셀: openBits = NS or EW, isBridge = true, bridgeRole 배정
+    //                     (Nv==1 Single / 끝 EndLow·EndHigh / 내부 Mid).
     //          양 강변:  강 쪽 출구 비트 OR — stage 3 강변 도로(평행) 마스크와 결합되면서
     //                   강변 lot이 T자/십자로 자연 승격 (streetByOpenSides 정상 매칭).
     //                   stage 3 lock은 강과 *평행한* 방향만 — 강 쪽 비트는 unlocked.
-    //     6) plan.bridges 폴리라인 push — Map.ixx 디버그 오버레이용 (stage 9 lot 페인트 검증)
+    //     6) plan.bridges 폴리라인 push — Map.ixx 디버그 오버레이용 (강변~강변 전 구간)
 
     {
         constexpr double BRIDGE_P = 0.5;
         constexpr int BRIDGE_MIN_GAP_PX = 4;
+        constexpr int MAX_BRIDGE_SPAN = 6;   //2~4px 강 + 여유. 초과 폭(넓은 해협)은 다리 미생성.
         constexpr int HALF_PX = TILE_PER_PIXEL / 2;
+
+        //local 좌표 물 여부 — 패치 밖(마진 너머)이면 false. cityPixelAt은 무검사라 런 스캔에 필수.
+        auto waterAtLocal = [&](int lx, int ly) -> bool {
+            if (lx < 0 || lx >= patchW || ly < 0 || ly >= patchH) return false;
+            return isWater(cityTerrainBox[static_cast<std::size_t>(ly) * patchW + lx]);
+            };
 
         std::vector<worldGrid::PixelCoord> waterPixels;
         for (int ly = 1; ly < patchH - 1; ++ly)
@@ -613,28 +624,45 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 waterPixels.push_back({ patchPxX + lx, patchPxY + ly, node.center.z });
         std::shuffle(waterPixels.begin(), waterPixels.end(), rng);
 
-        std::vector<worldGrid::PixelCoord> placed;
+        std::vector<char> visited(static_cast<std::size_t>(patchW) * patchH, 0);
+        std::vector<worldGrid::PixelCoord> placedCenters;
         bool firstBridge = true;
 
         for (const auto& p : waterPixels)
         {
+            const int sx = p.x - patchPxX;
+            const int sy = p.y - patchPxY;
+            if (visited[static_cast<std::size_t>(sy) * patchW + sx]) continue;
             if (!isWater(cityPixelAt(p))) continue;
 
-            const bool nLand = isCityLandPixel(cityPixelAt({ p.x,     p.y - 1, p.z }));
-            const bool sLand = isCityLandPixel(cityPixelAt({ p.x,     p.y + 1, p.z }));
-            const bool wLand = isCityLandPixel(cityPixelAt({ p.x - 1, p.y,     p.z }));
-            const bool eLand = isCityLandPixel(cityPixelAt({ p.x + 1, p.y,     p.z }));
-            const bool ns = nLand && sLand;
-            const bool we = wLand && eLand;
-            if (!ns && !we) continue;
+            //수직 런 [yN..yS] — p가 속한 세로 물줄. 양끝 바로 밖이 city land여야 NS 횡단 유효.
+            int yN = sy; while (waterAtLocal(sx, yN - 1)) --yN;
+            int yS = sy; while (waterAtLocal(sx, yS + 1)) ++yS;
+            const int Nv = yS - yN + 1;
+            const bool nsValid = Nv <= MAX_BRIDGE_SPAN
+                && isCityLandAtLocal(sx, yN - 1) && isCityLandAtLocal(sx, yS + 1);
 
-            //같은 z에서 기존 다리와 최소 간격 — 강 따라 다리 밀집 방지
+            //수평 런 [xW..xE] — 가로 물줄. 양끝 바로 밖이 city land여야 EW 횡단 유효.
+            int xW = sx; while (waterAtLocal(xW - 1, sy)) --xW;
+            int xE = sx; while (waterAtLocal(xE + 1, sy)) ++xE;
+            const int Nh = xE - xW + 1;
+            const bool weValid = Nh <= MAX_BRIDGE_SPAN
+                && isCityLandAtLocal(xW - 1, sy) && isCityLandAtLocal(xE + 1, sy);
+
+            if (!nsValid && !weValid) continue;   //양안 land인 직선 횡단 없음 — visited 안 박음
+            const bool chooseNS = nsValid && (!weValid || Nv <= Nh);   //짧은 축(진짜 횡단) 우선, 동률 NS
+
+            //같은 z에서 기존 횡단과 최소 간격 — 강 따라 다리 밀집 방지 (런 중심 기준)
+            const int cxLocal = chooseNS ? sx : (xW + xE) / 2;
+            const int cyLocal = chooseNS ? (yN + yS) / 2 : sy;
+            const worldGrid::PixelCoord center{ patchPxX + cxLocal, patchPxY + cyLocal, p.z };
+
             bool tooClose = false;
-            for (const auto& bp : placed)
+            for (const auto& bp : placedCenters)
             {
-                if (bp.z != p.z) continue;
-                if (std::abs(bp.x - p.x) <= BRIDGE_MIN_GAP_PX &&
-                    std::abs(bp.y - p.y) <= BRIDGE_MIN_GAP_PX) { tooClose = true; break; }
+                if (bp.z != center.z) continue;
+                if (std::abs(bp.x - center.x) <= BRIDGE_MIN_GAP_PX &&
+                    std::abs(bp.y - center.y) <= BRIDGE_MIN_GAP_PX) { tooClose = true; break; }
             }
             if (tooClose) continue;
 
@@ -642,41 +670,51 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             if (!firstBridge && std::uniform_real_distribution<double>{0.0, 1.0}(rng) >= BRIDGE_P) continue;
             firstBridge = false;
 
-            //roads[]에 박기 — 강 픽셀 마스크 + isBridge + 양 강변 출구 OR
-            const std::size_t bridgeRoadIdx = roadIdx(p.x, p.y);
-            if (ns)
+            //roads[]에 런 전체 박기 — 각 픽셀 마스크 + isBridge + role, 양 강변 출구 OR
+            if (chooseNS)
             {
-                roads[bridgeRoadIdx].openBits = std::uint8_t(RoadPixel::Dir::NORTH) | std::uint8_t(RoadPixel::Dir::SOUTH);
-                roads[bridgeRoadIdx].isBridge = true;
-                roads[roadIdx(p.x, p.y - 1)].open(RoadPixel::Dir::SOUTH);   //북쪽 강변 → 다리
-                roads[roadIdx(p.x, p.y + 1)].open(RoadPixel::Dir::NORTH);   //남쪽 강변 → 다리
+                for (int y = yN; y <= yS; ++y)
+                {
+                    const std::size_t idx = static_cast<std::size_t>(y) * patchW + sx;
+                    roads[idx].openBits = std::uint8_t(RoadPixel::Dir::NORTH) | std::uint8_t(RoadPixel::Dir::SOUTH);
+                    roads[idx].isBridge = true;
+                    roads[idx].bridgeRole = (Nv == 1) ? BridgeRole::Single
+                                          : (y == yN) ? BridgeRole::EndLow
+                                          : (y == yS) ? BridgeRole::EndHigh
+                                                      : BridgeRole::Mid;
+                    visited[idx] = 1;
+                }
+                roads[static_cast<std::size_t>(yN - 1) * patchW + sx].open(RoadPixel::Dir::SOUTH);   //북쪽 강변 → 다리
+                roads[static_cast<std::size_t>(yS + 1) * patchW + sx].open(RoadPixel::Dir::NORTH);   //남쪽 강변 → 다리
+
+                const int bx  =  p.x                * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                const int by0 = (patchPxY + yN - 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                const int by1 = (patchPxY + yS + 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx, by0, p.z}, {bx, by1, p.z} } });
             }
-            else   //we
+            else   //EW
             {
-                roads[bridgeRoadIdx].openBits = std::uint8_t(RoadPixel::Dir::EAST) | std::uint8_t(RoadPixel::Dir::WEST);
-                roads[bridgeRoadIdx].isBridge = true;
-                roads[roadIdx(p.x - 1, p.y)].open(RoadPixel::Dir::EAST);    //서쪽 강변 → 다리
-                roads[roadIdx(p.x + 1, p.y)].open(RoadPixel::Dir::WEST);    //동쪽 강변 → 다리
+                for (int x = xW; x <= xE; ++x)
+                {
+                    const std::size_t idx = static_cast<std::size_t>(sy) * patchW + x;
+                    roads[idx].openBits = std::uint8_t(RoadPixel::Dir::EAST) | std::uint8_t(RoadPixel::Dir::WEST);
+                    roads[idx].isBridge = true;
+                    roads[idx].bridgeRole = (Nh == 1) ? BridgeRole::Single
+                                          : (x == xW) ? BridgeRole::EndLow
+                                          : (x == xE) ? BridgeRole::EndHigh
+                                                      : BridgeRole::Mid;
+                    visited[idx] = 1;
+                }
+                roads[static_cast<std::size_t>(sy) * patchW + (xW - 1)].open(RoadPixel::Dir::EAST);   //서쪽 강변 → 다리
+                roads[static_cast<std::size_t>(sy) * patchW + (xE + 1)].open(RoadPixel::Dir::WEST);   //동쪽 강변 → 다리
+
+                const int by  =  p.y                * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
+                const int bx0 = (patchPxX + xW - 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                const int bx1 = (patchPxX + xE + 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
+                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx0, by, p.z}, {bx1, by, p.z} } });
             }
 
-            //plan.bridges 폴리라인 push (디버그 오버레이용)
-            const int bz = p.z;
-            if (ns)
-            {
-                const int bx  =  p.x      * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
-                const int by0 = (p.y - 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
-                const int by1 = (p.y + 1) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
-                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx, by0, bz}, {bx, by1, bz} } });
-            }
-            else
-            {
-                const int by  =  p.y      * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;
-                const int bx0 = (p.x - 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
-                const int bx1 = (p.x + 1) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
-                plan.bridges.push_back(worldGen::RoadPolyLine{ .verts = { {bx0, by, bz}, {bx1, by, bz} } });
-            }
-
-            placed.push_back(p);
+            placedCenters.push_back(center);
         }
     }
 
@@ -703,7 +741,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 if (mask == 0) continue;
 
                 const Lot* lot = roads[idx].isBridge
-                    ? static_cast<const Lot*>(bridgeByOpenSides(mask))
+                    ? static_cast<const Lot*>(bridgeByOpenSides(mask, roads[idx].bridgeRole))
                     : static_cast<const Lot*>(streetByOpenSides(mask));
                 if (lot == nullptr) continue;
 

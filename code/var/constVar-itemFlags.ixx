@@ -198,4 +198,13 @@ export enum class itemFlag
     VEGETABLE, //야채 플래그
 
     NO_ITEM_FORM, //월드 전용 정의(나무/Ramp/타일 등) — 인벤토리 ItemStack으로 인스턴스화되지 않음
+
+    PROP_POCKET_OPEN_SPRITE, //루팅창이 이 프롭의 포켓을 열고 있는 동안 propSprIndex+1(문 열린 스프라이트)로 그림. 장롱/캐비닛/금고/냉장고 등
+
+    WINDOW, //창문 프롭. 커튼/개폐/파손 상태를 아래 플래그들로 표현(propSprIndex 기준 오프셋)
+    WINDOW_OPEN, //창문 유리가 열림(없으면 닫힘). 열리면 통행 가능(PROP_WALKABLE)
+    WINDOW_BROKEN, //창문이 깨짐(1차 파손, 스프라이트 +5=149). 통행 가능, 커튼과 공존 불가(깨질 때 커튼 자동 해체)
+    WINDOW_FRAME, //창틀만 남음(2차 파손, 스프라이트 +6=150). 통행 가능
+    CURTAIN, //커튼이 달려 있음(커튼 유무는 이 플래그로 판별)
+    CURTAIN_OPEN, //커튼이 열림(없으면 닫혀서 시야 차단 = PROP_BLOCKER)
 };

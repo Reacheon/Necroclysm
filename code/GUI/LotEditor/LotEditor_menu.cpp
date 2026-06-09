@@ -50,6 +50,18 @@ void LotEditor::openEditorContextMenu(Point3 t)
             //컨테이너 프롭에 내용물이 있으면 비우기 제공(잘못 채운 거 비우고 다시 채우기용).
             if (propPtr->leadItem.pocketPtr != nullptr && propPtr->leadItem.pocketPtr->itemInfo.empty() == false)
                 menuItems_.push_back({ L"Empty contents", 7 });
+            //창문 저작: 커튼 달기/제거, 커튼/창문 개폐, 파손 토글(플래그 직접 조작 — export 플래그 직렬화 후 영속)
+            if (propPtr->leadItem.checkFlag(itemFlag::WINDOW))
+            {
+                if (propPtr->leadItem.checkFlag(itemFlag::CURTAIN))
+                {
+                    menuItems_.push_back({ L"Remove curtain", 21 });
+                    menuItems_.push_back({ L"Toggle curtain", 22 });
+                }
+                else menuItems_.push_back({ L"Add curtain", 20 });
+                menuItems_.push_back({ L"Toggle window", 23 });
+                menuItems_.push_back({ L"Cycle break", 24 });
+            }
         }
         //차량 컨테이너 부품에 cargo가 들어있으면 비우기 제공.
         {
@@ -182,6 +194,102 @@ void LotEditor::executeMenuAction(int id)
         {
             if (v == activeVeh_) activeVeh_ = nullptr;
             World::ins()->destroyVehicle(v);
+        }
+        break;
+    }
+    case 20: //커튼 달기 (닫힌 상태로 시작 = 시야 차단)
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr && p->leadItem.checkFlag(itemFlag::WINDOW))
+        {
+            p->leadItem.addFlag(itemFlag::CURTAIN);
+            p->leadItem.eraseFlag(itemFlag::CURTAIN_OPEN);
+            p->leadItem.eraseFlag(itemFlag::WINDOW_OPEN);
+            p->leadItem.eraseFlag(itemFlag::WINDOW_BROKEN);
+            p->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+            p->leadItem.addFlag(itemFlag::PROP_BLOCKER);
+        }
+        break;
+    }
+    case 21: //커튼 제거
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr)
+        {
+            p->leadItem.eraseFlag(itemFlag::CURTAIN);
+            p->leadItem.eraseFlag(itemFlag::CURTAIN_OPEN);
+            p->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+        }
+        break;
+    }
+    case 22: //커튼 개폐 토글 (닫으면 안쪽 창문도 닫힘)
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr && p->leadItem.checkFlag(itemFlag::CURTAIN))
+        {
+            if (p->leadItem.checkFlag(itemFlag::CURTAIN_OPEN))
+            {
+                p->leadItem.eraseFlag(itemFlag::CURTAIN_OPEN);
+                p->leadItem.eraseFlag(itemFlag::WINDOW_OPEN);
+                p->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+                p->leadItem.addFlag(itemFlag::PROP_BLOCKER);
+            }
+            else
+            {
+                p->leadItem.addFlag(itemFlag::CURTAIN_OPEN);
+                p->leadItem.eraseFlag(itemFlag::PROP_BLOCKER);
+            }
+        }
+        break;
+    }
+    case 23: //창문 개폐 토글 (커튼이 닫혀 있으면 먼저 커튼을 열어야 함)
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr && p->leadItem.checkFlag(itemFlag::WINDOW) && p->leadItem.checkFlag(itemFlag::WINDOW_BROKEN) == false)
+        {
+            if (p->leadItem.checkFlag(itemFlag::CURTAIN) && p->leadItem.checkFlag(itemFlag::CURTAIN_OPEN) == false) break;
+            if (p->leadItem.checkFlag(itemFlag::WINDOW_OPEN))
+            {
+                p->leadItem.eraseFlag(itemFlag::WINDOW_OPEN);
+                p->leadItem.eraseFlag(itemFlag::PROP_WALKABLE);
+            }
+            else
+            {
+                p->leadItem.addFlag(itemFlag::WINDOW_OPEN);
+                p->leadItem.addFlag(itemFlag::PROP_WALKABLE);
+            }
+        }
+        break;
+    }
+    case 24: //파손 단계 순환: 멀쩡 → 깨짐(149) → 창틀만(150) → 멀쩡 (파손 시 커튼 자동 해체)
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr && p->leadItem.checkFlag(itemFlag::WINDOW))
+        {
+            ItemData& w = p->leadItem;
+            if (w.checkFlag(itemFlag::WINDOW_FRAME))
+            {
+                //창틀만 → 멀쩡(닫힌 창문)으로 복구
+                w.eraseFlag(itemFlag::WINDOW_FRAME);
+                w.eraseFlag(itemFlag::WINDOW_OPEN);
+                w.eraseFlag(itemFlag::PROP_WALKABLE);
+            }
+            else if (w.checkFlag(itemFlag::WINDOW_BROKEN))
+            {
+                //깨짐 → 창틀만
+                w.eraseFlag(itemFlag::WINDOW_BROKEN);
+                w.addFlag(itemFlag::WINDOW_FRAME);
+            }
+            else
+            {
+                //멀쩡 → 깨짐(커튼 자동 해체)
+                w.eraseFlag(itemFlag::CURTAIN);
+                w.eraseFlag(itemFlag::CURTAIN_OPEN);
+                w.eraseFlag(itemFlag::WINDOW_OPEN);
+                w.addFlag(itemFlag::WINDOW_BROKEN);
+                w.eraseFlag(itemFlag::PROP_BLOCKER);
+                w.addFlag(itemFlag::PROP_WALKABLE);
+            }
         }
         break;
     }

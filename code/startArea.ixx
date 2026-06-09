@@ -223,12 +223,12 @@ export void startArea()
 	setWall({ -5,-2,0 }, itemID::wasteContainerWall);
 	//집 우측 4타일
 	setWall({ -1,-3,0 }, itemID::wasteContainerWall);
-	setWall({ -1,-4,0 }, itemID::glassWall);
+	createProp({ -1,-4,0 }, itemID::window);//유리벽 → 창문(프롭). 벽은 깔지 않음
 	setWall({ -1,-5,0 }, itemID::wasteContainerWall);
 	setWall({ -1,-6,0 }, itemID::wasteContainerWall);
 	//집 좌측 4타일
 	setWall({ -5,-3,0 }, itemID::wasteContainerWall);
-	setWall({ -5,-4,0 }, itemID::glassWall);
+	createProp({ -5,-4,0 }, itemID::window);//유리벽 → 창문(프롭). 벽은 깔지 않음
 	setWall({ -5,-5,0 }, itemID::wasteContainerWall);
 	setWall({ -5,-6,0 }, itemID::wasteContainerWall);
 	//잡 상단 중앙 3타일

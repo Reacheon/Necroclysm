@@ -53,7 +53,14 @@ ContextMenu::~ContextMenu()
 
 void ContextMenu::changeXY(int inputX, int inputY, bool center)
 {
-	contextMenuBase = { 0, 0, 186, 9 + 33 * (int)actOptions.size() };
+	//가장 긴 옵션 텍스트에 맞춰 박스 너비 결정 (측정 전 폰트 상태를 draw와 일치시킴)
+	setFont(fontType::mainFont);
+	setFontSize(24);
+	int maxTextW = 0;
+	for (act a : actOptions) maxTextW = myMax(maxTextW, queryTextWidth(getOptionText(a)));
+	int boxW = myMax(186, maxTextW + 72);//+72 -> 우측 여백 12px 보장, 최소 186 유지
+
+	contextMenuBase = { 0, 0, boxW, 9 + 33 * (int)actOptions.size() };
 	subContextMenuBase = { 0,0,0,0 };
 
 	if (center == false)
@@ -81,6 +88,144 @@ void ContextMenu::changeXY(int inputX, int inputY, bool center)
 	for (int i = 0; i < 30; i++) optionRect[i] = { contextMenuBase.x + 6, contextMenuBase.y + 6 + 33 * i, contextMenuBase.w - 12, 30 };
 }
 
+std::wstring ContextMenu::getOptionText(act inputAct, int* iconIndex)
+{
+	std::wstring optionText;
+	int icon = 0;
+	if (inputAct == act::closeDoor)
+	{
+		optionText = sysStr[176];//닫기
+		icon = 64;
+	}
+	else if (inputAct == act::inspect)
+	{
+		optionText = sysStr[177];//조사
+		icon = 65;
+	}
+	else if (inputAct == act::unbox)
+	{
+		optionText = sysStr[178];//열기
+		icon = 66;
+	}
+	else if (inputAct == act::pull)
+	{
+		optionText = sysStr[179];//당기기
+		icon = 67;
+	}
+	else if (inputAct == act::climb)
+	{
+		optionText = sysStr[188];//등반
+		icon = 69;
+	}
+	else if (inputAct == act::swim)
+	{
+		optionText = sysStr[186];//수영
+		icon = 70;
+	}
+	else if (inputAct == act::ride)
+	{
+		optionText = sysStr[187];//탑승
+		icon = 71;
+	}
+	else if (inputAct == act::vehicleRepair)
+	{
+		optionText = sysStr[203];//수리
+		icon = 28;
+	}
+	else if (inputAct == act::vehicleDetach)
+	{
+		optionText = sysStr[204];//탈착
+		icon = 85;
+	}
+	else if (inputAct == act::drawLiquid)
+	{
+		optionText = sysStr[206];//담기
+		icon = 93;
+	}
+	else if (inputAct == act::sleep)
+	{
+		optionText = sysStr[211];//수면
+		icon = 98;
+	}
+	else if (inputAct == act::drinkFloorWater)
+	{
+		optionText = sysStr[232];//마시기(바닥물마시기)
+		icon = 99;
+	}
+	else if (inputAct == act::propCarry)
+	{
+		optionText = sysStr[327];//프롭 들기
+		icon = 100;
+	}
+	else if (inputAct == act::propTurnOn)
+	{
+		optionText = sysStr[333];//켜기
+		icon = 102;
+	}
+	else if (inputAct == act::propTurnOff)
+	{
+		optionText = sysStr[334];//끄기
+		icon = 101;
+	}
+	else if (inputAct == act::connectPlusZ)
+	{
+		optionText = sysStr[340];//상층과 연결
+		icon = 101;
+	}
+	else if (inputAct == act::connectMinusZ)
+	{
+		optionText = sysStr[341];//하층과 연결
+		icon = 101;
+	}
+	else if (inputAct == act::toggleCrossCable)
+	{
+		Prop* targetProp = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+		bool isCrossed = targetProp != nullptr && targetProp->leadItem.checkFlag(itemFlag::CROSSED_CABLE);
+		if (isCrossed) optionText = L"Uncross";
+		else optionText = L"Cross";
+		icon = 101;
+	}
+	else if (inputAct == act::hideWire)
+	{
+		optionText = L"Hide Wire";
+		icon = 101;
+	}
+	else if (inputAct == act::showWire)
+	{
+		optionText = L"Show Wire";
+		icon = 101;
+	}
+	else if (inputAct == act::pray)
+	{
+		optionText = L"Pray";
+		icon = 25;
+	}
+	else if (inputAct == act::closeWindow)
+	{
+		optionText = L"Close";
+		icon = 64;
+	}
+	else if (inputAct == act::closeCurtain)
+	{
+		optionText = L"Close";
+		icon = 64;
+	}
+	else if (inputAct == act::tearCurtain)
+	{
+		optionText = L"Detach";
+		icon = 67;
+	}
+	else if (inputAct == act::breakWindow)
+	{
+		optionText = L"Break";
+		icon = 67;
+	}
+	else optionText = L"???";
+
+	if (iconIndex) *iconIndex = icon;
+	return optionText;
+}
+
 void ContextMenu::drawGUI()
 {
 	if (getStateDraw() == false) { return; }
@@ -92,117 +237,8 @@ void ContextMenu::drawGUI()
 
 		for (int i = 0; i < actOptions.size(); i++)
 		{
-			std::wstring optionText;
 			int iconIndex = 0;
-			if (actOptions[i] == act::closeDoor)
-			{
-				optionText = sysStr[176];//닫기
-				iconIndex = 64;
-			}
-			else if (actOptions[i] == act::inspect)
-			{
-				optionText = sysStr[177];//조사
-				iconIndex = 65;
-			}
-			else if (actOptions[i] == act::unbox)
-			{
-				optionText = sysStr[178];//열기
-				iconIndex = 66;
-			}
-			else if (actOptions[i] == act::pull)
-			{
-				optionText = sysStr[179];//당기기
-				iconIndex = 67;
-			}
-			else if (actOptions[i] == act::climb)
-			{
-				optionText = sysStr[188];//등반
-				iconIndex = 69;
-			}
-			else if (actOptions[i] == act::swim)
-			{
-				optionText = sysStr[186];//수영
-				iconIndex = 70;
-			}
-			else if (actOptions[i] == act::ride)
-			{
-				optionText = sysStr[187];//탑승
-				iconIndex = 71;
-			}
-			else if (actOptions[i] == act::vehicleRepair)
-			{
-				optionText = sysStr[203];//수리
-				iconIndex = 28;
-			}
-			else if (actOptions[i] == act::vehicleDetach)
-			{
-				optionText = sysStr[204];//탈착
-				iconIndex = 85;
-			}
-			else if (actOptions[i] == act::drawLiquid)
-			{
-				optionText = sysStr[206];//담기
-				iconIndex = 93;
-			}
-			else if (actOptions[i] == act::sleep)
-			{
-				optionText = sysStr[211];//수면
-				iconIndex = 98;
-			}
-			else if (actOptions[i] == act::drinkFloorWater)
-			{
-				optionText = sysStr[232];//마시기(바닥물마시기)
-				iconIndex = 99;
-			}
-			else if (actOptions[i] == act::propCarry)
-			{
-				optionText = sysStr[327];//프롭 들기
-				iconIndex = 100;
-			}
-			else if (actOptions[i] == act::propTurnOn)
-			{
-				optionText = sysStr[333];//켜기
-				iconIndex = 102;
-			}
-			else if (actOptions[i] == act::propTurnOff)
-			{
-				optionText = sysStr[334];//끄기
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::connectPlusZ)
-			{
-				optionText = sysStr[340];//상층과 연결
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::connectMinusZ)
-			{
-				optionText = sysStr[341];//하층과 연결
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::toggleCrossCable)
-			{
-				Prop* targetProp = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
-				bool isCrossed = targetProp != nullptr && targetProp->leadItem.checkFlag(itemFlag::CROSSED_CABLE);
-				if (isCrossed) optionText = L"Uncross";
-				else optionText = L"Cross";
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::hideWire)
-			{
-				optionText = L"Hide Wire";
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::showWire)
-			{
-				optionText = L"Show Wire";
-				iconIndex = 101;
-			}
-			else if (actOptions[i] == act::pray)
-			{
-				optionText = L"Pray";
-				iconIndex = 25;
-			}
-			else optionText = L"???";
+			std::wstring optionText = getOptionText(actOptions[i], &iconIndex);
 
 			if (checkCursor(&optionRect[i]))
 			{
@@ -564,6 +600,26 @@ void ContextMenu::executeContextAct(act inputAct)
 		{
 			actFunc::showWire({ contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ() });
 		}
+	}
+	else if (inputAct == act::closeWindow)
+	{
+		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			actFunc::closeWindow(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+	}
+	else if (inputAct == act::closeCurtain)
+	{
+		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			actFunc::closeCurtain(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+	}
+	else if (inputAct == act::tearCurtain)
+	{
+		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			actFunc::tearCurtain(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
+	}
+	else if (inputAct == act::breakWindow)
+	{
+		if (TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ()) != nullptr)
+			actFunc::breakWindow(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 	}
 }
 

@@ -230,7 +230,7 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							tgtPocket->itemInfo[i].addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
 						}
 
-						tgtPocket->itemInfo[i].propSprIndex += 16;
+						tgtPocket->itemInfo[i].vehSprIndex += 16;
 						PlayerPtr->updateVision(PlayerInfo().eyeSight);
 					}
 				}
@@ -257,6 +257,26 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						}
 
 						PlayerPtr->updateVision(PlayerInfo().eyeSight);
+					}
+				}
+				else if (tgtProp->leadItem.checkFlag(itemFlag::WINDOW))
+				{
+					//클릭 = 열기 진행: 커튼 닫힘이면 커튼부터, 그 다음 창문 유리. 깨진 창문은 무동작
+					ItemData& w = tgtProp->leadItem;
+					if (w.checkFlag(itemFlag::WINDOW_BROKEN) == false)
+					{
+						if (w.checkFlag(itemFlag::CURTAIN) && w.checkFlag(itemFlag::CURTAIN_OPEN) == false)
+						{
+							w.addFlag(itemFlag::CURTAIN_OPEN);
+							w.eraseFlag(itemFlag::PROP_BLOCKER);
+							PlayerPtr->updateVision(PlayerInfo().eyeSight);
+						}
+						else if (w.checkFlag(itemFlag::WINDOW_OPEN) == false)
+						{
+							w.addFlag(itemFlag::WINDOW_OPEN);
+							w.addFlag(itemFlag::PROP_WALKABLE);
+							PlayerPtr->updateVision(PlayerInfo().eyeSight);
+						}
 					}
 				}
 				else if (tgtProp->leadItem.checkFlag(itemFlag::TREE))

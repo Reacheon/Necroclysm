@@ -77,7 +77,8 @@ void LotEditor::restoreHostState()
     drawHUD = savedDrawHUD_;
     lotEditorActive = false;
     lotEditorHoverVeh = nullptr;
-    PlayerPtr->updateVision(); //복귀 후 플레이어 시야 재계산
+    World::ins()->downgradeWhiteFovToGray(); //LotEditor가 전체공개한 white를 gray로 되돌림
+    PlayerPtr->updateVision(); //복귀 후 플레이어 시야 재계산(실제 가시영역만 다시 white)
     GUI::actDrawAll(this);
 }
 

@@ -66,13 +66,21 @@ void Loot::drawGUI()
 
 		int tileIndex = 140;
 		std::wstring tileName = L"Tile name";
+		Sprite* tileSpr = spr::itemset;
 
 		drawSpriteCenter(spr::itemBackgroundRect, 0, lootBase.x + 16 + 32, lootBase.y + 44 + 32);
 
 
 		if (lootItemData != nullptr)
 		{
-			tileIndex = lootItemData->getSprIndex();
+			//프롭/차량부품 컨테이너는 인벤토리 아이콘(itemset)이 아니라 실제 설치 이미지로 표시.
+			//차량 부품은 vehset/vehSprIndex, 그 외 프롭은 propset/propSprIndex 기준.
+			const bool isVehPart = (lootItemData->category == itemCategory::vehicles);
+			tileSpr = isVehPart ? spr::vehset : spr::propset;
+			int baseIndex = isVehPart ? lootItemData->vehSprIndex : lootItemData->propSprIndex;
+			tileIndex = baseIndex + lootItemData->extraSprIndexSingle + 16 * lootItemData->extraSprIndex16;
+			//루팅창이 열려 있는 동안 = 프롭이 열린 상태이므로 문 열린 스프라이트(+1)로 표시
+			if (lootItemData->checkFlag(itemFlag::PROP_POCKET_OPEN_SPRITE)) tileIndex += 1;
 			tileName = lootItemData->name;
 		}
 		else if (lootStack != nullptr)
@@ -82,8 +90,8 @@ void Loot::drawGUI()
 			tileIndex = itemDex[floorIndex].getSprIndex();
 			tileName = itemDex[floorIndex].name;
 		}
-		setZoom(4.0);
-		drawSpriteCenter(spr::itemset, tileIndex, lootBase.x + 16 + 32, lootBase.y + 44 + 32);
+		setZoom(3.0);
+		drawSpriteCenter(tileSpr, tileIndex, lootBase.x + 16 + 32, lootBase.y + 44 + 34);
 		setZoom(1.0);
 
 		setFontSize(24);

@@ -265,6 +265,7 @@ export void textureLoader()
 	spr::segment = new Sprite(renderer, "image/UI/segment.png", 12, 16);
 	spr::tileset = new Sprite(renderer, "image/tileset/tileset.png", 16, 16);
 	spr::propset = new Sprite(renderer, "image/tileset/propset.png", 48, 48);
+	spr::vehset = new Sprite(renderer, "image/tileset/vehset.png", 48, 48);
 	spr::icon32 = new Sprite(renderer, "image/UI/icon32.png", 32, 32);
 	spr::ring24 = new Sprite(renderer, "image/UI/ring24.png", 24, 24);
 	spr::bloodM = new Sprite(renderer, "image/effect/bloodM1.png", 48, 48);

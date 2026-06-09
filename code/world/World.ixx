@@ -101,6 +101,24 @@ public:
 		for (auto& kv : chunkPtr)
 			if (kv.first.z == z) fn(kv.first.x, kv.first.y);
 	}
+	// 모든 로드된 청크의 white fov 타일을 gray로 다운그레이드.
+	// LotEditor가 렌더 영역 전체를 white로 강제 공개하므로, 종료 시 호출해
+	// 정상 시야 상태(이전에 본 영역=gray)로 되돌린 뒤 updateVision으로 실제 가시영역만 다시 white로 만든다.
+	void downgradeWhiteFovToGray()
+	{
+		for (auto& kv : chunkPtr)
+		{
+			Chunk* chunk = kv.second.get();
+			for (int y = 0; y < CHUNK_SIZE_Y; y++)
+			{
+				for (int x = 0; x < CHUNK_SIZE_X; x++)
+				{
+					TileData& t = chunk->getChunkTile(x, y);
+					if (t.fov == fovFlag::white) t.fov = fovFlag::gray;
+				}
+			}
+		}
+	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
 		chunkX = (x >= 0)

@@ -306,6 +306,14 @@ void analyseRender()
     }
 }
 
+// 창문은 16x16를 꽉 채우는 사각형이라, 인접한 벽이 창문을 벽으로 취급해 끊김 없이
+// 이어 보이도록 벽 연결 판정에 포함한다. (창문은 prop으로 저장되어 tile->wall엔 안 잡힘)
+static bool tileHasWindow(int x, int y, int z)
+{
+    Prop* p = TileProp(x, y, z);
+    return p != nullptr && p->leadItem.checkFlag(itemFlag::WINDOW);
+}
+
 void drawTiles()
 {
     SDL_Texture* tileTexture = spr::tileset->getTexture();
@@ -452,6 +460,13 @@ void drawTiles()
                             lC = (uLeft  != nullptr) && (g == itemDex[uLeft->wall].tileConnectGroup);
                             rC = (uRight != nullptr) && (g == itemDex[uRight->wall].tileConnectGroup);
                         }
+
+                        // 인접 창문은 벽으로 취급 — 벽이 창문 위/아래/옆으로 끊김 없이 이어 보이게
+                        tC = tC || tileHasWindow(tgtX,     tgtY - 1, pZ - d);
+                        bC = bC || tileHasWindow(tgtX,     tgtY + 1, pZ - d);
+                        lC = lC || tileHasWindow(tgtX - 1, tgtY,     pZ - d);
+                        rC = rC || tileHasWindow(tgtX + 1, tgtY,     pZ - d);
+
                         uDir = connectGroupExtraIndex(tC, bC, lC, rC);
                     }
 
@@ -951,6 +966,12 @@ void drawTiles()
                     rightCheck = (currentTileGroup == rightTileGroup);
                 }
 
+                // 인접 창문은 벽으로 취급 — 벽이 창문 위/아래/옆으로 끊김 없이 이어 보이게
+                topCheck   = topCheck   || tileHasWindow(tgtX,     tgtY - 1, PlayerZ());
+                botCheck   = botCheck   || tileHasWindow(tgtX,     tgtY + 1, PlayerZ());
+                leftCheck  = leftCheck  || tileHasWindow(tgtX - 1, tgtY,     PlayerZ());
+                rightCheck = rightCheck || tileHasWindow(tgtX + 1, tgtY,     PlayerZ());
+
                 dirCorrection = connectGroupExtraIndex(topCheck, botCheck, leftCheck, rightCheck);
             }
 
@@ -1237,12 +1258,12 @@ void drawEntities()
                     dst.h = tileSize;
 
                     setZoom(zoomScale);
-                    SDL_SetTextureAlphaMod(spr::propset->getTexture(), 150);
-                    SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND);
-                    int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
+                    SDL_SetTextureAlphaMod(spr::vehset->getTexture(), 150);
+                    SDL_SetTextureBlendMode(spr::vehset->getTexture(), SDL_BLENDMODE_BLEND);
+                    int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].vehSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
                     drawSpriteCenter
                     (
-                        spr::propset,
+                        spr::vehset,
                         sprIndex,
                         dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
                         dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
@@ -1256,7 +1277,7 @@ void drawEntities()
                         dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
                         dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
                     );
-                    SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255);
+                    SDL_SetTextureAlphaMod(spr::vehset->getTexture(), 255);
                     SDL_SetTextureAlphaMod(spr::dirMarker->getTexture(), 255);
                     setZoom(1.0);
                 }

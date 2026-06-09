@@ -27,9 +27,9 @@ void Vehicle::drawSelf()
             dst.h = tileSize;
 
             setZoom(zoomScale);
-            SDL_SetTextureAlphaMod(spr::propset->getTexture(), alpha); //텍스쳐 투명도 설정
-            SDL_SetTextureBlendMode(spr::propset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
-            int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].propSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
+            SDL_SetTextureAlphaMod(spr::vehset->getTexture(), alpha); //텍스쳐 투명도 설정
+            SDL_SetTextureBlendMode(spr::vehset->getTexture(), SDL_BLENDMODE_BLEND); //블렌드모드 설정
+            int sprIndex = vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].vehSprIndex + vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndexSingle + 16 * vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].extraSprIndex16;
 
             if (vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].itemCode == itemID::minecart)
             {
@@ -40,12 +40,12 @@ void Vehicle::drawSelf()
 
             drawSpriteCenter
             (
-                spr::propset,
+                spr::vehset,
                 sprIndex,
                 dst.x + dst.w / 2 + zoomScale * vPtr->getIntegerFakeX(),
                 dst.y + dst.h / 2 + zoomScale * vPtr->getIntegerFakeY()
             );
-            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 255); //텍스쳐 투명도 설정
+            SDL_SetTextureAlphaMod(spr::vehset->getTexture(), 255); //텍스쳐 투명도 설정
 
 
             if (vPtr->partInfo[{tgtX, tgtY, tgtZ}]->itemInfo[layer].pocketPtr != nullptr)

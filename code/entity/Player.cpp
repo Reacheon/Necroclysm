@@ -218,10 +218,10 @@ void Player::updateMinimap()
 						{
 							for (const ItemData& part : it->second->itemInfo)
 							{
-								int sprIdx = part.propSprIndex
+								int sprIdx = part.vehSprIndex
 									+ part.extraSprIndexSingle
 									+ 16 * part.extraSprIndex16;
-								drawSpriteCenterExSrc(spr::propset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
+								drawSpriteCenterExSrc(spr::vehset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
 							}
 						}
 					}

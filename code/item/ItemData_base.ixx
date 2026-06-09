@@ -116,7 +116,8 @@ export struct ItemDataBase
     unsigned __int8 throwRange = 5;
     float throwStoppingPower = 0.005f;
     unsigned __int16 bookIndex = 0; //책 파일의 이름명, 0이면 작동하지 않음(책이 아닌걸로 취급), 1이면 1.txt를 읽어냄
-    unsigned __int16 propSprIndex = 0; //아이템아이콘 말고 실제 Vehicle로 설치되었을 때의 이미지 인덱스
+    unsigned __int16 propSprIndex = 0; //프롭으로 설치되었을 때 propset.png에서의 이미지 인덱스(아이템 아이콘과 별개)
+    unsigned __int16 vehSprIndex = 0; //차량 부품으로 설치되었을 때 vehset.png에서의 이미지 인덱스(아이템 아이콘과 별개)
     void* equipSpr = nullptr;
     void* equipSprToggleOn = nullptr;
     void* flipEquipSpr = nullptr;

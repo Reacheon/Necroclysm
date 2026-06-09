@@ -13,6 +13,7 @@ import globalTime;
 
 import drawText;
 import ContextMenu;
+import Loot;
 
 
 void Prop::drawSelf()
@@ -223,6 +224,21 @@ void Prop::drawSelf()
 
             sprIndex += (2 + animFrame);
         }
+    }
+
+    //창문: 단일 window 프롭의 플래그 조합으로 propSprIndex(=144) 기준 오프셋 결정
+    //  +0 닫힘 / +1 열림 / +2 커튼닫힘 / +3 커튼열림+창문닫힘 / +4 커튼열림+창문열림 / +5 깨짐
+    if (leadItem.checkFlag(itemFlag::WINDOW))
+    {
+        if (leadItem.checkFlag(itemFlag::WINDOW_FRAME)) sprIndex += 6;
+        else if (leadItem.checkFlag(itemFlag::WINDOW_BROKEN)) sprIndex += 5;
+        else if (leadItem.checkFlag(itemFlag::CURTAIN))
+        {
+            if (leadItem.checkFlag(itemFlag::CURTAIN_OPEN) == false) sprIndex += 2;
+            else if (leadItem.checkFlag(itemFlag::WINDOW_OPEN) == false) sprIndex += 3;
+            else sprIndex += 4;
+        }
+        else if (leadItem.checkFlag(itemFlag::WINDOW_OPEN)) sprIndex += 1;
     }
 
 
@@ -618,6 +634,13 @@ void Prop::drawSelf()
     if (iCode == itemID::electricOven || iCode == itemID::electricCooktop)
     {
         if (leadItem.checkFlag(itemFlag::PROP_POWER_ON)) sprIndex += 1;
+    }
+
+    //루팅창이 이 프롭의 포켓을 열고 있는 동안만 문 열린 스프라이트(+1)로 그림 (장롱/캐비닛/금고/냉장고/탄통 등)
+    if (leadItem.checkFlag(itemFlag::PROP_POCKET_OPEN_SPRITE))
+    {
+        Loot* lootPtr = Loot::ins();
+        if (lootPtr != nullptr && lootPtr->panel.pocket == leadItem.pocketPtr.get()) sprIndex += 1;
     }
 
 

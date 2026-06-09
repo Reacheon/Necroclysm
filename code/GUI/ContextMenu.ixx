@@ -23,6 +23,7 @@ public:
 	~ContextMenu();
 	static ContextMenu* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center);
+	std::wstring getOptionText(act inputAct, int* iconIndex = nullptr);
 	void drawGUI();
 	void clickUpGUI();
 	void step();

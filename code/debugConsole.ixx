@@ -869,7 +869,7 @@ export void debugConsole()
 		if      (lotSel == 1) lot = &sampleLot;
 		else if (lotSel == 2) lot = &streetNS;
 		else if (lotSel == 3) lot = &streetCross;
-		else if (lotSel == 4) lot = &bridgeNS;
+		else if (lotSel == 4) lot = &bridgeNS_Single;
 		if (lot == nullptr)
 		{
 			prt(L"잘못된 값을 입력하였습니다.\n");
