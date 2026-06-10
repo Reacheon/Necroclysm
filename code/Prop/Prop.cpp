@@ -235,6 +235,32 @@ void Prop::updateSprIndex()
         leftTile = sameCheck(-1, 0);
         rightTile = sameCheck(1, 0);
         leadItem.extraSprIndexSingle = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
+
+        //하단 대각(좌하/우하) 미점유 변형 — 하단+좌/우가 연결된 기본형에서 해당 쪽 대각이 비면 +16~+25 변형 선택
+        //양쪽 관여: (0,■□)=+16 (0,□■)=+17 (0,□□)=+18 (4,■□)=+19 (4,□■)=+20 (4,□□)=+21
+        //한쪽 관여: (6,우하□)=+22 (2,좌하□)=+23 (5,우하□)=+24 (3,좌하□)=+25
+        if (leadItem.checkFlag(itemFlag::PROP_CONNECT_DIAG_BOTTOM))
+        {
+            int base = leadItem.extraSprIndexSingle;
+            if (base == 0 || base == 4)//사방연결/하좌우연결 — 양쪽 대각 관여
+            {
+                bool botLeftTile = sameCheck(-1, 1);
+                bool botRightTile = sameCheck(1, 1);
+                if (!botLeftTile || !botRightTile)
+                {
+                    int variant = botLeftTile ? 0 : (botRightTile ? 1 : 2);
+                    leadItem.extraSprIndexSingle = (base == 0 ? 16 : 19) + variant;
+                }
+            }
+            else if (base == 6 || base == 5)//상하우연결/하우연결 — 우하 대각만 관여
+            {
+                if (!sameCheck(1, 1)) leadItem.extraSprIndexSingle = (base == 6 ? 22 : 24);
+            }
+            else if (base == 2 || base == 3)//상하좌연결/하좌연결 — 좌하 대각만 관여
+            {
+                if (!sameCheck(-1, 1)) leadItem.extraSprIndexSingle = (base == 2 ? 23 : 25);
+            }
+        }
     }
 }
 

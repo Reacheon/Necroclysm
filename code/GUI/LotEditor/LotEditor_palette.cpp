@@ -149,7 +149,10 @@ void LotEditor::drawPalette()
             {
                 //나무는 48px 풀스프라이트라 셀을 넘쳐 이웃을 가림 -> 1/2배(2.0->1.0)로 픽셀손실 없이 축소.
                 setZoom(itemDex[code].checkFlag(itemFlag::TREE) ? 1.0f : 2.0f);
-                drawSpriteCenter(spr::propset, itemDex[code].propSprIndex, cx, cy);
+                //고립(이웃에 동류 없음) 변형을 대표 이미지로 - 타일과 동일 처리.
+                int sprIdx = itemDex[code].propSprIndex;
+                if (itemDex[code].tileConnectGroup != -1) sprIdx += connectGroupExtraIndex(false, false, false, false);
+                drawSpriteCenter(spr::propset, sprIdx, cx, cy);
             }
             else if (mode_ == EditMode::Item || mode_ == EditMode::Vehicle)
             {

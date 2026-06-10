@@ -121,7 +121,8 @@ void LotEditor::drawTopBar()
         : (mode_ == EditMode::Monster && sel >= 0 && sel < (int)entityDex.size() ? entityDex[sel].name : L"(none)");
 
     std::wstring line1 = L"Z " + std::to_wstring(PlayerZ()) + L"   Zoom " + std::to_wstring((int)(zoomScale + 0.01f)) + L"x   Chunk (" + std::to_wstring(ccx) + L"," + std::to_wstring(ccy) + L")";
-    std::wstring line2 = L"Sel #" + std::to_wstring(sel) + L"  " + selName;
+    //"#"는 drawText에서 컬러코드(#RRGGBB)로 오인되어 뒤 7글자를 먹어버리므로 리터럴 # 사용 금지
+    std::wstring line2 = L"Sel " + std::to_wstring(sel) + L"  " + selName;
 
     setFont(fontType::mainFont);
     setFontSize(14);

@@ -128,7 +128,7 @@ Corouter Craft::executeCraft()
 
 						createProp(buildLocation, itemID::craftingItem);
 
-						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].propWIPSprIndex;
+						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].craftWIPSprIndex;
 
 						PlayerPtr->setFakeX(3 * (buildLocation.x - PlayerX()));
 						PlayerPtr->setFakeY(3 * (buildLocation.y - PlayerY()));
@@ -223,7 +223,7 @@ Corouter Craft::executeCraft()
 
 						createProp(buildLocation, itemID::craftingItem);
 
-						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].propWIPSprIndex;
+						TileProp(buildLocation)->leadItem.propSprIndex = itemDex[targetItemCode].craftWIPSprIndex;
 
 						PlayerPtr->setFakeX(3 * (buildLocation.x - PlayerX()));
 						PlayerPtr->setFakeY(3 * (buildLocation.y - PlayerY()));

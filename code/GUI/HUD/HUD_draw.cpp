@@ -116,7 +116,7 @@ void HUD::drawGUI()
 		if (ctrlVeh == nullptr)
 		{
 			SDL_SetTextureBlendMode(texture::minimap, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(texture::minimap, 160);
+			SDL_SetTextureAlphaMod(texture::minimap, 255);
 			setZoom(1.0);
 			drawTexture(texture::minimap, 13, 13);
 

@@ -180,6 +180,16 @@ void destroyProp(Point3 inputCoor)
 {
     //eraseProp()은 Prop 소멸자에서 자동 호출됨
     World::ins()->getTile(inputCoor).PropPtr.reset();
+
+    //철거로 연결이 끊긴 주변 설치물의 extraIndex(연결) 갱신
+    int dx = 0;
+    int dy = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        dir2Coord(i, dx, dy);
+        Prop* targetProp = TileProp(inputCoor.x + dx, inputCoor.y + dy, inputCoor.z);
+        if (targetProp != nullptr) targetProp->updateSprIndex();
+    }
 }
 
 void createProp(Point3 inputCoor, int inputItemCode)

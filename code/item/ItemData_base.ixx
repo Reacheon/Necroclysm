@@ -161,7 +161,7 @@ export struct ItemDataBase
 
     __int32 codeID = 0; //아이템 생성 시 genItemID()로 부여되는 고유 ID값 (0인 경우 미할당)
 
-    __int32 propWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
+    __int32 craftWIPSprIndex = 80; //제작 중인 아이템의 스프라이트
 
     int propInstallCode = itemID::none;   //이게 none이 아닐 경우 주변 타일에 설치 가능
     int propUninstallCode = itemID::none; //이게 none이 아닐 경우 주변 타일에 해체 가능

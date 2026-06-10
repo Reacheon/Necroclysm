@@ -34,7 +34,7 @@ namespace csvItem
     constexpr int propRBash = 19;
     constexpr int vehSprIndex = 20;
     constexpr int vehPriority = 21;
-    constexpr int propWIPSprIndex = 22;
+    constexpr int craftWIPSprIndex = 22;
     constexpr int calorie = 23;
     constexpr int hydration = 24;
     constexpr int hydrationPer = 25;
@@ -575,6 +575,8 @@ export int readItemDex(const wchar_t* file)
                             { L"WINDOW_FRAME", itemFlag::WINDOW_FRAME },
                             { L"CURTAIN", itemFlag::CURTAIN },
                             { L"CURTAIN_OPEN", itemFlag::CURTAIN_OPEN },
+
+                            { L"PROP_CONNECT_DIAG_BOTTOM", itemFlag::PROP_CONNECT_DIAG_BOTTOM },
                         };
 
                         size_t pos = 0;
@@ -1128,7 +1130,7 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::vehPriority:
                         itemDex[tgtIndex].vehPriority = wtoi(strFragment.c_str());
                         break;
-                    case csvItem::propWIPSprIndex:
+                    case csvItem::craftWIPSprIndex:
                     {
                         // 제작 중(WIP) 스프라이트 인덱스는 아틀라스 레이아웃에 묶인 상수라
                         // TSV엔 이름으로 적고 숫자는 여기서 하드코딩한다. 모르는 이름이면 errorBox.
@@ -1144,8 +1146,8 @@ export int readItemDex(const wchar_t* file)
                             {L"WIP_METAL_CABLE",  116},
                         };
                         auto it = wipSprMap.find(strFragment);
-                        if (it != wipSprMap.end()) { itemDex[tgtIndex].propWIPSprIndex = it->second; }
-                        else { errorBox(L"readItemDex.ixx csvItem::propWIPSprIndex: 알 수 없는 WIP 스프라이트 이름 '" + strFragment + L"'"); }
+                        if (it != wipSprMap.end()) { itemDex[tgtIndex].craftWIPSprIndex = it->second; }
+                        else { errorBox(L"readItemDex.ixx csvItem::craftWIPSprIndex: 알 수 없는 WIP 스프라이트 이름 '" + strFragment + L"'"); }
                         break;
                     }
                     case csvItem::propInstallCode:

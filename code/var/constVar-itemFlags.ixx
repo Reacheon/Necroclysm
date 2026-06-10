@@ -207,4 +207,6 @@ export enum class itemFlag
     WINDOW_FRAME, //창틀만 남음(2차 파손, 스프라이트 +6=150). 통행 가능
     CURTAIN, //커튼이 달려 있음(커튼 유무는 이 플래그로 판별)
     CURTAIN_OPEN, //커튼이 열림(없으면 닫혀서 시야 차단 = PROP_BLOCKER)
+
+    PROP_CONNECT_DIAG_BOTTOM, //연결 프롭의 하단 대각(좌하/우하) 미점유 변형 스프라이트(+16~+25) 보유. 하단+좌/우 연결 기본형(0/4/6/2/5/3)에서 적용. 테이블 등
 };
