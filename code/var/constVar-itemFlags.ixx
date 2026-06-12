@@ -209,4 +209,8 @@ export enum class itemFlag
     CURTAIN_OPEN, //커튼이 열림(없으면 닫혀서 시야 차단 = PROP_BLOCKER)
 
     PROP_CONNECT_DIAG_BOTTOM, //연결 프롭의 하단 대각(좌하/우하) 미점유 변형 스프라이트(+16~+25) 보유. 하단+좌/우 연결 기본형(0/4/6/2/5/3)에서 적용. 테이블 등
+
+    ROLLUP_DOOR, //롤업도어 프롭. 기계식 윈치로만 개폐(DOOR 계열 클릭 경로와 분리), H는 좌우/V는 상하로 개폐 상태가 체인 전파됨
+    ROLLUP_DOOR_OPEN, //롤업도어 열림 상태(없으면 닫힘). 열리면 통행 가능 + 스프라이트 +16 + 반투명
+    PROP_DEPTH_UPPER, //동일 타일의 엔티티/프롭/차량보다 위에 그려지는 프롭(열린 롤업도어 등)
 };

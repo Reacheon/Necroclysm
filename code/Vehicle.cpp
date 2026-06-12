@@ -540,7 +540,7 @@ void Vehicle::shift(int dx, int dy)
                     blocked = true; blockPos = newPos; blockReason = L"wall"; break;
                 }
                 Prop* p = TileProp(newPos.x, newPos.y, newPos.z);
-                if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+                if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER))
                 {
                     blocked = true; blockPos = newPos; blockReason = L"prop"; break;
                 }
@@ -699,7 +699,7 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
                 return true;
             }
             Prop* p = TileProp(nx, ny, nz);
-            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER))
             {
                 prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
                 return true;
@@ -720,7 +720,7 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
         int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
         if (TileWall(nx, ny, nz) != itemID::none) return true;
         Prop* p = TileProp(nx, ny, nz);
-        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
+        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER)) return true;
         Vehicle* v = TileVehicle(nx, ny, nz);
         if (v != nullptr && v != this) return true;
     }
@@ -786,7 +786,7 @@ bool Vehicle::colisionCheck(int dx, int dy)
                 return true;
             }
             Prop* p = TileProp(nx, ny, nz);
-            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER))
+            if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER))
             {
                 prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
                 return true;
@@ -806,7 +806,7 @@ bool Vehicle::colisionCheck(int dx, int dy)
         int nx = pos.x + dx, ny = pos.y + dy, nz = pos.z;
         if (TileWall(nx, ny, nz) != itemID::none) return true;
         Prop* p = TileProp(nx, ny, nz);
-        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER)) return true;
+        if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER)) return true;
         Vehicle* v = TileVehicle(nx, ny, nz);
         if (v != nullptr && v != this)
         {

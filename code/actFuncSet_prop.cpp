@@ -111,6 +111,110 @@ namespace actFunc
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
+	//롤업도어 한 칸의 개폐 상태 설정 — 나무문 closeDoor 패턴(가스 ON/OFF 전환 포함). 열린 문은 PROP_DEPTH_UPPER로 엔티티/차량 위에 그려짐
+	void setRollupDoorState(int tgtX, int tgtY, int tgtZ, bool open)
+	{
+		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
+		if (tgtProp == nullptr) return;
+		ItemData& d = tgtProp->leadItem;
+		if (d.checkFlag(itemFlag::ROLLUP_DOOR) == false) return;
+		if (open)
+		{
+			//PROP_DEPTH_UPPER: 렌더 최상단 + 차량 충돌 통과(Vehicle::colisionCheck). 닫힘은 DEPTH 플래그 없음 = 엔티티 깊이 + 차량 차단
+			d.addFlag(itemFlag::ROLLUP_DOOR_OPEN);
+			d.addFlag(itemFlag::PROP_WALKABLE);
+			d.addFlag(itemFlag::PROP_DEPTH_UPPER);
+			d.eraseFlag(itemFlag::PROP_BLOCKER);
+			if (d.checkFlag(itemFlag::PROP_GAS_OBSTACLE_ON))
+			{
+				d.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+				d.addFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+			}
+		}
+		else
+		{
+			d.eraseFlag(itemFlag::ROLLUP_DOOR_OPEN);
+			d.eraseFlag(itemFlag::PROP_WALKABLE);
+			d.eraseFlag(itemFlag::PROP_DEPTH_UPPER);
+			d.addFlag(itemFlag::PROP_BLOCKER);
+			if (d.checkFlag(itemFlag::PROP_GAS_OBSTACLE_OFF))
+			{
+				d.eraseFlag(itemFlag::PROP_GAS_OBSTACLE_OFF);
+				d.addFlag(itemFlag::PROP_GAS_OBSTACLE_ON);
+			}
+		}
+	}
+
+	void toggleRollupDoors(Point3 winchPos)
+	{
+		std::unordered_set<Point3, Point3::Hash> visitedSet;
+		bool anyOpened = false, anyClosed = false, anyBlocked = false;
+		for (int dir = 0; dir < 8; dir++)
+		{
+			int dx, dy;
+			dir2Coord(dir, dx, dy);
+			Point3 seed = { winchPos.x + dx, winchPos.y + dy, winchPos.z };
+			Prop* seedProp = TileProp(seed.x, seed.y, seed.z);
+			if (seedProp == nullptr || seedProp->leadItem.checkFlag(itemFlag::ROLLUP_DOOR) == false) continue;
+			if (visitedSet.find(seed) != visitedSet.end()) continue; //앞선 시드의 체인에 이미 포함 → 스킵(이중 토글 방지)
+
+			//시드 문의 반전된 상태가 체인 전체를 결정(문별 개별 토글)
+			bool newOpen = seedProp->leadItem.checkFlag(itemFlag::ROLLUP_DOOR_OPEN) == false;
+
+			//1차: 체인 수집 BFS — H문은 좌우(±x), V문은 상하(±y)로 같은 itemCode인 문에만 전파
+			std::vector<Point3> chainTiles;
+			std::queue<Point3> frontierQueue;
+			frontierQueue.push(seed);
+			while (!frontierQueue.empty())
+			{
+				Point3 current = frontierQueue.front();
+				frontierQueue.pop();
+				if (visitedSet.find(current) != visitedSet.end()) continue;
+				visitedSet.insert(current);
+				chainTiles.push_back(current);
+				int curCode = TileProp(current.x, current.y, current.z)->leadItem.itemCode;
+
+				int cdx = (curCode == itemID::rollupDoorH) ? 1 : 0;
+				int cdy = (curCode == itemID::rollupDoorV) ? 1 : 0;
+				for (int sign = -1; sign <= 1; sign += 2)
+				{
+					Point3 next = { current.x + cdx * sign, current.y + cdy * sign, current.z };
+					Prop* nextProp = TileProp(next.x, next.y, next.z);
+					if (nextProp != nullptr && nextProp->leadItem.itemCode == curCode && visitedSet.find(next) == visitedSet.end()) frontierQueue.push(next);
+				}
+			}
+
+			//닫기는 체인 전체가 비어 있어야 가능 — 한 칸이라도 엔티티/차량/아이템이 깔려 있으면 문이 끼므로 체인째 거부(문은 물리적으로 한 장)
+			if (newOpen == false)
+			{
+				bool chainBlocked = false;
+				for (const Point3& tile : chainTiles)
+				{
+					ItemStack* stackPtr = TileItemStack(tile.x, tile.y, tile.z);
+					if (TileEntity(tile.x, tile.y, tile.z) != nullptr || TileVehicle(tile.x, tile.y, tile.z) != nullptr || (stackPtr != nullptr && stackPtr->getPocket()->itemInfo.empty() == false))
+					{
+						chainBlocked = true;
+						break;
+					}
+				}
+				if (chainBlocked)
+				{
+					anyBlocked = true;
+					continue;
+				}
+			}
+
+			//2차: 체인 전체에 새 상태 적용
+			for (const Point3& tile : chainTiles) setRollupDoorState(tile.x, tile.y, tile.z, newOpen);
+			if (newOpen) anyOpened = true;
+			else anyClosed = true;
+		}
+		if (anyOpened) updateLog(L"The roll-up door rattles open.");
+		if (anyClosed) updateLog(L"The roll-up door rattles shut.");
+		if (anyBlocked) updateLog(L"Something is in the way of the roll-up door.");
+		if (anyOpened || anyClosed) PlayerPtr->updateVision(PlayerInfo().eyeSight);
+	}
+
 	void closeVDoor(int tgtX, int tgtY, int tgtZ)
 	{
 		ItemPocket* tgtPocket = TileVehicle(tgtX, tgtY, PlayerZ())->partInfo[{tgtX, tgtY, PlayerZ() }].get();

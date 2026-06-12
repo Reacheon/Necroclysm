@@ -18,6 +18,7 @@ import ItemData;
 import ItemStack;
 import Particle;
 import globalTime;
+import actFuncSet;
 
 bool Entity::runAnimation(bool shutdown)
 {
@@ -1264,7 +1265,12 @@ bool Entity::runAnimation(bool shutdown)
 				Prop* address = TileProp(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 				if (address != nullptr)
 				{
-					if (address->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
+					//기계식 윈치: 전원 토글 대신 인접 롤업도어 체인 개폐
+					if (address->leadItem.itemCode == itemID::mechanicalWinch)
+					{
+						actFunc::toggleRollupDoors({ PlayerX() + dx, PlayerY() + dy, PlayerZ() });
+					}
+					else if (address->leadItem.checkFlag(itemFlag::PROP_POWER_OFF))
 					{
 						address->leadItem.eraseFlag(itemFlag::PROP_POWER_OFF);
 						address->leadItem.addFlag(itemFlag::PROP_POWER_ON);

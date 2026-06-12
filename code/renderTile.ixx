@@ -60,7 +60,7 @@ void drawDebug();
 
 
 // 차량과 엔티티는 중복을 허용하면 안됨
-std::vector<Point2> tileList, itemList, floorPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList, wallHPList;
+std::vector<Point2> tileList, itemList, floorPropList, upperPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList, wallHPList;
 std::unordered_set<Point2, Point2::Hash> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
 std::vector<Drawable*> renderVehList, renderEntityList;
 std::unordered_set<Point2, Point2::Hash> raySet;
@@ -85,6 +85,7 @@ export std::int64_t renderTile()
     tileList.clear();
     itemList.clear();
     floorPropList.clear();
+    upperPropList.clear();
     renderVehList.clear();
     renderEntityList.clear();
     gasList.clear();
@@ -236,7 +237,12 @@ void analyseRender()
 
             // 플레이어와 겹치는 일반설치물
             Prop* pPtr = thisTile->PropPtr.get();
-            if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false) renderEntityList.push_back((Drawable*)pPtr);
+            if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
+            {
+                //열린 롤업도어 등 — 같은 타일의 엔티티/차량 위에 그려지는 프롭은 별도 리스트로 분리
+                if (pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER)) upperPropList.push_back({ tgtX, tgtY });
+                else renderEntityList.push_back((Drawable*)pPtr);
+            }
 
             // 일반 객체
             Drawable* ePtr = (Drawable*)(thisTile->EntityPtr.get());
@@ -1204,6 +1210,13 @@ void drawEntities()
             elem->drawSelf();
             entityCache.insert(elem);
         }
+    }
+
+    // 상단 프롭 그리기 — 동일 타일의 엔티티/차량을 덮는 프롭(열린 롤업도어 등). 가스/안개보다는 아래
+    for (const auto& elem : upperPropList)
+    {
+        Prop* upPtr = TileProp(elem.x, elem.y, pZ);
+        if (upPtr != nullptr) upPtr->drawSelf();
     }
 
     // 헬기 로터 그리기

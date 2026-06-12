@@ -19,6 +19,7 @@ import Player;
 import drawText;
 import drawPrimitive;
 import log;
+import actFuncSet;
 
 namespace
 {
@@ -62,6 +63,8 @@ void LotEditor::openEditorContextMenu(Point3 t)
                 menuItems_.push_back({ L"Toggle window", 23 });
                 menuItems_.push_back({ L"Cycle break", 24 });
             }
+            //롤업도어 저작: 개폐 상태 미리보기 토글(export는 itemCode만 저장 — 열림 상태는 영속되지 않음)
+            if (propPtr->leadItem.checkFlag(itemFlag::ROLLUP_DOOR)) menuItems_.push_back({ L"Toggle rollup door", 25 });
         }
         //차량 컨테이너 부품에 cargo가 들어있으면 비우기 제공.
         {
@@ -291,6 +294,12 @@ void LotEditor::executeMenuAction(int id)
                 w.addFlag(itemFlag::PROP_WALKABLE);
             }
         }
+        break;
+    }
+    case 25: //롤업도어 개폐 토글(체인 전파 없이 해당 칸만)
+    {
+        Prop* p = TileProp(t.x, t.y, t.z);
+        if (p != nullptr && p->leadItem.checkFlag(itemFlag::ROLLUP_DOOR)) actFunc::setRollupDoorState(t.x, t.y, t.z, p->leadItem.checkFlag(itemFlag::ROLLUP_DOOR_OPEN) == false);
         break;
     }
     }

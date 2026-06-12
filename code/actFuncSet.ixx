@@ -29,6 +29,10 @@ export namespace actFunc
 	export void closeCurtain(int tgtX, int tgtY, int tgtZ);
 	export void tearCurtain(int tgtX, int tgtY, int tgtZ);
 	export void breakWindow(int tgtX, int tgtY, int tgtZ);
+	//롤업도어 한 칸의 개폐 상태 설정(플래그 일괄 전환). 시야 갱신은 호출측 책임
+	export void setRollupDoorState(int tgtX, int tgtY, int tgtZ, bool open);
+	//기계식 윈치 작동 — 인접 8타일에서 롤업도어를 찾아 체인 단위로 개별 토글(H는 좌우, V는 상하 전파)
+	export void toggleRollupDoors(Point3 winchPos);
 	export void toggle(ItemData& inputItem);
 	export void drinkBottle(ItemData& inputData);
 	export void eatFood(ItemPocket* inputPocket, int inputCursor);

@@ -577,6 +577,10 @@ export int readItemDex(const wchar_t* file)
                             { L"CURTAIN_OPEN", itemFlag::CURTAIN_OPEN },
 
                             { L"PROP_CONNECT_DIAG_BOTTOM", itemFlag::PROP_CONNECT_DIAG_BOTTOM },
+
+                            { L"ROLLUP_DOOR", itemFlag::ROLLUP_DOOR },
+                            { L"ROLLUP_DOOR_OPEN", itemFlag::ROLLUP_DOOR_OPEN },
+                            { L"PROP_DEPTH_UPPER", itemFlag::PROP_DEPTH_UPPER },
                         };
 
                         size_t pos = 0;

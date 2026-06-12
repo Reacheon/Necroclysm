@@ -315,6 +315,12 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
 					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
 				}
+				else if (tgtProp->leadItem.itemCode == itemID::mechanicalWinch)
+				{
+					//기계식 윈치: 툭 치면 인접 롤업도어 체인 개폐(propTurnOnOff 람다에서 처리)
+					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));
+					addAniToPlayerTurn(PlayerPtr, aniFlag::propTurnOnOff);
+				}
 				else if (tgtProp->leadItem.itemCode == itemID::campfire && tgtProp->energyPercent > 0.0f)
 				{
 					PlayerPtr->setDirection(coord2Dir(touchX - PlayerX(), touchY - PlayerY()));

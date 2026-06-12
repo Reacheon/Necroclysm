@@ -635,4 +635,8 @@ export namespace itemID
     constexpr int humidifier = 640;           //가습기
     constexpr int controlPanel = 641; //제어반(공장)
 
+    constexpr int mechanicalWinch = 642;      //기계식 윈치(인접 롤업도어 개폐)
+    constexpr int rollupDoorH = 643;          //롤업도어 (↔, 좌우 체인)
+    constexpr int rollupDoorV = 644;          //롤업도어 (↕, 상하 체인)
+
 };

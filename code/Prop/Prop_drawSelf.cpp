@@ -241,6 +241,28 @@ void Prop::drawSelf()
         else if (leadItem.checkFlag(itemFlag::WINDOW_OPEN)) sprIndex += 1;
     }
 
+    //롤업도어: H는 좌우 벽 유무로 변형 선택(+0 양쪽벽X / +1 우벽만 / +2 양쪽벽 / +3 좌벽만), V는 변형 없음
+    //인접 롤업도어도 벽 취급 — 여러 칸 폭의 차고문이 끊김 없이 이어져 보이게
+    //열림(ROLLUP_DOOR_OPEN) 시 +16 스프라이트 + 반투명으로 말려 올라간 모습 표현
+    if (leadItem.checkFlag(itemFlag::ROLLUP_DOOR))
+    {
+        if (iCode == itemID::rollupDoorH)
+        {
+            Prop* lProp = TileProp(getGridX() - 1, getGridY(), getGridZ());
+            Prop* rProp = TileProp(getGridX() + 1, getGridY(), getGridZ());
+            bool wallL = ExistWall(getGridX() - 1, getGridY(), getGridZ()) || (lProp != nullptr && lProp->leadItem.checkFlag(itemFlag::ROLLUP_DOOR));
+            bool wallR = ExistWall(getGridX() + 1, getGridY(), getGridZ()) || (rProp != nullptr && rProp->leadItem.checkFlag(itemFlag::ROLLUP_DOOR));
+            if (wallL && wallR) sprIndex += 2;
+            else if (wallR) sprIndex += 1;
+            else if (wallL) sprIndex += 3;
+        }
+        if (leadItem.checkFlag(itemFlag::ROLLUP_DOOR_OPEN))
+        {
+            sprIndex += 16;
+            SDL_SetTextureAlphaMod(spr::propset->getTexture(), 170);
+        }
+    }
+
 
     if (iCode == itemID::leverRL || iCode == itemID::leverUD)
     {
