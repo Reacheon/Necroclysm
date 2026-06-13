@@ -639,4 +639,8 @@ export namespace itemID
     constexpr int rollupDoorH = 643;          //롤업도어 (↔, 좌우 체인)
     constexpr int rollupDoorV = 644;          //롤업도어 (↕, 상하 체인)
 
+    constexpr int polishedCeramicTile = 645;  //광택 세라믹 타일
+    constexpr int mop = 646;                  //대걸레
+    constexpr int iceCreamFreezer = 647;      //아이스크림 냉동고
+
 };

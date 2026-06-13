@@ -1129,6 +1129,15 @@ void drawItems()
         std::vector<ItemData>& pocketInfo = address->getPocket()->itemInfo;
         if (pocketInfo.size() == 0) continue; //빈 포켓은 그리지 않음
 
+        // 테이블 위 아이템스택은 테이블 높이만큼 y -5px 올려 그림
+        int tableYOffset = 0;
+        Prop* tilePropPtr = TileProp(tgtX, tgtY, pZ);
+        if (tilePropPtr != nullptr)
+        {
+            int propCode = tilePropPtr->leadItem.itemCode;
+            if (propCode == itemID::woodenTable || propCode == itemID::steelTable || propCode == itemID::roundWoodenTable) tableYOffset = -5;
+        }
+
         for (int i = pocketInfo.size() - 1; i >= 0; i--)
         {
             if (pocketInfo[pocketInfo.size() - 1].checkFlag(itemFlag::LIQUID) == false)
@@ -1139,7 +1148,7 @@ void drawItems()
                     spr::itemset,
                     pocketInfo[pocketInfo.size() - 1].getSprIndex(),
                     (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
-                    (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
+                    (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY() + tableYOffset)
                 );
                 setZoom(1.0);
                 break;
