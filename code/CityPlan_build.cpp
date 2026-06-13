@@ -30,6 +30,64 @@ import Lot;
 //   본 함수를 호출 — prt는 스레드 안전 보장 X. 디버그 출력 용도로만 사용.
 // ════════════════════════════════════════════════════════════════════════
 
+//LotResult를 절대좌표 (originX,originY,baseZ) 기준으로 plan에 블릿.
+//  stage 9(도로 픽셀)·stage 10(건물 그룹) 공용 — Lot 로컬 좌표를 절대 Point3로 옮겨
+//  tiles + 4개 spawn 채널에 누적한다. r은 spawn 페이로드를 move out 하므로 소비됨.
+static void blitLotResult(CityPlan& plan, LotResult& r, int originX, int originY, int baseZ)
+{
+    //LotResult.planes는 sparse z map (쓰여진 z만 존재). itemID::none 슬롯은 스킵.
+    for (const auto& [zLayer, plane] : r.planes)
+    {
+        for (int y = 0; y < r.h; ++y)
+            for (int x = 0; x < r.w; ++x)
+            {
+                const std::size_t pi = static_cast<std::size_t>(y) * r.w + x;
+                const int f = plane.floor[pi];
+                const int w = plane.wall[pi];
+                const int p = plane.prop[pi];
+                if (f == itemID::none && w == itemID::none && p == itemID::none) continue;
+
+                plan.tiles.push_back(CityTile{
+                    .pos   = Point3{ originX + x, originY + y, baseZ + zLayer },
+                    .floor = f,
+                    .wall  = w,
+                    .prop  = p,
+                });
+            }
+    }
+
+    //── spawn 채널 — Lot 로컬 좌표를 절대 Point3로 옮겨 plan에 누적
+    for (auto& s : r.itemStacks)
+    {
+        plan.itemStacks.push_back(CityItemStack{
+            .pos   = Point3{ originX + s.x, originY + s.y, baseZ + s.z },
+            .items = std::move(s.items),
+        });
+    }
+    for (const auto& m : r.monsters)
+    {
+        plan.monsters.push_back(CityMonster{
+            .pos        = Point3{ originX + m.x, originY + m.y, baseZ + m.z },
+            .entityCode = m.entityCode,
+        });
+    }
+    for (auto& v : r.vehicles)
+    {
+        plan.vehicles.push_back(CityVehicle{
+            .pos  = Point3{ originX + v.x, originY + v.y, baseZ + v.z },
+            .plan = std::move(v.plan),
+        });
+    }
+    //prop 인스턴스화 후 후처리로 ItemPocket 채울 데이터 — XY만 절대화.
+    for (auto& c : r.propContents)
+    {
+        plan.propContents.push_back(CityPropContents{
+            .pos   = Point3{ originX + c.x, originY + c.y, baseZ + c.z },
+            .items = std::move(c.items),
+        });
+    }
+}
+
 CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 {
     CityPlan plan{ id };
@@ -231,7 +289,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //══════════════════════════════════════════════════════════════════
     // 4. 도시 내부 건물 픽셀 다트던지기
     //══════════════════════════════════════════════════════════════════
-    //   Phase 1 — 무작위 좌표 + 1x1/2x1/1x2/2x2/3x3 블록 가설 배치 → checkPoints 전셀의
+    //   Phase 1 — 무작위 좌표 + 1x1/2x1/1x2/2x2 블록 가설 배치 → checkPoints 전셀의
     //             점유/지면/도로 검사 + 연결성 BFS → 통과 시 확정, 실패면 ++failStreak.
     //             failStreak >= MAX_FAIL_STREAK 이면 Phase 2로 이행.
     //   Phase 2 — 결정적 채움. "미래 도로 2x2" (= 기존 도로 OR 빈 도시 셀의 4셀 결합)을
@@ -390,11 +448,11 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         };
 
         //블록 크기 추첨 — 큰 블록일수록 희귀. 분포 튜닝 시 임계값 조정.
-        //  3x3:3% / 2x2:7% / 2x1:10% / 1x2:10% / 1x1:70%
+        //  3x3은 매칭 건물 Lot 부재로 당분간 제외(기존 3% → 2x2로 흡수).
+        //  2x2:10% / 2x1:10% / 1x2:10% / 1x1:70%
         const int boxPr = localRandom(1, 100);
         int blockW, blockH;
-        if      (boxPr <=  3) { blockW = 3; blockH = 3; }
-        else if (boxPr <= 10) { blockW = 2; blockH = 2; }
+        if      (boxPr <= 10) { blockW = 2; blockH = 2; }
         else if (boxPr <= 20) { blockW = 2; blockH = 1; }
         else if (boxPr <= 30) { blockW = 1; blockH = 2; }
         else                  { blockW = 1; blockH = 1; }
@@ -755,60 +813,112 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
                 const int originX = (patchPxX + lx) * TILE_PER_PIXEL + TILE_BASE_X;
                 const int originY = (patchPxY + ly) * TILE_PER_PIXEL + TILE_BASE_Y;
-                const int baseZ   = node.center.z;
-
-                //LotResult.planes는 sparse z map (쓰여진 z만 존재). itemID::none 슬롯은 스킵.
-                for (const auto& [zLayer, plane] : r.planes)
-                {
-                    for (int y = 0; y < r.h; ++y)
-                        for (int x = 0; x < r.w; ++x)
-                        {
-                            const std::size_t pi = static_cast<std::size_t>(y) * r.w + x;
-                            const int f = plane.floor[pi];
-                            const int w = plane.wall[pi];
-                            const int p = plane.prop[pi];
-                            if (f == itemID::none && w == itemID::none && p == itemID::none) continue;
-
-                            plan.tiles.push_back(CityTile{
-                                .pos   = Point3{ originX + x, originY + y, baseZ + zLayer },
-                                .floor = f,
-                                .wall  = w,
-                                .prop  = p,
-                            });
-                        }
-                }
-
-                //── spawn 채널 — Lot 로컬 좌표를 절대 Point3로 옮겨 plan에 누적
-                for (auto& s : r.itemStacks)
-                {
-                    plan.itemStacks.push_back(CityItemStack{
-                        .pos   = Point3{ originX + s.x, originY + s.y, baseZ + s.z },
-                        .items = std::move(s.items),
-                    });
-                }
-                for (const auto& m : r.monsters)
-                {
-                    plan.monsters.push_back(CityMonster{
-                        .pos        = Point3{ originX + m.x, originY + m.y, baseZ + m.z },
-                        .entityCode = m.entityCode,
-                    });
-                }
-                for (auto& v : r.vehicles)
-                {
-                    plan.vehicles.push_back(CityVehicle{
-                        .pos  = Point3{ originX + v.x, originY + v.y, baseZ + v.z },
-                        .plan = std::move(v.plan),
-                    });
-                }
-                //prop 인스턴스화 후 후처리로 ItemPocket 채울 데이터 — XY만 절대화.
-                for (auto& c : r.propContents)
-                {
-                    plan.propContents.push_back(CityPropContents{
-                        .pos   = Point3{ originX + c.x, originY + c.y, baseZ + c.z },
-                        .items = std::move(c.items),
-                    });
-                }
+                blitLotResult(plan, r, originX, originY, node.center.z);
             }
+    }
+
+
+    //══════════════════════════════════════════════════════════════════
+    // 10. 건물 픽셀 그룹 → 건물 Lot 페인트
+    //══════════════════════════════════════════════════════════════════
+    //   stage 4~5가 확정한 building 픽셀을 memberBuildingIndex별 그룹(직사각형
+    //   footprint)으로 복원 → buildingByFootprint로 Lot 선택 → 인접 도로를 향하도록
+    //   회전 결정 → blitLotResult로 plan.tiles에 블릿. stage 9(도로)와 동일한 픽셀→Lot
+    //   패턴이며, 차이는 "그룹 단위 멀티픽셀 footprint"라는 점뿐.
+    //
+    //   회전↔footprint 결합: 비정사각 Lot(authored 2x1)은 none/180이 2x1, 90/270이 1x2.
+    //   그룹이 직사각형이면 footprint 보존 회전만 후보(2x1 그룹→도어 N/S, 1x2 그룹→도어
+    //   E/W), 정사각이면 4방향 자유. allowRotation()==false면 none만(authored 방향).
+    //   도어 컨벤션은 캐논 남쪽(rotateLotResult CCW): none=S, ccw90=E, ccw180=N, ccw270=W.
+    //   도어가 도로 향하는 회전을 우선, 없으면 footprint 맞는 아무 회전(균등 추첨).
+
+    {
+        //building 픽셀을 memberIndex별 bounding box로 묶음 — stage 5 후 모두 직사각형.
+        struct Group { int minPx, minPy, maxPx, maxPy, count; bool init; };
+        std::unordered_map<int, Group> groups;
+        for (const auto& bp : buildings)
+        {
+            Group& g = groups[bp.memberBuildingIndex];
+            if (!g.init) { g.minPx = g.maxPx = bp.coord.x; g.minPy = g.maxPy = bp.coord.y; g.init = true; }
+            else
+            {
+                g.minPx = std::min(g.minPx, bp.coord.x);  g.maxPx = std::max(g.maxPx, bp.coord.x);
+                g.minPy = std::min(g.minPy, bp.coord.y);  g.maxPy = std::max(g.maxPy, bp.coord.y);
+            }
+            ++g.count;
+        }
+
+        //절대 px의 roads[] openBits 조회 — 그룹 외곽 도로 인접 판정용. 패치 밖이면 도로 없음.
+        auto roadOpenAtPx = [&](int px, int py) -> bool {
+            const int lx = px - patchPxX, ly = py - patchPxY;
+            if (lx < 0 || lx >= patchW || ly < 0 || ly >= patchH) return false;
+            return roads[static_cast<std::size_t>(ly) * patchW + lx].openBits != 0;
+            };
+
+        for (const auto& kv : groups)
+        {
+            const Group& g = kv.second;
+            const int gw = g.maxPx - g.minPx + 1;
+            const int gh = g.maxPy - g.minPy + 1;
+            if (g.count != gw * gh) continue;   //비직사각(이론상 없음) — 방어적 스킵
+
+            //그룹 결정론 시드 — origin px 해시 (stage 9 픽셀 시드와 동형). 선택·회전·내용 공유.
+            std::uint64_t gSeed = seed ^ 0x9E3779B97F4A7C15ULL;
+            gSeed ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(g.minPx)) * 0xBF58476D1CE4E5B9ULL;
+            gSeed  = (gSeed ^ (gSeed >> 27)) * 0x94D049BB133111EBULL;
+            gSeed ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(g.minPy)) * 0x94D049BB133111EBULL;
+            gSeed ^= gSeed >> 31;
+            std::mt19937_64 gRng{ gSeed };
+
+            const Lot* lot = buildingByFootprint(gw, gh, gRng);
+            if (lot == nullptr) continue;   //매칭 footprint 없음 — 빈 마당으로 남김
+
+            //그룹 4면 도로 인접 여부 (외곽 한 줄에 도로 픽셀이 하나라도 있으면 true)
+            bool roadN = false, roadS = false, roadE = false, roadW = false;
+            for (int i = 0; i < gw; ++i)
+            {
+                if (roadOpenAtPx(g.minPx + i, g.minPy - 1)) roadN = true;
+                if (roadOpenAtPx(g.minPx + i, g.maxPy + 1)) roadS = true;
+            }
+            for (int j = 0; j < gh; ++j)
+            {
+                if (roadOpenAtPx(g.minPx - 1, g.minPy + j)) roadW = true;
+                if (roadOpenAtPx(g.maxPx + 1, g.minPy + j)) roadE = true;
+            }
+
+            //회전 후보 — footprint가 (gw,gh) 일치 + (회전가능 or none). reservoir 균등 추첨으로
+            //  도로 향하는 회전(bestRoad)과 전체(bestAny)를 동시에 뽑아, 도로 후보 있으면 우선.
+            const int aw = lot->sizeChunkW();
+            const int ah = lot->sizeChunkH();
+            const bool canRot = lot->allowRotation();
+
+            lotRot bestRoad = lotRot::none, bestAny = lotRot::none;
+            int nRoad = 0, nAny = 0;
+            auto consider = [&](lotRot rot, int rw, int rh, bool doorRoad) {
+                if (rw != gw || rh != gh) return;            //footprint 불일치
+                if (rot != lotRot::none && !canRot) return;  //비회전 Lot은 none만
+                ++nAny;
+                if (std::uniform_int_distribution<int>{1, nAny}(gRng) == 1) bestAny = rot;
+                if (doorRoad)
+                {
+                    ++nRoad;
+                    if (std::uniform_int_distribution<int>{1, nRoad}(gRng) == 1) bestRoad = rot;
+                }
+                };
+            consider(lotRot::none,   aw, ah, roadS);   //도어 남
+            consider(lotRot::ccw90,  ah, aw, roadE);   //도어 동 (W/H 스왑)
+            consider(lotRot::ccw180, aw, ah, roadN);   //도어 북
+            consider(lotRot::ccw270, ah, aw, roadW);   //도어 서 (W/H 스왑)
+            if (nAny == 0) continue;   //방어적 — buildingByFootprint가 후보 존재를 보장
+
+            const lotRot chosen = (nRoad > 0) ? bestRoad : bestAny;
+
+            LotResult r = generateRotated(*lot, gRng(), chosen);
+
+            const int originX = g.minPx * TILE_PER_PIXEL + TILE_BASE_X;
+            const int originY = g.minPy * TILE_PER_PIXEL + TILE_BASE_Y;
+            blitLotResult(plan, r, originX, originY, node.center.z);
+        }
     }
 
 

@@ -918,6 +918,9 @@
     <ClCompile Include="code\Lot\lot-rotate.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
+    <ClCompile Include="code\Lot\Lot-CityBuildings.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
+    </ClCompile>
     <ClCompile Include="code\Lot\kinds\Lot-Sample.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
@@ -931,6 +934,81 @@
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
     <ClCompile Include="code\Lot\kinds\Lot-ConvenienceStore.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Hypermarket.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-StationeryStore.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-PoliceStation.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-House.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Cafe.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Temple.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Church.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Cathedral.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Skyscraper.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-JunkShop.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-FireStation.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-GasStation.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Cinema.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Warehouse.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-AnimalHospital.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-HardwareStore.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Bookstore.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Restaurant.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Pharmacy.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Park.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Bank.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-PatrolStation.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-BicycleShop.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-ShoppingArcade.ixx">
+      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
+    </ClCompile>
+    <ClCompile Include="code\Lot\kinds\Lot-Apartment.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
   </ItemGroup>
