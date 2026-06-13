@@ -185,6 +185,7 @@
     <ClCompile Include="code\Lot\lot-rotate.ixx" />
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
+    <ClCompile Include="code\mapEditorMode.ixx" />
     <ClCompile Include="code\Drawable.ixx" />
     <ClCompile Include="code\entity\Entity.cpp" />
     <ClCompile Include="code\entity\Entity.ixx" />

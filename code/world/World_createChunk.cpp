@@ -3,6 +3,7 @@ module World;
 import std;
 import util;
 import constVar;
+import globalVar;
 import Chunk;
 import TileData;
 import worldGrid;
@@ -44,13 +45,15 @@ void World::createChunk(int chunkX, int chunkY, int chunkZ)
 {
     //--- 1) chunkFlag 디폴트 (Phase 2 미진입 시 보임) ---
     chunkFlag inputFlag = chunkFlag::seawater;
-    if (chunkZ > 0)      inputFlag = chunkFlag::none;
-    else if (chunkZ < 0) inputFlag = chunkFlag::underground;
+    if (chunkZ > 0)           inputFlag = chunkFlag::none;
+    else if (chunkZ < 0)      inputFlag = chunkFlag::underground;
+    else if (mapEditorActive) inputFlag = chunkFlag::dirt; //맵 에디터: z==0 표면 = 흙(빈 캔버스)
 
     auto chunk = std::make_unique<Chunk>(inputFlag);
 
     //--- 2) Phase 2 진입 후: Sector 데이터 블릿 ---
-    if (worldGrid::worldPixelMmapActive())
+    //   맵 에디터는 절차생성을 전부 우회 — z<0 지하/z>0 공허/z=0 흙의 균일 빈 월드만 생성.
+    if (!mapEditorActive && worldGrid::worldPixelMmapActive())
     {
         // chunkX는 음수/W 초과(render-space)일 수 있으므로 wrap 후 sector 계산.
         const int wrapChunkX        = worldWrap::wrapChunkX(chunkX);

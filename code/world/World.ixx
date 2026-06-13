@@ -310,6 +310,33 @@ public:
 		}
 		activeChunk.clear();   // 남은 chunkPtr 기준으로 다음 setGrid가 재구성
 	}
+
+	// 맵 에디터 진입용: 전 월드(청크+차량) 제거 후 플레이어를 origin에 재배치.
+	//   호출 전 반드시 mapEditorActive=true (origin 청크가 dirt로 생성되도록).
+	//   playerCur = 현재 플레이어 좌표. 전제: 플레이어가 차량 미탑승(vehicleOwnerMap.clear가 탑승 차량 파괴).
+	void resetWorldForEditor(Point3 playerCur, Point3 origin)
+	{
+		// 플레이어 unique_ptr를 현재 타일에서 추출 — 청크 제거가 플레이어를 파괴하지 않도록.
+		std::unique_ptr<Entity> playerHold = std::move(getTile(playerCur).EntityPtr);
+
+		// 청크 제거는 반드시 erase 루프로 — chunkPtr.clear()는 노드를 맵에서 분리하지 않고 파괴해서,
+		//   소멸 중인 Prop/Monster/ItemStack 소멸자의 tryGetChunk가 반쯤 파괴된 청크를 찾아 크래시한다.
+		//   erase(it)는 노드를 분리한 뒤 파괴 → 소멸자의 tryGetChunk가 nullptr 반환 → 정리 생략(안전).
+		//   (wipeOrphanedChunks와 동일한 광역 청크 소멸 패턴.)
+		for (auto it = chunkPtr.begin(); it != chunkPtr.end(); )
+			it = chunkPtr.erase(it);
+		activeChunk.clear();
+		// 차량은 청크 전멸 후 제거 — Vehicle 소멸자의 tryGetChunk도 전부 nullptr → 안전하게 생략.
+		vehicleOwnerMap.clear();
+
+		// origin 청크를 빈 dirt로 생성(mapEditorActive 전제) 후 플레이어 재배치.
+		int ocx, ocy;
+		changeToChunkCoord(origin.x, origin.y, ocx, ocy);
+		createChunk(ocx, ocy, origin.z);
+		getTile(origin).EntityPtr = std::move(playerHold);
+		getTile(origin).EntityPtr->setGrid(origin.x, origin.y, origin.z); // 그리드/청크 멤버십 갱신
+		getTile(origin).EntityPtr->pullEquipLights();
+	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

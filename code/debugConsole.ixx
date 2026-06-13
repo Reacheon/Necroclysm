@@ -27,6 +27,7 @@ import Teleport;
 import Lot;
 import VehiclePlan;
 import LotEditor;
+import mapEditorMode;
 
 export void debugConsole()
 {
@@ -75,6 +76,7 @@ export void debugConsole()
 	prt(L"37. SUV 소환\n");
 	prt(L"38. Lot으로 청크 페인트 (헬퍼 테스트)\n");
 	prt(L"39. LotEditor 실행\n");
+	prt(L"40. 맵 에디터 모드 (월드 초기화 + LotEditor)\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -951,6 +953,11 @@ export void debugConsole()
 	case 39://LotEditor 실행
 	{
 		new LotEditor();
+		break;
+	}
+	case 40://맵 에디터 모드: 월드 초기화 후 LotEditor 자동 기동
+	{
+		enterMapEditor();
 		break;
 	}
 	case 99://콘솔 출력 초기화

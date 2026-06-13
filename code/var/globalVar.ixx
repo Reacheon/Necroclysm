@@ -242,6 +242,7 @@ export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을
 
 export bool drawHUD = true;
 export bool lotEditorActive = false; //LotEditor 활성 중 - renderTile이 시야 전체공개+플레이어 숨김에 사용
+export bool mapEditorActive = false; //맵 에디터 빈 월드 - createChunk가 procgen 우회, z=0 dirt/z<0 지하/z>0 공허
 export void* lotEditorHoverVeh = nullptr; //LotEditor 커서가 올라간 차량(천장 반투명용). Vehicle*를 void*로 보관(순환 import 회피)
 
 export std::wstring currentUsingSkill = L""; //현재 사용 중인 스킬 ID. 비어있으면 미사용.
