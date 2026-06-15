@@ -658,3 +658,23 @@ export enum class creatureType
     animal,
     undead,
 };
+
+//월드맵(Map.ixx) 청크 심볼 식별자. 건물 Lot 1종 = 1값 (mapSymbolOf로 Lot→심볼 매핑).
+//  실제 스프라이트(아틀라스·인덱스·footprint 오프셋·변형)는 Map.ixx resolveSymbol이 결정 —
+//  여기는 "무엇인가"만 들고, "어떻게 그릴지"는 렌더러가 안다. mountain은 Lot이 아니라
+//  worldGrid::Terrain::Mountain에서 직접 파생(렌더러 전용)이지만 enum 일관성 위해 포함.
+export enum class MapSymbol
+{
+    none,
+    //1x1 (mapset1by1)
+    apartment, bank, house, warehouse, cafe, cinema, junkShop, animalHospital,
+    pharmacy, restaurant, stationeryStore, hardwareStore, bookstore,
+    patrolStation, convenienceStore, bicycleShop, temple, church, cathedral,
+    skyscraper, gasStation, shoppingArcade,
+    //2x1 / 1x2 (mapset2by2 — footprint 방향에 따라 wide/tall 스프라이트 분기)
+    policeStation, fireStation,
+    //2x2 (mapset2by2)
+    park, hypermarket, school,
+    //terrain 파생 (Lot 아님 — 렌더러가 Mountain 청크에 직접 부여)
+    mountain,
+};

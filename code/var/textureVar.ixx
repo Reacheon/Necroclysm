@@ -67,6 +67,8 @@ export namespace spr
 	Sprite* tileset = nullptr;
 	Sprite* propset = nullptr;
 	Sprite* vehset = nullptr; //차량 부품 전용 아틀라스(과거엔 propset 공용 -> 혼동 방지 위해 분리). 부품은 vehSprIndex로 색인
+	Sprite* mapset1by1 = nullptr; //월드맵 1x1 청크 심볼 (48px 셀 = 3x3 청크, 심볼 art는 중앙 16px). 건물·도로·산 1칸
+	Sprite* mapset2by2 = nullptr; //월드맵 2x2/2x1/1x2 청크 심볼 (64px 셀 = 4x4 청크). 공원·마트·학교·경찰서·소방서·산 2x2
 	Sprite* icon32 = nullptr;
 	Sprite* ring24 = nullptr;
 	Sprite* bloodM = nullptr;

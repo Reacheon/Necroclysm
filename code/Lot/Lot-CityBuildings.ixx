@@ -2,6 +2,7 @@ module;
 export module Lot:CityBuildings;
 
 import std;
+import constVar;   //MapSymbol — 건물 Lot을 월드맵 심볼로 매핑
 import :base;
 
 //건물 kind 싱글톤 참조용 — 같은 모듈 내 sibling 파티션 import (외부 import 아님).
@@ -50,17 +51,41 @@ import :Park;
 
 namespace
 {
-    //도시 절차배치 대상 건물 Lot 마스터 목록. 추가 시 여기 한 줄.
-    const Lot* const cityBuildingPool[] = {
+    //풀 엔트리 — Lot 싱글톤 + 월드맵 심볼. 심볼은 mapSymbolOf로 역참조(월드맵 렌더).
+    struct PoolEntry { const Lot* lot; MapSymbol sym; };
+
+    //도시 절차배치 대상 건물 Lot 마스터 목록. 추가 시 여기 한 줄(Lot + 심볼).
+    const PoolEntry cityBuildingPool[] = {
         //1x1
-        &house, &apartment, &cafe, &restaurant, &convenienceStore, &shoppingArcade,
-        &temple, &church, &cathedral, &skyscraper, &bank, &cinema, &warehouse,
-        &junkShop, &gasStation, &animalHospital, &hardwareStore, &bookstore,
-        &pharmacy, &patrolStation, &bicycleShop, &stationeryStore,
-        //2x1 (회전 가능: policeStation, 비회전: fireStation)
-        &policeStation, &fireStation,
+        { &house,            MapSymbol::house            },
+        { &apartment,        MapSymbol::apartment        },
+        { &cafe,             MapSymbol::cafe             },
+        { &restaurant,       MapSymbol::restaurant       },
+        { &convenienceStore, MapSymbol::convenienceStore },
+        { &shoppingArcade,   MapSymbol::shoppingArcade   },
+        { &temple,           MapSymbol::temple           },
+        { &church,           MapSymbol::church           },
+        { &cathedral,        MapSymbol::cathedral        },
+        { &skyscraper,       MapSymbol::skyscraper       },
+        { &bank,             MapSymbol::bank             },
+        { &cinema,           MapSymbol::cinema           },
+        { &warehouse,        MapSymbol::warehouse        },
+        { &junkShop,         MapSymbol::junkShop         },
+        { &gasStation,       MapSymbol::gasStation       },
+        { &animalHospital,   MapSymbol::animalHospital   },
+        { &hardwareStore,    MapSymbol::hardwareStore    },
+        { &bookstore,        MapSymbol::bookstore        },
+        { &pharmacy,         MapSymbol::pharmacy         },
+        { &patrolStation,    MapSymbol::patrolStation    },
+        { &bicycleShop,      MapSymbol::bicycleShop      },
+        { &stationeryStore,  MapSymbol::stationeryStore  },
+        //2x1 (회전 가능: policeStation, fireStation 둘 다 — 심볼은 footprint 방향으로 wide/tall 분기)
+        { &policeStation,    MapSymbol::policeStation    },
+        { &fireStation,      MapSymbol::fireStation      },
         //2x2
-        &hypermarket, &school, &park,
+        { &hypermarket,      MapSymbol::hypermarket      },
+        { &school,           MapSymbol::school           },
+        { &park,             MapSymbol::park             },
     };
 
     //Lot이 group footprint(gw,gh)를 채울 수 있는가.
@@ -82,9 +107,18 @@ export const Lot* buildingByFootprint(int gw, int gh, std::mt19937_64& rng)
 {
     const Lot* hits[std::size(cityBuildingPool)];
     int n = 0;
-    for (const Lot* l : cityBuildingPool)
-        if (canFillFootprint(*l, gw, gh)) hits[n++] = l;
+    for (const auto& e : cityBuildingPool)
+        if (canFillFootprint(*e.lot, gw, gh)) hits[n++] = e.lot;
 
     if (n == 0) return nullptr;
     return hits[std::uniform_int_distribution<int>{0, n - 1}(rng)];
+}
+
+//Lot 싱글톤 → 월드맵 심볼. 풀에 없는 Lot(Street/Bridge/Sample 등)이면 none.
+//  CityPlan_build stage 10이 선택한 건물 Lot을 plan.symbols에 기록할 때 사용.
+export MapSymbol mapSymbolOf(const Lot* lot)
+{
+    for (const auto& e : cityBuildingPool)
+        if (e.lot == lot) return e.sym;
+    return MapSymbol::none;
 }

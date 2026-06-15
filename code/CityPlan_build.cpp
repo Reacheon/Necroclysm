@@ -917,6 +917,16 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
             const int originX = g.minPx * TILE_PER_PIXEL + TILE_BASE_X;
             const int originY = g.minPy * TILE_PER_PIXEL + TILE_BASE_Y;
+
+            //월드맵 심볼 — 건물 종류 + 그룹 footprint(회전 후 실제 점유 모양 gw×gh).
+            //  Lot이 빈 스켈레톤이라 blitLotResult가 타일을 안 깔아도 심볼은 이 채널로 표시.
+            plan.symbols.push_back(CitySymbol{
+                .pos    = Point3{ originX, originY, node.center.z },
+                .w      = gw,
+                .h      = gh,
+                .symbol = mapSymbolOf(lot),
+            });
+
             blitLotResult(plan, r, originX, originY, node.center.z);
         }
     }
@@ -940,6 +950,13 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
             {
                 const RoadPixel& r = roads[static_cast<std::size_t>(y) * patchW + x];
                 if (r.openBits == 0) continue;
+
+                //월드맵 도로 autotile 래스터 — 청크 좌상단 + openBits 그대로 기록.
+                plan.roadCells.push_back(CityRoadCell{
+                    .pos      = Point3{ (patchPxX + x) * TILE_PER_PIXEL + TILE_BASE_X,
+                                        (patchPxY + y) * TILE_PER_PIXEL + TILE_BASE_Y, z },
+                    .openBits = r.openBits,
+                });
 
                 const int cx = (patchPxX + x) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;
                 const int cy = (patchPxY + y) * TILE_PER_PIXEL + TILE_BASE_Y + HALF_PX;

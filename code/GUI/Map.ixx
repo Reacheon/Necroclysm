@@ -7,24 +7,41 @@ import std;
 import util;
 import constVar;
 import GUI;
+import Sprite;
 import textureVar;
 import drawText;
 import drawSprite;
 import globalVar;
+import globalTime;
+import connectGroupExtraIndex;
 import checkCursor;
 import Player;
 import World;
 import TileData;
 import worldGrid;
 import worldGen;
+import worldWrap;
 import city;
 import CityPlan;
 import worldSession;
 
 // ════════════════════════════════════════════════════════════════════════
-// Map — 풀스크린 인터랙티브 월드맵 (구글지도 스타일)
-//   §1 설정/팔레트  §2 카메라  §3 텍스처 캐시  §4 데이터 로딩
-//   §5 렌더링       §6 UI 크롬  §7 Map 클래스
+// Map — 풀스크린 월드맵 (고전 JRPG 월드맵 스타일).
+//
+//   구글지도식 무제한 줌을 폐기하고 "1청크 = 1심볼" 타일 기반으로 재작성.
+//   레이어:
+//     ① 베이스 지형 — tileset.png. 청크 1개당 타일 1개(잔디/해수/담수). 배치 렌더.
+//     ② 산 심볼     — worldGrid::Terrain::Mountain. 4개 사각형 뭉치면 2x2로 머지(JRPG).
+//     ③ 도로 심볼   — CityPlan.roadCells(openBits) → autotile(직선/코너/T/십자) mapset1by1.
+//     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2).
+//
+//   좌표계는 "픽셀=청크"(worldPixel 인덱스, 0-base). 1픽셀=1청크=24타일.
+//     pixelX = (tileX - TILE_BASE_X) / TILE_PER_PIXEL,  X는 원기둥 wrap.
+//   카메라 centerPX/PY(실수 픽셀) + 이산 줌(chunkPx = 청크 1개의 화면 픽셀).
+//
+//   심볼 데이터는 "이미 생성된(캐시된) 도시"에서만(peek). 지형(산/물)은 전 세계.
+//
+//   §1 설정/팔레트  §2 카메라  §3 심볼 매핑  §4 렌더링  §5 UI  §6 Map 클래스
 // ════════════════════════════════════════════════════════════════════════
 
 
@@ -34,84 +51,22 @@ import worldSession;
 
 namespace mapcfg
 {
-    // 픽셀 퍼펙트 줌 레벨 — pxPerTile = 스크린 픽셀 / 월드 타일.
-    //   조건1: 24*pxPerTile 가 정수 → 패치 텍스처 (1 patch px = 24 tiles) 가
-    //          모든 화면 픽셀에 정수 비율로 매핑 → 띠/뭉개짐 없음.
-    //   조건2: pxPerTile 가 ≥1 일 때 정수 → 16px 타일 스프라이트가 모든
-    //          타일에 동일한 정수 픽셀 크기로 렌더 → 균일.
-    //
-    //   24 약수: 1, 2, 3, 4, 6, 8, 12, 24.
-    //   조건1 만족: pxPerTile = n/24 꼴. 1/24부터 1/12, 1/8, ..., 1.0, ...
-    //
-    //   1/24 미만 (광역 조망): 조건1 위배 — 패치 텍스처가 nearest scale로
-    //   다운샘플링되어 약간 뭉개지지만, 한 패치가 화면에서 ≤1px 정도라 시각적 무관.
-    //   최소값 1/96 ≈ 0.01 px/tile — 대륙 1개 정도 한 화면에 표시.
-    //   1/48, 1/16은 24-약수 아님 → 약한 sub-pixel (시각 거의 무관).
-    inline constexpr double ZOOM_LEVELS[] = {
-        // 광역 조망 (sub-pixel-perfect — 텍스처 다운샘플)
-        1.0/96,    // ≈ 0.01042
-        1.0/64,    // = 0.015625
-        1.0/48,    // ≈ 0.0208  (24× = 0.5, 약한 sub-pixel)
-        // 픽셀 퍼펙트 단계 (조건1 만족)
-        1.0/24,    // ≈ 0.0417  (24× = 1)
-        1.0/16,    // = 0.0625  (24× = 1.5, 약한 sub-pixel)
-        1.0/12,    // ≈ 0.0833  (24× = 2)
-        1.0/8,     // = 0.125   (24× = 3)
-        1.0/6,     // ≈ 0.1667  (24× = 4)
-        1.0/4,     // = 0.25    (24× = 6)
-        1.0/3,     // ≈ 0.3333  (24× = 8)
-        1.0/2,     // = 0.5     (24× = 12)
-        1.0, 2.0, 3.0, 4.0, 5.0, 6.0
-    };
-    inline constexpr int    ZOOM_LEVEL_COUNT   = (int)(sizeof(ZOOM_LEVELS) / sizeof(ZOOM_LEVELS[0]));
-    inline constexpr int    DEFAULT_ZOOM_LEVEL = 10;  // 0.5 (위 배열에서 1/2 위치)
-    inline constexpr double DEFAULT_PX_PER_TILE = ZOOM_LEVELS[DEFAULT_ZOOM_LEVEL];
+    //이산 줌 — 청크 1개가 차지하는 화면 픽셀. 심볼/타일은 chunkPx/16 배율로 그려짐.
+    //  (베이스 타일 16px, mapset1by1 48px=3청크, mapset2by2 64px=4청크 → 모두 같은 배율.)
+    //  무제한 광역 조망(대륙 단위)은 의도적으로 제외 — 지역 단위 항법 지도.
+    inline constexpr int ZOOM_PX[] = { 6, 8, 12, 16, 24, 32, 48 };
+    inline constexpr int ZOOM_COUNT   = (int)(sizeof(ZOOM_PX) / sizeof(ZOOM_PX[0]));
+    inline constexpr int DEFAULT_ZOOM = 3;   // 16px/청크 (네이티브 픽셀아트)
 
-    // 프레임당 신규 텍스처 빌드 한도 (영속 캐시 — 첫 방문 영역에만 쓰임).
-    inline constexpr int FRAME_BUDGET_PATCHES = 2;     // 패치 1개 ≈ 5~8ms
-
-    // 가시 미로드 패치 자동 로드 한도
-    inline constexpr int FRAME_BUDGET_PATCH_LOAD = 2;
-
-    // 가시 영역 pxPerTile 이 이 값 이하일 때만 패치 자동 로드
-    inline constexpr double AUTOLOAD_MAX_ZOOM = 1.5;
+    //이 값 미만 줌에서는 바다 파도를 안 그림(저배율 클러터/draw 폭증 방지).
+    //  도로·건물·산 심볼은 모든 줌에서 유지 — 지형만 남으면 어색해서.
+    inline constexpr int SYMBOL_MIN_PX = 8;
 }
 
 namespace mappal
 {
-    // Terrain 색 — 구글맵 톤. mmap 픽셀 (worldGrid::Terrain 16종) 기반.
-    //   worldGen_generateWorld.cpp의 terrainPreviewColor와 톤 일관 (월드젠 미리보기와 같은 색).
-    inline SDL_Color terrainColor(worldGrid::Terrain t)
-    {
-        switch (t)
-        {
-        case worldGrid::Terrain::Land:                  return { 192, 215, 168, 255 };  // grass green
-        case worldGrid::Terrain::Sea:                   return {  85, 132, 173, 255 };  // sea blue
-        case worldGrid::Terrain::River:                 return { 137, 180, 200, 255 };  // light blue
-        case worldGrid::Terrain::Lake:                  return { 111, 106, 184, 255 };  // purple-blue
-        case worldGrid::Terrain::CityZone:              return { 162, 162, 162, 255 };  // city gray (#a2a2a2)
-        case worldGrid::Terrain::CityCenter:            return { 255,  96,  96, 255 };  // city center red
-        case worldGrid::Terrain::CityRiver:             return { 166, 193, 234, 255 };  // city river
-        case worldGrid::Terrain::CitySea:               return { 115, 112, 184, 255 };  // city sea (strait)
-        case worldGrid::Terrain::Mountain:              return { 138, 106,  82, 255 };  // brown
-        case worldGrid::Terrain::Polar:                 return { 242, 246, 255, 255 };  // ice white
-        case worldGrid::Terrain::Tundra:                return { 142, 198, 205, 255 };  // pale teal
-        case worldGrid::Terrain::Subarctic:             return { 110, 155, 200, 255 };  // cold blue
-        case worldGrid::Terrain::Monsoon:               return { 150, 163,  85, 255 };  // olive
-        case worldGrid::Terrain::InsularRainforest:     return {  53, 119,  73, 255 };  // SE-Asia green
-        case worldGrid::Terrain::Desert:                return { 232, 217, 122, 255 };  // sand
-        case worldGrid::Terrain::ContinentalRainforest: return {  31,  74,  26, 255 };  // dense jungle
-        }
-        return { 18, 18, 22, 255 };
-    }
-
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
     inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
-    inline SDL_Color roadLine()     { return { 255, 140,  30, 255 }; }  // 광역 도로 폴리라인 오버레이
-    inline SDL_Color cityRoadLine() { return { 255, 220,  80, 255 }; }  // 도시 내부 도로 세그먼트 (debug)
-    inline SDL_Color bridgeLine()   { return { 120, 220, 255, 255 }; }  // 도시 내부 다리 (16단계 z+1 deck)
-
-    // UI 크롬
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
     inline SDL_Color uiBorder()     { return { 110, 110, 115, 255 }; }
     inline SDL_Color uiText()       { return { 235, 235, 230, 255 }; }
@@ -120,225 +75,189 @@ namespace mappal
 
 // ════════════════════════════════════════════════════════════════════════
 // §2  카메라 (MapView)
+//
+//   픽셀(=청크) 좌표계. centerPX/PY는 화면 중앙이 가리키는 픽셀(실수).
+//   X는 원기둥 wrap — relX가 최단 분기로 정규화.
 // ════════════════════════════════════════════════════════════════════════
 
-// 화면 중앙이 가리키는 월드 타일 (실수) + 줌. 좌표 변환 함수 캡슐화.
 struct MapView
 {
-    double centerTileX = 0.0;
-    double centerTileY = 0.0;
-    double pxPerTile   = mapcfg::DEFAULT_PX_PER_TILE;
-    int    z           = 0;
-    int    viewW       = 0;
-    int    viewH       = 0;
+    double centerPX  = 0.0;
+    double centerPY  = 0.0;
+    int    zoomLevel = mapcfg::DEFAULT_ZOOM;
+    int    z         = 0;
+    int    viewW     = 0;
+    int    viewH     = 0;
 
-    double screenXFromTileX(double tx) const { return (tx - centerTileX) * pxPerTile + viewW * 0.5; }
-    double screenYFromTileY(double ty) const { return (ty - centerTileY) * pxPerTile + viewH * 0.5; }
-    double tileXFromScreenX(double sx) const { return centerTileX + (sx - viewW * 0.5) / pxPerTile; }
-    double tileYFromScreenY(double sy) const { return centerTileY + (sy - viewH * 0.5) / pxPerTile; }
+    int    chunkPx()   const { return mapcfg::ZOOM_PX[zoomLevel]; }
+    double zoomScale() const { return chunkPx() / 16.0; }   // tileset 16px 기준 배율
+    bool   symbolsVisible() const { return chunkPx() >= mapcfg::SYMBOL_MIN_PX; }
 
-    // 가시 타일 박스 (반열림 [min, max))
-    void visibleTileBounds(double& minTX, double& minTY, double& maxTX, double& maxTY) const
+    //카메라 중앙 기준 X 최단 거리(픽셀) — ±WORLD_CHUNK_W/2로 wrap.
+    double relX(double px) const
     {
-        minTX = tileXFromScreenX(0);
-        minTY = tileYFromScreenY(0);
-        maxTX = tileXFromScreenX(viewW);
-        maxTY = tileYFromScreenY(viewH);
+        double rel = px - centerPX;
+        const double W = static_cast<double>(WORLD_CHUNK_W);
+        rel -= std::round(rel / W) * W;
+        return rel;
     }
 
-    // 현재 pxPerTile 에 가장 가까운 ZOOM_LEVELS 인덱스 (로그 거리 — 비례 척도).
-    int currentZoomLevel() const
-    {
-        int best = 0;
-        double bestDiff = std::numeric_limits<double>::infinity();
-        double cur = std::log(pxPerTile);
-        for (int i = 0; i < mapcfg::ZOOM_LEVEL_COUNT; i++)
-        {
-            double d = std::abs(cur - std::log(mapcfg::ZOOM_LEVELS[i]));
-            if (d < bestDiff) { bestDiff = d; best = i; }
-        }
-        return best;
-    }
+    double sX(double px) const { return relX(px) * chunkPx() + viewW * 0.5; }
+    double sY(double py) const { return (py - centerPY) * chunkPx() + viewH * 0.5; }
 
-    // 이산 줌 — delta 만큼 레벨 이동 후 anchor 화면 위치 고정.
+    double pixelXFromScreen(double sx) const { return centerPX + (sx - viewW * 0.5) / chunkPx(); }
+    double pixelYFromScreen(double sy) const { return centerPY + (sy - viewH * 0.5) / chunkPx(); }
+
+    //이산 줌 — delta 레벨 이동, anchor 화면 위치 고정.
     void zoomAround(int anchorScreenX, int anchorScreenY, int delta)
     {
-        int level = std::clamp(currentZoomLevel() + delta, 0, mapcfg::ZOOM_LEVEL_COUNT - 1);
-        double anchorTX = tileXFromScreenX(anchorScreenX);
-        double anchorTY = tileYFromScreenY(anchorScreenY);
-        pxPerTile = mapcfg::ZOOM_LEVELS[level];
-        centerTileX = anchorTX + (viewW * 0.5 - anchorScreenX) / pxPerTile;
-        centerTileY = anchorTY + (viewH * 0.5 - anchorScreenY) / pxPerTile;
+        const double apX = pixelXFromScreen(anchorScreenX);
+        const double apY = pixelYFromScreen(anchorScreenY);
+        zoomLevel = std::clamp(zoomLevel + delta, 0, mapcfg::ZOOM_COUNT - 1);
+        centerPX = apX - (anchorScreenX - viewW * 0.5) / chunkPx();
+        centerPY = apY - (anchorScreenY - viewH * 0.5) / chunkPx();
     }
 
-    // 카메라 Y를 월드 영역 안으로 클램프 — 남/북극 너머로 못 나가게.
-    //   월드 가장자리가 화면 가장자리에 닿으면 멈춤 (Google Maps 스타일).
-    //   X는 cylindrical wrap이라 클램프 안 함.
-    //   뷰포트가 월드보다 큰 경우(극단 줌아웃) 월드를 화면 정중앙 정렬.
+    //카메라 Y를 월드(극지) 안으로 클램프. X는 wrap이라 클램프 안 함.
     void clampCenterY()
     {
-        const double worldMinY = static_cast<double>(TILE_BASE_Y);
-        const double worldMaxY = worldMinY + static_cast<double>(WORLD_TILE_H);
-        const double viewHalfTiles = viewH * 0.5 / pxPerTile;
-        if (viewHalfTiles * 2.0 >= worldMaxY - worldMinY)
-        {
-            centerTileY = (worldMinY + worldMaxY) * 0.5;
-        }
+        const double halfH = viewH * 0.5 / chunkPx();
+        if (halfH * 2.0 >= static_cast<double>(WORLD_PIXEL_H))
+            centerPY = WORLD_PIXEL_H * 0.5;
         else
-        {
-            centerTileY = std::clamp(centerTileY, worldMinY + viewHalfTiles, worldMaxY - viewHalfTiles);
-        }
+            centerPY = std::clamp(centerPY, halfH, WORLD_PIXEL_H - halfH);
     }
 };
 
+//타일 좌표 → 픽셀(청크) 좌표 (실수).
+static double tileToPixelX(int tx) { return static_cast<double>(tx - TILE_BASE_X) / TILE_PER_PIXEL; }
+static double tileToPixelY(int ty) { return static_cast<double>(ty - TILE_BASE_Y) / TILE_PER_PIXEL; }
+//타일 좌표 → 픽셀(청크) 정수 인덱스 (청크 정렬 좌표 전용 — pos는 항상 청크 좌상단).
+static int    tilePixelIX(int tx)  { return (tx - TILE_BASE_X) / TILE_PER_PIXEL; }
+static int    tilePixelIY(int ty)  { return (ty - TILE_BASE_Y) / TILE_PER_PIXEL; }
+
 
 // ════════════════════════════════════════════════════════════════════════
-// §3  텍스처 캐시
-//
-//   resetFrame(budget) — 매 프레임 시작 호출. budget + pending 카운터 초기화.
-//   getOrBuild(key)    — hit 즉시 반환. miss 시 budget 안에서 빌드, 0 이면
-//                        nullptr + pending++. 데이터 부재 시 nullptr (pending X).
-//   pendingThisFrame() — 이번 프레임 budget 부족으로 미룬 빌드 수.
-//   clear()            — 모든 텍스처 파괴 (월드 리셋 등).
+// §3  심볼 매핑 (terrain·도로·건물 → mapset 스프라이트)
 // ════════════════════════════════════════════════════════════════════════
 
-// 패치 그리드 셀 1개 = 400×400 픽셀 텍스처 (1 px = 1 mmap pixel).
-//   데이터 소스는 mmap (worldGrid::worldPixel) — Phase 1 미진입 시 텍스처 빌드 안 함.
-//   캐시는 패치 그리드 좌표(sx, sy, sz)로 인덱싱. 빌드된 텍스처는 영구 보관.
-class PixelTextureCache
+//베이스 지형 타일 id — 육지=잔디(기본), 바다=해수, 강/호수=담수.
+static int baseFloorId(worldGrid::Terrain t)
 {
-public:
-    static PixelTextureCache& ins() { static PixelTextureCache c; return c; }
-
-    void resetFrame(int budget) { budget_ = budget; pending_ = 0; }
-    int  pendingThisFrame() const { return pending_; }
-
-    SDL_Texture* getOrBuild(int sx, int sy, int sz)
+    using T = worldGrid::Terrain;
+    switch (t)
     {
-        Key k{ sx, sy, sz };
-        if (auto it = textures_.find(k); it != textures_.end()) return it->second;
-
-        //mmap 미진입(월드젠 전)에는 빌드 불가 — pending 아님, 그냥 nullptr.
-        if (!worldGrid::worldPixelMmapActive()) return nullptr;
-
-        if (budget_ <= 0) { pending_++; return nullptr; }
-
-        SDL_Texture* tex = build(sx, sy, sz);
-        if (!tex) return nullptr;
-        textures_[k] = tex;
-        budget_--;
-        return tex;
-    }
-
-    void clear()
-    {
-        for (auto& [k, t] : textures_) if (t) SDL_DestroyTexture(t);
-        textures_.clear();
-    }
-
-private:
-    //패치 그리드 셀 (sx, sy)에 해당하는 mmap 픽셀 영역을 400×400 텍스처로 빌드.
-    //  글로벌 픽셀 좌표 = sx*400+px (단, mmap은 [0, 43200) × [0, 21600) 범위만 유효).
-    //  범위 밖은 worldGrid::worldPixel이 Sea 반환 → 자연스럽게 Sea로 처리됨.
-    static SDL_Texture* build(int sx, int sy, int /*sz*/)
-    {
-        SDL_Surface* surf = SDL_CreateSurface(PIXEL_PER_PATCH, PIXEL_PER_PATCH, SDL_PIXELFORMAT_RGBA32);
-        if (!surf) return nullptr;
-
-        SDL_LockSurface(surf);
-        const SDL_PixelFormatDetails* fmt = SDL_GetPixelFormatDetails(surf->format);
-
-        //글로벌 픽셀 시작점. patch 좌표는 World의 patch 그리드와 동일 인덱싱.
-        const int globalPx0 = (sx - PATCH_X_MIN) * PIXEL_PER_PATCH;   // PATCH_X_MIN(-54)가 픽셀 0
-        const int globalPy0 = (sy - PATCH_Y_MIN) * PIXEL_PER_PATCH;   // PATCH_Y_MIN(-27)가 픽셀 0
-
-        for (int py = 0; py < PIXEL_PER_PATCH; py++)
-        {
-            std::uint32_t* row = (std::uint32_t*)((std::uint8_t*)surf->pixels + py * surf->pitch);
-            for (int px = 0; px < PIXEL_PER_PATCH; px++)
-            {
-                const worldGrid::Terrain t = worldGrid::worldPixel(globalPx0 + px, globalPy0 + py);
-                const SDL_Color c = mappal::terrainColor(t);
-                row[px] = SDL_MapRGBA(fmt, nullptr, c.r, c.g, c.b, c.a);
-            }
-        }
-        SDL_UnlockSurface(surf);
-
-        SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, surf);
-        SDL_DestroySurface(surf);
-        if (tex) SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
-        return tex;
-    }
-
-    struct Key { int sx, sy, sz; bool operator==(const Key&) const = default; };
-    struct KeyHash
-    {
-        std::size_t operator()(const Key& k) const noexcept
-        {
-            std::size_t h = (std::size_t)(k.sx + 1024) * 65537ull;
-            h ^= (std::size_t)(k.sy + 1024) * 257ull;
-            h ^= (std::size_t)(k.sz + 8) * 31ull;
-            return h;
-        }
-    };
-    std::unordered_map<Key, SDL_Texture*, KeyHash> textures_;
-    int budget_  = 0;
-    int pending_ = 0;
-};
-
-
-// ════════════════════════════════════════════════════════════════════════
-// §4  렌더링 계층
-//   (PatchAutoLoader는 mmap 도입 후 폐지 — Phase 1 완료 시점에 모든 픽셀이
-//    이미 mmap으로 즉시 접근 가능. 별도 로딩 절차 불필요.)
-// ════════════════════════════════════════════════════════════════════════
-
-// (1) 바이옴 베이스 — mmap 활성 시 가시 픽셀 텍스처를 적절히 스케일해 blit.
-//     mmap 미진입(타이틀/Phase 1 미완료): 호출 자체가 스킵됨 → 검은 배경 + 타일 스프라이트 + 마커만.
-static void drawBiomeLayer(const MapView& v)
-{
-    if (!worldGrid::worldPixelMmapActive()) return;
-
-    double minTX, minTY, maxTX, maxTY;
-    v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
-
-    int minSX = (int)std::floor(minTX / TILE_PER_PATCH);
-    int minSY = (int)std::floor(minTY / TILE_PER_PATCH);
-    int maxSX = (int)std::floor(maxTX / TILE_PER_PATCH);
-    int maxSY = (int)std::floor(maxTY / TILE_PER_PATCH);
-
-    double patchScreenSize = (double)TILE_PER_PATCH * v.pxPerTile;
-
-    for (int sy = minSY; sy <= maxSY; sy++)
-    {
-        for (int sx = minSX; sx <= maxSX; sx++)
-        {
-            SDL_Texture* tex = PixelTextureCache::ins().getOrBuild(sx, sy, v.z);
-            if (!tex) continue;  // 미빌드 → 다음 프레임에 채워짐
-
-            double dstX = v.screenXFromTileX((double)sx * TILE_PER_PATCH);
-            double dstY = v.screenYFromTileY((double)sy * TILE_PER_PATCH);
-            SDL_FRect dst{
-                (float)std::floor(dstX),
-                (float)std::floor(dstY),
-                (float)std::ceil(patchScreenSize) + 1.0f,
-                (float)std::ceil(patchScreenSize) + 1.0f
-            };
-            SDL_RenderTexture(renderer, tex, nullptr, &dst);
-        }
+    case T::Sea: case T::CitySea:                   return itemID::deepSeaWater;
+    case T::River: case T::Lake: case T::CityRiver: return itemID::deepFreshWater;
+    default:                                        return itemID::grass;
     }
 }
 
-// (2) 타일 스프라이트 레이어 — 생성된 청크의 floor / wall 을 spr::tileset 으로 직접 그림.
-//   SDL_RenderGeometry 직접 사용: drawSpriteBatchCenter 는 위치를 Point2(int) 로
-//   받아 정수 픽셀에 스냅 → 분수 줌에서 누적 트런케이션 드리프트로 ~1/frac
-//   타일마다 1 px 갭 발생. 여기서는 모서리 4개 모두 screenXFromTileX/(Y) 로
-//   직접 도출해 인접 타일 quad 가 비트 동일한 float 경계를 공유 → 갭 X.
+//도로 openBits(N=1,E=2,S=4,W=8) → mapset1by1 인덱스. degree<2는 stage7이 제거하므로
+//  방어적으로 직선 fallback. (3=N+E corner, 7=N+E+S T, 15=십자 등)
+static int roadSpriteIndex(std::uint8_t b)
+{
+    switch (b)
+    {
+    case 15:            return 40;   // NESW 십자
+    case (1 | 4):       return 42;   // N+S 수직
+    case (2 | 8):       return 41;   // E+W 수평
+    case (1 | 2):       return 43;   // N+E 코너
+    case (1 | 8):       return 44;   // N+W 코너
+    case (4 | 8):       return 45;   // S+W 코너
+    case (2 | 4):       return 46;   // E+S 코너
+    case (1 | 2 | 4):   return 50;   // N+E+S (W없음) T
+    case (1 | 2 | 8):   return 51;   // N+E+W (S없음) T
+    case (1 | 4 | 8):   return 52;   // N+S+W (E없음) T
+    case (2 | 4 | 8):   return 53;   // E+S+W (N없음) T
+    case 1: case 4:     return 42;   // degree1 fallback(수직)
+    case 2: case 8:     return 41;   // degree1 fallback(수평)
+    default:            return -1;   // 0 = 도로 아님
+    }
+}
+
+//건물 심볼 해석 결과. atlas/idx + footprint 좌상단 청크 오프셋 + 셀 청크폭.
+struct ResolvedSym
+{
+    Sprite* atlas      = nullptr;
+    int     idx        = 0;
+    int     offX       = 0;   // 앵커(좌상단 청크) 기준 스프라이트 좌상단 청크 오프셋
+    int     offY       = 0;
+    int     cellChunks = 0;   // 스프라이트가 덮는 청크 변 길이(컬링용)
+};
+
+//(symbol, footprint w×h, hash) → 스프라이트. footprint 컨벤션:
+//  1x1: mapset1by1 48px=3청크, 중앙(1,1) 정렬 → off(-1,-1).
+//  2x2: mapset2by2 64px=4청크, 중앙2x2(1..2) 정렬 → off(-1,-1).
+//  2x1(wide): 4x4 중 row2·col1~2 채움 → off(-1,-2).
+//  1x2(tall): 4x4 중 col2·row1~2 채움 → off(-2,-1).
+static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
+{
+    auto one  = [&](int idx) { return ResolvedSym{ spr::mapset1by1, idx, -1, -1, 3 }; };
+    auto two2 = [&](int idx) { return ResolvedSym{ spr::mapset2by2, idx, -1, -1, 4 }; };
+    //2x1/1x2 — footprint 방향으로 wide/tall 스프라이트 + 오프셋 분기.
+    auto rect = [&](int wideIdx, int tallIdx) -> ResolvedSym {
+        if (w == 2 && h == 1) return ResolvedSym{ spr::mapset2by2, wideIdx, -1, -2, 4 };
+        return ResolvedSym{ spr::mapset2by2, tallIdx, -2, -1, 4 };   // 1x2 tall
+    };
+
+    switch (s)
+    {
+    case MapSymbol::apartment:        return one(1);
+    case MapSymbol::bank:             return one(2);
+    case MapSymbol::house:            return one(3);
+    case MapSymbol::warehouse:        return one(4);
+    case MapSymbol::cafe:             return one(5);
+    case MapSymbol::cinema:           return one(6);
+    case MapSymbol::junkShop:         return one(7);
+    case MapSymbol::animalHospital:   return one(8);
+    case MapSymbol::pharmacy:         return one(9);
+    case MapSymbol::restaurant:       return one(10);
+    case MapSymbol::stationeryStore:  return one(11);
+    case MapSymbol::hardwareStore:    return one(12);
+    case MapSymbol::bookstore:        return one(13);
+    case MapSymbol::patrolStation:    return one(15);
+    case MapSymbol::convenienceStore: return one((hash & 1) ? 17 : 16);
+    case MapSymbol::bicycleShop:      return one(18);
+    case MapSymbol::temple:           return one(19);
+    case MapSymbol::church:           return one(20);
+    case MapSymbol::cathedral:        return one(21);
+    case MapSymbol::skyscraper:       return one(22);
+    case MapSymbol::gasStation:       return one((hash & 1) ? 25 : 24);
+    case MapSymbol::shoppingArcade:   return one(32 + static_cast<int>(hash % 3));
+    case MapSymbol::policeStation:    return rect(2, 3);
+    case MapSymbol::fireStation:      return rect(4, 5);
+    case MapSymbol::park:             return two2(1);
+    case MapSymbol::hypermarket:      return two2(6);
+    case MapSymbol::school:           return two2(7);
+    default:                          return ResolvedSym{};   // none / mountain(별도 처리)
+    }
+}
+
+static std::uint64_t symHash(int px, int py)
+{
+    std::uint64_t h = static_cast<std::uint64_t>(static_cast<std::uint32_t>(px)) * 0x9E3779B97F4A7C15ULL;
+    h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(py)) * 0xBF58476D1CE4E5B9ULL;
+    h ^= h >> 31;
+    return h;
+}
+
+
+// ════════════════════════════════════════════════════════════════════════
+// §4  렌더링
+// ════════════════════════════════════════════════════════════════════════
+
+//y로 정렬해 그리는 심볼(산·건물) — 남쪽이 위에 겹치는 JRPG 페인터 순서.
+struct SymDraw { float sortY; Sprite* atlas; int idx; int sx; int sy; };
+
 namespace
 {
-    struct TileBatchEntry { float left, top, right, bottom; int sprIdx; };
+    struct BaseQuad { float l, t, r, b; int sprIdx; Uint8 a; };
 
-    inline void flushTileBatch(TileBatchEntry* entries, int count)
+    //tileset 베이스 타일/파도 배치 flush — 인접 quad가 비트 동일 float 경계 공유 → 갭 없음.
+    //  베이스 타일(alpha 255)과 파도(alpha<255)을 같은 배치로 — 청크 셀 내부에만
+    //  그려지므로 셀 간 겹침 없음 → 같은 청크에서 push 순서(타일→파도)만 지키면 파도가 위.
+    void flushBaseBatch(BaseQuad* q, int count)
     {
         if (count <= 0) return;
 
@@ -346,412 +265,266 @@ namespace
         float texW, texH;
         SDL_GetTextureSize(tex, &texW, &texH);
 
-        const int   srcSize = spr::tileset->getW();           // 16
-        const float uW      = (float)srcSize / texW;
-        const float vH      = (float)srcSize / texH;
-        const int   atlasW  = (int)texW;
-
-        // atlas bleeding 방지 — UV 를 0.5 텍셀 안쪽으로 inset 해서 샘플이 항상
-        //   픽셀 중심을 향하게 함. 분수 줌에서 옆 스프라이트의 첫 텍셀이 새는
-        //   것 (예: 화면 가로로 한 줄 초록 띠) 차단.
-        const float insetU = 0.5f / texW;
-        const float insetV = 0.5f / texH;
+        const int   srcSize = spr::tileset->getW();   // 16
+        const float uW = srcSize / texW, vH = srcSize / texH;
+        const int   atlasW = (int)texW;
+        const float insetU = 0.5f / texW, insetV = 0.5f / texH;
 
         static SDL_Vertex vertices[MAX_BATCH * 4];
         static int        indices [MAX_BATCH * 6];
-        const SDL_FColor white = { 1.0f, 1.0f, 1.0f, 1.0f };
 
         for (int i = 0; i < count; i++)
         {
-            const int sprIdx = entries[i].sprIdx;
+            const int sprIdx = q[i].sprIdx;
             const float u  = (float)((srcSize * sprIdx) % atlasW) / texW;
             const float vY = (float)(srcSize * ((srcSize * sprIdx) / atlasW)) / texH;
-
-            const float u0 = u + insetU,        u1 = u + uW - insetU;
-            const float v0 = vY + insetV,       v1 = vY + vH - insetV;
-
-            const float l = entries[i].left;
-            const float t = entries[i].top;
-            const float r = entries[i].right;
-            const float b = entries[i].bottom;
+            const float u0 = u + insetU,  u1 = u + uW - insetU;
+            const float v0 = vY + insetV, v1 = vY + vH - insetV;
+            const SDL_FColor col = { 1.0f, 1.0f, 1.0f, q[i].a / 255.0f };
 
             const int vBase = i * 4;
-            vertices[vBase    ] = { { l, t }, white, { u0, v0 } };
-            vertices[vBase + 1] = { { r, t }, white, { u1, v0 } };
-            vertices[vBase + 2] = { { r, b }, white, { u1, v1 } };
-            vertices[vBase + 3] = { { l, b }, white, { u0, v1 } };
+            vertices[vBase    ] = { { q[i].l, q[i].t }, col, { u0, v0 } };
+            vertices[vBase + 1] = { { q[i].r, q[i].t }, col, { u1, v0 } };
+            vertices[vBase + 2] = { { q[i].r, q[i].b }, col, { u1, v1 } };
+            vertices[vBase + 3] = { { q[i].l, q[i].b }, col, { u0, v1 } };
 
             const int iBase = i * 6;
-            indices[iBase    ] = vBase;
-            indices[iBase + 1] = vBase + 1;
-            indices[iBase + 2] = vBase + 2;
-            indices[iBase + 3] = vBase;
-            indices[iBase + 4] = vBase + 2;
-            indices[iBase + 5] = vBase + 3;
+            indices[iBase    ] = vBase;     indices[iBase + 1] = vBase + 1;
+            indices[iBase + 2] = vBase + 2; indices[iBase + 3] = vBase;
+            indices[iBase + 4] = vBase + 2; indices[iBase + 5] = vBase + 3;
         }
-
         SDL_RenderGeometry(renderer, tex, vertices, count * 4, indices, count * 6);
     }
 }
 
-static void drawTileSpriteLayer(const MapView& v)
+//① 베이스 지형(오토타일) + 파도 + ② 산 심볼 (단일 스윕, 로컬 terrain 버퍼).
+//   본체 renderTile의 floor 오토타일(tileConnectGroup+connectGroupExtraIndex)과
+//   파도(스프라이트 1504~1526)을 청크 스케일로 이식 — 1청크가 1타일 역할.
+//   산 심볼은 항상 수집(모든 줌 유지). 파도만 drawFoam(=symbolsVisible)일 때 (저배율 클러터/성능 회피).
+static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDraw>& symOut)
 {
-    double minTX, minTY, maxTX, maxTY;
-    v.visibleTileBounds(minTX, minTY, maxTX, maxTY);
+    if (!worldGrid::worldPixelMmapActive()) return;
 
-    static thread_local TileBatchEntry batch[MAX_BATCH];
-    int count = 0;
+    using T = worldGrid::Terrain;
 
-    auto flush  = [&]() { flushTileBatch(batch, count); count = 0; };
-    auto submit = [&](int sprIdx, int tx, int ty)
-    {
-        if (count >= MAX_BATCH) flush();
-        // 인접 타일이 비트 동일한 float 경계를 공유하도록 모서리를 직접 도출.
-        //   (tx+1) 호출은 다음 타일의 left 와 비트 동일 (같은 함수, 같은 입력).
-        batch[count].left   = (float)v.screenXFromTileX((double)tx);
-        batch[count].top    = (float)v.screenYFromTileY((double)ty);
-        batch[count].right  = (float)v.screenXFromTileX((double)(tx + 1));
-        batch[count].bottom = (float)v.screenYFromTileY((double)(ty + 1));
-        batch[count].sprIdx = sprIdx;
-        count++;
+    const int cp = v.chunkPx();
+    const double halfW = v.viewW * 0.5 / cp;
+    const double halfH = v.viewH * 0.5 / cp;
+
+    const int minPX = (int)std::floor(v.centerPX - halfW) - 2;
+    const int maxPX = (int)std::ceil (v.centerPX + halfW) + 2;
+    const int minPY = std::max(0,                  (int)std::floor(v.centerPY - halfH) - 2);
+    const int maxPY = std::min(WORLD_PIXEL_H - 1,   (int)std::ceil (v.centerPY + halfH) + 2);
+    if (maxPX < minPX || maxPY < minPY) return;
+
+    //로컬 terrain 버퍼 — 그릴 범위 +1 마진(이웃 룩업). worldPixel은 y OOB면 Sea, X는 자동 wrap.
+    //  매 청크 worldPixel 반복(오토타일은 이웃 4~8개 조회) 대신 1회 채워 버퍼에서 O(1) 룩업.
+    const int bx0 = minPX - 1, by0 = minPY - 1;
+    const int bw  = (maxPX + 1) - bx0 + 1;
+    const int bh  = (maxPY + 1) - by0 + 1;
+    static thread_local std::vector<T> LT;
+    LT.assign(static_cast<std::size_t>(bw) * bh, T::Sea);
+    for (int ly = 0; ly < bh; ++ly)
+        for (int lx = 0; lx < bw; ++lx)
+            LT[static_cast<std::size_t>(ly) * bw + lx] =
+                worldGrid::worldPixel(worldWrap::wrapPixelX(bx0 + lx), by0 + ly);
+
+    auto terrAt = [&](int x, int y) -> T {
+        const int lx = x - bx0, ly = y - by0;
+        if (lx < 0 || lx >= bw || ly < 0 || ly >= bh) return T::Sea;
+        return LT[static_cast<std::size_t>(ly) * bw + lx];
+    };
+    auto isSea = [&](int x, int y) { T t = terrAt(x, y); return t == T::Sea || t == T::CitySea; };
+    auto isMtn = [&](int x, int y) { return terrAt(x, y) == T::Mountain; };
+    //담수 파도는 안 씀 — 본체의 담수 파도 스프라이트(+496)는 물속 깊은물↔얕은물 전용이라
+    //  육지 물가에 그리면 일부 변형이 "물 들어갈 때 퍼지는 파동(Wave 2016~2021)" 스프라이트와
+    //  겹쳐 잔디 위에 정지된 파동으로 보임. 담수는 floor 오토타일 가장자리로만 표현.
+
+    const seasonFlag season = getSeason();
+
+    //floor 오토타일 sprite index — 본체 renderTile 규칙 그대로(이웃은 청크 terrain).
+    //  cg==0: 같은 floor id끼리 연결 / cg>0: 같은 connectGroup끼리 / cg==-1: 오토타일 없음.
+    auto floorSprIdx = [&](int ix, int iy) -> int {
+        const int id = baseFloorId(terrAt(ix, iy));
+        int spr = itemDex[id].tileSprIndex + itemDex[id].extraSprIndexSingle + 16 * itemDex[id].extraSprIndex16;
+        const int cg = itemDex[id].tileConnectGroup;
+        if (cg != -1)
+        {
+            auto conn = [&](int nx, int ny) -> bool {
+                const int nid = baseFloorId(terrAt(nx, ny));
+                return (cg == 0) ? (id == nid) : (cg == itemDex[nid].tileConnectGroup);
+            };
+            spr += connectGroupExtraIndex(conn(ix, iy - 1), conn(ix, iy + 1), conn(ix - 1, iy), conn(ix + 1, iy));
+        }
+        if (id == itemID::grass)
+        {
+            if (season == seasonFlag::winter)      spr += 16;
+            else if (season == seasonFlag::summer) spr += 32;
+        }
+        return spr;
     };
 
-    World::ins()->forEachChunkAtZ(v.z, [&](int cx, int cy)
-    {
-        // 청크 바운딩으로 가시 컬링
-        double tx0 = (double)cx * CHUNK_SIZE_X;
-        double ty0 = (double)cy * CHUNK_SIZE_Y;
-        if (tx0 + CHUNK_SIZE_X < minTX || tx0 > maxTX) return;
-        if (ty0 + CHUNK_SIZE_Y < minTY || ty0 > maxTY) return;
+    static thread_local std::vector<BaseQuad> batch;
+    batch.clear();
+    auto flush    = [&]() { flushBaseBatch(batch.data(), (int)batch.size()); batch.clear(); };
+    auto pushQuad = [&](int ix, int iy, int sprIdx, Uint8 a) {
+        if ((int)batch.size() >= MAX_BATCH) flush();
+        batch.push_back(BaseQuad{
+            (float)v.sX((double)ix),       (float)v.sY((double)iy),
+            (float)v.sX((double)(ix + 1)), (float)v.sY((double)(iy + 1)), sprIdx, a });
+    };
 
-        for (int ly = 0; ly < CHUNK_SIZE_Y; ly++)
+    //파도 — 본체 renderTile addWave 매핑(1504~1526). isW: 그 방향 이웃이 물인가.
+    //  자기 자신이 그 물타입이 아닐 때만(경계 셀) 그림. baseOff: 해수=애니프레임, 담수=496.
+    //  맵에서는 파도가 움직이면 정신사나워서 2번째 프레임(인덱스1, 오프셋32)으로 고정.
+    const int seaAnim = 32;
+    auto emitFoam = [&](int ix, int iy, auto&& isW, int baseOff, Uint8 alpha) {
+        const bool tC = isW(ix, iy - 1), bC = isW(ix, iy + 1), lC = isW(ix - 1, iy), rC = isW(ix + 1, iy);
+        const bool trC = isW(ix + 1, iy - 1), tlC = isW(ix - 1, iy - 1),
+                   blC = isW(ix - 1, iy + 1), brC = isW(ix + 1, iy + 1);
+        if (!(tC || bC || lC || rC || trC || tlC || blC || brC)) return;
+        auto push = [&](int idx) { pushQuad(ix, iy, idx + baseOff, alpha); };
+        if      (tC && bC && lC && rC) push(1526);
+        else if (tC && bC && rC)       push(1520);
+        else if (lC && bC && rC)       push(1523);
+        else if (bC && rC && tC)       push(1522);
+        else if (rC && tC && lC)       push(1521);
+        else if (tC && bC)             push(1524);
+        else if (rC && lC)             push(1525);
+        else if (rC && tC)             push(1505);
+        else if (tC && lC)             push(1507);
+        else if (lC && bC)             push(1509);
+        else if (bC && rC)             push(1511);
+        else if (tC)                   push(1506);
+        else if (bC)                   push(1510);
+        else if (lC)                   push(1508);
+        else if (rC)                   push(1504);
+        if (trC && !tC && !rC) push(1514);
+        if (tlC && !tC && !lC) push(1515);
+        if (blC && !bC && !lC) push(1512);
+        if (brC && !bC && !rC) push(1513);
+    };
+
+    for (int iy = minPY; iy <= maxPY; ++iy)
+        for (int ix = minPX; ix <= maxPX; ++ix)
         {
-            for (int lx = 0; lx < CHUNK_SIZE_X; lx++)
+            const T t = terrAt(ix, iy);
+
+            //① 베이스 타일 (오토타일)
+            pushQuad(ix, iy, floorSprIdx(ix, iy), 255);
+
+            //파도 — 해수 경계만. 자기 자신이 바다가 아닌 셀에만(본체와 동일).
+            if (drawFoam && !isSea(ix, iy))
+                emitFoam(ix, iy, isSea, seaAnim, 200);
+
+            //② 산 심볼 (2x2 머지) — 짝수그리드 4-뭉치는 mapset2by2 #9, 아니면 mapset1by1 #31. 항상.
+            if (t == T::Mountain)
             {
-                int tx = (int)tx0 + lx;
-                int ty = (int)ty0 + ly;
-                const TileData& td = World::ins()->getTile(tx, ty, v.z);
-
-                int floorId = td.floor;
-                if (floorId != 0)
+                const int ddx = ix & 1, ddy = iy & 1;   // WORLD_PIXEL_W 짝수 → ix 패리티 = wrap 패리티
+                const bool full2x2 =
+                    isMtn(ix - ddx,     iy - ddy)     && isMtn(ix - ddx + 1, iy - ddy) &&
+                    isMtn(ix - ddx,     iy - ddy + 1) && isMtn(ix - ddx + 1, iy - ddy + 1);
+                if (full2x2)
                 {
-                    int sprIdx = itemDex[floorId].tileSprIndex
-                               + itemDex[floorId].extraSprIndexSingle
-                               + 16 * itemDex[floorId].extraSprIndex16;
-                    submit(sprIdx, tx, ty);
+                    if (ddx == 0 && ddy == 0)   // 블록 앵커만 2x2 그림 (나머지 3개는 이 스프라이트가 덮음)
+                        symOut.push_back(SymDraw{ (float)iy, spr::mapset2by2, 9,
+                            (int)std::lround(v.sX((double)(ix - 1))),
+                            (int)std::lround(v.sY((double)(iy - 1))) });
                 }
-
-                int wallId = td.wall;
-                if (wallId != 0)
+                else
                 {
-                    int sprIdx = itemDex[wallId].tileSprIndex
-                               + itemDex[wallId].extraSprIndexSingle
-                               + 16 * itemDex[wallId].extraSprIndex16;
-                    submit(sprIdx, tx, ty);
+                    symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, 31,
+                        (int)std::lround(v.sX((double)(ix - 1))),
+                        (int)std::lround(v.sY((double)(iy - 1))) });
                 }
             }
         }
-    });
-
     flush();
 }
 
-// (3) 도로 폴리라인 오버레이 — buildRoadNetwork 가 생성한 도시간 광역 도로.
-//     worldGen::activePolyLines 가 nullptr 이면 (월드젠 전) 스킵.
-//
-//     wrap 보정: 첫 정점만 카메라 기준 signedDeltaTileX 로 화면 좌표로 끌어오고,
-//     이후 정점은 "직전 정점 기준" signedDeltaTileX 로 누적 — 폴리라인 전체가
-//     단일 분기에서 일관되게 그려짐. (각 정점을 카메라 기준으로 독립 계산하면
-//     인접 정점이 카메라 기준 ±W/2 경계를 사이에 둘 때 한쪽은 동쪽, 다른쪽은
-//     서쪽으로 분기되어 화면을 가로지르는 가짜 선이 생긴다.)
-//
-//     verts.z == view.z 인 폴리라인만 그림 (도로는 표면 z 평면).
-static void drawRoadOverlay(const MapView& v)
-{
-    const auto* polys = worldGen::activePolyLines;
-    if (!polys || polys->empty()) return;
-
-    const SDL_Color road = mappal::roadLine();
-    const float vw = static_cast<float>(v.viewW);
-    const float vh = static_cast<float>(v.viewH);
-    constexpr float marginPx = 8.0f;
-
-    const int camX = static_cast<int>(std::floor(v.centerTileX));
-
-    auto tileYToScreen = [&](int py) -> double
-    {
-        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
-    };
-
-    for (const auto& poly : *polys)
-    {
-        if (poly.verts.size() < 2) continue;
-        if (poly.verts[0].z != v.z) continue;
-
-        //첫 정점 — 카메라 기준 최단 wrap 분기.
-        double prevSx = static_cast<double>(worldWrap::signedDeltaTileX(camX, poly.verts[0].x))
-                      * v.pxPerTile + v.viewW * 0.5;
-        double prevSy = tileYToScreen(poly.verts[0].y);
-
-        for (std::size_t i = 1; i < poly.verts.size(); ++i)
-        {
-            //직전 정점 기준 누적 — seam 가로지름 방지.
-            const int dxSeg = worldWrap::signedDeltaTileX(poly.verts[i - 1].x, poly.verts[i].x);
-            const double curSx = prevSx + static_cast<double>(dxSeg) * v.pxPerTile;
-            const double curSy = tileYToScreen(poly.verts[i].y);
-
-            //AABB 컬링 — 양 끝 모두 화면 밖이면 스킵.
-            const float minX = (float)std::min(prevSx, curSx);
-            const float maxX = (float)std::max(prevSx, curSx);
-            const float minY = (float)std::min(prevSy, curSy);
-            const float maxY = (float)std::max(prevSy, curSy);
-            if (maxX >= -marginPx && minX <= vw + marginPx &&
-                maxY >= -marginPx && minY <= vh + marginPx)
-            {
-                drawLine(
-                    static_cast<int>(std::round(prevSx)),
-                    static_cast<int>(std::round(prevSy)),
-                    static_cast<int>(std::round(curSx)),
-                    static_cast<int>(std::round(curSy)),
-                    road);
-            }
-
-            prevSx = curSx;
-            prevSy = curSy;
-        }
-    }
-}
-
-// (3.4) 도시 건물 분포 오버레이 (debug) — buildCityPlan 4단계의 건물 픽셀.
-//       memberIndex 해시 색상으로 칠해서 같은 건물의 픽셀들이 한 덩어리로 보이게.
-//       1픽셀당 24x24 타일 정사각형. 도로 오버레이보다 먼저 그려서 도로가 위에 얹힘.
-static void drawCityBuildingOverlay(const MapView& v)
+//③ 도로 심볼 (캐시된 도시만) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자가 설정.
+static void drawCityRoads(const MapView& v)
 {
     const auto* cities = worldGen::activeCities;
-    if (!cities || cities->empty()) return;
+    if (!cities) return;
 
-    const float vw = static_cast<float>(v.viewW);
-    const float vh = static_cast<float>(v.viewH);
-    const int camX = static_cast<int>(std::floor(v.centerTileX));
-
-    auto tileYToScreen = [&](int py) -> double
-    {
-        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
-    };
-
-    //memberIndex 해시 → 색상. golden ratio 곱셈으로 인접 index끼리 대비.
-    //비트 마스크로 어두운 색 회피 + 알파로 반투명 → 밑의 지형 보이게.
-    auto colorForIndex = [](int idx) -> SDL_Color
-    {
-        if (idx < 0) return SDL_Color{ 128, 128, 128, 140 };
-        const std::uint32_t h = static_cast<std::uint32_t>(idx) * 2654435761u;
-        return SDL_Color{
-            static_cast<Uint8>(((h >>  0) & 0x9F) | 0x60),
-            static_cast<Uint8>(((h >>  8) & 0x9F) | 0x60),
-            static_cast<Uint8>(((h >> 16) & 0x9F) | 0x60),
-            150
-        };
-    };
-
-    constexpr int CITY_VIS_MARGIN_TILES = 4000;
+    const int cp = v.chunkPx();
+    const int span = 3 * cp;   // mapset1by1 = 3청크
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
-        const auto cityId = static_cast<city::CityId>(i);
-        const auto& cn = (*cities)[i];
-
-        const int dxFromCam = worldWrap::signedDeltaTileX(camX, cn.center.x);
-        const double sxd = static_cast<double>(dxFromCam) * v.pxPerTile + v.viewW * 0.5;
-        const double syd = (static_cast<double>(cn.center.y) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
-        const double marginPxScreen = CITY_VIS_MARGIN_TILES * v.pxPerTile;
-        const bool inView = (sxd + marginPxScreen >= 0) && (sxd - marginPxScreen <= v.viewW)
-                         && (syd + marginPxScreen >= 0) && (syd - marginPxScreen <= v.viewH);
-        if (!inView) continue;
-
-        const CityPlan* plan = CityPlanCache::ins().peek(cityId);
+        const CityPlan* plan = CityPlanCache::ins().peek(static_cast<city::CityId>(i));
         if (!plan) continue;
 
-        const double rectW = static_cast<double>(TILE_PER_PIXEL) * v.pxPerTile;
-        const double rectH = rectW;
-
-        for (const auto& bp : plan->buildings)
+        for (const auto& rc : plan->roadCells)
         {
-            if (bp.pos.z != v.z) continue;
+            if (rc.pos.z != v.z) continue;
+            const int idx = roadSpriteIndex(rc.openBits);
+            if (idx < 0) continue;
 
-            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, bp.pos.x))
-                             * v.pxPerTile + v.viewW * 0.5;
-            const double syA = tileYToScreen(bp.pos.y);
+            const int px = tilePixelIX(rc.pos.x);
+            const int py = tilePixelIY(rc.pos.y);
+            const int sx = (int)std::lround(v.sX((double)(px - 1)));
+            const int sy = (int)std::lround(v.sY((double)(py - 1)));
+            if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-            if (sxA + rectW < 0 || sxA > vw || syA + rectH < 0 || syA > vh) continue;
-
-            const SDL_Rect rect{
-                static_cast<int>(std::round(sxA)),
-                static_cast<int>(std::round(syA)),
-                static_cast<int>(std::round(rectW)),
-                static_cast<int>(std::round(rectH))
-            };
-            drawFillRect(rect, colorForIndex(bp.memberIndex));
+            drawSprite(spr::mapset1by1, idx, sx, sy);
         }
     }
 }
 
-// (3.5) 도시 내부 도로 오버레이 (debug) — buildCityPlan이 생성한 살아남은 segments.
-//       이미 캐시된 도시(CityPlanCache::peek 성공)만 그림. 미캐시 도시는 스킵 —
-//       대도시 일괄 계산은 비용 크니까 플레이어가 근처로 갈 때 자동 캐시되는 패턴 유지.
-//
-//       각 세그먼트는 2점 라인. 광역 도로처럼 누적 wrap 불필요 — 한 도시 안의
-//       세그먼트라 길이가 짧고 seam을 가로지를 일 거의 없음. 단순히 양 끝점을
-//       카메라 기준으로 각각 wrap-clamp 해서 그림.
-static void drawCityRoadOverlay(const MapView& v)
+//④ 건물 심볼 (캐시된 도시만) — symOut에 누적(산과 함께 y정렬 후 그림).
+static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 {
     const auto* cities = worldGen::activeCities;
-    if (!cities || cities->empty()) return;
+    if (!cities) return;
 
-    const SDL_Color color = mappal::cityRoadLine();
-    const float vw = static_cast<float>(v.viewW);
-    const float vh = static_cast<float>(v.viewH);
-    constexpr float marginPx = 8.0f;
-
-    const int camX = static_cast<int>(std::floor(v.centerTileX));
-
-    auto tileYToScreen = [&](int py) -> double
-    {
-        return (static_cast<double>(py) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
-    };
-
-    //── 디버그 카운터 (60프레임당 1회 콘솔 출력) ──
-    static int dbgFrameCount = 0;
-    const bool dbgPrint = (++dbgFrameCount % 60 == 0);
-    int dbgCached = 0;
-    int dbgTotalSegs = 0;
-    int dbgDrawn = 0;
-    int dbgWrongZ = 0;
-    int dbgClipped = 0;
-
-    constexpr int CITY_VIS_MARGIN_TILES = 4000;  // 가장 큰 도시 베이징(~2880타일) 커버
+    const int cp = v.chunkPx();
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
-        const auto cityId = static_cast<city::CityId>(i);
-        const auto& cn = (*cities)[i];
-
-        //가시 검사 — city.center가 view 영역 (+margin) 안인지
-        const int dxFromCam = worldWrap::signedDeltaTileX(camX, cn.center.x);
-        const double sxd = static_cast<double>(dxFromCam) * v.pxPerTile + v.viewW * 0.5;
-        const double syd = (static_cast<double>(cn.center.y) - v.centerTileY) * v.pxPerTile + v.viewH * 0.5;
-        const double marginPxScreen = CITY_VIS_MARGIN_TILES * v.pxPerTile;
-        const bool inView = (sxd + marginPxScreen >= 0) && (sxd - marginPxScreen <= v.viewW)
-                         && (syd + marginPxScreen >= 0) && (syd - marginPxScreen <= v.viewH);
-        if (!inView) continue;
-
-        //이미 캐시된 도시만 그림 — 미캐시 도시는 스킵.
-        //  CityPlan 빌드는 무거우니 카메라 이동으로 강제 발동시키지 않음.
-        //  플레이어가 청크 생성 범위에 들어가면 자연스럽게 캐시됨.
-        const CityPlan* plan = CityPlanCache::ins().peek(cityId);
+        const CityPlan* plan = CityPlanCache::ins().peek(static_cast<city::CityId>(i));
         if (!plan) continue;
-        ++dbgCached;
-        dbgTotalSegs += static_cast<int>(plan->segments.size());
 
-        for (const auto& seg : plan->segments)
+        for (const auto& sym : plan->symbols)
         {
-            if (seg.verts.size() < 2) continue;
-            if (seg.verts[0].z != v.z) { ++dbgWrongZ; continue; }
+            if (sym.pos.z != v.z) continue;
+            const int apx = tilePixelIX(sym.pos.x);
+            const int apy = tilePixelIY(sym.pos.y);
 
-            //양 끝점을 카메라 기준 최단 wrap 분기로 화면 좌표 산출.
-            //  세그먼트가 짧아서 양 끝이 모두 같은 wrap 분기로 떨어짐 → 누적 보정 불필요.
-            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, seg.verts[0].x))
-                             * v.pxPerTile + v.viewW * 0.5;
-            const double syA = tileYToScreen(seg.verts[0].y);
+            const ResolvedSym rs = resolveSymbol(sym.symbol, sym.w, sym.h, symHash(apx, apy));
+            if (!rs.atlas) continue;
 
-            const int dxSeg = worldWrap::signedDeltaTileX(seg.verts[0].x, seg.verts[1].x);
-            const double sxB = sxA + static_cast<double>(dxSeg) * v.pxPerTile;
-            const double syB = tileYToScreen(seg.verts[1].y);
+            const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
+            const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
+            const int span = rs.cellChunks * cp;
+            if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-            //AABB 컬링
-            const float minX = (float)std::min(sxA, sxB);
-            const float maxX = (float)std::max(sxA, sxB);
-            const float minY = (float)std::min(syA, syB);
-            const float maxY = (float)std::max(syA, syB);
-            if (maxX >= -marginPx && minX <= vw + marginPx &&
-                maxY >= -marginPx && minY <= vh + marginPx)
-            {
-                drawLine(
-                    static_cast<int>(std::round(sxA)),
-                    static_cast<int>(std::round(syA)),
-                    static_cast<int>(std::round(sxB)),
-                    static_cast<int>(std::round(syB)),
-                    color);
-                ++dbgDrawn;
-            }
-            else
-            {
-                ++dbgClipped;
-            }
+            symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy });
         }
-
-        //── 다리 (segments와 분리 채널, z+1 deck — segments와 같은 view.z에서 그림) ──
-        const SDL_Color bridgeColor = mappal::bridgeLine();
-        for (const auto& br : plan->bridges)
-        {
-            if (br.verts.size() < 2) continue;
-            if (br.verts[0].z != v.z) { ++dbgWrongZ; continue; }
-
-            const double sxA = static_cast<double>(worldWrap::signedDeltaTileX(camX, br.verts[0].x))
-                             * v.pxPerTile + v.viewW * 0.5;
-            const double syA = tileYToScreen(br.verts[0].y);
-            const int dxSeg = worldWrap::signedDeltaTileX(br.verts[0].x, br.verts[1].x);
-            const double sxB = sxA + static_cast<double>(dxSeg) * v.pxPerTile;
-            const double syB = tileYToScreen(br.verts[1].y);
-
-            const float minX = (float)std::min(sxA, sxB);
-            const float maxX = (float)std::max(sxA, sxB);
-            const float minY = (float)std::min(syA, syB);
-            const float maxY = (float)std::max(syA, syB);
-            if (maxX >= -marginPx && minX <= vw + marginPx &&
-                maxY >= -marginPx && minY <= vh + marginPx)
-            {
-                drawLine(
-                    static_cast<int>(std::round(sxA)),
-                    static_cast<int>(std::round(syA)),
-                    static_cast<int>(std::round(sxB)),
-                    static_cast<int>(std::round(syB)),
-                    bridgeColor);
-                ++dbgDrawn;
-            }
-            else
-            {
-                ++dbgClipped;
-            }
-        }
-    }
-
-    if (dbgPrint)
-    {
-        prt(L"[CityRoadOverlay] visCities=%d  segs(total=%d drawn=%d wrongZ=%d clipped=%d)  view.z=%d  cache.total=%zu\n",
-            dbgCached, dbgTotalSegs, dbgDrawn, dbgWrongZ, dbgClipped, v.z, CityPlanCache::ins().size());
     }
 }
 
-// (4) 플레이어 마커 — 화면 안이면 펄스 마커, 화면 밖이면 가장자리 클램프
+//⑤ 플레이어 마커 — 화면 안이면 펄스, 밖이면 가장자리 클램프.
 static void drawPlayerMarker(const MapView& v)
 {
-    double sxd = v.screenXFromTileX(PlayerX());
-    double syd = v.screenYFromTileY(PlayerY());
+    const double ppX = tileToPixelX(PlayerX());
+    const double ppY = tileToPixelY(PlayerY());
+    const double sxd = v.sX(ppX);
+    const double syd = v.sY(ppY);
 
-    bool offscreen = (sxd < 0 || sxd > v.viewW || syd < 0 || syd > v.viewH);
-    if (offscreen)
+    if (sxd < 0 || sxd > v.viewW || syd < 0 || syd > v.viewH)
     {
-        int ex = (int)std::clamp(sxd, 16.0, (double)v.viewW - 16.0);
-        int ey = (int)std::clamp(syd, 16.0, (double)v.viewH - 16.0);
+        const int ex = (int)std::clamp(sxd, 16.0, (double)v.viewW - 16.0);
+        const int ey = (int)std::clamp(syd, 16.0, (double)v.viewH - 16.0);
         drawFillRect(SDL_Rect{ ex - 7, ey - 7, 14, 14 }, mappal::playerMarker());
         drawRect(SDL_Rect{ ex - 7, ey - 7, 14, 14 }, SDL_Color{ 255, 255, 255, 255 });
         return;
     }
 
-    int sx = (int)std::round(sxd);
-    int sy = (int)std::round(syd);
-    bool on = (SDL_GetTicks() % 900) < 600;
-    if (on)
+    const int sx = (int)std::round(sxd);
+    const int sy = (int)std::round(syd);
+    if ((SDL_GetTicks() % 900) < 600)
     {
         drawFillCircle(sx, sy, 7, SDL_Color{ 255, 255, 255, 255 }, 255);
         drawFillCircle(sx, sy, 5, mappal::playerMarker(), 255);
@@ -764,10 +537,9 @@ static void drawPlayerMarker(const MapView& v)
 
 
 // ════════════════════════════════════════════════════════════════════════
-// §6  UI 크롬 (좌상단 좌표, 좌하단 줌, 우상단 Tab, 우하단 로딩)
+// §5  UI 크롬
 // ════════════════════════════════════════════════════════════════════════
 
-// 좌표 패널 — 헤더 + 페이드 separator + X/Y/Z 우측정렬 표
 static void drawCoordPanel()
 {
     SDL_Rect panel{ 22, 22, 240, 134 };
@@ -779,7 +551,6 @@ static void drawCoordPanel()
     drawText(header, panel.x + 14, panel.y + 8, mappal::uiText());
     setFont(fontType::mainFont);
 
-    // 헤더 글자폭 + 8px 까지 솔리드, 그 뒤 알파 페이드
     int headerW   = queryTextWidth(header);
     int sepX      = panel.x + 14;
     int sepY      = panel.y + 34;
@@ -793,7 +564,6 @@ static void drawCoordPanel()
         drawPoint(solidEndX + 1 + i, sepY, mappal::uiBorder(), a);
     }
 
-    // X/Y/Z — 라벨 좌측, 숫자 우측정렬
     int rowY    = panel.y + 43;
     int labelX  = panel.x + 18;
     int valueRX = panel.x + panel.w - 18;
@@ -814,7 +584,6 @@ static void drawCoordPanel()
     kv(L"Z", PlayerZ());
 }
 
-// 줌 패널 — +/-/@ 버튼 + 현재 배율 표시
 struct ZoomButtons { SDL_Rect zoomIn, zoomOut, home; };
 
 static ZoomButtons computeZoomButtons()
@@ -822,9 +591,9 @@ static ZoomButtons computeZoomButtons()
     constexpr int margin = 22, btnSize = 64, gap = 10;
     int yBase = cameraH - margin - btnSize;
     return {
-        { margin,                            yBase, btnSize, btnSize },
-        { margin + btnSize + gap,            yBase, btnSize, btnSize },
-        { margin + (btnSize + gap) * 2,      yBase, btnSize, btnSize }
+        { margin,                       yBase, btnSize, btnSize },
+        { margin + btnSize + gap,       yBase, btnSize, btnSize },
+        { margin + (btnSize + gap) * 2, yBase, btnSize, btnSize }
     };
 }
 
@@ -840,11 +609,8 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
     drawStadium(panelX, panelY, panelW, panelH, mappal::uiPanel(), 220, 3);
 
     setFontSize(16);
-    std::wostringstream oss;
-    oss << L"Zoom  ";
-    oss.precision(2);
-    oss << std::fixed << v.pxPerTile << L" px/tile";
-    drawText(oss.str(), panelX + 14, panelY + 8, mappal::uiText());
+    std::wstring label = L"Zoom  " + std::to_wstring(v.chunkPx()) + L" px/chunk";
+    drawText(label, panelX + 14, panelY + 8, mappal::uiText());
 
     auto button = [&](const SDL_Rect& r, const std::wstring& glyph)
         {
@@ -860,7 +626,6 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
     button(zb.home,    L"@");
 }
 
-// 우상단 Tab 버튼 — HUD::drawTab 의 tabFlag::back 케이스 재현
 static void drawTabButton()
 {
     SDL_Color btnColor = mappal::uiPanel();
@@ -881,85 +646,9 @@ static void drawTabButton()
         tab.x + 164, tab.y + 8);
 }
 
-// 우하단 로딩 패널 — 스피너 + 진행 카운트. pending 0 이면 호출자가 스킵.
-struct LoadingStats
-{
-    int patchesLoading    = 0;  // (deprecated, 항상 0 — Patch 자동로드 시스템 폐지)
-    int patchesBuilding   = 0;  // 픽셀 텍스처 빌드 대기 (frame budget 초과)
-    int total() const { return patchesLoading + patchesBuilding; }
-};
-
-// 두 개의 75도 호가 180도 간격으로 회전 — 머리는 또렷하고 꼬리는 제곱 페이드.
-// 호 한 개당 36개의 라디얼 라인을 쌓아서 2px 두께를 만들고, 머리 끝에는
-// 작은 글로우 점을 더해 회전 방향을 강조한다.
-static void drawLoadingSpinner(int cx, int cy)
-{
-    constexpr float PI    = 3.14159265f;
-    constexpr float TWOPI = 6.28318531f;
-    constexpr float ARC   = 1.30f;          // ≈ 75°
-    constexpr float SPIN  = 3.0f;           // rad/sec ≈ 0.48 회전/초
-    constexpr float R_IN  = 12.0f;
-    constexpr float R_OUT = 14.0f;
-    constexpr int   N     = 36;             // 호당 라디얼 분할
-
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-
-    const float t   = (float)SDL_GetTicks() / 1000.0f;
-    const float rot = std::fmod(t * SPIN, TWOPI);
-    const SDL_Color col = mappal::uiText();
-
-    for (int k = 0; k < 2; ++k)
-    {
-        const float head = rot + (float)k * PI;
-        for (int s = 0; s < N; ++s)
-        {
-            const float frac = (float)s / (float)(N - 1);   // 0=머리, 1=꼬리
-            const float ang  = head - frac * ARC;
-            const float fade = 1.0f - frac;
-            const Uint8 a = (Uint8)(245.0f * fade * fade);
-            if (a < 6) continue;
-            const float c = std::cos(ang), si = std::sin(ang);
-            drawLine(
-                (int)std::round((float)cx + R_IN  * c),
-                (int)std::round((float)cy + R_IN  * si),
-                (int)std::round((float)cx + R_OUT * c),
-                (int)std::round((float)cy + R_OUT * si),
-                col, a);
-        }
-        // 머리 끝 글로우 점 — 회전 방향성 강조
-        const float c = std::cos(head), si = std::sin(head);
-        const float rMid = (R_IN + R_OUT) * 0.5f;
-        drawFillCircle(
-            (int)std::round((float)cx + rMid * c),
-            (int)std::round((float)cy + rMid * si),
-            2, col, 220);
-    }
-}
-
-static void drawLoadingPanel(const LoadingStats& stats)
-{
-    constexpr int margin  = 22;
-    constexpr int panelW  = 220;
-    constexpr int panelH  = 56;
-    int panelX = cameraW - margin - panelW;
-    int panelY = cameraH - margin - panelH;
-    drawStadium(panelX, panelY, panelW, panelH, mappal::uiPanel(), 220, 3);
-
-    // 좌측 텍스트
-    setFontSize(14);
-    drawText(L"Loading map data", panelX + 16, panelY + 10, mappal::uiText());
-
-    setFontSize(12);
-    std::wstring sub = std::to_wstring(stats.total()) + L" regions pending";
-    drawText(sub, panelX + 16, panelY + 30, mappal::uiBorder());
-
-    // 우측 스피너
-    drawLoadingSpinner(panelX + panelW - 28, panelY + panelH / 2);
-}
-
 
 // ════════════════════════════════════════════════════════════════════════
-// §7  Map 클래스
+// §6  Map 클래스
 // ════════════════════════════════════════════════════════════════════════
 
 export class Map : public GUI
@@ -968,14 +657,13 @@ private:
     inline static Map* ptr = nullptr;
     MapView view;
 
-    // 드래그 상태
-    bool   dragging        = false;
-    bool   dragMoved       = false;
-    double dragAnchorTileX = 0.0;
-    double dragAnchorTileY = 0.0;
+    bool   dragging      = false;
+    bool   dragMoved     = false;
+    double dragAnchorPX  = 0.0;
+    double dragAnchorPY  = 0.0;
 
-    // 줌은 Map 인스턴스 수명 넘어 영속. 센터/Z 는 매 열기마다 플레이어 기준으로 리셋.
-    inline static double persistedPxPerTile = mapcfg::DEFAULT_PX_PER_TILE;
+    //줌은 Map 인스턴스 수명 넘어 영속. 센터/Z는 매 열기마다 플레이어 기준 리셋.
+    inline static int persistedZoom = mapcfg::DEFAULT_ZOOM;
 
 public:
     Map() : GUI(false)
@@ -986,20 +674,17 @@ public:
         view.viewW = cameraW;
         view.viewH = cameraH;
         view.z = PlayerZ();
-        view.centerTileX = (double)PlayerX();
-        view.centerTileY = (double)PlayerY();
-        view.pxPerTile = persistedPxPerTile;
+        view.centerPX = tileToPixelX(PlayerX());
+        view.centerPY = tileToPixelY(PlayerY());
+        view.zoomLevel = persistedZoom;
         x = 0; y = 0;
-
-        // mmap 기반 — 패치 사전 로드 불필요 (Phase 1 완료면 모든 픽셀 즉시 접근).
-        // 텍스처 캐시 영속 — clear() 안 함. 다시 열어도 즉시 풀 디테일.
 
         deactInput();
         deactDraw();
         addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
     }
 
-    ~Map() { persistedPxPerTile = view.pxPerTile; ptr = nullptr; }
+    ~Map() { persistedZoom = view.zoomLevel; ptr = nullptr; }
 
     static Map* ins() { return ptr; }
 
@@ -1009,7 +694,7 @@ public:
     {
         if (getStateDraw() == false) return;
 
-        // 펼침/닫힘 애니메이션 — 박스만 그리고 종료. 빌드 작업 안 함.
+        //펼침/닫힘 애니메이션 — 박스만 그리고 종료.
         double r = getFoldRatio();
         if (r < 1.0)
         {
@@ -1023,36 +708,41 @@ public:
 
         view.viewW = cameraW;
         view.viewH = cameraH;
-        view.clampCenterY();   // 드래그/줌/리사이즈로 카메라가 남/북극 너머로 갔으면 되돌림
+        view.clampCenterY();
 
-        // 매 프레임 작업 예산 초기화 (텍스처 빌드 한도)
-        PixelTextureCache::ins().resetFrame(mapcfg::FRAME_BUDGET_PATCHES);
-
-        // 렌더
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
-        drawBiomeLayer       (view);  // mmap 활성 시에만 — 내부에서 cache.getOrBuild → budget 안에서 빌드
-        drawTileSpriteLayer  (view);  // 항상 — 로드된 청크의 실제 타일 스프라이트
-        drawRoadOverlay      (view);  // 도시간 광역 도로 폴리라인 (worldGen 결과)
-        drawCityBuildingOverlay(view);  // 도시 내부 건물 분포 디버그 (memberIndex 해시 색상)
-        drawCityRoadOverlay  (view);  // 도시 내부 도로 세그먼트 (CityPlan 캐시된 도시만)
-        drawPlayerMarker     (view);
+
+        static thread_local std::vector<SymDraw> symDraws;
+        symDraws.clear();
+
+        //심볼(도로·건물·산)은 모든 줌에서 유지 — 지형(tileset)만 남고 심볼이 사라지면 어색함.
+        //  바다 파도만 줌 게이트(읽기 불가 + 광역에서 draw 폭증하는 장식 디테일).
+        const bool foamOn = view.symbolsVisible();
+
+        drawTerrainLayer(view, foamOn, symDraws);   // ① 베이스(+파도) + ② 산 수집(항상)
+
+        setZoom((float)view.zoomScale());
+        drawCityRoads    (view);             // ③ 도로 (평면, 즉시)
+        drawCityBuildings(view, symDraws);   // ④ 건물 수집
+
+        //산+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침.
+        std::sort(symDraws.begin(), symDraws.end(),
+            [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
+        for (const auto& s : symDraws)
+            drawSprite(s.atlas, s.idx, s.sx, s.sy);
+
+        setZoom(1.0f);
+
+        drawPlayerMarker(view);
 
         drawCoordPanel();
         drawZoomPanel(view, computeZoomButtons());
         drawTabButton();
-
-        // 진행 표시 — 이번 프레임 budget 부족으로 미룬 텍스처 빌드가 있으면
-        LoadingStats stats{
-            0,
-            PixelTextureCache::ins().pendingThisFrame()
-        };
-        if (stats.total() > 0) drawLoadingPanel(stats);
     }
 
     // ────────── 입력 ──────────
     void clickDownGUI() override
     {
-        // 좌클릭(또는 터치)만 드래그 시작. 우클릭/휠클릭은 무시.
         if (option::inputMethod == input::mouse && event.button.button != SDL_BUTTON_LEFT) return;
 
         if (checkCursor(&tab)) return;
@@ -1061,16 +751,16 @@ public:
 
         dragging = true;
         dragMoved = false;
-        dragAnchorTileX = view.centerTileX;
-        dragAnchorTileY = view.centerTileY;
+        dragAnchorPX = view.centerPX;
+        dragAnchorPY = view.centerPY;
     }
 
     void clickMotionGUI(int dx, int dy) override
     {
         if (!dragging) return;
         if (dx * dx + dy * dy > 16) dragMoved = true;
-        view.centerTileX = dragAnchorTileX + dx / view.pxPerTile;
-        view.centerTileY = dragAnchorTileY + dy / view.pxPerTile;
+        view.centerPX = dragAnchorPX + dx / (double)view.chunkPx();
+        view.centerPY = dragAnchorPY + dy / (double)view.chunkPx();
     }
 
     void clickUpGUI() override
@@ -1084,20 +774,12 @@ public:
         if (checkCursor(&tab)) { close(aniFlag::winUnfoldClose); return; }
 
         ZoomButtons zb = computeZoomButtons();
-        if (checkCursor(&zb.zoomIn))
-        {
-            view.zoomAround(view.viewW / 2, view.viewH / 2, +2);
-            return;
-        }
-        if (checkCursor(&zb.zoomOut))
-        {
-            view.zoomAround(view.viewW / 2, view.viewH / 2, -2);
-            return;
-        }
+        if (checkCursor(&zb.zoomIn))  { view.zoomAround(view.viewW / 2, view.viewH / 2, +1); return; }
+        if (checkCursor(&zb.zoomOut)) { view.zoomAround(view.viewW / 2, view.viewH / 2, -1); return; }
         if (checkCursor(&zb.home))
         {
-            view.centerTileX = (double)PlayerX();
-            view.centerTileY = (double)PlayerY();
+            view.centerPX = tileToPixelX(PlayerX());
+            view.centerPY = tileToPixelY(PlayerY());
             return;
         }
     }

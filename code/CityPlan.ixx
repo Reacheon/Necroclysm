@@ -53,6 +53,30 @@ export struct CityBuildingPixel
     int    memberIndex = -1;
 };
 
+// ── CitySymbol (월드맵) ───────────────────────────────────────────────────
+// stage 10이 건물 그룹마다 1개 push — 월드맵(Map.ixx)이 그릴 건물 청크 심볼.
+//   pos: footprint 좌상단 청크의 실타일 좌표(= g.minPx 기준). w/h: footprint 청크 크기
+//   (회전 적용된 그룹의 실제 점유 모양 — 2x1/1x2 분기에 사용). symbol: 건물 종류.
+//   실제 스프라이트(아틀라스·인덱스·오프셋·변형)는 Map.ixx resolveSymbol이 결정.
+//   Lot이 빈 스켈레톤이라 plan.tiles는 비어도, 심볼은 이 채널로 항상 표시된다.
+export struct CitySymbol
+{
+    Point3    pos;
+    int       w = 1;
+    int       h = 1;
+    MapSymbol symbol = MapSymbol::none;
+};
+
+// ── CityRoadCell (월드맵) ─────────────────────────────────────────────────
+// stage 7까지 확정된 도로 픽셀의 openBits 래스터 — 월드맵이 도로 autotile 심볼 선택에 사용.
+//   pos: 청크 좌상단 실타일 좌표. openBits: N=1,E=2,S=4,W=8. plan.segments(디버그 폴리라인)와
+//   별개로, 렌더러가 4방향 비트마스크 → 도로 스프라이트(직선/코너/T/십자)를 직접 매핑한다.
+export struct CityRoadCell
+{
+    Point3       pos;
+    std::uint8_t openBits = 0;
+};
+
 // ── CityItemStack / CityMonster ──────────────────────────────────────────
 // Lot이 깔 spawn (sparse). tiles와 평행 채널 — 페이로드 자료형이 달라
 // (items 리스트 / entityCode) prop처럼 단일 itemID로 합쳐지지 않음.
@@ -109,6 +133,12 @@ export struct CityPlan
     //  픽셀 1개 = TILE_PER_PIXEL 타일 정사각형. 같은 건물의 모든 픽셀은 동일 memberIndex
     //  보유 → Map 오버레이가 memberIndex 해시 색상으로 칠하면 건물 단위가 한 덩어리로 보임.
     std::vector<CityBuildingPixel> buildings;
+
+    //  월드맵(Map.ixx) 청크 심볼 — stage 10이 건물 그룹별 1개 push (종류·footprint·앵커).
+    std::vector<CitySymbol> symbols;
+
+    //  월드맵 도로 autotile 래스터 — stage 7 후 openBits 픽셀을 그대로 기록.
+    std::vector<CityRoadCell> roadCells;
 
     std::vector<CityItemStack> itemStacks;   //sparse
     std::vector<CityMonster>   monsters;     //sparse
