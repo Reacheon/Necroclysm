@@ -671,10 +671,11 @@ export enum class MapSymbol
     pharmacy, restaurant, stationeryStore, hardwareStore, bookstore,
     patrolStation, convenienceStore, bicycleShop, temple, church, cathedral,
     skyscraper, gasStation, shoppingArcade,
+    postOffice, autoShop, clothingStore, jewelryStore, laundromat, gardenShop,
     //2x1 / 1x2 (mapset2by2 — footprint 방향에 따라 wide/tall 스프라이트 분기)
-    policeStation, fireStation,
+    policeStation, fireStation, hotel, hospital, library,
     //2x2 (mapset2by2)
-    park, hypermarket, school,
+    park, hypermarket, school, parkingLot,
     //terrain 파생 (Lot 아님 — 렌더러가 Mountain 청크에 직접 부여)
     mountain,
 };

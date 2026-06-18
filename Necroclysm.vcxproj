@@ -191,6 +191,9 @@
     <ClCompile Include="code\Lot\kinds\Lot-Skyscraper.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-JunkShop.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-FireStation.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-Hotel.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-Hospital.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-Library.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-GasStation.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-Cinema.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-Warehouse.ixx" />
@@ -205,6 +208,13 @@
     <ClCompile Include="code\Lot\kinds\Lot-BicycleShop.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-ShoppingArcade.ixx" />
     <ClCompile Include="code\Lot\kinds\Lot-Apartment.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-PostOffice.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-AutoShop.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-ClothingStore.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-JewelryStore.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-Laundromat.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-GardenShop.ixx" />
+    <ClCompile Include="code\Lot\kinds\Lot-ParkingLot.ixx" />
     <ClCompile Include="code\Lot\Lot.ixx" />
     <ClCompile Include="code\Lot\Lot-base.ixx" />
     <ClCompile Include="code\Lot\lot-rotate.ixx" />

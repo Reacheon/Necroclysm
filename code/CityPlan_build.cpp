@@ -448,13 +448,14 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         };
 
         //블록 크기 추첨 — 큰 블록일수록 희귀. 분포 튜닝 시 임계값 조정.
+        //  ★ footprint 버킷 간 발생률 = *여기* 결정 (버킷 안 건물별 비율은 Lot-CityBuildings의 weight).
         //  3x3은 매칭 건물 Lot 부재로 당분간 제외(기존 3% → 2x2로 흡수).
-        //  2x2:10% / 2x1:10% / 1x2:10% / 1x1:70%
+        //  2x2:10% / 2x1:5% / 1x2:5% / 1x1:80%  (가로로 긴 건물 과다 생성 완화로 2x1·1x2 절반↓)
         const int boxPr = localRandom(1, 100);
         int blockW, blockH;
         if      (boxPr <= 10) { blockW = 2; blockH = 2; }
-        else if (boxPr <= 20) { blockW = 2; blockH = 1; }
-        else if (boxPr <= 30) { blockW = 1; blockH = 2; }
+        else if (boxPr <= 15) { blockW = 2; blockH = 1; }
+        else if (boxPr <= 20) { blockW = 1; blockH = 2; }
         else                  { blockW = 1; blockH = 1; }
 
         std::vector<worldGrid::PixelCoord> checkPoints;
@@ -951,11 +952,12 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 const RoadPixel& r = roads[static_cast<std::size_t>(y) * patchW + x];
                 if (r.openBits == 0) continue;
 
-                //월드맵 도로 autotile 래스터 — 청크 좌상단 + openBits 그대로 기록.
+                //월드맵 도로 autotile 래스터 — 청크 좌상단 + openBits + 다리 여부 기록.
                 plan.roadCells.push_back(CityRoadCell{
                     .pos      = Point3{ (patchPxX + x) * TILE_PER_PIXEL + TILE_BASE_X,
                                         (patchPxY + y) * TILE_PER_PIXEL + TILE_BASE_Y, z },
                     .openBits = r.openBits,
+                    .isBridge = r.isBridge,
                 });
 
                 const int cx = (patchPxX + x) * TILE_PER_PIXEL + TILE_BASE_X + HALF_PX;

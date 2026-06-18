@@ -71,10 +71,12 @@ export struct CitySymbol
 // stage 7까지 확정된 도로 픽셀의 openBits 래스터 — 월드맵이 도로 autotile 심볼 선택에 사용.
 //   pos: 청크 좌상단 실타일 좌표. openBits: N=1,E=2,S=4,W=8. plan.segments(디버그 폴리라인)와
 //   별개로, 렌더러가 4방향 비트마스크 → 도로 스프라이트(직선/코너/T/십자)를 직접 매핑한다.
+//   isBridge: 강/해협을 건너는 다리 칸(stage 8). 렌더러가 일반 도로 대신 다리 전용 심볼로 그림.
 export struct CityRoadCell
 {
     Point3       pos;
     std::uint8_t openBits = 0;
+    bool         isBridge = false;
 };
 
 // ── CityItemStack / CityMonster ──────────────────────────────────────────

@@ -31,8 +31,11 @@ import worldSession;
 //   구글지도식 무제한 줌을 폐기하고 "1청크 = 1심볼" 타일 기반으로 재작성.
 //   레이어:
 //     ① 베이스 지형 — tileset.png. 청크 1개당 타일 1개(잔디/해수/담수). 배치 렌더.
-//     ② 산 심볼     — worldGrid::Terrain::Mountain. 4개 사각형 뭉치면 2x2로 머지(JRPG).
-//     ③ 도로 심볼   — CityPlan.roadCells(openBits) → autotile(직선/코너/T/십자) mapset1by1.
+//     ② 산 심볼     — worldGrid::Terrain::Mountain. 본체 floor와 동일 16타일 오토타일
+//                     (connectGroupExtraIndex)로 mapset1by1 #64~79 중 선택.
+//     ③ 도로 심볼   — 외부 도로(activePolyLines 래스터) + CityPlan.roadCells(openBits)를
+//                     같은 autotile(직선/코너/T/십자) mapset1by1로. 도시↔도시 연결 도로는
+//                     어느 CityPlan에도 안 들어가므로 폴리라인을 직접 청크 셀로 래스터화.
 //     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2).
 //
 //   좌표계는 "픽셀=청크"(worldPixel 인덱스, 0-base). 1픽셀=1청크=24타일.
@@ -225,11 +228,21 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
     case MapSymbol::skyscraper:       return one(22);
     case MapSymbol::gasStation:       return one((hash & 1) ? 25 : 24);
     case MapSymbol::shoppingArcade:   return one(32 + static_cast<int>(hash % 3));
+    case MapSymbol::postOffice:       return one(55);
+    case MapSymbol::autoShop:         return one(56);
+    case MapSymbol::clothingStore:    return one(57);
+    case MapSymbol::jewelryStore:     return one(58);
+    case MapSymbol::laundromat:       return one(59);
+    case MapSymbol::gardenShop:       return one(60);
     case MapSymbol::policeStation:    return rect(2, 3);
     case MapSymbol::fireStation:      return rect(4, 5);
+    case MapSymbol::hotel:            return rect(11, 12);
+    case MapSymbol::hospital:         return rect(13, 14);
+    case MapSymbol::library:          return rect(16, 17);
     case MapSymbol::park:             return two2(1);
     case MapSymbol::hypermarket:      return two2(6);
     case MapSymbol::school:           return two2(7);
+    case MapSymbol::parkingLot:       return two2(9);
     default:                          return ResolvedSym{};   // none / mountain(별도 처리)
     }
 }
@@ -417,32 +430,147 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
             if (drawFoam && !isSea(ix, iy))
                 emitFoam(ix, iy, isSea, seaAnim, 200);
 
-            //② 산 심볼 (2x2 머지) — 짝수그리드 4-뭉치는 mapset2by2 #9, 아니면 mapset1by1 #31. 항상.
+            //② 산 심볼 (16타일 오토타일) — 본체 floor 타일과 동일 규약(connectGroupExtraIndex).
+            //  카디널 4방향 이웃이 산이면 연결 → mapset1by1 #64(베이스) + 0~15. 건물과 같은
+            //  3청크 중앙 정렬(art는 중앙 16px)이라 인접 산끼리 가장자리가 매끈히 이어짐. 항상 수집.
             if (t == T::Mountain)
             {
-                const int ddx = ix & 1, ddy = iy & 1;   // WORLD_PIXEL_W 짝수 → ix 패리티 = wrap 패리티
-                const bool full2x2 =
-                    isMtn(ix - ddx,     iy - ddy)     && isMtn(ix - ddx + 1, iy - ddy) &&
-                    isMtn(ix - ddx,     iy - ddy + 1) && isMtn(ix - ddx + 1, iy - ddy + 1);
-                if (full2x2)
-                {
-                    if (ddx == 0 && ddy == 0)   // 블록 앵커만 2x2 그림 (나머지 3개는 이 스프라이트가 덮음)
-                        symOut.push_back(SymDraw{ (float)iy, spr::mapset2by2, 9,
-                            (int)std::lround(v.sX((double)(ix - 1))),
-                            (int)std::lround(v.sY((double)(iy - 1))) });
-                }
-                else
-                {
-                    symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, 31,
-                        (int)std::lround(v.sX((double)(ix - 1))),
-                        (int)std::lround(v.sY((double)(iy - 1))) });
-                }
+                const int idx = 64 + connectGroupExtraIndex(
+                    isMtn(ix, iy - 1), isMtn(ix, iy + 1), isMtn(ix - 1, iy), isMtn(ix + 1, iy));
+                symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
+                    (int)std::lround(v.sX((double)(ix - 1))),
+                    (int)std::lround(v.sY((double)(iy - 1))) });
             }
         }
     flush();
 }
 
-//③ 도로 심볼 (캐시된 도시만) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자가 설정.
+//③-a 외부 도로 (도시간 광역 도로망). worldGen::activePolyLines를 청크 셀 openBits로
+//   래스터화 — CityPlan.roadCells는 도시 footprint 안쪽만 담아서, 도시↔도시 연결 도로는
+//   이 채널이 아니면 월드맵에 안 나온다. (procGenerate stage 3가 실타일에 15폭 아스팔트로
+//   이미 깔지만, 그건 월드 타일이지 월드맵 심볼이 아니다.)
+struct HighwayCell { int cx; int cy; int z; int sprIdx; };   // sprIdx = 빌드시 해석된 mapset1by1 인덱스
+
+//activePolyLines를 청크 openBits 셀로 래스터화한 캐시. 폴리라인은 월드젠 후 불변이라
+//  포인터 기준 1회 메모이즈 (Map 여닫기마다 재계산 회피, 새 월드면 포인터 바뀌어 재빌드).
+//  4-연결(대각 없는) 라인 워크로 인접 셀끼리 양방향 비트를 OR — 교차/분기는 자연히 T·십자.
+static const std::vector<HighwayCell>& highwayCells()
+{
+    static std::vector<HighwayCell> cache;
+    static const std::vector<worldGen::RoadPolyLine>* builtFrom = nullptr;
+    static bool built = false;
+
+    const std::vector<worldGen::RoadPolyLine>* polys = worldGen::activePolyLines;
+    if (built && polys == builtFrom) return cache;
+    built     = true;
+    builtFrom = polys;
+    cache.clear();
+    if (polys == nullptr) return cache;
+
+    //(cx,cy,z) → openBits 누적. cx∈[0,WORLD_CHUNK_W) cy∈[0,WORLD_PIXEL_H) 둘 다 16비트 이내.
+    std::unordered_map<std::uint64_t, std::uint8_t> bits;
+    auto keyOf = [](int cx, int cy, int z) -> std::uint64_t {
+        return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) << 32)
+             | (static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy)) << 16)
+             |  static_cast<std::uint64_t>(static_cast<std::uint32_t>((z + 32768) & 0xFFFF));
+        };
+    auto stamp = [&](int cx, int cy, int z, std::uint8_t bit) { bits[keyOf(cx, cy, z)] |= bit; };
+
+    constexpr std::uint8_t kN = 1, kE = 2, kS = 4, kW = 8;   // roadSpriteIndex와 동일 비트
+
+    for (const worldGen::RoadPolyLine& poly : *polys)
+        for (std::size_t i = 1; i < poly.verts.size(); ++i)
+        {
+            const Point3& a = poly.verts[i - 1];
+            const Point3& b = poly.verts[i];
+            const int z  = a.z;
+            const int ax = tilePixelIX(a.x), ay = tilePixelIY(a.y);
+            const int bx = tilePixelIX(b.x), by = tilePixelIY(b.y);
+
+            //4-연결 라인 워크 — 매 step이 정확히 한 카디널 이동(대각 staircase). 이동마다
+            //  두 셀에 서로 향하는 비트를 박아 끊김 없는 도로 토폴로지 형성.
+            const int dx = std::abs(bx - ax), dy = std::abs(by - ay);
+            const int sx = (ax < bx) ? 1 : -1;
+            const int sy = (ay < by) ? 1 : -1;
+            const int dx2 = dx * 2, dy2 = dy * 2;
+            const int moves = dx + dy;
+            int x = ax, y = ay, err = dx - dy;
+            for (int m = 0; m < moves; ++m)
+            {
+                if (err > 0)
+                {
+                    stamp(x, y, z, (sx > 0) ? kE : kW);
+                    x += sx;
+                    stamp(x, y, z, (sx > 0) ? kW : kE);
+                    err -= dy2;
+                }
+                else
+                {
+                    stamp(x, y, z, (sy > 0) ? kS : kN);
+                    y += sy;
+                    stamp(x, y, z, (sy > 0) ? kN : kS);
+                    err += dx2;
+                }
+            }
+        }
+
+    //심볼 해석 — 셀이 수계(강/바다/호수) 위면 다리 심볼, 아니면 일반 도로 autotile. worldPixel은
+    //  X 자동 wrap·범위밖 Sea·mmap 활성 필요. (procGenerate stage8이 박는 CityRoadCell.isBridge와
+    //  달리 외부 도로엔 플래그가 없어 여기서 지형으로 재구성.) 물 횡단은 A*가 직진 강제라 openBits
+    //  항상 한 축: E|W=수평 다리, N|S=수직 다리(38). 수평 다리는 바로 아래(cy+1)가 물이면 물에
+    //  기둥 내리는 37, 물이 아니면(강폭 1칸 등) 기둥 없는 39.
+    const bool mmapOn = worldGrid::worldPixelMmapActive();
+    auto isWaterPixel = [](worldGrid::Terrain t) {
+        using T = worldGrid::Terrain;
+        return t == T::Sea || t == T::River || t == T::Lake || t == T::CityRiver || t == T::CitySea;
+        };
+
+    cache.reserve(bits.size());
+    for (const auto& [k, ob] : bits)
+    {
+        const int cx = static_cast<int>((k >> 32) & 0xFFFF);
+        const int cy = static_cast<int>((k >> 16) & 0xFFFF);
+        const int z  = static_cast<int>(k & 0xFFFF) - 32768;
+
+        int sprIdx;
+        if (mmapOn && isWaterPixel(worldGrid::worldPixel(cx, cy)))
+        {
+            if (ob & (2 | 8))   // E|W → 수평 다리: 아래 물이면 기둥(37), 아니면 39
+                sprIdx = isWaterPixel(worldGrid::worldPixel(cx, cy + 1)) ? 37 : 39;
+            else                // N|S → 수직 다리
+                sprIdx = 38;
+        }
+        else
+        {
+            sprIdx = roadSpriteIndex(ob);
+            if (sprIdx < 0) continue;   // openBits==0 (방어적 — 정상적으로는 없음)
+        }
+
+        cache.push_back(HighwayCell{ .cx = cx, .cy = cy, .z = z, .sprIdx = sprIdx });
+    }
+    return cache;
+}
+
+//외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
+static void drawHighways(const MapView& v)
+{
+    const std::vector<HighwayCell>& cells = highwayCells();
+    const int cp   = v.chunkPx();
+    const int span = 3 * cp;   // mapset1by1 = 3청크
+
+    for (const HighwayCell& c : cells)
+    {
+        if (c.z != v.z) continue;
+
+        const int sx = (int)std::lround(v.sX((double)(c.cx - 1)));
+        const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
+        if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
+
+        drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
+    }
+}
+
+//③-b 도시 내부 도로 심볼 (캐시된 도시만) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자가 설정.
 static void drawCityRoads(const MapView& v)
 {
     const auto* cities = worldGen::activeCities;
@@ -459,8 +587,17 @@ static void drawCityRoads(const MapView& v)
         for (const auto& rc : plan->roadCells)
         {
             if (rc.pos.z != v.z) continue;
-            const int idx = roadSpriteIndex(rc.openBits);
-            if (idx < 0) continue;
+
+            //다리 칸은 전용 심볼 — E|W(좌우) 37 / N|S(상하) 38. (다리 openBits는 한 축뿐)
+            //  그 외는 일반 도로 autotile.
+            int idx;
+            if (rc.isBridge)
+                idx = (rc.openBits & (2 | 8)) ? 37 : 38;   // N=1,E=2,S=4,W=8
+            else
+            {
+                idx = roadSpriteIndex(rc.openBits);
+                if (idx < 0) continue;
+            }
 
             const int px = tilePixelIX(rc.pos.x);
             const int py = tilePixelIY(rc.pos.y);
@@ -722,7 +859,8 @@ public:
         drawTerrainLayer(view, foamOn, symDraws);   // ① 베이스(+파도) + ② 산 수집(항상)
 
         setZoom((float)view.zoomScale());
-        drawCityRoads    (view);             // ③ 도로 (평면, 즉시)
+        drawHighways     (view);             // ③-a 외부 도로 (평면, 즉시)
+        drawCityRoads    (view);             // ③-b 내부 도로 (평면, 즉시)
         drawCityBuildings(view, symDraws);   // ④ 건물 수집
 
         //산+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침.
