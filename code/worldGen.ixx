@@ -5,6 +5,7 @@ import util;
 import constVar;
 import worldGrid;
 import city;
+import worldWrap;
 
 //============================================================
 // worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
@@ -137,4 +138,230 @@ export namespace worldGen
     //  prt() 등 std::wprintf 계열은 스레드 안전이 보장되지 않으므로 워커 스레드에서는
     //  호출하지 않는다 — 각 phase 함수 내부의 prt만 사용.
     void generateWorld(std::uint64_t seed, WorldGenProgress& progress);
+
+    //도시간 광역 도로망(activePolyLines)을 청크 셀로 래스터화한 마스크 — 숲이 도로를
+    //  덮지 않도록(맵 심볼·인-월드 공통) isForestChunk가 조회. 도로 셀을 1링 dilation해
+    //  3청크폭 숲 스프라이트가 도로에 겹치는 것까지 차단(도로변 clearing). 폴리라인은
+    //  월드젠 후 불변 → activePolyLines 포인터 기준 1회 빌드, 이후 O(1) 조회.
+    //  worker(Sector)·main(Map) 양쪽 호출 → mutex 가드. inline 지역 static은 프로그램당 1개.
+    inline bool isHighwayChunk(int chunkPxX, int chunkPxY)
+    {
+        static std::unordered_set<std::uint64_t> mask;
+        static const std::vector<RoadPolyLine>*  builtFrom = nullptr;
+        static bool       built = false;
+        static std::mutex mtx;
+
+        auto key = [](int cx, int cy) noexcept -> std::uint64_t {
+            return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) << 32)
+                 |  static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy));
+        };
+
+        std::lock_guard<std::mutex> lk(mtx);
+        if (!built || builtFrom != activePolyLines)
+        {
+            built     = true;
+            builtFrom = activePolyLines;
+            mask.clear();
+            if (activePolyLines != nullptr)
+            {
+                auto floorDiv = [](int a, int b) noexcept {
+                    return (a >= 0) ? (a / b) : -(((-a) + b - 1) / b);
+                };
+                auto stampDilated = [&](int cx, int cy) {
+                    for (int oy = -1; oy <= 1; ++oy)
+                    for (int ox = -1; ox <= 1; ++ox)
+                        mask.insert(key(worldWrap::wrapPixelX(cx + ox), cy + oy));
+                };
+                //각 세그먼트를 청크 공간 4-연결 워크로 따라가며 지나는 셀 stamp (+1링).
+                for (const RoadPolyLine& poly : *activePolyLines)
+                    for (std::size_t i = 1; i < poly.verts.size(); ++i)
+                    {
+                        const Point3& a = poly.verts[i - 1];
+                        const Point3& b = poly.verts[i];
+                        const int ax = floorDiv(a.x - TILE_BASE_X, TILE_PER_PIXEL);
+                        const int ay = floorDiv(a.y - TILE_BASE_Y, TILE_PER_PIXEL);
+                        const int bx = floorDiv(b.x - TILE_BASE_X, TILE_PER_PIXEL);
+                        const int by = floorDiv(b.y - TILE_BASE_Y, TILE_PER_PIXEL);
+                        const int dx = std::abs(bx - ax), dy = std::abs(by - ay);
+                        const int sx = (ax < bx) ? 1 : -1, sy = (ay < by) ? 1 : -1;
+                        const int moves = dx + dy;
+                        int x = ax, y = ay, err = dx - dy;
+                        stampDilated(x, y);
+                        for (int m = 0; m < moves; ++m)
+                        {
+                            if (err > 0) { x += sx; err -= dy * 2; }
+                            else         { y += sy; err += dx * 2; }
+                            stampDilated(x, y);
+                        }
+                    }
+            }
+        }
+        return mask.count(key(worldWrap::wrapPixelX(chunkPxX), chunkPxY)) != 0;
+    }
+
+    //절차적 산맥 청크 판정 — 위성 Mountain(Terrain) 외에 추가로 산맥을 절차 생성.
+    //  isForestChunk와 같은 "지터드 시드 격자 + 각진동 반경" 순수 함수 (다른 salt).
+    //  Map.ixx의 isMtn이 위성+절차 둘 다 보게 해 #64~79 오토타일이 자연 연결되고,
+    //  Sector_procGenerate stage 6이 같은 술어로 인-월드 바위벽을 깐다.
+    //    ① 게이트 — 물/도시만 제외 (그 외 land는 사막·극지 포함 어디든 산 가능).
+    //    ② 3×3 셀 시드 거리 테스트 (각진동 로브). 숲보다 크고 드문 덩어리.
+    //    ③ 도로 양보 (isHighwayChunk) — 산이 도시간 도로를 막지 않게(패스).
+    inline bool isMountainChunk(int chunkPxX, int chunkPxY, std::uint64_t seed)
+    {
+        constexpr int MTN_CELL  = 32;   // 시드 격자 한 변(청크) — 숲보다 넓게
+        constexpr int MTN_R_MIN = 5;    // 산 반경 최소(청크)
+        constexpr int MTN_R_MAX = 14;   // 산 반경 최대(청크) — +엣지워프(×1.6≈22.4) < MTN_CELL
+        constexpr int MTN_FILL  = 50;   // 0..255, 셀이 산 시드 보유 확률(~20%)
+
+        const int pcx = worldWrap::wrapPixelX(chunkPxX);
+        const int pcy = chunkPxY;
+
+        //① 게이트 — 물/도시 제외.
+        switch (worldGrid::worldPixel(pcx, pcy))
+        {
+        case worldGrid::Terrain::Sea:
+        case worldGrid::Terrain::CitySea:
+        case worldGrid::Terrain::River:
+        case worldGrid::Terrain::Lake:
+        case worldGrid::Terrain::CityRiver:
+        case worldGrid::Terrain::CityZone:
+        case worldGrid::Terrain::CityCenter:
+            return false;
+        default:
+            break;
+        }
+
+        auto floorDiv = [](int a, int b) noexcept {
+            return (a >= 0) ? (a / b) : -(((-a) + b - 1) / b);
+        };
+        auto hashCell = [seed](int cx, int cy) noexcept -> std::uint64_t {
+            std::uint64_t h = seed ^ 0xBADA55C0FFEEULL;   // 숲과 다른 salt
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) * 0xBF58476D1CE4E5B9ULL;
+            h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy)) * 0x94D049BB133111EBULL;
+            h ^= h >> 31;
+            return h;
+        };
+
+        //② 이웃 3×3 셀의 시드를 거리 테스트.
+        const int cellX = floorDiv(pcx, MTN_CELL);
+        const int cellY = floorDiv(pcy, MTN_CELL);
+        bool found = false;
+        for (int gy = -1; gy <= 1 && !found; ++gy)
+        for (int gx = -1; gx <= 1 && !found; ++gx)
+        {
+            const int ccx = cellX + gx;
+            const int ccy = cellY + gy;
+            const std::uint64_t h = hashCell(ccx, ccy);
+            if ((h & 0xff) >= static_cast<std::uint64_t>(MTN_FILL)) continue;
+
+            const int seedX = ccx * MTN_CELL + static_cast<int>((h >> 8)  % MTN_CELL);
+            const int seedY = ccy * MTN_CELL + static_cast<int>((h >> 16) % MTN_CELL);
+            const int baseR = MTN_R_MIN + static_cast<int>((h >> 24) % (MTN_R_MAX - MTN_R_MIN + 1));
+
+            const double dx = static_cast<double>(pcx - seedX);
+            const double dy = static_cast<double>(pcy - seedY);
+            const double d2 = dx * dx + dy * dy;
+            const double rMax = static_cast<double>(MTN_R_MAX) * 1.6;
+            if (d2 > rMax * rMax) continue;
+
+            const double ang = std::atan2(dy, dx);
+            const double p1 = static_cast<double>((h >> 32) & 0x3ff) / 1024.0 * 6.28318530718;
+            const double p2 = static_cast<double>((h >> 42) & 0x3ff) / 1024.0 * 6.28318530718;
+            const double a1 = 0.18 + static_cast<double>((h >> 52) & 0x3f) / 63.0 * 0.18;
+            const double a2 = 0.10 + static_cast<double>((h >> 58) & 0x3f) / 63.0 * 0.12;
+            const double r  = static_cast<double>(baseR) * (1.0 + a1 * std::sin(2.0 * ang + p1) + a2 * std::sin(3.0 * ang + p2));
+            if (d2 < r * r) found = true;
+        }
+        if (!found) return false;
+
+        //③ 도로 양보 — 산이라도 도시간 도로(1링 포함)면 비움(패스).
+        if (isHighwayChunk(pcx, pcy)) return false;
+        return true;
+    }
+
+    //숲 청크 판정 — 절차적 (위성에 숲 없음). 전역 상태 없는 *순수 함수*:
+    //  Sector_procGenerate(실타일 grass+나무)와 Map.ixx(월드맵 16-오토타일 #96~111)가
+    //  같은 술어를 호출해 일관 — 산맥이 Terrain::Mountain 하나를 공유하는 것과 동일 분업.
+    //
+    //  모델: "지터드 시드 격자 + 해석적 반경". chunkPx = 픽셀좌표(=청크, 1:1).
+    //    ① 위성 terrain 게이트 — 숲-가능 바이옴만 (도시/산/사막/물/극지 제외)
+    //    ② 이웃 3×3 셀의 숲 시드를 거리 테스트. 반경은 시드별 각진동(angular harmonic)으로
+    //       일그러뜨려 원이 아닌 유기적 로브 (픽셀섬 없이 매끄러운 가장자리 → 오토타일 친화).
+    //    ③ 도로 청크면 양보 (isHighwayChunk) — 숲이 도시간 도로를 덮지 않게.
+    //  maxReach(≈12.8) < FOREST_CELL(24) 이라 3×3 이웃이면 충분 (먼 셀 시드는 도달 불가).
+    //  X 시암: 내부에서 wrapPixelX로 정규화 → 두 호출자가 같은 청크에 같은 답.
+    //    (블롭은 ±W/2 경계에서 끊김 — 거긴 태평양이라 실영향 작음, 추후 보강.)
+    inline bool isForestChunk(int chunkPxX, int chunkPxY, std::uint64_t seed)
+    {
+        constexpr int FOREST_CELL  = 24;   // 시드 격자 한 변(청크)
+        constexpr int FOREST_R_MIN = 3;    // 숲 반경 최소(청크)
+        constexpr int FOREST_R_MAX = 8;    // 숲 반경 최대(청크) — +엣지워프 < FOREST_CELL
+        constexpr int FOREST_FILL  = 70;   // 0..255, 셀이 숲 시드 보유 확률(~27%)
+
+        const int pcx = worldWrap::wrapPixelX(chunkPxX);
+        const int pcy = chunkPxY;
+
+        //① 숲-가능 바이옴 게이트 (위성 terrain).
+        switch (worldGrid::worldPixel(pcx, pcy))
+        {
+        case worldGrid::Terrain::Land:
+        case worldGrid::Terrain::Monsoon:
+        case worldGrid::Terrain::InsularRainforest:
+        case worldGrid::Terrain::ContinentalRainforest:
+        case worldGrid::Terrain::Subarctic:
+            break;
+        default:
+            return false;   // Sea/River/Lake/City*/Mountain/Desert/Tundra/Polar
+        }
+
+        auto floorDiv = [](int a, int b) noexcept {
+            return (a >= 0) ? (a / b) : -(((-a) + b - 1) / b);
+        };
+        auto hashCell = [seed](int cx, int cy) noexcept -> std::uint64_t {
+            std::uint64_t h = seed ^ 0x0F0235EEDF0E57ULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) * 0xBF58476D1CE4E5B9ULL;
+            h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy)) * 0x94D049BB133111EBULL;
+            h ^= h >> 31;
+            return h;
+        };
+
+        //② 이웃 3×3 셀의 시드를 거리 테스트.
+        const int cellX = floorDiv(pcx, FOREST_CELL);
+        const int cellY = floorDiv(pcy, FOREST_CELL);
+        bool found = false;
+        for (int gy = -1; gy <= 1 && !found; ++gy)
+        for (int gx = -1; gx <= 1 && !found; ++gx)
+        {
+            const int ccx = cellX + gx;
+            const int ccy = cellY + gy;
+            const std::uint64_t h = hashCell(ccx, ccy);
+            if ((h & 0xff) >= static_cast<std::uint64_t>(FOREST_FILL)) continue;  // 이 셀엔 숲 없음
+
+            const int seedX = ccx * FOREST_CELL + static_cast<int>((h >> 8)  % FOREST_CELL);
+            const int seedY = ccy * FOREST_CELL + static_cast<int>((h >> 16) % FOREST_CELL);
+            const int baseR = FOREST_R_MIN + static_cast<int>((h >> 24) % (FOREST_R_MAX - FOREST_R_MIN + 1));
+
+            const double dx = static_cast<double>(pcx - seedX);
+            const double dy = static_cast<double>(pcy - seedY);
+            const double d2 = dx * dx + dy * dy;
+            const double rMax = static_cast<double>(FOREST_R_MAX) * 1.6;
+            if (d2 > rMax * rMax) continue;   // 빠른 컬 (각진동 최대치 밖)
+
+            const double ang = std::atan2(dy, dx);
+            const double p1 = static_cast<double>((h >> 32) & 0x3ff) / 1024.0 * 6.28318530718;
+            const double p2 = static_cast<double>((h >> 42) & 0x3ff) / 1024.0 * 6.28318530718;
+            const double a1 = 0.18 + static_cast<double>((h >> 52) & 0x3f) / 63.0 * 0.18;  // 0.18..0.36
+            const double a2 = 0.10 + static_cast<double>((h >> 58) & 0x3f) / 63.0 * 0.12;  // 0.10..0.22
+            const double r  = static_cast<double>(baseR) * (1.0 + a1 * std::sin(2.0 * ang + p1) + a2 * std::sin(3.0 * ang + p2));
+            if (d2 < r * r) found = true;
+        }
+        if (!found) return false;
+
+        //③ 양보 — 숲이라도 산맥/도시간 도로(1링 포함)면 비움 (우선순위 산>숲>도로).
+        if (isMountainChunk(pcx, pcy, seed)) return false;
+        if (isHighwayChunk(pcx, pcy)) return false;
+        return true;
+    }
 }

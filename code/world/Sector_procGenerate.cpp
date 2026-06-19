@@ -14,12 +14,14 @@ import CityPlan;
 //   책임: SectorPlan.tiles (1920×1920 PaintCell) 전부를 결정해서 채움.
 //        청크는 본 산출물을 *블릿만* — 자체 결정 0.
 //
-//   향후 단계는 모두 본 함수에 누적됨:
-//     1) raw 픽셀 기반 베이스 페인트 (현재 구현)
-//     2) 곡선 강·해안 — 47 autotile (현재 구현)
-//     3) 광역 도로 폴리라인 페인트 — 15타일 asphalt, 사이드워크 X (현재 구현)
-//     4) 인카운터 사이트 좌표
-//     5) Bridge 후처리 (도로↔수계 교차 보강)
+//   단계 (모두 본 함수에 *적층* 누적, Painter's algorithm — 나중 단계가 앞을 덮음):
+//     1) raw 픽셀 기반 베이스 페인트
+//     2) 곡선 강·해안 — 47 autotile
+//     3) 광역 도로 폴리라인 페인트 — 15타일 asphalt
+//     4) 도시 CityPlan 소비 — floor/wall/prop/spawn
+//     5) 숲 배치 — 절차적 지터드 시드 격자 (도로·도시 위 보존)
+//     6) 산맥 인-월드 — 위성+절차 바위벽 (도로·도시·물 보존)
+//   향후: 인카운터 사이트, 국도 분기, Bridge 후처리 (아래 TODO)
 //
 //   각 단계가 *같은 3.7M PaintCell 배열*에 *적층 페인트* (Painter's algorithm).
 //   순서가 중요 — 나중 단계가 앞 단계를 덮어씀.
@@ -123,9 +125,9 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
     //═══════════════════════════════════════════════════════════════════════
     // 2) 곡선 강·해안 — 47 Autotile
-    // 강이나 해안선은 픽셀(48타일)로 양자화되어 있기에 월드맵에서 보면 불연속적으로 보인다.
+    // 강이나 해안선은 픽셀(24타일=1청크)로 양자화되어 있기에 월드맵에서 보면 불연속적으로 보인다.
     // 기존에 물이 있던 자리를 땅으로 채우는 47 오토타일링을 공격적으로 해서 해안선이나 강가를 자연스럽게 만드려고 한다.
-    // 오토타일링이므로 인접한 8개의 픽셀들이 어떤 픽셀인지를 참조해서 자기 위치의 픽셀(48타일) 내의 타일들을 흙으로 채워야 한다. 주변을 오염시키면 안된다.
+    // 오토타일링이므로 인접한 8개의 픽셀들이 어떤 픽셀인지를 참조해서 자기 위치의 픽셀(24타일) 내의 타일들을 흙으로 채워야 한다. 주변을 오염시키면 안된다.
     // 가능하면 자연스럽게 이어져야 한다.
     // 채우는 타일은 일단 dirt로 한다. 나중에 모래나 이런 걸로 바꿀 수도 있으나 지금은 이 정도로 하자.
     // 따로 헬퍼 함수를 만들지 말고 딥모듈 원칙을 따라서 이 함수 내에서 코드를 끝낼 것 (람다 함수가 중간에 필요하면 사용하여도 OK)
@@ -134,7 +136,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     //   접근법: 47-piece autotile prefab 룩업. 알고리즘 기반 SDF/사분면 룰을 모두
     //   포기 — 본질적 트레이드오프(경계 일관 vs 변 디테일 vs 코너 둥글기)가
     //   해결 불가. 대신 사용자가 직접 그린 PNG (image/spline/shoreSpline{0..N}.png,
-    //   각 8×6 그리드의 48×48 셀 47개)를 마스크로 변환해 룩업.
+    //   각 8×6 그리드(48셀 중 47개 사용)의 24×24 셀)를 마스크로 변환해 룩업.
     //
     //   각 water 픽셀에서:
     //     1) (seed, rawPx, rawPy) hash → variant 선택 (해안선 패턴 다양화)
@@ -474,6 +476,167 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
                 const int dy = c.pos.y - sectorOriginTileY;
                 if (dx < 0 || dx >= SectorCoord::TILES || dy < 0 || dy >= SectorCoord::TILES) continue;
                 plan.propContents.push_back(SectorPropContents{ .pos = c.pos, .items = c.items });
+            }
+        }
+    }
+
+    //═══════════════════════════════════════════════════════════════════════
+    // 5) 숲 배치 — 절차적 (위성에 숲 정보 없음).
+    //
+    //   모델: "지터드 시드 격자 + 해석적 반경" — 전역 패스/상태 없이 청크 하나만
+    //   보고 결정하는 *순수 함수*. lazy 섹터 생성·임의 청크 조회 양쪽에서 동일.
+    //   ("점 찍고 확장"의 결정론 버전 — 성장을 시뮬레이션이 아닌 거리 테스트로.)
+    //
+    //   결정 단위 = 청크(=픽셀=맵 1셀). 건물 Lot처럼 1청크=1숲셀. 숲 청크 내부
+    //   24×24 타일에 grass 깔고 나무 prop 산포 → "들어가면 나무" 레이어.
+    //
+    //   숲 판정은 worldGen::isForestChunk(공유 순수함수)에 위임 — Map.ixx도 같은
+    //   술어를 호출해 월드맵 16-오토타일(mapset1by1 #96~111)을 그린다 (산맥이
+    //   Terrain::Mountain 하나를 공유하는 것과 동일 분업: Map은 심볼, Sector는 실타일).
+    //   여기 stage는 *인-월드 타일*(grass + 나무 prop)만 채운다.
+    //
+    //   덮어쓰기 금지: ① 청크 terrain이 숲-가능 바이옴일 때만 (City/Mountain/
+    //   Desert/물/극지 제외) ② 타일 floor가 아직 dirt일 때만 변환 → 도로(asphalt)·
+    //   도시 바닥/벽·물은 그대로 보존. 도로가 숲을 가로질러도 도로 타일은 살아남음.
+    //
+    //   X 시암 wrap 미처리(프로토타입): ±W/2(태평양) 경계에서 셀 격자 불연속.
+    //═══════════════════════════════════════════════════════════════════════
+    {
+        constexpr int TREE_PER_1024 = 175;   // 숲 dirt 타일당 나무 등장 확률(/1024 ≈ 17%)
+
+        //(타일좌표, salt) → 64비트 결정론 해시 (나무 산포용). 1단계 tileHash와 동일 믹스 상수.
+        auto hashCell = [seed](int cx, int cy, std::uint64_t salt) noexcept -> std::uint64_t {
+            std::uint64_t h = seed ^ salt;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) * 0xBF58476D1CE4E5B9ULL;
+            h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy)) * 0x94D049BB133111EBULL;
+            h ^= h >> 31;
+            return h;
+        };
+
+        //바이옴별 수종 선택 (해시 하위 2비트로 4종 중 하나).
+        auto pickTree = [](worldGrid::Terrain t, std::uint64_t h) noexcept -> int {
+            switch (t)
+            {
+            case worldGrid::Terrain::InsularRainforest:
+            case worldGrid::Terrain::ContinentalRainforest:
+            {
+                constexpr int sp[] = { itemID::jungleTree, itemID::palmTree, itemID::umbrellaAcaciaTree, itemID::bamboo };
+                return sp[h & 3];
+            }
+            case worldGrid::Terrain::Subarctic:
+            {
+                constexpr int sp[] = { itemID::spruceTree, itemID::pineTree, itemID::birchTree, itemID::juniperTree };
+                return sp[h & 3];
+            }
+            case worldGrid::Terrain::Monsoon:
+            {
+                constexpr int sp[] = { itemID::oakTree, itemID::pineTree, itemID::bamboo, itemID::ginkgoTree };
+                return sp[h & 3];
+            }
+            default:   // Land 온대림
+            {
+                constexpr int sp[] = { itemID::oakTree, itemID::mapleTree, itemID::birchTree, itemID::pineTree };
+                return sp[h & 3];
+            }
+            }
+        };
+
+        //청크 단위 스캔 (80×80). 공유 술어 worldGen::isForestChunk(Map.ixx도 동일 호출)이
+        //  숲이라 하면 청크 내부 dirt 타일을 grass로 바꾸고 나무 산포.
+        for (int ccy = 0; ccy < SectorCoord::PIXELS; ++ccy)
+        for (int ccx = 0; ccx < SectorCoord::PIXELS; ++ccx)
+        {
+            const int pcx = sectorOriginPxX + ccx;   // 청크 = 픽셀 좌표 (1:1)
+            const int pcy = sectorOriginPxY + ccy;
+
+            if (!worldGen::isForestChunk(pcx, pcy, seed)) continue;
+
+            const worldGrid::Terrain t = worldGrid::worldPixel(pcx, pcy);   // 수종 선택용
+
+            const int baseDx = ccx * TILE_PER_PIXEL;
+            const int baseDy = ccy * TILE_PER_PIXEL;
+            for (int ty = 0; ty < TILE_PER_PIXEL; ++ty)
+            for (int tx = 0; tx < TILE_PER_PIXEL; ++tx)
+            {
+                const int dxTile = baseDx + tx;
+                const int dyTile = baseDy + ty;
+                const std::size_t idx = static_cast<std::size_t>(dyTile) * SectorCoord::TILES + dxTile;
+                PaintCell& cell = plan.tiles[idx];
+
+                //dirt + walkable일 때만 변환 → 도로(asphalt)·도시 바닥/벽·물 보존.
+                if (cell.floor != itemID::dirt) continue;
+                if (!(cell.flags & TILE_FLAG_WALKABLE)) continue;
+
+                cell.floor = itemID::grass;
+
+                //per-tile 결정론 해시로 나무 prop 산포 (나무 = PROP_BLOCKER → createProp가 차단 처리).
+                const int wtx = sectorOriginTileX + dxTile;
+                const int wty = sectorOriginTileY + dyTile;
+                const std::uint64_t th = hashCell(wtx, wty, 0x7EE5EED7EE5ULL);
+                if ((th & 0x3ff) < static_cast<std::uint64_t>(TREE_PER_1024))
+                {
+                    plan.props.push_back(SectorProp{
+                        .pos    = Point3{ wtx, wty, sc.z },
+                        .itemId = pickTree(t, th >> 12) });
+                }
+            }
+        }
+    }
+
+    //═══════════════════════════════════════════════════════════════════════
+    // 6) 산맥 인-월드 — 위성 Mountain(Terrain) + 절차적(worldGen::isMountainChunk) 공통.
+    //
+    //   맵 심볼은 Map.ixx의 isMtn이 위성+절차 둘 다 #64~79로 그림. 여기 stage는 두 종류
+    //   산맥 청크에 *인-월드 바위벽*(stoneWall)을 산포 → "들어가면 바위" 레이어. (기존
+    //   위성 산맥은 stage1에서 dirt만 깔렸음 — 이제 둘 다 동일하게 바위 지대로 통일.)
+    //
+    //   덮어쓰기 금지: floor가 dirt일 때만 wall을 얹음 → 도로(asphalt)·물·도시 보존.
+    //   (절차 산맥은 isMountainChunk가 도로 1링을 양보하지만, 위성 산맥을 가로지르는
+    //    도로는 asphalt 타일이라 이 가드가 보존.) floor 위 wall만 — 등반은 후속 TODO.
+    //═══════════════════════════════════════════════════════════════════════
+    {
+        constexpr int ROCK_PER_1024 = 430;   // 산 dirt 타일당 바위벽 등장(/1024 ≈ 42%)
+
+        auto hashRock = [seed](int cx, int cy) noexcept -> std::uint64_t {
+            std::uint64_t h = seed ^ 0x20CC1A1B2C3DULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) * 0xBF58476D1CE4E5B9ULL;
+            h = (h ^ (h >> 27)) * 0x94D049BB133111EBULL;
+            h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy)) * 0x94D049BB133111EBULL;
+            h ^= h >> 31;
+            return h;
+        };
+
+        //청크 단위 스캔 (80×80). 위성 Mountain 또는 공유 술어 isMountainChunk면 바위벽 산포.
+        for (int ccy = 0; ccy < SectorCoord::PIXELS; ++ccy)
+        for (int ccx = 0; ccx < SectorCoord::PIXELS; ++ccx)
+        {
+            const int pcx = sectorOriginPxX + ccx;
+            const int pcy = sectorOriginPxY + ccy;
+
+            const bool mountain =
+                (worldGrid::worldPixel(pcx, pcy) == worldGrid::Terrain::Mountain)
+                || worldGen::isMountainChunk(pcx, pcy, seed);
+            if (!mountain) continue;
+
+            const int baseDx = ccx * TILE_PER_PIXEL;
+            const int baseDy = ccy * TILE_PER_PIXEL;
+            for (int ty = 0; ty < TILE_PER_PIXEL; ++ty)
+            for (int tx = 0; tx < TILE_PER_PIXEL; ++tx)
+            {
+                const int dxTile = baseDx + tx;
+                const int dyTile = baseDy + ty;
+                const std::size_t idx = static_cast<std::size_t>(dyTile) * SectorCoord::TILES + dxTile;
+                PaintCell& cell = plan.tiles[idx];
+
+                if (cell.floor != itemID::dirt) continue;   // 도로(asphalt)·물·도시 보존
+                if (cell.wall != itemID::none) continue;     // 이미 벽이면 유지
+
+                const int wtx = sectorOriginTileX + dxTile;
+                const int wty = sectorOriginTileY + dyTile;
+                const std::uint64_t th = hashRock(wtx, wty);
+                if ((th & 0x3ff) < static_cast<std::uint64_t>(ROCK_PER_1024))
+                    cell.wall = itemID::stoneWall;
             }
         }
     }

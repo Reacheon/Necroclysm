@@ -348,7 +348,34 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
         return LT[static_cast<std::size_t>(ly) * bw + lx];
     };
     auto isSea = [&](int x, int y) { T t = terrAt(x, y); return t == T::Sea || t == T::CitySea; };
-    auto isMtn = [&](int x, int y) { return terrAt(x, y) == T::Mountain; };
+    //절차적 산맥 마스크 — 위성 Mountain 외에 worldGen::isMountainChunk로 추가 생성.
+    //  LT처럼 1회 채워 O(1). isMtn이 위성+절차 둘 다 보게 해 #64~79 오토타일이 자연 연결.
+    static thread_local std::vector<char> LM;
+    LM.assign(static_cast<std::size_t>(bw) * bh, char(0));
+    for (int ly = 0; ly < bh; ++ly)
+        for (int lx = 0; lx < bw; ++lx)
+            LM[static_cast<std::size_t>(ly) * bw + lx] =
+                worldGen::isMountainChunk(bx0 + lx, by0 + ly, worldSeed) ? char(1) : char(0);
+    auto isMtn = [&](int x, int y) -> bool {
+        if (terrAt(x, y) == T::Mountain) return true;          // 위성 산맥
+        const int lx = x - bx0, ly = y - by0;
+        if (lx < 0 || lx >= bw || ly < 0 || ly >= bh) return false;
+        return LM[static_cast<std::size_t>(ly) * bw + lx] != 0;  // 절차 산맥
+    };
+
+    //숲 마스크 버퍼 — 절차적 숲(위성에 없음)이라 terrain이 아닌 공유 술어
+    //  worldGen::isForestChunk로 판정. 9셀 trig라 매 이웃 재계산 대신 LT처럼 1회 채워 O(1) 룩업.
+    static thread_local std::vector<char> LF;
+    LF.assign(static_cast<std::size_t>(bw) * bh, char(0));
+    for (int ly = 0; ly < bh; ++ly)
+        for (int lx = 0; lx < bw; ++lx)
+            LF[static_cast<std::size_t>(ly) * bw + lx] =
+                worldGen::isForestChunk(bx0 + lx, by0 + ly, worldSeed) ? char(1) : char(0);
+    auto isFor = [&](int x, int y) -> bool {
+        const int lx = x - bx0, ly = y - by0;
+        if (lx < 0 || lx >= bw || ly < 0 || ly >= bh) return false;
+        return LF[static_cast<std::size_t>(ly) * bw + lx] != 0;
+    };
     //담수 파도는 안 씀 — 본체의 담수 파도 스프라이트(+496)는 물속 깊은물↔얕은물 전용이라
     //  육지 물가에 그리면 일부 변형이 "물 들어갈 때 퍼지는 파동(Wave 2016~2021)" 스프라이트와
     //  겹쳐 잔디 위에 정지된 파동으로 보임. 담수는 floor 오토타일 가장자리로만 표현.
@@ -433,10 +460,23 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
             //② 산 심볼 (16타일 오토타일) — 본체 floor 타일과 동일 규약(connectGroupExtraIndex).
             //  카디널 4방향 이웃이 산이면 연결 → mapset1by1 #64(베이스) + 0~15. 건물과 같은
             //  3청크 중앙 정렬(art는 중앙 16px)이라 인접 산끼리 가장자리가 매끈히 이어짐. 항상 수집.
-            if (t == T::Mountain)
+            //  isMtn = 위성 Mountain ∪ 절차(isMountainChunk) — 둘이 한 오토타일로 연결됨.
+            if (isMtn(ix, iy))
             {
                 const int idx = 64 + connectGroupExtraIndex(
                     isMtn(ix, iy - 1), isMtn(ix, iy + 1), isMtn(ix - 1, iy), isMtn(ix + 1, iy));
+                symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
+                    (int)std::lround(v.sX((double)(ix - 1))),
+                    (int)std::lround(v.sY((double)(iy - 1))) });
+            }
+
+            //③ 숲 심볼 (16타일 오토타일) — 산맥(②)과 동일 규약·패스. 위성에 없는 절차적
+            //  숲이라 terrain이 아닌 공유 술어 worldGen::isForestChunk(LF 버퍼)로 판정 →
+            //  mapset1by1 #96(베이스) + 0~15. 산과 같은 3청크 중앙 정렬.
+            if (isFor(ix, iy))
+            {
+                const int idx = 96 + connectGroupExtraIndex(
+                    isFor(ix, iy - 1), isFor(ix, iy + 1), isFor(ix - 1, iy), isFor(ix + 1, iy));
                 symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
                     (int)std::lround(v.sX((double)(ix - 1))),
                     (int)std::lround(v.sY((double)(iy - 1))) });

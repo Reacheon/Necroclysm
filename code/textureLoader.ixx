@@ -165,8 +165,6 @@ export void textureLoader()
 
 	texture::circuitInfo = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 450, 69);
 
-	texture::shoreSpline[0] = IMG_LoadTexture(renderer, "image/spline/shoreSpline0.png");
-
 	// shoreSpline PNG 픽셀 → worldGrid::shoreSplineMask bool 마스크로 변환 (Sector_procGenerate 페이즈 2가 룩업).
 	//   #5b4940 = land (B=0x40), #3899ff = water (B=0xff). B 채널만 비교 (안티앨리어싱 견고).
 	//   각 PNG 8×6 그리드 47 셀 (마지막 1칸 공백). variant N개 순회 로드 — 파일 없으면 graceful skip.
