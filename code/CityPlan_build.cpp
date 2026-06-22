@@ -88,13 +88,16 @@ static void blitLotResult(CityPlan& plan, LotResult& r, int originX, int originY
     }
 }
 
-CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
+//buildCityPlan/buildCityLayout 공용 본체. layoutOnly면 stage 9 lot 생성과 stage 10
+//  머티리얼라이즈(generateRotated/blitLotResult)를 건너뛰고 symbols/roadCells만 채운다.
+//  stage 1-8과 심볼 결정은 동일하게 진행 → 같은 seed면 두 모드의 symbols/roadCells가 비트 동일.
+static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layoutOnly)
 {
     CityPlan plan{ id };
 
-    prt(L"[CityPlan] buildCityPlan id=%u seed=%llu tiles=%zu\n",
+    prt(L"[CityPlan] buildCityPlanImpl id=%u seed=%llu layoutOnly=%d\n",
         static_cast<unsigned>(id), static_cast<std::uint64_t>(seed),
-        plan.tiles.size());
+        layoutOnly ? 1 : 0);
 
 
     const worldGen::CityNode& node = (*worldGen::activeCities)[static_cast<std::uint32_t>(id)];
@@ -134,6 +137,60 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     auto cityPixelAt = [&](worldGrid::PixelCoord p) -> worldGrid::Terrain {
         return cityTerrainBox[static_cast<std::size_t>(p.y - patchPxY) * patchW + (p.x - patchPxX)];
         };
+
+    //══════════════════════════════════════════════════════════════════
+    // 1.5 이 클러스터 멤버십 마스크 — 외래 도시 픽셀 제거
+    //══════════════════════════════════════════════════════════════════
+    //   CityPlan_build는 도시를 "bbox 안의 City* 색 픽셀"로 식별한다. 그런데 4-연결로
+    //   분리된 인접 도시(서울↔인천)는 bbox가 겹쳐, 이 도시 plan의 박스 안에 *남의 도시*
+    //   픽셀(대각으로만 닿아 4-연결상 끊긴 조각)이 섞여 들어온다. 그 외래 조각은 건물
+    //   배치의 "남은 통행칸 전부 연결" 불변식을 영구히 깨서 건물이 0개가 된다(전부 도로).
+    //   → rect(이 도시의 land)에서 4-연결 flood fill로 *이 클러스터*만 표시하고, 비멤버
+    //     City 픽셀은 Land로 덮어 downstream이 도시 아님으로 취급. 인접 클러스터는 4-연결
+    //     상 절대 안 닿으므로(placeCities도 4-연결 클러스터링) 자동 배제된다.
+    {
+        auto isCityTerrain = [](worldGrid::Terrain t) {
+            return t == worldGrid::Terrain::CityZone || t == worldGrid::Terrain::CityCenter
+                || t == worldGrid::Terrain::CityRiver || t == worldGrid::Terrain::CitySea;
+            };
+
+        std::vector<std::uint8_t> member(static_cast<std::size_t>(patchW) * patchH, 0);
+        std::vector<std::pair<int, int>> stack;   // local 좌표
+
+        //seed: 모든 rect 픽셀 (이 도시의 CityZone/CityCenter land)
+        for (const city::CityRect& r : node.rectangles)
+            for (int ry = r.py; ry < r.y1(); ++ry)
+                for (int rx = r.px; rx < r.x1(); ++rx)
+                {
+                    const int lx = rx - patchPxX;
+                    const int ly = ry - patchPxY;
+                    const std::size_t idx = static_cast<std::size_t>(ly) * patchW + lx;
+                    if (!member[idx]) { member[idx] = 1; stack.emplace_back(lx, ly); }
+                }
+
+        //4-연결 확장 — City* 픽셀만 (이 클러스터의 강·해협까지 포함, 외래 도시는 미도달)
+        constexpr int fdx[4] = { 0, 0, +1, -1 };
+        constexpr int fdy[4] = { -1, +1, 0, 0 };
+        while (!stack.empty())
+        {
+            const auto [lx, ly] = stack.back();
+            stack.pop_back();
+            for (int d = 0; d < 4; ++d)
+            {
+                const int nx = lx + fdx[d], ny = ly + fdy[d];
+                if (nx < 0 || nx >= patchW || ny < 0 || ny >= patchH) continue;
+                const std::size_t nidx = static_cast<std::size_t>(ny) * patchW + nx;
+                if (member[nidx] || !isCityTerrain(cityTerrainBox[nidx])) continue;
+                member[nidx] = 1;
+                stack.emplace_back(nx, ny);
+            }
+        }
+
+        //비멤버 City 픽셀 → Land (겹친 bbox로 들어온 외래 도시 제거)
+        for (std::size_t i = 0; i < member.size(); ++i)
+            if (!member[i] && isCityTerrain(cityTerrainBox[i]))
+                cityTerrainBox[i] = worldGrid::Terrain::Land;
+    }
 
 
     //══════════════════════════════════════════════════════════════════
@@ -208,7 +265,7 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     //══════════════════════════════════════════════════════════════════
-    // 3. 강가 강제 도로 형성
+    // 3. 강가/해안 강제 도로 형성 (4-연결 보장)
     //══════════════════════════════════════════════════════════════════
 
     auto isWater = [](worldGrid::Terrain t) {
@@ -233,57 +290,50 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
         return isCityLandPixel(cityTerrainBox[static_cast<std::size_t>(ly) * patchW + lx]);
         };
 
+    //── 해안/강가 도로: 물에 8-방향(대각 포함) 인접한 도시 land ────────────────
+    // 상하좌우만 찍으면 대각선 해안선에서 해안도로가 계단형으로 대각끼리만 닿아
+    // 4-연결이 끊긴다(청크는 대각 도로 비트가 없어 4-연결로만 통행 가능). 대각
+    // 인접까지 포함하면 계단 안쪽 코너가 메워져 해안도로 띠가 4-연결이 된다.
+    // (직선 해안은 1px 유지, 대각 구간만 2px로 메움.) 강 모양 유연화 대응.
+    auto isCoastRoad = [&](int lx, int ly) -> bool {
+        if (!isCityLandAtLocal(lx, ly)) return false;
+        for (int oy = -1; oy <= 1; ++oy)
+            for (int ox = -1; ox <= 1; ++ox)
+            {
+                if (ox == 0 && oy == 0) continue;
+                const int wx = lx + ox, wy = ly + oy;
+                if (wx < 0 || wx >= patchW || wy < 0 || wy >= patchH) continue;
+                if (isWater(cityTerrainBox[static_cast<std::size_t>(wy) * patchW + wx])) return true;
+            }
+        return false;
+        };
+
+    std::vector<std::uint8_t> coastRoad(static_cast<std::size_t>(patchW) * patchH, 0);
     for (int y = 0; y < patchH; ++y)
         for (int x = 0; x < patchW; ++x)
-        {
-            const worldGrid::PixelCoord p{ patchPxX + x, patchPxY + y, node.center.z };
-            if (isWater(cityPixelAt(p)))
+            if (isCoastRoad(x, y)) coastRoad[static_cast<std::size_t>(y) * patchW + x] = 1;
+
+    //4-인접 해안도로끼리 open+lock → 해안 따라 4-연결 통행 보장.
+    //  lock: 후속 단계가 못 끔(강변·해안 도로 보존). 빈 land(진입로)와의 연결은 stage 6 담당.
+    {
+        constexpr int cdx[4] = {  0,  0, +1, -1 };
+        constexpr int cdy[4] = { -1, +1,  0,  0 };
+        const RoadPixel::Dir cdir[4] = { RoadPixel::Dir::NORTH, RoadPixel::Dir::SOUTH, RoadPixel::Dir::EAST, RoadPixel::Dir::WEST };
+        for (int y = 0; y < patchH; ++y)
+            for (int x = 0; x < patchW; ++x)
             {
-                for (int dir = 0; dir <4; dir++)
+                const std::size_t idx = static_cast<std::size_t>(y) * patchW + x;
+                if (!coastRoad[idx]) continue;
+                for (int d = 0; d < 4; ++d)
                 {
-                    int dx = 0 , dy = 0;
-                    if (dir == 0) dx = +1;
-                    else if (dir == 1) dy = -1;
-                    else if (dir == 2) dx = -1;
-                    else if (dir == 3) dy = +1;
-
-                    //pNearbyNearby(2px out)가 패치 밖이면 OOB → 스킵 (마진은 +1px만 확보됨)
-                    //이걸 통과하면 pNearby(1px out)는 자동으로 패치 안
-                    const int nnx = x + dx * 2;
-                    const int nny = y + dy * 2;
-                    if (nnx < 0 || nnx >= patchW || nny < 0 || nny >= patchH) continue;
-
-                    const worldGrid::PixelCoord pNearby{ patchPxX + x + dx, patchPxY + y + dy, node.center.z };
-                    if (isCityLandPixel(cityPixelAt(pNearby)))
-                    {
-                        const std::size_t nearbyIdx = roadIdx(pNearby.x, pNearby.y);
-                        const worldGrid::PixelCoord pNearbyNearby{ patchPxX + x + dx * 2, patchPxY + y + dy * 2, node.center.z };
-                        const std::size_t nearbyNearbyIdx = roadIdx(pNearbyNearby.x, pNearbyNearby.y);
-
-                        //강변에 강과 평행한 방향(강 가장자리를 따라가는 축)으로 도로 개방
-                        //물→강변 벡터가 수평(dx≠0)이면 강은 수직 → N/S 도로, 그 외엔 강이 수평 → E/W 도로
-                        //n1dx/n1dy는 d1 방향의 단위 오프셋, d2는 항상 반대 (-n1dx, -n1dy)
-                        RoadPixel::Dir d1, d2;
-                        int n1dx, n1dy;
-                        if (dx != 0) { d1 = RoadPixel::Dir::NORTH; d2 = RoadPixel::Dir::SOUTH; n1dx = 0;  n1dy = -1; }
-                        else         { d1 = RoadPixel::Dir::EAST;  d2 = RoadPixel::Dir::WEST;  n1dx = +1; n1dy = 0;  }
-
-                        //개방 조건 — 두 게이트 동시 통과해야 도로 오픈:
-                        //  (a) 도시 지면 체크 — d 방향 이웃이 도시 지면이어야 함. 사방이 바다인
-                        //      고립 도시에서 강변 도로가 바다로 직행하는 케이스 차단.
-                        //  (b) 평행 충돌 체크 — pNearbyNearby에 같은 방향 도로가 이미 있으면 차단.
-                        //      24타일(1픽셀) 간격 평행 도로 사이에 0폭 블록이 생겨 건물 배치 불가.
-                        //
-                        //개방 시 lock도 같이 — 강변/해안 도로는 stage 5 격자 알고리즘이 못 끔.
-                        //그리고 인접 1px 평행 lane 회피 신호로도 작동 (locked bit가 곧 "여기 도로 있음")
-                        const int lbx = x + dx;  // 강변 픽셀 local 좌표
-                        const int lby = y + dy;
-                        if (isCityLandAtLocal(lbx + n1dx, lby + n1dy) && roads[nearbyNearbyIdx].isOpen(d1) == false) { roads[nearbyIdx].open(d1); roads[nearbyIdx].lock(d1); }
-                        if (isCityLandAtLocal(lbx - n1dx, lby - n1dy) && roads[nearbyNearbyIdx].isOpen(d2) == false) { roads[nearbyIdx].open(d2); roads[nearbyIdx].lock(d2); }
-                    }
+                    const int nx = x + cdx[d], ny = y + cdy[d];
+                    if (nx < 0 || nx >= patchW || ny < 0 || ny >= patchH) continue;
+                    if (!coastRoad[static_cast<std::size_t>(ny) * patchW + nx]) continue;
+                    roads[idx].open(cdir[d]);
+                    roads[idx].lock(cdir[d]);
                 }
             }
-        }
+    }
 
 
     //══════════════════════════════════════════════════════════════════
@@ -790,7 +840,12 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     //
     //   픽셀별 시드 — (seed, pxX, pxY) 해시. 같은 (cityId, pixel) → 같은 lot 변형 보장.
     //   가로수 종류 등이 픽셀마다 결정론적으로 다르게 나옴.
+    //
+    //   layoutOnly(월드맵 경량 빌드)는 이 블록을 통째로 건너뜀 — tiles만 채우고 도시당
+    //   수천 픽셀 × lot->generate라 최대 비용. roadCells는 아래 Ex 섹션이 roads[]에서
+    //   직접 만들어 영향 없음.
 
+    if (!layoutOnly)
     {
         for (int ly = 0; ly < patchH; ++ly)
             for (int lx = 0; lx < patchW; ++lx)
@@ -914,13 +969,15 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
 
             const lotRot chosen = (nRoad > 0) ? bestRoad : bestAny;
 
-            LotResult r = generateRotated(*lot, gRng(), chosen);
-
             const int originX = g.minPx * TILE_PER_PIXEL + TILE_BASE_X;
             const int originY = g.minPy * TILE_PER_PIXEL + TILE_BASE_Y;
 
             //월드맵 심볼 — 건물 종류 + 그룹 footprint(회전 후 실제 점유 모양 gw×gh).
             //  Lot이 빈 스켈레톤이라 blitLotResult가 타일을 안 깔아도 심볼은 이 채널로 표시.
+            //  심볼 내용(mapSymbolOf/gw/gh/origin)은 lot 선택·chosen까지로 확정 — 아래
+            //  generateRotated(gRng 소비) 이전 값에만 의존. 그래서 generateRotated를 먼저
+            //  부르든 심볼을 먼저 push하든 심볼은 동일하고, layoutOnly가 머티리얼라이즈만
+            //  건너뛰어도 full build와 비트 동일한 심볼을 얻는다(gRng은 그룹 로컬·재사용 안 함).
             plan.symbols.push_back(CitySymbol{
                 .pos    = Point3{ originX, originY, node.center.z },
                 .w      = gw,
@@ -928,7 +985,11 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
                 .symbol = mapSymbolOf(lot),
             });
 
-            blitLotResult(plan, r, originX, originY, node.center.z);
+            if (!layoutOnly)
+            {
+                LotResult r = generateRotated(*lot, gRng(), chosen);
+                blitLotResult(plan, r, originX, originY, node.center.z);
+            }
         }
     }
 
@@ -991,4 +1052,18 @@ CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
     }
 
     return plan;
+}
+
+//── 공개 진입점 ────────────────────────────────────────────────────────────
+//  full: 타일까지 머티리얼라이즈 (procGenerate가 plan.tiles를 섹터로 블릿).
+//  layout: 심볼+도로망만 (월드맵 정찰지도 표시용). CityLayoutCache가 백그라운드 워커에서 호출.
+CityPlan buildCityPlan(city::CityId id, std::uint64_t seed)
+{
+    return buildCityPlanImpl(id, seed, /*layoutOnly=*/false);
+}
+
+CityLayout buildCityLayout(city::CityId id, std::uint64_t seed)
+{
+    CityPlan p = buildCityPlanImpl(id, seed, /*layoutOnly=*/true);
+    return CityLayout{ .symbols = std::move(p.symbols), .roadCells = std::move(p.roadCells) };
 }

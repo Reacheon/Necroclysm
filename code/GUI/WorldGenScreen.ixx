@@ -66,23 +66,47 @@ private:
     std::function<void(worldGen::WorldGenResult)> onCompleted;
     bool completedFired = false;
 
-    //--- 좌표 변환 헬퍼: 픽셀 좌표(0..43200) → 스크린 좌표 ---
+    //--- 레이아웃 ----------------------------------------------------------
+    //   게임 화면은 세로(cameraH) 고정·가로(cameraW) 가변. 맵과 로드맵/텍스트가
+    //   겹치지 않게 예약 구역을 분리한다. 두 배치를 빌드 토글로 비교 중 —
+    //   확정되면 안 쓰는 분기를 제거.
+    //     0 = 좌측 레일 : 로드맵을 좌측 세로 컬럼에, 맵은 그 오른쪽 영역 중앙.
+    //     1 = 하단 밴드 : 맵을 전체 폭 중앙, 하단 밴드에 phase 텍스트 + 가로 로드맵.
+    //                     (세로 고정·가로 가변 특성에 더 부합, 맵 좌우 대칭)
+    static constexpr int LAYOUT_MODE = 1;
+
+    static constexpr int MARGIN = 48;
+    static constexpr int RAIL_W = 340;   // [모드0] 좌측 로드맵 레일 폭
+    static constexpr int BAND_H = 210;   // [모드1] 하단 밴드 높이(텍스트+가로 로드맵)
+
     SDL_Rect mapRect() const
     {
-        // 화면에 들어가는 최대 1080x540 비례. 여백 80px.
-        const int margin = 80;
-        const int maxW = cameraW - margin * 2;
-        const int maxH = cameraH - margin * 2 - 80; //하단 텍스트 영역 확보
+        // 예약 구역(레일/밴드)을 뺀 콘텐츠 영역 안에서 2:1 위성지도를 중앙배치.
+        int contentX, contentW, contentH;
+        if constexpr (LAYOUT_MODE == 0)
+        {
+            contentX = RAIL_W;
+            contentW = cameraW - RAIL_W - MARGIN;
+            contentH = cameraH - 132 - MARGIN;   // 하단 텍스트 여유
+        }
+        else
+        {
+            contentX = MARGIN;
+            contentW = cameraW - MARGIN * 2;
+            contentH = cameraH - BAND_H - MARGIN;
+        }
 
-        // 2:1 비율 유지. min(maxW, maxH*2) 가 가로 길이.
-        int w = std::min(maxW, maxH * 2);
-        int h = w / 2;
+        // 2:1 비율 유지. min(contentW, contentH*2) 가 가로 길이.
+        const int w = std::min(contentW, contentH * 2);
+        const int h = w / 2;
         return SDL_Rect{
-            (cameraW - w) / 2,
-            (cameraH - h) / 2 - 30, //텍스트 자리 위로 살짝 올리기
+            contentX + (contentW - w) / 2,
+            MARGIN + (contentH - h) / 2,
             w, h
         };
     }
+
+    //--- 좌표 변환 헬퍼: 픽셀 좌표(0..43200) → 스크린 좌표 ---
 
     SDL_FPoint pixelToScreen(int px, int py) const
     {
@@ -125,9 +149,84 @@ private:
         return L"";
     }
 
-    //--- 좌측 하단 로딩 로드맵 ---------------------------------------------
-    //   5단계 진행도를 원-라인-원 형태로 표시. 활성 단계는 흰색 + 두 줄
-    //   회전 스피너(머리/꼬리 페이드 아크)로 강조.
+    //--- 단일 단계 링(테두리 2px + 중앙 번호) + 활성 시 회전 스피너 ---------
+    //   세로/가로 로드맵 공용. (cx,cy)는 링 중심.
+    void drawStepRing(int cx, int cy, int stepNum, SDL_Color col, bool isActive) const
+    {
+        constexpr SDL_Color C_ACTIVE = { 245, 245, 240, 255 };
+        constexpr int R_OUTER = 17;   // 본 링 바깥 반지름
+        constexpr int R_INNER = 15;   // 본 링 안쪽 (두께 2px)
+
+        // 두께 2px 링 (스캔라인 방식 — 외곽-내곽 사이만 채움)
+        for (int dy = -R_OUTER; dy <= R_OUTER; ++dy)
+        {
+            const int oxSpan = (int)std::sqrt((float)(R_OUTER * R_OUTER - dy * dy));
+            const int absdy  = (dy < 0) ? -dy : dy;
+            if (absdy <= R_INNER)
+            {
+                const int ixSpan = (int)std::sqrt((float)(R_INNER * R_INNER - dy * dy));
+                drawLine(cx - oxSpan, cy + dy, cx - ixSpan, cy + dy, col);
+                drawLine(cx + ixSpan + 1, cy + dy, cx + oxSpan, cy + dy, col);
+            }
+            else
+            {
+                drawLine(cx - oxSpan, cy + dy, cx + oxSpan, cy + dy, col);
+            }
+        }
+
+        // 숫자 — 원 중심에 정확히 정렬
+        setFont(fontType::mainFontBold);
+        setFontSize(18);
+        drawTextCenter(std::to_wstring(stepNum), cx, cy, col);
+
+        // 활성 단계: 두 개의 회전 아크 스피너
+        //   본 링 바깥(R_OUTER+2.5 ~ R_OUTER+4.5)에 75도짜리 호 두 개를 180도
+        //   간격으로 띄우고, 각 호는 머리에서 꼬리 방향으로 페이드. 라디얼 라인을
+        //   촘촘히 쌓아 2px 두께를 만든다.
+        if (isActive)
+        {
+            constexpr float PI    = 3.14159265f;
+            constexpr float TWOPI = 6.28318531f;
+            const float rot = std::fmod((float)SDL_GetTicks() / 1000.0f * 3.0f, TWOPI);   // ≈ 0.48 회전/초
+            constexpr float ARC = 1.30f;                    // ≈ 75도
+
+            const float rIn  = (float)R_OUTER + 2.5f;
+            const float rOut = (float)R_OUTER + 4.5f;
+
+            constexpr int N = 36;  // 호당 라디얼 분할
+            for (int k = 0; k < 2; ++k)
+            {
+                const float head = rot + (float)k * PI;
+                for (int s = 0; s < N; ++s)
+                {
+                    const float frac = (float)s / (float)(N - 1);  // 0=머리, 1=꼬리
+                    const float ang  = head - frac * ARC;
+                    // 머리 가까이는 밝고, 꼬리는 빠르게 페이드
+                    const float fade = 1.0f - frac;
+                    const Uint8 a = (Uint8)(245.0f * fade * fade);
+                    if (a < 6) continue;
+                    const float c = std::cos(ang), si = std::sin(ang);
+                    drawLine(
+                        (int)std::round((float)cx + rIn  * c),
+                        (int)std::round((float)cy + rIn  * si),
+                        (int)std::round((float)cx + rOut * c),
+                        (int)std::round((float)cy + rOut * si),
+                        C_ACTIVE, a);
+                }
+                // 머리 끝에 살짝 굵은 글로우 점 — 회전 방향성을 강조
+                const float c = std::cos(head), si = std::sin(head);
+                const float rMid = (rIn + rOut) * 0.5f;
+                drawFillCircle(
+                    (int)std::round((float)cx + rMid * c),
+                    (int)std::round((float)cy + rMid * si),
+                    2, C_ACTIVE, 220);
+            }
+        }
+    }
+
+    //--- 로딩 로드맵 -------------------------------------------------------
+    //   4단계 진행도를 원-점선-원 형태로 표시. 활성 단계는 흰색 + 회전 스피너.
+    //   LAYOUT_MODE에 따라 좌측 세로 컬럼(0) / 하단 가로 스트립(1)으로 배치.
     void drawRoadmap(worldGen::GenPhase ph) const
     {
         // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=prepareSpawn
@@ -147,13 +246,7 @@ private:
         constexpr SDL_Color C_PENDING = { 105, 105, 110, 255 };
         constexpr SDL_Color C_DONE    = { 175, 175, 180, 255 };
         constexpr SDL_Color C_ACTIVE  = { 245, 245, 240, 255 };
-
-        constexpr int R_OUTER = 17;   // 본 링 바깥 반지름
-        constexpr int R_INNER = 15;   // 본 링 안쪽 (두께 2px)
-        constexpr int SPACING = 64;   // 단계 간 세로 간격 (5단계 맞추려고 74→64로 축소)
-        const int cx       = 64;
-        const int firstCy  = cameraH - 264;   // 최상단 원 중심 Y — 지도와 겹치지 않게 좀 더 아래로
-        const int textX    = cx + 36;
+        constexpr int R_OUTER = 17;
 
         static const wchar_t* labels[N_STEPS] = {
             L"Loading satellite imagery",
@@ -162,98 +255,71 @@ private:
             L"Preparing spawn area",
         };
 
-        // 단계 사이를 잇는 도트 라인 (3px 점, 4px 간격)
-        for (int i = 0; i < N_STEPS - 1; ++i)
-        {
-            const int yA = firstCy +  i      * SPACING + R_OUTER + 4;
-            const int yB = firstCy + (i + 1) * SPACING - R_OUTER - 4;
-            const SDL_Color lineCol = stepDone[i] ? C_DONE : C_PENDING;
-            for (int y = yA; y <= yB; y += 5)
-            {
-                drawLine(cx, y, cx, std::min(yB, y + 2), lineCol);
-            }
-        }
-
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-        // 각 단계 그리기
-        for (int i = 0; i < N_STEPS; ++i)
+        auto colOf = [&](int i, bool isActive) -> SDL_Color
         {
-            const int cy = firstCy + i * SPACING;
-            const bool isActive = (activeStep == (i + 1));
-            const SDL_Color col = isActive ? C_ACTIVE : (stepDone[i] ? C_DONE : C_PENDING);
+            return isActive ? C_ACTIVE : (stepDone[i] ? C_DONE : C_PENDING);
+        };
 
-            // 두께 2px 링 (스캔라인 방식 — 외곽-내곽 사이만 채움)
-            for (int dy = -R_OUTER; dy <= R_OUTER; ++dy)
+        if constexpr (LAYOUT_MODE == 0)
+        {
+            // 좌측 세로 컬럼 — 라벨은 링 우측.
+            constexpr int SPACING = 64;
+            const int cx      = 64;
+            const int firstCy = cameraH - 264;
+            const int textX   = cx + 36;
+
+            // 단계 사이 도트 라인 (세로, 3px 점·5px 간격)
+            for (int i = 0; i < N_STEPS - 1; ++i)
             {
-                const int oxSpan = (int)std::sqrt((float)(R_OUTER * R_OUTER - dy * dy));
-                const int absdy  = (dy < 0) ? -dy : dy;
-                if (absdy <= R_INNER)
-                {
-                    const int ixSpan = (int)std::sqrt((float)(R_INNER * R_INNER - dy * dy));
-                    drawLine(cx - oxSpan, cy + dy, cx - ixSpan, cy + dy, col);
-                    drawLine(cx + ixSpan + 1, cy + dy, cx + oxSpan, cy + dy, col);
-                }
-                else
-                {
-                    drawLine(cx - oxSpan, cy + dy, cx + oxSpan, cy + dy, col);
-                }
+                const int yA = firstCy +  i      * SPACING + R_OUTER + 4;
+                const int yB = firstCy + (i + 1) * SPACING - R_OUTER - 4;
+                const SDL_Color lineCol = stepDone[i] ? C_DONE : C_PENDING;
+                for (int y = yA; y <= yB; y += 5)
+                    drawLine(cx, y, cx, std::min(yB, y + 2), lineCol);
             }
 
-            // 숫자 — 원 중심에 정확히 정렬
-            setFont(fontType::mainFontBold);
-            setFontSize(18);
-            const std::wstring numStr = std::to_wstring(i + 1);
-            drawTextCenter(numStr, cx, cy, col);
-
-            // 라벨 — 원 우측, 세로 중앙
-            setFont(fontType::mainFont);
-            setFontSize(15);
-            drawTextCenter(labels[i], textX + queryTextWidth(labels[i]) / 2, cy, col);
-
-            // 활성 단계: 두 개의 회전 아크 스피너
-            //   본 링 바깥(R_OUTER+2.5 ~ R_OUTER+4.5)에 75도짜리 호 두 개를
-            //   180도 간격으로 띄우고, 각 호는 머리에서 꼬리 방향으로 페이드.
-            //   라디얼 라인을 촘촘히 쌓아서 2px 두께를 만든다.
-            if (isActive)
+            for (int i = 0; i < N_STEPS; ++i)
             {
-                constexpr float PI    = 3.14159265f;
-                constexpr float TWOPI = 6.28318531f;
-                const float t   = (float)SDL_GetTicks() / 1000.0f;
-                const float rot = std::fmod(t * 3.0f, TWOPI);   // ≈ 0.48 회전/초
-                constexpr float ARC = 1.30f;                    // ≈ 75도
+                const int cy = firstCy + i * SPACING;
+                const bool isActive = (activeStep == (i + 1));
+                const SDL_Color col = colOf(i, isActive);
+                drawStepRing(cx, cy, i + 1, col, isActive);
 
-                const float rIn  = (float)R_OUTER + 2.5f;
-                const float rOut = (float)R_OUTER + 4.5f;
+                setFont(fontType::mainFont);
+                setFontSize(15);
+                drawTextCenter(labels[i], textX + queryTextWidth(labels[i]) / 2, cy, col);
+            }
+        }
+        else
+        {
+            // 하단 가로 스트립 — 화면 중앙 정렬, 라벨은 링 아래.
+            constexpr int SPACING = 250;            // 링 중심 간 가로 간격(최장 라벨 수용)
+            const int cy      = cameraH - 92;       // 링 중심 Y (하단 밴드 안)
+            const int totalW  = SPACING * (N_STEPS - 1);
+            const int firstCx = (cameraW - totalW) / 2;
 
-                constexpr int N = 36;  // 호당 라디얼 분할
-                for (int k = 0; k < 2; ++k)
-                {
-                    const float head = rot + (float)k * PI;
-                    for (int s = 0; s < N; ++s)
-                    {
-                        const float frac = (float)s / (float)(N - 1);  // 0=머리, 1=꼬리
-                        const float ang  = head - frac * ARC;
-                        // 머리 가까이는 밝고, 꼬리는 빠르게 페이드
-                        const float fade = 1.0f - frac;
-                        const Uint8 a = (Uint8)(245.0f * fade * fade);
-                        if (a < 6) continue;
-                        const float c = std::cos(ang), si = std::sin(ang);
-                        drawLine(
-                            (int)std::round((float)cx + rIn  * c),
-                            (int)std::round((float)cy + rIn  * si),
-                            (int)std::round((float)cx + rOut * c),
-                            (int)std::round((float)cy + rOut * si),
-                            C_ACTIVE, a);
-                    }
-                    // 머리 끝에 살짝 굵은 글로우 점 — 회전 방향성을 강조
-                    const float c = std::cos(head), si = std::sin(head);
-                    const float rMid = (rIn + rOut) * 0.5f;
-                    drawFillCircle(
-                        (int)std::round((float)cx + rMid * c),
-                        (int)std::round((float)cy + rMid * si),
-                        2, C_ACTIVE, 220);
-                }
+            // 단계 사이 도트 라인 (가로, 3px 점·5px 간격)
+            for (int i = 0; i < N_STEPS - 1; ++i)
+            {
+                const int xA = firstCx +  i      * SPACING + R_OUTER + 4;
+                const int xB = firstCx + (i + 1) * SPACING - R_OUTER - 4;
+                const SDL_Color lineCol = stepDone[i] ? C_DONE : C_PENDING;
+                for (int x = xA; x <= xB; x += 5)
+                    drawLine(x, cy, std::min(xB, x + 2), cy, lineCol);
+            }
+
+            for (int i = 0; i < N_STEPS; ++i)
+            {
+                const int cx = firstCx + i * SPACING;
+                const bool isActive = (activeStep == (i + 1));
+                const SDL_Color col = colOf(i, isActive);
+                drawStepRing(cx, cy, i + 1, col, isActive);
+
+                setFont(fontType::mainFont);
+                setFontSize(15);
+                drawTextCenter(labels[i], cx, cy + R_OUTER + 18, col);
             }
         }
     }
@@ -467,6 +533,7 @@ public:
         const int dotCount = (int)((SDL_GetTicks() / 400) % 3) + 1;
         std::wstring dots(dotCount, L'.');
 
+        const int mapCx = r.x + r.w / 2;        // 텍스트는 맵 중앙 기준 정렬(모드1=화면중앙, 모드0=레일 우측 쏠림)
         const int textY = r.y + r.h + 32;
         const int subY  = textY + 30;
 
@@ -475,7 +542,7 @@ public:
         // 텍스트는 본문 + 점. 본문은 중앙 정렬, 점은 그 오른쪽에 고정 폭(점 3자리만큼 미리 자리 잡음).
         const std::wstring full = std::wstring(lbl) + L" ...";
         const int fullW = queryTextWidth(full);
-        const int leftX = (cameraW - fullW) / 2;
+        const int leftX = mapCx - fullW / 2;
 
         drawText(lbl, leftX, textY, wgcfg::TEXT_MAIN);
         const int lblW = queryTextWidth(lbl);
@@ -508,7 +575,7 @@ public:
         if (!subStr.empty())
         {
             const int subW = queryTextWidth(subStr);
-            drawText(subStr, (cameraW - subW) / 2, subY, wgcfg::TEXT_SUB);
+            drawText(subStr, mapCx - subW / 2, subY, wgcfg::TEXT_SUB);
         }
 
         //--- 좌측 하단 로딩 로드맵 ---

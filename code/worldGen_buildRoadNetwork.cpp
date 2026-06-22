@@ -311,6 +311,12 @@ namespace worldGen
         //  City/Sea/Lake 만나면 그 직전까지 (River 는 통과 — 다리). 반환 strut 의 첫/마지막을
         //  caller 가 폴리라인 시작/끝에 prepend/append → 폴리라인 첫·끝 segment 무조건 직각.
         static constexpr int kStrutLen = 16;
+        //가지 overshoot 캡 — 두 도시가 가까우면(진입점 축거리 < 2×kStrutLen) 양쪽 16칸 가지가
+        //  서로를 지나쳐 redundant 꼬리 + A* backtrack 을 만든다. 축거리를 반으로 나눠 각 가지를
+        //  캡(아래 edgeTask). kStrutMin: 캡이 작아도 직교 off-ramp 최소 길이(셀) 보장.
+        //  kStrutGapMargin: 양 끝점이 정확히 겹쳐 A* 가 fail(aStart==bEnd) 하는 것 방지용 여유(px).
+        static constexpr int kStrutMin = 3;
+        static constexpr int kStrutGapMargin = 4;
         auto computeStrut = [&grid](int entryX, int entryY, int stepX, int stepY, int z) -> std::vector<PixelCoord>
             {
                 constexpr auto isHostile = [](Terrain t) noexcept {
@@ -1120,8 +1126,21 @@ namespace worldGen
 
                 const CityEntry ceA = boundaryEntryFor(e.a, cps[e.b].px, cps[e.b].py);
                 const CityEntry ceB = boundaryEntryFor(e.b, cps[e.a].px, cps[e.a].py);
-                const std::vector<PixelCoord> strutA = computeStrut(ceA.pixel.x, ceA.pixel.y, ceA.stepX, ceA.stepY, ceA.pixel.z);
-                const std::vector<PixelCoord> strutB = computeStrut(ceB.pixel.x, ceB.pixel.y, ceB.stepX, ceB.stepY, ceB.pixel.z);
+                std::vector<PixelCoord> strutA = computeStrut(ceA.pixel.x, ceA.pixel.y, ceA.stepX, ceA.stepY, ceA.pixel.z);
+                std::vector<PixelCoord> strutB = computeStrut(ceB.pixel.x, ceB.pixel.y, ceB.stepX, ceB.stepY, ceB.pixel.z);
+
+                //가지 overshoot 캡 — 두 가지는 boundaryEntryFor 의 |dx|>=|dy| 대칭 때문에 항상 같은 축.
+                //  진입점 차를 stepA 로 사영해 축거리(axisGap) 산출 → 반씩 나눠 각 가지 셀 수를 캡.
+                //  먼 도시는 capCells 가 kStrutLen 이상이라 무변동. computeStrut 이 terrain 으로 이미
+                //  더 짧게 잘랐으면 그대로 둠(축소만, 확장 안 함). 캡 후 끝점이 상대를 안 지나침.
+                {
+                    const int axisGap = (ceB.pixel.x - ceA.pixel.x) * ceA.stepX
+                                      + (ceB.pixel.y - ceA.pixel.y) * ceA.stepY;
+                    const int capCells = std::clamp((axisGap - kStrutGapMargin) / 2 + 1, kStrutMin, kStrutLen);
+                    if (static_cast<int>(strutA.size()) > capCells) strutA.resize(capCells);
+                    if (static_cast<int>(strutB.size()) > capCells) strutB.resize(capCells);
+                }
+
                 const PixelCoord aStart = strutA.back();
                 const PixelCoord bEnd = strutB.back();
                 if (aStart == bEnd)

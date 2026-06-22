@@ -163,7 +163,7 @@ namespace worldGen
 
         //══════════════════════════════════════════════════════════════════
         // Phase 0 : 사전배치 도시 추출
-        //   8-connected 클러스터링(CityZone ∪ CityCenter ∪ CityRiver ∪ CitySea).
+        //   4-connected(상하좌우) 클러스터링(CityZone ∪ CityCenter ∪ CityRiver ∪ CitySea).
         //   1 클러스터 = 1 도시. centroid는 클러스터 안의 CityCenter 픽셀 평균(없으면 전체 평균).
         //   CityRiver/CitySea(도시 내 강·해협)도 클러스터에 포함 — 강·바다가 도시를 가로지르는
         //   경우(이스탄불·홍콩·런던 등)에도 하나의 도시로 묶이고 bbox/면적이 수역까지 정확히 반영됨.
@@ -261,22 +261,22 @@ namespace worldGen
                         ++centerCount;
                     }
 
-                    for (int dy = -1; dy <= 1; ++dy)
+                    //4-연결(상하좌우)만 — 대각선 접촉은 다른 도시로 분리.
+                    //  대각으로만 닿은 인접 도시(서울·인천 등)가 한 클러스터로 병합되어
+                    //  centroid가 두 도심 사이로 빠지는 매칭 실패를 차단.
+                    constexpr int nbrDx[4] = {  0,  0, +1, -1 };
+                    constexpr int nbrDy[4] = { -1, +1,  0,  0 };
+                    for (int d = 0; d < 4; ++d)
                     {
-                        const int ny = cy + dy;
-                        if (ny < 0 || ny >= H) continue;
-                        for (int dx = -1; dx <= 1; ++dx)
+                        const int nx = cx + nbrDx[d];
+                        const int ny = cy + nbrDy[d];
+                        if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
+                        const std::size_t nIdx = static_cast<std::size_t>(ny) * W + nx;
+                        auto it = cityPixels.find(nIdx);
+                        if (it != cityPixels.end())
                         {
-                            if (dx == 0 && dy == 0) continue;
-                            const int nx = cx + dx;
-                            if (nx < 0 || nx >= W) continue;
-                            const std::size_t nIdx = static_cast<std::size_t>(ny) * W + nx;
-                            auto it = cityPixels.find(nIdx);
-                            if (it != cityPixels.end())
-                            {
-                                cityPixels.erase(it);
-                                frontier.push_back(nIdx);
-                            }
+                            cityPixels.erase(it);
+                            frontier.push_back(nIdx);
                         }
                     }
                 }
@@ -355,14 +355,14 @@ namespace worldGen
                 }
 
                 // 클러스터 → 4×4+ 직사각형 분해 (사전배치 도시 layout 입력).
-                //   히스토그램 max-rect 그리디. minSize=4. mask는 CityZone/CityCenter만 (계획서 룰:
+                //   히스토그램 max-rect 그리디. minSize=1 (도시 영역 1px 유동화). mask는 CityZone/CityCenter만 (계획서 룰:
                 //   "강이나 바다 픽셀은 사각형 분리에 안 써도 됨"). CityRiver/CitySea는 BFS 클러스터링
                 //   에서 두 직사각형을 묶는 역할이지만 decomposition에서는 제외 — 강이 가로지르는
                 //   Seoul/NY/Hongkong 같은 도시도 north/south 직사각형으로 깔끔히 분리됨.
                 std::vector<city::CityRect> rects;
                 const int bboxW = maxX - minX + 1;
                 const int bboxH = maxY - minY + 1;
-                if (bboxW >= 4 && bboxH >= 4)
+                if (bboxW >= 1 && bboxH >= 1)
                 {
                     // 진단용 — 클러스터 픽셀 지형 종류별 카운트. PNG 색이 의도대로
                     // CityZone/Center/River/Sea로 읽혔는지 + bbox 외 다른 잡티 없는지 확인용.
@@ -385,11 +385,11 @@ namespace worldGen
                             mask[static_cast<std::size_t>(cy - minY) * bboxW + (cx - minX)] = 1;
                         }
                     }
-                    rects = city::decomposeClusterToRects(mask.data(), minX, minY, bboxW, bboxH, 4);
+                    rects = city::decomposeClusterToRects(mask.data(), minX, minY, bboxW, bboxH, 1);
                     if (rects.empty())
                     {
                         const SDL_Color warn{ 0xff, 0xa0, 0x60, 0xff };
-                        prt(warn, L"  [WARN] preset cluster at (%d, %d) bbox %dx%d failed 4x4 decomposition - layout skipped\n",
+                        prt(warn, L"  [WARN] preset cluster at (%d, %d) bbox %dx%d failed decomposition - layout skipped\n",
                             centroidX, centroidY, bboxW, bboxH);
                         prt(L"          cluster pixels: Zone=%d Center=%d River=%d Sea=%d Other=%d (total=%zu)\n",
                             countZone, countCenter, countRiver, countSea, countOther, clusterPixels.size());

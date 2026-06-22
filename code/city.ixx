@@ -110,8 +110,8 @@ export namespace city
     //     ContinentalRainforest, Desert, Polar.
     inline constexpr std::array PRESET_CITIES = {
         //          codename                    displayName       pixelX   pixelY   climate
-        PresetCity{ CityName::incheon,          "Incheon",         36797,   6314,   worldGrid::Terrain::Land },
-        PresetCity{ CityName::seoul,            "Seoul",           36841,   6294,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::incheon,          "Incheon",         36806,   6303,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::seoul,            "Seoul",           36835,   6292,   worldGrid::Terrain::Land },
         PresetCity{ CityName::daejeon,          "Daejeon",         36876,   6432,   worldGrid::Terrain::Land },
         PresetCity{ CityName::daegu,            "Daegu",           37027,   6494,   worldGrid::Terrain::Land },
         PresetCity{ CityName::busan,            "Busan",           37095,   6582,   worldGrid::Terrain::Land },
@@ -126,7 +126,7 @@ export namespace city
         PresetCity{ CityName::beijing,          "Beijing",         35597,   6027,   worldGrid::Terrain::Land },
         PresetCity{ CityName::shanghai,         "Shanghai",        36182,   7083,   worldGrid::Terrain::Land },
         PresetCity{ CityName::hongkong,         "Hongkong",        35298,   8111,   worldGrid::Terrain::Land },
-        PresetCity{ CityName::taibei,           "Taibei",          36179,   7794,   worldGrid::Terrain::Land },
+        PresetCity{ CityName::taibei,           "Taipei",          36179,   7794,   worldGrid::Terrain::Land },
         PresetCity{ CityName::hanoi,            "Hanoi",           34289,   8277,   worldGrid::Terrain::Land },
         PresetCity{ CityName::bangkok,          "Bangkok",         33673,   9150,   worldGrid::Terrain::InsularRainforest },
         PresetCity{ CityName::jakarta,          "Jakarta",         34420,  11544,   worldGrid::Terrain::InsularRainforest },
@@ -186,5 +186,5 @@ export namespace city
     //             rect들의 합집합으로 분해 가능하도록 그려져 있음 (작가가 보장).
     //   출력 보장: 반환되는 모든 CityRect는 w≥minSize ∧ h≥minSize. 호출자는 더 작은
     //             rect를 가정하지 않아도 됨.
-    std::vector<CityRect> decomposeClusterToRects(const std::uint8_t* inMask, int bboxPxX, int bboxPxY, int bboxW, int bboxH, int minSize = 4);
+    std::vector<CityRect> decomposeClusterToRects(const std::uint8_t* inMask, int bboxPxX, int bboxPxY, int bboxW, int bboxH, int minSize = 1);
 }

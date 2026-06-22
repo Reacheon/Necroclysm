@@ -24,19 +24,23 @@ import worldWrap;
 import city;
 import CityPlan;
 import worldSession;
+import mapDiscovery;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 월드맵 (고전 JRPG 월드맵 스타일).
 //
 //   구글지도식 무제한 줌을 폐기하고 "1청크 = 1심볼" 타일 기반으로 재작성.
 //   레이어:
-//     ① 베이스 지형 — tileset.png. 청크 1개당 타일 1개(잔디/해수/담수). 배치 렌더.
+//     ① 베이스 지형 — tileset.png. 청크 1개당 타일 1개(잔디/해수/담수). 배치 렌더. 도시 영역도
+//                     잔디 — 도시는 ③-b 도로·다리 + ④ 건물 심볼로만 드러난다.
 //     ② 산 심볼     — worldGrid::Terrain::Mountain. 본체 floor와 동일 16타일 오토타일
 //                     (connectGroupExtraIndex)로 mapset1by1 #64~79 중 선택.
-//     ③ 도로 심볼   — 외부 도로(activePolyLines 래스터) + CityPlan.roadCells(openBits)를
-//                     같은 autotile(직선/코너/T/십자) mapset1by1로. 도시↔도시 연결 도로는
-//                     어느 CityPlan에도 안 들어가므로 폴리라인을 직접 청크 셀로 래스터화.
-//     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2).
+//     ③ 도로 심볼   — ③-a 외부 도로(activePolyLines 래스터)는 autotile(직선/코너/T/십자) mapset1by1로.
+//                     도시↔도시 연결 도로는 어느 CityPlan에도 안 들어가므로 폴리라인을 직접 청크
+//                     셀로 래스터화. ③-b 도시 내부 도로·다리(CityPlan.roadCells). 둘 다 *미발견
+//                     청크여도 항상 표시*(전세계 골격/정찰지도), 단 미발견은 어둡게(fog).
+//     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2). 발견=실제 종류,
+//                     미발견=footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
 //
 //   좌표계는 "픽셀=청크"(worldPixel 인덱스, 0-base). 1픽셀=1청크=24타일.
 //     pixelX = (tileX - TILE_BASE_X) / TILE_PER_PIXEL,  X는 원기둥 wrap.
@@ -54,16 +58,22 @@ import worldSession;
 
 namespace mapcfg
 {
-    //이산 줌 — 청크 1개가 차지하는 화면 픽셀. 심볼/타일은 chunkPx/16 배율로 그려짐.
-    //  (베이스 타일 16px, mapset1by1 48px=3청크, mapset2by2 64px=4청크 → 모두 같은 배율.)
-    //  무제한 광역 조망(대륙 단위)은 의도적으로 제외 — 지역 단위 항법 지도.
-    inline constexpr int ZOOM_PX[] = { 6, 8, 12, 16, 24, 32, 48 };
-    inline constexpr int ZOOM_COUNT   = (int)(sizeof(ZOOM_PX) / sizeof(ZOOM_PX[0]));
-    inline constexpr int DEFAULT_ZOOM = 3;   // 16px/청크 (네이티브 픽셀아트)
+    //이산 줌 "단계"(px/청크). 인접 단계 사이는 애니메이션으로 부드럽게 보간(매끈)하되 단계
+    //  자체는 분명히 존재(rest 지점). 작을수록 광역. LOD_SWITCH_PX 미만 단계는 위성 텍스처로
+    //  그려진다. 0번은 자리표시자 — zoomLevel 0 = "전세계 한 화면"(런타임 fit, levelScale가 계산).
+    inline constexpr double ZOOM_STOPS[] = { 0.0, 0.20, 0.55, 1.4, 3.0, 6, 10, 16, 24, 36, 48 };
+    inline constexpr int    ZOOM_COUNT   = (int)(sizeof(ZOOM_STOPS) / sizeof(ZOOM_STOPS[0]));
+    inline constexpr int    DEFAULT_ZOOM = 7;   // 16px/청크 (네이티브 픽셀아트)
+
+    //per-청크 타일 렌더 ↔ 위성 텍스처 전환 스케일. 미만=위성 텍스처(광역), 이상=살아있는 타일맵.
+    //  rest 단계는 이 밴드를 피해 배치(3.0=위성 / 6=타일)해 정지 시 어정쩡한 블러 회피.
+    inline constexpr double LOD_SWITCH_PX = 4.5;
+
+    //줌 애니메이션 이징(프레임당 현재→목표 보간 비율). 클수록 빠름.
+    inline constexpr double ZOOM_EASE = 0.28;
 
     //이 값 미만 줌에서는 바다 파도를 안 그림(저배율 클러터/draw 폭증 방지).
-    //  도로·건물·산 심볼은 모든 줌에서 유지 — 지형만 남으면 어색해서.
-    inline constexpr int SYMBOL_MIN_PX = 8;
+    inline constexpr double SYMBOL_MIN_PX = 8.0;
 }
 
 namespace mappal
@@ -87,14 +97,53 @@ struct MapView
 {
     double centerPX  = 0.0;
     double centerPY  = 0.0;
-    int    zoomLevel = mapcfg::DEFAULT_ZOOM;
+    int    zoomLevel = mapcfg::DEFAULT_ZOOM;   // 목표 줌 단계(이산)
     int    z         = 0;
     int    viewW     = 0;
     int    viewH     = 0;
 
-    int    chunkPx()   const { return mapcfg::ZOOM_PX[zoomLevel]; }
-    double zoomScale() const { return chunkPx() / 16.0; }   // tileset 16px 기준 배율
-    bool   symbolsVisible() const { return chunkPx() >= mapcfg::SYMBOL_MIN_PX; }
+    //연속 줌 — curScale(현재 화면 px/청크)이 targetScale로 매 프레임 이징. 이게 "매끈함".
+    //  카메라(centerPX/PY)와 스케일을 위성뷰·타일맵이 공유 → 경계 튐이 원천적으로 없음.
+    double curScale    = 16.0;
+    double targetScale = 16.0;
+    bool   animating   = false;
+
+    //줌 앵커 — 줌 내내 이 월드점(anchorWX/WY)을 이 화면점(anchorSX/SY)에 고정(구글지도식).
+    double anchorWX = 0.0, anchorWY = 0.0;
+    int    anchorSX = 0,   anchorSY = 0;
+
+    //줌 단계 → px/청크. 0 = 전세계 한 화면(런타임 fit), 그 외 ZOOM_STOPS.
+    double levelScale(int lvl) const
+    {
+        if (lvl <= 0) return static_cast<double>(viewH) / WORLD_PIXEL_H;
+        return mapcfg::ZOOM_STOPS[lvl];
+    }
+
+    int    chunkPx()   const { return std::max(1, (int)std::lround(curScale)); }   // 컬링/span용 근사 정수
+    double zoomScale() const { return curScale / 16.0; }                            // tileset 16px 기준 배율
+    bool   symbolsVisible() const { return curScale >= mapcfg::SYMBOL_MIN_PX; }
+    bool   worldLOD()  const { return curScale < mapcfg::LOD_SWITCH_PX; }            // 위성 텍스처 LOD?
+
+    //목표 단계로 줌 — 화면(sx,sy) 밑 월드점을 앵커로 잡아 줌 내내 그 자리에 고정.
+    void zoomAt(int sx, int sy, int delta)
+    {
+        anchorWX = centerPX + (sx - viewW * 0.5) / curScale;
+        anchorWY = centerPY + (sy - viewH * 0.5) / curScale;
+        anchorSX = sx; anchorSY = sy;
+        zoomLevel = std::clamp(zoomLevel + delta, 0, mapcfg::ZOOM_COUNT - 1);
+        targetScale = levelScale(zoomLevel);
+        animating = true;
+    }
+
+    //매 프레임 — curScale을 targetScale로 이징하고 앵커 월드점을 앵커 화면점에 재고정.
+    void tickAnim()
+    {
+        if (!animating) return;
+        curScale += (targetScale - curScale) * mapcfg::ZOOM_EASE;
+        if (std::abs(targetScale - curScale) <= targetScale * 0.003) { curScale = targetScale; animating = false; }
+        centerPX = anchorWX - (anchorSX - viewW * 0.5) / curScale;
+        centerPY = anchorWY - (anchorSY - viewH * 0.5) / curScale;
+    }
 
     //카메라 중앙 기준 X 최단 거리(픽셀) — ±WORLD_CHUNK_W/2로 wrap.
     double relX(double px) const
@@ -105,26 +154,14 @@ struct MapView
         return rel;
     }
 
-    double sX(double px) const { return relX(px) * chunkPx() + viewW * 0.5; }
-    double sY(double py) const { return (py - centerPY) * chunkPx() + viewH * 0.5; }
+    double sX(double px) const { return relX(px) * curScale + viewW * 0.5; }
+    double sY(double py) const { return (py - centerPY) * curScale + viewH * 0.5; }
 
-    double pixelXFromScreen(double sx) const { return centerPX + (sx - viewW * 0.5) / chunkPx(); }
-    double pixelYFromScreen(double sy) const { return centerPY + (sy - viewH * 0.5) / chunkPx(); }
-
-    //이산 줌 — delta 레벨 이동, anchor 화면 위치 고정.
-    void zoomAround(int anchorScreenX, int anchorScreenY, int delta)
-    {
-        const double apX = pixelXFromScreen(anchorScreenX);
-        const double apY = pixelYFromScreen(anchorScreenY);
-        zoomLevel = std::clamp(zoomLevel + delta, 0, mapcfg::ZOOM_COUNT - 1);
-        centerPX = apX - (anchorScreenX - viewW * 0.5) / chunkPx();
-        centerPY = apY - (anchorScreenY - viewH * 0.5) / chunkPx();
-    }
-
-    //카메라 Y를 월드(극지) 안으로 클램프. X는 wrap이라 클램프 안 함.
+    //카메라 Y를 월드(극지) 안으로 클램프. X는 wrap이라 클램프 안 함. 전세계 fit(level0)에서는
+    //  halfH*2 >= 월드높이 → 자동으로 centerPY=월드중앙(전체가 세로로 꽉 참).
     void clampCenterY()
     {
-        const double halfH = viewH * 0.5 / chunkPx();
+        const double halfH = viewH * 0.5 / curScale;
         if (halfH * 2.0 >= static_cast<double>(WORLD_PIXEL_H))
             centerPY = WORLD_PIXEL_H * 0.5;
         else
@@ -145,6 +182,7 @@ static int    tilePixelIY(int ty)  { return (ty - TILE_BASE_Y) / TILE_PER_PIXEL;
 // ════════════════════════════════════════════════════════════════════════
 
 //베이스 지형 타일 id — 육지=잔디(기본), 바다=해수, 강/호수=담수.
+//  도시 영역(CityZone/Center)도 잔디 — 도시는 그 위의 도로·다리(③-b)와 건물 심볼(④)로만 드러난다.
 static int baseFloorId(worldGrid::Terrain t)
 {
     using T = worldGrid::Terrain;
@@ -247,6 +285,18 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
     }
 }
 
+//미발견 도시의 "?건물" 심볼 — 실제 종류 대신 footprint(w×h)별 미확인 placeholder.
+//  오프셋/셀 규약은 resolveSymbol과 동일(1x1=mapset1by1 3청크 off(-1,-1), 나머지=mapset2by2 4청크
+//  off는 wide -1,-2 / tall -2,-1 / 2x2 -1,-1). 그 외 footprint(3x3 등)는 프로토타입 미지원 → 스킵.
+static ResolvedSym resolveUnknownSymbol(int w, int h)
+{
+    if (w == 1 && h == 1) return ResolvedSym{ spr::mapset1by1, 63, -1, -1, 3 };
+    if (w == 2 && h == 2) return ResolvedSym{ spr::mapset2by2, 20, -1, -1, 4 };
+    if (w == 2 && h == 1) return ResolvedSym{ spr::mapset2by2, 19, -1, -2, 4 };   // wide
+    if (w == 1 && h == 2) return ResolvedSym{ spr::mapset2by2, 18, -2, -1, 4 };   // tall
+    return ResolvedSym{};
+}
+
 static std::uint64_t symHash(int px, int py)
 {
     std::uint64_t h = static_cast<std::uint64_t>(static_cast<std::uint32_t>(px)) * 0x9E3779B97F4A7C15ULL;
@@ -255,17 +305,42 @@ static std::uint64_t symHash(int px, int py)
     return h;
 }
 
+//[프로토타입] 절차생성 도시 임시 이름 — center 타일 해시로 결정론적 의사 영어 지명.
+//  매 프레임 같은 결과여야 깜빡임이 없으므로 좌표 해시 기반(난수 X). 접두·접미 각 16개라
+//  & 15로 인덱싱. TODO: 향후 문화권(직사각형 구역) 기반 생성기로 교체할 자리표시자.
+static std::wstring placeholderCityName(int tileX, int tileY)
+{
+    static const wchar_t* pre[] = {
+        L"Ash", L"Black", L"North", L"Red", L"Stone", L"West", L"Green", L"Frost",
+        L"Iron", L"Gray", L"Pine", L"Bay", L"Fort", L"Salt", L"Wolf", L"Crow" };
+    static const wchar_t* suf[] = {
+        L"ton", L"ford", L"field", L"haven", L"burg", L"vale", L"port", L"wood",
+        L"ridge", L"mont", L"dale", L"reach", L"hollow", L"crest", L"moor", L"stead" };
+    const std::uint64_t h = symHash(tileX, tileY);
+    return std::wstring(pre[(h >> 3) & 15]) + suf[(h >> 11) & 15];
+}
+
+//사전배치 도시 표시명 — PRESET_CITIES에서 codename 룩업(ASCII displayName → wide). 미발견 시 빈 문자열.
+static std::wstring presetDisplayName(city::CityName cn)
+{
+    for (const auto& pc : city::PRESET_CITIES)
+        if (pc.codename == cn)
+            return std::wstring(pc.displayName.begin(), pc.displayName.end());
+    return {};
+}
+
 
 // ════════════════════════════════════════════════════════════════════════
 // §4  렌더링
 // ════════════════════════════════════════════════════════════════════════
 
 //y로 정렬해 그리는 심볼(산·건물) — 남쪽이 위에 겹치는 JRPG 페인터 순서.
-struct SymDraw { float sortY; Sprite* atlas; int idx; int sx; int sy; };
+//  br = 전장의 구름 밝기. 자연물(산/숲)은 미발견에서도 그리되 어둡게, 건물은 발견된 곳만(=밝게).
+struct SymDraw { float sortY; Sprite* atlas; int idx; int sx; int sy; Uint8 br = 255; };
 
 namespace
 {
-    struct BaseQuad { float l, t, r, b; int sprIdx; Uint8 a; };
+    struct BaseQuad { float l, t, r, b; int sprIdx; Uint8 a; Uint8 br; };   // br = 전장의 구름 밝기(0~255)
 
     //tileset 베이스 타일/파도 배치 flush — 인접 quad가 비트 동일 float 경계 공유 → 갭 없음.
     //  베이스 타일(alpha 255)과 파도(alpha<255)을 같은 배치로 — 청크 셀 내부에만
@@ -293,7 +368,8 @@ namespace
             const float vY = (float)(srcSize * ((srcSize * sprIdx) / atlasW)) / texH;
             const float u0 = u + insetU,  u1 = u + uW - insetU;
             const float v0 = vY + insetV, v1 = vY + vH - insetV;
-            const SDL_FColor col = { 1.0f, 1.0f, 1.0f, q[i].a / 255.0f };
+            const float bf = q[i].br / 255.0f;   // 밝기 곱 — 미발견 청크는 어둡게(윤곽만 보임)
+            const SDL_FColor col = { bf, bf, bf, q[i].a / 255.0f };
 
             const int vBase = i * 4;
             vertices[vBase    ] = { { q[i].l, q[i].t }, col, { u0, v0 } };
@@ -309,6 +385,11 @@ namespace
         SDL_RenderGeometry(renderer, tex, vertices, count * 4, indices, count * 6);
     }
 }
+
+//전장의 구름 밝기 — 발견(가봤거나 지금 보이는 곳) 청크=풀밝기, 미발견=어둡게(윤곽만).
+//  전략맵엔 낡을 정보가 없어 "지금 보임 vs 기억" 구분 없이 발견/미발견 2상태로 통일.
+//  지형(drawTerrainLayer)·외부 도로망(drawHighways)이 공유 — 항상 그리되 밝기로 fog를 표현.
+static Uint8 fogBright(int px, int py) { return mapDiscovery::discovered(px, py) ? 255 : 100; }
 
 //① 베이스 지형(오토타일) + 파도 + ② 산 심볼 (단일 스윕, 로컬 terrain 버퍼).
 //   본체 renderTile의 floor 오토타일(tileConnectGroup+connectGroupExtraIndex)과
@@ -407,23 +488,23 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
     static thread_local std::vector<BaseQuad> batch;
     batch.clear();
     auto flush    = [&]() { flushBaseBatch(batch.data(), (int)batch.size()); batch.clear(); };
-    auto pushQuad = [&](int ix, int iy, int sprIdx, Uint8 a) {
+    auto pushQuad = [&](int ix, int iy, int sprIdx, Uint8 a, Uint8 br) {
         if ((int)batch.size() >= MAX_BATCH) flush();
         batch.push_back(BaseQuad{
             (float)v.sX((double)ix),       (float)v.sY((double)iy),
-            (float)v.sX((double)(ix + 1)), (float)v.sY((double)(iy + 1)), sprIdx, a });
+            (float)v.sX((double)(ix + 1)), (float)v.sY((double)(iy + 1)), sprIdx, a, br });
     };
 
     //파도 — 본체 renderTile addWave 매핑(1504~1526). isW: 그 방향 이웃이 물인가.
     //  자기 자신이 그 물타입이 아닐 때만(경계 셀) 그림. baseOff: 해수=애니프레임, 담수=496.
     //  맵에서는 파도가 움직이면 정신사나워서 2번째 프레임(인덱스1, 오프셋32)으로 고정.
     const int seaAnim = 32;
-    auto emitFoam = [&](int ix, int iy, auto&& isW, int baseOff, Uint8 alpha) {
+    auto emitFoam = [&](int ix, int iy, auto&& isW, int baseOff, Uint8 alpha, Uint8 br) {
         const bool tC = isW(ix, iy - 1), bC = isW(ix, iy + 1), lC = isW(ix - 1, iy), rC = isW(ix + 1, iy);
         const bool trC = isW(ix + 1, iy - 1), tlC = isW(ix - 1, iy - 1),
                    blC = isW(ix - 1, iy + 1), brC = isW(ix + 1, iy + 1);
         if (!(tC || bC || lC || rC || trC || tlC || blC || brC)) return;
-        auto push = [&](int idx) { pushQuad(ix, iy, idx + baseOff, alpha); };
+        auto push = [&](int idx) { pushQuad(ix, iy, idx + baseOff, alpha, br); };
         if      (tC && bC && lC && rC) push(1526);
         else if (tC && bC && rC)       push(1520);
         else if (lC && bC && rC)       push(1523);
@@ -449,13 +530,14 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
         for (int ix = minPX; ix <= maxPX; ++ix)
         {
             const T t = terrAt(ix, iy);
+            const Uint8 br = fogBright(ix, iy);   // 전장의 구름 밝기
 
             //① 베이스 타일 (오토타일)
-            pushQuad(ix, iy, floorSprIdx(ix, iy), 255);
+            pushQuad(ix, iy, floorSprIdx(ix, iy), 255, br);
 
             //파도 — 해수 경계만. 자기 자신이 바다가 아닌 셀에만(본체와 동일).
             if (drawFoam && !isSea(ix, iy))
-                emitFoam(ix, iy, isSea, seaAnim, 200);
+                emitFoam(ix, iy, isSea, seaAnim, 200, br);
 
             //② 산 심볼 (16타일 오토타일) — 본체 floor 타일과 동일 규약(connectGroupExtraIndex).
             //  카디널 4방향 이웃이 산이면 연결 → mapset1by1 #64(베이스) + 0~15. 건물과 같은
@@ -467,7 +549,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
                     isMtn(ix, iy - 1), isMtn(ix, iy + 1), isMtn(ix - 1, iy), isMtn(ix + 1, iy));
                 symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
                     (int)std::lround(v.sX((double)(ix - 1))),
-                    (int)std::lround(v.sY((double)(iy - 1))) });
+                    (int)std::lround(v.sY((double)(iy - 1))), br });
             }
 
             //③ 숲 심볼 (16타일 오토타일) — 산맥(②)과 동일 규약·패스. 위성에 없는 절차적
@@ -479,7 +561,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
                     isFor(ix, iy - 1), isFor(ix, iy + 1), isFor(ix - 1, iy), isFor(ix + 1, iy));
                 symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
                     (int)std::lround(v.sX((double)(ix - 1))),
-                    (int)std::lround(v.sY((double)(iy - 1))) });
+                    (int)std::lround(v.sY((double)(iy - 1))), br });
             }
         }
     flush();
@@ -592,6 +674,8 @@ static const std::vector<HighwayCell>& highwayCells()
 }
 
 //외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
+//  도로망은 미발견 청크여도 항상 표시(전세계 도로 골격) — 단 미발견은 지형처럼 어둡게(fogBright)
+//  색조해 전장의 구름 느낌은 유지. (도시 내부 도로·다리는 drawCityRoads가 따로 그림.)
 static void drawHighways(const MapView& v)
 {
     const std::vector<HighwayCell>& cells = highwayCells();
@@ -606,11 +690,74 @@ static void drawHighways(const MapView& v)
         const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
         if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
+        const Uint8 br = fogBright(c.cx, c.cy);
+        SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
         drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
+    }
+    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
+}
+
+//도시 심볼/도로망 소스 — full plan(CityPlanCache) 우선, 없으면 경량 layout(CityLayoutCache).
+//  full은 symbols/roadCells의 상위집합이고 같은 seed면 layout과 동일하므로 우선해도 무손실.
+//  둘 다 없으면 nullptr → 호출자가 그 도시를 스킵(아직 생성 안 됨).
+static const std::vector<CityRoadCell>* roadCellsFor(city::CityId id)
+{
+    if (const CityPlan*   p = CityPlanCache::ins().peek(id))   return &p->roadCells;
+    if (const CityLayout* l = CityLayoutCache::ins().peek(id)) return &l->roadCells;
+    return nullptr;
+}
+static const std::vector<CitySymbol>* symbolsFor(city::CityId id)
+{
+    if (const CityPlan*   p = CityPlanCache::ins().peek(id))   return &p->symbols;
+    if (const CityLayout* l = CityLayoutCache::ins().peek(id)) return &l->symbols;
+    return nullptr;
+}
+
+//도시 footprint(rectangles, 청크-픽셀 단위)의 bbox가 현재 화면과 겹치는지. 중심 픽셀을
+//  화면으로(relX이 X 시암 wrap 처리) + footprint 절반+여유 반경으로 근사 컬링.
+static bool cityOnScreen(const MapView& v, const worldGen::CityNode& node)
+{
+    if (node.rectangles.empty()) return false;
+    int minPx = node.rectangles[0].px, minPy = node.rectangles[0].py;
+    int maxPx = node.rectangles[0].x1(), maxPy = node.rectangles[0].y1();
+    for (const auto& r : node.rectangles)
+    {
+        minPx = std::min(minPx, r.px);   minPy = std::min(minPy, r.py);
+        maxPx = std::max(maxPx, r.x1()); maxPy = std::max(maxPy, r.y1());
+    }
+    const double cx = v.sX((minPx + maxPx) * 0.5);
+    const double cy = v.sY((minPy + maxPy) * 0.5);
+    const double rPx = (std::max(maxPx - minPx, maxPy - minPy) * 0.5 + 2.0) * v.curScale;
+    return !(cx + rPx < 0 || cx - rPx > v.viewW || cy + rPx < 0 || cy - rPx > v.viewH);
+}
+
+//화면에 들어온 미캐시 도시의 경량 layout을 백그라운드 워커에 요청 — 도시가 시야에 들어오면
+//  정찰지도(?건물+도로망)가 채워진다. 두 캐시 peek로 이미 있는 도시는 스킵, requestAsync가
+//  inFlight로 중복 방지, 프레임당 enqueue 상한으로 신규 영역 스크롤 시 워커 폭주 차단.
+//  렌더 스레드는 요청만 하고 절대 블록되지 않음(빌드는 워커에서 락 밖 수행).
+static void ensureVisibleCityLayouts(const MapView& v)
+{
+    const auto* cities = worldGen::activeCities;
+    if (!cities) return;
+
+    constexpr int MAX_ENQUEUE_PER_FRAME = 8;
+    int enqueued = 0;
+    for (std::size_t i = 0; i < cities->size(); ++i)
+    {
+        const auto& node = (*cities)[i];
+        if (node.center.z != v.z) continue;
+        const auto id = static_cast<city::CityId>(i);
+        if (CityPlanCache::ins().peek(id))   continue;   // full plan 이미 있음
+        if (CityLayoutCache::ins().peek(id)) continue;   // layout 이미 있음
+        if (!cityOnScreen(v, node)) continue;
+        CityLayoutCache::ins().requestAsync(id, worldSeed);
+        if (++enqueued >= MAX_ENQUEUE_PER_FRAME) break;
     }
 }
 
-//③-b 도시 내부 도로 심볼 (캐시된 도시만) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자가 설정.
+//③-b 도시 내부 도로·다리 심볼 (캐시 or 경량 layout) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자.
+//   발견 여부와 무관하게 그리되 미발견 청크는 지형처럼 어둡게(fogBright) 색조. 미발견 도시는
+//   잔디 위에 이 도로망/다리 + ?건물(④)이 얹혀 "정찰지도"처럼 보인다.
 static void drawCityRoads(const MapView& v)
 {
     const auto* cities = worldGen::activeCities;
@@ -621,10 +768,10 @@ static void drawCityRoads(const MapView& v)
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
-        const CityPlan* plan = CityPlanCache::ins().peek(static_cast<city::CityId>(i));
-        if (!plan) continue;
+        const std::vector<CityRoadCell>* rcs = roadCellsFor(static_cast<city::CityId>(i));
+        if (!rcs) continue;
 
-        for (const auto& rc : plan->roadCells)
+        for (const auto& rc : *rcs)
         {
             if (rc.pos.z != v.z) continue;
 
@@ -645,12 +792,16 @@ static void drawCityRoads(const MapView& v)
             const int sy = (int)std::lround(v.sY((double)(py - 1)));
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
+            const Uint8 br = fogBright(px, py);
+            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
             drawSprite(spr::mapset1by1, idx, sx, sy);
         }
     }
+    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
 }
 
-//④ 건물 심볼 (캐시된 도시만) — symOut에 누적(산과 함께 y정렬 후 그림).
+//④ 건물 심볼 (캐시된 도시) — symOut에 누적(산과 함께 y정렬 후 그림). 발견된 청크는 실제 종류
+//   스프라이트, 미발견 청크는 footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
 static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 {
     const auto* cities = worldGen::activeCities;
@@ -660,16 +811,20 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
-        const CityPlan* plan = CityPlanCache::ins().peek(static_cast<city::CityId>(i));
-        if (!plan) continue;
+        const std::vector<CitySymbol>* syms = symbolsFor(static_cast<city::CityId>(i));
+        if (!syms) continue;
 
-        for (const auto& sym : plan->symbols)
+        for (const auto& sym : *syms)
         {
             if (sym.pos.z != v.z) continue;
             const int apx = tilePixelIX(sym.pos.x);
             const int apy = tilePixelIY(sym.pos.y);
+            const bool seen = mapDiscovery::discovered(apx, apy);
 
-            const ResolvedSym rs = resolveSymbol(sym.symbol, sym.w, sym.h, symHash(apx, apy));
+            //발견=실제 종류, 미발견=?건물 placeholder. 둘 다 못 풀면(none/미지원 footprint) 스킵.
+            const ResolvedSym rs = seen
+                ? resolveSymbol(sym.symbol, sym.w, sym.h, symHash(apx, apy))
+                : resolveUnknownSymbol(sym.w, sym.h);
             if (!rs.atlas) continue;
 
             const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
@@ -677,9 +832,284 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
             const int span = rs.cellChunks * cp;
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-            symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy });
+            symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy, fogBright(apx, apy) });
         }
     }
+}
+
+//⑥ 도시 이름 라벨 — 도시 중심에 표기. CityPlan 캐시 없이 activeCities의 center를 직접 사용
+//   (peek로 캐시된 도시만 보는 건물/도로와 달리 전 도시 라벨 가능). 사전배치=PRESET_CITIES
+//   displayName, 절차생성(codename==none)=placeholderCityName 자리표시자.
+//   픽셀폰트 size 12를 zoomScale로 NEAREST 스케일(격자 보존). 배경은 반투명 검정 박스.
+//   발견 여부 무관하게 화면 내 전 도시 표기 — 청크맵에선 도시 layout(?건물+도로망)이 이미
+//   보이므로 이름도 같이 노출. 클러터는 화면 컬링으로만 제한(저배율 Satellite 모드는
+//   drawWorldView가 사전마킹 도시만 표기). 이 함수는 비-worldLOD(청크맵) 분기에서만 호출됨.
+static void drawCityLabels(const MapView& v)
+{
+    const auto* cities = worldGen::activeCities;
+    if (!cities) return;
+
+    //줌 배율로 라벨 크기 — 너무 작아 안 보이거나 너무 커 화면을 덮지 않게 클램프.
+    const float scale = std::clamp((float)v.zoomScale(), 0.85f, 2.5f);
+
+    setFont(fontType::pixel);
+    setFontSize(12);
+
+    for (const auto& node : *cities)
+    {
+        if (node.center.z != v.z) continue;
+
+        const double sxd = v.sX(tileToPixelX(node.center.x));
+        const double syd = v.sY(tileToPixelY(node.center.y));
+        if (sxd < -256 || sxd > v.viewW + 256 || syd < -64 || syd > v.viewH + 64) continue;
+
+        const std::wstring name = (node.codename != city::CityName::none)
+            ? presetDisplayName(node.codename)
+            : placeholderCityName(node.center.x, node.center.y);
+        if (name.empty()) continue;
+
+        const int cx = (int)std::lround(sxd);
+        const int cy = (int)std::lround(syd);
+        const int tw = (int)std::lround(queryTextWidth(name)  * scale);
+        const int th = (int)std::lround(queryTextHeight(name) * scale);
+
+        //배경 — 반투명 검정. drawFillRect 2-인자는 알파 255 강제라 3-인자(alpha)로.
+        const int padX = (int)std::lround(4.0f * scale);
+        const int padY = (int)std::lround(2.0f * scale);
+        drawFillRect(SDL_Rect{ cx - tw / 2 - padX, cy - th / 2 - padY,
+                               tw + padX * 2, th + padY * 2 }, SDL_Color{ 0, 0, 0, 255 }, (Uint8)100);
+
+        drawTextCenterScaled(name, cx, cy, scale, SDL_Color{ 245, 222, 120, 255 });
+    }
+
+    setFont(fontType::mainFont);   // 폰트 상태 복원(이후 UI 크롬이 자체 폰트/크기 설정)
+}
+
+// ────────── 위성 텍스처 LOD (광역 조망) ──────────
+//  curScale < LOD_SWITCH_PX 일 때 per-청크 타일맵 대신 그림. 전세계 한 장 텍스처는
+//  텍셀당 ~20청크라 중간 줌에서 ~90배 확대돼 뭉개진다(눈 아픔). 대신 "보이는 영역"만
+//  화면 해상도로 그때그때 재샘플링 → 텍셀 ≈ 화면픽셀 ≈ 1청크라 어느 줌에서든 선명.
+//  카메라(sX/sY/curScale)를 타일맵과 공유 → LOD 경계를 넘나들어도 위치·스케일 연속.
+namespace
+{
+    SDL_Texture*  g_satTex  = nullptr;
+    int           g_satTW   = 0, g_satTH = 0;       // 텍스처 크기
+    double        g_satWX0  = 0.0, g_satWY0 = 0.0;  // 덮는 월드 rect 좌상단(청크좌표, X unwrapped)
+    double        g_satCPT  = -1.0;                 // chunks per texel(해상도). <0 = 무효
+    std::uint64_t g_satSeed = ~0ull;                // worldSeed 바뀌면 재빌드
+
+    SDL_Texture*  g_worldTex  = nullptr;            // 전세계 저해상도 백드롭(검정 깜빡임 방지)
+    std::uint64_t g_worldSeed = ~0ull;
+
+    //지형 타입 → 위성지도풍 색. 도시(CityZone/Center)는 육지색과 동일 — 지형 색으로
+    //  도시 위치가 새면 전장의 구름이 무의미해지므로. 도시는 발견된 점으로만 드러냄.
+    SDL_Color worldTerrainColor(worldGrid::Terrain t)
+    {
+        using T = worldGrid::Terrain;
+        switch (t)
+        {
+        case T::Sea: case T::CitySea:                   return {  40,  72, 112, 255 };
+        case T::River: case T::Lake: case T::CityRiver: return {  74, 116, 156, 255 };
+        case T::Mountain:                               return { 120, 112, 102, 255 };
+        case T::Desert:                                 return { 198, 178, 120, 255 };
+        case T::Polar:                                  return { 232, 238, 244, 255 };
+        case T::Tundra:                                 return { 188, 198, 192, 255 };
+        case T::Subarctic:                              return { 132, 158, 134, 255 };
+        case T::Monsoon:                                return {  92, 142,  82, 255 };
+        case T::InsularRainforest:                      return {  54, 122,  74, 255 };
+        case T::ContinentalRainforest:                  return {  44, 112,  64, 255 };
+        default:                                        return {  86, 132,  78, 255 };   // Land/CityZone/CityCenter
+        }
+    }
+
+    //전세계 저해상도 백드롭 — 시드별 1회 빌드. 항상 화면을 덮어 윈도우 미커버 영역(로딩 전/
+    //  패닝 경계/줌아웃 주변)의 검정 깜빡임을 막는다. fit 줌에서는 2160px가 화면과 1:1이라 선명.
+    SDL_Texture* worldMapTexture()
+    {
+        if (!worldGrid::worldPixelMmapActive()) return nullptr;
+        if (g_worldTex && g_worldSeed == worldSeed) return g_worldTex;
+        if (g_worldTex) { SDL_DestroyTexture(g_worldTex); g_worldTex = nullptr; }
+
+        constexpr int TW = 2160, TH = 1080;   // 2:1 (월드 비율)
+        SDL_Texture* tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, TW, TH);
+        if (!tex) return nullptr;
+        SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_LINEAR);
+
+        static std::vector<std::uint32_t> buf;
+        buf.assign(static_cast<std::size_t>(TW) * TH, 0);
+        for (int ty = 0; ty < TH; ++ty)
+        {
+            const int py = static_cast<int>(static_cast<std::int64_t>(ty) * WORLD_PIXEL_H / TH);
+            for (int tx = 0; tx < TW; ++tx)
+            {
+                const int px = static_cast<int>(static_cast<std::int64_t>(tx) * WORLD_PIXEL_W / TW);
+                const SDL_Color c = worldTerrainColor(worldGrid::worldPixel(px, py));
+                buf[static_cast<std::size_t>(ty) * TW + tx] =
+                    (static_cast<std::uint32_t>(c.r) << 24) | (static_cast<std::uint32_t>(c.g) << 16)
+                  | (static_cast<std::uint32_t>(c.b) <<  8) |  0xFFu;
+            }
+        }
+        SDL_UpdateTexture(tex, nullptr, buf.data(), TW * static_cast<int>(sizeof(std::uint32_t)));
+        g_worldTex  = tex;
+        g_worldSeed = worldSeed;
+        return tex;
+    }
+
+    //현재 뷰에 맞는 위성 윈도우 텍스처 확보(필요 시에만 재빌드). 출력: 덮는 rect 좌상단/해상도.
+    //  재빌드 조건 = 시드 변경 / 해상도 어긋남 / 보이는 영역이 캐시 rect 밖. 줌 애니 중엔
+    //  무조건 재사용(매프레임 빌드 회피 — rect로 블릿하므로 기하는 정확, 해상도만 잠깐 어긋).
+    SDL_Texture* satelliteTexture(const MapView& v, double& oWX0, double& oWY0, double& oCPT)
+    {
+        if (!worldGrid::worldPixelMmapActive()) return nullptr;
+
+        //텍스처 크기 — 화면 비율, 1텍셀≈1화면픽셀 목표. (TW가 선명도/빌드비용 튜닝 포인트.)
+        constexpr int TW = 1280;
+        const int TH = std::max(1, (int)std::lround(TW * (double)v.viewH / std::max(1, v.viewW)));
+
+        //덮을 월드 폭(청크) = 보이는폭 * 마진. 한 월드 폭은 넘지 않게 캡(wrap blit 회피).
+        constexpr double marginF = 1.5;
+        double coverW = (v.viewW / v.curScale) * marginF;
+        coverW = std::min(coverW, static_cast<double>(WORLD_PIXEL_W) * 0.95);
+        const double cpt    = std::max(1e-9, coverW / TW);   // chunks per texel
+        const double coverH = TH * cpt;
+        const double wx0 = v.centerPX - coverW * 0.5;
+        const double wy0 = v.centerPY - coverH * 0.5;
+
+        //재사용 판정 — 보이는 영역이 캐시 rect 안 + 해상도 ±25% 이내 + 시드 동일.
+        const double visW = v.viewW / v.curScale, visH = v.viewH / v.curScale;
+        const bool resOK   = g_satCPT > 0 && cpt >= g_satCPT * 0.8 && cpt <= g_satCPT * 1.25;
+        const bool coverOK = g_satTex && g_satSeed == worldSeed && resOK
+            && v.centerPX - visW * 0.5 >= g_satWX0 && v.centerPX + visW * 0.5 <= g_satWX0 + g_satTW * g_satCPT
+            && v.centerPY - visH * 0.5 >= g_satWY0 && v.centerPY + visH * 0.5 <= g_satWY0 + g_satTH * g_satCPT;
+
+        if (g_satTex && g_satSeed == worldSeed && (coverOK || v.animating))
+        {
+            oWX0 = g_satWX0; oWY0 = g_satWY0; oCPT = g_satCPT;
+            return g_satTex;
+        }
+
+        if (!g_satTex || g_satTW != TW || g_satTH != TH)
+        {
+            if (g_satTex) SDL_DestroyTexture(g_satTex);
+            g_satTex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, TW, TH);
+            if (!g_satTex) return nullptr;
+            SDL_SetTextureScaleMode(g_satTex, SDL_SCALEMODE_LINEAR);
+            g_satTW = TW; g_satTH = TH;
+        }
+
+        static std::vector<std::uint32_t> buf;
+        buf.assign(static_cast<std::size_t>(TW) * TH, 0);
+        for (int ty = 0; ty < TH; ++ty)
+        {
+            const int  wy   = (int)std::lround(wy0 + ty * cpt);
+            const bool yOOB = (wy < 0 || wy >= WORLD_PIXEL_H);
+            for (int tx = 0; tx < TW; ++tx)
+            {
+                const worldGrid::Terrain t = yOOB ? worldGrid::Terrain::Sea
+                    : worldGrid::worldPixel(worldWrap::wrapPixelX((int)std::lround(wx0 + tx * cpt)), wy);
+                const SDL_Color c = worldTerrainColor(t);
+                buf[static_cast<std::size_t>(ty) * TW + tx] =
+                    (static_cast<std::uint32_t>(c.r) << 24) | (static_cast<std::uint32_t>(c.g) << 16)
+                  | (static_cast<std::uint32_t>(c.b) <<  8) |  0xFFu;
+            }
+        }
+        SDL_UpdateTexture(g_satTex, nullptr, buf.data(), TW * static_cast<int>(sizeof(std::uint32_t)));
+        g_satWX0 = wx0; g_satWY0 = wy0; g_satCPT = cpt; g_satSeed = worldSeed;
+        oWX0 = wx0; oWY0 = wy0; oCPT = cpt;
+        return g_satTex;
+    }
+}
+
+static void drawWorldView(const MapView& v)
+{
+    SDL_Texture* bg = worldMapTexture();   // 전세계 백드롭 — 항상 화면을 덮어 검정 방지
+    if (!bg)
+    {
+        setFont(fontType::mainFont);
+        setFontSize(28);
+        drawTextOutlineCenter(L"No world data yet", v.viewW / 2, v.viewH / 2, mappal::uiText());
+        return;
+    }
+
+    //① 백드롭 — 전세계 텍스처를 통합 카메라로 wrap-타일 블릿. fit에서 1:1 선명, 줌인 시
+    //  저해상도 배경이 되어 윈도우 미커버/로딩중 영역을 검정 대신 채운다(깜빡임 제거).
+    {
+        const double worldWpx = static_cast<double>(WORLD_PIXEL_W) * v.curScale;
+        const double topY     = v.sY(0.0);
+        const double height   = static_cast<double>(WORLD_PIXEL_H) * v.curScale;
+        double originX = v.viewW * 0.5 - v.centerPX * v.curScale;
+        originX = std::fmod(originX, worldWpx);
+        if (originX > 0) originX -= worldWpx;
+        for (double ox = originX; ox < v.viewW; ox += worldWpx)
+        {
+            SDL_FRect dst = { static_cast<float>(ox), static_cast<float>(topY),
+                              static_cast<float>(worldWpx), static_cast<float>(height) };
+            SDL_RenderTexture(renderer, bg, nullptr, &dst);
+        }
+    }
+
+    //② 고해상도 윈도우 — 줌 안정(애니 X) + 광역(coverW≥월드폭/2)이 아닐 때만 위에 덧그려 선명.
+    //  줌 애니 중엔 스킵(백드롭만) → 스테일 윈도우가 줌하며 어긋나 보이는 것·매프레임 재빌드 방지.
+    if (!v.animating && (v.viewW / v.curScale) * 1.5 < static_cast<double>(WORLD_PIXEL_W) * 0.5)
+    {
+        double wx0, wy0, cpt;
+        if (SDL_Texture* win = satelliteTexture(v, wx0, wy0, cpt))
+        {
+            const double left = v.sX(wx0);
+            const double top  = v.sY(wy0);
+            const double w    = g_satTW * cpt * v.curScale;
+            const double h    = g_satTH * cpt * v.curScale;
+            SDL_FRect dst = { static_cast<float>(left), static_cast<float>(top),
+                              static_cast<float>(w), static_cast<float>(h) };
+            SDL_RenderTexture(renderer, win, nullptr, &dst);
+        }
+    }
+
+    //점: 발견한 도시만(전장의 구름 핵심 — 지형색은 도시 위치를 숨기므로 점이 유일한 노출).
+    //  이름: 사전마킹(preset, codename!=none) 도시만(발견 무관, 밝게) — 전세계 조망 시 방향
+    //  잡는 앵커. 절차생성 자리표시자 이름은 위성지도에서 어색해 제외(이름은 청크맵에서만).
+    //  → 미발견 preset은 이름만 떠 위치 힌트, 발견 도시는 점, 발견 preset은 점+이름.
+    const auto* cities = worldGen::activeCities;
+    if (cities)
+    {
+        setFont(fontType::pixel);
+        setFontSize(12);
+        for (const auto& node : *cities)
+        {
+            const bool seen   = mapDiscovery::discovered(tilePixelIX(node.center.x), tilePixelIY(node.center.y));
+            const bool preset = (node.codename != city::CityName::none);
+            if (!seen && !preset) continue;
+
+            const int sx = (int)std::lround(v.sX(tileToPixelX(node.center.x)));
+            const int sy = (int)std::lround(v.sY(tileToPixelY(node.center.y)));
+            if (sx < -8 || sx > v.viewW + 8 || sy < -8 || sy > v.viewH + 8) continue;
+
+            if (seen)
+            {
+                drawFillCircle(sx, sy, 3, SDL_Color{ 245, 222, 120, 255 }, 255);
+                drawFillCircle(sx, sy, 2, SDL_Color{  70,  45,  15, 255 }, 255);
+            }
+
+            if (preset)
+            {
+                const std::wstring name = presetDisplayName(node.codename);
+                if (!name.empty())
+                    drawTextOutlineCenter(name, sx, sy - 13, SDL_Color{ 245, 222, 120, 255 });
+            }
+        }
+        setFont(fontType::mainFont);
+    }
+
+    //플레이어 마커(펄스).
+    const int psx = (int)std::lround(v.sX(tileToPixelX(PlayerX())));
+    const int psy = (int)std::lround(v.sY(tileToPixelY(PlayerY())));
+    if ((SDL_GetTicks() % 900) < 600)
+    {
+        drawFillCircle(psx, psy, 5, SDL_Color{ 255, 255, 255, 255 }, 255);
+        drawFillCircle(psx, psy, 3, mappal::playerMarker(), 255);
+    }
+    else
+        drawFillCircle(psx, psy, 4, mappal::playerMarker(), 220);
 }
 
 //⑤ 플레이어 마커 — 화면 안이면 펄스, 밖이면 가장자리 클램프.
@@ -717,48 +1147,44 @@ static void drawPlayerMarker(const MapView& v)
 // §5  UI 크롬
 // ════════════════════════════════════════════════════════════════════════
 
-static void drawCoordPanel()
+//플레이어 좌표 — 우측하단, 축별 3줄. 무채색만 사용: 라벨(X/Y/Z)은 흐린 회색+준굵게,
+//  값은 밝은 흰색+굵게 → 색상(hue) 없이 밝기·굵기로 라벨↔값 구분(라벨 3개는 동일색).
+//  값은 우측정렬, 박스 없이 외곽선으로 가독성 확보. 안내 문구는 없음.
+static void drawCoordPanel(const MapView& v)
 {
-    SDL_Rect panel{ 22, 22, 240, 134 };
-    drawStadium(panel.x, panel.y, panel.w, panel.h, mappal::uiPanel(), 220, 3);
+    constexpr int margin = 26;
+    constexpr int rowH   = 26;
+    const int RX = v.viewW - margin;   // 값 우측 정렬 기준선
 
-    setFontSize(16);
-    const std::wstring header = L"Player Coordinates";
+    const wchar_t* labels[3] = { L"X", L"Y", L"Z" };
+    const int      vals[3]   = { PlayerX(), PlayerY(), PlayerZ() };
+
+    const SDL_Color labelCol = { 240, 240, 240, 255 };   // 흐린 회색(X/Y/Z 동일)
+    const SDL_Color valueCol = { 240, 240, 234, 255 };   // 밝은 흰색
+
+    setFontSize(19);
+
+    //값 최대폭(굵은 폰트 기준)으로 라벨 컬럼 결정 — 값=우측정렬(RX), 라벨=그 왼쪽 고정 컬럼.
     setFont(fontType::mainFontBold);
-    drawText(header, panel.x + 14, panel.y + 8, mappal::uiText());
-    setFont(fontType::mainFont);
+    int maxValW = 0;
+    for (int i = 0; i < 3; ++i) maxValW = std::max(maxValW, queryTextWidth(std::to_wstring(vals[i])));
+    const int labelColRight = RX - maxValW - 18;
+    const int topY = v.viewH - margin - rowH * 3;
 
-    int headerW   = queryTextWidth(header);
-    int sepX      = panel.x + 14;
-    int sepY      = panel.y + 34;
-    int sepEndX   = panel.x + panel.w - 14;
-    int solidEndX = std::min(sepX + headerW + 8, sepEndX);
-    drawLine(sepX, sepY, solidEndX, sepY, mappal::uiBorder());
-    int fadeLen = sepEndX - solidEndX;
-    for (int i = 0; i < fadeLen; i++)
+    for (int i = 0; i < 3; ++i)
     {
-        Uint8 a = (Uint8)(255 - (255 * i / fadeLen));
-        drawPoint(solidEndX + 1 + i, sepY, mappal::uiBorder(), a);
+        const int y = topY + i * rowH;
+
+        setFont(fontType::mainFontBold);
+        const std::wstring val = std::to_wstring(vals[i]);
+        drawTextOutline(val, RX - queryTextWidth(val), y, valueCol);                 // 값(흰·굵게, 우측정렬)
+
+        setFont(fontType::mainFontSemiBold);
+        const std::wstring lab = labels[i];
+        drawTextOutline(lab, labelColRight - queryTextWidth(lab), y, labelCol);      // 라벨(회색·준굵게)
     }
 
-    int rowY    = panel.y + 43;
-    int labelX  = panel.x + 18;
-    int valueRX = panel.x + panel.w - 18;
-    auto kv = [&](const wchar_t* label, int val)
-        {
-            setFontSize(15);
-            setFont(fontType::mainFontSemiBold);
-            drawText(label, labelX, rowY + 3, mappal::uiText());
-            setFont(fontType::mainFont);
-            setFontSize(20);
-            std::wstring s = std::to_wstring(val);
-            int vw = queryTextWidth(s);
-            drawText(s, valueRX - vw, rowY, mappal::uiText());
-            rowY += 28;
-        };
-    kv(L"X", PlayerX());
-    kv(L"Y", PlayerY());
-    kv(L"Z", PlayerZ());
+    setFont(fontType::mainFont);
 }
 
 struct ZoomButtons { SDL_Rect zoomIn, zoomOut, home; };
@@ -786,7 +1212,9 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
     drawStadium(panelX, panelY, panelW, panelH, mappal::uiPanel(), 220, 3);
 
     setFontSize(16);
-    std::wstring label = L"Zoom  " + std::to_wstring(v.chunkPx()) + L" px/chunk";
+    std::wstring label = v.worldLOD()
+        ? std::wstring(L"Satellite")
+        : L"Zoom  " + std::to_wstring((int)std::lround(v.curScale)) + L" px/chunk";
     drawText(label, panelX + 14, panelY + 8, mappal::uiText());
 
     auto button = [&](const SDL_Rect& r, const std::wstring& glyph)
@@ -853,7 +1281,10 @@ public:
         view.z = PlayerZ();
         view.centerPX = tileToPixelX(PlayerX());
         view.centerPY = tileToPixelY(PlayerY());
-        view.zoomLevel = persistedZoom;
+        view.zoomLevel   = persistedZoom;
+        view.targetScale = view.levelScale(persistedZoom);
+        view.curScale    = view.targetScale;   // 열 때는 애니 없이 그 줌부터
+        view.animating   = false;
         x = 0; y = 0;
 
         deactInput();
@@ -885,35 +1316,52 @@ public:
 
         view.viewW = cameraW;
         view.viewH = cameraH;
+        view.tickAnim();        // 연속 줌 애니메이션(스케일 이징 + 앵커 고정) — "매끈함"
         view.clampCenterY();
 
         drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, mappal::background());
 
-        static thread_local std::vector<SymDraw> symDraws;
-        symDraws.clear();
+        if (view.worldLOD())
+        {
+            //광역(위성 텍스처 LOD) — per-청크 타일맵 대신 다운샘플 위성 + 발견 도시 점.
+            drawWorldView(view);
+        }
+        else
+        {
+            static thread_local std::vector<SymDraw> symDraws;
+            symDraws.clear();
 
-        //심볼(도로·건물·산)은 모든 줌에서 유지 — 지형(tileset)만 남고 심볼이 사라지면 어색함.
-        //  바다 파도만 줌 게이트(읽기 불가 + 광역에서 draw 폭증하는 장식 디테일).
-        const bool foamOn = view.symbolsVisible();
+            //심볼(도로·건물·산)은 모든 줌에서 유지 — 지형(tileset)만 남고 심볼이 사라지면 어색함.
+            //  바다 파도만 줌 게이트(읽기 불가 + 광역에서 draw 폭증하는 장식 디테일).
+            const bool foamOn = view.symbolsVisible();
 
-        drawTerrainLayer(view, foamOn, symDraws);   // ① 베이스(+파도) + ② 산 수집(항상)
+            drawTerrainLayer(view, foamOn, symDraws);   // ① 베이스(+파도) + ② 산/숲 수집(항상)
 
-        setZoom((float)view.zoomScale());
-        drawHighways     (view);             // ③-a 외부 도로 (평면, 즉시)
-        drawCityRoads    (view);             // ③-b 내부 도로 (평면, 즉시)
-        drawCityBuildings(view, symDraws);   // ④ 건물 수집
+            setZoom((float)view.zoomScale());
+            drawHighways     (view);             // ③-a 외부 도로망 (전세계 항상 표시, 미발견은 어둡게)
+            ensureVisibleCityLayouts(view);      // 화면 내 미캐시 도시 경량 layout 백그라운드 요청
+            drawCityRoads    (view);             // ③-b 내부 도로·다리 (항상 표시, 미발견은 어둡게)
+            drawCityBuildings(view, symDraws);   // ④ 건물 (발견=실제 / 미발견=?건물, 어둡게)
 
-        //산+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침.
-        std::sort(symDraws.begin(), symDraws.end(),
-            [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
-        for (const auto& s : symDraws)
-            drawSprite(s.atlas, s.idx, s.sx, s.sy);
+            //산+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침. 그릴 때 br로 색조(전장의 구름).
+            std::sort(symDraws.begin(), symDraws.end(),
+                [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
+            for (const auto& s : symDraws)
+            {
+                SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
+                drawSprite(s.atlas, s.idx, s.sx, s.sy);
+            }
+            //색조 모드 원복 — 텍스처 상태라 다른 패스/다음 프레임 오염 방지.
+            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
+            SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
 
-        setZoom(1.0f);
+            setZoom(1.0f);
 
-        drawPlayerMarker(view);
+            drawCityLabels(view);   // ⑥ 도시 이름 라벨 (발견된 도시만)
+            drawPlayerMarker(view);
+        }
 
-        drawCoordPanel();
+        drawCoordPanel(view);
         drawZoomPanel(view, computeZoomButtons());
         drawTabButton();
     }
@@ -927,6 +1375,7 @@ public:
         ZoomButtons zb = computeZoomButtons();
         if (checkCursor(&zb.zoomIn) || checkCursor(&zb.zoomOut) || checkCursor(&zb.home)) return;
 
+        view.animating = false;   // 드래그 시작 → 진행 중인 줌 애니 취소(앵커가 센터 덮어쓰지 않게)
         dragging = true;
         dragMoved = false;
         dragAnchorPX = view.centerPX;
@@ -937,8 +1386,8 @@ public:
     {
         if (!dragging) return;
         if (dx * dx + dy * dy > 16) dragMoved = true;
-        view.centerPX = dragAnchorPX + dx / (double)view.chunkPx();
-        view.centerPY = dragAnchorPY + dy / (double)view.chunkPx();
+        view.centerPX = dragAnchorPX + dx / view.curScale;
+        view.centerPY = dragAnchorPY + dy / view.curScale;   // Y는 clampCenterY가 월드 안으로 보정
     }
 
     void clickUpGUI() override
@@ -952,10 +1401,12 @@ public:
         if (checkCursor(&tab)) { close(aniFlag::winUnfoldClose); return; }
 
         ZoomButtons zb = computeZoomButtons();
-        if (checkCursor(&zb.zoomIn))  { view.zoomAround(view.viewW / 2, view.viewH / 2, +1); return; }
-        if (checkCursor(&zb.zoomOut)) { view.zoomAround(view.viewW / 2, view.viewH / 2, -1); return; }
+        //버튼 줌 — 화면 중앙 앵커. 단계 사이는 애니로 매끈히 보간(zoomAt→tickAnim).
+        if (checkCursor(&zb.zoomIn))  { view.zoomAt(view.viewW / 2, view.viewH / 2, +1); return; }
+        if (checkCursor(&zb.zoomOut)) { view.zoomAt(view.viewW / 2, view.viewH / 2, -1); return; }
         if (checkCursor(&zb.home))
         {
+            view.animating = false;
             view.centerPX = tileToPixelX(PlayerX());
             view.centerPY = tileToPixelY(PlayerY());
             return;
@@ -965,10 +1416,9 @@ public:
     void mouseWheel() override
     {
         if (getStateInput() == false) return;
-        if (event.wheel.y > 0)
-            view.zoomAround((int)getMouseX(), (int)getMouseY(), +1);
-        else if (event.wheel.y < 0)
-            view.zoomAround((int)getMouseX(), (int)getMouseY(), -1);
+        //휠 = 마우스 지점 앵커로 한 단계 줌. 가장 광역(level 0)=전세계 한 화면, 가장 근접=48px/청크.
+        const int delta = (event.wheel.y > 0) ? +1 : (event.wheel.y < 0 ? -1 : 0);
+        if (delta != 0) view.zoomAt((int)getMouseX(), (int)getMouseY(), delta);
     }
 
     void keyDownGUI() override

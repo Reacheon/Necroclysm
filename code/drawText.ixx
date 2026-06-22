@@ -341,6 +341,24 @@ export void drawTextCenter(std::wstring text, int x, int y) {
     drawTextCenter(text, x, y, col::white);
 }
 
+//텍스트를 scale배로 중앙 그리기 — 텍스처를 NEAREST로 확대/축소(픽셀폰트 격자 보존).
+//  현재 setFont/setFontSize 상태를 그대로 사용 → 한 폰트크기(예: 픽셀폰트 12)를 줌 배율로
+//  키우는 용도(월드맵 도시 라벨). 단색·단일행 전용(멀티컬러/줄바꿈 미지원).
+export void drawTextCenterScaled(std::wstring text, int x, int y, float scale, SDL_Color inputCol)
+{
+    if (inputCol.a == 0) inputCol.a = 255;
+    CachedTexture* cached = getCachedTexture(text, s_fontSize, inputCol);
+    if (!cached) return;
+
+    SDL_FRect dst = {
+        std::round(float(x) - cached->width  * scale / 2.0f),
+        std::round(float(y) - cached->height * scale / 2.0f),
+        std::round(cached->width  * scale),
+        std::round(cached->height * scale)
+    };
+    SDL_RenderTexture(renderer, cached->texture, nullptr, &dst);
+}
+
 export void drawTextOutline(std::wstring text, int x, int y, SDL_Color inputCol)
 {
     drawText(text, x - 1, y, col::black);

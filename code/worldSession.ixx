@@ -4,6 +4,7 @@ import std;
 import util;
 import worldGen;
 import WorldGenScreen;
+import mapDiscovery;
 
 //============================================================
 // 월드 생성 진행 상태 — main 루프에서 플레이어 의존 코드 가드용.
@@ -57,6 +58,9 @@ export void startWorldGen()
         worldGen::activePolyLines = &worldGenResult->roads;
         worldGen::activeCities    = &worldGenResult->cities;
         worldGenInProgress = false;
+
+        //새 월드 — 이전 월드의 전장의 구름(발견 청크) 제거.
+        mapDiscovery::reset();
 
         //타이틀 청크 wipe + SPAWN_DEFAULT 텔레포트.
         if (onWorldGenComplete) onWorldGenComplete();

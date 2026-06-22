@@ -24,6 +24,7 @@ import Wave;
 import Wake;
 import Sector;
 import worldSession;
+import mapDiscovery;
 import Sprite;
 import drawSprite;
 import Vehicle;
@@ -317,6 +318,9 @@ void Player::updateVision(int range, int cx, int cy)
 
 	const int z = getGridZ();
 	World* world = World::ins();
+
+	//월드맵 전장의 구름 — 시야 갱신 위치(=플레이어 인지 시점) 주변 청크를 발견 처리.
+	mapDiscovery::markAroundTile(cx, cy);
 
 	// 청크 포인터 캐시: ray와 gray 루프 모두 공간적으로 인접한 타일에 연쇄 접근하므로
 	// 같은 청크 안에서는 unordered_map 룩업을 회피한다.

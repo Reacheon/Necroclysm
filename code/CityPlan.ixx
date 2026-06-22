@@ -6,6 +6,7 @@ import city;
 import worldGen;
 import constVar;
 import VehiclePlan;
+import ProcGenWorker;
 
 // ════════════════════════════════════════════════════════════════════════
 // CityPlan — 도시 1개의 절차생성 산출물 (골격).
@@ -162,6 +163,20 @@ export struct CityPlan
 //   dedup). 순수 함수라 직접 호출도 안전하나, 같은 도시 재계산 방지를 위해 캐시 권장.
 export CityPlan buildCityPlan(city::CityId id, std::uint64_t seed);
 
+// ── CityLayout (월드맵 경량) ──────────────────────────────────────────────
+// buildCityPlan의 무거운 산출물(tiles + spawn 채널) 없이, 월드맵이 그리는 데 필요한
+//   심볼 + 도로망만 담는 경량 구조. 같은 (id, seed)면 full plan의 symbols/roadCells와
+//   비트 동일 (CityPlan_build.cpp 결정론 보장) → 플레이어가 안 가본 도시도 정찰지도로 표시.
+export struct CityLayout
+{
+    std::vector<CitySymbol>   symbols;
+    std::vector<CityRoadCell> roadCells;
+};
+
+// buildCityLayout — stage 9 lot 생성·stage 10 머티리얼라이즈를 건너뛴 경량 빌드.
+//   buildCityPlan과 stage 1-8 + 심볼 결정을 공유 → 심볼 위치가 나중의 full 머티리얼라이즈와 일치.
+export CityLayout buildCityLayout(city::CityId id, std::uint64_t seed);
+
 // ── Cache ───────────────────────────────────────────────────────────────
 // CityId 키 메모이즈 캐시. 플레이어 근처 섹터가 로드될 때 procGenerate가 lazy 조회.
 //   결정론: 같은 (id, seed)면 같은 plan.
@@ -233,4 +248,77 @@ private:
 
     mutable std::mutex mtx_;
     std::unordered_map<city::CityId, CityPlan> cache_;
+};
+
+// ── CityLayoutCache ───────────────────────────────────────────────────────
+// 월드맵 전용 경량 캐시 (CityPlanCache와 분리). 도시가 맵 화면에 들어오면 Map.ixx가
+//   requestAsync로 백그라운드 layout을 요청 → 정찰지도(?건물+도로망)가 채워진다.
+//
+//   왜 CityPlanCache와 분리하나: procGenerate가 CityPlanCache::getOrCompute 후 plan.tiles를
+//   바로 소비한다. layout-only(타일 없음) 엔트리를 거기 넣으면 도시가 인게임에 건물/도로
+//   없이 깔리는 버그가 된다. 별도 캐시라 procGenerate는 이걸 절대 보지 않음.
+//
+//   full ↔ layout: 둘 다 같은 seed면 symbols/roadCells가 동일. 플레이어 접근 시
+//   CityPlanCache에 full이 생기고 Map은 full을 우선(roadCellsFor/symbolsFor). layout 엔트리는
+//   작아서(POD 벡터 2개) 그대로 둬도 무해 — eviction 불필요.
+export class CityLayoutCache
+{
+public:
+    static CityLayoutCache& ins()
+    {
+        static CityLayoutCache c;
+        return c;
+    }
+
+    //비계산 조회 — 있으면 포인터, 없으면 nullptr. 렌더 스레드가 매 프레임 호출.
+    //  반환 ref는 clear 전까지 valid (unordered_map 원소 주소 안정성). 워커는 신규 키
+    //  삽입만 하므로 한 프레임 내 포인터/순회 안전.
+    const CityLayout* peek(city::CityId id) const
+    {
+        std::lock_guard lk(mtx_);
+        auto it = cache_.find(id);
+        if (it == cache_.end()) return nullptr;
+        return &it->second;
+    }
+
+    //layout 백그라운드 생성 요청. 이미 캐시됐거나 진행 중이면 무시(dedupe). 빌드는 워커
+    //  스레드에서 *락 밖*으로 수행 → 렌더 스레드 peek이 stage 1-8 계산에 블록되지 않음.
+    void requestAsync(city::CityId id, std::uint64_t seed)
+    {
+        {
+            std::lock_guard lk(mtx_);
+            if (cache_.contains(id)) return;
+            if (!inFlight_.insert(static_cast<std::uint32_t>(id)).second) return;   // 이미 큐/진행 중
+        }
+        ProcGenWorker::ins().submit([id, seed]
+        {
+            CityLayout lay = buildCityLayout(id, seed);
+            auto& self = CityLayoutCache::ins();
+            std::lock_guard lk(self.mtx_);
+            self.cache_.emplace(id, std::move(lay));
+            self.inFlight_.erase(static_cast<std::uint32_t>(id));
+        });
+    }
+
+    void clear()
+    {
+        std::lock_guard lk(mtx_);
+        cache_.clear();
+        inFlight_.clear();
+    }
+
+    std::size_t size() const noexcept
+    {
+        std::lock_guard lk(mtx_);
+        return cache_.size();
+    }
+
+private:
+    CityLayoutCache() = default;
+    CityLayoutCache(const CityLayoutCache&) = delete;
+    CityLayoutCache& operator=(const CityLayoutCache&) = delete;
+
+    mutable std::mutex mtx_;
+    std::unordered_map<city::CityId, CityLayout> cache_;
+    std::unordered_set<std::uint32_t>            inFlight_;
 };
