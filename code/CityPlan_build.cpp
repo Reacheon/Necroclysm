@@ -102,7 +102,7 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
 
     const worldGen::CityNode& node = (*worldGen::activeCities)[static_cast<std::uint32_t>(id)];
    
-    if (node.rectangles.empty()) return plan;
+    if (node.bboxW <= 0 || node.bboxH <= 0) return plan;
 
     std::mt19937_64 rng{ seed ^ (static_cast<std::uint64_t>(id) * 0x9E3779B97F4A7C15ULL) };
     auto localRandom = [&](int a, int b) { return std::uniform_int_distribution<int>{a, b}(rng); };
@@ -111,16 +111,10 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
     // 1. 도시의 픽셀 데이터를 로컬 변수에 저장 (주변픽셀 감지 위해 +1px 마진) ▶ cityPixelAt
     //══════════════════════════════════════════════════════════════════
 
-    int minX = node.rectangles[0].px, minY = node.rectangles[0].py;
-    int maxX = node.rectangles[0].x1(), maxY = node.rectangles[0].y1();
-    for (const auto& r : node.rectangles)
-    {
-        minX = std::min(minX, r.px);   minY = std::min(minY, r.py);
-        maxX = std::max(maxX, r.x1()); maxY = std::max(maxY, r.y1());
-    }
-
-    const int cityWidth = maxX - minX;
-    const int cityHeight = maxY - minY;
+    const int minX = node.bboxPx;
+    const int minY = node.bboxPy;
+    const int cityWidth  = node.bboxW;
+    const int cityHeight = node.bboxH;
 
     //도시 주변 픽셀도 알 수 있게 1픽셀 마진을 가진 박스
     const int patchPxX = minX - 1; 
@@ -141,34 +135,41 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
     //══════════════════════════════════════════════════════════════════
     // 1.5 이 클러스터 멤버십 마스크 — 외래 도시 픽셀 제거
     //══════════════════════════════════════════════════════════════════
-    //   CityPlan_build는 도시를 "bbox 안의 City* 색 픽셀"로 식별한다. 그런데 4-연결로
-    //   분리된 인접 도시(서울↔인천)는 bbox가 겹쳐, 이 도시 plan의 박스 안에 *남의 도시*
-    //   픽셀(대각으로만 닿아 4-연결상 끊긴 조각)이 섞여 들어온다. 그 외래 조각은 건물
-    //   배치의 "남은 통행칸 전부 연결" 불변식을 영구히 깨서 건물이 0개가 된다(전부 도로).
-    //   → rect(이 도시의 land)에서 4-연결 flood fill로 *이 클러스터*만 표시하고, 비멤버
-    //     City 픽셀은 Land로 덮어 downstream이 도시 아님으로 취급. 인접 클러스터는 4-연결
-    //     상 절대 안 닿으므로(placeCities도 4-연결 클러스터링) 자동 배제된다.
+    //   도시는 terrain 픽셀(프리셋=PNG, 절차=doPaint)로 존재한다. bbox 안엔 4-연결로
+    //   분리된 인접 도시(서울↔인천 등) 픽셀이 섞일 수 있는데, 그 외래 조각은 4-연결상
+    //   끊겨 건물 연결성 BFS를 영구히 깨서 건물이 0개가 된다(전부 도로). → 도시 중심에서
+    //   4-연결 flood fill로 *이 클러스터*만 member로 표시하고, 비멤버 City 픽셀은 Land로
+    //   덮는다. 인접 클러스터는 4-연결상 안 닿으므로(placeCities도 4-연결) 자동 배제.
+    //   member는 stage 2 진입점 도시-내부 판정에도 쓰여 함수 스코프로 둔다.
+    auto isCityTerrain = [](worldGrid::Terrain t) {
+        return t == worldGrid::Terrain::CityZone || t == worldGrid::Terrain::CityCenter
+            || t == worldGrid::Terrain::CityRiver || t == worldGrid::Terrain::CitySea;
+        };
+
+    std::vector<std::uint8_t> member(static_cast<std::size_t>(patchW) * patchH, 0);
     {
-        auto isCityTerrain = [](worldGrid::Terrain t) {
-            return t == worldGrid::Terrain::CityZone || t == worldGrid::Terrain::CityCenter
-                || t == worldGrid::Terrain::CityRiver || t == worldGrid::Terrain::CitySea;
-            };
-
-        std::vector<std::uint8_t> member(static_cast<std::size_t>(patchW) * patchH, 0);
-        std::vector<std::pair<int, int>> stack;   // local 좌표
-
-        //seed: 모든 rect 픽셀 (이 도시의 CityZone/CityCenter land)
-        for (const city::CityRect& r : node.rectangles)
-            for (int ry = r.py; ry < r.y1(); ++ry)
-                for (int rx = r.px; rx < r.x1(); ++rx)
+        //seed: 도시 중심에 가장 가까운 City* 픽셀. center는 이 도시 footprint 안이라
+        //  최근접 City 픽셀은 자기 클러스터 소속. 클러스터는 4-연결이라 한 점에서 전체 도달.
+        const int centerPxX = (node.center.x - TILE_BASE_X) / TILE_PER_PIXEL;
+        const int centerPxY = (node.center.y - TILE_BASE_Y) / TILE_PER_PIXEL;
+        const int clX = std::clamp(centerPxX - patchPxX, 0, patchW - 1);
+        const int clY = std::clamp(centerPxY - patchPxY, 0, patchH - 1);
+        int seedLx = -1, seedLy = -1;
+        long long bestD = -1;
+        for (int ly = 0; ly < patchH; ++ly)
+            for (int lx = 0; lx < patchW; ++lx)
+                if (isCityTerrain(cityTerrainBox[static_cast<std::size_t>(ly) * patchW + lx]))
                 {
-                    const int lx = rx - patchPxX;
-                    const int ly = ry - patchPxY;
-                    const std::size_t idx = static_cast<std::size_t>(ly) * patchW + lx;
-                    if (!member[idx]) { member[idx] = 1; stack.emplace_back(lx, ly); }
+                    const long long d = (long long)(lx - clX) * (lx - clX) + (long long)(ly - clY) * (ly - clY);
+                    if (bestD < 0 || d < bestD) { bestD = d; seedLx = lx; seedLy = ly; }
                 }
 
-        //4-연결 확장 — City* 픽셀만 (이 클러스터의 강·해협까지 포함, 외래 도시는 미도달)
+        std::vector<std::pair<int, int>> stack;
+        if (seedLx >= 0)
+        {
+            member[static_cast<std::size_t>(seedLy) * patchW + seedLx] = 1;
+            stack.emplace_back(seedLx, seedLy);
+        }
         constexpr int fdx[4] = { 0, 0, +1, -1 };
         constexpr int fdy[4] = { -1, +1, 0, 0 };
         while (!stack.empty())
@@ -238,16 +239,10 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
                 const int epx = (endpoint.x - TILE_BASE_X) / TILE_PER_PIXEL;
                 const int epy = (endpoint.y - TILE_BASE_Y) / TILE_PER_PIXEL;
 
-                bool inCity = false;
-                for (const city::CityRect& r : node.rectangles)
-                {
-                    if (epx >= r.px && epx < r.x1() && epy >= r.py && epy < r.y1())
-                    {
-                        inCity = true;
-                        break;
-                    }
-                }
-                if (!inCity) continue;
+                //도시 안(이 클러스터 멤버)인지 — 멤버십 마스크로 판정.
+                const int elx = epx - patchPxX, ely = epy - patchPxY;
+                if (elx < 0 || elx >= patchW || ely < 0 || ely >= patchH) continue;
+                if (!member[static_cast<std::size_t>(ely) * patchW + elx]) continue;
 
                 const int dx = endpoint.x - adjacent.x;
                 const int dy = endpoint.y - adjacent.y;

@@ -329,7 +329,6 @@
     <ClCompile Include="code\worldGen_generateWorld.cpp" />
     <ClCompile Include="code\CityPlan.ixx" />
     <ClCompile Include="code\CityPlan_build.cpp" />
-    <ClCompile Include="code\city_decompose.cpp" />
     <ClCompile Include="code\worldGrid.ixx" />
     <ClCompile Include="code\worldGrid_load.cpp" />
     <ClCompile Include="code\worldGrid_mmap.cpp" />

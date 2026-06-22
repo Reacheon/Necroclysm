@@ -38,10 +38,11 @@ export namespace worldGen
         //  사전배치 도시 식별자. 매칭된 preset의 codename, 또는 절차생성/미매칭이면 none.
         //  displayName/landmark 등 도시별 메타데이터는 city::PRESET_CITIES에서 룩업.
 
-        std::vector<city::CityRect> rectangles;
-        //  도시의 직사각형 분해 결과(픽셀 좌표). 절차생성 도시는 placeCities Phase 4에서
-        //  쌓은 1~5개 직사각형 그대로, 사전배치 도시는 PNG 클러스터에서 역분해된 1~N개.
-        //  CityPlan_build가 이 rectangles를 입력으로 받아 도시 내부 layout 생성.
+        int bboxPx = 0, bboxPy = 0;   // footprint bbox 좌상단 픽셀 (raw, 1px=1청크)
+        int bboxW = 0,  bboxH = 0;    // footprint 픽셀 크기
+        //  도시 footprint 경계상자. CityPlan_build가 이 bbox로 terrain 박스를 잡고,
+        //  중심에서 4-연결 flood fill로 실제 클러스터(land+물)를 도출한다. 도시는 이미
+        //  terrain 픽셀(프리셋=PNG, 절차=doPaint)로 존재하므로 직사각형 분해는 불필요.
     };
 
     struct RoadPolyLine

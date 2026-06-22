@@ -713,18 +713,13 @@ static const std::vector<CitySymbol>* symbolsFor(city::CityId id)
     return nullptr;
 }
 
-//도시 footprint(rectangles, 청크-픽셀 단위)의 bbox가 현재 화면과 겹치는지. 중심 픽셀을
+//도시 footprint(bbox, 청크-픽셀 단위)가 현재 화면과 겹치는지. 중심 픽셀을
 //  화면으로(relX이 X 시암 wrap 처리) + footprint 절반+여유 반경으로 근사 컬링.
 static bool cityOnScreen(const MapView& v, const worldGen::CityNode& node)
 {
-    if (node.rectangles.empty()) return false;
-    int minPx = node.rectangles[0].px, minPy = node.rectangles[0].py;
-    int maxPx = node.rectangles[0].x1(), maxPy = node.rectangles[0].y1();
-    for (const auto& r : node.rectangles)
-    {
-        minPx = std::min(minPx, r.px);   minPy = std::min(minPy, r.py);
-        maxPx = std::max(maxPx, r.x1()); maxPy = std::max(maxPy, r.y1());
-    }
+    if (node.bboxW <= 0 || node.bboxH <= 0) return false;
+    const int minPx = node.bboxPx, minPy = node.bboxPy;
+    const int maxPx = node.bboxPx + node.bboxW, maxPy = node.bboxPy + node.bboxH;
     const double cx = v.sX((minPx + maxPx) * 0.5);
     const double cy = v.sY((minPy + maxPy) * 0.5);
     const double rPx = (std::max(maxPx - minPx, maxPy - minPy) * 0.5 + 2.0) * v.curScale;

@@ -96,9 +96,8 @@ namespace worldGen
             Terrain climate;
             city::CityName codename;   // 사전배치 매칭된 codename, 절차생성/미매칭은 none.
 
-            std::vector<city::CityRect> rectangles;
-            //  사전배치: Phase 0의 decomposeClusterToRects 결과. 분해 실패 시 비어 있음.
-            //  절차생성: Phase 4가 페인트하면서 채움. 페인트 실패 시 비어 있음.
+            int bboxPx = 0, bboxPy = 0, bboxW = 0, bboxH = 0;
+            //  footprint bbox(픽셀). 사전배치=클러스터 min/max, 절차생성=페인트한 rect 합집합.
         };
 
         //해안/강 보너스 LUT — squared Euclidean distance(실픽셀²)로 인덱싱.
@@ -218,9 +217,6 @@ namespace worldGen
                 }
             };
 
-            std::vector<std::pair<int,int>> clusterPixels;  // 4×4 분해용 클러스터 픽셀 좌표 누적
-            clusterPixels.reserve(2048);
-
             while (!cityPixels.empty())
             {
                 const std::size_t startIdx = *cityPixels.begin();
@@ -234,7 +230,6 @@ namespace worldGen
                 const int sy0 = static_cast<int>(startIdx / W);
                 int minX = sx0, maxX = sx0, minY = sy0, maxY = sy0;
 
-                clusterPixels.clear();
                 frontier.clear();
                 frontier.push_back(startIdx);
 
@@ -253,7 +248,6 @@ namespace worldGen
                     if (cx > maxX) maxX = cx;
                     if (cy < minY) minY = cy;
                     if (cy > maxY) maxY = cy;
-                    clusterPixels.emplace_back(cx, cy);
                     if (grid.data[curIdx] == Terrain::CityCenter)
                     {
                         sumCenterX += cx;
@@ -354,50 +348,10 @@ namespace worldGen
                         centroidX, centroidY);
                 }
 
-                // 클러스터 → 4×4+ 직사각형 분해 (사전배치 도시 layout 입력).
-                //   히스토그램 max-rect 그리디. minSize=1 (도시 영역 1px 유동화). mask는 CityZone/CityCenter만 (계획서 룰:
-                //   "강이나 바다 픽셀은 사각형 분리에 안 써도 됨"). CityRiver/CitySea는 BFS 클러스터링
-                //   에서 두 직사각형을 묶는 역할이지만 decomposition에서는 제외 — 강이 가로지르는
-                //   Seoul/NY/Hongkong 같은 도시도 north/south 직사각형으로 깔끔히 분리됨.
-                std::vector<city::CityRect> rects;
-                const int bboxW = maxX - minX + 1;
-                const int bboxH = maxY - minY + 1;
-                if (bboxW >= 1 && bboxH >= 1)
-                {
-                    // 진단용 — 클러스터 픽셀 지형 종류별 카운트. PNG 색이 의도대로
-                    // CityZone/Center/River/Sea로 읽혔는지 + bbox 외 다른 잡티 없는지 확인용.
-                    int countZone = 0, countCenter = 0, countRiver = 0, countSea = 0, countOther = 0;
-
-                    std::vector<std::uint8_t> mask(static_cast<std::size_t>(bboxW) * bboxH, 0);
-                    for (const auto& [cx, cy] : clusterPixels)
-                    {
-                        const Terrain t = grid.data[static_cast<std::size_t>(cy) * W + cx];
-                        switch (t)
-                        {
-                        case Terrain::CityZone:   ++countZone;   break;
-                        case Terrain::CityCenter: ++countCenter; break;
-                        case Terrain::CityRiver:  ++countRiver;  break;
-                        case Terrain::CitySea:    ++countSea;    break;
-                        default:                  ++countOther;  break;
-                        }
-                        if (t == Terrain::CityZone || t == Terrain::CityCenter)
-                        {
-                            mask[static_cast<std::size_t>(cy - minY) * bboxW + (cx - minX)] = 1;
-                        }
-                    }
-                    rects = city::decomposeClusterToRects(mask.data(), minX, minY, bboxW, bboxH, 1);
-                    if (rects.empty())
-                    {
-                        const SDL_Color warn{ 0xff, 0xa0, 0x60, 0xff };
-                        prt(warn, L"  [WARN] preset cluster at (%d, %d) bbox %dx%d failed decomposition - layout skipped\n",
-                            centroidX, centroidY, bboxW, bboxH);
-                        prt(L"          cluster pixels: Zone=%d Center=%d River=%d Sea=%d Other=%d (total=%zu)\n",
-                            countZone, countCenter, countRiver, countSea, countOther, clusterPixels.size());
-                    }
-                }
-
-                CityRec rec{ centroidX, centroidY, R, tier, matchedClimate, matchedCodename, {} };
-                rec.rectangles = std::move(rects);
+                // footprint bbox = 클러스터 경계상자. 직사각형 분해 불필요 — 도시는 PNG terrain
+                //   픽셀로 존재하고, CityPlan_build가 중심에서 flood fill로 실제 픽셀을 도출한다.
+                CityRec rec{ centroidX, centroidY, R, tier, matchedClimate, matchedCodename,
+                             minX, minY, maxX - minX + 1, maxY - minY + 1 };
                 cities.push_back(std::move(rec));
             }
 
@@ -956,13 +910,17 @@ namespace worldGen
                 for (const Rect& r : mine) doPaint(r);
                 totalRectsPainted += mine.size();
 
-                //  CityPlan 입력용 — mine을 CityRec.rectangles에 복사 (Rect → city::CityRect).
-                //  X wrap은 후속 CityPlan 단계가 raw 좌표 그대로 처리하므로 여기서는 변환 X.
-                auto& dstRects = cities[i].rectangles;
-                dstRects.reserve(mine.size());
-                for (const Rect& r : mine)
+                //  CityPlan 입력용 bbox — 페인트한 rect 합집합의 경계상자 (mine은 비어있지 않음).
                 {
-                    dstRects.push_back(city::CityRect{ r.x, r.y, r.w, r.h });
+                    int mnX = mine[0].x, mnY = mine[0].y;
+                    int mxX = mine[0].x + mine[0].w, mxY = mine[0].y + mine[0].h;
+                    for (const Rect& r : mine)
+                    {
+                        mnX = std::min(mnX, r.x);         mnY = std::min(mnY, r.y);
+                        mxX = std::max(mxX, r.x + r.w);   mxY = std::max(mxY, r.y + r.h);
+                    }
+                    cities[i].bboxPx = mnX;        cities[i].bboxPy = mnY;
+                    cities[i].bboxW  = mxX - mnX;  cities[i].bboxH  = mxY - mnY;
                 }
 
                 //중심 픽셀 = CityCenter (방금 칠한 CityZone 위에만)
@@ -991,7 +949,7 @@ namespace worldGen
                 c.tier,
                 c.climate,
                 c.codename,
-                std::move(c.rectangles)
+                c.bboxPx, c.bboxPy, c.bboxW, c.bboxH
             });
         }
 

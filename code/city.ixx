@@ -11,7 +11,6 @@ import worldGrid;
 //     - PresetCity: 사전배치 도시 메타데이터 (좌표, 이름, 기후)
 //     - PRESET_CITIES: PNG에 마킹한 ~40개 도시 하드코딩 테이블
 //     - CityId: 런타임 도시 식별자 강타입 (worldGenResult.cities 인덱스 래퍼)
-//     - CityRect + decomposeClusterToRects: 도시 픽셀 footprint 직사각형 분해
 //
 //   책임 (향후):
 //     - LandmarkType + 도시별 랜드마크 매핑 (콜로세움, 빅벤 등)
@@ -162,29 +161,4 @@ export namespace city
     // worldGenResult.cities 인덱스의 강타입 래퍼. CityPlanCache 키 / CityIndex 조회에 사용.
     // enum class라 정수·다른 인덱스와 혼용 불가. std::hash<enum>가 자동 지원 → 맵 키로 바로 사용.
     enum class CityId : std::uint32_t {};
-
-    // ─── 직사각형 (픽셀 좌표) ─────────────────────────────────────────────
-    // 도시를 구성하는 직사각형. w/h는 항상 ≥ minSize (계획서 보장).
-    // 픽셀 좌표(1px=48타일), raw — X 시암 wrap은 호출자가 처리.
-    struct CityRect
-    {
-        int px = 0, py = 0;   // 좌상단 픽셀 좌표 (raw)
-        int w  = 0, h  = 0;   // 폭/높이 픽셀
-
-        constexpr int x1() const noexcept { return px + w; }  // exclusive
-        constexpr int y1() const noexcept { return py + h; }
-    };
-
-    // ─── 클러스터 → 직사각형 분해 ─────────────────────────────────────────
-    // PNG 클러스터링 결과(임의 모양의 City* 픽셀 집합)를 minSize 이상 직사각형들로 분해.
-    //   입력: inMask[(py-py0)*bboxW + (px-px0)] = (그 픽셀이 클러스터 소속이면 1)
-    //         (bboxPxX, bboxPxY) = bbox 좌상단 raw 픽셀 좌표.
-    //   출력: 클러스터를 완전히 덮는 (오버랩 없는) 직사각형 리스트. 분해 실패 시 빈 리스트.
-    //   알고리즘: 수평 슬랩 분해 → 실패 시 백트래킹 폴백. 결정론적. 정의는 city_decompose.cpp.
-    //
-    //   입력 계약: PNG 마킹 규약상 사전배치 도시 클러스터는 항상 ≥minSize×minSize 픽셀
-    //             rect들의 합집합으로 분해 가능하도록 그려져 있음 (작가가 보장).
-    //   출력 보장: 반환되는 모든 CityRect는 w≥minSize ∧ h≥minSize. 호출자는 더 작은
-    //             rect를 가정하지 않아도 됨.
-    std::vector<CityRect> decomposeClusterToRects(const std::uint8_t* inMask, int bboxPxX, int bboxPxY, int bboxW, int bboxH, int minSize = 1);
 }
