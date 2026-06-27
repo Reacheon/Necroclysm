@@ -7,6 +7,7 @@ import worldGrid;
 import worldGen;
 import city;
 import CityPlan;
+import autotile47Index;
 
 // ════════════════════════════════════════════════════════════════════════
 // procGenerate — Sector-level 절차생성의 단일 슈퍼함수.
@@ -212,46 +213,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
         return static_cast<int>(h % static_cast<std::uint64_t>(variantCount));
     };
 
-    //   8 이웃 land 마스크 → 47 prefab 인덱스. GameMaker autotile47 컨벤션.
-    //   외각 코너는 양변 water일 때만 raw 비트 의미. 양변 land 코너는 prefab에서
-    //   자동 처리되므로 raw 무관. 한쪽 변 land 코너도 raw 무관 (변에 흡수).
-    auto autotile47 = [](bool n, bool e, bool s, bool w, bool nw, bool ne, bool sw, bool se) -> int {
-        const bool oNW = nw && !n && !w;
-        const bool oNE = ne && !n && !e;
-        const bool oSW = sw && !s && !w;
-        const bool oSE = se && !s && !e;
-        const int edges = (n ? 1 : 0) + (e ? 1 : 0) + (s ? 1 : 0) + (w ? 1 : 0);
-
-        if (edges == 0)
-        {
-            //   변 0: 외각 코너 16조합. NW=1, NE=2, SE=4, SW=8 비트 합.
-            return (oNW ? 1 : 0) | (oNE ? 2 : 0) | (oSE ? 4 : 0) | (oSW ? 8 : 0);
-        }
-        if (edges == 4) return 46;
-        if (edges == 1)
-        {
-            //   변 1 + 외각 코너 (변 인접 코너 2개는 한쪽 land라 흡수, 나머지 2개만 외각 가능).
-            if (w) return 16 + ((oNE ? 1 : 0) | (oSE ? 2 : 0));
-            if (n) return 20 + ((oSE ? 1 : 0) | (oSW ? 2 : 0));
-            if (e) return 24 + ((oSW ? 1 : 0) | (oNW ? 2 : 0));
-            return 28 + ((oNW ? 1 : 0) | (oNE ? 2 : 0));   // s
-        }
-        if (edges == 2)
-        {
-            if (w && e) return 32;   // L+R 수직 통로
-            if (n && s) return 33;   // T+B 수평 통로
-            //   변 2 인접: 양변 land 코너 1개(자동 처리), 양변 water 코너 1개(외각 가능).
-            if (n && w) return oSE ? 35 : 34;   // T+L, 외각 SE
-            if (n && e) return oSW ? 37 : 36;   // T+R, 외각 SW
-            if (e && s) return oNW ? 39 : 38;   // R+B, 외각 NW
-            return oNE ? 41 : 40;               // L+B, 외각 NE
-        }
-        //   edges == 3: 데드엔드. 양변 land 코너 2개 자동 처리, 외각 가능 0개.
-        if (!s) return 42;   // L+T+R
-        if (!e) return 43;   // L+T+B
-        if (!n) return 44;   // L+B+R
-        return 45;           // T+R+B
-    };
+    //   8 이웃 land 마스크 → 47 prefab 인덱스는 공유 모듈 autotile47Index로(Map GUI 산맥과 동일 컨벤션).
+    //   여기선 자기=물, bool=land(이웃이 육지). 외각 코너는 양변 water일 때만 raw 비트 의미.
 
     for (int dy = 0; dy < SectorCoord::TILES; ++dy)
     {
@@ -281,7 +244,7 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             const bool se = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx + 1]);
             const bool sw = isLandTerrain(terr[static_cast<std::size_t>(fy + 1) * FIELD_SZ + fx - 1]);
 
-            const int idx = autotile47(n, e, s, w, nw, ne, sw, se);
+            const int idx = autotile47Index(n, e, s, w, nw, ne, sw, se);
             const int variant = pickVariant(rawPx, rawPy, worldGrid::shoreSplineVariantCount);
 
             //   prefab 마스크 룩업: 자기 픽셀 내부 (localX, localY) 위치가 land이면 dirt 채움.

@@ -993,6 +993,14 @@ public:
 	void openContextMenu(Point2 targetGrid)
 	{
 		std::vector<act> inputOptions;
+
+		// 줌아웃 직후(주변 청크 미스트리밍) 먼 타일 우클릭 시, 타깃이 미생성 청크면
+		// 아래 TileVehicle/TileWall/TileEntity 등 getTile().at()이 std::out_of_range를
+		// 던져 종료된다. 미로드 타일엔 띄울 메뉴가 없으므로 일찍 빠진다(HUD_draw의 호버 가드와 동일).
+		int targetChunkX, targetChunkY;
+		World::ins()->changeToChunkCoord(targetGrid.x, targetGrid.y, targetChunkX, targetChunkY);
+		if (!World::ins()->existChunk(targetChunkX, targetChunkY, PlayerZ())) return;
+
 		//문닫기 추가
 		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{

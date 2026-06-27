@@ -14,6 +14,7 @@ import drawSprite;
 import globalVar;
 import globalTime;
 import connectGroupExtraIndex;
+import autotile47Index;
 import checkCursor;
 import Player;
 import World;
@@ -33,8 +34,8 @@ import mapDiscovery;
 //   레이어:
 //     ① 베이스 지형 — tileset.png. 청크 1개당 타일 1개(잔디/해수/담수). 배치 렌더. 도시 영역도
 //                     잔디 — 도시는 ③-b 도로·다리 + ④ 건물 심볼로만 드러난다.
-//     ② 산 심볼     — worldGrid::Terrain::Mountain. 본체 floor와 동일 16타일 오토타일
-//                     (connectGroupExtraIndex)로 mapset1by1 #64~79 중 선택.
+//     ② 산 심볼     — worldGrid::Terrain::Mountain. 47-piece 블롭 오토타일
+//                     (autotile47Index)로 auto47Mountain.png(16px=1청크) 중 선택.
 //     ③ 도로 심볼   — ③-a 외부 도로(activePolyLines 래스터)는 autotile(직선/코너/T/십자) mapset1by1로.
 //                     도시↔도시 연결 도로는 어느 CityPlan에도 안 들어가므로 폴리라인을 직접 청크
 //                     셀로 래스터화. ③-b 도시 내부 도로·다리(CityPlan.roadCells). 둘 다 *미발견
@@ -539,22 +540,25 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
             if (drawFoam && !isSea(ix, iy))
                 emitFoam(ix, iy, isSea, seaAnim, 200, br);
 
-            //② 산 심볼 (16타일 오토타일) — 본체 floor 타일과 동일 규약(connectGroupExtraIndex).
-            //  카디널 4방향 이웃이 산이면 연결 → mapset1by1 #64(베이스) + 0~15. 건물과 같은
-            //  3청크 중앙 정렬(art는 중앙 16px)이라 인접 산끼리 가장자리가 매끈히 이어짐. 항상 수집.
+            //② 산 심볼 (47-piece 블롭 오토타일) — auto47Mountain.png. 8 이웃 기반이라
+            //  기존 16타일(mapset #64~79, 3청크 중앙정렬)보다 코너·변 디테일이 풍부.
+            //  각 bool = "그 이웃이 非산"(대비지형) — shoreSpline과 동일 autotile47Index 컨벤션.
+            //  셀=16px=1청크라 오프셋 없이 자기 청크 칸에 그대로 그림.
             //  isMtn = 위성 Mountain ∪ 절차(isMountainChunk) — 둘이 한 오토타일로 연결됨.
             if (isMtn(ix, iy))
             {
-                const int idx = 64 + connectGroupExtraIndex(
-                    isMtn(ix, iy - 1), isMtn(ix, iy + 1), isMtn(ix - 1, iy), isMtn(ix + 1, iy));
-                symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
-                    (int)std::lround(v.sX((double)(ix - 1))),
-                    (int)std::lround(v.sY((double)(iy - 1))), br });
+                auto bg = [&](int x, int y) { return !isMtn(x, y); };   // 대비지형(非산)
+                const int idx = autotile47Index(
+                    bg(ix, iy - 1), bg(ix + 1, iy), bg(ix, iy + 1), bg(ix - 1, iy),
+                    bg(ix - 1, iy - 1), bg(ix + 1, iy - 1), bg(ix - 1, iy + 1), bg(ix + 1, iy + 1));
+                symOut.push_back(SymDraw{ (float)iy, spr::auto47Mountain, idx,
+                    (int)std::lround(v.sX((double)ix)),
+                    (int)std::lround(v.sY((double)iy)), br });
             }
 
-            //③ 숲 심볼 (16타일 오토타일) — 산맥(②)과 동일 규약·패스. 위성에 없는 절차적
+            //③ 숲 심볼 (16타일 오토타일, connectGroupExtraIndex) — 위성에 없는 절차적
             //  숲이라 terrain이 아닌 공유 술어 worldGen::isForestChunk(LF 버퍼)로 판정 →
-            //  mapset1by1 #96(베이스) + 0~15. 산과 같은 3청크 중앙 정렬.
+            //  mapset1by1 #96(베이스) + 0~15. 건물과 같은 3청크 중앙 정렬(art는 중앙 16px).
             if (isFor(ix, iy))
             {
                 const int idx = 96 + connectGroupExtraIndex(
@@ -896,8 +900,8 @@ namespace
     SDL_Texture*  g_worldTex  = nullptr;            // 전세계 저해상도 백드롭(검정 깜빡임 방지)
     std::uint64_t g_worldSeed = ~0ull;
 
-    //지형 타입 → 위성지도풍 색. 도시(CityZone/Center)는 육지색과 동일 — 지형 색으로
-    //  도시 위치가 새면 전장의 구름이 무의미해지므로. 도시는 발견된 점으로만 드러냄.
+    //지형 타입 → 위성지도풍 색. 도시(CityZone/Center)는 회색 footprint로 표기 — 위성 줌에서
+    //  도시를 지형색에 묻지 않고 명시적으로 드러낸다. 내부 물(CityRiver/CitySea)은 물색 유지.
     SDL_Color worldTerrainColor(worldGrid::Terrain t)
     {
         using T = worldGrid::Terrain;
@@ -913,7 +917,8 @@ namespace
         case T::Monsoon:                                return {  92, 142,  82, 255 };
         case T::InsularRainforest:                      return {  54, 122,  74, 255 };
         case T::ContinentalRainforest:                  return {  44, 112,  64, 255 };
-        default:                                        return {  86, 132,  78, 255 };   // Land/CityZone/CityCenter
+        case T::CityZone: case T::CityCenter:           return { 128, 128, 128, 255 };   // 도시 footprint = 회색
+        default:                                        return {  86, 132,  78, 255 };   // Land
         }
     }
 
@@ -1349,6 +1354,7 @@ public:
             //색조 모드 원복 — 텍스처 상태라 다른 패스/다음 프레임 오염 방지.
             SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
             SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
+            SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
 
             setZoom(1.0f);
 

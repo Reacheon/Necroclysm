@@ -139,7 +139,7 @@ export namespace worldGrid
     //   procGenerate는 (seed + rawPx + rawPy) hash로 variant 선택 → 8 이웃 land
     //   마스크 → 47 인덱스 → shoreSplineMask[variant][idx] 룩업 → 타일 dirt/water 결정.
     //   variant끼리 *변/코너 경계 패턴은 동일*하게 그려져야 인접 픽셀에서 점프 X.
-    //   인덱스 매핑은 GameMaker autotile47 컨벤션 (Sector_procGenerate.cpp 참조).
+    //   인덱스 매핑은 GameMaker autotile47 컨벤션 (autotile47Index 모듈 참조).
     //============================================================
     inline constexpr int SHORE_TILE_SIZE     = 24;
     inline constexpr int SHORE_INDEX_COUNT   = 47;

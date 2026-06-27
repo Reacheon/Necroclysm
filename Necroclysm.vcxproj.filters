@@ -453,6 +453,9 @@
     <ClCompile Include="code\util\col2Str.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\autotile47Index.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
     <ClCompile Include="code\util\connectGroupExtraIndex.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>

@@ -45,7 +45,13 @@ void setFloor(Point3 coord, int val)
     World::ins()->getTile(coord.x, coord.y, coord.z).setFloor(val);
 }
 
-Entity* TileEntity(int x, int y, int z) { return (Entity*&)World::ins()->getTile(x, y, z).EntityPtr; }
+Entity* TileEntity(int x, int y, int z)
+{
+    // 줌아웃 hover 판정 등 로드 영역 경계 밖을 조회할 수 있는 read-only 경로가 호출하므로
+    // getTile(.at() 예외) 대신 tryGetTile로 미로드 청크는 nullptr 처리 (TileFloor와 동일 패턴).
+    TileData* t = World::ins()->tryGetTile(x, y, z);
+    return t != nullptr ? t->EntityPtr.get() : nullptr;
+}
 
 void EntityPtrMove(Point3 startCoor, Point3 endCoor)
 {
@@ -284,6 +290,10 @@ void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWa
 
 bool isWalkable(Point3 coord)
 {
+    // 미로드 청크 타일은 보행 불가로 간주. 아래 TileVehicle 등 getTile().at()이 던지는
+    // std::out_of_range 방지 — 월드 로드 직후 청크 스트리밍 전, 자동이동 A*가 플레이어
+    // 주변 박스(±20)를 훑으며 미로드 타일에 닿을 수 있다. 미탐사 void는 경로가 될 수 없으므로 false가 맞다.
+    if (World::ins()->tryGetTile(coord.x, coord.y, coord.z) == nullptr) return false;
     if (TileWall(coord.x, coord.y, coord.z) != itemID::none) return false;
     else if (TileProp(coord.x, coord.y, coord.z) != nullptr && TileProp(coord.x, coord.y, coord.z)->leadItem.checkFlag(itemFlag::PROP_WALKABLE) == false) return false;
     else if (TileEntity(coord.x, coord.y, coord.z) != nullptr) return false;

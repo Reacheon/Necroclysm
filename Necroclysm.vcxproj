@@ -405,6 +405,7 @@
     <ClCompile Include="code\turnCycleLoop.ixx" />
     <ClCompile Include="code\turnWait.ixx" />
     <ClCompile Include="code\util\aStar.ixx" />
+    <ClCompile Include="code\util\autotile47Index.ixx" />
     <ClCompile Include="code\util\col2Str.ixx" />
     <ClCompile Include="code\util\connectGroupExtraIndex.ixx" />
     <ClCompile Include="code\util\Corouter.ixx" />
