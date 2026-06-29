@@ -42,4 +42,10 @@ export void dataLoader()
 	readTSV(systemPath.c_str(), tempSysStr);
 	systemPath.clear();
 	for (int i = 0; i < tempSysStr.size(); i++) { sysStr.push_back(tempSysStr[i][1]); }
+
+	//사전배치 도시 표시명 로드 — codename(enum 값)으로 인덱싱(헤더=슬롯0=none, 데이터=1부터). col1=현재 팩 언어.
+	std::wstring cityPath = L"language/" + option::language + L"/cityName.tsv";
+	std::vector<std::array<std::wstring, 3>> tempCity(1, { L" ", L" ", L" " });
+	readTSV(cityPath.c_str(), tempCity);
+	for (int i = 0; i < tempCity.size(); i++) { cityName.push_back(tempCity[i][1]); }
 }

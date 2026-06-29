@@ -306,28 +306,12 @@ static std::uint64_t symHash(int px, int py)
     return h;
 }
 
-//[프로토타입] 절차생성 도시 임시 이름 — center 타일 해시로 결정론적 의사 영어 지명.
-//  매 프레임 같은 결과여야 깜빡임이 없으므로 좌표 해시 기반(난수 X). 접두·접미 각 16개라
-//  & 15로 인덱싱. TODO: 향후 문화권(직사각형 구역) 기반 생성기로 교체할 자리표시자.
-static std::wstring placeholderCityName(int tileX, int tileY)
-{
-    static const wchar_t* pre[] = {
-        L"Ash", L"Black", L"North", L"Red", L"Stone", L"West", L"Green", L"Frost",
-        L"Iron", L"Gray", L"Pine", L"Bay", L"Fort", L"Salt", L"Wolf", L"Crow" };
-    static const wchar_t* suf[] = {
-        L"ton", L"ford", L"field", L"haven", L"burg", L"vale", L"port", L"wood",
-        L"ridge", L"mont", L"dale", L"reach", L"hollow", L"crest", L"moor", L"stead" };
-    const std::uint64_t h = symHash(tileX, tileY);
-    return std::wstring(pre[(h >> 3) & 15]) + suf[(h >> 11) & 15];
-}
-
-//사전배치 도시 표시명 — PRESET_CITIES에서 codename 룩업(ASCII displayName → wide). 미발견 시 빈 문자열.
+//사전배치 도시 표시명 — codename(enum 값)으로 cityName.tsv 적재 벡터(globalVar::cityName) 인덱싱.
+//  슬롯0(none)·범위 밖이면 빈 문자열(호출부가 빈 라벨 스킵). 콘솔 로그용 영어명은 PRESET_CITIES.displayName 유지.
 static std::wstring presetDisplayName(city::CityName cn)
 {
-    for (const auto& pc : city::PRESET_CITIES)
-        if (pc.codename == cn)
-            return std::wstring(pc.displayName.begin(), pc.displayName.end());
-    return {};
+    const std::size_t i = static_cast<std::size_t>(cn);
+    return (i != 0 && i < cityName.size()) ? cityName[i] : std::wstring{};
 }
 
 
@@ -402,9 +386,11 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
 
     using T = worldGrid::Terrain;
 
-    const int cp = v.chunkPx();
-    const double halfW = v.viewW * 0.5 / cp;
-    const double halfH = v.viewH * 0.5 / cp;
+    //컬링 반경은 정수 chunkPx()가 아닌 *정확한* curScale로 — 줌 애니 중 cp(=lround)가 curScale보다
+    //  크면(각 반올림 구간 하단, 예 curScale∈[4.5,5)→cp=5) 범위가 화면보다 좁아져 가장자리에 베이스
+    //  타일이 안 깔리고 배경(검정)이 비쳐 깜빡인다. 실제 quad는 sX/sY(curScale)로 그리므로 반경도 동일 기준.
+    const double halfW = v.viewW * 0.5 / v.curScale;
+    const double halfH = v.viewH * 0.5 / v.curScale;
 
     const int minPX = (int)std::floor(v.centerPX - halfW) - 2;
     const int maxPX = (int)std::ceil (v.centerPX + halfW) + 2;
@@ -851,7 +837,7 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 
 //⑥ 도시 이름 라벨 — 도시 중심에 표기. CityPlan 캐시 없이 activeCities의 center를 직접 사용
 //   (peek로 캐시된 도시만 보는 건물/도로와 달리 전 도시 라벨 가능). 사전배치=PRESET_CITIES
-//   displayName, 절차생성(codename==none)=placeholderCityName 자리표시자.
+//   displayName, 절차생성(codename==none)=nameGen 영어식 지명 생성기(center 해시 seed).
 //   픽셀폰트 size 12를 zoomScale로 NEAREST 스케일(격자 보존). 배경은 반투명 검정 박스.
 //   발견 여부 무관하게 화면 내 전 도시 표기 — 청크맵에선 도시 layout(?건물+도로망)이 이미
 //   보이므로 이름도 같이 노출. 클러터는 화면 컬링으로만 제한(저배율 Satellite 모드는
@@ -867,6 +853,9 @@ static void drawCityLabels(const MapView& v)
     setFont(fontType::pixel);
     setFontSize(12);
 
+    //절차도시 이름을 그릴 문자체계 — 현재 언어팩 기준. 같은 seed면 라틴/한글이 음차 관계(향후 cityName.tsv).
+    const nameGen::Script nameScript = (option::language == L"Korean") ? nameGen::Script::Hangul : nameGen::Script::Latin;
+
     for (const auto& node : *cities)
     {
         if (node.center.z != v.z) continue;
@@ -877,7 +866,7 @@ static void drawCityLabels(const MapView& v)
 
         const std::wstring name = (node.codename != city::CityName::none)
             ? presetDisplayName(node.codename)
-            : placeholderCityName(node.center.x, node.center.y);
+            : nameGen::placeName(symHash(node.center.x, node.center.y), nameScript);
         if (name.empty()) continue;
 
         const int cx = (int)std::lround(sxd);
@@ -902,6 +891,9 @@ static void drawCityLabels(const MapView& v)
 //  텍셀당 ~20청크라 중간 줌에서 ~90배 확대돼 뭉개진다(눈 아픔). 대신 "보이는 영역"만
 //  화면 해상도로 그때그때 재샘플링 → 텍셀 ≈ 화면픽셀 ≈ 1청크라 어느 줌에서든 선명.
 //  카메라(sX/sY/curScale)를 타일맵과 공유 → LOD 경계를 넘나들어도 위치·스케일 연속.
+//  전장의 구름 — 위성 텍스처를 구울 때 미발견 청크 텍셀을 청크맵과 동일한 fogBright로 어둡게
+//  "베이크". 별도 오버레이 없이 카메라와 정합되며, 발견 청크 수(mapDiscovery::count)가 바뀌면
+//  캐시를 무효화해 새로 탐험한 영역이 밝아진다(맵 보는 중엔 발견이 안 바뀌므로 재빌드 없음).
 namespace
 {
     SDL_Texture*  g_satTex  = nullptr;
@@ -909,9 +901,11 @@ namespace
     double        g_satWX0  = 0.0, g_satWY0 = 0.0;  // 덮는 월드 rect 좌상단(청크좌표, X unwrapped)
     double        g_satCPT  = -1.0;                 // chunks per texel(해상도). <0 = 무효
     std::uint64_t g_satSeed = ~0ull;                // worldSeed 바뀌면 재빌드
+    std::size_t   g_satDisc = static_cast<std::size_t>(-1);   // 발견 청크 수 바뀌면 재빌드(fog 베이크)
 
     SDL_Texture*  g_worldTex  = nullptr;            // 전세계 저해상도 백드롭(검정 깜빡임 방지)
     std::uint64_t g_worldSeed = ~0ull;
+    std::size_t   g_worldDisc = static_cast<std::size_t>(-1); // 발견 청크 수 바뀌면 재빌드(fog 베이크)
 
     //지형 타입 → 위성지도풍 색. 도시(CityZone/Center)는 회색 footprint로 표기 — 위성 줌에서
     //  도시를 지형색에 묻지 않고 명시적으로 드러낸다. 내부 물(CityRiver/CitySea)은 물색 유지.
@@ -940,7 +934,8 @@ namespace
     SDL_Texture* worldMapTexture()
     {
         if (!worldGrid::worldPixelMmapActive()) return nullptr;
-        if (g_worldTex && g_worldSeed == worldSeed) return g_worldTex;
+        const std::size_t disc = mapDiscovery::count();   // 발견 상태 변화 감지(fog 베이크 무효화)
+        if (g_worldTex && g_worldSeed == worldSeed && g_worldDisc == disc) return g_worldTex;
         if (g_worldTex) { SDL_DestroyTexture(g_worldTex); g_worldTex = nullptr; }
 
         constexpr int TW = 2160, TH = 1080;   // 2:1 (월드 비율)
@@ -956,15 +951,17 @@ namespace
             for (int tx = 0; tx < TW; ++tx)
             {
                 const int px = static_cast<int>(static_cast<std::int64_t>(tx) * WORLD_PIXEL_W / TW);
+                const Uint8 br = fogBright(px, py);   // 전장의 구름 — 미발견 청크 어둡게(청크맵과 동일 강도)
                 const SDL_Color c = worldTerrainColor(worldGrid::worldPixel(px, py));
                 buf[static_cast<std::size_t>(ty) * TW + tx] =
-                    (static_cast<std::uint32_t>(c.r) << 24) | (static_cast<std::uint32_t>(c.g) << 16)
-                  | (static_cast<std::uint32_t>(c.b) <<  8) |  0xFFu;
+                    (static_cast<std::uint32_t>(c.r * br / 255) << 24) | (static_cast<std::uint32_t>(c.g * br / 255) << 16)
+                  | (static_cast<std::uint32_t>(c.b * br / 255) <<  8) |  0xFFu;
             }
         }
         SDL_UpdateTexture(tex, nullptr, buf.data(), TW * static_cast<int>(sizeof(std::uint32_t)));
         g_worldTex  = tex;
         g_worldSeed = worldSeed;
+        g_worldDisc = disc;
         return tex;
     }
 
@@ -974,6 +971,7 @@ namespace
     SDL_Texture* satelliteTexture(const MapView& v, double& oWX0, double& oWY0, double& oCPT)
     {
         if (!worldGrid::worldPixelMmapActive()) return nullptr;
+        const std::size_t disc = mapDiscovery::count();   // 발견 상태 변화 감지(fog 베이크 무효화)
 
         //텍스처 크기 — 화면 비율, 1텍셀≈1화면픽셀 목표. (TW가 선명도/빌드비용 튜닝 포인트.)
         constexpr int TW = 1280;
@@ -988,14 +986,19 @@ namespace
         const double wx0 = v.centerPX - coverW * 0.5;
         const double wy0 = v.centerPY - coverH * 0.5;
 
-        //재사용 판정 — 보이는 영역이 캐시 rect 안 + 해상도 ±25% 이내 + 시드 동일.
+        //재사용 판정 — 커버리지(가시영역이 캐시 rect 안)와 해상도(±25%)를 분리.
         const double visW = v.viewW / v.curScale, visH = v.viewH / v.curScale;
-        const bool resOK   = g_satCPT > 0 && cpt >= g_satCPT * 0.8 && cpt <= g_satCPT * 1.25;
-        const bool coverOK = g_satTex && g_satSeed == worldSeed && resOK
+        const bool coversView = g_satTex
             && v.centerPX - visW * 0.5 >= g_satWX0 && v.centerPX + visW * 0.5 <= g_satWX0 + g_satTW * g_satCPT
             && v.centerPY - visH * 0.5 >= g_satWY0 && v.centerPY + visH * 0.5 <= g_satWY0 + g_satTH * g_satCPT;
+        const bool resOK = g_satCPT > 0 && cpt >= g_satCPT * 0.8 && cpt <= g_satCPT * 1.25;
 
-        if (g_satTex && g_satSeed == worldSeed && (coverOK || v.animating))
+        //정지 시엔 커버+해상도 둘 다 맞을 때만 재사용(아니면 뷰에 맞게 재빌드 → 최선명).
+        //  애니 중엔 *커버될 때만* 재사용하고 해상도 드리프트는 무시 — 줌인은 커버가 유지되니
+        //  그대로 재사용(미세 텍스처를 화면에 축소/확대), 줌아웃은 뷰가 커져 커버를 잃는 순간
+        //  재빌드해 풀스크린 커버를 복구한다(백드롭 뿌얘짐 제거). 커버 경계마다만 재빌드라
+        //  매프레임 재빌드는 아님(원작자가 피하려던 비용은 그대로 회피).
+        if (g_satTex && g_satSeed == worldSeed && g_satDisc == disc && coversView && (resOK || v.animating))
         {
             oWX0 = g_satWX0; oWY0 = g_satWY0; oCPT = g_satCPT;
             return g_satTex;
@@ -1018,16 +1021,17 @@ namespace
             const bool yOOB = (wy < 0 || wy >= WORLD_PIXEL_H);
             for (int tx = 0; tx < TW; ++tx)
             {
-                const worldGrid::Terrain t = yOOB ? worldGrid::Terrain::Sea
-                    : worldGrid::worldPixel(worldWrap::wrapPixelX((int)std::lround(wx0 + tx * cpt)), wy);
+                const int wx = worldWrap::wrapPixelX((int)std::lround(wx0 + tx * cpt));
+                const worldGrid::Terrain t = yOOB ? worldGrid::Terrain::Sea : worldGrid::worldPixel(wx, wy);
+                const Uint8 br = fogBright(wx, wy);   // 전장의 구름 — 미발견 청크 어둡게(청크맵과 동일)
                 const SDL_Color c = worldTerrainColor(t);
                 buf[static_cast<std::size_t>(ty) * TW + tx] =
-                    (static_cast<std::uint32_t>(c.r) << 24) | (static_cast<std::uint32_t>(c.g) << 16)
-                  | (static_cast<std::uint32_t>(c.b) <<  8) |  0xFFu;
+                    (static_cast<std::uint32_t>(c.r * br / 255) << 24) | (static_cast<std::uint32_t>(c.g * br / 255) << 16)
+                  | (static_cast<std::uint32_t>(c.b * br / 255) <<  8) |  0xFFu;
             }
         }
         SDL_UpdateTexture(g_satTex, nullptr, buf.data(), TW * static_cast<int>(sizeof(std::uint32_t)));
-        g_satWX0 = wx0; g_satWY0 = wy0; g_satCPT = cpt; g_satSeed = worldSeed;
+        g_satWX0 = wx0; g_satWY0 = wy0; g_satCPT = cpt; g_satSeed = worldSeed; g_satDisc = disc;
         oWX0 = wx0; oWY0 = wy0; oCPT = cpt;
         return g_satTex;
     }
@@ -1061,9 +1065,10 @@ static void drawWorldView(const MapView& v)
         }
     }
 
-    //② 고해상도 윈도우 — 줌 안정(애니 X) + 광역(coverW≥월드폭/2)이 아닐 때만 위에 덧그려 선명.
-    //  줌 애니 중엔 스킵(백드롭만) → 스테일 윈도우가 줌하며 어긋나 보이는 것·매프레임 재빌드 방지.
-    if (!v.animating && (v.viewW / v.curScale) * 1.5 < static_cast<double>(WORLD_PIXEL_W) * 0.5)
+    //② 고해상도 윈도우 — 광역(coverW≥월드폭/2)이 아니면 백드롭 위에 덧그려 선명. 줌 애니 중에도
+    //  그린다: satelliteTexture가 애니 중 커버를 보장(커버 잃으면 재빌드)하므로 항상 화면을 덮어
+    //  줌인/줌아웃 모두 백드롭 뿌얘짐이 안 보인다. (정지 시엔 뷰에 정확히 맞게 재빌드되어 최선명.)
+    if ((v.viewW / v.curScale) * 1.5 < static_cast<double>(WORLD_PIXEL_W) * 0.5)
     {
         double wx0, wy0, cpt;
         if (SDL_Texture* win = satelliteTexture(v, wx0, wy0, cpt))

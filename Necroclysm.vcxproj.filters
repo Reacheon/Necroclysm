@@ -396,6 +396,9 @@
     <ClCompile Include="code\util\lineMaker.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
+    <ClCompile Include="code\util\nameGen.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
     <ClCompile Include="code\util\nanoTimer.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>

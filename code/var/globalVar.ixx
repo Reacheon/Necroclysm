@@ -57,6 +57,7 @@ export namespace debug
 };
 
 export std::vector<std::wstring> sysStr;
+export std::vector<std::wstring> cityName;   //사전배치 도시 표시명 — codename(enum 값) 인덱스. cityName.tsv에서 로드.
 
 export namespace timer
 {

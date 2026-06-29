@@ -82,6 +82,12 @@ namespace worldGen
         static constexpr double WATER_PEAK[3] = { 1.5, 1.0, 0.4 };   // T1, T2, T3
         static constexpr double WATER_TAU [3] = { 8.0, 14.0, 25.0 }; // 실픽셀 단위
 
+        //티어별 내륙 클리어런스² (실픽셀², dSq 비교용). 절차생성 도시 다트는 가장 가까운 물에서
+        //  √CLEARANCE_SQ = {24,16,8}px 이상 떨어진 곳에만 허용한다. 유기 성장 footprint가 물
+        //  경계를 곡선으로 끌어안지 않도록(물가=매립지식 직각, 미지원) 애초에 물에서 뗀다. 해안
+        //  도시 리얼리즘은 사전배치(위성)가 전담. 센티넬(50px 내 물 없음)은 항상 통과(매우 내륙).
+        static constexpr int CLEARANCE_SQ[3] = { 24*24, 16*16, 8*8 };  // T1, T2, T3
+
         //══════════════════════════════════════════════════════════════════
         // 내부 타입 — placeCities 안에서만 사용
         //══════════════════════════════════════════════════════════════════
@@ -600,8 +606,13 @@ namespace worldGen
                     continue;
                 }
 
-                //2. 로컬 물 스캔 + 점수
+                //2. 로컬 물 스캔 + 내륙 클리어런스 게이트 + 점수
                 const int dSq = scanForWaterSq(px, py);
+
+                //내륙 바이어스 — 물에 너무 가까운 다트는 컷. 절차도시는 물에서 떨어진 내륙에만 배치돼야
+                //  유기 성장 footprint가 물 경계를 곡선으로 따라가지 않는다(물가=직각, 해안도시는 사전배치 전담).
+                if (dSq < CLEARANCE_SQ[static_cast<int>(tier)]) { ++dr.rejectScore; continue; }
+
                 const double s = base * waterLut.get(dSq, tier) * latLut[py];
 
                 //3. 점수 비례 accept
@@ -661,48 +672,41 @@ namespace worldGen
         const std::int64_t tProc = getNanoTimer();
 
         //══════════════════════════════════════════════════════════════════
-        // Phase 4 : 절차생성 도시 영역 페인트
-        //   각 절차생성 도시(인덱스 ≥ preMarkedCount)에 직사각형 1~5개 폴리곤을
-        //   결정해 CityZone 픽셀로 그리드에 그린다. 사전배치 도시(PNG 클러스터)는
-        //   건드리지 않음.
+        // Phase 4 : 절차생성 도시 영역 페인트 (유기 성장 모델)
+        //   각 절차생성 도시(인덱스 ≥ preMarkedCount)의 footprint를 직사각형 합집합이 아니라
+        //   *유기적 blob*으로 그린다. 도시 중심 부근 씨앗에서 출발해, 점수가 낮은 프론티어
+        //   픽셀부터 면적 예산만큼 편입하는 가중 성장(weighted growth):
         //
-        //   목적: Map.ixx 월드맵에 절차생성 도시도 영역으로 표시 + Sector_procGenerate
-        //   /buildRoadNetwork가 사전배치와 동일한 단일 인터페이스로 처리.
+        //       score(p) = (가장 가까운 씨앗까지 거리) - amp × 부호fBm(p)   (fBm = 다옥타브 value noise)
         //
-        //   결정론: 도시별 시드 = seed XOR (i × golden_ratio). 동일 입력 → 동일 폴리곤.
+        //   거리항 → 콤팩트, fBm항 → 넓은 lobe + 가장자리 삐죽함(돌출/함몰). 직사각형 티 제거.
+        //   대도시(T1)는 씨앗 여러 개 → 다중심 메트로. 결과는 사전배치(위성) 도시처럼
+        //   임의 경계의 픽셀 blob이라, 하류(CityPlan/Sector/도로)는 동일 인터페이스로 처리.
         //
-        //   배치 룰 (carving 방지 + 물 1px 버퍼):
-        //     - 직사각형 본체 픽셀: 전부 paintable 자연 지형이거나 자기 도시의 이전 직사각형
-        //       (다른 도시 영역/Sea/River/Lake/Mountain/Polar 침범 시 reject)
-        //     - 직사각형 둘레 1px 버퍼: water(Sea/River/Lake/CityRiver/CitySea) 금지
-        //       (해안/강가 도시도 최소 1px 간격 유지 — 시각적 분리)
-        //   → 결과 폴리곤은 항상 완전한 직사각형 합집합 (carving 없음).
+        //   물 처리(내륙 한정): 물/비페인터블 픽셀은 프론티어에 안 넣고, 물 1px 버퍼(SETBACK)
+        //   안의 픽셀도 제외 → blob은 물에 닿지 않는다. 다트 단계의 내륙 클리어런스(CLEARANCE_SQ)와
+        //   합쳐 절차도시는 내륙에 머문다. 물가 경계의 직각 매립(이스탄불/인천식)은 미지원(향후 B안).
         //
-        //   1~5 직사각형 변동:
-        //     - 첫 직사각형: 도시 중심 기준 중앙 정렬, MAX_FIRST_ATTEMPTS회 재시도
-        //     - 추가 직사각형: 기존 직사각형 중 하나 골라서 NSEW 한 변에 부착, 공유변 보장
-        //     - 어느 직사각형이라도 못 끼우면 종료 (그 도시는 더 작은 폴리곤으로 마무리)
-        //     - 첫 직사각형도 실패 시 폴리곤 0개 → 도시 페인트 스킵 (점만 남음)
+        //   결정론: 도시별 시드 = seed XOR (i × golden_ratio). 동일 입력 → 동일 blob.
         //
-        //   강 픽셀 분리(이스탄불식)는 미지원, 향후 추가 가능.
+        //   유령 도시: 씨앗(중심 부근 페인터블 픽셀)을 못 찾으면 페인트 0 → 점만 남음(스킵).
+        //   내륙 다트는 성장 여지가 충분해 해안 슬리버발 유령(구 직사각형 페인터 버그)은 사실상 소멸.
         //
-        //   프로토타입 — tier별 크기/직사각형 수는 게임 플레이 보고 조정.
+        //   프로토타입 — tier별 반경/씨앗 수/노이즈 진폭은 게임 플레이 보고 조정.
         //══════════════════════════════════════════════════════════════════
         {
-            //tier별 직사각형 한 변 길이 분포 (픽셀). R_T* 안에 들어오는 범위.
-            //  넓은 범위로 폭/높이 독립 롤 → 정사각형부터 가늘고 긴 모양까지 다양.
-            auto tierRange = [](CityTier t) noexcept -> std::pair<int,int> {
+            //tier별 기준 반경 분포(픽셀) — 면적 예산 = π·r²·0.92, 노이즈 스케일·진폭의 기준.
+            auto tierBaseRadius = [](CityTier t) noexcept -> std::pair<int,int> {
                 switch (t) {
-                    case CityTier::T1: return {20, 50};   // 중심 정렬 first rect ±25 → maxExtent 60 안에 여유
-                    case CityTier::T2: return {10, 25};
-                    case CityTier::T3: return { 7, 15};
+                    case CityTier::T1: return {22, 38};
+                    case CityTier::T2: return {11, 20};
+                    case CityTier::T3: return { 5, 10};
                 }
-                return {7, 15};
+                return {5, 10};
             };
 
-            //tier별 도시 *전체* 크기 한도 — CityCenter에서 폴리곤 최외곽 픽셀까지 max 거리(픽셀).
-            //  현실 도시 스케일 기준: T1 bbox ≤ 120×120 (~Beijing), T2 ≤ 60×60, T3 ≤ 30×30.
-            //  체인 직사각형이 이 박스를 넘지 못하도록 후보 단계에서 reject.
+            //tier별 도시 *전체* 크기 한도 — 중심에서 blob 픽셀까지 max 거리(픽셀, 로컬 박스 반변).
+            //  성장 프론티어가 이 박스를 못 넘게 캡. T1 ≤ 120×120(~Beijing), T2 ≤ 60×60, T3 ≤ 30×30.
             auto tierMaxExtent = [](CityTier t) noexcept -> int {
                 switch (t) {
                     case CityTier::T1: return 60;
@@ -712,15 +716,25 @@ namespace worldGen
                 return 15;
             };
 
-            //tier별 목표 직사각형 수 분포 [min, max]. 실제 배치는 probe 실패 시 더 적을 수 있음.
-            //  T1은 자주 3~4개, T3는 단일 직사각형이 흔하도록.
-            auto tierRectCount = [](CityTier t) noexcept -> std::pair<int,int> {
+            //tier별 씨앗 수 분포 [min,max] — 다중 씨앗 = 다중심 lobe. T1 대도시만 여러 개.
+            auto tierSeedCount = [](CityTier t) noexcept -> std::pair<int,int> {
                 switch (t) {
-                    case CityTier::T1: return {2, 5};
-                    case CityTier::T2: return {1, 3};
-                    case CityTier::T3: return {1, 2};
+                    case CityTier::T1: return {2, 3};
+                    case CityTier::T2: return {1, 2};
+                    case CityTier::T3: return {1, 1};
                 }
                 return {1, 1};
+            };
+
+            //tier별 노이즈 진폭(반경 대비 비율) — 클수록 경계가 삐죽삐죽. 부호 노이즈라 돌출+함몰 양쪽.
+            //  amp = 이값 × rBase = px 단위 최대 반경 편차. 더 삐죽 원하면 올리고, 너무 너덜대면 내림.
+            auto tierNoiseAmpFrac = [](CityTier t) noexcept -> double {
+                switch (t) {
+                    case CityTier::T1: return 0.65;
+                    case CityTier::T2: return 0.60;
+                    case CityTier::T3: return 0.50;
+                }
+                return 0.50;
             };
 
             //페인트 가능 자연 지형 — 직사각형 본체가 이 위에 떨어져야 함.
@@ -763,20 +777,47 @@ namespace worldGen
                 return lo + static_cast<int>(roll(s) % static_cast<std::uint32_t>(hi - lo + 1));
             };
 
-            //로컬 직사각형 표현 — wrap 처리 전 raw 좌표 사용 (시암 근처 음수 가능).
-            struct Rect { int x, y, w, h; };
-
-            //(rawX, rawY)가 직사각형 안에 있나? wrap 무시 — 같은 좌표 공간 비교.
-            auto inRect = [](int rawX, int rawY, const Rect& r) noexcept -> bool {
-                return rawX >= r.x && rawX < r.x + r.w && rawY >= r.y && rawY < r.y + r.h;
+            //정수 격자점 해시 → [0,1). 도시 salt로 분리 — value-noise의 코너 값.
+            auto hashLattice = [](int xi, int yi, std::uint64_t salt) noexcept -> double {
+                std::uint64_t h = salt + 0x9E3779B97F4A7C15ULL;
+                h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(xi)) * 0xFF51AFD7ED558CCDULL;
+                h = (h ^ (h >> 33)) * 0xC4CEB9FE1A85EC53ULL;
+                h ^= static_cast<std::uint64_t>(static_cast<std::uint32_t>(yi)) * 0xFF51AFD7ED558CCDULL;
+                h = (h ^ (h >> 33)) * 0xC4CEB9FE1A85EC53ULL;
+                h ^= h >> 29;
+                return static_cast<double>(h >> 11) * (1.0 / 9007199254740992.0);
             };
 
-            //직사각형이 도시 중심(cx, cy)에서 maxExt 픽셀 이내에 완전히 들어가나?
-            //  4 모서리 중 가장 먼 점이 maxExt 이하면 OK. tier별 도시 크기 캡 enforce용.
-            auto withinExtent = [](const Rect& r, int cx, int cy, int maxExt) noexcept -> bool {
-                const int dxMax = std::max(cx - r.x, r.x + r.w - 1 - cx);
-                const int dyMax = std::max(cy - r.y, r.y + r.h - 1 - cy);
-                return dxMax <= maxExt && dyMax <= maxExt;
+            //2D value noise (bilinear + smoothstep) — scale = 격자 셀 크기(픽셀). 경계 lobe 생성용.
+            auto valueNoise = [&](double x, double y, double scale, std::uint64_t salt) noexcept -> double {
+                const double fx = x / scale, fy = y / scale;
+                const double flx = std::floor(fx), fly = std::floor(fy);
+                const int x0 = static_cast<int>(flx), y0 = static_cast<int>(fly);
+                auto smooth = [](double tt) noexcept { return tt * tt * (3.0 - 2.0 * tt); };
+                const double tx = smooth(fx - flx), ty = smooth(fy - fly);
+                const double v00 = hashLattice(x0,     y0,     salt);
+                const double v10 = hashLattice(x0 + 1, y0,     salt);
+                const double v01 = hashLattice(x0,     y0 + 1, salt);
+                const double v11 = hashLattice(x0 + 1, y0 + 1, salt);
+                const double a = v00 + (v10 - v00) * tx;
+                const double b = v01 + (v11 - v01) * tx;
+                return a + (b - a) * ty;
+            };
+
+            //fBm — value noise 다옥타브 합성. 옥타브0=넓은 lobe, 고주파 옥타브=가장자리 삐죽함.
+            //  단일 저주파 노이즈는 큰 혹 1~2개(찌그러진 원/타원)만 만들어서 고주파를 얹는다. [0,1).
+            constexpr int    NOISE_OCTAVES   = 4;     // 옥타브 수(↑ = 더 잔 디테일)
+            constexpr double NOISE_GAIN      = 0.55;  // 옥타브별 진폭 감쇠(↑ = 고주파 삐죽함 강함)
+            constexpr double NOISE_BASE_FRAC = 0.9;   // 옥타브0 셀 크기 = rBase × 이값(↓ = 큰 lobe 더 잘게)
+            auto fbm = [&](double x, double y, double baseScale, std::uint64_t salt) noexcept -> double {
+                double sum = 0.0, a = 1.0, norm = 0.0, scale = baseScale;
+                for (int o = 0; o < NOISE_OCTAVES; ++o) {
+                    sum  += a * valueNoise(x, y, scale, salt + static_cast<std::uint64_t>(o) * 0x9E3779B9ULL);
+                    norm += a;
+                    a     *= NOISE_GAIN;
+                    scale *= 0.5;   // lacunarity 2 — 셀 절반 = 주파수 2배
+                }
+                return sum / norm;
             };
 
             //그리드 픽셀 읽기 — X wrap 적용, Y out-of-bounds는 호출자가 처리.
@@ -785,155 +826,163 @@ namespace worldGen
                 return grid.data[static_cast<std::size_t>(rawY) * PixelCostGrid::W + x];
             };
 
-            //후보 직사각형이 본체 + 버퍼 룰을 모두 통과하면 true.
-            //   본체: paintable 자연 지형 OR 자기 도시의 기존 직사각형 안
-            //   버퍼(둘레 1px): water 금지 (off-world는 통과)
-            auto canPlace = [&](const Rect& cand, const std::vector<Rect>& mine) noexcept -> bool {
-                //본체 — Y out-of-bounds는 즉시 reject
-                for (int dy = 0; dy < cand.h; ++dy) {
-                    const int rawY = cand.y + dy;
-                    if (rawY < 0 || rawY >= PixelCostGrid::H) return false;
-                    for (int dx = 0; dx < cand.w; ++dx) {
-                        const int rawX = cand.x + dx;
-                        const Terrain t = readGrid(rawX, rawY);
-                        if (!paintable(t)) {
-                            //자기 도시의 이전 직사각형 안이면 허용 (그 픽셀은 곧 페인트됨)
-                            bool inOwn = false;
-                            for (const Rect& r : mine) {
-                                if (inRect(rawX, rawY, r)) { inOwn = true; break; }
-                            }
-                            if (!inOwn) return false;
-                        }
-                    }
+            //물 근접 테스트 — (rawX,rawY) 중심 (2·SETBACK+1)² 안에 물이 있으면 true.
+            //  성장이 물에 SETBACK 픽셀 이내로 못 붙게 해 blob이 물에 닿지 않도록 한다(물가=직각, 미지원).
+            constexpr int SETBACK = 1;
+            auto nearWater = [&](int rawX, int rawY) noexcept -> bool {
+                for (int dy = -SETBACK; dy <= SETBACK; ++dy) {
+                    const int yy = rawY + dy;
+                    if (yy < 0 || yy >= PixelCostGrid::H) continue;  // 월드 밖 Y는 물 아님
+                    for (int dx = -SETBACK; dx <= SETBACK; ++dx)
+                        if (isWater(readGrid(rawX + dx, yy))) return true;
                 }
-
-                //버퍼 — 본체 둘레 1px, water 금지. off-world(Y 범위 밖)는 패스.
-                auto bufferOk = [&](int rawX, int rawY) noexcept -> bool {
-                    if (rawY < 0 || rawY >= PixelCostGrid::H) return true;
-                    return !isWater(readGrid(rawX, rawY));
-                };
-                //상/하 행 (코너 포함)
-                for (int dx = -1; dx <= cand.w; ++dx) {
-                    if (!bufferOk(cand.x + dx, cand.y - 1))         return false;
-                    if (!bufferOk(cand.x + dx, cand.y + cand.h))    return false;
-                }
-                //좌/우 열 (코너는 위에서 처리, 여기는 안쪽만)
-                for (int dy = 0; dy < cand.h; ++dy) {
-                    if (!bufferOk(cand.x - 1,        cand.y + dy)) return false;
-                    if (!bufferOk(cand.x + cand.w,   cand.y + dy)) return false;
-                }
-                return true;
+                return false;
             };
 
-            //실제 페인트 — canPlace 통과한 직사각형만 호출. 본체 픽셀 전체 CityZone으로.
-            auto doPaint = [&](const Rect& r) noexcept {
-                for (int dy = 0; dy < r.h; ++dy) {
-                    const int rawY = r.y + dy;
-                    if (rawY < 0 || rawY >= PixelCostGrid::H) continue;
-                    for (int dx = 0; dx < r.w; ++dx) {
-                        const int rawX = r.x + dx;
-                        const int x = ((rawX % PixelCostGrid::W) + PixelCostGrid::W) % PixelCostGrid::W;
-                        Terrain& cell = grid.data[static_cast<std::size_t>(rawY) * PixelCostGrid::W + x];
-                        //canPlace 통과한 본체는 전부 paintable이거나 자기 이전 CityZone — 무조건 페인트.
-                        cell = Terrain::CityZone;
+            //씨앗 탐색 — (cx,cy) 부근 chebyshev shell을 넓혀가며 성장 가능(페인터블·비물근접) 픽셀.
+            //  찾으면 out에 raw 좌표 채우고 true. 못 찾으면 false(도시/씨앗 스킵).
+            auto findSeed = [&](int cx, int cy, int searchR, int& outX, int& outY) noexcept -> bool {
+                for (int r = 0; r <= searchR; ++r)
+                    for (int dy = -r; dy <= r; ++dy) {
+                        const int yy = cy + dy;
+                        if (yy < 0 || yy >= PixelCostGrid::H) continue;
+                        for (int dx = -r; dx <= r; ++dx) {
+                            if (r > 0 && std::abs(dx) < r && std::abs(dy) < r) continue;  // 껍질만(내부는 작은 r에서 봄)
+                            const int xx = cx + dx;
+                            if (paintable(readGrid(xx, yy)) && !nearWater(xx, yy)) { outX = xx; outY = yy; return true; }
+                        }
                     }
+                return false;
+            };
+
+            //성장 프론티어 후보 — score 낮은 순으로 편입. seq는 결정론 tie-break(먼저 들어온 것 우선).
+            struct Cand { double score; std::uint32_t seq; int lx; int ly; };
+            struct CandCmp {
+                bool operator()(const Cand& a, const Cand& b) const noexcept {
+                    if (a.score != b.score) return a.score > b.score;  // 작은 score가 top(min-heap)
+                    return a.seq > b.seq;
                 }
             };
 
             //통계
             int paintedCount = 0;
             int skippedCount = 0;
-            std::size_t totalRectsPainted = 0;
-            std::size_t totalAttempts = 0;
+            std::size_t totalPixels = 0;
 
-            constexpr int MAX_FIRST_ATTEMPTS      = 8;    // 첫 직사각형 재시도 한도
-            constexpr int MAX_ADDITIONAL_ATTEMPTS = 24;   // 추가 직사각형 시도 총량 (성공/실패 합계)
+            //성장 visited 버퍼 — 최대 tier(maxExt=60) 기준 (2·60+1)² 한 번 할당해 도시마다 재사용.
+            constexpr int MAXEXT   = 60;
+            constexpr int SIDE_MAX = 2 * MAXEXT + 1;
+            std::vector<std::uint8_t> visited(static_cast<std::size_t>(SIDE_MAX) * SIDE_MAX);
+            std::vector<std::pair<int,int>> seedsLocal;
+            seedsLocal.reserve(4);
+
+            constexpr int PRIMARY_SEARCH_R = 4;   // 중심이 물/비페인터블일 때 1차 씨앗 재탐색 반경
+            constexpr int ADD_SEARCH_R     = 3;   // 추가 씨앗 스냅 반경
 
             for (std::size_t i = preMarkedCount; i < cities.size(); ++i) {
                 const CityRec& c = cities[i];
                 std::uint64_t state = seed ^ (static_cast<std::uint64_t>(i) * 0x9E3779B97F4A7C15ULL);
-                //LCG 초기 bit 분포 개선용 한 번 돌려서 워밍업.
-                roll(state);
+                roll(state);  // LCG 워밍업
 
-                const auto [lo, hi] = tierRange(c.tier);
-                const auto [minR, maxR] = tierRectCount(c.tier);
-                const int targetRects = rollRange(state, minR, maxR);
-                const int maxExt = tierMaxExtent(c.tier);
+                const auto [rLo, rHi]   = tierBaseRadius(c.tier);
+                const int rBase         = rollRange(state, rLo, rHi);
+                const auto [seLo, seHi] = tierSeedCount(c.tier);
+                const int seedCount     = rollRange(state, seLo, seHi);
+                const int maxExt        = tierMaxExtent(c.tier);
+                const int side          = 2 * maxExt + 1;
+                const double noiseScale = rBase * NOISE_BASE_FRAC;   // 옥타브0 셀 크기(넓은 lobe 스케일)
+                const double amp        = tierNoiseAmpFrac(c.tier) * rBase;
+                const int areaBudget    = static_cast<int>(3.14159265 * rBase * rBase * 0.92);
+                const std::uint64_t citySalt = state * 0xD1B54A32D192ED03ULL + 0x9E3779B97F4A7C15ULL;
 
-                std::vector<Rect> mine;
-                mine.reserve(5);
+                //씨앗 — 1차는 중심 부근, 추가는 중심에서 ~0.5~0.8·rBase 떨어진 곳에 스냅(다중심 lobe).
+                seedsLocal.clear();
+                int psx = 0, psy = 0;
+                if (!findSeed(c.px, c.py, PRIMARY_SEARCH_R, psx, psy)) { ++skippedCount; continue; }
+                seedsLocal.push_back({ psx - c.px, psy - c.py });
+                const std::pair<int,int> primaryLocal = seedsLocal[0];
 
-                //첫 직사각형 — 도시 중심 기준 중앙 정렬, 여러 크기 시도
-                for (int a = 0; a < MAX_FIRST_ATTEMPTS; ++a) {
-                    ++totalAttempts;
-                    const int w = rollRange(state, lo, hi);
-                    const int h = rollRange(state, lo, hi);
-                    Rect cand{ c.px - w / 2, c.py - h / 2, w, h };
-                    if (!withinExtent(cand, c.px, c.py, maxExt)) continue;
-                    if (canPlace(cand, mine)) {
-                        mine.push_back(cand);
-                        break;
+                for (int k = 1; k < seedCount; ++k) {
+                    const double ang = (roll(state) % 360) * 0.0174532925;
+                    const int d = rollRange(state, std::max(1, rBase / 2), std::max(2, (rBase * 4) / 5));
+                    const int tx = c.px + static_cast<int>(std::cos(ang) * d);
+                    const int ty = c.py + static_cast<int>(std::sin(ang) * d);
+                    int asx = 0, asy = 0;
+                    if (findSeed(tx, ty, ADD_SEARCH_R, asx, asy)) {
+                        const int lx = asx - c.px, ly = asy - c.py;
+                        if (std::max(std::abs(lx), std::abs(ly)) <= maxExt)
+                            seedsLocal.push_back({ lx, ly });
                     }
                 }
 
-                //첫 직사각형 실패 → 페인트 0개. 도시는 점으로만 남음 (CityCenter도 안 찍음).
-                if (mine.empty()) {
-                    ++skippedCount;
-                    continue;
-                }
-
-                //추가 직사각형 — 기존 중 하나 anchor로 골라 NSEW 한 변에 부착.
-                int addAttempts = 0;
-                while (static_cast<int>(mine.size()) < targetRects && addAttempts < MAX_ADDITIONAL_ATTEMPTS) {
-                    ++addAttempts;
-                    ++totalAttempts;
-                    const Rect& anchor = mine[roll(state) % mine.size()];
-                    const int w = rollRange(state, lo, hi);
-                    const int h = rollRange(state, lo, hi);
-                    const int dir = static_cast<int>(roll(state) % 4);
-                    Rect cand{};
-                    cand.w = w;
-                    cand.h = h;
-                    switch (dir) {
-                        case 0: cand.x = anchor.x + (anchor.w - w) / 2; cand.y = anchor.y - h;             break;  // N
-                        case 1: cand.x = anchor.x + anchor.w;            cand.y = anchor.y + (anchor.h - h) / 2; break;  // E
-                        case 2: cand.x = anchor.x + (anchor.w - w) / 2; cand.y = anchor.y + anchor.h;     break;  // S
-                        case 3: cand.x = anchor.x - w;                   cand.y = anchor.y + (anchor.h - h) / 2; break;  // W
+                //가중 성장 — min-score 프론티어를 면적 예산만큼 편입.
+                std::fill(visited.begin(), visited.begin() + static_cast<std::ptrdiff_t>(side) * side, std::uint8_t{0});
+                std::priority_queue<Cand, std::vector<Cand>, CandCmp> pq;
+                std::uint32_t seq = 0;
+                auto tryPush = [&](int lx, int ly) noexcept {
+                    if (lx < -maxExt || lx > maxExt || ly < -maxExt || ly > maxExt) return;  // extent 캡
+                    const int li = (ly + maxExt) * side + (lx + maxExt);
+                    if (visited[li]) return;
+                    visited[li] = 1;  // enqueue/blocked 표시 — 픽셀당 1회만 평가
+                    const int rawX = c.px + lx, rawY = c.py + ly;
+                    if (rawY < 0 || rawY >= PixelCostGrid::H) return;   // 월드 밖 Y
+                    if (!paintable(readGrid(rawX, rawY))) return;       // 물/산/타도시 등 차단
+                    if (nearWater(rawX, rawY)) return;                  // 물 SETBACK 버퍼
+                    double best = 1.0e18;
+                    for (const auto& s : seedsLocal) {
+                        const double ddx = lx - s.first, ddy = ly - s.second;
+                        const double dd = ddx * ddx + ddy * ddy;
+                        if (dd < best) best = dd;
                     }
-                    if (!withinExtent(cand, c.px, c.py, maxExt)) continue;
-                    if (canPlace(cand, mine)) {
-                        mine.push_back(cand);
+                    const double dist = std::sqrt(best);
+                    //부호 fBm: 0.5 중심을 빼 ±로 — 돌출(저score=멀리 자람)+함몰(고score) 양쪽. amp=px 최대 편차.
+                    const double nz = 2.0 * fbm(static_cast<double>(lx), static_cast<double>(ly), noiseScale, citySalt) - 1.0;
+                    pq.push(Cand{ dist - amp * nz, seq++, lx, ly });
+                };
+
+                for (const auto& s : seedsLocal) tryPush(s.first, s.second);
+
+                int painted = 0;
+                int mnX = 0, mnY = 0, mxX = 0, mxY = 0;
+                bool any = false;
+                while (!pq.empty() && painted < areaBudget) {
+                    const Cand top = pq.top(); pq.pop();
+                    const int rawX = c.px + top.lx, rawY = c.py + top.ly;
+                    const int xw = ((rawX % PixelCostGrid::W) + PixelCostGrid::W) % PixelCostGrid::W;
+                    grid.data[static_cast<std::size_t>(rawY) * PixelCostGrid::W + xw] = Terrain::CityZone;
+                    ++painted;
+                    if (!any) { mnX = rawX; mnY = rawY; mxX = rawX + 1; mxY = rawY + 1; any = true; }
+                    else {
+                        mnX = std::min(mnX, rawX);     mnY = std::min(mnY, rawY);
+                        mxX = std::max(mxX, rawX + 1); mxY = std::max(mxY, rawY + 1);
                     }
+                    tryPush(top.lx + 1, top.ly);
+                    tryPush(top.lx - 1, top.ly);
+                    tryPush(top.lx, top.ly + 1);
+                    tryPush(top.lx, top.ly - 1);
                 }
 
-                //모든 accepted 직사각형 페인트
-                for (const Rect& r : mine) doPaint(r);
-                totalRectsPainted += mine.size();
+                if (painted == 0) { ++skippedCount; continue; }  // 방어적(1차 씨앗 통과 시 사실상 미발생)
 
-                //  CityPlan 입력용 bbox — 페인트한 rect 합집합의 경계상자 (mine은 비어있지 않음).
-                {
-                    int mnX = mine[0].x, mnY = mine[0].y;
-                    int mxX = mine[0].x + mine[0].w, mxY = mine[0].y + mine[0].h;
-                    for (const Rect& r : mine)
-                    {
-                        mnX = std::min(mnX, r.x);         mnY = std::min(mnY, r.y);
-                        mxX = std::max(mxX, r.x + r.w);   mxY = std::max(mxY, r.y + r.h);
-                    }
-                    cities[i].bboxPx = mnX;        cities[i].bboxPy = mnY;
-                    cities[i].bboxW  = mxX - mnX;  cities[i].bboxH  = mxY - mnY;
-                }
-
-                //중심 픽셀 = CityCenter (방금 칠한 CityZone 위에만)
-                if (c.py >= 0 && c.py < PixelCostGrid::H) {
-                    const int cxw = ((c.px % PixelCostGrid::W) + PixelCostGrid::W) % PixelCostGrid::W;
-                    Terrain& cell = grid.data[static_cast<std::size_t>(c.py) * PixelCostGrid::W + cxw];
-                    if (cell == Terrain::CityZone) cell = Terrain::CityCenter;
-                }
+                cities[i].bboxPx = mnX;        cities[i].bboxPy = mnY;
+                cities[i].bboxW  = mxX - mnX;  cities[i].bboxH  = mxY - mnY;
+                totalPixels += static_cast<std::size_t>(painted);
                 ++paintedCount;
+
+                //중심 픽셀 = CityCenter. 중심이 안 칠해졌으면(중심이 물/오프셋) 1차 씨앗에 찍음.
+                const int cxw = ((c.px % PixelCostGrid::W) + PixelCostGrid::W) % PixelCostGrid::W;
+                if (c.py >= 0 && c.py < PixelCostGrid::H
+                    && grid.data[static_cast<std::size_t>(c.py) * PixelCostGrid::W + cxw] == Terrain::CityZone) {
+                    grid.data[static_cast<std::size_t>(c.py) * PixelCostGrid::W + cxw] = Terrain::CityCenter;
+                } else {
+                    const int sx = c.px + primaryLocal.first, sy = c.py + primaryLocal.second;
+                    const int sxw = ((sx % PixelCostGrid::W) + PixelCostGrid::W) % PixelCostGrid::W;
+                    grid.data[static_cast<std::size_t>(sy) * PixelCostGrid::W + sxw] = Terrain::CityCenter;
+                }
             }
 
-            prt(L"  [paint] procgen cities painted = %d, skipped = %d  (%zu rects, %zu attempts)\n",
-                paintedCount, skippedCount, totalRectsPainted, totalAttempts);
+            prt(L"  [paint] procgen cities painted = %d, skipped = %d  (%zu pixels grown)\n",
+                paintedCount, skippedCount, totalPixels);
         }
         const std::int64_t tPaint = getNanoTimer();
 

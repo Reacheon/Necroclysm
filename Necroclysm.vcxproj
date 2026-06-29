@@ -421,6 +421,7 @@
     <ClCompile Include="code\util\HSVConverter.ixx" />
     <ClCompile Include="code\util\isCircle.ixx" />
     <ClCompile Include="code\util\lineMaker.ixx" />
+    <ClCompile Include="code\util\nameGen.ixx" />
     <ClCompile Include="code\util\nanoTimer.ixx" />
     <ClCompile Include="code\util\Point.ixx" />
     <ClCompile Include="code\util\prt.ixx" />

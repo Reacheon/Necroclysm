@@ -215,7 +215,7 @@ export namespace worldGen
         constexpr int MTN_CELL     = 32;   // 시드 격자 한 변(청크) — 숲보다 넓게
         constexpr int MTN_R_MIN    = 5;    // 산 반경 최소(청크)
         constexpr int MTN_R_MAX    = 14;   // 산 반경 최대(청크) — +엣지워프(×1.6≈22.4) < MTN_CELL
-        constexpr int MTN_FILL     = 50;   // 0..255, 셀이 산 시드 보유 확률(~20%)
+        constexpr int MTN_FILL     = 8;   // 0..255, 셀이 산 시드 보유 확률(~9%) — 산=던전이라 희소하게
         constexpr int MTN_MIN_SIZE = 16;   // 이 미만(청크) 덩어리는 폐기 — 1px·과편 던전 방지
 
         const int pcx = worldWrap::wrapPixelX(chunkPxX);
