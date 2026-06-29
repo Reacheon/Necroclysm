@@ -200,37 +200,46 @@ export namespace worldGen
         return mask.count(key(worldWrap::wrapPixelX(chunkPxX), chunkPxY)) != 0;
     }
 
-    //절차적 산맥 청크 판정 — 위성 Mountain(Terrain) 외에 추가로 산맥을 절차 생성.
-    //  isForestChunk와 같은 "지터드 시드 격자 + 각진동 반경" 순수 함수 (다른 salt).
-    //  Map.ixx의 isMtn이 위성+절차 둘 다 보게 해 #64~79 오토타일이 자연 연결되고,
-    //  Sector_procGenerate stage 6이 같은 술어로 인-월드 바위벽을 깐다.
-    //    ① 게이트 — 물/도시만 제외 (그 외 land는 사막·극지 포함 어디든 산 가능).
-    //    ② 3×3 셀 시드 거리 테스트 (각진동 로브). 숲보다 크고 드문 덩어리.
-    //    ③ 도로 양보 (isHighwayChunk) — 산이 도시간 도로를 막지 않게(패스).
+    //절차적 산맥 청크 판정 — 씨앗에서 사방 성장(flood-fill)해 물(바다·강)에서 막히고,
+    //  씨앗과 연결된 부분만, MTN_MIN_SIZE 이상만 산으로 채택. → 산은 *구성상* 하나의
+    //  4-연결 덩어리이며 물에 의해 분단되지 않는다(렌더 브리징 불필요). 위성 Mountain(Terrain)
+    //  과는 isMtn/Sector에서 합집합으로 합쳐져 한 오토타일로 연결.
+    //    · 후보(candidate): 기존 "지터드 시드 격자 + 각진동 반경"을 영역 후보로 재사용.
+    //    · 벽: 물/도시 청크. 씨앗 청크가 물/도시면 그 씨앗은 산 없음.
+    //    · 캐시: 씨앗 셀 단위 지연 계산(isHighwayChunk 패턴, mutex 가드). 시드+위성 불변이라
+    //      무효화 없음. Map 렌더 스레드·Sector 워커 공유.
+    //  도로 양보(isHighwayChunk)는 더 이상 안 함 — 도로는 산을 지우지 않고 터널로 관통(렌더).
+    //  X 시암(±W/2)에서 영역이 끊길 수 있으나 거긴 태평양이라 실영향 작음(기존 동일).
     inline bool isMountainChunk(int chunkPxX, int chunkPxY, std::uint64_t seed)
     {
-        constexpr int MTN_CELL  = 32;   // 시드 격자 한 변(청크) — 숲보다 넓게
-        constexpr int MTN_R_MIN = 5;    // 산 반경 최소(청크)
-        constexpr int MTN_R_MAX = 14;   // 산 반경 최대(청크) — +엣지워프(×1.6≈22.4) < MTN_CELL
-        constexpr int MTN_FILL  = 50;   // 0..255, 셀이 산 시드 보유 확률(~20%)
+        constexpr int MTN_CELL     = 32;   // 시드 격자 한 변(청크) — 숲보다 넓게
+        constexpr int MTN_R_MIN    = 5;    // 산 반경 최소(청크)
+        constexpr int MTN_R_MAX    = 14;   // 산 반경 최대(청크) — +엣지워프(×1.6≈22.4) < MTN_CELL
+        constexpr int MTN_FILL     = 50;   // 0..255, 셀이 산 시드 보유 확률(~20%)
+        constexpr int MTN_MIN_SIZE = 16;   // 이 미만(청크) 덩어리는 폐기 — 1px·과편 던전 방지
 
         const int pcx = worldWrap::wrapPixelX(chunkPxX);
         const int pcy = chunkPxY;
 
-        //① 게이트 — 물/도시 제외.
-        switch (worldGrid::worldPixel(pcx, pcy))
-        {
-        case worldGrid::Terrain::Sea:
-        case worldGrid::Terrain::CitySea:
-        case worldGrid::Terrain::River:
-        case worldGrid::Terrain::Lake:
-        case worldGrid::Terrain::CityRiver:
-        case worldGrid::Terrain::CityZone:
-        case worldGrid::Terrain::CityCenter:
-            return false;
-        default:
-            break;
-        }
+        //물/도시 청크인가 — 성장의 벽(산은 물을 품지도 가로지르지도 않는다).
+        auto isWaterOrCity = [](int x, int y) noexcept -> bool {
+            switch (worldGrid::worldPixel(worldWrap::wrapPixelX(x), y))
+            {
+            case worldGrid::Terrain::Sea:
+            case worldGrid::Terrain::CitySea:
+            case worldGrid::Terrain::River:
+            case worldGrid::Terrain::Lake:
+            case worldGrid::Terrain::CityRiver:
+            case worldGrid::Terrain::CityZone:
+            case worldGrid::Terrain::CityCenter:
+                return true;
+            default:
+                return false;
+            }
+        };
+
+        //① 빠른 컷 — 물/도시는 산 아님.
+        if (isWaterOrCity(pcx, pcy)) return false;
 
         auto floorDiv = [](int a, int b) noexcept {
             return (a >= 0) ? (a / b) : -(((-a) + b - 1) / b);
@@ -243,42 +252,90 @@ export namespace worldGen
             h ^= h >> 31;
             return h;
         };
-
-        //② 이웃 3×3 셀의 시드를 거리 테스트.
-        const int cellX = floorDiv(pcx, MTN_CELL);
-        const int cellY = floorDiv(pcy, MTN_CELL);
-        bool found = false;
-        for (int gy = -1; gy <= 1 && !found; ++gy)
-        for (int gx = -1; gx <= 1 && !found; ++gx)
-        {
-            const int ccx = cellX + gx;
-            const int ccy = cellY + gy;
-            const std::uint64_t h = hashCell(ccx, ccy);
-            if ((h & 0xff) >= static_cast<std::uint64_t>(MTN_FILL)) continue;
-
-            const int seedX = ccx * MTN_CELL + static_cast<int>((h >> 8)  % MTN_CELL);
-            const int seedY = ccy * MTN_CELL + static_cast<int>((h >> 16) % MTN_CELL);
-            const int baseR = MTN_R_MIN + static_cast<int>((h >> 24) % (MTN_R_MAX - MTN_R_MIN + 1));
-
-            const double dx = static_cast<double>(pcx - seedX);
-            const double dy = static_cast<double>(pcy - seedY);
+        auto chunkKey = [](int x, int y) noexcept -> std::uint64_t {
+            return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(x)) << 32)
+                 |  static_cast<std::uint64_t>(static_cast<std::uint32_t>(y));
+        };
+        //특정 셀 시드의 각진동 후보 영역 판정(기존 반경 테스트 그대로).
+        auto inCandidate = [](int x, int y, int seedX, int seedY, int baseR, std::uint64_t h) noexcept -> bool {
+            const double dx = static_cast<double>(x - seedX);
+            const double dy = static_cast<double>(y - seedY);
             const double d2 = dx * dx + dy * dy;
             const double rMax = static_cast<double>(MTN_R_MAX) * 1.6;
-            if (d2 > rMax * rMax) continue;
-
+            if (d2 > rMax * rMax) return false;
             const double ang = std::atan2(dy, dx);
             const double p1 = static_cast<double>((h >> 32) & 0x3ff) / 1024.0 * 6.28318530718;
             const double p2 = static_cast<double>((h >> 42) & 0x3ff) / 1024.0 * 6.28318530718;
             const double a1 = 0.18 + static_cast<double>((h >> 52) & 0x3f) / 63.0 * 0.18;
             const double a2 = 0.10 + static_cast<double>((h >> 58) & 0x3f) / 63.0 * 0.12;
             const double r  = static_cast<double>(baseR) * (1.0 + a1 * std::sin(2.0 * ang + p1) + a2 * std::sin(3.0 * ang + p2));
-            if (d2 < r * r) found = true;
-        }
-        if (!found) return false;
+            return d2 < r * r;
+        };
 
-        //③ 도로 양보 — 산이라도 도시간 도로(1링 포함)면 비움(패스).
-        if (isHighwayChunk(pcx, pcy)) return false;
-        return true;
+        //캐시 — 프로그램당 1개(inline 지역 static). mutex 가드(Map 렌더·Sector 워커 공유).
+        static std::unordered_set<std::uint64_t> mountainSet;     // 산으로 확정된 청크
+        static std::unordered_set<std::uint64_t> computedCells;   // 이미 flood-fill한 씨앗 셀
+        static std::uint64_t builtSeed = 0;
+        static bool          seedInit  = false;
+        static std::mutex    mtx;
+
+        std::lock_guard<std::mutex> lk(mtx);
+        if (!seedInit || builtSeed != seed)   // 새 월드면 캐시 리셋
+        {
+            mountainSet.clear();
+            computedCells.clear();
+            builtSeed = seed;
+            seedInit  = true;
+        }
+
+        //씨앗 셀 1개를 flood-fill해 그 산 영역을 mountainSet에 적재(미계산분만).
+        auto computeCell = [&](int ccx, int ccy)
+        {
+            if (!computedCells.insert(chunkKey(ccx, ccy)).second) return;   // 이미 계산됨
+
+            const std::uint64_t h = hashCell(ccx, ccy);
+            if ((h & 0xff) >= static_cast<std::uint64_t>(MTN_FILL)) return;   // 시드 없는 셀
+
+            const int seedX = ccx * MTN_CELL + static_cast<int>((h >> 8)  % MTN_CELL);
+            const int seedY = ccy * MTN_CELL + static_cast<int>((h >> 16) % MTN_CELL);
+            const int baseR = MTN_R_MIN + static_cast<int>((h >> 24) % (MTN_R_MAX - MTN_R_MIN + 1));
+            if (isWaterOrCity(seedX, seedY)) return;   // 씨앗이 물/도시면 산 없음
+
+            //씨앗에서 4-연결 BFS — 후보∩비물 영역의 씨앗-연결성분(키는 X 시암 정규화).
+            constexpr int fdx[4] = { 0, 0, +1, -1 };
+            constexpr int fdy[4] = { -1, +1, 0, 0 };
+            std::unordered_set<std::uint64_t> visited;
+            std::vector<std::pair<int, int>>  stack;
+            visited.insert(chunkKey(worldWrap::wrapPixelX(seedX), seedY));
+            stack.emplace_back(seedX, seedY);
+            while (!stack.empty())
+            {
+                const auto [x, y] = stack.back();
+                stack.pop_back();
+                for (int d = 0; d < 4; ++d)
+                {
+                    const int nx = x + fdx[d], ny = y + fdy[d];
+                    const std::uint64_t nk = chunkKey(worldWrap::wrapPixelX(nx), ny);
+                    if (visited.count(nk)) continue;
+                    if (!inCandidate(nx, ny, seedX, seedY, baseR, h)) continue;
+                    if (isWaterOrCity(nx, ny)) continue;
+                    visited.insert(nk);
+                    stack.emplace_back(nx, ny);
+                }
+            }
+
+            if (visited.size() < static_cast<std::size_t>(MTN_MIN_SIZE)) return;   // 과편 폐기
+            for (std::uint64_t k : visited) mountainSet.insert(k);
+        };
+
+        //② 질의점 주변 3×3 씨앗 셀 계산(후보반경<MTN_CELL이라 3×3로 충분).
+        const int cellX = floorDiv(pcx, MTN_CELL);
+        const int cellY = floorDiv(pcy, MTN_CELL);
+        for (int gy = -1; gy <= 1; ++gy)
+        for (int gx = -1; gx <= 1; ++gx)
+            computeCell(cellX + gx, cellY + gy);
+
+        return mountainSet.count(chunkKey(pcx, pcy)) != 0;
     }
 
     //숲 청크 판정 — 절차적 (위성에 숲 없음). 전역 상태 없는 *순수 함수*:

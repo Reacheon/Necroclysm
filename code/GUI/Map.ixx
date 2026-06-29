@@ -396,7 +396,7 @@ static Uint8 fogBright(int px, int py) { return mapDiscovery::discovered(px, py)
 //   본체 renderTile의 floor 오토타일(tileConnectGroup+connectGroupExtraIndex)과
 //   파도(스프라이트 1504~1526)을 청크 스케일로 이식 — 1청크가 1타일 역할.
 //   산 심볼은 항상 수집(모든 줌 유지). 파도만 drawFoam(=symbolsVisible)일 때 (저배율 클러터/성능 회피).
-static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDraw>& symOut)
+static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDraw>& symOut, std::vector<SymDraw>& mtnOut)
 {
     if (!worldGrid::worldPixelMmapActive()) return;
 
@@ -551,7 +551,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
                 const int idx = autotile47Index(
                     bg(ix, iy - 1), bg(ix + 1, iy), bg(ix, iy + 1), bg(ix - 1, iy),
                     bg(ix - 1, iy - 1), bg(ix + 1, iy - 1), bg(ix - 1, iy + 1), bg(ix + 1, iy + 1));
-                symOut.push_back(SymDraw{ (float)iy, spr::auto47Mountain, idx,
+                mtnOut.push_back(SymDraw{ (float)iy, spr::auto47Mountain, idx,
                     (int)std::lround(v.sX((double)ix)),
                     (int)std::lround(v.sY((double)iy)), br });
             }
@@ -677,6 +677,15 @@ static const std::vector<HighwayCell>& highwayCells()
     return cache;
 }
 
+//도로 셀이 산 위인가 — 산 위 도로는 터널(반투명)로 그린다. 생성이 산을 단일 연결 덩어리로
+//  보장하므로 렌더 브리징 없이 산 판정만으로 충분(위성 Mountain ∪ 절차 isMountainChunk).
+static constexpr Uint8 TUNNEL_ALPHA = 110;   // 산 위 도로 알파(터널) — 빌드 후 튜닝 가능
+static bool roadCellOnMountain(int cx, int cy)
+{
+    return worldGrid::worldPixel(worldWrap::wrapPixelX(cx), cy) == worldGrid::Terrain::Mountain
+        || worldGen::isMountainChunk(cx, cy, worldSeed);
+}
+
 //외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
 //  도로망은 미발견 청크여도 항상 표시(전세계 도로 골격) — 단 미발견은 지형처럼 어둡게(fogBright)
 //  색조해 전장의 구름 느낌은 유지. (도시 내부 도로·다리는 drawCityRoads가 따로 그림.)
@@ -696,9 +705,11 @@ static void drawHighways(const MapView& v)
 
         const Uint8 br = fogBright(c.cx, c.cy);
         SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
+        SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(c.cx, c.cy) ? TUNNEL_ALPHA : 255);
         drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
     }
     SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
+    SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
 //도시 심볼/도로망 소스 — full plan(CityPlanCache) 우선, 없으면 경량 layout(CityLayoutCache).
@@ -793,10 +804,12 @@ static void drawCityRoads(const MapView& v)
 
             const Uint8 br = fogBright(px, py);
             SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
+            SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(px, py) ? TUNNEL_ALPHA : 255);
             drawSprite(spr::mapset1by1, idx, sx, sy);
         }
     }
     SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
+    SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
 //④ 건물 심볼 (캐시된 도시) — symOut에 누적(산과 함께 y정렬 후 그림). 발견된 청크는 실제 종류
@@ -1328,22 +1341,32 @@ public:
         }
         else
         {
-            static thread_local std::vector<SymDraw> symDraws;
+            static thread_local std::vector<SymDraw> symDraws, mtnDraws;
             symDraws.clear();
+            mtnDraws.clear();
 
             //심볼(도로·건물·산)은 모든 줌에서 유지 — 지형(tileset)만 남고 심볼이 사라지면 어색함.
             //  바다 파도만 줌 게이트(읽기 불가 + 광역에서 draw 폭증하는 장식 디테일).
             const bool foamOn = view.symbolsVisible();
 
-            drawTerrainLayer(view, foamOn, symDraws);   // ① 베이스(+파도) + ② 산/숲 수집(항상)
+            drawTerrainLayer(view, foamOn, symDraws, mtnDraws);   // ① 베이스(+파도) + ② 산(mtnDraws)·숲(symDraws) 수집
 
             setZoom((float)view.zoomScale());
-            drawHighways     (view);             // ③-a 외부 도로망 (전세계 항상 표시, 미발견은 어둡게)
+
+            //② 산 레이어 — 도로보다 *먼저* 그린다(도로가 산 위에 터널로 반투명되게). 1셀 타일이라 y정렬 불필요.
+            for (const auto& s : mtnDraws)
+            {
+                SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
+                drawSprite(s.atlas, s.idx, s.sx, s.sy);
+            }
+            SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+
+            drawHighways     (view);             // ③-a 외부 도로망 (산 위면 터널 반투명, 미발견은 어둡게)
             ensureVisibleCityLayouts(view);      // 화면 내 미캐시 도시 경량 layout 백그라운드 요청
-            drawCityRoads    (view);             // ③-b 내부 도로·다리 (항상 표시, 미발견은 어둡게)
+            drawCityRoads    (view);             // ③-b 내부 도로·다리 (산 위면 터널 반투명, 미발견은 어둡게)
             drawCityBuildings(view, symDraws);   // ④ 건물 (발견=실제 / 미발견=?건물, 어둡게)
 
-            //산+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침. 그릴 때 br로 색조(전장의 구름).
+            //숲+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침. 그릴 때 br로 색조(전장의 구름).
             std::sort(symDraws.begin(), symDraws.end(),
                 [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
             for (const auto& s : symDraws)

@@ -942,8 +942,14 @@ namespace worldGen
         //══════════════════════════════════════════════════════════════════
         std::vector<CityNode> result;
         result.reserve(cities.size());
+        int droppedGhosts = 0;
         for (auto& c : cities)
         {
+            //유령 도시 드롭: footprint 페인팅 실패(해안/강/소형섬 1px 물 버퍼 충돌)로 bbox가
+            //  빈 절차생성 도시는 CityPlan_build 게이트(bboxW/H<=0)에서 빈 plan이 되어 라벨만
+            //  뜨는 "유령 도시"가 된다. 결과에서 제외하면 라벨·도로·건물·MST 노드 전부 미생성.
+            //  프리셋 도시는 클러스터 bbox가 항상 >0이라 절대 걸리지 않음.
+            if (c.bboxW <= 0 || c.bboxH <= 0) { ++droppedGhosts; continue; }
             result.push_back(CityNode{
                 pixelToTileCenter(c.px, c.py),
                 c.tier,
@@ -952,6 +958,8 @@ namespace worldGen
                 c.bboxPx, c.bboxPy, c.bboxW, c.bboxH
             });
         }
+        if (droppedGhosts > 0)
+            prt(L"  [phase5] dropped %d ghost cities (empty footprint)\n", droppedGhosts);
 
         const std::int64_t tDone = getNanoTimer();
 
