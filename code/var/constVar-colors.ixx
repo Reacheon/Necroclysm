@@ -9,6 +9,44 @@ export namespace mulCol
     constexpr SDL_Color dawn = { 0,0,100,30 };
     constexpr SDL_Color sunfall = { 121,78,59,100 };
     constexpr SDL_Color night = { 0,0,100,100 };
+
+    //시각(0~24시, 실수) → 시간대별 곱셈(MUL) 틴트 색. 알파=틴트 강도. 밤=남색(곱셈이라 R·G는 0쪽으로
+    //  깎이고 파랑만 남음), 18시=노을(따뜻한 갈색), 10~17시=투명(낮, 틴트 없음). 본체 월드 렌더
+    //  (renderTile::drawMulFogs)와 월드맵(Map::drawNightOverlay)이 공유하는 단일 팔레트 — 한 곳만
+    //  고치면 양쪽에 반영된다. (위 day/dawn/sunfall/night 상수는 미사용 레거시 — 실 값은 아래 키프레임.)
+    inline SDL_Color ambientMulColorAt(float timeOfDay)
+    {
+        struct TimeColor { float time; SDL_Color color; };
+        static constexpr TimeColor timeColors[] =
+        {
+            { 0.0f,  {   0,  0,  59, 150 } },
+            { 6.0f,  {   0,  0,  59, 150 } },
+            { 8.0f,  {   0,  0,  49,  50 } },
+            { 10.0f, {   0,  0,   0,   0 } },
+            { 17.0f, {   0,  0,   0,   0 } },
+            { 18.0f, { 121, 78,  59, 130 } },
+            { 18.5f, {   0,  0,  59, 150 } },
+            { 24.0f, {   0,  0,  59, 150 } },
+        };
+        constexpr int n = (int)(sizeof(timeColors) / sizeof(timeColors[0]));
+        for (int i = 0; i < n - 1; ++i)
+        {
+            if (timeOfDay >= timeColors[i].time && timeOfDay < timeColors[i + 1].time)
+            {
+                const float t1 = timeColors[i].time, t2 = timeColors[i + 1].time;
+                const float ratio = (timeOfDay - t1) / (t2 - t1);
+                const SDL_Color& c1 = timeColors[i].color;
+                const SDL_Color& c2 = timeColors[i + 1].color;
+                return {
+                    (Uint8)(c1.r + (c2.r - c1.r) * ratio),
+                    (Uint8)(c1.g + (c2.g - c1.g) * ratio),
+                    (Uint8)(c1.b + (c2.b - c1.b) * ratio),
+                    (Uint8)(c1.a + (c2.a - c1.a) * ratio)
+                };
+            }
+        }
+        return { 0, 0, 0, 0 };   //범위 밖(예: 정확히 24.0) — 틴트 없음
+    }
 }
 
 export namespace col

@@ -334,6 +334,7 @@
     <ClCompile Include="code\worldGrid_mmap.cpp" />
     <ClCompile Include="code\worldSession.ixx" />
     <ClCompile Include="code\mapDiscovery.ixx" />
+    <ClCompile Include="code\MapPin.ixx" />
     <ClCompile Include="code\city.ixx" />
     <ClCompile Include="code\Teleport.ixx" />
     <ClCompile Include="code\Prop\Prop.cpp" />

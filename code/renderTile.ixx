@@ -1517,48 +1517,8 @@ void drawBridgeShadows()
 
 void drawMulFogs()
 {
-    struct TimeColor
-    {
-        float time;
-        SDL_Color color;
-    };
-
-    static const std::vector<TimeColor> timeColors =
-    {
-        {0.0f,  {0, 0, 59, 150}},
-        {6.0f,  {0, 0, 59, 150}},
-        {8.0f,  { 0,0,49,50}},
-        {10.0f, {0, 0, 0, 0}},
-        {17.0f, {0, 0, 0, 0}},
-        {18.0f, {121, 78, 59, 130}},
-        {18.5f, {0, 0, 59, 150}},
-        {24.0f, {0, 0, 59, 150}}
-    };
-
-    float currentTime = getHour() + getMin() / 60.0f;
-
-    SDL_Color mulLightColor = { 0, 0, 0, 0 };
-    for (size_t i = 0; i < timeColors.size() - 1; ++i)
-    {
-        if (currentTime >= timeColors[i].time && currentTime < timeColors[i + 1].time)
-        {
-            float t1 = timeColors[i].time;
-            float t2 = timeColors[i + 1].time;
-            float ratio = (currentTime - t1) / (t2 - t1);
-
-            const SDL_Color& c1 = timeColors[i].color;
-            const SDL_Color& c2 = timeColors[i + 1].color;
-
-            mulLightColor =
-            {
-                (Uint8)(c1.r + (c2.r - c1.r) * ratio),
-                (Uint8)(c1.g + (c2.g - c1.g) * ratio),
-                (Uint8)(c1.b + (c2.b - c1.b) * ratio),
-                (Uint8)(c1.a + (c2.a - c1.a) * ratio)
-            };
-            break;
-        }
-    }
+    //시간대별 야간 틴트 색 — 키프레임 보간은 constVar:colors가 단일 출처(월드맵 Map과 공유).
+    SDL_Color mulLightColor = mulCol::ambientMulColorAt(getHour() + getMin() / 60.0f);
 
     int mulFogCounter = 0;
     for (const auto& fog : mulFogList)

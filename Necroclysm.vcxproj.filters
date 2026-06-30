@@ -891,6 +891,9 @@
     <ClCompile Include="code\mapDiscovery.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
     </ClCompile>
+    <ClCompile Include="code\MapPin.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\worldGrid.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
     </ClCompile>

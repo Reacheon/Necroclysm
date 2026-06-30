@@ -17,6 +17,7 @@ import connectGroupExtraIndex;
 import autotile47Index;
 import checkCursor;
 import Player;
+import Entity;
 import World;
 import TileData;
 import worldGrid;
@@ -26,6 +27,7 @@ import city;
 import CityPlan;
 import worldSession;
 import mapDiscovery;
+import MapPin;
 
 // ════════════════════════════════════════════════════════════════════════
 // Map — 풀스크린 월드맵 (고전 JRPG 월드맵 스타일).
@@ -312,6 +314,53 @@ static std::wstring presetDisplayName(city::CityName cn)
 {
     const std::size_t i = static_cast<std::size_t>(cn);
     return (i != 0 && i < cityName.size()) ? cityName[i] : std::wstring{};
+}
+
+//MapSymbol → 화면 표시명(영어) — 청크맵 hover 툴팁용. resolveSymbol과 같은 종류 집합을 커버.
+//  (프로토타입 — 다국어는 향후 sysStr 매핑. city displayName과 동일 정책: 표시는 영어, i18n은 후속.)
+static std::wstring mapSymbolName(MapSymbol s)
+{
+    switch (s)
+    {
+    case MapSymbol::apartment:        return L"Apartment";
+    case MapSymbol::bank:             return L"Bank";
+    case MapSymbol::house:            return L"House";
+    case MapSymbol::warehouse:        return L"Warehouse";
+    case MapSymbol::cafe:             return L"Cafe";
+    case MapSymbol::cinema:           return L"Cinema";
+    case MapSymbol::junkShop:         return L"Junk Shop";
+    case MapSymbol::animalHospital:   return L"Animal Hospital";
+    case MapSymbol::pharmacy:         return L"Pharmacy";
+    case MapSymbol::restaurant:       return L"Restaurant";
+    case MapSymbol::stationeryStore:  return L"Stationery Store";
+    case MapSymbol::hardwareStore:    return L"Hardware Store";
+    case MapSymbol::bookstore:        return L"Bookstore";
+    case MapSymbol::patrolStation:    return L"Patrol Station";
+    case MapSymbol::convenienceStore: return L"Convenience Store";
+    case MapSymbol::bicycleShop:      return L"Bicycle Shop";
+    case MapSymbol::temple:           return L"Temple";
+    case MapSymbol::church:           return L"Church";
+    case MapSymbol::cathedral:        return L"Cathedral";
+    case MapSymbol::skyscraper:       return L"Skyscraper";
+    case MapSymbol::gasStation:       return L"Gas Station";
+    case MapSymbol::shoppingArcade:   return L"Shopping Arcade";
+    case MapSymbol::postOffice:       return L"Post Office";
+    case MapSymbol::autoShop:         return L"Auto Shop";
+    case MapSymbol::clothingStore:    return L"Clothing Store";
+    case MapSymbol::jewelryStore:     return L"Jewelry Store";
+    case MapSymbol::laundromat:       return L"Laundromat";
+    case MapSymbol::gardenShop:       return L"Garden Shop";
+    case MapSymbol::policeStation:    return L"Police Station";
+    case MapSymbol::fireStation:      return L"Fire Station";
+    case MapSymbol::hotel:            return L"Hotel";
+    case MapSymbol::hospital:         return L"Hospital";
+    case MapSymbol::library:          return L"Library";
+    case MapSymbol::park:             return L"Park";
+    case MapSymbol::hypermarket:      return L"Hypermarket";
+    case MapSymbol::school:           return L"School";
+    case MapSymbol::parkingLot:       return L"Parking Lot";
+    default:                          return std::wstring{};   // none / mountain
+    }
 }
 
 
@@ -847,8 +896,13 @@ static void drawCityLabels(const MapView& v)
     const auto* cities = worldGen::activeCities;
     if (!cities) return;
 
-    //줌 배율로 라벨 크기 — 너무 작아 안 보이거나 너무 커 화면을 덮지 않게 클램프.
-    const float scale = std::clamp((float)v.zoomScale(), 0.85f, 2.5f);
+    //줌 배율로 라벨 크기 — 단, zoomScale을 1:1로 따라가면 저배율(16/10px 청크)에서 폰트가
+    //  10~12px까지 줄어 읽기 힘듦. 기준 배율(LABEL_BASE_SCALE, 16px/청크 기준)에서 줌 변화의
+    //  LABEL_ZOOM_RATE 비율만 추종 → 줌아웃 시 천천히 작아진다. 너무 작/커지지 않게 클램프.
+    constexpr float LABEL_BASE_SCALE = 1.45f;  // 16px/청크(zoomScale=1)에서의 기준 배율 — 튜닝 가능
+    constexpr float LABEL_ZOOM_RATE  = 0.45f;  // 줌 변화 추종 비율(1=완전추종, 0=고정) — 튜닝 가능
+    const float scale = std::clamp(
+        LABEL_BASE_SCALE + ((float)v.zoomScale() - 1.0f) * LABEL_ZOOM_RATE, 0.9f, 2.5f);
 
     setFont(fontType::pixel);
     setFontSize(12);
@@ -1037,6 +1091,73 @@ namespace
     }
 }
 
+//⑤-b 얼굴 말풍선 마커 — 흰 테두리 원 배지 안에 플레이어 얼굴, hasTail이면 tailAng 방향으로 꼬리(말풍선).
+//   화면 밖 클램프(꼬리=플레이어 방향)와 위성맵 기본 마커(꼬리=아래, π/2)가 공유한다. 얼굴은 합성
+//   텍스처 frame0의 얼굴 영역(중앙 16px의 살짝 위, FACE_SRC)을 구멍 중앙에 NEAREST 스케일 — 합성
+//   텍스처는 투명 배경이라 사각 크롭이어도 원 밖으로 안 삐져 보인다(원형 클립 불요). 어두운 구멍 원이
+//   얼굴 투명부를 메워 "원에 뚫린 구멍 속 얼굴"처럼 보인다. (composePlayerTexture는 끝에서 렌더타겟을
+//   메인 타겟으로 복원하므로 맵 패스 중 호출해도 안전.)
+static void drawFaceBubble(int cx, int cy, double radius, double tailAng, bool hasTail)
+{
+    if (PlayerPtr == nullptr) return;
+
+    const SDL_Color rim    = { 255, 255, 255, 255 };   // 흰 테두리/꼬리
+    const SDL_Color hole   = {  28,  30,  40, 255 };   // 구멍(어두운 배경)
+    const double    margin = std::max(2.0, radius * 0.16);
+
+    //꼬리 — 배지 중심에서 tailAng 방향 삼각형(흰색). 밑변은 중심 부근, 꼭짓점은 바깥(fillTri가
+    //  이 함수보다 뒤라 SDL_RenderGeometry로 직접). 배지 원이 위에 덮어 밑변 안쪽은 가려진다.
+    if (hasTail)
+    {
+        const double tip = radius * 1.7, half = radius * 0.55;
+        const double ca = std::cos(tailAng), sa = std::sin(tailAng);
+        const SDL_FColor fc = { 1.f, 1.f, 1.f, 1.f };
+        SDL_Vertex tv[3] = {
+            { { (float)(cx + ca * tip),  (float)(cy + sa * tip)  }, fc, { 0, 0 } },
+            { { (float)(cx - sa * half), (float)(cy + ca * half) }, fc, { 0, 0 } },
+            { { (float)(cx + sa * half), (float)(cy - ca * half) }, fc, { 0, 0 } } };
+        int ti[3] = { 0, 1, 2 };
+        SDL_RenderGeometry(renderer, nullptr, tv, 3, ti, 3);
+    }
+
+    //배지 — 흰 원(테두리) → 안쪽 어두운 원(구멍).
+    drawFillCircle(cx, cy, (int)std::lround(radius),          rim,  255);
+    drawFillCircle(cx, cy, (int)std::lround(radius - margin), hole, 255);
+
+    //얼굴 — frame0 얼굴 크롭(FACE_SRC)을 구멍에 *원형*으로 클립. 화면 정원(반지름 rFace)을 triangle
+    //  fan(원판 메시)으로 만들고 각 둘레 정점의 UV를 크롭 중앙 기준 같은 각도·반지름에 매핑 → src의
+    //  내접원만 그려져 네모 모서리(어깨·머리카락 삐침)가 잘려나간다(SDL 사각 클립 한계 우회). 얼굴
+    //  투명부는 BLEND로 구멍(어두운 원)이 비친다.
+    const SDL_FRect FACE_SRC   = { 16.f, 6.f, 16.f, 16.f };   // frame0 내 얼굴 크롭(중앙 16px의 살짝 위) — 튜닝 가능
+    constexpr double FACE_FILL = 1.0;                         // 구멍 지름 대비 얼굴 채움 비율 — 튜닝 가능
+    SDL_Texture* faceTex = PlayerPtr->composePlayerTexture();
+    SDL_SetTextureBlendMode(faceTex, SDL_BLENDMODE_BLEND);
+    {
+        float texW, texH;
+        SDL_GetTextureSize(faceTex, &texW, &texH);
+        const float cu = (FACE_SRC.x + FACE_SRC.w * 0.5f) / texW;   // 크롭 중심 UV
+        const float cv = (FACE_SRC.y + FACE_SRC.h * 0.5f) / texH;
+        const float hu = (FACE_SRC.w * 0.5f) / texW;               // 크롭 반폭 UV(=내접원 반지름)
+        const float hv = (FACE_SRC.h * 0.5f) / texH;
+        const double rFace = (radius - margin) * FACE_FILL;
+        constexpr int SEG = 32;
+        const SDL_FColor fcw = { 1.f, 1.f, 1.f, 1.f };
+        SDL_Vertex fv[SEG + 2];
+        int        fi[SEG * 3];
+        fv[0] = { { (float)cx, (float)cy }, fcw, { cu, cv } };      // 중심
+        for (int i = 0; i <= SEG; ++i)
+        {
+            const double th = (double)i / SEG * (std::numbers::pi * 2.0);
+            const double c = std::cos(th), s = std::sin(th);
+            fv[i + 1] = { { (float)(cx + c * rFace), (float)(cy + s * rFace) }, fcw,
+                          { cu + (float)c * hu, cv + (float)s * hv } };
+        }
+        for (int i = 0; i < SEG; ++i) { fi[i * 3] = 0; fi[i * 3 + 1] = i + 1; fi[i * 3 + 2] = i + 2; }
+        SDL_RenderGeometry(renderer, faceTex, fv, SEG + 2, fi, SEG * 3);
+    }
+    SDL_DestroyTexture(faceTex);
+}
+
 static void drawWorldView(const MapView& v)
 {
     SDL_Texture* bg = worldMapTexture();   // 전세계 백드롭 — 항상 화면을 덮어 검정 방지
@@ -1082,128 +1203,272 @@ static void drawWorldView(const MapView& v)
             SDL_RenderTexture(renderer, win, nullptr, &dst);
         }
     }
+}
 
-    //점: 발견한 도시만(전장의 구름 핵심 — 지형색은 도시 위치를 숨기므로 점이 유일한 노출).
-    //  이름: 사전마킹(preset, codename!=none) 도시만(발견 무관, 밝게) — 전세계 조망 시 방향
-    //  잡는 앵커. 절차생성 자리표시자 이름은 위성지도에서 어색해 제외(이름은 청크맵에서만).
-    //  → 미발견 preset은 이름만 떠 위치 힌트, 발견 도시는 점, 발견 preset은 점+이름.
+//⑤-b 위성 뷰 도시 점/라벨 — drawWorldView에서 분리. 야간 오버레이 *뒤*에 그려 점/라벨은 조명
+//  영향을 안 받는다(밤에도 또렷, 청크맵 라벨과 동일 정책). 점: 발견한 도시만(전장의 구름 핵심 —
+//  지형색은 도시 위치를 숨기므로 점이 유일한 노출). 이름: 사전마킹(preset, codename!=none) 도시만
+//  (발견 무관) — 전세계 조망 시 방향 앵커. 절차생성 자리표시자 이름은 위성지도에서 어색해 제외(이름은
+//  청크맵에서만). → 미발견 preset은 이름만 떠 위치 힌트, 발견 도시는 점, 발견 preset은 점+이름.
+static void drawWorldCities(const MapView& v)
+{
     const auto* cities = worldGen::activeCities;
-    if (cities)
+    if (!cities) return;
+
+    setFont(fontType::pixel);
+    setFontSize(12);
+    for (const auto& node : *cities)
     {
-        setFont(fontType::pixel);
-        setFontSize(12);
-        for (const auto& node : *cities)
+        const bool seen   = mapDiscovery::discovered(tilePixelIX(node.center.x), tilePixelIY(node.center.y));
+        const bool preset = (node.codename != city::CityName::none);
+        if (!seen && !preset) continue;
+
+        const int sx = (int)std::lround(v.sX(tileToPixelX(node.center.x)));
+        const int sy = (int)std::lround(v.sY(tileToPixelY(node.center.y)));
+        if (sx < -8 || sx > v.viewW + 8 || sy < -8 || sy > v.viewH + 8) continue;
+
+        if (seen)
         {
-            const bool seen   = mapDiscovery::discovered(tilePixelIX(node.center.x), tilePixelIY(node.center.y));
-            const bool preset = (node.codename != city::CityName::none);
-            if (!seen && !preset) continue;
-
-            const int sx = (int)std::lround(v.sX(tileToPixelX(node.center.x)));
-            const int sy = (int)std::lround(v.sY(tileToPixelY(node.center.y)));
-            if (sx < -8 || sx > v.viewW + 8 || sy < -8 || sy > v.viewH + 8) continue;
-
-            if (seen)
-            {
-                drawFillCircle(sx, sy, 3, SDL_Color{ 245, 222, 120, 255 }, 255);
-                drawFillCircle(sx, sy, 2, SDL_Color{  70,  45,  15, 255 }, 255);
-            }
-
-            if (preset)
-            {
-                const std::wstring name = presetDisplayName(node.codename);
-                if (!name.empty())
-                    drawTextOutlineCenter(name, sx, sy - 13, SDL_Color{ 245, 222, 120, 255 });
-            }
+            drawFillCircle(sx, sy, 3, SDL_Color{ 245, 222, 120, 255 }, 255);
+            drawFillCircle(sx, sy, 2, SDL_Color{  70,  45,  15, 255 }, 255);
         }
-        setFont(fontType::mainFont);
-    }
 
-    //플레이어 마커(펄스).
-    const int psx = (int)std::lround(v.sX(tileToPixelX(PlayerX())));
-    const int psy = (int)std::lround(v.sY(tileToPixelY(PlayerY())));
-    if ((SDL_GetTicks() % 900) < 600)
+        if (preset)
+        {
+            const std::wstring name = presetDisplayName(node.codename);
+            if (!name.empty())
+                drawTextOutlineCenter(name, sx, sy - 13, SDL_Color{ 245, 222, 120, 255 });
+        }
+    }
+    setFont(fontType::mainFont);
+}
+
+//⑤-c 위성 뷰 플레이어 마커 — 얼굴 말풍선. 화면 안이면 배지를 위치 위로 올려 꼬리가 아래(위치)를
+//  가리키고, 화면 밖이면 플레이어 방향 꼬리 + 가장자리 클램프. (위성맵은 광역이라 항상 말풍선.)
+//  drawWorldView에서 분리 — 야간 오버레이 *뒤*에 그려 말풍선은 조명 영향을 안 받는다(밤에도 또렷).
+static void drawWorldPlayerMarker(const MapView& v)
+{
+    const double pxd = v.sX(tileToPixelX(PlayerX()));
+    const double pyd = v.sY(tileToPixelY(PlayerY()));
+    constexpr double R = 26.0, M = 16.0;
+    if (pxd < 0 || pxd > v.viewW || pyd < 0 || pyd > v.viewH)
     {
-        drawFillCircle(psx, psy, 5, SDL_Color{ 255, 255, 255, 255 }, 255);
-        drawFillCircle(psx, psy, 3, mappal::playerMarker(), 255);
+        const double ang = std::atan2(pyd - v.viewH * 0.5, pxd - v.viewW * 0.5);
+        const int ex = (int)std::clamp(pxd, M + R, v.viewW - M - R);
+        const int ey = (int)std::clamp(pyd, M + R, v.viewH - M - R);
+        drawFaceBubble(ex, ey, R, ang, true);
     }
     else
-        drawFillCircle(psx, psy, 4, mappal::playerMarker(), 220);
+    {
+        const int bx = (int)std::lround(pxd);
+        const int by = (int)std::lround(pyd - R * 1.5);   // 배지를 위로 올려 꼬리 끝이 위치를 가리킴
+        drawFaceBubble(bx, by, R, std::numbers::pi * 0.5, true);   // 꼬리 아래(π/2)
+    }
 }
 
 //⑤ 플레이어 마커 — 화면 안이면 펄스, 밖이면 가장자리 클램프.
 static void drawPlayerMarker(const MapView& v)
 {
-    const double ppX = tileToPixelX(PlayerX());
-    const double ppY = tileToPixelY(PlayerY());
+    //플레이어 위치를 자신이 속한 청크 칸 *중앙*으로 양자화 — 건물 심볼과 동일하게 청크 그리드에
+    //  스냅(청크 내 세부 타일 위치는 무시). tilePixelIX/IY=청크 인덱스, +0.5=칸 중앙.
+    const double ppX = tilePixelIX(PlayerX()) + 0.5;
+    const double ppY = tilePixelIY(PlayerY()) + 0.5;
     const double sxd = v.sX(ppX);
     const double syd = v.sY(ppY);
 
+    //화면 밖 — 빨간 사각 대신 얼굴 말풍선(꼬리=플레이어 방향)을 가장자리로 클램프.
     if (sxd < 0 || sxd > v.viewW || syd < 0 || syd > v.viewH)
     {
-        const int ex = (int)std::clamp(sxd, 16.0, (double)v.viewW - 16.0);
-        const int ey = (int)std::clamp(syd, 16.0, (double)v.viewH - 16.0);
-        drawFillRect(SDL_Rect{ ex - 7, ey - 7, 14, 14 }, mappal::playerMarker());
-        drawRect(SDL_Rect{ ex - 7, ey - 7, 14, 14 }, SDL_Color{ 255, 255, 255, 255 });
+        constexpr double R = 28.0, M = 16.0;
+        const double ang = std::atan2(syd - v.viewH * 0.5, sxd - v.viewW * 0.5);
+        const int ex = (int)std::clamp(sxd, M + R, (double)v.viewW - M - R);
+        const int ey = (int)std::clamp(syd, M + R, (double)v.viewH - M - R);
+        drawFaceBubble(ex, ey, R, ang, true);
         return;
     }
 
     const int sx = (int)std::round(sxd);
     const int sy = (int)std::round(syd);
-    if ((SDL_GetTicks() % 900) < 600)
+
+    //프로토타입 — 빨간 점/펄스는 안 그리고, 플레이어 캐릭터 스프라이트 *자체*가 깜빡이는 마커.
+    //  캐릭터 본체 bbox는 프레임 중앙 ~16x16(건물 art와 동일 크기, 머리만 위로 빼꼼)이라 건물 심볼과
+    //  같은 zoomScale 배율로 칸 중심에 그리면 본체가 1청크에 꽉 찬다(프레임 중심 24,24 ≈ 본체 중심).
+    //  단 줌아웃에선 본체(=16*z px)가 너무 작아지지 않게 화면 본체폭 하한(MARKER_MIN_BODY_PX)으로 살짝 키움.
+    //  composePlayerTexture는 매 호출 288x384 TARGET 텍스처를 새로 만들고 끝에서 렌더타겟을 nullptr
+    //  (=맵이 그려지는 메인 타겟)로 복원하므로 맵 패스 중 호출해도 안전. Sprite takeOwnership=true →
+    //  스코프 끝에서 SDL_DestroyTexture(매 프레임 1개, 프로토타입 OK·추후 캐시 가능).
+    //  frame 0 = charSprIndex::WALK(정면 idle — 상태창 포트레이트와 동일).
+    //깜빡임 — 켜짐 구간(900ms 중 600ms)만 캐릭터를 그리고 흐림 구간은 완전히 사라짐(on/off).
+    //  켜짐 구간만 합성·드로우라 비용도 절약. 합성 텍스처는 BLEND 명시(투명 배경 처리, 매 프레임 새 텍스처).
+    if (PlayerPtr != nullptr && (SDL_GetTicks() % 900) < 600)
     {
-        drawFillCircle(sx, sy, 7, SDL_Color{ 255, 255, 255, 255 }, 255);
-        drawFillCircle(sx, sy, 5, mappal::playerMarker(), 255);
+        constexpr double MARKER_MIN_BODY_PX = 14.0;   // 줌아웃 시 본체 최소 화면폭(px) — 튜닝 가능
+        const float z = (float)std::max(v.zoomScale(), MARKER_MIN_BODY_PX / 16.0);
+        SDL_Texture* charTex = PlayerPtr->composePlayerTexture();
+        Sprite charSpr(renderer, charTex, 48, 48, true);
+        SDL_SetTextureBlendMode(charTex, SDL_BLENDMODE_BLEND);
+        setZoom(z);
+        drawSpriteCenter(&charSpr, charSprIndex::WALK, sx, sy);
+        setZoom(1.0f);
     }
-    else
+}
+
+
+// ────────── ⑧ 맵 핀 (플레이어 웨이포인트 = 빛의 기둥) ──────────
+//  타일점에서 위로 솟는 발광 기둥. 크기는 줌(curScale)에 비례 가변(클램프) — 당길수록 커지고 멀수록 작게.
+//  애니는 차분하게(호흡 + 바닥 원형 펄스). 메뉴 색칩은 단색 위치핀 기호(원+삼각). SDL 원시함수만(신규 아트 0).
+
+static SDL_Color mpTint(SDL_Color c, double f)
+{
+    return SDL_Color{ (Uint8)(c.r + (255 - c.r) * f), (Uint8)(c.g + (255 - c.g) * f), (Uint8)(c.b + (255 - c.b) * f), 255 };
+}
+
+//단색 삼각형 채움(SDL_RenderGeometry) — 위치핀 기호의 끝(아래 삼각)용.
+static void fillTri(float x0, float y0, float x1, float y1, float x2, float y2, SDL_Color c)
+{
+    const SDL_FColor fc = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, 1.0f };
+    SDL_Vertex v[3] = { { { x0, y0 }, fc, { 0, 0 } }, { { x1, y1 }, fc, { 0, 0 } }, { { x2, y2 }, fc, { 0, 0 } } };
+    int idx[3] = { 0, 1, 2 };
+    SDL_RenderGeometry(renderer, nullptr, v, 3, idx, 3);
+}
+
+//세로 그라디언트 빔(빛의 기둥 1겹) — 바닥(baseY)에서 위(topY)로 알파가 아래→위로 옅어지는 사다리꼴.
+//  SDL_RenderGeometry 쿼드(2삼각형) + 정점 알파. 알파<255라 BLEND 모드 보장.
+static void gradBeam(float cx, float baseY, float topY, float halfBase, float halfTop, SDL_Color c, Uint8 aBase, Uint8 aTop)
+{
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    const SDL_FColor cb = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, aBase / 255.0f };
+    const SDL_FColor ct = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, aTop  / 255.0f };
+    SDL_Vertex v[4] = {
+        { { cx - halfBase, baseY }, cb, { 0, 0 } },
+        { { cx + halfBase, baseY }, cb, { 0, 0 } },
+        { { cx + halfTop,  topY  }, ct, { 0, 0 } },
+        { { cx - halfTop,  topY  }, ct, { 0, 0 } },
+    };
+    int idx[6] = { 0, 1, 2, 0, 2, 3 };
+    SDL_RenderGeometry(renderer, nullptr, v, 4, idx, 6);
+}
+
+//단색 위치핀 기호 — 원(머리) 아래에 삼각(끝). 메뉴 색 버튼 칩용(옛 광택 구 대체). 플랫 단색.
+static void drawPinGlyph(int cx, int cy, int glyphH, SDL_Color col)
+{
+    const int   rc     = std::max(3, (int)std::lround(glyphH * 0.30));   // 머리 반지름
+    const int   headCy = cy - (int)std::lround(glyphH * 0.16);           // 머리 중심(위쪽)
+    const float bw     = rc * 0.95f;
+    fillTri((float)cx, (float)(cy + glyphH * 0.52f),
+            (float)(cx - bw), (float)headCy, (float)(cx + bw), (float)headCy, col);   // 아래 삼각
+    drawFillCircle(cx, headCy, rc, col, 255);                                          // 머리 원
+}
+
+//타원 외곽선(바닥 원형 펄스용) — 선분 근사. 채움이 아니라 링이라 "퍼지는 파동"으로 읽힌다.
+static void ellipseRing(int cx, int cy, double rx, double ry, SDL_Color c, Uint8 a)
+{
+    if (rx < 1.0 || a == 0) return;
+    const int seg = std::max(16, (int)std::lround(rx * 1.6));
+    double px = cx + rx, py = cy;
+    for (int i = 1; i <= seg; ++i)
     {
-        drawFillCircle(sx, sy, 5, mappal::playerMarker(), 200);
+        const double ang = (double)i / seg * (std::numbers::pi * 2.0);
+        const double nx = cx + std::cos(ang) * rx;
+        const double ny = cy + std::sin(ang) * ry;
+        drawLine((int)std::lround(px), (int)std::lround(py), (int)std::lround(nx), (int)std::lround(ny), c, a);
+        px = nx; py = ny;
     }
+}
+
+//빛의 기둥 마커 — 타일점(ax,ay)에서 위로 솟는 발광 기둥 + 바닥 글로우 풀. 애니는 차분하게:
+//  ① 전체가 밝아졌다 어두워지는 호흡 ② 바닥에서 천천히 퍼지는 원형(타원) 펄스 1겹. (상승 펄스는 과해서 폐기.)
+//  scale=화면 px/청크(curScale). 크기를 여기 비례시키되 클램프 → 어느 줌에서도 자연스러운 크기.
+static void drawBeacon(int ax, int ay, SDL_Color col, double scale)
+{
+    const double W = std::clamp(scale * 0.34, 3.0, 26.0);     // 기준 반폭(줌 가변)
+    const double H = std::clamp(scale * 2.60, 24.0, 150.0);   // 기둥 높이(줌 가변)
+    const float  cx = (float)ax, baseY = (float)ay, topY = (float)(ay - H);
+    const SDL_Color hot = mpTint(col, 0.55);                  // 중심부 밝은 틴트
+
+    const double now = (double)SDL_GetTicks();
+    const double breath = 0.82 + 0.18 * std::sin(now / 1700.0 * 2.0 * std::numbers::pi);   // 전체 강도 호흡
+    auto A = [&](double a) -> Uint8 { return (Uint8)std::clamp(a * breath, 0.0, 255.0); };
+
+    //바닥 글로우 풀 — 빛이 바닥에 고인 동심 타원(중심 밝게).
+    drawFillEllipse(ax, ay, (int)std::lround(W * 2.4), (int)std::lround(W * 1.0),  col, A(55));
+    drawFillEllipse(ax, ay, (int)std::lround(W * 1.5), (int)std::lround(W * 0.62), col, A(110));
+    drawFillEllipse(ax, ay, (int)std::lround(W * 0.8), (int)std::lround(W * 0.34), hot, A(190));
+
+    //기둥 — 겉(넓고 옅음) → 중간 → 중심부(좁고 밝음). 위로 갈수록 알파 0.
+    gradBeam(cx, baseY, topY, (float)(W * 1.8),  (float)(W * 1.3), col, A(40),  0);
+    gradBeam(cx, baseY, topY, (float)(W * 1.0),  (float)(W * 0.7), col, A(115), 0);
+    gradBeam(cx, baseY, topY, (float)(W * 0.42), (float)(W * 0.3), hot, A(200), 0);
+
+    //바닥 원형 펄스 — 바닥에서 바깥으로 천천히 퍼지며 사라지는 타원 링 1겹(지면 파동). 차분.
+    {
+        const double pp = std::fmod(now, 2200.0) / 2200.0;       // 0..1 (약 2.2초 주기)
+        const double rx = W * (1.1 + pp * 2.6);
+        const Uint8  pa = (Uint8)std::lround((1.0 - pp) * 100.0); // 퍼질수록 옅게
+        ellipseRing(ax, ay, rx, rx * 0.42, col, pa);
+    }
+}
+
+//화면 밖 핀의 가장자리 방향 표시 — 플레이어 마커 off-screen 처리와 동일 컨셉(가장자리로 클램프).
+//  미니맵 rim 화살표와 같은 결: 흰 테 없이 색 글로우 + 바깥 방향 화살표 + 밝은 중심. (앵커가 화면 밖일 때)
+static void drawMapPinEdge(const MapView& v, double sxd, double syd, SDL_Color col)
+{
+    constexpr double margin = 22.0;
+    const double ang = std::atan2(syd - v.viewH * 0.5, sxd - v.viewW * 0.5);   // 화면 중심→핀 방향
+    const int ex = (int)std::clamp(sxd, margin, v.viewW - margin);
+    const int ey = (int)std::clamp(syd, margin, v.viewH - margin);
+    const SDL_Color hot = mpTint(col, 0.45);
+
+    drawFillCircle(ex, ey, 10, col, 50);    // 글로우(바깥)
+    drawFillCircle(ex, ey, 6,  col, 110);   // 글로우(안쪽)
+
+    const double L = 12.0, halfW = 7.5, back = 3.0;   // 바깥을 가리키는 화살표
+    const float tipX = ex + (float)(std::cos(ang) * L),    tipY = ey + (float)(std::sin(ang) * L);
+    const float bX   = ex - (float)(std::cos(ang) * back), bY   = ey - (float)(std::sin(ang) * back);
+    const float pX   = (float)(-std::sin(ang) * halfW),    pY   = (float)(std::cos(ang) * halfW);
+    fillTri(tipX, tipY, bX + pX, bY + pY, bX - pX, bY - pY, hot);
+    drawFillCircle(ex, ey, 3, hot, 255);    // 밝은 중심
+}
+
+//⑧ 맵 핀 — 색상별 마커. 현재 보는 z의 색마다 빛의 기둥으로 그림(크기는 v.curScale 비례, 가변).
+//  앵커(핀 타일점)가 화면 안이면 기둥, 밖이면 플레이어 마커처럼 가장자리 방향 표시(drawMapPinEdge).
+//  sX(tileToPixelX)/sY(tileToPixelY) 환산 — 핀 x가 청크 중심 타일이라 셀 한가운데에 앉는다.
+static void drawMapPins(const MapView& v)
+{
+    for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
+    {
+        if (!mapPins[i] || mapPins[i]->z != v.z) continue;
+        const double sxd = v.sX(tileToPixelX(mapPins[i]->x));
+        const double syd = v.sY(tileToPixelY(mapPins[i]->y));
+        const SDL_Color col = mapPinColor(i);
+        if (sxd < 0 || sxd > v.viewW || syd < 0 || syd > v.viewH)
+            drawMapPinEdge(v, sxd, syd, col);   // 화면 밖 → 가장자리 방향 표시
+        else
+            drawBeacon((int)std::lround(sxd), (int)std::lround(syd), col, v.curScale);
+    }
+}
+
+
+//⑨ 야간 조명 오버레이 — 본체 월드 타일이 시간대별로 받는 곱셈(MUL) 틴트(밤=남색)를 월드맵에도
+//   똑같이 적용. 타일별 배치인 본체(renderTile::drawMulFogs)와 달리 맵은 화면 전체에 색이 균일하므로
+//   풀스크린 사각형 1장이면 동일 결과(같은 색·같은 MUL 블렌드). 틴트 색은 constVar:colors가 단일 출처.
+//   지형·심볼 위에 깔되 라벨·플레이어·핀·UI보다 아래라 정보/마커 가독성은 유지된다(빛기둥은 밤에 빛남).
+static void drawNightOverlay(const MapView& v)
+{
+    const SDL_Color c = mulCol::ambientMulColorAt(getHour() + getMin() / 60.0f);
+    if (c.a == 0) return;   //낮 — 틴트 없음(곱셈 항등)
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+    SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+    SDL_FRect full = { 0.0f, 0.0f, (float)v.viewW, (float)v.viewH };
+    SDL_RenderFillRect(renderer, &full);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);   //블렌드 모드 원복(다음 패스 오염 방지)
 }
 
 
 // ════════════════════════════════════════════════════════════════════════
 // §5  UI 크롬
 // ════════════════════════════════════════════════════════════════════════
-
-//플레이어 좌표 — 우측하단, 축별 3줄. 무채색만 사용: 라벨(X/Y/Z)은 흐린 회색+준굵게,
-//  값은 밝은 흰색+굵게 → 색상(hue) 없이 밝기·굵기로 라벨↔값 구분(라벨 3개는 동일색).
-//  값은 우측정렬, 박스 없이 외곽선으로 가독성 확보. 안내 문구는 없음.
-static void drawCoordPanel(const MapView& v)
-{
-    constexpr int margin = 26;
-    constexpr int rowH   = 26;
-    const int RX = v.viewW - margin;   // 값 우측 정렬 기준선
-
-    const wchar_t* labels[3] = { L"X", L"Y", L"Z" };
-    const int      vals[3]   = { PlayerX(), PlayerY(), PlayerZ() };
-
-    const SDL_Color labelCol = { 240, 240, 240, 255 };   // 흐린 회색(X/Y/Z 동일)
-    const SDL_Color valueCol = { 240, 240, 234, 255 };   // 밝은 흰색
-
-    setFontSize(19);
-
-    //값 최대폭(굵은 폰트 기준)으로 라벨 컬럼 결정 — 값=우측정렬(RX), 라벨=그 왼쪽 고정 컬럼.
-    setFont(fontType::mainFontBold);
-    int maxValW = 0;
-    for (int i = 0; i < 3; ++i) maxValW = std::max(maxValW, queryTextWidth(std::to_wstring(vals[i])));
-    const int labelColRight = RX - maxValW - 18;
-    const int topY = v.viewH - margin - rowH * 3;
-
-    for (int i = 0; i < 3; ++i)
-    {
-        const int y = topY + i * rowH;
-
-        setFont(fontType::mainFontBold);
-        const std::wstring val = std::to_wstring(vals[i]);
-        drawTextOutline(val, RX - queryTextWidth(val), y, valueCol);                 // 값(흰·굵게, 우측정렬)
-
-        setFont(fontType::mainFontSemiBold);
-        const std::wstring lab = labels[i];
-        drawTextOutline(lab, labelColRight - queryTextWidth(lab), y, labelCol);      // 라벨(회색·준굵게)
-    }
-
-    setFont(fontType::mainFont);
-}
 
 struct ZoomButtons { SDL_Rect zoomIn, zoomOut, home; };
 
@@ -1223,18 +1488,52 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
     constexpr int margin = 22;
     int btnSize = zb.zoomIn.w;
     constexpr int gap = 10;
-    int panelW = (btnSize + gap) * 3 + 18;
-    int panelH = btnSize + 30 + 14;
+    constexpr int coordRow = 24;   // 라벨과 버튼 사이에 끼울 좌표 한 줄 높이
+
+    //플레이어 좌표 한 줄 — 라벨(주황) + 값(흰색). 폭을 미리 측정해 패널 너비에 반영.
+    const wchar_t* clabels[3] = { L"X", L"Y", L"Z" };
+    const int      cvals[3]   = { PlayerX(), PlayerY(), PlayerZ() };
+    setFontSize(16);
+    int coordW = 0;
+    for (int i = 0; i < 3; ++i)
+    {
+        setFont(fontType::mainFontSemiBold); coordW += queryTextWidth(std::wstring(clabels[i])) + 4;
+        setFont(fontType::mainFontBold);     coordW += queryTextWidth(std::to_wstring(cvals[i]));
+        if (i < 2) coordW += 14;
+    }
+
+    //버튼은 computeZoomButtons가 화면 하단 기준으로 고정 → 패널만 위로 coordRow만큼 키워 좌표 줄을 끼운다.
+    int panelW = std::max((btnSize + gap) * 3 + 18, coordW + 28);
+    int panelH = btnSize + 30 + 14 + coordRow;
     int panelX = margin - 9;
-    int panelY = cameraH - margin - btnSize - 36;
+    int panelY = cameraH - margin - btnSize - 36 - coordRow;
     drawStadium(panelX, panelY, panelW, panelH, mappal::uiPanel(), 220, 3);
 
+    //① 줌 라벨(또는 Satellite).
+    setFont(fontType::mainFont);
     setFontSize(16);
     std::wstring label = v.worldLOD()
         ? std::wstring(L"Satellite")
         : L"Zoom  " + std::to_wstring((int)std::lround(v.curScale)) + L" px/chunk";
     drawText(label, panelX + 14, panelY + 8, mappal::uiText());
 
+    //② 좌표 한 줄 — 라벨 아래, 버튼 위. 라벨=주황(Status #e1772e), 값=밝은 흰색.
+    {
+        int hx = panelX + 14;
+        const int cy = panelY + 8 + coordRow;
+        for (int i = 0; i < 3; ++i)
+        {
+            setFont(fontType::mainFontSemiBold);
+            drawText(clabels[i], hx, cy, SDL_Color{ 0xe1, 0x77, 0x2e, 255 });
+            hx += queryTextWidth(std::wstring(clabels[i])) + 4;
+            setFont(fontType::mainFontBold);
+            const std::wstring val = std::to_wstring(cvals[i]);
+            drawText(val, hx, cy, SDL_Color{ 240, 240, 234, 255 });
+            hx += queryTextWidth(val) + 14;
+        }
+    }
+
+    //③ 줌 버튼.
     auto button = [&](const SDL_Rect& r, const std::wstring& glyph)
         {
             SDL_Color fill = { 35, 35, 45, 255 };
@@ -1269,6 +1568,97 @@ static void drawTabButton()
         tab.x + 164, tab.y + 8);
 }
 
+//청크 그리드 마커 — gridMarker(16px)를 zoomScale로 스케일 → 정확히 1청크 셀(16*zoomScale=curScale).
+//  펄스 알파는 게임 화면 마커(HUD)와 동일 sin 곡선. (px,py)=대상 청크 픽셀 인덱스. hover·메뉴 타겟 공용.
+static void drawChunkMarker(const MapView& v, int px, int py)
+{
+    const double rat = std::fmod(static_cast<double>(SDL_GetTicks()) / 1500.0, 1.0);
+    const double na  = (std::sin(rat * 2.0 * 3.14159265358979) + 1.0) * 0.5;
+    const Uint8  a   = static_cast<Uint8>(100 + na * (255 - 100));
+
+    setZoom(static_cast<float>(v.zoomScale()));
+    SDL_SetTextureBlendMode(spr::gridMarker->getTexture(), SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), a);
+    drawSpriteCenter(spr::gridMarker, 0,
+        (int)std::lround(v.sX(px + 0.5)), (int)std::lround(v.sY(py + 0.5)));
+    SDL_SetTextureAlphaMod(spr::gridMarker->getTexture(), 255);
+    setZoom(1.0f);
+}
+
+//⑦ 마우스 hover — 가리키는 청크에 타일 마커(게임 화면과 동일 gridMarker, 펄스 알파) + 그 청크에
+//   건물이 있으면 마우스 우측하단에 이름 툴팁(반투명 검정 배경). 청크맵 분기에서만 호출 —
+//   위성 LOD(광역 조망)에선 미호출(마커/툴팁 불필요). 건물 탐색은 hover 청크를 bbox로 감싸는
+//   도시만 심볼 스캔(drawCityBuildings와 동일 footprint 규약: pos=좌상단, w×h 청크). 미발견 건물은
+//   "Unknown"(?건물 스프라이트와 정합 — 종류는 가봐야 드러남).
+static void drawHoverInfo(const MapView& v)
+{
+    //UI 크롬(탭/줌 버튼) 위에선 hover 비활성 — 툴팁/마커가 버튼을 덮지 않게.
+    ZoomButtons zb = computeZoomButtons();
+    if (checkCursor(&tab) || checkCursor(&zb.zoomIn) || checkCursor(&zb.zoomOut) || checkCursor(&zb.home))
+        return;
+
+    const int mx = (int)getMouseX();
+    const int my = (int)getMouseY();
+
+    //스크린 → 청크 픽셀 역변환(sX/sY의 역). X는 원기둥 wrap, Y는 월드 범위 밖이면 공허 → 스킵.
+    const double pxF = v.centerPX + (mx - v.viewW * 0.5) / v.curScale;
+    const double pyF = v.centerPY + (my - v.viewH * 0.5) / v.curScale;
+    const int px = (int)std::floor(pxF);
+    const int py = (int)std::floor(pyF);
+    if (py < 0 || py >= WORLD_PIXEL_H) return;
+
+    //① 타일 마커 — hover 청크에 그리드 마커.
+    drawChunkMarker(v, px, py);
+
+    //② 건물 이름 — hover 청크를 footprint로 덮는 심볼 탐색. 발견=실제 종류, 미발견=Unknown.
+    const auto* cities = worldGen::activeCities;
+    if (!cities) return;
+
+    const int wpx = worldWrap::wrapPixelX(px);   // 건물 anchor(apx)는 wrap된 좌표
+    std::wstring label;
+    for (std::size_t i = 0; i < cities->size() && label.empty(); ++i)
+    {
+        const auto& node = (*cities)[i];
+        if (node.center.z != v.z) continue;
+        //이 도시 bbox가 hover 청크를 안 감싸면 심볼 스캔 생략(값싼 컬링).
+        if (wpx < node.bboxPx || wpx >= node.bboxPx + node.bboxW ||
+            py  < node.bboxPy || py  >= node.bboxPy + node.bboxH) continue;
+
+        const std::vector<CitySymbol>* syms = symbolsFor(static_cast<city::CityId>(i));
+        if (!syms) continue;
+
+        for (const auto& sym : *syms)
+        {
+            if (sym.pos.z != v.z) continue;
+            const int apx = tilePixelIX(sym.pos.x);
+            const int apy = tilePixelIY(sym.pos.y);
+            if (wpx < apx || wpx >= apx + sym.w || py < apy || py >= apy + sym.h) continue;
+
+            label = mapDiscovery::discovered(apx, apy) ? mapSymbolName(sym.symbol) : L"Unknown";
+            break;
+        }
+    }
+    if (label.empty()) return;
+
+    //③ 툴팁 — 마우스 우측하단. 반투명 검정 배경 + 흰 글씨. 화면 밖으로 넘치면 반대쪽으로 클램프.
+    setFont(fontType::mainFont);
+    setFontSize(18);
+    const int tw = queryTextWidth(label);
+    const int th = queryTextHeight(label);
+    constexpr int padX = 8, padY = 5, off = 18;
+
+    int bx = mx + off;
+    int by = my + off;
+    if (bx + tw + padX * 2 > v.viewW) bx = mx - off - (tw + padX * 2);   // 우측 넘침 → 좌측
+    if (by + th + padY * 2 > v.viewH) by = v.viewH - (th + padY * 2);    // 하단 넘침 → 위로 당김
+    if (bx < 0) bx = 0;
+    if (by < 0) by = 0;
+
+    drawFillRect(SDL_Rect{ bx, by, tw + padX * 2, th + padY * 2 }, SDL_Color{ 0, 0, 0, 255 }, (Uint8)190);
+    drawText(label, bx + padX, by + padY, mappal::uiText());
+    setFont(fontType::mainFont);
+}
+
 
 // ════════════════════════════════════════════════════════════════════════
 // §6  Map 클래스
@@ -1284,6 +1674,15 @@ private:
     bool   dragMoved     = false;
     double dragAnchorPX  = 0.0;
     double dragAnchorPY  = 0.0;
+
+    //핀 컨텍스트 메뉴 상태 — 청크맵에서 우클릭 시 열림. 타겟 타일 좌표(찍을 위치)와 레이아웃 rect 보관.
+    //  Map이 항상 최상단 GUI이므로 별도 GUI 서브클래스 없이 Map 안에서 모달처럼 직접 처리(드래그/줌 억제).
+    bool     pinMenuOpen  = false;
+    int      pinMenuTileX = 0;
+    int      pinMenuTileY = 0;
+    int      pinMenuZ     = 0;
+    SDL_Rect pinMenuRect{};
+    std::array<SDL_Rect, MAP_PIN_COLOR_COUNT> pinSwatch{};
 
     //줌은 Map 인스턴스 수명 넘어 영속. 센터/Z는 매 열기마다 플레이어 기준 리셋.
     inline static int persistedZoom = mapcfg::DEFAULT_ZOOM;
@@ -1316,6 +1715,134 @@ public:
 
     void changeXY(int /*ix*/, int /*iy*/, bool /*center*/) override { x = 0; y = 0; }
 
+    // ────────── 핀 컨텍스트 메뉴 ──────────
+
+    //메뉴 박스/스와치/제거버튼 rect 배치 — 앵커(mx,my) 우하단에 펼치되 화면 밖이면 반대로 클램프.
+    //  레이아웃: 좌표 한 줄 → "MAP PIN" 헤더(버튼 위, 양옆 구분선) → 색 버튼 줄(서로 떨어짐) → (마커 있으면)제거.
+    //  좌표 폭을 그릴 때와 동일 폰트로 측정해 패널 너비 결정(버튼 줄과 max). 상수는 drawPinMenu와 공유.
+    void layoutPinMenu(int mx, int my)
+    {
+        constexpr int padX = 14, padTop = 9, padBot = 12, coordH = 24, headerH = 18;
+        constexpr int btn = 48, btnGap = 12, gapCoordHeader = 4, gapHeaderBtn = 8, groupGap = 16, labelGap = 4;
+
+        setFontSize(17);
+        const wchar_t* labels[3] = { L"X", L"Y", L"Z" };
+        const int      vals[3]   = { pinMenuTileX, pinMenuTileY, pinMenuZ };
+        int coordW = 0;
+        for (int i = 0; i < 3; ++i)
+        {
+            setFont(fontType::mainFontSemiBold); coordW += queryTextWidth(labels[i]) + labelGap;
+            setFont(fontType::mainFontBold);     coordW += queryTextWidth(std::to_wstring(vals[i]));
+            if (i < 2) coordW += groupGap;
+        }
+        setFont(fontType::mainFont);
+
+        const int swatchRowW = MAP_PIN_COLOR_COUNT * btn + (MAP_PIN_COLOR_COUNT - 1) * btnGap;
+        const int contentW   = std::max(swatchRowW, coordW);
+        const int panelW     = contentW + padX * 2;
+        const int swatchTop  = padTop + coordH + gapCoordHeader + headerH + gapHeaderBtn;
+        const int panelH     = swatchTop + btn + padBot;
+
+        int bx = mx + 6, by = my + 6;
+        if (bx + panelW > cameraW) bx = cameraW - panelW - 4;
+        if (by + panelH > cameraH) by = cameraH - panelH - 4;
+        if (bx < 4) bx = 4;
+        if (by < 4) by = 4;
+        pinMenuRect = { bx, by, panelW, panelH };
+
+        const int sx0 = bx + (panelW - swatchRowW) / 2;
+        for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
+            pinSwatch[i] = { sx0 + i * (btn + btnGap), by + swatchTop, btn, btn };
+    }
+
+    //우클릭 → 메뉴 열기. 청크맵에서만, UI 크롬 위는 무시. 타겟 청크 중심 타일을 좌표로 잡는다.
+    void openPinMenu(int mx, int my)
+    {
+        if (view.worldLOD()) return;   // 위성 LOD가 아닌 청크맵 단계에서만
+        ZoomButtons zb = computeZoomButtons();
+        if (checkCursor(&tab) || checkCursor(&zb.zoomIn) || checkCursor(&zb.zoomOut) || checkCursor(&zb.home)) return;
+
+        //스크린 → 청크 픽셀 역변환(drawHoverInfo와 동일). X는 원기둥 wrap, Y 월드 밖이면 무시.
+        const double pxF = view.centerPX + (mx - view.viewW * 0.5) / view.curScale;
+        const double pyF = view.centerPY + (my - view.viewH * 0.5) / view.curScale;
+        const int px = (int)std::floor(pxF);
+        const int py = (int)std::floor(pyF);
+        if (py < 0 || py >= WORLD_PIXEL_H) return;
+        const int wpx = worldWrap::wrapPixelX(px);
+
+        //청크 중심 타일 좌표 — tileToPixelX로 되돌리면 정확히 이 셀 중심으로 환산된다.
+        pinMenuTileX = TILE_BASE_X + wpx * TILE_PER_PIXEL + TILE_PER_PIXEL / 2;
+        pinMenuTileY = TILE_BASE_Y + py  * TILE_PER_PIXEL + TILE_PER_PIXEL / 2;
+        pinMenuZ     = view.z;
+
+        layoutPinMenu(mx, my);
+        pinMenuOpen = true;
+    }
+
+    //버튼 1개 — 좌측하단 줌 패널(+/-/@)과 동일 스타일: drawStadium(채움,240,edge3) + drawRect(테두리).
+    //  base {35,35,45} / 호버 lowCol::blue / 누름 lowCol::deepBlue. active=그 색 마커가 어딘가에 사용 중(배경 deepBlue).
+    void pinButton(const SDL_Rect& r, bool active)
+    {
+        SDL_Color fill = active ? lowCol::deepBlue : SDL_Color{ 35, 35, 45, 255 };
+        if (checkCursor(&r)) fill = click ? lowCol::deepBlue : lowCol::blue;
+        drawStadium(r.x, r.y, r.w, r.h, fill, 240, 3);
+        drawRect(r, mappal::uiBorder());
+    }
+
+    //메뉴 렌더 — 좌표 한 줄(라벨 회색+값 흰색) + "MAP PIN" 헤더(버튼 위, 양옆 구분선) + 색 버튼 줄 + (마커 있으면)제거.
+    //  패널은 줌 패널과 동일하게 drawStadium(uiPanel,220,3)만 — 윈도우 테두리 없음. 버튼도 줌 버튼과 동일 스타일.
+    void drawPinMenu()
+    {
+        if (!pinMenuOpen) return;
+
+        constexpr int padX = 14, padTop = 9, coordH = 24, headerH = 18, gapCoordHeader = 4, groupGap = 16, labelGap = 4;
+
+        //패널 — 줌 패널과 동일(테두리 없음).
+        drawStadium(pinMenuRect.x, pinMenuRect.y, pinMenuRect.w, pinMenuRect.h, mappal::uiPanel(), 220, 3);
+
+        //좌표 한 줄(라벨 회색 + 값 흰색).
+        const wchar_t* labels[3] = { L"X", L"Y", L"Z" };
+        const int      vals[3]   = { pinMenuTileX, pinMenuTileY, pinMenuZ };
+        setFontSize(17);
+        int       hx = pinMenuRect.x + padX;
+        const int hy = pinMenuRect.y + padTop;
+        for (int i = 0; i < 3; ++i)
+        {
+            setFont(fontType::mainFontSemiBold);
+            drawText(labels[i], hx, hy, SDL_Color{ 0xe1, 0x77, 0x2e, 255 });   // 주황(Status.ixx 라벨 색 #e1772e)
+            hx += queryTextWidth(labels[i]) + labelGap;
+            setFont(fontType::mainFontBold);
+            const std::wstring val = std::to_wstring(vals[i]);
+            drawText(val, hx, hy, mappal::uiText());
+            hx += queryTextWidth(val) + groupGap;
+        }
+
+        //"MAP PIN" 헤더 — 버튼 줄 바로 위, 텍스트 양옆으로 구분선(좌표와의 오인 방지).
+        {
+            setFont(fontType::mainFontSemiBold);
+            setFontSize(12);
+            const std::wstring cap = L"MAP PIN";
+            const int capW = queryTextWidth(cap);
+            const int midY = pinMenuRect.y + padTop + coordH + gapCoordHeader + headerH / 2;
+            const int cxc  = pinMenuRect.x + pinMenuRect.w / 2;
+            drawTextCenter(cap, cxc, midY, SDL_Color{ 150, 152, 160, 255 });
+            const SDL_Color line = mappal::uiBorder();
+            drawLine(pinMenuRect.x + padX, midY, cxc - capW / 2 - 8, midY, line, 130);
+            drawLine(cxc + capW / 2 + 8, midY, pinMenuRect.x + pinMenuRect.w - padX, midY, line, 130);
+        }
+
+        //색 버튼 — 줌 버튼 스타일 + 단색 위치핀 기호. 그 색 마커가 (위치 무관) 존재하면 배경 deepBlue(사용 중 표시).
+        //  클릭 동작은 토글: 그 색이 존재하면(어디든) 취소, 없으면 이 위치에 설치(clickUpGUI).
+        for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
+        {
+            const SDL_Rect& s = pinSwatch[i];
+            pinButton(s, mapPinExists(i));
+            drawPinGlyph(s.x + s.w / 2, s.y + s.h / 2, 24, MAP_PIN_PALETTE[i]);
+        }
+
+        setFont(fontType::mainFont);
+    }
+
     void drawGUI() override
     {
         if (getStateDraw() == false) return;
@@ -1343,6 +1870,10 @@ public:
         {
             //광역(위성 텍스처 LOD) — per-청크 타일맵 대신 다운샘플 위성 + 발견 도시 점.
             drawWorldView(view);
+            drawNightOverlay(view);      // ⑨ 야간 남색 틴트(위성 지형 위, 도시·마커·핀 아래)
+            drawWorldCities(view);       // ⑤-b 도시 점/라벨 — 오버레이 뒤라 조명 영향 안 받음
+            drawMapPins(view);           // ⑧ 맵 핀(빛의 기둥) — 말풍선보다 먼저(뒤에)
+            drawWorldPlayerMarker(view); // ⑤-c 플레이어 말풍선 — 핀(빛의 기둥) 앞, 조명 영향 안 받음
         }
         else
         {
@@ -1386,19 +1917,34 @@ public:
 
             setZoom(1.0f);
 
+            drawNightOverlay(view);   // ⑨ 야간 남색 틴트(지형·심볼 위, 라벨·마커·핀·UI 아래)
             drawCityLabels(view);   // ⑥ 도시 이름 라벨 (발견된 도시만)
-            drawPlayerMarker(view);
+            drawMapPins(view);                     // ⑧ 맵 핀(빛의 기둥) — 플레이어 마커보다 먼저(뒤에)
+            drawPlayerMarker(view);                // ⑤ 플레이어 마커 — 핀(빛의 기둥) 앞에
+            //⑦ 마커/툴팁 — 메뉴 열림 중엔 툴팁은 끄되(클러터), 그리드 마커는 메뉴가 가리키는 청크에 고정 유지.
+            if (pinMenuOpen) drawChunkMarker(view, tilePixelIX(pinMenuTileX), tilePixelIY(pinMenuTileY));
+            else             drawHoverInfo(view);
         }
 
-        drawCoordPanel(view);
-        drawZoomPanel(view, computeZoomButtons());
+        drawZoomPanel(view, computeZoomButtons());   // 줌 패널 — 좌표 한 줄 포함(라벨↔버튼 사이)
         drawTabButton();
+        drawPinMenu();   // ⑧ 핀 컨텍스트 메뉴 — 항상 최상단(크롬 위)
     }
 
     // ────────── 입력 ──────────
+
+    //우클릭 = 핀 메뉴 열기(청크맵). 마우스 우버튼 down은 clickDownGUI가 일찍 return하므로 팬 시작 안 함.
+    void clickRightGUI() override
+    {
+        if (getStateInput() == false) return;
+        openPinMenu((int)getMouseX(), (int)getMouseY());
+    }
+
     void clickDownGUI() override
     {
         if (option::inputMethod == input::mouse && event.button.button != SDL_BUTTON_LEFT) return;
+
+        if (pinMenuOpen) return;   // 메뉴 열림 중엔 팬 시작 금지(선택/닫기는 clickUpGUI에서)
 
         if (checkCursor(&tab)) return;
         ZoomButtons zb = computeZoomButtons();
@@ -1422,6 +1968,23 @@ public:
     void clickUpGUI() override
     {
         if (getStateInput() == false) return;
+
+        //핀 메뉴가 열려 있으면 메뉴 상호작용이 우선 — 색 버튼=토글(그 색이 어디든 있으면 취소, 없으면 이 위치에 설치),
+        //  그 외=닫기(클릭 소비).
+        if (pinMenuOpen)
+        {
+            for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
+                if (checkCursor(&pinSwatch[i]))
+                {
+                    if (mapPinExists(i)) clearMapPin(i);                                     // 어디든 있으면 취소
+                    else                 setMapPin(i, pinMenuTileX, pinMenuTileY, pinMenuZ);  // 없으면 이 위치에 설치
+                    pinMenuOpen = false;
+                    return;
+                }
+            pinMenuOpen = false;
+            return;
+        }
+
         bool wasDrag = dragMoved;
         dragging = false;
         dragMoved = false;
@@ -1445,6 +2008,7 @@ public:
     void mouseWheel() override
     {
         if (getStateInput() == false) return;
+        pinMenuOpen = false;   // 줌하면 타겟 셀이 어긋나므로 메뉴 닫음
         //휠 = 마우스 지점 앵커로 한 단계 줌. 가장 광역(level 0)=전세계 한 화면, 가장 근접=48px/청크.
         const int delta = (event.wheel.y > 0) ? +1 : (event.wheel.y < 0 ? -1 : 0);
         if (delta != 0) view.zoomAt((int)getMouseX(), (int)getMouseY(), delta);
@@ -1453,6 +2017,7 @@ public:
     void keyDownGUI() override
     {
         if (getStateInput() == false) return;
+        if (pinMenuOpen && event.key.key == SDLK_ESCAPE) { pinMenuOpen = false; return; }   // ESC=메뉴 먼저 닫기
         if (event.key.key == SDLK_M || event.key.key == SDLK_ESCAPE)
             close(aniFlag::winUnfoldClose);
     }
