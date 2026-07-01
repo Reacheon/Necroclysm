@@ -125,7 +125,8 @@ public:
     virtual void drawSelf() override;
 
     // 플레이어 캐릭터 합성 텍스처 생성 (스킨/눈/머리/장비/돌연변이 전 레이어). 반환된 텍스처는 호출자가 SDL_DestroyTexture로 해제.
-    SDL_Texture* composePlayerTexture();
+    // allowBlink=false면 자연 깜빡임 합성을 생략(항상 눈 뜬 상태). 정지된 마커/초상화용. isEyesClose/isEyesHalf 강제 상태는 무관하게 유지.
+    SDL_Texture* composePlayerTexture(bool allowBlink = true);
 
     bool hitAnimation(bool shutdown, const std::function<void()>);
 };

@@ -1130,7 +1130,7 @@ static void drawFaceBubble(int cx, int cy, double radius, double tailAng, bool h
     //  투명부는 BLEND로 구멍(어두운 원)이 비친다.
     const SDL_FRect FACE_SRC   = { 16.f, 6.f, 16.f, 16.f };   // frame0 내 얼굴 크롭(중앙 16px의 살짝 위) — 튜닝 가능
     constexpr double FACE_FILL = 1.0;                         // 구멍 지름 대비 얼굴 채움 비율 — 튜닝 가능
-    SDL_Texture* faceTex = PlayerPtr->composePlayerTexture();
+    SDL_Texture* faceTex = PlayerPtr->composePlayerTexture(false);   // 얼굴 말풍선은 눈 깜빡임 없음
     SDL_SetTextureBlendMode(faceTex, SDL_BLENDMODE_BLEND);
     {
         float texW, texH;
@@ -1304,7 +1304,7 @@ static void drawPlayerMarker(const MapView& v)
     {
         constexpr double MARKER_MIN_BODY_PX = 14.0;   // 줌아웃 시 본체 최소 화면폭(px) — 튜닝 가능
         const float z = (float)std::max(v.zoomScale(), MARKER_MIN_BODY_PX / 16.0);
-        SDL_Texture* charTex = PlayerPtr->composePlayerTexture();
+        SDL_Texture* charTex = PlayerPtr->composePlayerTexture(false);   // 맵 마커는 눈 깜빡임 없음
         Sprite charSpr(renderer, charTex, 48, 48, true);
         SDL_SetTextureBlendMode(charTex, SDL_BLENDMODE_BLEND);
         setZoom(z);
@@ -1347,17 +1347,6 @@ static void gradBeam(float cx, float baseY, float topY, float halfBase, float ha
     };
     int idx[6] = { 0, 1, 2, 0, 2, 3 };
     SDL_RenderGeometry(renderer, nullptr, v, 4, idx, 6);
-}
-
-//단색 위치핀 기호 — 원(머리) 아래에 삼각(끝). 메뉴 색 버튼 칩용(옛 광택 구 대체). 플랫 단색.
-static void drawPinGlyph(int cx, int cy, int glyphH, SDL_Color col)
-{
-    const int   rc     = std::max(3, (int)std::lround(glyphH * 0.30));   // 머리 반지름
-    const int   headCy = cy - (int)std::lround(glyphH * 0.16);           // 머리 중심(위쪽)
-    const float bw     = rc * 0.95f;
-    fillTri((float)cx, (float)(cy + glyphH * 0.52f),
-            (float)(cx - bw), (float)headCy, (float)(cx + bw), (float)headCy, col);   // 아래 삼각
-    drawFillCircle(cx, headCy, rc, col, 255);                                          // 머리 원
 }
 
 //타원 외곽선(바닥 원형 펄스용) — 선분 근사. 채움이 아니라 링이라 "퍼지는 파동"으로 읽힌다.
@@ -1831,13 +1820,16 @@ public:
             drawLine(cxc + capW / 2 + 8, midY, pinMenuRect.x + pinMenuRect.w - padX, midY, line, 130);
         }
 
-        //색 버튼 — 줌 버튼 스타일 + 단색 위치핀 기호. 그 색 마커가 (위치 무관) 존재하면 배경 deepBlue(사용 중 표시).
+        //색 버튼 — 줌 버튼 스타일 + 핀 아이콘 스프라이트(icon16: 적120·녹121·청122·보라123, MAP_PIN_PALETTE 순서와 정합).
+        //  그 색 마커가 (위치 무관) 존재하면 배경 deepBlue(사용 중 표시).
         //  클릭 동작은 토글: 그 색이 존재하면(어디든) 취소, 없으면 이 위치에 설치(clickUpGUI).
         for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
         {
             const SDL_Rect& s = pinSwatch[i];
             pinButton(s, mapPinExists(i));
-            drawPinGlyph(s.x + s.w / 2, s.y + s.h / 2, 24, MAP_PIN_PALETTE[i]);
+            setZoom(2.0f);   // 16px 아이콘을 2배(32px)로 — 버튼 대비 너무 작아 확대
+            drawSpriteCenter(spr::icon16, 120 + i, s.x + s.w / 2, s.y + s.h / 2);
+            setZoom(1.0f);
         }
 
         setFont(fontType::mainFont);

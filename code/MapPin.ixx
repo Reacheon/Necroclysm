@@ -10,6 +10,7 @@ import std;
 //
 //   마커는 "색상별로 하나"다 — 색마다 마커 1개(최대 MAP_PIN_COLOR_COUNT개 동시 존재).
 //   같은 색을 다시 찍으면 그 색 마커가 새 자리로 이동한다(슬롯 = 색 인덱스, std::optional).
+//   또한 "타일당 하나" — 이미 마커가 있는 타일에 다른 색을 찍으면 기존 마커가 사라진다(핀 겹침 방지).
 //   좌표는 타일 단위(찍은 청크의 중심 타일)로 보관 — 플레이어 좌표 패널·미니맵 방위 계산과
 //   같은 단위라 변환이 단순하고 표시가 일관된다. x는 청크 중심 타일이라 tileToPixelX로 되돌리면
 //   정확히 그 청크 셀 중심이 나온다(렌더는 Map.ixx가 plr 마커와 동일하게 sX/sY로 환산).
@@ -53,9 +54,15 @@ export inline bool mapPinExists(int color)
 }
 
 //그 색 마커 설치/이동 — 색당 1개라 항상 이 좌표로 교체.
+//  타일당 1개 불변식: 같은 좌표에 다른 색 마커가 있으면 지운다(핀 2개 겹침 = 사용자 혼란 방지).
 export inline void setMapPin(int color, int x, int y, int z)
 {
-    if (color >= 0 && color < MAP_PIN_COLOR_COUNT) mapPins[color] = MapPin{ x, y, z };
+    if (color < 0 || color >= MAP_PIN_COLOR_COUNT) return;
+    //같은 타일 위의 다른 색 마커 제거 — 한 타일엔 마커 하나만 존속.
+    for (int i = 0; i < MAP_PIN_COLOR_COUNT; ++i)
+        if (i != color && mapPins[i] && mapPins[i]->x == x && mapPins[i]->y == y && mapPins[i]->z == z)
+            mapPins[i].reset();
+    mapPins[color] = MapPin{ x, y, z };
 }
 
 //그 색 마커 제거 — 컨텍스트 메뉴에서 같은 색 버튼 재클릭(토글) 시 사용.

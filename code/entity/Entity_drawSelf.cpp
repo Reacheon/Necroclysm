@@ -490,7 +490,7 @@ void Entity::drawSelf()
 
 // 플레이어 외형 전 레이어(스킨/눈/머리/수염/뿔/장비/돌연변이)를 288x384 텍스처로 합성.
 // 반환된 SDL_Texture*는 호출자가 SDL_DestroyTexture로 해제.
-SDL_Texture* Entity::composePlayerTexture()
+SDL_Texture* Entity::composePlayerTexture(bool allowBlink)
 {
 	SDL_Texture* playerTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, CHAR_TEXTURE_WIDTH, CHAR_TEXTURE_HEIGHT);
 	SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
@@ -528,7 +528,7 @@ SDL_Texture* Entity::composePlayerTexture()
 		const wchar_t* stateStem = L"EYES_OPEN";
 		if (entityInfo.isEyesClose) stateStem = L"EYES_CLOSE";
 		else if (entityInfo.isEyesHalf) stateStem = L"EYES_HALF";
-		else
+		else if (allowBlink)
 		{
 			Uint32 phaseOffset = (Uint32)((uintptr_t)this % BLINK_PERIOD_MS);
 			Uint32 phase = (SDL_GetTicks() + phaseOffset) % BLINK_PERIOD_MS;
