@@ -49,8 +49,6 @@ export namespace spr
 	Sprite* buttonsPressed = nullptr;
 	Sprite* menuPopUp = nullptr;
 	Sprite* letterboxBtnMarker = nullptr;
-	Sprite* proficIcon = nullptr;
-	Sprite* proficIconGold = nullptr;
 	Sprite* bionicSkeleton = nullptr;
 	Sprite* bionicSlotGauge = nullptr;
 	Sprite* mutationIcon = nullptr;
@@ -181,5 +179,8 @@ export namespace spr
 	Sprite* statusPortraitBackground = nullptr;
 
 	Sprite* rampUpTile = nullptr;
+
+	Sprite* skillRankUpBtn = nullptr;
+	Sprite* skillActiveBtn = nullptr;
 
 }

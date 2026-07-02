@@ -283,7 +283,6 @@
     <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp" />
     <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.cpp" />
     <ClCompile Include="code\GUI\Map.ixx" />
-    <ClCompile Include="code\GUI\Profic.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />
     <ClCompile Include="code\GUI\Sample.ixx" />
     <ClCompile Include="code\GUI\WorldGenScreen.ixx" />
@@ -347,6 +346,7 @@
     <ClCompile Include="code\renderWeather.ixx" />
     <ClCompile Include="code\scriptLoader.ixx" />
     <ClCompile Include="code\skill\SkillBehavior.ixx" />
+    <ClCompile Include="code\skill\SkillAthletics.ixx" />
     <ClCompile Include="code\skill\SkillFireStorm.ixx" />
     <ClCompile Include="code\skill\SkillLeap.ixx" />
     <ClCompile Include="code\skill\SkillRegistry.ixx" />

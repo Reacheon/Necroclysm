@@ -8,7 +8,6 @@ export enum class act
     ability,    //특수능력
     equipment,  //인벤토리
     bionic,     //바이오닉
-    profic,      //재능
     runMode,    //달리기 모드
     skill,      //스킬
     quest,      //퀘스트
@@ -528,6 +527,18 @@ export enum class skillType
     ACTIVE,
     PASSIVE,
     TOGGLE,
+};
+
+// 스킬 GUI 탭 순서 = 열거 순서. weapon~divinity는 연속이어야 함 (탭 표시 여부 루프가 범위 순회).
+export enum class skillCategory
+{
+    all,
+    weapon,     //무기술
+    survival,   //생존
+    action,     //행동
+    bionic,
+    mutation,
+    divinity,
 };
 
 export enum class quickSlotFlag

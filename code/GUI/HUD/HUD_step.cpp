@@ -3,7 +3,6 @@ import constVar;
 import globalVar;
 import World;
 import ItemData;
-import Profic;
 import Sleep;
 import statusEffect;
 
@@ -28,18 +27,6 @@ void HUD::step()
     {
         gamepadStep();
         mouseStep();
-    }
-    //현재 수련 중인 재능이 없을 경우 강제로 재능 창을 열음
-    if (Profic::ins() == nullptr)
-    {
-        for (int i = 0; i < TALENT_SIZE; i++)
-        {
-            if (PlayerInfo().proficFocus[i] > 0) { break; }
-            if (i == TALENT_SIZE - 1)
-            {
-                new Profic();
-            }
-        }
     }
     if (doPopUpSingleHUD == true)
     {

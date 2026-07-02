@@ -90,26 +90,3 @@ export std::wstring toolQuality2String(int input)
 	else return sysStr[291];//미확인 기술
 };
 
-export std::wstring profic2String(int input)
-{
-	if (input == proficFlag::fighting) return sysStr[55];//전투
-	else if (input == proficFlag::dodging) return sysStr[56];//회피 
-	else if (input == proficFlag::stealth) return sysStr[57];//은신
-	else if (input == proficFlag::throwing) return sysStr[58];//투척
-	else if (input == proficFlag::unarmedCombat) return sysStr[59];//격투
-	else if (input == proficFlag::piercingWeapon) return sysStr[60];//관통
-	else if (input == proficFlag::cuttingWeapon) return sysStr[61];//절단
-	else if (input == proficFlag::bashingWeapon) return sysStr[62];//타격
-	else if (input == proficFlag::archery) return sysStr[63];//궁술
-	else if (input == proficFlag::gun) return sysStr[64];//총기
-	else if (input == proficFlag::electronics) return sysStr[65];//전자공학
-	else if (input == proficFlag::chemistry) return sysStr[66];//화학공학
-	else if (input == proficFlag::mechanics) return sysStr[67];//기계공학
-	else if (input == proficFlag::computer) return sysStr[68];//컴퓨터
-	else if (input == proficFlag::medicine) return sysStr[69];//의학
-	else if (input == proficFlag::cooking) return sysStr[70];//요리
-	else if (input == proficFlag::fabrication) return sysStr[71];//재봉
-	else if (input == proficFlag::social) return sysStr[72];//화술
-	else if (input == proficFlag::architecture) return sysStr[73];//건축공학
-    else return sysStr[293]; // 미확인 숙련도
-};

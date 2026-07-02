@@ -28,9 +28,6 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
 	entityInfo.equipment = std::make_unique<ItemPocket>(storageType::equip);
-	entityInfo.proficFocus[0] = 1;
-
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Entity::~Entity()//소멸자
 {
@@ -56,6 +53,7 @@ void Entity::addSkill(const std::wstring& skillId)
 	}
 	SkillData newSkill;
 	newSkill.skillId = skillId;
+	if (behavior) newSkill.skillRank = behavior->skillRank; //시작 랭크 (바이오닉은 부품 등급)
 	entityInfo.skillList.push_back(newSkill);
 }
 
@@ -856,58 +854,6 @@ void Entity::throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY)
 	throwCoord.y = gridY;
 	throwCoord.z = getGridZ();
 	addAniToPlayerTurn(this, aniFlag::entityThrow);
-}
-//@brief 경험치 테이블과 적성값을 참조하여 입력한 index의 재능레벨을 반환함
-float Entity::getProficLevel(int index)
-{
-	float exp = entityInfo.proficExp[index];
-
-	// 경험치가 0이면 레벨 0.0 반환
-	if (exp <= 0) return 0.0f;
-
-	// 첫 번째 레벨업 전까지는 0.X 레벨
-	if (exp < expTable[0]) return exp / expTable[0];
-
-	// 각 레벨 구간에서 정확한 레벨 계산
-	for (int i = 0; i < MAX_PROFIC_LEVEL - 1; i++)
-	{
-		float currentExp = expTable[i];
-		float nextExp = expTable[i + 1];
-		if (exp >= currentExp && exp < nextExp)
-		{
-			float partial = (exp - currentExp) / (nextExp - currentExp);
-			return static_cast<float>(i + 1) + partial;  // i+1로 변경 (0부터 시작)
-		}
-	}
-
-	// 최대 레벨 도달
-	return static_cast<float>(MAX_PROFIC_LEVEL);
-}
-
-void Entity::addProficExp(int expVal)
-{
-	int divider = 0;
-	for (int i = 0; i < TALENT_SIZE; i++)
-	{
-		divider += entityInfo.proficFocus[i];
-	}
-	errorBox(divider == 0, L"You need to enable at least one profic(divider=0 at addProficExp).");
-	int frag = floor((float)(expVal) / (float)divider);
-	for (int i = 0; i < TALENT_SIZE; i++)
-	{
-		entityInfo.proficExp[i] += (frag * entityInfo.proficFocus[i]);
-	}
-	//만렙이 된 재능의 포커스 해제
-	for (int i = 0; i < TALENT_SIZE; i++)
-	{
-		if (entityInfo.proficFocus[i] > 0)
-		{
-			if (getProficLevel(i) >= MAX_PROFIC_LEVEL)
-			{
-				entityInfo.proficFocus[i] = 0;
-			}
-		}
-	}
 }
 //메소드를 실행한 객체를 죽이고 아이템을 드랍한다.
 //현재 개체가 보유한 모든 부위를 벡터 형태로 반환한다.

@@ -16,7 +16,6 @@ export constexpr int EQUIP_ITEM_MAX = 10;
 export constexpr int LOOT_ITEM_MAX = 9;
 export constexpr int INVENTORY_ITEM_MAX = 9;
 export constexpr int DMG_FLAG_SIZE = 3;
-export constexpr int TALENT_SIZE = 20;
 
 // 24칸이 한 청크니까 차량의 왼쪽끝(코어)이 청크의 오른쪽끝에 있어도 최대 2청크만 걸침 → 3*3 분석으로 충분.
 // (청크가 16일 땐 31차량이 3청크 걸쳐 5*5 분석이 필요했으나, 24청크 전환으로 여유 확보)
@@ -65,9 +64,7 @@ export constexpr int TOLERANCE_HOLD_DEL_XY = 20; //이 값 이상 움직일 경�
 
 export constexpr int MARKER_LIMIT_DIST = 100; //플레이어로부터 100칸 이상 떨어지면 마커가 그려지지 않음
 
-export constexpr int MAX_PROFIC_LEVEL = 27;
-
-export constexpr int SKILL_GUI_MAX = 7;
+export constexpr int SKILL_GUI_MAX = 8;
 export constexpr int QUICK_SLOT_MAX = 8;
 
 export constexpr int CRAFT_MAX_ROW = 4;

@@ -254,8 +254,6 @@ export void textureLoader()
 	spr::buttonsPressed = new Sprite(renderer, "image/UI/buttonsPressed.png", 48, 48);
 	spr::menuPopUp = new Sprite(renderer, "image/UI/menuPopUp.png", 35, 36);
 	spr::letterboxBtnMarker = new Sprite(renderer, "image/UI/barButtonMarker.png", 108, 108);
-	spr::proficIcon = new Sprite(renderer, "image/UI/proficIcon.png", 16, 16);
-	spr::proficIconGold = new Sprite(renderer, "image/UI/proficIconGold.png", 16, 16);
 	spr::bionicSkeleton = new Sprite(renderer, "image/UI/bionicSkeleton.png", 36, 72);
 	spr::bionicSlotGauge = new Sprite(renderer, "image/UI/bionicSlotGauge.png", 64, 10);
 	spr::mutationIcon = new Sprite(renderer, "image/UI/mutationIcon.png", 16, 16);
@@ -425,4 +423,6 @@ export void textureLoader()
 	spr::btnGuideBackground = new  Sprite(renderer, "image/UI/GUI/btnGuideBackground.png", 426, 66);
 	spr::statusPortraitBackground = new  Sprite(renderer, "image/UI/GUI/statusPortraitBackground.png", 110, 110);
 	spr::rampUpTile = new  Sprite(renderer, "image/tileset/rampUp.png", 16, 16);
+	spr::skillRankUpBtn = new  Sprite(renderer, "image/UI/skillRankUpBtn.png", 36, 36);
+	spr::skillActiveBtn = new  Sprite(renderer, "image/UI/skillActiveBtn.png", 54, 40);
 }

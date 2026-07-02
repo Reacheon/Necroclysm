@@ -27,7 +27,7 @@ export namespace actSet
 {
     inline std::vector<act> null()
     {
-        std::vector<act> result = { act::status, act::equipment, act::profic, act::skill, act::runMode, act::craft, act::wait, act::sleep, act::cooking };
+        std::vector<act> result = { act::status, act::equipment, act::skill, act::runMode, act::map, act::craft, act::wait, act::sleep, act::cooking };
         if (playerGod != godFlag::none) result.insert(result.begin() + 7, act::god);
         return result;
     }

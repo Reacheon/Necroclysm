@@ -22,7 +22,6 @@ public:
 		src = skillSrc::MAGIC;
 		type = skillType::ACTIVE;
 		reqStat = L"INT";
-		reqProfic = { proficFlag::invocations };
 		skillRank = L"F";
 	}
 

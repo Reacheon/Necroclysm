@@ -54,16 +54,13 @@ export void useSkill(const std::wstring& skillId)
 		return;
 	}
 
-	// 실패율 판정 (reqProfic이 있는 스킬만 실패 가능)
-	if (!behavior->reqProfic.empty())
+	// 실패율 판정 (자기 랭크 + 참조 스킬 랭크 기반)
+	int failRate = behavior->calcFailRate(caster, *skillDataPtr);
+	if (failRate > 0 && randomRange(1, 100) <= failRate)
 	{
-		int failRate = behavior->calcFailRate(caster);
-		if (failRate > 0 && randomRange(1, 100) <= failRate)
-		{
-			updateLog(L"You fail to use " + behavior->name + L".");
-			turnWait(1.0);
-			return;
-		}
+		updateLog(L"You fail to use " + behavior->name + L".");
+		turnWait(1.0);
+		return;
 	}
 
 	currentUsingSkill = skillId;

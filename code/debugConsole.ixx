@@ -50,7 +50,7 @@ export void debugConsole()
 	prt(L"11.가스 생성\n");
 	prt(L"12. 이큅 1번 제자리 드롭\n");
 	prt(L"13. 달리기 토글\n");
-	prt(L"14. 경험치 획득\n");
+	prt(L"14. (빈 슬롯)\n");
 	prt(L"15. 탑승 중인 차량을 반시계로 22.5도 회전\n");
 	prt(L"16. 탑승 중인 차량을 워프시키기\n");
 	prt(L"17. 탑승 중인 차량을 연속적으로 이동시키기\n");
@@ -238,10 +238,6 @@ export void debugConsole()
 	}
 	case 14:
 	{
-		int expVal;
-		prt(L"추가할 경험치의 양을 입력해주세요.\n");
-		std::cin >> expVal;
-		PlayerPtr->addProficExp(expVal);
 		break;
 	}
 	case 15://탑승 중인 차량 회전
@@ -557,6 +553,7 @@ export void debugConsole()
 			SkillData newSD;
 			newSD.skillId = pickedId;
 			newSD.isLearned = true;
+			newSD.skillRank = bhv->skillRank; //시작 랭크 (바이오닉은 부품 등급)
 			PlayerInfo().skillList.push_back(newSD);
 			prt(L"[디버그] 스킬 추가 완료: %ls (%ls, src=%d)\n",
 				bhv->name.c_str(), pickedId.c_str(), (int)bhv->src);

@@ -597,28 +597,7 @@ void Craft::drawGUI()
 
 				std::wstring tooltipText;
 
-				//조합에 필요한 플레이어 재능
-				std::wstring proficStr = col2Str(col::gray) + sysStr[233] + L" : ";//필요 기술
-				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeProficNeed.size(); i++)
-				{
-					int needLevel = recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second;
-					int playerLevel = PlayerPtr->getProficLevel(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
-					if (playerLevel >= needLevel) proficStr += col2Str(lowCol::green);
-					else
-					{
-						proficStr += col2Str(lowCol::red);
-						canCraft = false;
-					}
-
-					proficStr += profic2String(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].first);
-					proficStr += L" ";
-					proficStr += std::to_wstring(recipePtr->itemInfo[targetCursor].recipeProficNeed[i].second);
-					proficStr += L"레벨";
-					if (i != recipePtr->itemInfo[targetCursor].recipeProficNeed.size() - 1) proficStr += L", ";
-				}
-				if (recipePtr->itemInfo[targetCursor].recipeProficNeed.size() == 0) proficStr += col2Str(col::white) + sysStr[236];
-
-				tooltipText += proficStr + L"\n";
+				//조합 기술 요구치 표시는 구 숙련도 폐기로 제거됨 — 신 스킬 랭크 기반으로 재작업 예정
 
 				//조합에 필요한 기술(툴 퀄리티)
 				std::wstring qualityStr = col2Str(col::gray) + sysStr[234]+L" : ";//필요 공구

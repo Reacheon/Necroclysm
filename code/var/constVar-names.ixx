@@ -32,30 +32,6 @@ export namespace wound
     constexpr int shock = 6; //쇼크 : 정신적인 충격, 머리에만 발생함
 };
 
-export namespace proficFlag
-{
-    constexpr int fighting = 0;
-    constexpr int dodging = 1;
-    constexpr int stealth = 2;
-    constexpr int throwing = 3;
-    constexpr int unarmedCombat = 4;
-    constexpr int piercingWeapon = 5;
-    constexpr int cuttingWeapon = 6;
-    constexpr int bashingWeapon = 7;
-    constexpr int archery = 8;
-    constexpr int gun = 9;
-    constexpr int electronics = 10;
-    constexpr int chemistry = 11;
-    constexpr int mechanics = 12;
-    constexpr int computer = 13;
-    constexpr int medicine = 14;
-    constexpr int cooking = 15;
-    constexpr int fabrication = 16;
-    constexpr int social = 17;
-    constexpr int architecture = 18;
-    constexpr int invocations = 19;
-};
-
 export namespace toolQuality
 {
     constexpr int none = 0;
@@ -394,6 +370,7 @@ export namespace skillRefCode
     // 자주 비교되는 스킬 ID 상수. 직접 L"SKILL_ROLL" 같은 리터럴 대신 이걸 사용.
     inline const std::wstring roll = L"SKILL_ROLL";
     inline const std::wstring leap = L"SKILL_LEAP";
+    inline const std::wstring athletics = L"SKILL_ATHLETICS";
 }
 
 export namespace connectFlag

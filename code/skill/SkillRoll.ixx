@@ -22,9 +22,10 @@ public:
 		iconIndex = 1;
 		descript = L"Roll toward an adjacent tile. Increases evasion chance against attacks for the rest of the turn. ";
 		src = skillSrc::GENERAL;
+		category = skillCategory::action;
 		type = skillType::ACTIVE;
 		reqStat = L"DEX";
-		reqProfic = { proficFlag::dodging };
+		refSkills = { skillRefCode::athletics };
 		skillRank = L"F";
 	}
 

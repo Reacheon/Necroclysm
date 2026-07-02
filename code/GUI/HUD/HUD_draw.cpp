@@ -847,9 +847,14 @@ void HUD::drawQuickSlot()
 			int centerX = quickSlotRegion.x + quickSlotRegion.w / 2;
 			int textY = quickSlotRegion.h + 18;
 
-			if (skillBhv && !skillBhv->reqProfic.empty())
+			// 스킬 런타임 데이터 (실패율 계산에 현재 랭크 필요)
+			const SkillData* qsData = nullptr;
+			for (const auto& sd : PlayerInfo().skillList)
+				if (sd.skillId == quickSlot[i].second) { qsData = &sd; break; }
+
+			if (skillBhv && qsData && skillBhv->type != skillType::PASSIVE)
 			{
-				int failRate = skillBhv->calcFailRate(static_cast<Entity*>(PlayerPtr));
+				int failRate = skillBhv->calcFailRate(static_cast<Entity*>(PlayerPtr), *qsData);
 				SDL_Color failCol;
 				if (failRate <= 4) failCol = col::yellowGreen;
 				else if (failRate <= 20) failCol = lowCol::yellow;
@@ -1092,7 +1097,6 @@ void HUD::drawBarAct()
 		if (barAct[i] == act::status) setBtnLayout80(sysStr[3], 15);
 		else if (barAct[i] == act::craft) setBtnLayout80(sysStr[75], 3);
 		else if (barAct[i] == act::equipment) setBtnLayout80(sysStr[332], 1);
-		else if (barAct[i] == act::profic) setBtnLayout80(sysStr[7], 10);
 		else if (barAct[i] == act::skill) setBtnLayout80(sysStr[197], 17);
 		else if (barAct[i] == act::wait)
 		{
@@ -1151,7 +1155,7 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::accel) setBtnLayout(sysStr[147], 0);
 		else if (barAct[i] == act::brake) setBtnLayout(sysStr[148], 0);
 		else if (barAct[i] == act::god) setBtnLayout80(sysStr[149], 25);
-		else if (barAct[i] == act::map) setBtnLayout(sysStr[150], 73);
+		else if (barAct[i] == act::map) setBtnLayout80(sysStr[150], 49);
 		else if (barAct[i] == act::collectiveLever) setBtnLayout(sysStr[151], 0);
 		else if (barAct[i] == act::cyclicLever) setBtnLayout(sysStr[152], 0);
 		else if (barAct[i] == act::rpmLever) setBtnLayout(sysStr[153], 0);

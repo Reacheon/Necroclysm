@@ -22,8 +22,7 @@ public:
 		src = skillSrc::MAGIC;
 		type = skillType::PASSIVE;
 		maxCooldown = 0.0f;
-		reqProfic = { proficFlag::invocations };
-		skillRank = L"D";
+		skillRank = L"F";
 	}
 
 	// 패시브 스킬이므로 execute는 빈 코루틴

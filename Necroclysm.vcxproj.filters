@@ -282,6 +282,9 @@
     <ClCompile Include="code\skill\SkillRegistry.cpp">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
+    <ClCompile Include="code\skill\SkillAthletics.ixx">
+      <Filter>소스 파일\00_var\Skill</Filter>
+    </ClCompile>
     <ClCompile Include="code\skill\SkillFireStorm.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
@@ -367,9 +370,6 @@
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Map.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\Profic.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Quest.ixx">

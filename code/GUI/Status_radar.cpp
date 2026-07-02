@@ -11,6 +11,7 @@ import globalVar;
 import checkCursor;
 import constVar;
 import Player;
+import SkillData;
 
 void Status::drawRadarChart(const std::function<SDL_Color(const SDL_Rect&)>& stadiumCol)
 {
@@ -24,11 +25,12 @@ void Status::drawRadarChart(const std::function<SDL_Color(const SDL_Rect&)>& sta
 			hexAngle[i] = std::numbers::pi / 180.0 * (60.0 * i);
 
 		// ratio 값 (0.0~1.0): 각 꼭짓점의 실제 데이터 비율
-		// i=0: Bionic Capacity, i=1: Progress, i=2: Profic Avg
+		// i=0: Bionic Capacity, i=1: Progress, i=2: Rank Avg
 		// i=3: Status Avg, i=4: Locked, i=5: Mutation Threshold
-		double proficSum = 0.0;
-		for (int i = 0; i < TALENT_SIZE; i++)
-			proficSum += PlayerPtr->getProficLevel(i);
+		double rankSum = 0.0;
+		for (const auto& sd : PlayerInfo().skillList)
+			rankSum += rankDifficulty(sd.skillRank);
+		double rankAvgVal = PlayerInfo().skillList.empty() ? 0.0 : rankSum / PlayerInfo().skillList.size();
 		double statAvgVal = (PlayerPtr->entityInfo.statStr
 			+ PlayerPtr->entityInfo.statInt
 			+ PlayerPtr->entityInfo.statDex) / 3.0;
@@ -36,7 +38,7 @@ void Status::drawRadarChart(const std::function<SDL_Color(const SDL_Rect&)>& sta
 		double ratio[6] = {
 			0.9,                                                       // Bionic Capacity (미구현)
 			0.6,                                                       // Progress (미구현)
-			std::clamp(proficSum / TALENT_SIZE / MAX_PROFIC_LEVEL, 0.0, 1.0), // Profic Avg
+			std::clamp(rankAvgVal / 7.0, 0.0, 1.0),                    // Rank Avg (F=1 ~ S=7)
 			std::clamp(statAvgVal / 10.0, 0.0, 1.0),                  // Status Avg
 			0.0,                                                       // Locked
 			0.9,                                                       // Mutation Threshold (미구현)
@@ -138,14 +140,14 @@ void Status::drawRadarChart(const std::function<SDL_Color(const SDL_Rect&)>& sta
 
 	SDL_Rect vertex4Btn = { statusBase.x + 52,statusBase.y + 312,70,56 };
 	{
-		// Profic Avg: 전체 숙련도 레벨 평균 (최대 27)
-		double proficSum = 0.0;
-		for (int i = 0; i < TALENT_SIZE; i++)
-			proficSum += PlayerPtr->getProficLevel(i);
-		double proficAvg = proficSum / TALENT_SIZE;
+		// Rank Avg: 보유 스킬 랭크 평균 (F=1 ~ S=7)
+		double rankSum = 0.0;
+		for (const auto& sd : PlayerInfo().skillList)
+			rankSum += rankDifficulty(sd.skillRank);
+		double rankAvg = PlayerInfo().skillList.empty() ? 0.0 : rankSum / PlayerInfo().skillList.size();
 		std::wstringstream wss;
-		wss << std::fixed << std::setprecision(1) << proficAvg;
-		drawVertexBtn(vertex4Btn, L"#e1772eProfic Avg", wss.str(), stadiumCol(vertex4Btn));
+		wss << std::fixed << std::setprecision(1) << rankAvg;
+		drawVertexBtn(vertex4Btn, L"#e1772eRank Avg", wss.str(), stadiumCol(vertex4Btn));
 	}
 
 	SDL_Rect vertex5Btn = { statusBase.x + 25,statusBase.y + 244,70,56 };

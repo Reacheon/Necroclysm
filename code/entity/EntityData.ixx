@@ -92,9 +92,6 @@ export struct EntityData : public EntityData_Base
     bool isPlayer = false;
     __int8 direction = 0;
     std::unique_ptr<ItemPocket> equipment;
-    std::array<int, TALENT_SIZE> proficExp = { 0, }; //경험치
-    std::array<int, TALENT_SIZE> proficApt = { 0,0,+1,-2,0,0,0,-1,0, }; //적성
-    std::array<int, TALENT_SIZE> proficFocus = { 0, }; //집중도 0:미분배, 1:소분배, 2:일반분배
     __int16 sprIndex = 0;
     __int16 sprIndexInfimum = 0;
     bool sprFlip = false;

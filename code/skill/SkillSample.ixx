@@ -35,10 +35,11 @@ public:
 		iconIndex = 0;
 		descript = L"This is a sample skill for reference.";
 		src = skillSrc::GENERAL;   // GENERAL, BIONIC, MUTATION, MAGIC
+		category = skillCategory::action; // GENERAL 전용 탭 분류: weapon(무기술)/survival(생존)/action(행동)
 		type = skillType::ACTIVE;  // ACTIVE, PASSIVE, TOGGLE
 		reqStat = L"";             // STR, INT, DEX 또는 빈 문자열
-		// reqProfic = { 1 };      // 필요 숙련도 인덱스 목록
-		// skillRank = L"F";       // 기본값 F
+		// refSkills = { skillRefCode::athletics }; // 실패율에 영향을 주는 참조 스킬 ID (보통 1개, 드물게 2개)
+		// skillRank = L"F";       // 시작 랭크. 기본값 F (바이오닉은 부품 등급으로 사용)
 		// maxSkillLevel = 5;      // 기본값 5
 		// maxCooldown = 30.0f;    // 기본값 30.0
 		// energyPerAct = 0.0f;

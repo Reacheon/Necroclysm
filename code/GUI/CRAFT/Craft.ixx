@@ -364,13 +364,7 @@ public:
 	bool canCraft(int itemCode, bool exceptMaterial)
 	{
 		ItemPocket* equipPtr = PlayerEquip();
-		//조합에 필요한 플레이어 재능 체크
-		for (int i = 0; i < itemDex[itemCode].recipeProficNeed.size(); i++)
-		{
-			int needLevel = itemDex[itemCode].recipeProficNeed[i].second;
-			int playerLevel = PlayerPtr->getProficLevel(itemDex[itemCode].recipeProficNeed[i].first);
-			if (playerLevel < needLevel) return false;
-		}
+		//조합 기술 요구치는 구 숙련도 폐기로 미검사 상태 — 신 스킬 랭크 기반으로 재작업 예정 (recipeProficNeed 데이터는 유지 중)
 
 		//조합에 필요한 기술(툴 퀄리티) 체크
 		for (int i = 0; i < itemDex[itemCode].recipeQualityNeed.size(); i++)

@@ -30,8 +30,7 @@ public:
 		src = skillSrc::MAGIC;
 		type = skillType::ACTIVE;
 		maxCooldown = 0.0f;
-		reqProfic = { proficFlag::invocations };
-		skillRank = L"C";
+		skillRank = L"F";
 	}
 
 	bool canUse(Entity* caster, const SkillData& data) const override

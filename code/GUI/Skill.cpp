@@ -19,14 +19,6 @@ import useSkill;
 import World;
 import Entity;
 
-// 숙련도 인덱스 → 표시 이름
-static std::wstring getProficName(int index)
-{
-	if (index >= 0 && index <= 18) return sysStr[55 + index];
-	if (index == 19) return sysStr[295]; // Invocations
-	return L"?";
-}
-
 //스킬 실패율에 따른 확률 텍스트 색상 변경
 static SDL_Color getFailColor(int failRate)
 {
@@ -48,12 +40,43 @@ Skill::Skill() : GUI(false)
 	deactDraw();
 	addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
+	refilterSkills();
+}
+
+// 표시할 탭 목록과 filteredSkills 재구성 (생성자/클릭 공용).
+// 탭은 전체 + 해당 카테고리 스킬을 하나라도 보유한 것만, filteredSkills는 categoryCursor 기준 필터.
+void Skill::refilterSkills()
+{
+	visibleCats.clear();
+	visibleCats.push_back(skillCategory::all);
+	for (int c = (int)skillCategory::weapon; c <= (int)skillCategory::divinity; c++)
+	{
+		for (auto& sd : PlayerInfo().skillList)
+		{
+			auto* bhv = SkillRegistry::get(sd.skillId);
+			if (bhv && bhv->getCategory() == static_cast<skillCategory>(c))
+			{
+				visibleCats.push_back(static_cast<skillCategory>(c));
+				break;
+			}
+		}
+	}
+
+	// 보고 있던 탭이 사라졌으면 전체로 복귀
+	if (std::find(visibleCats.begin(), visibleCats.end(), categoryCursor) == visibleCats.end())
+		categoryCursor = skillCategory::all;
+
 	filteredSkills.clear();
 	for (auto& sd : PlayerInfo().skillList)
 	{
-		auto* bhv = SkillRegistry::get(sd.skillId);
-		if (bhv && bhv->src == skillSrc::GENERAL)
+		if (categoryCursor == skillCategory::all)
+		{
 			filteredSkills.push_back(sd);
+			continue;
+		}
+
+		auto* bhv = SkillRegistry::get(sd.skillId);
+		if (bhv && bhv->getCategory() == categoryCursor) filteredSkills.push_back(sd);
 	}
 }
 
@@ -64,7 +87,7 @@ Skill::~Skill()
 
 void Skill::changeXY(int inputX, int inputY, bool center)
 {
-	skillBase = { 0, 0, 410, 548 };
+	skillBase = { 0, 0, 516, 609 };
 
 	if (center == false)
 	{
@@ -77,14 +100,9 @@ void Skill::changeXY(int inputX, int inputY, bool center)
 		skillBase.y += inputY - skillBase.h / 2;
 	}
 
-	generalBox = { skillBase.x + 22 + 90 * 0,skillBase.y + 82,90,26 };
-	mutationBox = { skillBase.x + 22 + 90 * 1,skillBase.y + 82,90,26 };
-	bionicBox = { skillBase.x + 22 + 90 * 2,skillBase.y + 82,90,26 };
-	magicBox = { skillBase.x + 22 + 90 * 3,skillBase.y + 82,90,26 };
-
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < SKILL_GUI_MAX; i++)
 	{
-		skillBtn[i] = { skillBase.x + 13, skillBase.y + 121 + 61*i, 374,48 };
+		skillBtn[i] = { skillBase.x + 13, skillBase.y + 121 + 61 * i, 480,48 };
 	}
 
 	if (center == false)
@@ -135,37 +153,44 @@ void Skill::drawGUI()
 
 				if (pressed)
 				{
-					SDL_Rect bottomWhiteRect = { box.x + 20, box.y + 24, 50,3 };
+					SDL_Rect bottomWhiteRect = { box.x + box.w / 2 - 20, box.y + 24, 40,3 };
 					drawFillRect(bottomWhiteRect, col::white);
 				}
 
-				setFontSize(14);
+				setFontSize(13);
 				drawTextCenter(boxStr, box.x + box.w / 2, box.y + box.h / 2 - 1, letterColor);
 			};
 
-		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, col::gray);
-		// 왼쪽 그라데이션
-		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 16, skillBase.y + 107, { 0x4c,0x4c,0x4c });
-		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 12, skillBase.y + 107, { 0x34,0x34,0x34 });
-		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 8, skillBase.y + 107, { 0x26,0x26,0x26 });
-		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 4, skillBase.y + 107, { 0x1f,0x1f,0x1f });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, col::gray);
+		// 왼쪽 그라데이션 (탭 여백 10px 안에서 페이드가 끝나도록 8px 폭)
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 8, skillBase.y + 107, { 0x4c,0x4c,0x4c });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 6, skillBase.y + 107, { 0x34,0x34,0x34 });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 4, skillBase.y + 107, { 0x26,0x26,0x26 });
+		drawLine(skillBase.x + 3, skillBase.y + 107, skillBase.x + 3 + 2, skillBase.y + 107, { 0x1f,0x1f,0x1f });
 		// 오른쪽 그라데이션
-		drawLine(skillBase.x + 405 - 16, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x4c,0x4c,0x4c });
-		drawLine(skillBase.x + 405 - 12, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x34,0x34,0x34 });
-		drawLine(skillBase.x + 405 - 8, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x26,0x26,0x26 });
-		drawLine(skillBase.x + 405 - 4, skillBase.y + 107, skillBase.x + 405, skillBase.y + 107, { 0x1f,0x1f,0x1f });
+		drawLine(skillBase.x + 511 - 8, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, { 0x4c,0x4c,0x4c });
+		drawLine(skillBase.x + 511 - 6, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, { 0x34,0x34,0x34 });
+		drawLine(skillBase.x + 511 - 4, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, { 0x26,0x26,0x26 });
+		drawLine(skillBase.x + 511 - 2, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, { 0x1f,0x1f,0x1f });
 
 
-		drawSubcategoryBox(sysStr[199], generalBox, categoryCursor == skillCategory::general, false);
-		drawSubcategoryBox(sysStr[200], mutationBox, categoryCursor == skillCategory::mutation, false);
-		drawSubcategoryBox(sysStr[201], bionicBox, categoryCursor == skillCategory::bionic, false);
-		drawSubcategoryBox(sysStr[202], magicBox, categoryCursor == skillCategory::magic, false);
+		setFontSize(14);
+		drawText(L"Available Skill Point : "+col2Str(lowCol::green)+L"32", skillBase.x + skillBase.w - 162, skillBase.y + 43);
+
+
+		// 탭 라벨: 전체/무기술/생존/행동/바이오닉/돌연변이/신성력 (skillCategory 순서)
+		static constexpr int catStrIdx[7] = { 353, 354, 355, 356, 201, 200, 202 };
+		for (int c = 0; c < (int)visibleCats.size(); c++)
+		{
+			SDL_Rect catBox = { skillBase.x + 13 + 70 * c, skillBase.y + 82, 70, 26 };
+			drawSubcategoryBox(sysStr[catStrIdx[(int)visibleCats[c]]], catBox, categoryCursor == visibleCats[c], false);
+		}
 
 
 		// 스킬 스크롤 그리기
 		if (filteredSkills.size() > SKILL_GUI_MAX)
 		{
-			SDL_Rect skillScrollBox = { skillBase.x + 397, skillBase.y + 121, 2, 414 };
+			SDL_Rect skillScrollBox = { skillBase.x + 503, skillBase.y + 121, 2, 475 };
 			drawFillRect(skillScrollBox, { 120,120,120 });
 			SDL_Rect inScrollBox = skillScrollBox; // 내부 스크롤 커서
 			inScrollBox.h = skillScrollBox.h * myMin(1.0, (float)SKILL_GUI_MAX / (float)filteredSkills.size());
@@ -178,7 +203,7 @@ void Skill::drawGUI()
 		//std::wstring aquiredSkillText = sysStr[231] + L" : 13";
 		//drawText(aquiredSkillText, skillBase.x + 272 - queryTextWidth(aquiredSkillText), skillBase.y +34);//습득한 스킬
 
-		for (int i = 0; i < 7; i++)
+		for (int i = 0; i < SKILL_GUI_MAX; i++)
 		{
 			if (skillScroll + i < filteredSkills.size())
 			{
@@ -194,9 +219,14 @@ void Skill::drawGUI()
 				drawRect(skillBtn[i], skillOutlineColor);
 				SkillData& tgtData = filteredSkills[skillScroll + i];
 				auto* tgtBhv = SkillRegistry::get(tgtData.skillId);
+
 				setZoom(2.0);
 				drawSprite(spr::icon24, tgtBhv ? tgtBhv->iconIndex : 0, skillBtn[i].x, skillBtn[i].y);
 				setZoom(1.0);
+
+				// 사용 불가능한 스킬(패시브)은 아이콘 위에 테두리를 그려 구분
+				if (tgtBhv && tgtBhv->type == skillType::PASSIVE)
+					drawRect({ skillBtn[i].x, skillBtn[i].y, 48, 48 }, skillOutlineColor);
 
 				// 토글 활성 이펙트
 				if (tgtBhv && tgtBhv->type == skillType::TOGGLE && tgtData.toggle)
@@ -207,53 +237,74 @@ void Skill::drawGUI()
 				std::wstring skillName = tgtBhv ? tgtBhv->name : L"?";
 				setFontSize(22);
 				setFont(fontType::mainFontMedium);
-				// 패시브 스킬은 회색으로 표시
-				if (tgtBhv && tgtBhv->type == skillType::PASSIVE)
-					drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3, { 0x70, 0x70, 0x70 });
-				else
-					drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
+				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
 
-				drawLine(skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y, skillBtn[i].x + skillBtn[i].w - 1 - 36, skillBtn[i].y + skillBtn[i].h - 1, col::gray);
+				//실패율에 영향 미치는 참조 스킬들 (콤마 구분, 회색)
+				std::wstring refText;
+				if (tgtBhv)
+				{
+					for (size_t r = 0; r < tgtBhv->refSkills.size(); r++)
+					{
+						if (r > 0) refText += L", ";
+						auto* refBhv = SkillRegistry::get(tgtBhv->refSkills[r]);
+						refText += refBhv ? refBhv->name : L"?";
+					}
+				}
+				if (!refText.empty())
+				{
+					setFont(fontType::mainFontMedium);
+					setFontSize(12);
+					drawText(col2Str(col::lightGray) + refText, skillBtn[i].x + 58, skillBtn[i].y + 29);
+				}
 
 				setFont(fontType::mainFontSemiBold);
 				setFontSize(16);
-				std::wstring rankText = L"Rank " + (tgtBhv ? tgtBhv->skillRank : L"?");
-				drawText(rankText, skillBtn[i].x + 330- queryTextWidth(rankText), skillBtn[i].y + 4);
+				std::wstring rankText = L"Rank " + tgtData.skillRank;
+				drawText(rankText, skillBtn[i].x + skillBtn[i].w - 49 - queryTextWidth(rankText), skillBtn[i].y + 2);
 				setFont(fontType::mainFont);
 
-				// 요구 숙련도 이름 표시
-				std::wstring profText;
-				if (tgtBhv)
+				// 바이오닉은 설치 시점에 랭크 고정 — 숙련치 게이지/승급 버튼 없음
+				if (!tgtBhv || tgtBhv->src != skillSrc::BIONIC)
 				{
-					for (size_t p = 0; p < tgtBhv->reqProfic.size(); p++)
-					{
-						if (p > 0) profText += L" / ";
-						profText += getProficName(tgtBhv->reqProfic[p]);
-					}
+					bool expFull = tgtData.skillExp >= 100.0f;
+
+					//승급 버튼: 0=숙련치 가득(금색), 1=눌림, 2=숙련치 부족(회색)
+					drawSprite(spr::skillRankUpBtn, expFull ? 0 : 2, skillBtn[i].x + skillBtn[i].w - 41, skillBtn[i].y + 6);
+
+					//숙련치 게이지 (100에서 멈춤 — 초과 숙련치는 증발)
+					drawRect({ skillBtn[i].x + skillBtn[i].w - 43 - 71, skillBtn[i].y + 22,67,8 }, col::white);
+					int gaugeW = static_cast<int>(61.0f * myMin(tgtData.skillExp, 100.0f) / 100.0f);
+					if (gaugeW > 0)
+						drawFillRect(SDL_Rect{ skillBtn[i].x + skillBtn[i].w - 43 - 71 + 3, skillBtn[i].y + 22 + 3, gaugeW, 2 }, expFull ? SDL_Color{ 0xe1,0xb8,0x40 } : col::white);
+
+					setFont(fontType::mainFont);
+					setFontSize(12);
+					std::wstring expText = std::format(L"{:.1f} / 100.0", myMin(tgtData.skillExp, 100.0f));
+					drawText(expText, skillBtn[i].x + skillBtn[i].w - 43 - (expFull ? 73 : 71), skillBtn[i].y + 22 + 8);
 				}
-				if (profText.empty()) profText = L"-";
-				setFontSize(12);
-				drawText(profText, skillBtn[i].x + 330 - queryTextWidth(profText), skillBtn[i].y + 25);
 
-				// 실패율 계산 및 색상 적용
-				int failRate = 0;
-				if (tgtBhv)
-					failRate = tgtBhv->calcFailRate(static_cast<Entity*>(PlayerPtr));
+				drawLine(skillBtn[i].x + skillBtn[i].w - 120, skillBtn[i].y, skillBtn[i].x + skillBtn[i].w - 120, skillBtn[i].y + 47, skillOutlineColor);
 
-				setFontSize(12);
-				drawTextCenter(L"Fail", skillBtn[i].x + skillBtn[i].w - 20, skillBtn[i].y + 12);
-				setFont(fontType::mainFontSemiBold);
-				setFontSize(15);
-				SDL_Color failCol = getFailColor(failRate);
-				std::wstring failStr = std::to_wstring(failRate) + L"%";
-				drawTextCenter(col2Str(failCol) + failStr, skillBtn[i].x + skillBtn[i].w - 18, skillBtn[i].y + 29);
+				//액티브/토글 스킬은 사용 라벨과 실패율을 표시 (패시브는 없음)
+				if (tgtBhv && tgtBhv->type != skillType::PASSIVE)
+				{
+					drawSprite(spr::skillActiveBtn, 0, skillBtn[i].x + skillBtn[i].w - 178, skillBtn[i].y + 4);
+					setFont(fontType::mainFontMedium);
+					setFontSize(15);
+					drawTextCenter(tgtBhv->type == skillType::TOGGLE ? L"Toggle" : L"Active", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 12);
+
+					int failRate = tgtBhv->calcFailRate(static_cast<Entity*>(PlayerPtr), tgtData);
+					setFontSize(12);
+					setFont(fontType::mainFontMedium);
+					drawTextCenter(col2Str(col::lightGray) + L"Fail" + col2Str(getFailColor(failRate)) + L" " + std::to_wstring(failRate) + L"%", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 28);
+				}
 			}
 		}
 
 		if (!dragSkillTarget.empty())
 		{
 			bool cursorIconDraw = true;
-			for (int i = 0; i < 7; i++)
+			for (int i = 0; i < SKILL_GUI_MAX; i++)
 			{
 				if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
 				{
@@ -303,98 +354,85 @@ void Skill::clickUpGUI()
 	{
 		close(aniFlag::winUnfoldClose);
 	}
-	else if (checkCursor(&generalBox))
-	{
-		if (categoryCursor != skillCategory::general) categoryCursor = skillCategory::general;
-	}
-	else if (checkCursor(&mutationBox))
-	{
-		if (categoryCursor != skillCategory::mutation) categoryCursor = skillCategory::mutation;
-	}
-	else if (checkCursor(&bionicBox))
-	{
-		if (categoryCursor != skillCategory::bionic) categoryCursor = skillCategory::bionic;
-	}
-	else if (checkCursor(&magicBox))
-	{
-		if (categoryCursor != skillCategory::magic) categoryCursor = skillCategory::magic;
-	}
 	else
 	{
-		for (int i = 0; i < QUICK_SLOT_MAX; i++)
+		bool onCategory = false;
+		for (int c = 0; c < (int)visibleCats.size(); c++)
 		{
-			if (checkCursor(&quickSlotBtn[i]) && !dragSkillTarget.empty())
+			SDL_Rect catBox = { skillBase.x + 13 + 70 * c, skillBase.y + 82, 70, 26 };
+			if (checkCursor(&catBox))
 			{
-				for (int j = 0; j < QUICK_SLOT_MAX; j++)
+				if (categoryCursor != visibleCats[c])
 				{
-					if (quickSlot[j].first == quickSlotFlag::SKILL && quickSlot[j].second == dragSkillTarget)
-					{
-						quickSlot[j].first = quickSlotFlag::NONE;
-						quickSlot[j].second.clear();
-					}
+					categoryCursor = visibleCats[c];
+					skillScroll = 0;  //탭 변경 시 스크롤 초기화
 				}
-
-				quickSlot[i].first = quickSlotFlag::SKILL;
-				quickSlot[i].second = dragSkillTarget;
+				onCategory = true;
+				break;
 			}
 		}
 
-		for (int i = 0; i < SKILL_GUI_MAX; i++)
+		if (onCategory == false)
 		{
-			if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
+			for (int i = 0; i < QUICK_SLOT_MAX; i++)
 			{
-				if (!dragSkillTarget.empty() && filteredSkills[skillScroll + i].skillId == dragSkillTarget)
+				if (checkCursor(&quickSlotBtn[i]) && !dragSkillTarget.empty())
 				{
-					auto* clickedBhv = SkillRegistry::get(dragSkillTarget);
-
-					// 패시브 스킬은 사용 불가 → 무시
-					if (clickedBhv && clickedBhv->type == skillType::PASSIVE)
-						break;
-
-					useSkill(dragSkillTarget);
-
-					// 토글 스킬은 GUI 유지 (filteredSkills의 toggle 상태 동기화)
-					if (clickedBhv && clickedBhv->type == skillType::TOGGLE)
+					for (int j = 0; j < QUICK_SLOT_MAX; j++)
 					{
-						for (auto& sd : PlayerInfo().skillList)
+						if (quickSlot[j].first == quickSlotFlag::SKILL && quickSlot[j].second == dragSkillTarget)
 						{
-							if (sd.skillId == dragSkillTarget)
-							{
-								filteredSkills[skillScroll + i].toggle = sd.toggle;
-								break;
-							}
+							quickSlot[j].first = quickSlotFlag::NONE;
+							quickSlot[j].second.clear();
 						}
-						break;
 					}
 
-					// 액티브 스킬: 실제 발동(코루틴 시작)됐을 때만 GUI 닫기
-					if (!currentUsingSkill.empty())
+					quickSlot[i].first = quickSlotFlag::SKILL;
+					quickSlot[i].second = dragSkillTarget;
+				}
+			}
+
+			for (int i = 0; i < SKILL_GUI_MAX; i++)
+			{
+				if (skillScroll + i < filteredSkills.size() && checkCursor(&skillBtn[i]))
+				{
+					if (!dragSkillTarget.empty() && filteredSkills[skillScroll + i].skillId == dragSkillTarget)
 					{
-						delete this;
-						return;
+						auto* clickedBhv = SkillRegistry::get(dragSkillTarget);
+
+						// 패시브 스킬은 사용 불가 → 무시
+						if (clickedBhv && clickedBhv->type == skillType::PASSIVE)
+							break;
+
+						useSkill(dragSkillTarget);
+
+						// 토글 스킬은 GUI 유지 (filteredSkills의 toggle 상태 동기화)
+						if (clickedBhv && clickedBhv->type == skillType::TOGGLE)
+						{
+							for (auto& sd : PlayerInfo().skillList)
+							{
+								if (sd.skillId == dragSkillTarget)
+								{
+									filteredSkills[skillScroll + i].toggle = sd.toggle;
+									break;
+								}
+							}
+							break;
+						}
+
+						// 액티브 스킬: 실제 발동(코루틴 시작)됐을 때만 GUI 닫기
+						if (!currentUsingSkill.empty())
+						{
+							delete this;
+							return;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	filteredSkills.clear();
-	for (auto& sd : PlayerInfo().skillList)
-	{
-		if (categoryCursor == skillCategory::all)
-		{
-			filteredSkills.push_back(sd);
-		}
-		else
-		{
-			auto* bhv = SkillRegistry::get(sd.skillId);
-			if (!bhv) continue;
-			if (categoryCursor == skillCategory::general && bhv->src == skillSrc::GENERAL) filteredSkills.push_back(sd);
-			else if (categoryCursor == skillCategory::mutation && bhv->src == skillSrc::MUTATION) filteredSkills.push_back(sd);
-			else if (categoryCursor == skillCategory::bionic && bhv->src == skillSrc::BIONIC) filteredSkills.push_back(sd);
-			else if (categoryCursor == skillCategory::magic && bhv->src == skillSrc::MAGIC) filteredSkills.push_back(sd);
-		}
-	}
+	refilterSkills();
 
 	dragSkillTarget.clear();
 }

@@ -108,8 +108,6 @@ public:
     void drop(ItemPocket* txPtr);
     void throwing(std::unique_ptr<ItemPocket> txPtr, int gridX, int gridY);
 
-    float getProficLevel(int index);
-    void addProficExp(int expVal);
     virtual void endMove() = 0;
     bool runAnimation(bool shutdown);
 

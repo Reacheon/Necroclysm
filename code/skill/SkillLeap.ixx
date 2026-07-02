@@ -22,10 +22,11 @@ public:
 		iconIndex = 2;
 		descript = L"Jump to any tile within 2 spaces. Consumes twice as much time as normal movement. ";
 		src = skillSrc::GENERAL;
+		category = skillCategory::action;
 		type = skillType::ACTIVE;
 		reqStat = L"DEX";
-		reqProfic = { proficFlag::dodging };
-		skillRank = L"E";
+		refSkills = { skillRefCode::athletics };
+		skillRank = L"F";
 	}
 
 	bool canUse(Entity* caster, const SkillData& data) const override

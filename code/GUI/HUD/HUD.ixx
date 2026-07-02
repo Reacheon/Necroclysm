@@ -16,7 +16,6 @@ import Player;
 import World;
 import log;
 import Equip;
-import Profic;
 import Craft;
 import Light;
 import Sticker;
@@ -384,9 +383,6 @@ public:
 			break;
 		case act::equipment:
 			new Equip();
-			break;
-		case act::profic:
-			new Profic();
 			break;
 		case act::mutation:
 			break;

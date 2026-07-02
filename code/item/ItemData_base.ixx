@@ -27,6 +27,8 @@ export struct ItemDataBase
     unsigned __int16 craftTime = 20;
     std::vector<std::pair<unsigned __int16, unsigned __int32>> recipe;
     std::vector<unsigned __int8> recipeQualityNeed;
+    // *ProficNeed 3종: TSV의 (구 숙련도 인덱스, 요구 레벨) 쌍. 구 숙련도 시스템 폐기로 현재 미사용 —
+    // 신 스킬 랭크 요구치로 재작업 예정이라 데이터만 유지 중.
     std::vector<std::pair<unsigned __int8, unsigned __int8>> recipeProficNeed;
     std::vector<std::pair<unsigned __int16, unsigned __int32>> disassy;
     std::vector<unsigned __int8> disassyQualityNeed;

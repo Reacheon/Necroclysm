@@ -71,6 +71,9 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 	//getEquipPtr()->addItemFromDex(374);
 	//getEquipPtr()->itemInfo[i++].equipState = equipHandFlag::normal;
 
+	//기본 스킬 (패시브라 퀵슬롯 없음)
+	addSkill(skillRefCode::athletics);
+
 	addSkill(L"SKILL_FIRESTORM");
 	quickSlot[2] = { quickSlotFlag::SKILL, L"SKILL_FIRESTORM" };
 
@@ -79,8 +82,6 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 
 	addSkill(L"SKILL_LEAP");
 	quickSlot[1] = { quickSlotFlag::SKILL, L"SKILL_LEAP" };
-
-	for (int i = 0; i < TALENT_SIZE; i++) entityInfo.proficApt[i] = 2.0;
 }
 Player::~Player()
 {

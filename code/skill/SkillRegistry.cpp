@@ -5,6 +5,7 @@ import SkillBehavior;
 import SkillFireStorm;
 import SkillRoll;
 import SkillLeap;
+import SkillAthletics;
 import SkillSelfHeal;
 import SkillHealOther;
 import SkillPurify;
@@ -35,6 +36,7 @@ void SkillRegistry::init()
 	registerSkill(std::make_unique<SkillFireStorm>());
 	registerSkill(std::make_unique<SkillRoll>());
 	registerSkill(std::make_unique<SkillLeap>());
+	registerSkill(std::make_unique<SkillAthletics>());
 	registerSkill(std::make_unique<SkillSelfHeal>());
 	registerSkill(std::make_unique<SkillHealOther>());
 	registerSkill(std::make_unique<SkillPurify>());
