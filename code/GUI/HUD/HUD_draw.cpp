@@ -485,24 +485,59 @@ void HUD::drawGUI()
 
 		//배터리 잔량 표시
 		{
-			int pivotX = letterbox.x + 706;
-			int pivotY = letterbox.y + 21;
 
-			drawRect(pivotX, pivotY, 62, 34, col::lightGray);
-			drawRect(pivotX + 1, pivotY + 1, 60, 32, col::lightGray);
-			drawFillRect(pivotX + 61, pivotY + 12, 6, 8, col::lightGray);
 
-			int curEnergy = PlayerInfo().energy;
-			int maxEnergy = PlayerInfo().maxEnergy;
-			double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
-			int energyPct = static_cast<int>(energyRatio * 100.0 + 0.5);
+			if(1)
+			{
+				int pivotX = letterbox.x + 702;
+				int pivotY = letterbox.y + 16;
 
-			drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(52 * energyRatio), 24, lowCol::green);
+				drawRect(pivotX, pivotY, 70, 34, col::lightGray);
+				drawRect(pivotX + 1, pivotY + 1, 68, 32, col::lightGray);
+				drawFillRect(pivotX + 69, pivotY + 12, 6, 8, col::lightGray);
 
-			setFont(fontType::mainFontExtraBold);
-			setFontSize(18);
-			drawTextOutlineCenter(std::to_wstring(energyPct) + L"%", pivotX + 31, pivotY + 16);
-			setFont(fontType::mainFont);
+				int curEnergy = PlayerInfo().energy;
+				int maxEnergy = PlayerInfo().maxEnergy;
+				double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
+				int energyPct = static_cast<int>(energyRatio * 100.0 + 0.5);
+
+				drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(60 * energyRatio), 24, lowCol::green);
+
+				setFont(fontType::mainFontExtraBold);
+
+				setFontSize(16);
+				drawTextOutlineCenter(L"100.0", pivotX + 35, pivotY + 16);
+
+				//setFontSize(14);
+				//drawTextOutlineCenter(L"9999.0", pivotX + 35, pivotY + 16);
+				setFont(fontType::mainFont);
+
+				setFontSize(14);
+				setFont(fontType::mainFontSemiBold);
+				drawTextCenter(col2Str(col::lightGray) + L"/ 100 kJ", pivotX + 40, pivotY + 44);
+			}
+			else
+			{
+				int pivotX = letterbox.x + 702;
+				int pivotY = letterbox.y + 22;
+
+				drawRect(pivotX, pivotY, 70, 34, col::lightGray);
+				drawRect(pivotX + 1, pivotY + 1, 68, 32, col::lightGray);
+				drawFillRect(pivotX + 69, pivotY + 12, 6, 8, col::lightGray);
+
+				int curEnergy = PlayerInfo().energy;
+				int maxEnergy = PlayerInfo().maxEnergy;
+				double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
+				int energyPct = static_cast<int>(energyRatio * 100.0 + 0.5);
+
+				drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(60 * energyRatio), 24, lowCol::green);
+
+				setFont(fontType::mainFontExtraBold);
+				setFontSize(18);
+				drawTextOutlineCenter(std::to_wstring(energyPct) + L"%", pivotX + 35, pivotY + 16);
+				setFont(fontType::mainFont);
+			}
+
 		}
 
 

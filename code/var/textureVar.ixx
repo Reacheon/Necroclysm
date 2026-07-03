@@ -183,4 +183,8 @@ export namespace spr
 	Sprite* skillRankUpBtn = nullptr;
 	Sprite* skillActiveBtn = nullptr;
 
+	Sprite* statusAbilityUpBtn = nullptr;
+	Sprite* statusResetBtn = nullptr;
+
+
 }

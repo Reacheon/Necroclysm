@@ -257,57 +257,96 @@ void Status::drawGUI()
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			SDL_Rect strBtn = { statusBase.x + 625,statusBase.y + 96,60,60 };
+			SDL_Rect strBtn = { statusBase.x + 625,statusBase.y + 82,60,60 };
 			drawStadium(strBtn, stadiumCol(strBtn), 255, 4);
-			drawTextCenter(L"Str", strBtn.x + strBtn.w/2, strBtn.y + 12);
+			drawTextCenter(L"Str", strBtn.x + strBtn.w / 2, strBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statStr), strBtn.x + strBtn.w / 2, strBtn.y + strBtn.h / 2 + 8);
+
+			if (0)
+			{
+				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statStr), strBtn.x + strBtn.w / 2, strBtn.y + strBtn.h / 2 + 8);
+			}
+			else //분배할 AP가 남아있을 경우
+			{
+				drawTextCenter(std::to_wstring(12), strBtn.x + strBtn.w / 2 - 10, strBtn.y + strBtn.h / 2 + 8);
+				drawSprite(spr::statusAbilityUpBtn, 0, strBtn.x + 40, strBtn.y + 27); //0번 일반, 1번 클릭 (호버링없는 2인덱스짜리)
+			}
 
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			SDL_Rect intBtn = { statusBase.x + 625 + 83*1,statusBase.y + 96,60,60 };
+			SDL_Rect intBtn = { statusBase.x + 625 + 83*1,statusBase.y + 82,60,60 };
 			drawStadium(intBtn, stadiumCol(intBtn), 255, 4);
 			drawTextCenter(L"Int", intBtn.x + intBtn.w / 2, intBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statInt), intBtn.x + intBtn.w / 2, intBtn.y + intBtn.h / 2 + 8);
+			if (0)
+			{
+				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statInt), intBtn.x + intBtn.w / 2, intBtn.y + intBtn.h / 2 + 8);
+			}
+			else
+			{
+				drawTextCenter(std::to_wstring(12), intBtn.x + intBtn.w / 2 - 10, intBtn.y + intBtn.h / 2 + 8);
+				drawSprite(spr::statusAbilityUpBtn, 0, intBtn.x + 40, intBtn.y + 27);
+			}
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			SDL_Rect dexBtn = { statusBase.x + 625 + 83 * 2,statusBase.y + 96,60,60 };
+			SDL_Rect dexBtn = { statusBase.x + 625 + 83 * 2,statusBase.y + 82,60,60 };
 			drawStadium(dexBtn, stadiumCol(dexBtn), 255, 4);
 			drawTextCenter(L"Dex", dexBtn.x + dexBtn.w / 2, dexBtn.y + 12);
 			setFontSize(24);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statDex), dexBtn.x + dexBtn.w / 2, dexBtn.y + dexBtn.h / 2 + 8);
+			
+			if (0)
+			{
+				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statDex), dexBtn.x + dexBtn.w / 2, dexBtn.y + dexBtn.h / 2 + 8);
+			}
+			else
+			{
+				drawTextCenter(std::to_wstring(12), dexBtn.x + dexBtn.w / 2 - 10, dexBtn.y + dexBtn.h / 2 + 8);
+				drawSprite(spr::statusAbilityUpBtn, 0, dexBtn.x + 40, dexBtn.y + 27);
+			}
+			
+
 
 
 			setFont(fontType::mainFont);
 
 
-			SDL_Rect energyIcon = { statusBase.x + 624,statusBase.y + 48,32,32 };
-			drawStadium(energyIcon, stadiumCol(energyIcon), 255, 4);
-			setZoom(2.0);
-			drawSprite(spr::icon16, 118, energyIcon.x, energyIcon.y);
-			setZoom(1.0);
+			SDL_Rect gaugeRect = { statusBase.x + 670,statusBase.y + 48,184,23 };
 
-			SDL_Rect gaugeRect = { statusBase.x + 662,statusBase.y + 53,184,23 };
-
-			drawRect(gaugeRect, col::white);
-			drawRect(SDL_Rect{ gaugeRect.x-1,gaugeRect.y,gaugeRect.w+2,gaugeRect.h }, col::white);
-			drawFillRect(SDL_Rect{ statusBase.x + 847,statusBase.y + 60,5,9 }, col::white);
+			drawRect(gaugeRect, { 0x5b,0x5b,0x5b });
+			drawRect(SDL_Rect{ gaugeRect.x - 1,gaugeRect.y,gaugeRect.w + 2,gaugeRect.h }, {0x5b,0x5b,0x5b});
 
 			int curEnergy = PlayerInfo().energy;
 			int maxEnergy = PlayerInfo().maxEnergy;
 			double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
 			int gaugeW = static_cast<int>(176 * energyRatio);
 
-			SDL_Rect inGaugeRect = { statusBase.x + 666,statusBase.y + 57,gaugeW,15 };
-			drawFillRect(inGaugeRect, {0x5b,0xbf,0x75});
+			SDL_Rect inGaugeRect = { gaugeRect.x+4,gaugeRect.y + 4,gaugeW,15 };
+			SDL_Rect inGaugeRectIn = { gaugeRect.x + 4,gaugeRect.y + 5,gaugeW,10 };
+			SDL_Rect inGaugeRectInIn = { gaugeRect.x + 4,gaugeRect.y + 7,gaugeW,5 };
+			SDL_Rect inGaugeRectInInIn = { gaugeRect.x + 4,gaugeRect.y + 9,gaugeW,1 };
 
-			std::wstring energyStr = std::to_wstring(curEnergy) + L" / " + std::to_wstring(maxEnergy) + L" kJ";
+
+			drawFillRect(inGaugeRect, {0x85,0x3d,0x9c});
+			drawFillRect(inGaugeRectIn, { 0x9e,0x51,0xb7 });
+			drawFillRect(inGaugeRectInIn, { 0xb0,0x66,0xc8 });
+			drawFillRect(inGaugeRectInInIn, { 0xc3,0x79,0xdb });
+
+
+			setFontSize(18);
+			setFont(fontType::mainFontMedium);
+			drawText(L"Level 27", gaugeRect.x - 80, gaugeRect.y + 1);
+
+			setFontSize(16);
+			setFont(fontType::mainFontSemiBold);
+			drawText(L"AP : "+col2Str(lowCol::green)+L"17", gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
+
+
+			std::wstring energyStr = std::to_wstring(curEnergy) + L" / " + std::to_wstring(maxEnergy);
 
 			setFontSize(15);
 			setFont(fontType::mainFontMedium);
@@ -320,6 +359,12 @@ void Status::drawGUI()
 
 			drawTextCenter(energyStr, gaugeRect.x + gaugeRect.w/2, gaugeRect.y + gaugeRect.h/2);
 
+			//분배를 1포인트라도 해서 초기화가 가능한 경우에만 초기화 버튼 표시
+			//0 일반, 1 호버링, 2 클릭
+			if (1)
+			{
+				drawSprite(spr::statusResetBtn, 0, statusBase.x + 579, statusBase.y + 98);
+			}
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

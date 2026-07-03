@@ -425,4 +425,7 @@ export void textureLoader()
 	spr::rampUpTile = new  Sprite(renderer, "image/tileset/rampUp.png", 16, 16);
 	spr::skillRankUpBtn = new  Sprite(renderer, "image/UI/skillRankUpBtn.png", 36, 36);
 	spr::skillActiveBtn = new  Sprite(renderer, "image/UI/skillActiveBtn.png", 54, 40);
+
+	spr::statusAbilityUpBtn = new  Sprite(renderer, "image/UI/GUI/Status/statusAbilityUpBtn.png", 22, 22);
+	spr::statusResetBtn = new  Sprite(renderer, "image/UI/GUI/Status/statusResetBtn.png", 26, 26);
 }
