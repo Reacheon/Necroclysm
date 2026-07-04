@@ -20,6 +20,8 @@ import SkillRegistry;
 import statusEffect;
 import GodRegistry;
 import GodBehavior;
+import Entity;
+import playerLevel;
 
 export class Status : public GUI
 {
@@ -31,6 +33,7 @@ private:
 	int bionicScroll = 0;
 	int mutationScroll = 0;
 	int partScroll[6] = { 0, }; // 부위별 바이오닉/돌연변이 스크롤
+	int sessionAlloc[3] = { 0, }; // 이번 창 세션에서 Str/Int/Dex에 분배한 AP (창을 닫기 전까지 초기화 버튼으로 환불 가능)
 public:
 	Status() : GUI(false)
 	{
@@ -82,6 +85,37 @@ public:
 		}
 		else
 		{
+			//AP 분배: +버튼은 분배할 AP가 남아있을 때만 그려지므로 클릭도 그때만 유효
+			if (playerLevel::ap > 0)
+			{
+				unsigned __int8* stats[3] = { &PlayerPtr->entityInfo.statStr, &PlayerPtr->entityInfo.statInt, &PlayerPtr->entityInfo.statDex };
+				for (int i = 0; i < 3; i++)
+				{
+					SDL_Rect upBtn = { statusBase.x + 625 + 83 * i + 40, statusBase.y + 82 + 27, 22, 22 };
+					if (checkCursor(&upBtn))
+					{
+						(*stats[i])++;
+						sessionAlloc[i]++;
+						playerLevel::ap--;
+						return;
+					}
+				}
+			}
+
+			//초기화: 이번 창 세션에서 분배한 포인트 전액 환불 (창을 닫으면 확정)
+			int allocated = sessionAlloc[0] + sessionAlloc[1] + sessionAlloc[2];
+			if (allocated > 0)
+			{
+				SDL_Rect resetBtn = { statusBase.x + 579, statusBase.y + 98, 26, 26 };
+				if (checkCursor(&resetBtn))
+				{
+					PlayerPtr->entityInfo.statStr -= sessionAlloc[0];
+					PlayerPtr->entityInfo.statInt -= sessionAlloc[1];
+					PlayerPtr->entityInfo.statDex -= sessionAlloc[2];
+					playerLevel::ap += allocated;
+					sessionAlloc[0] = sessionAlloc[1] = sessionAlloc[2] = 0;
+				}
+			}
 		}
 	}
 

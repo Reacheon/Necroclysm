@@ -29,6 +29,7 @@ import VehiclePlan;
 import LotEditor;
 import mapEditorMode;
 import levelUpFX;
+import playerLevel;
 
 export void debugConsole()
 {
@@ -78,6 +79,7 @@ export void debugConsole()
 	prt(L"38. Lot으로 청크 페인트 (헬퍼 테스트)\n");
 	prt(L"39. LotEditor 실행\n");
 	prt(L"40. 맵 에디터 모드 (월드 초기화 + LotEditor)\n");
+	prt(L"41. 경험치 추가\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -958,6 +960,18 @@ export void debugConsole()
 	case 40://맵 에디터 모드: 월드 초기화 후 LotEditor 자동 기동
 	{
 		enterMapEditor();
+		break;
+	}
+	case 41://경험치 추가
+	{
+		prt(L"현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
+			playerLevel::level, playerLevel::exp, playerLevel::expToNext(), playerLevel::ap, playerLevel::skillPoint);
+		prt(L"추가할 경험치를 입력해주세요.\n");
+		int expInput;
+		std::cin >> expInput;
+		playerLevel::addExp(expInput);
+		prt(L"[디버그] 경험치를 %d만큼 추가했다. 현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
+			expInput, playerLevel::level, playerLevel::exp, playerLevel::expToNext(), playerLevel::ap, playerLevel::skillPoint);
 		break;
 	}
 	case 99://콘솔 출력 초기화

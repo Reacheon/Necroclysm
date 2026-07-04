@@ -22,7 +22,7 @@ import SystemMenu;
 import debugConsole;
 import Map;
 import LotEditor;
-import levelUpFX;
+import playerLevel;
 
 static bool btnPressed = false;
 
@@ -283,7 +283,7 @@ void HUD::keyUpGUI()
 		if (LotEditor::ins() == nullptr) new LotEditor();
 		break;
 	case SDLK_F3:
-		levelUpFX::trigger();
+		playerLevel::levelUp(); //연출·로그·포인트 지급 포함 즉시 레벨업
 		break;
 	case SDLK_M:
 		// 이미 열려있으면 아무 것도 안 함 (중복 생성 방지). 닫기는 Tab으로 처리됨

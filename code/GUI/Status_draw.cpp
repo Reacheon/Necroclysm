@@ -22,6 +22,7 @@ import GodRegistry;
 import GodBehavior;
 import Sprite;
 import Entity;
+import playerLevel;
 
 void Status::drawGUI()
 	{
@@ -255,60 +256,37 @@ void Status::drawGUI()
 				}
 			}
 
-			setFontSize(16);
-			setFont(fontType::mainFontSemiBold);
-			SDL_Rect strBtn = { statusBase.x + 625,statusBase.y + 82,60,60 };
-			drawStadium(strBtn, stadiumCol(strBtn), 255, 4);
-			drawTextCenter(L"Str", strBtn.x + strBtn.w / 2, strBtn.y + 12);
-			setFontSize(24);
-			setFont(fontType::mainFontBold);
+			//스탯 박스 3종 (Str/Int/Dex) — 분배할 AP가 남아있으면 +버튼과 함께 그림
+			float mouseXf, mouseYf;
+			bool mouseDown = (SDL_GetMouseState(&mouseXf, &mouseYf) & SDL_BUTTON_LMASK) != 0;
 
-			if (0)
+			const wchar_t* statLabels[3] = { L"Str", L"Int", L"Dex" };
+			const int statValues[3] = { PlayerPtr->entityInfo.statStr, PlayerPtr->entityInfo.statInt, PlayerPtr->entityInfo.statDex };
+			for (int i = 0; i < 3; i++)
 			{
-				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statStr), strBtn.x + strBtn.w / 2, strBtn.y + strBtn.h / 2 + 8);
-			}
-			else //분배할 AP가 남아있을 경우
-			{
-				drawTextCenter(std::to_wstring(12), strBtn.x + strBtn.w / 2 - 10, strBtn.y + strBtn.h / 2 + 8);
-				drawSprite(spr::statusAbilityUpBtn, 0, strBtn.x + 40, strBtn.y + 27); //0번 일반, 1번 클릭 (호버링없는 2인덱스짜리)
-			}
+				setFontSize(16);
+				setFont(fontType::mainFontSemiBold);
+				SDL_Rect statBtn = { statusBase.x + 625 + 83 * i,statusBase.y + 82,60,60 };
+				SDL_Rect upBtn = { statBtn.x + 40, statBtn.y + 27, 22, 22 };
+				drawStadium(statBtn, col::black, 255, 4);
+				//호버 틴트는 라벨 뒤의 좁은 스타디움에만 — 박스 전체가 변하면 반응 범위가 너무 넓게 읽힘
+				SDL_Rect labelRect = { statBtn.x + 3, statBtn.y + 3, 54, 19 };
+				drawStadium(labelRect, stadiumCol(labelRect), 255, 4);
+				drawTextCenter(statLabels[i], statBtn.x + statBtn.w / 2, statBtn.y + 12);
+				setFontSize(24);
+				setFont(fontType::mainFontBold);
 
-
-			setFontSize(16);
-			setFont(fontType::mainFontSemiBold);
-			SDL_Rect intBtn = { statusBase.x + 625 + 83*1,statusBase.y + 82,60,60 };
-			drawStadium(intBtn, stadiumCol(intBtn), 255, 4);
-			drawTextCenter(L"Int", intBtn.x + intBtn.w / 2, intBtn.y + 12);
-			setFontSize(24);
-			setFont(fontType::mainFontBold);
-			if (0)
-			{
-				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statInt), intBtn.x + intBtn.w / 2, intBtn.y + intBtn.h / 2 + 8);
-			}
-			else
-			{
-				drawTextCenter(std::to_wstring(12), intBtn.x + intBtn.w / 2 - 10, intBtn.y + intBtn.h / 2 + 8);
-				drawSprite(spr::statusAbilityUpBtn, 0, intBtn.x + 40, intBtn.y + 27);
+				if (playerLevel::ap == 0)
+				{
+					drawTextCenter(std::to_wstring(statValues[i]), statBtn.x + statBtn.w / 2, statBtn.y + statBtn.h / 2 + 8);
+				}
+				else //분배할 AP가 남아있을 경우
+				{
+					drawTextCenter(std::to_wstring(statValues[i]), statBtn.x + statBtn.w / 2 - 10, statBtn.y + statBtn.h / 2 + 8);
+					drawSprite(spr::statusAbilityUpBtn, (checkCursor(&upBtn) && mouseDown) ? 1 : 0, upBtn.x, upBtn.y); //0번 일반, 1번 클릭 (호버링없는 2인덱스짜리)
+				}
 			}
 
-			setFontSize(16);
-			setFont(fontType::mainFontSemiBold);
-			SDL_Rect dexBtn = { statusBase.x + 625 + 83 * 2,statusBase.y + 82,60,60 };
-			drawStadium(dexBtn, stadiumCol(dexBtn), 255, 4);
-			drawTextCenter(L"Dex", dexBtn.x + dexBtn.w / 2, dexBtn.y + 12);
-			setFontSize(24);
-			setFont(fontType::mainFontBold);
-			
-			if (0)
-			{
-				drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.statDex), dexBtn.x + dexBtn.w / 2, dexBtn.y + dexBtn.h / 2 + 8);
-			}
-			else
-			{
-				drawTextCenter(std::to_wstring(12), dexBtn.x + dexBtn.w / 2 - 10, dexBtn.y + dexBtn.h / 2 + 8);
-				drawSprite(spr::statusAbilityUpBtn, 0, dexBtn.x + 40, dexBtn.y + 27);
-			}
-			
 
 
 
@@ -320,10 +298,10 @@ void Status::drawGUI()
 			drawRect(gaugeRect, { 0x5b,0x5b,0x5b });
 			drawRect(SDL_Rect{ gaugeRect.x - 1,gaugeRect.y,gaugeRect.w + 2,gaugeRect.h }, {0x5b,0x5b,0x5b});
 
-			int curEnergy = PlayerInfo().energy;
-			int maxEnergy = PlayerInfo().maxEnergy;
-			double energyRatio = (maxEnergy > 0) ? static_cast<double>(curEnergy) / maxEnergy : 0.0;
-			int gaugeW = static_cast<int>(176 * energyRatio);
+			int curExp = playerLevel::exp;
+			int needExp = playerLevel::expToNext();
+			double expRatio = (needExp > 0) ? static_cast<double>(curExp) / needExp : 0.0;
+			int gaugeW = static_cast<int>(176 * expRatio);
 
 			SDL_Rect inGaugeRect = { gaugeRect.x+4,gaugeRect.y + 4,gaugeW,15 };
 			SDL_Rect inGaugeRectIn = { gaugeRect.x + 4,gaugeRect.y + 5,gaugeW,10 };
@@ -339,14 +317,14 @@ void Status::drawGUI()
 
 			setFontSize(18);
 			setFont(fontType::mainFontMedium);
-			drawText(L"Level 27", gaugeRect.x - 80, gaugeRect.y + 1);
+			drawText(L"Level " + std::to_wstring(playerLevel::level), gaugeRect.x - 80, gaugeRect.y + 1);
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			drawText(L"AP : "+col2Str(lowCol::green)+L"17", gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
+			drawText(L"AP : "+col2Str(lowCol::green)+std::to_wstring(playerLevel::ap), gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
 
 
-			std::wstring energyStr = std::to_wstring(curEnergy) + L" / " + std::to_wstring(maxEnergy);
+			std::wstring expStr = std::to_wstring(curExp) + L" / " + std::to_wstring(needExp);
 
 			setFontSize(15);
 			setFont(fontType::mainFontMedium);
@@ -354,16 +332,18 @@ void Status::drawGUI()
 			{
 				int dx, dy;
 				dir2Coord(i, dx, dy);
-				drawTextCenter(col2Str(col::black) + energyStr, gaugeRect.x + gaugeRect.w / 2 + dx, gaugeRect.y + gaugeRect.h / 2 + dy);
+				drawTextCenter(col2Str(col::black) + expStr, gaugeRect.x + gaugeRect.w / 2 + dx, gaugeRect.y + gaugeRect.h / 2 + dy);
 			}
 
-			drawTextCenter(energyStr, gaugeRect.x + gaugeRect.w/2, gaugeRect.y + gaugeRect.h/2);
+			drawTextCenter(expStr, gaugeRect.x + gaugeRect.w/2, gaugeRect.y + gaugeRect.h/2);
 
 			//분배를 1포인트라도 해서 초기화가 가능한 경우에만 초기화 버튼 표시
 			//0 일반, 1 호버링, 2 클릭
-			if (1)
+			if (sessionAlloc[0] + sessionAlloc[1] + sessionAlloc[2] > 0)
 			{
-				drawSprite(spr::statusResetBtn, 0, statusBase.x + 579, statusBase.y + 98);
+				SDL_Rect resetBtn = { statusBase.x + 579, statusBase.y + 98, 26, 26 };
+				int resetIdx = checkCursor(&resetBtn) ? (mouseDown ? 2 : 1) : 0;
+				drawSprite(spr::statusResetBtn, resetIdx, resetBtn.x, resetBtn.y);
 			}
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

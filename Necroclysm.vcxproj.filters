@@ -621,6 +621,9 @@
     <ClCompile Include="code\entity\Player.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
+    <ClCompile Include="code\entity\playerLevel.ixx">
+      <Filter>소스 파일\05_Class\01_Entity</Filter>
+    </ClCompile>
     <ClCompile Include="code\entity\readEntityDex.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
