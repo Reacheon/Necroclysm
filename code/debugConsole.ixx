@@ -28,6 +28,7 @@ import Lot;
 import VehiclePlan;
 import LotEditor;
 import mapEditorMode;
+import levelUpFX;
 
 export void debugConsole()
 {
@@ -50,7 +51,7 @@ export void debugConsole()
 	prt(L"11.가스 생성\n");
 	prt(L"12. 이큅 1번 제자리 드롭\n");
 	prt(L"13. 달리기 토글\n");
-	prt(L"14. (빈 슬롯)\n");
+	prt(L"14. 레벨업 이펙트 재생\n");
 	prt(L"15. 탑승 중인 차량을 반시계로 22.5도 회전\n");
 	prt(L"16. 탑승 중인 차량을 워프시키기\n");
 	prt(L"17. 탑승 중인 차량을 연속적으로 이동시키기\n");
@@ -236,8 +237,10 @@ export void debugConsole()
 	{
 		break;
 	}
-	case 14:
+	case 14://레벨업 연출 재생
 	{
+		levelUpFX::trigger();
+		prt(L"[디버그] 레벨업 연출 재생!\n");
 		break;
 	}
 	case 15://탑승 중인 차량 회전

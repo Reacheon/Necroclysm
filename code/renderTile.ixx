@@ -32,6 +32,7 @@ import Footprint;
 import Wave;
 import Wake;
 import nervedriveFilter;
+import levelUpFX;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -144,6 +145,7 @@ export std::int64_t renderTile()
     drawRampArrows();
     dur::mulFog = PROFILE([] { drawMulFogs(); });
     dur::fog = PROFILE([] { drawFogs(); });
+    levelUpFX::draw(); // 레벨업 연출 — 포그/어둠 위에 그려야 밤에도 빛기둥이 보임
     dur::marker = PROFILE([] { drawMarkers(); });
     dur::debug = PROFILE([] { drawDebug(); });
 

@@ -22,6 +22,7 @@ import SystemMenu;
 import debugConsole;
 import Map;
 import LotEditor;
+import levelUpFX;
 
 static bool btnPressed = false;
 
@@ -280,6 +281,9 @@ void HUD::keyUpGUI()
 	case SDLK_F2:
 		// 이미 열려있으면 중복 생성 방지
 		if (LotEditor::ins() == nullptr) new LotEditor();
+		break;
+	case SDLK_F3:
+		levelUpFX::trigger();
 		break;
 	case SDLK_M:
 		// 이미 열려있으면 아무 것도 안 함 (중복 생성 방지). 닫기는 Tab으로 처리됨
