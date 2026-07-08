@@ -689,4 +689,11 @@ export enum class MapSymbol
     park, hypermarket, school, parkingLot,
     //terrain 파생 (Lot 아님 — 렌더러가 Mountain 청크에 직접 부여)
     mountain,
+    //1x1 교외 구조물 (mapset1by1) — energyBank/warpGate/shop은 궤도엘리베이터 초지능 AI가
+    //  지상 인간용으로 세운 인프라. 도시 내부가 아니라 교외에 간간히 배치(배치 로직은 후속).
+    mine, lookoutTower, energyBank, warpGate, shop,
+    //2x2 (mapset2by2). 창고(warehouse)는 별도 값 없이 기존 1x1 값이 footprint로 2x1/1x2/2x2 분기.
+    nuclearPlant, solarPlant, researchLab,
+    //3x3 (mapset3by3)
+    airport, prison, militaryBase,
 };

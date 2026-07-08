@@ -42,7 +42,7 @@ import MapPin;
 //                     도시↔도시 연결 도로는 어느 CityPlan에도 안 들어가므로 폴리라인을 직접 청크
 //                     셀로 래스터화. ③-b 도시 내부 도로·다리(CityPlan.roadCells). 둘 다 *미발견
 //                     청크여도 항상 표시*(전세계 골격/정찰지도), 단 미발견은 어둡게(fog).
-//     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2). 발견=실제 종류,
+//     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2) / mapset3by3(3x3). 발견=실제 종류,
 //                     미발견=footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
 //
 //   좌표계는 "픽셀=청크"(worldPixel 인덱스, 0-base). 1픽셀=1청크=24타일.
@@ -235,10 +235,12 @@ struct ResolvedSym
 //  2x2: mapset2by2 64px=4청크, 중앙2x2(1..2) 정렬 → off(-1,-1).
 //  2x1(wide): 4x4 중 row2·col1~2 채움 → off(-1,-2).
 //  1x2(tall): 4x4 중 col2·row1~2 채움 → off(-2,-1).
+//  3x3: mapset3by3 80px=5청크, 중앙3x3(1..3) 정렬 → off(-1,-1).
 static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
 {
-    auto one  = [&](int idx) { return ResolvedSym{ spr::mapset1by1, idx, -1, -1, 3 }; };
-    auto two2 = [&](int idx) { return ResolvedSym{ spr::mapset2by2, idx, -1, -1, 4 }; };
+    auto one   = [&](int idx) { return ResolvedSym{ spr::mapset1by1, idx, -1, -1, 3 }; };
+    auto two2  = [&](int idx) { return ResolvedSym{ spr::mapset2by2, idx, -1, -1, 4 }; };
+    auto three = [&](int idx) { return ResolvedSym{ spr::mapset3by3, idx, -1, -1, 5 }; };
     //2x1/1x2 — footprint 방향으로 wide/tall 스프라이트 + 오프셋 분기.
     auto rect = [&](int wideIdx, int tallIdx) -> ResolvedSym {
         if (w == 2 && h == 1) return ResolvedSym{ spr::mapset2by2, wideIdx, -1, -2, 4 };
@@ -250,7 +252,10 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
     case MapSymbol::apartment:        return one(1);
     case MapSymbol::bank:             return one(2);
     case MapSymbol::house:            return one(3);
-    case MapSymbol::warehouse:        return one(4);
+    case MapSymbol::warehouse:        //창고는 다목적(경공업 공장 등) — footprint별 스프라이트 분기
+        if (w == 2 && h == 2) return two2(26);
+        if (w == 2 || h == 2) return rect(24, 25);
+        return one(4);
     case MapSymbol::cafe:             return one(5);
     case MapSymbol::cinema:           return one(6);
     case MapSymbol::junkShop:         return one(7);
@@ -284,19 +289,31 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
     case MapSymbol::hypermarket:      return two2(6);
     case MapSymbol::school:           return two2(7);
     case MapSymbol::parkingLot:       return two2(9);
+    case MapSymbol::mine:             return one(112);
+    case MapSymbol::lookoutTower:     return one(113);
+    case MapSymbol::energyBank:       return one(114);
+    case MapSymbol::warpGate:         return one(115);
+    case MapSymbol::shop:             return one(116);
+    case MapSymbol::nuclearPlant:     return two2(21);
+    case MapSymbol::solarPlant:       return two2(22);
+    case MapSymbol::researchLab:      return two2(23);
+    case MapSymbol::airport:          return three(0);
+    case MapSymbol::prison:           return three(1);
+    case MapSymbol::militaryBase:     return three(2);
     default:                          return ResolvedSym{};   // none / mountain(별도 처리)
     }
 }
 
 //미발견 도시의 "?건물" 심볼 — 실제 종류 대신 footprint(w×h)별 미확인 placeholder.
-//  오프셋/셀 규약은 resolveSymbol과 동일(1x1=mapset1by1 3청크 off(-1,-1), 나머지=mapset2by2 4청크
-//  off는 wide -1,-2 / tall -2,-1 / 2x2 -1,-1). 그 외 footprint(3x3 등)는 프로토타입 미지원 → 스킵.
+//  오프셋/셀 규약은 resolveSymbol과 동일(1x1=mapset1by1 3청크 off(-1,-1), 3x3=mapset3by3 5청크
+//  off(-1,-1), 나머지=mapset2by2 4청크 — off는 wide -1,-2 / tall -2,-1 / 2x2 -1,-1).
 static ResolvedSym resolveUnknownSymbol(int w, int h)
 {
     if (w == 1 && h == 1) return ResolvedSym{ spr::mapset1by1, 63, -1, -1, 3 };
     if (w == 2 && h == 2) return ResolvedSym{ spr::mapset2by2, 20, -1, -1, 4 };
     if (w == 2 && h == 1) return ResolvedSym{ spr::mapset2by2, 19, -1, -2, 4 };   // wide
     if (w == 1 && h == 2) return ResolvedSym{ spr::mapset2by2, 18, -2, -1, 4 };   // tall
+    if (w == 3 && h == 3) return ResolvedSym{ spr::mapset3by3, 3, -1, -1, 5 };
     return ResolvedSym{};
 }
 
@@ -359,6 +376,17 @@ static std::wstring mapSymbolName(MapSymbol s)
     case MapSymbol::hypermarket:      return L"Hypermarket";
     case MapSymbol::school:           return L"School";
     case MapSymbol::parkingLot:       return L"Parking Lot";
+    case MapSymbol::mine:             return L"Mine";
+    case MapSymbol::lookoutTower:     return L"Lookout Tower";
+    case MapSymbol::energyBank:       return L"Energy Bank";
+    case MapSymbol::warpGate:         return L"Warp Gate";
+    case MapSymbol::shop:             return L"Shop";
+    case MapSymbol::nuclearPlant:     return L"Nuclear Power Plant";
+    case MapSymbol::solarPlant:       return L"Solar Power Plant";
+    case MapSymbol::researchLab:      return L"Research Lab";
+    case MapSymbol::airport:          return L"Airport";
+    case MapSymbol::prison:           return L"Prison";
+    case MapSymbol::militaryBase:     return L"Military Base";
     default:                          return std::wstring{};   // none / mountain
     }
 }
@@ -1905,6 +1933,7 @@ public:
             //색조 모드 원복 — 텍스처 상태라 다른 패스/다음 프레임 오염 방지.
             SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
             SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
+            SDL_SetTextureColorMod(spr::mapset3by3->getTexture(), 255, 255, 255);
             SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
 
             setZoom(1.0f);

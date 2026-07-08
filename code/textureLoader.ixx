@@ -264,6 +264,7 @@ export void textureLoader()
 	spr::vehset = new Sprite(renderer, "image/tileset/vehset.png", 48, 48);
 	spr::mapset1by1 = new Sprite(renderer, "image/mapset/mapset1by1.png", 48, 48);
 	spr::mapset2by2 = new Sprite(renderer, "image/mapset/mapset2by2.png", 64, 64);
+	spr::mapset3by3 = new Sprite(renderer, "image/mapset/mapset3by3.png", 80, 80);
 	spr::auto47Mountain = new Sprite(renderer, "image/autotile47/auto47Mountain.png", 16, 16);
 	spr::icon32 = new Sprite(renderer, "image/UI/icon32.png", 32, 32);
 	spr::ring24 = new Sprite(renderer, "image/UI/ring24.png", 24, 24);
