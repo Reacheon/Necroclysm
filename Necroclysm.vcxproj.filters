@@ -888,6 +888,9 @@
     <ClCompile Include="code\worldGen_placeCities.cpp">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
     </ClCompile>
+    <ClCompile Include="code\worldGen_placeSites.cpp">
+      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
+    </ClCompile>
     <ClCompile Include="code\worldGen.ixx">
       <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
     </ClCompile>

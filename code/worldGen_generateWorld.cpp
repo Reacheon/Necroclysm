@@ -66,24 +66,39 @@ namespace worldGen
             progress.roadsSnap.push_back(r);
         });
 
-        //--- Phase 1~3 산출물 저장 ---
-        progress.result = WorldGenResult{ std::move(cities), std::move(roads) };
-
-        //  activePolyLines / activeCities 즉시 세팅 — WorldGenScreen worker가 본 함수 직후
-        //  prepareSpawn 에서 9 sector를 getOrCompute로 동기 생성. 이 procGenerate들이
-        //  광역 폴리라인을 읽어 도로 페인트, 도시 CityPlan을 lazy 생성해야 한다.
-        //  worldSession 콜백은 result를 move한 후 worldGenResult-> 주소로 재설정.
-        worldGen::activePolyLines = &progress.result->roads;
-        worldGen::activeCities    = &progress.result->cities;
-
         //--- mmap 진입 — 933MB heap → 디스크 임시 파일 + mmap → heap free ---
+        //  Phase 4(placeSites)가 worldPixel/isMountainChunk를 쓰므로 사이트 배치 *전*에 전환.
         //  성공 시: Phase 2 게임플레이는 worldGrid::worldPixel() 통해 lazy 페이지 폴트로 픽셀 접근.
         //  실패 시: heap grid 그대로 유지 (워커 스레드 종료 시 RAII로 free) — 폴백.
-        //          worldPixel은 Sea 반환하므로 게임은 동작하나 색상 데이터 무효.
+        //          worldPixel은 Sea 반환하므로 게임은 동작하나 색상 데이터 무효
+        //          (placeSites도 전 픽셀 Sea → 사이트 0개로 퇴화 — 어차피 그 경로는 월드 무효).
         if (transitionToMmap(grid))
         {
             grid.data.reset();   //933MB heap 즉시 회수
         }
+
+        //--- Phase 4: 인카운터 사이트 배치 ---
+        progress.phase.store(GenPhase::placeSite, std::memory_order_release);
+
+        std::vector<SiteNode> sites = placeSites(seed, cities, roads, [&](const SiteNode&)
+        {
+            progress.sitesPlaced.fetch_add(1, std::memory_order_relaxed);
+        }, [&](const RoadPolyLine& r)
+        {
+            std::lock_guard<std::mutex> lk(progress.roadsMtx);
+            progress.roadsSnap.push_back(r);   //2티어 도로·스퍼가 월드젠 화면 라인으로 증식
+        });
+
+        //--- Phase 1~4 산출물 저장 ---
+        progress.result = WorldGenResult{ std::move(cities), std::move(roads), std::move(sites) };
+
+        //  activePolyLines / activeCities / activeSites 즉시 세팅 — WorldGenScreen worker가
+        //  본 함수 직후 prepareSpawn 에서 9 sector를 getOrCompute로 동기 생성. 이
+        //  procGenerate들이 광역 폴리라인을 읽어 도로 페인트, 도시 CityPlan을 lazy 생성해야
+        //  한다. worldSession 콜백은 result를 move한 후 worldGenResult-> 주소로 재설정.
+        worldGen::activePolyLines = &progress.result->roads;
+        worldGen::activeCities    = &progress.result->cities;
+        worldGen::activeSites     = &progress.result->sites;
 
         //  prepareSpawn + done 설정은 *호출자*(WorldGenScreen 워커)가 처리.
         //  worldGen 모듈은 Sector 모듈을 import할 수 없으므로 (Sector → worldGen 단방향 의존),

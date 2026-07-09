@@ -229,6 +229,7 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
     {
         for (const worldGen::RoadPolyLine& line : *worldGen::activePolyLines)
         {
+            if (line.minor) continue;   //사이트 가지 — 끝점이 도시 진입이 아님
             if (line.verts.size() < 2) continue;
 
             for (int endIdx = 0; endIdx < 2; ++endIdx)

@@ -266,8 +266,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
     //   각 폴리라인 segment를 8방향(카디널+45°) 두꺼운 라인으로 페인트.
     //
     //   페인트 룰:
-    //     - 15타일 너비 asphalt만 (사이드워크 X — 도시 외부)
-    //     - 각 segment를 primary-axis로 walk하면서 매 타일마다 15×15 square stamp.
+    //     - 본선 15타일 / 2티어 국지 도로·사이트 스퍼(minor) 7타일 너비 asphalt만 (사이드워크 X — 도시 외부)
+    //     - 각 segment를 primary-axis로 walk하면서 매 타일마다 square stamp.
     //       (정확한 perpendicular strip 알고리즘 대신 redundant blob — 단순/안전)
     //     - water 위에도 paint — 도로가 강/바다를 가로지름 (의도된 다리 표현)
     //
@@ -279,7 +279,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
         const int tileMaxX = tileMinX + SectorCoord::TILES;
         const int tileMaxY = tileMinY + SectorCoord::TILES;
 
-        constexpr int POLY_HALF = 7;   // 15타일 = 2*7+1, 너비 정확히 15
+        constexpr int POLY_HALF   = 7;   // 본선: 15타일 = 2*7+1
+        constexpr int BRANCH_HALF = 3;   // 2티어 국지 도로·사이트 스퍼(minor): 7타일 = 2*3+1
 
         auto paintPolyAsphalt = [&](int wtx, int wty) noexcept
         {
@@ -290,30 +291,30 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             plan.tiles[idx].flags = TILE_FLAG_WALKABLE;
         };
 
-        auto stampBlob = [&](int cx, int cy) noexcept
+        auto stampBlob = [&](int cx, int cy, int half) noexcept
         {
-            for (int by = -POLY_HALF; by <= POLY_HALF; ++by)
-            for (int bx = -POLY_HALF; bx <= POLY_HALF; ++bx)
+            for (int by = -half; by <= half; ++by)
+            for (int bx = -half; bx <= half; ++bx)
                 paintPolyAsphalt(cx + bx, cy + by);
         };
 
         // 한 segment (실타일 좌표 a→b) 를 두꺼운 라인으로 페인트.
         //   steps = primary axis 최대 거리. 매 step에서 보간 위치에 stamp.
         //   카디널/45°/일반 각도 모두 동일 처리. 45°에서도 stamp 겹쳐 끊김 없음.
-        auto paintSegment = [&](const Point3& a, const Point3& b) noexcept
+        auto paintSegment = [&](const Point3& a, const Point3& b, int half) noexcept
         {
             const int dx = b.x - a.x;
             const int dy = b.y - a.y;
             const int adx = std::abs(dx);
             const int ady = std::abs(dy);
             const int steps = std::max(adx, ady);
-            if (steps == 0) { stampBlob(a.x, a.y); return; }
+            if (steps == 0) { stampBlob(a.x, a.y, half); return; }
 
             // segment bbox cull — segment 단위로도 한 번 더.
-            const int sMinX = std::min(a.x, b.x) - POLY_HALF;
-            const int sMaxX = std::max(a.x, b.x) + POLY_HALF;
-            const int sMinY = std::min(a.y, b.y) - POLY_HALF;
-            const int sMaxY = std::max(a.y, b.y) + POLY_HALF;
+            const int sMinX = std::min(a.x, b.x) - half;
+            const int sMaxX = std::max(a.x, b.x) + half;
+            const int sMinY = std::min(a.y, b.y) - half;
+            const int sMaxY = std::max(a.y, b.y) + half;
             if (sMaxX < tileMinX || sMinX >= tileMaxX) return;
             if (sMaxY < tileMinY || sMinY >= tileMaxY) return;
 
@@ -321,13 +322,15 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
             {
                 const int x = a.x + static_cast<int>(static_cast<std::int64_t>(dx) * s / steps);
                 const int y = a.y + static_cast<int>(static_cast<std::int64_t>(dy) * s / steps);
-                stampBlob(x, y);
+                stampBlob(x, y, half);
             }
         };
 
         for (const auto& poly : *worldGen::activePolyLines)
         {
             if (poly.verts.size() < 2) continue;
+
+            const int half = poly.minor ? BRANCH_HALF : POLY_HALF;
 
             // 폴리라인 전체 bbox cull
             int pMinX = poly.verts[0].x, pMaxX = poly.verts[0].x;
@@ -339,14 +342,14 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
                 if (v.y < pMinY) pMinY = v.y;
                 if (v.y > pMaxY) pMaxY = v.y;
             }
-            if (pMaxX + POLY_HALF < tileMinX) continue;
-            if (pMinX - POLY_HALF >= tileMaxX) continue;
-            if (pMaxY + POLY_HALF < tileMinY) continue;
-            if (pMinY - POLY_HALF >= tileMaxY) continue;
+            if (pMaxX + half < tileMinX) continue;
+            if (pMinX - half >= tileMaxX) continue;
+            if (pMaxY + half < tileMinY) continue;
+            if (pMinY - half >= tileMaxY) continue;
 
             for (std::size_t i = 1; i < poly.verts.size(); ++i)
             {
-                paintSegment(poly.verts[i - 1], poly.verts[i]);
+                paintSegment(poly.verts[i - 1], poly.verts[i], half);
             }
         }
     }
@@ -606,8 +609,8 @@ SectorPlan procGenerate(SectorCoord sc, std::uint64_t seed)
 
     //═══════════════════════════════════════════════════════════════════════
     // TODO 향후 단계 (모두 본 함수에 누적)
-    //   - 인카운터 사이트 좌표 (Land 픽셀 위에 결정론 배치)
-    //   - 폴리라인 주변 국도 분기 — 1티어 도로에서 갈라지는 마이너 도로망
+    //   - 인카운터 사이트 Lot blit — 좌표/가지도로는 worldGen::placeSites가 확정
+    //     (activeSites + minor 폴리라인, 3단계가 페인트). 건물 타일은 Lot 콘텐츠 대기.
     //   - Bridge 후처리 보강 — 폴리라인↔수계 교차 시 다리 텍스처
     //═══════════════════════════════════════════════════════════════════════
 

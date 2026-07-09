@@ -143,6 +143,7 @@ private:
         case worldGen::GenPhase::loadPng:      return L"Loading satellite imagery";
         case worldGen::GenPhase::placeCity:    return L"Placing cities";
         case worldGen::GenPhase::buildRoad:    return L"Building road network";
+        case worldGen::GenPhase::placeSite:    return L"Placing encounter sites";
         case worldGen::GenPhase::prepareSpawn: return L"Preparing spawn area";
         case worldGen::GenPhase::done:         return L"Finalizing world";
         }
@@ -229,17 +230,18 @@ private:
     //   LAYOUT_MODE에 따라 좌측 세로 컬럼(0) / 하단 가로 스트립(1)으로 배치.
     void drawRoadmap(worldGen::GenPhase ph) const
     {
-        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=prepareSpawn
-        constexpr int N_STEPS = 4;
+        // 단계 번호: 1=loadPng, 2=placeCity, 3=buildRoad, 4=placeSite, 5=prepareSpawn
+        constexpr int N_STEPS = 5;
         int activeStep = 0;
-        bool stepDone[N_STEPS] = { false, false, false, false };
+        bool stepDone[N_STEPS] = { false, false, false, false, false };
         switch (ph)
         {
         case worldGen::GenPhase::idle:         activeStep = 0; break;
         case worldGen::GenPhase::loadPng:      activeStep = 1; break;
         case worldGen::GenPhase::placeCity:    activeStep = 2; stepDone[0] = true; break;
         case worldGen::GenPhase::buildRoad:    activeStep = 3; stepDone[0] = stepDone[1] = true; break;
-        case worldGen::GenPhase::prepareSpawn: activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case worldGen::GenPhase::placeSite:    activeStep = 4; stepDone[0] = stepDone[1] = stepDone[2] = true; break;
+        case worldGen::GenPhase::prepareSpawn: activeStep = 5; stepDone[0] = stepDone[1] = stepDone[2] = stepDone[3] = true; break;
         case worldGen::GenPhase::done:         for (auto& d : stepDone) d = true; break;
         }
 
@@ -252,6 +254,7 @@ private:
             L"Loading satellite imagery",
             L"Placing cities",
             L"Building road network",
+            L"Placing encounter sites",
             L"Preparing spawn area",
         };
 
@@ -295,16 +298,22 @@ private:
         else
         {
             // 하단 가로 스트립 — 화면 중앙 정렬, 라벨은 링 아래.
-            constexpr int SPACING = 250;            // 링 중심 간 가로 간격(최장 라벨 수용)
+            //   간격은 양끝(1·5번) 라벨이 화면 밖으로 나가지 않는 선에서 최대 250 —
+            //   1:1 등 좁은 비율에서 라벨이 잘리는 것 방지 (와이드에선 250 유지).
+            setFont(fontType::mainFont);
+            setFontSize(15);
+            int maxLabelW = 0;
+            for (const wchar_t* lbl : labels) maxLabelW = std::max(maxLabelW, queryTextWidth(lbl));
+            const int spacing = std::min(250, (cameraW - maxLabelW - 24) / (N_STEPS - 1));
             const int cy      = cameraH - 92;       // 링 중심 Y (하단 밴드 안)
-            const int totalW  = SPACING * (N_STEPS - 1);
+            const int totalW  = spacing * (N_STEPS - 1);
             const int firstCx = (cameraW - totalW) / 2;
 
             // 단계 사이 도트 라인 (가로, 3px 점·5px 간격)
             for (int i = 0; i < N_STEPS - 1; ++i)
             {
-                const int xA = firstCx +  i      * SPACING + R_OUTER + 4;
-                const int xB = firstCx + (i + 1) * SPACING - R_OUTER - 4;
+                const int xA = firstCx +  i      * spacing + R_OUTER + 4;
+                const int xB = firstCx + (i + 1) * spacing - R_OUTER - 4;
                 const SDL_Color lineCol = stepDone[i] ? C_DONE : C_PENDING;
                 for (int x = xA; x <= xB; x += 5)
                     drawLine(x, cy, std::min(xB, x + 2), cy, lineCol);
@@ -312,7 +321,7 @@ private:
 
             for (int i = 0; i < N_STEPS; ++i)
             {
-                const int cx = firstCx + i * SPACING;
+                const int cx = firstCx + i * spacing;
                 const bool isActive = (activeStep == (i + 1));
                 const SDL_Color col = colOf(i, isActive);
                 drawStepRing(cx, cy, i + 1, col, isActive);
@@ -429,7 +438,7 @@ public:
             if (deficit > 0)
                 rate = std::max(rate, deficit / wgcfg::CITY_DEFICIT_DIV);
             //phase가 도시 단계를 지났으면 잔여분 빠르게 정리
-            if (ph == worldGen::GenPhase::buildRoad || ph == worldGen::GenPhase::done)
+            if (ph == worldGen::GenPhase::buildRoad || ph == worldGen::GenPhase::placeSite || ph == worldGen::GenPhase::done)
                 rate = std::max(rate, deficit / wgcfg::CITY_FINAL_DIV);
             displayedCityCount = std::min((double)cityActual, displayedCityCount + rate);
         }
@@ -567,6 +576,9 @@ public:
             break;
         case worldGen::GenPhase::buildRoad:
             sub << L"roads " << (int)displayedRoadCount;
+            break;
+        case worldGen::GenPhase::placeSite:
+            sub << L"sites " << (progress ? progress->sitesPlaced.load(std::memory_order_relaxed) : 0);
             break;
         default:
             break;

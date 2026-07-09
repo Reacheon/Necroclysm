@@ -162,9 +162,12 @@ export struct SectorPropContents
 //   props: 어느 z층의 prop 좌표/itemId든 모두 담긴 sparse 리스트.
 //   skyTiles: sc.z와 다른 z의 floor/wall sparse 리스트 (다리 deck 등).
 //
+//   인카운터 사이트/2티어 도로는 SectorPlan 채널이 아니라 worldGen이 담당 —
+//   worldGen::activeSites(좌표·심볼) + activePolyLines의 minor 폴리라인(2티어 국지 도로·
+//   진입 스퍼, 3단계가 페인트). 사이트 건물 타일은 향후 Lot blit 단계에서 CityPlan
+//   소비(4단계) 패턴으로.
+//
 //   향후 추가 (모두 procGenerate에서 채움):
-//     std::vector<EncounterSite>  encounters;
-//     std::vector<RoadPolyLine>   branchRoads;
 //     std::vector<MiniSiteSpawn>  miniSites;
 
 export struct SectorPlan

@@ -327,6 +327,7 @@
     <ClCompile Include="code\worldGen.ixx" />
     <ClCompile Include="code\worldGen_buildRoadNetwork.cpp" />
     <ClCompile Include="code\worldGen_placeCities.cpp" />
+    <ClCompile Include="code\worldGen_placeSites.cpp" />
     <ClCompile Include="code\worldGen_generateWorld.cpp" />
     <ClCompile Include="code\CityPlan.ixx" />
     <ClCompile Include="code\CityPlan_build.cpp" />

@@ -696,4 +696,10 @@ export enum class MapSymbol
     nuclearPlant, solarPlant, researchLab,
     //3x3 (mapset3by3)
     airport, prison, militaryBase,
+    //항만 — R/U/L/D는 배가 나가는(뱃길) 방향. footprint로 1x1(mapset1by1)/2x2(mapset2by2)
+    //  스프라이트 분기. CitySymbol에 방향 필드가 없어 방향을 심볼 값에 굽는다(배치 로직이
+    //  바다 방향을 보고 선택). RULD 순 연속 배치 전제 — 렌더러가 인덱스 오프셋으로 사용.
+    //  배치 조건(미구현, 규약만): 점유 타일 전부 바다 + 뱃길 방향 접경(2x2=2타일, 1x1=1타일)도
+    //  바다 + 반대쪽 접경은 육지. (아트 규약: 육지쪽=컨테이너·크레인, 뱃길쪽=정박한 배+돌출 포트)
+    harborR, harborU, harborL, harborD,
 };

@@ -57,6 +57,7 @@ export void startWorldGen()
         //  worldGenResult가 optional이라 주소가 안정적 — clear 전까지 유효.
         worldGen::activePolyLines = &worldGenResult->roads;
         worldGen::activeCities    = &worldGenResult->cities;
+        worldGen::activeSites     = &worldGenResult->sites;
         worldGenInProgress = false;
 
         //새 월드 — 이전 월드의 전장의 구름(발견 청크) 제거.

@@ -8,10 +8,11 @@ import city;
 import worldWrap;
 
 //============================================================
-// worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인).
+// worldGen — 월드 1회 부트스트랩 (도시 좌표 + 도로망 폴리라인 + 인카운터 사이트).
 //   책임:
 //     - placeCities: 약 4400개 도시 좌표 절차생성 (사전배치 + rejection sampling)
 //     - buildRoadNetwork: 도시간 도로 폴리라인 생성 (절차)
+//     - placeSites: 2티어 국지 도로망(피더/링크) 성장 + 교외 인카운터 사이트 도로변 배치
 //     - generateWorld: 위 단계 + worldGrid PNG 로드 + mmap 진입 순차 실행
 //   사용처:
 //     - WorldGenScreen: 워커 스레드에서 generateWorld 실행
@@ -48,6 +49,17 @@ export namespace worldGen
     struct RoadPolyLine
     {
         std::vector<Point3> verts;  //실타일 좌표
+        bool minor = false;         //2티어 국지 도로·사이트 진입 스퍼 — Sector 페인터가 좁은 폭으로 페인트
+    };
+
+    //교외 인카운터 사이트 — 도시 밖, 2티어 도로변(대형은 1티어 전용 가지 끝)에 배치되는 구조물.
+    //  CitySymbol(CityPlan.ixx)과 동일 형태 — Map.ixx 심볼 파이프라인(resolveSymbol/
+    //  y정렬/컬링/fog)을 그대로 재사용. 건물 Lot 연결은 후속(지금은 좌표+심볼만).
+    struct SiteNode
+    {
+        Point3    pos;                       //footprint 좌상단 청크의 실타일 좌표 (중심 아님)
+        int       w = 1, h = 1;              //footprint 청크(=픽셀) 크기
+        MapSymbol symbol = MapSymbol::none;
     };
 
     //활성 폴리라인 글로벌 view 포인터.
@@ -64,11 +76,17 @@ export namespace worldGen
     //  CityId = 이 벡터의 인덱스. nullptr면 스킵 (월드젠 전 startArea 시점).
     inline const std::vector<CityNode>* activeCities = nullptr;
 
+    //활성 사이트 목록 글로벌 view 포인터 — activeCities와 동일 패턴.
+    //  Map.ixx(심볼 렌더·hover 툴팁)와 isSiteChunk(숲 clearing)가 소비.
+    //  nullptr면 스킵 (월드젠 전 startArea 시점).
+    inline const std::vector<SiteNode>* activeSites = nullptr;
+
     //generateWorld 결과 — WorldGenProgress::result에 채워짐.
     struct WorldGenResult
     {
         std::vector<CityNode> cities;
         std::vector<RoadPolyLine> roads;
+        std::vector<SiteNode> sites;
     };
 
     //진행 단계.
@@ -78,8 +96,9 @@ export namespace worldGen
         loadPng      = 1, //위성 PNG 디코드 중
         placeCity    = 2, //도시 좌표 배치 중
         buildRoad    = 3, //도로망 폴리라인 생성 중
-        prepareSpawn = 4, //스폰 지점 주변 섹터 사전 절차생성 중 (외부, WorldGenScreen 워커가 처리)
-        done         = 5, //모든 단계 완료(result에 채워짐)
+        placeSite    = 4, //교외 인카운터 사이트 배치 중 (mmap 전환 포함)
+        prepareSpawn = 5, //스폰 지점 주변 섹터 사전 절차생성 중 (외부, WorldGenScreen 워커가 처리)
+        done         = 6, //모든 단계 완료(result에 채워짐)
     };
 
     //워커 스레드와 WorldGenScreen GUI가 공유하는 진행 상태.
@@ -93,6 +112,9 @@ export namespace worldGen
         //PNG 진행 (5832장 기준)
         std::atomic<int> patchesLoadedTotal{ 0 };
         std::atomic<int> patchesLoadedDone { 0 };
+
+        //사이트 배치 진행 (placeSites 콜백에서 증가 — GUI 서브카운트 표시용)
+        std::atomic<int> sitesPlaced{ 0 };
 
         //도시 누적 스냅샷
         std::mutex             citiesMtx;
@@ -118,6 +140,7 @@ export namespace worldGen
     //콜백 타입. default no-op — 내부에서 출력에 영향 없음(순수성 유지).
     using CitySink = std::function<void(const CityNode&)>;
     using RoadSink = std::function<void(const RoadPolyLine&)>;
+    using SiteSink = std::function<void(const SiteNode&)>;
 
     //placeCities는 grid를 mutate — 절차생성 도시의 폴리곤을 CityZone 픽셀로 그려 넣음.
     //  사전배치 도시는 PNG에 이미 있으니 건드리지 않음. buildRoadNetwork는 painted 결과를 봄.
@@ -127,8 +150,17 @@ export namespace worldGen
     //  도시 진입은 cityRegion 경계로 직교 (cardinal) 진입. 도시 내부 layout 의존 없음.
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
-    //월드 골격(도시 좌표 + 도로 폴리라인)을 게임 시작 1회 절차적 생성.
-    //  3단계(PNG 로드 → 도시 배치 → 도로망)를 순차 실행하면서 progress의 phase /
+    //placeSites — 2티어 국지 도로망 성장 + 교외 인카운터 사이트 배치.
+    //  ① 1티어 앵커에서 2티어 도로가 확률 발아(지역 밀도 노이즈) — 막다른 피더 또는
+    //     타도로 접속 링크(루프 형성), 피더 위 서브가지 깊이 2.
+    //  ② 사이트는 2티어 도로변 수직 스퍼(2~4px)로 얹힘. 대형(공항/군부대/교도소/원전)만
+    //     1티어 직결 직선/L/Z 가지. 지형/도시거리/사이트거리/도로침범 검사 통과 시 확정.
+    //  accept마다 폴리라인(minor=true)을 roads에 직접 append(기존 소비처가 자동 소비).
+    //  worldPixel 사용 — mmap 전환 후 호출 전제.
+    std::vector<SiteNode> placeSites(std::uint64_t seed, const std::vector<CityNode>& cities, std::vector<RoadPolyLine>& roads, SiteSink onSite = {}, RoadSink onRoad = {});
+
+    //월드 골격(도시 좌표 + 도로 폴리라인 + 인카운터 사이트)을 게임 시작 1회 절차적 생성.
+    //  4단계(PNG 로드 → 도시 배치 → 도로망 → 사이트 배치)를 순차 실행하면서 progress의 phase /
     //  카운터 / 누적 스냅샷 / 미리보기 RGBA를 갱신한다. 완료 시점에 progress.result에
     //  최종 결과가 들어가고 progress.done = true가 된다.
     //
@@ -195,6 +227,46 @@ export namespace worldGen
                             stampDilated(x, y);
                         }
                     }
+            }
+        }
+        return mask.count(key(worldWrap::wrapPixelX(chunkPxX), chunkPxY)) != 0;
+    }
+
+    //인카운터 사이트 footprint 청크 판정 — isHighwayChunk와 동일 패턴(activeSites 포인터
+    //  기준 1회 빌드 마스크, mutex 가드). footprint + 1링 dilation stamp — 3청크폭 숲
+    //  스프라이트가 사이트에 겹치는 것까지 차단(사이트 클리어링). isForestChunk가 양보 조회,
+    //  향후 사이트 Lot이 깔릴 자리를 나무로부터 예약하는 역할 겸용.
+    inline bool isSiteChunk(int chunkPxX, int chunkPxY)
+    {
+        static std::unordered_set<std::uint64_t> mask;
+        static const std::vector<SiteNode>* builtFrom = nullptr;
+        static bool       built = false;
+        static std::mutex mtx;
+
+        auto key = [](int cx, int cy) noexcept -> std::uint64_t {
+            return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(cx)) << 32)
+                 |  static_cast<std::uint64_t>(static_cast<std::uint32_t>(cy));
+        };
+
+        std::lock_guard<std::mutex> lk(mtx);
+        if (!built || builtFrom != activeSites)
+        {
+            built     = true;
+            builtFrom = activeSites;
+            mask.clear();
+            if (activeSites != nullptr)
+            {
+                auto floorDiv = [](int a, int b) noexcept {
+                    return (a >= 0) ? (a / b) : -(((-a) + b - 1) / b);
+                };
+                for (const SiteNode& s : *activeSites)
+                {
+                    const int px = floorDiv(s.pos.x - TILE_BASE_X, TILE_PER_PIXEL);
+                    const int py = floorDiv(s.pos.y - TILE_BASE_Y, TILE_PER_PIXEL);
+                    for (int oy = -1; oy <= s.h; ++oy)
+                    for (int ox = -1; ox <= s.w; ++ox)
+                        mask.insert(key(worldWrap::wrapPixelX(px + ox), py + oy));
+                }
             }
         }
         return mask.count(key(worldWrap::wrapPixelX(chunkPxX), chunkPxY)) != 0;
@@ -417,8 +489,9 @@ export namespace worldGen
         }
         if (!found) return false;
 
-        //③ 양보 — 숲이라도 산맥/도시간 도로(1링 포함)면 비움 (우선순위 산>숲>도로).
+        //③ 양보 — 숲이라도 산맥/사이트/도시간 도로(1링 포함)면 비움 (우선순위 산>사이트>숲>도로).
         if (isMountainChunk(pcx, pcy, seed)) return false;
+        if (isSiteChunk(pcx, pcy)) return false;
         if (isHighwayChunk(pcx, pcy)) return false;
         return true;
     }

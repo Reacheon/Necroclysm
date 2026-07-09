@@ -44,6 +44,7 @@ import MapPin;
 //                     청크여도 항상 표시*(전세계 골격/정찰지도), 단 미발견은 어둡게(fog).
 //     ④ 건물 심볼   — CityPlan.symbols → mapset1by1(1x1) / mapset2by2(2x1·1x2·2x2) / mapset3by3(3x3). 발견=실제 종류,
 //                     미발견=footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
+//                     ④-b 교외 사이트(worldGen::activeSites)도 같은 규약으로 drawSites가 그림.
 //
 //   좌표계는 "픽셀=청크"(worldPixel 인덱스, 0-base). 1픽셀=1청크=24타일.
 //     pixelX = (tileX - TILE_BASE_X) / TILE_PER_PIXEL,  X는 원기둥 wrap.
@@ -300,6 +301,11 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
     case MapSymbol::airport:          return three(0);
     case MapSymbol::prison:           return three(1);
     case MapSymbol::militaryBase:     return three(2);
+    //항만 — footprint로 1x1/2x2 분기, RULD 연속 인덱스(1x1=26~29, 2x2=27~30).
+    case MapSymbol::harborR:          return (w == 1) ? one(26) : two2(27);
+    case MapSymbol::harborU:          return (w == 1) ? one(27) : two2(28);
+    case MapSymbol::harborL:          return (w == 1) ? one(28) : two2(29);
+    case MapSymbol::harborD:          return (w == 1) ? one(29) : two2(30);
     default:                          return ResolvedSym{};   // none / mountain(별도 처리)
     }
 }
@@ -307,8 +313,16 @@ static ResolvedSym resolveSymbol(MapSymbol s, int w, int h, std::uint64_t hash)
 //미발견 도시의 "?건물" 심볼 — 실제 종류 대신 footprint(w×h)별 미확인 placeholder.
 //  오프셋/셀 규약은 resolveSymbol과 동일(1x1=mapset1by1 3청크 off(-1,-1), 3x3=mapset3by3 5청크
 //  off(-1,-1), 나머지=mapset2by2 4청크 — off는 wide -1,-2 / tall -2,-1 / 2x2 -1,-1).
-static ResolvedSym resolveUnknownSymbol(int w, int h)
+//  항만만 예외로 종류·방향을 드러내는 전용 ?스프라이트(물 위 구조물이라 일반 ?건물이 어색):
+//  RULD 연속 인덱스, 1x1=117~120 / 2x2=32~35.
+static ResolvedSym resolveUnknownSymbol(MapSymbol s, int w, int h)
 {
+    if (s >= MapSymbol::harborR && s <= MapSymbol::harborD)
+    {
+        const int d = static_cast<int>(s) - static_cast<int>(MapSymbol::harborR);
+        if (w == 1 && h == 1) return ResolvedSym{ spr::mapset1by1, 117 + d, -1, -1, 3 };
+        return ResolvedSym{ spr::mapset2by2, 32 + d, -1, -1, 4 };
+    }
     if (w == 1 && h == 1) return ResolvedSym{ spr::mapset1by1, 63, -1, -1, 3 };
     if (w == 2 && h == 2) return ResolvedSym{ spr::mapset2by2, 20, -1, -1, 4 };
     if (w == 2 && h == 1) return ResolvedSym{ spr::mapset2by2, 19, -1, -2, 4 };   // wide
@@ -387,6 +401,9 @@ static std::wstring mapSymbolName(MapSymbol s)
     case MapSymbol::airport:          return L"Airport";
     case MapSymbol::prison:           return L"Prison";
     case MapSymbol::militaryBase:     return L"Military Base";
+    case MapSymbol::harborR: case MapSymbol::harborU:
+    case MapSymbol::harborL: case MapSymbol::harborD:
+        return L"Harbor";
     default:                          return std::wstring{};   // none / mountain
     }
 }
@@ -749,6 +766,42 @@ static bool roadCellOnMountain(int cx, int cy)
         || worldGen::isMountainChunk(cx, cy, worldSeed);
 }
 
+//사이트 footprint 청크 판정 — 심볼 밑에 깔린 외부 도로 셀은 그리지 않는다(조망대 아래
+//  중앙분리선 같은 어색함 방지). 진입 스퍼의 끝 셀이 footprint 안쪽이라 심볼과 겹치기 때문.
+//  openBits(highwayCells)는 건드리지 않으므로 이웃 셀의 T/코너 연결 팔은 그대로 —
+//  시각적으로 도로가 시설 안으로 들어가며 끝난다. activeSites 포인터 기준 1회 메모이즈
+//  (highwayCells 패턴 — Map은 메인 스레드 전용이라 뮤텍스 불필요, isSiteChunk와 다른 점).
+//  worldGen::isSiteChunk는 1링 dilation이 있어 진입로 셀까지 지워버리므로 여기선 못 쓴다.
+static bool siteFootprintChunk(int cx, int cy)
+{
+    static std::unordered_set<std::uint64_t> mask;
+    static const std::vector<worldGen::SiteNode>* builtFrom = nullptr;
+    static bool built = false;
+
+    auto keyOf = [](int x, int y) -> std::uint64_t {
+        return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(x)) << 32)
+             |  static_cast<std::uint64_t>(static_cast<std::uint32_t>(y));
+    };
+
+    const std::vector<worldGen::SiteNode>* sites = worldGen::activeSites;
+    if (!built || builtFrom != sites)
+    {
+        built     = true;
+        builtFrom = sites;
+        mask.clear();
+        if (sites != nullptr)
+            for (const worldGen::SiteNode& s : *sites)
+            {
+                const int px = tilePixelIX(s.pos.x);
+                const int py = tilePixelIY(s.pos.y);
+                for (int oy = 0; oy < s.h; ++oy)
+                for (int ox = 0; ox < s.w; ++ox)
+                    mask.insert(keyOf(px + ox, py + oy));
+            }
+    }
+    return mask.count(keyOf(cx, cy)) != 0;
+}
+
 //외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
 //  도로망은 미발견 청크여도 항상 표시(전세계 도로 골격) — 단 미발견은 지형처럼 어둡게(fogBright)
 //  색조해 전장의 구름 느낌은 유지. (도시 내부 도로·다리는 drawCityRoads가 따로 그림.)
@@ -761,6 +814,7 @@ static void drawHighways(const MapView& v)
     for (const HighwayCell& c : cells)
     {
         if (c.z != v.z) continue;
+        if (siteFootprintChunk(c.cx, c.cy)) continue;   //사이트 심볼 밑 도로 숨김 — 연결은 이웃 셀이 유지
 
         const int sx = (int)std::lround(v.sX((double)(c.cx - 1)));
         const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
@@ -875,6 +929,10 @@ static void drawCityRoads(const MapView& v)
     SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
+//디버그 — 미발견 심볼 전체 식별 토글(F4, 맵 열린 상태). ?건물/Unknown이 실심볼·실명으로
+//   표시된다(fog 밝기는 유지 — 발견 상태 자체는 안 건드림). 세션 전역, 세이브 무관.
+static bool debugRevealSymbols = false;
+
 //④ 건물 심볼 (캐시된 도시) — symOut에 누적(산과 함께 y정렬 후 그림). 발견된 청크는 실제 종류
 //   스프라이트, 미발견 청크는 footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
 static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
@@ -894,12 +952,12 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
             if (sym.pos.z != v.z) continue;
             const int apx = tilePixelIX(sym.pos.x);
             const int apy = tilePixelIY(sym.pos.y);
-            const bool seen = mapDiscovery::discovered(apx, apy);
+            const bool seen = debugRevealSymbols || mapDiscovery::discovered(apx, apy);
 
             //발견=실제 종류, 미발견=?건물 placeholder. 둘 다 못 풀면(none/미지원 footprint) 스킵.
             const ResolvedSym rs = seen
                 ? resolveSymbol(sym.symbol, sym.w, sym.h, symHash(apx, apy))
-                : resolveUnknownSymbol(sym.w, sym.h);
+                : resolveUnknownSymbol(sym.symbol, sym.w, sym.h);
             if (!rs.atlas) continue;
 
             const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
@@ -909,6 +967,37 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 
             symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy, fogBright(apx, apy) });
         }
+    }
+}
+
+//④-b 교외 인카운터 사이트 심볼 — drawCityBuildings와 동일 규약(발견=실제/미발견=?건물,
+//   y정렬·컬링·fog 공용 파이프라인). 데이터 소스만 다름: worldGen::activeSites 직접 순회
+//   (도시와 달리 CityPlan 캐시 불필요 — 월드젠 때 eager 확정된 세션 불변 배열).
+static void drawSites(const MapView& v, std::vector<SymDraw>& symOut)
+{
+    const auto* sites = worldGen::activeSites;
+    if (!sites) return;
+
+    const int cp = v.chunkPx();
+
+    for (const auto& site : *sites)
+    {
+        if (site.pos.z != v.z) continue;
+        const int apx = tilePixelIX(site.pos.x);
+        const int apy = tilePixelIY(site.pos.y);
+        const bool seen = debugRevealSymbols || mapDiscovery::discovered(apx, apy);
+
+        const ResolvedSym rs = seen
+            ? resolveSymbol(site.symbol, site.w, site.h, symHash(apx, apy))
+            : resolveUnknownSymbol(site.symbol, site.w, site.h);
+        if (!rs.atlas) continue;
+
+        const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
+        const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
+        const int span = rs.cellChunks * cp;
+        if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
+
+        symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy, fogBright(apx, apy) });
     }
 }
 
@@ -1651,7 +1740,23 @@ static void drawHoverInfo(const MapView& v)
             const int apy = tilePixelIY(sym.pos.y);
             if (wpx < apx || wpx >= apx + sym.w || py < apy || py >= apy + sym.h) continue;
 
-            label = mapDiscovery::discovered(apx, apy) ? mapSymbolName(sym.symbol) : L"Unknown";
+            label = (debugRevealSymbols || mapDiscovery::discovered(apx, apy)) ? mapSymbolName(sym.symbol) : L"Unknown";
+            break;
+        }
+    }
+
+    //②-b 교외 사이트 — 도시 bbox 밖이라 위 루프에 안 걸림. activeSites 선형 스캔
+    //   (수천 개 footprint 포함검사, hover 시 프레임당 1회 — 무해).
+    if (label.empty() && worldGen::activeSites != nullptr)
+    {
+        for (const auto& site : *worldGen::activeSites)
+        {
+            if (site.pos.z != v.z) continue;
+            const int apx = tilePixelIX(site.pos.x);
+            const int apy = tilePixelIY(site.pos.y);
+            if (wpx < apx || wpx >= apx + site.w || py < apy || py >= apy + site.h) continue;
+
+            label = (debugRevealSymbols || mapDiscovery::discovered(apx, apy)) ? mapSymbolName(site.symbol) : L"Unknown";
             break;
         }
     }
@@ -1921,6 +2026,7 @@ public:
             ensureVisibleCityLayouts(view);      // 화면 내 미캐시 도시 경량 layout 백그라운드 요청
             drawCityRoads    (view);             // ③-b 내부 도로·다리 (산 위면 터널 반투명, 미발견은 어둡게)
             drawCityBuildings(view, symDraws);   // ④ 건물 (발견=실제 / 미발견=?건물, 어둡게)
+            drawSites        (view, symDraws);   // ④-b 교외 사이트 (같은 규약, activeSites 직접 순회)
 
             //숲+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침. 그릴 때 br로 색조(전장의 구름).
             std::sort(symDraws.begin(), symDraws.end(),
@@ -2039,6 +2145,7 @@ public:
     {
         if (getStateInput() == false) return;
         if (pinMenuOpen && event.key.key == SDLK_ESCAPE) { pinMenuOpen = false; return; }   // ESC=메뉴 먼저 닫기
+        if (event.key.key == SDLK_F4) { debugRevealSymbols = !debugRevealSymbols; return; } // 디버그 — 미발견 심볼 전체 식별 토글
         if (event.key.key == SDLK_M || event.key.key == SDLK_ESCAPE)
             close(aniFlag::winUnfoldClose);
     }
