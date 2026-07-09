@@ -151,10 +151,12 @@ export namespace worldGen
     std::vector<RoadPolyLine> buildRoadNetwork(std::uint64_t seed, const worldGrid::PixelCostGrid& grid, const std::vector<CityNode>& cities, RoadSink onRoad = {});
 
     //placeSites — 2티어 국지 도로망 성장 + 교외 인카운터 사이트 배치.
-    //  ① 1티어 앵커에서 2티어 도로가 확률 발아(지역 밀도 노이즈) — 막다른 피더 또는
-    //     타도로 접속 링크(루프 형성), 피더 위 서브가지 깊이 2.
+    //  ① 2티어 도로 성장: 도시 경계 방사(도시 가장자리 타일 프리펜드 — CityPlan 진입
+    //     등록과 정합) + 1티어 앵커 확률 발아(지역 밀도 노이즈) — 막다른 피더 또는
+    //     1티어 접속 링크(루프 형성), 서브가지 깊이 2.
     //  ② 사이트는 2티어 도로변 수직 스퍼(2~4px)로 얹힘. 대형(공항/군부대/교도소/원전)만
     //     1티어 직결 직선/L/Z 가지. 지형/도시거리/사이트거리/도로침범 검사 통과 시 확정.
+    //  ③ 정산: 사이트도 존치 자식도 없는 피더는 철거, 존치 피더는 마지막 수요 지점에서 트림.
     //  accept마다 폴리라인(minor=true)을 roads에 직접 append(기존 소비처가 자동 소비).
     //  worldPixel 사용 — mmap 전환 후 호출 전제.
     std::vector<SiteNode> placeSites(std::uint64_t seed, const std::vector<CityNode>& cities, std::vector<RoadPolyLine>& roads, SiteSink onSite = {}, RoadSink onRoad = {});

@@ -11,7 +11,9 @@ using namespace worldGrid;  // Terrain, worldPixel 등 unqualified 접근
 //   1티어(도시간 폴리라인)만 있던 구현은 사이트마다 전용 막다른 가지를 역산했는데,
 //   "도로가 시설을 위해 존재"하는 역인과라 짧은 스텁이 반복되는 절차티가 남았다.
 //   여기서는 인과를 현실 방향으로 뒤집는다:
-//     [B] 2티어 도로가 1티어 변에서 자기 이유로 먼저 성장 —
+//     [B] 2티어 도로가 1티어 변·도시 경계에서 자기 이유로 먼저 성장 —
+//         · 방사: 도시 경계에서 밖으로 뻗는 교외 지방도 (도시 가장자리 타일 프리펜드로
+//           CityPlan 진입 등록과 정합 — 1티어 cityEdgeTileForRoad 미러)
 //         · 피더: 오지로 뻗는 막다른 지방도 (주축 단조 진출 + 측면 jog 랜덤워크)
 //         · 링크: 멀리 걸어간 뒤 *1티어*에 닿으면 그 자리서 접속 → 본선↔본선 연결로.
 //           2티어끼리 접속은 불허 — 본선 옆 마이크로 루프 클러터의 주범
@@ -68,6 +70,7 @@ namespace worldGen
         constexpr int    T2_ROOT_DIST  = 14;   //가지 뿌리간 최소 간격(픽셀) — 본선에서 빗살처럼 돋는 것 방지
         constexpr double T2_SPROUT_T1  = 0.50; //1티어 앵커 발아율 상한 (×밀도로 감쇠, 뿌리 간격이 상한 밀도 결정)
         constexpr double T2_SPROUT_SUB = 0.30; //피더 위 서브가지 발아율 상한
+        constexpr double CITY_RADIAL_PROB = 0.75; //도시 방사 가지 방향(4카디널)당 시도 확률 — 밀도 노이즈 미적용(교외는 도시가 만든다)
         constexpr int    DENS_CELL_PX  = 96;   //밀도 노이즈 셀 한 변(픽셀) — 지방 단위 대비 스케일
         constexpr double DENS_CUTOFF   = 0.30; //노이즈 보간값 이 미만 지역은 밀도 0 — 2티어가 아예 없는 오지 지방
         constexpr int    SUB_SPACING   = 12;   //피더 위 서브가지 앵커 간격(픽셀)
@@ -93,12 +96,13 @@ namespace worldGen
         //  minCityDistPx: 도시 footprint bbox까지 최소 거리(픽셀), needMountain: 광산 전용,
         //  trunk: 1티어 직결 전용 가지(대형 — 현실에서도 고속도로 직결). false면 2티어 도로변.
         struct SiteTypeDef { MapSymbol symbol; int w; int h; int weight; int target; int minCityDistPx; bool needMountain; bool trunk; };
+        //  소형 생활시설의 minCityDist는 낮게(3~6) — 도시 방사 가지 위 근교 배치 허용.
         static constexpr SiteTypeDef SITE_TABLE[] = {
-            { MapSymbol::shop,         1, 1, 20, 2400,  6, false, false },
-            { MapSymbol::energyBank,   1, 1, 14, 1600,  6, false, false },
-            { MapSymbol::warpGate,     1, 1,  7,  800,  8, false, false },
-            { MapSymbol::lookoutTower, 1, 1, 10, 1200,  8, false, false },
-            { MapSymbol::warehouse,    2, 2,  8,  900,  8, false, false },
+            { MapSymbol::shop,         1, 1, 20, 2400,  3, false, false },
+            { MapSymbol::energyBank,   1, 1, 14, 1600,  3, false, false },
+            { MapSymbol::warpGate,     1, 1,  7,  800,  6, false, false },
+            { MapSymbol::lookoutTower, 1, 1, 10, 1200,  5, false, false },
+            { MapSymbol::warehouse,    2, 2,  8,  900,  6, false, false },
             { MapSymbol::mine,         1, 1,  7,  800, 10, true , false },
             { MapSymbol::solarPlant,   2, 2,  5,  600, 10, false, false },
             { MapSymbol::researchLab,  2, 2,  4,  500, 14, false, false },
@@ -257,10 +261,12 @@ namespace worldGen
             std::size_t         roadIdx;          //roads 내 폴리라인 인덱스
             Anchor              root;             //발아 앵커 (1티어 or 부모 가지 위)
             std::vector<Anchor> cells;            //커밋 셀 순서 보존
-            int                 parent   = -1;    //서브가지의 부모 branchId (-1 = 1티어 발아)
+            int                 parent   = -1;    //서브가지의 부모 branchId (-1 = 1티어/도시 발아)
             int                 rootOrd  = 0;     //부모 cells 내 뿌리 위치 (parent >= 0일 때)
             bool                linked   = false; //1티어 접속 여부 — 연결로는 정산 면제
             int                 lastUsed = -1;    //사이트/존치 자식이 쓰는 마지막 셀 ord ([C]/[D]가 갱신)
+            bool                cityRoot = false; //도시 방사 가지 — verts 맨 앞에 도시 가장자리 타일 프리펜드
+            Point3              cityVert{ 0, 0, 0 };   //프리펜드된 타일 (트림 rebuild 시 재프리펜드)
         };
         std::vector<T2Branch> branches;
         int t2TotalPx = 0;
@@ -268,7 +274,7 @@ namespace worldGen
         SpatialHash rootHash(PixelCostGrid::W, PixelCostGrid::H, 16);
         std::vector<std::pair<int, int>> rootPx;   //accept된 가지 뿌리 픽셀 (rootHash 인덱스 대상)
 
-        auto growBranch = [&](const Anchor& an, int side, int parentId, int parentOrd, std::vector<T2Ref>* subOut) -> int
+        auto growBranch = [&](const Anchor& an, int side, int parentId, int parentOrd, const Point3* cityVertPtr, std::vector<T2Ref>* subOut) -> int
         {
             //뿌리 간격 — 기존 가지 뿌리가 T2_ROOT_DIST 안이면 발아 안 함.
             bool nearRoot = false;
@@ -360,10 +366,13 @@ namespace worldGen
             if (bends.size() < 2) return 0;
 
             //accept — 폴리라인(minor) append + stamp + 앵커 등록.
+            //  도시 방사면 도시 가장자리 타일을 맨 앞에 — CityPlan 진입 스캔이 이 끝점을
+            //  멤버 픽셀로 인식해 내부 도로망과 open/lock 연결 (1티어 진입 규약 미러).
             constexpr int HALF_T = TILE_PER_PIXEL / 2;
             RoadPolyLine poly;
             poly.minor = true;
-            poly.verts.reserve(bends.size());
+            poly.verts.reserve(bends.size() + (cityVertPtr != nullptr ? 1u : 0u));
+            if (cityVertPtr != nullptr) poly.verts.push_back(*cityVertPtr);
             for (const auto& [bx, by] : bends)
                 poly.verts.push_back(Point3{ bx * TILE_PER_PIXEL + TILE_BASE_X + HALF_T, by * TILE_PER_PIXEL + TILE_BASE_Y + HALF_T, an.z });
             roads.push_back(poly);
@@ -381,18 +390,59 @@ namespace worldGen
                 for (int i = SUB_END_SKIP; i < static_cast<int>(cells.size()) - SUB_END_SKIP; i += SUB_SPACING)
                     subOut->push_back(T2Ref{ myId, i });
 
-            branches.push_back(T2Branch{ roads.size() - 1, an, std::move(cells), parentId, parentOrd, linked, -1 });
+            branches.push_back(T2Branch{ roads.size() - 1, an, std::move(cells), parentId, parentOrd, linked, -1,
+                                         cityVertPtr != nullptr, cityVertPtr != nullptr ? *cityVertPtr : Point3{ 0, 0, 0 } });
             return linked ? 2 : 1;
         };
 
-        //라운드 0: 1티어 앵커 발아 → 라운드 1: 피더 위 서브가지 (깊이 2 고정).
-        int nFeeder = 0, nLink = 0, nSub = 0;
+        //라운드 C: 도시 방사 → 라운드 0: 1티어 앵커 발아 → 라운드 1: 서브가지 (깊이 2 고정).
+        int nRadial = 0, nFeeder = 0, nLink = 0, nSub = 0;
         std::vector<T2Ref> subAnchors;
+
+        //라운드 C — 교외 지방도가 도시 경계에서 밖으로. 도시 중심에서 4카디널로 걸어 첫
+        //  비도시 픽셀을 뿌리로, 마지막 도시 픽셀의 바깥쪽 가장자리 타일을 프리펜드
+        //  (buildRoadNetwork cityEdgeTileForRoad 미러 — CityPlan 진입 등록과 좌표 정합).
+        //  뿌리 간격(T2_ROOT_DIST)이 자연 스케일링: 소도시는 1~2방, 대도시는 4방 모두.
+        {
+            auto isCityT = [](Terrain t) noexcept -> bool {
+                return t == Terrain::CityZone || t == Terrain::CityCenter
+                    || t == Terrain::CityRiver || t == Terrain::CitySea;
+            };
+            static constexpr int RD[4][2] = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+            for (const CityNode& c : cities)
+            {
+                const int ccx = (c.center.x - TILE_BASE_X) / TILE_PER_PIXEL;
+                const int ccy = (c.center.y - TILE_BASE_Y) / TILE_PER_PIXEL;
+                for (int d = 0; d < 4; ++d)
+                {
+                    if (u01(rng) >= CITY_RADIAL_PROB) continue;
+                    const int rdx = RD[d][0], rdy = RD[d][1];
+                    int px = ccx, py = ccy;
+                    bool out = false;
+                    for (int stp = 0; stp < 200 && !out; ++stp)
+                    {
+                        if (!isCityT(worldPixel(worldWrap::wrapPixelX(px), py))) out = true;
+                        else { px += rdx; py += rdy; }
+                    }
+                    if (!out || !pathOk(worldPixel(worldWrap::wrapPixelX(px), py))) continue;   //경계 밖이 물이면 스킵
+
+                    const int cityPx = px - rdx, cityPy = py - rdy;   //마지막 도시 픽셀
+                    const int localX = (rdx > 0) ? (TILE_PER_PIXEL - 1) : (rdx < 0) ? 0 : TILE_PER_PIXEL / 2;
+                    const int localY = (rdy > 0) ? (TILE_PER_PIXEL - 1) : (rdy < 0) ? 0 : TILE_PER_PIXEL / 2;
+                    const Point3 cityVert{ cityPx * TILE_PER_PIXEL + TILE_BASE_X + localX, cityPy * TILE_PER_PIXEL + TILE_BASE_Y + localY, c.center.z };
+
+                    //주축이 방사 방향(rd)이 되도록 앵커 세팅 — pdx=-sdy·side에서 side=1 고정이면 sdx=rdy, sdy=-rdx.
+                    const Anchor an{ px, py, c.center.z, rdy, -rdx };
+                    if (growBranch(an, 1, -1, 0, &cityVert, &subAnchors) != 0) ++nRadial;
+                }
+            }
+        }
+
         for (const Anchor& an : anchors)
         {
             if (u01(rng) >= T2_SPROUT_T1 * densityAt(an.px, an.py)) continue;
             const int side = std::uniform_int_distribution<int>{ 0, 1 }(rng) ? 1 : -1;
-            const int r = growBranch(an, side, -1, 0, &subAnchors);
+            const int r = growBranch(an, side, -1, 0, nullptr, &subAnchors);
             if (r == 1) ++nFeeder; else if (r == 2) ++nLink;
         }
         for (const T2Ref& sr : subAnchors)
@@ -400,10 +450,10 @@ namespace worldGen
             const Anchor an = branches[static_cast<std::size_t>(sr.branchId)].cells[static_cast<std::size_t>(sr.ord)];   //복사 — growBranch가 branches를 재할당
             if (u01(rng) >= T2_SPROUT_SUB * densityAt(an.px, an.py)) continue;
             const int side = std::uniform_int_distribution<int>{ 0, 1 }(rng) ? 1 : -1;
-            if (growBranch(an, side, sr.branchId, sr.ord, nullptr) != 0) ++nSub;
+            if (growBranch(an, side, sr.branchId, sr.ord, nullptr, nullptr) != 0) ++nSub;
         }
-        prt(L"[worldGen] tier2 roads: %d feeder + %d link + %d sub (anchors=%llu, %d px)\n",
-            nFeeder, nLink, nSub, static_cast<std::uint64_t>(anchors.size()), t2TotalPx);
+        prt(L"[worldGen] tier2 roads: %d radial + %d feeder + %d link + %d sub (anchors=%llu, %d px)\n",
+            nRadial, nFeeder, nLink, nSub, static_cast<std::uint64_t>(anchors.size()), t2TotalPx);
 
         //사이트 앵커 풀 — 전 가지 셀의 평면 참조 (셀 수 ∝ 호길이라 균일 추첨 = 호길이 비례).
         std::vector<T2Ref> t2refs;
@@ -660,9 +710,10 @@ namespace worldGen
                 if (upTo >= last) continue;   //꼬리 없음
                 ++nTrimmed;
 
-                //verts 재구성 — 뿌리 + 방향 전환점 + 트림 지점.
+                //verts 재구성 — (도시 가장자리 프리펜드) + 뿌리 + 방향 전환점 + 트림 지점.
                 RoadPolyLine& poly = roads[br.roadIdx];
                 poly.verts.clear();
+                if (br.cityRoot) poly.verts.push_back(br.cityVert);
                 poly.verts.push_back(vertOf(br.root.px, br.root.py, br.root.z));
                 for (int i = 1; i <= upTo; ++i)
                     if (br.cells[static_cast<std::size_t>(i)].sdx != br.cells[static_cast<std::size_t>(i - 1)].sdx

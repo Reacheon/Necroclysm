@@ -229,7 +229,9 @@ static CityPlan buildCityPlanImpl(city::CityId id, std::uint64_t seed, bool layo
     {
         for (const worldGen::RoadPolyLine& line : *worldGen::activePolyLines)
         {
-            if (line.minor) continue;   //사이트 가지 — 끝점이 도시 진입이 아님
+            //minor(2티어) 폴리라인도 스캔 — 도시 방사 가지(placeSites 라운드 C)는 front
+            //  끝점이 도시 가장자리 타일(멤버 픽셀)이라 진입으로 등록되어야 한다. 야지
+            //  가지/사이트 스퍼의 끝점은 비도시 픽셀이라 아래 member 검사가 알아서 걸러냄.
             if (line.verts.size() < 2) continue;
 
             for (int endIdx = 0; endIdx < 2; ++endIdx)
