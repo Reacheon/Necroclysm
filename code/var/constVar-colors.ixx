@@ -5,15 +5,10 @@ export module constVar:colors;
 
 export namespace mulCol
 {
-    constexpr SDL_Color day = { 255,255,255,255 };
-    constexpr SDL_Color dawn = { 0,0,100,30 };
-    constexpr SDL_Color sunfall = { 121,78,59,100 };
-    constexpr SDL_Color night = { 0,0,100,100 };
-
     //시각(0~24시, 실수) → 시간대별 곱셈(MUL) 틴트 색. 알파=틴트 강도. 밤=남색(곱셈이라 R·G는 0쪽으로
     //  깎이고 파랑만 남음), 18시=노을(따뜻한 갈색), 10~17시=투명(낮, 틴트 없음). 본체 월드 렌더
     //  (renderTile::drawMulFogs)와 월드맵(Map::drawNightOverlay)이 공유하는 단일 팔레트 — 한 곳만
-    //  고치면 양쪽에 반영된다. (위 day/dawn/sunfall/night 상수는 미사용 레거시 — 실 값은 아래 키프레임.)
+    //  고치면 양쪽에 반영된다.
     inline SDL_Color ambientMulColorAt(float timeOfDay)
     {
         struct TimeColor { float time; SDL_Color color; };

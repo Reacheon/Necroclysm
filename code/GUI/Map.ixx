@@ -465,10 +465,18 @@ namespace
     }
 }
 
+//디버그 — 미발견 심볼 전체 식별 토글(F4, 맵 열린 상태). ?건물/Unknown이 실심볼·실명으로
+//   표시되고 전장의 구름도 전부 걷힌다(발견 상태 자체는 안 건드림). 세션 전역, 세이브 무관.
+static bool debugRevealSymbols = false;
+
 //전장의 구름 밝기 — 발견(가봤거나 지금 보이는 곳) 청크=풀밝기, 미발견=어둡게(윤곽만).
 //  전략맵엔 낡을 정보가 없어 "지금 보임 vs 기억" 구분 없이 발견/미발견 2상태로 통일.
 //  지형(drawTerrainLayer)·외부 도로망(drawHighways)이 공유 — 항상 그리되 밝기로 fog를 표현.
-static Uint8 fogBright(int px, int py) { return mapDiscovery::discovered(px, py) ? 255 : 100; }
+static Uint8 fogBright(int px, int py) { return (debugRevealSymbols || mapDiscovery::discovered(px, py)) ? 255 : 100; }
+
+//fog 베이크 무효화 스탬프 — 위성/전세계 백드롭 텍스처의 캐시 키. 발견 청크 수에 디버그 리빌
+//  상태를 접어 넣어 F4 토글 시에도 베이크가 재빌드된다. (-2 = 리빌 켜짐 센티널, 초기값 -1과 구분)
+static std::size_t fogStamp() { return debugRevealSymbols ? static_cast<std::size_t>(-2) : mapDiscovery::count(); }
 
 //① 베이스 지형(오토타일) + 파도 + ② 산 심볼 (단일 스윕, 로컬 terrain 버퍼).
 //   본체 renderTile의 floor 오토타일(tileConnectGroup+connectGroupExtraIndex)과
@@ -657,12 +665,62 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
 //   이미 깔지만, 그건 월드 타일이지 월드맵 심볼이 아니다.)
 struct HighwayCell { int cx; int cy; int z; int sprIdx; };   // sprIdx = 빌드시 해석된 mapset1by1 인덱스
 
+//공간 버킷 그리드 — 전 세계 규모 셀 배열(외부 도로망·사이트)의 전수 순회 회피. 셀들을
+//  32×32청크 버킷으로 인덱싱해, 드로우는 화면에 걸린 버킷만 순회한다. 풀맵(프레임당)과
+//  미니맵 청크 모드(걸음당 재렌더)가 공유 — 특히 미니맵은 디스크가 ~8청크라 버킷 몇 개로 끝.
+constexpr int SYM_BUCKET_SHIFT = 5;                                    // 버킷 한 변 = 32청크
+constexpr int SYM_BUCKET_W     = WORLD_CHUNK_W >> SYM_BUCKET_SHIFT;    // X 버킷 수
+static_assert(WORLD_CHUNK_W % (1 << SYM_BUCKET_SHIFT) == 0);           // 월드 폭이 정확히 나눠떨어져야 X wrap 정합
+
+static std::uint64_t bucketKey(int bx, int by)
+{
+    return (static_cast<std::uint64_t>(static_cast<std::uint32_t>(bx)) << 32)
+         |  static_cast<std::uint64_t>(static_cast<std::uint32_t>(by));
+}
+
+//뷰에 걸린 버킷들을 순회하며 fn(bucketKey) 호출. X는 원기둥 wrap(버킷 그리드가 월드 폭을
+//  정확히 나누므로 이음매 없음), 전세계 폭 초과 시 클램프로 중복 순회 차단. MARGIN은 대형
+//  심볼(최대 5청크 스팬 + 오프셋 -2)이 화면 밖 앵커에서 걸쳐 들어오는 여유 — 셀 단위 정밀
+//  컬링은 각 드로우 함수가 기존대로 수행하므로 버킷은 넉넉해도 결과 동일.
+template <typename Fn>
+static void forVisibleBuckets(const MapView& v, Fn&& fn)
+{
+    const double halfW = v.viewW * 0.5 / v.curScale;
+    const double halfH = v.viewH * 0.5 / v.curScale;
+    constexpr int MARGIN = 8;
+    const int minPX = (int)std::floor(v.centerPX - halfW) - MARGIN;
+    const int maxPX = (int)std::ceil (v.centerPX + halfW) + MARGIN;
+    const int minPY = std::max(0,                 (int)std::floor(v.centerPY - halfH) - MARGIN);
+    const int maxPY = std::min(WORLD_PIXEL_H - 1, (int)std::ceil (v.centerPY + halfH) + MARGIN);
+    if (maxPX < minPX || maxPY < minPY) return;
+
+    const int bx0 = minPX >> SYM_BUCKET_SHIFT;
+    int bxCount = (maxPX >> SYM_BUCKET_SHIFT) - bx0 + 1;
+    if (bxCount > SYM_BUCKET_W) bxCount = SYM_BUCKET_W;
+    const int by0 = minPY >> SYM_BUCKET_SHIFT;
+    const int by1 = maxPY >> SYM_BUCKET_SHIFT;
+
+    for (int by = by0; by <= by1; ++by)
+        for (int i = 0; i < bxCount; ++i)
+        {
+            const int bx = (((bx0 + i) % SYM_BUCKET_W) + SYM_BUCKET_W) % SYM_BUCKET_W;
+            fn(bucketKey(bx, by));
+        }
+}
+
+//외부 도로 셀 + 공간 버킷 인덱스(bucketKey → cells 인덱스 목록).
+struct HighwayIndex
+{
+    std::vector<HighwayCell> cells;
+    std::unordered_map<std::uint64_t, std::vector<int>> buckets;
+};
+
 //activePolyLines를 청크 openBits 셀로 래스터화한 캐시. 폴리라인은 월드젠 후 불변이라
 //  포인터 기준 1회 메모이즈 (Map 여닫기마다 재계산 회피, 새 월드면 포인터 바뀌어 재빌드).
 //  4-연결(대각 없는) 라인 워크로 인접 셀끼리 양방향 비트를 OR — 교차/분기는 자연히 T·십자.
-static const std::vector<HighwayCell>& highwayCells()
+static const HighwayIndex& highwayCells()
 {
-    static std::vector<HighwayCell> cache;
+    static HighwayIndex cache;
     static const std::vector<worldGen::RoadPolyLine>* builtFrom = nullptr;
     static bool built = false;
 
@@ -670,7 +728,8 @@ static const std::vector<HighwayCell>& highwayCells()
     if (built && polys == builtFrom) return cache;
     built     = true;
     builtFrom = polys;
-    cache.clear();
+    cache.cells.clear();
+    cache.buckets.clear();
     if (polys == nullptr) return cache;
 
     //(cx,cy,z) → openBits 누적. cx∈[0,WORLD_CHUNK_W) cy∈[0,WORLD_PIXEL_H) 둘 다 16비트 이내.
@@ -731,7 +790,7 @@ static const std::vector<HighwayCell>& highwayCells()
         return t == T::Sea || t == T::River || t == T::Lake || t == T::CityRiver || t == T::CitySea;
         };
 
-    cache.reserve(bits.size());
+    cache.cells.reserve(bits.size());
     for (const auto& [k, ob] : bits)
     {
         const int cx = static_cast<int>((k >> 32) & 0xFFFF);
@@ -752,7 +811,14 @@ static const std::vector<HighwayCell>& highwayCells()
             if (sprIdx < 0) continue;   // openBits==0 (방어적 — 정상적으로는 없음)
         }
 
-        cache.push_back(HighwayCell{ .cx = cx, .cy = cy, .z = z, .sprIdx = sprIdx });
+        cache.cells.push_back(HighwayCell{ .cx = cx, .cy = cy, .z = z, .sprIdx = sprIdx });
+    }
+
+    //공간 버킷 인덱싱 — 드로우가 화면에 걸린 버킷만 순회하게 (cx는 keyOf 규약상 이미 [0,W)).
+    for (int i = 0; i < (int)cache.cells.size(); ++i)
+    {
+        const HighwayCell& c = cache.cells[i];
+        cache.buckets[bucketKey(c.cx >> SYM_BUCKET_SHIFT, c.cy >> SYM_BUCKET_SHIFT)].push_back(i);
     }
     return cache;
 }
@@ -805,26 +871,35 @@ static bool siteFootprintChunk(int cx, int cy)
 //외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
 //  도로망은 미발견 청크여도 항상 표시(전세계 도로 골격) — 단 미발견은 지형처럼 어둡게(fogBright)
 //  색조해 전장의 구름 느낌은 유지. (도시 내부 도로·다리는 drawCityRoads가 따로 그림.)
+//  전 세계 셀 전수 순회 대신 화면에 걸린 공간 버킷만 순회 — 셀 단위 정밀 컬링은 기존대로.
 static void drawHighways(const MapView& v)
 {
-    const std::vector<HighwayCell>& cells = highwayCells();
+    const HighwayIndex& hw = highwayCells();
+    if (hw.cells.empty()) return;
     const int cp   = v.chunkPx();
     const int span = 3 * cp;   // mapset1by1 = 3청크
 
-    for (const HighwayCell& c : cells)
+    forVisibleBuckets(v, [&](std::uint64_t bk)
     {
-        if (c.z != v.z) continue;
-        if (siteFootprintChunk(c.cx, c.cy)) continue;   //사이트 심볼 밑 도로 숨김 — 연결은 이웃 셀이 유지
+        const auto it = hw.buckets.find(bk);
+        if (it == hw.buckets.end()) return;
+        for (const int ci : it->second)
+        {
+            const HighwayCell& c = hw.cells[ci];
+            if (c.z != v.z) continue;
 
-        const int sx = (int)std::lround(v.sX((double)(c.cx - 1)));
-        const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
-        if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
+            const int sx = (int)std::lround(v.sX((double)(c.cx - 1)));
+            const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
+            if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-        const Uint8 br = fogBright(c.cx, c.cy);
-        SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
-        SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(c.cx, c.cy) ? TUNNEL_ALPHA : 255);
-        drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
-    }
+            if (siteFootprintChunk(c.cx, c.cy)) continue;   //사이트 심볼 밑 도로 숨김 — 연결은 이웃 셀이 유지
+
+            const Uint8 br = fogBright(c.cx, c.cy);
+            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
+            SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(c.cx, c.cy) ? TUNNEL_ALPHA : 255);
+            drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
+        }
+    });
     SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
     SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
@@ -873,10 +948,10 @@ static void ensureVisibleCityLayouts(const MapView& v)
     {
         const auto& node = (*cities)[i];
         if (node.center.z != v.z) continue;
+        if (!cityOnScreen(v, node)) continue;   //화면 컬링 먼저 — 화면 밖 도시는 캐시 peek(해시)도 안 함
         const auto id = static_cast<city::CityId>(i);
         if (CityPlanCache::ins().peek(id))   continue;   // full plan 이미 있음
         if (CityLayoutCache::ins().peek(id)) continue;   // layout 이미 있음
-        if (!cityOnScreen(v, node)) continue;
         CityLayoutCache::ins().requestAsync(id, worldSeed);
         if (++enqueued >= MAX_ENQUEUE_PER_FRAME) break;
     }
@@ -895,6 +970,7 @@ static void drawCityRoads(const MapView& v)
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
+        if (!cityOnScreen(v, (*cities)[i])) continue;   //도시 bbox 화면 컬링 — 화면 밖 도시는 셀 순회 자체를 스킵
         const std::vector<CityRoadCell>* rcs = roadCellsFor(static_cast<city::CityId>(i));
         if (!rcs) continue;
 
@@ -929,10 +1005,6 @@ static void drawCityRoads(const MapView& v)
     SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
-//디버그 — 미발견 심볼 전체 식별 토글(F4, 맵 열린 상태). ?건물/Unknown이 실심볼·실명으로
-//   표시된다(fog 밝기는 유지 — 발견 상태 자체는 안 건드림). 세션 전역, 세이브 무관.
-static bool debugRevealSymbols = false;
-
 //④ 건물 심볼 (캐시된 도시) — symOut에 누적(산과 함께 y정렬 후 그림). 발견된 청크는 실제 종류
 //   스프라이트, 미발견 청크는 footprint별 "?건물" placeholder(resolveUnknownSymbol) + 어둡게(fog).
 static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
@@ -944,6 +1016,7 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
 
     for (std::size_t i = 0; i < cities->size(); ++i)
     {
+        if (!cityOnScreen(v, (*cities)[i])) continue;   //도시 bbox 화면 컬링 — 화면 밖 도시는 심볼 순회 자체를 스킵
         const std::vector<CitySymbol>* syms = symbolsFor(static_cast<city::CityId>(i));
         if (!syms) continue;
 
@@ -970,35 +1043,66 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
     }
 }
 
+//사이트 공간 버킷 — activeSites(전 세계 도로변 배열, 세션 불변)를 앵커 청크 기준으로
+//  버킷 인덱싱. 포인터 기준 1회 메모이즈(highwayCells 패턴). 값 = activeSites 인덱스.
+static const std::unordered_map<std::uint64_t, std::vector<int>>& siteBuckets()
+{
+    static std::unordered_map<std::uint64_t, std::vector<int>> buckets;
+    static const std::vector<worldGen::SiteNode>* builtFrom = nullptr;
+    static bool built = false;
+
+    const std::vector<worldGen::SiteNode>* sites = worldGen::activeSites;
+    if (built && builtFrom == sites) return buckets;
+    built     = true;
+    builtFrom = sites;
+    buckets.clear();
+    if (sites != nullptr)
+        for (int i = 0; i < (int)sites->size(); ++i)
+        {
+            const worldGen::SiteNode& s = (*sites)[i];
+            buckets[bucketKey(tilePixelIX(s.pos.x) >> SYM_BUCKET_SHIFT,
+                              tilePixelIY(s.pos.y) >> SYM_BUCKET_SHIFT)].push_back(i);
+        }
+    return buckets;
+}
+
 //④-b 교외 인카운터 사이트 심볼 — drawCityBuildings와 동일 규약(발견=실제/미발견=?건물,
-//   y정렬·컬링·fog 공용 파이프라인). 데이터 소스만 다름: worldGen::activeSites 직접 순회
+//   y정렬·컬링·fog 공용 파이프라인). 데이터 소스만 다름: worldGen::activeSites
 //   (도시와 달리 CityPlan 캐시 불필요 — 월드젠 때 eager 확정된 세션 불변 배열).
+//   전수 순회 대신 화면에 걸린 공간 버킷만 순회 — 심볼 단위 정밀 컬링은 기존대로.
 static void drawSites(const MapView& v, std::vector<SymDraw>& symOut)
 {
     const auto* sites = worldGen::activeSites;
     if (!sites) return;
 
+    const auto& buckets = siteBuckets();
     const int cp = v.chunkPx();
 
-    for (const auto& site : *sites)
+    forVisibleBuckets(v, [&](std::uint64_t bk)
     {
-        if (site.pos.z != v.z) continue;
-        const int apx = tilePixelIX(site.pos.x);
-        const int apy = tilePixelIY(site.pos.y);
-        const bool seen = debugRevealSymbols || mapDiscovery::discovered(apx, apy);
+        const auto it = buckets.find(bk);
+        if (it == buckets.end()) return;
+        for (const int si : it->second)
+        {
+            const worldGen::SiteNode& site = (*sites)[si];
+            if (site.pos.z != v.z) continue;
+            const int apx = tilePixelIX(site.pos.x);
+            const int apy = tilePixelIY(site.pos.y);
+            const bool seen = debugRevealSymbols || mapDiscovery::discovered(apx, apy);
 
-        const ResolvedSym rs = seen
-            ? resolveSymbol(site.symbol, site.w, site.h, symHash(apx, apy))
-            : resolveUnknownSymbol(site.symbol, site.w, site.h);
-        if (!rs.atlas) continue;
+            const ResolvedSym rs = seen
+                ? resolveSymbol(site.symbol, site.w, site.h, symHash(apx, apy))
+                : resolveUnknownSymbol(site.symbol, site.w, site.h);
+            if (!rs.atlas) continue;
 
-        const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
-        const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
-        const int span = rs.cellChunks * cp;
-        if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
+            const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
+            const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
+            const int span = rs.cellChunks * cp;
+            if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-        symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy, fogBright(apx, apy) });
-    }
+            symOut.push_back(SymDraw{ (float)apy, rs.atlas, rs.idx, sx, sy, fogBright(apx, apy) });
+        }
+    });
 }
 
 //⑥ 도시 이름 라벨 — 도시 중심에 표기. CityPlan 캐시 없이 activeCities의 center를 직접 사용
@@ -1057,13 +1161,108 @@ static void drawCityLabels(const MapView& v)
     setFont(fontType::mainFont);   // 폰트 상태 복원(이후 UI 크롬이 자체 폰트/크기 설정)
 }
 
+//HUD 미니맵 청크맵 모드 — texture::minimap에 청크맵(1청크=1심볼)을 렌더. M키로 타일맵과
+//  토글되며 갱신 시점은 타일 모드와 동일(Player::updateMinimap이 호출). drawGUI 청크맵 분기의
+//  축약판(지형+파도+산·숲+도로+건물+사이트, 전장의 구름 포함) — 라벨·야간틴트·핀 제외
+//  (핀 방위 표시는 HUD가 모드별 배율로 오버레이). 스케일은 MINIMAP_CHUNK_PX(16px=1청크,
+//  mapset 네이티브) 고정 — 디스크 지름 246px ≈ 15청크 ≈ 369타일 조망.
+export void renderChunkMinimap()
+{
+    constexpr int TEXPX = MINIMAP_DIAMETER * MINIMAP_TILE_PX;   // 미니맵 텍스처 변 길이(246)
+
+    MapView v;
+    v.viewW = TEXPX;
+    v.viewH = TEXPX;
+    v.z = PlayerZ();
+    v.centerPX = (PlayerX() + 0.5 - TILE_BASE_X) / TILE_PER_PIXEL;
+    v.centerPY = (PlayerY() + 0.5 - TILE_BASE_Y) / TILE_PER_PIXEL;
+    v.curScale    = MINIMAP_CHUNK_PX;
+    v.targetScale = MINIMAP_CHUNK_PX;
+
+    SDL_SetRenderTarget(renderer, texture::minimap);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+
+    static thread_local std::vector<SymDraw> symDraws, mtnDraws;
+    symDraws.clear();
+    mtnDraws.clear();
+
+    drawTerrainLayer(v, true, symDraws, mtnDraws);   // ① 베이스(+파도) + ② 산(mtnDraws)·숲(symDraws) 수집
+
+    setZoom((float)v.zoomScale());
+
+    //② 산 레이어 — 도로보다 먼저(산 위 도로가 터널로 반투명되게). drawGUI 청크맵 분기와 동일 순서.
+    for (const auto& s : mtnDraws)
+    {
+        SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
+        drawSprite(s.atlas, s.idx, s.sx, s.sy);
+    }
+    SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+
+    drawHighways     (v);             // ③-a 외부 도로망
+    ensureVisibleCityLayouts(v);      // 반경 내 미캐시 도시 경량 layout 백그라운드 요청
+    drawCityRoads    (v);             // ③-b 도시 내부 도로·다리
+    drawCityBuildings(v, symDraws);   // ④ 건물 (발견=실제 / 미발견=?건물)
+    drawSites        (v, symDraws);   // ④-b 교외 사이트
+
+    //숲+건물 y정렬 페인터 순서 — 남쪽이 위에 겹침.
+    std::sort(symDraws.begin(), symDraws.end(),
+        [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
+    for (const auto& s : symDraws)
+    {
+        SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
+        drawSprite(s.atlas, s.idx, s.sx, s.sy);
+    }
+    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
+    SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
+    SDL_SetTextureColorMod(spr::mapset3by3->getTexture(), 255, 255, 255);
+    SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+
+    setZoom(1.0f);
+
+    //원형 마스크 — 디스크 밖 픽셀을 행 스팬 단위로 클리어(타일 모드의 isCircle 스킵과 동등한 결과).
+    //  반경은 텍스처 절반에서 살짝 안쪽 — 링 아트(minimapEdge) 바깥으로 맵이 비져나오지 않게.
+    constexpr double MASK_INSET = 3.0;   // px — 링 안쪽 안착 여유(튜닝 가능)
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    const double cPix = TEXPX * 0.5;               // 디스크 중심
+    const double rPix = TEXPX * 0.5 - MASK_INSET;  // 마스크 반경
+    for (int row = 0; row < TEXPX; ++row)
+    {
+        const double dy   = row + 0.5 - cPix;
+        const double half = (std::abs(dy) >= rPix) ? 0.0 : std::sqrt(rPix * rPix - dy * dy);
+        const int x0 = (int)std::floor(cPix - half);
+        const int x1 = (int)std::ceil (cPix + half);
+        if (x0 > 0)
+        {
+            SDL_FRect l = { 0.0f, (float)row, (float)x0, 1.0f };
+            SDL_RenderFillRect(renderer, &l);
+        }
+        if (x1 < TEXPX)
+        {
+            SDL_FRect r = { (float)x1, (float)row, (float)(TEXPX - x1), 1.0f };
+            SDL_RenderFillRect(renderer, &r);
+        }
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+    //플레이어 마커 — 중앙(타일 모드와 같은 크기의 붉은 점).
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_FRect playerRect = { (float)(TEXPX / 2 - MINIMAP_TILE_PX / 2), (float)(TEXPX / 2 - MINIMAP_TILE_PX / 2),
+                             (float)MINIMAP_TILE_PX, (float)MINIMAP_TILE_PX };
+    SDL_RenderFillRect(renderer, &playerRect);
+
+    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_SetRenderTarget(renderer, nullptr);
+}
+
 // ────────── 위성 텍스처 LOD (광역 조망) ──────────
 //  curScale < LOD_SWITCH_PX 일 때 per-청크 타일맵 대신 그림. 전세계 한 장 텍스처는
 //  텍셀당 ~20청크라 중간 줌에서 ~90배 확대돼 뭉개진다(눈 아픔). 대신 "보이는 영역"만
 //  화면 해상도로 그때그때 재샘플링 → 텍셀 ≈ 화면픽셀 ≈ 1청크라 어느 줌에서든 선명.
 //  카메라(sX/sY/curScale)를 타일맵과 공유 → LOD 경계를 넘나들어도 위치·스케일 연속.
 //  전장의 구름 — 위성 텍스처를 구울 때 미발견 청크 텍셀을 청크맵과 동일한 fogBright로 어둡게
-//  "베이크". 별도 오버레이 없이 카메라와 정합되며, 발견 청크 수(mapDiscovery::count)가 바뀌면
+//  "베이크". 별도 오버레이 없이 카메라와 정합되며, fog 스탬프(fogStamp)가 바뀌면
 //  캐시를 무효화해 새로 탐험한 영역이 밝아진다(맵 보는 중엔 발견이 안 바뀌므로 재빌드 없음).
 namespace
 {
@@ -1105,7 +1304,7 @@ namespace
     SDL_Texture* worldMapTexture()
     {
         if (!worldGrid::worldPixelMmapActive()) return nullptr;
-        const std::size_t disc = mapDiscovery::count();   // 발견 상태 변화 감지(fog 베이크 무효화)
+        const std::size_t disc = fogStamp();   // 발견 상태·디버그 리빌 변화 감지(fog 베이크 무효화)
         if (g_worldTex && g_worldSeed == worldSeed && g_worldDisc == disc) return g_worldTex;
         if (g_worldTex) { SDL_DestroyTexture(g_worldTex); g_worldTex = nullptr; }
 
@@ -1142,7 +1341,7 @@ namespace
     SDL_Texture* satelliteTexture(const MapView& v, double& oWX0, double& oWY0, double& oCPT)
     {
         if (!worldGrid::worldPixelMmapActive()) return nullptr;
-        const std::size_t disc = mapDiscovery::count();   // 발견 상태 변화 감지(fog 베이크 무효화)
+        const std::size_t disc = fogStamp();   // 발견 상태·디버그 리빌 변화 감지(fog 베이크 무효화)
 
         //텍스처 크기 — 화면 비율, 1텍셀≈1화면픽셀 목표. (TW가 선명도/빌드비용 튜닝 포인트.)
         constexpr int TW = 1280;
@@ -1322,11 +1521,11 @@ static void drawWorldView(const MapView& v)
     }
 }
 
-//⑤-b 위성 뷰 도시 점/라벨 — drawWorldView에서 분리. 야간 오버레이 *뒤*에 그려 점/라벨은 조명
-//  영향을 안 받는다(밤에도 또렷, 청크맵 라벨과 동일 정책). 점: 발견한 도시만(전장의 구름 핵심 —
-//  지형색은 도시 위치를 숨기므로 점이 유일한 노출). 이름: 사전마킹(preset, codename!=none) 도시만
-//  (발견 무관) — 전세계 조망 시 방향 앵커. 절차생성 자리표시자 이름은 위성지도에서 어색해 제외(이름은
-//  청크맵에서만). → 미발견 preset은 이름만 떠 위치 힌트, 발견 도시는 점, 발견 preset은 점+이름.
+//⑤-b 위성 뷰 도시 라벨 — drawWorldView에서 분리. 야간 오버레이 *뒤*에 그려 라벨은 조명
+//  영향을 안 받는다(밤에도 또렷, 청크맵 라벨과 동일 정책). 이름: 사전마킹(preset, codename!=none)
+//  도시만(발견 무관) — 전세계 조망 시 방향 앵커. 절차생성 자리표시자 이름은 위성지도에서 어색해
+//  제외(이름은 청크맵에서만). 발견 도시 점 표기는 폐기 — 도시 위치는 지형색(worldTerrainColor의
+//  회색 footprint)이 이미 드러내므로 점은 클러터일 뿐이고 라벨까지 가렸다.
 static void drawWorldCities(const MapView& v)
 {
     const auto* cities = worldGen::activeCities;
@@ -1336,26 +1535,15 @@ static void drawWorldCities(const MapView& v)
     setFontSize(12);
     for (const auto& node : *cities)
     {
-        const bool seen   = mapDiscovery::discovered(tilePixelIX(node.center.x), tilePixelIY(node.center.y));
-        const bool preset = (node.codename != city::CityName::none);
-        if (!seen && !preset) continue;
+        if (node.codename == city::CityName::none) continue;
 
         const int sx = (int)std::lround(v.sX(tileToPixelX(node.center.x)));
         const int sy = (int)std::lround(v.sY(tileToPixelY(node.center.y)));
         if (sx < -8 || sx > v.viewW + 8 || sy < -8 || sy > v.viewH + 8) continue;
 
-        if (seen)
-        {
-            drawFillCircle(sx, sy, 3, SDL_Color{ 245, 222, 120, 255 }, 255);
-            drawFillCircle(sx, sy, 2, SDL_Color{  70,  45,  15, 255 }, 255);
-        }
-
-        if (preset)
-        {
-            const std::wstring name = presetDisplayName(node.codename);
-            if (!name.empty())
-                drawTextOutlineCenter(name, sx, sy - 13, SDL_Color{ 245, 222, 120, 255 });
-        }
+        const std::wstring name = presetDisplayName(node.codename);
+        if (!name.empty())
+            drawTextOutlineCenter(name, sx, sy - 13, SDL_Color{ 245, 222, 120, 255 });
     }
     setFont(fontType::mainFont);
 }
@@ -1996,7 +2184,7 @@ public:
             //광역(위성 텍스처 LOD) — per-청크 타일맵 대신 다운샘플 위성 + 발견 도시 점.
             drawWorldView(view);
             drawNightOverlay(view);      // ⑨ 야간 남색 틴트(위성 지형 위, 도시·마커·핀 아래)
-            drawWorldCities(view);       // ⑤-b 도시 점/라벨 — 오버레이 뒤라 조명 영향 안 받음
+            drawWorldCities(view);       // ⑤-b 도시 라벨 — 오버레이 뒤라 조명 영향 안 받음
             drawMapPins(view);           // ⑧ 맵 핀(빛의 기둥) — 말풍선보다 먼저(뒤에)
             drawWorldPlayerMarker(view); // ⑤-c 플레이어 말풍선 — 핀(빛의 기둥) 앞, 조명 영향 안 받음
         }
@@ -2145,7 +2333,7 @@ public:
     {
         if (getStateInput() == false) return;
         if (pinMenuOpen && event.key.key == SDLK_ESCAPE) { pinMenuOpen = false; return; }   // ESC=메뉴 먼저 닫기
-        if (event.key.key == SDLK_F4) { debugRevealSymbols = !debugRevealSymbols; return; } // 디버그 — 미발견 심볼 전체 식별 토글
+        if (event.key.key == SDLK_F4) { debugRevealSymbols = !debugRevealSymbols; return; } // 디버그 — 미발견 심볼 식별 + 전장의 구름 해제 토글
         if (event.key.key == SDLK_M || event.key.key == SDLK_ESCAPE)
             close(aniFlag::winUnfoldClose);
     }

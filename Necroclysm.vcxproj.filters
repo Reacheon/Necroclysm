@@ -684,9 +684,6 @@
     <ClCompile Include="code\mouseInput.ixx">
       <Filter>소스 파일\01_system\02_turn\Input</Filter>
     </ClCompile>
-    <ClCompile Include="code\SystemMenu.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\GUI\HUD\HUD_step.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
@@ -933,7 +930,7 @@
     <ClCompile Include="code\Lot\Lot-base.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
-    <ClCompile Include="code\Lot\lot-rotate.ixx">
+    <ClCompile Include="code\Lot\Lot-rotate.ixx">
       <Filter>소스 파일\05_Class\03_World\Lot</Filter>
     </ClCompile>
     <ClCompile Include="code\Lot\Lot-CityBuildings.ixx">

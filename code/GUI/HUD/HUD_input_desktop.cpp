@@ -18,7 +18,6 @@ import Aim;
 import useSkill;
 import ItemData;
 import ItemPocket;
-import SystemMenu;
 import debugConsole;
 import Map;
 import LotEditor;
@@ -105,7 +104,15 @@ void HUD::clickUpGUI()
 			}
 		}
 	}
-	else if (checkCursor(&minimapRegion));
+	else if (checkCursor(&minimapRegion))
+	{
+		//미니맵 좌상단 M 버튼 — 타일맵<->청크맵 토글(M키와 동일)
+		if (checkCursor(&openMapBtn))
+		{
+			minimapChunkMode = !minimapChunkMode;
+			PlayerPtr->updateMinimap();
+		}
+	}
 	else//타일터치
 	{
 		if (dragQuickSlotTarget == -1)
@@ -286,11 +293,9 @@ void HUD::keyUpGUI()
 		playerLevel::levelUp(); //연출·로그·포인트 지급 포함 즉시 레벨업
 		break;
 	case SDLK_M:
-		// 이미 열려있으면 아무 것도 안 함 (중복 생성 방지). 닫기는 Tab으로 처리됨
-		if (Map::ins() == nullptr) new Map();
-		break;
-	case SDLK_ESCAPE:
-		new SystemMenu();
+		// 미니맵 타일맵<->청크맵 토글 — 월드맵 열기는 메인 버튼으로 이동됨
+		minimapChunkMode = !minimapChunkMode;
+		PlayerPtr->updateMinimap();
 		break;
 
 	}

@@ -217,7 +217,7 @@
     <ClCompile Include="code\Lot\kinds\Lot-ParkingLot.ixx" />
     <ClCompile Include="code\Lot\Lot.ixx" />
     <ClCompile Include="code\Lot\Lot-base.ixx" />
-    <ClCompile Include="code\Lot\lot-rotate.ixx" />
+    <ClCompile Include="code\Lot\Lot-rotate.ixx" />
     <ClCompile Include="code\Lot\Lot-CityBuildings.ixx" />
     <ClCompile Include="code\Damage.cpp" />
     <ClCompile Include="code\debugConsole.ixx" />
@@ -390,7 +390,6 @@
     <ClCompile Include="code\SkillData.ixx" />
     <ClCompile Include="code\statusEffect.ixx" />
     <ClCompile Include="code\Sticker.ixx" />
-    <ClCompile Include="code\SystemMenu.ixx" />
     <ClCompile Include="code\turnCycleLoop_propTurn.cpp" />
     <ClCompile Include="code\useSkill.ixx" />
     <ClCompile Include="code\globalTime.ixx" />

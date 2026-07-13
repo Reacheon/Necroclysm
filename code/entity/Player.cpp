@@ -28,6 +28,7 @@ import mapDiscovery;
 import Sprite;
 import drawSprite;
 import Vehicle;
+import Map;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -148,6 +149,13 @@ void Player::updateMinimap()
 
 	if (ctrlVeh == nullptr)
 	{
+		//청크맵 모드(M키 토글) — Map 모듈의 심볼 파이프라인(renderChunkMinimap)이 texture::minimap을 직접 채움.
+		if (minimapChunkMode)
+		{
+			renderChunkMinimap();
+			return;
+		}
+
 		SDL_SetRenderTarget(renderer, texture::minimap);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);

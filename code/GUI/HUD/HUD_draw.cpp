@@ -130,6 +130,8 @@ void HUD::drawGUI()
 				constexpr int    mmCx  = 13 + MINIMAP_DIAMETER * MINIMAP_TILE_PX / 2;   // 디스크 화면 중심
 				constexpr int    mmCy  = mmCx;
 				constexpr double edgeR = (MINIMAP_DIAMETER / 2 - 2) * MINIMAP_TILE_PX;   // 테두리 안착 반경(px)
+				//타일→미니맵 px 배율 — 타일 모드 6px/타일, 청크맵 모드 16px/청크(=16/24 px/타일)
+				const double pxPerTile = minimapChunkMode ? (double)MINIMAP_CHUNK_PX / TILE_PER_PIXEL : (double)MINIMAP_TILE_PX;
 
 				//테두리(흰 외곽선) 없이 색 글로우로 분리 — 부드러운 색 후광 위에 밝은 화살표 + 밝은 중심부.
 				auto rimArrow = [](int sx, int sy, double ang, SDL_Color c)
@@ -160,13 +162,13 @@ void HUD::drawGUI()
 					if (!mapPins[pi] || mapPins[pi]->z != PlayerZ()) continue;
 					const double dx = worldWrap::signedDeltaTileX(PlayerX(), mapPins[pi]->x);
 					const double dy = mapPins[pi]->y - PlayerY();
-					const double distPx = std::sqrt(dx * dx + dy * dy) * MINIMAP_TILE_PX;
+					const double distPx = std::sqrt(dx * dx + dy * dy) * pxPerTile;
 					const SDL_Color c = mapPinColor(pi);
 
 					if (distPx <= edgeR)
 					{
-						const int sx = mmCx + (int)std::lround(dx * MINIMAP_TILE_PX);
-						const int sy = mmCy + (int)std::lround(dy * MINIMAP_TILE_PX);
+						const int sx = mmCx + (int)std::lround(dx * pxPerTile);
+						const int sy = mmCy + (int)std::lround(dy * pxPerTile);
 						const SDL_Color hot = { (Uint8)std::min(255, c.r + 70), (Uint8)std::min(255, c.g + 70), (Uint8)std::min(255, c.b + 70), 255 };
 						drawFillCircle(sx, sy, 6, c, 55);    // 글로우(바깥) — 흰 테 대신
 						drawFillCircle(sx, sy, 4, c, 130);   // 글로우(안쪽)

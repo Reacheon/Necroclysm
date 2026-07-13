@@ -227,6 +227,7 @@ export std::array<std::pair<quickSlotFlag, std::wstring>, 8> quickSlot = { std::
 
 export SDL_Rect quickSlotRegion;
 export SDL_Rect minimapRegion;
+export bool minimapChunkMode = false; //미니맵 모드 — false=타일맵, true=청크맵(1청크=1심볼). M키로 토글
 
 export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해 원래 마우스 클릭좌표, 기존 클릭좌표랑은 조금 다르니 유의할 것, 카메라 이동에 사용됨
 
