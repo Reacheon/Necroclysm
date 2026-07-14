@@ -413,9 +413,127 @@ static std::wstring mapSymbolName(MapSymbol s)
 // §4  렌더링
 // ════════════════════════════════════════════════════════════════════════
 
+//── 저배율 스무딩 ────────────────────────────────────────────────────────
+//  16px 아트를 curScale(<16)px로 NEAREST 축소하면 화면픽셀마다 텍셀 1개만 살아남는데, 어떤
+//  텍셀이 살아남는지는 서브픽셀 위상(카메라 소수부·쿼드 위치의 UV 보간 오차)에 따라 달라진다
+//  → 정지 상태에선 같은 잔디 타일끼리도 무늬가 다르게 보이고, 줌 애니 중엔 스케일이 매 프레임
+//  변해 그 선별 패턴이 통째로 이동한다(그물망 모아레). 처방:
+//    · 축소 구간(curScale<16)과 줌 애니 중엔 LINEAR 샘플링.
+//    · 8px/청크 미만은 LINEAR 2탭으로도 텍셀을 건너뛰므로(스트라이드>2) 절반 해상도 mip
+//      (2x2 박스 다운샘플)으로 축소비를 2 이하로 유지.
+//    · 정지 16px/청크 이상은 기존 NEAREST(네이티브 픽셀아트 선명도 유지).
+
+static bool mapSmoothScale(const MapView& v) { return v.animating || v.curScale < 15.999; }
+
+//아틀라스의 절반 해상도 mip Sprite — 세션 1회 생성·캐시. STATIC 텍스처는 직접 못 읽으므로
+//  TARGET에 무블렌드 1:1 복사 후 ReadPixels로 리드백 → CPU 2x2 박스 다운샘플(알파 가중 평균:
+//  스트레이트 알파를 유지해 투명픽셀의 검정이 RGB로 번지는 다크 프린지 방지). 실패 시 nullptr를
+//  캐시(매 프레임 재시도 방지)하고 호출부는 native LINEAR로 폴백. build=false면 캐시 조회만(원복용).
+static Sprite* mapHalfMip(Sprite* native, bool build = true)
+{
+    static std::unordered_map<Sprite*, Sprite*> cache;
+    if (auto it = cache.find(native); it != cache.end()) return it->second;
+    if (!build) return nullptr;
+
+    Sprite*& slot = cache[native];   // 이하 실패 경로도 nullptr로 기록됨
+
+    float fw = 0.0f, fh = 0.0f;
+    SDL_GetTextureSize(native->getTexture(), &fw, &fh);
+    const int w = (int)fw, h = (int)fh, w2 = w / 2, h2 = h / 2;
+    if (w2 <= 0 || h2 <= 0) return nullptr;
+
+    SDL_Texture* rt = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, w, h);
+    if (!rt) return nullptr;
+    SDL_Texture* prevTarget = SDL_GetRenderTarget(renderer);
+    SDL_BlendMode prevBlend;
+    SDL_GetTextureBlendMode(native->getTexture(), &prevBlend);
+    SDL_SetRenderTarget(renderer, rt);
+    SDL_SetTextureBlendMode(native->getTexture(), SDL_BLENDMODE_NONE);
+    SDL_SetTextureColorMod(native->getTexture(), 255, 255, 255);   //복사에 색조/알파 모드가 섞이지 않게
+    SDL_SetTextureAlphaMod(native->getTexture(), 255);
+    SDL_RenderTexture(renderer, native->getTexture(), nullptr, nullptr);
+    SDL_SetTextureBlendMode(native->getTexture(), prevBlend);
+    SDL_Surface* raw = SDL_RenderReadPixels(renderer, nullptr);
+    SDL_SetRenderTarget(renderer, prevTarget);
+    SDL_DestroyTexture(rt);
+    if (!raw) return nullptr;
+
+    SDL_Surface* src = SDL_ConvertSurface(raw, SDL_PIXELFORMAT_RGBA32);
+    SDL_DestroySurface(raw);
+    if (!src) return nullptr;
+
+    static std::vector<Uint8> out;
+    out.assign(static_cast<std::size_t>(w2) * h2 * 4, 0);
+    const Uint8* sp    = static_cast<const Uint8*>(src->pixels);
+    const int    pitch = src->pitch;
+    for (int y = 0; y < h2; ++y)
+        for (int x = 0; x < w2; ++x)
+        {
+            int rSum = 0, gSum = 0, bSum = 0, aSum = 0;
+            for (int dy = 0; dy < 2; ++dy)
+                for (int dx = 0; dx < 2; ++dx)
+                {
+                    const Uint8* p = sp + (y * 2 + dy) * pitch + (x * 2 + dx) * 4;
+                    rSum += p[0] * p[3]; gSum += p[1] * p[3]; bSum += p[2] * p[3]; aSum += p[3];
+                }
+            Uint8* o = &out[(static_cast<std::size_t>(y) * w2 + x) * 4];
+            o[0] = aSum ? static_cast<Uint8>((rSum + aSum / 2) / aSum) : 0;
+            o[1] = aSum ? static_cast<Uint8>((gSum + aSum / 2) / aSum) : 0;
+            o[2] = aSum ? static_cast<Uint8>((bSum + aSum / 2) / aSum) : 0;
+            o[3] = static_cast<Uint8>((aSum + 2) / 4);
+        }
+    SDL_DestroySurface(src);
+
+    SDL_Texture* mip = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, w2, h2);
+    if (!mip) return nullptr;
+    SDL_UpdateTexture(mip, nullptr, out.data(), w2 * 4);
+    SDL_SetTextureScaleMode(mip, SDL_SCALEMODE_LINEAR);
+    SDL_SetTextureBlendMode(mip, SDL_BLENDMODE_BLEND);
+
+    slot = new Sprite(renderer, mip, native->getW() / 2, native->getH() / 2, true);
+    return slot;
+}
+
+//심볼 1개 드로우 — 저배율 스무딩 공용 경로(산·숲·건물·도로·다리·사이트). 스케일모드·줌·색조(br)·
+//  알파를 여기서 일괄 세팅한다. 8px/청크 미만은 half mip로 대체(셀이 절반이라 줌 2배 보정).
+//  색조/알파는 draw마다 덮어쓰므로 개별 원복 없이 패스 끝에서 resetSymbolAtlasMods()로 일괄 원복.
+//  좌표는 *실수* 화면좌표 — 셀별 독립 반올림(lround)을 하면 배율이 소수인 줌 애니 중 인접 심볼
+//  간격이 ±1px로 출렁여 오토타일(숲/산) 아트 이음매가 벌어진다(4셀 모서리에서 십자 틈).
+static void drawSymbolSprite(const MapView& v, Sprite* native, int idx, float sx, float sy, Uint8 br, Uint8 alpha = 255)
+{
+    const bool smooth = mapSmoothScale(v);
+    Sprite* atlas = native;
+    if (smooth && v.curScale < 8.0)
+        if (Sprite* mip = mapHalfMip(native)) atlas = mip;
+
+    SDL_SetTextureScaleMode(atlas->getTexture(), smooth ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+    setZoom((float)(v.curScale / 16.0 * native->getW() / atlas->getW()));
+    SDL_SetTextureColorMod(atlas->getTexture(), br, br, br);
+    SDL_SetTextureAlphaMod(atlas->getTexture(), alpha);
+    drawSpriteF(atlas, idx, sx, sy);
+}
+
+//심볼 패스 종료 원복 — 색조/알파 255, native는 NEAREST로(본체·미니맵 등 다른 사용처 오염 방지).
+//  mip은 생성 없이 캐시된 것만(mapHalfMip build=false).
+static void resetSymbolAtlasMods()
+{
+    for (Sprite* s : { spr::mapset1by1, spr::mapset2by2, spr::mapset3by3, spr::auto47Mountain })
+    {
+        SDL_SetTextureColorMod(s->getTexture(), 255, 255, 255);
+        SDL_SetTextureAlphaMod(s->getTexture(), 255);
+        SDL_SetTextureScaleMode(s->getTexture(), SDL_SCALEMODE_NEAREST);
+        if (Sprite* m = mapHalfMip(s, false))
+        {
+            SDL_SetTextureColorMod(m->getTexture(), 255, 255, 255);
+            SDL_SetTextureAlphaMod(m->getTexture(), 255);
+        }
+    }
+}
+
 //y로 정렬해 그리는 심볼(산·건물) — 남쪽이 위에 겹치는 JRPG 페인터 순서.
 //  br = 전장의 구름 밝기. 자연물(산/숲)은 미발견에서도 그리되 어둡게, 건물은 발견된 곳만(=밝게).
-struct SymDraw { float sortY; Sprite* atlas; int idx; int sx; int sy; Uint8 br = 255; };
+//  sx/sy는 실수 화면좌표(반올림 금지 — drawSymbolSprite 주석 참조).
+struct SymDraw { float sortY; Sprite* atlas; int idx; float sx; float sy; Uint8 br = 255; };
 
 namespace
 {
@@ -424,15 +542,22 @@ namespace
     //tileset 베이스 타일/파도 배치 flush — 인접 quad가 비트 동일 float 경계 공유 → 갭 없음.
     //  베이스 타일(alpha 255)과 파도(alpha<255)을 같은 배치로 — 청크 셀 내부에만
     //  그려지므로 셀 간 겹침 없음 → 같은 청크에서 push 순서(타일→파도)만 지키면 파도가 위.
-    void flushBaseBatch(BaseQuad* q, int count)
+    //  축소·줌애니 구간은 LINEAR(+8px 미만 half mip)로 샘플(§4 저배율 스무딩 주석).
+    void flushBaseBatch(BaseQuad* q, int count, const MapView& v)
     {
         if (count <= 0) return;
 
-        SDL_Texture* tex = spr::tileset->getTexture();
+        const bool smooth = mapSmoothScale(v);
+        Sprite* atlas = spr::tileset;
+        if (smooth && v.curScale < 8.0)
+            if (Sprite* mip = mapHalfMip(atlas)) atlas = mip;
+
+        SDL_Texture* tex = atlas->getTexture();
+        SDL_SetTextureScaleMode(tex, smooth ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
         float texW, texH;
         SDL_GetTextureSize(tex, &texW, &texH);
 
-        const int   srcSize = spr::tileset->getW();   // 16
+        const int   srcSize = atlas->getW();   // 16 (native) / 8 (half mip)
         const float uW = srcSize / texW, vH = srcSize / texH;
         const int   atlasW = (int)texW;
         const float insetU = 0.5f / texW, insetV = 0.5f / texH;
@@ -462,6 +587,8 @@ namespace
             indices[iBase + 4] = vBase + 2; indices[iBase + 5] = vBase + 3;
         }
         SDL_RenderGeometry(renderer, tex, vertices, count * 4, indices, count * 6);
+        if (atlas == spr::tileset)
+            SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);   //본체 월드 렌더와 공유 — NEAREST 원복
     }
 }
 
@@ -576,7 +703,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
 
     static thread_local std::vector<BaseQuad> batch;
     batch.clear();
-    auto flush    = [&]() { flushBaseBatch(batch.data(), (int)batch.size()); batch.clear(); };
+    auto flush    = [&]() { flushBaseBatch(batch.data(), (int)batch.size(), v); batch.clear(); };
     auto pushQuad = [&](int ix, int iy, int sprIdx, Uint8 a, Uint8 br) {
         if ((int)batch.size() >= MAX_BATCH) flush();
         batch.push_back(BaseQuad{
@@ -640,8 +767,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
                     bg(ix, iy - 1), bg(ix + 1, iy), bg(ix, iy + 1), bg(ix - 1, iy),
                     bg(ix - 1, iy - 1), bg(ix + 1, iy - 1), bg(ix - 1, iy + 1), bg(ix + 1, iy + 1));
                 mtnOut.push_back(SymDraw{ (float)iy, spr::auto47Mountain, idx,
-                    (int)std::lround(v.sX((double)ix)),
-                    (int)std::lround(v.sY((double)iy)), br });
+                    (float)v.sX((double)ix), (float)v.sY((double)iy), br });
             }
 
             //③ 숲 심볼 (16타일 오토타일, connectGroupExtraIndex) — 위성에 없는 절차적
@@ -652,8 +778,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
                 const int idx = 96 + connectGroupExtraIndex(
                     isFor(ix, iy - 1), isFor(ix, iy + 1), isFor(ix - 1, iy), isFor(ix + 1, iy));
                 symOut.push_back(SymDraw{ (float)iy, spr::mapset1by1, idx,
-                    (int)std::lround(v.sX((double)(ix - 1))),
-                    (int)std::lround(v.sY((double)(iy - 1))), br });
+                    (float)v.sX((double)(ix - 1)), (float)v.sY((double)(iy - 1)), br });
             }
         }
     flush();
@@ -868,7 +993,8 @@ static bool siteFootprintChunk(int cx, int cy)
     return mask.count(keyOf(cx, cy)) != 0;
 }
 
-//외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림. setZoom은 호출자.
+//외부 도로 그리기 — highwayCells()가 빌드 시 해석해둔 sprIdx(도로/다리)를 그대로 그림.
+//  스케일모드·줌·색조·알파는 drawSymbolSprite가 셀마다 세팅(원복은 호출자의 resetSymbolAtlasMods).
 //  도로망은 미발견 청크여도 항상 표시(전세계 도로 골격) — 단 미발견은 지형처럼 어둡게(fogBright)
 //  색조해 전장의 구름 느낌은 유지. (도시 내부 도로·다리는 drawCityRoads가 따로 그림.)
 //  전 세계 셀 전수 순회 대신 화면에 걸린 공간 버킷만 순회 — 셀 단위 정밀 컬링은 기존대로.
@@ -888,20 +1014,15 @@ static void drawHighways(const MapView& v)
             const HighwayCell& c = hw.cells[ci];
             if (c.z != v.z) continue;
 
-            const int sx = (int)std::lround(v.sX((double)(c.cx - 1)));
-            const int sy = (int)std::lround(v.sY((double)(c.cy - 1)));
+            const float sx = (float)v.sX((double)(c.cx - 1));
+            const float sy = (float)v.sY((double)(c.cy - 1));
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
             if (siteFootprintChunk(c.cx, c.cy)) continue;   //사이트 심볼 밑 도로 숨김 — 연결은 이웃 셀이 유지
 
-            const Uint8 br = fogBright(c.cx, c.cy);
-            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
-            SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(c.cx, c.cy) ? TUNNEL_ALPHA : 255);
-            drawSprite(spr::mapset1by1, c.sprIdx, sx, sy);
+            drawSymbolSprite(v, spr::mapset1by1, c.sprIdx, sx, sy, fogBright(c.cx, c.cy), roadCellOnMountain(c.cx, c.cy) ? TUNNEL_ALPHA : 255);
         }
     });
-    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
-    SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
 //도시 심볼/도로망 소스 — full plan(CityPlanCache) 우선, 없으면 경량 layout(CityLayoutCache).
@@ -957,7 +1078,8 @@ static void ensureVisibleCityLayouts(const MapView& v)
     }
 }
 
-//③-b 도시 내부 도로·다리 심볼 (캐시 or 경량 layout) — 평면 레이어라 즉시 그림(정렬 X). setZoom은 호출자.
+//③-b 도시 내부 도로·다리 심볼 (캐시 or 경량 layout) — 평면 레이어라 즉시 그림(정렬 X).
+//   스케일모드·줌·색조·알파는 drawSymbolSprite가 셀마다 세팅(원복은 호출자의 resetSymbolAtlasMods).
 //   발견 여부와 무관하게 그리되 미발견 청크는 지형처럼 어둡게(fogBright) 색조. 미발견 도시는
 //   잔디 위에 이 도로망/다리 + ?건물(④)이 얹혀 "정찰지도"처럼 보인다.
 static void drawCityRoads(const MapView& v)
@@ -991,18 +1113,13 @@ static void drawCityRoads(const MapView& v)
 
             const int px = tilePixelIX(rc.pos.x);
             const int py = tilePixelIY(rc.pos.y);
-            const int sx = (int)std::lround(v.sX((double)(px - 1)));
-            const int sy = (int)std::lround(v.sY((double)(py - 1)));
+            const float sx = (float)v.sX((double)(px - 1));
+            const float sy = (float)v.sY((double)(py - 1));
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
-            const Uint8 br = fogBright(px, py);
-            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), br, br, br);
-            SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), roadCellOnMountain(px, py) ? TUNNEL_ALPHA : 255);
-            drawSprite(spr::mapset1by1, idx, sx, sy);
+            drawSymbolSprite(v, spr::mapset1by1, idx, sx, sy, fogBright(px, py), roadCellOnMountain(px, py) ? TUNNEL_ALPHA : 255);
         }
     }
-    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);   // 색조 원복(다음 패스 오염 방지)
-    SDL_SetTextureAlphaMod(spr::mapset1by1->getTexture(), 255);             // 알파 원복(다음 패스/프레임 오염 방지)
 }
 
 //④ 건물 심볼 (캐시된 도시) — symOut에 누적(산과 함께 y정렬 후 그림). 발견된 청크는 실제 종류
@@ -1033,8 +1150,8 @@ static void drawCityBuildings(const MapView& v, std::vector<SymDraw>& symOut)
                 : resolveUnknownSymbol(sym.symbol, sym.w, sym.h);
             if (!rs.atlas) continue;
 
-            const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
-            const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
+            const float sx = (float)v.sX((double)(apx + rs.offX));
+            const float sy = (float)v.sY((double)(apy + rs.offY));
             const int span = rs.cellChunks * cp;
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
@@ -1095,8 +1212,8 @@ static void drawSites(const MapView& v, std::vector<SymDraw>& symOut)
                 : resolveUnknownSymbol(site.symbol, site.w, site.h);
             if (!rs.atlas) continue;
 
-            const int sx = (int)std::lround(v.sX((double)(apx + rs.offX)));
-            const int sy = (int)std::lround(v.sY((double)(apy + rs.offY)));
+            const float sx = (float)v.sX((double)(apx + rs.offX));
+            const float sy = (float)v.sY((double)(apy + rs.offY));
             const int span = rs.cellChunks * cp;
             if (sx + span < 0 || sx > v.viewW || sy + span < 0 || sy > v.viewH) continue;
 
@@ -1189,15 +1306,10 @@ export void renderChunkMinimap()
 
     drawTerrainLayer(v, true, symDraws, mtnDraws);   // ① 베이스(+파도) + ② 산(mtnDraws)·숲(symDraws) 수집
 
-    setZoom((float)v.zoomScale());
-
     //② 산 레이어 — 도로보다 먼저(산 위 도로가 터널로 반투명되게). drawGUI 청크맵 분기와 동일 순서.
+    //   스케일모드·줌·색조는 drawSymbolSprite가 세팅(16px 고정이라 NEAREST 1:1 — 기존과 동일 출력).
     for (const auto& s : mtnDraws)
-    {
-        SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
-        drawSprite(s.atlas, s.idx, s.sx, s.sy);
-    }
-    SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+        drawSymbolSprite(v, s.atlas, s.idx, s.sx, s.sy, s.br);
 
     drawHighways     (v);             // ③-a 외부 도로망
     ensureVisibleCityLayouts(v);      // 반경 내 미캐시 도시 경량 layout 백그라운드 요청
@@ -1209,14 +1321,8 @@ export void renderChunkMinimap()
     std::sort(symDraws.begin(), symDraws.end(),
         [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
     for (const auto& s : symDraws)
-    {
-        SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
-        drawSprite(s.atlas, s.idx, s.sx, s.sy);
-    }
-    SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
-    SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
-    SDL_SetTextureColorMod(spr::mapset3by3->getTexture(), 255, 255, 255);
-    SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+        drawSymbolSprite(v, s.atlas, s.idx, s.sx, s.sy, s.br);
+    resetSymbolAtlasMods();   //색조·알파·스케일모드 원복(다른 패스/다음 프레임 오염 방지)
 
     setZoom(1.0f);
 
@@ -2200,15 +2306,10 @@ public:
 
             drawTerrainLayer(view, foamOn, symDraws, mtnDraws);   // ① 베이스(+파도) + ② 산(mtnDraws)·숲(symDraws) 수집
 
-            setZoom((float)view.zoomScale());
-
             //② 산 레이어 — 도로보다 *먼저* 그린다(도로가 산 위에 터널로 반투명되게). 1셀 타일이라 y정렬 불필요.
+            //   스케일모드·줌·색조는 drawSymbolSprite가 세팅(저배율/줌애니 스무딩 포함).
             for (const auto& s : mtnDraws)
-            {
-                SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
-                drawSprite(s.atlas, s.idx, s.sx, s.sy);
-            }
-            SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+                drawSymbolSprite(view, s.atlas, s.idx, s.sx, s.sy, s.br);
 
             drawHighways     (view);             // ③-a 외부 도로망 (산 위면 터널 반투명, 미발견은 어둡게)
             ensureVisibleCityLayouts(view);      // 화면 내 미캐시 도시 경량 layout 백그라운드 요청
@@ -2220,15 +2321,8 @@ public:
             std::sort(symDraws.begin(), symDraws.end(),
                 [](const SymDraw& a, const SymDraw& b) { return a.sortY < b.sortY; });
             for (const auto& s : symDraws)
-            {
-                SDL_SetTextureColorMod(s.atlas->getTexture(), s.br, s.br, s.br);
-                drawSprite(s.atlas, s.idx, s.sx, s.sy);
-            }
-            //색조 모드 원복 — 텍스처 상태라 다른 패스/다음 프레임 오염 방지.
-            SDL_SetTextureColorMod(spr::mapset1by1->getTexture(), 255, 255, 255);
-            SDL_SetTextureColorMod(spr::mapset2by2->getTexture(), 255, 255, 255);
-            SDL_SetTextureColorMod(spr::mapset3by3->getTexture(), 255, 255, 255);
-            SDL_SetTextureColorMod(spr::auto47Mountain->getTexture(), 255, 255, 255);
+                drawSymbolSprite(view, s.atlas, s.idx, s.sx, s.sy, s.br);
+            resetSymbolAtlasMods();   //색조·알파·스케일모드 원복(다른 패스/다음 프레임 오염 방지)
 
             setZoom(1.0f);
 

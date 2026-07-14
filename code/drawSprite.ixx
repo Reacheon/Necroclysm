@@ -85,6 +85,23 @@ export void drawSpriteRotate(Sprite* spr, int index, int x, int y, double rotate
     SDL_RenderTextureRotated(renderer, spr->getTexture(), &src, &dst, rotateAngle, centerF, s_flip);
 }
 
+//실수 좌표 드로우 — 타일링 심볼(월드맵 숲/산 오토타일 등)용. 정수 반올림(lround) 앵커는 셀마다
+//  독립 반올림되어 배율이 소수일 때 인접 스프라이트 간격이 ±1px 출렁여 이음매가 벌어진다.
+export void drawSpriteF(Sprite* spr, int index, float x, float y)
+{
+    float textureW, textureH;
+    SDL_GetTextureSize(spr->getTexture(), &textureW, &textureH);
+    SDL_FRect src = { (spr->getW() * index) % static_cast<int>(textureW),
+                     spr->getH() * ((spr->getW() * index) / static_cast<int>(textureW)),
+                     spr->getW(),
+                     spr->getH() };
+    SDL_FRect dst = { x,
+                      y,
+                      src.w * s_zoomScale,
+                      src.h * s_zoomScale };
+    SDL_RenderTextureRotated(renderer, spr->getTexture(), &src, &dst, 0, nullptr, s_flip);
+}
+
 export void drawSprite(Sprite* spr, int x, int y) { drawSprite(spr, 0, x, y); }
 
 export void drawSpriteCenter(Sprite* spr, int index, int x, int y)
