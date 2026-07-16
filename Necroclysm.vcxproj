@@ -261,6 +261,7 @@
     <ClCompile Include="code\GUI\EQUIP\Equip_input_mouse.cpp" />
     <ClCompile Include="code\GUI\GameOver.ixx" />
     <ClCompile Include="code\GUI\GUI.ixx" />
+    <ClCompile Include="code\GUI\TitleScreen.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD.ixx" />
     <ClCompile Include="code\GUI\HUD\HUD_draw.cpp" />
     <ClCompile Include="code\GUI\HUD\HUD_input_gamepad.cpp" />
