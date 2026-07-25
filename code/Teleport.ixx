@@ -90,6 +90,10 @@ namespace teleport
         drawSpinner(cameraW - margin, cameraH - margin);
 
         SDL_RenderPresent(renderer);
+
+        // 자체 present 후 메인 루프의 프레임 타겟으로 복귀 — 안 하면 이번 프레임의
+        // 남은 그리기가 창에 직접 가서 endFrame 블릿에 덮여버림.
+        SDL_SetRenderTarget(renderer, frameTarget);
     }
 
     //SDL 이벤트 큐 비우기 — Windows "응답 없음" 방지. QUIT 외엔 폐기.

@@ -1359,7 +1359,7 @@ export void renderChunkMinimap()
     SDL_RenderFillRect(renderer, &playerRect);
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-    SDL_SetRenderTarget(renderer, nullptr);
+    SDL_SetRenderTarget(renderer, frameTarget);
 }
 
 // ────────── 위성 텍스처 LOD (광역 조망) ──────────

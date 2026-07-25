@@ -67,8 +67,16 @@ public:
 			statusBase.y += inputY - statusBase.h / 2;
 		}
 
-		if (statusBase.x < 87) { statusBase.x = 87; }
-		if (statusBase.y >= 275) { statusBase.y = 274; }
+		// y 상한: 중앙-20px. (1080 기준 274 — 절대값이면 세로로 긴 화면에서 상단에 붙음)
+		const int maxY = cameraH / 2 - 266;
+		if (statusBase.y > maxY) { statusBase.y = maxY; }
+
+		// x는 좌측 저항 스타디움 박스(HUD_draw: x -10~87, y cameraH-665~cameraH-314)와
+		// 세로로 겹칠 때만 87로 밀어낸다. 세로로 긴 화면에서는 안 겹치므로 진짜 중앙 정렬.
+		const int resBoxTop = cameraH - 665;
+		const int resBoxBottom = cameraH - 314;
+		const bool overlapResBox = statusBase.y < resBoxBottom && statusBase.y + statusBase.h > resBoxTop;
+		if (overlapResBox && statusBase.x < 87) { statusBase.x = 87; }
 
 		x = statusBase.x;
 		y = statusBase.y;

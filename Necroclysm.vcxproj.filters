@@ -375,6 +375,9 @@
     <ClCompile Include="code\GUI\TitleScreen.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\CharSelectScreen.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\GUI\Map.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>

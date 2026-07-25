@@ -100,7 +100,7 @@ export namespace nervedriveFilter
         g_skipPlayer = false;
         g_activePass = false;
 
-        SDL_SetRenderTarget(renderer, nullptr);
+        SDL_SetRenderTarget(renderer, frameTarget);
 
         SDL_SetTextureBlendMode(g_worldRT, SDL_BLENDMODE_BLEND);
         SDL_SetTextureColorMod(g_worldRT, TINT_R, TINT_G, TINT_B);

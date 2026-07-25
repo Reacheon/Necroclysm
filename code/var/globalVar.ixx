@@ -68,6 +68,7 @@ export namespace timer
 /////////////////////////////////////////////////////////////////
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
+export SDL_Texture* frameTarget = nullptr;//논리 해상도 1:1 프레임 렌더타겟. 메인 출력은 여기로 그리고 endFrame에서 창 크기로 한 번에 스케일 (displayLoader가 생성/재생성)
 export SDL_Gamepad* controller; //메인컨트롤러
 // sol::state lua 는 lua/luaState.h 로 이동됨 (모듈 호환성 문제 회피)
 

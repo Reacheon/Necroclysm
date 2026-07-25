@@ -31,6 +31,9 @@ import mapEditorMode;
 import levelUpFX;
 import playerLevel;
 import TitleScreen;
+import CharSelectScreen;
+import displayLoader;
+import GUI;
 
 export void debugConsole()
 {
@@ -82,6 +85,8 @@ export void debugConsole()
 	prt(L"40. 맵 에디터 모드 (월드 초기화 + LotEditor)\n");
 	prt(L"41. 경험치 추가\n");
 	prt(L"42. 타이틀 화면으로\n");
+	prt(L"43. 캐릭터 선택 화면\n");
+	prt(L"44. 해상도 변경\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -979,6 +984,27 @@ export void debugConsole()
 	case 42://타이틀 화면으로
 	{
 		new TitleScreen();
+		break;
+	}
+	case 43://캐릭터 선택 화면
+	{
+		new CharSelectScreen();
+		break;
+	}
+	case 44://런타임 해상도 변경
+	{
+		int newW, newH;
+		prt(L"현재 카메라 해상도: %dx%d\n", cameraW, cameraH);
+		prt(L"기준은 1080x1080 - 가로가 길면 W만, 세로가 길면 H만 1080보다 크게.\n");
+		prt(L"새 가로(W) 해상도를 입력해주세요.\n");
+		std::cin >> newW;
+		prt(L"새 세로(H) 해상도를 입력해주세요.\n");
+		std::cin >> newH;
+		applyDebugResolution(newW, newH);
+		// 레터박스·탭 등 changeXY가 캐시한 절대 좌표를 새 cameraW/H로 재계산.
+		// 현재 x/y를 그대로 되넘기는 건 GUI 베이스 애니메이션과 동일한 재배치 패턴 —
+		// HUD는 y가 상대값이라 팝업 상태도 유지된다. (HUD 직접 import는 순환이라 불가)
+		for (GUI* g : GUI::activeGUIList) g->changeXY(g->x, g->y, false);
 		break;
 	}
 	case 99://콘솔 출력 초기화

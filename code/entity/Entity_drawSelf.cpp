@@ -752,6 +752,6 @@ SDL_Texture* Entity::composePlayerTexture(bool allowBlink)
 	//돌연변이 레이어: 주둥이, 귀 (모든 장비 위)
 	drawMutationLayer(entityInfo, mutDrawLayer::aboveEquip);
 
-	SDL_SetRenderTarget(renderer, nullptr);
+	SDL_SetRenderTarget(renderer, frameTarget);
 	return playerTexture;
 }

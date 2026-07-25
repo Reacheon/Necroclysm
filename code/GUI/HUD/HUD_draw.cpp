@@ -248,7 +248,7 @@ void HUD::drawGUI()
 
 				SDL_SetRenderClipRect(renderer, nullptr);
 
-				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_SetRenderTarget(renderer, frameTarget);
 				SDL_SetTextureAlphaMod(texture::mainGaugeWhiteShadow, alpha);
 				drawTexture(texture::mainGaugeWhiteShadow, x, y);
 				SDL_SetTextureAlphaMod(texture::mainGaugeWhiteShadow, 255);
@@ -1639,7 +1639,7 @@ void HUD::drawBodyParts()
 				SDL_RenderFillRect(renderer, &rect);
 
 				SDL_SetRenderClipRect(renderer, nullptr);
-				SDL_SetRenderTarget(renderer, nullptr);
+				SDL_SetRenderTarget(renderer, frameTarget);
 
 				SDL_SetTextureAlphaMod(texture::hpGaugeWhiteShadow, fakeHPAlpha);
 				drawTexture(texture::hpGaugeWhiteShadow, inputX, inputY);
@@ -1666,7 +1666,7 @@ void HUD::drawBodyParts()
 
 			SDL_SetRenderClipRect(renderer, nullptr);
 
-			SDL_SetRenderTarget(renderer, nullptr);
+			SDL_SetRenderTarget(renderer, frameTarget);
 			SDL_SetTextureAlphaMod(texture::hpGaugeWhiteShadow, 255);
 			drawTexture(texture::hpGaugeWhiteShadow, inputX, inputY);
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -2073,7 +2073,7 @@ void HUD::drawCircuitInfo()
 			drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 29 + 16);
 
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-			SDL_SetRenderTarget(renderer, nullptr);
+			SDL_SetRenderTarget(renderer, frameTarget);
 
 			Point2 mouseCoord = getAbsMouseGrid();
 			SDL_Rect dst;
@@ -2418,7 +2418,7 @@ void HUD::drawFluidCircuitInfo()
 		drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 29 + 16);
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-		SDL_SetRenderTarget(renderer, nullptr);
+		SDL_SetRenderTarget(renderer, frameTarget);
 
 		// 화면 위치 계산
 		Point2 mouseCoord = getAbsMouseGrid();

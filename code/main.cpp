@@ -98,6 +98,8 @@ int main(int argc, char** argv)
 	{
 		std::int64_t loopStart = getNanoTimer();
 
+		beginFrame();//이번 프레임의 모든 그리기를 논리 해상도 렌더타겟으로
+
 		//■Timer 변수
 		if (timer::cursorHightlight < 23) { timer::cursorHightlight++; }
 		else { timer::cursorHightlight = 0; }
@@ -162,6 +164,7 @@ int main(int argc, char** argv)
 		}
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
 		//renderFPS(getNanoTimer() - loopStart);
+		endFrame();//렌더타겟을 창 크기로 단일 블릿
 		SDL_RenderPresent(renderer);
 
 		if (hasInitMinimap == false && !worldGenInProgress && PlayerPtr != nullptr)

@@ -312,7 +312,7 @@ void Player::updateMinimap()
 		SDL_RenderPoint(renderer, (NAVIMAP_WIDTH / 2), (NAVIMAP_HEIGHT / 2));
 	}
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-	SDL_SetRenderTarget(renderer, nullptr);
+	SDL_SetRenderTarget(renderer, frameTarget);
 }
 
 
