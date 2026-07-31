@@ -1725,9 +1725,9 @@ static void drawPlayerMarker(const MapView& v)
 }
 
 
-// ────────── ⑧ 맵 핀 (플레이어 웨이포인트 = 빛의 기둥) ──────────
-//  타일점에서 위로 솟는 발광 기둥. 크기는 줌(curScale)에 비례 가변(클램프) — 당길수록 커지고 멀수록 작게.
-//  애니는 차분하게(호흡 + 바닥 원형 펄스). 메뉴 색칩은 단색 위치핀 기호(원+삼각). SDL 원시함수만(신규 아트 0).
+// ────────── ⑧ 맵 핀 (플레이어 웨이포인트 = 핀 도트) ──────────
+//  색상별 도트 스프라이트(spr::mapPin, 80px=5x5청크·16px=1청크)를 배경 심볼과 같은 해상도로 그린다.
+//  애니는 차분하게(밝기 호흡 + 발밑 도트 펄스). 메뉴 색칩은 단색 위치핀 기호(원+삼각).
 
 static SDL_Color mpTint(SDL_Color c, double f)
 {
@@ -1743,69 +1743,71 @@ static void fillTri(float x0, float y0, float x1, float y1, float x2, float y2, 
     SDL_RenderGeometry(renderer, nullptr, v, 3, idx, 3);
 }
 
-//세로 그라디언트 빔(빛의 기둥 1겹) — 바닥(baseY)에서 위(topY)로 알파가 아래→위로 옅어지는 사다리꼴.
-//  SDL_RenderGeometry 쿼드(2삼각형) + 정점 알파. 알파<255라 BLEND 모드 보장.
-static void gradBeam(float cx, float baseY, float topY, float halfBase, float halfTop, SDL_Color c, Uint8 aBase, Uint8 aTop)
+//핀 도트 마커 — 색상별 도트(spr::mapPin)의 중심(40,40)을 타일점(ax,ay)에 맞춰 그린다.
+//  애니는 차분하게: ① 전체가 밝아졌다 어두워지는 밝기 호흡(색조 곱) ② 발밑 도트 펄스.
+//  배율은 배경 심볼(drawSymbolSprite)과 동일한 16px=1청크 환산 → 도트 픽셀이 맵 아트 픽셀과 1:1로 정합.
+//  줌아웃 하한(SYMBOL_MIN_PX/청크)만 둠 — 심볼이 흐려지는 광역에서도 핀은 찾을 수 있어야 하므로.
+static void drawBeacon(const MapView& v, int pinIdx, int ax, int ay, SDL_Color col)
 {
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    const SDL_FColor cb = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, aBase / 255.0f };
-    const SDL_FColor ct = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, aTop  / 255.0f };
-    SDL_Vertex v[4] = {
-        { { cx - halfBase, baseY }, cb, { 0, 0 } },
-        { { cx + halfBase, baseY }, cb, { 0, 0 } },
-        { { cx + halfTop,  topY  }, ct, { 0, 0 } },
-        { { cx - halfTop,  topY  }, ct, { 0, 0 } },
-    };
-    int idx[6] = { 0, 1, 2, 0, 2, 3 };
-    SDL_RenderGeometry(renderer, nullptr, v, 4, idx, 6);
-}
-
-//타원 외곽선(바닥 원형 펄스용) — 선분 근사. 채움이 아니라 링이라 "퍼지는 파동"으로 읽힌다.
-static void ellipseRing(int cx, int cy, double rx, double ry, SDL_Color c, Uint8 a)
-{
-    if (rx < 1.0 || a == 0) return;
-    const int seg = std::max(16, (int)std::lround(rx * 1.6));
-    double px = cx + rx, py = cy;
-    for (int i = 1; i <= seg; ++i)
-    {
-        const double ang = (double)i / seg * (std::numbers::pi * 2.0);
-        const double nx = cx + std::cos(ang) * rx;
-        const double ny = cy + std::sin(ang) * ry;
-        drawLine((int)std::lround(px), (int)std::lround(py), (int)std::lround(nx), (int)std::lround(ny), c, a);
-        px = nx; py = ny;
-    }
-}
-
-//빛의 기둥 마커 — 타일점(ax,ay)에서 위로 솟는 발광 기둥 + 바닥 글로우 풀. 애니는 차분하게:
-//  ① 전체가 밝아졌다 어두워지는 호흡 ② 바닥에서 천천히 퍼지는 원형(타원) 펄스 1겹. (상승 펄스는 과해서 폐기.)
-//  scale=화면 px/청크(curScale). 크기를 여기 비례시키되 클램프 → 어느 줌에서도 자연스러운 크기.
-static void drawBeacon(int ax, int ay, SDL_Color col, double scale)
-{
-    const double W = std::clamp(scale * 0.34, 3.0, 26.0);     // 기준 반폭(줌 가변)
-    const double H = std::clamp(scale * 2.60, 24.0, 150.0);   // 기둥 높이(줌 가변)
-    const float  cx = (float)ax, baseY = (float)ay, topY = (float)(ay - H);
-    const SDL_Color hot = mpTint(col, 0.55);                  // 중심부 밝은 틴트
-
+    constexpr double BREATH_MS = 1700.0;   // 밝기 호흡 주기 — 발밑 펄스도 이 주기에 위상 동기
     const double now = (double)SDL_GetTicks();
-    const double breath = 0.82 + 0.18 * std::sin(now / 1700.0 * 2.0 * std::numbers::pi);   // 전체 강도 호흡
-    auto A = [&](double a) -> Uint8 { return (Uint8)std::clamp(a * breath, 0.0, 255.0); };
+    const double breath = 0.825 + 0.175 * std::sin(now / BREATH_MS * 2.0 * std::numbers::pi);   // 밝기 호흡(하한 65%)
+    const Uint8  br = (Uint8)std::clamp(breath * 255.0, 0.0, 255.0);
 
-    //바닥 글로우 풀 — 빛이 바닥에 고인 동심 타원(중심 밝게).
-    drawFillEllipse(ax, ay, (int)std::lround(W * 2.4), (int)std::lround(W * 1.0),  col, A(55));
-    drawFillEllipse(ax, ay, (int)std::lround(W * 1.5), (int)std::lround(W * 0.62), col, A(110));
-    drawFillEllipse(ax, ay, (int)std::lround(W * 0.8), (int)std::lround(W * 0.34), hot, A(190));
+    Sprite* pin = spr::mapPin[pinIdx];
+    const double zoom = std::max(v.curScale, mapcfg::SYMBOL_MIN_PX) / 16.0;
+    SDL_SetTextureScaleMode(pin->getTexture(), mapSmoothScale(v) ? SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST);
+    SDL_SetTextureColorMod(pin->getTexture(), br, br, br);
+    setZoom((float)zoom);
+    drawSpriteF(pin, 0, (float)(ax - 40.0 * zoom), (float)(ay - 40.0 * zoom));
+    setZoom(1.0f);
 
-    //기둥 — 겉(넓고 옅음) → 중간 → 중심부(좁고 밝음). 위로 갈수록 알파 0.
-    gradBeam(cx, baseY, topY, (float)(W * 1.8),  (float)(W * 1.3), col, A(40),  0);
-    gradBeam(cx, baseY, topY, (float)(W * 1.0),  (float)(W * 0.7), col, A(115), 0);
-    gradBeam(cx, baseY, topY, (float)(W * 0.42), (float)(W * 0.3), hot, A(200), 0);
-
-    //바닥 원형 펄스 — 바닥에서 바깥으로 천천히 퍼지며 사라지는 타원 링 1겹(지면 파동). 차분.
+    //발밑 도트 펄스 — 납작 타원 링이 주기적으로 퍼지며 사라짐. 스크린 해상도 원시 원이 아니라
+    //  맵 아트 픽셀(16px=1청크) 격자에 스냅한 도트 사각형 배치로 그림 — 레벨업 충격파와 동일 기법.
+    //  반경이 정수 격자로 양자화돼 그대로면 성장이 뚝뚝 끊기므로, 인접 두 반경(r0,r0+1)을 소수부
+    //  가중 알파로 크로스페이드 — 도트는 격자에 남고 전이만 연속. 주기 시작도 짧은 페이드인으로 연결.
     {
-        const double pp = std::fmod(now, 2200.0) / 2200.0;       // 0..1 (약 2.2초 주기)
-        const double rx = W * (1.1 + pp * 2.6);
-        const Uint8  pa = (Uint8)std::lround((1.0 - pp) * 100.0); // 퍼질수록 옅게
-        ellipseRing(ax, ay, rx, rx * 0.42, col, pa);
+        constexpr double R_MIN = 6.0, R_MAX = 20.0;   // 아트픽셀 반경 — 핀 본체 폭(16px)에서 시작해 퍼짐
+        const double u = std::fmod(now / BREATH_MS - 0.75 + 1.0, 1.0);   // 호흡과 동주기·위상 동기: 호흡 최저점(sin=-1, u=0)=밝아지기 시작할 때 링 방출
+        const double eased = 1.0 - (1.0 - u) * (1.0 - u);           // 감속 곡선 — 퍼질수록 느리게
+        const double rReal = R_MIN + eased * (R_MAX - R_MIN);
+        const double aBase = (1.0 - eased) * 150.0 * std::min(1.0, u / 0.08);   // 퍼질수록 옅게 + 시작 페이드인
+        const double cyd = (double)ay + 4.0 * zoom;                 // 진원 — 타일점 4아트픽셀 아래(핀 본체 발밑)
+
+        constexpr size_t MAX_PT = 512;
+        static SDL_Color cols[MAX_PT];
+        static Point2 pts[MAX_PT];
+        size_t n = 0;
+        //핀 아트가 짝수 폭(16px, 중심=픽셀 경계)이므로 링도 짝수 대칭이어야 함 — lround(중심 픽셀 1개,
+        //  홀수 폭)가 아니라 floor로 열/행 인덱스를 잡아 -r..r-1(짝수 폭, 경계 대칭)로 래스터화.
+        //  우/하 극단만 마지막 인덱스로 클램프(cos·r == r 정확히 닿는 각도의 경계 이탈 방지).
+        auto ring = [&](int r, int a)
+        {
+            if (a < 6 || r < 1) return;
+            SDL_Color c = col; c.a = (Uint8)std::min(a, 255);
+            const int steps = std::max(24, r * 8);
+            int prevX = 9999, prevY = 9999;
+            for (int i = 0; i < steps; ++i)
+            {
+                const double ang = (double)i / steps * 2.0 * std::numbers::pi;
+                const int gx = std::min((int)std::floor(std::cos(ang) * r), r - 1);
+                const int gy = std::min((int)std::floor(std::sin(ang) * r * 0.5), (int)std::floor(r * 0.5) - 1);   // 납작비율(탑다운 지면 파동)
+                if ((gx == prevX && gy == prevY) || n >= MAX_PT) continue;   // 인접 중복 도트 제거(이중 블렌딩 방지)
+                prevX = gx; prevY = gy;
+                cols[n] = c;
+                pts[n] = { (int)std::lround(ax + gx * zoom), (int)std::lround(cyd + gy * zoom) };
+                ++n;
+            }
+        };
+        const int    r0   = (int)std::floor(rReal);
+        const double frac = rReal - r0;
+        ring(r0, (int)std::lround(aBase * (1.0 - frac)));
+        ring(r0 + 1, (int)std::lround(aBase * frac));
+        if (n > 0)
+        {
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            drawRectBatch(1, 1, cols, pts, n, (float)zoom);
+        }
     }
 }
 
@@ -1830,8 +1832,8 @@ static void drawMapPinEdge(const MapView& v, double sxd, double syd, SDL_Color c
     drawFillCircle(ex, ey, 3, hot, 255);    // 밝은 중심
 }
 
-//⑧ 맵 핀 — 색상별 마커. 현재 보는 z의 색마다 빛의 기둥으로 그림(크기는 v.curScale 비례, 가변).
-//  앵커(핀 타일점)가 화면 안이면 기둥, 밖이면 플레이어 마커처럼 가장자리 방향 표시(drawMapPinEdge).
+//⑧ 맵 핀 — 색상별 마커. 현재 보는 z의 색마다 핀 도트로 그림(배율은 배경 심볼과 동일, 줌 가변).
+//  앵커(핀 타일점)가 화면 안이면 도트, 밖이면 플레이어 마커처럼 가장자리 방향 표시(drawMapPinEdge).
 //  sX(tileToPixelX)/sY(tileToPixelY) 환산 — 핀 x가 청크 중심 타일이라 셀 한가운데에 앉는다.
 static void drawMapPins(const MapView& v)
 {
@@ -1844,7 +1846,7 @@ static void drawMapPins(const MapView& v)
         if (sxd < 0 || sxd > v.viewW || syd < 0 || syd > v.viewH)
             drawMapPinEdge(v, sxd, syd, col);   // 화면 밖 → 가장자리 방향 표시
         else
-            drawBeacon((int)std::lround(sxd), (int)std::lround(syd), col, v.curScale);
+            drawBeacon(v, i, (int)std::lround(sxd), (int)std::lround(syd), col);
     }
 }
 
@@ -1852,7 +1854,7 @@ static void drawMapPins(const MapView& v)
 //⑨ 야간 조명 오버레이 — 본체 월드 타일이 시간대별로 받는 곱셈(MUL) 틴트(밤=남색)를 월드맵에도
 //   똑같이 적용. 타일별 배치인 본체(renderTile::drawMulFogs)와 달리 맵은 화면 전체에 색이 균일하므로
 //   풀스크린 사각형 1장이면 동일 결과(같은 색·같은 MUL 블렌드). 틴트 색은 constVar:colors가 단일 출처.
-//   지형·심볼 위에 깔되 라벨·플레이어·핀·UI보다 아래라 정보/마커 가독성은 유지된다(빛기둥은 밤에 빛남).
+//   지형·심볼 위에 깔되 라벨·플레이어·핀·UI보다 아래라 정보/마커 가독성은 유지된다(핀 도트는 밤에도 밝음).
 static void drawNightOverlay(const MapView& v)
 {
     const SDL_Color c = mulCol::ambientMulColorAt(getHour() + getMin() / 60.0f);
@@ -2291,8 +2293,8 @@ public:
             drawWorldView(view);
             drawNightOverlay(view);      // ⑨ 야간 남색 틴트(위성 지형 위, 도시·마커·핀 아래)
             drawWorldCities(view);       // ⑤-b 도시 라벨 — 오버레이 뒤라 조명 영향 안 받음
-            drawMapPins(view);           // ⑧ 맵 핀(빛의 기둥) — 말풍선보다 먼저(뒤에)
-            drawWorldPlayerMarker(view); // ⑤-c 플레이어 말풍선 — 핀(빛의 기둥) 앞, 조명 영향 안 받음
+            drawMapPins(view);           // ⑧ 맵 핀(도트) — 말풍선보다 먼저(뒤에)
+            drawWorldPlayerMarker(view); // ⑤-c 플레이어 말풍선 — 핀(도트) 앞, 조명 영향 안 받음
         }
         else
         {
@@ -2328,8 +2330,8 @@ public:
 
             drawNightOverlay(view);   // ⑨ 야간 남색 틴트(지형·심볼 위, 라벨·마커·핀·UI 아래)
             drawCityLabels(view);   // ⑥ 도시 이름 라벨 (발견된 도시만)
-            drawMapPins(view);                     // ⑧ 맵 핀(빛의 기둥) — 플레이어 마커보다 먼저(뒤에)
-            drawPlayerMarker(view);                // ⑤ 플레이어 마커 — 핀(빛의 기둥) 앞에
+            drawMapPins(view);                     // ⑧ 맵 핀(도트) — 플레이어 마커보다 먼저(뒤에)
+            drawPlayerMarker(view);                // ⑤ 플레이어 마커 — 핀(도트) 앞에
             //⑦ 마커/툴팁 — 메뉴 열림 중엔 툴팁은 끄되(클러터), 그리드 마커는 메뉴가 가리키는 청크에 고정 유지.
             if (pinMenuOpen) drawChunkMarker(view, tilePixelIX(pinMenuTileX), tilePixelIY(pinMenuTileY));
             else             drawHoverInfo(view);

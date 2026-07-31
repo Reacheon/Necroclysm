@@ -266,6 +266,12 @@ export void textureLoader()
 	spr::mapset2by2 = new Sprite(renderer, "image/mapset/mapset2by2.png", 64, 64);
 	spr::mapset3by3 = new Sprite(renderer, "image/mapset/mapset3by3.png", 80, 80);
 	spr::auto47Mountain = new Sprite(renderer, "image/autotile47/auto47Mountain.png", 16, 16);
+	spr::levelUpEffect = new Sprite(renderer, "image/effect/levelUpEffect.png", 80, 80);
+	spr::mapPin[0] = new Sprite(renderer, "image/effect/mapPinRed.png", 80, 80);
+	spr::mapPin[1] = new Sprite(renderer, "image/effect/mapPinGreen.png", 80, 80);
+	spr::mapPin[2] = new Sprite(renderer, "image/effect/mapPinBlue.png", 80, 80);
+	spr::mapPin[3] = new Sprite(renderer, "image/effect/mapPinPurple.png", 80, 80);
+	spr::mapPin[4] = new Sprite(renderer, "image/effect/mapPinYellow.png", 80, 80);
 	spr::icon32 = new Sprite(renderer, "image/UI/icon32.png", 32, 32);
 	spr::ring24 = new Sprite(renderer, "image/UI/ring24.png", 24, 24);
 	spr::bloodM = new Sprite(renderer, "image/effect/bloodM1.png", 48, 48);
