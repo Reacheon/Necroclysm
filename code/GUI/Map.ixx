@@ -1727,14 +1727,14 @@ static void drawPlayerMarker(const MapView& v)
 
 // ────────── ⑧ 맵 핀 (플레이어 웨이포인트 = 핀 도트) ──────────
 //  색상별 도트 스프라이트(spr::mapPin, 80px=5x5청크·16px=1청크)를 배경 심볼과 같은 해상도로 그린다.
-//  애니는 차분하게(밝기 호흡 + 발밑 도트 펄스). 메뉴 색칩은 단색 위치핀 기호(원+삼각).
+//  애니는 차분하게(밝기 호흡 + 발밑 도트 펄스). 메뉴 색 버튼 아이콘은 icon16 #120~123.
 
 static SDL_Color mpTint(SDL_Color c, double f)
 {
     return SDL_Color{ (Uint8)(c.r + (255 - c.r) * f), (Uint8)(c.g + (255 - c.g) * f), (Uint8)(c.b + (255 - c.b) * f), 255 };
 }
 
-//단색 삼각형 채움(SDL_RenderGeometry) — 위치핀 기호의 끝(아래 삼각)용.
+//단색 삼각형 채움(SDL_RenderGeometry) — 화면 밖 핀 가장자리 표시(drawMapPinEdge)의 방향 화살표용.
 static void fillTri(float x0, float y0, float x1, float y1, float x2, float y2, SDL_Color c)
 {
     const SDL_FColor fc = { c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, 1.0f };

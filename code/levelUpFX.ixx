@@ -13,7 +13,8 @@ import Player;
 
 // 레벨업 연출 — 섬광 기둥 스프라이트(spr::levelUpEffect) + 발밑 충격파 + 접지 빛 웅덩이.
 //
-// 기둥은 도트 스프라이트 애니(80px 9프레임, 60ms/프레임): 4프레임에서 최대가 된 뒤 잦아듦.
+// 기둥은 도트 스프라이트 애니(80px 9프레임, 균등 80ms — FX_FRAME_DUR 표로 프레임별 조정 가능):
+// 4프레임에서 최대가 된 뒤 잦아듦.
 // 중심(40,40)을 캐릭터 앵커(origin)에 정렬. 캐릭터 플래시·빛 웅덩이는 같은 엔벨로프로 감쇠.
 //
 // 좌표 규약: 모든 픽셀은 게임픽셀 단위(1 이펙트 픽셀 = zoomScale 스크린픽셀)로
@@ -24,9 +25,9 @@ import Player;
 
 static Uint64 fxStartTick = 0; // 0 = 비활성
 
-constexpr int FX_FRAME_MS = 60;       // 픽셀아트 애니 1프레임 길이
 constexpr int FX_SPRITE_FRAMES = 9;   // levelUpEffect.png 프레임 수 (절정 = 4번째)
-constexpr int FX_TOTAL_FRAMES = 16;   // 총 수명 약 1초 — 충격파(0.85초)가 끝까지 퍼지도록 스프라이트보다 길게
+constexpr int FX_FRAME_DUR[FX_SPRITE_FRAMES] = { 80, 80, 80, 80, 80, 80, 80, 80, 80 }; // 프레임별 길이(ms) — 표라서 개별 조정 가능
+constexpr int FX_TOTAL_MS = 900;      // 총 수명 — 충격파(0.85초)가 끝까지 퍼지도록 스프라이트(720ms)보다 길게
 constexpr float FX_TAU = 6.2831853f;
 
 export namespace levelUpFX
@@ -39,9 +40,12 @@ export namespace levelUpFX
 	{
 		if (fxStartTick == 0 || PlayerPtr == nullptr) return;
 		Uint64 t = SDL_GetTicks() - fxStartTick;
-		int frame = (int)(t / FX_FRAME_MS);
-		if (frame >= FX_TOTAL_FRAMES) { fxStartTick = 0; return; }
+		if (t >= FX_TOTAL_MS) { fxStartTick = 0; return; }
 		float tSec = t / 1000.0f;
+
+		// 프레임 룩업 — 경과시간이 속한 프레임 인덱스. 표 끝을 지나면 FX_SPRITE_FRAMES(기둥 종료, 충격파 여운 구간).
+		int frame = 0;
+		for (Uint64 acc = 0; frame < FX_SPRITE_FRAMES && t >= acc + FX_FRAME_DUR[frame]; ++frame) acc += FX_FRAME_DUR[frame];
 
 		int z = std::max(1, (int)zoomScale); // 줌 1~5 정수 스냅 전제 — 게임픽셀 1개 = z 스크린픽셀
 
