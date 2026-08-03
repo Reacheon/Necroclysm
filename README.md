@@ -1,5 +1,3 @@
-# Necroclysm
-
 ![Necroclysm](titleLogo_5x.png)
 
 Necroclysm is an open-source roguelike inspired by *Dungeon Crawl: Stone Soup* and *Cataclysm: Dark Days Ahead*.
