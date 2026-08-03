@@ -87,6 +87,7 @@ export void debugConsole()
 	prt(L"42. 타이틀 화면으로\n");
 	prt(L"43. 캐릭터 선택 화면\n");
 	prt(L"44. 해상도 변경\n");
+	prt(L"45. 모든 UI 숨기기 토글\n");
 
 	prt(L"99. 콘솔 클리어\n");
 	prt(L"////////////////////////////////////////\n");
@@ -1005,6 +1006,13 @@ export void debugConsole()
 		// 현재 x/y를 그대로 되넘기는 건 GUI 베이스 애니메이션과 동일한 재배치 패턴 —
 		// HUD는 y가 상대값이라 팝업 상태도 유지된다. (HUD 직접 import는 순환이라 불가)
 		for (GUI* g : GUI::activeGUIList) g->changeXY(g->x, g->y, false);
+		break;
+	}
+	case 45://모든 UI 숨기기 토글 - renderUI(HUD 포함 전체 GUI)/renderLog 스킵. 스크린샷용
+	{
+		debug::hideAllUI = !debug::hideAllUI;
+		if (debug::hideAllUI) prt(L"[디버그] 모든 UI를 숨겼다. (다시 45번 입력 시 복원)\n");
+		else prt(L"[디버그] 모든 UI를 다시 표시한다.\n");
 		break;
 	}
 	case 99://콘솔 출력 초기화

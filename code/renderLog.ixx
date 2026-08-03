@@ -27,6 +27,8 @@ export std::int64_t renderLog(SDL_Renderer* renderer)
 {
 	std::int64_t timeStampStart = getNanoTimer();
 
+	if (debug::hideAllUI) return (getNanoTimer() - timeStampStart);
+
 	const auto& magazine = getLogMagazine();
 
 	setFont(fontType::mainFont);

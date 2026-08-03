@@ -52,6 +52,7 @@ export namespace option
 export namespace debug
 {
     bool chunkLineDraw = false;
+    bool hideAllUI = false; //활성화할 경우 renderUI/renderLog를 통째로 스킵 - 스크린샷용 클린 화면
     bool noCraftMaterialNeed = true; //활성화할 경우 CRAFT에서 재료없이 조합 가능
     bool printCircuitLog = true; //활성화할 경우 회로 관련 로그들을 출력함
 };
