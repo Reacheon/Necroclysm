@@ -1,5 +1,6 @@
 module;
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 
 export module displayLoader;
 export import globalVar;
@@ -122,6 +123,13 @@ export void displayLoader()
         dispOption::fullScreen ? SDL_WINDOW_FULLSCREEN : 0,
         &window, &renderer))
         errorBox(L"창·렌더러 생성 실패");
+
+    // 타이틀바/작업표시줄 아이콘
+    if (SDL_Surface* icon = IMG_Load("image/windowIcon.png"))
+    {
+        SDL_SetWindowIcon(window, icon);
+        SDL_DestroySurface(icon);
+    }
 
     setPrimitiveRenderer(renderer);
 

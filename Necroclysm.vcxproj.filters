@@ -1066,4 +1066,12 @@
   <ItemGroup>
     <None Include="vsDebug.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Necroclysm.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+    <Image Include="windowIcon.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

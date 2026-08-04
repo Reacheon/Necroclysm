@@ -1,0 +1,3 @@
+#pragma code_page(65001)
+// exe 임베드 아이콘 - 탐색기/작업표시줄/핀 아이콘은 여기서, 런타임 창 아이콘은 SDL_SetWindowIcon
+IDI_ICON1 ICON "windowIcon.ico"

@@ -476,6 +476,12 @@
   <ItemGroup>
     <None Include="vsDebug.natvis" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Necroclysm.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="windowIcon.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
