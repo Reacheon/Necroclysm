@@ -17,9 +17,6 @@ import connectGroupExtraIndex;
 import autotile47Index;
 import checkCursor;
 import Player;
-import Entity;
-import World;
-import TileData;
 import worldGrid;
 import worldGen;
 import worldWrap;
@@ -83,7 +80,6 @@ namespace mapcfg
 namespace mappal
 {
     inline SDL_Color background()   { return {  10,  10,  14, 255 }; }
-    inline SDL_Color playerMarker() { return { 220,  80,  80, 255 }; }
     inline SDL_Color uiPanel()      { return {  20,  20,  28, 220 }; }
     inline SDL_Color uiBorder()     { return { 110, 110, 115, 255 }; }
     inline SDL_Color uiText()       { return { 235, 235, 230, 255 }; }
@@ -711,16 +707,14 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
             (float)v.sX((double)(ix + 1)), (float)v.sY((double)(iy + 1)), sprIdx, a, br });
     };
 
-    //파도 — 본체 renderTile addWave 매핑(1504~1526). isW: 그 방향 이웃이 물인가.
-    //  자기 자신이 그 물타입이 아닐 때만(경계 셀) 그림. baseOff: 해수=애니프레임, 담수=496.
+    //파도 — 본체 renderTile addWave 매핑(1504~1526). 해수 경계 셀 전용(담수 파도 미사용 사유는 위 주석).
     //  맵에서는 파도가 움직이면 정신사나워서 2번째 프레임(인덱스1, 오프셋32)으로 고정.
-    const int seaAnim = 32;
-    auto emitFoam = [&](int ix, int iy, auto&& isW, int baseOff, Uint8 alpha, Uint8 br) {
-        const bool tC = isW(ix, iy - 1), bC = isW(ix, iy + 1), lC = isW(ix - 1, iy), rC = isW(ix + 1, iy);
-        const bool trC = isW(ix + 1, iy - 1), tlC = isW(ix - 1, iy - 1),
-                   blC = isW(ix - 1, iy + 1), brC = isW(ix + 1, iy + 1);
+    auto emitFoam = [&](int ix, int iy, Uint8 br) {
+        const bool tC = isSea(ix, iy - 1), bC = isSea(ix, iy + 1), lC = isSea(ix - 1, iy), rC = isSea(ix + 1, iy);
+        const bool trC = isSea(ix + 1, iy - 1), tlC = isSea(ix - 1, iy - 1),
+                   blC = isSea(ix - 1, iy + 1), brC = isSea(ix + 1, iy + 1);
         if (!(tC || bC || lC || rC || trC || tlC || blC || brC)) return;
-        auto push = [&](int idx) { pushQuad(ix, iy, idx + baseOff, alpha, br); };
+        auto push = [&](int idx) { pushQuad(ix, iy, idx + 32, 200, br); };
         if      (tC && bC && lC && rC) push(1526);
         else if (tC && bC && rC)       push(1520);
         else if (lC && bC && rC)       push(1523);
@@ -753,7 +747,7 @@ static void drawTerrainLayer(const MapView& v, bool drawFoam, std::vector<SymDra
 
             //파도 — 해수 경계만. 자기 자신이 바다가 아닌 셀에만(본체와 동일).
             if (drawFoam && !isSea(ix, iy))
-                emitFoam(ix, iy, isSea, seaAnim, 200, br);
+                emitFoam(ix, iy, br);
 
             //② 산 심볼 (47-piece 블롭 오토타일) — auto47Mountain.png. 8 이웃 기반이라
             //  기존 16타일(mapset #64~79, 3청크 중앙정렬)보다 코너·변 디테일이 풍부.
@@ -1914,10 +1908,18 @@ static void drawZoomPanel(const MapView& v, const ZoomButtons& zb)
     //① 줌 라벨(또는 Satellite).
     setFont(fontType::mainFont);
     setFontSize(16);
-    std::wstring label = v.worldLOD()
-        ? std::wstring(L"Satellite")
-        : L"Zoom  " + std::to_wstring((int)std::lround(v.curScale)) + L" px/chunk";
-    drawText(label, panelX + 14, panelY + 8, mappal::uiText());
+
+
+    if (v.worldLOD())
+    {
+        drawSprite(spr::icon16, 124, panelX + 14 , panelY + 10);
+        drawText(L"Satellite", panelX + 14 + 20, panelY + 8, mappal::uiText());
+    }
+    else
+    {
+        drawSprite(spr::icon16, 125, panelX + 14, panelY + 10);
+        drawText(L"Zoom  " + std::to_wstring((int)std::lround(v.curScale)) + L" px/chunk", panelX + 14 + 20, panelY + 8, mappal::uiText());
+    }
 
     //② 좌표 한 줄 — 라벨 아래, 버튼 위. 라벨=주황(Status #e1772e), 값=밝은 흰색.
     {
@@ -2128,8 +2130,6 @@ public:
     }
 
     ~Map() { persistedZoom = view.zoomLevel; ptr = nullptr; }
-
-    static Map* ins() { return ptr; }
 
     void changeXY(int /*ix*/, int /*iy*/, bool /*center*/) override { x = 0; y = 0; }
 
