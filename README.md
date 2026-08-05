@@ -9,3 +9,4 @@ Your goal is to wander a post-apocalyptic world and collect at least three of th
 - **Source code**: Licensed under the [MIT License](LICENSE.txt).
 - **Fonts**: Each font retains its original license. See `font/gulim/OFL.txt` and `font/pretendard/LICENSE.txt`.
 - **Art and music**: © 2026 Doyoung Hong (Ignyter). All Rights Reserved.
+- No Vibe Coding. No AI Assets.
