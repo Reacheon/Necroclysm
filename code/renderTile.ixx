@@ -168,8 +168,6 @@ void analyseRender()
             if (tgtX < renderRegion.x || tgtX >= renderRegion.x + renderRegion.w) continue;
             if (tgtY < renderRegion.y || tgtY >= renderRegion.y + renderRegion.h) continue;
 
-            if (lotEditorActive) thisTile->fov = fovFlag::white; //LotEditor: 카메라에 잡힌 전 영역을 밝혀 편집 가능하게
-
             // 바닥과 벽
             if (thisTile->fov != fovFlag::black)
             {
@@ -333,7 +331,7 @@ void drawTiles()
 
     //가시 타일이 많아 배치 버퍼(MAX_BATCH)를 넘기 직전이면 중간 플러시 후 카운터 리셋.
     //  (기존: 무경계 tileCounter++ -> vertices[] 오버플로우로 인접 static(파도 set 등) 손상 크래시.
-    //   LotEditor 전체공개/저배율에서 가시 타일 급증해 노출됨. Map.ixx의 flush 패턴과 동일.)
+    //   저배율에서 가시 타일 급증해 노출됨.)
     auto flushIfFull = [&]()
     {
         if (tileCounter >= MAX_BATCH - 64)
@@ -1100,7 +1098,7 @@ void drawCorpses()
         if (pZ == adr->getZ()) // 플레이어의 z축과 시체의 z축이 같을 경우
         {
             setZoom(zoomScale);
-            drawSpriteCenter(adr->getSprite(), adr->getSprIndex(), (cameraW / 2) + zoomScale * worldWrap::signedDeltaRenderX(cameraX, adr->getX()), (cameraH / 2) + zoomScale * (adr->getY() - cameraY));
+            drawSpriteCenter(adr->getSprite(), adr->getSprIndex(), (cameraW / 2) + zoomScale * (adr->getX() - cameraX), (cameraH / 2) + zoomScale * (adr->getY() - cameraY));
             setZoom(1.0);
         }
     }
@@ -1149,7 +1147,7 @@ void drawItems()
                 (
                     spr::itemset,
                     pocketInfo[pocketInfo.size() - 1].getSprIndex(),
-                    (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
+                    (cameraW / 2) + zoomScale * ((address->getX() - cameraX) + address->getIntegerFakeX()),
                     (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY() + tableYOffset)
                 );
                 setZoom(1.0);
@@ -1216,7 +1214,6 @@ void drawEntities()
         if (entityCache.find(elem) == entityCache.end())
         {
             // Nervedrive 필터 월드패스: 플레이어는 틴트 이후 디폴트 타겟에 따로 그림.
-            if (lotEditorActive && elem == (Drawable*)PlayerPtr) { entityCache.insert(elem); continue; } //LotEditor: 플레이어 스프라이트 숨김
             if (nervedriveFilter::shouldSkipPlayerInWorld() && elem == (Drawable*)PlayerPtr) { entityCache.insert(elem); continue; }
             elem->drawSelf();
             entityCache.insert(elem);
@@ -1367,7 +1364,7 @@ void drawDamages()
     for (int i = 0; i < Damage::list.size(); i++)
     {
         Damage* address = Damage::list[i];
-        int drawingX = (cameraW / 2) + zoomScale * worldWrap::signedDeltaRenderX(cameraX, address->getX());
+        int drawingX = (cameraW / 2) + zoomScale * (address->getX() - cameraX);
         int drawingY = (cameraH / 2) + zoomScale * (address->getY() - cameraY);
 
         if(zoomScale == 3.0f || zoomScale == 2.0f) setZoom(2.0f);
@@ -1388,7 +1385,7 @@ void drawBullets()
         (
             address->sprite,
             address->sprIndex,
-            (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
+            (cameraW / 2) + zoomScale * ((address->getX() - cameraX) + address->getIntegerFakeX()),
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );
         setZoom(1.0);
@@ -1406,7 +1403,7 @@ void drawParticles()
         (
             address->sprite,
             address->sprIndex,
-            (cameraW / 2) + zoomScale * (worldWrap::signedDeltaRenderX(cameraX, address->getX()) + address->getIntegerFakeX()),
+            (cameraW / 2) + zoomScale * ((address->getX() - cameraX) + address->getIntegerFakeX()),
             (cameraH / 2) + zoomScale * (address->getY() - cameraY + address->getIntegerFakeY())
         );
         SDL_SetTextureAlphaMod(address->sprite->getTexture(), 255);
@@ -1525,7 +1522,7 @@ void drawMulFogs()
     int mulFogCounter = 0;
     for (const auto& fog : mulFogList)
     {
-        //LotEditor 전체공개 시 mulFogList=가시 전 타일 -> MAX_BATCH 초과 가능. 넘기 전 중간 플러시.
+        //가시 전 타일이 mulFogList에 들어오면 MAX_BATCH 초과 가능. 넘기 전 중간 플러시.
         if (mulFogCounter >= MAX_BATCH - 4)
         {
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);

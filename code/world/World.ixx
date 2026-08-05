@@ -15,7 +15,6 @@ import Monster;
 import ItemStack;
 import Entity;
 import ItemPocket;
-import VehiclePlan;
 
 export class World
 {
@@ -68,56 +67,23 @@ private:
 public:
 	TileData& getTile(int x, int y, int z)
 	{
-		// chunkX/Y는 raw input(음수·W 초과 가능)으로 floorDiv. localX 계산은
-		// raw chunkX 기준이어야 [0,16) 로컬 좌표가 제대로 나온다 — render-space
-		// 에서 들어온 tgtX=-50도 localX=14처럼 올바르게 매핑.
-		// chunkPtr 룩업 직전에만 wrapChunkX로 X축 시암 정규화.
 		int chunkX, chunkY;
 		changeToChunkCoord(x, y, chunkX, chunkY);
 		int localX = x - (chunkX * CHUNK_SIZE_X);
 		int localY = y - (chunkY * CHUNK_SIZE_Y);
-		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, z})->getChunkTile(localX, localY);
+		return chunkPtr.at({chunkX, chunkY, z})->getChunkTile(localX, localY);
 	}
 	TileData& getTile(Point3 inputCoor)
 	{
 		return getTile(inputCoor.x, inputCoor.y, inputCoor.z);
 	}
 
-	// 청크 1개 생성 + (Phase 2 진입 후) Sector 데이터 기반 per-tile 페인트.
-	// 정의는 World_createChunk.cpp.
+	// 청크 1개 생성 — z별 디폴트 채움. 정의는 World_createChunk.cpp.
 	void createChunk(int chunkX, int chunkY, int chunkZ);
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		// X축 wrap — 시암 너머 chunkX(예: -3, W+5)도 같은 키로 룩업.
-		chunkX = worldWrap::wrapChunkX(chunkX);
 		if (chunkPtr.find({ chunkX,chunkY,chunkZ }) != chunkPtr.end()) return true;
 		else return false;
-	}
-	// 주어진 z 의 모든 생성 청크 좌표를 콜백. 가시 그리드 스캔 대신
-	//   생성된 청크만 순회할 때 사용 (월드맵에서 줌아웃 시 비용 폭주 방지).
-	template<typename F>
-	void forEachChunkAtZ(int z, F&& fn) const
-	{
-		for (auto& kv : chunkPtr)
-			if (kv.first.z == z) fn(kv.first.x, kv.first.y);
-	}
-	// 모든 로드된 청크의 white fov 타일을 gray로 다운그레이드.
-	// LotEditor가 렌더 영역 전체를 white로 강제 공개하므로, 종료 시 호출해
-	// 정상 시야 상태(이전에 본 영역=gray)로 되돌린 뒤 updateVision으로 실제 가시영역만 다시 white로 만든다.
-	void downgradeWhiteFovToGray()
-	{
-		for (auto& kv : chunkPtr)
-		{
-			Chunk* chunk = kv.second.get();
-			for (int y = 0; y < CHUNK_SIZE_Y; y++)
-			{
-				for (int x = 0; x < CHUNK_SIZE_X; x++)
-				{
-					TileData& t = chunk->getChunkTile(x, y);
-					if (t.fov == fovFlag::white) t.fov = fovFlag::gray;
-				}
-			}
-		}
 	}
 	void changeToChunkCoord(int x, int y, int& chunkX, int& chunkY)
 	{
@@ -144,7 +110,7 @@ public:
 	}
 	void activate(int x, int y, int z)
 	{
-		activeChunk.push_back(chunkPtr.at({worldWrap::wrapChunkX(x), y, z}).get());
+		activeChunk.push_back(chunkPtr.at({x, y, z}).get());
 	}
 	void deactivate()
 	{
@@ -216,38 +182,34 @@ public:
 		return totalStackSet;
 	}
 
-	// (Patch 시스템 제거됨 — 픽셀 데이터는 worldGrid mmap이 단일 진리원천.
-	//  타이틀/Phase 1 미진입에는 createChunk가 chunkFlag::seawater 디폴트로 채움.
-	//  Phase 1 이후엔 Sector 모듈이 mmap 경유로 per-tile 페인트 결정.)
-
 	chunkFlag getChunkFlag(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->getChunkFlag();
+		return chunkPtr.at({chunkX, chunkY, chunkZ})->getChunkFlag();
 	}
 	weatherFlag getChunkWeather(int chunkX, int chunkY, int chunkZ)
 	{
-		return chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->getWeather();
+		return chunkPtr.at({chunkX, chunkY, chunkZ})->getWeather();
 	}
 
 	void setChunkWeather(int chunkX, int chunkY, int chunkZ, weatherFlag input)
 	{
-		chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->setWeather(input);
+		chunkPtr.at({chunkX, chunkY, chunkZ})->setWeather(input);
 	}
 
 	void chunkOverwrite(int chunkX, int chunkY, int chunkZ, chunkFlag inputChunk)
 	{
-		chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ})->chunkLoad(inputChunk);
+		chunkPtr.at({chunkX, chunkY, chunkZ})->chunkLoad(inputChunk);
 	}
 
 	Chunk& getChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		return *chunkPtr.at({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ});
+		return *chunkPtr.at({chunkX, chunkY, chunkZ});
 	}
 
 	// 청크 누락 시 nullptr 반환. 핫 루프에서 .at() 예외 비용 없이 안전하게 룩업할 때 사용
 	Chunk* tryGetChunk(int chunkX, int chunkY, int chunkZ)
 	{
-		auto it = chunkPtr.find({worldWrap::wrapChunkX(chunkX), chunkY, chunkZ});
+		auto it = chunkPtr.find({chunkX, chunkY, chunkZ});
 		return (it != chunkPtr.end()) ? it->second.get() : nullptr;
 	}
 
@@ -288,55 +250,6 @@ public:
 		if (target != nullptr) destroyVehicle(target->vehicleId);
 	}
 
-	// 플레이어로부터 *radius* 청크 너머의 모든 청크를 제거. activeChunk도 클리어.
-	//   WorldGen 후 startArea 잔여 청크를 날리는 용도.
-	//   activeChunk는 클리어 후 다음 setGrid에서 재구성됨.
-	void wipeOrphanedChunks(int playerChunkX, int playerChunkY, int playerZ, int radius)
-	{
-		// X축은 시암 wrap을 고려한 부호 있는 최단거리.
-		const int normPlayerCX = worldWrap::wrapChunkX(playerChunkX);
-		auto it = chunkPtr.begin();
-		while (it != chunkPtr.end())
-		{
-			const Point3& c = it->first;
-			const int dxWrap = worldWrap::signedDeltaChunkX(normPlayerCX, c.x);
-			const bool farX  = std::abs(dxWrap)         > radius;
-			const bool farY  = std::abs(c.y - playerChunkY) > radius;
-			const bool diffZ = c.z != playerZ;
-			if (farX || farY || diffZ)
-				it = chunkPtr.erase(it);
-			else
-				++it;
-		}
-		activeChunk.clear();   // 남은 chunkPtr 기준으로 다음 setGrid가 재구성
-	}
-
-	// 맵 에디터 진입용: 전 월드(청크+차량) 제거 후 플레이어를 origin에 재배치.
-	//   호출 전 반드시 mapEditorActive=true (origin 청크가 dirt로 생성되도록).
-	//   playerCur = 현재 플레이어 좌표. 전제: 플레이어가 차량 미탑승(vehicleOwnerMap.clear가 탑승 차량 파괴).
-	void resetWorldForEditor(Point3 playerCur, Point3 origin)
-	{
-		// 플레이어 unique_ptr를 현재 타일에서 추출 — 청크 제거가 플레이어를 파괴하지 않도록.
-		std::unique_ptr<Entity> playerHold = std::move(getTile(playerCur).EntityPtr);
-
-		// 청크 제거는 반드시 erase 루프로 — chunkPtr.clear()는 노드를 맵에서 분리하지 않고 파괴해서,
-		//   소멸 중인 Prop/Monster/ItemStack 소멸자의 tryGetChunk가 반쯤 파괴된 청크를 찾아 크래시한다.
-		//   erase(it)는 노드를 분리한 뒤 파괴 → 소멸자의 tryGetChunk가 nullptr 반환 → 정리 생략(안전).
-		//   (wipeOrphanedChunks와 동일한 광역 청크 소멸 패턴.)
-		for (auto it = chunkPtr.begin(); it != chunkPtr.end(); )
-			it = chunkPtr.erase(it);
-		activeChunk.clear();
-		// 차량은 청크 전멸 후 제거 — Vehicle 소멸자의 tryGetChunk도 전부 nullptr → 안전하게 생략.
-		vehicleOwnerMap.clear();
-
-		// origin 청크를 빈 dirt로 생성(mapEditorActive 전제) 후 플레이어 재배치.
-		int ocx, ocy;
-		changeToChunkCoord(origin.x, origin.y, ocx, ocy);
-		createChunk(ocx, ocy, origin.z);
-		getTile(origin).EntityPtr = std::move(playerHold);
-		getTile(origin).EntityPtr->setGrid(origin.x, origin.y, origin.z); // 그리드/청크 멤버십 갱신
-		getTile(origin).EntityPtr->pullEquipLights();
-	}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,11 +286,6 @@ export void destroyItemStack(Point3 inputCoor);
 export void destroyProp(Point3 inputCoor);
 export void createProp(Point3 inputCoor, int inputItemCode);
 export void createFlame(Point3 inputCoor, flameFlag inputFlag);
-//차량 spawn 헬퍼 — Lot→createChunk 파이프라인의 마지막 단계에서 호출.
-//  anchor에 leadItem만 깐 빈 차량을 만든 뒤 plan.ops를 순서대로 replay한다
-//  (extendPart/addPart/addCargo). bodyDir은 plan에 기록된 facing 그대로 둔다.
-//  extendPart가 각 부품 타일의 TileVehicle도 함께 채우므로 별도 fixup 불필요.
-export void createVehicleFromPlan(Point3 anchor, const VehiclePlan& plan);
 
 export void DestroyWall(int x, int y, int z);
 

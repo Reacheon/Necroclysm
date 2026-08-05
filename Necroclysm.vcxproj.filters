@@ -73,14 +73,8 @@
     <Filter Include="소스 파일\00_var\Skill">
       <UniqueIdentifier>{5f5a64ad-856a-41c1-88c7-ce014c9be36c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\00_var\God">
-      <UniqueIdentifier>{a3b7c8d9-1e2f-4a5b-9c6d-7e8f0a1b2c3d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\HUD">
       <UniqueIdentifier>{22f9baed-4728-4fb7-8327-47dc9f1961ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\LotEditor">
-      <UniqueIdentifier>{7c3e1a90-2b4d-4f6a-9c11-5e8d0a7b2f33}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\01_system\04_GUI\CRAFT">
       <UniqueIdentifier>{9d79e804-c248-4c63-a091-579272003866}</UniqueIdentifier>
@@ -109,41 +103,11 @@
     <Filter Include="소스 파일\01_system\04_GUI\ITEM_GUI\EQUIP">
       <UniqueIdentifier>{935822c5-a1ac-4409-a3f3-ed0108979383}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\01_system\04_GUI\GOD">
-      <UniqueIdentifier>{b4c5d6e7-2f3a-4b5c-8d9e-0f1a2b3c4d5e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\00_var\Skill\BIONIC">
       <UniqueIdentifier>{c1d2e3f4-5a6b-47c8-9d0e-1f2a3b4c5d6e}</UniqueIdentifier>
     </Filter>
     <Filter Include="소스 파일\00_var\Skill\MUTATION">
       <UniqueIdentifier>{d2e3f4a5-6b7c-48d9-8e1f-2a3b4c5d6e7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\00_var\Skill\INVOCATION">
-      <UniqueIdentifier>{badb3356-b475-4df9-bd0e-c2c1384510dc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\00_var\Skill\INVOCATION\REHYLION">
-      <UniqueIdentifier>{19b97f97-56e4-4cc6-b1d8-69513ea57ae4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\ProcGen">
-      <UniqueIdentifier>{922acc36-88bb-4fb4-92b4-45cb8ee5d8c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\ProcGen\WorldGen">
-      <UniqueIdentifier>{518355f2-b5f8-4d54-8138-9f4ea72cc1f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\ProcGen\SectorGen">
-      <UniqueIdentifier>{7f7cab3f-413c-4302-af72-916e7b8752ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\ProcGen\WorldGrid">
-      <UniqueIdentifier>{a8c4e7f1-9d3b-4e62-8c1a-7f5b3d2e9a04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\City">
-      <UniqueIdentifier>{b3d8e2f5-7c1a-4f6e-9b04-1d8c3e5a7f02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\Lot">
-      <UniqueIdentifier>{f5ad29c9-fb75-400c-9ee1-3c5406373aea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\05_Class\03_World\Lot\kinds">
-      <UniqueIdentifier>{e1a0146e-35ff-4dac-aef2-70b003266cbb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -222,9 +186,6 @@
     <ClCompile Include="code\debugConsole.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
-    <ClCompile Include="code\mapEditorMode.ixx">
-      <Filter>소스 파일\05_Class\06_Static</Filter>
-    </ClCompile>
     <ClCompile Include="code\Teleport.ixx">
       <Filter>소스 파일\05_Class\06_Static</Filter>
     </ClCompile>
@@ -297,21 +258,6 @@
     <ClCompile Include="code\skill\SkillSample.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="code\god\GodBehavior.ixx">
-      <Filter>소스 파일\00_var\God</Filter>
-    </ClCompile>
-    <ClCompile Include="code\god\GodRegistry.ixx">
-      <Filter>소스 파일\00_var\God</Filter>
-    </ClCompile>
-    <ClCompile Include="code\god\GodRegistry.cpp">
-      <Filter>소스 파일\00_var\God</Filter>
-    </ClCompile>
-    <ClCompile Include="code\god\GodRehylion.ixx">
-      <Filter>소스 파일\00_var\God</Filter>
-    </ClCompile>
-    <ClCompile Include="code\god\GodService.ixx">
-      <Filter>소스 파일\00_var\God</Filter>
-    </ClCompile>
     <ClCompile Include="code\skill\SkillLeap.ixx">
       <Filter>소스 파일\00_var\Skill</Filter>
     </ClCompile>
@@ -334,12 +280,6 @@
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
     <ClCompile Include="code\Vehicle.cpp">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Vehicle\VehiclePlan.ixx">
-      <Filter>소스 파일\05_Class\07_Vehicle</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Vehicle\VehiclePrefab.ixx">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
     <ClCompile Include="code\Flame.ixx">
@@ -378,9 +318,6 @@
     <ClCompile Include="code\GUI\CharSelectScreen.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\Map.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
     <ClCompile Include="code\GUI\Quest.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
@@ -403,9 +340,6 @@
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\lineMaker.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\nameGen.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\nanoTimer.ixx">
@@ -432,12 +366,6 @@
     <ClCompile Include="code\util\sgn.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\spatialHash.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\dsu.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\util\stringToWstring.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -453,9 +381,6 @@
     <ClCompile Include="code\util\Vec3.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\worldWrap.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\util\wstring2Number.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -463,9 +388,6 @@
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\col2Str.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\autotile47Index.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\connectGroupExtraIndex.ixx">
@@ -543,30 +465,6 @@
     <ClCompile Include="code\GUI\HUD\HUD_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor.ixx">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_lifecycle.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_apply.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_input.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_export.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_palette.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\LotEditor\LotEditor_menu.cpp">
-      <Filter>소스 파일\01_system\04_GUI\LotEditor</Filter>
-    </ClCompile>
     <ClCompile Include="code\GUI\INVENTORY\Inventory_draw.cpp">
       <Filter>소스 파일\01_system\04_GUI\ITEM_GUI\INVENTORY</Filter>
     </ClCompile>
@@ -625,9 +523,6 @@
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\entity\Player.ixx">
-      <Filter>소스 파일\05_Class\01_Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="code\entity\playerLevel.ixx">
       <Filter>소스 파일\05_Class\01_Entity</Filter>
     </ClCompile>
     <ClCompile Include="code\entity\readEntityDex.ixx">
@@ -703,9 +598,6 @@
       <Filter>소스 파일\05_Class\05_Etc</Filter>
     </ClCompile>
     <ClCompile Include="code\util\ThreadPool.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
-    <ClCompile Include="code\util\ProcGenWorker.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\var\textureVar.ixx">
@@ -801,12 +693,6 @@
     <ClCompile Include="code\Vehicle_drawSelf.cpp">
       <Filter>소스 파일\05_Class\07_Vehicle</Filter>
     </ClCompile>
-    <ClCompile Include="code\GUI\GOD\GodPanel.ixx">
-      <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\GOD\GodPanel_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI\GOD</Filter>
-    </ClCompile>
     <ClCompile Include="code\skill\SkillNervedrive.ixx">
       <Filter>소스 파일\00_var\Skill\BIONIC</Filter>
     </ClCompile>
@@ -860,207 +746,6 @@
     </ClCompile>
     <ClCompile Include="code\skill\SkillEyeMask.ixx">
       <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillFocusHeal.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillHealOther.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillLivingWard.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillPurify.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillSelfHeal.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\skill\SkillSuperRegen.ixx">
-      <Filter>소스 파일\00_var\Skill\INVOCATION\REHYLION</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\WorldGenScreen.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen_buildRoadNetwork.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen_generateWorld.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen_placeCities.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen_placeSites.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGen.ixx">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldSession.ixx">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\mapDiscovery.ixx">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\MapPin.ixx">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGrid.ixx">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGrid_load.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
-    </ClCompile>
-    <ClCompile Include="code\worldGrid_mmap.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\WorldGrid</Filter>
-    </ClCompile>
-    <ClCompile Include="code\city.ixx">
-      <Filter>소스 파일\05_Class\03_World\City</Filter>
-    </ClCompile>
-    <ClCompile Include="code\CityPlan.ixx">
-      <Filter>소스 파일\05_Class\03_World\City</Filter>
-    </ClCompile>
-    <ClCompile Include="code\CityPlan_build.cpp">
-      <Filter>소스 파일\05_Class\03_World\City</Filter>
-    </ClCompile>
-    <ClCompile Include="code\world\Sector_procGenerate.cpp">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\world\Sector.ixx">
-      <Filter>소스 파일\05_Class\03_World\ProcGen\SectorGen</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\Lot.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\Lot-base.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\Lot-rotate.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\Lot-CityBuildings.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Sample.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-School.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Street.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Bridge.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-ConvenienceStore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Hypermarket.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-StationeryStore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-PoliceStation.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-House.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Cafe.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Temple.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Church.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Cathedral.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Skyscraper.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-JunkShop.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-FireStation.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Hotel.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Hospital.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Library.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-GasStation.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Cinema.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Warehouse.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-AnimalHospital.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-HardwareStore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Bookstore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Restaurant.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Pharmacy.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Park.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Bank.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-PatrolStation.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-BicycleShop.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-ShoppingArcade.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Apartment.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-PostOffice.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-AutoShop.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-ClothingStore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-JewelryStore.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-Laundromat.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-GardenShop.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
-    </ClCompile>
-    <ClCompile Include="code\Lot\kinds\Lot-ParkingLot.ixx">
-      <Filter>소스 파일\05_Class\03_World\Lot\kinds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

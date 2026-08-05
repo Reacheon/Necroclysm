@@ -22,13 +22,10 @@ import GameOver;
 import turnWait;
 import Wave;
 import Wake;
-import Sector;
-import worldSession;
-import mapDiscovery;
 import Sprite;
 import drawSprite;
 import Vehicle;
-import Map;
+import levelUpFX;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -149,18 +146,11 @@ void Player::updateMinimap()
 
 	if (ctrlVeh == nullptr)
 	{
-		//청크맵 모드(M키 토글) — Map 모듈의 심볼 파이프라인(renderChunkMinimap)이 texture::minimap을 직접 채움.
-		if (minimapChunkMode)
-		{
-			renderChunkMinimap();
-			return;
-		}
-
 		SDL_SetRenderTarget(renderer, texture::minimap);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
-		// Map.ixx의 타일 스프라이트 레이어와 동일한 방식 — floor + wall을 실제 spr::tileset으로 그림.
+		// floor + wall을 실제 spr::tileset으로 그림.
 		// 타일 1개 = MINIMAP_TILE_PX × MINIMAP_TILE_PX 픽셀 (예: 6×6). 16×16 스프라이트를 축소(NEAREST)해서 표시.
 		const int R = MINIMAP_DIAMETER / 2;
 		const int TPX = MINIMAP_TILE_PX;
@@ -327,9 +317,6 @@ void Player::updateVision(int range, int cx, int cy)
 
 	const int z = getGridZ();
 	World* world = World::ins();
-
-	//월드맵 전장의 구름 — 시야 갱신 위치(=플레이어 인지 시점) 주변 청크를 발견 처리.
-	mapDiscovery::markAroundTile(cx, cy);
 
 	// 청크 포인터 캐시: ray와 gray 루프 모두 공간적으로 인접한 타일에 연쇄 접근하므로
 	// 같은 청크 안에서는 unordered_map 룩업을 회피한다.
@@ -549,14 +536,7 @@ void Player::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
 	Coord::setGrid(inputGridX, inputGridY, inputGridZ);
 
-	// (Patch 시스템 제거됨 — 청크 페인트는 mmap 활성 시 Sector 경유, 그 외 chunkFlag 디폴트.)
 	updateNearbyChunk(CHUNK_LOADING_RANGE);
-
-	// 월드젠 완료 후에만 섹터 ensure — 시작 영역(startArea)에서는 worldSeed=0이라 의미 없음
-	if (worldGenResult.has_value())
-	{
-		loadNearbySectors(Point3{ getGridX(), getGridY(), getGridZ() }, worldSeed);
-	}
 }
 
 void Player::endMove()//aStar로 인해 이동이 끝났을 경우
@@ -937,4 +917,24 @@ void Player::changeWalkMode(walkFlag inputMode)
 	else if (inputMode == walkFlag::crawl) pStatus.push_back({ statusEffectFlag::crawl, -1 });
 
 	entityInfo.walkMode = inputMode;
+}
+//즉시 1레벨업 — 포인트 지급·연출·로그까지 한 번에 (F3/디버그에서도 직접 호출)
+void Player::levelUp()
+{
+	level++;
+	ap += 1;
+	skillPoint += 10;
+	levelUpFX::trigger();
+	updateLog(L"You reach Level " + std::to_wstring(level) + L". You feel new power flowing through you.");
+}
+
+void Player::addExp(int amount)
+{
+	if (amount <= 0) return;
+	exp += amount;
+	while (exp >= expToNext())
+	{
+		exp -= expToNext();
+		levelUp();
+	}
 }

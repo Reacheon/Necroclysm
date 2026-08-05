@@ -18,8 +18,6 @@ import Drawable;
 import Vehicle;
 import Prop;
 
-export godFlag playerGod = godFlag::none;
-export int godPiety = 0;
 export int loopCount = 1; // 메타 세이브: 현재 루프 번호 (죽을 때마다 +1)
 
 /////////////////////////////////////////////////////////////////
@@ -27,9 +25,7 @@ export namespace actSet
 {
     inline std::vector<act> null()
     {
-        std::vector<act> result = { act::status, act::equipment, act::skill, act::runMode, act::map, act::craft, act::wait, act::sleep, act::cooking };
-        if (playerGod != godFlag::none) result.insert(result.begin() + 7, act::god);
-        return result;
+        return { act::status, act::equipment, act::skill, act::runMode, act::craft, act::wait, act::sleep, act::cooking };
     }
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
@@ -58,7 +54,6 @@ export namespace debug
 };
 
 export std::vector<std::wstring> sysStr;
-export std::vector<std::wstring> cityName;   //사전배치 도시 표시명 — codename(enum 값) 인덱스. cityName.tsv에서 로드.
 
 export namespace timer
 {
@@ -69,7 +64,7 @@ export namespace timer
 /////////////////////////////////////////////////////////////////
 export SDL_Window* window;//게임의 메인 윈도우
 export SDL_Renderer* renderer;//게임의 메인 렌더러
-export SDL_Texture* frameTarget = nullptr;//논리 해상도 1:1 프레임 렌더타겟. 메인 출력은 여기로 그리고 endFrame에서 창 크기로 한 번에 스케일 (displayLoader가 생성/재생성)
+export SDL_Texture* frameTarget = nullptr;//논리 해상도 1:1 프레임 렌더타겟. 메인 출력은 여기로 그리고 메인 루프 끝에서 창 크기로 한 번에 스케일 (displayLoader가 생성/재생성)
 export SDL_Gamepad* controller; //메인컨트롤러
 // sol::state lua 는 lua/luaState.h 로 이동됨 (모듈 호환성 문제 회피)
 
@@ -229,7 +224,6 @@ export std::array<std::pair<quickSlotFlag, std::wstring>, 8> quickSlot = { std::
 
 export SDL_Rect quickSlotRegion;
 export SDL_Rect minimapRegion;
-export bool minimapChunkMode = false; //미니맵 모드 — false=타일맵, true=청크맵(1청크=1심볼). M키로 토글
 
 export int prevMouseX4Motion, prevMouseY4Motion = 0; //마우스모션에 대해 원래 마우스 클릭좌표, 기존 클릭좌표랑은 조금 다르니 유의할 것, 카메라 이동에 사용됨
 
@@ -245,9 +239,6 @@ export int delayR2 = 0;
 export Point2 contextMenuTargetGrid = { 0,0 }; //컨텍스트메뉴가 열렸을때 커서위치(컨메뉴가 존재하는지 확인하고 쓸 것)
 
 export bool drawHUD = true;
-export bool lotEditorActive = false; //LotEditor 활성 중 - renderTile이 시야 전체공개+플레이어 숨김에 사용
-export bool mapEditorActive = false; //맵 에디터 빈 월드 - createChunk가 procgen 우회, z=0 dirt/z<0 지하/z>0 공허
-export void* lotEditorHoverVeh = nullptr; //LotEditor 커서가 올라간 차량(천장 반투명용). Vehicle*를 void*로 보관(순환 import 회피)
 
 export std::wstring currentUsingSkill = L""; //현재 사용 중인 스킬 ID. 비어있으면 미사용.
 

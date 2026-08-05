@@ -18,7 +18,6 @@ import SkillRegistry;
 import useSkill;
 import World;
 import Entity;
-import playerLevel;
 
 //스킬 실패율에 따른 확률 텍스트 색상 변경
 static SDL_Color getFailColor(int failRate)
@@ -176,7 +175,7 @@ void Skill::drawGUI()
 
 
 		setFontSize(14);
-		drawText(L"Available Skill Point : "+col2Str(lowCol::green)+std::to_wstring(playerLevel::skillPoint), skillBase.x + skillBase.w - 162, skillBase.y + 43);
+		drawText(L"Available Skill Point : "+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->skillPoint), skillBase.x + skillBase.w - 162, skillBase.y + 43);
 
 
 		// 탭 라벨: 전체/무기술/생존/행동/바이오닉/돌연변이/신성력 (skillCategory 순서)

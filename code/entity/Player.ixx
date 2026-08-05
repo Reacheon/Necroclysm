@@ -31,6 +31,15 @@ public:
 	Uint8 lLegFakeHPAlpha = 255;
 	Uint8 rLegFakeHPAlpha = 255;
 
+	int level = 1;
+	int exp = 0;        //현재 레벨에서 누적한 경험치
+	int ap = 0;         //미분배 어빌리티 포인트 (레벨당 +1)
+	int skillPoint = 0; //미사용 스킬 포인트 (레벨당 +10)
+
+	int expToNext() { return level * 100; }
+	void levelUp();  //즉시 1레벨업 — 포인트 지급·연출·로그까지 한 번에 (F3/디버그에서도 직접 호출)
+	void addExp(int amount);
+
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.
 	~Player();
 	virtual void startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType) override;

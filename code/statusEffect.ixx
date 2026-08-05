@@ -21,10 +21,7 @@ export enum statusEffectFlag
     crouch = 8,
     crawl = 9,
 
-    superRegen = 10,
-    immuneStatus = 11,
-
-    STATUS_EFFECT_COUNT = 12,
+    STATUS_EFFECT_COUNT = 10,
 };
 
 export class statusEffect
@@ -54,8 +51,6 @@ export inline const StatusEffectMeta statusEffectMeta[] = {
     /* run          */ { 60, L"Run",           col::white },
     /* crouch       */ { 62, L"Crouch",        col::white },
     /* crawl        */ { 61, L"Crawl",         col::white },
-    /* superRegen   */ { 0,  L"Super Regen",   col::white },
-    /* immuneStatus */ { 0,  L"Immune",        col::white },
 };
 
 export inline bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)

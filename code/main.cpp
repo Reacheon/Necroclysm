@@ -25,11 +25,6 @@ import turnCycleLoop;
 import startArea;
 import initCoordTransform;
 import nervedriveFilter;
-import WorldGenScreen;
-import worldSession;
-import worldGrid;
-import ProcGenWorker;
-import Teleport;
 #define SDL_GESTURE_IMPLEMENTATION 1
 #include "SDL_gesture.h"
 
@@ -57,22 +52,9 @@ int main(int argc, char** argv)
 	dataLoader();
 	initNanoTimer();
 	initCoordTransform();
-	startArea();//스타트 세팅(월드 생성은 디버그 콘솔에서 수동 트리거 — startWorldGen)
+	startArea();//스타트 세팅
 
-	// 월드 생성(Phase 1~4) 완료 후 자동 후처리: 타이틀 청크 wipe + SPAWN으로 텔레포트.
-	//   worldSession 자체는 World/Teleport import 안 함 (cycle 회피) → 콜백 주입.
-	onWorldGenComplete = []()
-	{
-		// 1) 텔레포트 — Phase 4가 SPAWN_DEFAULT 주변 9 섹터를 사전 ensure했으므로 즉각 진입.
-		teleportPlayer(SPAWN_DEFAULT);
-
-		// 2) 텔레포트 후 플레이어 청크 위치 기준으로 startArea 잔여 청크 wipe.
-		int playerChunkX, playerChunkY;
-		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), playerChunkX, playerChunkY);
-		World::ins()->wipeOrphanedChunks(playerChunkX, playerChunkY, PlayerZ(), CHUNK_LOADING_RANGE);
-	};
-
-	if (Gesture_Init() == 0) 
+	if (Gesture_Init() == 0)
 	{
 		gestureInitialized = true;
 		prt(L"SDL_gesture 초기화 성공\n");
@@ -98,7 +80,7 @@ int main(int argc, char** argv)
 	{
 		std::int64_t loopStart = getNanoTimer();
 
-		beginFrame();//이번 프레임의 모든 그리기를 논리 해상도 렌더타겟으로
+		if (frameTarget != nullptr) SDL_SetRenderTarget(renderer, frameTarget);//이번 프레임의 모든 그리기를 논리 해상도 렌더타겟으로
 
 		//■Timer 변수
 		if (timer::cursorHightlight < 23) { timer::cursorHightlight++; }
@@ -106,46 +88,30 @@ int main(int argc, char** argv)
 		if (timer::timer600 != 599) { timer::timer600++; }
 		else { timer::timer600 = 0; }
 
-		if (worldGenInProgress)
-		{
-			//월드 생성 중 — Player 의존 코드 전부 스킵. SDL 이벤트만 최소한으로 폴링하고
-			//창 닫기(QUIT)에만 반응. WorldGenScreen은 입력 비활성이라 다른 입력 이벤트는 버려도 됨.
-			while (SDL_PollEvent(&event))
-			{
-				if (event.type == SDL_EVENT_QUIT) quit = true;
-			}
-			if (auto* wgs = WorldGenScreen::ins()) wgs->step();
-			drawFillRect(SDL_Rect{ 0, 0, cameraW, cameraH }, SDL_Color{ 10, 10, 14, 255 });
-			dur::renderUI = renderUI();
-			dur::renderLog = renderLog(renderer);
-		}
-		else
-		{
-			dur::turnCycle = turnCycleLoop();
-			dur::stepEvent = stepEvent();
-			//▲이동 관련 코드는 전부 이 위에 적혀야 함. 아니면 화면이 흔들림▲
+		dur::turnCycle = turnCycleLoop();
+		dur::stepEvent = stepEvent();
+		//▲이동 관련 코드는 전부 이 위에 적혀야 함. 아니면 화면이 흔들림▲
 
-			if (cameraFix == true)
-			{
-				cameraX = (PlayerPtr)->getX();
-				cameraY = (PlayerPtr)->getY();
-			}
-
-			//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
-			// nervedriveOn이면 월드 렌더를 오프스크린 RT로 우회 → 초록 틴트 후 블릿 → 플레이어 덧그림.
-			// 비활성일 때는 아무 효과 없이 평소처럼 진행됨.
-			const bool nervedriveFilterActive = nervedriveFilter::beginWorldPass();
-			dur::renderTile = renderTile();
-			dur::renderWeather = renderWeather();
-			dur::renderSticker = renderSticker(cameraX, cameraY);
-			if (nervedriveFilterActive)
-			{
-				nervedriveFilter::endWorldPassAndBlit();
-				PlayerPtr->drawSelf();
-			}
-			dur::renderUI = renderUI();
-			dur::renderLog = renderLog(renderer);
+		if (cameraFix == true)
+		{
+			cameraX = (PlayerPtr)->getX();
+			cameraY = (PlayerPtr)->getY();
 		}
+
+		//▼화면 렌더링 관련 코드는 이  아래에 적혀야 함▼
+		// nervedriveOn이면 월드 렌더를 오프스크린 RT로 우회 → 초록 틴트 후 블릿 → 플레이어 덧그림.
+		// 비활성일 때는 아무 효과 없이 평소처럼 진행됨.
+		const bool nervedriveFilterActive = nervedriveFilter::beginWorldPass();
+		dur::renderTile = renderTile();
+		dur::renderWeather = renderWeather();
+		dur::renderSticker = renderSticker(cameraX, cameraY);
+		if (nervedriveFilterActive)
+		{
+			nervedriveFilter::endWorldPassAndBlit();
+			PlayerPtr->drawSelf();
+		}
+		dur::renderUI = renderUI();
+		dur::renderLog = renderLog(renderer);
 		dur::totalDelay = getNanoTimer() - loopStart;
 		const int constDelay = 16000000;
 		std::int64_t delayTime = constDelay - dur::totalDelay;
@@ -164,10 +130,16 @@ int main(int argc, char** argv)
 		}
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms
 		//renderFPS(getNanoTimer() - loopStart);
-		endFrame();//렌더타겟을 창 크기로 단일 블릿
+		//렌더타겟을 창 크기로 단일 블릿
+		if (frameTarget != nullptr)
+		{
+			SDL_SetRenderTarget(renderer, nullptr);
+			const SDL_FRect dst = { 0.0f, 0.0f, (float)cameraW, (float)cameraH };
+			SDL_RenderTexture(renderer, frameTarget, nullptr, &dst);
+		}
 		SDL_RenderPresent(renderer);
 
-		if (hasInitMinimap == false && !worldGenInProgress && PlayerPtr != nullptr)
+		if (hasInitMinimap == false && PlayerPtr != nullptr)
 		{
 			PlayerPtr->updateMinimap();
 			hasInitMinimap = true;
@@ -181,8 +153,6 @@ int main(int argc, char** argv)
 		Gesture_Quit();
 		gestureInitialized = false;
 	}
-	ProcGenWorker::ins().shutdown();
-	worldGrid::shutdownWorldPixelMmap();
 	TTF_Quit();
 	SDL_Quit();
 	//_CrtDumpMemoryLeaks();

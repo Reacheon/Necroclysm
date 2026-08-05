@@ -34,7 +34,7 @@ ItemStack::ItemStack(Point3 inputCoor, std::vector<std::pair<int, int>> inputIte
 
 ItemStack::~ItemStack()
 {
-	// 광역 청크 소멸(wipeOrphanedChunks, 게임 종료) 도중에는 자신을 담은 청크가 이미
+	// 광역 청크 소멸(게임 종료) 도중에는 자신을 담은 청크가 이미
 	// unordered_map에서 분리된 채로 ~Chunk가 호출됨 → getChunk()의 .at()이 throw.
 	// tryGetChunk로 안전 조회 — 청크가 사라진 상태면 컨테이너 자체가 비워지니 eraseStack 불필요.
 	Point2 cc = World::ins()->changeToChunkCoord(getGridX(), getGridY());

@@ -18,11 +18,8 @@ import SkillData;
 import SkillBehavior;
 import SkillRegistry;
 import statusEffect;
-import GodRegistry;
-import GodBehavior;
 import Sprite;
 import Entity;
-import playerLevel;
 
 void Status::drawGUI()
 	{
@@ -78,7 +75,7 @@ void Status::drawGUI()
 
 			setFontSize(16);
 			setFont(fontType::mainFontBold);
-			//좌측 열: Age, Race, God
+			//좌측 열: Age, Race
 			Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
 			drawText(L"#e1772eAge", agePivot.x + 5, agePivot.y + 1);
 			SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
@@ -93,21 +90,6 @@ void Status::drawGUI()
 			drawStadium(raceRect, stadiumCol(raceRect), 255, 4);
 			setFont(fontType::mainFontMedium);
 			drawTextCenter(L"Human", raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
-
-			Point2 godPivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 2 };
-			setFont(fontType::mainFontBold);
-			drawText(L"#e1772eGod", godPivot.x + 5, godPivot.y + 1);
-			SDL_Rect godRect = { godPivot.x + 55, godPivot.y, 120, 23 };
-			drawStadium(godRect, stadiumCol(godRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			std::wstring godName = L"-";
-			if (playerGod != godFlag::none)
-			{
-				GodBehavior* godBhv = GodRegistry::get(playerGod);
-				if (godBhv) godName = godBhv->name;
-			}
-			drawTextCenter(godName, godRect.x + godRect.w / 2, godRect.y + godRect.h / 2);
-
 
 			//우측 열: Hunger, Thirsty, Fatigue (퍼센트 실시간 표시)
 			auto makePercentStr = [](double percent) -> std::wstring {
@@ -276,7 +258,7 @@ void Status::drawGUI()
 				setFontSize(24);
 				setFont(fontType::mainFontBold);
 
-				if (playerLevel::ap == 0)
+				if (PlayerPtr->ap == 0)
 				{
 					drawTextCenter(std::to_wstring(statValues[i]), statBtn.x + statBtn.w / 2, statBtn.y + statBtn.h / 2 + 8);
 				}
@@ -298,8 +280,8 @@ void Status::drawGUI()
 			drawRect(gaugeRect, { 0x5b,0x5b,0x5b });
 			drawRect(SDL_Rect{ gaugeRect.x - 1,gaugeRect.y,gaugeRect.w + 2,gaugeRect.h }, {0x5b,0x5b,0x5b});
 
-			int curExp = playerLevel::exp;
-			int needExp = playerLevel::expToNext();
+			int curExp = PlayerPtr->exp;
+			int needExp = PlayerPtr->expToNext();
 			double expRatio = (needExp > 0) ? static_cast<double>(curExp) / needExp : 0.0;
 			int gaugeW = static_cast<int>(176 * expRatio);
 
@@ -317,11 +299,11 @@ void Status::drawGUI()
 
 			setFontSize(18);
 			setFont(fontType::mainFontMedium);
-			drawText(L"Level " + std::to_wstring(playerLevel::level), gaugeRect.x - 80, gaugeRect.y + 1);
+			drawText(L"Level " + std::to_wstring(PlayerPtr->level), gaugeRect.x - 80, gaugeRect.y + 1);
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			drawText(L"AP : "+col2Str(lowCol::green)+std::to_wstring(playerLevel::ap), gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
+			drawText(L"AP : "+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->ap), gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
 
 
 			std::wstring expStr = std::to_wstring(curExp) + L" / " + std::to_wstring(needExp);

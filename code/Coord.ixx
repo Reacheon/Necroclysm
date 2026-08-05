@@ -47,16 +47,14 @@ public:
 
 	void setXY(int inputX, int inputY)
 	{
-		// X축 시암 wrap — 동/서로 무한정 이동해도 저장 좌표는 [0, RENDER_X_SPAN) 유지.
-		x = worldWrap::wrapRenderX(inputX);
+		x = inputX;
 		y = inputY;
 		gridX = (x - 8) / 16;
 		gridY = (y - 8) / 16;
 	}
 	virtual void setGrid(int inputX, int inputY, int inputZ)
 	{
-		// X축 시암 wrap — gridX는 [0, WORLD_TILE_W) 정규화.
-		gridX = worldWrap::wrapTileX(inputX);
+		gridX = inputX;
 		gridY = inputY;
 		gridZ = inputZ;
 		x = 16 * gridX + 8;

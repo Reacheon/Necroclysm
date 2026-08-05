@@ -7,8 +7,7 @@ export namespace mulCol
 {
     //시각(0~24시, 실수) → 시간대별 곱셈(MUL) 틴트 색. 알파=틴트 강도. 밤=남색(곱셈이라 R·G는 0쪽으로
     //  깎이고 파랑만 남음), 18시=노을(따뜻한 갈색), 10~17시=투명(낮, 틴트 없음). 본체 월드 렌더
-    //  (renderTile::drawMulFogs)와 월드맵(Map::drawNightOverlay)이 공유하는 단일 팔레트 — 한 곳만
-    //  고치면 양쪽에 반영된다.
+    //  (renderTile::drawMulFogs)가 사용하는 단일 팔레트.
     inline SDL_Color ambientMulColorAt(float timeOfDay)
     {
         struct TimeColor { float time; SDL_Color color; };
@@ -84,5 +83,4 @@ export namespace lowCol
     constexpr SDL_Color crimson = { 0xd0,0x3f,0x89 };
 };
 
-// pngPatchPixelCol namespace 제거됨 — Patch 시스템 폐지로 PNG 색상 매핑은 worldGrid 모듈
-// 내부(worldGrid_load.cpp의 colorToTerrain)에서 직접 처리.
+// pngPatchPixelCol namespace 제거됨 — Patch 시스템 폐지.

@@ -13,7 +13,6 @@ import Dialogue;
 import Loot;
 import Prop;
 import ItemData;
-import GodPanel;
 import actFuncSet;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
@@ -183,14 +182,6 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 							}
 						}
 					}
-					else if (tgtProp->leadItem.itemCode == itemID::altarOfRehylion)
-					{
-						if (GodPanel::ins() == nullptr)
-						{
-							new GodPanel(godFlag::rehylion, { touchX, touchY, PlayerZ() });
-							click = false;
-						}
-					}
 				}
 			}
 		}
@@ -333,16 +324,6 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 						if (touchX > PlayerX()) PlayerPtr->setDirection(0);
 						else if (touchX < PlayerX()) PlayerPtr->setDirection(4);
 						Corouter::start(actFunc::useAutodoc(touchX, touchY, PlayerZ()));
-						click = false;
-					}
-				}
-				else if (tgtProp->leadItem.itemCode == itemID::altarOfRehylion)
-				{
-					if (touchX > PlayerX()) PlayerPtr->setDirection(0);
-					else if (touchX < PlayerX()) PlayerPtr->setDirection(4);
-					if (GodPanel::ins() == nullptr)
-					{
-						new GodPanel(godFlag::rehylion, { touchX, touchY, PlayerZ() });
 						click = false;
 					}
 				}

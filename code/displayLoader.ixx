@@ -16,41 +16,7 @@ namespace dispOption
     double windowScale = 1.0;          // 창 크기 배율 (전체화면에서는 상관없음)
 }
 
-// 프레임 렌더타겟 (재)생성 — cameraW×cameraH 1:1 버퍼. 모든 그리기는 여기에 정수 좌표
-// 그대로 이뤄지고, endFrame에서 전체를 한 번만 창 크기로 스케일한다. 드로우 콜마다
-// 개별 스케일될 때 생기는 타일 경계 반올림 어긋남(비정수 배율 가로선)이 원천 차단됨.
-void recreateFrameTarget()
-{
-    // 디버그 콘솔은 프레임 도중(구 타겟 바인딩 상태)에 실행되므로, 파괴 전에 바인딩
-    // 여부를 기억해뒀다가 새 타겟으로 갈아끼운다 — 파괴된 포인터로 복귀하면 안 됨.
-    const bool wasBound = (frameTarget != nullptr && SDL_GetRenderTarget(renderer) == frameTarget);
-    if (frameTarget != nullptr) SDL_DestroyTexture(frameTarget);
-    frameTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, cameraW, cameraH);
-    if (frameTarget == nullptr) errorBox(L"프레임 렌더타겟 생성 실패");
-    SDL_SetTextureScaleMode(frameTarget, SDL_SCALEMODE_LINEAR);
-    SDL_SetTextureBlendMode(frameTarget, SDL_BLENDMODE_NONE);
-
-    // 생성 직후 내용은 미정의 — 첫 프레임 쓰레기 픽셀 방지용 1회 클리어
-    SDL_SetRenderTarget(renderer, frameTarget);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    if (wasBound == false) SDL_SetRenderTarget(renderer, nullptr);
-}
-
-// 메인 루프 프레임 시작: 이후의 모든 그리기를 프레임 타겟으로 보낸다.
-export void beginFrame()
-{
-    if (frameTarget != nullptr) SDL_SetRenderTarget(renderer, frameTarget);
-}
-
-// 메인 루프 프레임 끝(present 직전): 프레임 타겟을 창에 단일 블릿.
-export void endFrame()
-{
-    if (frameTarget == nullptr) return;
-    SDL_SetRenderTarget(renderer, nullptr);
-    const SDL_FRect dst = { 0.0f, 0.0f, (float)cameraW, (float)cameraH };
-    SDL_RenderTexture(renderer, frameTarget, nullptr, &dst);
-}
+void recreateFrameTarget();
 
 export void displayLoader()
 {
@@ -145,23 +111,12 @@ export void displayLoader()
         (float)cameraW / (float)cameraH,
         dispOption::fullScreen ? "Fullscreen" : "Windowed",
         (dispOption::fullScreen && dispOption::useLetterbox) ? "Letterbox" : "Stretch");
-
-    //letterbox = { 0, 0, 782, 176 };
-    //letterbox.x = (cameraW - letterbox.w) / 2;
-    //letterbox.y = cameraH - letterbox.h + 6;
-
-    //for (int i = 0; i < 7; ++i)
-    //    barButton[i] = { cameraW / 2 - 300 + 88 * i, cameraH - 80, 72, 72 };
-
-    //letterboxPopUpButton = { letterbox.x + letterbox.w - 39,
-    //                         letterbox.y - 33,
-    //                         29, 29 };
 }
 
-// 런타임 카메라 해상도 변경 (디버그 콘솔용). 논리 해상도를 갈아끼우고
+// 런타임 카메라 해상도 변경. 논리 해상도를 갈아끼우고
 // 창모드면 창 크기도 모니터의 90% 안에 들어오도록 스케일해 재조정한다.
 // 전체화면에서는 창 크기는 그대로 두고 논리 해상도만 갱신 (stretch로 채워짐).
-export void applyDebugResolution(int camW, int camH)
+export void applyResolution(int camW, int camH)
 {
     // 해상도 규약: 기본 1080x1080에서 한 축만 늘어남 - 짧은 축은 반드시 1080
     if ((camW < camH ? camW : camH) != 1080)
@@ -200,8 +155,29 @@ export void applyDebugResolution(int camW, int camH)
         : SDL_LOGICAL_PRESENTATION_STRETCH);
 
     recreateFrameTarget();
-    // 중단된 프레임의 남은 그리기가 새 타겟으로 가도록 재바인딩 (endFrame이 어차피 블릿함)
+    // 중단된 프레임의 남은 그리기가 새 타겟으로 가도록 재바인딩 (메인 루프 끝 블릿이 처리)
     SDL_SetRenderTarget(renderer, frameTarget);
 
     std::printf("[debug] Camera: %dx%d (%.2f:1)\n", cameraW, cameraH, (float)cameraW / (float)cameraH);
+}
+
+// 프레임 렌더타겟 (재)생성 — cameraW×cameraH 1:1 버퍼. 모든 그리기는 여기에 정수 좌표
+// 그대로 이뤄지고, 메인 루프 끝에서 전체를 한 번만 창 크기로 스케일한다. 드로우 콜마다
+// 개별 스케일될 때 생기는 타일 경계 반올림 어긋남(비정수 배율 가로선)이 원천 차단됨.
+void recreateFrameTarget()
+{
+    // 디버그 콘솔은 프레임 도중(구 타겟 바인딩 상태)에 실행되므로, 파괴 전에 바인딩
+    // 여부를 기억해뒀다가 새 타겟으로 갈아끼운다 — 파괴된 포인터로 복귀하면 안 됨.
+    const bool wasBound = (frameTarget != nullptr && SDL_GetRenderTarget(renderer) == frameTarget);
+    if (frameTarget != nullptr) SDL_DestroyTexture(frameTarget);
+    frameTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, cameraW, cameraH);
+    if (frameTarget == nullptr) errorBox(L"프레임 렌더타겟 생성 실패");
+    SDL_SetTextureScaleMode(frameTarget, SDL_SCALEMODE_LINEAR);
+    SDL_SetTextureBlendMode(frameTarget, SDL_BLENDMODE_NONE);
+
+    // 생성 직후 내용은 미정의 — 첫 프레임 쓰레기 픽셀 방지용 1회 클리어
+    SDL_SetRenderTarget(renderer, frameTarget);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    if (wasBound == false) SDL_SetRenderTarget(renderer, nullptr);
 }

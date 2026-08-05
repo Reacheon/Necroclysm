@@ -10,7 +10,6 @@ import Sprite;
 export namespace texture
 {
 	SDL_Texture* minimap = nullptr;
-	SDL_Texture* worldmap = nullptr;
 	SDL_Texture* navimap = nullptr;
 	SDL_Texture* mainGaugeWhiteShadow = nullptr;
 	SDL_Texture* hpGaugeWhiteShadow = nullptr;
@@ -57,12 +56,7 @@ export namespace spr
 	Sprite* tileset = nullptr;
 	Sprite* propset = nullptr;
 	Sprite* vehset = nullptr; //차량 부품 전용 아틀라스(과거엔 propset 공용 -> 혼동 방지 위해 분리). 부품은 vehSprIndex로 색인
-	Sprite* mapset1by1 = nullptr; //월드맵 1x1 청크 심볼 (48px 셀 = 3x3 청크, 심볼 art는 중앙 16px). 건물·도로·산 1칸
-	Sprite* mapset2by2 = nullptr; //월드맵 2x2/2x1/1x2 청크 심볼 (64px 셀 = 4x4 청크). 공원·마트·학교·경찰서·소방서·산 2x2
-	Sprite* mapset3by3 = nullptr; //월드맵 3x3 청크 심볼 (80px 셀 = 5x5 청크, 심볼 art는 중앙 48px). 공항·교도소·군부대
-	Sprite* auto47Mountain = nullptr; //월드맵 산맥 47-piece 블롭 오토타일 (128x96 = 8x6 셀 중 47, 16px=1청크). autotile47Index로 색인
 	Sprite* levelUpEffect = nullptr; //레벨업 섬광 기둥 (80px, 9프레임, 절정=4프레임 후 감쇠, 중심(40,40)=캐릭터 앵커)
-	Sprite* mapPin[5] = {}; //월드맵 핀 도트 (80px = 5x5청크, 16px=1청크로 mapset과 동일 해상도, 앵커=중심(40,40)). 인덱스=MAP_PIN_PALETTE 순(red/green/blue/violet), [4]=yellow(메인퀘스트 마커 예약)
 	Sprite* icon32 = nullptr;
 	Sprite* ring24 = nullptr;
 	Sprite* bloodM = nullptr;

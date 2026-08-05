@@ -31,8 +31,6 @@ import statusEffect;
 import SkillData;
 import SkillBehavior;
 import SkillRegistry;
-import worldGrid;
-import ProcGenWorker;
 
 constexpr double EPSILON = 0.000001;
 
@@ -335,8 +333,6 @@ std::int64_t playerInputTurn()
 					break;
 				case SDL_EVENT_QUIT:
 					//IMG_Quit();
-					ProcGenWorker::ins().shutdown();
-					worldGrid::shutdownWorldPixelMmap();
 					TTF_Quit();
 					SDL_Quit();
 					exit(0);
@@ -644,8 +640,6 @@ std::int64_t entityAITurn()
 		// 플레이어 HP 재생
 		{
 			float regenRate = 0.1f;
-			if (checkStatusEffect(PlayerPtr->entityInfo.statusEffectVec, statusEffectFlag::superRegen))
-				regenRate += 3.0f;
 
 			PlayerPtr->regenAccum += regenRate;
 			int healTick = (int)PlayerPtr->regenAccum;

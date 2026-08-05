@@ -55,7 +55,7 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 }
 Monster::~Monster()
 {
-	// 광역 청크 소멸(wipeOrphanedChunks, 게임 종료) 도중에는 자신을 담은 청크가 이미
+	// 광역 청크 소멸(게임 종료) 도중에는 자신을 담은 청크가 이미
 	// unordered_map에서 분리된 채로 ~Chunk → ~TileData → ~EntityPtr가 호출됨 →
 	// getChunk()의 .at()이 throw. tryGetChunk로 안전 조회.
 	Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());

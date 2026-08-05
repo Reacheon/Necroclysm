@@ -15,8 +15,6 @@ export enum class act
 
     identify,   //감정
     vehicle,    //차량
-    god, //신앙
-    map, //지도
 
     closeDoor, //문닫기
 
@@ -412,23 +410,6 @@ export enum class itemSubcategory
     material_etc,
 };
 
-export enum class godFlag
-{
-    none,
-    rehylion,
-};
-
-//신이 감시하는 행동 유형
-export enum class conductType
-{
-    KILL_NEUTRAL,       //중립 몬스터 살해
-    KILL_HOLY,          //신성한 존재 살해
-    KILL_EVIL,          //사악한 존재 살해
-    USE_NECROMANCY,     //네크로맨시 사용
-    USE_EVIL_ITEM,      //사악한 아이템 사용
-    ATTACK_ALLY,        //아군 공격
-    SELF_MUTATE,        //자발적 변이
-};
 
 //입은 데미지의 종류
 export enum class dmgFlag
@@ -670,36 +651,3 @@ export enum class creatureType
     undead,
 };
 
-//월드맵(Map.ixx) 청크 심볼 식별자. 건물 Lot 1종 = 1값 (mapSymbolOf로 Lot→심볼 매핑).
-//  실제 스프라이트(아틀라스·인덱스·footprint 오프셋·변형)는 Map.ixx resolveSymbol이 결정 —
-//  여기는 "무엇인가"만 들고, "어떻게 그릴지"는 렌더러가 안다. mountain은 Lot이 아니라
-//  worldGrid::Terrain::Mountain에서 직접 파생(렌더러 전용)이지만 enum 일관성 위해 포함.
-export enum class MapSymbol
-{
-    none,
-    //1x1 (mapset1by1)
-    apartment, bank, house, warehouse, cafe, cinema, junkShop, animalHospital,
-    pharmacy, restaurant, stationeryStore, hardwareStore, bookstore,
-    patrolStation, convenienceStore, bicycleShop, temple, church, cathedral,
-    skyscraper, gasStation, shoppingArcade,
-    postOffice, autoShop, clothingStore, jewelryStore, laundromat, gardenShop,
-    //2x1 / 1x2 (mapset2by2 — footprint 방향에 따라 wide/tall 스프라이트 분기)
-    policeStation, fireStation, hotel, hospital, library,
-    //2x2 (mapset2by2)
-    park, hypermarket, school, parkingLot,
-    //terrain 파생 (Lot 아님 — 렌더러가 Mountain 청크에 직접 부여)
-    mountain,
-    //1x1 교외 구조물 (mapset1by1) — energyBank/warpGate/shop은 궤도엘리베이터 초지능 AI가
-    //  지상 인간용으로 세운 인프라. 도시 내부가 아니라 교외에 간간히 배치(배치 로직은 후속).
-    mine, lookoutTower, energyBank, warpGate, shop,
-    //2x2 (mapset2by2). 창고(warehouse)는 별도 값 없이 기존 1x1 값이 footprint로 2x1/1x2/2x2 분기.
-    nuclearPlant, solarPlant, researchLab,
-    //3x3 (mapset3by3)
-    airport, prison, militaryBase,
-    //항만 — R/U/L/D는 배가 나가는(뱃길) 방향. footprint로 1x1(mapset1by1)/2x2(mapset2by2)
-    //  스프라이트 분기. CitySymbol에 방향 필드가 없어 방향을 심볼 값에 굽는다(배치 로직이
-    //  바다 방향을 보고 선택). RULD 순 연속 배치 전제 — 렌더러가 인덱스 오프셋으로 사용.
-    //  배치 조건(미구현, 규약만): 점유 타일 전부 바다 + 뱃길 방향 접경(2x2=2타일, 1x1=1타일)도
-    //  바다 + 반대쪽 접경은 육지. (아트 규약: 육지쪽=컨테이너·크레인, 뱃길쪽=정박한 배+돌출 포트)
-    harborR, harborU, harborL, harborD,
-};

@@ -18,10 +18,7 @@ import SkillData;
 import SkillBehavior;
 import SkillRegistry;
 import statusEffect;
-import GodRegistry;
-import GodBehavior;
 import Entity;
-import playerLevel;
 
 export class Status : public GUI
 {
@@ -94,7 +91,7 @@ public:
 		else
 		{
 			//AP 분배: +버튼은 분배할 AP가 남아있을 때만 그려지므로 클릭도 그때만 유효
-			if (playerLevel::ap > 0)
+			if (PlayerPtr->ap > 0)
 			{
 				unsigned __int8* stats[3] = { &PlayerPtr->entityInfo.statStr, &PlayerPtr->entityInfo.statInt, &PlayerPtr->entityInfo.statDex };
 				for (int i = 0; i < 3; i++)
@@ -104,7 +101,7 @@ public:
 					{
 						(*stats[i])++;
 						sessionAlloc[i]++;
-						playerLevel::ap--;
+						PlayerPtr->ap--;
 						return;
 					}
 				}
@@ -120,7 +117,7 @@ public:
 					PlayerPtr->entityInfo.statStr -= sessionAlloc[0];
 					PlayerPtr->entityInfo.statInt -= sessionAlloc[1];
 					PlayerPtr->entityInfo.statDex -= sessionAlloc[2];
-					playerLevel::ap += allocated;
+					PlayerPtr->ap += allocated;
 					sessionAlloc[0] = sessionAlloc[1] = sessionAlloc[2] = 0;
 				}
 			}

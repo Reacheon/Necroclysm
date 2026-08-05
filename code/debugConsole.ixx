@@ -18,18 +18,11 @@ import Light;
 import Flame;
 import ItemStack;
 import GameOver;
-import GodService;
 import SkillRegistry;
 import Lst;
 import paletteLoader;
-import worldSession;
 import Teleport;
-import Lot;
-import VehiclePlan;
-import LotEditor;
-import mapEditorMode;
 import levelUpFX;
-import playerLevel;
 import TitleScreen;
 import CharSelectScreen;
 import displayLoader;
@@ -71,18 +64,13 @@ export void debugConsole()
 	prt(L"26. 청크 덮어쓰기\n");
 	prt(L"27. Lua 스크립트 실행\n");
 	prt(L"28. 게임오버\n");
-	prt(L"29. 신앙도 변경\n");
 	prt(L"30. 스킬 추가\n");
 	prt(L"31. 테스트 Lst 띄우기\n");
 	prt(L"32. 플레이어 헤어스타일 변경\n");
 	prt(L"33. 플레이어 눈 색상 변경\n");
 	prt(L"34. 플레이어 피부색 변경\n");
 	prt(L"35. 플레이어 성별 변경\n");
-	prt(L"36. 월드 생성 (PNG 로드 → 도시 4400개 → 도로망)\n");
 	prt(L"37. SUV 소환\n");
-	prt(L"38. Lot으로 청크 페인트 (헬퍼 테스트)\n");
-	prt(L"39. LotEditor 실행\n");
-	prt(L"40. 맵 에디터 모드 (월드 초기화 + LotEditor)\n");
 	prt(L"41. 경험치 추가\n");
 	prt(L"42. 타이틀 화면으로\n");
 	prt(L"43. 캐릭터 선택 화면\n");
@@ -473,23 +461,6 @@ export void debugConsole()
 		GameOver::create(L"테스트 사망 문구입니다.");
 		break;
 	}
-	case 29://신앙도 변경
-	{
-		int pietyDelta;
-		prt(L"현재 신: %d, 현재 신앙도: %d, 현재 랭크: %d\n", (int)playerGod, godPiety, GodService::getPietyRank());
-		prt(L"현재 스킬 수: %d\n", (int)PlayerInfo().skillList.size());
-		prt(L"추가할 신앙도를 입력해주세요. (음수 가능)\n");
-		std::cin >> pietyDelta;
-		GodService::changePiety(pietyDelta);
-		prt(L"[디버그] 신앙도를 %d만큼 변경하였다. 현재 신앙도: %d (랭크: %d)\n", pietyDelta, godPiety, GodService::getPietyRank());
-		prt(L"변경 후 스킬 수: %d\n", (int)PlayerInfo().skillList.size());
-		for (auto& sd : PlayerInfo().skillList)
-		{
-			auto* bhv = SkillRegistry::get(sd.skillId);
-			prt(L"  - %ls: %ls\n", sd.skillId.c_str(), bhv ? bhv->name.c_str() : L"(미등록)");
-		}
-		break;
-	}
 	case 30://스킬 추가
 	{
 		prt(L"현재 보유 스킬 목록:\n");
@@ -742,17 +713,6 @@ export void debugConsole()
 		prt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
 		break;
 	}
-	case 36://월드 생성 (PNG 로드 → 도시 배치 → 도로망)
-	{
-		if (worldGenInProgress)
-		{
-			prt(L"[worldGen] 이미 진행 중이다.\n");
-			break;
-		}
-		prt(L"[worldGen] WorldGenScreen 띄우고 워커 스레드 기동.\n");
-		startWorldGen();
-		break;
-	}
 	case 37://SUV 소환
 	{
 		// SUV는 [vX-1..vX+2] × [vY-3..vY+3] (4×7=28 타일)를 차지한다.
@@ -852,134 +812,16 @@ export void debugConsole()
 		prt(L"[디버그] SUV를 (%d,%d,%d) 위치에 소환했다.\n", vX, vY, vZ);
 		break;
 	}
-	case 38://Lot으로 청크 페인트 (헬퍼 테스트)
-	{
-		//CityPlan/SectorPlan 파이프라인 우회. Lot의 LotResult를 지정 청크에 직접
-		//페인트해 5개 헬퍼가 실타일까지 도달하는지 확인. 캐시·결정성은 정상
-		//도시 진입 경로에서 별도 검증.
-		int pcx = 0, pcy = 0;
-		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), pcx, pcy);
-		prt(L"플레이어 현재 청크: (%d, %d, %d)\n", pcx, pcy, PlayerZ());
-
-		int chunkX, chunkY, chunkZ;
-		prt(L"chunkX를 입력해주세요.\n");
-		std::cin >> chunkX;
-		prt(L"chunkY를 입력해주세요.\n");
-		std::cin >> chunkY;
-		prt(L"chunkZ를 입력해주세요.\n");
-		std::cin >> chunkZ;
-
-		prt(L"페인트할 Lot을 선택해주세요.\n");
-		prt(L"1. SampleLot\n");
-		prt(L"2. Street NS\n");
-		prt(L"3. Street Cross\n");
-		prt(L"4. Bridge NS\n");
-		int lotSel;
-		std::cin >> lotSel;
-
-		const Lot* lot = nullptr;
-		if      (lotSel == 1) lot = &sampleLot;
-		else if (lotSel == 2) lot = &streetNS;
-		else if (lotSel == 3) lot = &streetCross;
-		else if (lotSel == 4) lot = &bridgeNS_Single;
-		if (lot == nullptr)
-		{
-			prt(L"잘못된 값을 입력하였습니다.\n");
-			break;
-		}
-
-		//footprint 청크가 모두 로드돼 있어야 함 — 미로드면 setFloor의 getTile().at()이
-		//throw되면서 부분 페인트로 남아 진단이 꼬임. 미리 차단.
-		{
-			bool allLoaded = true;
-			for (int cw = 0; cw < lot->sizeChunkW() && allLoaded; ++cw)
-				for (int ch = 0; ch < lot->sizeChunkH() && allLoaded; ++ch)
-				{
-					if (World::ins()->existChunk(chunkX + cw, chunkY + ch, chunkZ) == false)
-					{
-						prt(L"[에러] 청크 (%d, %d, %d)가 로드돼 있지 않다. 페인트 중단.\n",
-							chunkX + cw, chunkY + ch, chunkZ);
-						allLoaded = false;
-					}
-				}
-			if (allLoaded == false) break;
-		}
-
-		prt(L"회전을 입력해주세요 (0=none, 1=ccw90, 2=ccw180, 3=ccw270).\n");
-		int rotSel = 0;
-		std::cin >> rotSel;
-		lotRot rot = lotRot::none;
-		if      (rotSel == 1) rot = lotRot::ccw90;
-		else if (rotSel == 2) rot = lotRot::ccw180;
-		else if (rotSel == 3) rot = lotRot::ccw270;
-
-		LotResult r = generateRotated(*lot, 0, rot);   //고정 seed (재현성) + CCW 회전
-
-		const int originX = chunkX * CHUNK_SIZE_X;
-		const int originY = chunkY * CHUNK_SIZE_Y;
-
-		//raster: floor/wall/prop을 절대 타일 좌표로 페인트
-		for (const auto& [zLayer, plane] : r.planes)
-		{
-			for (int ly = 0; ly < r.h; ++ly)
-				for (int lx = 0; lx < r.w; ++lx)
-				{
-					const std::size_t pi = static_cast<std::size_t>(ly) * r.w + lx;
-					const int f = plane.floor[pi];
-					const int w = plane.wall[pi];
-					const int p = plane.prop[pi];
-					const Point3 pos{ originX + lx, originY + ly, chunkZ + zLayer };
-					if (f != itemID::none) setFloor(pos, f);
-					if (w != itemID::none) setWall(pos, w);
-					if (p != itemID::none) createProp(pos, p);
-				}
-		}
-
-		//spawn: itemStack/monster를 절대 좌표로 생성
-		for (const auto& s : r.itemStacks)
-			createItemStack({ originX + s.x, originY + s.y, chunkZ + s.z }, s.items);
-		for (const auto& m : r.monsters)
-			createMonster({ originX + m.x, originY + m.y, chunkZ + m.z }, m.entityCode);
-		//vehicle: createChunk 파이프라인의 마지막 단계와 동일 — floor/wall/prop/spawn 다음.
-		for (const auto& v : r.vehicles)
-			createVehicleFromPlan({ originX + v.x, originY + v.y, chunkZ + v.z }, *v.plan);
-
-		//후처리: prop 내부 ItemPocket 채움 — World_createChunk의 동기화 동등 경로.
-		//   createProp 인스턴스 후 같은 좌표의 TileProp(pos)->leadItem.pocketPtr에 아이템 주입.
-		//   prop 없거나 pocket 없으면 silent skip (lot 작성자가 setProp 안 한 경우).
-		for (const auto& c : r.propContents)
-		{
-			Point3 pos{ originX + c.x, originY + c.y, chunkZ + c.z };
-			Prop* prop = TileProp(pos);
-			if (prop == nullptr || prop->leadItem.pocketPtr == nullptr) continue;
-			for (const auto& [code, count] : c.items)
-				prop->leadItem.pocketPtr->addItemFromDex(code, count);
-		}
-		prt(L"[디버그] 청크 (%d,%d,%d) 페인트 완료. itemStack %d, monster %d, vehicle %d, propContents %d.\n",
-			chunkX, chunkY, chunkZ, (int)r.itemStacks.size(), (int)r.monsters.size(), (int)r.vehicles.size(),
-			(int)r.propContents.size());
-		break;
-	}
-	case 39://LotEditor 실행
-	{
-		new LotEditor();
-		break;
-	}
-	case 40://맵 에디터 모드: 월드 초기화 후 LotEditor 자동 기동
-	{
-		enterMapEditor();
-		break;
-	}
 	case 41://경험치 추가
 	{
 		prt(L"현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
-			playerLevel::level, playerLevel::exp, playerLevel::expToNext(), playerLevel::ap, playerLevel::skillPoint);
+			PlayerPtr->level, PlayerPtr->exp, PlayerPtr->expToNext(), PlayerPtr->ap, PlayerPtr->skillPoint);
 		prt(L"추가할 경험치를 입력해주세요.\n");
 		int expInput;
 		std::cin >> expInput;
-		playerLevel::addExp(expInput);
+		PlayerPtr->addExp(expInput);
 		prt(L"[디버그] 경험치를 %d만큼 추가했다. 현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
-			expInput, playerLevel::level, playerLevel::exp, playerLevel::expToNext(), playerLevel::ap, playerLevel::skillPoint);
+			expInput, PlayerPtr->level, PlayerPtr->exp, PlayerPtr->expToNext(), PlayerPtr->ap, PlayerPtr->skillPoint);
 		break;
 	}
 	case 42://타이틀 화면으로
@@ -1001,7 +843,7 @@ export void debugConsole()
 		std::cin >> newW;
 		prt(L"새 세로(H) 해상도를 입력해주세요.\n");
 		std::cin >> newH;
-		applyDebugResolution(newW, newH);
+		applyResolution(newW, newH);
 		// 레터박스·탭 등 changeXY가 캐시한 절대 좌표를 새 cameraW/H로 재계산.
 		// 현재 x/y를 그대로 되넘기는 건 GUI 베이스 애니메이션과 동일한 재배치 패턴 —
 		// HUD는 y가 상대값이라 팝업 상태도 유지된다. (HUD 직접 import는 순환이라 불가)

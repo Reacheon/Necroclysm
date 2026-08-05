@@ -67,10 +67,9 @@ void Vehicle::drawSelf()
         };
 
 
-    //천장 투명도: 플레이어가 이 차량 위에 있거나 LotEditor에서 호버 중이면 천장(과 그 위 부품들)을 반투명화
+    //천장 투명도: 플레이어가 이 차량 위에 있으면 천장(과 그 위 부품들)을 반투명화
     int propCeilAlpha = 255;
     if (TileVehicle(PlayerX(), PlayerY(), PlayerZ()) == this) propCeilAlpha = 50;
-    if (lotEditorActive && lotEditorHoverVeh == (void*)this) propCeilAlpha = 50; //LotEditor: 호버한 차량 천장 반투명
 
     for (const auto& [pos, pocket] : this->partInfo)
     {

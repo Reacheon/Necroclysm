@@ -202,8 +202,8 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
 
 void Vehicle::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
-    // 갓 생성된 Vehicle은 기본 좌표 (0,0,0)에서 시작하므로, 플레이어가 원점에서 멀리 떨어져
-    // wipeOrphanedChunks가 (0,0,0)을 비운 상태에서는 prev 청크가 존재하지 않는다.
+    // 갓 생성된 Vehicle은 기본 좌표 (0,0,0)에서 시작하므로, 플레이어가 원점에서 멀리
+    // 떨어져 있으면 prev 청크가 로드돼 있지 않을 수 있다.
     // 소멸자와 동일하게 tryGetChunk로 안전하게 조회. (없으면 erase 자체가 의미 없음)
     Point2 prevChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
     if (Chunk* prevChunk = World::ins()->tryGetChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ()))

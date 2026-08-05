@@ -25,11 +25,6 @@ import Status;
 import SkillBehavior;
 import SkillRegistry;
 import Entity;
-import GodService;
-import GodBehavior;
-import GodRegistry;
-import MapPin;
-import worldWrap;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 
@@ -123,84 +118,7 @@ void HUD::drawGUI()
 			drawTexture(texture::minimap, 13, 13);
 
 			drawSprite(spr::minimapEdge, 0, 14, 14);
-
-			//맵 핀 방위 표시 — 미니맵 디스크 안이면 실제 위치 점, 밖이면 테두리에 그 방위 색 화살표(오픈월드 관례).
-			//  X는 원기둥 wrap이므로 signedDeltaTileX로 최단 부호 거리, Y는 직접 차. 핀은 FOV 무관 항상 표시.
-			{
-				constexpr int    mmCx  = 13 + MINIMAP_DIAMETER * MINIMAP_TILE_PX / 2;   // 디스크 화면 중심
-				constexpr int    mmCy  = mmCx;
-				constexpr double edgeR = (MINIMAP_DIAMETER / 2 - 2) * MINIMAP_TILE_PX;   // 테두리 안착 반경(px)
-				//타일→미니맵 px 배율 — 타일 모드 6px/타일, 청크맵 모드 16px/청크(=16/24 px/타일)
-				const double pxPerTile = minimapChunkMode ? (double)MINIMAP_CHUNK_PX / TILE_PER_PIXEL : (double)MINIMAP_TILE_PX;
-
-				//테두리(흰 외곽선) 없이 색 글로우로 분리 — 부드러운 색 후광 위에 밝은 화살표 + 밝은 중심부.
-				auto rimArrow = [](int sx, int sy, double ang, SDL_Color c)
-				{
-					const double L = 9.0, halfW = 5.5, back = 2.0;
-					const float tipX = sx + (float)(std::cos(ang) * L);
-					const float tipY = sy + (float)(std::sin(ang) * L);
-					const float bX   = sx - (float)(std::cos(ang) * back);
-					const float bY   = sy - (float)(std::sin(ang) * back);
-					const float pX   = (float)(-std::sin(ang) * halfW);
-					const float pY   = (float)( std::cos(ang) * halfW);
-
-					drawFillCircle(sx, sy, 8, c, 55);    // 글로우(바깥)
-					drawFillCircle(sx, sy, 5, c, 110);   // 글로우(안쪽)
-					const SDL_Color hot = { (Uint8)std::min(255, c.r + 60), (Uint8)std::min(255, c.g + 60), (Uint8)std::min(255, c.b + 60), 255 };
-					const SDL_FColor fc = { hot.r / 255.0f, hot.g / 255.0f, hot.b / 255.0f, 1.0f };
-					SDL_Vertex v[3] = {
-						{ { tipX,    tipY    }, fc, { 0, 0 } },
-						{ { bX + pX, bY + pY }, fc, { 0, 0 } },
-						{ { bX - pX, bY - pY }, fc, { 0, 0 } },
-					};
-					int idx[3] = { 0, 1, 2 };
-					SDL_RenderGeometry(renderer, nullptr, v, 3, idx, 3);
-				};
-
-				for (int pi = 0; pi < MAP_PIN_COLOR_COUNT; ++pi)   // 색상별 마커, 같은 z일 때만
-				{
-					if (!mapPins[pi] || mapPins[pi]->z != PlayerZ()) continue;
-					const double dx = worldWrap::signedDeltaTileX(PlayerX(), mapPins[pi]->x);
-					const double dy = mapPins[pi]->y - PlayerY();
-					const double distPx = std::sqrt(dx * dx + dy * dy) * pxPerTile;
-					const SDL_Color c = mapPinColor(pi);
-
-					if (distPx <= edgeR)
-					{
-						const int sx = mmCx + (int)std::lround(dx * pxPerTile);
-						const int sy = mmCy + (int)std::lround(dy * pxPerTile);
-						const SDL_Color hot = { (Uint8)std::min(255, c.r + 70), (Uint8)std::min(255, c.g + 70), (Uint8)std::min(255, c.b + 70), 255 };
-						drawFillCircle(sx, sy, 6, c, 55);    // 글로우(바깥) — 흰 테 대신
-						drawFillCircle(sx, sy, 4, c, 130);   // 글로우(안쪽)
-						drawFillCircle(sx, sy, 3, c, 255);   // 색 점
-						drawFillCircle(sx, sy, 1, hot, 255); // 밝은 중심부
-					}
-					else
-					{
-						const double ang = std::atan2(dy, dx);
-						const int sx = mmCx + (int)std::lround(std::cos(ang) * edgeR);
-						const int sy = mmCy + (int)std::lround(std::sin(ang) * edgeR);
-						rimArrow(sx, sy, ang, c);
-					}
-				}
-			}
-
-			Point2 minimapBtn = { 36,36 };
-			if (option::inputMethod == input::gamepad)
-			{
-				setZoom(1.0);
-				drawSpriteCenter(spr::gamepadButtons, 16, minimapBtn.x + 3, minimapBtn.y + 3);
-			}
-			else if (option::inputMethod == input::mouse)
-			{
-				if (checkCursor(&openMapBtn)) drawStadium(openMapBtn, click ? lowCol::deepBlue : lowCol::blue, 255, 2);
-				else drawStadium(openMapBtn, { 0,0,0 }, 255, 2);
-
-				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::m + state[SDL_SCANCODE_M]
-					, minimapBtn.x, minimapBtn.y);
-			}
 			setZoom(1.0);
-
 		}
 
 
@@ -212,18 +130,7 @@ void HUD::drawGUI()
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
 
-			std::wstring titleText = L"Nekdol, ";
-			auto* god = GodService::getCurrentGod();
-			if (god)
-			{
-				titleText += god->playerTitle + L" of " + god->name + L" ";
-				int rank = GodService::getPietyRank();
-				for (int i = 0; i < 6; i++) titleText += (i < rank) ? L"*" : L".";
-			}
-			else
-			{
-				titleText += L"Survivor";
-			}
+			std::wstring titleText = L"Nekdol, Survivor";
 
 			drawText(titleText, letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 			setFont(fontType::mainFont);
@@ -1191,8 +1098,6 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::shiftGear) setBtnLayout(sysStr[146], 0);
 		else if (barAct[i] == act::accel) setBtnLayout(sysStr[147], 0);
 		else if (barAct[i] == act::brake) setBtnLayout(sysStr[148], 0);
-		else if (barAct[i] == act::god) setBtnLayout80(sysStr[149], 25);
-		else if (barAct[i] == act::map) setBtnLayout80(sysStr[150], 49);
 		else if (barAct[i] == act::collectiveLever) setBtnLayout(sysStr[151], 0);
 		else if (barAct[i] == act::cyclicLever) setBtnLayout(sysStr[152], 0);
 		else if (barAct[i] == act::rpmLever) setBtnLayout(sysStr[153], 0);

@@ -24,13 +24,11 @@ import CoordSelect;
 import turnWait;
 import Vehicle;
 import Prop;
-import Map;
 import globalTime;
 import debugConsole;
 import CoordSelect;
 import SkillData;
 import ContextMenu;
-import GodPanel;
 import ItemPocket;
 import ItemStack;
 import Dialogue;
@@ -53,8 +51,7 @@ private:
 	Point2 advancedModeGrid;
 
 	SDL_Rect quickSlotPopBtn;
-	SDL_Rect openMapBtn;
-	
+
 	bool isQuickSlotPop = false; //화면우측의 퀵슬롯이 오른쪽으로 팝업되었는지를 나타내는 bool 변수
 	float popUpDist = 360;
 	int quickSlotDist = 0;
@@ -135,8 +132,6 @@ public:
 		for (int i = 0; i < 8; i++) quickSlotBtn[i] = { 185 + 90 + 72 * i, 0, 62,64 };
 
         minimapRegion = { 14, 14, spr::minimapEdge->getW(), spr::minimapEdge->getH() };
-
-		openMapBtn = { 18,18 ,38, 38 };
 
 
 		x = 0;
@@ -515,15 +510,6 @@ public:
 			turnWait(1.0);
 			break;
 		}
-		case act::god:
-			if (playerGod != godFlag::none && GodPanel::ins() == nullptr)
-			{
-				new GodPanel(playerGod);
-			}
-			break;
-		case act::map:
-			new Map();
-			break;
 		case act::test:
 			debugConsole();
 			break;

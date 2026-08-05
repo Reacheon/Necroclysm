@@ -19,9 +19,6 @@ import useSkill;
 import ItemData;
 import ItemPocket;
 import debugConsole;
-import Map;
-import LotEditor;
-import playerLevel;
 
 static bool btnPressed = false;
 
@@ -106,12 +103,7 @@ void HUD::clickUpGUI()
 	}
 	else if (checkCursor(&minimapRegion))
 	{
-		//미니맵 좌상단 M 버튼 — 타일맵<->청크맵 토글(M키와 동일)
-		if (checkCursor(&openMapBtn))
-		{
-			minimapChunkMode = !minimapChunkMode;
-			PlayerPtr->updateMinimap();
-		}
+		//미니맵 위 클릭은 소비 — 아래 타일터치로 흘러가지 않게
 	}
 	else//타일터치
 	{
@@ -285,17 +277,8 @@ void HUD::keyUpGUI()
 	case SDLK_F1:
 		debugConsole();
 		break;
-	case SDLK_F2:
-		// 이미 열려있으면 중복 생성 방지
-		if (LotEditor::ins() == nullptr) new LotEditor();
-		break;
 	case SDLK_F3:
-		playerLevel::levelUp(); //연출·로그·포인트 지급 포함 즉시 레벨업
-		break;
-	case SDLK_M:
-		// 미니맵 타일맵<->청크맵 토글 — 월드맵 열기는 메인 버튼으로 이동됨
-		minimapChunkMode = !minimapChunkMode;
-		PlayerPtr->updateMinimap();
+		PlayerPtr->levelUp(); //연출·로그·포인트 지급 포함 즉시 레벨업
 		break;
 
 	}

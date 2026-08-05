@@ -15,7 +15,6 @@ import Entity;
 import Monster;
 import log;
 import globalTime;
-import VehiclePlan;
 
 int TileFloor(int x, int y, int z)
 {
@@ -218,73 +217,6 @@ void createProp(Point3 inputCoor, int inputItemCode)
 
 void createFlame(Point3 inputCoor, flameFlag inputFlag) { World::ins()->getTile(inputCoor).flamePtr = std::make_unique<Flame>(inputCoor, inputFlag); }
 
-void createVehicleFromPlan(Point3 anchor, const VehiclePlan& plan)
-{
-    //차량 footprint가 anchor 청크 경계를 넘어 인접 청크 타일을 건드릴 때
-    //  Vehicle::extendPart → getTile.at()이 std::out_of_range throw. spawn 전에
-    //  footprint extent로 산정한 청크 링을 ensure. tryGetChunk 선행 필수 —
-    //  무조건 createChunk면 기존 청크 데이터가 새 빈 청크로 덮여 날아감.
-    int maxOffset = 0;
-    for (const VehiclePlanOp& op : plan.ops)
-    {
-        maxOffset = std::max({ maxOffset, std::abs(op.dx), std::abs(op.dy) });
-    }
-    const int chunkR = maxOffset / TILE_PER_PIXEL + 1;
-
-    int anchorChunkX, anchorChunkY;
-    World::ins()->changeToChunkCoord(anchor.x, anchor.y, anchorChunkX, anchorChunkY);
-    for (int dy = -chunkR; dy <= chunkR; ++dy)
-    {
-        for (int dx = -chunkR; dx <= chunkR; ++dx)
-        {
-            if (World::ins()->tryGetChunk(anchorChunkX + dx, anchorChunkY + dy, anchor.z) == nullptr)
-            {
-                World::ins()->createChunk(anchorChunkX + dx, anchorChunkY + dy, anchor.z);
-            }
-        }
-    }
-
-    Vehicle* veh = World::ins()->createVehicle(anchor.x, anchor.y, anchor.z, plan.leadItem);
-    veh->name = plan.name;
-    veh->vehType = plan.type;
-    //부품 배치 전 facing 설정 — extendPart/addPart의 updateSpr가 bodyDir로 스프라이트를 고른다.
-    veh->bodyDir = plan.bodyDir;
-
-    //plan.ops를 기록 순서대로 replay — extendPart 인접성 / addPart 프레임 선행 보장.
-    //  extendPart가 각 부품 타일의 TileVehicle도 함께 채운다.
-    for (const VehiclePlanOp& op : plan.ops)
-    {
-        const int tx = anchor.x + op.dx;
-        const int ty = anchor.y + op.dy;
-        switch (op.kind)
-        {
-        case vehOpKind::extend:
-            veh->extendPart(tx, ty, op.items[0]);
-            break;
-        case vehOpKind::part:
-            veh->addPart(tx, ty, op.items);
-            break;
-        case vehOpKind::cargo:
-        {
-            //같은 타일의 앞선 part op가 넣은 컨테이너(op.items[0])의 내부 pocket에 내용물 채움.
-            ItemPocket* partPocket = veh->partInfo[{tx, ty, veh->getGridZ()}].get();
-            bool filled = false;
-            for (int i = 0; i < partPocket->itemInfo.size(); i++)
-            {
-                if (partPocket->itemInfo[i].itemCode == op.items[0] && partPocket->itemInfo[i].pocketPtr != nullptr)
-                {
-                    partPocket->itemInfo[i].pocketPtr->addItemFromDex(op.cargoContent, op.cargoCount);
-                    filled = true;
-                    break;
-                }
-            }
-            errorBox(!filled, L"[createVehicleFromPlan] cargo 컨테이너를 찾지 못했다: itemCode=" +
-                std::to_wstring(op.items[0]));
-            break;
-        }
-        }
-    }
-}
 
 void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWall(); }
 
