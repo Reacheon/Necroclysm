@@ -2,8 +2,8 @@ export module WorldData;
 
 import std;
 
-constexpr int WORLD_DATA_SIZE = 1080; //가로세로 1080 픽셀
-constexpr int WORLD_MAX_HEIGHT = 32; //z=-16~ z=15
+export constexpr int WORLD_DATA_SIZE = 1080; //가로세로 1080 픽셀
+export constexpr int WORLD_MAX_HEIGHT = 32; //z=-16~ z=15
 
 export enum class chunkType
 {
