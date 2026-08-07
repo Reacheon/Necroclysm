@@ -150,15 +150,12 @@ void Player::updateMinimap()
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 		SDL_RenderClear(renderer);
 
-		// floor + wall을 실제 spr::tileset으로 그림.
-		// 타일 1개 = MINIMAP_TILE_PX × MINIMAP_TILE_PX 픽셀 (예: 6×6). 16×16 스프라이트를 축소(NEAREST)해서 표시.
 		const int R = MINIMAP_DIAMETER / 2;
 		const int TPX = MINIMAP_TILE_PX;
 		const int pgx = getGridX();
 		const int pgy = getGridY();
 		const int pgz = getGridZ();
 
-		// 16×16 타일 스프라이트를 TPX×TPX로 축소 렌더 — drawSprite는 s_zoomScale을 사용.
 		setZoom(static_cast<float>(TPX) / 16.0f);
 
 		for (int dy = -R; dy <= R; dy++)
