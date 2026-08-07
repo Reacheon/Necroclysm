@@ -161,11 +161,6 @@ void Player::updateMinimap()
 		// 16×16 타일 스프라이트를 TPX×TPX로 축소 렌더 — drawSprite는 s_zoomScale을 사용.
 		setZoom(static_cast<float>(TPX) / 16.0f);
 
-		auto drawTileSpr = [&](int sprIdx, int destX, int destY)
-		{
-			drawSprite(spr::tileset, sprIdx, destX, destY);
-		};
-
 		for (int dy = -R; dy <= R; dy++)
 		{
 			for (int dx = -R; dx <= R; dx++)
@@ -174,43 +169,36 @@ void Player::updateMinimap()
 
 				const int destX = (dx + R) * TPX;
 				const int destY = (dy + R) * TPX;
-				SDL_FRect cell = { static_cast<float>(destX), static_cast<float>(destY),
-				                   static_cast<float>(TPX), static_cast<float>(TPX) };
+				const int cellCx = destX + TPX / 2;
+				const int cellCy = destY + TPX / 2;
+				SDL_FRect cell = { static_cast<float>(destX), static_cast<float>(destY), static_cast<float>(TPX), static_cast<float>(TPX) };
 
 				const TileData* tgtTile = &World::ins()->getTile(pgx + dx, pgy + dy, pgz);
 				if (tgtTile->fov == fovFlag::white || tgtTile->fov == fovFlag::gray)
 				{
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					if (tgtTile->floor != itemID::none)
 					{
-						int sprIdx = itemDex[tgtTile->floor].tileSprIndex
-							+ itemDex[tgtTile->floor].extraSprIndexSingle
-							+ 16 * itemDex[tgtTile->floor].extraSprIndex16;
-						drawTileSpr(sprIdx, destX, destY);
+						int sprIdx = itemDex[tgtTile->floor].tileSprIndex + itemDex[tgtTile->floor].extraSprIndexSingle + 16 * itemDex[tgtTile->floor].extraSprIndex16;
+						drawSprite(spr::tileset, sprIdx, destX, destY);
 					}
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					if (tgtTile->wall != itemID::none)
 					{
-						int sprIdx = itemDex[tgtTile->wall].tileSprIndex
-							+ itemDex[tgtTile->wall].extraSprIndexSingle
-							+ 16 * itemDex[tgtTile->wall].extraSprIndex16;
-						drawTileSpr(sprIdx, destX, destY);
+						int sprIdx = itemDex[tgtTile->wall].tileSprIndex + itemDex[tgtTile->wall].extraSprIndexSingle + 16 * itemDex[tgtTile->wall].extraSprIndex16;
+						drawSprite(spr::tileset, sprIdx, destX, destY);
 					}
-					//prop / vehicle도 실제 스프라이트로 그림. propset(48×48)의 중앙 16×16만 잘라
-					//floor/wall과 동일한 6×6 셀로 렌더 — 트리/대형 prop의 over-tile 부분은 잘림.
-					const int cellCx = destX + TPX / 2;
-					const int cellCy = destY + TPX / 2;
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					if (tgtTile->PropPtr != nullptr)
 					{
 						const ItemData& propItem = tgtTile->PropPtr->leadItem;
-						//RAMP는 메인뷰에서도 prop sprite를 안 그리고 별도 화살표로 표시 → 미니맵에서도 스킵.
-						if (propItem.checkFlag(itemFlag::RAMP_UP) == false
-						 && propItem.checkFlag(itemFlag::RAMP_DOWN) == false)
+						if (propItem.checkFlag(itemFlag::RAMP_UP) == false && propItem.checkFlag(itemFlag::RAMP_DOWN) == false) //RAMP
 						{
-							int sprIdx = propItem.propSprIndex
-								+ propItem.extraSprIndexSingle
-								+ 16 * propItem.extraSprIndex16;
+							int sprIdx = propItem.propSprIndex + propItem.extraSprIndexSingle + 16 * propItem.extraSprIndex16;
 							drawSpriteCenterExSrc(spr::propset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
 						}
 					}
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					if (tgtTile->VehiclePtr != nullptr)
 					{
 						auto it = tgtTile->VehiclePtr->partInfo.find({ pgx + dx, pgy + dy, pgz });
@@ -218,13 +206,12 @@ void Player::updateMinimap()
 						{
 							for (const ItemData& part : it->second->itemInfo)
 							{
-								int sprIdx = part.vehSprIndex
-									+ part.extraSprIndexSingle
-									+ 16 * part.extraSprIndex16;
+								int sprIdx = part.vehSprIndex + part.extraSprIndexSingle + 16 * part.extraSprIndex16;
 								drawSpriteCenterExSrc(spr::vehset, sprIdx, cellCx, cellCy, SDL_Rect{ 16, 16, 16, 16 });
 							}
 						}
 					}
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					if (tgtTile->fov == fovFlag::gray)
 					{
 						SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -243,7 +230,7 @@ void Player::updateMinimap()
 
 		setZoom(1.0f);
 
-		// 플레이어 마커 (중앙 타일)
+		// 플레이어 마커
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 		SDL_FRect playerRect = {

@@ -25,7 +25,7 @@ export namespace actSet
 {
     inline std::vector<act> null()
     {
-        return { act::status, act::equipment, act::skill, act::runMode, act::craft, act::wait, act::sleep, act::cooking };
+        return { act::status, act::equipment, act::skill, act::runMode, act::map, act::craft, act::wait, act::sleep, act::cooking };
     }
     std::vector<act> lootPart = { act::pick, act::wield, act::equip, act::eat };
     std::vector<act> vehicle = { act::turnLeft, act::wait, act::turnRight, act::startEngine, act::shiftGear,act::brake, act::accel, act::headlight,act::test };
@@ -40,7 +40,7 @@ export namespace actSet
 };
 export namespace option
 {
-    std::wstring language = L"English";// 또는 "English"
+    std::wstring language = L"Korean";// 또는 "English"
     input inputMethod = input::mouse; //조작방식 설정
     bool showDamage = true; //데미지 폰트 출력 여부
 };

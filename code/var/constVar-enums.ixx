@@ -12,6 +12,7 @@ export enum class act
     skill,      //스킬
     quest,      //퀘스트
     menu,       //메뉴
+    map, //지도
 
     identify,   //감정
     vehicle,    //차량

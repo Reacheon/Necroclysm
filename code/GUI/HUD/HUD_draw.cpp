@@ -1112,6 +1112,7 @@ void HUD::drawBarAct()
 		else if (barAct[i] == act::sleep) setBtnLayout80(sysStr[211], 45);
 		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[194], 156);
 		else if (barAct[i] == act::propInstall) setBtnLayout80(sysStr[328], 26);
+		else if (barAct[i] == act::map) setBtnLayout80(sysStr[150], 49);
 		else if (barAct[i] == act::skillActive)
 		{
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");

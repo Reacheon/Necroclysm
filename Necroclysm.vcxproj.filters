@@ -109,6 +109,9 @@
     <Filter Include="소스 파일\00_var\Skill\MUTATION">
       <UniqueIdentifier>{d2e3f4a5-6b7c-48d9-8e1f-2a3b4c5d6e7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\05_Class\09_ProcGenerate">
+      <UniqueIdentifier>{a22458ed-eb31-4d1a-86c4-1d9c962d7ff1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\const2Str.ixx">
@@ -561,6 +564,9 @@
     <ClCompile Include="code\GUI\HUD\HUD_tileTouch.cpp">
       <Filter>소스 파일\01_system\04_GUI\HUD</Filter>
     </ClCompile>
+    <ClCompile Include="code\GUI\Map.ixx">
+      <Filter>소스 파일\01_system\04_GUI</Filter>
+    </ClCompile>
     <ClCompile Include="code\GUI\Sample.ixx">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
@@ -746,6 +752,9 @@
     </ClCompile>
     <ClCompile Include="code\skill\SkillEyeMask.ixx">
       <Filter>소스 파일\00_var\Skill\MUTATION</Filter>
+    </ClCompile>
+    <ClCompile Include="code\WorldData.ixx">
+      <Filter>소스 파일\05_Class\09_ProcGenerate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

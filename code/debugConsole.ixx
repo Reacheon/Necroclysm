@@ -27,6 +27,7 @@ import TitleScreen;
 import CharSelectScreen;
 import displayLoader;
 import GUI;
+import WorldData;
 
 export void debugConsole()
 {
@@ -856,6 +857,14 @@ export void debugConsole()
 		if (debug::hideAllUI) prt(L"[디버그] 모든 UI를 숨겼다. (다시 45번 입력 시 복원)\n");
 		else prt(L"[디버그] 모든 UI를 다시 표시한다.\n");
 		break;
+	}
+	case 46://월드 생성
+	{
+		if (currentWorld == nullptr)
+		{
+			currentWorld = std::make_unique<WorldData>();
+			prt(L"[디버그] 월드 생성이 완료되었다.\n");
+		}
 	}
 	case 99://콘솔 출력 초기화
 	{

@@ -38,6 +38,7 @@ import Sleep;
 import Aim;
 import Cook;
 import Status;
+import Map;
 
 //HUD 객체는 멤버변수가 아니라 전역변수 사용하도록 만들 것
 export class HUD : public GUI
@@ -432,6 +433,9 @@ public:
 			ctrlVeh->updateSpr();
 			break;
 		}
+		case act::map:
+			new Map();
+			break;
 		case act::wait:
 		{
 			turnWait(1.0);

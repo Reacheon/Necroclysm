@@ -231,6 +231,7 @@
     <ClCompile Include="code\GUI\LOOT\Loot_draw.cpp" />
     <ClCompile Include="code\GUI\LOOT\Loot_input_gamepad.cpp" />
     <ClCompile Include="code\GUI\LOOT\Loot_input_mouse.cpp" />
+    <ClCompile Include="code\GUI\Map.ixx" />
     <ClCompile Include="code\GUI\Quest.ixx" />
     <ClCompile Include="code\GUI\Sample.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
@@ -374,6 +375,7 @@
     <ClCompile Include="code\Vehicle_drawSelf.cpp" />
     <ClCompile Include="code\Wake.ixx" />
     <ClCompile Include="code\Wave.ixx" />
+    <ClCompile Include="code\WorldData.ixx" />
     <ClCompile Include="code\world\Chunk.ixx" />
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
