@@ -28,7 +28,7 @@ export void clickDown()
 export void clickHold()
 {
 	click = false;
-	prt(L"1초 이상 눌렀다.\n");
+	dbgPrt(L"1초 이상 눌렀다.\n");
 	clickStartTime = std::numeric_limits<std::int64_t>::max();
 	deactClickUp = true;
 
@@ -78,11 +78,11 @@ export void clickRight()
 	switch (option::inputMethod)
 	{
 	case input::mouse:
-		prt(L"마우스 클릭라이트 Up 입력 (%d,%d)\n", static_cast<int>(getMouseX()), static_cast<int>(getMouseY()));
+		dbgPrt(L"마우스 클릭라이트 Up 입력 (%d,%d)\n", static_cast<int>(getMouseX()), static_cast<int>(getMouseY()));
 		clickUpPoint = { static_cast<int>(getMouseX()), static_cast<int>(getMouseY()) };
 		break;
 	case input::touch:
-		prt(L"터치 클릭라이트 Up 입력 (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));
+		dbgPrt(L"터치 클릭라이트 Up 입력 (%d,%d)\n", (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH));
 		clickUpPoint = { (int)(event.tfinger.x * cameraW), (int)(event.tfinger.y * cameraH) };
 		break;
 	}

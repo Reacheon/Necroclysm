@@ -14,7 +14,7 @@ import actFuncSet;
 
 ItemPocket::ItemPocket(storageType inputType) { type = inputType; }
 
-ItemPocket::~ItemPocket() { prt(L"ItemPocket : 소멸자가 호출되었습니다..\n"); }
+ItemPocket::~ItemPocket() { dbgPrt(L"ItemPocket : 소멸자가 호출되었습니다..\n"); }
 
 storageType ItemPocket::getType() { return type; }
 
@@ -30,7 +30,7 @@ void ItemPocket::eraseItemInfo(int index)
 void ItemPocket::subtractItemIndex(int index, int number)
 {
 	if (number <= 0) return;
-	errorBox(itemInfo[index].number < number, L"The number of items to remove is greater than the number of items.");
+	errorBox(itemInfo[index].number < number, L"[ItemPocket.cpp] 제거할 아이템의 숫자가 실제 존재하는 아이템의 숫자보다 많다.");
 	itemInfo[index].number -= number;
 	if (itemInfo[index].lootSelect > itemInfo[index].number) { itemInfo[index].lootSelect = itemInfo[index].number; }//셀렉트 값 조정
 	if (itemInfo[index].number == 0) { eraseItemInfo(index); }
@@ -56,7 +56,7 @@ void ItemPocket::subtractItemCode(int code, int number)
 			if (totalRemovedCount == number) return;
 		}
 
-		errorBox(totalRemovedCount > number, L"Error occurs at method subtractItemCode(ItemPocket.ixx), the number of Item has been subtracted over its own number.");
+		errorBox(totalRemovedCount > number, L"[subtractItemCode] 실제 아이템의 숫자보다 많은 아이템이 제거되었다.");
 	}
 }
 
@@ -68,10 +68,10 @@ void ItemPocket::subtractItemCode(int code, int number)
 int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 {
 
-	errorBox(storagePtr == nullptr, L"Destination storage pointer is null in transferItem.");
-	errorBox(number <= 0, L"Number to transfer must be positive in transferItem.");
-	errorBox(index < 0 || index >= itemInfo.size(), L"Source index out of bounds in transferItem.");
-	errorBox(itemInfo[index].number < number, L"item number that have to transfer is not enough in transferItem function(ItemPocket.ixx)");
+	errorBox(storagePtr == nullptr, L"transferItem : 목적지의 포켓이 널포인터이다.");
+	errorBox(number <= 0, L"transferItem : 전송할 아이템의 숫자는 양수여야 한다.");
+	errorBox(index < 0 || index >= itemInfo.size(), L"transferItem : 전송할 아이템의 인덱스가 범위를 벗어났다.");
+	errorBox(itemInfo[index].number < number, L"transferItem : 전송할 아이템의 숫자가 실제 존재하는 아이템의 숫자보다 많다.");
 	errorBox(storagePtr->type == storageType::equip && number >= 2, L"2개 이상의 장비가 동시에 장착되었다.");
 
 
@@ -118,8 +118,8 @@ int ItemPocket::transferItem(ItemPocket* storagePtr, int index, int number)
 int ItemPocket::addItemFromDex(int index, int number)
 {
 
-	errorBox(index < 0 || index >= itemDex.size(), L"Item index out of bounds for itemDex in addItemFromDex.");
-	errorBox(number <= 0, L"Number to add must be positive in addItemFromDex.");
+	errorBox(index < 0 || index >= itemDex.size(), L"addItemFromDex : 추가할 아이템의 인덱스가 범위를 벗어났다.");
+	errorBox(number <= 0, L"addItemFromDex : 추가할 아이템의 숫자는 음수일 수 없다.");
 
 	ItemData tgtItem = std::move(cloneFromItemDex(itemDex[index], number));
 
@@ -158,7 +158,7 @@ void ItemPocket::addItemFromDex(std::vector<Point2> inputVec)
 
 void ItemPocket::addRecipe(int inputItemCode)
 {
-	errorBox(getType() != storageType::recipe, L"The addRecipe function was executed while the storageType was not set to 'recipe'(ItemPocket.ixx).");
+	errorBox(getType() != storageType::recipe, L"플레이어의 레시피 포켓이 아닌 포켓에서 addRecipe 함수가 실행되었다.");
 	if (itemDex[inputItemCode].checkFlag(itemFlag::NOT_RECIPE)) return; //NOT_RECIPE 플래그가 있을 경우 레시피목록에 추가하지 않음
 
 	if (itemInfo.size() == 0) { addItemFromDex(inputItemCode, 1); }
@@ -177,8 +177,8 @@ void ItemPocket::addRecipe(int inputItemCode)
 void ItemPocket::swap(int index1, int index2)
 {
 	if (index1 == index2) return;
-	errorBox(index1 >= itemInfo.size() || index1 < 0, L"index1 is an invalid value in swap.");
-	errorBox(index2 >= itemInfo.size() || index2 < 0, L"index2 is an invalid value in swap.");
+	errorBox(index1 >= itemInfo.size() || index1 < 0, L"swap : index1이 범위를 벗어났다.");
+	errorBox(index2 >= itemInfo.size() || index2 < 0, L"swap : index2가 범위를 벗어났다.");
 	std::swap(itemInfo[index1], itemInfo[index2]);
 }
 
@@ -364,7 +364,7 @@ int ItemPocket::searchSubcategory(itemSubcategory input) { return searchSubcateg
 int ItemPocket::numberItem(int inputCode, int currentDepth)
 {
 	constexpr int MAX_DEPTH = 50;
-	errorBox(currentDepth > MAX_DEPTH, L"Maximum recursion depth exceeded in numberItem. Possible pocket cycle?");
+	errorBox(currentDepth > MAX_DEPTH, L"numberItem 함수가 최대 재귀 탐색 횟수를 초과했다.");
 
 	int count = 0;
 	for (int i = 0; i < itemInfo.size(); i++)
@@ -384,7 +384,7 @@ int ItemPocket::numberItem(int inputCode, int currentDepth)
 bool ItemPocket::checkToolQuality(int input, int currentDepth) // 깊이 인자 추가
 {
 	constexpr int MAX_DEPTH = 50;
-	errorBox(currentDepth > MAX_DEPTH, L"Maximum recursion depth exceeded in checkToolQuality. Possible pocket cycle?");
+	errorBox(currentDepth > MAX_DEPTH, L"checkToolQuality 함수가 최대 재귀 탐색 횟수를 초과했다.");
 
 	for (int i = 0; i < itemInfo.size(); ++i)
 	{
@@ -445,7 +445,7 @@ int ItemPocket::countPocketItemNumber()
 //상단 총알의 데이터를 삭제
 void ItemPocket::popTopBullet()
 {
-	errorBox(itemInfo.size() == 0, L"function popTopBullet has executed with no bullet in ItemPocket.ixx");
+	errorBox(itemInfo.size() == 0, L"총알이 없는데 popTopBullet이 실행되었다.");
 	if (itemInfo[0].number == 1) { itemInfo.erase(itemInfo.begin()); }
 	else { itemInfo[0].number--; }
 };

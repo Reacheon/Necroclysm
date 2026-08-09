@@ -3,6 +3,7 @@ export module dirToXY;
 import std;
 import dir16;
 import Point;
+import dbgPrt;
 
 export void dir2Coord(int dir, int& dx, int& dy)
 {
@@ -56,7 +57,7 @@ export int del2Dir(float delX, float delY)
 		else if (delY < 0) return 6;
 		else
 		{
-			std::wprintf(L"del2Dir에서 잘못된 기울기 값이 계산되었다. 원점을 좌표로 입력했다.\n");
+			dbgPrt(L"del2Dir에서 잘못된 기울기 값이 계산되었다. 원점을 좌표로 입력했다.\n");
 			std::abort();
 		}
 	}
@@ -72,7 +73,7 @@ export int del2Dir(float delX, float delY)
 		else if (m >= 2) return 2;
 		else
 		{
-			std::wprintf(L"del2Dir에서 잘못된 기울기 값이 계산되었다.\n");
+			dbgPrt(L"del2Dir에서 잘못된 기울기 값이 계산되었다.\n");
 			std::abort();
 		}
 	}
@@ -85,7 +86,7 @@ export int del2Dir(float delX, float delY)
 		else if (m >= 2) return 6;
 		else
 		{
-			std::wprintf(L"del2Dir에서 잘못된 기울기 값이 계산되었다.\n");
+			dbgPrt(L"del2Dir에서 잘못된 기울기 값이 계산되었다.\n");
 			std::abort();
 		}
 	}

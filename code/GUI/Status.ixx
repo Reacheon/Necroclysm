@@ -35,7 +35,7 @@ public:
 	Status() : GUI(false)
 	{
 		//1개 이상의 Status 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one Status instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		changeXY(cameraW / 2, cameraH / 2, true);
@@ -79,7 +79,6 @@ public:
 		y = statusBase.y;
 	}
 	void drawGUI(); // Status_draw.cpp에서 구현
-	void drawRadarChart(const std::function<SDL_Color(const SDL_Rect&)>& stadiumCol); // Status_radar.cpp에서 구현
 	void clickUpGUI()
 	{
 		if (getStateInput() == false) { return; }

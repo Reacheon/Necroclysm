@@ -56,8 +56,6 @@ export const std::deque<Log>& getLogMagazine() { return logMagazine; }
 
 export void updateLog(std::wstring text)
 {
-    prt(L"Run updateLog function\n");
-
     for (auto& logElem : logMagazine) logElem.layer++;
 
     Log log;

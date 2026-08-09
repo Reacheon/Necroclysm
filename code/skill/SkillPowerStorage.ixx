@@ -16,7 +16,7 @@ public:
 	SkillPowerStorage()
 	{
 		id = L"BION_POWER_STORAGE";
-		name = L"Power Storage";
+		name = sysStr[273];
 		iconIndex = 12;
 		descript = L"";
 		src = skillSrc::BIONIC;

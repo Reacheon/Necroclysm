@@ -142,11 +142,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					{
 						if (TileFloor(PlayerX(), PlayerY(), PlayerZ() + 1) == itemID::none)
 						{
-							updateLog(L"There is no floor above these stairs.");
+							updateLog(sysStr[349]);
 						}
 						else
 						{
-							updateLog(L"You go up the stairs.");
+							updateLog(sysStr[350]);
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() + 1 });
 
@@ -164,11 +164,11 @@ void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 					{
 						if (TileWall(PlayerX(), PlayerY(), PlayerZ() + 1) != itemID::none)
 						{
-							updateLog(L"The stairs going down are blocked by a wall.");
+							updateLog(sysStr[351]);
 						}
 						else
 						{
-							updateLog(L"You go down the stairs.");
+							updateLog(sysStr[352]);
 
 							EntityPtrMove({ PlayerX(), PlayerY(), PlayerZ() }, { PlayerX(), PlayerY(), PlayerZ() - 1 });
 

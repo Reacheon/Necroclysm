@@ -176,7 +176,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		std::wstring insideStr = L"(";
 		if (pocketPtr->itemInfo.size() == 1) insideStr += pocketPtr->itemInfo[0].name + L")";
-		else if (pocketPtr->itemInfo.size() > 1) insideStr += std::to_wstring(pocketPtr->itemInfo.size()) + L" items)";
+		else if (pocketPtr->itemInfo.size() > 1) insideStr += std::to_wstring(pocketPtr->itemInfo.size()) + L"개 아이템)";
 		int maxVol = inputItem.pocketMaxVolume;
 		int currentVol = pocketPtr->getPocketVolume();
 
@@ -260,21 +260,21 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 	else if (inputItem.equipState == equipHandFlag::left)
 	{
 		statusColor = col::black;
-		statusStr = sysStr[49];//왼손
+		statusStr = sysStr[32];//왼손
 		statusStrColor = lowCol::yellow;
 		setFontSize(12);
 	}
 	else if (inputItem.equipState == equipHandFlag::right)
 	{
 		statusColor = col::black;
-		statusStr = sysStr[50];
+		statusStr = sysStr[33];
 		statusStrColor = lowCol::yellow;
 		setFontSize(12);
 	}
 	else if (inputItem.equipState == equipHandFlag::both)
 	{
 		statusColor = col::black;
-		statusStr = sysStr[51];
+		statusStr = sysStr[34];
 		statusStrColor = lowCol::yellow;
 	}
 	else if (inputItem.lootSelect == inputItem.number) //전체선택
@@ -575,7 +575,7 @@ export void drawVolumeGauge(int x, int y, ItemData& containerItem)
 
 	drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 	setFontSize(13);
-	drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3); //부피
+	drawText(sysStr[13], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3); //부피
 
 	ItemPocket* pkPtr = containerItem.pocketPtr.get();
 	if (containerItem.pocketMaxVolume > 0)

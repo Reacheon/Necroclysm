@@ -2,14 +2,14 @@ export module aStar;
 
 import std;
 import Point;
-import prt;
+import dbgPrt;
 import nanoTimer;
 import dirToXY;
 
 export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkableTile, int playerX, int playerY, int dstX, int dstY)
 {
-	//prt(L"////////////////////////////aStar 알고리즘 실행됨/////////////////////////////\n");
-	//prt(L"이 엔티티의 현재 위치는 (%d,%d)이고 목적지는 (%d,%d)이다\n",playerX,playerY, dstX, dstY);
+	//dbgPrt(L"////////////////////////////aStar 알고리즘 실행됨/////////////////////////////\n");
+	//dbgPrt(L"이 엔티티의 현재 위치는 (%d,%d)이고 목적지는 (%d,%d)이다\n",playerX,playerY, dstX, dstY);
 
 	Point2 playerPos(playerX, playerY);
 	Point2 dstPos(dstX, dstY);
@@ -82,41 +82,41 @@ export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkab
 
 			if (walkableTile.find(nextPos) != walkableTile.end())//해당 방향의 사각형이 오픈리스트에 있거나 현재 오픈리스트가 0개인지 체크함
 			{
-				//prt(L"aStar : (%d,%d) 타일은 이동가능 타일이다.\n", nextPos.x, nextPos.y);
+				//dbgPrt(L"aStar : (%d,%d) 타일은 이동가능 타일이다.\n", nextPos.x, nextPos.y);
 				if (closeSet.find(nextPos) == closeSet.end())
 				{
 					if (openSet.find(nextPos) != openSet.end())//이미 열린 리스트면 현재 위치에서 G값을 계산하고 원래 G값보다 낮으면 갱신함
 					{
-						//prt(L"aStar : (%d,%d) 타일은 이미 오픈리스트이다.\n", nextPos.x, nextPos.y);
+						//dbgPrt(L"aStar : (%d,%d) 타일은 이미 오픈리스트이다.\n", nextPos.x, nextPos.y);
 						if (valG[pivot] + dg < valG[nextPos])
 						{
-							//prt(L"aStar : (%d,%d) 타일이 갱신되었다.\n", nextPos.x, nextPos.y);
+							//dbgPrt(L"aStar : (%d,%d) 타일이 갱신되었다.\n", nextPos.x, nextPos.y);
 							valG.erase(valG.find(nextPos));
 							valH.erase(valH.find(nextPos));
 							valF.erase(valF.find(nextPos));
 							valDir.erase(valDir.find(nextPos));
 
 							valDir[nextPos] = ddir;
-							//prt(L"aStar : (%d,%d) 타일의 방향은 %d이다.\n", nextPos.x, nextPos.y, valDir[nextPos]);
+							//dbgPrt(L"aStar : (%d,%d) 타일의 방향은 %d이다.\n", nextPos.x, nextPos.y, valDir[nextPos]);
 							valH[nextPos] = 10 * (std::abs(nextPos.x - playerX) + std::abs(nextPos.y - playerY));
 							valG[nextPos] = valG[pivot] + dg;
 							valF[nextPos] = valG[nextPos] + valH[nextPos];
 						}
 						else
 						{
-							//prt(L"aStar : (%d,%d) 타일의 갱신에 실패하였다.\n", nextPos.x, nextPos.y);
+							//dbgPrt(L"aStar : (%d,%d) 타일의 갱신에 실패하였다.\n", nextPos.x, nextPos.y);
 						}
 					}
 					else//열린 리스트에도 없고 닫힌 리스트에도 없으면 새로 오픈리스트에 넣고 FGH를 새로 추가함
 					{
-						//prt(L"aStar : (%d,%d) 타일이 새로운 오픈리스트에 추가되었다.\n", nextPos.x, nextPos.y);
+						//dbgPrt(L"aStar : (%d,%d) 타일이 새로운 오픈리스트에 추가되었다.\n", nextPos.x, nextPos.y);
 
 						//열린 리스트에 피벗X+1와 피벗Y를 추가하고 추가한 노드에 FGH를 추가함
 						valDir[nextPos] = ddir;
 						valH[nextPos] = 10 * (std::abs(nextPos.x - playerX) + std::abs(nextPos.y - playerY));
 						valG[nextPos] = valG[pivot] + dg;
 						valF[nextPos] = valG[nextPos] + valH[nextPos];
-						//prt(L"aStar : (%d,%d) 타일의 방향은 %d이다.\n", nextPos.x, nextPos.y, valDir[nextPos]);
+						//dbgPrt(L"aStar : (%d,%d) 타일의 방향은 %d이다.\n", nextPos.x, nextPos.y, valDir[nextPos]);
 
 						tempPair = { valF[nextPos], nextPos.x, nextPos.y };
 						openQueue->push(tempPair);
@@ -133,7 +133,7 @@ export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkab
 			}
 			else
 			{
-				//prt(L"aStar : (%d,%d) 타일은 이동불가 타일이다.\n", nextPos.x, nextPos.y);
+				//dbgPrt(L"aStar : (%d,%d) 타일은 이동불가 타일이다.\n", nextPos.x, nextPos.y);
 			}
 		}
 	}
@@ -143,9 +143,9 @@ export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkab
 
 	if (pathFind == true)
 	{
-		//prt(L"%d개의 오픈리스트를 연산에 이용했다.\n", stack);
-		//prt(L"현재 위치에서 %d 방향으로 이동하기 시작한다.\n", valDir[playerPos]);
-		//prt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
+		//dbgPrt(L"%d개의 오픈리스트를 연산에 이용했다.\n", stack);
+		//dbgPrt(L"현재 위치에서 %d 방향으로 이동하기 시작한다.\n", valDir[playerPos]);
+		//dbgPrt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
 		std::vector<Point2> trail;
 		Point2 current = playerPos;
 		while (true)
@@ -163,8 +163,8 @@ export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkab
 	}
 	else
 	{
-		//prt(L"[디버그] 길찾기 실패\n");
-		//prt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
+		//dbgPrt(L"[디버그] 길찾기 실패\n");
+		//dbgPrt(L"////////////////////////////aStar 알고리즘 종료됨/////////////////////////////\n");
 		return {};
 	}
 }

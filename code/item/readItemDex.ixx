@@ -221,7 +221,7 @@ export int readItemDex(const wchar_t* file)
                 csvWidth++;
                 if (str[i] == UNI::LF)
                 {
-                    //prt(L"이 csv 파일의 가로사이즈는 %d이다!\n", csvWidth);
+                    //dbgPrt(L"이 csv 파일의 가로사이즈는 %d이다!\n", csvWidth);
                     break;
                 }
             }
@@ -327,7 +327,7 @@ export int readItemDex(const wchar_t* file)
                         else if (strFragment == L"VEHICLES") { itemDex[tgtIndex].category = itemCategory::vehicles; }
                         else if (strFragment == L"STRUCTURES") { itemDex[tgtIndex].category = itemCategory::structures; }
                         else if (strFragment == L"MATERIALS") { itemDex[tgtIndex].category = itemCategory::materials; }
-                        else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
+                        else { errorBox(L"readItemDex.ixx에서 알 수 없는 category의 아이템을 파싱했다."); }
 
                         break;
                     case csvItem::subcategory:
@@ -338,7 +338,7 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"EQUIPMENT_FIREARMS") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_firearms; }
                             else if (strFragment == L"EQUIPMENT_THROWING") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_throwing; }
                             else if (strFragment == L"EQUIPMENT_CLOTHING") { itemDex[tgtIndex].subcategory = itemSubcategory::equipment_clothing; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(equipment)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::foods)
                         {
@@ -347,7 +347,7 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"FOODS_PRESERVED") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_preserved; }
                             else if (strFragment == L"FOODS_DRINKS") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_drinks; }
                             else if (strFragment == L"FOODS_INGREDIENTS") { itemDex[tgtIndex].subcategory = itemSubcategory::foods_ingredients; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(foods)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::tools)
                         {
@@ -355,13 +355,13 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"TOOLS_POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_power; }
                             else if (strFragment == L"TOOLS_CONTAINERS") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_containers; }
                             else if (strFragment == L"TOOLS_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::tools_etc; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tools)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::tech)
                         {
                             if (strFragment == L"TECH_BIONICS") { itemDex[tgtIndex].subcategory = itemSubcategory::tech_bionics; }
                             else if (strFragment == L"TECH_POWERARMOR") { itemDex[tgtIndex].subcategory = itemSubcategory::tech_powerArmor; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(tech)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::consumables)
                         {
@@ -369,7 +369,7 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"CONSUMABLE_AMMO") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_ammo; }
                             else if (strFragment == L"CONSUMABLE_FUEL") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_fuel; }
                             else if (strFragment == L"CONSUMABLE_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::consumable_etc; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(consumables)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::vehicles)
                         {
@@ -377,14 +377,14 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"VEHICLE_POWER") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_power; }
                             else if (strFragment == L"VEHICLE_EXTERIORS") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_exteriors; }
                             else if (strFragment == L"VEHICLE_PARTS") { itemDex[tgtIndex].subcategory = itemSubcategory::vehicle_parts; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(vehicles)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::structures)
                         {
                             if (strFragment == L"STRUCTURE_WALLS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_walls; }
                             else if (strFragment == L"STRUCTURE_FLOORS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_floors; }
                             else if (strFragment == L"STRUCTURE_PROPS") { itemDex[tgtIndex].subcategory = itemSubcategory::structure_props; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(structures)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
                         else if (itemDex[tgtIndex].category == itemCategory::materials)
                         {
@@ -393,9 +393,9 @@ export int readItemDex(const wchar_t* file)
                             else if (strFragment == L"MATERIAL_COMPONENTS") { itemDex[tgtIndex].subcategory = itemSubcategory::material_components; }
                             else if (strFragment == L"MATERIAL_CHEMICALS") { itemDex[tgtIndex].subcategory = itemSubcategory::material_chemicals; }
                             else if (strFragment == L"MATERIAL_ETC") { itemDex[tgtIndex].subcategory = itemSubcategory::material_etc; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::subcategory(materials)"); }
+                            else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         }
-                        else { errorBox(L"error in readItemDex.ixx, itemCategory"); }
+                        else { errorBox(L"readItemDex.ixx에서 알 수 없는 subcategory의 아이템을 파싱했다."); }
                         break;
                     case csvItem::weight:
                         itemDex[tgtIndex].weight = wtoi(strFragment.c_str());
@@ -595,7 +595,7 @@ export int readItemDex(const wchar_t* file)
                             {
                                 auto it = flagMap.find(token);
                                 if (it != flagMap.end()) itemDex[tgtIndex].flag.push_back(it->second);
-                                else errorBox(L"error in readItemDex.ixx, csvItem::flag, unknown itemFlag defined " + token);
+                                else errorBox(L"readItemDex.ixx에서 정의되지 않는 아이템 플래그 " + token + L"를 발견하였다.");
                             }
                             if (sep == std::wstring::npos) break;
                             pos = sep + 1;
@@ -898,7 +898,7 @@ export int readItemDex(const wchar_t* file)
                         if (strFragment == L"NORMAL") { itemDex[tgtIndex].bulletType = bulletFlag::normal; }
                         else if (strFragment == L"TRACER") { itemDex[tgtIndex].bulletType = bulletFlag::tracer; }
                         else if (strFragment == L"AP") { itemDex[tgtIndex].bulletType = bulletFlag::ap; }
-                        else { errorBox(L"error in readItemDex.ixx, csvItem::bulletType"); }
+                        else { errorBox(L"readItemDex.ixx에서 잘못된 bulletType이 파싱되었다."); }
                         break;
                     case csvItem::bulletRange:
                         itemDex[tgtIndex].bulletRange = wtoi(strFragment.c_str());
@@ -996,13 +996,13 @@ export int readItemDex(const wchar_t* file)
                         // 베이스명만 저장. 베이스명+"_MALE"/"_FEMALE" 등이 모두 등록돼있는지 검증.
                         if (itemDex[tgtIndex].checkFlag(itemFlag::EQUIP_SPR_GENDERED))
                         {
-                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_MALE");
-                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_FEMALE");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 스프라이트("+ strFragment + L"_MALE" +L")가 spr::spriteMapper에 없다.");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 스프라이트(" + strFragment + L"_MALE" + L")가 spr::spriteMapper에 없다.");
                             itemDex[tgtIndex].equipSprName = strFragment;
                         }
                         else
                         {
-                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), strFragment+L" 이미지 파일이 spr::spriteMapper에 존재하지 않는다.");
                             itemDex[tgtIndex].equipSpr = spr::spriteMapper[strFragment.c_str()];
 
                             if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
@@ -1017,13 +1017,13 @@ export int readItemDex(const wchar_t* file)
                     case csvItem::flipEquipSprName:
                         if (itemDex[tgtIndex].checkFlag(itemFlag::EQUIP_SPR_GENDERED))
                         {
-                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_MALE");
-                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 변종이 spr::spriteMapper에 없음 : " + strFragment + L"_FEMALE");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_MALE")   == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 MALE 스프라이트(" + strFragment + L"_MALE" + L")가 spr::spriteMapper에 없다.");
+                            errorBox(spr::spriteMapper.find(strFragment + L"_FEMALE") == spr::spriteMapper.end(), L"EQUIP_SPR_GENDERED 아이템의 FEMALE 스프라이트(" + strFragment + L"_MALE" + L")가 spr::spriteMapper에 없다.");
                             itemDex[tgtIndex].flipEquipSprName = strFragment;
                         }
                         else
                         {
-                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), strFragment + L" 이미지 파일이 spr::spriteMapper에 존재하지 않는다.");
                             itemDex[tgtIndex].flipEquipSpr = spr::spriteMapper[strFragment.c_str()];
 
                             if (itemDex[tgtIndex].checkFlag(itemFlag::HAS_TOGGLE_SPRITE))
@@ -1037,7 +1037,7 @@ export int readItemDex(const wchar_t* file)
                         break;
 
                     case csvItem::leftWieldSpr:
-                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 leftWield 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), strFragment + L" 이미지 파일(왼손)이 spr::spriteMapper에 존재하지 않는다.");
                         itemDex[tgtIndex].leftWieldSpr = spr::spriteMapper[strFragment.c_str()];
                         break;
                     case csvItem::leftWieldPriority:
@@ -1045,7 +1045,7 @@ export int readItemDex(const wchar_t* file)
                         break;
 
                     case csvItem::rightWieldSpr:
-                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 rightWield 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                        errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), strFragment + L" 이미지 파일(오른손)이 spr::spriteMapper에 존재하지 않는다.");
                         itemDex[tgtIndex].rightWieldSpr = spr::spriteMapper[strFragment.c_str()];
                         break;
                     case csvItem::rightWieldPriority:
@@ -1151,7 +1151,7 @@ export int readItemDex(const wchar_t* file)
                         };
                         auto it = wipSprMap.find(strFragment);
                         if (it != wipSprMap.end()) { itemDex[tgtIndex].craftWIPSprIndex = it->second; }
-                        else { errorBox(L"readItemDex.ixx csvItem::craftWIPSprIndex: 알 수 없는 WIP 스프라이트 이름 '" + strFragment + L"'"); }
+                        else { errorBox(L"craftWIPSprIndex에서 알 수 없는 WIP 스프라이트 이름(" + strFragment + L")가 입력되었다."); }
                         break;
                     }
                     case csvItem::propInstallCode:
@@ -1194,12 +1194,12 @@ export int readItemDex(const wchar_t* file)
                         itemDex[tgtIndex].gunOptRange = wtoi(strFragment.c_str());
                         break;
                     default:
-                        errorBox(L"readItemDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.");
+                        errorBox(L"readItemDex.ixx에서 csv의 잘못된 장소를 읽었다.");
                         break;
                     }
 
-                    //prt(L"[문자열] %ws ", strFragment.c_str());
-                    //\prt(L"를 (%d,%d)에 입력했다.\n", tgtIndex, arrayCounter % (csvWidth));
+                    //dbgPrt(L"[문자열] %ws ", strFragment.c_str());
+                    //\dbgPrt(L"를 (%d,%d)에 입력했다.\n", tgtIndex, arrayCounter % (csvWidth));
                 }
 
                 arrayCounter++;

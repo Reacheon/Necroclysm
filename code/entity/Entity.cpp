@@ -23,7 +23,7 @@ import Vehicle;
 
 Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 {
-	prt(L"Entity : 생성자가 호출되었습니다!\n");
+	dbgPrt(L"Entity : 생성자가 호출되었습니다!\n");
 	loadDataFromDex(newEntityIndex);
 	setAniPriority(1);
 	setGrid(gridX, gridY, gridZ);
@@ -32,7 +32,7 @@ Entity::Entity(int newEntityIndex, int gridX, int gridY, int gridZ)//생성자
 Entity::~Entity()//소멸자
 {
 	//나중에 바닥이 걸을 수 있는 타일인지 아닌지를 체크하여 true가 되는지의 여부를 결정하는 조건문 추가할것
-	prt(L"Entity : 소멸자가 호출되었습니다..\n");
+	dbgPrt(L"Entity : 소멸자가 호출되었습니다..\n");
 
 }
 #pragma region getset method
@@ -49,7 +49,7 @@ void Entity::addSkill(const std::wstring& skillId)
 	auto* behavior = SkillRegistry::get(skillId);
 	if (behavior)
 	{
-		prt(L"스킬 %ls를 추가했다.\n", behavior->name.c_str());
+		dbgPrt(L"스킬 %ls를 추가했다.\n", behavior->name.c_str());
 	}
 	SkillData newSkill;
 	newSkill.skillId = skillId;
@@ -67,7 +67,7 @@ void Entity::removeSkill(const std::wstring& skillId)
 		auto* behavior = SkillRegistry::get(skillId);
 		if (behavior)
 		{
-			prt(L"스킬 %ls를 잃었다.\n", behavior->name.c_str());
+			dbgPrt(L"스킬 %ls를 잃었다.\n", behavior->name.c_str());
 		}
 		list.erase(it);
 	}
@@ -394,12 +394,12 @@ bool Entity::getHasAStarDst() { return hasAStarDst; }
 void Entity::deactAStarDst() { hasAStarDst = false; }
 int Entity::getAStarDstX()
 {
-	errorBox(hasAStarDst == false, L"getAStarDstX activated while hasAStarDst is false");
+	errorBox(hasAStarDst == false, L"aStar 알고리즘의 목적지가 지정되지 않았는데 getAStarDstX 함수가 실행되었다.");
 	return aStarDst.x;
 }
 int Entity::getAStarDstY()
 {
-	errorBox(hasAStarDst == false, L"getAStarDstY activated while hasAStarDst is false");
+	errorBox(hasAStarDst == false, L"aStar 알고리즘의 목적지가 지정되지 않았는데 getAStarDstX 함수가 실행되었다.");
 	return aStarDst.y;
 }
 void Entity::setAStarDst(int inputX, int inputY)
@@ -423,7 +423,7 @@ void Entity::move(int dir, bool jump)
 	int dstGridX = (dstX - 8) / 16;
 	int dstGridY = (dstY - 8) / 16;
 
-	errorBox(dGridX == 0 && dGridY == 0, L"Entity::move에서 같은 좌표로 이동했다.");
+	errorBox(dGridX == 0 && dGridY == 0, L"Entity::move에서 기존 위치와 같은 좌표로 이동을 시도했다.");
 
 
 	if (jump == false)
@@ -477,7 +477,7 @@ void Entity::attack(int gridX, int gridY)
 	Entity* victimEntity = TileEntity(gridX, gridY, getGridZ());
 	if (victimEntity == nullptr)
 	{
-		prt(L"[디버그] 공격이 빗나갔다.\n");
+		dbgPrt(L"[디버그] 공격이 빗나갔다.\n");
 	}
 	else
 	{
@@ -633,7 +633,7 @@ void Entity::attack(int gridX, int gridY)
 		else
 		{
 			if (option::showDamage) new Damage(L"MISS", col::lightGray, victimEntity->getGridX(), victimEntity->getGridY(), dmgAniFlag::dodged);
-			prt(L"[디버그] 공격이 빗나갔다.\n");
+			dbgPrt(L"[디버그] 공격이 빗나갔다.\n");
 		}
 	}
 }

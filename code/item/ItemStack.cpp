@@ -43,7 +43,7 @@ ItemStack::~ItemStack()
 		chunk->eraseStack(this);
 	}
 
-	prt(L"ItemStack : 소멸자가 호출되었습니다..\n");
+	dbgPrt(L"ItemStack : 소멸자가 호출되었습니다..\n");
 }
 
 void ItemStack::setGrid(int inputGridX, int inputGridY, int inputGridZ)
@@ -107,7 +107,7 @@ void ItemStack::pullStackLights(Point3 tgtCoor)
 
 bool ItemStack::runAnimation(bool shutdown)
 {
-	//prt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
+	//dbgPrt(L"ItemStack %p의 runAnimation이 실행되었다.\n",this);
 	auto aniTyhpe = getAniType();
 	if (getAniType() == aniFlag::drop)
 	{
@@ -154,7 +154,7 @@ bool ItemStack::runAnimation(bool shutdown)
 		int relX = getIntegerFakeX();
 		int relY = getIntegerFakeY();
 		float dist = sqrt(pow(relX, 2) + pow(relY, 2));
-		prt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
+		dbgPrt(L"[전]현재 fake는 (%d,%d)\n", getIntegerFakeX(), getIntegerFakeY());
 		static Point3 prevCoor;
 		if (getTimer() == 1) prevCoor = getClosestGridWithFake();
 
@@ -193,7 +193,7 @@ bool ItemStack::runAnimation(bool shutdown)
 
 			setFakeX(0);
 			setFakeY(0);
-			prt(L"애니메이션 종료\n");
+			dbgPrt(L"애니메이션 종료\n");
 			resetTimer();
 			setAniType(aniFlag::null);
 			pullStackLights();

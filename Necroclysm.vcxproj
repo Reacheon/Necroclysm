@@ -236,7 +236,6 @@
     <ClCompile Include="code\GUI\Sample.ixx" />
     <ClCompile Include="code\GUI\Status.ixx" />
     <ClCompile Include="code\GUI\Status_draw.cpp" />
-    <ClCompile Include="code\GUI\Status_radar.cpp" />
     <ClCompile Include="code\GUI\Skill.cpp" />
     <ClCompile Include="code\GUI\Skill.ixx" />
     <ClCompile Include="code\GUI\Sleep.ixx" />
@@ -331,6 +330,7 @@
     <ClCompile Include="code\util\col2Str.ixx" />
     <ClCompile Include="code\util\connectGroupExtraIndex.ixx" />
     <ClCompile Include="code\util\Corouter.ixx" />
+    <ClCompile Include="code\util\dbgPrt.ixx" />
     <ClCompile Include="code\util\decimalCutter.ixx" />
     <ClCompile Include="code\util\dir16.ixx" />
     <ClCompile Include="code\util\dirToXY.ixx" />
@@ -345,7 +345,6 @@
     <ClCompile Include="code\util\lineMaker.ixx" />
     <ClCompile Include="code\util\nanoTimer.ixx" />
     <ClCompile Include="code\util\Point.ixx" />
-    <ClCompile Include="code\util\prt.ixx" />
     <ClCompile Include="code\util\randomEngine.ixx" />
     <ClCompile Include="code\util\readTSV.ixx" />
     <ClCompile Include="code\util\replaceStr.ixx" />

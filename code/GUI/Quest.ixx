@@ -24,7 +24,7 @@ public:
 	Quest() : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		//메세지 박스 렌더링
@@ -75,7 +75,7 @@ public:
 
 		if (getFoldRatio() == 1.0)
 		{
-			drawWindow(&questBase, sysStr[198], 3);
+			drawWindow(&questBase, sysStr[121], 3);
 
 		}
 		else

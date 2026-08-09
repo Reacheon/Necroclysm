@@ -30,7 +30,7 @@ static SDL_Color getFailColor(int failRate)
 Skill::Skill() : GUI(false)
 {
 	//1개 이상의 메시지 객체 생성 시의 예외 처리
-	errorBox(ptr != nullptr, L"More than one message instance was generated.");
+	errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 	ptr = this;
 
 	//메세지 박스 렌더링
@@ -123,7 +123,7 @@ void Skill::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-		drawWindow(&skillBase, sysStr[197], 113);
+		drawWindow(&skillBase, sysStr[120], 113);
 
 		auto drawSubcategoryBox = [](std::wstring boxStr, SDL_Rect box, bool pressed, bool deactColorChange)
 			{
@@ -175,11 +175,11 @@ void Skill::drawGUI()
 
 
 		setFontSize(14);
-		drawText(L"Available Skill Point : "+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->skillPoint), skillBase.x + skillBase.w - 162, skillBase.y + 43);
+		drawText(sysStr[297]+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->skillPoint), skillBase.x + skillBase.w - 162, skillBase.y + 43);
 
 
 		// 탭 라벨: 전체/무기술/생존/행동/바이오닉/돌연변이/신성력 (skillCategory 순서)
-		static constexpr int catStrIdx[7] = { 353, 354, 355, 356, 201, 200, 202 };
+		static constexpr int catStrIdx[7] = { 261, 262, 263, 264, 123, 122, 124 };
 		for (int c = 0; c < (int)visibleCats.size(); c++)
 		{
 			SDL_Rect catBox = { skillBase.x + 13 + 70 * c, skillBase.y + 82, 70, 26 };
@@ -200,7 +200,7 @@ void Skill::drawGUI()
 		}
 
 		//setFontSize(10);
-		//std::wstring aquiredSkillText = sysStr[231] + L" : 13";
+		//std::wstring aquiredSkillText = sysStr[150] + L" : 13";
 		//drawText(aquiredSkillText, skillBase.x + 272 - queryTextWidth(aquiredSkillText), skillBase.y +34);//습득한 스킬
 
 		for (int i = 0; i < SKILL_GUI_MAX; i++)
@@ -259,7 +259,7 @@ void Skill::drawGUI()
 
 				setFont(fontType::mainFontSemiBold);
 				setFontSize(16);
-				std::wstring rankText = L"Rank " + tgtData.skillRank;
+				std::wstring rankText = sysStr[298]+L" " + tgtData.skillRank;
 				drawText(rankText, skillBtn[i].x + skillBtn[i].w - 49 - queryTextWidth(rankText), skillBtn[i].y + 2);
 				setFont(fontType::mainFont);
 
@@ -291,12 +291,12 @@ void Skill::drawGUI()
 					drawSprite(spr::skillActiveBtn, 0, skillBtn[i].x + skillBtn[i].w - 178, skillBtn[i].y + 4);
 					setFont(fontType::mainFontMedium);
 					setFontSize(15);
-					drawTextCenter(tgtBhv->type == skillType::TOGGLE ? L"Toggle" : L"Active", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 12);
+					drawTextCenter(tgtBhv->type == skillType::TOGGLE ? sysStr[299] : sysStr[300], skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 12);
 
 					int failRate = tgtBhv->calcFailRate(static_cast<Entity*>(PlayerPtr), tgtData);
 					setFontSize(12);
 					setFont(fontType::mainFontMedium);
-					drawTextCenter(col2Str(col::lightGray) + L"Fail" + col2Str(getFailColor(failRate)) + L" " + std::to_wstring(failRate) + L"%", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 28);
+					drawTextCenter(col2Str(col::lightGray) + sysStr[301] + col2Str(getFailColor(failRate)) + L" " + std::to_wstring(failRate) + L"%", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 28);
 				}
 			}
 		}

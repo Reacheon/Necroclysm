@@ -16,7 +16,7 @@ public:
 	SkillFur()
 	{
 		id = L"MUT_FUR";
-		name = L"Fur";
+		name = sysStr[277];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

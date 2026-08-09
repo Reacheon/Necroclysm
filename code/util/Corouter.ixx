@@ -40,8 +40,8 @@ export struct Corouter
 
     ~Corouter()
     {
-        if (handler && !started) errorBox(L"Corouter destroyed without being started. Use Corouter::start() to run coroutine functions.");
-        if (handler && !handler.done() && handler.promise().is_running) errorBox(L"Corouter destroyed while still running.");
+        if (handler && !started) errorBox(L"[Corouter] 코루터가 시작도 전에 소멸자가 호출되었다.");
+        if (handler && !handler.done() && handler.promise().is_running) errorBox(L"[Corouter] 코루터가 작동 중인데 소멸자가 호출되었다.");
         if (handler) handler.destroy();
     }
 
@@ -62,13 +62,13 @@ export struct Corouter
     {
         if (handler.promise().is_running) 
         {
-            errorBox(L"Corouter::run(): 이미 실행 중인 코루틴입니다!");
+            errorBox(L"이미 실행 중인 코루터를 실행하려 했다.");
             return;
         }
 
         if (handler.done()) 
         {
-            errorBox(L"Corouter::run(): 이미 완료된 코루틴을 다시 실행하려고 합니다!");
+            errorBox(L"이미 완료된 코루터를 실행하려 했다.");
             return;
         }
 

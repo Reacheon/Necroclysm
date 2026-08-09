@@ -351,9 +351,6 @@
     <ClCompile Include="code\util\Point.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
-    <ClCompile Include="code\util\prt.ixx">
-      <Filter>소스 파일\04_util</Filter>
-    </ClCompile>
     <ClCompile Include="code\util\randomEngine.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
@@ -397,6 +394,9 @@
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\Corouter.ixx">
+      <Filter>소스 파일\04_util</Filter>
+    </ClCompile>
+    <ClCompile Include="code\util\dbgPrt.ixx">
       <Filter>소스 파일\04_util</Filter>
     </ClCompile>
     <ClCompile Include="code\util\decimalCutter.ixx">
@@ -574,9 +574,6 @@
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Status_draw.cpp">
-      <Filter>소스 파일\01_system\04_GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="code\GUI\Status_radar.cpp">
       <Filter>소스 파일\01_system\04_GUI</Filter>
     </ClCompile>
     <ClCompile Include="code\GUI\Sleep.ixx">

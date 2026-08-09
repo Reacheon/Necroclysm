@@ -4,6 +4,7 @@ import constVar;
 import globalVar;
 import Prop;
 import World;
+import dbgPrt;
 
 std::int64_t propTurn()
 {
@@ -159,7 +160,7 @@ std::int64_t propTurn()
 	{
 		loopCount++;
 		if (loopCount >= MAX_CIRCUIT_LOOP_COUNT) break;
-		if (debug::printCircuitLog) std::wprintf(L"▼전자회로 루프 카운트: %d\n", loopCount);
+		if (debug::printCircuitLog) dbgPrt(L"▼전자회로 루프 카운트: %d\n", loopCount);
 
 		if (nextCircuitStartQueue.empty() == false)
 		{

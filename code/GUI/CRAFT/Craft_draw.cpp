@@ -39,7 +39,7 @@ void Craft::drawGUI()
 
 		// 제작 중 텍스트 (점 애니메이션 추가)
 		int dotCount = (SDL_GetTicks() / 800) % 4;
-		std::wstring craftText = L"Crafting";
+		std::wstring craftText = sysStr[447];
 		for (int i = 0; i < dotCount; i++) craftText += L".";
 		setFontSize(27);
 		drawTextCenter(craftText, tooltipBox.x + 255, tooltipBox.y + 27 + yOffset);
@@ -56,9 +56,8 @@ void Craft::drawGUI()
 		setFont(fontType::pixel);
 		setFontSize(18);
 		int remainingMinutes = itemDex[targetItemCode].craftTime - elapsedTime;
-		std::wstring progressText = std::to_wstring(remainingMinutes) + L" m left ( ";
-		progressText += std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime)));
-		progressText += L"% )";
+		std::wstring progressText = replaceStr(sysStr[448], L"(%min)", std::to_wstring(remainingMinutes));
+		progressText = replaceStr(progressText, L"(%percent)", std::to_wstring((int)(((float)elapsedTime * 100.0 / (float)itemDex[targetItemCode].craftTime))));
 		drawTextCenter(progressText, tooltipGauge.x + tooltipGauge.w / 2, tooltipGauge.y + tooltipGauge.h + 17);
 
 		setFont(fontType::mainFont);
@@ -109,7 +108,7 @@ void Craft::drawGUI()
 	{
 		//윈도우 박스 그리기
 		setWindowAlpha(220);
-		drawWindow(&craftBase, sysStr[75], 13);
+		drawWindow(&craftBase, sysStr[39], 13);
 		resetWindowAlpha();
 
 		setFont(fontType::mainFont);
@@ -132,7 +131,7 @@ void Craft::drawGUI()
 			SDL_Rect bookmarkInCategory = { bookmarkCategory.x + 5,  bookmarkCategory.y + 5, bookmarkCategory.w - 10, bookmarkCategory.h - 10 };
 			drawRect(bookmarkInCategory, outlineColor);
 			setFontSize(18);
-			drawTextCenter(L"★ " + sysStr[122], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
+			drawTextCenter(L"★ " + sysStr[66], bookmarkCategory.x + (bookmarkCategory.w / 2), bookmarkCategory.y + (bookmarkCategory.h / 2));
 		}
 
 		//좌측 카테고리 분류 기능 만들기
@@ -162,39 +161,39 @@ void Craft::drawGUI()
 			switch (i)
 			{
 			default://전체
-				categoryName = sysStr[76];
+				categoryName = sysStr[40];
 				categoryIndex = 36;
 				break;
 			case 0://장비
-				categoryName = sysStr[77];
+				categoryName = sysStr[41];
 				categoryIndex = 50;
 				break;
 			case 1://음식
-				categoryName = sysStr[78];
+				categoryName = sysStr[42];
 				categoryIndex = 173;
 				break;
 			case 2://도구
-				categoryName = sysStr[79];
+				categoryName = sysStr[43];
 				categoryIndex = 15;
 				break;
 			case 3://기술
-				categoryName = sysStr[80];
+				categoryName = sysStr[44];
 				categoryIndex = 47;
 				break;
 			case 4://소모품
-				categoryName = sysStr[81];
+				categoryName = sysStr[45];
 				categoryIndex = 35;
 				break;
 			case 5://차량
-				categoryName = sysStr[82];
+				categoryName = sysStr[46];
 				categoryIndex = 48;
 				break;
 			case 6://건축물
-				categoryName = sysStr[83];
+				categoryName = sysStr[47];
 				categoryIndex = 20;
 				break;
 			case 7://재료
-				categoryName = sysStr[84];
+				categoryName = sysStr[48];
 				categoryIndex = 6;
 				break;
 
@@ -314,7 +313,7 @@ void Craft::drawGUI()
 				drawRect(searchBtnInRect, outlineColor);
 
 				setFontSize(18);
-				drawTextCenter(sysStr[27], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 2);
+				drawTextCenter(sysStr[18], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 2);
 			}
 		}
 
@@ -365,7 +364,7 @@ void Craft::drawGUI()
 			switch (selectCategory)
 			{
 			default://전체
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], true, deactColorChange);
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], true, deactColorChange);
 				break;
 			case -2://즐겨찾기
 				drawSubcategoryBox(L"1", subcategoryBox[0], selectSubcategory == 0, deactColorChange);
@@ -375,7 +374,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(L"5", subcategoryBox[4], selectSubcategory == 4, deactColorChange);
 				break;
 			case 0://장비
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_melee), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_ranged), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_firearms), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
@@ -383,7 +382,7 @@ void Craft::drawGUI()
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::equipment_clothing), subcategoryBox[5], selectSubcategory == 5, deactColorChange);
 				break;
 			case 1://음식
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_cooked), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_processed), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::foods_preserved), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
@@ -392,7 +391,7 @@ void Craft::drawGUI()
 				break;
 
 			case 2://도구
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_hand), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_power), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tools_containers), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
@@ -400,13 +399,13 @@ void Craft::drawGUI()
 				break;
 
 			case 3://기술
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_bionics), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::tech_powerArmor), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				break;
 
 			case 4://소모품
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_medicine), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_ammo), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::consumable_fuel), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
@@ -414,22 +413,22 @@ void Craft::drawGUI()
 				break;
 
 			case 5://차량
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
-				drawSubcategoryBox(sysStr[260], subcategoryBox[1], selectSubcategory == 1, deactColorChange); //프레임
-				drawSubcategoryBox(sysStr[261], subcategoryBox[2], selectSubcategory == 2, deactColorChange); //파워
-				drawSubcategoryBox(sysStr[262], subcategoryBox[3], selectSubcategory == 3, deactColorChange); //외장
-				drawSubcategoryBox(sysStr[263], subcategoryBox[4], selectSubcategory == 4, deactColorChange); //부품
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[177], subcategoryBox[1], selectSubcategory == 1, deactColorChange); //프레임
+				drawSubcategoryBox(sysStr[178], subcategoryBox[2], selectSubcategory == 2, deactColorChange); //파워
+				drawSubcategoryBox(sysStr[179], subcategoryBox[3], selectSubcategory == 3, deactColorChange); //외장
+				drawSubcategoryBox(sysStr[180], subcategoryBox[4], selectSubcategory == 4, deactColorChange); //부품
 				break;
 
 			case 6://건축물
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_walls), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_floors), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::structure_props), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
 				break;
 
 			case 7://재료
-				drawSubcategoryBox(sysStr[276], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
+				drawSubcategoryBox(sysStr[188], subcategoryBox[0], selectSubcategory == 0, deactColorChange);//전체
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_metals), subcategoryBox[1], selectSubcategory == 1, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_organic), subcategoryBox[2], selectSubcategory == 2, deactColorChange);
 				drawSubcategoryBox(itemSubcategory2String(itemSubcategory::material_components), subcategoryBox[3], selectSubcategory == 3, deactColorChange);
@@ -530,7 +529,7 @@ void Craft::drawGUI()
 		if (numNoneBlackFilter == 0) // 만약 아이템이 없을 경우
 		{
 			setFontSize(18);
-			drawTextCenter(sysStr[127], craftBase.x + craftBase.w / 2 + 135, craftBase.y + craftBase.h / 2 + 60);
+			drawTextCenter(sysStr[71], craftBase.x + craftBase.w / 2 + 135, craftBase.y + craftBase.h / 2 + 60);
 		}
 
 		// 스크롤 그리기
@@ -585,12 +584,12 @@ void Craft::drawGUI()
 
 				drawText(categoryStr, topWindow.x + 102, topWindow.y + 18 + 27, col::lightGray);
 
-				std::wstring weightStr = sysStr[17]+L" : ";
+				std::wstring weightStr = sysStr[12]+L" : ";
 				weightStr += decimalCutter(((float)(recipePtr->itemInfo[targetCursor].weight)) / 1000.0, 3);
 				weightStr += L"kg";
 				drawText(weightStr, topWindow.x + 102, topWindow.y + 18 + 48);
 
-				std::wstring volumeStr = sysStr[18] + L" : ";
+				std::wstring volumeStr = sysStr[13] + L" : ";
 				volumeStr += decimalCutter(((float)recipePtr->itemInfo[targetCursor].getVolume()) / 1000.0, 3);
 				volumeStr += L"L";
 				drawText(volumeStr, topWindow.x + 252, topWindow.y + 18 + 48);
@@ -600,7 +599,7 @@ void Craft::drawGUI()
 				//조합 기술 요구치 표시는 구 숙련도 폐기로 제거됨 — 신 스킬 랭크 기반으로 재작업 예정
 
 				//조합에 필요한 기술(툴 퀄리티)
-				std::wstring qualityStr = col2Str(col::gray) + sysStr[234]+L" : ";//필요 공구
+				std::wstring qualityStr = col2Str(col::gray) + sysStr[152]+L" : ";//필요 공구
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipeQualityNeed.size(); i++)
 				{
 					if (equipPtr->checkToolQuality(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]))
@@ -616,11 +615,11 @@ void Craft::drawGUI()
 					qualityStr += toolQuality2String(recipePtr->itemInfo[targetCursor].recipeQualityNeed[i]);
 					if (i != recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() - 1) qualityStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + sysStr[236];
+				if (recipePtr->itemInfo[targetCursor].recipeQualityNeed.size() == 0) qualityStr += col2Str(col::white) + sysStr[154];
 				tooltipText += qualityStr + L"\n";
 
 				//조합에 필요한 재료
-				std::wstring materialStr = col2Str(col::gray) + sysStr[235]+L" : ";//필요 재료
+				std::wstring materialStr = col2Str(col::gray) + sysStr[153]+L" : ";//필요 재료
 				for (int i = 0; i < recipePtr->itemInfo[targetCursor].recipe.size(); i++)
 				{
 					//툴 퀄리티에 따라 적색, 녹색 변화
@@ -642,7 +641,7 @@ void Craft::drawGUI()
 					materialStr += L")";
 					if (i != recipePtr->itemInfo[targetCursor].recipe.size() - 1) materialStr += L", ";
 				}
-				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + sysStr[236];
+				if (recipePtr->itemInfo[targetCursor].recipe.size() == 0) materialStr += col2Str(col::white) + sysStr[154];
 				tooltipText += materialStr + L"\n";
 
 				//아이템 설명
@@ -668,10 +667,10 @@ void Craft::drawGUI()
 					drawRect(tooltipCraftBtn, outlineColor);
 					setFontSize(18);
 
-					drawTextCenter(sysStr[237], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6);//조합하기
+					drawTextCenter(sysStr[155], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6);//조합하기
 					setFontSize(15);
 
-					std::wstring remainStr = replaceStr(replaceStr(sysStr[238], L"(%hour)", L"1"), L"(%min)",L"34");
+					std::wstring remainStr = replaceStr(replaceStr(sysStr[156], L"(%hour)", L"1"), L"(%min)",L"34");
 					drawTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6 + 18);
 					setZoom(1.5);
 					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 21, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
@@ -695,7 +694,7 @@ void Craft::drawGUI()
 					drawRect(tooltipBookmarkBtn, outlineColor);
 
 					int bookmarkSprIndex;
-					std::wstring bookmarkLabel = sysStr[239]; //즐겨찾기
+					std::wstring bookmarkLabel = sysStr[157]; //즐겨찾기
 					SDL_Color textColor = col::white;
 					if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK1)) { bookmarkSprIndex = 32; bookmarkLabel += L" 1"; }
 					else if (recipePtr->itemInfo[targetCursor].checkFlag(itemFlag::BOOKMARK2)) { bookmarkSprIndex = 33; bookmarkLabel += L" 2"; }
@@ -782,7 +781,7 @@ void Craft::drawBookmarkDropdown()
 
 		//슬롯 번호
 		setFontSize(18);
-		drawText(sysStr[239] + L" " + slotNames[i], blockRect.x + 42, blockRect.y + BM_DD_BLOCK_H / 2 - 10);
+		drawText(sysStr[157] + L" " + slotNames[i], blockRect.x + 42, blockRect.y + BM_DD_BLOCK_H / 2 - 10);
 
 		//블록 사이 구분선 (마지막 제외)
 		if (i < BM_DD_COUNT - 1)

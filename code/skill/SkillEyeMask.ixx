@@ -17,7 +17,7 @@ public:
 	SkillEyeMask()
 	{
 		id = L"MUT_EYE_MASK";
-		name = L"Eye Mask";
+		name = sysStr[275];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

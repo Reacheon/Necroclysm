@@ -25,7 +25,7 @@ export class CoordSelectCraft : public GUI
 {
 private:
 	inline static CoordSelectCraft* ptr = nullptr;
-	std::wstring telepathyStr = sysStr[175];
+	std::wstring telepathyStr = sysStr[103];
 	int index = -1;
 	std::wstring parameter = L"";
 	std::vector<Point2> selectableCoord;
@@ -51,13 +51,13 @@ public:
 		selectableCoord = inputSelectableCoord;
 		telepathyStr = inputTelepathyStr;
 		rotatedItemCode = tgtItemCode;
-		prt(L"CoordSelectCraft : 생성자가 호출되었습니다..\n");
+		dbgPrt(L"CoordSelectCraft : 생성자가 호출되었습니다..\n");
 		ptr = this;
 	}
 
 	~CoordSelectCraft()
 	{
-		prt(L"CoordSelectCraft : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"CoordSelectCraft : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 		UIType = act::null;
 	}
@@ -352,7 +352,7 @@ public:
 					std::wstring yStr = std::to_wstring(throwingY);
 					std::wstring zStr = std::to_wstring(throwingZ);
 
-					prt(L"절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
+					dbgPrt(L"절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
 
 
 					if (selectableCoord.size() > 0)//선택좌표가 있는 경우일 때
@@ -397,7 +397,7 @@ public:
 
 							if (i == selectableCoord.size() - 1)
 							{
-								prt(L"해당 좌표는 선택할 수 없다.\n");
+								dbgPrt(L"해당 좌표는 선택할 수 없다.\n");
 							}
 						}
 					}
@@ -439,7 +439,7 @@ public:
 						}
 						else
 						{
-							prt(L"해당 좌표는 시야에 보이지 않는다.\n");
+							dbgPrt(L"해당 좌표는 시야에 보이지 않는다.\n");
 						}
 					}
 				}

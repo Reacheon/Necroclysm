@@ -1,16 +1,16 @@
 module;
 #include <SDL3/SDL.h>
 
-export module prt;
+export module dbgPrt;
 
 import std;
 
-export void prt(const wchar_t* format, auto... args)
+export void dbgPrt(const wchar_t* format, auto... args)
 {
     std::wprintf(format, args...);
 }
 
-export void prt(SDL_Color col, const wchar_t* format, auto... args)
+export void dbgPrt(SDL_Color col, const wchar_t* format, auto... args)
 {
     std::wprintf(L"\033[38;2;%d;%d;%dm", col.r, col.g, col.b);
     std::wprintf(format, args...);

@@ -33,7 +33,7 @@ private:
 	SDL_Rect inventoryBase;
 	std::array<SDL_Rect, 12> bionicRect;
 
-	std::wstring titleInventory = sysStr[185];
+	std::wstring titleInventory = sysStr[108];
 	int titleItemSprIndex = 60;
 
 	SDL_Rect dropBtn;
@@ -245,7 +245,7 @@ public:
 		{
 			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
-				prt(L"탭이 실행되었다.\n");
+				dbgPrt(L"탭이 실행되었다.\n");
 				close(aniFlag::winUnfoldClose);
 				delayR2 = 20;
 			}
@@ -324,7 +324,7 @@ public:
 		// 선택된 아이템이 있는지 확인
 		if (!panel.hasAnySelection())
 		{
-			updateLog(L"No items selected to drop.");
+			updateLog(sysStr[353]);
 			co_return;
 		}
 
@@ -338,12 +338,12 @@ public:
 			}
 		}
 
-		new CoordSelect(L"Drop items where?", selectableCoord);
+		new CoordSelect(sysStr[354], selectableCoord);
 		co_await std::suspend_always();
 
 		if (coAnswer.empty())
 		{
-			updateLog(L"Drop cancelled.");
+			updateLog(sysStr[355]);
 			co_return;
 		}
 
@@ -373,7 +373,7 @@ public:
 		}
 
 		// 한 번에 던지기
-		updateLog(L"You drop the selected items.");
+		updateLog(sysStr[356]);
 		PlayerPtr->throwing(std::move(droppingPocket), targetX, targetY);
 		PlayerPtr->updateStatus();
 

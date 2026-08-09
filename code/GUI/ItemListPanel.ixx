@@ -105,33 +105,33 @@ public:
 		}
 
 		setFontSize(14);
-		drawTextCenter(sysStr[15], label.x + 30, label.y + 14);     //선택
-		drawTextCenter(sysStr[16], label.x + 183, label.y + 14);    //이름
+		drawTextCenter(sysStr[10], label.x + 30, label.y + 14);     //선택
+		drawTextCenter(sysStr[11], label.x + 183, label.y + 14);    //이름
 
 		if (showSort)
 		{
 			switch (sortType)
 			{
 			default:
-				drawTextCenter(sysStr[24], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[15], label.x + 337, label.y + 14);
 				break;
 			case sortFlag::weightDescend:
-				drawTextCenter(sysStr[45], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[28], label.x + 337, label.y + 14);
 				break;
 			case sortFlag::weightAscend:
-				drawTextCenter(sysStr[46], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[29], label.x + 337, label.y + 14);
 				break;
 			case sortFlag::volumeDescend:
-				drawTextCenter(sysStr[47], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[30], label.x + 337, label.y + 14);
 				break;
 			case sortFlag::volumeAscend:
-				drawTextCenter(sysStr[48], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[31], label.x + 337, label.y + 14);
 				break;
 			}
 		}
 		else
 		{
-			drawTextCenter(sysStr[24], label.x + 337, label.y + 14); //물리량
+			drawTextCenter(sysStr[15], label.x + 337, label.y + 14); //물리량
 		}
 	}
 
@@ -172,7 +172,7 @@ public:
 		{
 			setFont(fontType::mainFont);
 			setFontSize(16);
-			drawTextCenter(sysStr[162], centerX, centerY, col::lightGray); //가방 안에 아이템이 없다
+			drawTextCenter(sysStr[101], centerX, centerY, col::lightGray); //가방 안에 아이템이 없다
 		}
 	}
 
@@ -241,7 +241,7 @@ public:
 		switch (sortType)
 		{
 		default:
-			errorBox(L"undefined sorting in ItemListPanel");
+			errorBox(L"ItemListPanel : 잘못된 sortFlag가 사용되었다.");
 			break;
 		case sortFlag::null:
 			pocket->sortWeightDescend();

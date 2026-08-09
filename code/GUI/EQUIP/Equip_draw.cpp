@@ -21,7 +21,7 @@ void Equip::drawGUI()
 
 	if (getFoldRatio() == 1.0)
 	{
-	drawWindow(&equipBase, sysStr[332], 94);
+	drawWindow(&equipBase, sysStr[242], 94);
 	setFlip(SDL_FLIP_HORIZONTAL);
 	drawSprite(spr::newWindowArrow, 0, equipBase.x + equipBase.w - 4, equipBase.y + 255);
     setFlip(SDL_FLIP_NONE);
@@ -34,7 +34,7 @@ void Equip::drawGUI()
 		drawFillRect(SDL_Rect{ weightGaugeRect.x + 2, weightGaugeRect.y + 2, 50, 6 }, lowCol::green);
 		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 56, weightGaugeRect.y + 5);
 		setFontSize(12);
-		drawText(sysStr[163], weightGaugeRect.x - 46, weightGaugeRect.y - 2);//무게
+		drawText(sysStr[102], weightGaugeRect.x - 46, weightGaugeRect.y - 2);//무게
 		setFontSize(10);
 		drawText(L"32.5 / 92.3 kg", weightGaugeRect.x + 132, weightGaugeRect.y - 1);
 
@@ -51,7 +51,7 @@ void Equip::drawGUI()
 
 		if (panel.pocket->itemInfo.size() == 0) // 만약 아이템이 없을 경우
 		{
-			drawTextCenter(sysStr[90], equipArea.x + equipArea.w / 2, equipArea.y + equipArea.h / 2);
+			drawTextCenter(sysStr[52], equipArea.x + equipArea.w / 2, equipArea.y + equipArea.h / 2);
 		}
 
 		//스크롤바

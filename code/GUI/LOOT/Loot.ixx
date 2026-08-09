@@ -61,8 +61,8 @@ public:
 	Loot(ItemPocket* inputPocket, ItemData* inputData, Point3 tgtPoint) : GUI(false)
 	{
 		ptr = this;
-		prt(L"Loot : 생성자가 생성되었습니다..\n");
-		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
+		dbgPrt(L"Loot : 생성자가 생성되었습니다..\n");
+		dbgPrt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 
 		int revX = tgtPoint.x - PlayerX();
 		int revY = tgtPoint.y - PlayerY();
@@ -96,7 +96,7 @@ public:
 		deactDraw();
 		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
-		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
+		dbgPrt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
 		if (option::inputMethod == input::gamepad) panel.cursor = 0;
 	}
@@ -104,8 +104,8 @@ public:
 	Loot(ItemStack* inputStack) : GUI(false)
 	{
 		ptr = this;
-		prt(L"Loot : 생성자가 생성되었습니다..\n");
-		prt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
+		dbgPrt(L"Loot : 생성자가 생성되었습니다..\n");
+		dbgPrt(L"현재 loot의 ptr 변수는 %p입니다.\n", ptr);
 
 		int revX = inputStack->getGridX() - PlayerX();
 		int revY = inputStack->getGridY() - PlayerY();
@@ -140,14 +140,14 @@ public:
 		deactDraw();
 		addAniToPlayerTurn(this, aniFlag::winUnfoldOpen);
 
-		prt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
+		dbgPrt(L"item의 크기는 %d입니다.\n", sizeof(ItemData));
 
 		if (option::inputMethod == input::gamepad) panel.cursor = 0;
 	}
 
 	~Loot()
 	{
-		prt(L"Loot : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Loot : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 
 		UIType = act::null;
@@ -216,7 +216,6 @@ public:
 		{
 			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
-				prt(L"탭이 실행되었다.\n");
 				executeTab();
 				delayR2 = 20;
 			}
@@ -269,7 +268,7 @@ public:
 
 		if (equipPtr->itemInfo.size() == 0)
 		{
-			updateLog(sysStr[123]);//소지한 가방이 하나도 없다
+			updateLog(sysStr[67]);//소지한 포켓이 하나도 없다.
 			return;
 		}
 
@@ -289,7 +288,7 @@ public:
 			//가방을 찾지 못했을 경우
 			if (i == equipPtr->itemInfo.size() - 1 && bagPtr == nullptr)
 			{
-				updateLog(sysStr[123]);//소지한 가방이 하나도 없다
+				updateLog(sysStr[67]);//소지한 포켓이 하나도 없다.
 				return;
 			}
 		}
@@ -312,7 +311,7 @@ public:
 
 			if (maxVol < itemsVol + currentVol)
 			{
-				updateLog(sysStr[124]);
+				updateLog(sysStr[68]); //소지한 포켓이 하나도 없다.
 				return;
 			}
 
@@ -326,7 +325,7 @@ public:
 				}
 			}
 
-			if (moved)updateLog(L"You put the items into the pocket.");
+			if (moved) updateLog(sysStr[357]); //아이템들을 포켓에 집어 넣었다.
 
 			panel.clearAllSelections();
 			return;
@@ -364,8 +363,8 @@ public:
 					}
 				}
 
-				if (moved) updateLog(L"You put the items into the pocket.");
-				if (hasIllegal) updateLog(L"Some selected items cannot be put into this pocket.");
+				if (moved) updateLog(sysStr[357]); //아이템들을 포켓에 집어 넣었다.
+				if (hasIllegal) updateLog(sysStr[358]); //일부 아이템은 포켓에 집어넣을 수 없었다.
 
 				panel.clearAllSelections();
 			}
@@ -394,14 +393,14 @@ public:
 
 					panel.clearAllSelections();
 
-					if (moved)updateLog(L"You put items into the pocket up to the limit.");
-					if (hasIllegal)updateLog(L"Some selected items cannot be put into this pocket.");
+					if (moved) updateLog(sysStr[360]); //포켓이 꽉 차서 일부 아이템은 들어가지 못했다.
+					if (hasIllegal) updateLog(sysStr[358]); //일부 아이템은 포켓에 집어넣을 수 없었다.
 				}
 				//완전히 가득 찬 경우
 				else
 				{
-					updateLog(L"The bag is full and cannot hold any more items.");
-					if (hasIllegal) updateLog(L"Some selected items cannot be put into this pocket.");
+					updateLog(sysStr[359]);
+					if (hasIllegal) updateLog(sysStr[358]); //일부 아이템은 포켓에 집어넣을 수 없었다.
 				}
 			}
 
@@ -441,7 +440,7 @@ public:
 		}
 		if (numberOfBag == 0)
 		{
-			updateLog(sysStr[123]);
+			updateLog(sysStr[67]);
 			return;
 		}
 		else

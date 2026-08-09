@@ -53,7 +53,7 @@ ItemData cloneFromItemDex(ItemData& inputData, int transferNumber)
 {
     ItemData newItem;
 
-    errorBox(transferNumber <= 0, L"Number to add must be positive in addItemFromDex.");
+    errorBox(transferNumber <= 0, L"cloneFromItemDex에서 음수의 아이템 전달을 시도했다.");
 
     ItemData& itemTemplate = inputData;
 

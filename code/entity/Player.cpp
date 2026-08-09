@@ -30,7 +30,7 @@ import levelUpFX;
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
 	static Player* ptr = this;
-	prt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
+	dbgPrt(L"[디버그] 플레이어 생성 완료 ID : %p\n", this);
 
 	entityInfo.skinColor = L"LIGHT";
 	entityInfo.gender = L"MALE";
@@ -83,7 +83,7 @@ Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)
 }
 Player::~Player()
 {
-	prt(L"Player : 소멸자가 호출되었습니다..\n");
+	dbgPrt(L"Player : 소멸자가 호출되었습니다..\n");
 }
 
 
@@ -100,8 +100,7 @@ void Player::startMove(int inputDir)
 {
 	if (PlayerPtr->getAniType() == aniFlag::null)
 	{
-		//errorBox(PlayerPtr->getAniType() == aniFlag::null, L"Player's startMove activated while player's aniFlag is not null.");
-		errorBox(((PlayerPtr)->getX() - 8) % 16 != 0, L"This instance moved from non-integer coordinates.");
+		errorBox(((PlayerPtr)->getX() - 8) % 16 != 0, L"플레이어가 정수 좌표가 아닌 곳으로 이동을 시도하였다.");
 
 		int dx, dy;
 		dir2Coord(inputDir, dx, dy);
@@ -450,7 +449,7 @@ void Player::updateVision(int range, int cx, int cy)
 	double gray  = (tAfterGray - tStart) / 1000000.0;
 	double work  = (tEnd - tAfterGray)   / 1000000.0;
 
-	//prt(L"[updateVision perf] (%d,%d) total=%.3fms | gray=%.3fms work=%.3fms | rays=%d (single-thread)\n",
+	//dbgPrt(L"[updateVision perf] (%d,%d) total=%.3fms | gray=%.3fms work=%.3fms | rays=%d (single-thread)\n",
 	//	cx, cy, total, gray, work, rayCount);
 }
 
@@ -466,7 +465,7 @@ void Player::updateVision()
 
 void Player::updateNearbyChunk(int range)
 {
-    //std::wprintf(L"updateNearbyChunk 호출됨. 플레이어 좌표 : %d,%d,%d\n", getGridX(), getGridY(), getGridZ());
+    //dbgPrt(L"updateNearbyChunk 호출됨. 플레이어 좌표 : %d,%d,%d\n", getGridX(), getGridY(), getGridZ());
 	int chunkX, chunkY;
 	World::ins()->changeToChunkCoord(getGridX(), getGridY(), chunkX, chunkY);
 	for (int y = chunkY - range; y <= chunkY + range; y++)
@@ -504,13 +503,13 @@ void Player::updateNearbyChunk(int range)
 
 	World::ins()->deactivate();
 
-	//std::wprintf(L"▼청크 활성화▼\n");
+	//dbgPrt(L"▼청크 활성화▼\n");
 	for (int x = chunkX - 2; x <= chunkX + 2; x++)
 	{
 		for (int y = chunkY - 2; y <= chunkY + 2; y++)
 		{
-            //std::wprintf(L"(%d,%d) ", x, y);
-			//if (y == chunkY + 2) std::wprintf(L"\n");
+            //dbgPrt(L"(%d,%d) ", x, y);
+			//if (y == chunkY + 2) dbgPrt(L"\n");
 			World::ins()->activate(x, y, PlayerZ());
 		}
 	}
@@ -902,14 +901,14 @@ void Player::changeWalkMode(walkFlag inputMode)
 
 	entityInfo.walkMode = inputMode;
 }
-//즉시 1레벨업 — 포인트 지급·연출·로그까지 한 번에 (F3/디버그에서도 직접 호출)
+
 void Player::levelUp()
 {
 	level++;
 	ap += 1;
 	skillPoint += 10;
 	levelUpFX::trigger();
-	updateLog(L"You reach Level " + std::to_wstring(level) + L". You feel new power flowing through you.");
+	updateLog(replaceStr(sysStr[449], L"(%level)", std::to_wstring(level)));
 }
 
 void Player::addExp(int amount)

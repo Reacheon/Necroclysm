@@ -16,7 +16,7 @@ public:
 	SkillShortMuzzle()
 	{
 		id = L"MUT_SHORT_MUZZLE";
-		name = L"Short Muzzle";
+		name = sysStr[287];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

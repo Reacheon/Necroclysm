@@ -18,9 +18,9 @@ public:
 	SkillRoll()
 	{
 		id = L"SKILL_ROLL";
-		name = L"Roll";
+		name = sysStr[267];
 		iconIndex = 1;
-		descript = L"Roll toward an adjacent tile. Increases evasion chance against attacks for the rest of the turn. ";
+		descript = L"";
 		src = skillSrc::GENERAL;
 		category = skillCategory::action;
 		type = skillType::ACTIVE;
@@ -36,7 +36,7 @@ public:
 		int cz = caster->getGridZ();
 		if (itemDex[TileFloor(cx, cy, cz)].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[TileFloor(cx, cy, cz)].checkFlag(itemFlag::WATER_DEEP))
 		{
-			updateLog(L"You cannot roll in water.");
+			updateLog(sysStr[265]); //물에서는 구를 수 없다.
 			return false;
 		}
 		return true;
@@ -61,7 +61,7 @@ public:
 				}
 			}
 		}
-		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[319]);
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[229]);
 		co_await std::suspend_always();
 		rangeSet.clear();
 		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }

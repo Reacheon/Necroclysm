@@ -17,9 +17,9 @@ public:
 	SkillAthletics()
 	{
 		id = L"SKILL_ATHLETICS";
-		name = L"Athletics";
+		name = sysStr[270];
 		iconIndex = 13;
-		descript = L"Overall physical conditioning. Improves swimming, climbing and running, and supports acrobatic skills such as Roll and Leap.";
+		descript = L"";
 		src = skillSrc::GENERAL;
 		category = skillCategory::survival;
 		type = skillType::PASSIVE;

@@ -73,7 +73,7 @@ public:
 	Aim() : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		//메세지 박스 렌더링
@@ -360,28 +360,28 @@ public:
 			if (isRifle)
 			{
 				setFontSize(11);
-				auto selectorLabel = [&](const wchar_t* label, fireSelector sel, int yPos)
+				auto selectorLabel = [&](const std::wstring& label, fireSelector sel, int yPos)
 				{
 					if (currentSelector == sel)
 					{
-						std::wstring text = std::wstring(label) + L"◀";
+						std::wstring text = label + L"◀";
 						drawTextOutline(text.c_str(), cx + 22, yPos, col::white);
 					}
 					else
 					{
-						drawTextOutline(label, cx + 22, yPos, col::lightGray);
+						drawTextOutline(label.c_str(), cx + 22, yPos, col::lightGray);
 					}
 				};
-				selectorLabel(L"Auto",   fireSelector::AUTO,   accY - 4 - 22);
-				selectorLabel(L"Single", fireSelector::SINGLE, accY - 4 - 11);
-				selectorLabel(L"Burst",  fireSelector::BURST,  accY - 4);
+				selectorLabel(sysStr[406],   fireSelector::AUTO,   accY - 4 - 22);
+				selectorLabel(sysStr[407], fireSelector::SINGLE, accY - 4 - 11);
+				selectorLabel(sysStr[408],  fireSelector::BURST,  accY - 4);
 			}
 			// 쌍권총 선택 표시
 			else if (pistolMode == pistolAimMode::DUAL)
 			{
 				setFontSize(11);
-				std::wstring labelL = L"[L]" + leftPistolName;
-				std::wstring labelR = L"[R]" + rightPistolName;
+				std::wstring labelL = L"[L] " + leftPistolName;
+				std::wstring labelR = L"[R] " + rightPistolName;
 
 				if (dualSelected == equipHandFlag::left)
 				{
@@ -523,13 +523,13 @@ public:
 				int pivotY = cameraH - 280;
 				drawSprite(spr::btnGuideBackground, pivotX, pivotY);
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseLeft, pivotX + 112, pivotY + 30);
-				drawText(L"Shot", pivotX + 132, pivotY + 15);
+				drawText(sysStr[409], pivotX + 132, pivotY + 15);
 
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseRight, pivotX + 112 + 100, pivotY + 30);
-				drawText(L"Aim", pivotX + 132 + 100, pivotY + 15);
+				drawText(sysStr[410], pivotX + 132 + 100, pivotY + 15);
 
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseWheel, pivotX + 112 + 190, pivotY + 30);
-				drawText(isRifle ? L"Selector" : L"Switch", pivotX + 132 + 190, pivotY + 15);
+				drawText(isRifle ? sysStr[411] : sysStr[412], pivotX + 132 + 190, pivotY + 15);
 			}
 			else
 			{
@@ -539,10 +539,10 @@ public:
 				int pivotY = cameraH - 280;
 				drawSprite(spr::btnGuideBackground, pivotX, pivotY);
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseLeft, pivotX + 122, pivotY + 30);
-				drawText(L"Shot", pivotX + 142, pivotY + 15);
+				drawText(sysStr[409], pivotX + 142, pivotY + 15);
 
 				drawSpriteCenter(spr::keyboardButtons, keyboardIndex::mouseRight, pivotX + 132 + 100, pivotY + 30);
-				drawText(L"Aim", pivotX + 152 + 100, pivotY + 15);
+				drawText(sysStr[410], pivotX + 152 + 100, pivotY + 15);
 			}
 		}
 	}
@@ -698,14 +698,14 @@ public:
 		if (newSel != currentSelector)
 		{
 			currentSelector = newSel;
-			const wchar_t* name = L"";
+			std::wstring name = L"";
 			switch (currentSelector)
 			{
-			case fireSelector::AUTO:   name = L"Auto";   break;
-			case fireSelector::SINGLE: name = L"Single"; break;
-			case fireSelector::BURST:  name = L"Burst";  break;
+			case fireSelector::AUTO:   name = sysStr[406];   break;
+			case fireSelector::SINGLE: name = sysStr[407]; break;
+			case fireSelector::BURST:  name = sysStr[408];  break;
 			}
-			updateLog(std::wstring(L"Changed fire selector to #58D68D") + name + L"#FFFFFF.");
+			updateLog(replaceStr(sysStr[413], L"(%mode)", col2Str(SDL_Color{ 0x58,0xD6,0x8D }) + name + col2Str(col::white)));
 		}
 	}
 	void gamepadBtnDown() 
@@ -750,7 +750,6 @@ public:
 		{
 			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
-				prt(L"탭이 실행되었다.\n");
 				executeTabShot();
 				delayR2 = 20;
 			}
@@ -837,7 +836,7 @@ public:
 
 				//자기 자신에게 던지는 경우도 고려해야 되나?
 				std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-				updateLog(replaceStr(L"You throw the (%item).", L"(%item)", PlayerEquip()->itemInfo[PlayerPtr->getAimWeaponIndex()].name));
+				updateLog(replaceStr(sysStr[414], L"(%item)", PlayerEquip()->itemInfo[PlayerPtr->getAimWeaponIndex()].name));
 				PlayerEquip()->transferItem(drop.get(), PlayerPtr->getAimWeaponIndex(), 1);
 				PlayerPtr->throwing(std::move(drop), targetX, targetY);
 				PlayerPtr->updateStatus();

@@ -1,7 +1,7 @@
 export module utf8Decoder;
 
 import std;
-import prt;
+import dbgPrt;
 
 //  @brief utf-8로 인코딩된 값을 유니코드로 바꾸는 함수
 //  @param byte1 첫번째 바이트
@@ -38,7 +38,7 @@ export std::uint32_t utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 		}
 	}
 
-	if (strByte == -1) { prt(L"[에러] utf8Decoder가 UTF-8 인코딩이 아닌 잘못된 입력값을 받았습니다.\n"); }
+	if (strByte == -1) { dbgPrt(L"[에러] utf8Decoder가 UTF-8 인코딩이 아닌 잘못된 입력값을 받았습니다.\n"); }
 
 	//decode에는 완성한 값이 한 칸당 유니코드 숫자로 들어감
 	std::string decode;
@@ -73,15 +73,15 @@ export std::uint32_t utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			//prt(L"%d번째 바이트의 비트들은 %d 이다.", i+1, bit[i][j] - 48);
+			//dbgPrt(L"%d번째 바이트의 비트들은 %d 이다.", i+1, bit[i][j] - 48);
 		}
-		//prt(L"\n");
+		//dbgPrt(L"\n");
 	}
 
 	//각 비트의 값을 decode에 붙혀넣는다. 반드시 48을 빼줄 것
 	for (int i = startPoint; i < 8; i++)
 	{
-		//prt(L"decode의 %d번째에 %d를 입력했다.\n", i, bit[0][i] - 48);
+		//dbgPrt(L"decode의 %d번째에 %d를 입력했다.\n", i, bit[0][i] - 48);
 		decode[i - startPoint] += bit[0][i] - 48;
 		int lastMax0 = i - startPoint;
 		if (i == 7)
@@ -120,7 +120,7 @@ export std::uint32_t utf8Decoder(char byte1, char byte2, char byte3, char byte4)
 			unicode += std::pow(2, bitSize - i - 1);
 		}
 	}
-	//prt(L"디코딩 결과값은 %d이다.\n", number);
+	//dbgPrt(L"디코딩 결과값은 %d이다.\n", number);
 	return unicode;
 }
 

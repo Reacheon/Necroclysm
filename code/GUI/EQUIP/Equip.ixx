@@ -53,7 +53,7 @@ public:
 
 	Equip() : GUI(false)
 	{
-		errorBox(ptr != nullptr, L"More than equip instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
         int arrowEndX, arrowEndY, targetX, targetY;
@@ -75,7 +75,7 @@ public:
 	}
 	~Equip()
 	{
-		prt(L"Equip : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Equip : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 
 		UIType = act::null;
@@ -242,7 +242,7 @@ public:
 	void executeDroping()
 	{
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
-		updateLog(replaceStr(sysStr[126], L"(%item)", equipPtr->itemInfo[panel.cursor].name));//(%item)를(을) 버렸다.
+		updateLog(replaceStr(sysStr[70], L"(%item)", equipPtr->itemInfo[panel.cursor].name));//(%item)를(을) 버렸다.
 		equipPtr->transferItem(drop.get(), panel.cursor, 1);
 		PlayerPtr->throwing(std::move(drop), PlayerX(), PlayerY());
 		PlayerPtr->updateStatus();
@@ -266,13 +266,13 @@ public:
 		for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 		if (rangeSet.size() == 0)
 		{
-			updateLog(L"No valid space to install.");
+			updateLog(L"주변에 이 아이템을 설치할만한 공간이 없다.");
 			co_return;
 		}
 
 		int tgtItemCode = equipPtr->itemInfo[panel.cursor].itemCode;
 
-		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
+		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[209], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 		co_await std::suspend_always();
 		rangeSet.clear();
 		actDraw();
@@ -295,7 +295,7 @@ public:
 			//설치할 아이템의 내부에 있는 아이템을 전부 설치된 상태 아이템의 내부로 옮김
 			if (propItem.pocketPtr != nullptr && tgtItem.pocketPtr != nullptr)
 			{
-                errorBox(propItem.pocketMaxVolume != tgtItem.pocketMaxVolume, L"PropInstall : propItem.pocketMaxVolume != tgtItem.pocketMaxVolume");
+                errorBox(propItem.pocketMaxVolume != tgtItem.pocketMaxVolume, L"PropInstall : 아이템화된 프롭과 프롭의 포켓 부피가 다르다.");
 				for (int i = tgtItem.pocketPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
                     tgtItem.pocketPtr->transferItem(propItem.pocketPtr.get(), i, tgtItem.pocketPtr->itemInfo[i].number);
@@ -312,7 +312,7 @@ public:
 			}
 			PlayerPtr->updateStatus();
 
-            updateLog(replaceStr(sysStr[329], L"(%item)", itemDex[targetItemCode].name));
+            updateLog(replaceStr(sysStr[239], L"(%item)", itemDex[targetItemCode].name));
 
 			close(aniFlag::null);
 		}

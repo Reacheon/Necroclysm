@@ -22,9 +22,9 @@ public:
 	SkillMetabExchange()
 	{
 		id = L"BION_METAB_EXCHANGE";
-		name = L"Metab Exchange";
+		name = sysStr[271];
 		iconIndex = 11;
-		descript = L"Converts metabolic energy into bionic power. Increases hunger over time.";
+		descript = L"";
 		src = skillSrc::BIONIC;
 		type = skillType::TOGGLE;
 		skillRank = L"F";
@@ -37,7 +37,7 @@ public:
 	{
 		if (!data.toggle && hunger >= HUNGER_THRESHOLD)
 		{
-			updateLog(L"You are too hungry to activate Metab Exchange.");
+			updateLog(sysStr[289]);
 			return false;
 		}
 		return true;
@@ -45,12 +45,12 @@ public:
 
 	void onToggleOn(Entity* caster, const SkillData& data) override
 	{
-		updateLog(L"Metab Exchange activated. Your body begins converting nutrients into power.");
+		updateLog(sysStr[290]);
 	}
 
 	void onToggleOff(Entity* caster, const SkillData& data) override
 	{
-		updateLog(L"Metab Exchange deactivated.");
+		updateLog(sysStr[291]);
 	}
 
 	// 매 턴 호출: 허기 증가 + 에너지 충전, 허기 75% 이상이면 자동 종료
@@ -62,7 +62,7 @@ public:
 		if (hunger >= HUNGER_THRESHOLD)
 		{
 			data.toggle = false;
-			updateLog(L"Metab Exchange automatically shuts down due to extreme hunger.");
+			updateLog(sysStr[292]);
 			return;
 		}
 

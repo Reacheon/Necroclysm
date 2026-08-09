@@ -118,7 +118,7 @@ double Prop::getOutletFluid()
 
 void Prop::updateFluidCircuitNetwork()
 {
-    if (debug::printCircuitLog) std::wprintf(L"------------------------- 유체 회로망 업데이트 시작 ------------------------\n");
+    if (debug::printCircuitLog) dbgPrt(L"------------------------- 유체 회로망 업데이트 시작 ------------------------\n");
     int cursorX = getGridX();
     int cursorY = getGridY();
     int cursorZ = getGridZ();
@@ -136,7 +136,7 @@ void Prop::updateFluidCircuitNetwork()
 
     if (saveFrontierQueue.size() > 0 && saveVisitedSet.size() > 0)
     {
-        if (debug::printCircuitLog) std::wprintf(L"------------------------- 이전 유체 회로망 탐색 결과 불러오기 ------------------------\n");
+        if (debug::printCircuitLog) dbgPrt(L"------------------------- 이전 유체 회로망 탐색 결과 불러오기 ------------------------\n");
         frontierQueue = saveFrontierQueue;
         visitedSet = saveVisitedSet;
     }
@@ -158,7 +158,7 @@ void Prop::updateFluidCircuitNetwork()
             if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)) powerState = L" [ON]";
             else if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) powerState = L" [OFF]";
 
-            std::wprintf(L"[BFS 탐색] %ls (%d,%d,%d)%ls\n",
+            dbgPrt(L"[BFS 탐색] %ls (%d,%d,%d)%ls\n",
                 currentProp->leadItem.name.c_str(),
                 current.x, current.y, current.z,
                 powerState.c_str());
@@ -166,7 +166,7 @@ void Prop::updateFluidCircuitNetwork()
 
         if (currentProp == nullptr)
         {
-            std::wprintf(L"[경고] BFS가 nullptr 프롭에 도달함 (%d,%d,%d)\n", current.x, current.y, current.z);
+            dbgPrt(L"[경고] BFS가 nullptr 프롭에 도달함 (%d,%d,%d)\n", current.x, current.y, current.z);
             continue;
         }
 
@@ -183,7 +183,7 @@ void Prop::updateFluidCircuitNetwork()
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[33m★ 펌프 감지: %ls \x1b[0m\n",
+                    dbgPrt(L"  \x1b[33m★ 펌프 감지: %ls \x1b[0m\n",
                         currentProp->leadItem.name.c_str());
                 }
 
@@ -197,7 +197,7 @@ void Prop::updateFluidCircuitNetwork()
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[33m★ 탱크 감지: %ls \x1b[0m\n",
+                    dbgPrt(L"  \x1b[33m★ 탱크 감지: %ls \x1b[0m\n",
                         currentProp->leadItem.name.c_str());
                 }
 
@@ -226,7 +226,7 @@ void Prop::updateFluidCircuitNetwork()
 
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[91m◆ 싱크 감지: %ls (%d,%d,%d)\x1b[0m\n",
+                    dbgPrt(L"  \x1b[91m◆ 싱크 감지: %ls (%d,%d,%d)\x1b[0m\n",
                         currentProp->leadItem.name.c_str(),
                         current.x, current.y, current.z);
                 }
@@ -245,7 +245,7 @@ void Prop::updateFluidCircuitNetwork()
                 {
                     ItemData& nextItem = nextProp->leadItem;
                     if (debug::printCircuitLog)
-                        std::wprintf(L"  [연결] %ls (%d,%d) %ls\n",
+                        dbgPrt(L"  [연결] %ls (%d,%d) %ls\n",
                             dirToArrow(directions[i]), nextCoord.x, nextCoord.y, nextItem.name.c_str());
                     frontierQueue.push(nextCoord);
 
@@ -266,7 +266,7 @@ void Prop::updateFluidCircuitNetwork()
         int y = pumpProp->getGridY();
         int z = pumpProp->getGridZ();
 
-        if (debug::printCircuitLog) std::wprintf(L"========================▼펌프 (%d,%d) : 밀어내기 시작▼========================\n", x, y);
+        if (debug::printCircuitLog) dbgPrt(L"========================▼펌프 (%d,%d) : 밀어내기 시작▼========================\n", x, y);
         if (pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) &&
             pumpProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
@@ -357,15 +357,15 @@ void Prop::updateFluidCircuitNetwork()
             remainFluid = 0.0;
         }
 
-        // 3. 로그 출력 (std::wprintf 사용)
+        // 3. 로그 출력 (dbgPrt 사용)
         if (totalInlet > EPSILON)
         {
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"  \x1b[96m▶ [SINK 처리] (%d,%d)%ls \x1b[0m\n",
+                dbgPrt(L"  \x1b[96m▶ [SINK 처리] (%d,%d)%ls \x1b[0m\n",
                     sinkProp->getGridX(), sinkProp->getGridY(), sinkProp->leadItem.name.c_str());
 
-                std::wprintf(L"      │ 총 유입량: %.2f mL\n", totalInlet);
+                dbgPrt(L"      │ 총 유입량: %.2f mL\n", totalInlet);
             }
 
             if (consumedByDevice > EPSILON)
@@ -423,7 +423,7 @@ void Prop::updateFluidCircuitNetwork()
                 }
 
 
-                if (debug::printCircuitLog) std::wprintf(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
+                if (debug::printCircuitLog) dbgPrt(L"      │ ├─ \x1b[32m[장치소비] %.2f / %d (충족률: %.1f%%)\x1b[0m\n",
                     consumedByDevice,
                     sinkProp->leadItem.fluidDemand,
                     (consumedByDevice / sinkProp->leadItem.fluidDemand) * 100.0);
@@ -431,7 +431,7 @@ void Prop::updateFluidCircuitNetwork()
 
             if (leakedByHole > EPSILON) //누수 알고리즘
             {
-                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",leakedByHole);
+                if (debug::printCircuitLog) dbgPrt(L"      │ └─ \x1b[34m[누수발생] %.2f (구멍으로 배출)\x1b[0m\n",leakedByHole);
                 
                 sinkProp->jetFluidType = sinkProp->sinkFluidType;
                 sinkProp->jetFluidDir = sinkProp->getHoleDirection();
@@ -440,15 +440,15 @@ void Prop::updateFluidCircuitNetwork()
             }
             else if (hasHole && leakedByHole <= EPSILON)
             {
-                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[90m[누수없음] 잔여 유량 없음\x1b[0m\n");
+                if (debug::printCircuitLog) dbgPrt(L"      │ └─ \x1b[90m[누수없음] 잔여 유량 없음\x1b[0m\n");
             }
             else if (!hasHole && remainFluid > EPSILON)
             {
                 // 구멍이 없고 Demand보다 많이 들어온 경우 (막힌 관 끝에 압력이 차는 상황 등)
-                if (debug::printCircuitLog) std::wprintf(L"      │ └─ \x1b[33m[잔류] %.2f (배출구 없음)\x1b[0m\n", remainFluid);
+                if (debug::printCircuitLog) dbgPrt(L"      │ └─ \x1b[33m[잔류] %.2f (배출구 없음)\x1b[0m\n", remainFluid);
             }
 
-            if (debug::printCircuitLog) std::wprintf(L"      └──────────────────────────────────\n");
+            if (debug::printCircuitLog) dbgPrt(L"      └──────────────────────────────────\n");
         }
 
     }
@@ -456,8 +456,8 @@ void Prop::updateFluidCircuitNetwork()
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"======================== 유압 회로망 요약 ========================\n");
-        std::wprintf(L"노드: %zu개, 펌프: %zu개\n",
+        dbgPrt(L"======================== 유압 회로망 요약 ========================\n");
+        dbgPrt(L"노드: %zu개, 펌프: %zu개\n",
             visitedSet.size(), pumpPropVec.size());
     }
 }
@@ -465,7 +465,7 @@ void Prop::updateFluidCircuitNetwork()
 bool Prop::isPipeConnected(Point3 currentCoord, dir16 dir)
 {
     Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
-    errorBox(currentProp == nullptr, L"currentProp is nullptr in isPipeConnected");
+    errorBox(currentProp == nullptr, L"isPipeConnected에 인자로 입력된 위치에 프롭이 존재하지 않는다.");
     ItemData& crtItem = currentProp->leadItem;
 
     Point3 delCoord = { 0,0,0 };
@@ -503,7 +503,7 @@ bool Prop::isPipeConnected(Point3 currentCoord, dir16 dir)
         guestFlag = itemFlag::PIPE_CNCT_ABOVE;
         break;
     default:
-        errorBox(L"[Error] isPipeConnected lambda function received invalid direction argument.\n");
+        errorBox(L"isPipeConnected가 잘못된 방향 인자를 받았다.\n");
         break;
     }
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
@@ -549,7 +549,7 @@ bool Prop::isPipeConnected(Point3 currentCoord, dir16 dir)
         if (currentCondition && targetCondition) return true;
         else return false;
     }
-    else errorBox(L"[Error] isPipeConnected lambda function received invalid direction argument.\n");
+    else errorBox(L"isPipeConnected가 잘못된 방향 인자를 받았다.\n");
 }
 
 bool Prop::isPipeConnected(Prop* currentProp, dir16 dir)
@@ -560,7 +560,7 @@ bool Prop::isPipeConnected(Prop* currentProp, dir16 dir)
 bool Prop::isPipeLinked(Point3 currentCoord, dir16 dir)
 {
     Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
-    errorBox(currentProp == nullptr, L"currentProp is nullptr in isPipeLinked");
+    errorBox(currentProp == nullptr, L"isPipeLinked에 인자로 입력된 위치에 프롭이 존재하지 않는다.");
 
     Point3 delCoord = { 0,0,0 };
     itemFlag hostFlag, guestFlag;
@@ -597,7 +597,7 @@ bool Prop::isPipeLinked(Point3 currentCoord, dir16 dir)
         guestFlag = itemFlag::PIPE_CNCT_ABOVE;
         break;
     default:
-        errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+        errorBox(L"isPipeLinked가 잘못된 방향 인자를 받았다.\n");
         break;
     }
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
@@ -621,7 +621,7 @@ bool Prop::isPipeLinked(Point3 currentCoord, dir16 dir)
     }
     else
     {
-        errorBox(L"[Error] isPipeLinked received invalid direction argument.\n");
+        errorBox(L"isPipeLinked가 잘못된 방향 인자를 받았다.\n");
         return false;
     }
 }
@@ -695,7 +695,7 @@ bool Prop::isSink()
 //connect 체크를 하지 않음에 유의할 것
 bool Prop::isSameFluid(Prop* prop1, Prop* prop2)
 {
-    errorBox(prop1 == nullptr || prop2 == nullptr, L"Inserted parameter is nullptr in isSameFluid");
+    errorBox(prop1 == nullptr || prop2 == nullptr, L"isSameFluid 함수에서 인자로 들어간 prop이 널포인터이다.");
     if (prop1->nodeFluidType == fluidType::NONE || prop2->nodeFluidType == fluidType::NONE) return true;
     if (prop1->nodeFluidType == prop2->nodeFluidType) return true;
     return false;
@@ -703,18 +703,17 @@ bool Prop::isSameFluid(Prop* prop1, Prop* prop2)
 
 double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    errorBox(donorProp == nullptr, L"[Error] pushFluid: null donor\n");
+    errorBox(donorProp == nullptr, L"pushFluid에서 donorProp이 널포인터이다.\n");
     int dx, dy, dz;
     dirToXYZ(txDir, dx, dy, dz);
     Point3 nextCoord = { donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz };
     Prop* nextProp = TileProp(nextCoord);
-    errorBox(nextProp == nullptr, L"[Error] pushFluid: no acceptor found\n");
+    errorBox(nextProp == nullptr, L"pushFluid에서 acceptorProp이 널포인터이다.\n");
 
     txFluidAmount = std::min(donorProp->nodeFluidAmount, txFluidAmount);
 
-    errorBox(txFluidAmount > donorProp->nodeFluidAmount + EPSILON, L"[Error] pushFluid: insufficient fluid\n");
-    errorBox(!isPipeConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
-        L"[Error] pushFluid: not connected\n");
+    errorBox(txFluidAmount > donorProp->nodeFluidAmount + EPSILON, L"pushFluid에서 보낼 유량이 실제 존재하는 유량보다 많다.\n");
+    errorBox(!isPipeConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir), L"pushFluid에서 보낼 방향과 현재 프롭이 파이프로 연결되지 않았다.\n");
 
     if (isSameFluid(donorProp, nextProp) == false) return 0; //종류가 다른 유체일 경우 섞이지 않고 벽처럼 작동함
 
@@ -723,14 +722,14 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
     if (pathVisited.find(donorProp) != pathVisited.end())
     {
         if (debug::printCircuitLog)
-            std::wprintf(L"%s[PUSH-SKIP] (%d,%d)%ls 이미 방문됨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
+            dbgPrt(L"%s[PUSH-SKIP] (%d,%d)%ls 이미 방문됨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
         return 0;
     }
     pathVisited.insert(donorProp);
     if (pathVisited.find(nextProp) != pathVisited.end()) return 0;
 
 
-    if (debug::printCircuitLog) std::wprintf(L"%s[PUSH] (%d,%d)%ls → (%d,%d)%ls [%ls] 시도: %.2f\n",
+    if (debug::printCircuitLog) dbgPrt(L"%s[PUSH] (%d,%d)%ls → (%d,%d)%ls [%ls] 시도: %.2f\n",
         indent.c_str(),
         donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str(),
         nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -754,7 +753,7 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
 
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s  └─ \x1b[33m[SINK진입] SINK, 요구=%ls, 잔여용량=%ls, 시도량=%.2f\x1b[0m\n",
+            dbgPrt(L"%s  └─ \x1b[33m[SINK진입] SINK, 요구=%ls, 잔여용량=%ls, 시도량=%.2f\x1b[0m\n",
                 indent.c_str(),
                 (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(nextProp->leadItem.fluidDemand, 2).c_str(),
                 (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(requiredFluid, 2).c_str(),
@@ -768,7 +767,7 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s      → 실제소비=%.2f, 남은용량=%ls\n",
+                dbgPrt(L"%s      → 실제소비=%.2f, 남은용량=%ls\n",
                     indent.c_str(),
                     sinkTxFluid,
                     (requiredFluid == INFINITE_DEMAND_DOUBLE) ? L"\u221E"/*∞*/ : decimalCutter(requiredFluid - sinkTxFluid, 2).c_str());
@@ -779,7 +778,7 @@ double Prop::pushFluid (Prop* donorProp, dir16 txDir, double txFluidAmount, std:
         }
         else if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s      → \x1b[90m용량 소진됨, 스킵\x1b[0m\n", indent.c_str());
+            dbgPrt(L"%s      → \x1b[90m용량 소진됨, 스킵\x1b[0m\n", indent.c_str());
         }
     }
 
@@ -825,7 +824,7 @@ void Prop::divideFluid(Prop* propPtr, double inputFluid, std::vector<dir16> poss
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE] (%d,%d)%ls 분배시작: %.2f → %zu방향\n",
+        dbgPrt(L"%s[DIVIDE] (%d,%d)%ls 분배시작: %.2f → %zu방향\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             inputFluid, possibleDirs.size());
@@ -846,7 +845,7 @@ void Prop::divideFluid(Prop* propPtr, double inputFluid, std::vector<dir16> poss
 
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s  [DIV] %zu방향, 각 %.2f씩\n",
+            dbgPrt(L"%s  [DIV] %zu방향, 각 %.2f씩\n",
                 indent.c_str(), possibleDirs.size(), splitFluid);
         }
 
@@ -865,7 +864,7 @@ void Prop::divideFluid(Prop* propPtr, double inputFluid, std::vector<dir16> poss
 
         if (debug::printCircuitLog && pushedFluid > EPSILON)
         {
-            std::wprintf(L"%s  [DIV-RESULT] 루프%d: 전송=%.2f, 잔여=%.2f\n",
+            dbgPrt(L"%s  [DIV-RESULT] 루프%d: 전송=%.2f, 잔여=%.2f\n",
                 indent.c_str(), loopCount, pushedFluid, remainingFluid);
         }
 
@@ -874,7 +873,7 @@ void Prop::divideFluid(Prop* propPtr, double inputFluid, std::vector<dir16> poss
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE-END] (%d,%d)%ls 총 %d회 반복, 미분배=%.2f\n",
+        dbgPrt(L"%s[DIVIDE-END] (%d,%d)%ls 총 %d회 반복, 미분배=%.2f\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             loopCount, remainingFluid);
@@ -888,7 +887,7 @@ void Prop::transferFluid(Prop* thisProp, Prop* nextProp, double txFluidAmount, c
     {
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s[전송 스킵] (%d,%d)%ls → (%d,%d)%ls 양:%.8f (EPSILON 미만)\n",
+            dbgPrt(L"%s[전송 스킵] (%d,%d)%ls → (%d,%d)%ls 양:%.8f (EPSILON 미만)\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -931,7 +930,7 @@ void Prop::transferFluid(Prop* thisProp, Prop* nextProp, double txFluidAmount, c
     {
         if (isSinkTransfer)
         {
-            std::wprintf(L"\x1b[33m%s[전송 SINK] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls 전송:%.2f 마찰손실:%.2f 부하:%.2f/%d\x1b[0m\n",
+            dbgPrt(L"\x1b[33m%s[전송 SINK] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls 전송:%.2f 마찰손실:%.2f 부하:%.2f/%d\x1b[0m\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeFluidAmount + actualTransfer, thisProp->nodeFluidAmount,
@@ -941,7 +940,7 @@ void Prop::transferFluid(Prop* thisProp, Prop* nextProp, double txFluidAmount, c
         }
         else
         {
-            std::wprintf(L"%s[전송] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls [%.2f/%d] 전송:%.2f 마찰손실:%.2f\n",
+            dbgPrt(L"%s[전송] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls [%.2f/%d] 전송:%.2f 마찰손실:%.2f\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeFluidAmount + actualTransfer, thisProp->nodeFluidAmount,

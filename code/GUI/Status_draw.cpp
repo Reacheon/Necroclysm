@@ -28,7 +28,7 @@ void Status::drawGUI()
 		if (getFoldRatio() == 1.0)
 		{
 			setWindowAlpha(200);
-			drawWindow(&statusBase, L"Status", 4);
+			drawWindow(&statusBase, sysStr[2], 4);
 			resetWindowAlpha();
 
 			// 호버 시 푸른색 틴트 적용 람다
@@ -67,7 +67,7 @@ void Status::drawGUI()
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
 			if (loopCount > 1)
-				drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"(Loop #" + std::to_wstring(loopCount) + L")", statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
+				drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + replaceStr(sysStr[337], L"(%number)", std::to_wstring(loopCount)), statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
 			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol (Loop #7)", statusBase.x + 139, statusBase.y + 44);
 
 			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol, Survivor", statusBase.x + 139, statusBase.y + 44);
@@ -77,7 +77,7 @@ void Status::drawGUI()
 			setFont(fontType::mainFontBold);
 			//좌측 열: Age, Race
 			Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
-			drawText(L"#e1772eAge", agePivot.x + 5, agePivot.y + 1);
+			drawText(L"#e1772e" + sysStr[329], agePivot.x + 5, agePivot.y + 1);
 			SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
 			drawStadium(ageRect, stadiumCol(ageRect), 255, 4);
 			setFont(fontType::mainFontMedium);
@@ -85,11 +85,11 @@ void Status::drawGUI()
 
 			Point2 racePivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 1 };
 			setFont(fontType::mainFontBold);
-			drawText(L"#e1772eRace", racePivot.x + 5, racePivot.y + 1);
+			drawText(L"#e1772e" + sysStr[330], racePivot.x + 5, racePivot.y + 1);
 			SDL_Rect raceRect = { racePivot.x + 55, racePivot.y, 120, 23 };
 			drawStadium(raceRect, stadiumCol(raceRect), 255, 4);
 			setFont(fontType::mainFontMedium);
-			drawTextCenter(L"Human", raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
+			drawTextCenter(sysStr[331], raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
 
 			//우측 열: Hunger, Thirsty, Fatigue (퍼센트 실시간 표시)
 			auto makePercentStr = [](double percent) -> std::wstring {
@@ -104,7 +104,7 @@ void Status::drawGUI()
 
 			Point2 hungerPivot = { statusBase.x + 137 + 221, statusBase.y + 79 };
 			setFont(fontType::mainFontBold);
-			drawText(L"#e1772eHunger", hungerPivot.x + 5, hungerPivot.y + 1);
+			drawText(L"#e1772e" + sysStr[332], hungerPivot.x + 5, hungerPivot.y + 1);
 			SDL_Rect hungerRect = { hungerPivot.x + 75, hungerPivot.y, 77, 23 };
 			drawStadium(hungerRect, stadiumCol(hungerRect), 255, 4);
 			setFont(fontType::mainFontMedium);
@@ -112,7 +112,7 @@ void Status::drawGUI()
 
 			Point2 thirstyPivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 1 };
 			setFont(fontType::mainFontBold);
-			drawText(L"#e1772eThirsty", thirstyPivot.x + 5, thirstyPivot.y + 1);
+			drawText(L"#e1772e" + sysStr[333], thirstyPivot.x + 5, thirstyPivot.y + 1);
 			SDL_Rect thirstyRect = { thirstyPivot.x + 75, thirstyPivot.y, 77, 23 };
 			drawStadium(thirstyRect, stadiumCol(thirstyRect), 255, 4);
 			setFont(fontType::mainFontMedium);
@@ -120,16 +120,13 @@ void Status::drawGUI()
 
 			Point2 fatiguePivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 2 };
 			setFont(fontType::mainFontBold);
-			drawText(L"#e1772eFatigue", fatiguePivot.x + 5, fatiguePivot.y + 1);
+			drawText(L"#e1772e" + sysStr[334], fatiguePivot.x + 5, fatiguePivot.y + 1);
 			SDL_Rect fatigueRect = { fatiguePivot.x + 75, fatiguePivot.y, 77, 23 };
 			drawStadium(fatigueRect, stadiumCol(fatigueRect), 255, 4);
 			setFont(fontType::mainFontMedium);
 			drawTextCenter(percentColor(fatigue) + makePercentStr(fatigue), fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
 			setFont(fontType::mainFont);
 
-
-
-			drawRadarChart(stadiumCol);
 
 
 			//세로 구분선 (하단 실선 + 상단 페이드아웃)
@@ -156,13 +153,13 @@ void Status::drawGUI()
 			drawFillRect(statusBase.x + 1, statusBase.y + 385, 81, 32, { 0x63,0x63,0x63 });
 			setFont(fontType::mainFontBold);
 			setFontSize(22);
-			drawTextCenter(L"Trait",statusBase.x + 1 + 40, statusBase.y + 385 + 16);
+			drawTextCenter(sysStr[335],statusBase.x + 1 + 40, statusBase.y + 385 + 16);
 			setFont(fontType::mainFontMedium);
 			setFontSize(20);
-			drawText(L"Strategist", statusBase.x + 88, statusBase.y + 388);
+			drawText(L"슬로스타트", statusBase.x + 88, statusBase.y + 388);
 			setFont(fontType::mainFont);
 			setFontSize(15);
-			drawTextWidth(L" quick fox jumps over the lazy dog. quick fox jumps over the lazy dog. quick fox jumps over the lazy dog.", statusBase.x + 1 + 7, statusBase.y + 416 + 8, 288, 18);
+			drawTextWidth(L" 플레이어는 컨디션이 전혀 좋아지지 않는다!", statusBase.x + 1 + 7, statusBase.y + 416 + 8, 288, 18);
 
 			setFontSize(12);
 			
@@ -174,7 +171,7 @@ void Status::drawGUI()
 
 			setFontSize(15);
 			setFont(fontType::mainFontBold);
-			drawTextCenter(L"Status Effects", statusBase.x + 933, statusBase.y + 49);
+			drawTextCenter(sysStr[336], statusBase.x + 933, statusBase.y + 49);
 
 			setFontSize(14);
 			setFont(fontType::mainFont);
@@ -242,7 +239,7 @@ void Status::drawGUI()
 			float mouseXf, mouseYf;
 			bool mouseDown = (SDL_GetMouseState(&mouseXf, &mouseYf) & SDL_BUTTON_LMASK) != 0;
 
-			const wchar_t* statLabels[3] = { L"Str", L"Int", L"Dex" };
+			const std::wstring statLabels[3] = { sysStr[344], sysStr[345], sysStr[346] };
 			const int statValues[3] = { PlayerPtr->entityInfo.statStr, PlayerPtr->entityInfo.statInt, PlayerPtr->entityInfo.statDex };
 			for (int i = 0; i < 3; i++)
 			{
@@ -299,11 +296,12 @@ void Status::drawGUI()
 
 			setFontSize(18);
 			setFont(fontType::mainFontMedium);
-			drawText(L"Level " + std::to_wstring(PlayerPtr->level), gaugeRect.x - 80, gaugeRect.y + 1);
+			drawText(sysStr[347]+L" " + std::to_wstring(PlayerPtr->level), gaugeRect.x - 80, gaugeRect.y + 1);//레벨
 
 			setFontSize(16);
 			setFont(fontType::mainFontSemiBold);
-			drawText(L"AP : "+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->ap), gaugeRect.x + gaugeRect.w - 54, gaugeRect.y + 102);
+			std::wstring apText = sysStr[348] + L" : " + col2Str(lowCol::green) + std::to_wstring(PlayerPtr->ap);
+			drawText(apText, gaugeRect.x + gaugeRect.w + 65 - queryTextWidth(apText), gaugeRect.y + 102);
 
 
 			std::wstring expStr = std::to_wstring(curExp) + L" / " + std::to_wstring(needExp);
@@ -357,7 +355,7 @@ void Status::drawGUI()
 			setZoom(1.0);
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(18);
-			drawText(L"Bionics", statusBase.x + 305 + 38, statusBase.y + 190 + 4);
+			drawText(sysStr[123], statusBase.x + 305 + 38, statusBase.y + 190 + 4);
 			
 			{
 				constexpr int bionicMaxVisible = 13; // 252 / 19
@@ -454,7 +452,7 @@ void Status::drawGUI()
 			setZoom(1.0);
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(18);
-			drawText(L"Mutations", statusBase.x + 731 + 38, statusBase.y + 190 + 4);
+			drawText(sysStr[122], statusBase.x + 731 + 38, statusBase.y + 190 + 4);
 
 			{
 				constexpr int mutMaxVisible = 13; // 252 / 19
@@ -533,7 +531,7 @@ void Status::drawGUI()
 				};
 
 			// 부위별 HP 박스 그리기 람다
-			auto drawPartBox = [&](int px, int py, const wchar_t* partName, int curHP, int maxHP)
+			auto drawPartBox = [&](int px, int py, const std::wstring& partName, int curHP, int maxHP)
 			{
 				SDL_Rect partRect = { statusBase.x + px, statusBase.y + py, 90, 48 };
 				drawStadium(partRect, stadiumCol(partRect), 255, 4);
@@ -555,12 +553,12 @@ void Status::drawGUI()
 				drawTextCenter(hpText, partRect.x + 59, partRect.y + 38);
 			};
 
-			drawPartBox(467, 209, L"Torso", PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.maxHP);
-			drawPartBox(608, 194, L"Head", PlayerPtr->headHP, PART_MAX_HP);
-			drawPartBox(451, 287, L"R.Arm", PlayerPtr->rArmHP, PART_MAX_HP);
-			drawPartBox(465, 395, L"R.Leg", PlayerPtr->rLegHP, PART_MAX_HP);
-			drawPartBox(625, 287, L"L.Arm", PlayerPtr->lArmHP, PART_MAX_HP);
-			drawPartBox(610, 393, L"L.Leg", PlayerPtr->lLegHP, PART_MAX_HP);
+			drawPartBox(467, 209, sysStr[338], PlayerPtr->entityInfo.HP, PlayerPtr->entityInfo.maxHP);
+			drawPartBox(608, 194, sysStr[339], PlayerPtr->headHP, PART_MAX_HP);
+			drawPartBox(451, 287, sysStr[340], PlayerPtr->rArmHP, PART_MAX_HP);
+			drawPartBox(465, 395, sysStr[341], PlayerPtr->rLegHP, PART_MAX_HP);
+			drawPartBox(625, 287, sysStr[342], PlayerPtr->lArmHP, PART_MAX_HP);
+			drawPartBox(610, 393, sysStr[343], PlayerPtr->lLegHP, PART_MAX_HP);
 
 			setFont(fontType::mainFont);
 

@@ -16,7 +16,7 @@ public:
 	SkillRabbitEars()
 	{
 		id = L"MUT_RABBIT_EARS";
-		name = L"Rabbit Ears";
+		name = sysStr[282];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

@@ -184,7 +184,7 @@ double Prop::getOutletCharge()
 
 void Prop::updateCircuitNetwork()
 {
-    if (debug::printCircuitLog) std::wprintf(L"------------------------- 회로망 업데이트 시작 ------------------------\n");
+    if (debug::printCircuitLog) dbgPrt(L"------------------------- 회로망 업데이트 시작 ------------------------\n");
     int cursorX = getGridX();
     int cursorY = getGridY();
     int cursorZ = getGridZ();
@@ -210,7 +210,7 @@ void Prop::updateCircuitNetwork()
 
     if (saveFrontierQueue.size() > 0 && saveVisitedSet.size() > 0)
     {
-        if (debug::printCircuitLog) std::wprintf(L"------------------------- 이전 회로망 탐색 결과 불러오기 ------------------------\n");
+        if (debug::printCircuitLog) dbgPrt(L"------------------------- 이전 회로망 탐색 결과 불러오기 ------------------------\n");
         frontierQueue = saveFrontierQueue;
         visitedSet = saveVisitedSet;
     }
@@ -235,7 +235,7 @@ void Prop::updateCircuitNetwork()
             if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)) powerState = L" [ON]";
             else if (currentProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF)) powerState = L" [OFF]";
 
-            std::wprintf(L"[BFS 탐색] %ls (%d,%d,%d)%ls\n",
+            dbgPrt(L"[BFS 탐색] %ls (%d,%d,%d)%ls\n",
                 currentProp->leadItem.name.c_str(),
                 current.x, current.y, current.z,
                 powerState.c_str());
@@ -243,7 +243,7 @@ void Prop::updateCircuitNetwork()
 
         if (currentProp == nullptr)
         {
-            std::wprintf(L"[경고] BFS가 nullptr 프롭에 도달함 (%d,%d,%d)\n", current.x, current.y, current.z);
+            dbgPrt(L"[경고] BFS가 nullptr 프롭에 도달함 (%d,%d,%d)\n", current.x, current.y, current.z);
             continue;
         }
 
@@ -259,7 +259,7 @@ void Prop::updateCircuitNetwork()
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[33m★ 전원 감지: %ls (출력: %d)\x1b[0m\n",
+                    dbgPrt(L"  \x1b[33m★ 전원 감지: %ls (출력: %d)\x1b[0m\n",
                         currentProp->leadItem.name.c_str(),
                         currentProp->leadItem.electricMaxPower);
                 }
@@ -304,7 +304,7 @@ void Prop::updateCircuitNetwork()
             {
                 if (debug::printCircuitLog)
                 {
-                    std::wprintf(L"  \x1b[91m◆ 부하 감지: %ls (소비: %d)\x1b[0m\n",
+                    dbgPrt(L"  \x1b[91m◆ 부하 감지: %ls (소비: %d)\x1b[0m\n",
                         currentProp->leadItem.name.c_str(),
                         currentProp->leadItem.gndUsePower);
                 }
@@ -377,14 +377,14 @@ void Prop::updateCircuitNetwork()
                         if (crossStates[current] == crossFlag::horizontal && (directions[i] == dir16::up || directions[i] == dir16::down))
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"  \x1b[90m[SKIP] %ls방향 크로스케이블 방향 불일치\x1b[0m\n", dirToArrow(directions[i]));
+                                dbgPrt(L"  \x1b[90m[SKIP] %ls방향 크로스케이블 방향 불일치\x1b[0m\n", dirToArrow(directions[i]));
                             crossStates.erase(current);
                             continue;
                         }
                         if (crossStates[current] == crossFlag::vertical && (directions[i] == dir16::right || directions[i] == dir16::left))
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"  \x1b[90m[SKIP] %ls방향 크로스케이블 방향 불일치\x1b[0m\n", dirToArrow(directions[i]));
+                                dbgPrt(L"  \x1b[90m[SKIP] %ls방향 크로스케이블 방향 불일치\x1b[0m\n", dirToArrow(directions[i]));
                             crossStates.erase(current);
                             continue;
                         }
@@ -395,7 +395,7 @@ void Prop::updateCircuitNetwork()
                         ItemData& nextItem = nextProp->leadItem;
 
                         if (debug::printCircuitLog)
-                            std::wprintf(L"  [연결] %ls (%d,%d) %ls\n",
+                            dbgPrt(L"  [연결] %ls (%d,%d) %ls\n",
                                 dirToArrow(directions[i]), nextCoord.x, nextCoord.y, nextItem.name.c_str());
 
                         bool isSignalInput = false;
@@ -405,7 +405,8 @@ void Prop::updateCircuitNetwork()
                             if (nextItem.itemCode == itemID::powerBankR || nextItem.itemCode == itemID::powerBankT || nextItem.itemCode == itemID::powerBankL || nextItem.itemCode == itemID::powerBankB)
                             {
                                 double ratio = (nextItem.powerStorage) / static_cast<double>(nextItem.powerStorageMax);
-                                errorBox(ratio > 1 || ratio < 0, L"Ratio is out of range");
+                                errorBox(ratio > 1, L"파워뱅크의 에너지가 100%를 초과하였다.");
+                                errorBox(ratio < 0, L"파워뱅크의 에너지 백분율이 음수로 떨어졌다.");
 
                                 if (nextItem.itemCode == itemID::powerBankR)
                                 {
@@ -440,25 +441,25 @@ void Prop::updateCircuitNetwork()
                             if (directions[i] == dir16::right && nextProp->leadItem.gndUsePowerLeft > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerLeft);
+                                    dbgPrt(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerLeft);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerLeft;
                             }
                             else if (directions[i] == dir16::up && nextProp->leadItem.gndUsePowerDown > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerDown);
+                                    dbgPrt(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerDown);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerDown;
                             }
                             else if (directions[i] == dir16::left && nextProp->leadItem.gndUsePowerRight > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerRight);
+                                    dbgPrt(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerRight);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerRight;
                             }
                             else if (directions[i] == dir16::down && nextProp->leadItem.gndUsePowerUp > 0)
                             {
                                 if (debug::printCircuitLog)
-                                    std::wprintf(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerUp);
+                                    dbgPrt(L"    └─ \x1b[35m◆ 지향성부하: 소비=%d\x1b[0m\n", nextProp->leadItem.gndUsePowerUp);
                                 circuitTotalLoad += nextProp->leadItem.gndUsePowerUp;
                             }
 
@@ -531,7 +532,7 @@ void Prop::updateCircuitNetwork()
                         if (isSignalInput)
                         {
                             if (debug::printCircuitLog)
-                                std::wprintf(L"    └─ \x1b[36m[신호입력핀] BFS 차단, 전하만 공급\x1b[0m\n");
+                                dbgPrt(L"    └─ \x1b[36m[신호입력핀] BFS 차단, 전하만 공급\x1b[0m\n");
 
                             nextProp->nodeMaxCharge = circuitMaxEnergy;
                             nextProp->nodeCharge = circuitMaxEnergy;
@@ -550,7 +551,7 @@ void Prop::updateCircuitNetwork()
             else
             {
                 if (debug::printCircuitLog)
-                    std::wprintf(L"  \x1b[90m[SKIP-BFS] %ls - 신호핀에서 메인라인 확장 차단\x1b[0m\n", currentProp->leadItem.name.c_str());
+                    dbgPrt(L"  \x1b[90m[SKIP-BFS] %ls - 신호핀에서 메인라인 확장 차단\x1b[0m\n", currentProp->leadItem.name.c_str());
                 skipBFSSet.erase(current);
             }
 
@@ -604,7 +605,7 @@ void Prop::updateCircuitNetwork()
         double voltOutputPower = myMin(std::ceil(circuitTotalLoad * voltRatio), voltProp->leadItem.electricMaxPower);
         voltOutputPower *= LOSS_COMPENSATION_FACTOR;  // 저항손실 보존 변수 (기본값 120%)
 
-        if (debug::printCircuitLog) std::wprintf(L"========================▼전압원 (%d,%d)%ls : 밀어내기 시작▼========================\n", x, y, voltProp->leadItem.name.c_str());
+        if (debug::printCircuitLog) dbgPrt(L"========================▼전압원 (%d,%d)%ls : 밀어내기 시작▼========================\n", x, y, voltProp->leadItem.name.c_str());
         if (voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON) || voltProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF) == false)
         {
             double finalVoltOutput = voltOutputPower;
@@ -627,8 +628,8 @@ void Prop::updateCircuitNetwork()
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"======================== 회로망 요약 ========================\n");
-        std::wprintf(L"노드: %zu개, 전압원: %zu개, 총부하: %d, 총전력: %d\n",
+        dbgPrt(L"======================== 회로망 요약 ========================\n");
+        dbgPrt(L"노드: %zu개, 전압원: %zu개, 총부하: %d, 총전력: %d\n",
             visitedSet.size(), voltagePropVec.size(), circuitTotalLoad, circuitMaxEnergy);
     }
 }
@@ -672,7 +673,7 @@ bool Prop::isCableConnected(Point3 currentCoord, dir16 dir)
         guestFlag = itemFlag::CABLE_Z_ASCEND;
         break;
     default:
-        errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
+        errorBox(L"isCableConnected가 잘못된 방향 인자를 받았다.\n");
         break;
     }
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
@@ -892,7 +893,7 @@ bool Prop::isCableConnected(Point3 currentCoord, dir16 dir)
     }
     else
     {
-        errorBox(L"[Error] isCableConnected lambda function received invalid direction argument.\n");
+        errorBox(L"isCableConnected가 잘못된 방향 인자를 받았다.\n");
         return false;
     }
 }
@@ -905,7 +906,7 @@ bool Prop::isCableConnected(Prop* currentProp, dir16 dir)
 bool Prop::isCableLinked(Point3 currentCoord, dir16 dir)
 {
     Prop* currentProp = TileProp(currentCoord.x, currentCoord.y, currentCoord.z);
-    errorBox(currentProp == nullptr, L"currentProp is nullptr in isCableLinked");
+    errorBox(currentProp == nullptr, L"isCableLinked에 인자로 입력된 위치의 프롭이 널포인터이다.");
 
     Point3 delCoord = { 0,0,0 };
     itemFlag hostFlag, guestFlag;
@@ -942,7 +943,7 @@ bool Prop::isCableLinked(Point3 currentCoord, dir16 dir)
         guestFlag = itemFlag::CABLE_Z_ASCEND;
         break;
     default:
-        errorBox(L"[Error] isCableLinked received invalid direction argument.");
+        errorBox(L"isCableLinked 함수가 잘못된 방향 인자를 입력받았다.");
         break;
     }
     Prop* targetProp = TileProp(currentCoord.x + delCoord.x, currentCoord.y + delCoord.y, currentCoord.z + delCoord.z);
@@ -964,7 +965,7 @@ bool Prop::isCableLinked(Point3 currentCoord, dir16 dir)
         if (currentCondition && targetCondition) return true;
         else return false;
     }
-    else errorBox(L"[Error] isCableLinked received invalid direction argument.");
+    else errorBox(L"isCableLinked 함수가 잘못된 방향 인자를 입력받았다.");
 }
 
 bool Prop::isCableLinked(Prop* currentProp, dir16 dir)
@@ -974,7 +975,7 @@ bool Prop::isCableLinked(Prop* currentProp, dir16 dir)
 
 bool Prop::isGround(Point3 current, dir16 dir)
 {
-    errorBox(dir == dir16::above || dir == dir16::below, L"[Error] isGround: invalid direction\n");
+    errorBox(dir == dir16::above || dir == dir16::below, L"isGround에 z축 방향이 입력되었다.n\n");
 
     int dx, dy, dz;
     dirToXYZ(dir, dx, dy, dz);
@@ -998,25 +999,24 @@ bool Prop::isGround(Point3 current, dir16 dir)
 
 double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std::unordered_set<Prop*> pathVisited, int depth)
 {
-    errorBox(donorProp == nullptr, L"[Error] pushCharge: null donor\n");
+    errorBox(donorProp == nullptr, L"pushCharge 함수에서 donorProp이 널포인터이다.\n");
     int dx, dy, dz;
     dirToXYZ(txDir, dx, dy, dz);
     Point3 nextCoord = { donorProp->getGridX() + dx, donorProp->getGridY() + dy, donorProp->getGridZ() + dz };
     Prop* nextProp = TileProp(nextCoord);
-    errorBox(nextProp == nullptr, L"[Error] pushCharge: no acceptor found\n");
+    errorBox(nextProp == nullptr, L"pushCharge 함수에서 recieverProp이 널포인터이다.\n");
 
     txChargeAmount = std::min(donorProp->nodeCharge, txChargeAmount);
 
-    errorBox(txChargeAmount > donorProp->nodeCharge + EPSILON, L"[Error] pushCharge: insufficient electron\n");
-    errorBox(!isCableConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),
-        L"[Error] pushCharge: not connected\n");
+    errorBox(txChargeAmount > donorProp->nodeCharge + EPSILON, L"pushCharge에서 보낼 전자가 실제 존재하는 전자의 숫자보다 많다.\n");
+    errorBox(!isCableConnected({ donorProp->getGridX(), donorProp->getGridY(), donorProp->getGridZ() }, txDir),L"pushCharge에서 보낼 방향과 donorProp이 전기적으로 연결되지 않았다.\n");
 
     std::wstring indent(depth * 2, L' ');
 
     if (pathVisited.find(donorProp) != pathVisited.end())
     {
         if (debug::printCircuitLog)
-            std::wprintf(L"%s[PUSH-SKIP] (%d,%d)%ls 이미 방문됨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
+            dbgPrt(L"%s[PUSH-SKIP] (%d,%d)%ls 이미 방문됨\n", indent.c_str(), donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str());
         return 0;
     }
     pathVisited.insert(donorProp);
@@ -1024,7 +1024,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
 
 
-    if (debug::printCircuitLog) std::wprintf(L"%s[PUSH] (%d,%d)%ls → (%d,%d)%ls [%ls] 시도: %.2f\n",
+    if (debug::printCircuitLog) dbgPrt(L"%s[PUSH] (%d,%d)%ls → (%d,%d)%ls [%ls] 시도: %.2f\n",
         indent.c_str(),
         donorProp->getGridX(), donorProp->getGridY(), donorProp->leadItem.name.c_str(),
         nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -1071,7 +1071,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s  └─ \x1b[33m[GND진입] %ls GND, 요구=%d, 잔여용량=%.2f, 시도량=%.2f\x1b[0m\n",
+            dbgPrt(L"%s  └─ \x1b[33m[GND진입] %ls GND, 요구=%d, 잔여용량=%.2f, 시도량=%.2f\x1b[0m\n",
                 indent.c_str(),
                 isDirectionalGnd ? L"지향성" : L"일반",
                 requiredPower,
@@ -1086,7 +1086,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s      → 실제소비=%.2f, 남은용량=%.2f\n",
+                dbgPrt(L"%s      → 실제소비=%.2f, 남은용량=%.2f\n",
                     indent.c_str(),
                     gndTxEnergy,
                     remainEnergy - gndTxEnergy);
@@ -1100,7 +1100,7 @@ double Prop::pushCharge(Prop* donorProp, dir16 txDir, double txChargeAmount, std
         }
         else if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s      → \x1b[90m용량 소진됨, 스킵\x1b[0m\n", indent.c_str());
+            dbgPrt(L"%s      → \x1b[90m용량 소진됨, 스킵\x1b[0m\n", indent.c_str());
         }
 
         if (isDirectionalGnd)
@@ -1158,7 +1158,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE] (%d,%d)%ls 분배시작: %.2f → %zu방향\n",
+        dbgPrt(L"%s[DIVIDE] (%d,%d)%ls 분배시작: %.2f → %zu방향\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             inputCharge, possibleDirs.size());
@@ -1198,7 +1198,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s  [DIV-GND] 접지 %zu방향, 각 %.2f씩\n",
+                dbgPrt(L"%s  [DIV-GND] 접지 %zu방향, 각 %.2f씩\n",
                     indent.c_str(), gndDirs.size(), gndSplitCharge);
             }
 
@@ -1233,7 +1233,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
             if (debug::printCircuitLog)
             {
-                std::wprintf(L"%s  [DIV-LOOP] 일반 %zu방향, 각 %.2f씩\n",
+                dbgPrt(L"%s  [DIV-LOOP] 일반 %zu방향, 각 %.2f씩\n",
                     indent.c_str(), nonGndDirs.size(), splitCharge);
             }
 
@@ -1251,7 +1251,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
         if (debug::printCircuitLog && (gndPushedCharge > EPSILON || loopPushedCharge > EPSILON))
         {
-            std::wprintf(L"%s  [DIV-RESULT] 루프%d: GND=%.2f, 일반=%.2f, 잔여=%.2f\n",
+            dbgPrt(L"%s  [DIV-RESULT] 루프%d: GND=%.2f, 일반=%.2f, 잔여=%.2f\n",
                 indent.c_str(), loopCount, gndPushedCharge, loopPushedCharge, remainingCharge);
         }
 
@@ -1260,7 +1260,7 @@ void Prop::divideCharge(Prop* propPtr, double inputCharge, std::vector<dir16> po
 
     if (debug::printCircuitLog)
     {
-        std::wprintf(L"%s[DIVIDE-END] (%d,%d)%ls 총 %d회 반복, 미분배=%.2f\n",
+        dbgPrt(L"%s[DIVIDE-END] (%d,%d)%ls 총 %d회 반복, 미분배=%.2f\n",
             indent.c_str(),
             propPtr->getGridX(), propPtr->getGridY(), propPtr->leadItem.name.c_str(),
             loopCount, remainingCharge);
@@ -1274,7 +1274,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
     {
         if (debug::printCircuitLog)
         {
-            std::wprintf(L"%s[전송 스킵] (%d,%d)%ls → (%d,%d)%ls 양:%.8f (EPSILON 미만)\n",
+            dbgPrt(L"%s[전송 스킵] (%d,%d)%ls → (%d,%d)%ls 양:%.8f (EPSILON 미만)\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 nextProp->getGridX(), nextProp->getGridY(), nextProp->leadItem.name.c_str(),
@@ -1308,7 +1308,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
     {
         if (isGroundTransfer)
         {
-            std::wprintf(L"\x1b[33m%s[전송 GND] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls 전송:%.2f 손실:%.2f 부하:%.2f/%d\x1b[0m\n",
+            dbgPrt(L"\x1b[33m%s[전송 GND] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls 전송:%.2f 손실:%.2f 부하:%.2f/%d\x1b[0m\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeCharge + requiredFromDonor, thisProp->nodeCharge,
@@ -1318,7 +1318,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
         }
         else
         {
-            std::wprintf(L"%s[전송] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls [%.2f/%d] 전송:%.2f 손실:%.2f\n",
+            dbgPrt(L"%s[전송] (%d,%d)%ls [%.2f→%.2f] → (%d,%d)%ls [%.2f/%d] 전송:%.2f 손실:%.2f\n",
                 indent.c_str(),
                 thisProp->getGridX(), thisProp->getGridY(), thisProp->leadItem.name.c_str(),
                 thisProp->nodeCharge + requiredFromDonor, thisProp->nodeCharge,

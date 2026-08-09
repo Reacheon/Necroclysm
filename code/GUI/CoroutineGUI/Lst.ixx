@@ -41,8 +41,8 @@ public:
 	{
 		coAnswer.clear();
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		prt(L"Lst 객체가 생성되었다.\n");
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		dbgPrt(L"Lst 객체가 생성되었다.\n");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		lstTitleText = inputTitle;
@@ -69,7 +69,7 @@ public:
 
 	~Lst()
 	{
-		prt(L"Lst : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Lst : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 
 		exInput = false;

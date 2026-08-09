@@ -32,7 +32,7 @@ ContextMenu::ContextMenu(int inputMouseX, int inputMouseY, int inputGridX, int i
 	actOptions = inputOptions;
 	contextMenuTargetGrid = { inputGridX, inputGridY };
 	//1개 이상의 메시지 객체 생성 시의 예외 처리
-	errorBox(ptr != nullptr, L"More than one message instance was generated.");
+	errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 	ptr = this;
 
 	//메세지 박스 렌더링
@@ -94,130 +94,125 @@ std::wstring ContextMenu::getOptionText(act inputAct, int* iconIndex)
 	int icon = 0;
 	if (inputAct == act::closeDoor)
 	{
-		optionText = sysStr[176];//닫기
+		optionText = sysStr[104];//닫기
 		icon = 64;
 	}
 	else if (inputAct == act::inspect)
 	{
-		optionText = sysStr[177];//조사
+		optionText = sysStr[105];//조사
 		icon = 65;
 	}
 	else if (inputAct == act::unbox)
 	{
-		optionText = sysStr[178];//열기
+		optionText = sysStr[106];//열기
 		icon = 66;
 	}
 	else if (inputAct == act::pull)
 	{
-		optionText = sysStr[179];//당기기
+		optionText = sysStr[107];//당기기
 		icon = 67;
 	}
 	else if (inputAct == act::climb)
 	{
-		optionText = sysStr[188];//등반
+		optionText = sysStr[111];//등반
 		icon = 69;
 	}
 	else if (inputAct == act::swim)
 	{
-		optionText = sysStr[186];//수영
+		optionText = sysStr[109];//수영
 		icon = 70;
 	}
 	else if (inputAct == act::ride)
 	{
-		optionText = sysStr[187];//탑승
+		optionText = sysStr[110];//탑승
 		icon = 71;
 	}
 	else if (inputAct == act::vehicleRepair)
 	{
-		optionText = sysStr[203];//수리
+		optionText = sysStr[125];//수리
 		icon = 28;
 	}
 	else if (inputAct == act::vehicleDetach)
 	{
-		optionText = sysStr[204];//탈착
+		optionText = sysStr[126];//탈착
 		icon = 85;
 	}
 	else if (inputAct == act::drawLiquid)
 	{
-		optionText = sysStr[206];//담기
+		optionText = sysStr[128];//담기
 		icon = 93;
 	}
 	else if (inputAct == act::sleep)
 	{
-		optionText = sysStr[211];//수면
+		optionText = sysStr[131];//수면
 		icon = 98;
 	}
 	else if (inputAct == act::drinkFloorWater)
 	{
-		optionText = sysStr[232];//마시기(바닥물마시기)
+		optionText = sysStr[151];//마시기(바닥물마시기)
 		icon = 99;
 	}
 	else if (inputAct == act::propCarry)
 	{
-		optionText = sysStr[327];//프롭 들기
+		optionText = sysStr[237];//프롭 들기
 		icon = 100;
 	}
 	else if (inputAct == act::propTurnOn)
 	{
-		optionText = sysStr[333];//켜기
+		optionText = sysStr[243];//켜기
 		icon = 102;
 	}
 	else if (inputAct == act::propTurnOff)
 	{
-		optionText = sysStr[334];//끄기
+		optionText = sysStr[244];//끄기
 		icon = 101;
 	}
 	else if (inputAct == act::connectPlusZ)
 	{
-		optionText = sysStr[340];//상층과 연결
+		optionText = sysStr[248];//상층과 연결
 		icon = 101;
 	}
 	else if (inputAct == act::connectMinusZ)
 	{
-		optionText = sysStr[341];//하층과 연결
+		optionText = sysStr[249];//하층과 연결
 		icon = 101;
 	}
 	else if (inputAct == act::toggleCrossCable)
 	{
 		Prop* targetProp = TileProp(contextMenuTargetGrid.x, contextMenuTargetGrid.y, PlayerZ());
 		bool isCrossed = targetProp != nullptr && targetProp->leadItem.checkFlag(itemFlag::CROSSED_CABLE);
-		if (isCrossed) optionText = L"Uncross";
-		else optionText = L"Cross";
+		if (isCrossed) optionText = sysStr[431];
+		else optionText = sysStr[432];
 		icon = 101;
 	}
 	else if (inputAct == act::hideWire)
 	{
-		optionText = L"Hide Wire";
+		optionText = sysStr[433];
 		icon = 101;
 	}
 	else if (inputAct == act::showWire)
 	{
-		optionText = L"Show Wire";
+		optionText = sysStr[434];
 		icon = 101;
-	}
-	else if (inputAct == act::pray)
-	{
-		optionText = L"Pray";
-		icon = 25;
 	}
 	else if (inputAct == act::closeWindow)
 	{
-		optionText = L"Close";
+		optionText = sysStr[435];
 		icon = 64;
 	}
 	else if (inputAct == act::closeCurtain)
 	{
-		optionText = L"Close";
+		optionText = sysStr[436];
 		icon = 64;
 	}
 	else if (inputAct == act::tearCurtain)
 	{
-		optionText = L"Detach";
+		optionText = sysStr[437];
 		icon = 67;
 	}
 	else if (inputAct == act::breakWindow)
 	{
-		optionText = L"Break";
+		optionText = sysStr[438];
 		icon = 67;
 	}
 	else optionText = L"???";
@@ -390,7 +385,7 @@ void ContextMenu::executeContextAct(act inputAct)
 		{
 			partNames.push_back(vParts[i].name);
 		}
-		new Maint(L"수리", L"수리할 부품을 선택해주세요.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() }, maintFlag::repair);
+		new Maint(sysStr[125], sysStr[439], { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() }, maintFlag::repair);
 	}
 	else if (inputAct == act::vehicleDetach)
 	{
@@ -403,7 +398,7 @@ void ContextMenu::executeContextAct(act inputAct)
 			partNames.push_back(vParts[i].name);
 			partNames.push_back(vParts[i].name);
 		}
-		new Maint(L"탈착", L"차량에서 분리할 부품을 선택해주세요.", { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() }, maintFlag::detach);
+		new Maint(sysStr[126], sysStr[440], { contextMenuTargetGrid.x,contextMenuTargetGrid.y,PlayerZ() }, maintFlag::detach);
 	}
 	else if (inputAct == act::drawLiquid)
 	{
@@ -438,7 +433,7 @@ void ContextMenu::executeContextAct(act inputAct)
 		{
 			targetBottle->itemInfo.clear();
 			targetBottle->itemInfo.push_back(std::move(cloneFromItemDex(itemDex[itemID::water], maxVolume)));
-			updateLog(L"You fill the bottle with water.");
+			updateLog(sysStr[441]);
 		}
 	}
 	else if (inputAct == act::sleep)
@@ -468,7 +463,7 @@ void ContextMenu::executeContextAct(act inputAct)
 
 			if (propItem.pocketPtr != nullptr && tempPocket->itemInfo[0].pocketPtr != nullptr)
 			{
-				errorBox(propItem.pocketMaxVolume != tempPocket->itemInfo[0].pocketMaxVolume, L"Prop uninstall pocket volume is different from itemdex.");
+				errorBox(propItem.pocketMaxVolume != tempPocket->itemInfo[0].pocketMaxVolume, L"[propCarry] 프롭의 포켓 부피가 아이템화시킨 포켓 부피와 다르다.");
 				for (int i = propItem.pocketPtr->itemInfo.size() - 1; i >= 0; i--)
 				{
 					propItem.pocketPtr->transferItem(tempPocket->itemInfo[0].pocketPtr.get(), i, propItem.pocketPtr->itemInfo[i].number);
@@ -494,11 +489,11 @@ void ContextMenu::executeContextAct(act inputAct)
 					if (pPtr->leadItem.pocketPtr->itemInfo[0].itemCode == itemID::gasoline)
 					{
 						pPtr->propTurnOn();
-						updateLog(sysStr[337]);
+						updateLog(sysStr[246]);
 					}
-					else updateLog(sysStr[335]);
+					else updateLog(sysStr[245]);
 				}
-				else updateLog(sysStr[335]);
+				else updateLog(sysStr[245]);
 				turnWait(1.0);
 			}
 			else
@@ -520,7 +515,7 @@ void ContextMenu::executeContextAct(act inputAct)
 				pPtr->leadItem.itemCode == itemID::gasolineGeneratorB)
 			{
 				pPtr->propTurnOff();
-				updateLog(sysStr[339]);
+				updateLog(sysStr[247]);
 				turnWait(1.0);
 			}
 			else

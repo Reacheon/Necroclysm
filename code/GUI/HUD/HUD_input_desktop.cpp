@@ -90,7 +90,7 @@ void HUD::clickUpGUI()
 		{
 			if (checkCursor(&quickSlotBtn[i]))
 			{
-				prt(L"%d번 스킬 슬롯을 눌렀다!\n", i + 1);
+				dbgPrt(L"%d번 스킬 슬롯을 눌렀다!\n", i + 1);
 				if (quickSlot[i].first != quickSlotFlag::NONE)
 				{
 					if (dragQuickSlotTarget == i)
@@ -109,7 +109,7 @@ void HUD::clickUpGUI()
 	{
 		if (dragQuickSlotTarget == -1)
 		{
-			prt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
+			dbgPrt(L"[HUD] 절대좌표 (%d,%d) 타일을 터치했다.\n", clickTile.x, clickTile.y);
 			clickTile = { getAbsMouseGrid().x,getAbsMouseGrid().y };
 			tileTouch(clickTile.x, clickTile.y);
 		}
@@ -178,7 +178,7 @@ void HUD::mouseStep()
 		if (checkCursor(&letterbox) == false && checkCursor(&tab) == false && checkCursor(&letterboxPopUpButton) == false && checkCursor(&tabSmallBox) == false)
 		{
 			//터치한 좌표를 얻어내는 부분
-			// prt(L"1초 이상 눌렀다.\n");
+			// dbgPrt(L"1초 이상 눌렀다.\n");
 			//int revX, revY, revGridX, revGridY;
 			//revX = clickDownPoint.x - (cameraW / 2);
 			//revY = clickDownPoint.y - (cameraH / 2);
@@ -219,7 +219,7 @@ void HUD::clickHoldGUI()
 {
 	if (option::inputMethod == input::touch)
 	{
-		updateLog(L"[HUD] Touch hold event triggered.");
+		updateLog(L"[Debug] 터치 홀드 이벤트가 작동했다.");
 		openContextMenu(touchStartGrid);//터치이벤트가 끝나고 스텝이벤트라서 absMouse 함수 사용 금지(쓰레기값 출력됨)
 	}
 }

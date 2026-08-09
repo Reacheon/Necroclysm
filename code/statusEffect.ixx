@@ -41,16 +41,16 @@ export struct StatusEffectMeta
 };
 
 export inline const StatusEffectMeta statusEffectMeta[] = {
-    /* confused     */ { 1,  L"Confused",      col::white },
-    /* bleeding     */ { 2,  L"Bleeding",      lowCol::red },
+    /* confused     */ { 1,  L"혼란",      col::white },
+    /* bleeding     */ { 2,  L"출혈",      lowCol::red },
     /* hungry       */ { 3,  nullptr,          col::white },
     /* dehydrated   */ { 4,  nullptr,          col::white },
-    /* blind        */ { 15, L"Blind",         col::white },
+    /* blind        */ { 15, L"실명",         col::white },
     /* tired        */ { 11, nullptr,          col::white },
-    /* exhausted    */ { 11, L"Exhausted",     lowCol::red },
-    /* run          */ { 60, L"Run",           col::white },
-    /* crouch       */ { 62, L"Crouch",        col::white },
-    /* crawl        */ { 61, L"Crawl",         col::white },
+    /* exhausted    */ { 11, L"탈진",     lowCol::red },
+    /* run          */ { 60, L"달리기",           col::white },
+    /* crouch       */ { 62, L"앉기",        col::white },
+    /* crawl        */ { 61, L"포복",         col::white },
 };
 
 export inline bool checkStatusEffect(std::vector<statusEffect>& inputStatus, statusEffectFlag inputFlag)

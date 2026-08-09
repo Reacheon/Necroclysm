@@ -250,7 +250,7 @@ void HUD::gamepadStep()
 		{
 			if (delayR2 <= 0 && SDL_GetGamepadAxis(controller, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 1000)
 			{
-				prt(L"[HUD:STEP] 탭이 실행되었다.\n");
+				dbgPrt(L"[HUD:STEP] 탭이 실행되었다.\n");
 				executeTab();
 				delayR2 = 20;
 			}

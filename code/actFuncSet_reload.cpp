@@ -99,7 +99,7 @@ namespace
 	std::wstring dirToSourceLabel(int dir)
 	{
 		static const std::wstring labels[] = { L"E", L"NE", L"N", L"NW", L"W", L"SW", L"S", L"SE" };
-		if (dir < 0) return L"Floor";
+		if (dir < 0) return sysStr[182];
 		return labels[dir];
 	}
 
@@ -123,7 +123,7 @@ namespace
 		ItemPocket* equipPtr = PlayerEquip();
 
 		//1. 장비 포켓 + 장비 서브포켓
-		result.push_back({ equipPtr, L"Equip" });
+		result.push_back({ equipPtr, sysStr[242] });
 		collectSubPocketsWithSource(equipPtr, result);
 
 		//2. 주변 9타일 순회
@@ -185,7 +185,7 @@ namespace actFunc
 	//장전 : 총이나 탄창에 사용, 자기 자신의 탄환을 채워넣음
 	Corouter reloadSelf(actEnv envType, ItemPocket* reloadItemPocket, int reloadItemCursor)
 	{
-		prt(L"executeReloadSelf이 실행되었다.\n");
+		dbgPrt(L"executeReloadSelf이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 		std::vector<ItemData>& equipInfo = PlayerEquip()->itemInfo;
 
@@ -199,7 +199,7 @@ namespace actFunc
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
 						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
-						updateLog(sysStr[325]);//화살을 시위에 걸었다.
+						updateLog(sysStr[235]);//화살을 시위에 걸었다.
 						co_return;
 					}
 				}
@@ -214,7 +214,7 @@ namespace actFunc
 					if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 					{
 						equipInfo[j].pocketPtr.get()->transferItem(reloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get(), 0, 1);
-						updateLog(sysStr[326]);//볼트를 장전했다.
+						updateLog(sysStr[236]);//볼트를 장전했다.
 						co_return;
 					}
 				}
@@ -244,13 +244,13 @@ namespace actFunc
 
 		if (bulletList.size() == 0)
 		{
-			updateLog(sysStr[96]);//이 아이템을 넣을만한 포켓이 없다.
+			updateLog(sysStr[57]);//이 아이템을 넣을만한 포켓이 없다.
 			co_return;
 		}
 
 		////////////////////////////////////////////////////////////////////
 
-		new LstEx(sysStr[95], sysStr[94], bulletList, spr::itemset);//넣기, 넣을 포켓을 선택해주세요.
+		new LstEx(sysStr[56], sysStr[55], bulletList, spr::itemset);//넣기, 넣을 포켓을 선택해주세요.
 		co_await std::suspend_always();
 
 		////////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ namespace actFunc
 	Corouter reloadOther(actEnv envType, ItemPocket* reloadItemPocket, int reloadItemCursor)
 	{
 		//탄창이 장착한 총에 바로 넣는 기능 추가? -> 탄창을 안 빼고 총알을 넣는게 현실적으로 가능할리가 없다
-		prt(L"executeReloadOther이 실행되었다.\n");
+		dbgPrt(L"executeReloadOther이 실행되었다.\n");
 		int targetLootCursor = reloadItemCursor;
 
 		//주변 접근 가능한 모든 포켓 수집 (출처 정보 포함)
@@ -317,12 +317,12 @@ namespace actFunc
 
 		if (pocketList.size() == 0)
 		{
-			updateLog(sysStr[96]);//이 아이템을 넣을만한 포켓이 없다.
+			updateLog(sysStr[57]);//이 아이템을 넣을만한 포켓이 없다.
 			co_return;
 		}
 
 		////////////////////////////////////////////////////////////////////
-		new LstEx(sysStr[95], sysStr[94], pocketList, spr::itemset);//넣기, 넣을 포켓을 선택해주세요.
+		new LstEx(sysStr[56], sysStr[55], pocketList, spr::itemset);//넣기, 넣을 포켓을 선택해주세요.
 		co_await std::suspend_always();
 		////////////////////////////////////////////////////////////////////
 
@@ -370,7 +370,7 @@ namespace actFunc
 	//배터리 장착 : 전자기기에 사용, 자신에게 배터리를 추가함
 	Corouter insertBattery(actEnv envType, ItemPocket* targetItemPocket, int targetItemCursor)
 	{
-		prt(L"insertBattery가 실행되었다.\n");
+		dbgPrt(L"insertBattery가 실행되었다.\n");
 
 		//주변 접근 가능한 모든 포켓 수집 (출처 정보 포함)
 		std::vector<PocketSource> targetSearchPtr = gatherNearbyPocketsWithSource();
@@ -391,12 +391,12 @@ namespace actFunc
 
 		if (batteryList.size() == 0)
 		{
-			updateLog(sysStr[344]);//주변에 배터리가 없다.
+			updateLog(sysStr[252]);//주변에 배터리가 없다.
 			co_return;
 		}
 
 		////////////////////////////////////////////////////////////////////
-		new LstEx(sysStr[342], sysStr[345], batteryList, spr::itemset);//배터리 장착, 장착할 배터리를 선택해주세요.
+		new LstEx(sysStr[250], sysStr[253], batteryList, spr::itemset);//배터리 장착, 장착할 배터리를 선택해주세요.
 		co_await std::suspend_always();
 		////////////////////////////////////////////////////////////////////
 
@@ -419,7 +419,7 @@ namespace actFunc
 								i,
 								1
 							);
-							updateLog(sysStr[346]);//배터리를 장착했다.
+							updateLog(sysStr[254]);//배터리를 장착했다.
 							turnWait(1.0);
 							co_return;
 						}
@@ -437,13 +437,13 @@ namespace actFunc
 		ItemPocket* targetPocket = unloadItemPocket->itemInfo[targetLootCursor].pocketPtr.get();
 		if (targetPocket->itemInfo.size() == 0)
 		{
-			updateLog(sysStr[348]);//분리할 배터리가 없다.
+			updateLog(sysStr[256]);//분리할 배터리가 없다.
 			return;
 		}
 		std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
 		for (int i = 0; i < targetPocket->itemInfo.size(); i++) { targetPocket->transferItem(drop.get(), i, targetPocket->itemInfo[i].number); }
 		PlayerPtr->drop(drop.get());
-		updateLog(sysStr[347]);//배터리를 분리했다.
+		updateLog(sysStr[255]);//배터리를 분리했다.
 		turnWait(1.0);
 	}
 }

@@ -25,8 +25,8 @@ public:
         lifetime = inputLifetime;
         list.push_back(this);
         map[{ inputGridX, inputGridY, inputGridZ }].push_back(this);
-        if (list.size() > 500) prt(L"[메모리 누수 경고] Footprint의 객체 수가 500개를 넘어갔습니다.\n");
-        if (map[{ inputGridX, inputGridY, inputGridZ }].size() > 500) prt(L"[메모리 누수 경고] Footprint의 객체 수가 한 타일에서 500개를 넘어갔습니다.\n");
+        if (list.size() > 500) dbgPrt(L"[메모리 누수 경고] Footprint의 객체 수가 500개를 넘어갔습니다.\n");
+        if (map[{ inputGridX, inputGridY, inputGridZ }].size() > 500) dbgPrt(L"[메모리 누수 경고] Footprint의 객체 수가 한 타일에서 500개를 넘어갔습니다.\n");
     }
     ~Footprint()
     {

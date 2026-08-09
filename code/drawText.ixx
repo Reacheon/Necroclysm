@@ -47,7 +47,7 @@ export void setFont(fontType inputFont)
     else if (inputFont == fontType::mainFontSemiBold) s_currentFont = mainFontSemiBold;
     else if (inputFont == fontType::mainFontBold) s_currentFont = mainFontBold;
     else if (inputFont == fontType::mainFontExtraBold) s_currentFont = mainFontExtraBold;
-    else errorBox(L"Invalid font type specified.");
+    else errorBox(L"setFont: 알 수 없는 폰트타입을 인자로 넣었다.");
 }
 
 struct TextCacheKey

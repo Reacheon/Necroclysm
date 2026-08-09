@@ -18,9 +18,9 @@ public:
 	SkillLeap()
 	{
 		id = L"SKILL_LEAP";
-		name = L"Leap";
+		name = sysStr[268];
 		iconIndex = 2;
-		descript = L"Jump to any tile within 2 spaces. Consumes twice as much time as normal movement. ";
+		descript = L"";
 		src = skillSrc::GENERAL;
 		category = skillCategory::action;
 		type = skillType::ACTIVE;
@@ -36,7 +36,7 @@ public:
 		int cz = caster->getGridZ();
 		if (itemDex[TileFloor(cx, cy, cz)].checkFlag(itemFlag::WATER_SHALLOW) || itemDex[TileFloor(cx, cy, cz)].checkFlag(itemFlag::WATER_DEEP))
 		{
-			updateLog(L"You cannot leap in water.");
+			updateLog(sysStr[266]);
 			return false;
 		}
 		return true;
@@ -64,7 +64,7 @@ public:
 			}
 		}
 
-		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[320]);
+		new CoordSelect(CoordSelectFlag::SINGLE_TARGET_SKILL, sysStr[230]);
 		co_await std::suspend_always();
 		rangeSet.clear();
 		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }

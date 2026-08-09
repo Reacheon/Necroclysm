@@ -23,13 +23,13 @@ export void dataLoader()
 	std::wstring entityPath = L"language/" + option::language + L"/entityDex.tsv";
 	readEntityDex(entityPath.c_str());
 
-	//스킬 행동 등록
-	SkillRegistry::init();
-
 	//시스템(UI) 문자열 로드
 	std::wstring systemPath = L"language/" + option::language + L"/sysStr.tsv";
 	std::vector<std::array<std::wstring, 4>> tempSysStr(1, { L" ", L" ", L" " });
 	readTSV(systemPath.c_str(), tempSysStr);
 	systemPath.clear();
 	for (int i = 0; i < tempSysStr.size(); i++) { sysStr.push_back(tempSysStr[i][1]); }
+
+	//스킬 행동 등록
+	SkillRegistry::init();
 }

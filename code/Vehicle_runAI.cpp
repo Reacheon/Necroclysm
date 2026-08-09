@@ -15,12 +15,8 @@ bool Vehicle::runAI()
 {
     if (isAIFirstRun) isAIFirstRun = false;
 
-    //prt(L"[Vehicle:AI] ID : %p의 AI를 실행시켰다.\n", this);
-
     while (1)
     {
-
-        //prt(L"[Vehicle:AI] ID : %p의 turnResource는 %f입니다.\n", this, getTurnResource());
         if (getTurnResource() > 2.0)
         {
             clearTurnResource();
@@ -103,7 +99,7 @@ bool Vehicle::runAI()
                 {
                     if (currentRail->leadItem.checkFlag(itemFlag::RAIL_BUFFER))//버퍼 레일 강제정지
                     {
-                        prt(L"열차가 버퍼 레일을 만나서 정지하였다.\n");
+                        dbgPrt(L"열차가 버퍼 레일을 만나서 정지하였다.\n");
                         singleRailSpdVal = 0;
                         break;
                     }
@@ -138,7 +134,7 @@ bool Vehicle::runAI()
                 }
                 else
                 {
-                    prt(L"[Vehicle:train %p] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n", this);
+                    dbgPrt(L"[Vehicle:train %p] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n", this);
                     singleRailSpdVal = 0;
                     break;
                 }
@@ -169,7 +165,7 @@ bool Vehicle::runAI()
                             return 6;
                             break;
                         default:
-                            errorBox(L"[Vehicle_runAI.cpp : intDir] Unsupported direction. Only dir0, dir2, dir4, and dir6 are allowed.");
+                            errorBox(L"[Vehicle_runAI.cpp] 광차가 대각선 방향으로 이동을 시도하였다.");
                         }
                     };
 
@@ -219,7 +215,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dx, trainCursorY - getGridY() + dy) == true)
                     {
-                        prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                        dbgPrt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -235,7 +231,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxLeft, trainCursorY - getGridY() + dyLeft) == true)
                     {
-                        prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                        dbgPrt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -251,7 +247,7 @@ bool Vehicle::runAI()
                 {
                     if (colisionCheck(singleRailSpdDir, trainCursorX - getGridX() + dxRight, trainCursorY - getGridY() + dyRight) == true)
                     {
-                        prt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
+                        dbgPrt(L"[Vehicle:train ] %p 열차가 1칸 이동했을 때 다른 객체와 충돌하여 속도가 0으로 설정되었다.\n", this);
                         singleRailSpdDir = prevSpdDir;
                         singleRailSpdVal = 0;
                         break;
@@ -265,7 +261,7 @@ bool Vehicle::runAI()
                 }
             }
 
-            //prt(L"[Vehicle:train] 열차의 이동이 (%d,%d)로 실행되었다. 변위는 (%d,%d)이다.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
+            //dbgPrt(L"[Vehicle:train] 열차의 이동이 (%d,%d)로 실행되었다. 변위는 (%d,%d)이다.\n", trainCursorX, trainCursorY, trainCursorX - getGridX(), trainCursorY - getGridY());
             singleRailSpdVal = 0;
             shift(trainCursorX - getGridX(), trainCursorY - getGridY());
 
@@ -286,7 +282,7 @@ bool Vehicle::runAI()
                     }
                 }
 
-                //prt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFakeX(), getFakeY());
+                //dbgPrt(L"[Vehicle : train %p ] 차량의 fake 좌표는 (%f,%f)로 설정했다\n", this, getFakeX(), getFakeY());
 
                 //iAmDictator();
                 addAniToMonsterTurn(this, aniFlag::minecartRush);
@@ -401,7 +397,7 @@ bool Vehicle::runAI()
                 }
                 else
                 {
-                    prt(L"[Vehicle:train] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n");
+                    dbgPrt(L"[Vehicle:train] 현재 이 차량의 위치에 레일이 설치되어있지 않다.\n");
                     AI_TURN_CONTINUE;
                 }
                 AI_TURN_CONTINUE;
@@ -417,7 +413,7 @@ bool Vehicle::runAI()
                 {
                     if (getMainEngine() == nullptr)
                     {
-                        if(ctrlVeh==this) updateLog(L"The vehicle has no engine installed.");
+                        if(ctrlVeh==this) updateLog(L"이 차량에는 엔진이 장착되어 있지 않다.");
                         useTurnResource(1.0);
                         spdVec = getZeroVec();
                         accVec = getZeroVec();
@@ -504,7 +500,7 @@ bool Vehicle::runAI()
                                 {
                                     dxFinal = path[i - 1].x;
                                     dyFinal = path[i - 1].y;
-                                    prt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
+                                    dbgPrt(L"[Vehicle] Path 이동 중 충돌이 발생하여 이동을 멈춥니다.\n");
                                     accVec = getZeroVec();
                                     spdVec = getZeroVec();
                                     break;
@@ -539,7 +535,7 @@ bool Vehicle::runAI()
                     }
                     else
                     {
-                        if (ctrlVeh == this) updateLog(L"The vehicle is low on fuel.\n");
+                        if (ctrlVeh == this) updateLog(L"차량의 연료가 다 떨어졌다.\n");
                         useTurnResource(1.0);
                     }
                 }
@@ -651,7 +647,7 @@ bool Vehicle::runAI()
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //위의 모든 패턴 조건을 만족하지않을시 return true
-        //prt(L"[Vehicle:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
+        //dbgPrt(L"[Vehicle:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
         isAIFirstRun = true;
         AI_TURN_END;
     }

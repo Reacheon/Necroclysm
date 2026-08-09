@@ -26,7 +26,7 @@ public:
 	Map() : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one map instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		//메세지 박스 렌더링
@@ -101,7 +101,7 @@ public:
 			drawSpriteCenter(spr::icon48, 182, tab.x + 90, tab.y + 78);
 			setZoom(1.0);
 			setFontSize(22);
-			drawTextCenter(sysStr[31], tab.x + 90, tab.y + 150);
+			drawTextCenter(sysStr[21], tab.x + 90, tab.y + 150);
 			drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		}
 

@@ -26,7 +26,7 @@ void Loot::drawGUI()
 
 	bool hasSelect = panel.hasAnySelection();
 
-	std::wstring windowTitle = sysStr[10];
+	std::wstring windowTitle = sysStr[5];
 
 	if (hasSelect == true)
 	{
@@ -41,7 +41,7 @@ void Loot::drawGUI()
 		if (numberOfBag > 0 && pocketCursor >= 0 && pocketCursor < numberOfBag)
 		{
 			std::wstring pocketName = equipPtr->itemInfo[pocketList[pocketCursor]].name;
-			windowTitle = sysStr[10] + L" ▶ " + pocketName;
+			windowTitle = sysStr[5] + L" ▶ " + pocketName;
 		}
 	}
 	drawWindow(&lootBase, windowTitle, 1);
@@ -112,7 +112,7 @@ void Loot::drawGUI()
 
 			drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 			setFontSize(13);
-			drawText(sysStr[18], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);
+			drawText(sysStr[13], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);
 
 			setFont(fontType::pixel);
 			setFontSize(14);
@@ -128,7 +128,7 @@ void Loot::drawGUI()
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 20, dropBtn.y + 18);
 		setZoom(1.0);
 		setFontSize(20);
-		drawTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 - 2);
+		drawTextCenter(sysStr[35], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 - 2);
 		drawFillRect(dropBtn, col::black, 150);
 	}
 	else
@@ -149,7 +149,7 @@ void Loot::drawGUI()
 		if (numberOfBag == 0)
 		{
 			setFontSize(14);
-			drawTextCenter(sysStr[19], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 18, col::lightGray);
+			drawTextCenter(sysStr[14], pocketWindow.x + pocketWindow.w / 2, pocketWindow.y + 18, col::lightGray);
 		}
 		else
 		{
@@ -346,7 +346,7 @@ void Loot::drawGUI()
 			}
 		}
 		setFontSize(14);
-		drawTextCenter(sysStr[15], panel.label.x + 30, panel.label.y + 14);
+		drawTextCenter(sysStr[10], panel.label.x + 30, panel.label.y + 14);
 
 		{
 			std::wstring tailStr = L"";
@@ -362,28 +362,28 @@ void Loot::drawGUI()
 			if (grayNumber > 0)
 			{
 				int whiteNumber = panel.pocket->itemInfo.size() - grayNumber;
-				tailStr = L" (" + std::to_wstring(whiteNumber) + L" " + sysStr[87] + L")";
+				tailStr = L" (" + std::to_wstring(whiteNumber) + L" " + sysStr[50] + L")";
 			}
 
-			drawTextCenter(sysStr[16] + tailStr, panel.label.x + 183, panel.label.y + 14);
+			drawTextCenter(sysStr[11] + tailStr, panel.label.x + 183, panel.label.y + 14);
 		}
 
 		switch (panel.sortType)
 		{
 		default:
-			drawTextCenter(sysStr[24], panel.label.x + 337, panel.label.y + 14);
+			drawTextCenter(sysStr[15], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::weightDescend:
-			drawTextCenter(sysStr[45], panel.label.x + 337, panel.label.y + 14);
+			drawTextCenter(sysStr[28], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::weightAscend:
-			drawTextCenter(sysStr[46], panel.label.x + 337, panel.label.y + 14);
+			drawTextCenter(sysStr[29], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::volumeDescend:
-			drawTextCenter(sysStr[47], panel.label.x + 337, panel.label.y + 14);
+			drawTextCenter(sysStr[30], panel.label.x + 337, panel.label.y + 14);
 			break;
 		case sortFlag::volumeAscend:
-			drawTextCenter(sysStr[48], panel.label.x + 337, panel.label.y + 14);
+			drawTextCenter(sysStr[31], panel.label.x + 337, panel.label.y + 14);
 			break;
 		}
 

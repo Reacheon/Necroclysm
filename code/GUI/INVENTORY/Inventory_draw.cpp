@@ -68,7 +68,7 @@ void Inventory::drawGUI()
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 20, dropBtn.y + 18);
 		setZoom(1.0);
 		setFontSize(20);
-		drawTextCenter(sysStr[52], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 - 2);//버리기
+		drawTextCenter(sysStr[35], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 - 2);//버리기
 
 		// 선택된 아이템이 없으면 비활성화 효과
 		if (!hasSelectedItems)

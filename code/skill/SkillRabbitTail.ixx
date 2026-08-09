@@ -16,7 +16,7 @@ public:
 	SkillRabbitTail()
 	{
 		id = L"MUT_RABBIT_TAIL";
-		name = L"Rabbit Tail";
+		name = sysStr[283];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

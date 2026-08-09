@@ -15,7 +15,7 @@ public:
 	// 스킬 고유 ID. SkillData.skillId와 매칭. 접두어 규칙:
 	//   SKILL_xxx → GENERAL/MAGIC, BION_xxx → BIONIC, MUT_xxx → MUTATION
 	std::wstring id = L"";
-	std::wstring name = L"UNNAMED SKILL";
+	std::wstring name = L"미확인 스킬";
 	int iconIndex = 0;
 	std::wstring descript = L"";
 	std::wstring abstract = L"";

@@ -55,9 +55,9 @@ public:
 	Msg(msgFlag type, std::wstring inputTitle, std::wstring inputText, std::vector<std::wstring> option, int inputMsgItemCode = -1) : GUI(true)
 	{
 		coAnswer.clear();
-		prt(L"Msg : 생성자가 호출되었습니다.\n");
+		dbgPrt(L"Msg : 생성자가 호출되었습니다.\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 
@@ -91,7 +91,7 @@ public:
 	}
 	~Msg()
 	{
-		prt(L"Msg : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Msg : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 
 		if (msgType == msgFlag::input)

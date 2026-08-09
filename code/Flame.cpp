@@ -12,7 +12,7 @@ Flame::Flame(Point3 inputCoor, flameFlag inputFlame)
     TileData* thisTile = &World::ins()->getTile(inputCoor.x, inputCoor.y, inputCoor.z);
     if (thisTile->flamePtr != nullptr)
     {
-        prt(L"[makeFlag] 이미 (%d,%d,%d)에는 화염이 존재한다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
+        dbgPrt(L"[Flame] 이미 (%d,%d,%d)에는 화염이 존재한다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
         errorBox(L"중복된 위치에 Flame이 생성되었다.\n");
     }
     else

@@ -313,7 +313,7 @@ export void drawRectBatch(int rectW, int rectH, SDL_Color* cols, const Point2* p
 	static SDL_Vertex vertices[MAX_RECT * 4];
 	static int indices[MAX_RECT * 6];
 
-	if (count > MAX_RECT) errorBox(L"drawRectBatch: count exceeds MAX_RECT limit(>4096)");
+	if (count > MAX_RECT) errorBox(L"drawRectBatch: 렌더링 가능한 사각형 한도를 초과하였다.");
 
 	const float rectWf = static_cast<float>(rectW) * inputZoomScale;
 	const float rectHf = static_cast<float>(rectH) * inputZoomScale;

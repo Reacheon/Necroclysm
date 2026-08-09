@@ -50,8 +50,8 @@ Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gri
 	}
 
     setGrid(gridX, gridY, gridZ);
-	prt(entityInfo.name.c_str());
-	prt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
+	dbgPrt(entityInfo.name.c_str());
+	dbgPrt(lowCol::red, L"\nMonster : 생성자가 호출되었습니다! ID : %p\n", this);
 }
 Monster::~Monster()
 {
@@ -64,7 +64,7 @@ Monster::~Monster()
 		currentChunk->eraseMonster(this);
 	}
 
-	prt(lowCol::red, L"Monster : 소멸자가 호출되었습니다..\n");
+	dbgPrt(lowCol::red, L"Monster : 소멸자가 호출되었습니다..\n");
 }
 
 void Monster::startAtk(int inputGridX, int inputGridY, int inputGridZ, aniFlag inputAniType)
@@ -94,10 +94,10 @@ void Monster::endMove()
 
 bool Monster::runAI()
 {
-	//prt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
+	//dbgPrt(L"[Monster]%p의 AI를 실행시켰다.\n", this);
 	while (1)
 	{
-		//prt(lowCol::red, L"[ID : %p]의 timeResource는 %f입니다.\n", this, getTimeResource());
+		//dbgPrt(lowCol::red, L"[ID : %p]의 timeResource는 %f입니다.\n", this, getTimeResource());
 		if (getTurnResource() >= 2.0)
 		{
 			clearTurnResource();
@@ -112,8 +112,8 @@ bool Monster::runAI()
 			if (std::abs(PlayerX() - getGridX()) > 1 || std::abs(PlayerY() - getGridY()) > 1)//1칸 이내에 있지 않으면
 			{
 				useTurnResource(1.2);
-				prt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.2, getTurnResource());
-				prt(lowCol::red, L"[Monster 이동] 이동 인공지능 실행\n");
+				dbgPrt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.2, getTurnResource());
+				dbgPrt(lowCol::red, L"[Monster 이동] 이동 인공지능 실행\n");
 				int toDir = -1;
 				int x1 = getGridX();
 				int y1 = getGridY();
@@ -209,8 +209,8 @@ bool Monster::runAI()
 			if (std::abs(PlayerX() - getGridX()) <= 1 && std::abs(PlayerY() - getGridY()) <= 1)//1칸 이내에 있으면
 			{
 				useTurnResource(1.3);
-				prt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.3, getTurnResource());
-				prt(lowCol::red, L"[Monster 공격] 적이 당신을 강타했다!\n");
+				dbgPrt(lowCol::red, L"[Monster 시간] %f만큼의 시간을 소모했다. 남은 시간은 %f\n", 1.3, getTurnResource());
+				dbgPrt(lowCol::red, L"[Monster 공격] 적이 당신을 강타했다!\n");
 				setDirection(coord2Dir(PlayerX() - getGridX(), PlayerY() - getGridY()));
 				startAtk(PlayerX(), PlayerY(), PlayerZ());
 				return false;
@@ -221,7 +221,7 @@ bool Monster::runAI()
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//위의 모든 패턴 조건을 만족하지않을시 return true
-		//prt(lowCol::red, L"[Monster] AI가 true를 반환했다. AI를 종료합니다.\n");
+		//dbgPrt(lowCol::red, L"[Monster] AI가 true를 반환했다. AI를 종료합니다.\n");
 		return true;
 	}
 }
@@ -230,7 +230,7 @@ void Monster::death()
 {
 	if (aniManager.contains(this))
 	{
-		prt(lowCol::red, L"[Monster] runAnimation 강제 종료\n");
+		dbgPrt(lowCol::red, L"[Monster] runAnimation 강제 종료\n");
 		runAnimation(true);
 	}
 	new Corpse(corpseType::bloodM, getX(), getY(), getGridZ());

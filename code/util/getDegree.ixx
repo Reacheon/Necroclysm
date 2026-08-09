@@ -14,7 +14,6 @@ export float getDegree(int x1, int y1, int x2, int y2)
 
 export int getIntDegree(int x1, int y1, int x2, int y2)
 {
-	//prt(L"\033[0;31m(%d,%d)에서 (%d,%d) 사이의 각도는 %f입니다.\033[0m\n",x1,y1,x2,y2, getDegree(x1, y1, x2, y2));
 	if (getDegree(x1, y1, x2, y2) < 22.5 || 337.5 <= getDegree(x1, y1, x2, y2)) { return 0; }
 	else if (22.5 <= getDegree(x1, y1, x2, y2)&& getDegree(x1, y1, x2, y2) < 67.5) { return 1; }
 	else if (67.5 <= getDegree(x1, y1, x2, y2) && getDegree(x1, y1, x2, y2) < 112.5) { return 2; }

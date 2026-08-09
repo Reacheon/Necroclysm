@@ -16,9 +16,9 @@ public:
 	SkillFireStorm()
 	{
 		id = L"SKILL_FIRESTORM";
-		name = L"Firestorm";
+		name = sysStr[269];
 		iconIndex = 3;
-		descript = L"스킬 설명";
+		descript = L"";
 		src = skillSrc::MAGIC;
 		type = skillType::ACTIVE;
 		reqStat = L"INT";
@@ -41,7 +41,7 @@ public:
 				}
 			}
 		}
-		new CoordSelect(CoordSelectFlag::FIRESTORM, sysStr[321], coordList);
+		new CoordSelect(CoordSelectFlag::FIRESTORM, sysStr[231], coordList);
 		co_await std::suspend_always();
 		if (coAnswer.empty()) { currentUsingSkill.clear(); co_return; }
 

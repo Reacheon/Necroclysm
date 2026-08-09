@@ -85,7 +85,7 @@ public:
 		delGridY = inputGridY;
 		delX = 16 * delGridX;
 		delY = 16 * delGridY;
-		//prt(L"del값이 (%d,%d)로 설정되었다.\n", delGridX, delGridY);
+		//dbgPrt(L"del값이 (%d,%d)로 설정되었다.\n", delGridX, delGridY);
 	}
 	int getDelGridX() { return delGridX; }
 	int getDelGridY() { return delGridY; }

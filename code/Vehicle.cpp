@@ -20,7 +20,7 @@ Vehicle::Vehicle(int inputX, int inputY, int inputZ, int leadItemCode)
     trainWheelCenter = { inputX, inputY };
 
     setAniPriority(3);
-    prt(L"[Vehicle:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
+    dbgPrt(L"[Vehicle:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputX, inputY, inputZ);
     setGrid(inputX, inputY, inputZ);
 
     errorBox(TileVehicle(inputX, inputY, inputZ) != nullptr, L"생성위치에 이미 프롭이 존재한다!");
@@ -59,7 +59,7 @@ Vehicle::~Vehicle()
         currentChunk->eraseVehicle(this);
     }
 
-    prt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
+    dbgPrt(L"[Vehicle:destructor] 소멸자가 호출되었다. \n");
 }
 
 
@@ -171,32 +171,11 @@ void Vehicle::extendPart(int inputX, int inputY, int inputItemCode)
     }
     errorBox(partInfo.find({ inputX, inputY, getGridZ() }) != partInfo.end(), L"[Vehicle:extendPart] 이미 이 프롭 프레임이 있는 좌표로 확장을 시도했다.");
 
-    //부품 footprint가 World의 다른 점유물과 충돌하는지 검사 — vehicle spawn 시점에만 발견되는 케이스.
-    //  벽: vehicle은 floor/prop을 덮어쓰는 정책이지만 wall은 침입 금지(일관성).
-    //  다른 vehicle: 같은 타일을 두 vehicle이 점유하면 TileVehicle 포인터가 한쪽으로 덮여 leak.
-    //                anchor 좌표를 메시지에 포함해 어느 vehicle과 충돌했는지 진단 용이.
-    errorBox(ExistWall(inputX, inputY, getGridZ()),
-        L"[Vehicle:extendPart] (" + std::to_wstring(inputX) + L"," +
-        std::to_wstring(inputY) + L"," + std::to_wstring(getGridZ()) +
-        L") 위치에 벽이 존재해 vehicle '" + name + L"' 부품 확장 불가.");
-
-    if (Vehicle* existing = TileVehicle(inputX, inputY, getGridZ()); existing != nullptr && existing != this)
-    {
-        errorBox(true,
-            L"[Vehicle:extendPart] (" + std::to_wstring(inputX) + L"," +
-            std::to_wstring(inputY) + L"," + std::to_wstring(getGridZ()) +
-            L") 위치에 다른 vehicle '" + existing->name + L"' (anchor=(" +
-            std::to_wstring(existing->getGridX()) + L"," +
-            std::to_wstring(existing->getGridY()) + L"," +
-            std::to_wstring(existing->getGridZ()) + L"))의 부품이 있어 vehicle '" +
-            name + L"' 부품 확장 불가.");
-    }
-
     partInfo[{inputX, inputY, getGridZ()}] = std::make_unique<ItemPocket>(storageType::null);
     partInfo[{inputX, inputY, getGridZ()}]->addItemFromDex(inputItemCode);
     TileVehicle(inputX, inputY, getGridZ()) = this;
 
-    //prt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공다.\n", inputX, inputY, inputItemCode);
+    //dbgPrt(L"[Vehicle:extendPart] %p 차량이 %d,%d 위치로 %d 아이템을 확장에 성공다.\n", inputX, inputY, inputItemCode);
     updateSpr();
 }
 
@@ -220,7 +199,6 @@ void Vehicle::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 
 int Vehicle::getSprIndex(int inputX, int inputY)
 {
-    errorBox(partInfo[{inputX, inputY, getGridZ()}]->itemInfo.size() == 0, L"[Vehicle:getSprIndex] The vehicle part are empty(itemInfo size is zero)");
     return partInfo[{inputX, inputY, getGridZ()}]->itemInfo[0].getSprIndex();
 }
 
@@ -552,7 +530,7 @@ void Vehicle::shift(int dx, int dy)
             }
             if (blocked)
             {
-                prt(L"[Vehicle:shift] ramp 텔레포트 막힘 - %s 도착지(%d,%d,%d)\n",
+                dbgPrt(L"[Vehicle:shift] ramp 텔레포트 막힘 - %s 도착지(%d,%d,%d)\n",
                     blockReason, blockPos.x, blockPos.y, blockPos.z);
                 break;
             }
@@ -690,24 +668,24 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
             int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
             if (TileFloor(nx, ny, nz) == itemID::none)
             {
-                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             if (TileWall(nx, ny, nz) != itemID::none)
             {
-                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             Prop* p = TileProp(nx, ny, nz);
             if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER))
             {
-                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             Vehicle* v = TileVehicle(nx, ny, nz);
             if (v != nullptr && v != this)
             {
-                prt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck(dir)] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
         }
@@ -777,24 +755,24 @@ bool Vehicle::colisionCheck(int dx, int dy)
             int nx = pos.x + offsetX, ny = pos.y + offsetY, nz = pos.z + dz;
             if (TileFloor(nx, ny, nz) == itemID::none)
             {
-                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - floor 없음 (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             if (TileWall(nx, ny, nz) != itemID::none)
             {
-                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - wall (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             Prop* p = TileProp(nx, ny, nz);
             if (p != nullptr && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) && !p->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER))
             {
-                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - prop (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
             Vehicle* v = TileVehicle(nx, ny, nz);
             if (v != nullptr && v != this)
             {
-                prt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
+                dbgPrt(L"[Vehicle:colisionCheck] ramp 텔레포트 막힘 - vehicle (%d,%d,%d)\n", nx, ny, nz);
                 return true;
             }
         }
@@ -810,7 +788,7 @@ bool Vehicle::colisionCheck(int dx, int dy)
         Vehicle* v = TileVehicle(nx, ny, nz);
         if (v != nullptr && v != this)
         {
-            prt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, v);
+            dbgPrt(L"(%d,%d)만큼 이동했을 때 포인터 %p와 충돌했다.\n", dx, dy, v);
             return true;
         }
     }

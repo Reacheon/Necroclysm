@@ -23,7 +23,7 @@ export void displayLoader()
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
     SDL_DisplayID disp = SDL_GetPrimaryDisplay();
     const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
-    if (!mode) errorBox(L"디스플레이 정보를 읽을 수 없습니다.");
+    if (!mode) errorBox(L"디스플레이 정보를 읽는데 실패하였다.");
 
     int screenW = mode->w;
     int screenH = mode->h;
@@ -85,10 +85,8 @@ export void displayLoader()
         }
     }
 
-    if (!SDL_CreateWindowAndRenderer("Necroclysm", winW, winH,
-        dispOption::fullScreen ? SDL_WINDOW_FULLSCREEN : 0,
-        &window, &renderer))
-        errorBox(L"창·렌더러 생성 실패");
+    if (!SDL_CreateWindowAndRenderer("Necroclysm", winW, winH,dispOption::fullScreen ? SDL_WINDOW_FULLSCREEN : 0,&window, &renderer))
+        errorBox(L"창과 렌더러를 생성하는데 실패하였다.");
 
     // 타이틀바/작업표시줄 아이콘
     if (SDL_Surface* icon = IMG_Load("image/windowIcon.png"))
@@ -171,7 +169,6 @@ void recreateFrameTarget()
     const bool wasBound = (frameTarget != nullptr && SDL_GetRenderTarget(renderer) == frameTarget);
     if (frameTarget != nullptr) SDL_DestroyTexture(frameTarget);
     frameTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, cameraW, cameraH);
-    if (frameTarget == nullptr) errorBox(L"프레임 렌더타겟 생성 실패");
     SDL_SetTextureScaleMode(frameTarget, SDL_SCALEMODE_LINEAR);
     SDL_SetTextureBlendMode(frameTarget, SDL_BLENDMODE_NONE);
 

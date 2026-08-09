@@ -23,7 +23,7 @@ export class CoordSelect : public GUI
 {
 private:
 	inline static CoordSelect* ptr = nullptr;
-	std::wstring telepathyStr = sysStr[175];
+	std::wstring telepathyStr = sysStr[103];
 	int index = -1;
 	std::wstring parameter = L"";
 	std::vector<Point2> selectableCoord;
@@ -39,8 +39,8 @@ public:
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
-		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
-		errorBox(ptr != nullptr, L"More than one CoordSelect instance was generated.");
+		dbgPrt(L"CoordSelect : 생성자가 호출되었습니다..\n");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 	}
 	CoordSelect(std::wstring inputTelepathyStr) : CoordSelect(CoordSelectFlag::NONE, inputTelepathyStr) { }
@@ -52,8 +52,8 @@ public:
 		coAnswer.clear();
 		type = inputType;
 		telepathyStr = inputTelepathyStr;
-		prt(L"CoordSelect : 생성자가 호출되었습니다..\n");
-		errorBox(ptr != nullptr, L"More than one CoordSelect instance was generated.");
+		dbgPrt(L"CoordSelect : 생성자가 호출되었습니다..\n");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		selectableCoord = inputSelectableCoord;
@@ -67,7 +67,7 @@ public:
 
 	~CoordSelect()
 	{
-		prt(L"CoordSelect : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"CoordSelect : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 		UIType = act::null;
 		rangeSet.clear();
@@ -205,7 +205,7 @@ public:
 				std::wstring yStr = std::to_wstring(throwingY);
 				std::wstring zStr = std::to_wstring(throwingZ);
 
-				prt(L"[CoordSelect] 절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
+				dbgPrt(L"[CoordSelect] 절대좌표 (%d,%d) 타일을 터치했다.\n", wtoi(xStr.c_str()), wtoi(yStr.c_str()));
 
 				if (rangeSet.size() > 0)
 				{
@@ -213,12 +213,12 @@ public:
 					if (rangeSet.find(targetPoint) != rangeSet.end())
 					{
 						coAnswer = xStr + L"," + yStr + L"," + zStr;
-						prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+						dbgPrt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
 						delete this;
 					}
 					else
 					{
-						prt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
+						dbgPrt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
 					}
 				}
 				else if (selectableCoord.size() > 0)
@@ -228,14 +228,14 @@ public:
 						if (selectableCoord[i].x == throwingX && selectableCoord[i].y == throwingY)
 						{
 							coAnswer = xStr + L"," + yStr + L"," + zStr;
-							prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+							dbgPrt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
 							delete this;
 							break;
 						}
 
 						if (i == selectableCoord.size() - 1)
 						{
-							prt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
+							dbgPrt(L"[CoordSelect] 해당 좌표는 선택할 수 없다.\n");
 						}
 					}
 				}
@@ -245,12 +245,12 @@ public:
 					if (TileFov(throwingX, throwingY, throwingZ) == fovFlag::white)
 					{
 						coAnswer = xStr + L"," + yStr + L"," + zStr;
-						prt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
+						dbgPrt(L"[CoordSelect] coAnswer의 값은 %ls이다.\n", coAnswer.c_str());
 						delete this;
 					}
 					else
 					{
-						prt(L"[CoordSelect] 해당 좌표는 시야에 보이지 않는다.\n");
+						dbgPrt(L"[CoordSelect] 해당 좌표는 시야에 보이지 않는다.\n");
 					}
 				}
 			}

@@ -17,7 +17,7 @@ public:
 	SkillRoundEars()
 	{
 		id = L"MUT_ROUND_EARS";
-		name = L"Round Ears";
+		name = sysStr[286];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

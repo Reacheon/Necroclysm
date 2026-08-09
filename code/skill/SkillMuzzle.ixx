@@ -16,7 +16,7 @@ public:
 	SkillMuzzle()
 	{
 		id = L"MUT_MUZZLE";
-		name = L"Muzzle";
+		name = sysStr[280];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

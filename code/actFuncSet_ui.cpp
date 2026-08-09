@@ -11,9 +11,9 @@ namespace actFunc
 	//아이템 수량 선택 (Loot, Inventory 공통) — 우클릭 시 수량 직접 입력
 	Corouter selectItemEx(ItemPocket* pocket, int index)
 	{
-		std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
+		std::vector<std::wstring> choiceVec = { sysStr[25], sysStr[22] };//확인, 취소
 		exInputText.clear();
-		new Msg(msgFlag::input, sysStr[40], sysStr[39], choiceVec);//아이템 선택, 얼마나?
+		new Msg(msgFlag::input, sysStr[27], sysStr[26], choiceVec);//아이템 선택, 얼마나?
 		co_await std::suspend_always();
 
 		if (exInputText.empty() == false)
@@ -43,17 +43,17 @@ namespace actFunc
 					pocket->itemInfo[j].eraseFlag(itemFlag::GRAYFILTER);
 				}
 				pocket->sortByUnicode();
-				updateLog(sysStr[86]);//검색 상태를 해제했다.
+				updateLog(sysStr[49]);//검색 상태를 해제했다.
 				co_return;
 			}
 
 			if (i == pocket->itemInfo.size() - 1)//검색 중이 아닐 경우
 			{
-				std::vector<std::wstring> choiceVec = { sysStr[38], sysStr[35] };//확인, 취소
-				new Msg(msgFlag::input, sysStr[27], sysStr[97], choiceVec);//검색, 검색할 키워드를 입력해주세요
+				std::vector<std::wstring> choiceVec = { sysStr[25], sysStr[22] };//확인, 취소
+				new Msg(msgFlag::input, sysStr[18], sysStr[58], choiceVec);//검색, 검색할 키워드를 입력해주세요
 				scroll = 0;
 				co_await std::suspend_always();
-				if (coAnswer == sysStr[38])
+				if (coAnswer == sysStr[25])
 				{
 					int matchCount = pocket->searchTxt(exInputText);
 					for (int i = 0; i < pocket->itemInfo.size(); i++) pocket->itemInfo[i].addFlag(itemFlag::GRAYFILTER);

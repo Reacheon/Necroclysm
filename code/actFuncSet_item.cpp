@@ -22,12 +22,12 @@ namespace actFunc
 {
 	void drinkBottle(ItemData& inputData)
 	{
-		errorBox(inputData.pocketPtr == nullptr, L"drinkBottle: inputData.pocketPtr is nullptr.");
-		errorBox(inputData.pocketPtr->itemInfo.size() == 0, L"drinkBottle: inputData.pocketPtr->itemInfo.size() is 0.");
+		errorBox(inputData.pocketPtr == nullptr, L"[drinkBottle] inputData.pocketPtr가 널포인터이다.");
+		errorBox(inputData.pocketPtr->itemInfo.size() == 0, L"[drinkBottle] inputData.pocketPtr->itemInfo.size()가 0이다.");
 
 		if (thirst <= 0.0)
 		{
-			updateLog(L"You're not thirsty.");
+			updateLog(sysStr[415]);
 			return;
 		}
 
@@ -48,18 +48,18 @@ namespace actFunc
 				if (thirst < 0.0) thirst = 0.0;
 
 				inputData.pocketPtr->subtractItemIndex(i, waterToConsume);
-				updateLog(L"You drink from the bottle. Your thirst is quenched.");
+				updateLog(sysStr[416]);
 				return;
 			}
 		}
 
-		updateLog(L"The bottle is empty.");
+		updateLog(sysStr[417]);
 	}
 
 	void eatFood(ItemPocket* inputPocket, int inputCursor)
 	{
-		errorBox(inputPocket == nullptr, L"eatFood: inputPocket is nullptr.");
-		errorBox(inputCursor < 0 || inputCursor >= inputPocket->itemInfo.size(), L"eatFood: inputCursor is out of bounds.");
+		errorBox(inputPocket == nullptr, L"[eatFood] inputPocket이 널포인터이다.");
+		errorBox(inputCursor < 0 || inputCursor >= inputPocket->itemInfo.size(), L"[eatFood] inputCursor의 값이 범위를 벗어났다.");
 
 		ItemData& targetItem = inputPocket->itemInfo[inputCursor];
 		int itemCalorie = targetItem.calorie;
@@ -67,7 +67,7 @@ namespace actFunc
 
 		if (hunger <= 0.0)
 		{
-			updateLog(L"You're too full to eat anymore.");
+			updateLog(sysStr[418]);
 			return;
 		}
 
@@ -76,14 +76,14 @@ namespace actFunc
 		if (hunger < 0.0) hunger = 0.0;
 
 		inputPocket->subtractItemIndex(inputCursor, 1);
-		updateLog(L"You eat the food. Your hunger is satisfied.");
+		updateLog(sysStr[419]);
 	}
 
 	void spillPocket(ItemData& inputData)
 	{
 		ItemPocket* pPtr = inputData.pocketPtr.get();
-		errorBox(pPtr == nullptr, L"spillPocket: inputData.pocketPtr is nullptr.");
-		errorBox(pPtr->itemInfo.size() == 0, L"spillPocket: inputData.pocketPtr->itemInfo.size() is 0.");
+		errorBox(pPtr == nullptr, L"[spillPocket] inputData.pocketPtr이 널포인터이다.");
+		errorBox(pPtr->itemInfo.size() == 0, L"[spillPocket] inputData.pocketPtr->itemInfo.size()가 0이다.");
 
 		std::wstring itemName = inputData.name;
 		Point3 playerPos = { PlayerX(), PlayerY(), PlayerZ() };
@@ -96,7 +96,7 @@ namespace actFunc
 			// ItemStack이 없으면 새로 생성
 			createItemStack(playerPos);
 			existingStack = TileItemStack(playerPos.x, playerPos.y, playerPos.z);
-			errorBox(existingStack == nullptr, L"spillPocket: Failed to create ItemStack.");
+			errorBox(existingStack == nullptr, L"[spillPocket] 아이템스택 만들기가 실패하였다.");
 		}
 
 		ItemPocket* targetPocket = existingStack->getPocket();
@@ -109,7 +109,7 @@ namespace actFunc
 			pPtr->transferItem(targetPocket, 0, itemCount);
 		}
 
-		std::wstring logText = replaceStr(sysStr[297], L"(%container)", itemName);
+		std::wstring logText = replaceStr(sysStr[207], L"(%container)", itemName);
 		updateLog(logText);
 	}
 
@@ -119,7 +119,7 @@ namespace actFunc
 		ItemPocket* equipPtr = PlayerEquip();
 		if (tgtItem.checkFlag(itemFlag::TWOHANDED)) //양손장비일 경우
 		{
-			std::wstring logStr = replaceStr(sysStr[331], L"(%item)", tgtItem.name);
+			std::wstring logStr = replaceStr(sysStr[241], L"(%item)", tgtItem.name);
 			updateLog(logStr);
 			bool isWield = false;
 			std::unique_ptr<ItemPocket> drop = std::make_unique<ItemPocket>(storageType::null);
@@ -179,11 +179,11 @@ namespace actFunc
 				if (hasBoth == false)
 				{
 					//왼손, 오른손 각각 한손 아이템이 있는 경우 → 어느 손을 교체할지 물어봄
-					std::vector<std::wstring> choiceVec = { sysStr[49], sysStr[50] };
-					new Msg(msgFlag::normal, sysStr[98], sysStr[99], choiceVec);
+					std::vector<std::wstring> choiceVec = { sysStr[32], sysStr[33] };
+					new Msg(msgFlag::normal, sysStr[59], sysStr[60], choiceVec);
 					co_await std::suspend_always();
 					if (coAnswer.empty()) co_return;
-					if (coAnswer == sysStr[49]) handDir = equipHandFlag::left;
+					if (coAnswer == sysStr[32]) handDir = equipHandFlag::left;
 					else handDir = equipHandFlag::right;
 				}
 
@@ -210,7 +210,7 @@ namespace actFunc
 			}
 
 			int returnIndex = targetPocket->transferItem(equipPtr, targetPocketCursor, 1);
-			std::wstring logStr = replaceStr(sysStr[331], L"(%item)", equipPtr->itemInfo[returnIndex].name);
+			std::wstring logStr = replaceStr(sysStr[241], L"(%item)", equipPtr->itemInfo[returnIndex].name);
 			updateLog(logStr);
 			equipPtr->itemInfo[returnIndex].equipState = handDir;
 			equipPtr->sortEquip();
@@ -229,14 +229,14 @@ namespace actFunc
 
 	Corouter executeThrowing(ItemPocket* inputPocket, int inputIndex)//던지기
 	{
-		new CoordSelect(sysStr[131]);
+		new CoordSelect(sysStr[75]);
 		rangeRay = true;
 
 		co_await std::suspend_always();
 
 		if (coAnswer.empty())
 		{
-			updateLog(sysStr[330]);
+			updateLog(sysStr[240]);
 			rangeRay = false;
 			co_return;
 		}
@@ -251,10 +251,10 @@ namespace actFunc
 		if (targetX == PlayerX() && targetY == PlayerY() && targetZ == PlayerZ());
 		else PlayerPtr->setDirection(getIntDegree(PlayerX(), PlayerY(), targetX, targetY));
 
-		prt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
+		dbgPrt(L"executeThrowing에서 사용한 좌표의 값은 (%d,%d,%d)이다.\n", targetX, targetY, targetZ);
 
 		std::unique_ptr<ItemPocket> throwing = std::make_unique<ItemPocket>(storageType::null);
-		std::wstring logStr = replaceStr(L"You throw the (%item).", L"(%item)", inputPocket->itemInfo[inputIndex].name);
+		std::wstring logStr = replaceStr(sysStr[414], L"(%item)", inputPocket->itemInfo[inputIndex].name);
 		updateLog(logStr);
 		inputPocket->transferItem(throwing.get(), inputIndex, 1);
 		PlayerPtr->throwing(std::move(throwing), targetX, targetY);
@@ -265,7 +265,7 @@ namespace actFunc
 
 	void executeEquip(ItemPocket* sourcePocket, int sourceIndex)
 	{
-		updateLog(replaceStr(sysStr[125], L"(%item)", sourcePocket->itemInfo[sourceIndex].name)); // (%item)를(을) 장착했다.
+		updateLog(replaceStr(sysStr[69], L"(%item)", sourcePocket->itemInfo[sourceIndex].name)); // (%item)를(을) 장착했다.
 
 		ItemPocket* equipPtr = PlayerEquip();
 		int returnIndex = sourcePocket->transferItem(equipPtr, sourceIndex, 1);
@@ -294,14 +294,14 @@ namespace actFunc
 		for (int i = 0; i < selectableTile.size(); i++) rangeSet.insert({ selectableTile[i].x,selectableTile[i].y });
 		if (rangeSet.size() == 0)
 		{
-			updateLog(L"No suitable farmland nearby.");
+			updateLog(sysStr[420]);
 			GUI::actDrawAll();
 			co_return;
 		}
 
 		int tgtItemCode = tgtPocket->itemInfo[tgtIndex].itemCode;
 
-		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[299], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
+		new CoordSelectCraft(tgtItem.propInstallCode, sysStr[209], selectableTile);//조합할 아이템을 설치할 위치를 선택해주세요.
 		co_await std::suspend_always();
 		rangeSet.clear();
 		GUI::actDrawAll();
@@ -323,7 +323,7 @@ namespace actFunc
 			tgtPocket->subtractItemIndex(tgtIndex, 1);
 			PlayerPtr->updateStatus();
 
-			updateLog(replaceStr(sysStr[329], L"(%item)", itemDex[targetItemCode].name));
+			updateLog(replaceStr(sysStr[239], L"(%item)", itemDex[targetItemCode].name));
 		}
 		else co_return;
 	}
@@ -334,8 +334,8 @@ namespace actFunc
 	// 취소 시 앰플은 소모되지 않는다.
 	Corouter executeDye(ItemPocket* tgtPocket, int tgtIndex)
 	{
-		errorBox(tgtPocket == nullptr, L"executeDye: tgtPocket is nullptr.");
-		errorBox(tgtIndex < 0 || tgtIndex >= (int)tgtPocket->itemInfo.size(), L"executeDye: tgtIndex out of bounds.");
+		errorBox(tgtPocket == nullptr, L"executeDye: tgtPocket가 널포인터이다.");
+		errorBox(tgtIndex < 0 || tgtIndex >= (int)tgtPocket->itemInfo.size(), L"executeDye: tgtIndex가 범위를 벗어났다.");
 
 		// 1단계 : 플레이어의 현재 외형 상태를 조회해 가능한 선택지 목록 구성
 		enum class dyeTarget { hair, fur, horn };
@@ -355,17 +355,17 @@ namespace actFunc
 
 		std::vector<std::wstring> targetLabels;
 		std::vector<dyeTarget> targetMap;
-		if (hasHair) { targetLabels.push_back(L"Dye hair"); targetMap.push_back(dyeTarget::hair); }
-		if (hasFur)  { targetLabels.push_back(L"Dye fur");  targetMap.push_back(dyeTarget::fur); }
-		if (hasHorn) { targetLabels.push_back(L"Dye horn"); targetMap.push_back(dyeTarget::horn); }
+		if (hasHair) { targetLabels.push_back(sysStr[424]); targetMap.push_back(dyeTarget::hair); }
+		if (hasFur)  { targetLabels.push_back(sysStr[425]);  targetMap.push_back(dyeTarget::fur); }
+		if (hasHorn) { targetLabels.push_back(sysStr[426]); targetMap.push_back(dyeTarget::horn); }
 
 		if (targetLabels.empty())
 		{
-			updateLog(L"There is nothing you can dye.");
+			updateLog(sysStr[421]);
 			co_return;
 		}
 
-		new Lst(L"Dye Ampoule", L"Select what to dye.", targetLabels);
+		new Lst(sysStr[427], sysStr[428], targetLabels);
 		co_await std::suspend_always();
 		if (coAnswer.empty()) co_return;
 
@@ -394,11 +394,11 @@ namespace actFunc
 			auto [pal, colorOptions] = buildDyeOptions("palette/fur.tsv");
 			if (colorOptions.empty())
 			{
-				updateLog(L"Failed to load fur palette.");
+				updateLog(L"[DEBUG] 털 염색 팔레트를 불러오는 것에 실패했다.");
 				co_return;
 			}
 
-			new LstEx(L"Dye Fur", L"Select a fur color.", colorOptions, spr::colorPaletteOption, false);
+			new LstEx(sysStr[425], sysStr[429], colorOptions, spr::colorPaletteOption, false);
 			co_await std::suspend_always();
 			if (coAnswer.empty()) co_return;
 
@@ -408,7 +408,7 @@ namespace actFunc
 			PlayerInfo().furColor = pal.colorNames[colorSel];
 			tgtPocket->subtractItemIndex(tgtIndex, 1);
 			PlayerPtr->updateStatus();
-			updateLog(L"You dye your fur.");
+			updateLog(sysStr[422]);
 			co_return;
 		}
 
@@ -417,11 +417,11 @@ namespace actFunc
 			auto [pal, colorOptions] = buildDyeOptions("palette/hair.tsv");
 			if (colorOptions.empty())
 			{
-				updateLog(L"Failed to load hair palette.");
+				updateLog(L"[DEBUG] 머리카락 염색 팔레트를 불러오는 것에 실패했다.");
 				co_return;
 			}
 
-			new LstEx(L"Dye Hair", L"Select a hair color.", colorOptions, spr::colorPaletteOption, false);
+			new LstEx(sysStr[424], sysStr[430], colorOptions, spr::colorPaletteOption, false);
 			co_await std::suspend_always();
 			if (coAnswer.empty()) co_return;
 
@@ -431,7 +431,7 @@ namespace actFunc
 			PlayerInfo().hairColor = pal.colorNames[colorSel];
 			tgtPocket->subtractItemIndex(tgtIndex, 1);
 			PlayerPtr->updateStatus();
-			updateLog(L"You dye your hair.");
+			updateLog(sysStr[423]);
 			co_return;
 		}
 
@@ -490,6 +490,6 @@ namespace actFunc
 		}
 
 		PlayerPtr->updateStatus();
-		updateLog(replaceStr(sysStr[351], L"(%item)", itemDex[fruitCode].name)); //(%item)에서 씨앗을 추출했다.
+		updateLog(replaceStr(sysStr[259], L"(%item)", itemDex[fruitCode].name)); //(%item)에서 씨앗을 추출했다.
 	}
 }

@@ -16,7 +16,7 @@ public:
 	SkillFloppyEars()
 	{
 		id = L"MUT_FLOPPY_EARS";
-		name = L"Floppy Ears";
+		name = sysStr[276];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

@@ -16,7 +16,7 @@ public:
 	SkillPrickEars()
 	{
 		id = L"MUT_PRICK_EARS";
-		name = L"Prick Ears";
+		name = sysStr[281];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

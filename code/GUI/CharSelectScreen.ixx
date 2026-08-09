@@ -19,7 +19,7 @@ public:
 	CharSelectScreen() : GUI(false)
 	{
 		//1개 이상의 캐릭터 선택 화면 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one CharSelectScreen instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		changeXY(0, 0, false);

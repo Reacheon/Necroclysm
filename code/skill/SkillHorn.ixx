@@ -16,7 +16,7 @@ public:
 	SkillHorn()
 	{
 		id = L"MUT_HORN";
-		name = L"Horn";
+		name = sysStr[278];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

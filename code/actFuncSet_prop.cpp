@@ -209,9 +209,9 @@ namespace actFunc
 			if (newOpen) anyOpened = true;
 			else anyClosed = true;
 		}
-		if (anyOpened) updateLog(L"The roll-up door rattles open.");
-		if (anyClosed) updateLog(L"The roll-up door rattles shut.");
-		if (anyBlocked) updateLog(L"Something is in the way of the roll-up door.");
+		if (anyOpened) updateLog(sysStr[315]);
+		if (anyClosed) updateLog(sysStr[316]);
+		if (anyBlocked) updateLog(sysStr[317]);
 		if (anyOpened || anyClosed) PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
@@ -252,11 +252,11 @@ namespace actFunc
 						inputItem.lightPtr = std::make_unique<Light>(PlayerX(), PlayerY(), PlayerZ(), 8, 110, SDL_Color{ 150, 150, 250 });
 						inputItem.itemSprIndex += 1;
 						PlayerPtr->updateVision();
-						updateLog(L"The headlamp comes on.");
+						updateLog(sysStr[318]);
 					}
-					else updateLog(L"The inserted battery is depleted.");
+					else updateLog(sysStr[319]);
 				}
-				else updateLog(L"No battery inserted in the headlamp.");
+				else updateLog(sysStr[320]);
 			}
 			else if (inputItem.checkFlag(itemFlag::TOGGLE_ON))
 			{
@@ -265,15 +265,15 @@ namespace actFunc
 				inputItem.lightPtr.reset();
 				inputItem.itemSprIndex -= 1;
 				PlayerPtr->updateVision();
-				updateLog(L"The headlamp goes off.");
+				updateLog(sysStr[321]);
 			}
 		}
 	}
 
 	void setWireVisibility(Point3 tgtPoint, bool hide)
 	{
-		errorBox(TileProp(tgtPoint) == nullptr, L"actFunc::setWireVisibility: Start point is nullptr.");
-		errorBox(TileProp(tgtPoint)->leadItem.checkFlag(itemFlag::CIRCUIT) == false, L"actFunc::setWireVisibility: Start point is missing the CIRCUIT flag.");
+		errorBox(TileProp(tgtPoint) == nullptr, L"actFunc::setWireVisibility: Start point가 널포인터이다.");
+		errorBox(TileProp(tgtPoint)->leadItem.checkFlag(itemFlag::CIRCUIT) == false, L"actFunc::setWireVisibility: CIRCUIT 플래그가 없는데 setWireVisibility가 실행되었다.");
 
 		//BFS로 연결된 회로 네트워크 전체를 순회
 		std::queue<Point3> frontierQueue;
@@ -342,7 +342,7 @@ namespace actFunc
 	std::wstring autodocDirLabel(int dir)
 	{
 		static const std::wstring labels[] = { L"E", L"NE", L"N", L"NW", L"W", L"SW", L"S", L"SE" };
-		if (dir < 0) return L"Floor";
+		if (dir < 0) return sysStr[182];
 		return labels[dir];
 	}
 
@@ -353,7 +353,7 @@ namespace actFunc
 		ItemPocket* equipPtr = PlayerEquip();
 
 		//1. 장비 포켓 + 서브포켓
-		result.push_back({ equipPtr, L"Equip" });
+		result.push_back({ equipPtr, sysStr[242] });
 		collectSubPocketsAutodoc(equipPtr, result);
 
 		//2. 주변 9타일 순회
@@ -393,9 +393,9 @@ namespace actFunc
 	{
 		//메인 메뉴 표시
 		new Lst(
-			L"AUTODOC #00FF80[ONLINE]",
-			L"Bionic implant procedure standing by...",
-			{ L"Implant Bionic", L"Extract Bionic" }
+			replaceStr(sysStr[442], L"(%state)", col2Str(SDL_Color{ 0x00,0xFF,0x80 }) + sysStr[443]),
+			sysStr[444],
+			{ sysStr[445], sysStr[446] }
 		);
 		co_await std::suspend_always();
 		if (coAnswer.empty()) co_return;
@@ -422,11 +422,11 @@ namespace actFunc
 
 			if (cbmList.size() == 0)
 			{
-				updateLog(L"No bionic modules found nearby.");
+				updateLog(sysStr[322]);
 				co_return;
 			}
 
-			new LstEx(L"Implant Bionic", L"Select a CBM to implant.", cbmList, spr::itemset);
+			new LstEx(sysStr[327], sysStr[328], cbmList, spr::itemset);
 			co_await std::suspend_always();
 
 			if (coAnswer.empty()) co_return;
@@ -446,7 +446,7 @@ namespace actFunc
 							auto* behavior = SkillRegistry::get(skillId);
 							if (!behavior)
 							{
-								updateLog(L"Error: Invalid bionic module.");
+								updateLog(L"[디버그] 잘못된 바이오닉 모듈을 선택했다.");
 								co_return;
 							}
 
@@ -461,11 +461,11 @@ namespace actFunc
 								if (skillId == L"BION_POWER_STORAGE")
 								{
 									it->skillLevel++;
-									updateLog(std::format(L"The autodoc installs an additional {}. (x{})", behavior->name, it->skillLevel));
+									updateLog(replaceStr(replaceStr(sysStr[323], L"(%skill)", behavior->name), L"(%number)", std::to_wstring(it->skillLevel)));
 								}
 								else
 								{
-									updateLog(std::format(L"You already have {} installed.", behavior->name));
+									updateLog(replaceStr(sysStr[324], L"(%skill)", behavior->name));
 									co_return;
 								}
 							}
@@ -473,7 +473,7 @@ namespace actFunc
 							{
 								//신규 설치
 								PlayerPtr->addSkill(skillId);
-								updateLog(std::format(L"The autodoc successfully installs {}.", behavior->name));
+								updateLog(replaceStr(sysStr[325], L"(%skill)", behavior->name));
 							}
 
 							//Power Storage 설치 시 maxEnergy & energy 증가
@@ -495,7 +495,7 @@ namespace actFunc
 		else if (selected == 1) //Extract Bionic
 		{
 			//TODO: 바이오닉 추출 로직
-			updateLog(L"The autodoc begins the bionic extraction procedure...");
+			updateLog(sysStr[326]);
 		}
 
 		co_return;

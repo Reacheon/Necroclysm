@@ -22,12 +22,10 @@ private:
 public:
 	Chunk(chunkFlag input)
 	{
-		//prt(lowCol::green, L"Chunk : 생성자가 호출되었습니다..\n");
 		chunkLoad(input);
 	}
 	~Chunk()
 	{
-		//prt(lowCol::green, L"Chunk : 소멸자가 호출되었습니다..\n");
 	}
 	TileData& getChunkTile(int x, int y) { return singleTile[y][x]; }
 

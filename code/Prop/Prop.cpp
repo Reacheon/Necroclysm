@@ -23,7 +23,7 @@ Prop::Prop(Point3 inputCoor, int leadItemCode)
 {
     leadItem = cloneFromItemDex(itemDex[leadItemCode], 1);
     setAniPriority(3);
-    //prt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
+    //dbgPrt(L"[Prop:constructor] 생성자가 호출되었다. 생성된 좌표는 %d,%d,%d이다.\n", inputCoor.x, inputCoor.y, inputCoor.z);
     setGrid(inputCoor.x, inputCoor.y, inputCoor.z);
 
     errorBox(TileProp(inputCoor.x, inputCoor.y, inputCoor.z) != nullptr, L"생성위치에 이미 설치물이 존재한다!");
@@ -64,7 +64,7 @@ Prop::~Prop()
     Chunk* currentChunk = World::ins()->tryGetChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
     if (currentChunk == nullptr)
     {
-        prt(L"[Prop:destructor] 청크 광역 소멸 중 — 정리 생략.\n");
+        dbgPrt(L"[Prop:destructor] 청크 광역 소멸 중 — 정리 생략.\n");
         return;
     }
 
@@ -85,7 +85,7 @@ Prop::~Prop()
         }
     }
 
-    prt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
+    dbgPrt(L"[Prop:destructor] 소멸자가 호출되었다. \n");
 }
 
 void Prop::setGrid(int inputGridX, int inputGridY, int inputGridZ)
@@ -266,11 +266,11 @@ void Prop::updateSprIndex()
 
 bool Prop::runAI()
 {
-    //prt(L"[Prop:AI] ID : %p의 AI를 실행시켰다.\n", this);
+    //dbgPrt(L"[Prop:AI] ID : %p의 AI를 실행시켰다.\n", this);
     while (1)
     {
 
-        //prt(L"[Prop:AI] ID : %p의 turnResource는 %f입니다.\n", this, getTurnResource());
+        //dbgPrt(L"[Prop:AI] ID : %p의 turnResource는 %f입니다.\n", this, getTurnResource());
         if (getTurnResource() >= 2.0)
         {
             clearTurnResource();
@@ -281,14 +281,14 @@ bool Prop::runAI()
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         //위의 모든 패턴 조건을 만족하지않을시 return true
-        //prt(L"[Prop:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
+        //dbgPrt(L"[Prop:AI] AI가 true를 반환했다. AI를 종료합니다.\n");
         return true;
     }
 }
 
 bool Prop::runAnimation(bool shutdown)
 {
-    //prt(L"Prop %p의 runAnimation이 실행되었다.\n", this);
+    //dbgPrt(L"Prop %p의 runAnimation이 실행되었다.\n", this);
     if (getAniType() == aniFlag::propRush)
     {
         addTimer();

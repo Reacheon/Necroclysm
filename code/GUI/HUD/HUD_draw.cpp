@@ -130,7 +130,7 @@ void HUD::drawGUI()
 			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
 
-			std::wstring titleText = L"Nekdol, Survivor";
+			std::wstring titleText = L"테스트 이름";
 
 			drawText(titleText, letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 			setFont(fontType::mainFont);
@@ -646,9 +646,9 @@ void HUD::drawTab()
 
 
 		setFontSize(16);
-		drawTextCenter(sysStr[195], tab.x + 92, tab.y + 11);
-		drawTextCenter(sysStr[207], tab.x + 142, tab.y + 80);
-		//renderTextCenter(sysStr[195], tab.x + 60, tab.y + 92 + 7);
+		drawTextCenter(sysStr[118], tab.x + 92, tab.y + 11);
+		drawTextCenter(sysStr[129], tab.x + 142, tab.y + 80);
+		//renderTextCenter(sysStr[118], tab.x + 60, tab.y + 92 + 7);
 
 
 
@@ -679,7 +679,7 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon48, 17, tab.x + 90, tab.y + 78);
 		setZoom(1.0);
 		setFontSize(22);
-		drawTextCenter(sysStr[14], tab.x + 90, tab.y + 150);
+		drawTextCenter(sysStr[9], tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	case tabFlag::back:
@@ -689,7 +689,7 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon48, 182, tab.x + 90, tab.y + 78);
 		setZoom(1.0);
 		setFontSize(22);
-		drawTextCenter(sysStr[31], tab.x + 90, tab.y + 150);
+		drawTextCenter(sysStr[21], tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	case tabFlag::confirm:
@@ -699,7 +699,7 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon48, 39, tab.x + 90, tab.y + 78);
 		setZoom(1.0);
 		setFontSize(22);
-		drawTextCenter(sysStr[91], tab.x + 90, tab.y + 150);
+		drawTextCenter(sysStr[53], tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	case tabFlag::till:
@@ -709,7 +709,7 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon80, 43, tab.x + 90, tab.y + 55 + 25);
 		setZoom(1.0);
 		setFontSize(22);
-		drawTextCenter(L"Tilling", tab.x + 90, tab.y + 150);
+		drawTextCenter(sysStr[362], tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	case tabFlag::water:
@@ -719,11 +719,11 @@ void HUD::drawTab()
 		drawSpriteCenter(spr::icon80, 44, tab.x + 90, tab.y + 55 + 25);
 		setZoom(1.0);
 		setFontSize(22);
-		drawTextCenter(L"Watering", tab.x + 90, tab.y + 150);
+		drawTextCenter(sysStr[363], tab.x + 90, tab.y + 150);
 		drawSpriteCenter(spr::keyboardButtons, keyboardIndex::tab + SDL_GetKeyboardState(nullptr)[SDL_SCANCODE_TAB], tab.x + 164, tab.y + 8);
 		break;
 	default:
-		errorBox(L"undefined tabFalg");
+		errorBox(L"정의되지 않은 tabFlag가 입력되었다.");
 		break;
 	}
 
@@ -1038,85 +1038,85 @@ void HUD::drawBarAct()
 				useIcon80 = true;
 			};
 
-		if (barAct[i] == act::status) setBtnLayout80(sysStr[3], 15);
-		else if (barAct[i] == act::craft) setBtnLayout80(sysStr[75], 3);
-		else if (barAct[i] == act::equipment) setBtnLayout80(sysStr[332], 1);
-		else if (barAct[i] == act::skill) setBtnLayout80(sysStr[197], 17);
+		if (barAct[i] == act::status) setBtnLayout80(sysStr[2], 15);
+		else if (barAct[i] == act::craft) setBtnLayout80(sysStr[39], 3);
+		else if (barAct[i] == act::equipment) setBtnLayout80(sysStr[242], 1);
+		else if (barAct[i] == act::skill) setBtnLayout80(sysStr[120], 17);
 		else if (barAct[i] == act::wait)
 		{
-			if (ctrlVeh == nullptr) setBtnLayout80(sysStr[142], 2);
-			else setBtnLayout(sysStr[142], 0);
+			if (ctrlVeh == nullptr) setBtnLayout80(sysStr[82], 2);
+			else setBtnLayout(sysStr[82], 0);
 		}
-		else if (barAct[i] == act::quest) setBtnLayout(sysStr[198], 52);
+		else if (barAct[i] == act::quest) setBtnLayout(sysStr[121], 52);
 		else if (barAct[i] == act::runMode)
 		{
 
-			if (PlayerInfo().walkMode == walkFlag::walk) setBtnLayout80(sysStr[8], 4);
-			else if (PlayerInfo().walkMode == walkFlag::run) setBtnLayout80(sysStr[8], 5);
-			else if (PlayerInfo().walkMode == walkFlag::crouch) setBtnLayout80(sysStr[8], 7);
-			else if (PlayerInfo().walkMode == walkFlag::crawl) setBtnLayout80(sysStr[8], 6);
+			if (PlayerInfo().walkMode == walkFlag::walk) setBtnLayout80(sysStr[3], 4);
+			else if (PlayerInfo().walkMode == walkFlag::run) setBtnLayout80(sysStr[3], 5);
+			else if (PlayerInfo().walkMode == walkFlag::crouch) setBtnLayout80(sysStr[3], 7);
+			else if (PlayerInfo().walkMode == walkFlag::crawl) setBtnLayout80(sysStr[3], 6);
 			else if (PlayerInfo().walkMode == walkFlag::wade)
 			{
-				setBtnLayout80(sysStr[8], 9);
+				setBtnLayout80(sysStr[3], 9);
 				deactRect = true;
 			}
 			else if (PlayerInfo().walkMode == walkFlag::swim)
 			{
-				setBtnLayout80(sysStr[8], 8);
+				setBtnLayout80(sysStr[3], 8);
 				deactRect = true;
 			}
 		}
-		else if (barAct[i] == act::identify) setBtnLayout(sysStr[135], 52);
-		else if (barAct[i] == act::vehicle) setBtnLayout(sysStr[128], 48);
-		else if (barAct[i] == act::armor) setBtnLayout(sysStr[129], 16);
-		else if (barAct[i] == act::cooking) setBtnLayout80(sysStr[130], 46);
-		else if (barAct[i] == act::menu) setBtnLayout(sysStr[9], 13);
-		else if (barAct[i] == act::loot) setBtnLayout(sysStr[10], 0);
-		else if (barAct[i] == act::pick) setBtnLayout(sysStr[11], 17);
-		else if (barAct[i] == act::wield) setBtnLayout80(sysStr[12], 12);
-		else if (barAct[i] == act::equip) setBtnLayout80(sysStr[13], 19);
-		else if (barAct[i] == act::eat) setBtnLayout80(sysStr[30], 23);
-		else if (barAct[i] == act::pickSelect) setBtnLayout(sysStr[25], 26);
-		else if (barAct[i] == act::selectAll) setBtnLayout(sysStr[26], 27);
-		else if (barAct[i] == act::searching) setBtnLayout(sysStr[27], 28);
-		else if (barAct[i] == act::select) setBtnLayout(sysStr[29], 30);
-		else if (barAct[i] == act::droping) setBtnLayout80(sysStr[52], 40);
-		else if (barAct[i] == act::throwing) setBtnLayout80(sysStr[53], 27);
-		else if (barAct[i] == act::construct) setBtnLayout(sysStr[73], 20);
-		else if (barAct[i] == act::open) setBtnLayout80(sysStr[88], 41);
-		else if (barAct[i] == act::test) setBtnLayout(sysStr[92], 60);
-		else if (barAct[i] == act::reloadBulletToMagazine) setBtnLayout80(sysStr[113], 32);
-		else if (barAct[i] == act::unloadBulletFromMagazine) setBtnLayout80(sysStr[114], 33);
-		else if (barAct[i] == act::reloadMagazine) setBtnLayout80(sysStr[115], 30);
-		else if (barAct[i] == act::unloadMagazine) setBtnLayout80(sysStr[116], 31);
-		else if (barAct[i] == act::reloadBulletToGun) setBtnLayout80(sysStr[113], 28);
-		else if (barAct[i] == act::unloadBulletFromGun) setBtnLayout80(sysStr[114], 29);
-		else if (barAct[i] == act::turnLeft) setBtnLayout(sysStr[141], 0);
-		else if (barAct[i] == act::turnRight) setBtnLayout(sysStr[143], 0);
-		else if (barAct[i] == act::startEngine) setBtnLayout(sysStr[144], 0);
-		else if (barAct[i] == act::stopEngine) setBtnLayout(sysStr[145], 0);
-		else if (barAct[i] == act::shiftGear) setBtnLayout(sysStr[146], 0);
-		else if (barAct[i] == act::accel) setBtnLayout(sysStr[147], 0);
-		else if (barAct[i] == act::brake) setBtnLayout(sysStr[148], 0);
-		else if (barAct[i] == act::collectiveLever) setBtnLayout(sysStr[151], 0);
-		else if (barAct[i] == act::cyclicLever) setBtnLayout(sysStr[152], 0);
-		else if (barAct[i] == act::rpmLever) setBtnLayout(sysStr[153], 0);
-		else if (barAct[i] == act::tailRotorPedalL) setBtnLayout(sysStr[154], 0);
-		else if (barAct[i] == act::tailRotorPedalR) setBtnLayout(sysStr[155], 0);
-		else if (barAct[i] == act::closeDoor) setBtnLayout(sysStr[156], 91);
-		else if (barAct[i] == act::phone) setBtnLayout(sysStr[189], 150);
-		else if (barAct[i] == act::message) setBtnLayout(sysStr[190], 151);
-		else if (barAct[i] == act::camera) setBtnLayout(sysStr[191], 152);
-		else if (barAct[i] == act::internet) setBtnLayout(sysStr[192], 154);
-		else if (barAct[i] == act::settings) setBtnLayout(sysStr[193], 155);
-		else if (barAct[i] == act::sleep) setBtnLayout80(sysStr[211], 45);
-		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[194], 156);
-		else if (barAct[i] == act::propInstall) setBtnLayout80(sysStr[328], 26);
-		else if (barAct[i] == act::map) setBtnLayout80(sysStr[150], 49);
+		else if (barAct[i] == act::identify) setBtnLayout(sysStr[76], 52);
+		else if (barAct[i] == act::vehicle) setBtnLayout(sysStr[72], 48);
+		else if (barAct[i] == act::armor) setBtnLayout(sysStr[73], 16);
+		else if (barAct[i] == act::cooking) setBtnLayout80(sysStr[74], 46);
+		else if (barAct[i] == act::menu) setBtnLayout(sysStr[4], 13);
+		else if (barAct[i] == act::loot) setBtnLayout(sysStr[5], 0);
+		else if (barAct[i] == act::pick) setBtnLayout(sysStr[6], 17);
+		else if (barAct[i] == act::wield) setBtnLayout80(sysStr[7], 12);
+		else if (barAct[i] == act::equip) setBtnLayout80(sysStr[8], 19);
+		else if (barAct[i] == act::eat) setBtnLayout80(sysStr[20], 23);
+		else if (barAct[i] == act::pickSelect) setBtnLayout(sysStr[16], 26);
+		else if (barAct[i] == act::selectAll) setBtnLayout(sysStr[17], 27);
+		else if (barAct[i] == act::searching) setBtnLayout(sysStr[18], 28);
+		else if (barAct[i] == act::select) setBtnLayout(sysStr[19], 30);
+		else if (barAct[i] == act::droping) setBtnLayout80(sysStr[35], 40);
+		else if (barAct[i] == act::throwing) setBtnLayout80(sysStr[36], 27);
+		else if (barAct[i] == act::construct) setBtnLayout(sysStr[38], 20);
+		else if (barAct[i] == act::open) setBtnLayout80(sysStr[51], 41);
+		else if (barAct[i] == act::test) setBtnLayout(sysStr[54], 60);
+		else if (barAct[i] == act::reloadBulletToMagazine) setBtnLayout80(sysStr[62], 32);
+		else if (barAct[i] == act::unloadBulletFromMagazine) setBtnLayout80(sysStr[63], 33);
+		else if (barAct[i] == act::reloadMagazine) setBtnLayout80(sysStr[64], 30);
+		else if (barAct[i] == act::unloadMagazine) setBtnLayout80(sysStr[65], 31);
+		else if (barAct[i] == act::reloadBulletToGun) setBtnLayout80(sysStr[62], 28);
+		else if (barAct[i] == act::unloadBulletFromGun) setBtnLayout80(sysStr[63], 29);
+		else if (barAct[i] == act::turnLeft) setBtnLayout(sysStr[81], 0);
+		else if (barAct[i] == act::turnRight) setBtnLayout(sysStr[83], 0);
+		else if (barAct[i] == act::startEngine) setBtnLayout(sysStr[84], 0);
+		else if (barAct[i] == act::stopEngine) setBtnLayout(sysStr[85], 0);
+		else if (barAct[i] == act::shiftGear) setBtnLayout(sysStr[86], 0);
+		else if (barAct[i] == act::accel) setBtnLayout(sysStr[87], 0);
+		else if (barAct[i] == act::brake) setBtnLayout(sysStr[88], 0);
+		else if (barAct[i] == act::collectiveLever) setBtnLayout(sysStr[90], 0);
+		else if (barAct[i] == act::cyclicLever) setBtnLayout(sysStr[91], 0);
+		else if (barAct[i] == act::rpmLever) setBtnLayout(sysStr[92], 0);
+		else if (barAct[i] == act::tailRotorPedalL) setBtnLayout(sysStr[93], 0);
+		else if (barAct[i] == act::tailRotorPedalR) setBtnLayout(sysStr[94], 0);
+		else if (barAct[i] == act::closeDoor) setBtnLayout(sysStr[95], 91);
+		else if (barAct[i] == act::phone) setBtnLayout(sysStr[112], 150);
+		else if (barAct[i] == act::message) setBtnLayout(sysStr[113], 151);
+		else if (barAct[i] == act::camera) setBtnLayout(sysStr[114], 152);
+		else if (barAct[i] == act::internet) setBtnLayout(sysStr[115], 154);
+		else if (barAct[i] == act::settings) setBtnLayout(sysStr[116], 155);
+		else if (barAct[i] == act::sleep) setBtnLayout80(sysStr[131], 45);
+		else if (barAct[i] == act::saveAndQuit) setBtnLayout(sysStr[117], 156);
+		else if (barAct[i] == act::propInstall) setBtnLayout80(sysStr[238], 26);
+		else if (barAct[i] == act::map) setBtnLayout80(sysStr[89], 49);
 		else if (barAct[i] == act::skillActive)
 		{
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
-			setBtnLayout(sysStr[157], 140);
+			setBtnLayout(sysStr[96], 140);
 
 		}
 		else if (barAct[i] == act::skillToggle)
@@ -1124,11 +1124,11 @@ void HUD::drawBarAct()
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
 			if (targetSkill->toggle == false)
 			{
-				setBtnLayout(sysStr[158], 141);
+				setBtnLayout(sysStr[97], 141);
 			}
 			else
 			{
-				setBtnLayout(sysStr[159], 142);
+				setBtnLayout(sysStr[98], 142);
 			}
 		}
 		else if (barAct[i] == act::quickSlot)
@@ -1136,27 +1136,27 @@ void HUD::drawBarAct()
 			errorBox(targetSkill == nullptr, L"HUD의 targetSkill이 nullptr이다.\n");
 			if (targetSkill->isQuickSlot == false)
 			{
-				setBtnLayout(sysStr[160], 146);
+				setBtnLayout(sysStr[99], 146);
 			}
 			else
 			{
-				setBtnLayout(sysStr[161], 147);
+				setBtnLayout(sysStr[100], 147);
 			}
 		}
-		else if (barAct[i] == act::toggleOff) setBtnLayout80(sysStr[196], 37);
-		else if (barAct[i] == act::toggleOn) setBtnLayout80(sysStr[196], 38);
+		else if (barAct[i] == act::toggleOff) setBtnLayout80(sysStr[119], 37);
+		else if (barAct[i] == act::toggleOn) setBtnLayout80(sysStr[119], 38);
 		else if (barAct[i] == act::headlight)
 		{
-			if (ctrlVeh->headlightOn == false) setBtnLayout(sysStr[205], 165);
-			else setBtnLayout(sysStr[205], 164);
+			if (ctrlVeh->headlightOn == false) setBtnLayout(sysStr[127], 165);
+			else setBtnLayout(sysStr[127], 164);
 		}
-		else if (barAct[i] == act::drink) setBtnLayout(sysStr[210], 37);
-		else if (barAct[i] == act::dump) setBtnLayout(sysStr[296], 174);
-		else if (barAct[i] == act::insertBattery) setBtnLayout80(sysStr[342], 35);
-		else if (barAct[i] == act::removeBattery) setBtnLayout80(sysStr[343], 36);
-		else if (barAct[i] == act::plant) setBtnLayout80(sysStr[349], 34);
-		else if (barAct[i] == act::extractSeed) setBtnLayout80(sysStr[350], 39);
-		else if (barAct[i] == act::dye) setBtnLayout80(L"Dye", 47);
+		else if (barAct[i] == act::drink) setBtnLayout(sysStr[130], 37);
+		else if (barAct[i] == act::dump) setBtnLayout(sysStr[206], 174);
+		else if (barAct[i] == act::insertBattery) setBtnLayout80(sysStr[250], 35);
+		else if (barAct[i] == act::removeBattery) setBtnLayout80(sysStr[251], 36);
+		else if (barAct[i] == act::plant) setBtnLayout80(sysStr[257], 34);
+		else if (barAct[i] == act::extractSeed) setBtnLayout80(sysStr[258], 39);
+		else if (barAct[i] == act::dye) setBtnLayout80(sysStr[361], 47);
 		else setBtnLayout(L" ", 0);
 
 		//48*48 심볼 아이콘 그리기
@@ -1265,22 +1265,22 @@ void HUD::drawStatusEffects()
 		case statusEffectFlag::hungry:
 			if (fakeHunger >= PLAYER_STARVE_PERCENT)
 			{
-				statEfctName = sysStr[220]; // 영양실조 (Starving)
+				statEfctName = sysStr[140]; // 영양실조 (Starving)
 				textColor = lowCol::red;
 			}
 			else if (fakeHunger >= PLAYER_VERY_HUNGRY_PERCENT)
 			{
-				statEfctName = sysStr[219]; // 굶주림 (Famished)
+				statEfctName = sysStr[139]; // 굶주림 (Famished)
 				textColor = lowCol::orange;
 			}
 			else if (fakeHunger >= PLAYER_HUNGRY_PERCENT)
 			{
-				statEfctName = sysStr[218]; // 배고픔 (Hungry)
+				statEfctName = sysStr[138]; // 배고픔 (Hungry)
 				textColor = lowCol::yellow;
 			}
 			else
 			{
-				statEfctName = sysStr[217]; // 배부름 (Full)
+				statEfctName = sysStr[137]; // 배부름 (Full)
 				textColor = col::green;
 			}
 			break;
@@ -1288,22 +1288,22 @@ void HUD::drawStatusEffects()
 		case statusEffectFlag::dehydrated:
 			if (fakeThirst >= PLAYER_DEHYDRATION_PERCENT)
 			{
-				statEfctName = sysStr[224]; // 탈수 상태 (Dehydrated)
+				statEfctName = sysStr[144]; // 탈수 상태 (Dehydrated)
 				textColor = lowCol::red;
 			}
 			else if (fakeThirst >= PLAYER_VERY_THIRSTY_PERCENT)
 			{
-				statEfctName = sysStr[223]; // 심한 갈증 (Parched)
+				statEfctName = sysStr[143]; // 심한 갈증 (Parched)
 				textColor = lowCol::orange;
 			}
 			else if (fakeThirst >= PLAYER_THIRSTY_PERCENT)
 			{
-				statEfctName = sysStr[222]; // 목마름 (Thirsty)
+				statEfctName = sysStr[142]; // 목마름 (Thirsty)
 				textColor = lowCol::yellow;
 			}
 			else
 			{
-				statEfctName = sysStr[221]; // 해갈 (Hydrated)
+				statEfctName = sysStr[141]; // 해갈 (Hydrated)
 				textColor = col::green;
 			}
 			break;
@@ -1311,22 +1311,22 @@ void HUD::drawStatusEffects()
 		case statusEffectFlag::tired:
 			if (fakeFatigue >= PLAYER_EXHAUSTED_PERCENT)
 			{
-				statEfctName = sysStr[228]; // 탈진 상태 (Exhausted)
+				statEfctName = sysStr[148]; // 탈진 상태 (Exhausted)
 				textColor = lowCol::red;
 			}
 			else if (fakeFatigue >= PLAYER_VERY_TIRED_PERCENT)
 			{
-				statEfctName = sysStr[227]; // 심한 피로 (Weary)
+				statEfctName = sysStr[147]; // 심한 피로 (Weary)
 				textColor = lowCol::orange;
 			}
 			else if (fakeFatigue >= PLAYER_TIRED_PERCENT)
 			{
-				statEfctName = sysStr[226]; // 피곤함 (Tired)
+				statEfctName = sysStr[146]; // 피곤함 (Tired)
 				textColor = lowCol::yellow;
 			}
 			else
 			{
-				statEfctName = sysStr[225]; // 개운함 (Refreshed)
+				statEfctName = sysStr[145]; // 개운함 (Refreshed)
 				textColor = col::green;
 				statEfctIcon = 58;
 			}
@@ -1477,7 +1477,7 @@ void HUD::drawQuest()
 	int pivotX = 14;
 	int pivotY = 272;
 	setFontSize(24);
-	drawText(sysStr[212], pivotX, pivotY);
+	drawText(sysStr[132], pivotX, pivotY);
 	drawLine(pivotX, pivotY + 36, pivotX + 110, pivotY + 36);
 	for (int i = 0; i < 120; i++)
 	{
@@ -1487,7 +1487,7 @@ void HUD::drawQuest()
 	drawRect({ pivotX + 1, pivotY + 49, 14, 14 }, col::white);
 	setFontSize(16);
 	int elapsedDay = getElapsedDays();
-	std::wstring questStr = sysStr[213] + L"  (";
+	std::wstring questStr = sysStr[133] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
 	drawText(questStr, pivotX + 20, pivotY + 46);
@@ -1578,11 +1578,13 @@ void HUD::drawBodyParts()
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 			// 텍스트 그리기
+			setFont(fontType::mainFontSemiBold);
 			if (gaugeFlip == false)
 				drawText(partName, inputX, inputY - 26, col::white);
 			else
 				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
 
+			setFont(fontType::mainFont);
 			std::wstring hpText = std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%";
 			if (gaugeFlip == false)
 				drawText(hpText, inputX + 40, inputY + 6, col::white);
@@ -1599,20 +1601,9 @@ void HUD::drawBodyParts()
 	drawSpriteCenter(spr::bodyShape, isMale ? 0 : 1, 146, cameraH - 152);
 	SDL_SetTextureAlphaMod(spr::bodyShape->getTexture(), 255);
 
-	auto drawPartName = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName)
-		{
-			if (gaugeFlip == false)
-				drawText(partName, inputX, inputY - 26, col::white);
-			else
-				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
-		};
 
-	drawPartName(false, 173, cameraH - 1 - 65, L"LLeg");
-	drawPartName(true, 25, cameraH - 1 - 65, L"RLeg");
-	drawPartName(false, 193, cameraH - 1 - 164, L"LArm");
-	drawPartName(true, 3, cameraH - 1 - 164, L"RArm");
-	drawPartName(true, 21, cameraH - 1 - 245, L"Torso");
-	drawPartName(false, 167, cameraH - 1 - 282, L"Head");
+
+
 
 	// 각 부위 그리기
 	if ((Equip::ins() == nullptr || !Equip::ins()->isFullyOpen()) &&
@@ -1621,45 +1612,60 @@ void HUD::drawBodyParts()
 		drawSingleBodyPartGauge(false,
 			173,
 			cameraH - 1 - 65,
-			L"LLeg",
+			sysStr[343],
 			PlayerPtr->lLegHP, PlayerPtr->lLegFakeHP, PART_MAX_HP, PlayerPtr->lLegFakeHPAlpha);
 
-		drawSingleBodyPartGauge(true, 25,
+		drawSingleBodyPartGauge(true, 28,
 			cameraH - 1 - 65,
-			L"RLeg",
+			sysStr[341],
 			PlayerPtr->rLegHP, PlayerPtr->rLegFakeHP, PART_MAX_HP, PlayerPtr->rLegFakeHPAlpha);
 
 		drawSingleBodyPartGauge(false,
 			193,
 			cameraH - 1 - 164,
-			L"LArm",
+			sysStr[342],
 			PlayerPtr->lArmHP, PlayerPtr->lArmFakeHP, PART_MAX_HP, PlayerPtr->lArmFakeHPAlpha);
 
 		drawSingleBodyPartGauge(true,
 			3,
-			cameraH - 1 - 164,
-			L"RArm",
+			cameraH - 1 - 164 + 6,
+			sysStr[340],
 			PlayerPtr->rArmHP, PlayerPtr->rArmFakeHP, PART_MAX_HP, PlayerPtr->rArmFakeHPAlpha);
 
 		drawSingleBodyPartGauge(true,
 			21,
 			cameraH - 1 - 245,
-			L"Torso",
+			sysStr[364],
 			PlayerInfo().HP, PlayerInfo().fakeHP,
 			PlayerInfo().maxHP, PlayerInfo().fakeHPAlpha);
 
 		drawSingleBodyPartGauge(false,
 			167,
 			cameraH - 1 - 282,
-			L"Head",
+			sysStr[339],
 			PlayerPtr->headHP, PlayerPtr->headFakeHP, PART_MAX_HP, PlayerPtr->headFakeHPAlpha);
 	}
 	else
 	{
+		auto drawPartName = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName)
+			{
+				setFont(fontType::mainFontSemiBold);
+				if (gaugeFlip == false)
+					drawText(partName, inputX, inputY - 26, col::white);
+				else
+					drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+			};
+
 		// 파츠별 부가정보 표시
 		// 비반전(L계열/Head): textOff=14, Enc center=+89
 		// 반전(R계열/Torso):  textOff=6,  Enc center=+17
 		// 행 간격 17px, 물리저항(0~2행) / 속성저항(3~6행, 전신 공통)
+		drawPartName(false, 173, cameraH - 1 - 65, sysStr[343]);
+		drawPartName(true, 28, cameraH - 1 - 65, sysStr[341]);
+		drawPartName(false, 193, cameraH - 1 - 164, sysStr[342]);
+		drawPartName(true, 3, cameraH - 1 - 164 + 6, sysStr[340]);
+		drawPartName(true, 21, cameraH - 1 - 245, sysStr[364]);
+		drawPartName(false, 167, cameraH - 1 - 282, sysStr[339]);
 
 		auto drawPartInfo = [&](bool flip, int pivotX, int pivotY, int rPierce, int rCut, int rBash, int enc)
 			{
@@ -1672,7 +1678,7 @@ void HUD::drawBodyParts()
 
 				setFont(fontType::mainFontSemiBold);
 				setFontSize(12);
-				drawTextCenter(L"#f2c122Enc", pivotX + cOff, pivotY + 7);
+				drawTextCenter(L"#f2c122" + sysStr[365], pivotX + cOff, pivotY + 7);
 				setFontSize(14);
 				if (enc >= 100)
 					drawTextCenter(L"#ff3333100", pivotX + cOff, pivotY + 20);
@@ -1681,13 +1687,13 @@ void HUD::drawBodyParts()
 
 				setFontSize(16);
 				// 물리저항
-				drawText(L"#f26522rPierce", pivotX + tOff, pivotY + 29 + 17 * 0);
+				drawText(L"#f26522" + sysStr[366], pivotX + tOff, pivotY + 29 + 17 * 0);
 				drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 0);
 
-				drawText(L"#f26522rCut", pivotX + tOff, pivotY + 29 + 17 * 1);
+				drawText(L"#f26522" + sysStr[367], pivotX + tOff, pivotY + 29 + 17 * 1);
 				drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 1);
 
-				drawText(L"#f26522rBash", pivotX + tOff, pivotY + 29 + 17 * 2);
+				drawText(L"#f26522" + sysStr[368], pivotX + tOff, pivotY + 29 + 17 * 2);
 				drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
 
 			};
@@ -1695,19 +1701,19 @@ void HUD::drawBodyParts()
 		drawPartInfo(false, 164, cameraH - 311, PlayerPtr->getResPierceHead(), PlayerPtr->getResCutHead(), PlayerPtr->getResBashHead(), PlayerPtr->getEncHead());  // 머리
 		drawPartInfo(true, 16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 상체
 		drawPartInfo(false, 190, cameraH - 193, PlayerPtr->getResPierceLArm(), PlayerPtr->getResCutLArm(), PlayerPtr->getResBashLArm(), PlayerPtr->getEncLArm());  // 왼팔
-		drawPartInfo(true, 2, cameraH - 193, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
+		drawPartInfo(true, 2, cameraH - 193 + 6, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
 		drawPartInfo(false, 170, cameraH - 94, PlayerPtr->getResPierceLLeg(), PlayerPtr->getResCutLLeg(), PlayerPtr->getResBashLLeg(), PlayerPtr->getEncLLeg());  // 왼다리
-		drawPartInfo(true, 20, cameraH - 94, PlayerPtr->getResPierceRLeg(), PlayerPtr->getResCutRLeg(), PlayerPtr->getResBashRLeg(), PlayerPtr->getEncRLeg());  // 오른다리
+		drawPartInfo(true, 12, cameraH - 94, PlayerPtr->getResPierceRLeg(), PlayerPtr->getResCutRLeg(), PlayerPtr->getResBashRLeg(), PlayerPtr->getEncRLeg());  // 오른다리
 
 
 		int pivotX = 0;
 		int pivotY = cameraH - 665;
 		drawStadium(SDL_Rect{ pivotX - 10,pivotY,97,351 }, col::black, 220, 3);
 		setFontSize(18);
-		drawTextCenter(L"#f26522Shield", pivotX + 42, pivotY + 20);
+		drawTextCenter(L"#f26522" + sysStr[369], pivotX + 42, pivotY + 20);
 		drawTextCenter(std::to_wstring(PlayerPtr->getSH()), pivotX + 42, pivotY + 20 + 20);
 
-		drawTextCenter(L"#f26522Evasion", pivotX + 42, pivotY + 20 + 50);
+		drawTextCenter(L"#f26522" + sysStr[370], pivotX + 42, pivotY + 20 + 50);
 		drawTextCenter(std::to_wstring(PlayerPtr->getEV()), pivotX + 42, pivotY + 20 + 20 + 50);
 
 		// 속성저항 (전신 공통)
@@ -1739,31 +1745,31 @@ void HUD::drawBodyParts()
 
 		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
 		setFontSize(14);
-		drawText(L"rFire", pivotX + 5 + 18, resBaseY + resGap * 0 - 1);
+		drawText(sysStr[371], pivotX + 5 + 18, resBaseY + resGap * 0 - 1);
 		setFontSize(18);
 		drawTextCenter(resLvStr(rFire), pivotX + 5 + 34, resBaseY + resGap * 0 + 24);
 
 		drawSprite(spr::icon16, 109, pivotX + 4, resBaseY + resGap * 1);
 		setFontSize(14);
-		drawText(L"rCold", pivotX + 5 + 18, resBaseY + resGap * 1 - 1);
+		drawText(sysStr[372], pivotX + 5 + 18, resBaseY + resGap * 1 - 1);
 		setFontSize(18);
 		drawTextCenter(resLvStr(rCold), pivotX + 5 + 34, resBaseY + resGap * 1 + 24);
 
 		drawSprite(spr::icon16, 110, pivotX + 4, resBaseY + resGap * 2);
 		setFontSize(14);
-		drawText(L"rElec", pivotX + 5 + 18, resBaseY + resGap * 2 - 1);
+		drawText(sysStr[373], pivotX + 5 + 18, resBaseY + resGap * 2 - 1);
 		setFontSize(18);
 		drawTextCenter(resLvStr(rElec), pivotX + 5 + 34, resBaseY + resGap * 2 + 24);
 
 		drawSprite(spr::icon16, 111, pivotX + 4, resBaseY + resGap * 3);
 		setFontSize(14);
-		drawText(L"rRad", pivotX + 5 + 18, resBaseY + resGap * 3 - 1);
+		drawText(sysStr[374], pivotX + 5 + 18, resBaseY + resGap * 3 - 1);
 		setFontSize(18);
 		drawTextCenter(resLvStr(rRad), pivotX + 5 + 34, resBaseY + resGap * 3 + 24);
 
 		drawSprite(spr::icon16, 112, pivotX + 4, resBaseY + resGap * 4);
 		setFontSize(14);
-		drawText(L"rCorr", pivotX + 5 + 18, resBaseY + resGap * 4 - 1);
+		drawText(sysStr[375], pivotX + 5 + 18, resBaseY + resGap * 4 - 1);
 		setFontSize(18);
 		drawTextCenter(resLvStr(rCorr), pivotX + 5 + 34, resBaseY + resGap * 4 + 24);
 
@@ -1807,23 +1813,23 @@ void HUD::drawCircuitInfo()
 		{
 			if (tgtProp->isFluidFlowing()) return;
 
-			std::wstring firstString = L"Power:";
+			std::wstring firstString = sysStr[376];
 			std::wstring firstNumber = L"534.6";
 			std::wstring firstColStr = L"";
 			std::wstring firstUnit = L"kJ/turn";
 
-			std::wstring secondString = L"Loss:";
+			std::wstring secondString = sysStr[377];
 			std::wstring secondNumber = L"0.2";
 			std::wstring secondColStr = L"";
 			std::wstring secondUnit = L"kJ/turn";
 
 			if (tgtProp->leadItem.electricMaxPower > 0)
 			{
-				firstString = L"Output:";
+				firstString = sysStr[376];
 				firstNumber = decimalCutter(tgtProp->getOutletCharge() / 1000.0, 3);
 				firstUnit = L"kJ/turn";
 
-				secondString = L"Stored:";
+				secondString = sysStr[378];
 				if (tgtProp->leadItem.itemCode == itemID::powerBankR || tgtProp->leadItem.itemCode == itemID::powerBankT || tgtProp->leadItem.itemCode == itemID::powerBankL || tgtProp->leadItem.itemCode == itemID::powerBankB)
 				{
 					secondNumber.clear();
@@ -1845,10 +1851,10 @@ void HUD::drawCircuitInfo()
 			}
 			else if (tgtProp->leadItem.gndUsePower > 0)
 			{
-				firstString = L"Input:";
+				firstString = sysStr[379];
 				firstNumber = decimalCutter(tgtProp->getInletCharge() / 1000.0, 3);
 
-				secondString = L"Need:";
+				secondString = sysStr[380];
 				secondNumber = decimalCutter(tgtProp->leadItem.gndUsePower / 1000.0, 3);
 
 				if (tgtProp->getInletCharge() <= tgtProp->leadItem.gndUsePower) firstColStr = col2Str(lowCol::green);
@@ -1856,10 +1862,10 @@ void HUD::drawCircuitInfo()
 			}
 			else
 			{
-				firstString = L"Flow:";
+				firstString = sysStr[381];
 				firstNumber = decimalCutter(tgtProp->getInletCharge() / 1000.0, 3);
 
-				secondString = L"Loss:";
+				secondString = sysStr[377];
 				secondNumber = decimalCutter(tgtProp->totalLossCharge / 1000, 4);
 				secondUnit = L"kJ/turn";
 			}
@@ -2151,13 +2157,13 @@ void HUD::drawFluidCircuitInfo()
 			bool isOn = tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_ON)
 				&& !tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF);
 
-			firstString = L"Power:";
+			firstString = sysStr[376];
 			firstNumber = std::to_wstring(PUMP_POWER);
 			firstColStr = isOn ? col2Str(lowCol::green) : col2Str(col::gray);
 			firstUnit = L"mL/turn";
 
-			secondString = L"State:";
-			secondNumber = isOn ? (col2Str(lowCol::green) + L"ON") : (col2Str(lowCol::red) + L"OFF");
+			secondString = sysStr[382];
+			secondNumber = isOn ? (col2Str(lowCol::green) + sysStr[383]) : (col2Str(lowCol::red) + sysStr[384]);
 			secondUnit = L"";
 		}
 		else if (isTank)
@@ -2166,7 +2172,7 @@ void HUD::drawFluidCircuitInfo()
 			double capacity = tgtProp->leadItem.maxFluid; // 멤버명 확인 필요
 			double ratio = (capacity > 0) ? std::clamp(stored / capacity, 0.0, 1.0) : 0.0;
 
-			firstString = L"Stored:";
+			firstString = sysStr[378];
 			firstNumber.clear();
 			if (ratio < 0.3333) firstNumber += col2Str(lowCol::red);
 			else if (ratio < 0.6666) firstNumber += col2Str(lowCol::yellow);
@@ -2175,7 +2181,7 @@ void HUD::drawFluidCircuitInfo()
 			firstNumber += col2Str(col::gray) + L" / " + decimalCutter(capacity, 1);
 			firstUnit = L"mL";
 
-			secondString = L"Fill:";
+			secondString = sysStr[385];
 			if (ratio < 0.3333) secondColStr = col2Str(lowCol::red);
 			else if (ratio < 0.6666) secondColStr = col2Str(lowCol::yellow);
 			else secondColStr = col2Str(lowCol::green);
@@ -2186,21 +2192,21 @@ void HUD::drawFluidCircuitInfo()
 		{
 			bool isOpen = !tgtProp->leadItem.checkFlag(itemFlag::PROP_POWER_OFF);
 
-			firstString = L"State:";
-			firstNumber = isOpen ? (col2Str(lowCol::green) + L"Open") : (col2Str(lowCol::red) + L"Closed");
+			firstString = sysStr[382];
+			firstNumber = isOpen ? (col2Str(lowCol::green) + sysStr[386]) : (col2Str(lowCol::red) + sysStr[387]);
 			firstUnit = L"";
 
-			secondString = L"Volume:";
+			secondString = sysStr[388];
 			secondNumber = decimalCutter(tgtProp->nodeFluidAmount, 1);
 			secondUnit = L"mL";
 		}
 		else // 일반 파이프/유체회로 노드
 		{
-			firstString = L"Volume:";
+			firstString = sysStr[388];
 			firstNumber = decimalCutter(tgtProp->nodeFluidAmount, 1);
 			firstUnit = L"mL";
 
-			secondString = L"Resist:";
+			secondString = sysStr[389];
 			secondNumber = decimalCutter(tgtProp->totalResistFluid, 2);
 			secondUnit = L"mL";
 		}
@@ -2208,7 +2214,7 @@ void HUD::drawFluidCircuitInfo()
 		// 싱크에서 유체를 소비 중이면 2번째 줄을 Drain으로 오버라이드
 		if (tgtProp->sinkFluidAmount > 0 && !isPump && !isTank)
 		{
-			secondString = L"Drain:";
+			secondString = sysStr[390];
 			secondColStr = L"";
 			secondNumber = col2Str(lowCol::orange) + decimalCutter(tgtProp->sinkFluidAmount, 1);
 			secondUnit = L"mL/turn";

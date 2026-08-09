@@ -35,74 +35,74 @@ export void debugConsole()
 	int yp = PlayerY();
 	int zp = PlayerZ();
 
-	prt(L"////////////////////////////////////////\n");
-	prt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
-	prt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
-	prt(L"2.적 생성\n");
-	prt(L"3.테스트 로그 갱신\n");
-	prt(L"4.아이템 생성\n");
-	prt(L"5.불 생성\n");
-	prt(L"6.EntityPtr 콘솔 출력\n");
-	prt(L"7.벽 생성\n");
-	prt(L"8.로그 타이머 비활성화/활성화\n");
-	prt(L"9.콘솔 입력 로그 출력\n");
-	prt(L"10.고정 텍스쳐 생성\n");
-	prt(L"11.가스 생성\n");
-	prt(L"12. 이큅 1번 제자리 드롭\n");
-	prt(L"13. 달리기 토글\n");
-	prt(L"14. 레벨업 이펙트 재생\n");
-	prt(L"15. 탑승 중인 차량을 반시계로 22.5도 회전\n");
-	prt(L"16. 탑승 중인 차량을 워프시키기\n");
-	prt(L"17. 탑승 중인 차량을 연속적으로 이동시키기\n");
-	prt(L"18. fov 콘솔 출력\n");
-	prt(L"19. 시간 강제 설정\n");
-	prt(L"20. 날짜 강제 설정\n");
-	prt(L"21. 날씨 변경\n");
-	prt(L"22. 말 생성\n");
-	prt(L"23. 상태이상 추가\n");
-	prt(L"24. 플레이어 텔레포트\n");
-	prt(L"25. 청크 라인 표시\n");
-	prt(L"26. 청크 덮어쓰기\n");
-	prt(L"27. Lua 스크립트 실행\n");
-	prt(L"28. 게임오버\n");
-	prt(L"30. 스킬 추가\n");
-	prt(L"31. 테스트 Lst 띄우기\n");
-	prt(L"32. 플레이어 헤어스타일 변경\n");
-	prt(L"33. 플레이어 눈 색상 변경\n");
-	prt(L"34. 플레이어 피부색 변경\n");
-	prt(L"35. 플레이어 성별 변경\n");
-	prt(L"37. SUV 소환\n");
-	prt(L"41. 경험치 추가\n");
-	prt(L"42. 타이틀 화면으로\n");
-	prt(L"43. 캐릭터 선택 화면\n");
-	prt(L"44. 해상도 변경\n");
-	prt(L"45. 모든 UI 숨기기 토글\n");
+	dbgPrt(L"////////////////////////////////////////\n");
+	dbgPrt(L"[디버그 모드] 원하는 값을 입력해주세요.\n");
+	dbgPrt(L"현재 플레이어의 좌표는 (%d,%d,%d)이다.\n", PlayerX(), PlayerY(), PlayerZ());
+	dbgPrt(L"2.적 생성\n");
+	dbgPrt(L"3.테스트 로그 갱신\n");
+	dbgPrt(L"4.아이템 생성\n");
+	dbgPrt(L"5.불 생성\n");
+	dbgPrt(L"6.EntityPtr 콘솔 출력\n");
+	dbgPrt(L"7.벽 생성\n");
+	dbgPrt(L"8.로그 타이머 비활성화/활성화\n");
+	dbgPrt(L"9.콘솔 입력 로그 출력\n");
+	dbgPrt(L"10.고정 텍스쳐 생성\n");
+	dbgPrt(L"11.가스 생성\n");
+	dbgPrt(L"12. 이큅 1번 제자리 드롭\n");
+	dbgPrt(L"13. 달리기 토글\n");
+	dbgPrt(L"14. 레벨업 이펙트 재생\n");
+	dbgPrt(L"15. 탑승 중인 차량을 반시계로 22.5도 회전\n");
+	dbgPrt(L"16. 탑승 중인 차량을 워프시키기\n");
+	dbgPrt(L"17. 탑승 중인 차량을 연속적으로 이동시키기\n");
+	dbgPrt(L"18. fov 콘솔 출력\n");
+	dbgPrt(L"19. 시간 강제 설정\n");
+	dbgPrt(L"20. 날짜 강제 설정\n");
+	dbgPrt(L"21. 날씨 변경\n");
+	dbgPrt(L"22. 말 생성\n");
+	dbgPrt(L"23. 상태이상 추가\n");
+	dbgPrt(L"24. 플레이어 텔레포트\n");
+	dbgPrt(L"25. 청크 라인 표시\n");
+	dbgPrt(L"26. 청크 덮어쓰기\n");
+	dbgPrt(L"27. Lua 스크립트 실행\n");
+	dbgPrt(L"28. 게임오버\n");
+	dbgPrt(L"30. 스킬 추가\n");
+	dbgPrt(L"31. 테스트 Lst 띄우기\n");
+	dbgPrt(L"32. 플레이어 헤어스타일 변경\n");
+	dbgPrt(L"33. 플레이어 눈 색상 변경\n");
+	dbgPrt(L"34. 플레이어 피부색 변경\n");
+	dbgPrt(L"35. 플레이어 성별 변경\n");
+	dbgPrt(L"37. SUV 소환\n");
+	dbgPrt(L"41. 경험치 추가\n");
+	dbgPrt(L"42. 타이틀 화면으로\n");
+	dbgPrt(L"43. 캐릭터 선택 화면\n");
+	dbgPrt(L"44. 해상도 변경\n");
+	dbgPrt(L"45. 모든 UI 숨기기 토글\n");
 
-	prt(L"99. 콘솔 클리어\n");
-	prt(L"////////////////////////////////////////\n");
+	dbgPrt(L"99. 콘솔 클리어\n");
+	dbgPrt(L"////////////////////////////////////////\n");
 	int select;
 	std::cin >> select;
 	switch (select)
 	{
 	default:
 	{
-		prt(L"잘못된 값을 입력하였습니다.\n");
+		dbgPrt(L"잘못된 값을 입력하였습니다.\n");
 		break;
 	}
 	case 2: // generateEntity
 	{
 		Player* ptr = PlayerPtr;
 		int inputEntityCode;
-		prt(L"생성할 몬스터의 코드를 입력해주세요.\n");
+		dbgPrt(L"생성할 몬스터의 코드를 입력해주세요.\n");
 		std::cin >> inputEntityCode;
 		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, inputEntityCode);
-		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
+		dbgPrt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
 	case 3: //로그 업데이트
 	{
 		updateLog(L"#FFFFFFDEBUG : #FF0000Fire#2ECCFAICE");
-		prt(L"[디버그]테스트로그를 갱신했다!\n");
+		dbgPrt(L"[디버그]테스트로그를 갱신했다!\n");
 		break;
 	}
 	case 4: //테스트 아이템
@@ -111,7 +111,7 @@ export void debugConsole()
 		ItemPocket* itemPtr = TileItemStack(PlayerX(), PlayerY(), PlayerZ())->getPocket();
 		itemPtr->addItemFromDex(itemID::test, 2);
 		itemPtr->addItemFromDex(itemID::ne555, 4);
-		prt(L"[디버그]테스트 아이템을 생성했다!\n");
+		dbgPrt(L"[디버그]테스트 아이템을 생성했다!\n");
 		break;
 	}
 	case 5: //맵핵
@@ -119,12 +119,12 @@ export void debugConsole()
 		int inputX;
 		int inputY;
 		int fireSize;
-		prt(L"[상대 좌표]\n");
-		prt(L"생성할 불의 크기를 입력해주세요.(1~3)\n");
+		dbgPrt(L"[상대 좌표]\n");
+		dbgPrt(L"생성할 불의 크기를 입력해주세요.(1~3)\n");
 		std::cin >> fireSize;
-		prt(L"생성할 화염의 x 좌표를 입력하세요.\n");
+		dbgPrt(L"생성할 화염의 x 좌표를 입력하세요.\n");
 		std::cin >> inputX;
-		prt(L"생성할 화염의 y 좌표를 입력하세요.\n");
+		dbgPrt(L"생성할 화염의 y 좌표를 입력하세요.\n");
 		std::cin >> inputY;
 
 		switch (fireSize)
@@ -139,7 +139,7 @@ export void debugConsole()
 			createFlame({ xp + inputX,yp + inputY,zp }, flameFlag::BIG);
 			break;
 		}
-		prt(L"[디버그]화염을 생성했다.\n");
+		dbgPrt(L"[디버그]화염을 생성했다.\n");
 		break;
 	}
 	case 6: //entityPtr 출력
@@ -151,13 +151,13 @@ export void debugConsole()
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (TileEntity(x, y, zp) == nullptr) prt(L"□");
-				else if (TileEntity(x, y, zp) == PlayerPtr) prt(lowCol::yellow, L"@");
-				else prt(lowCol::red, L"E");
+				if (TileEntity(x, y, zp) == nullptr) dbgPrt(L"□");
+				else if (TileEntity(x, y, zp) == PlayerPtr) dbgPrt(lowCol::yellow, L"@");
+				else dbgPrt(lowCol::red, L"E");
 			}
-			prt(L"\n");
+			dbgPrt(L"\n");
 		}
-		prt(L"[디버그] entityPtr 출력을 끝냈다!\n");
+		dbgPrt(L"[디버그] entityPtr 출력을 끝냈다!\n");
 		break;
 	}
 	case 7: //create wall
@@ -165,14 +165,14 @@ export void debugConsole()
 		int wallX;
 		int wallY;
 		int wallZ;
-		prt(L"[상대 좌표]\n");
-		prt(L"생성할 벽의 x 좌표를 입력하세요.\n");
+		dbgPrt(L"[상대 좌표]\n");
+		dbgPrt(L"생성할 벽의 x 좌표를 입력하세요.\n");
 		std::cin >> wallX;
-		prt(L"생성할 벽의 y 좌표를 입력하세요.\n");
+		dbgPrt(L"생성할 벽의 y 좌표를 입력하세요.\n");
 		std::cin >> wallY;
-		prt(L"생성할 벽의 z 좌표를 입력하세요.\n");
+		dbgPrt(L"생성할 벽의 z 좌표를 입력하세요.\n");
 		std::cin >> wallZ;
-		prt(L"[디버그](%d,%d,%d) 위치에 벽을 생성했다!\n", xp + wallX, yp + wallY, zp + wallZ);
+		dbgPrt(L"[디버그](%d,%d,%d) 위치에 벽을 생성했다!\n", xp + wallX, yp + wallY, zp + wallZ);
 		setWall({ xp + wallX, yp + wallY, zp + wallZ }, itemID::ne555);
 		break;
 	}
@@ -191,11 +191,11 @@ export void debugConsole()
 	case 9:
 	{
 		std::wstring input;
-		prt(L"로그에 출력할 문자열을 입력해주세요.\n");
+		dbgPrt(L"로그에 출력할 문자열을 입력해주세요.\n");
 		std::wcin.ignore();
 		std::getline(std::wcin, input);
 		updateLog(input);
-		prt(L"[디버그] 로그를 출력했다!\n");
+		dbgPrt(L"[디버그] 로그를 출력했다!\n");
 		break;
 	}
 	case 10: // generate Sticker
@@ -209,16 +209,16 @@ export void debugConsole()
 	case 11: // 가스 생성
 	{
 		int gasCode, gasVol;
-		prt(L"[상대 좌표]\n");
-		prt(L"생성할 가스의 아이템 코드를 입력해주세요.\n");
+		dbgPrt(L"[상대 좌표]\n");
+		dbgPrt(L"생성할 가스의 아이템 코드를 입력해주세요.\n");
 		std::cin >> gasCode;
-		prt(L"생성할 가스의 부피를 입력해주세요.\n");
+		dbgPrt(L"생성할 가스의 부피를 입력해주세요.\n");
 		std::cin >> gasVol;
 		if (World::ins()->getTile(xp, yp, zp).checkGas(gasCode) == -1)
 		{
 			World::ins()->getTile(xp, yp, zp).gasVec.push_back({ gasCode, gasVol });
 		}
-		prt(col::white, L"%ls를 %d의 부피만큼 좌표 (%d,%d,%d)에 생성하였다!\n", itemDex[gasCode].name.c_str(), gasVol, xp, yp, zp);
+		dbgPrt(col::white, L"%ls를 %d의 부피만큼 좌표 (%d,%d,%d)에 생성하였다!\n", itemDex[gasCode].name.c_str(), gasVol, xp, yp, zp);
 		break;
 	}
 	case 12: // 이큅먼트 1번 아이템 제자리 드롭
@@ -239,7 +239,7 @@ export void debugConsole()
 	case 14://레벨업 연출 재생
 	{
 		levelUpFX::trigger();
-		prt(L"[디버그] 레벨업 연출 재생!\n");
+		dbgPrt(L"[디버그] 레벨업 연출 재생!\n");
 		break;
 	}
 	case 15://탑승 중인 차량 회전
@@ -250,9 +250,9 @@ export void debugConsole()
 	case 16://탑승 중인 차량 순간이동
 	{
 		int dx, dy;
-		prt(L"이동할 거리 dx를 입력해주세요.\n");
+		dbgPrt(L"이동할 거리 dx를 입력해주세요.\n");
 		std::cin >> dx;
-		prt(L"이동할 거리 dy를 입력해주세요.\n");
+		dbgPrt(L"이동할 거리 dy를 입력해주세요.\n");
 		std::cin >> dy;
 		ctrlVeh->shift(dx, dy);
 		break;
@@ -260,9 +260,9 @@ export void debugConsole()
 	case 17://탑승 중인 차량 이동
 	{
 		int dx, dy;
-		prt(L"이동할 거리 dx를 입력해주세요.\n");
+		dbgPrt(L"이동할 거리 dx를 입력해주세요.\n");
 		std::cin >> dx;
-		prt(L"이동할 거리 dy를 입력해주세요.\n");
+		dbgPrt(L"이동할 거리 dy를 입력해주세요.\n");
 		std::cin >> dy;
 		ctrlVeh->rush(dx, dy);
 		break;
@@ -273,21 +273,21 @@ export void debugConsole()
 		{
 			for (int x = xp - 8; x <= xp + 8; x++)
 			{
-				if (TileFov(x, y, zp) == fovFlag::white) prt(L"○");
-				else if (TileFov(x, y, zp) == fovFlag::gray) prt(L"◎");
-				else prt(L"●");
+				if (TileFov(x, y, zp) == fovFlag::white) dbgPrt(L"○");
+				else if (TileFov(x, y, zp) == fovFlag::gray) dbgPrt(L"◎");
+				else dbgPrt(L"●");
 			}
-			prt(L"\n");
+			dbgPrt(L"\n");
 		}
-		prt(L"[디버그] entityPtr 출력을 끝냈다!\n");
+		dbgPrt(L"[디버그] entityPtr 출력을 끝냈다!\n");
 		break;
 	}
 	case 19: //시간 강제 설정
 	{
 		int tgtHour, tgtMin;
-		prt(L"[1/2] 바꿀 시간을 입력해주세요(0~23).\n");
+		dbgPrt(L"[1/2] 바꿀 시간을 입력해주세요(0~23).\n");
 		std::cin >> tgtHour;
-		prt(L"[2/2] 바꿀 분을 입력해주세요(0~59)\n");
+		dbgPrt(L"[2/2] 바꿀 분을 입력해주세요(0~59)\n");
 		std::cin >> tgtMin;
 		setDebugTime(tgtHour, tgtMin);
 		break;
@@ -295,9 +295,9 @@ export void debugConsole()
 	case 20: //날짜 강제 설정
 	{
 		int tgtMonth, tgtDay;
-		prt(L"[1/2] 바꿀 달을 입력해주세요(1~12).\n");
+		dbgPrt(L"[1/2] 바꿀 달을 입력해주세요(1~12).\n");
 		std::cin >> tgtMonth;
-		prt(L"[2/2] 바꿀 일을 입력해주세요.\n");
+		dbgPrt(L"[2/2] 바꿀 일을 입력해주세요.\n");
 		std::cin >> tgtDay;
 		setDebugDay(tgtMonth, tgtDay);
 		break;
@@ -308,26 +308,26 @@ export void debugConsole()
 		World::ins()->changeToChunkCoord(PlayerX(), PlayerY(), cx, cy);
 
 		int tgtWeather;
-		prt(L" 바꿀 날씨를 선택해주세요.\n");
-		prt(L" 1. 맑음\n");
-		prt(L" 2. 흐림\n");
-		prt(L" 3. 비\n");
-		prt(L" 4. 천둥\n");
-		prt(L" 5. 눈\n");
+		dbgPrt(L" 바꿀 날씨를 선택해주세요.\n");
+		dbgPrt(L" 1. 맑음\n");
+		dbgPrt(L" 2. 흐림\n");
+		dbgPrt(L" 3. 비\n");
+		dbgPrt(L" 4. 천둥\n");
+		dbgPrt(L" 5. 눈\n");
 		std::cin >> tgtWeather;
 		if (tgtWeather == 1) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::sunny);
 		else if (tgtWeather == 2) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::cloudy);
 		else if (tgtWeather == 3) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::rain);
 		else if (tgtWeather == 4) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::storm);
 		else if (tgtWeather == 5) World::ins()->setChunkWeather(cx, cy, zp, weatherFlag::snow);
-		prt(L" 날씨를 성공적으로 변경했다! \n");
+		dbgPrt(L" 날씨를 성공적으로 변경했다! \n");
 		break;
 	}
 	case 22: //말 생성
 	{
 		Player* ptr = PlayerPtr;
 		createMonster({ ptr->getGridX() + 1, ptr->getGridY(), ptr->getGridZ() }, 4);
-		prt(L"[디버그]새로운 엔티티를 만들었다!\n");
+		dbgPrt(L"[디버그]새로운 엔티티를 만들었다!\n");
 		break;
 	}
 	case 23: //상태이상 생성
@@ -335,13 +335,13 @@ export void debugConsole()
 		int tgtEfctIndex = 0;
 		float tgtEfctDur = 1.0f;
 
-		prt(L"[1/2] 추가할 상태이상의 인덱스를 입력해주세요.\n");
+		dbgPrt(L"[1/2] 추가할 상태이상의 인덱스를 입력해주세요.\n");
 		std::cin >> tgtEfctIndex;
 
-		prt(L"[2/2] 추가할 상태이상의 턴수를 입력해주세요.\n");
+		dbgPrt(L"[2/2] 추가할 상태이상의 턴수를 입력해주세요.\n");
 		std::cin >> tgtEfctDur;
 
-		prt(L"상태이상을 성공적으로 추가하였다.\n");
+		dbgPrt(L"상태이상을 성공적으로 추가하였다.\n");
 		PlayerInfo().statusEffectVec.push_back({ (statusEffectFlag)tgtEfctIndex,tgtEfctDur });
 
 		break;
@@ -364,24 +364,24 @@ export void debugConsole()
 
 		int tgtGridX = 0, tgtGridY = 0, tgtGridZ = 0;
 
-		prt(L"텔레포트 모드를 선택해주세요.\n");
-		prt(L"1. 수동 좌표 입력\n");
-		prt(L"2. 프리셋 위치\n");
+		dbgPrt(L"텔레포트 모드를 선택해주세요.\n");
+		dbgPrt(L"1. 수동 좌표 입력\n");
+		dbgPrt(L"2. 프리셋 위치\n");
 		int teleMode;
 		std::cin >> teleMode;
 
 		if (teleMode == 2)
 		{
-			prt(L"프리셋 번호를 선택해주세요.\n");
+			dbgPrt(L"프리셋 번호를 선택해주세요.\n");
 			for (int i = 0; i < (int)presets.size(); i++)
 			{
-				prt(L"%d. %ls (%d, %d, %d)\n", i + 1, presets[i].name, presets[i].x, presets[i].y, presets[i].z);
+				dbgPrt(L"%d. %ls (%d, %d, %d)\n", i + 1, presets[i].name, presets[i].x, presets[i].y, presets[i].z);
 			}
 			int psel;
 			std::cin >> psel;
 			if (psel < 1 || psel >(int)presets.size())
 			{
-				prt(L"잘못된 값을 입력하였습니다.\n");
+				dbgPrt(L"잘못된 값을 입력하였습니다.\n");
 				break;
 			}
 			tgtGridX = presets[psel - 1].x;
@@ -390,18 +390,18 @@ export void debugConsole()
 		}
 		else if (teleMode == 1)
 		{
-			prt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");
+			dbgPrt(L"텔레포트할 위치의 gridX 좌표를 입력해주세요.\n");
 			std::cin >> tgtGridX;
 
-			prt(L"텔레포트할 위치의 gridY 좌표를 입력해주세요.\n");
+			dbgPrt(L"텔레포트할 위치의 gridY 좌표를 입력해주세요.\n");
 			std::cin >> tgtGridY;
 
-			prt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
+			dbgPrt(L"텔레포트할 위치의 gridZ 좌표를 입력해주세요.\n");
 			std::cin >> tgtGridZ;
 		}
 		else
 		{
-			prt(L"잘못된 값을 입력하였습니다.\n");
+			dbgPrt(L"잘못된 값을 입력하였습니다.\n");
 			break;
 		}
 
@@ -422,22 +422,22 @@ export void debugConsole()
 		int chunkZ = 0;
 		int chunkInput = 0;
 
-		prt(L"chunkX를 입력해주세요.\n");
+		dbgPrt(L"chunkX를 입력해주세요.\n");
 		std::cin >> chunkX;
 
-		prt(L"chunkY를 입력해주세요.\n");
+		dbgPrt(L"chunkY를 입력해주세요.\n");
 		std::cin >> chunkY;
 
-		prt(L"chunkZ를 입력해주세요.\n");
+		dbgPrt(L"chunkZ를 입력해주세요.\n");
 		std::cin >> chunkZ;
 
 
-		prt(L"바꿀 청크를 입력해주세요.\n");
-		prt(L"1.바다\n");
-		prt(L"2.흙\n");
-		prt(L"3.도로\n");
-		prt(L"4.편의점\n");
-		prt(L"5.아파트\n");
+		dbgPrt(L"바꿀 청크를 입력해주세요.\n");
+		dbgPrt(L"1.바다\n");
+		dbgPrt(L"2.흙\n");
+		dbgPrt(L"3.도로\n");
+		dbgPrt(L"4.편의점\n");
+		dbgPrt(L"5.아파트\n");
 		std::cin >> chunkInput;
 
 		if (chunkInput == 1) World::ins()->chunkOverwrite(chunkX, chunkY, chunkZ, chunkFlag::seawater);
@@ -449,7 +449,7 @@ export void debugConsole()
 	{
 		lua["cppValue"] = 10;
 		sol::protected_function_result result = lua.script_file("exampleScript.lua");
-		if (result.valid()) std::wprintf(L"루아스크립트가 성공적으로 실행되었다.\n");
+		if (result.valid()) dbgPrt(L"루아스크립트가 성공적으로 실행되었다.\n");
 		else
 		{
 			sol::error err = result;
@@ -464,17 +464,17 @@ export void debugConsole()
 	}
 	case 30://스킬 추가
 	{
-		prt(L"현재 보유 스킬 목록:\n");
+		dbgPrt(L"현재 보유 스킬 목록:\n");
 		std::unordered_set<std::wstring> ownedIds;
 		for (auto& sd : PlayerInfo().skillList)
 		{
 			auto* bhv = SkillRegistry::get(sd.skillId);
-			prt(L"  - %ls: %ls (Lv%d)\n", sd.skillId.c_str(), bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
+			dbgPrt(L"  - %ls: %ls (Lv%d)\n", sd.skillId.c_str(), bhv ? bhv->name.c_str() : L"(미등록)", sd.skillLevel);
 			ownedIds.insert(sd.skillId);
 		}
 
 		// 등록된 모든 스킬을 src별로 그룹화해 번호와 함께 나열. 사용자는 번호로 선택.
-		prt(L"\n========== 등록된 모든 스킬 ==========\n");
+		dbgPrt(L"\n========== 등록된 모든 스킬 ==========\n");
 		std::vector<std::wstring> allIds = SkillRegistry::getAllIds();
 		const std::array<std::pair<skillSrc, const wchar_t*>, 5> srcOrder = { {
 			{ skillSrc::GENERAL,  L"GENERAL"  },
@@ -495,24 +495,24 @@ export void debugConsole()
 				if (bhv == nullptr || bhv->src != src) continue;
 				if (headerPrinted == false)
 				{
-					prt(L"[%ls]\n", label);
+					dbgPrt(L"[%ls]\n", label);
 					headerPrinted = true;
 				}
 				const wchar_t* ownedTag = ownedIds.count(id) ? L" [OWNED]" : L"";
-				prt(L"  %d) %ls (%ls)%ls\n", menuIdx, bhv->name.c_str(), id.c_str(), ownedTag);
+				dbgPrt(L"  %d) %ls (%ls)%ls\n", menuIdx, bhv->name.c_str(), id.c_str(), ownedTag);
 				indexedIds.push_back(id);
 				menuIdx++;
 			}
 		}
-		prt(L"=====================================\n");
+		dbgPrt(L"=====================================\n");
 
-		prt(L"추가할 스킬 번호를 입력해주세요. (-1: 취소)\n");
+		dbgPrt(L"추가할 스킬 번호를 입력해주세요. (-1: 취소)\n");
 		int menuChoice;
 		std::cin >> menuChoice;
 		if (menuChoice == -1) break;
 		if (menuChoice < 1 || menuChoice > (int)indexedIds.size())
 		{
-			prt(L"[에러] 번호 %d는 범위를 벗어났습니다.\n", menuChoice);
+			dbgPrt(L"[에러] 번호 %d는 범위를 벗어났습니다.\n", menuChoice);
 			break;
 		}
 
@@ -520,7 +520,7 @@ export void debugConsole()
 		auto* bhv = SkillRegistry::get(pickedId);
 		if (!bhv)
 		{
-			prt(L"[에러] 스킬 %ls는 SkillRegistry에 등록되지 않았습니다.\n", pickedId.c_str());
+			dbgPrt(L"[에러] 스킬 %ls는 SkillRegistry에 등록되지 않았습니다.\n", pickedId.c_str());
 			break;
 		}
 
@@ -529,7 +529,7 @@ export void debugConsole()
 		{
 			if (sd.skillId == pickedId)
 			{
-				prt(L"[에러] 이미 보유 중인 스킬입니다: %ls\n", bhv->name.c_str());
+				dbgPrt(L"[에러] 이미 보유 중인 스킬입니다: %ls\n", bhv->name.c_str());
 				goto debugSkillEnd;
 			}
 		}
@@ -540,7 +540,7 @@ export void debugConsole()
 			newSD.isLearned = true;
 			newSD.skillRank = bhv->skillRank; //시작 랭크 (바이오닉은 부품 등급)
 			PlayerInfo().skillList.push_back(newSD);
-			prt(L"[디버그] 스킬 추가 완료: %ls (%ls, src=%d)\n",
+			dbgPrt(L"[디버그] 스킬 추가 완료: %ls (%ls, src=%d)\n",
 				bhv->name.c_str(), pickedId.c_str(), (int)bhv->src);
 
 			// 추가된 스킬을 인게임 로그에도 노출 (디버그 테스트 시 무엇이 들어갔는지 확인용).
@@ -552,7 +552,7 @@ export void debugConsole()
 			case skillSrc::BIONIC:   srcLabel = L"bionic";   break;
 			default:                 srcLabel = L"skill";    break;
 			}
-			updateLog(L"[Debug] You gained a new " + srcLabel + L": " + bhv->name + L".");
+			updateLog(L"[DEBUG] 새로운 스킬을 추가했다.");
 		}
 		debugSkillEnd:
 		break;
@@ -560,12 +560,12 @@ export void debugConsole()
 	case 31://테스트 Lst 띄우기
 	{
 		int optionCount;
-		prt(L"생성할 옵션의 개수를 입력해주세요.\n");
+		dbgPrt(L"생성할 옵션의 개수를 입력해주세요.\n");
 		std::cin >> optionCount;
-		if (optionCount <= 0) { prt(L"1 이상의 값을 입력해주세요.\n"); break; }
+		if (optionCount <= 0) { dbgPrt(L"1 이상의 값을 입력해주세요.\n"); break; }
 
 		std::wstring lstText;
-		prt(L"안내 문자열을 입력해주세요. (Lst 상단에 표시됨)\n");
+		dbgPrt(L"안내 문자열을 입력해주세요. (Lst 상단에 표시됨)\n");
 		std::wcin.ignore();
 		std::getline(std::wcin, lstText);
 
@@ -574,7 +574,7 @@ export void debugConsole()
 			options.push_back(L"Option " + std::to_wstring(i + 1));
 
 		new Lst(L"Test List", lstText, options, false);
-		prt(L"[디버그] 옵션 %d개의 테스트 Lst를 띄웠다!\n", optionCount);
+		dbgPrt(L"[디버그] 옵션 %d개의 테스트 Lst를 띄웠다!\n", optionCount);
 		break;
 	}
 	case 32://플레이어 헤어스타일 변경
@@ -590,25 +590,25 @@ export void debugConsole()
 			styles.push_back(entry.path().stem().wstring());
 		}
 
-		prt(L"현재 헤어: %ls (색: %ls)\n",
+		dbgPrt(L"현재 헤어: %ls (색: %ls)\n",
 			PlayerPtr->entityInfo.hairStyle.empty() ? L"(없음)" : PlayerPtr->entityInfo.hairStyle.c_str(),
 			PlayerPtr->entityInfo.hairColor.c_str());
-		prt(L"변경할 헤어스타일 번호를 선택해주세요.\n");
+		dbgPrt(L"변경할 헤어스타일 번호를 선택해주세요.\n");
 		for (int i = 0; i < (int)styles.size(); i++)
 		{
-			prt(L"%d. %ls\n", i, styles[i].empty() ? L"(없음)" : styles[i].c_str());
+			dbgPrt(L"%d. %ls\n", i, styles[i].empty() ? L"(없음)" : styles[i].c_str());
 		}
 
 		int sel;
 		std::cin >> sel;
 		if (sel < 0 || sel >= (int)styles.size())
 		{
-			prt(L"잘못된 값입니다.\n");
+			dbgPrt(L"잘못된 값입니다.\n");
 			break;
 		}
 
 		PlayerPtr->entityInfo.hairStyle = styles[sel];
-		prt(L"[디버그] 헤어스타일을 %ls로 변경했다.\n",
+		dbgPrt(L"[디버그] 헤어스타일을 %ls로 변경했다.\n",
 			styles[sel].empty() ? L"(없음)" : styles[sel].c_str());
 		break;
 	}
@@ -619,28 +619,28 @@ export void debugConsole()
 		PaletteTable pal = loadPaletteTable("palette/eyes.tsv");
 		if (pal.colorNames.empty())
 		{
-			prt(L"[디버그] palette/eyes.tsv 로드 실패.\n");
+			dbgPrt(L"[디버그] palette/eyes.tsv 로드 실패.\n");
 			break;
 		}
 
-		prt(L"현재 눈 색상: %ls\n",
+		dbgPrt(L"현재 눈 색상: %ls\n",
 			PlayerPtr->entityInfo.eyeColor.empty() ? L"(없음)" : PlayerPtr->entityInfo.eyeColor.c_str());
-		prt(L"변경할 눈 색상 번호를 선택해주세요.\n");
+		dbgPrt(L"변경할 눈 색상 번호를 선택해주세요.\n");
 		for (int i = 0; i < (int)pal.colorNames.size(); i++)
 		{
-			prt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
+			dbgPrt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
 		}
 
 		int sel;
 		std::cin >> sel;
 		if (sel < 0 || sel >= (int)pal.colorNames.size())
 		{
-			prt(L"잘못된 값입니다.\n");
+			dbgPrt(L"잘못된 값입니다.\n");
 			break;
 		}
 
 		PlayerPtr->entityInfo.eyeColor = pal.colorNames[sel];
-		prt(L"[디버그] 눈 색상을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
+		dbgPrt(L"[디버그] 눈 색상을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
 		break;
 	}
 	case 34://플레이어 피부색 변경
@@ -650,28 +650,28 @@ export void debugConsole()
 		PaletteTable pal = loadPaletteTable("palette/skin.tsv");
 		if (pal.colorNames.empty())
 		{
-			prt(L"[디버그] palette/skin.tsv 로드 실패.\n");
+			dbgPrt(L"[디버그] palette/skin.tsv 로드 실패.\n");
 			break;
 		}
 
-		prt(L"현재 피부색: %ls\n",
+		dbgPrt(L"현재 피부색: %ls\n",
 			PlayerPtr->entityInfo.skinColor.empty() ? L"(없음)" : PlayerPtr->entityInfo.skinColor.c_str());
-		prt(L"변경할 피부색 번호를 선택해주세요.\n");
+		dbgPrt(L"변경할 피부색 번호를 선택해주세요.\n");
 		for (int i = 0; i < (int)pal.colorNames.size(); i++)
 		{
-			prt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
+			dbgPrt(L"%d. %ls\n", i, pal.colorNames[i].c_str());
 		}
 
 		int sel;
 		std::cin >> sel;
 		if (sel < 0 || sel >= (int)pal.colorNames.size())
 		{
-			prt(L"잘못된 값입니다.\n");
+			dbgPrt(L"잘못된 값입니다.\n");
 			break;
 		}
 
 		PlayerPtr->entityInfo.skinColor = pal.colorNames[sel];
-		prt(L"[디버그] 피부색을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
+		dbgPrt(L"[디버그] 피부색을 %ls로 변경했다.\n", pal.colorNames[sel].c_str());
 		break;
 	}
 	case 35://플레이어 성별 변경
@@ -691,27 +691,27 @@ export void debugConsole()
 
 		if (genders.empty())
 		{
-			prt(L"[디버그] image/charset/body/skin 에서 SKIN_*.png를 찾지 못했다.\n");
+			dbgPrt(L"[디버그] image/charset/body/skin 에서 SKIN_*.png를 찾지 못했다.\n");
 			break;
 		}
 
-		prt(L"현재 성별: %ls\n", PlayerPtr->entityInfo.gender.c_str());
-		prt(L"변경할 성별 번호를 선택해주세요.\n");
+		dbgPrt(L"현재 성별: %ls\n", PlayerPtr->entityInfo.gender.c_str());
+		dbgPrt(L"변경할 성별 번호를 선택해주세요.\n");
 		for (int i = 0; i < (int)genders.size(); i++)
 		{
-			prt(L"%d. %ls\n", i, genders[i].c_str());
+			dbgPrt(L"%d. %ls\n", i, genders[i].c_str());
 		}
 
 		int sel;
 		std::cin >> sel;
 		if (sel < 0 || sel >= (int)genders.size())
 		{
-			prt(L"잘못된 값입니다.\n");
+			dbgPrt(L"잘못된 값입니다.\n");
 			break;
 		}
 
 		PlayerPtr->entityInfo.gender = genders[sel];
-		prt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
+		dbgPrt(L"[디버그] 성별을 %ls로 변경했다.\n", genders[sel].c_str());
 		break;
 	}
 	case 37://SUV 소환
@@ -729,7 +729,7 @@ export void debugConsole()
 			{
 				if (TileVehicle(tx, ty, vZ) != nullptr)
 				{
-					prt(L"[디버그] (%d,%d,%d) 위치에 이미 차량이 있어 SUV를 소환할 수 없다.\n", tx, ty, vZ);
+					dbgPrt(L"[디버그] (%d,%d,%d) 위치에 이미 차량이 있어 SUV를 소환할 수 없다.\n", tx, ty, vZ);
 					blocked = true;
 				}
 			}
@@ -810,18 +810,18 @@ export void debugConsole()
 		myCar->addPart(vX + 1, vY + 3, { itemID::trunkDoor });
 		myCar->addPart(vX + 2, vY + 3, { itemID::vehicleWall, itemID::tailLight });
 
-		prt(L"[디버그] SUV를 (%d,%d,%d) 위치에 소환했다.\n", vX, vY, vZ);
+		dbgPrt(L"[디버그] SUV를 (%d,%d,%d) 위치에 소환했다.\n", vX, vY, vZ);
 		break;
 	}
 	case 41://경험치 추가
 	{
-		prt(L"현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
+		dbgPrt(L"현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
 			PlayerPtr->level, PlayerPtr->exp, PlayerPtr->expToNext(), PlayerPtr->ap, PlayerPtr->skillPoint);
-		prt(L"추가할 경험치를 입력해주세요.\n");
+		dbgPrt(L"추가할 경험치를 입력해주세요.\n");
 		int expInput;
 		std::cin >> expInput;
 		PlayerPtr->addExp(expInput);
-		prt(L"[디버그] 경험치를 %d만큼 추가했다. 현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
+		dbgPrt(L"[디버그] 경험치를 %d만큼 추가했다. 현재 레벨: %d, 경험치: %d/%d, AP: %d, 스킬포인트: %d\n",
 			expInput, PlayerPtr->level, PlayerPtr->exp, PlayerPtr->expToNext(), PlayerPtr->ap, PlayerPtr->skillPoint);
 		break;
 	}
@@ -838,11 +838,11 @@ export void debugConsole()
 	case 44://런타임 해상도 변경
 	{
 		int newW, newH;
-		prt(L"현재 카메라 해상도: %dx%d\n", cameraW, cameraH);
-		prt(L"기준은 1080x1080 - 가로가 길면 W만, 세로가 길면 H만 1080보다 크게.\n");
-		prt(L"새 가로(W) 해상도를 입력해주세요.\n");
+		dbgPrt(L"현재 카메라 해상도: %dx%d\n", cameraW, cameraH);
+		dbgPrt(L"기준은 1080x1080 - 가로가 길면 W만, 세로가 길면 H만 1080보다 크게.\n");
+		dbgPrt(L"새 가로(W) 해상도를 입력해주세요.\n");
 		std::cin >> newW;
-		prt(L"새 세로(H) 해상도를 입력해주세요.\n");
+		dbgPrt(L"새 세로(H) 해상도를 입력해주세요.\n");
 		std::cin >> newH;
 		applyResolution(newW, newH);
 		// 레터박스·탭 등 changeXY가 캐시한 절대 좌표를 새 cameraW/H로 재계산.
@@ -854,8 +854,8 @@ export void debugConsole()
 	case 45://모든 UI 숨기기 토글 - renderUI(HUD 포함 전체 GUI)/renderLog 스킵. 스크린샷용
 	{
 		debug::hideAllUI = !debug::hideAllUI;
-		if (debug::hideAllUI) prt(L"[디버그] 모든 UI를 숨겼다. (다시 45번 입력 시 복원)\n");
-		else prt(L"[디버그] 모든 UI를 다시 표시한다.\n");
+		if (debug::hideAllUI) dbgPrt(L"[디버그] 모든 UI를 숨겼다. (다시 45번 입력 시 복원)\n");
+		else dbgPrt(L"[디버그] 모든 UI를 다시 표시한다.\n");
 		break;
 	}
 	case 46://월드 생성
@@ -863,7 +863,7 @@ export void debugConsole()
 		if (currentWorld == nullptr)
 		{
 			currentWorld = std::make_unique<WorldData>();
-			prt(L"[디버그] 월드 생성이 완료되었다.\n");
+			dbgPrt(L"[디버그] 월드 생성이 완료되었다.\n");
 		}
 	}
 	case 99://콘솔 출력 초기화

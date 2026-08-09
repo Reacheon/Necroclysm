@@ -23,7 +23,7 @@ export void useSkill(const std::wstring& skillId)
 	auto* behavior = SkillRegistry::get(skillId);
 	if (!behavior)
 	{
-		std::wstring errorMsg = L"Player used an unknown skill: " + skillId;
+		std::wstring errorMsg = L"플레이어가 알 수 없는 스킬(" + skillId+ L")를 사용하였다.";
 		errorBox(errorMsg);
 		return;
 	}
@@ -58,7 +58,7 @@ export void useSkill(const std::wstring& skillId)
 	int failRate = behavior->calcFailRate(caster, *skillDataPtr);
 	if (failRate > 0 && randomRange(1, 100) <= failRate)
 	{
-		updateLog(L"You fail to use " + behavior->name + L".");
+		updateLog(behavior->name + sysStr[302]);
 		turnWait(1.0);
 		return;
 	}

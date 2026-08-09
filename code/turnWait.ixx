@@ -25,14 +25,14 @@ import gasData;
 //@param waitTime 기다린 턴(분), 예로 1.5를 입력하면 1.5턴(분)
 export void turnWait(float waitTime)
 {
-    errorBox(turnCycle != turn::playerInput && turnCycle != turn::playerAnime, L"turnWait() was called outside of the player's turn.");
+    errorBox(turnCycle != turn::playerInput && turnCycle != turn::playerAnime, L"플레이어 턴이 아닌데 turnWait 함수가 호출되었다.");
 
     // Nervedrive 작동 중이면 턴소모 0
     if (nervedriveOn) waitTime = 0;
 
     //240708기준 2ms 정도의 실행속도
 
-    //prt(L"[대기] %f분을 대기했다.\n", waitTime);
+    //dbgPrt(L"[대기] %f분을 대기했다.\n", waitTime);
     const int GAS_UPDATE_RANGE = 29;
     std::unordered_map<Point2, std::vector<gasData>,Point2::Hash> tempGas;
     int px = PlayerX();

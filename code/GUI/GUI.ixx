@@ -30,12 +30,12 @@ public:
 	{
 		if (isCorouter) coAnswer = L"";
 		activeGUIList.push_back(this);
-		prt(L"★ GUI : 생성자가 호출되었습니다. actvieGUIList의 크기는 %d입니다.\n", activeGUIList.size());
+		dbgPrt(L"★ GUI : 생성자가 호출되었습니다. actvieGUIList의 크기는 %d입니다.\n", activeGUIList.size());
 	}
 	virtual ~GUI() //가상 소멸자(없으면 자식 객체의 소멸자 미실행으로 메모리 누수 일어남)
 	{
 		activeGUIList.erase(std::find(activeGUIList.begin(), activeGUIList.end(), this));
-		prt(L"★ GUI : 소멸자가 호출되었습니다.. actvieGUIList의 크기는 %d입니다.\n", activeGUIList.size());
+		dbgPrt(L"★ GUI : 소멸자가 호출되었습니다.. actvieGUIList의 크기는 %d입니다.\n", activeGUIList.size());
 		if (isCorouter && Corouter::current) Corouter::current->run();
 	};
 	static std::vector<GUI*> getActiveGUIList() { return activeGUIList; }
@@ -88,7 +88,7 @@ public:
 		}
 		else//잘못된 창 닫기 애니메이션 입력
 		{
-			errorBox(L"wrong aniFlag parameter in GUI close function");
+			errorBox(L"GUI close 함수에서 알 수 없는 aniFlag가 입력되었다.");
 		}
 	}
     virtual void changeXY(int inputX, int inputY, bool center) = 0;
@@ -115,7 +115,7 @@ public:
 		switch (slipDir)
 		{
 			default:
-				errorBox(L"Diagonal GUI movement occured");
+				errorBox(L"GUI의 슬립 애니메이션이 대각선 방향으로 일어나버렸다.");
 				break;
 			case 0:
 				sgnX = 1;

@@ -16,7 +16,7 @@ public:
 	SkillBushyTail()
 	{
 		id = L"MUT_BUSHY_TAIL";
-		name = L"Bushy Tail";
+		name = sysStr[274];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

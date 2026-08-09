@@ -64,7 +64,7 @@ public:
 	}
 	~Sticker()
 	{
-		prt(L"Sticker : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Sticker : 소멸자가 호출되었습니다..\n");
 		StickerList.erase(key);
 	}
 	Sprite* getSprite() { return sprite; }

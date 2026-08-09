@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 
 	int numThreads = std::thread::hardware_concurrency();
 	if (numThreads == 0) numThreads = 4;
-	prt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
+	dbgPrt(L"이 컴퓨터의 스레드 숫자는 %d개이다.\n", numThreads);
 	threadPoolPtr = std::make_unique<ThreadPool>(numThreads);
 	SDL_AddGamepadMappingsFromFile("gamecontrollerdb.txt");
 
@@ -57,12 +57,12 @@ int main(int argc, char** argv)
 	if (Gesture_Init() == 0)
 	{
 		gestureInitialized = true;
-		prt(L"SDL_gesture 초기화 성공\n");
+		dbgPrt(L"SDL_gesture 초기화 성공\n");
 	}
 	else 
 	{
 		gestureInitialized = false;
-		prt(L"SDL_gesture 초기화 실패: %s\n", SDL_GetError());
+		dbgPrt(L"SDL_gesture 초기화 실패: %s\n", SDL_GetError());
 	}
 
 	scriptLoader();
@@ -118,14 +118,14 @@ int main(int argc, char** argv)
 		if (delayTime >= constDelay) delayTime = constDelay; // 만약 루프 시간이 음수(오류)가 나왔을 경우
 		else if (delayTime < 0)
 		{
-			//prt(L"루프가 16ms를 넘는 과부하가 발생했다.");
-			//if (turnCycle == turn::playerInput) prt(L"현재 턴은 playerInput이다.	");
-			//else if (turnCycle == turn::playerAnime) prt(L"현재 턴은 playerAnime이다.	");
-			//else if (turnCycle == turn::monsterAI) prt(L"현재 턴은 monsterAI이다.	");
-			//else prt(L"현재 턴은 monsterAnime이다.	");
-			//prt(L"turn : %ls ms, ", decimalCutter(dur::turnCycle / 1000000.0, 5).c_str());
-			//prt(L"tile : %ls ms, ", decimalCutter(dur::renderTile / 1000000.0, 5).c_str());
-			//prt(L"UI : %ls ms\n", decimalCutter(dur::renderUI / 1000000.0, 5).c_str());
+			//dbgPrt(L"루프가 16ms를 넘는 과부하가 발생했다.");
+			//if (turnCycle == turn::playerInput) dbgPrt(L"현재 턴은 playerInput이다.	");
+			//else if (turnCycle == turn::playerAnime) dbgPrt(L"현재 턴은 playerAnime이다.	");
+			//else if (turnCycle == turn::monsterAI) dbgPrt(L"현재 턴은 monsterAI이다.	");
+			//else dbgPrt(L"현재 턴은 monsterAnime이다.	");
+			//dbgPrt(L"turn : %ls ms, ", decimalCutter(dur::turnCycle / 1000000.0, 5).c_str());
+			//dbgPrt(L"tile : %ls ms, ", decimalCutter(dur::renderTile / 1000000.0, 5).c_str());
+			//dbgPrt(L"UI : %ls ms\n", decimalCutter(dur::renderUI / 1000000.0, 5).c_str());
 			delayTime = 0;
 		}
 		SDL_Delay(delayTime/1000000);//FPS60일 때 16, 루프 시간이 길어질 경우 그 시간을 측정해서 슬립 시간을 줄여줌 최대 16ms

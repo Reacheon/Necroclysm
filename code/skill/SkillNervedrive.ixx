@@ -20,9 +20,9 @@ public:
 	SkillNervedrive()
 	{
 		id = L"BION_NERVEDRIVE";
-		name = L"Nervedrive";
+		name = sysStr[272];
 		iconIndex = 10;
-		descript = L"Accelerates neural processing to extreme speeds. All actions cost 0 turns while active. Drains 500 kJ per turn.";
+		descript = L"";
 		src = skillSrc::BIONIC;
 		type = skillType::TOGGLE;
 		skillRank = L"F";
@@ -36,7 +36,7 @@ public:
 	{
 		if (!data.toggle && caster->entityInfo.energy < ENERGY_PER_TURN)
 		{
-			updateLog(L"Not enough bionic energy to activate Nervedrive.");
+			updateLog(sysStr[293]);
 			return false;
 		}
 		return true;
@@ -45,13 +45,13 @@ public:
 	void onToggleOn(Entity* caster, const SkillData& data) override
 	{
 		nervedriveOn = true;
-		updateLog(L"Nervedrive activated. Your perception of time slows to a crawl.");
+		updateLog(sysStr[294]);
 	}
 
 	void onToggleOff(Entity* caster, const SkillData& data) override
 	{
 		nervedriveOn = false;
-		updateLog(L"Nervedrive deactivated.");
+		updateLog(sysStr[295]);
 	}
 
 	// 매 턴 호출: 에너지 차감 후 다음 턴 에너지 부족하면 자동 종료
@@ -67,7 +67,7 @@ public:
 		{
 			data.toggle = false;
 			nervedriveOn = false;
-			updateLog(L"Nervedrive shuts down due to insufficient energy.");
+			updateLog(sysStr[296]);
 		}
 	}
 

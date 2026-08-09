@@ -56,9 +56,7 @@ void EntityPtrMove(Point3 startCoor, Point3 endCoor)
 {
     // 1단계: 시작 좌표의 EntityPtr 존재 확인
     auto& startTile = World::ins()->getTile(startCoor);
-    errorBox(startTile.EntityPtr == nullptr,
-        L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" +
-        std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
+    errorBox(startTile.EntityPtr == nullptr, L"EntityPtrMove: 시작 좌표에 EntityPtr이 없습니다. startCoor=(" + std::to_wstring(startCoor.x) + L"," + std::to_wstring(startCoor.y) + L"," + std::to_wstring(startCoor.z) + L")");
 
     // CDDA식 ramp 짝맞춤 + 양방향 전이.
     // 정방향: 진행 방향 2칸 앞 z±1에 floor + 2칸 앞이 ramp 아님 → z 전이

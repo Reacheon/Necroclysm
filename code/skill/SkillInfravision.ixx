@@ -16,7 +16,7 @@ public:
 	SkillInfravision()
 	{
 		id = L"MUT_INFRAVISION";
-		name = L"Infravision";
+		name = sysStr[279];
 		iconIndex = 117;
 		descript = L"";
 		src = skillSrc::MUTATION;

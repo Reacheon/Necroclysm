@@ -40,7 +40,7 @@ export namespace actSet
 };
 export namespace option
 {
-    std::wstring language = L"Korean";// 또는 "English"
+    std::wstring language = L"Korean";
     input inputMethod = input::mouse; //조작방식 설정
     bool showDamage = true; //데미지 폰트 출력 여부
 };

@@ -2,6 +2,7 @@ export module SkillRegistry;
 
 import std;
 import SkillBehavior;
+import util;
 
 export class SkillRegistry
 {
@@ -11,17 +12,8 @@ public:
 	static void registerSkill(std::unique_ptr<SkillBehavior> skill)
 	{
 		std::wstring id = skill->id;
-		// 빈 ID 또는 중복 등록은 버그. 개발 중 즉시 발견되도록 abort.
-		if (id.empty())
-		{
-			std::wprintf(L"[SkillRegistry] Skill with empty id registered.\n");
-			std::abort();
-		}
-		if (behaviors.contains(id))
-		{
-			std::wprintf(L"[SkillRegistry] Duplicate skill id: %ls\n", id.c_str());
-			std::abort();
-		}
+		errorBox(id.empty(), L"[registerSkill] ID가 정의되지 않은 스킬이 등록되었다.");
+		errorBox(behaviors.contains(id), L"[registerSkill] 이미 ID가 등록된 스킬이 또 추가되었다. 두 스킬이 중복된 ID를 가지고 있다.");
 		behaviors[id] = std::move(skill);
 	}
 
@@ -31,7 +23,6 @@ public:
 		return (it != behaviors.end()) ? it->second.get() : nullptr;
 	}
 
-	// 등록된 모든 스킬 ID를 이름 오름차순으로 반환. 디버그 리스팅 용도.
 	static std::vector<std::wstring> getAllIds()
 	{
 		std::vector<std::wstring> ids;

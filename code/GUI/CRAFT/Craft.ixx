@@ -89,9 +89,9 @@ private:
 public:
 	Craft() : GUI(false)
 	{
-		prt(L"Craft : 생성자가 호출되었습니다..\n");
+		dbgPrt(L"Craft : 생성자가 호출되었습니다..\n");
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
@@ -227,7 +227,7 @@ public:
 	}
 	~Craft()
 	{
-		prt(L"Craft : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Craft : 소멸자가 호출되었습니다..\n");
 
 		// 현재 창 상태 저장
 		savedCraftCursor = craftCursor;
@@ -474,7 +474,7 @@ public:
 		if (showCraftingTooltip == false) close(aniFlag::winUnfoldClose);
 		else
 		{
-			updateLog(sysStr[317]);//아이템 조합을 취소했다.
+			updateLog(sysStr[227]);//아이템 조합을 취소했다.
 
 			//조합 데이터 저장
 			if (itemDex[targetItemCode].checkFlag(itemFlag::COORDCRAFT))

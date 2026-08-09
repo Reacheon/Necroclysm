@@ -12,7 +12,7 @@ import Drawable;
 
 bool Vehicle::runAnimation(bool shutdown)
 {
-    //prt(L"Vehicle %p의 runAnimation이 실행되었다.\n", this);
+    //dbgPrt(L"Vehicle %p의 runAnimation이 실행되었다.\n", this);
     //move는 사실상 pulled 카트 용도로만 사용됨
     if (getAniType() == aniFlag::move)//만약 플레이어 인스턴스의 좌표와 목적좌표가 다를 경우
     {
@@ -90,7 +90,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             setFakeX(getFakeX() + xSpd);
             setFakeY(getFakeY() + ySpd);
-            //prt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFakeX(), getFakeY());
+            //dbgPrt(L"x방향의 속도를 %f, y방향의 속도를 %f만큼 더했다.현재의 fake 좌표는 (%f,%f)이다.\n", xSpd, ySpd, getFakeX(), getFakeY());
 
             if (xSpd > 0 && getFakeX() > 0) { setFakeX(0); }
             if (xSpd < 0 && getFakeX() < 0) { setFakeX(0); }
@@ -130,7 +130,7 @@ bool Vehicle::runAnimation(bool shutdown)
 
             if (getFakeX() == 0 && getFakeY() == 0)//도착
             {
-                //prt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
+                //dbgPrt(L"도착했다! 현재의 fake 좌표는 (%f,%f)이다.\n", getFakeX(), getFakeY());
 
                 extraRenderEntityList.clear();
                 setDelGrid(0, 0);
@@ -192,7 +192,7 @@ bool Vehicle::runAnimation(bool shutdown)
                 else if (gearState == gearFlag::reverse) bodyDir = reverse(singleRailMoveVec[0]);
             }
 
-            // prt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
+            // dbgPrt(L"[Vehicle : train %p ] 타이머 %d : 연산 후의 fake 좌표는 (%d,%d)이다.\n", this, getTimer(),getIntegerFakeX(), getIntegerFakeY());
 
             cameraX = PlayerPtr->getX() + PlayerPtr->getIntegerFakeX();
             cameraY = PlayerPtr->getY() + PlayerPtr->getIntegerFakeY();
@@ -200,14 +200,14 @@ bool Vehicle::runAnimation(bool shutdown)
             if (getTimer() >= 4)
             {
                 PlayerPtr->updateVision(PlayerInfo().eyeSight, PlayerX() + (PlayerPtr->getIntegerFakeX() / 16), PlayerY() + (PlayerPtr->getIntegerFakeY() / 16));
-                //prt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
+                //dbgPrt(L"[Vehicle : train %p ] 카운터가 4보다 커져 fake 좌표가 초기화되었다.\n", this);
                 singleRailMoveVec.erase(singleRailMoveVec.begin());
                 resetTimer();
             }
         }
         else
         {
-            //prt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
+            //dbgPrt(L"[Vehicle : train %p ] 이동이 전부 완료된 후의 페이크 좌표는 (%f,%f)이다.\n", this, getFakeX(), getFakeY());
             extraRenderVehList.clear();
             extraRenderEntityList.clear();
             PlayerPtr->updateVision(PlayerInfo().eyeSight);

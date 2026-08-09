@@ -79,19 +79,18 @@ export std::int64_t turnCycleLoop()
 	if (turnCycle == turn::playerInput)
 	{
 		playerInputTime = playerInputTurn();
-		//std::wprintf(L"[Turn:playerInput] %ls ns\n", decimalCutter(playerInputTime / 1000000.0, 5).c_str());
+		//dbgPrt(L"[Turn:playerInput] %ls ns\n", decimalCutter(playerInputTime / 1000000.0, 5).c_str());
 	}
 	else if (turnCycle == turn::playerAnime || turnCycle == turn::monsterAnime)
 	{
 		animationTime = animationTurn();
-		//std::wprintf(L"[Turn:animation] %ls ns\n", decimalCutter(animationTime / 1000000.0, 5).c_str());
+		//dbgPrt(L"[Turn:animation] %ls ns\n", decimalCutter(animationTime / 1000000.0, 5).c_str());
 	}
 	else if (turnCycle == turn::monsterAI)
 	{
 		entityAITime = entityAITurn();
-		//std::wprintf(L"[Turn:entityAI] %ls ns\n", decimalCutter(entityAITime / 1000000.0, 5).c_str());
+		//dbgPrt(L"[Turn:entityAI] %ls ns\n", decimalCutter(entityAITime / 1000000.0, 5).c_str());
 	}
-	else errorBox(L"Unknown turnCycle executed in turyCycleLoop.ixx");
 
 	return (getNanoTimer() - timeStampStart);
 };
@@ -107,7 +106,7 @@ void applyZoom(float newZoom, Point2 zoomCenter)
 	cameraX = worldX - (zoomCenter.x - cameraW / 2) / zoomScale;
 	cameraY = worldY - (zoomCenter.y - cameraH / 2) / zoomScale;
 
-	prt(L"줌: %.0fx (위치: %d, %d)\n", zoomScale, zoomCenter.x, zoomCenter.y);
+	dbgPrt(L"줌: %.0fx (위치: %d, %d)\n", zoomScale, zoomCenter.x, zoomCenter.y);
 }
 
 void handlePinchGesture(const SDL_Event& event) 
@@ -165,7 +164,7 @@ void snapToNearestZoomLevel() {
 	}
 
 	zoomScale = closestLevel;
-	prt(L"줌 레벨 스냅: %.1f\n", zoomScale);
+	dbgPrt(L"줌 레벨 스냅: %.1f\n", zoomScale);
 }
 
 
@@ -181,7 +180,7 @@ bool handleTouchEnd() {
 			pinchAccumulator = 0.0f;
 			deactClickUp = false;
 			deactHold = false;
-			prt(L"핀치 제스처 종료\n");
+			dbgPrt(L"핀치 제스처 종료\n");
 		}
 		return true; // 핀치 상태였음
 	}
@@ -234,7 +233,7 @@ std::int64_t playerInputTurn()
 		firstMonsterAI = true;
 		firstMonsterAnime = true;
 
-		//prt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
+		//dbgPrt(col::cyan, L"[턴 페이즈 1] 플레이어 입력\n");
 
 		//플레이어턴에 이전에 사용된 큐들 지우는 코드, 활성화하면 버그는 줄어들지만 조작감이 나빠진다...
 		//SDL_Event tempEvent;
@@ -245,7 +244,7 @@ std::int64_t playerInputTurn()
 
 		if (coTurnSkip&&GameOver::ins()==nullptr)
 		{
-			//prt(L"메인 함수 코루틴 재실행\n");
+			//dbgPrt(L"메인 함수 코루틴 재실행\n");
 			coTurnSkip = false;
 			Corouter::current->run();
 		}
@@ -267,7 +266,7 @@ std::int64_t playerInputTurn()
 				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)
 				{
 					if (isWalkable({ i, j, PlayerZ() })) walkableTile.insert({ i,j });
-					//else prt(L"(%d,%d) 타일은 이동 불가능한 타일이다.\n",i,j);
+					//else dbgPrt(L"(%d,%d) 타일은 이동 불가능한 타일이다.\n",i,j);
 				}
 			}
 
@@ -309,7 +308,7 @@ std::int64_t playerInputTurn()
 				case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
 					if (option::inputMethod != input::gamepad)
 					{
-						updateLog(L"Switched to gamepad mode.");
+						updateLog(L"게임패드 모드로 변경하였다.");
 						option::inputMethod = input::gamepad;
 					}
 					gamepadBtnDown();
@@ -317,7 +316,7 @@ std::int64_t playerInputTurn()
 				case SDL_EVENT_GAMEPAD_BUTTON_UP:
 					if (option::inputMethod != input::gamepad)
 					{
-						updateLog(L"Switched to gamepad mode.");
+						updateLog(L"게임패드 모드로 변경하였다.");
 						option::inputMethod = input::gamepad;
 					}
 					gamepadBtnUp();
@@ -381,7 +380,7 @@ std::int64_t playerInputTurn()
 				case SDL_EVENT_KEY_DOWN:
 					if (exInput == true && event.key.key == UNI::BACKSPACE)
 					{
-						prt(L"백스페이스 키 입력됨\n");
+						dbgPrt(L"백스페이스 키 입력됨\n");
 						if (!exInputEditing)
 						{
 							if (exInputCursor != 0) { --exInputCursor; }
@@ -400,7 +399,7 @@ std::int64_t playerInputTurn()
 				{
 					if (exInput == true)
 					{
-						prt(L"완성 이벤트 실행됨\n");
+						dbgPrt(L"완성 이벤트 실행됨\n");
 						std::wstring singleChar = L"";
 						singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
 						if (exInputCursor > exInputText.size()) exInputCursor = exInputText.size();
@@ -422,7 +421,7 @@ std::int64_t playerInputTurn()
 				{
 					if (exInput == true)
 					{
-						prt(L"편집 이벤트 입력됨\n");
+						dbgPrt(L"편집 이벤트 입력됨\n");
 						std::wstring singleChar = L"";
 						singleChar += utf8Decoder(event.text.text[0], event.text.text[1], event.text.text[2], event.text.text[3]);
 						exInputText.replace(exInputCursor, 1, singleChar);
@@ -470,7 +469,7 @@ std::int64_t animationTurn()
 			firstMonsterAI = true;
 			firstMonsterAnime = true;
 
-			//prt(col::cyan, L"[턴 페이즈 2] 플레이어 애니메이션\n");
+			//dbgPrt(col::cyan, L"[턴 페이즈 2] 플레이어 애니메이션\n");
 		}
 	}
 	else if (turnCycle == turn::monsterAnime)
@@ -482,7 +481,7 @@ std::int64_t animationTurn()
 			firstMonsterAI = true;
 			firstMonsterAnime = false;
 
-			//prt(col::cyan, L"[턴 페이즈 4] 몬스터 애니메이션\n");
+			//dbgPrt(col::cyan, L"[턴 페이즈 4] 몬스터 애니메이션\n");
 		}
 	}
 
@@ -540,7 +539,7 @@ std::int64_t animationTurn()
 
 				// 즉시 취소 처리
 				//coTurnSkip = false;
-				std::wprintf(L"코루틴이 즉시 취소되었습니다.\n");
+				dbgPrt(L"코루틴이 즉시 취소되었습니다.\n");
 			}
 		}
 	}
@@ -586,7 +585,7 @@ std::int64_t entityAITurn()
 		firstPlayerAnime = true;
 		firstMonsterAI = false;
 		firstMonsterAnime = true;
-		//prt(col::cyan, L"[턴 페이즈 3] 몬스터 AI\n");
+		//dbgPrt(col::cyan, L"[턴 페이즈 3] 몬스터 AI\n");
 	}
 
 
@@ -697,7 +696,7 @@ std::int64_t itemTurn()
 		{
 			if (item.itemCode == itemID::water)
 			{
-				errorBox(currentWaterV != 0, L"Multiple water items exist in a single ItemStack. (stacking did not occur)");
+				errorBox(currentWaterV != 0, L"복수의 유체 아이템이 하나의 타일에 존재하고 있다.");
 				currentWaterV += item.number;
 			}
 		}

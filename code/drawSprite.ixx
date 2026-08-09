@@ -421,7 +421,7 @@ export void drawSpriteBatch(Sprite* spr, const Point2* pts, const int* indexes, 
     static SDL_Vertex vertices[MAX_SPRITE * 4];
     static int indices[MAX_SPRITE * 6];
 
-    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatch: count exceeds MAX_SPRITE limit(>4096)");
+    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatch: 배치 가능한 스프라이트 숫자 한도를 초과하였다.");
 
     for (size_t i = 0; i < count; ++i)
     {
@@ -469,7 +469,7 @@ export void drawSpriteBatchCenter(Sprite* spr, const Point2* pts, const int* ind
     static SDL_Vertex vertices[MAX_SPRITE * 4];
     static int indices[MAX_SPRITE * 6];
 
-    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatchCenter: count exceeds MAX_SPRITE limit(>4096)");
+    if (count > MAX_SPRITE) errorBox(L"drawSpriteBatchCenter: 배치 가능한 스프라이트 숫자 한도를 초과하였다.");
 
     for (size_t i = 0; i < count; ++i)
     {

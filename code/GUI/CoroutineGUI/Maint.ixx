@@ -55,8 +55,8 @@ public:
 	{
 		coAnswer.clear();
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		prt(L"Maint 객체가 생성되었다.\n");
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		dbgPrt(L"Maint 객체가 생성되었다.\n");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		//메세지 박스 렌더링
@@ -75,7 +75,7 @@ public:
 
 	~Maint()
 	{
-		prt(L"Maint : 소멸자가 호출되었습니다..\n");
+		dbgPrt(L"Maint : 소멸자가 호출되었습니다..\n");
 		ptr = nullptr;
 
 		exInput = false;
@@ -253,13 +253,13 @@ public:
 					{
 						// 수리 로직 수행
 						// 예: items[selectedIndex]를 수리
-						prt(L"수리 실행: %ls\n", items[selectedIndex].name.c_str());
+						dbgPrt(L"수리 실행: %ls\n", items[selectedIndex].name.c_str());
 					}
 					else if (maintMode == maintFlag::detach)
 					{
 						// 탈착 로직 수행
 						// 예: items[selectedIndex]를 분리
-						prt(L"탈착 실행: %ls\n", items[selectedIndex].name.c_str());
+						dbgPrt(L"탈착 실행: %ls\n", items[selectedIndex].name.c_str());
 					}
 
 					close(aniFlag::null);

@@ -227,7 +227,7 @@ export void initCoordTransform()
         bool indicateCoord = false;
         auto prtCoordTransform = [=](dir16 input)
             {
-                prt(L"\n[initCoordTransform] ▼반시계방향으로 %ls만큼 회전▼\n", dir16ToString(input).c_str());
+                dbgPrt(L"\n[initCoordTransform] ▼반시계방향으로 %ls만큼 회전▼\n", dir16ToString(input).c_str());
 
                 for (int y = -MAX_VEHICLE_SIZE / 2; y <= MAX_VEHICLE_SIZE / 2; y++)
                 {

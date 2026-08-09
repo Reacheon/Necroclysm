@@ -29,7 +29,7 @@ public:
 			dictator = true;
 			priority += 1;
 		}
-		else errorBox(L"이미 독재 타입의 애니인데 독재타입으로 변화하려 하였다 in iAmDictaotr()");
+		else errorBox(L"이미 dictator인 애니 인스턴스인데 dictator로 변환을 시도하였다.");
 	}
 	void iAmNotDictator() 
 	{ 
@@ -38,7 +38,7 @@ public:
 			dictator = false;
 			priority -= 1;
 		}
-		else errorBox(L"이미 독재 타입의 애니가 아닌데 독재타입을 버리려 하였다 in iAmNotDictaotr()");
+		else errorBox(L"이미 dictator가 아닌 애니 인스턴스인데 dictator를 버리려 하였다.");
 	}
 	bool isDictator() { return dictator; }
 };

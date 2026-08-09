@@ -10,7 +10,7 @@ export namespace itemID
     constexpr int grass = 191;
     constexpr int blackAsphalt = 251;
     constexpr int yellowAsphalt = 316;
-    constexpr int whiteAsphalt = 489;
+    constexpr int whiteAsphalt = 488;
 
     constexpr int railRL = 265;
     constexpr int railTB = 266;
@@ -140,25 +140,25 @@ export namespace itemID
     constexpr int relayL = 143;
     constexpr int relayD = 144;
 
-    constexpr int andGateR = 534;
-    constexpr int andGateU = 535;
-    constexpr int andGateL = 536;
-    constexpr int andGateD = 537;
+    constexpr int andGateR = 533;
+    constexpr int andGateU = 534;
+    constexpr int andGateL = 535;
+    constexpr int andGateD = 536;
 
-    constexpr int orGateR = 538;
-    constexpr int orGateU = 539;
-    constexpr int orGateL = 540;
-    constexpr int orGateD = 541;
+    constexpr int orGateR = 537;
+    constexpr int orGateU = 538;
+    constexpr int orGateL = 539;
+    constexpr int orGateD = 540;
 
-    constexpr int xorGateR = 542;
-    constexpr int xorGateU = 543;
-    constexpr int xorGateL = 544;
-    constexpr int xorGateD = 545;
+    constexpr int xorGateR = 541;
+    constexpr int xorGateU = 542;
+    constexpr int xorGateL = 543;
+    constexpr int xorGateD = 544;
 
-    constexpr int notGateR = 546;
-    constexpr int notGateU = 547;
-    constexpr int notGateL = 548;
-    constexpr int notGateD = 549;
+    constexpr int notGateR = 545;
+    constexpr int notGateU = 546;
+    constexpr int notGateL = 547;
+    constexpr int notGateD = 548;
 
     constexpr int srLatchR = 426;
     constexpr int srLatchU = 427;
@@ -276,24 +276,22 @@ export namespace itemID
 
     constexpr int assaultRifle = 12;
 
-    constexpr int altarOfRehylion = 471;
-
-    constexpr int mutagen = 472;
-    constexpr int autodoc = 473;
+    constexpr int mutagen = 471;
+    constexpr int autodoc = 472;
     
-    constexpr int cbm_nervedrive = 474;
-    constexpr int cbm_powerStorage = 475;
-    constexpr int cbm_metabExchange = 476;
+    constexpr int cbm_nervedrive = 473;
+    constexpr int cbm_powerStorage = 474;
+    constexpr int cbm_metabExchange = 475;
 
-    constexpr int dyeAmpule = 483;
+    constexpr int dyeAmpule = 482;
 
-    constexpr int tshirt = 484; //EQUIP_SPR_GENDERED 적용 티셔츠. 착용 시 entityInfo.gender에 따라 T-SHIRT_MALE / T-SHIRT_FEMALE 스프라이트로 표시
+    constexpr int tshirt = 483; //EQUIP_SPR_GENDERED 적용 티셔츠. 착용 시 entityInfo.gender에 따라 T-SHIRT_MALE / T-SHIRT_FEMALE 스프라이트로 표시
 
     //속옷 3종. 외피보다 낮은 priority로 안쪽에 그려짐. 성별 무관 단일 스프라이트.
-    constexpr int bra = 485;
-    constexpr int panties = 486;
-    constexpr int briefs = 487;
-    constexpr int concreteWall = 488;
+    constexpr int bra = 484;
+    constexpr int panties = 485;
+    constexpr int briefs = 486;
+    constexpr int concreteWall = 487;
 
     ///////////////////////나무//////////////////////
 
@@ -319,14 +317,14 @@ export namespace itemID
     constexpr int magnoliaTree = 215;
     constexpr int bananaTree = 216;
     constexpr int willowTree = 217;
-    constexpr int zelkovaTree = 529; //느티나무
+    constexpr int zelkovaTree = 528; //느티나무
 
     constexpr int treeStump = 238;
-    constexpr int paver = 490;
-    constexpr int rampUp = 530;
-    constexpr int rampDown = 531;
-    constexpr int guardrail = 532;
-    constexpr int pillarWall = 533;
+    constexpr int paver = 489;
+    constexpr int rampUp = 529;
+    constexpr int rampDown = 530;
+    constexpr int guardrail = 531;
+    constexpr int pillarWall = 532;
 
     ///////////////////////아스팔트 변형 (페인트용 절반·대각·화살표) //////////////////////
     //   whiteAsphalt(562) / yellowAsphalt(377) 의 시각 변형 타일들. 도로 페인팅에서
@@ -334,53 +332,53 @@ export namespace itemID
     //   floorOverlay 가 베이스 색으로 동일 처리.
 
     // ── White Asphalt 절반 채움 (4면 axis + 4 대각) ──
-    constexpr int whiteAsphaltLeftHalf = 491;  // ◧
-    constexpr int whiteAsphaltRightHalf = 492;  // ◨
-    constexpr int whiteAsphaltTopHalf = 493;  // ⬒
-    constexpr int whiteAsphaltBottomHalf = 494;  // ⬓
-    constexpr int whiteAsphaltDiagUL = 495;  // ◩  (/-cut, upper-left filled)
-    constexpr int whiteAsphaltDiagLR = 496;  // ◪  (/-cut, lower-right filled)
-    constexpr int whiteAsphaltDiagUR = 497;  //     (\-cut, upper-right filled)
-    constexpr int whiteAsphaltDiagLL = 498;  //     (\-cut, lower-left filled)
+    constexpr int whiteAsphaltLeftHalf = 490;  // ◧
+    constexpr int whiteAsphaltRightHalf = 491;  // ◨
+    constexpr int whiteAsphaltTopHalf = 492;  // ⬒
+    constexpr int whiteAsphaltBottomHalf = 493;  // ⬓
+    constexpr int whiteAsphaltDiagUL = 494;  // ◩  (/-cut, upper-left filled)
+    constexpr int whiteAsphaltDiagLR = 495;  // ◪  (/-cut, lower-right filled)
+    constexpr int whiteAsphaltDiagUR = 496;  //     (\-cut, upper-right filled)
+    constexpr int whiteAsphaltDiagLL = 497;  //     (\-cut, lower-left filled)
 
     // ── White Asphalt 쿼터(1/4) 채움 — 가운데 1/4 사각형만 흰색, 가는 횡단보도용 ──
-    constexpr int whiteAsphaltRightQuarter = 523;  // ▕  (우측 쿼터만 채움)
-    constexpr int whiteAsphaltTopQuarter = 524;  // ▔  (상단 쿼터만 채움)
-    constexpr int whiteAsphaltLeftQuarter = 525;  // ▏  (좌측 쿼터만 채움)
-    constexpr int whiteAsphaltBottomQuarter = 526;  // ▁  (하단 쿼터만 채움)
+    constexpr int whiteAsphaltRightQuarter = 522;  // ▕  (우측 쿼터만 채움)
+    constexpr int whiteAsphaltTopQuarter = 523;  // ▔  (상단 쿼터만 채움)
+    constexpr int whiteAsphaltLeftQuarter = 524;  // ▏  (좌측 쿼터만 채움)
+    constexpr int whiteAsphaltBottomQuarter = 525;  // ▁  (하단 쿼터만 채움)
 
     // ── White Asphalt 화살표 (8방향) ──
-    constexpr int whiteAsphaltArrowR = 499;  // →
-    constexpr int whiteAsphaltArrowUR = 500;  // ↗
-    constexpr int whiteAsphaltArrowU = 501;  // ↑
-    constexpr int whiteAsphaltArrowUL = 502;  // ↖
-    constexpr int whiteAsphaltArrowL = 503;  // ←
-    constexpr int whiteAsphaltArrowLL = 504;  // ↙
-    constexpr int whiteAsphaltArrowD = 505;  // ↓
-    constexpr int whiteAsphaltArrowLR = 506;  // ↘
+    constexpr int whiteAsphaltArrowR = 498;  // →
+    constexpr int whiteAsphaltArrowUR = 499;  // ↗
+    constexpr int whiteAsphaltArrowU = 500;  // ↑
+    constexpr int whiteAsphaltArrowUL = 501;  // ↖
+    constexpr int whiteAsphaltArrowL = 502;  // ←
+    constexpr int whiteAsphaltArrowLL = 503;  // ↙
+    constexpr int whiteAsphaltArrowD = 504;  // ↓
+    constexpr int whiteAsphaltArrowLR = 505;  // ↘
 
-    constexpr int whiteAsphaltBowtiePattern = 527; //▶◀
-    constexpr int whiteAsphaltHourglassPattern = 528; //⧗
+    constexpr int whiteAsphaltBowtiePattern = 526; //▶◀
+    constexpr int whiteAsphaltHourglassPattern = 527; //⧗
 
     // ── Yellow Asphalt 절반 채움 ──
-    constexpr int yellowAsphaltLeftHalf = 507;  // ◧
-    constexpr int yellowAsphaltRightHalf = 508;  // ◨
-    constexpr int yellowAsphaltTopHalf = 509;  // ⬒
-    constexpr int yellowAsphaltBottomHalf = 510;  // ⬓
-    constexpr int yellowAsphaltDiagUL = 511;  // ◩
-    constexpr int yellowAsphaltDiagLR = 512;  // ◪
-    constexpr int yellowAsphaltDiagUR = 513;  //     (\-cut, UR filled)
-    constexpr int yellowAsphaltDiagLL = 514;  //     (\-cut, LL filled)
+    constexpr int yellowAsphaltLeftHalf = 506;  // ◧
+    constexpr int yellowAsphaltRightHalf = 507;  // ◨
+    constexpr int yellowAsphaltTopHalf = 508;  // ⬒
+    constexpr int yellowAsphaltBottomHalf = 509;  // ⬓
+    constexpr int yellowAsphaltDiagUL = 510;  // ◩
+    constexpr int yellowAsphaltDiagLR = 511;  // ◪
+    constexpr int yellowAsphaltDiagUR = 512;  //     (\-cut, UR filled)
+    constexpr int yellowAsphaltDiagLL = 513;  //     (\-cut, LL filled)
 
     // ── Yellow Asphalt 화살표 ──
-    constexpr int yellowAsphaltArrowR = 515;  // →
-    constexpr int yellowAsphaltArrowUR = 516;  // ↗
-    constexpr int yellowAsphaltArrowU = 517;  // ↑
-    constexpr int yellowAsphaltArrowUL = 518;  // ↖
-    constexpr int yellowAsphaltArrowL = 519;  // ←
-    constexpr int yellowAsphaltArrowLL = 520;  // ↙
-    constexpr int yellowAsphaltArrowD = 521;  // ↓
-    constexpr int yellowAsphaltArrowLR = 522;  // ↘
+    constexpr int yellowAsphaltArrowR = 514;  // →
+    constexpr int yellowAsphaltArrowUR = 515;  // ↗
+    constexpr int yellowAsphaltArrowU = 516;  // ↑
+    constexpr int yellowAsphaltArrowUL = 517;  // ↖
+    constexpr int yellowAsphaltArrowL = 518;  // ←
+    constexpr int yellowAsphaltArrowLL = 519;  // ↙
+    constexpr int yellowAsphaltArrowD = 520;  // ↓
+    constexpr int yellowAsphaltArrowLR = 521;  // ↘
 
     //── 의류·소품 ──
     constexpr int backpack = 2;            //배낭
@@ -525,122 +523,122 @@ export namespace itemID
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    constexpr int woodenStool = 550;          //스툴 나무 의자
+    constexpr int woodenStool = 549;          //스툴 나무 의자
 
-    constexpr int woodenChairR = 551;         //목재 의자
-    constexpr int woodenChairU = 552;
-    constexpr int woodenChairL = 553;
-    constexpr int woodenChairD = 554;
+    constexpr int woodenChairR = 550;         //목재 의자
+    constexpr int woodenChairU = 551;
+    constexpr int woodenChairL = 552;
+    constexpr int woodenChairD = 553;
 
-    constexpr int cardboardBox = 555;         //골판지 상자
-    constexpr int woodenTable = 556;          //나무 테이블
-    constexpr int steelTable = 557;           //철제 테이블
-    constexpr int drawer = 558;               //서랍
-    constexpr int wardrobe = 559;             //장롱
-    constexpr int openWardrobe = 560;         //개방형 장롱
-    constexpr int roundWoodenTable = 561;     //원형 목재 테이블
+    constexpr int cardboardBox = 554;         //골판지 상자
+    constexpr int woodenTable = 555;          //나무 테이블
+    constexpr int steelTable = 556;           //철제 테이블
+    constexpr int drawer = 557;               //서랍
+    constexpr int wardrobe = 558;             //장롱
+    constexpr int openWardrobe = 559;         //개방형 장롱
+    constexpr int roundWoodenTable = 560;     //원형 목재 테이블
 
-    constexpr int schoolChairR = 562;         //학교 의자
-    constexpr int schoolChairU = 563;
-    constexpr int schoolChairL = 564;
-    constexpr int schoolChairD = 565;
+    constexpr int schoolChairR = 561;         //학교 의자
+    constexpr int schoolChairU = 562;
+    constexpr int schoolChairL = 563;
+    constexpr int schoolChairD = 564;
 
-    constexpr int officeChairR = 566;         //사무용 의자
-    constexpr int officeChairU = 567;
-    constexpr int officeChairL = 568;
-    constexpr int officeChairD = 569;
+    constexpr int officeChairR = 565;         //사무용 의자
+    constexpr int officeChairU = 566;
+    constexpr int officeChairL = 567;
+    constexpr int officeChairD = 568;
 
-    constexpr int headrestChairR = 570;       //헤드레스트 의자
-    constexpr int headrestChairU = 571;
-    constexpr int headrestChairL = 572;
-    constexpr int headrestChairD = 573;
+    constexpr int headrestChairR = 569;       //헤드레스트 의자
+    constexpr int headrestChairU = 570;
+    constexpr int headrestChairL = 571;
+    constexpr int headrestChairD = 572;
 
-    constexpr int bluePlasticChair = 574;     //청색 플라스틱 의자
-    constexpr int redPlasticChair = 575;      //적색 플라스틱 의자
-    constexpr int cabinet = 576;              //캐비닛
-    constexpr int safe = 577;                 //금고
-    constexpr int window = 578;               //창문
-    constexpr int displayRefrigerator = 579;  //쇼케이스 냉장고
-    constexpr int checkoutCounter = 580;      //계산대
-    constexpr int coffeeMachine = 581;        //커피 머신
-    constexpr int flowerPot = 582;            //화분
-    constexpr int telephone = 583;            //전화기
-    constexpr int monitor = 584;              //모니터
-    constexpr int shelf = 585;                //선반
-    constexpr int computer = 586;             //컴퓨터
-    constexpr int printer = 587;              //프린터기
-    constexpr int centrifuge = 588;           //원심분리기
-    constexpr int electronicScale = 589;      //전자 저울
-    constexpr int operatingTable = 590;       //수술대
-    constexpr int dentalChair = 591;          //치과 의자
-    constexpr int drum = 592;                 //드럼통
-    constexpr int microscope = 593;           //현미경
-    constexpr int vacuumCleaner = 594;        //청소기
-    constexpr int autoclave = 595;            //오토클레이브
-    constexpr int atm = 596;                  //ATM
-    constexpr int tissueDispenser = 597;      //휴지 디스펜서
-    constexpr int ivStand = 598;              //링거 스탠드
-    constexpr int urinal = 599;               //소변기
-    constexpr int toilet = 600;               //좌변기
-    constexpr int washbasin = 601;            //세면대
-    constexpr int bathtub = 602;              //욕조
-    constexpr int shower = 603;               //샤워기
+    constexpr int bluePlasticChair = 573;     //청색 플라스틱 의자
+    constexpr int redPlasticChair = 574;      //적색 플라스틱 의자
+    constexpr int cabinet = 575;              //캐비닛
+    constexpr int safe = 576;                 //금고
+    constexpr int window = 577;               //창문
+    constexpr int displayRefrigerator = 578;  //쇼케이스 냉장고
+    constexpr int checkoutCounter = 579;      //계산대
+    constexpr int coffeeMachine = 580;        //커피 머신
+    constexpr int flowerPot = 581;            //화분
+    constexpr int telephone = 582;            //전화기
+    constexpr int monitor = 583;              //모니터
+    constexpr int shelf = 584;                //선반
+    constexpr int computer = 585;             //컴퓨터
+    constexpr int printer = 586;              //프린터기
+    constexpr int centrifuge = 587;           //원심분리기
+    constexpr int electronicScale = 588;      //전자 저울
+    constexpr int operatingTable = 589;       //수술대
+    constexpr int dentalChair = 590;          //치과 의자
+    constexpr int drum = 591;                 //드럼통
+    constexpr int microscope = 592;           //현미경
+    constexpr int vacuumCleaner = 593;        //청소기
+    constexpr int autoclave = 594;            //오토클레이브
+    constexpr int atm = 595;                  //ATM
+    constexpr int tissueDispenser = 596;      //휴지 디스펜서
+    constexpr int ivStand = 597;              //링거 스탠드
+    constexpr int urinal = 598;               //소변기
+    constexpr int toilet = 599;               //좌변기
+    constexpr int washbasin = 600;            //세면대
+    constexpr int bathtub = 601;              //욕조
+    constexpr int shower = 602;               //샤워기
 
-    constexpr int glassDoorH = 604;           //유리문 (↔, 수직통로 차단)
-    constexpr int glassDoorV = 605;           //유리문 (↕, 수평통로 차단)
+    constexpr int glassDoorH = 603;           //유리문 (↔, 수직통로 차단)
+    constexpr int glassDoorV = 604;           //유리문 (↕, 수평통로 차단)
 
-    constexpr int ventilator = 606;           //인공호흡기
+    constexpr int ventilator = 605;           //인공호흡기
 
-    constexpr int blackSofaR = 607;           //검은색 소파
-    constexpr int blackSofaU = 608;
-    constexpr int blackSofaL = 609;
-    constexpr int blackSofaD = 610;
+    constexpr int blackSofaR = 606;           //검은색 소파
+    constexpr int blackSofaU = 607;
+    constexpr int blackSofaL = 608;
+    constexpr int blackSofaD = 609;
 
-    constexpr int greenSofaR = 611;           //녹색 소파
-    constexpr int greenSofaU = 612;
-    constexpr int greenSofaL = 613;
-    constexpr int greenSofaD = 614;
+    constexpr int greenSofaR = 610;           //녹색 소파
+    constexpr int greenSofaU = 611;
+    constexpr int greenSofaL = 612;
+    constexpr int greenSofaD = 613;
 
-    constexpr int redSofaR = 615;             //적색 소파
-    constexpr int redSofaU = 616;
-    constexpr int redSofaL = 617;
-    constexpr int redSofaD = 618;
+    constexpr int redSofaR = 614;             //적색 소파
+    constexpr int redSofaU = 615;
+    constexpr int redSofaL = 616;
+    constexpr int redSofaD = 617;
 
-    constexpr int beigeSofaR = 619;           //베이지색 소파
-    constexpr int beigeSofaU = 620;
-    constexpr int beigeSofaL = 621;
-    constexpr int beigeSofaD = 622;
+    constexpr int beigeSofaR = 618;           //베이지색 소파
+    constexpr int beigeSofaU = 619;
+    constexpr int beigeSofaL = 620;
+    constexpr int beigeSofaD = 621;
 
-    constexpr int cinemaSeatR = 623;          //영화관 의자
-    constexpr int cinemaSeatU = 624;
-    constexpr int cinemaSeatL = 625;
-    constexpr int cinemaSeatD = 626;
+    constexpr int cinemaSeatR = 622;          //영화관 의자
+    constexpr int cinemaSeatU = 623;
+    constexpr int cinemaSeatL = 624;
+    constexpr int cinemaSeatD = 625;
 
-    constexpr int ctScannerR = 627;           //CT 기계
-    constexpr int ctScannerU = 628;
-    constexpr int ctScannerL = 629;
-    constexpr int ctScannerD = 630;
+    constexpr int ctScannerR = 626;           //CT 기계
+    constexpr int ctScannerU = 627;
+    constexpr int ctScannerL = 628;
+    constexpr int ctScannerD = 629;
 
-    constexpr int mriScannerR = 631;          //MRI 기계
-    constexpr int mriScannerU = 632;
-    constexpr int mriScannerL = 633;
-    constexpr int mriScannerD = 634;
+    constexpr int mriScannerR = 630;          //MRI 기계
+    constexpr int mriScannerU = 631;
+    constexpr int mriScannerL = 632;
+    constexpr int mriScannerD = 633;
 
-    constexpr int examinationTableR = 635;    //검사 테이블
-    constexpr int examinationTableU = 636;
-    constexpr int examinationTableL = 637;
-    constexpr int examinationTableD = 638;
+    constexpr int examinationTableR = 634;    //검사 테이블
+    constexpr int examinationTableU = 635;
+    constexpr int examinationTableL = 636;
+    constexpr int examinationTableD = 637;
 
-    constexpr int whiteboard = 639;           //화이트보드
-    constexpr int humidifier = 640;           //가습기
-    constexpr int controlPanel = 641; //제어반(공장)
+    constexpr int whiteboard = 638;           //화이트보드
+    constexpr int humidifier = 639;           //가습기
+    constexpr int controlPanel = 640; //제어반(공장)
 
-    constexpr int mechanicalWinch = 642;      //기계식 윈치(인접 롤업도어 개폐)
-    constexpr int rollupDoorH = 643;          //롤업도어 (↔, 좌우 체인)
-    constexpr int rollupDoorV = 644;          //롤업도어 (↕, 상하 체인)
+    constexpr int mechanicalWinch = 641;      //기계식 윈치(인접 롤업도어 개폐)
+    constexpr int rollupDoorH = 642;          //롤업도어 (↔, 좌우 체인)
+    constexpr int rollupDoorV = 643;          //롤업도어 (↕, 상하 체인)
 
-    constexpr int polishedCeramicTile = 645;  //광택 세라믹 타일
-    constexpr int mop = 646;                  //대걸레
-    constexpr int iceCreamFreezer = 647;      //아이스크림 냉동고
+    constexpr int polishedCeramicTile = 644;  //광택 세라믹 타일
+    constexpr int mop = 645;                  //대걸레
+    constexpr int iceCreamFreezer = 646;      //아이스크림 냉동고
 
 };

@@ -13,7 +13,7 @@ export import hasher;
 export import HSVConverter;
 export import isCircle;
 export import nanoTimer;
-export import prt;
+export import dbgPrt;
 export import randomEngine;
 export import readTSV;
 export import replaceStr;

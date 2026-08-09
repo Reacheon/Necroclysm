@@ -63,7 +63,6 @@ private:
 	//레시피 구조체
 	struct CookRecipe {
 		int resultCode;
-		std::wstring resultName;
 		std::vector<int> heatSources;
 		std::vector<int> cookwareList;
 		int minWaterML;
@@ -72,7 +71,6 @@ private:
 	inline static const std::vector<CookRecipe> recipes = {
 		{
 			itemID::eggFriedRice,
-			L"Egg Fried Rice",
 			{ itemID::campfire, itemID::electricCooktop },
 			{ itemID::fryingPan, itemID::cookingPot },
 			0,
@@ -91,7 +89,7 @@ public:
 	Cook() : GUI(false)
 	{
 		//1개 이상의 메시지 객체 생성 시의 예외 처리
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 
 		int arrowEndX, arrowEndY, targetX, targetY;
@@ -164,7 +162,7 @@ public:
 
 		if (getFoldRatio() == 1.0)
 		{
-			drawWindow(&cookBase, sysStr[352]/*Cooking*/, 0);
+			drawWindow(&cookBase, sysStr[260]/*Cooking*/, 0);
 			setFlip(SDL_FLIP_HORIZONTAL);
 			drawSprite(spr::newWindowArrow, 0, cookBase.x + cookBase.w - 4, cookBase.y + 234);
 			setFlip(SDL_FLIP_NONE);
@@ -186,7 +184,7 @@ public:
 				//drawSpriteCenter(spr::itemset, 152, heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 - 5);
 				setZoom(1.0);
 				setFontSize(16);
-				drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y);
+				drawTextCenter(sysStr[391], heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y);
 				//drawTextCenter(L"Heat", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 40);
 				//drawTextCenter(L"Source", heatSrcBtn.x + heatSrcBtn.w / 2, heatSrcBtn.y + heatSrcBtn.h / 2 + 30 - 23);
 			}
@@ -197,7 +195,7 @@ public:
 			drawSpriteCenter(spr::icon48, 190, recipeBtn.x + recipeBtn.w / 2, recipeBtn.y + recipeBtn.h / 2 + 2);
 			setZoom(1.0);
 			setFontSize(16);
-			drawTextCenter(L"Recipe", recipeBtn.x + recipeBtn.w / 2, recipeBtn.y);
+			drawTextCenter(sysStr[392], recipeBtn.x + recipeBtn.w / 2, recipeBtn.y);
 
 			//확대된 요리 그림
 			{
@@ -235,7 +233,7 @@ public:
 
 			//쿡웨어 버튼(프라이팬 혹은 냄비 혹은 뚝배기)
 			setFontSize(18);
-			drawTextCenter(col2Str(col::lightGray) + L"Cookware", cookwareBtn.x - 52, cookwareBtn.y + cookwareBtn.h/2);
+			drawTextCenter(col2Str(col::lightGray) + sysStr[393], cookwareBtn.x - 52, cookwareBtn.y + cookwareBtn.h/2);
 			if (checkCursor(&cookwareBtn)) { drawFillRect(cookwareBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookwareBtn, col::lightGray); }
 			else { drawFillRect(cookwareBtn, col::black); drawRect(cookwareBtn, col::gray); }
 
@@ -251,7 +249,7 @@ public:
 					setFontSize(12);
 					drawText(cookwarePtr->name, cookwareBtn.x + 46, cookwareBtn.y + 3);
 					setFontSize(16);
-					drawText(L"#e9c900" + recipes[matchedRecipeIdx].resultName, cookwareBtn.x + 46, cookwareBtn.y + 16);
+					drawText(L"#e9c900" + itemDex[recipes[matchedRecipeIdx].resultCode].name, cookwareBtn.x + 46, cookwareBtn.y + 16);
 				}
 				else
 				{
@@ -266,9 +264,9 @@ public:
 
 			setFontSize(16);
 			if (resultPhase)
-				drawTextCenter(col2Str(col::lightGray) + L"Description", cookBase.x + cookBase.w / 2, cookBase.y + 273);
+				drawTextCenter(col2Str(col::lightGray) + sysStr[394], cookBase.x + cookBase.w / 2, cookBase.y + 273);
 			else
-				drawTextCenter(col2Str(col::lightGray) + L"Ingredients", cookBase.x + cookBase.w / 2, cookBase.y + 273);
+				drawTextCenter(col2Str(col::lightGray) + sysStr[167], cookBase.x + cookBase.w / 2, cookBase.y + 273);
 
 			{
 				int lineY = cookBase.y + 263 + 12;
@@ -337,7 +335,7 @@ public:
 					drawTextCenter(L"#e9c900★★★", cookBase.x + cookBase.w / 2, cookBase.y + 303);
 
 					setFontSize(16);
-					drawTextWidth(L" Rice stir-fried with scrambled egg and carrot sauteed in scallion oil. A quick, satisfying meal.", cookBase.x + 19, cookBase.y + 326, 380,20);
+					drawTextWidth(L" 계란과 밥, 당근을 볶아 만든 간단한 식사.", cookBase.x + 19, cookBase.y + 326, 380,20);
 
 					for (int i = 0; i < 4; i++)
 					{
@@ -349,7 +347,7 @@ public:
 
 							setFontSize(16);
 							setFont(fontType::mainFontSemiBold);
-							drawTextCenter(L"Hunger", pivotX, pivotY);
+							drawTextCenter(sysStr[332], pivotX, pivotY);
 
 							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65-12%", pivotX + 92, pivotY);
@@ -359,7 +357,7 @@ public:
 						{
 							setFontSize(16);
 							setFont(fontType::mainFontSemiBold);
-							drawTextCenter(L"Thirsty", pivotX, pivotY);
+							drawTextCenter(sysStr[333], pivotX, pivotY);
 
 							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65-16%", pivotX + 92, pivotY);
@@ -369,7 +367,7 @@ public:
 						{
 							setFontSize(16);
 							setFont(fontType::mainFontSemiBold);
-							drawTextCenter(L"Mental", pivotX, pivotY);
+							drawTextCenter(sysStr[397], pivotX, pivotY);
 
 							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65+25%", pivotX + 92, pivotY);
@@ -379,7 +377,7 @@ public:
 						{
 							setFontSize(16);
 							setFont(fontType::mainFontSemiBold);
-							drawTextCenter(L"Atk Speed", pivotX, pivotY);
+							drawTextCenter(sysStr[398], pivotX, pivotY);
 
 							setFont(fontType::mainFontBold);
 							setFontSize(14);
@@ -412,26 +410,28 @@ public:
 				if (checkCursor(&transferBtn)) { drawFillRect(transferBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(transferBtn, col::lightGray); }
 				else { drawFillRect(transferBtn, col::black); drawRect(transferBtn, col::gray); }
 				setFontSize(18);
-				drawTextCenter(L"Transfer", transferBtn.x + transferBtn.w / 2, transferBtn.y + transferBtn.h / 2);
+				drawTextCenter(sysStr[395], transferBtn.x + transferBtn.w / 2, transferBtn.y + transferBtn.h / 2);
 
 				if (checkCursor(&eatBtn)) { drawFillRect(eatBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(eatBtn, col::lightGray); }
 				else { drawFillRect(eatBtn, col::black); drawRect(eatBtn, col::gray); }
 				setFontSize(18);
-				drawTextCenter(L"Eat Now", eatBtn.x + eatBtn.w / 2, eatBtn.y + eatBtn.h / 2);
+				drawTextCenter(sysStr[20], eatBtn.x + eatBtn.w / 2, eatBtn.y + eatBtn.h / 2);
 			}
 			else if (canCook)
 			{
 				if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
 				else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
-				setFontSize(22);
-				drawTextCenter(L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
+				setFont(fontType::mainFontSemiBold);
+				setFontSize(20);
+				drawTextCenter(sysStr[396], cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
 			}
 			else
 			{
 				drawFillRect(cookBtn, col::black, 80);
 				drawRect(cookBtn, col::gray, 80);
-				setFontSize(22);
-				drawTextCenter(col2Str(col::gray) + L"Cook", cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
+				setFont(fontType::mainFontSemiBold);
+				setFontSize(20);
+				drawTextCenter(col2Str(col::gray) + sysStr[396], cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
 			}
 		}
 		else
@@ -457,7 +457,7 @@ public:
 	}
 	void onClickRecipeBtn()
 	{
-		updateLog(L"[Cook] Recipe button clicked.");
+		updateLog(L"[DEBUG] 레시피 버튼을 눌렀다.");
 	}
 	void onClickHeatBtn()
 	{
@@ -474,7 +474,7 @@ public:
 	{
 		if (!canCook || matchedRecipeIdx < 0) return;
 		const CookRecipe& recipe = recipes[matchedRecipeIdx];
-		updateLog(recipe.resultName + L" has been cooked successfully!");
+		updateLog(replaceStr(sysStr[401], L"(%item)", itemDex[recipe.resultCode].name));
 
 		//쿡웨어 내부 물 삭제
 		if (cookwarePtr != nullptr && cookwarePtr->pocketPtr != nullptr)
@@ -515,7 +515,7 @@ public:
 			}
 		}
 
-		updateLog(L"You ate " + recipe.resultName + L".");
+		updateLog(replaceStr(sysStr[402], L"(%item)", itemDex[recipe.resultCode].name));
 		close(aniFlag::winUnfoldClose);
 	}
 	void clickUpGUI()
@@ -797,7 +797,7 @@ public:
 		case 5: return L"SW";
 		case 6: return L"S";
 		case 7: return L"SE";
-		default: return L"Here";
+		default: return L"?";
 		}
 	}
 
@@ -836,10 +836,10 @@ public:
 			{
 				if (&item == cookwarePtr) continue;
 				std::wstring tag;
-				if (item.equipState == equipHandFlag::left) tag = L"L Hand";
-				else if (item.equipState == equipHandFlag::right) tag = L"R Hand";
-				else if (item.equipState == equipHandFlag::both) tag = L"Both";
-				else tag = L"Equip";
+				if (item.equipState == equipHandFlag::left) tag = sysStr[32];
+				else if (item.equipState == equipHandFlag::right) tag = sysStr[33];
+				else if (item.equipState == equipHandFlag::both) tag = sysStr[34];
+				else tag = sysStr[242];
 				ddItems.push_back({ (int)item.itemCode, 1, &item, nullptr, tag, equipPtr, i });
 			}
 		}
@@ -849,7 +849,7 @@ public:
 		{
 			if (equipPtr->itemInfo[i].pocketPtr != nullptr)
 			{
-				scanPocketForTransfer(equipPtr->itemInfo[i].pocketPtr.get(), L"Bag");
+				scanPocketForTransfer(equipPtr->itemInfo[i].pocketPtr.get(), sysStr[399]);
 			}
 		}
 
@@ -858,7 +858,7 @@ public:
 		{
 			int dx = 0, dy = 0;
 			dir2Coord(dir, dx, dy);
-			std::wstring tileTag = (dir == -1) ? L"Floor" : (dirToLabel(dir) + L" Tile");
+			std::wstring tileTag = (dir == -1) ? sysStr[182] : (dirToLabel(dir) + L" " + sysStr[400]);
 
 			ItemStack* stack = TileItemStack(PlayerX() + dx, PlayerY() + dy, PlayerZ());
 			if (stack != nullptr)
@@ -887,9 +887,9 @@ public:
 		if (ddItems.empty())
 		{
 			if (target == DD_TRANSFER)
-				updateLog(L"There are no containers nearby to transfer to.");
+				updateLog(sysStr[403]);
 			else
-				updateLog(L"There are no items nearby.");
+				updateLog(sysStr[404]);
 			return;
 		}
 		ddTarget = target;
@@ -984,7 +984,7 @@ public:
 			//같은 벡터에 속한 target.itemPtr이 무효화될 수 있음 → 이름을 미리 복사
 			std::wstring targetName = target.itemPtr->name;
 			cwPocket->transferItem(destPocket, dishIndex, 1);
-			updateLog(L"Transferred " + recipe.resultName + L" to " + targetName + L".");
+			updateLog(replaceStr(replaceStr(sysStr[405], L"(%item)", itemDex[recipe.resultCode].name), L"(%target)", targetName));
 		}
 
 		//Transfer 후 Cook UI 닫기

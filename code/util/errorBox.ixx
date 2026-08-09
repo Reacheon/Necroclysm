@@ -4,7 +4,7 @@ module;
 export module errorBox;
 
 import std;
-import utf8Decoder; //utf8Encoder 사용
+import utf8Decoder;
 
 export void errorBox(bool condition, std::wstring text)
 {

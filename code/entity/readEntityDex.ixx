@@ -94,7 +94,7 @@ export int readEntityDex(const wchar_t* file)
                 csvWidth++;
                 if (str[i] == 10)
                 {
-                    //prt(L"이 csv 파일의 가로사이즈는 %d이다!\n", csvWidth);
+                    //dbgPrt(L"이 csv 파일의 가로사이즈는 %d이다!\n", csvWidth);
                     break;
                 }
             }
@@ -135,7 +135,7 @@ export int readEntityDex(const wchar_t* file)
                             entityDex[tgtIndex].entityCode = wtoi(strFragment.c_str());
                             break;
                         case csvEntity::sprFileName:
-                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"이 아이템의 equip 이미지 파일이 spr::spriteMapper에 없음 : " + strFragment);
+                            errorBox(spr::spriteMapper.find(strFragment) == spr::spriteMapper.end(), L"readEntityDex: 이 엔티티의 스프라이트 시트("+ strFragment+L")를 찾지 못하였다.");
                             entityDex[tgtIndex].entitySpr = spr::spriteMapper[strFragment.c_str()];
                             break;
                         case csvEntity::nativeDescript:
@@ -151,7 +151,7 @@ export int readEntityDex(const wchar_t* file)
                             else if (strFragment == L"zombie") { entityDex[tgtIndex].category = entityCategory::zombie; }
                             else if (strFragment == L"robot") { entityDex[tgtIndex].category = entityCategory::robot; }
                             else if (strFragment == L"animal") { entityDex[tgtIndex].category = entityCategory::animal; }
-                            else { errorBox(L"error in readItemDex.ixx, csvItem::category"); }
+                            else { errorBox(L"readEntityDex에서 알 수 없는 Entity Category를 읽었다."); }
                             break;
                         }
                         case csvEntity::temperature:
@@ -272,12 +272,12 @@ export int readEntityDex(const wchar_t* file)
                             entityDex[tgtIndex].maxEnergy = wtoi(strFragment.c_str());
                             break;
                         default:
-                            prt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
+                            dbgPrt(L"readEntityDex.ixx에서 오류 발생. csv의 잘못된 장소를 읽었다.\n");
                             break;
                     }
 
-                    //prt(L"[문자열] %ws ", strFragment.c_str());
-                    //prt(L"를 (%d,%d)에 입력했다.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
+                    //dbgPrt(L"[문자열] %ws ", strFragment.c_str());
+                    //dbgPrt(L"를 (%d,%d)에 입력했다.\n", arrayCounter / (csvWidth)-1, arrayCounter % (csvWidth));
                 }
 
                 arrayCounter++;

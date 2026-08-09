@@ -31,9 +31,9 @@ public:
 	SkillSample()
 	{
 		id = L"SKILL_SAMPLE";          // 고유 ID로 변경할 것 (SKILL_/BION_/MUT_ 접두어)
-		name = L"Sample Skill";
+		name = L"샘플 스킬";
 		iconIndex = 0;
-		descript = L"This is a sample skill for reference.";
+		descript = L"";
 		src = skillSrc::GENERAL;   // GENERAL, BIONIC, MUTATION, MAGIC
 		category = skillCategory::action; // GENERAL 전용 탭 분류: weapon(무기술)/survival(생존)/action(행동)
 		type = skillType::ACTIVE;  // ACTIVE, PASSIVE, TOGGLE

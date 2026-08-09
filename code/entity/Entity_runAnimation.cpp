@@ -22,8 +22,8 @@ import actFuncSet;
 
 bool Entity::runAnimation(bool shutdown)
 {
-	//if (isPlayer) prt(L"Player의 runAnimation이 실행되었다.\n");
-	//else prt(L"Entity %p의 runAnimation이 실행되었다.\n",this);
+	//if (isPlayer) dbgPrt(L"Player의 runAnimation이 실행되었다.\n");
+	//else dbgPrt(L"Entity %p의 runAnimation이 실행되었다.\n",this);
 
 	if (getAniType() == aniFlag::move)//만약 플레이어 인스턴스의 좌표와 목적좌표가 다를 경우
 	{
@@ -741,8 +741,6 @@ bool Entity::runAnimation(bool shutdown)
 			bulletPtr->addFakeX(xSpd);
 			bulletPtr->addFakeY(ySpd);
 
-
-			std::wprintf(L"bullet fake X:%f, fake Y:%f, delX :%f, delY: %f\n", bulletPtr->getFakeX(), bulletPtr->getFakeY(), delX, delY);
 			if (std::fabs(bulletPtr->getFakeX()) >= std::fabs(delX) && std::fabs(bulletPtr->getFakeY()) >= std::fabs(delY))
 			{
 				delete bulletPtr;
@@ -1191,7 +1189,7 @@ bool Entity::runAnimation(bool shutdown)
 
 			xDist = 16 * (getSkillTarget().x - startX);
 			yDist = 16 * (getSkillTarget().y - startY);
-			std::wprintf(L"xDist는 %d, yDist는 %d\n", xDist, yDist);
+			dbgPrt(L"xDist는 %d, yDist는 %d\n", xDist, yDist);
 			xSpd = xDist / 20.0f;
 			ySpd = yDist / 20.0f;
 
@@ -1543,7 +1541,7 @@ bool Entity::runAnimation(bool shutdown)
 
 		return false;
 	}
-	else errorBox(L"Entity_runAnimation: unhandled aniFlag.");
+	else errorBox(L"Entity_runAnimation: 알 수 없는 aniFlag가 발견되었다.");
 
 	return false;
 }

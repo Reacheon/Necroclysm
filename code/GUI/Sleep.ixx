@@ -48,7 +48,7 @@ private:
 public:
 	Sleep() : GUI(false)
 	{
-		errorBox(ptr != nullptr, L"More than one message instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 GUI 인스턴스가 생성되었다.");
 		ptr = this;
 		changeXY(cameraW / 2, cameraH / 2, true);
 		PlayerPtr->setSpriteIndex(charSprIndex::CRAWL);
@@ -122,7 +122,7 @@ public:
 			{
 				// 수면 시도 중 텍스트
 				int dotCount = (SDL_GetTicks() / 800) % 4;
-				std::wstring sleepText = sysStr[214];
+				std::wstring sleepText = sysStr[134];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
 				setFont(fontType::mainFontSemiBold);
@@ -133,14 +133,14 @@ public:
 				// 수면 확률 표시
 				setFontSize(12); // 8 × 1.5 = 12
 				float probability = getSleepProbability();
-				std::wstring probText = sysStr[229] + L": " + std::to_wstring((int)(probability * 100)) + L"%";
+				std::wstring probText = sysStr[149] + L": " + std::to_wstring((int)(probability * 100)) + L"%";
 				drawTextCenter(probText, tooltipBox.x + tooltipBox.w / 2 + 27, tooltipBox.y + 48); // 18→27, 30→45
 			}
 			else if (isAsleep)
 			{
 				// 수면 중 텍스트 (점 애니메이션 추가)
 				int dotCount = (SDL_GetTicks() / 800) % 4;
-				std::wstring sleepText = sysStr[215];
+				std::wstring sleepText = sysStr[135];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
 				setFont(fontType::mainFontSemiBold);
@@ -161,7 +161,7 @@ public:
 				int hours = remainingMinutes / 60;
 				int minutes = remainingMinutes % 60;
 
-				std::wstring progressText = sysStr[216];
+				std::wstring progressText = sysStr[136];
 				progressText = replaceStr(progressText, L"(%hour)", std::to_wstring(hours));
 				progressText = replaceStr(progressText, L"(%min)", std::to_wstring(minutes));
 				progressText += L" ( ";
@@ -192,7 +192,7 @@ public:
 			// 수면 시도 중에만 중단 가능
 			if (isTryingToSleep)
 			{
-				updateLog(L"Sleep attempt cancelled.");
+				updateLog(L"수면 시도를 취소하였다.");
 				coTurnSkip = false;
 				close(aniFlag::null);
 			}
@@ -221,17 +221,17 @@ public:
 								if (TileEntity(x, y, PlayerZ()) != nullptr)
 								{
 									//경고, 주변에 적이 있습니다. 계속 수면을 시도하시겠습니까?, 네,아니오,무시
-									new Msg(msgFlag::normal, sysStr[306], sysStr[323], { sysStr[36],sysStr[37],sysStr[311] });
+									new Msg(msgFlag::normal, sysStr[216], sysStr[233], { sysStr[23],sysStr[24],sysStr[221] });
 									co_await std::suspend_always();
-									if (coAnswer == sysStr[36]) goto sleepTryLoopEnd;
-									else if (coAnswer == sysStr[311])
+									if (coAnswer == sysStr[23]) goto sleepTryLoopEnd;
+									else if (coAnswer == sysStr[221])
 									{
 										negateMonster = true;
 										goto sleepTryLoopEnd;
 									}
 									else
 									{
-										updateLog(sysStr[324]);//수면 시도를 취소하였다.
+										updateLog(sysStr[234]);//수면 시도를 취소하였다.
 										coTurnSkip = false;
 										close(aniFlag::null);
 										co_return;
@@ -254,7 +254,7 @@ public:
 
 			if (roll < sleepChance)
 			{
-				updateLog(L"You fell asleep.");
+				updateLog(L"당신은 잠에 들었다.");
 				isTryingToSleep = false;
 				isAsleep = true;
 				PlayerInfo().isEyesClose = true; // 눈을 감음
@@ -287,7 +287,7 @@ public:
 		// 수면 완료
 		if (isAsleep)
 		{
-			updateLog(sysStr[322]);//숙면을 취했습니다. 피로가 완전히 회복되었습니다. 
+			updateLog(sysStr[232]);//숙면을 취했습니다. 피로가 완전히 회복되었습니다. 
 		}
 
 		isAsleep = false;

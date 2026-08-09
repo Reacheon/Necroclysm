@@ -81,15 +81,13 @@ public:
 	SkillData* targetSkill; //GUI들이 가리키는 스킬
 	HUD() : GUI(false)
 	{
-		prt(L"HUD instance was generated.\n");
-		errorBox(ptr != nullptr, L"More than one Loot instance was generated.");
+		errorBox(ptr != nullptr, L"중복된 HUD 인스턴스가 생성되었다.");
 		ptr = this;
 		setAlwaysDraw(true);
 		changeXY(0, 0, false);
 	}
 	~HUD()
 	{
-		prt(L"[Error] HUD instance was destroyed.\n");
 	}
 	static HUD* ins() { return ptr; }
 	void changeXY(int inputX, int inputY, bool center)
@@ -189,7 +187,7 @@ public:
 
 	bool runAnimation(bool shutdown) override
 	{
-		//prt(L"HUD의 runAnimation이 실행되었다.\n");
+		//dbgPrt(L"HUD의 runAnimation이 실행되었다.\n");
 		const int acc = 20;
 		const int initSpeed = 4;
 		if (getAniType() == aniFlag::popUpLetterbox)
@@ -482,7 +480,7 @@ public:
 				else if (ctrlVeh->gearState == gearFlag::reverse) ctrlVeh->accVec = scalarMultiple(dir16ToVec(reverse(ctrlVeh->wheelDir)), 7.0);
 				turnWait(1.0);
 			}
-			else updateLog(L"The engine is not running.");
+			else updateLog(sysStr[303]);
 			break;
 		}
 		case act::brake:
@@ -605,7 +603,7 @@ public:
 		}
 
 		default:
-			updateLog(L"Unknown letterbox button was pressed.");
+			updateLog(L"[DEBUG] 알 수 없는 레터박스 버튼이 눌렸다.");
 			break;
 		}
 
@@ -642,7 +640,7 @@ public:
 		}
 		if (nearCoord.x == 0 && nearCoord.y == 0)//찾지 못했을 경우
 		{
-			updateLog(sysStr[105]);
+			updateLog(sysStr[61]);
 		}
 		else//찾았을 경우
 		{
@@ -663,12 +661,12 @@ public:
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
 										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
-										updateLog(L"You nock an arrow.");
+										updateLog(sysStr[235]); //화살을 시위에 걸었다.
 										new Aim();
 										break;
 									}
 								}
-								if (j == equipInfo.size() - 1) updateLog(L"You have no arrows.");
+								if (j == equipInfo.size() - 1) updateLog(sysStr[304]); //화살이 부족하다.
 							}
 						}
 					}
@@ -684,12 +682,12 @@ public:
 									if (equipInfo[j].pocketPtr.get()->getPocketNumber() > 0)
 									{
 										equipInfo[j].pocketPtr.get()->transferItem(equipInfo[i].pocketPtr.get(), 0, 1);
-										updateLog(L"You load a bolt into the crossbow.");
+										updateLog(sysStr[236]); //볼트를 장전했다.
 										new Aim();
 										break;
 									}
 								}
-								if (j == equipInfo.size() - 1) updateLog(L"You have no bolts.");
+								if (j == equipInfo.size() - 1) updateLog(sysStr[305]); //볼트가 부족하다.
 							}
 						}
 					}
@@ -697,7 +695,7 @@ public:
 					{
 						if (equipInfo[i].pocketOnlyItem.empty())
 						{
-							updateLog(L"This gun has no ammo information available.");
+							updateLog(L"[DEBUG] 잘못된 총기데이터");
 							break;
 						}
 						unsigned short onlyCode = equipInfo[i].pocketOnlyItem[0];
@@ -705,7 +703,7 @@ public:
 						if (itemDex[onlyCode].checkFlag(itemFlag::AMMO))
 						{
 							if (getBulletNumber(equipInfo[i]) > 0) new Aim();
-							else updateLog(L"No ammunition is loaded.");
+							else updateLog(sysStr[306]); //총에 탄약이 부족하다.
 						}
 						/* ② 탄창식( MAGAZINE )  ------------------------------------------------ */
 						else if (itemDex[onlyCode].checkFlag(itemFlag::MAGAZINE))
@@ -718,12 +716,12 @@ public:
 								{
 									new Aim();
 								}
-								else updateLog(L"The magazine is empty.");
+								else updateLog(sysStr[307]); //탄창이 부족하다.
 							}
-							else updateLog(L"No magazine is loaded in the gun.");
+							else updateLog(sysStr[308]); //총에 탄창이 없다.
 						}
 						/* ③ 그밖의 예외적인 경우(확장성을 위해) ------------------------------- */
-						else errorBox(L"This gun has no ammo information available.");
+						else errorBox(L"[DEBUG] 잘못된 총기데이터");
 						break;
 					}
 				}
@@ -775,7 +773,7 @@ public:
 		}
 		else //문이 2개 이상일 경우
 		{
-			new CoordSelect(L"닫을 문을 선택해주세요.", doorList);
+			new CoordSelect(sysStr[314], doorList); //닫을 문을 선택해주세요.
 			co_await std::suspend_always();
 
 			if (coAnswer.empty()) co_return;
@@ -813,7 +811,7 @@ public:
 		}
 		if (selectableTile.empty())
 		{
-			updateLog(L"No suitable soil nearby to till.");
+			updateLog(sysStr[309]); //주변에 경작할 토지가 없다.
 			co_return;
 		}
 
@@ -823,7 +821,7 @@ public:
 		for (auto& tile : selectableTile)
 			rangeSet.insert({ tile.x, tile.y });
 
-		new CoordSelect(L"Select a tile to till.", selectableTile);
+		new CoordSelect(sysStr[310], selectableTile); //경작할 토지를 선택해주세요.
 		co_await std::suspend_always();
 
 		rangeSet.clear();
@@ -859,7 +857,7 @@ public:
 		}
 		if (wateringCanRemaining < 100)
 		{
-			updateLog(L"Watering can is empty.");
+			updateLog(sysStr[311]); //물뿌리개가 텅 비었다.
 			co_return;
 		}
 
@@ -878,7 +876,7 @@ public:
 		}
 		if (selectableTile.empty())
 		{
-			updateLog(L"No dry farmland nearby to water.");
+			updateLog(sysStr[312]); //주변에 물이 필요한 경작지가 없다.
 			co_return;
 		}
 
@@ -888,7 +886,7 @@ public:
 		for (auto& tile : selectableTile)
 			rangeSet.insert({ tile.x, tile.y });
 
-		new CoordSelect(L"Select a tile to water.", selectableTile);
+		new CoordSelect(sysStr[313], selectableTile); //물을 줄 타일을 선택하세요.
 		co_await std::suspend_always();
 
 		rangeSet.clear();
