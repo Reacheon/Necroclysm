@@ -10,142 +10,12 @@ import globalVar;
 import constVar;
 import textureVar;
 import Sprite;
-import paletteLoader; // PaletteTable, loadPaletteTable
+import paletteLoader;
 import nervedriveFilter;
 
-// source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
-// 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
-static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src, const std::vector<SDL_Color>& from, const std::vector<SDL_Color>& to)
-{
-	SDL_Surface* dst = SDL_ConvertSurface(src, SDL_PIXELFORMAT_RGBA32);
-	if (dst == nullptr) return nullptr;
-
-	SDL_LockSurface(dst);
-	Uint8* bytes = (Uint8*)dst->pixels;
-	int slotCount = (int)std::min(from.size(), to.size());
-	for (int y = 0; y < dst->h; y++)
-	{
-		Uint8* row = bytes + y * dst->pitch;
-		for (int x = 0; x < dst->w; x++)
-		{
-			Uint8* p = row + x * 4; // RGBA32: R,G,B,A
-			if (p[3] == 0) continue; // 완전 투명은 건너뜀
-			for (int s = 0; s < slotCount; s++)
-			{
-				if (p[0] == from[s].r && p[1] == from[s].g && p[2] == from[s].b)
-				{
-					p[0] = to[s].r;
-					p[1] = to[s].g;
-					p[2] = to[s].b;
-					break;
-				}
-			}
-		}
-	}
-	SDL_UnlockSurface(dst);
-
-	SDL_Texture* tex = SDL_CreateTextureFromSurface(r, dst);
-	SDL_DestroySurface(dst);
-	if (tex) SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
-	return tex;
-}
-
-// 지정 폴더(재귀)의 모든 PNG를 sourceColor 팔레트로 가정하고, palette TSV의 모든 색상 컬럼에
-// 대해 팔레트 스왑 결과를 spriteMapper[L"<stem>_<색>"]로 등록.
-// (sourceColor 컬럼은 원본과 동일한 결과를 만들지만 일관성 위해 동일 경로로 처리.)
-//   - 헤어:  imageDir="image/charset/body/hair", palettePath="palette/hair.tsv", sourceColor=L"BLACK"
-//   - 눈:    imageDir="image/charset/body/eyes", palettePath="palette/eyes.tsv", sourceColor=L"BLUE"
-//   - 피부:  imageDir="image/charset/body/skin", palettePath="palette/skin.tsv", sourceColor=L"LIGHT"
-static void loadPaletteSwappedSprites(SDL_Renderer* renderer, const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor)
-{
-	PaletteTable pal = loadPaletteTable(palettePath);
-	auto fromIt = pal.table.find(sourceColor);
-	if (fromIt == pal.table.end()) return;
-
-	namespace fs = std::filesystem;
-	for (const auto& entry : fs::recursive_directory_iterator(imageDir))
-	{
-		if (!entry.is_regular_file()) continue;
-		if (entry.path().extension() != ".png") continue;
-
-		std::wstring stem = entry.path().stem();
-		SDL_Surface* src = IMG_Load(entry.path().string().c_str());
-		if (src == nullptr) continue;
-
-		for (const auto& colorName : pal.colorNames)
-		{
-			auto toIt = pal.table.find(colorName);
-			if (toIt == pal.table.end()) continue;
-
-			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
-			if (tex == nullptr) continue;
-			spr::spriteMapper[stem + L"_" + colorName] = new Sprite(renderer, tex, 48, 48, true);
-		}
-		SDL_DestroySurface(src);
-	}
-}
-
-// 돌연변이 폴더 재귀 로드. _FURCOL / _HORNCOL 접미사면 팔레트 스왑하여 색상별 변종 등록.
-// 나머지는 일반 로드. 수동 그린 색상 변종(예: MUT_HORN_RED.png)은 팔레트 생성 변종과 충돌 시 수동 우선.
-static void loadMutationSprites(SDL_Renderer* renderer)
-{
-	PaletteTable furPal = loadPaletteTable("palette/fur.tsv");
-	PaletteTable hornPal = loadPaletteTable("palette/horn.tsv");
-
-	namespace fs = std::filesystem;
-	std::vector<fs::path> templates; // _FURCOL / _HORNCOL 파일들
-
-	// 1패스: 템플릿이 아닌 PNG들을 먼저 로드 (수동 색상 변종 포함)
-	for (const auto& entry : fs::recursive_directory_iterator("image/charset/mutation"))
-	{
-		if (!entry.is_regular_file()) continue;
-		if (entry.path().extension() != ".png") continue;
-
-		std::wstring stem = entry.path().stem();
-		if (stem.ends_with(L"_FURCOL") || stem.ends_with(L"_HORNCOL"))
-		{
-			templates.push_back(entry.path());
-			continue;
-		}
-		spr::spriteMapper[stem] = new Sprite(renderer, entry.path().string(), 48, 48);
-	}
-
-	// 2패스: 템플릿 PNG들을 팔레트 스왑하여 색상별 변종 생성
-	auto processTemplate = [&](const fs::path& path, const PaletteTable& pal, const std::wstring& suffix, const std::wstring& sourceColor)
-	{
-		std::wstring stem = path.stem();
-		std::wstring base = stem.substr(0, stem.size() - suffix.size()); // "_FURCOL" 제거
-
-		auto fromIt = pal.table.find(sourceColor);
-		if (fromIt == pal.table.end()) return; // 소스 팔레트 없음
-
-		SDL_Surface* src = IMG_Load(path.string().c_str());
-		if (src == nullptr) return;
-
-		for (const auto& colorName : pal.colorNames)
-		{
-			std::wstring key = base + colorName; // base는 이미 '_'로 끝남
-			if (spr::spriteMapper.find(key) != spr::spriteMapper.end()) continue; // 수동 변종 우선
-
-			auto toIt = pal.table.find(colorName);
-			if (toIt == pal.table.end()) continue;
-
-			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
-			if (tex == nullptr) continue;
-			spr::spriteMapper[key] = new Sprite(renderer, tex, 48, 48, true);
-		}
-		SDL_DestroySurface(src);
-	};
-
-	for (const auto& tpath : templates)
-	{
-		std::wstring stem = tpath.stem();
-		if (stem.ends_with(L"_FURCOL"))
-			processTemplate(tpath, furPal, L"FURCOL", L"GRAY");
-		else if (stem.ends_with(L"_HORNCOL"))
-			processTemplate(tpath, hornPal, L"HORNCOL", L"BROWN");
-	}
-}
+static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src, const std::vector<SDL_Color>& from, const std::vector<SDL_Color>& to);
+static void loadPaletteSwappedSprites(SDL_Renderer* renderer, const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor);
+static void loadMutationSprites(SDL_Renderer* renderer);
 
 export void textureLoader()
 {
@@ -365,4 +235,138 @@ export void textureLoader()
 
 	spr::statusAbilityUpBtn = new  Sprite(renderer, "image/UI/GUI/Status/statusAbilityUpBtn.png", 22, 22);
 	spr::statusResetBtn = new  Sprite(renderer, "image/UI/GUI/Status/statusResetBtn.png", 26, 26);
+}
+
+// source PNG의 픽셀을 from 팔레트 -> to 팔레트로 치환한 새 SDL_Texture 반환.
+// 매칭 안 되는 픽셀/투명 픽셀은 그대로 유지.
+static SDL_Texture* paletteSwapTexture(SDL_Renderer* r, SDL_Surface* src, const std::vector<SDL_Color>& from, const std::vector<SDL_Color>& to)
+{
+	SDL_Surface* dst = SDL_ConvertSurface(src, SDL_PIXELFORMAT_RGBA32);
+	if (dst == nullptr) return nullptr;
+
+	SDL_LockSurface(dst);
+	Uint8* bytes = (Uint8*)dst->pixels;
+	int slotCount = (int)std::min(from.size(), to.size());
+	for (int y = 0; y < dst->h; y++)
+	{
+		Uint8* row = bytes + y * dst->pitch;
+		for (int x = 0; x < dst->w; x++)
+		{
+			Uint8* p = row + x * 4; // RGBA32: R,G,B,A
+			if (p[3] == 0) continue; // 완전 투명은 건너뜀
+			for (int s = 0; s < slotCount; s++)
+			{
+				if (p[0] == from[s].r && p[1] == from[s].g && p[2] == from[s].b)
+				{
+					p[0] = to[s].r;
+					p[1] = to[s].g;
+					p[2] = to[s].b;
+					break;
+				}
+			}
+		}
+	}
+	SDL_UnlockSurface(dst);
+
+	SDL_Texture* tex = SDL_CreateTextureFromSurface(r, dst);
+	SDL_DestroySurface(dst);
+	if (tex) SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);
+	return tex;
+}
+
+// 지정 폴더(재귀)의 모든 PNG를 sourceColor 팔레트로 가정하고, palette TSV의 모든 색상 컬럼에
+// 대해 팔레트 스왑 결과를 spriteMapper[L"<stem>_<색>"]로 등록.
+// (sourceColor 컬럼은 원본과 동일한 결과를 만들지만 일관성 위해 동일 경로로 처리.)
+//   - 헤어:  imageDir="image/charset/body/hair", palettePath="palette/hair.tsv", sourceColor=L"BLACK"
+//   - 눈:    imageDir="image/charset/body/eyes", palettePath="palette/eyes.tsv", sourceColor=L"BLUE"
+//   - 피부:  imageDir="image/charset/body/skin", palettePath="palette/skin.tsv", sourceColor=L"LIGHT"
+static void loadPaletteSwappedSprites(SDL_Renderer* renderer, const std::string& imageDir, const std::string& palettePath, const std::wstring& sourceColor)
+{
+	PaletteTable pal = loadPaletteTable(palettePath);
+	auto fromIt = pal.table.find(sourceColor);
+	if (fromIt == pal.table.end()) return;
+
+	namespace fs = std::filesystem;
+	for (const auto& entry : fs::recursive_directory_iterator(imageDir))
+	{
+		if (!entry.is_regular_file()) continue;
+		if (entry.path().extension() != ".png") continue;
+
+		std::wstring stem = entry.path().stem();
+		SDL_Surface* src = IMG_Load(entry.path().string().c_str());
+		if (src == nullptr) continue;
+
+		for (const auto& colorName : pal.colorNames)
+		{
+			auto toIt = pal.table.find(colorName);
+			if (toIt == pal.table.end()) continue;
+
+			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
+			if (tex == nullptr) continue;
+			spr::spriteMapper[stem + L"_" + colorName] = new Sprite(renderer, tex, 48, 48, true);
+		}
+		SDL_DestroySurface(src);
+	}
+}
+
+// 돌연변이 폴더 재귀 로드. _FURCOL / _HORNCOL 접미사면 팔레트 스왑하여 색상별 변종 등록.
+// 나머지는 일반 로드. 수동 그린 색상 변종(예: MUT_HORN_RED.png)은 팔레트 생성 변종과 충돌 시 수동 우선.
+static void loadMutationSprites(SDL_Renderer* renderer)
+{
+	PaletteTable furPal = loadPaletteTable("palette/fur.tsv");
+	PaletteTable hornPal = loadPaletteTable("palette/horn.tsv");
+
+	namespace fs = std::filesystem;
+	std::vector<fs::path> templates; // _FURCOL / _HORNCOL 파일들
+
+	// 1패스: 템플릿이 아닌 PNG들을 먼저 로드 (수동 색상 변종 포함)
+	for (const auto& entry : fs::recursive_directory_iterator("image/charset/mutation"))
+	{
+		if (!entry.is_regular_file()) continue;
+		if (entry.path().extension() != ".png") continue;
+
+		std::wstring stem = entry.path().stem();
+		if (stem.ends_with(L"_FURCOL") || stem.ends_with(L"_HORNCOL"))
+		{
+			templates.push_back(entry.path());
+			continue;
+		}
+		spr::spriteMapper[stem] = new Sprite(renderer, entry.path().string(), 48, 48);
+	}
+
+	// 2패스: 템플릿 PNG들을 팔레트 스왑하여 색상별 변종 생성
+	auto processTemplate = [&](const fs::path& path, const PaletteTable& pal, const std::wstring& suffix, const std::wstring& sourceColor)
+	{
+		std::wstring stem = path.stem();
+		std::wstring base = stem.substr(0, stem.size() - suffix.size()); // "_FURCOL" 제거
+
+		auto fromIt = pal.table.find(sourceColor);
+		if (fromIt == pal.table.end()) return; // 소스 팔레트 없음
+
+		SDL_Surface* src = IMG_Load(path.string().c_str());
+		if (src == nullptr) return;
+
+		for (const auto& colorName : pal.colorNames)
+		{
+			std::wstring key = base + colorName; // base는 이미 '_'로 끝남
+			if (spr::spriteMapper.find(key) != spr::spriteMapper.end()) continue; // 수동 변종 우선
+
+			auto toIt = pal.table.find(colorName);
+			if (toIt == pal.table.end()) continue;
+
+			SDL_Texture* tex = paletteSwapTexture(renderer, src, fromIt->second, toIt->second);
+			if (tex == nullptr) continue;
+			spr::spriteMapper[key] = new Sprite(renderer, tex, 48, 48, true);
+		}
+		SDL_DestroySurface(src);
+	};
+
+	for (const auto& tpath : templates)
+	{
+		std::wstring stem = tpath.stem();
+		if (stem.ends_with(L"_FURCOL"))
+			processTemplate(tpath, furPal, L"FURCOL", L"GRAY");
+		else if (stem.ends_with(L"_HORNCOL"))
+			processTemplate(tpath, hornPal, L"HORNCOL", L"BROWN");
+	}
 }

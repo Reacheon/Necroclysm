@@ -32,6 +32,32 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
+		if (texture::worldmap == nullptr)
+		{
+			if (currentWorld != nullptr)
+			{
+				texture::worldmap = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WORLD_DATA_SIZE, WORLD_DATA_SIZE);
+				SDL_SetTextureScaleMode(texture::worldmap, SDL_SCALEMODE_NEAREST);
+
+				SDL_SetRenderTarget(renderer, texture::worldmap);
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+				SDL_RenderClear(renderer);
+				for (int y = 0; y < WORLD_DATA_SIZE; y++)
+				{
+					for (int x = 0; x < WORLD_DATA_SIZE; x++)
+					{
+
+						//노이즈맵 표시
+						Uint8 bright = (Uint8)((currentWorld->noiseMap[x][y] + 1.0f) * 0.5f * 255);
+						drawPoint(x, y, SDL_Color{ bright, bright, bright });
+
+						//if (currentWorld->getProphecy(x,y,0) == chunkType::deepSea) drawPoint(x, y, col::blue);
+					}
+				}
+				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+				SDL_SetRenderTarget(renderer, frameTarget);
+			}
+		}
 	}
 	~Map()
 	{
@@ -75,17 +101,11 @@ public:
 		drawFillRect(SDL_FRect{ 0,0,static_cast<float>(cameraW),static_cast<float>(cameraH) }, col::black, 255);
 
 
-		//일단 임시
-		if (currentWorld != nullptr)
+		if (texture::worldmap != nullptr)
 		{
-			for (int y = 0; y < WORLD_DATA_SIZE; y++)
-			{
-				for (int x = 0; x < WORLD_DATA_SIZE; x++)
-				{
-					if (currentWorld->getProphecy(x,y,0) == chunkType::deepSea) drawPoint(x, y, col::blue);
-				}
-			}
+			drawTexture(texture::worldmap, 0, 0);
 		}
+
 
 		//탭 버튼 그리기
 		{

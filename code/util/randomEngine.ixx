@@ -10,6 +10,7 @@ namespace
         return m;
     }
 
+    //원본 시드값 저장용 함수
     static std::uint64_t& seedRef()
     {
         static std::uint64_t s = 0;

@@ -1699,7 +1699,7 @@ void HUD::drawBodyParts()
 			};
 
 		drawPartInfo(false, 164, cameraH - 311, PlayerPtr->getResPierceHead(), PlayerPtr->getResCutHead(), PlayerPtr->getResBashHead(), PlayerPtr->getEncHead());  // 머리
-		drawPartInfo(true, 16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 상체
+		drawPartInfo(true, 16, cameraH - 274, PlayerPtr->getResPierceTorso(), PlayerPtr->getResCutTorso(), PlayerPtr->getResBashTorso(), PlayerPtr->getEncTorso());  // 몸통
 		drawPartInfo(false, 190, cameraH - 193, PlayerPtr->getResPierceLArm(), PlayerPtr->getResCutLArm(), PlayerPtr->getResBashLArm(), PlayerPtr->getEncLArm());  // 왼팔
 		drawPartInfo(true, 2, cameraH - 193 + 6, PlayerPtr->getResPierceRArm(), PlayerPtr->getResCutRArm(), PlayerPtr->getResBashRArm(), PlayerPtr->getEncRArm());  // 오른팔
 		drawPartInfo(false, 170, cameraH - 94, PlayerPtr->getResPierceLLeg(), PlayerPtr->getResCutLLeg(), PlayerPtr->getResBashLLeg(), PlayerPtr->getEncLLeg());  // 왼다리

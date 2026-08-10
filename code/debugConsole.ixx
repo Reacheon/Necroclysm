@@ -77,6 +77,7 @@ export void debugConsole()
 	dbgPrt(L"43. 캐릭터 선택 화면\n");
 	dbgPrt(L"44. 해상도 변경\n");
 	dbgPrt(L"45. 모든 UI 숨기기 토글\n");
+	dbgPrt(L"46. 월드 생성\n");
 
 	dbgPrt(L"99. 콘솔 클리어\n");
 	dbgPrt(L"////////////////////////////////////////\n");
@@ -862,7 +863,7 @@ export void debugConsole()
 	{
 		if (currentWorld == nullptr)
 		{
-			currentWorld = std::make_unique<WorldData>();
+			currentWorld = std::make_unique<WorldData>(getSeed());
 			dbgPrt(L"[디버그] 월드 생성이 완료되었다.\n");
 		}
 	}

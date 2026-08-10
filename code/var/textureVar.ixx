@@ -14,6 +14,7 @@ export namespace texture
 	SDL_Texture* mainGaugeWhiteShadow = nullptr;
 	SDL_Texture* hpGaugeWhiteShadow = nullptr;
 	SDL_Texture* circuitInfo = nullptr;
+	SDL_Texture* worldmap = nullptr;
 }
 
 export namespace spr
