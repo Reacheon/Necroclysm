@@ -38,94 +38,94 @@ void Status::drawGUI()
 			};
 
 
-			// 초상화: 배경 스프라이트 위에 플레이어 합성 스프라이트를 4배 확대하여 그림
-			{
-				const SDL_Rect portraitBox = { statusBase.x + 12, statusBase.y + 46, 110, 110 };
-				drawSprite(spr::statusPortraitBackground, 0, portraitBox.x, portraitBox.y);
+			//// 초상화: 배경 스프라이트 위에 플레이어 합성 스프라이트를 4배 확대하여 그림
+			//{
+			//	const SDL_Rect portraitBox = { statusBase.x + 12, statusBase.y + 46, 110, 110 };
+			//	drawSprite(spr::statusPortraitBackground, 0, portraitBox.x, portraitBox.y);
 
-				SDL_SetRenderClipRect(renderer, &portraitBox);
+			//	SDL_SetRenderClipRect(renderer, &portraitBox);
 
-				SDL_Texture* portraitTex = PlayerPtr->composePlayerTexture();
-				Sprite portraitSpr(renderer, portraitTex, 48, 48, true);
+			//	SDL_Texture* portraitTex = PlayerPtr->composePlayerTexture();
+			//	Sprite portraitSpr(renderer, portraitTex, 48, 48, true);
 
-				setZoom(4.0);
-				drawSpriteCenter(&portraitSpr, 0,
-					portraitBox.x + portraitBox.w / 2 + 2,
-					portraitBox.y + portraitBox.h / 2 + 22);
-				setZoom(1.0);
+			//	setZoom(4.0);
+			//	drawSpriteCenter(&portraitSpr, 0,
+			//		portraitBox.x + portraitBox.w / 2 + 2,
+			//		portraitBox.y + portraitBox.h / 2 + 22);
+			//	setZoom(1.0);
 
-				SDL_SetRenderClipRect(renderer, nullptr);
-			}
+			//	SDL_SetRenderClipRect(renderer, nullptr);
+			//}
 
 
 
-			setFontSize(24);
-			setFont(fontType::mainFontBold);
-			std::wstring nameText = PlayerPtr->entityInfo.name;
-			int nameTextWIdth = queryTextWidth(nameText, true);
-			drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + nameText, statusBase.x + 139, statusBase.y + 44);
-			setFontSize(16);
-			setFont(fontType::mainFontSemiBold);
-			if (loopCount > 1)
-				drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + replaceStr(sysStr[337], L"(%number)", std::to_wstring(loopCount)), statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
-			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol (Loop #7)", statusBase.x + 139, statusBase.y + 44);
+			//setFontSize(24);
+			//setFont(fontType::mainFontBold);
+			//std::wstring nameText = PlayerPtr->entityInfo.name;
+			//int nameTextWIdth = queryTextWidth(nameText, true);
+			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + nameText, statusBase.x + 139, statusBase.y + 44);
+			//setFontSize(16);
+			//setFont(fontType::mainFontSemiBold);
+			//if (loopCount > 1)
+			//	drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + replaceStr(sysStr[337], L"(%number)", std::to_wstring(loopCount)), statusBase.x + 139 + nameTextWIdth + 6, statusBase.y + 50);
+			////drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol (Loop #7)", statusBase.x + 139, statusBase.y + 44);
 
-			//drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol, Survivor", statusBase.x + 139, statusBase.y + 44);
-			setFont(fontType::mainFont);
+			////drawText(col2Str(SDL_Color{ 0xff,0xd3,0x44 }) + L"Nekdol, Survivor", statusBase.x + 139, statusBase.y + 44);
+			//setFont(fontType::mainFont);
 
-			setFontSize(16);
-			setFont(fontType::mainFontBold);
-			//좌측 열: Age, Race
-			Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
-			drawText(L"#e1772e" + sysStr[329], agePivot.x + 5, agePivot.y + 1);
-			SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
-			drawStadium(ageRect, stadiumCol(ageRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.age), ageRect.x + ageRect.w / 2, ageRect.y + ageRect.h / 2);
+			//setFontSize(16);
+			//setFont(fontType::mainFontBold);
+			////좌측 열: Age, Race
+			//Point2 agePivot = { statusBase.x + 137, statusBase.y + 79 };
+			//drawText(L"#e1772e" + sysStr[329], agePivot.x + 5, agePivot.y + 1);
+			//SDL_Rect ageRect = { agePivot.x + 55, agePivot.y, 120, 23 };
+			//drawStadium(ageRect, stadiumCol(ageRect), 255, 4);
+			//setFont(fontType::mainFontMedium);
+			//drawTextCenter(std::to_wstring(PlayerPtr->entityInfo.age), ageRect.x + ageRect.w / 2, ageRect.y + ageRect.h / 2);
 
-			Point2 racePivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 1 };
-			setFont(fontType::mainFontBold);
-			drawText(L"#e1772e" + sysStr[330], racePivot.x + 5, racePivot.y + 1);
-			SDL_Rect raceRect = { racePivot.x + 55, racePivot.y, 120, 23 };
-			drawStadium(raceRect, stadiumCol(raceRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			drawTextCenter(sysStr[331], raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
+			//Point2 racePivot = { statusBase.x + 137, statusBase.y + 79 + 27 * 1 };
+			//setFont(fontType::mainFontBold);
+			//drawText(L"#e1772e" + sysStr[330], racePivot.x + 5, racePivot.y + 1);
+			//SDL_Rect raceRect = { racePivot.x + 55, racePivot.y, 120, 23 };
+			//drawStadium(raceRect, stadiumCol(raceRect), 255, 4);
+			//setFont(fontType::mainFontMedium);
+			//drawTextCenter(sysStr[331], raceRect.x + raceRect.w / 2, raceRect.y + raceRect.h / 2);
 
-			//우측 열: Hunger, Thirsty, Fatigue (퍼센트 실시간 표시)
-			auto makePercentStr = [](double percent) -> std::wstring {
-				return std::to_wstring((int)std::round(percent)) + L"%";
-			};
-			auto percentColor = [](double percent) -> std::wstring {
-				if (percent >= 75.0) return col2Str(SDL_Color{ 0xff, 0x44, 0x44 });
-				if (percent >= 50.0) return col2Str(SDL_Color{ 0xff, 0xc1, 0x07 });
-				if (percent >= 25.0) return col2Str(SDL_Color{ 0xff, 0xe0, 0x80 });
-				return L"";
-			};
+			////우측 열: Hunger, Thirsty, Fatigue (퍼센트 실시간 표시)
+			//auto makePercentStr = [](double percent) -> std::wstring {
+			//	return std::to_wstring((int)std::round(percent)) + L"%";
+			//};
+			//auto percentColor = [](double percent) -> std::wstring {
+			//	if (percent >= 75.0) return col2Str(SDL_Color{ 0xff, 0x44, 0x44 });
+			//	if (percent >= 50.0) return col2Str(SDL_Color{ 0xff, 0xc1, 0x07 });
+			//	if (percent >= 25.0) return col2Str(SDL_Color{ 0xff, 0xe0, 0x80 });
+			//	return L"";
+			//};
 
-			Point2 hungerPivot = { statusBase.x + 137 + 221, statusBase.y + 79 };
-			setFont(fontType::mainFontBold);
-			drawText(L"#e1772e" + sysStr[332], hungerPivot.x + 5, hungerPivot.y + 1);
-			SDL_Rect hungerRect = { hungerPivot.x + 75, hungerPivot.y, 77, 23 };
-			drawStadium(hungerRect, stadiumCol(hungerRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			drawTextCenter(percentColor(hunger) + makePercentStr(hunger), hungerRect.x + hungerRect.w / 2, hungerRect.y + hungerRect.h / 2);
+			//Point2 hungerPivot = { statusBase.x + 137 + 221, statusBase.y + 79 };
+			//setFont(fontType::mainFontBold);
+			//drawText(L"#e1772e" + sysStr[332], hungerPivot.x + 5, hungerPivot.y + 1);
+			//SDL_Rect hungerRect = { hungerPivot.x + 75, hungerPivot.y, 77, 23 };
+			//drawStadium(hungerRect, stadiumCol(hungerRect), 255, 4);
+			//setFont(fontType::mainFontMedium);
+			//drawTextCenter(percentColor(hunger) + makePercentStr(hunger), hungerRect.x + hungerRect.w / 2, hungerRect.y + hungerRect.h / 2);
 
-			Point2 thirstyPivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 1 };
-			setFont(fontType::mainFontBold);
-			drawText(L"#e1772e" + sysStr[333], thirstyPivot.x + 5, thirstyPivot.y + 1);
-			SDL_Rect thirstyRect = { thirstyPivot.x + 75, thirstyPivot.y, 77, 23 };
-			drawStadium(thirstyRect, stadiumCol(thirstyRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			drawTextCenter(percentColor(thirst) + makePercentStr(thirst), thirstyRect.x + thirstyRect.w / 2, thirstyRect.y + thirstyRect.h / 2);
+			//Point2 thirstyPivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 1 };
+			//setFont(fontType::mainFontBold);
+			//drawText(L"#e1772e" + sysStr[333], thirstyPivot.x + 5, thirstyPivot.y + 1);
+			//SDL_Rect thirstyRect = { thirstyPivot.x + 75, thirstyPivot.y, 77, 23 };
+			//drawStadium(thirstyRect, stadiumCol(thirstyRect), 255, 4);
+			//setFont(fontType::mainFontMedium);
+			//drawTextCenter(percentColor(thirst) + makePercentStr(thirst), thirstyRect.x + thirstyRect.w / 2, thirstyRect.y + thirstyRect.h / 2);
 
-			Point2 fatiguePivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 2 };
-			setFont(fontType::mainFontBold);
-			drawText(L"#e1772e" + sysStr[334], fatiguePivot.x + 5, fatiguePivot.y + 1);
-			SDL_Rect fatigueRect = { fatiguePivot.x + 75, fatiguePivot.y, 77, 23 };
-			drawStadium(fatigueRect, stadiumCol(fatigueRect), 255, 4);
-			setFont(fontType::mainFontMedium);
-			drawTextCenter(percentColor(fatigue) + makePercentStr(fatigue), fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
-			setFont(fontType::mainFont);
+			//Point2 fatiguePivot = { statusBase.x + 137 + 221, statusBase.y + 79 + 27 * 2 };
+			//setFont(fontType::mainFontBold);
+			//drawText(L"#e1772e" + sysStr[334], fatiguePivot.x + 5, fatiguePivot.y + 1);
+			//SDL_Rect fatigueRect = { fatiguePivot.x + 75, fatiguePivot.y, 77, 23 };
+			//drawStadium(fatigueRect, stadiumCol(fatigueRect), 255, 4);
+			//setFont(fontType::mainFontMedium);
+			//drawTextCenter(percentColor(fatigue) + makePercentStr(fatigue), fatigueRect.x + fatigueRect.w / 2, fatigueRect.y + fatigueRect.h / 2);
+			//setFont(fontType::mainFont);
 
 
 
@@ -152,14 +152,14 @@ void Status::drawGUI()
 			drawLine(statusBase.x + 1, statusBase.y + 416, statusBase.x + 1 + 293, statusBase.y + 416, { 0x63,0x63,0x63 });
 			drawFillRect(statusBase.x + 1, statusBase.y + 385, 81, 32, { 0x63,0x63,0x63 });
 			setFont(fontType::mainFontBold);
-			setFontSize(22);
-			drawTextCenter(sysStr[335],statusBase.x + 1 + 40, statusBase.y + 385 + 16);
+			setFontSize(20);
+			drawTextCenter(L"클래스",statusBase.x + 1 + 40, statusBase.y + 385 + 14);
 			setFont(fontType::mainFontMedium);
 			setFontSize(20);
-			drawText(L"슬로스타트", statusBase.x + 88, statusBase.y + 388);
+			drawText(L"더스크체이서", statusBase.x + 88, statusBase.y + 388);
 			setFont(fontType::mainFont);
 			setFontSize(15);
-			drawTextWidth(L" 플레이어는 컨디션이 전혀 좋아지지 않는다!", statusBase.x + 1 + 7, statusBase.y + 416 + 8, 288, 18);
+			drawTextWidth(L" 전투 스킬의 랭크업 필요 경험치가 절반이 된다.", statusBase.x + 1 + 7, statusBase.y + 416 + 8, 288, 18);
 
 			setFontSize(12);
 			

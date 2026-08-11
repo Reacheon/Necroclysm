@@ -48,10 +48,11 @@ public:
 					{
 
 						//노이즈맵 표시
-						Uint8 bright = (Uint8)((currentWorld->noiseMap[x][y] + 1.0f) * 0.5f * 255);
-						drawPoint(x, y, SDL_Color{ bright, bright, bright });
+						//Uint8 bright = (Uint8)((currentWorld->noiseMap[x][y] + 1.0f) * 0.5f * 255);
+						//drawPoint(x, y, SDL_Color{ bright, bright, bright });
 
-						//if (currentWorld->getProphecy(x,y,0) == chunkType::deepSea) drawPoint(x, y, col::blue);
+						if (currentWorld->getProphecy(x, y, 0) == chunkType::deepSea) drawPoint(x, y, { 0x36,0x58,0xc3 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::dirt) drawPoint(x, y, { 0x7a,0xd4,0x33 });
 					}
 				}
 				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);

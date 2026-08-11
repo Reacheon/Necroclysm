@@ -1,5 +1,6 @@
 module;
 #include "lua/luaState.h"
+#include <SDL3/sdl.h>
 
 export module debugConsole;
 
@@ -861,11 +862,13 @@ export void debugConsole()
 	}
 	case 46://월드 생성
 	{
-		if (currentWorld == nullptr)
-		{
-			currentWorld = std::make_unique<WorldData>(getSeed());
-			dbgPrt(L"[디버그] 월드 생성이 완료되었다.\n");
-		}
+		currentWorld.reset();
+		SDL_DestroyTexture(texture::worldmap);
+		texture::worldmap = nullptr;
+		static std::uint64_t attempt = 0;
+		attempt++;
+		currentWorld = std::make_unique<WorldData>(getSeed() ^ (attempt * 0x9E3779B97F4A7C15ULL));
+		dbgPrt(L"[디버그] 월드 생성이 완료되었다.\n");
 	}
 	case 99://콘솔 출력 초기화
 	{
