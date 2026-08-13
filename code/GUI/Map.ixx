@@ -53,6 +53,7 @@ public:
 
 						if (currentWorld->getProphecy(x, y, 0) == chunkType::deepSea) drawPoint(x, y, { 0x36,0x58,0xc3 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::dirt) drawPoint(x, y, { 0x7a,0xd4,0x33 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::beach) drawPoint(x, y, { 0xec,0xec,0xc3 });
 					}
 				}
 				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);

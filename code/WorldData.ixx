@@ -25,9 +25,12 @@ export class WorldData
 private:
     std::array<chunkType, WORLD_DATA_SIZE* WORLD_DATA_SIZE* WORLD_MAX_HEIGHT> prophecy;
 public:
+
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap30;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap10;
+    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMapBeach;
+
     WorldData(std::uint64_t inputSeed) //생성자이며 최초에 지형 생성을 시작함
     {
         prophecy.fill(chunkType::none);
@@ -50,119 +53,52 @@ public:
                 return dis(gen);
             };
 
-        constexpr int NOISE_DIV = 120; //그리드 1개의 픽셀 크기
-        std::array<std::array<std::pair<float,float>, (WORLD_DATA_SIZE / NOISE_DIV +1)>, (WORLD_DATA_SIZE / NOISE_DIV + 1)> unitVectors;
-
-        for (int y = 0; y < (WORLD_DATA_SIZE / NOISE_DIV + 1); y++)
+        auto createNoiseMap = [&]<int FREQ>(std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>&outputNoise)
         {
-            for (int x = 0; x < (WORLD_DATA_SIZE / NOISE_DIV + 1); x++)
+            constexpr int gridSize = WORLD_DATA_SIZE / FREQ + 1;
+            std::array<std::array<std::pair<float, float>, gridSize>, gridSize> unitVector;
+
+            for (int y = 0; y < (WORLD_DATA_SIZE / FREQ + 1); y++)
             {
-                float rad = randFloat(0, 2 * std::numbers::pi);
-                unitVectors[x][y] = { std::cos(rad),std::sin(rad) };
+                for (int x = 0; x < (WORLD_DATA_SIZE / FREQ + 1); x++)
+                {
+                    float rad = randFloat(0, 2 * std::numbers::pi);
+                    unitVector[x][y] = { std::cos(rad),std::sin(rad) };
+                }
             }
-        }
 
-        for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        {
-            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
             {
-                float s, t, u, v;
-                int x0 = x / NOISE_DIV;
-                int y0 = y / NOISE_DIV;
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    float s, t, u, v;
+                    int x0 = x / FREQ;
+                    int y0 = y / FREQ;
 
-                //x0와 y0랑 스케일을 맞춘 x와 y 좌표
-                float scaledX = (float)x / NOISE_DIV ;
-                float scaledY = (float)y / NOISE_DIV;
+                    //x0와 y0랑 스케일을 맞춘 x와 y 좌표
+                    float scaledX = (float)x / FREQ;
+                    float scaledY = (float)y / FREQ;
 
-                s = unitVectors[x0][y0].first * (scaledX - x0) + unitVectors[x0][y0].second * (scaledY - y0);
-                t = unitVectors[x0 + 1][y0].first * (scaledX - (x0 + 1)) + unitVectors[x0 + 1][y0].second * (scaledY - y0);
-                u = unitVectors[x0][y0 + 1].first * (scaledX - x0) + unitVectors[x0][y0 + 1].second * (scaledY - (y0 + 1));
-                v = unitVectors[x0 + 1][y0 + 1].first * (scaledX - (x0 + 1)) + unitVectors[x0 + 1][y0 + 1].second * (scaledY - (y0 + 1));
+                    s = unitVector[x0][y0].first * (scaledX - x0) + unitVector[x0][y0].second * (scaledY - y0);
+                    t = unitVector[x0 + 1][y0].first * (scaledX - (x0 + 1)) + unitVector[x0 + 1][y0].second * (scaledY - y0);
+                    u = unitVector[x0][y0 + 1].first * (scaledX - x0) + unitVector[x0][y0 + 1].second * (scaledY - (y0 + 1));
+                    v = unitVector[x0 + 1][y0 + 1].first * (scaledX - (x0 + 1)) + unitVector[x0 + 1][y0 + 1].second * (scaledY - (y0 + 1));
 
-                float sx = 3 * std::pow(scaledX - x0, 2) - 2 * std::pow(scaledX - x0, 3);
-                float sy = 3 * std::pow(scaledY - y0, 2) - 2 * std::pow(scaledY - y0, 3);
-                float a = s + sx * (t - s);
-                float b = u + sx * (v - u);
-                noiseMap[x][y] = a + sy * (b - a);
+                    float sx = 3 * std::pow(scaledX - x0, 2) - 2 * std::pow(scaledX - x0, 3);
+                    float sy = 3 * std::pow(scaledY - y0, 2) - 2 * std::pow(scaledY - y0, 3);
+                    float a = s + sx * (t - s);
+                    float b = u + sx * (v - u);
+                    outputNoise[x][y] = a + sy * (b - a);
+                }
             }
-        }
+        };
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        constexpr int NOISE_DIV30 = 30; //그리드 1개의 픽셀 크기
-        std::array<std::array<std::pair<float, float>, (WORLD_DATA_SIZE / NOISE_DIV30 + 1)>, (WORLD_DATA_SIZE / NOISE_DIV30 + 1)> unitVectors45;
 
-        for (int y = 0; y < (WORLD_DATA_SIZE / NOISE_DIV30 + 1); y++)
-        {
-            for (int x = 0; x < (WORLD_DATA_SIZE / NOISE_DIV30 + 1); x++)
-            {
-                float rad = randFloat(0, 2 * std::numbers::pi);
-                unitVectors45[x][y] = { std::cos(rad),std::sin(rad) };
-            }
-        }
+        createNoiseMap.operator() < 120 > (noiseMap);
+        createNoiseMap.operator() < 30 > (noiseMap30);
+        createNoiseMap.operator() < 10 > (noiseMap10);
+        createNoiseMap.operator() < 120 > (noiseMapBeach);
 
-        for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        {
-            for (int x = 0; x < WORLD_DATA_SIZE; x++)
-            {
-                float s, t, u, v;
-                int x0 = x / NOISE_DIV30;
-                int y0 = y / NOISE_DIV30;
-
-                //x0와 y0랑 스케일을 맞춘 x와 y 좌표
-                float scaledX = (float)x / NOISE_DIV30;
-                float scaledY = (float)y / NOISE_DIV30;
-
-                s = unitVectors45[x0][y0].first * (scaledX - x0) + unitVectors45[x0][y0].second * (scaledY - y0);
-                t = unitVectors45[x0 + 1][y0].first * (scaledX - (x0 + 1)) + unitVectors45[x0 + 1][y0].second * (scaledY - y0);
-                u = unitVectors45[x0][y0 + 1].first * (scaledX - x0) + unitVectors45[x0][y0 + 1].second * (scaledY - (y0 + 1));
-                v = unitVectors45[x0 + 1][y0 + 1].first * (scaledX - (x0 + 1)) + unitVectors45[x0 + 1][y0 + 1].second * (scaledY - (y0 + 1));
-
-                float sx = 3 * std::pow(scaledX - x0, 2) - 2 * std::pow(scaledX - x0, 3);
-                float sy = 3 * std::pow(scaledY - y0, 2) - 2 * std::pow(scaledY - y0, 3);
-                float a = s + sx * (t - s);
-                float b = u + sx * (v - u);
-                noiseMap30[x][y] = a + sy * (b - a);
-            }
-        }
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        constexpr int NOISE_DIV10 = 10; //그리드 1개의 픽셀 크기
-        std::array<std::array<std::pair<float, float>, (WORLD_DATA_SIZE / NOISE_DIV10 + 1)>, (WORLD_DATA_SIZE / NOISE_DIV10 + 1)> unitVectors10;
-
-        for (int y = 0; y < (WORLD_DATA_SIZE / NOISE_DIV10 + 1); y++)
-        {
-            for (int x = 0; x < (WORLD_DATA_SIZE / NOISE_DIV10 + 1); x++)
-            {
-                float rad = randFloat(0, 2 * std::numbers::pi);
-                unitVectors10[x][y] = { std::cos(rad),std::sin(rad) };
-            }
-        }
-
-        for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        {
-            for (int x = 0; x < WORLD_DATA_SIZE; x++)
-            {
-                float s, t, u, v;
-                int x0 = x / NOISE_DIV10;
-                int y0 = y / NOISE_DIV10;
-
-                //x0와 y0랑 스케일을 맞춘 x와 y 좌표
-                float scaledX = (float)x / NOISE_DIV10;
-                float scaledY = (float)y / NOISE_DIV10;
-
-                s = unitVectors10[x0][y0].first * (scaledX - x0) + unitVectors10[x0][y0].second * (scaledY - y0);
-                t = unitVectors10[x0 + 1][y0].first * (scaledX - (x0 + 1)) + unitVectors10[x0 + 1][y0].second * (scaledY - y0);
-                u = unitVectors10[x0][y0 + 1].first * (scaledX - x0) + unitVectors10[x0][y0 + 1].second * (scaledY - (y0 + 1));
-                v = unitVectors10[x0 + 1][y0 + 1].first * (scaledX - (x0 + 1)) + unitVectors10[x0 + 1][y0 + 1].second * (scaledY - (y0 + 1));
-
-                float sx = 3 * std::pow(scaledX - x0, 2) - 2 * std::pow(scaledX - x0, 3);
-                float sy = 3 * std::pow(scaledY - y0, 2) - 2 * std::pow(scaledY - y0, 3);
-                float a = s + sx * (t - s);
-                float b = u + sx * (v - u);
-                noiseMap10[x][y] = a + sy * (b - a);
-            }
-        }
 
         //육지 생성
         for (int y = 0; y < WORLD_DATA_SIZE; y++)
@@ -178,7 +114,14 @@ public:
 
                 if (height > -0.2f)
                 {
-                    writeProphecy(x, y, 0, chunkType::dirt);
+                    if (height < -0.18f && noiseMapBeach[x][y] > -0.2f)
+                    {
+                        writeProphecy(x, y, 0, chunkType::beach);
+                    }
+                    else
+                    {
+                        writeProphecy(x, y, 0, chunkType::dirt);
+                    }
                 }
             }
         }
