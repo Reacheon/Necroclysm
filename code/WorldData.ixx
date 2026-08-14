@@ -1,6 +1,7 @@
 export module WorldData;
 
 import std;
+import util;
 
 export constexpr int WORLD_DATA_SIZE = 1080; //가로세로 1080 픽셀
 export constexpr int WORLD_MAX_HEIGHT = 32; //z=-16~ z=15
@@ -100,7 +101,7 @@ public:
         createNoiseMap.operator() < 120 > (noiseMapBeach);
 
 
-        //육지 생성
+        //바다 생성
         for (int y = 0; y < WORLD_DATA_SIZE; y++)
         {
             for (int x = 0; x < WORLD_DATA_SIZE; x++)
@@ -109,22 +110,62 @@ public:
                 int dy = std::abs(y - WORLD_DATA_SIZE / 2);
 
                 float penalty = std::min(1.0f,(float)sqrt(dx*dx+dy*dy) / (float)(WORLD_DATA_SIZE / 2));
+                float height = (noiseMap[x][y] + noiseMap30[x][y] * 0.25f + noiseMap10[x][y] * 0.1f) / 1.35f - penalty * penalty * penalty;
+                
+                if (height > -0.2f) writeProphecy(x, y, 0, chunkType::dirt);
+                else if (height > -0.3f) writeProphecy(x, y, 0, chunkType::shallowSea);
+                else writeProphecy(x, y, 0, chunkType::deepSea);
+            }
+        }
 
+        ////플루드필
+        //auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        //auto& cond = *condPtr;
+        //for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        //{
+        //    for (int x = 0; x < WORLD_DATA_SIZE; x++)
+        //    {
+        //        if (getProphecy(x, y, 0) == chunkType::shallowSea || getProphecy(x, y, 0) == chunkType::deepSea) cond[x][y] = true;
+        //        else cond[x][y] = false;
+        //    }
+        //}
+        //auto inlandSeaPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        //auto& inlandSea = *inlandSeaPtr;
+        //floodFillFindOrphan(cond, { 0,0 }, inlandSea);
+        //for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        //{
+        //    for (int x = 0; x < WORLD_DATA_SIZE; x++)
+        //    {
+        //        if (inlandSea[x][y] == true) writeProphecy(x, y, 0, chunkType::dirt);
+        //    }
+        //}
+
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                int dx = std::abs(x - WORLD_DATA_SIZE / 2);
+                int dy = std::abs(y - WORLD_DATA_SIZE / 2);
+
+                float penalty = std::min(1.0f, (float)sqrt(dx * dx + dy * dy) / (float)(WORLD_DATA_SIZE / 2));
                 float height = (noiseMap[x][y] + noiseMap30[x][y] * 0.25f + noiseMap10[x][y] * 0.1f) / 1.35f - penalty * penalty * penalty;
 
-                if (height > -0.2f)
+                if (height > 0.2)
+                {
+                    writeProphecy(x, y, 0, chunkType::mountain);
+                }
+                else if (height > -0.2f)
                 {
                     if (height < -0.18f && noiseMapBeach[x][y] > -0.2f)
                     {
                         writeProphecy(x, y, 0, chunkType::beach);
                     }
-                    else
-                    {
-                        writeProphecy(x, y, 0, chunkType::dirt);
-                    }
                 }
             }
         }
+
+
+        //강 생성
 
     };
     

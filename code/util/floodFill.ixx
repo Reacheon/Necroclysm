@@ -1,6 +1,8 @@
 export module floodFill;
 
 import std;
+import Point;
+import errorBox;
 
 struct pairHash
 {
@@ -95,4 +97,62 @@ export int floodFill(std::unordered_set<std::pair<int,int>, pairHash> walkableTi
 export int floodFill(std::unordered_set<std::pair<int, int>, pairHash> walkableTile, int startGridX, int startGridY, int limit)
 {
 	return floodFill(walkableTile, startGridX, startGridY, limit, -1, -1);
+}
+
+//@brief 입력한 컨디션에서 bool이 참인 지점만을 플루드필해간다. 컨디션이 true인데도 플루드필로 도달하지 못한 것을 아웃풋으로 반환한다.
+export template<std::size_t SIZE>
+int floodFillFindOrphan(const std::array<std::array<bool, SIZE>, SIZE>& inputConditions, Point2 startCoor, std::array<std::array<bool, SIZE>, SIZE>& outputArr)
+{
+
+	errorBox(inputConditions[startCoor.x][startCoor.y] == false, L"플루드필의 시작점 조건이 거짓이다.");
+
+	outputArr = inputConditions;
+	outputArr[startCoor.x][startCoor.y] = false;
+	int floodNumber = 1; //색칠된 타일의 수
+	std::queue<int> qX;
+	std::queue<int> qY;
+
+
+	//시작 지점을 큐에 넣음
+	qX.push(startCoor.x);
+	qY.push(startCoor.y);
+	int floodX, floodY = -1;
+	int dx, dy = 0;
+	while (qX.empty() == false) //큐가 없어질 때까지 계속
+	{
+		//큐의 앞을 빼내어 타겟으로 잡음
+		floodX = qX.front();
+		qX.pop();
+		floodY = qY.front();
+		qY.pop();
+
+		//타겟 타일 주변 십자칸 조사
+		for (int i = 0; i < 8; i+= 2)
+		{
+			switch (i)
+			{
+			case 0: dx = 1; dy = 0; break;
+			case 2: dx = 0; dy = -1; break;
+			case 4: dx = -1; dy = 0; break;
+			case 6: dx = 0; dy = 1; break;
+			}
+
+			if(floodX + dx >= 0 && floodY + dy >= 0)
+			{
+				if (floodX + dx < SIZE && floodY + dy < SIZE)
+				{
+					if (outputArr[floodX + dx][floodY + dy] == true)
+					{
+						outputArr[floodX + dx][floodY + dy] = false;
+						floodNumber++;
+						qX.push(floodX + dx);
+						qY.push(floodY + dy);
+					}
+				}
+			}
+		}
+	}
+
+	//탐색 종료
+	return floodNumber;
 }
