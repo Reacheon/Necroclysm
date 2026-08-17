@@ -31,6 +31,7 @@ public:
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap30;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap10;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMapBeach;
+    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMapForest;
 
     WorldData(std::uint64_t inputSeed) //생성자이며 최초에 지형 생성을 시작함
     {
@@ -94,11 +95,13 @@ public:
             }
         };
 
-
+        //1080의 약수 목록
+        //1,2,3,4,5,6,8,9,10,12,15,18,20,24,27,30,36,40,45,54,60,72,90,108,120,135,180,216,270,360,540,1080
         createNoiseMap.operator() < 120 > (noiseMap);
         createNoiseMap.operator() < 30 > (noiseMap30);
         createNoiseMap.operator() < 10 > (noiseMap10);
         createNoiseMap.operator() < 120 > (noiseMapBeach);
+        createNoiseMap.operator() < 24 > (noiseMapForest);
 
 
         //바다 생성
@@ -112,33 +115,35 @@ public:
                 float penalty = std::min(1.0f,(float)sqrt(dx*dx+dy*dy) / (float)(WORLD_DATA_SIZE / 2));
                 float height = (noiseMap[x][y] + noiseMap30[x][y] * 0.25f + noiseMap10[x][y] * 0.1f) / 1.35f - penalty * penalty * penalty;
                 
-                if (height > -0.2f) writeProphecy(x, y, 0, chunkType::dirt);
+                if (height > -0.15f) writeProphecy(x, y, 0, chunkType::dirt);
                 else if (height > -0.3f) writeProphecy(x, y, 0, chunkType::shallowSea);
                 else writeProphecy(x, y, 0, chunkType::deepSea);
             }
         }
 
-        ////플루드필
-        //auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
-        //auto& cond = *condPtr;
-        //for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        //{
-        //    for (int x = 0; x < WORLD_DATA_SIZE; x++)
-        //    {
-        //        if (getProphecy(x, y, 0) == chunkType::shallowSea || getProphecy(x, y, 0) == chunkType::deepSea) cond[x][y] = true;
-        //        else cond[x][y] = false;
-        //    }
-        //}
-        //auto inlandSeaPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
-        //auto& inlandSea = *inlandSeaPtr;
-        //floodFillFindOrphan(cond, { 0,0 }, inlandSea);
-        //for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        //{
-        //    for (int x = 0; x < WORLD_DATA_SIZE; x++)
-        //    {
-        //        if (inlandSea[x][y] == true) writeProphecy(x, y, 0, chunkType::dirt);
-        //    }
-        //}
+        //플루드필 : 내륙해 제거
+        {
+            auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+            auto& cond = *condPtr;
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    if (getProphecy(x, y, 0) == chunkType::shallowSea || getProphecy(x, y, 0) == chunkType::deepSea) cond[x][y] = true;
+                    else cond[x][y] = false;
+                }
+            }
+            auto inlandSeaPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+            auto& inlandSea = *inlandSeaPtr;
+            floodFillFindOrphan(cond, { 0,0 }, inlandSea);
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    if (inlandSea[x][y] == true) writeProphecy(x, y, 0, chunkType::dirt);
+                }
+            }
+        }
 
         for (int y = 0; y < WORLD_DATA_SIZE; y++)
         {
@@ -150,19 +155,50 @@ public:
                 float penalty = std::min(1.0f, (float)sqrt(dx * dx + dy * dy) / (float)(WORLD_DATA_SIZE / 2));
                 float height = (noiseMap[x][y] + noiseMap30[x][y] * 0.25f + noiseMap10[x][y] * 0.1f) / 1.35f - penalty * penalty * penalty;
 
-                if (height > 0.2)
+                if (height > 0.3)
                 {
                     writeProphecy(x, y, 0, chunkType::mountain);
                 }
-                else if (height > -0.2f)
+                else if (height > 0.2)
                 {
-                    if (height < -0.18f && noiseMapBeach[x][y] > -0.2f)
-                    {
-                        writeProphecy(x, y, 0, chunkType::beach);
-                    }
+                    writeProphecy(x, y, 0, chunkType::forest);
+                }
+
+                //else if (height > -0.2f)
+                //{
+                //    if (height < -0.18f && noiseMapBeach[x][y] > -0.2f)
+                //    {
+                //        writeProphecy(x, y, 0, chunkType::beach);
+                //    }
+                //}
+            }
+        }
+
+
+        //플루드필 : 산맥 내부 평원 제거
+        {
+            auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+            auto& cond = *condPtr;
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    if (getProphecy(x, y, 0) == chunkType::mountain) cond[x][y] = false;
+                    else cond[x][y] = true;
+                }
+            }
+            auto inMountainPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+            auto& inMountain = *inMountainPtr;
+            floodFillFindOrphan(cond, { 0,0 }, inMountain);
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    if (inMountain[x][y] == true) writeProphecy(x, y, 0, chunkType::mountain);
                 }
             }
         }
+
 
 
         //강 생성

@@ -1171,11 +1171,11 @@ bool Entity::runAnimation(bool shutdown)
 		static float jumpHeight = 20.0f; // 점프 최대 높이
 		static int startX = 0;
 		static int startY = 0;
+		static int afterDelayTimer = 0;
+		constexpr int AFTER_DELAY = 0;
 
 		if (getTimer() == 1)
 		{
-			
-
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			entityInfo.walkMode = walkFlag::crouch;
 			int skillX = getSkillTarget().x;
@@ -1196,6 +1196,8 @@ bool Entity::runAnimation(bool shutdown)
 			// 총 이동 거리 계산
 			totalDistance = std::sqrt(xDist * xDist + yDist * yDist);
 			entityInfo.jumpOffsetY = 0.0f; // 점프 오프셋 초기화
+
+			afterDelayTimer = 0;
 		}
 
 		// 현재 남은 거리 계산
@@ -1206,18 +1208,19 @@ bool Entity::runAnimation(bool shutdown)
 		entityInfo.jumpOffsetY = -4.0f * jumpHeight * progress * (1.0f - progress);
 
 		// 스프라이트 변경
-		if (progress < 0.3f)
+		if (afterDelayTimer == 0)
 		{
-			setSpriteIndex(charSprIndex::DASH);
+			if (progress < 0.5f)
+			{
+				setSpriteIndex(charSprIndex::DASH);
+			}
+			else
+			{
+				setSpriteIndex(charSprIndex::HOVER);
+				
+			}
 		}
-		else if (progress > 0.7f)
-		{
-			setSpriteIndex(charSprIndex::LAND);
-		}
-		else
-		{
-			setSpriteIndex(charSprIndex::HOVER);
-		}
+		else setSpriteIndex(charSprIndex::LAND);
 
 		addFakeX(xSpd);
 		if (xSpd > 0 && getFakeX() > 0) setFakeX(0);
@@ -1236,22 +1239,29 @@ bool Entity::runAnimation(bool shutdown)
 
 		if (std::abs(getIntegerFakeX()) == 0.0 && std::abs(getIntegerFakeY()) == 0.0)
 		{
-			setSpriteIndex(0);
-			resetTimer();
-			setAniType(aniFlag::null);
-			setFakeX(0);
-			setFakeY(0);
-			entityInfo.jumpOffsetY = 0.0f; // 점프 오프셋 초기화
-			turnWait(1.0);
-			endMove();
-			if (entityInfo.isPlayer)
+			if (afterDelayTimer < AFTER_DELAY)
 			{
-				PlayerPtr->changeWalkMode(walkFlag::walk);
-				cameraFix = true;
-				cameraX = getX();
-				cameraY = getY();
+				afterDelayTimer++;
 			}
-			return true;
+			else
+			{
+				setSpriteIndex(0);
+				resetTimer();
+				setAniType(aniFlag::null);
+				setFakeX(0);
+				setFakeY(0);
+				entityInfo.jumpOffsetY = 0.0f; // 점프 오프셋 초기화
+				turnWait(1.0);
+				endMove();
+				if (entityInfo.isPlayer)
+				{
+					PlayerPtr->changeWalkMode(walkFlag::walk);
+					cameraFix = true;
+					cameraX = getX();
+					cameraY = getY();
+				}
+				return true;
+			}
 		}
 	}
 	else if (getAniType() == aniFlag::propTurnOnOff)

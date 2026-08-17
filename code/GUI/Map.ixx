@@ -56,6 +56,7 @@ public:
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::dirt) drawPoint(x, y, { 0x7a,0xd4,0x33 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::beach) drawPoint(x, y, { 0xec,0xec,0xc3 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::mountain) drawPoint(x, y, { 0x84,0x74,0x66 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::forest) drawPoint(x, y, { 0x38,0xa6,0x41 });
 					}
 				}
 				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
