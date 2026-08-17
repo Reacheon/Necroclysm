@@ -48,7 +48,7 @@ public:
     std::wstring name = L"Vehicle";
     bool isEngineOn = false;
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도
-    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> partInfo;
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>> partInfo;
     vehFlag vehType = vehFlag::none;
     dir16 bodyDir = dir16::dir2;
     dir16 wheelDir = dir16::dir2;
@@ -102,7 +102,7 @@ public:
     void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
     int getSprIndex(int inputX, int inputY);
     void rotatePartInfo(dir16 inputDir16);
-    std::unordered_set<Point3, Point3::Hash> getRotateShadow(dir16 inputDir16);
+    std::unordered_set<Point3> getRotateShadow(dir16 inputDir16);
     void rotateEntityPtr(dir16 inputDir16);
     void rotate(dir16 inputDir16);
     void updateSpr();

@@ -57,6 +57,12 @@ public:
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::beach) drawPoint(x, y, { 0xec,0xec,0xc3 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::mountain) drawPoint(x, y, { 0x84,0x74,0x66 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::forest) drawPoint(x, y, { 0x38,0xa6,0x41 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::river) drawPoint(x, y, { 0x53,0xa6,0xcf });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::lake) drawPoint(x, y, { 0x53,0xa6,0xcf });
+
+
+						//Uint8 bright = (Uint8)((currentWorld->filledHeightMap[x][y]- currentWorld->heightMap[x][y] + 1.0f) * 0.5f * 255);
+						//drawPoint(x, y, SDL_Color{ bright, bright, bright });
 					}
 				}
 				SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);

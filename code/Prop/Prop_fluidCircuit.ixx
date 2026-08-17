@@ -124,7 +124,7 @@ void Prop::updateFluidCircuitNetwork()
     int cursorZ = getGridZ();
 
     std::queue<Point3> frontierQueue;
-    std::unordered_set<Point3, Point3::Hash> visitedSet;
+    std::unordered_set<Point3> visitedSet;
     std::vector<Prop*> pumpPropVec;
     std::vector<Prop*> tankPropVec;
     std::unordered_set<Prop*> loadSinkSet;

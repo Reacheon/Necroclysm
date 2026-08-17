@@ -51,7 +51,7 @@ public:
     int delayMaxStack = 3;
     double delayStartTurn = 0;
 
-    std::unordered_map<Point3, crossFlag, Point3::Hash> crossStates;
+    std::unordered_map<Point3, crossFlag> crossStates;
 
     double gndSink = 0.0;
     double gndSinkRight = 0.0;

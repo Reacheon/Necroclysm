@@ -17,7 +17,7 @@ public:
     int lifetime = 30;
     int alpha = 255;
     static std::vector<Wave*> list;
-    static std::unordered_map<Point3, std::vector<Wave*>, Point3::Hash> map;
+    static std::unordered_map<Point3, std::vector<Wave*>> map;
     Wave(int inputGridX, int inputGridY, int inputGridZ, int inputLifetime = 18)
     {
         setGrid(inputGridX, inputGridY, inputGridZ);
@@ -50,4 +50,4 @@ public:
     }
 };
 std::vector<Wave*> Wave::list;
-std::unordered_map<Point3, std::vector<Wave*>, Point3::Hash> Wave::map;
+std::unordered_map<Point3, std::vector<Wave*>> Wave::map;

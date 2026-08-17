@@ -206,7 +206,7 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> newPartInfo;
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         // straddle 시 z가 섞여있을 수 있어 partInfo 직접 순회 (xy 스캔 X) + z 보존
@@ -228,11 +228,11 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
     }
 }
 
-std::unordered_set<Point3, Point3::Hash> Vehicle::getRotateShadow(dir16 inputDir16)
+std::unordered_set<Point3> Vehicle::getRotateShadow(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_set<Point3, Point3::Hash> newPartInfo;
+        std::unordered_set<Point3> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (const auto& [pos, pocket] : partInfo)
@@ -253,7 +253,7 @@ std::unordered_set<Point3, Point3::Hash> Vehicle::getRotateShadow(dir16 inputDir
     }
     else
     {
-        std::unordered_set<Point3, Point3::Hash> newPartInfo;
+        std::unordered_set<Point3> newPartInfo;
         for (const auto& [pos, pocket] : partInfo)
         {
             newPartInfo.insert({ pos.x, pos.y, pos.z });
@@ -267,7 +267,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
     if (bodyDir != inputDir16)
     {
         // straddle 대응: (x,y) 충돌 가능성이 있어도 z 다르면 별개. Point3 키로 wormhole.
-        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
+        std::unordered_map<Point3, std::unique_ptr<Entity>> entityWormhole;
         for (const auto& [pos, pocket] : partInfo)
         {
             if (TileEntity(pos.x, pos.y, pos.z) != nullptr)
@@ -480,7 +480,7 @@ void Vehicle::shift(int dx, int dy)
             }
         }
 
-        std::unordered_map<Point3, Point3, Point3::Hash> partOldToNew;
+        std::unordered_map<Point3, Point3> partOldToNew;
         int appliedDx = stepDx, appliedDy = stepDy;
         int appliedZ = currentZ;
 
@@ -544,7 +544,7 @@ void Vehicle::shift(int dx, int dy)
         }
 
         // 이동 적용
-        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
+        std::unordered_map<Point3, std::unique_ptr<Entity>> entityWormhole;
         for (const auto& [oldPos, newPos] : partOldToNew)
         {
             TileVehicle(oldPos.x, oldPos.y, oldPos.z) = nullptr;
@@ -561,7 +561,7 @@ void Vehicle::shift(int dx, int dy)
                 EntityPtrMove(std::move(entityWormhole[oldPos]), newPos);
             }
         }
-        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>> shiftPartInfo;
         for (auto& [pos, pocket] : partInfo)
         {
             shiftPartInfo[partOldToNew[pos]] = std::move(pocket);
@@ -581,7 +581,7 @@ void Vehicle::shift(int dx, int dy)
 
 void Vehicle::zShift(int dz)
 {
-    std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::unordered_map<Point2, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (const auto& [pos, pocket] : partInfo)
     {
@@ -603,7 +603,7 @@ void Vehicle::zShift(int dz)
         }
     }
 
-    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>> shiftPartInfo;
     for (auto& [pos, pocket] : partInfo)
     {
         shiftPartInfo[{pos.x, pos.y, pos.z + dz}] = std::move(pocket);

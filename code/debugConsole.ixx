@@ -869,6 +869,7 @@ export void debugConsole()
 		attempt++;
 		currentWorld = std::make_unique<WorldData>(getSeed() ^ (attempt * 0x9E3779B97F4A7C15ULL));
 		dbgPrt(L"[디버그] 월드 생성이 완료되었다.\n");
+		break;
 	}
 	case 99://콘솔 출력 초기화
 	{

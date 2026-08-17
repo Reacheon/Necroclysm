@@ -150,7 +150,7 @@ export bool coTurnSkip = false; //true일 경우 플레이어 턴에 도달시 C
 //export std::unique_ptr<ItemPocket> availableRecipe;//이게 인텔리센스 오류의 원인
 
 export Vehicle* ctrlVeh = nullptr;
-export std::map < dir16, std::unordered_map<Point2, Point2, Point2::Hash>> coordTransform;//좌표변환
+export std::map < dir16, std::unordered_map<Point2, Point2>> coordTransform;//좌표변환
 
 export SDL_Rect quickSlotBtn[8];
 
@@ -242,7 +242,7 @@ export bool drawHUD = true;
 
 export std::wstring currentUsingSkill = L""; //현재 사용 중인 스킬 ID. 비어있으면 미사용.
 
-export std::unordered_set<Point2, Point2::Hash> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위) | Writer: CoordSelect, Equip(propInstall), Craft | Reader: HUD_draw(타일 하이라이트)
+export std::unordered_set<Point2> rangeSet; //선택 범위를 나타내는 좌표들(스킬이나 건축 범위) | Writer: CoordSelect, Equip(propInstall), Craft | Reader: HUD_draw(타일 하이라이트)
 
 export SDL_Color rangeColor = { 0xff, 0xff, 0xff }; //선택 범위를 나타내는 색상 | Writer: CoordSelect, Aim | Reader: HUD_draw
 export bool rangeRay = false; // Writer: Aim | Reader: HUD_draw
@@ -311,7 +311,7 @@ export std::vector<std::unique_ptr<Spatter>> spatters;
 //트랜지스터의 연결 상태가 변경되었을 경우 다음 updateCircuitNetwork에서 이 컨테이너들로 BFS를 다시 돌림
 //만약 두 컨테이너가 nullptr이면은 세이브 데이터가 없는 것임
 export std::queue<Point3> saveFrontierQueue;
-export std::unordered_set<Point3, Point3::Hash> saveVisitedSet;
+export std::unordered_set<Point3> saveVisitedSet;
 
 export std::queue<Point3> nextCircuitStartQueue; //전자스위치로 상태가 변경된 네트워크를 다시 계산할 때의 시작점 좌표들
 

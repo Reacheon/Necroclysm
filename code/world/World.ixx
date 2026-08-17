@@ -19,7 +19,7 @@ import ItemPocket;
 export class World
 {
 private:
-	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
+	std::unordered_map<Point3, std::unique_ptr<Chunk>> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;

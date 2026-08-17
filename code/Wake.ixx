@@ -18,7 +18,7 @@ public:
     int alpha = 255;
     int dir = 0;
     static std::vector<Wake*> list;
-    static std::unordered_map<Point3, std::vector<Wake*>, Point3::Hash> map;
+    static std::unordered_map<Point3, std::vector<Wake*>> map;
     Wake(int inputGridX, int inputGridY, int inputGridZ, int inputDir, int inputLifetime = 18)
     {
         setGrid(inputGridX, inputGridY, inputGridZ);
@@ -52,4 +52,4 @@ public:
     }
 };
 std::vector<Wake*> Wake::list;
-std::unordered_map<Point3, std::vector<Wake*>, Point3::Hash> Wake::map;
+std::unordered_map<Point3, std::vector<Wake*>> Wake::map;

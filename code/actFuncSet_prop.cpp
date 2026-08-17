@@ -147,7 +147,7 @@ namespace actFunc
 
 	void toggleRollupDoors(Point3 winchPos)
 	{
-		std::unordered_set<Point3, Point3::Hash> visitedSet;
+		std::unordered_set<Point3> visitedSet;
 		bool anyOpened = false, anyClosed = false, anyBlocked = false;
 		for (int dir = 0; dir < 8; dir++)
 		{
@@ -277,7 +277,7 @@ namespace actFunc
 
 		//BFS로 연결된 회로 네트워크 전체를 순회
 		std::queue<Point3> frontierQueue;
-		std::unordered_set<Point3, Point3::Hash> visitedSet;
+		std::unordered_set<Point3> visitedSet;
 		frontierQueue.push(tgtPoint);
 		while (!frontierQueue.empty())
 		{

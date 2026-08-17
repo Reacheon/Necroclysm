@@ -23,17 +23,20 @@ export struct Point2
     }
 
     bool operator==(const Point2& rhs) const { return x == rhs.x && y == rhs.y; }
-
-    struct Hash
+    bool operator<(const Point2& rhs) const
     {
-        std::size_t operator()(const Point2& p) const
-        {
-            std::size_t seed = 0;
-            seed ^= std::hash<int>()(p.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            seed ^= std::hash<int>()(p.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            return seed;
-        }
-    };
+        if (x != rhs.x) return x < rhs.x;
+        return y < rhs.y;
+    }
+};
+
+template<>
+struct std::hash<Point2>
+{
+    std::size_t operator()(const Point2& p) const noexcept
+    {
+        return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 16);
+    }
 };
 
 export Point2 calcMidpoint(std::vector<Point2> vec)
@@ -82,18 +85,15 @@ export struct Point3
         if (y != rhs.y) return y < rhs.y;
         return z < rhs.z;
     }
+};
 
-    struct Hash
+template<>
+struct std::hash<Point3>
+{
+    std::size_t operator()(const Point3& p) const noexcept
     {
-        std::size_t operator()(const Point3& p) const
-        {
-            std::size_t seed = 0;
-            seed ^= std::hash<int>()(p.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            seed ^= std::hash<int>()(p.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            seed ^= std::hash<int>()(p.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            return seed;
-        }
-    };
+        return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 16) ^ (std::hash<int>{}(p.z) << 32);
+    }
 };
 
 export Point3 calcMidpoint(std::vector<Point3> vec)

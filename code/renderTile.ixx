@@ -62,13 +62,13 @@ void drawDebug();
 
 // 차량과 엔티티는 중복을 허용하면 안됨
 std::vector<Point2> tileList, itemList, floorPropList, upperPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList, wallHPList;
-std::unordered_set<Point2, Point2::Hash> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
+std::unordered_set<Point2> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
 std::vector<Drawable*> renderVehList, renderEntityList;
-std::unordered_set<Point2, Point2::Hash> raySet;
-std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
-std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
-std::unordered_set<Point2, Point2::Hash> rampUpSet;
-std::unordered_set<Point2, Point2::Hash> rampDownSet;
+std::unordered_set<Point2> raySet;
+std::unordered_set<Point2> sprinklerSpraySet33;
+std::unordered_set<Point2> sprinklerSpraySet55;
+std::unordered_set<Point2> rampUpSet;
+std::unordered_set<Point2> rampDownSet;
 std::vector<Point2> bridgeShadowList;
 
 export std::int64_t renderTile()
