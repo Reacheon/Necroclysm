@@ -203,7 +203,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 				}
 			}
 		}
-		drawText(mainName, itemBox.x + 46, itemBox.y + itemBox.h / 2 - 12 + yCorrection);
+		drawText(mainName, itemBox.x + 46, itemBox.y + itemBox.h / 2 - 9 + yCorrection);
 	}
 
 	if (inputItem.checkFlag(itemFlag::GRAYFILTER)) { drawStadium(itemBox.x, itemBox.y, itemBox.w, itemBox.h, stadiumColor, 183, 5); }
@@ -227,7 +227,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	{
 		setFontSize(13);
 		std::wstring numberStr = L"x" + std::to_wstring(inputItem.number);
-		drawTextOutline(numberStr, itemBox.x + 250 - queryTextWidth(numberStr), itemBox.y - 3,col::white);
+		drawTextOutline(numberStr, itemBox.x + 250 - queryTextWidth(numberStr), itemBox.y + 1,col::white);
 	}
 
 	setZoom(1.0);
@@ -375,28 +375,29 @@ export void drawItemRectExtend(bool cursor, int x, int y, ItemData& inputItem, i
 		setFontSize(11);
 		setFont(fontType::mainFont);
 
-		drawSpriteCenter(spr::icon13, 39, box3.x + 12, box2.y + 8);
+		setZoom(1.0);
+		drawSprite(spr::icon13, 39, box3.x + 6, box2.y + 2);
 		if (inputItem.weight >= 1000)
 		{
 			std::wstring kgStr = decimalCutter(inputItem.weight / 1000.0, 2);
-			drawText(kgStr + L" kg", box3.x + 9 + 11, box2.y + 2);
+			drawText(kgStr + L" kg", box3.x + 9 + 11, box2.y + 3);
 		}
 		else
 		{
 			std::wstring kgStr = std::to_wstring(inputItem.weight);
-			drawText(kgStr + L" g", box3.x + 9 + 11, box2.y + 2);
+			drawText(kgStr + L" g", box3.x + 9 + 11, box2.y + 3);
 		}
 
-		drawSpriteCenter(spr::icon13, 40, box3.x + 12, box2.y + 23);
+		drawSprite(spr::icon13, 40, box3.x + 6, box2.y + 17);
 		if (inputItem.getVolume() >= 1000)
 		{
 			std::wstring volStr = decimalCutter(inputItem.getVolume() / 1000.0, 2);
-			drawText(volStr + L" L", box3.x + 9 + 11, box2.y + 16);
+			drawText(volStr + L" L", box3.x + 9 + 11, box2.y + 18);
 		}
 		else
 		{
 			std::wstring volStr = std::to_wstring(inputItem.getVolume());
-			drawText(volStr + L" mL", box3.x + 9 + 11, box2.y + 16);
+			drawText(volStr + L" mL", box3.x + 9 + 11, box2.y + 18);
 		}
 
 		setFont(fontType::mainFont);
@@ -565,17 +566,18 @@ export void drawSimpleItemRectAdd(cursorFlag inputCursor, int x, int y)
 
 
 ///@brief 컨테이너 아이템의 부피/수량 게이지를 그린다. Loot과 Inventory에서 공통으로 사용.
-///@param x 게이지 시작 x (아이콘 포함)
-///@param y 게이지 시작 y
+///@param x 게이지 pivot x (아이콘 좌상단)
+///@param y 게이지 pivot y
 ///@param containerItem 표시할 컨테이너 아이템
 export void drawVolumeGauge(int x, int y, ItemData& containerItem)
 {
-	SDL_Rect volumeGaugeRect = { x + 70, y, 125, 11 };
-	drawRect(volumeGaugeRect, col::white);
+	drawSprite(spr::icon16, 66, x, y);
 
-	drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 	setFontSize(13);
-	drawText(sysStr[13], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3); //부피
+	drawText(sysStr[13], x + 19, y + 1); //부피
+
+	SDL_Rect volumeGaugeRect = { x + 55, y + 3, 125, 11 };
+	drawRect(volumeGaugeRect, col::white);
 
 	ItemPocket* pkPtr = containerItem.pocketPtr.get();
 	if (containerItem.pocketMaxVolume > 0)
@@ -592,7 +594,7 @@ export void drawVolumeGauge(int x, int y, ItemData& containerItem)
 		std::wstring currentVolumeStr = decimalCutter((float)currentVolume / 1000.0, 1);
 		std::wstring maxVolumeStr = decimalCutter((float)containerItem.pocketMaxVolume / 1000.0, 1) + L" L";
 		setFontSize(13);
-		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
+		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 2);
 	}
 	else if (containerItem.pocketMaxNumber > 0)
 	{
@@ -608,6 +610,6 @@ export void drawVolumeGauge(int x, int y, ItemData& containerItem)
 		std::wstring currentVolumeStr = decimalCutter((float)currentNumber / 1000.0, 1);
 		std::wstring maxVolumeStr = decimalCutter((float)containerItem.pocketMaxNumber / 1000.0, 1);
 		setFontSize(13);
-		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 3);
+		drawText(currentVolumeStr + L" / " + maxVolumeStr, volumeGaugeRect.x + 132, volumeGaugeRect.y - 2);
 	}
 }

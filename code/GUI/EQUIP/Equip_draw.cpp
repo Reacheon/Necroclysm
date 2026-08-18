@@ -29,14 +29,14 @@ void Equip::drawGUI()
 	//여기서부턴 이큅 윈도우
 	{
 		//플레이어 무게 제한 게이지 그리기
-		SDL_Rect weightGaugeRect = { equipBase.x + 78, equipBase.y + 47, 125, 11 };
+		SDL_Rect weightGaugeRect = { equipBase.x + 62, equipBase.y + 46, 125, 11 };
 		drawRect(weightGaugeRect, col::white);
 		drawFillRect(SDL_Rect{ weightGaugeRect.x + 2, weightGaugeRect.y + 2, 50, 6 }, lowCol::green);
-		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 56, weightGaugeRect.y + 5);
+		drawSpriteCenter(spr::icon16, 61, weightGaugeRect.x - 40, weightGaugeRect.y + 6);
 		setFontSize(12);
-		drawText(sysStr[102], weightGaugeRect.x - 46, weightGaugeRect.y - 2);//무게
+		drawText(sysStr[102], weightGaugeRect.x - 31, weightGaugeRect.y);//무게
 		setFontSize(10);
-		drawText(L"32.5 / 92.3 kg", weightGaugeRect.x + 132, weightGaugeRect.y - 1);
+		drawText(L"32.5 / 92.3 kg", weightGaugeRect.x + 132, weightGaugeRect.y);
 
 
 		//이큅 윈도우 본체

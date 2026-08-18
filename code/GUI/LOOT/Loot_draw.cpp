@@ -95,24 +95,25 @@ void Loot::drawGUI()
 		setZoom(1.0);
 
 		setFontSize(24);
-        setFont(fontType::mainFontSemiBold);
-		drawText(tileName, lootBase.x + 88, lootBase.y + 46);
-        setFont(fontType::mainFont);
+		drawText(tileName, lootBase.x + 88, lootBase.y + 50);
 
 		drawLine(lootBase.x + 86, lootBase.y + 81, lootBase.x + 86 + 307, lootBase.y + 81, col::gray);
 
 		if (lootStack == nullptr && lootItemData != nullptr)
 		{
-			drawVolumeGauge(lootBase.x + 78, lootBase.y + 90, *lootItemData);
+			drawVolumeGauge(lootBase.x + 85, lootBase.y + 87, *lootItemData);
 		}
 		else if (lootStack != nullptr)
 		{
-			SDL_Rect volumeGaugeRect = { lootBase.x + 148, lootBase.y + 90, 125, 11 };
-			drawRect(volumeGaugeRect, col::white);
+			int pivotX = lootBase.x + 85;
+			int pivotY = lootBase.y + 87;
+			drawSprite(spr::icon16, 66, pivotX, pivotY);
 
-			drawSpriteCenter(spr::icon16, 62, volumeGaugeRect.x - 56, volumeGaugeRect.y + 5);
 			setFontSize(13);
-			drawText(sysStr[13], volumeGaugeRect.x - 54, volumeGaugeRect.y - 3);
+			drawText(sysStr[13], pivotX + 19, pivotY +1);
+
+			SDL_Rect volumeGaugeRect = { pivotX + 55, pivotY + 3, 125, 11 };
+			drawRect(volumeGaugeRect, col::white);
 
 			setFont(fontType::pixel);
 			setFontSize(14);
@@ -127,8 +128,8 @@ void Loot::drawGUI()
 		setZoom(2.0);
 		drawSpriteCenter(spr::icon16, 63, dropBtn.x + 20, dropBtn.y + 18);
 		setZoom(1.0);
-		setFontSize(20);
-		drawTextCenter(sysStr[35], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 - 2);
+		setFontSize(18);
+		drawTextCenter(sysStr[35], dropBtn.x + dropBtn.w / 2 + 14, dropBtn.y + dropBtn.h / 2 + 1);
 		drawFillRect(dropBtn, col::black, 150);
 	}
 	else

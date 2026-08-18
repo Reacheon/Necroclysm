@@ -34,14 +34,12 @@ void Inventory::drawGUI()
 		setZoom(1.0);
 
 		setFontSize(24);
-		setFont(fontType::mainFontSemiBold);
 		drawText(inventoryItemData->name, inventoryBase.x + 88, inventoryBase.y + 46);
-		setFont(fontType::mainFont);
 
 		drawLine(inventoryBase.x + 86, inventoryBase.y + 81, inventoryBase.x + 86 + 307, inventoryBase.y + 81, col::gray);
 
 		//부피 게이지
-		drawVolumeGauge(inventoryBase.x + 78, inventoryBase.y + 90, *inventoryItemData);
+		drawVolumeGauge(inventoryBase.x + 85, inventoryBase.y + 87, *inventoryItemData);
 
 		// 선택된 아이템이 있는지 확인
 		bool hasSelectedItems = panel.hasAnySelection();

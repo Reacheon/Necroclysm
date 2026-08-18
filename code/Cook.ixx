@@ -207,27 +207,10 @@ public:
 					drawSpriteCenter(cwSpr, cwSprIdx, cookBase.x + cookBase.w / 2, cookBase.y + cookBase.h / 2 - 140);
 				}
 
-				//김 애니메이션 (요리 완성 시)
+				
 				if (resultPhase)
 				{
-					Uint32 t = SDL_GetTicks();
-					int steamCX = cookBase.x + cookBase.w / 2;
-					int steamCY = cookBase.y + cookBase.h / 2 - 140;
-
-					constexpr int steamCount = 6;
-					constexpr float offsets[steamCount] = { 0, 370, 780, 1150, 1560, 1900 };
-					constexpr float xOffsets[steamCount] = { 0, 2.1f, 4.2f, 1.0f, 3.3f, 5.4f };
-
-					for (int p = 0; p < steamCount; p++)
-					{
-						float phase = std::fmod((t + (Uint32)offsets[p]) / 2400.0f, 1.0f);
-						int py = steamCY - (int)(phase * 50);
-						int px = steamCX + (int)(std::sin(phase * 3.14159 * 2.0 + xOffsets[p]) * 8);
-						int rx = 7 + (int)(phase * 6);
-						int ry = 5 + (int)(phase * 4);
-						Uint8 alpha = (Uint8)((1.0f - phase * phase) * 70);
-						drawFillEllipse(px, py, rx, ry, { 255, 255, 255 }, alpha);
-					}
+					//여기에 김 애니메이션 넣을것
 				}
 			}
 
@@ -304,7 +287,7 @@ public:
 						setZoom(1.0);
 
 						setFontSize(16);
-						drawText(itemDex[ingredientCode[i]].name, ingredientBtn[i].x + 46, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 11);
+						drawText(itemDex[ingredientCode[i]].name, ingredientBtn[i].x + 46, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 9);
 					}
 					else if (i == ingredientCount && ingredientCount < 6)//재료를 새롭게 추가할 수 있는 (+) 버튼
 					{
@@ -312,7 +295,7 @@ public:
 						else { drawFillRect(ingredientBtn[i], col::black); drawRect(ingredientBtn[i], col::gray); }
 
 						setFontSize(28);
-						drawTextCenter(L"+", ingredientBtn[i].x + ingredientBtn[i].w / 2, ingredientBtn[i].y + ingredientBtn[i].h / 2 - 4);
+						drawTextCenter(L"+", ingredientBtn[i].x + ingredientBtn[i].w / 2, ingredientBtn[i].y + ingredientBtn[i].h / 2);
 					}
 					else//빈 슬롯이며 눌러도 아무 기능 없음
 					{
@@ -346,46 +329,34 @@ public:
 						{
 
 							setFontSize(16);
-							setFont(fontType::mainFontSemiBold);
 							drawTextCenter(sysStr[332], pivotX, pivotY);
 
-							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65-12%", pivotX + 92, pivotY);
-							setFont(fontType::mainFont);
 						}
 						else if (i == 1)
 						{
 							setFontSize(16);
-							setFont(fontType::mainFontSemiBold);
 							drawTextCenter(sysStr[333], pivotX, pivotY);
 
-							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65-16%", pivotX + 92, pivotY);
-							setFont(fontType::mainFont);
 						}
 						else if (i == 2)
 						{
 							setFontSize(16);
-							setFont(fontType::mainFontSemiBold);
 							drawTextCenter(sysStr[397], pivotX, pivotY);
 
-							setFont(fontType::mainFontBold);
 							drawTextCenter(L"#59cb65+25%", pivotX + 92, pivotY);
-							setFont(fontType::mainFont);
 						}
 						else if (i == 3)
 						{
 							setFontSize(16);
-							setFont(fontType::mainFontSemiBold);
 							drawTextCenter(sysStr[398], pivotX, pivotY);
 
-							setFont(fontType::mainFontBold);
 							setFontSize(14);
 							std::wstring valText = L"#59cb65-11%#e9c900 (-3%)";
 							drawTextCenter(valText, pivotX + 92, pivotY);
 							int valWidth = getTextWidthWithoutColor(removeColorCodes(valText));
-							drawSprite(spr::icon16, 107, pivotX + 92 + valWidth / 2 - 3, pivotY - 12);//별모양 심볼
-							setFont(fontType::mainFont);
+							drawSprite(spr::icon16, 107, pivotX + 92 + valWidth / 2 - 3, pivotY - 16);//별모양 심볼
 						}
 					}
 				}
@@ -421,7 +392,6 @@ public:
 			{
 				if (checkCursor(&cookBtn)) { drawFillRect(cookBtn, click ? lowCol::deepBlue : lowCol::blue); drawRect(cookBtn, col::lightGray); }
 				else { drawFillRect(cookBtn, col::black); drawRect(cookBtn, col::gray); }
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(20);
 				drawTextCenter(sysStr[396], cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
 			}
@@ -429,7 +399,6 @@ public:
 			{
 				drawFillRect(cookBtn, col::black, 80);
 				drawRect(cookBtn, col::gray, 80);
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(20);
 				drawTextCenter(col2Str(col::gray) + sysStr[396], cookBtn.x + cookBtn.w / 2, cookBtn.y + cookBtn.h / 2);
 			}

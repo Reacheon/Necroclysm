@@ -277,7 +277,7 @@ void Craft::drawGUI()
 					{
 						exInputTextCut = exInputTextCut.substr(1);
 					}
-					drawText(exInputTextCut, inputTextPoint.x, inputTextPoint.y);
+					drawText(exInputTextCut, inputTextPoint.x, inputTextPoint.y + 4);
 					std::wstring cursorText = exInputTextCut.substr(0, exInputCursor + exInputEditing);
 					if (timer::timer600 % 30 <= 15 && exInput == true)
 					{
@@ -313,7 +313,7 @@ void Craft::drawGUI()
 				drawRect(searchBtnInRect, outlineColor);
 
 				setFontSize(18);
-				drawTextCenter(sysStr[18], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2 - 2);
+				drawTextCenter(sysStr[18], searchBtnRect.x + searchBtnRect.w / 2, searchBtnRect.y + searchBtnRect.h / 2);
 			}
 		}
 
@@ -480,7 +480,7 @@ void Craft::drawGUI()
 					if (textSize < 165)
 					{
 						setFontSize(17);
-						drawText(iPtr.name, pivotX + 51, pivotY + 9);
+						drawText(iPtr.name, pivotX + 51, pivotY + 11);
 					}
 					else
 					{
@@ -489,7 +489,7 @@ void Craft::drawGUI()
 
 						if (newTextSize < 165)
 						{
-							drawText(iPtr.name, pivotX + 51, pivotY + 9);
+							drawText(iPtr.name, pivotX + 51, pivotY + 11);
 						}
 						else
 						{
@@ -500,7 +500,7 @@ void Craft::drawGUI()
 								cutText = cutText.substr(0, cutText.length() - 1);
 							}
 							cutText += L"...";
-							drawText(cutText, pivotX + 51, pivotY + 9);
+							drawText(cutText, pivotX + 51, pivotY + 11);
                         }
 
 					}
@@ -667,11 +667,11 @@ void Craft::drawGUI()
 					drawRect(tooltipCraftBtn, outlineColor);
 					setFontSize(18);
 
-					drawTextCenter(sysStr[155], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6);//조합하기
-					setFontSize(15);
+					drawTextCenter(sysStr[155], tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 3);//조합하기
+					setFontSize(13);
 
 					std::wstring remainStr = replaceStr(replaceStr(sysStr[156], L"(%hour)", L"1"), L"(%min)",L"34");
-					drawTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6 + 18);
+					drawTextCenter(remainStr, tooltipCraftBtn.x + tooltipCraftBtn.w / 2 + 15, tooltipCraftBtn.y + tooltipCraftBtn.h / 2 - 3 - 6 + 19);
 					setZoom(1.5);
 					drawSpriteCenter(spr::icon16, 28, tooltipCraftBtn.x + 21, tooltipCraftBtn.y + tooltipCraftBtn.h / 2);
 					setZoom(1.0);
@@ -704,7 +704,7 @@ void Craft::drawGUI()
 					else { bookmarkSprIndex = 29; textColor = col::gray; }
 
 					setFontSize(18);
-					drawTextCenter(bookmarkLabel, tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 15, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 - 3, textColor);//즐겨찾기
+					drawTextCenter(bookmarkLabel, tooltipBookmarkBtn.x + tooltipBookmarkBtn.w / 2 + 15, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2 + 1, textColor);//즐겨찾기
 					setZoom(1.5);
 					drawSpriteCenter(spr::icon16, bookmarkSprIndex, tooltipBookmarkBtn.x + 21, tooltipBookmarkBtn.y + tooltipBookmarkBtn.h / 2);
 					setZoom(1.0);

@@ -160,9 +160,7 @@ public:
 			int titleTextOffsetY = -5;
 
 			setFontSize(40);
-			setFont(fontType::mainFontBold);
 			drawTextCenter(msgTitleText, msgBase.x +msgBase.w/2, msgBase.y+64 + titleTextOffsetY);
-			setFont(fontType::mainFont);
 
 			setZoom(2.0);
 			drawSpriteCenter(spr::icon32, 1,msgBase.x + msgBase.w / 2 - queryTextWidth(msgTitleText) / 2.0 -36, msgBase.y + 64 + titleTextOffsetY);
@@ -268,9 +266,7 @@ public:
 			setFontSize(24);
 			for (int i = 0; i < msgOptionVec.size(); i++)
 			{
-                setFont(fontType::mainFontSemiBold);
 				drawTextCenter(msgOptionVec[i], msgBtn[msgOptionVec.size()][i].x + msgBtn[msgOptionVec.size()][i].w / 2, msgBtn[msgOptionVec.size()][i].y + msgBtn[msgOptionVec.size()][i].h / 2);
-                setFont(fontType::mainFont);
 			}
 
 			if (exInput == true)

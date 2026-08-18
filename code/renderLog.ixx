@@ -44,7 +44,7 @@ export std::int64_t renderLog(SDL_Renderer* renderer)
 		drawSprite(spr::logBackground, log.x, log.y);
 
 		int textX = log.x + 68;
-		int centerY = log.y + 27; // 1줄 기준점. 줄 수가 늘면 이 점을 중심으로 위아래 분산
+		int centerY = log.y + 30; // 1줄 기준점. 줄 수가 늘면 이 점을 중심으로 위아래 분산
 		constexpr int lineGap = 20; // 줄 간격
 		constexpr int lineGap3 = lineGap - 1; // 3줄일 땐 바깥 줄을 1px씩 안으로 (오버플로우 완화)
 

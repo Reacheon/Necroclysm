@@ -81,6 +81,7 @@ static Sprite* createDmgSprite(const std::wstring& text, SDL_Color mainCol)
     drawTextCenter(text, cx, cy, mainCol);
 
     SDL_SetRenderTarget(renderer, prevTarget);
+    setFont(fontType::mainFont);
     return new Sprite(renderer, tex, texW, texH);
 }
 

@@ -127,13 +127,11 @@ void HUD::drawGUI()
 
 		if (ctrlVeh == nullptr)//플레이어 이름 그리기
 		{
-			setFont(fontType::mainFontSemiBold);
 			setFontSize(22);
 
 			std::wstring titleText = L"테스트 이름";
 
-			drawText(titleText, letterbox.x + 14 + vShift, letterbox.y + 1 + LETTERBOX_Y_OFFSET, lowCol::yellow);
-			setFont(fontType::mainFont);
+			drawText(titleText, letterbox.x + 14 + vShift, letterbox.y + 3 + LETTERBOX_Y_OFFSET, lowCol::yellow);
 		}
 
 		auto drawMainGaugeFill = [](int x, int y, double ratio, SDL_Color color, Uint8 alpha = 255)
@@ -173,10 +171,8 @@ void HUD::drawGUI()
 			int stressGaugePivotY = stressPivotY + 6 + GAUGE_Y_OFFSET;
 			drawSprite(spr::mainGauge, 0, stressGaugePivotX, stressGaugePivotY);
 			drawMainGaugeFill(stressGaugePivotX, stressGaugePivotY, 0.2, col::red);
-			setFont(fontType::mainFontSemiBold);
 			setFontSize(16);
-			drawTextOutline(L"92 / 100", stressGaugePivotX + 98, stressGaugePivotY + 9, lowCol::white);
-			setFont(fontType::mainFont);
+			drawTextOutline(L"92 / 100", stressGaugePivotX + 98, stressGaugePivotY + 11, lowCol::white);
 		}
 
 		if (ctrlVeh == nullptr)
@@ -203,10 +199,8 @@ void HUD::drawGUI()
 			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)fakeSTA / (double)pSTAMax, lowCol::red, alphaSTA);
 			drawMainGaugeFill(staminaGaugePivotX, staminaGaugePivotY, (double)pSTA / (double)pSTAMax, lowCol::yellow);
 
-			setFont(fontType::mainFontSemiBold);
 			setFontSize(16);
-			drawTextOutline(std::to_wstring(pSTA) + L" / " + std::to_wstring(pSTAMax), staminaGaugePivotX + 98, staminaGaugePivotY + 9, lowCol::white);
-			setFont(fontType::mainFont);
+			drawTextOutline(std::to_wstring(pSTA) + L" / " + std::to_wstring(pSTAMax), staminaGaugePivotX + 108, staminaGaugePivotY + 11, lowCol::white);
 		}
 
 		//하늘&날씨&온도 표시 기능
@@ -412,17 +406,13 @@ void HUD::drawGUI()
 
 				drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(60 * energyRatio), 24, lowCol::green);
 
-				setFont(fontType::mainFontExtraBold);
-
 				setFontSize(16);
 				drawTextOutlineCenter(L"100.0", pivotX + 35, pivotY + 16);
 
 				//setFontSize(14);
 				//drawTextOutlineCenter(L"9999.0", pivotX + 35, pivotY + 16);
-				setFont(fontType::mainFont);
 
 				setFontSize(14);
-				setFont(fontType::mainFontSemiBold);
 				drawTextCenter(col2Str(col::lightGray) + L"/ 100 kJ", pivotX + 40, pivotY + 44);
 			}
 			else
@@ -441,10 +431,8 @@ void HUD::drawGUI()
 
 				drawFillRect(pivotX + 5, pivotY + 5, static_cast<int>(60 * energyRatio), 24, lowCol::green);
 
-				setFont(fontType::mainFontExtraBold);
 				setFontSize(18);
 				drawTextOutlineCenter(std::to_wstring(energyPct) + L"%", pivotX + 35, pivotY + 16);
-				setFont(fontType::mainFont);
 			}
 
 		}
@@ -859,6 +847,7 @@ void HUD::drawQuickSlot()
 		setFont(fontType::pixel);
 		setFontSize(12);
 		drawTextCenter(std::to_wstring(i + 1), pivotX + skillRect.w / 2, pivotY + 58);
+		setFont(fontType::mainFont);
 
 		if (deact)
 		{
@@ -1176,17 +1165,17 @@ void HUD::drawBarAct()
 		//하단 텍스트
 
 		setFont(fontType::mainFont);
-		setFontSize(16);
+		setFontSize(15);
 		constexpr int MAX_TAB_TEXT_WIDTH = 100;
 		if (queryTextWidth(actName) > MAX_TAB_TEXT_WIDTH)
 		{
-			setFontSize(15);
+			setFontSize(14);
 			if (queryTextWidth(actName) > MAX_TAB_TEXT_WIDTH)
 			{
-				setFontSize(14);
+				setFontSize(13);
 				if (queryTextWidth(actName) > MAX_TAB_TEXT_WIDTH)
 				{
-					setFontSize(13);
+					setFontSize(12);
 				}
 			}
 		}
@@ -1340,7 +1329,7 @@ void HUD::drawStatusEffects()
 
 		setFontSize(15);
 
-		setZoom(2.0); // 2.25→2.0 (픽셀 퍼펙트)
+		setZoom(2.0);
 		drawSprite(spr::statusIcon, statEfctIcon, pivotX, pivotY);
 		setZoom(1.0);
 
@@ -1356,7 +1345,7 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-		drawTextOutline(statEfctName, pivotX + 45, pivotY + 6 + textOffsetY, textColor);
+		drawTextOutline(statEfctName, pivotX + 45, pivotY + 8 + textOffsetY, textColor);
 
 		int intDuration = std::ceil(myEfcts[i].duration);
 
@@ -1366,6 +1355,7 @@ void HUD::drawStatusEffects()
 			setFontSize(17);
 			int textWidth = queryTextWidth(std::to_wstring(intDuration));
 			drawText(std::to_wstring(intDuration), lineStartX + 11 - textWidth, pivotY + 17, col::white);
+			setFont(fontType::mainFont);
 		}
 
 		if (myEfcts[i].effectType == statusEffectFlag::hungry)
@@ -1473,24 +1463,22 @@ void HUD::drawStatusEffects()
 
 void HUD::drawQuest()
 {
-	setFont(fontType::mainFontExtraBold);
 	int pivotX = 14;
 	int pivotY = 272;
 	setFontSize(24);
-	drawText(sysStr[132], pivotX, pivotY);
+	drawText(sysStr[132], pivotX, pivotY + 4);
 	drawLine(pivotX, pivotY + 36, pivotX + 110, pivotY + 36);
 	for (int i = 0; i < 120; i++)
 	{
 		drawPoint(pivotX + 111 + i, pivotY + 36, col::white, 255 - 2 * i);
 	}
-	setFont(fontType::mainFont);
 	drawRect({ pivotX + 1, pivotY + 49, 14, 14 }, col::white);
 	setFontSize(16);
 	int elapsedDay = getElapsedDays();
 	std::wstring questStr = sysStr[133] + L"  (";
 	questStr += std::to_wstring(elapsedDay);
 	questStr += L"/100)";
-	drawText(questStr, pivotX + 20, pivotY + 46);
+	drawText(questStr, pivotX + 21, pivotY + 48);
 }
 
 
@@ -1578,18 +1566,18 @@ void HUD::drawBodyParts()
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 			// 텍스트 그리기
-			setFont(fontType::mainFontSemiBold);
+			setFontSize(18);
 			if (gaugeFlip == false)
-				drawText(partName, inputX, inputY - 26, col::white);
+				drawText(partName, inputX, inputY - 21, col::white);
 			else
-				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+				drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 21, col::white);
 
-			setFont(fontType::mainFont);
+			setFontSize(15);
 			std::wstring hpText = std::to_wstring(static_cast<int>(hpRatio * 100.0)) + L"%";
 			if (gaugeFlip == false)
-				drawText(hpText, inputX + 40, inputY + 6, col::white);
+				drawText(hpText, inputX + 48, inputY + 11, col::white);
 			else
-				drawText(hpText, inputX + 5, inputY + 6, col::white);
+				drawText(hpText, inputX + 5, inputY + 11, col::white);
 		};
 
 
@@ -1649,11 +1637,11 @@ void HUD::drawBodyParts()
 	{
 		auto drawPartName = [this](bool gaugeFlip, int inputX, int inputY, std::wstring partName)
 			{
-				setFont(fontType::mainFontSemiBold);
+				setFontSize(18);
 				if (gaugeFlip == false)
-					drawText(partName, inputX, inputY - 26, col::white);
+					drawText(partName, inputX, inputY - 21, col::white);
 				else
-					drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 26, col::white);
+					drawText(partName, inputX + 94 - queryTextWidth(partName), inputY - 21, col::white);
 			};
 
 		// 파츠별 부가정보 표시
@@ -1676,7 +1664,6 @@ void HUD::drawBodyParts()
 				drawSprite(spr::bodyPartEncLine, pivotX, pivotY);
 				if (flip) setFlip(SDL_FLIP_NONE);
 
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(12);
 				drawTextCenter(L"#f2c122" + sysStr[365], pivotX + cOff, pivotY + 7);
 				setFontSize(14);
@@ -1687,14 +1674,14 @@ void HUD::drawBodyParts()
 
 				setFontSize(16);
 				// 물리저항
-				drawText(L"#f26522" + sysStr[366], pivotX + tOff, pivotY + 29 + 17 * 0);
-				drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 0);
+				drawText(L"#f26522" + sysStr[366], pivotX + tOff, pivotY + 31 + 17 * 0);
+				drawText(rPierce > 0 ? std::to_wstring(rPierce) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 31 + 17 * 0);
 
-				drawText(L"#f26522" + sysStr[367], pivotX + tOff, pivotY + 29 + 17 * 1);
-				drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 1);
+				drawText(L"#f26522" + sysStr[367], pivotX + tOff, pivotY + 31 + 17 * 1);
+				drawText(rCut > 0 ? std::to_wstring(rCut) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 31 + 17 * 1);
 
-				drawText(L"#f26522" + sysStr[368], pivotX + tOff, pivotY + 29 + 17 * 2);
-				drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 29 + 17 * 2);
+				drawText(L"#f26522" + sysStr[368], pivotX + tOff, pivotY + 31 + 17 * 2);
+				drawText(rBash > 0 ? std::to_wstring(rBash) : col2Str(col::lightGray) + L"0", pivotX + tOff + 66, pivotY + 31 + 17 * 2);
 
 			};
 
@@ -1745,33 +1732,33 @@ void HUD::drawBodyParts()
 
 		drawSprite(spr::icon16, 108, pivotX + 4, resBaseY + resGap * 0);
 		setFontSize(14);
-		drawText(sysStr[371], pivotX + 5 + 18, resBaseY + resGap * 0 - 1);
+		drawText(sysStr[371], pivotX + 5 + 18, resBaseY + resGap * 0);
 		setFontSize(18);
-		drawTextCenter(resLvStr(rFire), pivotX + 5 + 34, resBaseY + resGap * 0 + 24);
+		drawTextCenter(resLvStr(rFire), pivotX + 5 + 34, resBaseY + resGap * 0 + 25);
 
 		drawSprite(spr::icon16, 109, pivotX + 4, resBaseY + resGap * 1);
 		setFontSize(14);
-		drawText(sysStr[372], pivotX + 5 + 18, resBaseY + resGap * 1 - 1);
+		drawText(sysStr[372], pivotX + 5 + 18, resBaseY + resGap * 1);
 		setFontSize(18);
-		drawTextCenter(resLvStr(rCold), pivotX + 5 + 34, resBaseY + resGap * 1 + 24);
+		drawTextCenter(resLvStr(rCold), pivotX + 5 + 34, resBaseY + resGap * 1 + 25);
 
 		drawSprite(spr::icon16, 110, pivotX + 4, resBaseY + resGap * 2);
 		setFontSize(14);
-		drawText(sysStr[373], pivotX + 5 + 18, resBaseY + resGap * 2 - 1);
+		drawText(sysStr[373], pivotX + 5 + 18, resBaseY + resGap * 2);
 		setFontSize(18);
-		drawTextCenter(resLvStr(rElec), pivotX + 5 + 34, resBaseY + resGap * 2 + 24);
+		drawTextCenter(resLvStr(rElec), pivotX + 5 + 34, resBaseY + resGap * 2 + 25);
 
 		drawSprite(spr::icon16, 111, pivotX + 4, resBaseY + resGap * 3);
 		setFontSize(14);
-		drawText(sysStr[374], pivotX + 5 + 18, resBaseY + resGap * 3 - 1);
+		drawText(sysStr[374], pivotX + 5 + 18, resBaseY + resGap * 3);
 		setFontSize(18);
-		drawTextCenter(resLvStr(rRad), pivotX + 5 + 34, resBaseY + resGap * 3 + 24);
+		drawTextCenter(resLvStr(rRad), pivotX + 5 + 34, resBaseY + resGap * 3 + 25);
 
 		drawSprite(spr::icon16, 112, pivotX + 4, resBaseY + resGap * 4);
 		setFontSize(14);
-		drawText(sysStr[375], pivotX + 5 + 18, resBaseY + resGap * 4 - 1);
+		drawText(sysStr[375], pivotX + 5 + 18, resBaseY + resGap * 4);
 		setFontSize(18);
-		drawTextCenter(resLvStr(rCorr), pivotX + 5 + 34, resBaseY + resGap * 4 + 24);
+		drawTextCenter(resLvStr(rCorr), pivotX + 5 + 34, resBaseY + resGap * 4 + 25);
 
 
 	}
@@ -1916,7 +1903,6 @@ void HUD::drawCircuitInfo()
 			if (tgtProp->chargeFlux[dir16::below] < 0) drawSpriteCenter(spr::fluxArrow, 11, 23, 46);
 			else if (tgtProp->chargeFlux[dir16::below] > 0) drawSpriteCenter(spr::fluxArrow, 12, 23, 46);
 
-			setFont(fontType::mainFontMedium);
 			setFontSize(22);
 			std::wstring title = tgtProp->leadItem.name;
 
@@ -1974,15 +1960,15 @@ void HUD::drawCircuitInfo()
 			setFont(fontType::mainFont);
 			setFontSize(18);
 
-			drawText(firstString, 49, 25);
+			drawText(firstString, 49, 27);
 
-			drawText(firstColStr + firstNumber, 49 + strMaxFirst + 26, 25);
-			drawText(firstUnit, window.w - 6 - queryTextWidth(firstUnit), 25);
+			drawText(firstColStr + firstNumber, 49 + strMaxFirst + 26, 27);
+			drawText(firstUnit, window.w - 6 - queryTextWidth(firstUnit), 27);
 
-			drawText(secondString, 49, 29 + 16);
+			drawText(secondString, 49, 31 + 16);
 
-			drawText(secondNumber, 49 + strMaxFirst + 26, 29 + 16);
-			drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 29 + 16);
+			drawText(secondNumber, 49 + strMaxFirst + 26, 31 + 16);
+			drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 31 + 16);
 
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 			SDL_SetRenderTarget(renderer, frameTarget);
@@ -2065,7 +2051,7 @@ void HUD::drawVehiclePartInfo()
 				//아이템 이름
 				setFont(fontType::mainFont);
 				setFontSize(15);
-				drawText(tgtPart.name, pivotX + 53, newPivotY + 7 + 26 * i, col::white);
+				drawText(tgtPart.name, pivotX + 53, newPivotY + 10 + 26 * i, col::white);
 
 				if (tgtPart.pocketPtr != nullptr)
 				{
@@ -2270,7 +2256,6 @@ void HUD::drawFluidCircuitInfo()
 		else if (tgtProp->fluidFlux[dir16::below] > 0) drawSpriteCenter(spr::fluxArrow, 12, 23, 46);
 
 		// 타이틀
-		setFont(fontType::mainFontMedium);
 		setFontSize(22);
 
 		if (isTank)
@@ -2321,13 +2306,13 @@ void HUD::drawFluidCircuitInfo()
 		setFont(fontType::mainFont);
 		setFontSize(18);
 
-		drawText(firstString, xLabel, 25);
-		drawText(firstColStr + firstNumber, xNumber, 25);
-		drawText(firstUnit, window.w - 6 - queryTextWidth(firstUnit), 25);
+		drawText(firstString, xLabel, 27);
+		drawText(firstColStr + firstNumber, xNumber, 27);
+		drawText(firstUnit, window.w - 6 - queryTextWidth(firstUnit), 27);
 
-		drawText(secondString, xLabel, 29 + 16);
-		drawText(secondColStr + secondNumber, xNumber, 29 + 16);
-		drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 29 + 16);
+		drawText(secondString, xLabel, 31 + 16);
+		drawText(secondColStr + secondNumber, xNumber, 31 + 16);
+		drawText(secondUnit, window.w - 6 - queryTextWidth(secondUnit), 31 + 16);
 
 		SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 		SDL_SetRenderTarget(renderer, frameTarget);

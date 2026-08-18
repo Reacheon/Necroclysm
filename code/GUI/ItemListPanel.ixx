@@ -105,33 +105,33 @@ public:
 		}
 
 		setFontSize(14);
-		drawTextCenter(sysStr[10], label.x + 30, label.y + 14);     //선택
-		drawTextCenter(sysStr[11], label.x + 183, label.y + 14);    //이름
+		drawTextCenter(sysStr[10], label.x + 30, label.y + 15);     //선택
+		drawTextCenter(sysStr[11], label.x + 183, label.y + 15);    //이름
 
 		if (showSort)
 		{
 			switch (sortType)
 			{
 			default:
-				drawTextCenter(sysStr[15], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[15], label.x + 337, label.y + 15);
 				break;
 			case sortFlag::weightDescend:
-				drawTextCenter(sysStr[28], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[28], label.x + 337, label.y + 15);
 				break;
 			case sortFlag::weightAscend:
-				drawTextCenter(sysStr[29], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[29], label.x + 337, label.y + 15);
 				break;
 			case sortFlag::volumeDescend:
-				drawTextCenter(sysStr[30], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[30], label.x + 337, label.y + 15);
 				break;
 			case sortFlag::volumeAscend:
-				drawTextCenter(sysStr[31], label.x + 337, label.y + 14);
+				drawTextCenter(sysStr[31], label.x + 337, label.y + 15);
 				break;
 			}
 		}
 		else
 		{
-			drawTextCenter(sysStr[15], label.x + 337, label.y + 14); //물리량
+			drawTextCenter(sysStr[15], label.x + 337, label.y + 15); //물리량
 		}
 	}
 

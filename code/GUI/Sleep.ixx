@@ -125,10 +125,8 @@ public:
 				std::wstring sleepText = sysStr[134];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(18);
 				drawTextCenter(sleepText.c_str(), tooltipBox.x + tooltipBox.w / 2 + 27, tooltipBox.y + 21); // 18→27, 14→21
-				setFont(fontType::mainFont);
 
 				// 수면 확률 표시
 				setFontSize(12); // 8 × 1.5 = 12
@@ -143,7 +141,6 @@ public:
 				std::wstring sleepText = sysStr[135];
 				for (int i = 0; i < dotCount; i++) sleepText += L".";
 
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(18);
 				drawTextCenter(sleepText.c_str(), tooltipBox.x + 170, tooltipBox.y + 16); // 113→170, 12→18
 
@@ -155,7 +152,6 @@ public:
 				sleepInGauge.w = 182 * ((float)sleepTime / (float)sleepDuration); // 121→182
 				drawFillRect(sleepInGauge, col::white);
 
-				setFont(fontType::mainFont);
 				setFontSize(12); // 8 × 1.5 = 12
 				int remainingMinutes = sleepDuration - sleepTime;
 				int hours = remainingMinutes / 60;

@@ -174,11 +174,13 @@ void Skill::drawGUI()
 		drawLine(skillBase.x + 511 - 2, skillBase.y + 107, skillBase.x + 511, skillBase.y + 107, { 0x1f,0x1f,0x1f });
 
 
+		//사용 가능한 스킬포인트
 		setFontSize(14);
-		drawText(sysStr[297]+col2Str(lowCol::green)+std::to_wstring(PlayerPtr->skillPoint), skillBase.x + skillBase.w - 162, skillBase.y + 43);
+		auto skillPointText = sysStr[297] + col2Str(lowCol::green) +L" "+ std::to_wstring(PlayerPtr->skillPoint);
+		drawText(skillPointText, skillBase.x + skillBase.w - queryTextWidth(skillPointText,true) - 7, skillBase.y + 44);
 
 
-		// 탭 라벨: 전체/무기술/생존/행동/바이오닉/돌연변이/신성력 (skillCategory 순서)
+		// 탭 라벨: 전체/무기술/생존/행동/바이오닉/돌연변이/마법 (skillCategory 순서)
 		static constexpr int catStrIdx[7] = { 261, 262, 263, 264, 123, 122, 124 };
 		for (int c = 0; c < (int)visibleCats.size(); c++)
 		{
@@ -236,8 +238,7 @@ void Skill::drawGUI()
 
 				std::wstring skillName = tgtBhv ? tgtBhv->name : L"?";
 				setFontSize(22);
-				setFont(fontType::mainFontMedium);
-				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 3);
+				drawText(skillName, skillBtn[i].x + 58, skillBtn[i].y + 6);
 
 				//실패율에 영향 미치는 참조 스킬들 (콤마 구분, 회색)
 				std::wstring refText;
@@ -252,16 +253,13 @@ void Skill::drawGUI()
 				}
 				if (!refText.empty())
 				{
-					setFont(fontType::mainFontMedium);
 					setFontSize(12);
-					drawText(col2Str(col::lightGray) + refText, skillBtn[i].x + 58, skillBtn[i].y + 29);
+					drawText(col2Str(col::lightGray) + refText, skillBtn[i].x + 58, skillBtn[i].y + 32);
 				}
 
-				setFont(fontType::mainFontSemiBold);
 				setFontSize(16);
 				std::wstring rankText = sysStr[298]+L" " + tgtData.skillRank;
-				drawText(rankText, skillBtn[i].x + skillBtn[i].w - 49 - queryTextWidth(rankText), skillBtn[i].y + 2);
-				setFont(fontType::mainFont);
+				drawText(rankText, skillBtn[i].x + skillBtn[i].w - 49 - queryTextWidth(rankText), skillBtn[i].y + 4);
 
 				// 바이오닉은 설치 시점에 랭크 고정 — 숙련치 게이지/승급 버튼 없음
 				if (!tgtBhv || tgtBhv->src != skillSrc::BIONIC)
@@ -277,10 +275,9 @@ void Skill::drawGUI()
 					if (gaugeW > 0)
 						drawFillRect(SDL_Rect{ skillBtn[i].x + skillBtn[i].w - 43 - 71 + 3, skillBtn[i].y + 22 + 3, gaugeW, 2 }, expFull ? SDL_Color{ 0xe1,0xb8,0x40 } : col::white);
 
-					setFont(fontType::mainFont);
 					setFontSize(12);
 					std::wstring expText = std::format(L"{:.1f} / 100.0", myMin(tgtData.skillExp, 100.0f));
-					drawText(expText, skillBtn[i].x + skillBtn[i].w - 43 - (expFull ? 73 : 71), skillBtn[i].y + 22 + 8);
+					drawText(expText, skillBtn[i].x + skillBtn[i].w - 43 - (expFull ? 73 : 71), skillBtn[i].y + 22 + 10);
 				}
 
 				drawLine(skillBtn[i].x + skillBtn[i].w - 120, skillBtn[i].y, skillBtn[i].x + skillBtn[i].w - 120, skillBtn[i].y + 47, skillOutlineColor);
@@ -289,13 +286,11 @@ void Skill::drawGUI()
 				if (tgtBhv && tgtBhv->type != skillType::PASSIVE)
 				{
 					drawSprite(spr::skillActiveBtn, 0, skillBtn[i].x + skillBtn[i].w - 178, skillBtn[i].y + 4);
-					setFont(fontType::mainFontMedium);
 					setFontSize(15);
 					drawTextCenter(tgtBhv->type == skillType::TOGGLE ? sysStr[299] : sysStr[300], skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 12);
 
 					int failRate = tgtBhv->calcFailRate(static_cast<Entity*>(PlayerPtr), tgtData);
 					setFontSize(12);
-					setFont(fontType::mainFontMedium);
 					drawTextCenter(col2Str(col::lightGray) + sysStr[301] + col2Str(getFailColor(failRate)) + L" " + std::to_wstring(failRate) + L"%", skillBtn[i].x + skillBtn[i].w - 178 + 27, skillBtn[i].y + 4 + 28);
 				}
 			}

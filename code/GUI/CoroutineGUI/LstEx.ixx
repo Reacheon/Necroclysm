@@ -191,14 +191,14 @@ public:
 				//아이템 이름 표시
 				setFontSize(21);
 				setFont(fontType::mainFont);
-				drawText(opt.name, textStartX, lstBtn[i].y + 8);
+				drawText(opt.name, textStartX, lstBtn[i].y + 10);
 
 				//출처 표시 (우측상단, 노란색, 작은 폰트)
 				if (showSource && !opt.source.empty())
 				{
 					setFontSize(13);
 					int sourceTextW = queryTextWidth(opt.source);
-					drawText(opt.source, lstBtn[i].x + lstBtn[i].w - sourceTextW - 6, lstBtn[i].y + 2, col::yellow);
+					drawText(opt.source, lstBtn[i].x + lstBtn[i].w - sourceTextW - 4, lstBtn[i].y + 4, col::yellow);
 				}
 			}
 

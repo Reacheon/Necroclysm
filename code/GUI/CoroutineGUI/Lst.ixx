@@ -159,7 +159,7 @@ public:
 				//텍스트 표시
 				setFontSize(21);
 				setFont(fontType::mainFont);
-				drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 14, lstBtn[i].y + 8);
+				drawText(lstOptionVec[currentItemIndex], lstBtn[i].x + 14, lstBtn[i].y + 10);
 			}
 
 			//하단 호버 인덱스 표시

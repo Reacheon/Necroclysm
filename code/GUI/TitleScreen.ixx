@@ -65,12 +65,10 @@ public:
 		else
 		{
 			//로고 PNG 로드 실패 시 텍스트 타이틀 폴백
-			setFont(fontType::mainFontExtraBold);
 			setFontSize(48);
 			drawTextCenter(L"NECROCLYSM", cameraW / 2, cameraH / 4, col::white);
 		}
 
-		setFont(fontType::mainFont);
 		setFontSize(15);
 	}
 	void clickUpGUI()
