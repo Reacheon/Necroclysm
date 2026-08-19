@@ -21,7 +21,7 @@ import Prop;
 import log;
 import Lst;
 import Maint;
-import ItemData;
+import Item;
 import ItemStack;
 import Sleep;
 import turnWait;

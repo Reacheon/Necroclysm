@@ -14,12 +14,12 @@ import Prop;
 import Monster;
 import ItemStack;
 import Entity;
-import ItemPocket;
+import Item;
 
 export class World
 {
 private:
-	std::unordered_map<Point3, std::unique_ptr<Chunk>> chunkPtr;
+	std::unordered_map<Point3, std::unique_ptr<Chunk>, Point3::Hash> chunkPtr;
 	std::vector<Chunk*> activeChunk; // 비소유 포인터
 	std::unordered_map<uint32_t, std::unique_ptr<Vehicle>> vehicleOwnerMap;
 	uint32_t vehicleIdCounter = 0;
@@ -78,7 +78,6 @@ public:
 		return getTile(inputCoor.x, inputCoor.y, inputCoor.z);
 	}
 
-	// 청크 1개 생성 — z별 디폴트 채움. 정의는 World_createChunk.cpp.
 	void createChunk(int chunkX, int chunkY, int chunkZ);
 	bool existChunk(int chunkX, int chunkY, int chunkZ)
 	{
@@ -213,8 +212,7 @@ public:
 		return (it != chunkPtr.end()) ? it->second.get() : nullptr;
 	}
 
-	// 타일이 속한 청크가 없으면 nullptr 반환. 렌더링 등 로드 영역 경계를 넘어 이웃 타일을
-	// 조회할 가능성이 있는 read-only 경로에서 사용 — 쓰기에는 getTile() 사용 (청크 보장).
+	//해당 타일이 생성되었는지 미리 체크
 	TileData* tryGetTile(int x, int y, int z)
 	{
 		int chunkX, chunkY;

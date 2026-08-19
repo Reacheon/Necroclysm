@@ -18,13 +18,14 @@ import drawWindow;
 import ContextMenu;
 import Maint;
 import statusEffect;
-import ItemData;
-import ItemPocket;
+import Item;
 import Equip;
 import Status;
 import SkillBehavior;
 import SkillRegistry;
 import Entity;
+import Prop;
+import SkillData;
 
 constexpr int PUMP_POWER = 30000; // 펌프는 일단 1분에 30000mL(30L) 수송 가능
 

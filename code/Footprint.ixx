@@ -17,7 +17,7 @@ public:
     int lifetime = 30;
     int alpha = 80;
     static std::vector<Footprint*> list;
-    static std::unordered_map<Point3, std::vector<Footprint*>> map;
+    static std::unordered_map<Point3, std::vector<Footprint*>, Point3::Hash> map;
     Footprint(int inputGridX, int inputGridY, int inputGridZ, int inputDir, int inputLifetime = 80)
     {
         setGrid(inputGridX, inputGridY, inputGridZ);
@@ -51,4 +51,4 @@ public:
     }
 };
 std::vector<Footprint*> Footprint::list;
-std::unordered_map<Point3, std::vector<Footprint*>> Footprint::map;
+std::unordered_map<Point3, std::vector<Footprint*>, Point3::Hash> Footprint::map;

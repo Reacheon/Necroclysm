@@ -256,11 +256,10 @@
     <ClCompile Include="code\drawWindowArrow.ixx" />
     <ClCompile Include="code\fontLoader.ixx" />
     <ClCompile Include="code\AI.ixx" />
+    <ClCompile Include="code\item\Item.ixx" />
     <ClCompile Include="code\item\ItemData.cpp" />
-    <ClCompile Include="code\item\ItemData.ixx" />
     <ClCompile Include="code\item\ItemData_base.ixx" />
     <ClCompile Include="code\item\ItemPocket.cpp" />
-    <ClCompile Include="code\item\ItemPocket.ixx" />
     <ClCompile Include="code\item\ItemStack.cpp" />
     <ClCompile Include="code\item\ItemStack.ixx" />
     <ClCompile Include="code\item\readItemDex.ixx" />

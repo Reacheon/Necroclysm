@@ -12,8 +12,9 @@ import log;
 import Dialogue;
 import Loot;
 import Prop;
-import ItemData;
+import Item;
 import actFuncSet;
+import ItemStack;
 
 void HUD::tileTouch(int touchX, int touchY) //일반 타일 터치
 {

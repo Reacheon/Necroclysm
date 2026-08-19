@@ -7,6 +7,8 @@ import TileData;
 
 import Monster;
 import Vehicle;
+import ItemStack;
+import Prop;
 
 export class Chunk
 {

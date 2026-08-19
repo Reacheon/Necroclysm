@@ -4,7 +4,7 @@ import constVar;
 import globalVar;
 import util;
 import Loot;
-import ItemData;
+import Item;
 import actFuncSet;
 
 void Loot::gamepadBtnDown()

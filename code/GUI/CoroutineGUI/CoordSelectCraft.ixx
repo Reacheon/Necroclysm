@@ -18,7 +18,7 @@ import textureVar;
 import drawText;
 import drawWindow;
 import log;
-import ItemPocket;
+import Item;
 
 //반환형 : wstring L"x좌표,y좌표,회전으로 변경된 itemCode", ex) 3,5,167
 export class CoordSelectCraft : public GUI
@@ -471,13 +471,6 @@ public:
 	}
 
 private:
-	//크래프트 회전 버튼용 *런타임* 사이클 — TSV의 rotatedCCW90ItemCode(분리된 기하 4-사이클)와는 별개로
-	//  제작 편의를 위해 그룹을 이어붙인 확장 사이클을 만든다.
-	//  · 취수 파이프 5-사이클: intakePipeR→U→L→D→pipe→R (물 위에 pipe 설치 시 취수파이프로 시작,
-	//    회전을 계속 누르면 일반 pipe로도 돌아가 물 위를 건너는 파이프도 만들 수 있다)
-	//  · 수직 파이프 9-사이클: verticalPipe→위엘보(RA→UA→LA→DA)→아래엘보(RB→UB→LB→DB)→verticalPipe
-	//  그 외 아이템은 TSV 체인을 그대로 따른다(논리게이트 등 기존 회전 유지).
-	//  TSV는 분리 유지 → LOT 자동회전/검증기는 깨끗한 4-사이클을 보고, 크래프트만 확장 사이클을 본다.
 	static int craftRotateNext(int code)
 	{
 		switch (code)

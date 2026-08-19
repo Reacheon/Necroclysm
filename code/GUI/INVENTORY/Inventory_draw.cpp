@@ -1,3 +1,5 @@
+#include <SDL3/sdl.h>
+
 import Inventory;
 import globalVar;
 import constVar;
@@ -11,6 +13,7 @@ import checkCursor;
 import drawText;
 import drawItemSlot;
 import CoordSelect;
+import GUI;
 
 void Inventory::drawGUI()
 {

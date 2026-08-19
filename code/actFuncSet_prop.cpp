@@ -1,5 +1,9 @@
+module;
+#include <SDL3/sdl.h>
+
 module actFuncSet;
 
+import std;
 import util;
 import constVar;
 import globalVar;
@@ -14,6 +18,9 @@ import ItemStack;
 import textureVar;
 import SkillBehavior;
 import SkillRegistry;
+import Item;
+import SkillData;
+import Light;
 
 namespace actFunc
 {
@@ -43,7 +50,6 @@ namespace actFunc
 		if (dropped != nullptr) addAniToPlayerTurn(dropped, aniFlag::drop);
 	}
 
-	//창문 닫기 — 열린 창문 유리를 닫음(통행 차단). 유리는 원래 시야 통과라 시야 변화 없음
 	void closeWindow(int tgtX, int tgtY, int tgtZ)
 	{
 		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
@@ -54,7 +60,6 @@ namespace actFunc
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
-	//커튼 닫기 — 커튼을 닫으면 안쪽 창문도 닫힘(폐쇄)으로 간주, 커튼이 시야 차단
 	void closeCurtain(int tgtX, int tgtY, int tgtZ)
 	{
 		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
@@ -68,7 +73,6 @@ namespace actFunc
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
-	//커튼 뜯기 — 커튼만 제거(창문 개폐 상태는 보존). 테스트 아이템 드롭(천 아이템 생기면 교체)
 	void tearCurtain(int tgtX, int tgtY, int tgtZ)
 	{
 		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
@@ -82,24 +86,20 @@ namespace actFunc
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
-	//창문 깨트리기 — 커튼이 있으면 자동 해체(드롭) 후 파손. 깨진 창문은 통행 가능
 	void breakWindow(int tgtX, int tgtY, int tgtZ)
 	{
 		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
 		if (tgtProp == nullptr) return;
 		ItemData& w = tgtProp->leadItem;
-		//2단계 파손: 멀쩡 → 깨진 창문(149) → 창틀만(150). 창틀이면 더 못 부숨
 		if (w.checkFlag(itemFlag::WINDOW) == false || w.checkFlag(itemFlag::WINDOW_FRAME)) return;
 
 		if (w.checkFlag(itemFlag::WINDOW_BROKEN))
 		{
-			//2회차: 깨진 창문 → 창틀만 남김
 			w.eraseFlag(itemFlag::WINDOW_BROKEN);
 			w.addFlag(itemFlag::WINDOW_FRAME);
 		}
 		else
 		{
-			//1회차: 멀쩡한 창문 → 깨진 창문(커튼 자동 해체). 깨진 시점부터 통행 가능
 			w.eraseFlag(itemFlag::CURTAIN);
 			w.eraseFlag(itemFlag::CURTAIN_OPEN);
 			w.eraseFlag(itemFlag::WINDOW_OPEN);
@@ -107,11 +107,10 @@ namespace actFunc
 			w.eraseFlag(itemFlag::PROP_BLOCKER);
 			w.addFlag(itemFlag::PROP_WALKABLE);
 		}
-		dropWithBounce(tgtX, tgtY, tgtZ, itemID::test, 1); //임시: 부서진 잔해(천/유리/창틀). 천 아이템 생기면 분기
+		dropWithBounce(tgtX, tgtY, tgtZ, itemID::test, 1); //임시
 		PlayerPtr->updateVision(PlayerInfo().eyeSight);
 	}
 
-	//롤업도어 한 칸의 개폐 상태 설정 — 나무문 closeDoor 패턴(가스 ON/OFF 전환 포함). 열린 문은 PROP_DEPTH_UPPER로 엔티티/차량 위에 그려짐
 	void setRollupDoorState(int tgtX, int tgtY, int tgtZ, bool open)
 	{
 		Prop* tgtProp = TileProp(tgtX, tgtY, tgtZ);
@@ -147,7 +146,7 @@ namespace actFunc
 
 	void toggleRollupDoors(Point3 winchPos)
 	{
-		std::unordered_set<Point3> visitedSet;
+		std::unordered_set<Point3, Point3::Hash> visitedSet;
 		bool anyOpened = false, anyClosed = false, anyBlocked = false;
 		for (int dir = 0; dir < 8; dir++)
 		{
@@ -161,7 +160,6 @@ namespace actFunc
 			//시드 문의 반전된 상태가 체인 전체를 결정(문별 개별 토글)
 			bool newOpen = seedProp->leadItem.checkFlag(itemFlag::ROLLUP_DOOR_OPEN) == false;
 
-			//1차: 체인 수집 BFS — H문은 좌우(±x), V문은 상하(±y)로 같은 itemCode인 문에만 전파
 			std::vector<Point3> chainTiles;
 			std::queue<Point3> frontierQueue;
 			frontierQueue.push(seed);
@@ -184,7 +182,6 @@ namespace actFunc
 				}
 			}
 
-			//닫기는 체인 전체가 비어 있어야 가능 — 한 칸이라도 엔티티/차량/아이템이 깔려 있으면 문이 끼므로 체인째 거부(문은 물리적으로 한 장)
 			if (newOpen == false)
 			{
 				bool chainBlocked = false;
@@ -277,7 +274,7 @@ namespace actFunc
 
 		//BFS로 연결된 회로 네트워크 전체를 순회
 		std::queue<Point3> frontierQueue;
-		std::unordered_set<Point3> visitedSet;
+		std::unordered_set<Point3, Point3::Hash> visitedSet;
 		frontierQueue.push(tgtPoint);
 		while (!frontierQueue.empty())
 		{

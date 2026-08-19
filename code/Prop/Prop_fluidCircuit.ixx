@@ -1,10 +1,12 @@
 export module Prop_fluidCircuit;
 
+import std;
 import Prop;
 import util;
 import constVar;
 import globalVar;
 import World;
+import Item;
 
 constexpr double TIME_PER_TURN = 60.0;
 constexpr double EPSILON = 0.000001;
@@ -124,7 +126,7 @@ void Prop::updateFluidCircuitNetwork()
     int cursorZ = getGridZ();
 
     std::queue<Point3> frontierQueue;
-    std::unordered_set<Point3> visitedSet;
+    std::unordered_set<Point3, Point3::Hash> visitedSet;
     std::vector<Prop*> pumpPropVec;
     std::vector<Prop*> tankPropVec;
     std::unordered_set<Prop*> loadSinkSet;

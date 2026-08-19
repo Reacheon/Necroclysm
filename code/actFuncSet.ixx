@@ -1,7 +1,6 @@
 export module actFuncSet;
 
-import ItemData;
-import ItemPocket;
+import Item;
 import util;
 
 //액트가 실행되는 환경은 3가지 경우가 가능
@@ -24,14 +23,12 @@ export namespace actFunc
 	export void unload(ItemPocket* unloadItemPocket, int unloadItemCursor);
 	export void closeDoor(int tgtX, int tgtY, int tgtZ);
 	export void closeVDoor(int tgtX, int tgtY, int tgtZ);
-	//창문 액션 — 모두 단일 window 프롭의 런타임 플래그를 변경
+	//창문 관련 행동들
 	export void closeWindow(int tgtX, int tgtY, int tgtZ);
 	export void closeCurtain(int tgtX, int tgtY, int tgtZ);
 	export void tearCurtain(int tgtX, int tgtY, int tgtZ);
 	export void breakWindow(int tgtX, int tgtY, int tgtZ);
-	//롤업도어 한 칸의 개폐 상태 설정(플래그 일괄 전환). 시야 갱신은 호출측 책임
 	export void setRollupDoorState(int tgtX, int tgtY, int tgtZ, bool open);
-	//기계식 윈치 작동 — 인접 8타일에서 롤업도어를 찾아 체인 단위로 개별 토글(H는 좌우, V는 상하 전파)
 	export void toggleRollupDoors(Point3 winchPos);
 	export void toggle(ItemData& inputItem);
 	export void drinkBottle(ItemData& inputData);

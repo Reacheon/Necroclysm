@@ -261,7 +261,6 @@ void Skill::drawGUI()
 				std::wstring rankText = sysStr[298]+L" " + tgtData.skillRank;
 				drawText(rankText, skillBtn[i].x + skillBtn[i].w - 49 - queryTextWidth(rankText), skillBtn[i].y + 4);
 
-				// 바이오닉은 설치 시점에 랭크 고정 — 숙련치 게이지/승급 버튼 없음
 				if (!tgtBhv || tgtBhv->src != skillSrc::BIONIC)
 				{
 					bool expFull = tgtData.skillExp >= 100.0f;
@@ -269,7 +268,6 @@ void Skill::drawGUI()
 					//승급 버튼: 0=숙련치 가득(금색), 1=눌림, 2=숙련치 부족(회색)
 					drawSprite(spr::skillRankUpBtn, expFull ? 0 : 2, skillBtn[i].x + skillBtn[i].w - 41, skillBtn[i].y + 6);
 
-					//숙련치 게이지 (100에서 멈춤 — 초과 숙련치는 증발)
 					drawRect({ skillBtn[i].x + skillBtn[i].w - 43 - 71, skillBtn[i].y + 22,67,8 }, col::white);
 					int gaugeW = static_cast<int>(61.0f * myMin(tgtData.skillExp, 100.0f) / 100.0f);
 					if (gaugeW > 0)

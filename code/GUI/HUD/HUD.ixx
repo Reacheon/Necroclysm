@@ -3,7 +3,7 @@ module;
 
 export module HUD;
 
-import ItemData;
+import Item;
 import std;
 import util;
 import GUI;
@@ -29,7 +29,6 @@ import debugConsole;
 import CoordSelect;
 import SkillData;
 import ContextMenu;
-import ItemPocket;
 import ItemStack;
 import Dialogue;
 import Skill;
@@ -995,7 +994,6 @@ public:
 			}
 		}
 
-		//창문 액션 추가 — 상태별로 노출(열린 창문엔 커튼 닫기 대신 창문 닫기만)
 		if (TileProp(targetGrid.x, targetGrid.y, PlayerZ()) != nullptr)
 		{
 			ItemData& w = TileProp(targetGrid.x, targetGrid.y, PlayerZ())->leadItem;
@@ -1003,11 +1001,9 @@ public:
 			{
 				if (w.checkFlag(itemFlag::WINDOW_FRAME))
 				{
-					//창틀만 남음 — 더 이상 액션 없음
 				}
 				else if (w.checkFlag(itemFlag::WINDOW_BROKEN))
 				{
-					//깨진 창문 — 한 번 더 부수면 창틀만 남음
 					inputOptions.push_back(act::breakWindow);
 				}
 				else
@@ -1036,8 +1032,6 @@ public:
 
 			for (int i = 0; i < vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo.size(); i++)
 			{
-				//pocketMaxNumber/Volume>0 이면 ItemData::cloneFromItemDex가 자동으로
-				//pocketPtr 생성 — 컨테이너 식별자로 pocketPtr 직접 검사.
 				if (vPtr->partInfo[{targetGrid.x, targetGrid.y, PlayerZ()}]->itemInfo[i].pocketPtr != nullptr)
 				{
 					inputOptions.push_back(act::unbox);

@@ -72,7 +72,6 @@ export PaletteTable loadPaletteTable(const std::string& path)
 // ===== 색상 키 → UI 메타데이터 =====
 // TSV 헤더 키는 UPPER_SNAKE (예: L"ASH_GRAY").
 // 이를 타이틀 케이스 UI 표시명(L"Ash Gray")으로 변환하는 헬퍼.
-// 새 색상 추가 시 별도 테이블 수정 불필요 — 키 이름 규칙만 지키면 자동 변환.
 export std::wstring paletteKeyToDisplayName(const std::wstring& key)
 {
 	std::wstring out;

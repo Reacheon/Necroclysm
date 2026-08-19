@@ -4,6 +4,7 @@ module;
 
 export module debugConsole;
 
+import std;
 import util;
 import constVar;
 import globalVar;
@@ -29,6 +30,9 @@ import CharSelectScreen;
 import displayLoader;
 import GUI;
 import WorldData;
+import Item;
+import statusEffect;
+import SkillData;
 
 export void debugConsole()
 {
@@ -350,7 +354,6 @@ export void debugConsole()
 	}
 	case 24:
 	{
-		// 프리셋 정의 — 새 도시 추가 시 여기에 한 줄 추가하면 자동으로 메뉴에 노출됨
 		struct TeleportPreset
 		{
 			const wchar_t* name;
@@ -407,7 +410,6 @@ export void debugConsole()
 			break;
 		}
 
-		// Teleport 모듈 통합 함수 — 패치·섹터·청크 동기 ensure + 로딩 화면 + 이동.
 		teleportPlayer(Point3{ tgtGridX, tgtGridY, tgtGridZ });
 		break;
 	}
@@ -848,7 +850,6 @@ export void debugConsole()
 		std::cin >> newH;
 		applyResolution(newW, newH);
 		// 레터박스·탭 등 changeXY가 캐시한 절대 좌표를 새 cameraW/H로 재계산.
-		// 현재 x/y를 그대로 되넘기는 건 GUI 베이스 애니메이션과 동일한 재배치 패턴 —
 		// HUD는 y가 상대값이라 팝업 상태도 유지된다. (HUD 직접 import는 순환이라 불가)
 		for (GUI* g : GUI::activeGUIList) g->changeXY(g->x, g->y, false);
 		break;

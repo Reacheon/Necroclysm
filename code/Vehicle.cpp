@@ -4,8 +4,8 @@ import globalVar;
 import constVar;
 import util;
 import World;
-import ItemPocket;
-import ItemData;
+import Chunk;
+import Item;
 import Entity;
 import Player;
 import AI;
@@ -92,7 +92,6 @@ void Vehicle::addPart(int inputX, int inputY, int dexIndex)
 
     auto& itemVec = partInfo[{inputX, inputY, getGridZ()}]->itemInfo;
 
-    // 타이어는 항상 맨 앞(렌더 최하단)에 — 설치 순서와 무관한 렌더 불변식
     // 그 외 부품은 맨 뒤에 추가 → 설치 순서 = 그리기 순서. vehPriority 게이트는 canAddPart에서 사전 검증한다
     if (isTire) itemVec.insert(itemVec.begin(), std::move(inputPart));
     else        itemVec.push_back(std::move(inputPart));
@@ -206,7 +205,7 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_map<Point3, std::unique_ptr<ItemPocket>> newPartInfo;
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         // straddle 시 z가 섞여있을 수 있어 partInfo 직접 순회 (xy 스캔 X) + z 보존
@@ -228,11 +227,11 @@ void Vehicle::rotatePartInfo(dir16 inputDir16)
     }
 }
 
-std::unordered_set<Point3> Vehicle::getRotateShadow(dir16 inputDir16)
+std::unordered_set<Point3, Point3::Hash> Vehicle::getRotateShadow(dir16 inputDir16)
 {
     if (bodyDir != inputDir16)
     {
-        std::unordered_set<Point3> newPartInfo;
+        std::unordered_set<Point3, Point3::Hash> newPartInfo;
         auto currentCoordTransform = coordTransform[bodyDir];
         auto targetCoordTransform = coordTransform[inputDir16];
         for (const auto& [pos, pocket] : partInfo)
@@ -253,7 +252,7 @@ std::unordered_set<Point3> Vehicle::getRotateShadow(dir16 inputDir16)
     }
     else
     {
-        std::unordered_set<Point3> newPartInfo;
+        std::unordered_set<Point3, Point3::Hash> newPartInfo;
         for (const auto& [pos, pocket] : partInfo)
         {
             newPartInfo.insert({ pos.x, pos.y, pos.z });
@@ -267,7 +266,7 @@ void Vehicle::rotateEntityPtr(dir16 inputDir16)
     if (bodyDir != inputDir16)
     {
         // straddle 대응: (x,y) 충돌 가능성이 있어도 z 다르면 별개. Point3 키로 wormhole.
-        std::unordered_map<Point3, std::unique_ptr<Entity>> entityWormhole;
+        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
         for (const auto& [pos, pocket] : partInfo)
         {
             if (TileEntity(pos.x, pos.y, pos.z) != nullptr)
@@ -431,7 +430,6 @@ void Vehicle::shift(int dx, int dy)
 {
     if (dx == 0 && dy == 0) return;
 
-    // 큰 점프도 한 칸씩 분해 — 경유 ramp 무시 방지
     std::vector<Point2> path;
     makeLine(path, dx, dy);
 
@@ -480,7 +478,7 @@ void Vehicle::shift(int dx, int dy)
             }
         }
 
-        std::unordered_map<Point3, Point3> partOldToNew;
+        std::unordered_map<Point3, Point3, Point3::Hash> partOldToNew;
         int appliedDx = stepDx, appliedDy = stepDy;
         int appliedZ = currentZ;
 
@@ -503,7 +501,6 @@ void Vehicle::shift(int dx, int dy)
                 partOldToNew[pos] = { pos.x + offsetX, pos.y + offsetY, appliedZ };
             }
 
-            // 텔레포트 도착지 전 범위 장애물 검사 — 하나라도 막히면 ramp 진입 자체 차단
             bool blocked = false;
             Point3 blockPos{ 0,0,0 };
             const wchar_t* blockReason = L"";
@@ -544,7 +541,7 @@ void Vehicle::shift(int dx, int dy)
         }
 
         // 이동 적용
-        std::unordered_map<Point3, std::unique_ptr<Entity>> entityWormhole;
+        std::unordered_map<Point3, std::unique_ptr<Entity>, Point3::Hash> entityWormhole;
         for (const auto& [oldPos, newPos] : partOldToNew)
         {
             TileVehicle(oldPos.x, oldPos.y, oldPos.z) = nullptr;
@@ -561,7 +558,7 @@ void Vehicle::shift(int dx, int dy)
                 EntityPtrMove(std::move(entityWormhole[oldPos]), newPos);
             }
         }
-        std::unordered_map<Point3, std::unique_ptr<ItemPocket>> shiftPartInfo;
+        std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
         for (auto& [pos, pocket] : partInfo)
         {
             shiftPartInfo[partOldToNew[pos]] = std::move(pocket);
@@ -581,7 +578,7 @@ void Vehicle::shift(int dx, int dy)
 
 void Vehicle::zShift(int dz)
 {
-    std::unordered_map<Point2, std::unique_ptr<Entity>> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
+    std::unordered_map<Point2, std::unique_ptr<Entity>, Point2::Hash> entityWormhole;//엔티티를 새로운 좌표로 옮기기 전에 임시적으로 저장하는 컨테이너
 
     for (const auto& [pos, pocket] : partInfo)
     {
@@ -603,7 +600,7 @@ void Vehicle::zShift(int dz)
         }
     }
 
-    std::unordered_map<Point3, std::unique_ptr<ItemPocket>> shiftPartInfo;
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> shiftPartInfo;
     for (auto& [pos, pocket] : partInfo)
     {
         shiftPartInfo[{pos.x, pos.y, pos.z + dz}] = std::move(pocket);
@@ -653,7 +650,6 @@ bool Vehicle::colisionCheck(dir16 inputDir16, int dx, int dy)
 
     if (triggered)
     {
-        // 텔레포트 후 위치 계산 — 후미 = rampHit + step
         int minDot = std::numeric_limits<int>::max();
         int rearX = 0, rearY = 0;
         for (const auto& pos : rotatedPartInfo)

@@ -1,11 +1,12 @@
-import Entity;
-
 #include <SDL3/SDL.h>
+
+import std;
+import Entity;
 
 import globalVar;
 import constVar;
 import World;
-import ItemData;
+import Item;
 import textureVar;
 import drawSprite;
 import drawText;

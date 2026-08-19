@@ -1,3 +1,4 @@
+module;
 #include <SDL3/SDL.h>
 
 module World;
@@ -6,8 +7,7 @@ import std;
 import util;
 import globalVar;
 import constVar;
-import ItemData;
-import ItemPocket;
+import Item;
 import ItemStack;
 import Prop;
 import Vehicle;
@@ -221,7 +221,6 @@ void DestroyWall(int x, int y, int z) { World::ins()->getTile(x, y, z).destoryWa
 bool isWalkable(Point3 coord)
 {
     // 미로드 청크 타일은 보행 불가로 간주. 아래 TileVehicle 등 getTile().at()이 던지는
-    // std::out_of_range 방지 — 월드 로드 직후 청크 스트리밍 전, 자동이동 A*가 플레이어
     // 주변 박스(±20)를 훑으며 미로드 타일에 닿을 수 있다. 미탐사 void는 경로가 될 수 없으므로 false가 맞다.
     if (World::ins()->tryGetTile(coord.x, coord.y, coord.z) == nullptr) return false;
     if (TileWall(coord.x, coord.y, coord.z) != itemID::none) return false;

@@ -14,11 +14,12 @@ import Prop;
 import Bullet;
 import Aim;
 import TileData;
-import ItemData;
+import Item;
 import ItemStack;
 import Particle;
 import globalTime;
 import actFuncSet;
+import Vehicle;
 
 bool Entity::runAnimation(bool shutdown)
 {

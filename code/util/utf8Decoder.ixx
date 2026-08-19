@@ -166,7 +166,6 @@ export std::wstring utf8Decoder(const std::string& utf8Str)
 
 //============================================================
 // utf8Encoder : std::wstring(또는 wstring_view) → UTF-8 std::string.
-//   <codecvt>/std::wstring_convert(C++26 제거 예정) 대체 — 자체 구현, 플랫폼 무관.
 //   sizeof(wchar_t)에 따라:
 //     Windows(2바이트, UTF-16): surrogate pair → 코드포인트 → UTF-8
 //     Linux/macOS(4바이트, UTF-32): wchar_t = 코드포인트 그대로
@@ -201,7 +200,6 @@ export std::string utf8Encoder(std::wstring_view wide)
 			out.push_back(static_cast<char>(0x80 | ((cp >> 6) & 0x3F)));
 			out.push_back(static_cast<char>(0x80 | (cp & 0x3F)));
 		}
-		//범위 외(>0x10FFFF)는 무시 — appendCodepoint에서 받지 않도록 호출측에서 가드
 	};
 
 	for (std::size_t i = 0; i < wide.size(); ++i)

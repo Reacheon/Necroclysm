@@ -9,6 +9,7 @@ import util;
 import constVar;
 import globalVar;
 import textureVar;
+import Item;
 
 namespace csvItem
 {
@@ -184,7 +185,6 @@ namespace csvItem
 export int readItemDex(const wchar_t* file)
 {
     //파일은 UTF-8(BOM optional)로 저장된 TSV. binary 모드 ifstream으로 raw 바이트 읽고
-    //utf8Decoder로 wstring 변환 — <codecvt>/wifstream::imbue(C++26 제거 예정) 대체.
     std::ifstream in(std::filesystem::path(file), std::ios::binary);
     std::wstring str;
     std::wstring strFragment;//표 한 칸의 문자열이 저장되는 객체, 매번 초기화됨
@@ -198,7 +198,6 @@ export int readItemDex(const wchar_t* file)
         in.read(raw.data(), size);
         in.close();
 
-        //UTF-8 BOM(EF BB BF) 스킵 — 기존 std::consume_header 동등
         std::size_t skip = 0;
         if (raw.size() >= 3 && static_cast<unsigned char>(raw[0]) == 0xEF
                             && static_cast<unsigned char>(raw[1]) == 0xBB
@@ -207,7 +206,6 @@ export int readItemDex(const wchar_t* file)
             skip = 3;
         }
         str = utf8Decoder(raw.c_str() + skip);
-        //CRLF → LF 정규화 — binary 모드라 \r이 그대로 살아 있음.
         //기존 wifstream(text 모드)이 자동 처리하던 부분. 미처리 시 마지막 셀에 \r이 붙어 wtoi 실패.
         std::erase(str, L'\r');
         //읽기 종료
@@ -1234,5 +1232,4 @@ export int readItemDex(const wchar_t* file)
         return 0;
     }
 }
-
 

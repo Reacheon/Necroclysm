@@ -11,7 +11,7 @@ import globalVar;
 import drawText;
 import checkCursor;
 import drawSprite;
-import ItemPocket;
+import Item;
 import Player;
 import textureVar;
 import drawWindow;

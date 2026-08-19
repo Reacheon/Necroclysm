@@ -7,12 +7,12 @@ import globalVar;
 import constVar;
 import textureVar;
 import World;
-import ItemPocket;
-import ItemData;
+import Item;
 import Player;
 import Ani;
 import Sprite;
 import Coord;
+import Chunk;
 
 ItemStack::ItemStack(Point3 inputCoor)
 {
@@ -36,7 +36,6 @@ ItemStack::~ItemStack()
 {
 	// 광역 청크 소멸(게임 종료) 도중에는 자신을 담은 청크가 이미
 	// unordered_map에서 분리된 채로 ~Chunk가 호출됨 → getChunk()의 .at()이 throw.
-	// tryGetChunk로 안전 조회 — 청크가 사라진 상태면 컨테이너 자체가 비워지니 eraseStack 불필요.
 	Point2 cc = World::ins()->changeToChunkCoord(getGridX(), getGridY());
 	if (Chunk* chunk = World::ins()->tryGetChunk(cc.x, cc.y, getGridZ()))
 	{
@@ -48,7 +47,6 @@ ItemStack::~ItemStack()
 
 void ItemStack::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
-	// 이전 청크에서 제거 — 생성 직후(기본 좌표 0,0,0)거나 로드 영역 밖이면 청크가 없을 수 있어
 	// tryGetChunk로 안전 조회(소멸자와 동일 패턴). getChunk의 .at()는 미로드 청크에서 throw.
 	Point2 prevCC = World::ins()->changeToChunkCoord(getGridX(), getGridY());
 	if (Chunk* prevChunk = World::ins()->tryGetChunk(prevCC.x, prevCC.y, getGridZ()))

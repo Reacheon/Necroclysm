@@ -215,7 +215,6 @@ void Status::drawGUI()
 				}
 			}
 
-			//스탯 박스 3종 (Str/Int/Dex) — 분배할 AP가 남아있으면 +버튼과 함께 그림
 			float mouseXf, mouseYf;
 			bool mouseDown = (SDL_GetMouseState(&mouseXf, &mouseYf) & SDL_BUTTON_LMASK) != 0;
 
@@ -227,7 +226,6 @@ void Status::drawGUI()
 				SDL_Rect statBtn = { statusBase.x + 625 + 83 * i,statusBase.y + 82,60,60 };
 				SDL_Rect upBtn = { statBtn.x + 40, statBtn.y + 27, 22, 22 };
 				drawStadium(statBtn, col::black, 255, 4);
-				//호버 틴트는 라벨 뒤의 좁은 스타디움에만 — 박스 전체가 변하면 반응 범위가 너무 넓게 읽힘
 				SDL_Rect labelRect = { statBtn.x + 3, statBtn.y + 3, 54, 19 };
 				drawStadium(labelRect, stadiumCol(labelRect), 255, 4);
 				drawTextCenter(statLabels[i], statBtn.x + statBtn.w / 2, statBtn.y + 12);

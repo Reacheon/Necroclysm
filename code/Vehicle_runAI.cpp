@@ -1,6 +1,7 @@
 #define AI_TURN_END return true;
 #define AI_TURN_CONTINUE return false;
 
+import std;
 import Vehicle;
 import globalVar;
 import World;
@@ -10,6 +11,7 @@ import Entity;
 import Player;
 import log;
 import Prop;
+import Drawable;
 
 bool Vehicle::runAI()
 {

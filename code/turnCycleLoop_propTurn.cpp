@@ -5,6 +5,7 @@ import globalVar;
 import Prop;
 import World;
 import dbgPrt;
+import Item;
 
 std::int64_t propTurn()
 {

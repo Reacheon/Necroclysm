@@ -1,6 +1,6 @@
-import HUD;
-
 #include <SDL3/SDL.h>
+
+import HUD;
 
 import std;
 import util;
@@ -16,8 +16,7 @@ import ContextMenu;
 import Entity;
 import Aim;
 import useSkill;
-import ItemData;
-import ItemPocket;
+import Item;
 import debugConsole;
 
 static bool btnPressed = false;
@@ -103,7 +102,6 @@ void HUD::clickUpGUI()
 	}
 	else if (checkCursor(&minimapRegion))
 	{
-		//미니맵 위 클릭은 소비 — 아래 타일터치로 흘러가지 않게
 	}
 	else//타일터치
 	{

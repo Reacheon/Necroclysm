@@ -121,7 +121,7 @@ export enum class itemFlag
 
     SPR_TH_WEAPON,
     NO_HAIR_HELMET,//머리카락이 안보이는 헬멧
-    DRAW_ABOVE_HAIR,//머리카락 위에 그려지는 장비 (투구/모자/헤어밴드 등). NO_HAIR_HELMET과 독립 — 후자는 hair 렌더를 스킵하고, 전자는 draw 순서만 제어한다.
+    DRAW_ABOVE_HAIR,
     EQUIP_SPR_GENDERED,//착용 스프라이트가 성별별로 다른 장비. equipSprName/flipEquipSprName을 베이스명으로 보고 런타임에 "<base>_<gender>"로 조회.
 
     BOW,
@@ -197,7 +197,7 @@ export enum class itemFlag
     PLATE, //완성된 요리를 담을 수 있는 접시
     VEGETABLE, //야채 플래그
 
-    NO_ITEM_FORM, //월드 전용 정의(나무/Ramp/타일 등) — 인벤토리 ItemStack으로 인스턴스화되지 않음
+    NO_ITEM_FORM,
 
     PROP_POCKET_OPEN_SPRITE, //루팅창이 이 프롭의 포켓을 열고 있는 동안 propSprIndex+1(문 열린 스프라이트)로 그림. 장롱/캐비닛/금고/냉장고 등
 

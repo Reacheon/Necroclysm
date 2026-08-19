@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 
+import std;
 import Craft;
 import globalVar;
 import constVar;
@@ -14,7 +15,7 @@ import Msg;
 import Vehicle;
 import Prop;
 import turnWait;
-import ItemData;
+import Item;
 
 void Craft::openBookmarkDropdown()
 {

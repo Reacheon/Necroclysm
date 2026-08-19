@@ -8,6 +8,7 @@ import checkCursor;
 import globalVar;
 import World;
 import actFuncSet;
+import Item;
 
 void Loot::clickUpGUI()
 {

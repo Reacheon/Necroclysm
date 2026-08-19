@@ -20,9 +20,8 @@ import Sticker;
 import Sprite;
 import GUI;
 import ItemStack;
-import ItemPocket;
 import drawWindow;
-import ItemData;
+import Item;
 
 //이 msg 클래스는 처음 만들어진 기초 GUI이며 모든 GUI들은 msg를 기반으로 만들어짐
 //msgIndex

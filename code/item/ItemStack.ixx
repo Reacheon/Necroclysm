@@ -7,7 +7,7 @@ import std;
 import util;
 import constVar;
 import textureVar;
-import ItemPocket;
+import Item;
 import Ani;
 import Sprite;
 import Coord;

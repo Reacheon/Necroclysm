@@ -33,6 +33,7 @@ import Wave;
 import Wake;
 import nervedriveFilter;
 import levelUpFX;
+import Item;
 
 SDL_Rect dst, renderRegion;
 int tileSize, cameraGridX, cameraGridY, renderRangeW, renderRangeH, pZ;
@@ -62,13 +63,13 @@ void drawDebug();
 
 // 차량과 엔티티는 중복을 허용하면 안됨
 std::vector<Point2> tileList, itemList, floorPropList, upperPropList, gasList, blackFogList, grayFogList, lightFogList, flameList, allTileList, mulFogList, wallHPList;
-std::unordered_set<Point2> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
+std::unordered_set<Point2, Point2::Hash> lightFogSet, shallowSeaWaves, deepSeaWaves, deepFreshWaves;
 std::vector<Drawable*> renderVehList, renderEntityList;
-std::unordered_set<Point2> raySet;
-std::unordered_set<Point2> sprinklerSpraySet33;
-std::unordered_set<Point2> sprinklerSpraySet55;
-std::unordered_set<Point2> rampUpSet;
-std::unordered_set<Point2> rampDownSet;
+std::unordered_set<Point2, Point2::Hash> raySet;
+std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet33;
+std::unordered_set<Point2, Point2::Hash> sprinklerSpraySet55;
+std::unordered_set<Point2, Point2::Hash> rampUpSet;
+std::unordered_set<Point2, Point2::Hash> rampDownSet;
 std::vector<Point2> bridgeShadowList;
 
 export std::int64_t renderTile()
@@ -137,7 +138,7 @@ export std::int64_t renderTile()
     dur::floorProp = PROFILE([] { drawFloorProp(); });
     dur::item = PROFILE([] { drawItems(); });
     dur::entity = PROFILE([] { drawEntities(); });
-    drawBridgeShadows(); // 다리 그림자 — 바닥/시체/프롭/아이템/엔티티 모두 위에 깔려서 같이 어두워짐
+    drawBridgeShadows();
     dur::damage = PROFILE([] { drawDamages(); });
     dur::bullet = PROFILE([] { drawBullets(); });
     dur::particle = PROFILE([] { drawParticles(); });
@@ -145,7 +146,7 @@ export std::int64_t renderTile()
     drawRampArrows();
     dur::mulFog = PROFILE([] { drawMulFogs(); });
     dur::fog = PROFILE([] { drawFogs(); });
-    levelUpFX::draw(); // 레벨업 연출 — 포그/어둠 위에 그려야 밤에도 빛기둥이 보임
+    levelUpFX::draw();
     dur::marker = PROFILE([] { drawMarkers(); });
     dur::debug = PROFILE([] { drawDebug(); });
 
@@ -184,7 +185,6 @@ void analyseRender()
                     {
                         int dx, dy;
                         dir2Coord(dir, dx, dy);
-                        // 이웃이 로드 영역 밖이면 wave 등록 생략 — 어차피 그쪽 경계는 렌더 안 함.
                         const TileData* nb = World::ins()->tryGetTile(tgtX + dx, tgtY + dy, pZ);
                         if (nb && nb->floor != itemID::deepSeaWater)
                         {
@@ -239,7 +239,6 @@ void analyseRender()
             Prop* pPtr = thisTile->PropPtr.get();
             if (pPtr != nullptr && pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_LOWER) == false)
             {
-                //열린 롤업도어 등 — 같은 타일의 엔티티/차량 위에 그려지는 프롭은 별도 리스트로 분리
                 if (pPtr->leadItem.checkFlag(itemFlag::PROP_DEPTH_UPPER)) upperPropList.push_back({ tgtX, tgtY });
                 else renderEntityList.push_back((Drawable*)pPtr);
             }
@@ -268,7 +267,6 @@ void analyseRender()
             }
 
             // 다리 그림자: 위 z에 floor 있고 ramp 아닌 경우 (다리 밑 어두운 효과)
-            // 단 이 타일에 광원 있으면 스킵 — 헤드라이트 등이 다리 밑 비추면 그림자 제거
             const TileData* aboveTile = World::ins()->tryGetTile(tgtX, tgtY, pZ + 1);
             if (aboveTile != nullptr && aboveTile->floor != itemID::none && thisTile->lightVec.size() == 0)
             {
@@ -467,7 +465,6 @@ void drawTiles()
                             rC = (uRight != nullptr) && (g == itemDex[uRight->wall].tileConnectGroup);
                         }
 
-                        // 인접 창문은 벽으로 취급 — 벽이 창문 위/아래/옆으로 끊김 없이 이어 보이게
                         tC = tC || tileHasWindow(tgtX,     tgtY - 1, pZ - d);
                         bC = bC || tileHasWindow(tgtX,     tgtY + 1, pZ - d);
                         lC = lC || tileHasWindow(tgtX - 1, tgtY,     pZ - d);
@@ -678,7 +675,6 @@ void drawTiles()
         flushIfFull();
         int tgtX = elem.x;
         int tgtY = elem.y;
-        // wave 항목은 로드 영역 경계를 벗어난 이웃 타일이 들어올 수 있음 — 청크 누락 시 스킵.
         const TileData* thisTile  = World::ins()->tryGetTile(tgtX,     tgtY,     PlayerZ());
         const TileData* topTile   = World::ins()->tryGetTile(tgtX,     tgtY - 1, PlayerZ());
         const TileData* botTile   = World::ins()->tryGetTile(tgtX,     tgtY + 1, PlayerZ());
@@ -925,7 +921,6 @@ void drawTiles()
         tileCounter++;
     }
 
-    // wall과 스킬 범위 UI는 파도 위에 그림 — floor < wave < wall 순서 유지
     for (const auto& elem : tileList)
     {
         flushIfFull();
@@ -972,7 +967,6 @@ void drawTiles()
                     rightCheck = (currentTileGroup == rightTileGroup);
                 }
 
-                // 인접 창문은 벽으로 취급 — 벽이 창문 위/아래/옆으로 끊김 없이 이어 보이게
                 topCheck   = topCheck   || tileHasWindow(tgtX,     tgtY - 1, PlayerZ());
                 botCheck   = botCheck   || tileHasWindow(tgtX,     tgtY + 1, PlayerZ());
                 leftCheck  = leftCheck  || tileHasWindow(tgtX - 1, tgtY,     PlayerZ());
@@ -1220,7 +1214,6 @@ void drawEntities()
         }
     }
 
-    // 상단 프롭 그리기 — 동일 타일의 엔티티/차량을 덮는 프롭(열린 롤업도어 등). 가스/안개보다는 아래
     for (const auto& elem : upperPropList)
     {
         Prop* upPtr = TileProp(elem.x, elem.y, pZ);
@@ -1516,7 +1509,6 @@ void drawBridgeShadows()
 
 void drawMulFogs()
 {
-    //시간대별 야간 틴트 색 — 키프레임 보간은 constVar:colors가 단일 출처(월드맵 Map과 공유).
     SDL_Color mulLightColor = mulCol::ambientMulColorAt(getHour() + getMin() / 60.0f);
 
     int mulFogCounter = 0;

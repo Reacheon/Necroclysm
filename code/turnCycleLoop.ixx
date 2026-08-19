@@ -14,6 +14,7 @@ import World;
 import Player;
 import Monster;
 import Vehicle;
+import ItemStack;
 import mouseInput;
 import keyboardInput;
 import gamepadInput;
@@ -31,6 +32,8 @@ import statusEffect;
 import SkillData;
 import SkillBehavior;
 import SkillRegistry;
+import TileData;
+import Item;
 
 constexpr double EPSILON = 0.000001;
 
@@ -260,7 +263,7 @@ std::int64_t playerInputTurn()
 		if (dx != 0 || dy != 0)
 		{
 			//주변 10칸으로 이동 가능한 타일 배열 계산
-			std::unordered_set<Point2> walkableTile;
+			std::unordered_set<Point2, Point2::Hash> walkableTile;
 			for (int i = PlayerX() - 20; i <= PlayerX() + 20; i++)
 			{
 				for (int j = PlayerY() - 20; j <= PlayerY() + 20; j++)

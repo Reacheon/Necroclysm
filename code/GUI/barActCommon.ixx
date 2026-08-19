@@ -6,8 +6,7 @@ export module barActCommon;
 import std;
 import constVar;
 import globalVar;
-import ItemData;
-import ItemPocket;
+import Item;
 
 
 ///@brief 총/탄창/탄환 관련 barAct 액션을 추가한다.

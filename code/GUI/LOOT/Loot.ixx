@@ -8,7 +8,6 @@ import util;
 import globalVar;
 import constVar;
 import drawWindowArrow;
-import ItemPocket;
 import drawItemList;
 import checkCursor;
 import drawSprite;
@@ -22,7 +21,7 @@ import Msg;
 import GUI;
 import actFuncSet;
 import drawWindow;
-import ItemData;
+import Item;
 import ItemListPanel;
 import barActCommon;
 

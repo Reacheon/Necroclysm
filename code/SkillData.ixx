@@ -28,7 +28,6 @@ export struct SkillData
     int skillLevel = 1;             // 바이오닉 중복 설치 수 (오토닥 추가 설치 시 증가)
 
     // 현재 랭크 (F~S). 습득 시 SkillBehavior의 시작 랭크로 초기화됨.
-    // 숙련치 100 도달 후 스킬포인트를 지불해 수동 승급 — 자동 승급 없음.
     std::wstring skillRank = L"F";
     float skillExp = 0.0f;          // 숙련치 0~100. 100에서 멈추며 초과분은 증발됨.
 

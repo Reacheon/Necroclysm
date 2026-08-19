@@ -6,7 +6,7 @@ import dbgPrt;
 import nanoTimer;
 import dirToXY;
 
-export std::vector<Point2> aStar(std::unordered_set<Point2> walkableTile, int playerX, int playerY, int dstX, int dstY)
+export std::vector<Point2> aStar(std::unordered_set<Point2, Point2::Hash> walkableTile, int playerX, int playerY, int dstX, int dstY)
 {
 	//dbgPrt(L"////////////////////////////aStar 알고리즘 실행됨/////////////////////////////\n");
 	//dbgPrt(L"이 엔티티의 현재 위치는 (%d,%d)이고 목적지는 (%d,%d)이다\n",playerX,playerY, dstX, dstY);
@@ -26,13 +26,13 @@ export std::vector<Point2> aStar(std::unordered_set<Point2> walkableTile, int pl
 
 	walkableTile.insert(playerPos);
 
-	std::unordered_map<Point2, int> valG;
-	std::unordered_map<Point2, int> valH;
-	std::unordered_map<Point2, int> valF;
-	std::unordered_map<Point2, int> valDir;
+	std::unordered_map<Point2, int, Point2::Hash> valG;
+	std::unordered_map<Point2, int, Point2::Hash> valH;
+	std::unordered_map<Point2, int, Point2::Hash> valF;
+	std::unordered_map<Point2, int, Point2::Hash> valDir;
 
-	std::unordered_set<Point2> openSet;
-	std::unordered_set<Point2> closeSet;
+	std::unordered_set<Point2, Point2::Hash> openSet;
+	std::unordered_set<Point2, Point2::Hash> closeSet;
 
 	//시작점을 오픈리스트에 넣음
 	Point2 pivot = dstPos;

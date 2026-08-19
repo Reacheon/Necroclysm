@@ -12,7 +12,9 @@ import log;
 import Corpse;
 import util;
 import AI;
-import ItemData;
+import Item;
+import Chunk;
+import Coord;
 
 Monster::Monster(int index, int gridX, int gridY, int gridZ) : Entity(index, gridX, gridY, gridZ)
 {

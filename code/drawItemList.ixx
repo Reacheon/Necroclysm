@@ -1,6 +1,6 @@
 export module drawItemList;
 import drawWindowArrow;
-import ItemPocket;
+import Item;
 import globalVar;
 import drawItemSlot;
 

@@ -64,7 +64,6 @@ public:
 			statusBase.y += inputY - statusBase.h / 2;
 		}
 
-		// y 상한: 중앙-20px. (1080 기준 274 — 절대값이면 세로로 긴 화면에서 상단에 붙음)
 		const int maxY = cameraH / 2 - 266;
 		if (statusBase.y > maxY) { statusBase.y = maxY; }
 

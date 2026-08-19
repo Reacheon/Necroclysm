@@ -31,7 +31,6 @@ import nervedriveFilter;
 int main(int argc, char** argv)
 {
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//시스템 기본 로케일 설정 — wprintf의 wchar_t→multibyte 변환이 ASCII 외 문자(한글 등)를 스킵하지 않게 함.
 	//"korean"(Windows 전용) 대신 ""(시스템 기본)을 사용하여 크로스플랫폼 호환:
 	//  Windows 한국어: ko_KR/CP949, Linux/macOS: LC_ALL 환경변수 기준.
 	try { std::locale::global(std::locale("")); } catch (...) { /*최소환경 폴백*/ }
@@ -159,4 +158,3 @@ int main(int argc, char** argv)
 
 	return 0;
 };
-

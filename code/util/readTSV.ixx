@@ -5,7 +5,7 @@ module;
 export module readTSV;
 import std;
 import wstring2Number;
-import utf8Decoder; //자체 UTF-8 디코더 사용, <codecvt>(C++26 제거 예정) 대체
+import utf8Decoder;
 
 template <typename T1, typename T2>
 struct isSame { enum { value = false }; };
@@ -15,8 +15,6 @@ struct isSame<T0, T0> { enum { value = true }; };
 export template<std::size_t SIZEW, typename T>
 int readTSV(const wchar_t* file, std::vector<std::array<T, SIZEW>>& arr)
 {
-    //binary 모드로 raw 바이트 읽기 — 줄별로 utf8Decoder 적용.
-    //wifstream + codecvt facet 패턴을 자체 디코더로 대체.
     std::ifstream fin(std::filesystem::path(file), std::ios::binary);
     if (!fin.is_open())
         return 0;

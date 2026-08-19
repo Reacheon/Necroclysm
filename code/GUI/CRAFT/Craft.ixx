@@ -18,8 +18,7 @@ import Msg;
 import Vehicle;
 import Prop;
 import turnWait;
-import ItemData;
-import ItemPocket;
+import Item;
 import GameOver;
 
 
@@ -364,7 +363,6 @@ public:
 	bool canCraft(int itemCode, bool exceptMaterial)
 	{
 		ItemPocket* equipPtr = PlayerEquip();
-		//조합 기술 요구치는 구 숙련도 폐기로 미검사 상태 — 신 스킬 랭크 기반으로 재작업 예정 (recipeProficNeed 데이터는 유지 중)
 
 		//조합에 필요한 기술(툴 퀄리티) 체크
 		for (int i = 0; i < itemDex[itemCode].recipeQualityNeed.size(); i++)

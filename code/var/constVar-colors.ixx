@@ -39,7 +39,7 @@ export namespace mulCol
                 };
             }
         }
-        return { 0, 0, 0, 0 };   //범위 밖(예: 정확히 24.0) — 틴트 없음
+        return { 0, 0, 0, 0 };
     }
 }
 
@@ -82,5 +82,3 @@ export namespace lowCol
     constexpr SDL_Color pink = { 0xbe,0x3f,0xd0 };
     constexpr SDL_Color crimson = { 0xd0,0x3f,0x89 };
 };
-
-// pngPatchPixelCol namespace 제거됨 — Patch 시스템 폐지.

@@ -2,6 +2,15 @@ export module Point;
 
 import std;
 
+
+/*
+Point2 Point3 
+범용 포인트 함수
+해시 함수를 쓰기 위해 std::unordered_set<Point2,Point2::Hash>같은 형태로 써야함
+물론 저 해시함수를 안 쓰게 설계할 수 있지만 그러면 프로젝트 인텔리센스가 붕괴되니 절대 시도하지 말 것 - 26년 8월 19일 기준
+util의 aStar 파일부터 모듈을 못 읽기 시작하고 item 관련 파일들을 못 읽기 시작함
+*/
+
 export struct Point2
 {
     int x = 0;
@@ -28,15 +37,17 @@ export struct Point2
         if (x != rhs.x) return x < rhs.x;
         return y < rhs.y;
     }
-};
 
-template<>
-struct std::hash<Point2>
-{
-    std::size_t operator()(const Point2& p) const noexcept
+    struct Hash
     {
-        return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 16);
-    }
+        std::size_t operator()(const Point2& p) const noexcept
+        {
+            std::size_t seed = 0;
+            seed ^= std::hash<int>()(p.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= std::hash<int>()(p.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            return seed;
+        }
+    };
 };
 
 export Point2 calcMidpoint(std::vector<Point2> vec)
@@ -85,15 +96,18 @@ export struct Point3
         if (y != rhs.y) return y < rhs.y;
         return z < rhs.z;
     }
-};
-
-template<>
-struct std::hash<Point3>
-{
-    std::size_t operator()(const Point3& p) const noexcept
+    
+    struct Hash
     {
-        return std::hash<int>{}(p.x) ^ (std::hash<int>{}(p.y) << 16) ^ (std::hash<int>{}(p.z) << 32);
-    }
+        std::size_t operator()(const Point3& p) const noexcept
+        {
+            std::size_t seed = 0;
+            seed ^= std::hash<int>()(p.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= std::hash<int>()(p.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            seed ^= std::hash<int>()(p.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+            return seed;
+        }
+    };
 };
 
 export Point3 calcMidpoint(std::vector<Point3> vec)

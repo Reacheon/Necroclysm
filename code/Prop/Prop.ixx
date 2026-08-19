@@ -3,7 +3,7 @@ export module Prop;
 import std;
 import constVar;
 import util;
-import ItemData;
+import Item;
 import Ani;
 import AI;
 import Light;
@@ -51,7 +51,7 @@ public:
     int delayMaxStack = 3;
     double delayStartTurn = 0;
 
-    std::unordered_map<Point3, crossFlag> crossStates;
+    std::unordered_map<Point3, crossFlag, Point3::Hash> crossStates;
 
     double gndSink = 0.0;
     double gndSinkRight = 0.0;

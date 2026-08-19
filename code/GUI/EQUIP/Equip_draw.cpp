@@ -11,8 +11,9 @@ import drawText;
 import checkCursor;
 import drawWindow;
 import drawSprite;
-import ItemData;
+import Item;
 import CoordSelect;
+import GUI;
 
 void Equip::drawGUI()
 {

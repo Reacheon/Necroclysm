@@ -112,7 +112,7 @@ public:
                 int dx = std::abs(x - WORLD_DATA_SIZE / 2);
                 int dy = std::abs(y - WORLD_DATA_SIZE / 2);
 
-                float penalty = std::min(1.0f, (float)sqrt(dx * dx + dy * dy) / (float)(WORLD_DATA_SIZE / 2));
+                float penalty = std::min(1.0f, (float)std::sqrt(dx * dx + dy * dy) / (float)(WORLD_DATA_SIZE / 2));
                 float height = (noiseMap[x][y] + noiseMap30[x][y] * 0.25f + noiseMap10[x][y] * 0.1f) / 1.45f - penalty * penalty * penalty;
                 heightMap[x][y] = height; //이거 없어지면 직선 강 생김ㅋ
             }
@@ -344,7 +344,7 @@ public:
                     auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
                     auto& cond = *condPtr;
 
-                    std::unordered_set<Point2> lake;
+                    std::unordered_set<Point2, Point2::Hash> lake;
 
                     for (int y = 0; y < WORLD_DATA_SIZE; y++)
                     {

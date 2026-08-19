@@ -1,5 +1,5 @@
-import ItemData;
-import ItemPocket;
+module Item;
+
 import std;
 import util;
 import constVar;

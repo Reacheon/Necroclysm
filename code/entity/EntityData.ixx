@@ -4,12 +4,11 @@ import std;
 import constVar;
 import Sprite;
 import SkillData;
-import ItemPocket;
+import Item;
 import statusEffect;
 
 //__int8 : -128~127
 //__int16 : -32768 ~32767
-//__int32 : –2,147,483,648 ~2,147,483,647
 
 
 export struct EntityData_Base

@@ -1,6 +1,8 @@
+module;
 #include <SDL3/SDL.h>
 
-import ItemPocket;
+module Item;
+
 import std;
 import util;
 import World;
@@ -8,9 +10,10 @@ import globalVar;
 import constVar;
 import Coord;
 import log;
-import ItemData;
 import actFuncSet;
 
+
+std::unique_ptr<ItemPocket> ItemPocket::unlockRecipes = std::make_unique<ItemPocket>(storageType::recipe);
 
 ItemPocket::ItemPocket(storageType inputType) { type = inputType; }
 

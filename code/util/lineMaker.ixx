@@ -82,7 +82,7 @@ export void makeLine(std::vector<Point2>& inputPath, int delX, int delY)
 };
 
 
-export void makeLine(std::unordered_set<Point2>& inputPath,int delX, int delY)
+export void makeLine(std::unordered_set<Point2, Point2::Hash>& inputPath,int delX, int delY)
 {
     int cursorX = 0;
     int cursorY = 0;

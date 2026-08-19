@@ -2,7 +2,6 @@ export module constVar:itemIDs;
 
 export namespace itemID
 {
-    //sentinel — "미설정" / "이 레이어 안 건드림". LotBuilder 등에서 vector 기본값(0)과 의미 일치.
     constexpr int none = 0;
 
     constexpr int metalFrame = 45;
@@ -328,7 +327,6 @@ export namespace itemID
 
     ///////////////////////아스팔트 변형 (페인트용 절반·대각·화살표) //////////////////////
     //   whiteAsphalt(562) / yellowAsphalt(377) 의 시각 변형 타일들. 도로 페인팅에서
-    //   직사각/대각 줄무늬, 차선 화살표 등을 표현. 색상은 베이스와 동일 — Map.ixx
     //   floorOverlay 가 베이스 색으로 동일 처리.
 
     // ── White Asphalt 절반 채움 (4면 axis + 4 대각) ──
@@ -341,7 +339,6 @@ export namespace itemID
     constexpr int whiteAsphaltDiagUR = 496;  //     (\-cut, upper-right filled)
     constexpr int whiteAsphaltDiagLL = 497;  //     (\-cut, lower-left filled)
 
-    // ── White Asphalt 쿼터(1/4) 채움 — 가운데 1/4 사각형만 흰색, 가는 횡단보도용 ──
     constexpr int whiteAsphaltRightQuarter = 522;  // ▕  (우측 쿼터만 채움)
     constexpr int whiteAsphaltTopQuarter = 523;  // ▔  (상단 쿼터만 채움)
     constexpr int whiteAsphaltLeftQuarter = 524;  // ▏  (좌측 쿼터만 채움)

@@ -58,7 +58,6 @@ public:
 
 	// 실패율 계산 (숙련도-스킬 통합 모델): 자기 랭크가 기본을 만들고 참조 스킬 랭크가 보정한다.
 	// 참조 랭크가 낮아도 자기 랭크만 충분히 높으면 쓸 만한 수준이 되도록 참조 비중은 보조적.
-	// 아래 세 상수가 밸런싱 손잡이 — F/참조없음 20%, 자기 S랭크 단독 2%, 참조까지 S면 0%.
 	int calcFailRate(Entity* caster, const SkillData& data) const
 	{
 		constexpr int BASE_FAIL = 20; // 자기 F랭크·참조 F 기준 실패율

@@ -8,6 +8,7 @@ import World;
 import globalTime;
 import ItemStack;
 import Entity;
+import Item;
 
 
 constexpr double TIME_PER_TURN = 60.0;
@@ -190,7 +191,7 @@ void Prop::updateCircuitNetwork()
     int cursorZ = getGridZ();
 
     std::queue<Point3> frontierQueue;
-    std::unordered_set<Point3> visitedSet;
+    std::unordered_set<Point3, Point3::Hash> visitedSet;
     std::vector<Prop*> voltagePropVec;
 
     /*
@@ -199,7 +200,7 @@ void Prop::updateCircuitNetwork()
     *   - 논리게이트의 입력핀 → 출력핀 누설 방지
     *   - 해당 노드는 BFS에 추가되지만, 그 노드에서의 확장은 1회만 허용
     */
-    std::unordered_set<Point3> skipBFSSet;
+    std::unordered_set<Point3, Point3::Hash> skipBFSSet;
 
     int circuitMaxEnergy = 0;
     int circuitTotalLoad = 0;
@@ -1332,7 +1333,7 @@ void Prop::transferCharge(Prop* thisProp, Prop* nextProp, double txChargeAmount,
 void Prop::initChargeBFS(std::queue<Point3> startPointSet)
 {
     std::queue<Point3> frontierQueue = startPointSet;
-    std::unordered_set<Point3> visitedSet;
+    std::unordered_set<Point3, Point3::Hash> visitedSet;
 
     while (!frontierQueue.empty())
     {

@@ -1,5 +1,6 @@
 module actFuncSet;
 
+import std;
 import util;
 import constVar;
 import globalVar;
@@ -12,6 +13,7 @@ import Vehicle;
 import LstEx;
 import textureVar;
 import turnWait;
+import Item;
 
 namespace
 {
@@ -20,7 +22,7 @@ namespace
 	{
 		for (auto& item : pocket->itemInfo)
 		{
-			if (item.pocketPtr != nullptr)
+			if (item.pocketPtr.get() != nullptr)
 			{
 				outVec.push_back(item.pocketPtr.get());
 				collectSubPockets(item.pocketPtr.get(), outVec);

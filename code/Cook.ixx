@@ -17,9 +17,9 @@ import log;
 import World;
 import Player;
 import ItemStack;
-import ItemPocket;
-import ItemData;
+import Item;
 import Prop;
+import Sprite;
 
 export class Cook : public GUI
 {

@@ -1,10 +1,12 @@
 #include <SDL3/SDL.h>
 
+import std;
 import Craft;
 import globalVar;
 import checkCursor;
 import log;
-import ItemData;
+import Item;
+import Corouter;
 
 void Craft::clickUpGUI()
 {

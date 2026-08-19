@@ -1,5 +1,6 @@
 module actFuncSet;
 
+import std;
 import util;
 import constVar;
 import globalVar;
@@ -17,6 +18,8 @@ import LstEx;
 import SkillRegistry;
 import SkillBehavior;
 import paletteLoader;
+import SkillData;
+import Item;
 
 namespace actFunc
 {

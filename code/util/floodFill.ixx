@@ -221,7 +221,7 @@ int floodFill(const std::array<std::array<bool, SIZE>, SIZE>& inputConditions, P
 
 //@brief 입력한 컨디션에서 bool이 참인 지점만을 플루드필해간다. 방문한 곳을 반환한다.
 export template<std::size_t SIZE>
-int floodFill(const std::array<std::array<bool, SIZE>, SIZE>& inputConditions, Point2 startCoor, std::unordered_set<Point2>& outputSet)
+int floodFill(const std::array<std::array<bool, SIZE>, SIZE>& inputConditions, Point2 startCoor, std::unordered_set<Point2, Point2::Hash>& outputSet)
 {
 
 	errorBox(inputConditions[startCoor.x][startCoor.y] == false, L"플루드필의 시작점 조건이 거짓이다.");

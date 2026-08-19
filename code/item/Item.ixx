@@ -1,9 +1,76 @@
-export module ItemPocket;
+export module Item;
 
 import std;
 import util;
 import constVar;
-import ItemData;
+import Light;
+import ItemDataBase;
+import Point;
+import dir16;
+
+/*
+* ItemData.ixx
+* ItemData와 ItemPocket의 선언을 포함한 파일
+* 일단은 미봉책으로 두 선언을 합쳐둔다. 섵부르게 수정하지 말 것
+*/
+
+class ItemPocket;
+
+//__int8 : -128~127
+//__int16 : -32768 ~32767
+
+export struct ItemData : public ItemDataBase
+{
+    ///////////////////비데이터베이스 변수////////////////////
+    unsigned __int32 pocketVolume = 0;
+    unsigned __int32 number = 1;
+    unsigned __int32 lootSelect = 0;
+    unsigned __int32 reactSelect = 0;
+
+    std::unique_ptr<ItemPocket> pocketPtr;
+    equipHandFlag equipState = equipHandFlag::none;
+    unsigned __int8 modeCurrent = 0;
+
+    unsigned __int16 unfinishItemCode = 0;
+    unsigned __int8 unfinishPercent = 100;
+
+    unsigned __int8 extraSprIndexSingle = 0; //벽의 연결로 추가되는 sprIndex(일단은 차량만 구현)
+    unsigned __int8 extraSprIndex16 = 0; //16단위로 움직이는 추가 sprIndex
+
+    unsigned __int16 rotatedCCW90ItemCode = 0;
+    dir16 propDir16 = dir16::dir0;
+
+    std::unique_ptr<Light> lightPtr;
+    __int16 propHP = 100;
+    float propFakeHP = 100.0f;
+
+    double powerStorage = 0; //현재 저장된 전하 용량(파워뱅크용)
+    
+    bool checkFlag(itemFlag inputFlag) const;
+
+    void addFlag(itemFlag inputFlag);
+
+    void eraseFlag(itemFlag inputFlag);
+
+    ItemData cloneForTransfer(int transferNumber) const;
+
+    bool itemOverlay(const ItemData& tgtItem) const;
+
+    ItemData();
+    virtual ~ItemData();
+    ItemData(ItemData&&) noexcept;
+    ItemData& operator=(ItemData&&) noexcept = default;
+    ItemData(const ItemData&) = delete;
+    ItemData& operator=(const ItemData&) = delete;
+
+    bool isPocketOnlyItem(int inputCode);
+
+    int getVolume() const;
+    int getSprIndex();
+};
+
+export ItemData cloneFromItemDex(ItemData& inputData, int transferNumber);
+
 
 export class ItemPocket
 {
@@ -96,11 +163,8 @@ public:
 	int findItemIndex(int inputItemCode);
 };
 
-inline std::unique_ptr<ItemPocket> ItemPocket::unlockRecipes = std::make_unique<ItemPocket>(storageType::recipe);
-
 //현재 이 총에 장전된 모든 총알을 벡터 형태로 반환
 export ItemPocket* getBulletPocket(ItemData& inputGun);
 
 //이 총에 장전된 모든 총알의 갯수 반환, 탄창일 때도 할것
 export int getBulletNumber(ItemData& inputGun);
-

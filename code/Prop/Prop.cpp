@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 
+import std;
 import Prop;
 import util;
 import globalVar;
@@ -7,8 +8,7 @@ import Player;
 import constVar;
 import World;
 import ItemStack;
-import ItemPocket;
-import ItemData;
+import Item;
 import Ani;
 import AI;
 import Light;
@@ -17,6 +17,7 @@ import log;
 import Drawable;
 import Sticker;
 import Particle;
+import Chunk;
 
 
 Prop::Prop(Point3 inputCoor, int leadItemCode)
@@ -58,13 +59,12 @@ Prop::~Prop()
 {
     // 광역 청크 소멸(게임 종료) 도중에는 자신을 담은 청크가 이미
     // unordered_map에서 분리된 채로 ~Chunk가 호출됨 → getChunk()/TileProp()가 .at()로
-    // 던짐. tryGetChunk로 본인 청크 존재 여부를 먼저 확인하고, 없으면 즉시 종료 —
     // 컨테이너 자체가 소멸되니 eraseProp도, 이웃 CABLE 플래그 정리도 의미 없음.
     Point2 currentChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
     Chunk* currentChunk = World::ins()->tryGetChunk(currentChunkCoord.x, currentChunkCoord.y, getGridZ());
     if (currentChunk == nullptr)
     {
-        dbgPrt(L"[Prop:destructor] 청크 광역 소멸 중 — 정리 생략.\n");
+        dbgPrt(L"[Prop:destructor] 청크 광역 소멸 중 - 정리 생략.\n");
         return;
     }
 
@@ -90,8 +90,6 @@ Prop::~Prop()
 
 void Prop::setGrid(int inputGridX, int inputGridY, int inputGridZ)
 {
-    // 생성자 첫 호출이면 getGridX/Y/Z가 디폴트(0,0,0) — 그 청크가 안 로드된 곳에서
-    // createProp 호출 시 .at() throw. tryGetChunk로 안전 처리 — 소멸자와 동일 패턴.
     Point2 prevChunkCoord = World::ins()->changeToChunkCoord(getGridX(), getGridY());
     if (Chunk* prevChunk = World::ins()->tryGetChunk(prevChunkCoord.x, prevChunkCoord.y, getGridZ()))
     {
@@ -236,13 +234,12 @@ void Prop::updateSprIndex()
         rightTile = sameCheck(1, 0);
         leadItem.extraSprIndexSingle = connectGroupExtraIndex(topTile, botTile, leftTile, rightTile);
 
-        //하단 대각(좌하/우하) 미점유 변형 — 하단+좌/우가 연결된 기본형에서 해당 쪽 대각이 비면 +16~+25 변형 선택
         //양쪽 관여: (0,■□)=+16 (0,□■)=+17 (0,□□)=+18 (4,■□)=+19 (4,□■)=+20 (4,□□)=+21
         //한쪽 관여: (6,우하□)=+22 (2,좌하□)=+23 (5,우하□)=+24 (3,좌하□)=+25
         if (leadItem.checkFlag(itemFlag::PROP_CONNECT_DIAG_BOTTOM))
         {
             int base = leadItem.extraSprIndexSingle;
-            if (base == 0 || base == 4)//사방연결/하좌우연결 — 양쪽 대각 관여
+            if (base == 0 || base == 4)
             {
                 bool botLeftTile = sameCheck(-1, 1);
                 bool botRightTile = sameCheck(1, 1);
@@ -252,11 +249,11 @@ void Prop::updateSprIndex()
                     leadItem.extraSprIndexSingle = (base == 0 ? 16 : 19) + variant;
                 }
             }
-            else if (base == 6 || base == 5)//상하우연결/하우연결 — 우하 대각만 관여
+            else if (base == 6 || base == 5)
             {
                 if (!sameCheck(1, 1)) leadItem.extraSprIndexSingle = (base == 6 ? 22 : 24);
             }
-            else if (base == 2 || base == 3)//상하좌연결/하좌연결 — 좌하 대각만 관여
+            else if (base == 2 || base == 3)
             {
                 if (!sameCheck(-1, 1)) leadItem.extraSprIndexSingle = (base == 2 ? 23 : 25);
             }

@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 
+import std;
 import Craft;
 import globalVar;
 import World;
@@ -15,6 +16,7 @@ import const2Str;
 import drawItemSlot;
 import Player;
 import GameOver;
+import Item;
 
 
 void Craft::drawGUI()
@@ -596,7 +598,6 @@ void Craft::drawGUI()
 
 				std::wstring tooltipText;
 
-				//조합 기술 요구치 표시는 구 숙련도 폐기로 제거됨 — 신 스킬 랭크 기반으로 재작업 예정
 
 				//조합에 필요한 기술(툴 퀄리티)
 				std::wstring qualityStr = col2Str(col::gray) + sysStr[152]+L" : ";//필요 공구

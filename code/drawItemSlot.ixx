@@ -5,8 +5,7 @@ export module drawItemSlot;
 
 import std;
 import util;
-import ItemData;
-import ItemPocket;
+import Item;
 import globalVar;
 import drawText;
 import constVar;
@@ -108,7 +107,7 @@ export void drawItemRect(cursorFlag inputCursor, int x, int y, ItemData& inputIt
 	}
 	else if (inputItem.pocketPtr)
 	{
-		if (inputItem.pocketPtr->itemInfo.size() == 1)
+		if (inputItem. pocketPtr->itemInfo.size() == 1)
 		{
 			ItemData& batteryData = inputItem.pocketPtr->itemInfo[0];
 			if (batteryData.itemCode == itemID::battery

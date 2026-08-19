@@ -6,8 +6,7 @@ export module Vehicle;
 
 import std;
 import constVar;
-import ItemPocket;
-import ItemData;
+import Item;
 import util;
 import Ani;
 import AI;
@@ -31,7 +30,7 @@ export enum class vehAddResult
     ok,                //설치 가능
     noFrame,           //프레임 없는 타일
     wallRoofConflict,  //차벽<->천장 동시 설치 불가
-    belowTopBand       //최상단(가장 최근) 부품보다 낮은 밴드 — 그 위에 깔 수 없음
+    belowTopBand
 };
 
 //checkAddPart 결과 묶음. blockerCode는 conflict/belowTopBand일 때 설치를 막은 기존 부품의 itemCode(메시지에 이름 표시용. ok/noFrame이면 none).
@@ -48,7 +47,7 @@ public:
     std::wstring name = L"Vehicle";
     bool isEngineOn = false;
     double pullMoveSpd = 3.0; //카트이동 시의 이동속도
-    std::unordered_map<Point3, std::unique_ptr<ItemPocket>> partInfo;
+    std::unordered_map<Point3, std::unique_ptr<ItemPocket>, Point3::Hash> partInfo;
     vehFlag vehType = vehFlag::none;
     dir16 bodyDir = dir16::dir2;
     dir16 wheelDir = dir16::dir2;
@@ -102,7 +101,7 @@ public:
     void setGrid(int inputGridX, int inputGridY, int inputGridZ) override;
     int getSprIndex(int inputX, int inputY);
     void rotatePartInfo(dir16 inputDir16);
-    std::unordered_set<Point3> getRotateShadow(dir16 inputDir16);
+    std::unordered_set<Point3, Point3::Hash> getRotateShadow(dir16 inputDir16);
     void rotateEntityPtr(dir16 inputDir16);
     void rotate(dir16 inputDir16);
     void updateSpr();
@@ -125,4 +124,3 @@ public:
     void useEngineFuel(int fuelAmount);
     void drawSelf() override;
 };
-

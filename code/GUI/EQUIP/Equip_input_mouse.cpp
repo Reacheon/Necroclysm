@@ -6,7 +6,7 @@ import checkCursor;
 import globalVar;
 import World;
 import actFuncSet;
-import ItemData;
+import Item;
 import log;
 
 void Equip::clickUpGUI()

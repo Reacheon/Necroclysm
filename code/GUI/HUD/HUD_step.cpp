@@ -1,10 +1,12 @@
+import std;
 import HUD;
 import constVar;
 import globalVar;
 import World;
-import ItemData;
+import Item;
 import Sleep;
 import statusEffect;
+import GUI;
 
 void HUD::step()
 {

@@ -1,6 +1,7 @@
-import Loot;
-
 #include <SDL3/SDL.h>
+
+import std;
+import Loot;
 
 import globalVar;
 import World;
@@ -14,6 +15,8 @@ import drawSprite;
 import checkCursor;
 import drawText;
 import drawItemSlot;
+import GUI;
+import Item;
 
 void Loot::drawGUI()
 {

@@ -13,7 +13,7 @@ import Sprite;
 import Drawable;
 import EntityData;
 import Vehicle;
-import ItemPocket;
+import Item;
 
 export class Entity : public Ani, public Coord, public Drawable 
 {

@@ -8,6 +8,7 @@ import Light;
 import std;
 import util;
 import World;
+import Chunk;
 import constVar;
 import Coord;
 
@@ -89,9 +90,7 @@ void Light::releaseLight()
 		int y = (*it).y;
 		int z = (*it).z;
 
-		// 광역 청크 소멸(게임 종료) 중 — Light 소유자(Prop의 ItemData 등)
 		// 가 멤버 소멸로 ~Light를 호출할 때, lit 타일의 청크가 이미 사라져있을 수 있음.
-		// getTile()의 .at()이 throw하므로 청크별 안전 조회로 우회 — 청크가 없으면 정리 불필요.
 		int chunkX, chunkY;
 		World::ins()->changeToChunkCoord(x, y, chunkX, chunkY);
 		Chunk* chunk = World::ins()->tryGetChunk(chunkX, chunkY, z);

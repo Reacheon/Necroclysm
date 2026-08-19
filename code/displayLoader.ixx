@@ -3,6 +3,7 @@ module;
 #include <SDL3_image/SDL_image.h>
 
 export module displayLoader;
+import std;
 export import globalVar;
 import util;
 import constVar;
@@ -126,13 +127,10 @@ export void applyResolution(int camW, int camH)
     cameraW = camW;
     cameraH = camH;
 
-    // 렌더타겟이 바인딩된 채로 SDL_SetRenderLogicalPresentation을 부르면 SDL이 출력
-    // 크기를 창이 아니라 타겟 텍스처 기준으로 계산해 잘못된 배율이 캐시됨 — 먼저 해제.
     SDL_SetRenderTarget(renderer, nullptr);
 
     if (dispOption::fullScreen == false)
     {
-        // 모니터의 90% 안에 들어오도록 창 크기 축소 — 비정수 배율 테스트 겸용
         double scale = dispOption::windowScale;
         SDL_DisplayID disp = SDL_GetPrimaryDisplay();
         const SDL_DisplayMode* mode = SDL_GetCurrentDisplayMode(disp);
@@ -159,20 +157,14 @@ export void applyResolution(int camW, int camH)
     std::printf("[debug] Camera: %dx%d (%.2f:1)\n", cameraW, cameraH, (float)cameraW / (float)cameraH);
 }
 
-// 프레임 렌더타겟 (재)생성 — cameraW×cameraH 1:1 버퍼. 모든 그리기는 여기에 정수 좌표
-// 그대로 이뤄지고, 메인 루프 끝에서 전체를 한 번만 창 크기로 스케일한다. 드로우 콜마다
-// 개별 스케일될 때 생기는 타일 경계 반올림 어긋남(비정수 배율 가로선)이 원천 차단됨.
 void recreateFrameTarget()
 {
-    // 디버그 콘솔은 프레임 도중(구 타겟 바인딩 상태)에 실행되므로, 파괴 전에 바인딩
-    // 여부를 기억해뒀다가 새 타겟으로 갈아끼운다 — 파괴된 포인터로 복귀하면 안 됨.
     const bool wasBound = (frameTarget != nullptr && SDL_GetRenderTarget(renderer) == frameTarget);
     if (frameTarget != nullptr) SDL_DestroyTexture(frameTarget);
     frameTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, cameraW, cameraH);
     SDL_SetTextureScaleMode(frameTarget, SDL_SCALEMODE_LINEAR);
     SDL_SetTextureBlendMode(frameTarget, SDL_BLENDMODE_NONE);
 
-    // 생성 직후 내용은 미정의 — 첫 프레임 쓰레기 픽셀 방지용 1회 클리어
     SDL_SetRenderTarget(renderer, frameTarget);
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);

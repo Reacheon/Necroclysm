@@ -17,8 +17,7 @@ import Player;
 import World;
 import Entity;
 import log;
-import ItemData;
-import ItemPocket;
+import Item;
 import replaceStr;
 import turnWait;
 

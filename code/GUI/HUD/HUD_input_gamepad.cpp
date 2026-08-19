@@ -12,6 +12,7 @@ import Aim;
 import turnWait;
 import Craft;
 import Equip;
+import GUI;
 
 void gamepadMove(int dir)
 {

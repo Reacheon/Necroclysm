@@ -13,8 +13,7 @@ import log;
 import TileData;
 import Chunk;
 import Prop;
-import ItemPocket;
-import ItemData;
+import Item;
 import nanoTimer;
 import globalTime;
 import Footprint;
@@ -26,6 +25,8 @@ import Sprite;
 import drawSprite;
 import Vehicle;
 import levelUpFX;
+import Coord;
+import ItemStack;
 
 Player::Player(int gridX, int gridY, int gridZ) : Entity(1, gridX, gridY, gridZ)//생성자입니다.
 {
@@ -366,7 +367,6 @@ void Player::updateVision(int range, int cx, int cy)
 			{
 				t->fov = fovFlag::white;
 			}
-			// 인라인 isRayBlocker — 동일 TileData 참조에서 wall + prop을 한 번에 판정
 			if (t->wall != itemID::none && itemDex[t->wall].checkFlag(itemFlag::TRANSPARENT_WALL) == false) return true;
 			if (t->PropPtr != nullptr && t->PropPtr->leadItem.checkFlag(itemFlag::PROP_BLOCKER) == true) return true;
 			return false;

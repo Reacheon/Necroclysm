@@ -66,7 +66,7 @@ export std::int64_t renderSticker(int cameraX, int cameraY)
 			{
 				if (address->getIsCenter() == true)
 				{
-					SDL_Point rCenter = { (float)address->rotateCenter.x * zoomScale, (float)address->rotateCenter.y * zoomScale };
+					SDL_Point rCenter = { static_cast<int>(address->rotateCenter.x * zoomScale), static_cast<int>(address->rotateCenter.y * zoomScale) };
 					setZoom(zoomScale);
 					drawSpriteCenterRotate
 					(
@@ -81,7 +81,7 @@ export std::int64_t renderSticker(int cameraX, int cameraY)
 				}
 				else
 				{
-					SDL_Point rCenter = { (float)address->rotateCenter.x * zoomScale, (float)address->rotateCenter.y * zoomScale };
+					SDL_Point rCenter = { static_cast<int>(address->rotateCenter.x * zoomScale), static_cast<int>(address->rotateCenter.y * zoomScale) };
 					setZoom(zoomScale);
 					drawSpriteRotate
 					(

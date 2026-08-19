@@ -9,8 +9,7 @@ import constVar;
 import globalVar;
 import HUD;
 import Player;
-import ItemData;
-import ItemPocket;
+import Item;
 import ItemStack;
 import World;
 import Vehicle;
@@ -27,7 +26,6 @@ export void startArea()
 	PlayerPtr->setGrid(0, 0, 0);
 	PlayerPtr->setDstGrid(0, 0);
 
-	// (Patch 시스템 제거됨 — 타이틀 영역은 createChunk가 chunkFlag::seawater 디폴트로 채움.
 	//  startArea가 그 위에 home base 영역 props/items를 배치.)
 
 	PlayerInfo().statusEffectVec.push_back({ statusEffectFlag::hungry, -1 });
@@ -816,7 +814,6 @@ export void startArea()
 
 	int vX = -9;
 	int vY = +3;
-	//SUV — 직접 조립 (디버그 콘솔 SUV 소환과 동일 footprint 4x7)
 	{
 		Vehicle* myCar = World::ins()->createVehicle(vX, vY, 0, itemID::metalFrame);
 		myCar->name = L"SUV";
@@ -1007,18 +1004,18 @@ export void startArea()
 		{
 			for (int dy = -60; dy <= 60; dy++)
 			{
-				float distance = sqrt(dx * dx + dy * dy);
+				float distance = std::sqrt(dx * dx + dy * dy);
 
 				// 여러 노이즈를 조합해서 더 자연스러운 해안선 만들기
-				float noise1 = sin(dx * 0.08f) * cos(dy * 0.12f) * 4.0f;
-				float noise2 = sin(dx * 0.15f + dy * 0.1f) * 2.5f;
-				float noise3 = cos(dx * 0.05f) * sin(dy * 0.07f) * 3.0f;
+				float noise1 = std::sin(dx * 0.08f) * std::cos(dy * 0.12f) * 4.0f;
+				float noise2 = std::sin(dx * 0.15f + dy * 0.1f) * 2.5f;
+				float noise3 = std::cos(dx * 0.05f) * std::sin(dy * 0.07f) * 3.0f;
 				float totalNoise = noise1 + noise2 + noise3;
 
 				// 타원형 기본 모양 (가로세로 비율 조정)
 				float ellipseX = dx / 1.4f;
 				float ellipseY = dy / 1.1f;
-				float ellipseDistance = sqrt(ellipseX * ellipseX + ellipseY * ellipseY);
+				float ellipseDistance = std::sqrt(ellipseX * ellipseX + ellipseY * ellipseY);
 
 				// 최종 거리 계산
 				float finalDistance = ellipseDistance + totalNoise;
@@ -1263,7 +1260,6 @@ export void startArea()
 
 		}
 
-		// 다리 끝 반대편 섬을 먼저 깔아둠 — 다리가 위에 덮어씌어지면서 끝부분이 섬에 박힘
 		// 섬 반경 18 ≥ 다리 폭 24/2 → 다리 끝 24타일 전체가 섬 안에 들어옴
 		for (int dx = -33; dx <= 7; dx++)
 		{
@@ -1271,7 +1267,7 @@ export void startArea()
 			{
 				float ldx = dx + 13.0f;
 				float ldy = dy - 73.0f;
-				float dist = sqrt(ldx * ldx + ldy * ldy);
+				float dist = std::sqrt(ldx * ldx + ldy * ldy);
 				if (dist <= 18)
 				{
 					if (dist <= 13) setFloor({ dx, dy, 0 }, itemID::grass);
@@ -1280,7 +1276,6 @@ export void startArea()
 			}
 		}
 
-		// 남쪽 다리 (z=1) — 밑 z=0의 바다/섬은 그대로 보존되어 보트 통과 가능
 		// 도로 16타일 + 양쪽 paver 인도 4타일(가드레일 1 + 보행 3) = 폭 24타일
 		for (int dy = 29; dy <= 60; dy++)
 		{
@@ -1291,7 +1286,6 @@ export void startArea()
 			}
 		}
 
-		// 진입측 / 출구측 양방향 ramp — 같은 (x, y)의 두 z에 RAMP_UP/RAMP_DOWN 쌍으로 배치
 		for (int dx = -25; dx <= -2; dx++)
 		{
 			createProp({ dx, 29, 0 }, itemID::rampUp);   // 도로 → 다리
@@ -1307,14 +1301,12 @@ export void startArea()
 			setWall({ -2, dy, 1 }, itemID::guardrail);
 		}
 
-		// ramp 뒤(다리 안쪽 z=0)에 기둥벽 — 다리 밑에서 ramp 역방향 진입 차단 + 시야 차단
 		for (int dx = -25; dx <= -2; dx++)
 		{
 			setWall({ dx, 30, 0 }, itemID::pillarWall); // 북쪽 ramp 뒤
 			setWall({ dx, 59, 0 }, itemID::pillarWall); // 남쪽 ramp 뒤
 		}
 
-		// z=0 진입측/출구측 다리 연장 — 도로가 다리로 전환되는 시각 단서 + 가드레일로 진입 방향 유도
 		// 양쪽 paver만 깔아서 가운데(진입 차선 / 섬 가장자리)는 그대로 보이게
 		for (int dy = 25; dy <= 29; dy++)
 		{
@@ -1451,7 +1443,6 @@ export void startArea()
 
 
 
-	// (Patch 시스템 제거됨 — createPatch 호출 불필요)
 
 	PlayerPtr->updateVision(PlayerInfo().eyeSight);
 

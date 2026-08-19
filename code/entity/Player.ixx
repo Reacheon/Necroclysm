@@ -37,7 +37,7 @@ public:
 	int skillPoint = 0; //미사용 스킬 포인트 (레벨당 +10)
 
 	int expToNext() { return level * 100; }
-	void levelUp();  //즉시 1레벨업 — 포인트 지급·연출·로그까지 한 번에 (F3/디버그에서도 직접 호출)
+	void levelUp();
 	void addExp(int amount);
 
 	Player(int gridX, int gridY, int gridZ);//생성자입니다.

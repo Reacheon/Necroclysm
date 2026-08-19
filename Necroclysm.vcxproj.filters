@@ -492,13 +492,10 @@
     <ClCompile Include="code\item\ItemData.cpp">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
-    <ClCompile Include="code\item\ItemData.ixx">
+    <ClCompile Include="code\item\Item.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
     <ClCompile Include="code\item\ItemPocket.cpp">
-      <Filter>소스 파일\05_Class\02_Item</Filter>
-    </ClCompile>
-    <ClCompile Include="code\item\ItemPocket.ixx">
       <Filter>소스 파일\05_Class\02_Item</Filter>
     </ClCompile>
     <ClCompile Include="code\item\ItemStack.cpp">
