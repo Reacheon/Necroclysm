@@ -19,6 +19,7 @@ export enum class chunkType : std::uint8_t
     forest,
     desert,
     snow,
+    city,//일단 디버그용
 };
 
 export class WorldData
@@ -34,6 +35,9 @@ public:
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMapForest;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> heightMap;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> filledHeightMap;
+    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> tempMap;
+    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> desertMap;
+    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> desertNoise;
 
     WorldData(std::uint64_t inputSeed) //생성자이며 최초에 지형 생성을 시작함
     {
@@ -104,6 +108,7 @@ public:
         createNoiseMap.operator() < 10 > (noiseMap10);
         createNoiseMap.operator() < 120 > (noiseMapBeach);
         createNoiseMap.operator() < 24 > (noiseMapForest);
+        createNoiseMap.operator() < 100 > (desertNoise);
 
         for (int y = 0; y < WORLD_DATA_SIZE; y++)
         {
@@ -335,7 +340,7 @@ public:
             for (auto elem : waterDepth)
             {
                 Point2 c = elem.second;
-                if (getProphecy(c.x, c.y, 0) != chunkType::deepSea 
+                if (getProphecy(c.x, c.y, 0) != chunkType::deepSea
                     && getProphecy(c.x, c.y, 0) != chunkType::shallowSea)
                 {
                     if (elem.first < MINIMUM_DEPTH) break;
@@ -371,7 +376,209 @@ public:
                 }
             }
 
+
+
         }
+
+        /////////////////////////////////////////////////극지방 만들기/////////////////////////////////////////////////
+
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                constexpr float ELEV_CONST = 1.05;
+                constexpr float LATITUDE_CONST = 0.2;
+
+                tempMap[x][y] = ELEV_CONST * (static_cast<float>(WORLD_DATA_SIZE - y) / static_cast<float>(WORLD_DATA_SIZE));
+                tempMap[x][y] += LATITUDE_CONST * heightMap[x][y];
+
+                if (tempMap[x][y] > 0.7f)
+                {
+                    if (getProphecy(x, y, 0) == chunkType::dirt)
+                    {
+                        writeProphecy(x, y, 0, chunkType::snow);
+                    }
+                    //나중에 산의 경우 snowMountain으로 바꾸는 코드를 넣어볼 것
+                }
+            }
+        }
+
+
+        /////////////////////////////////////////////////사막 만들기/////////////////////////////////////////////////
+
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                float latitudeParam = (static_cast<float>(y) / static_cast<float>(WORLD_DATA_SIZE));
+                float desertVal = (desertNoise[x][y] + 0.1 * noiseMap10[x][y]) / 1.1 + 0.6 * std::cos(3 * std::numbers::pi * latitudeParam) + 0.1 * heightMap[x][y]; //cos(3πx) 0.666 2/3 지점에서 최대가 됨
+
+                if (desertVal > 0.7f)
+                {
+                    if (getProphecy(x, y, 0) == chunkType::dirt)
+                    {
+                        writeProphecy(x, y, 0, chunkType::desert);
+                    }
+                }
+            }
+        }
+
+        /////////////////////////////////////////////////도시 배치/////////////////////////////////////////////////
+
+        std::vector<Point2> cityCoreVec;
+        bool cityGenerated = false;
+        int cityNumber = 0;
+        int loopCount = 0;
+        while (1)
+        {
+            loopCount++;
+            errorBox(loopCount > 50000, L"도시 다트 찍기가 잘 안 된다... 루프 카운트가 5만을 초과했다.");
+
+            int randX = randomRange(0, WORLD_DATA_SIZE - 1);
+            int randY = randomRange(0, WORLD_DATA_SIZE - 1);
+
+            if (randX < 10 || randX >= WORLD_DATA_SIZE - 10) continue;
+            if (randY < 10 || randY >= WORLD_DATA_SIZE - 10) continue;
+
+
+            if (getProphecy(randX, randY, 0) == chunkType::dirt)
+            {
+                //지름 11칸의 타일을 조사해서 하나라도 바다,얕은바다,강, 호수, 숲, 산 타일이 있으면 중단
+                bool cleanDistrict = true;
+                for (int dx = -15; dx <= 15; dx++)
+                {
+                    for (int dy = -15; dy <= 15; dy++)
+                    {
+                        if (isCircle(16, dx, dy) && getProphecy(randX + dx, randY + dy, 0) != chunkType::dirt) cleanDistrict = false;
+                    }
+                }
+
+                bool noNearbyCity = true;
+                constexpr int NO_CITY_DIAMETER = 100;
+                for (int dx = -NO_CITY_DIAMETER / 2; dx <= NO_CITY_DIAMETER / 2; dx++)
+                {
+                    for (int dy = -NO_CITY_DIAMETER / 2; dy <= NO_CITY_DIAMETER / 2; dy++)
+                    {
+                        if (isCircle(NO_CITY_DIAMETER / 2 + 1, dx, dy) && getProphecy(randX + dx, randY + dy, 0) == chunkType::city) noNearbyCity = false;
+                    }
+                }
+
+                if (cleanDistrict == false || noNearbyCity == false) continue;
+                writeProphecy(randX, randY, 0, chunkType::city);
+                cityCoreVec.push_back({ randX, randY });
+                cityNumber++;
+            }
+
+            if (cityNumber >= 10) break;
+        }
+
+        ////도시 확장 알고리즘
+        //for (auto core : cityCoreVec)
+        //{
+        //    int cursorX = core.x;
+        //    int cursorY = core.y;
+        //    int cityMaxSize = randomRange(100, 200);
+        //    int cityCurrentSize = 1;
+
+        //    std::vector<Point2> frontier;
+        //    frontier.push_back({ core.x + 1,core.y });
+        //    frontier.push_back({ core.x - 1,core.y });
+        //    frontier.push_back({ core.x ,core.y + 1 });
+        //    frontier.push_back({ core.x,core.y - 1});
+
+        //    while (frontier.empty() == false)
+        //    {
+        //        int dx = 0;
+        //        int dy = 0;
+        //        dx = randomRange(-1, 1);
+        //        dy = randomRange(-1, 1);
+        //        if (dx == 0 && dy == 0) continue;
+        //        if (std::abs(dx) == 1 && std::abs(dy) == 1) continue;
+
+
+        //        cursorX += dx;
+        //        cursorY += dy;
+        //        if (getProphecy(cursorX, cursorY, 0) == chunkType::city) continue;
+
+        //        for (int ddx = -2; ddx <= 2; ddx++)
+        //        {
+        //            for (int ddy = -2; ddy <= 2; ddy++)
+        //            {
+        //                writeProphecy(cursorX + ddx, cursorY + ddy, 0, chunkType::city);
+        //            }
+        //        }
+
+        //        cityCurrentSize++;
+        //        if (cityCurrentSize == cityMaxSize) break;
+        //    }
+        //}
+
+
+        //도시 확장 알고리즘 2
+        for (auto core : cityCoreVec)
+        {
+            int cursorX = core.x;
+            int cursorY = core.y;
+            int cityMaxSize = randomRange(150, 300);
+            int cityCurrentSize = 1;
+
+            std::vector<Point2> cityPoints;
+
+            std::priority_queue<std::pair<float, Point2>, std::vector<std::pair<float, Point2>>, std::greater<>> frontier;
+            float randomKey = randomRangeFloat(0.0, 1.0);
+            if (getProphecy(core.x + 1, core.y, 0) == chunkType::dirt) frontier.push({ randomKey,{ core.x + 1,core.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (getProphecy(core.x - 1, core.y, 0) == chunkType::dirt) frontier.push({ randomKey,{ core.x - 1,core.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (getProphecy(core.x, core.y + 1, 0) == chunkType::dirt) frontier.push({ randomKey,{ core.x ,core.y + 1 } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (getProphecy(core.x, core.y - 1, 0) == chunkType::dirt) frontier.push({ randomKey,{ core.x ,core.y - 1} });
+
+            while (frontier.empty() == false && cityCurrentSize < cityMaxSize)
+            {
+                int targetX = frontier.top().second.x;
+                int targetY = frontier.top().second.y;
+                frontier.pop();
+                if (getProphecy(targetX, targetY, 0) != chunkType::dirt) continue;
+
+                writeProphecy(targetX, targetY, 0, chunkType::city);
+                cityPoints.push_back({ targetX,targetY });
+
+                float randomKey = randomRangeFloat(0.0, 1.0);
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (getProphecy(targetX + 1, targetY, 0) == chunkType::dirt) frontier.push({ randomKey,{ targetX + 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (getProphecy(targetX - 1, targetY, 0) == chunkType::dirt) frontier.push({ randomKey,{ targetX - 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (getProphecy(targetX, targetY + 1, 0) == chunkType::dirt) frontier.push({ randomKey,{ targetX ,targetY + 1 } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (getProphecy(targetX, targetY - 1, 0) == chunkType::dirt) frontier.push({ randomKey,{ targetX ,targetY - 1} });
+
+                cityCurrentSize++;
+            }
+
+            for (auto elem : cityPoints)
+            {
+                for (int ddx = -2; ddx <= 2; ddx++)
+                {
+                    for (int ddy = -2; ddy <= 2; ddy++)
+                    {
+                        writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
+                        //여기에 숲이나 산 바다를 막는 체크 구문 추가할 것
+                    }
+                }
+            }
+
+            //지금은 평원에만 도시가 생기지만 평원뿐만이 아니라 사막 및 설원 도시도 추가할 것
+            //경계 문제도 해결할 것
+        }
+
+        //도로망 배치 알고리즘(N개의 도시를 잇는 완벽한 도로망 만들기)
+        {
+        }
+
+
+        /////////////////////////////////////////////////도시 배치/////////////////////////////////////////////////
     };
 
 

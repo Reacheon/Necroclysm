@@ -173,7 +173,7 @@ void HUD::drawGUI()
 			drawSprite(spr::mainGauge, 0, stressGaugePivotX, stressGaugePivotY);
 			drawMainGaugeFill(stressGaugePivotX, stressGaugePivotY, 0.2, col::red);
 			setFontSize(16);
-			drawTextOutline(L"92 / 100", stressGaugePivotX + 98, stressGaugePivotY + 11, lowCol::white);
+			drawTextOutline(L"20 / 100", stressGaugePivotX + 98, stressGaugePivotY + 11, lowCol::white);
 		}
 
 		if (ctrlVeh == nullptr)
@@ -1346,7 +1346,7 @@ void HUD::drawStatusEffects()
 			textWidth++;
 		}
 
-		drawTextOutline(statEfctName, pivotX + 45, pivotY + 8 + textOffsetY, textColor);
+		drawTextOutline(statEfctName, pivotX + 45, pivotY + 9 + textOffsetY, textColor);
 
 		int intDuration = std::ceil(myEfcts[i].duration);
 

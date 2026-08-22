@@ -32,6 +32,13 @@ public:
 		//메세지 박스 렌더링
 		changeXY(cameraW / 2, cameraH / 2, true);
 
+		currentWorld.reset();
+		SDL_DestroyTexture(texture::worldmap);
+		texture::worldmap = nullptr;
+		static std::uint64_t attempt = 10000;
+		attempt++;
+		currentWorld = std::make_unique<WorldData>(getSeed() ^ (attempt * 0x9E3779B97F4A7C15ULL));
+
 		if (texture::worldmap == nullptr)
 		{
 			if (currentWorld != nullptr)
@@ -59,6 +66,9 @@ public:
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::forest) drawPoint(x, y, { 0x38,0xa6,0x41 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::river) drawPoint(x, y, { 0x53,0xa6,0xcf });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::lake) drawPoint(x, y, { 0x53,0xa6,0xcf });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::snow) drawPoint(x, y, { 0xf2,0xf6,0xf7 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::desert) drawPoint(x, y, { 0xee,0xea,0x8b });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::city) drawPoint(x, y, { 0xa2,0xa2,0xa2 });
 
 
 						//Uint8 bright = (Uint8)((currentWorld->filledHeightMap[x][y]- currentWorld->heightMap[x][y] + 1.0f) * 0.5f * 255);

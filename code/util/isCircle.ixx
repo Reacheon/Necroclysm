@@ -142,7 +142,7 @@ export void initCircle()
 {
 	std::unordered_set<std::array<int, 2>> blank;
 	circleVec.push_back(blank);
-	for (int i = 1; i < 70; i++) circleVec.push_back(makeCircle(i, false));
+	for (int i = 1; i < 110; i++) circleVec.push_back(makeCircle(i, false));
 }
 
 export bool isCircle(int range, int revX, int revY)
