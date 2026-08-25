@@ -69,6 +69,8 @@ public:
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::snow) drawPoint(x, y, { 0xf2,0xf6,0xf7 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::desert) drawPoint(x, y, { 0xee,0xea,0x8b });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::city) drawPoint(x, y, { 0xa2,0xa2,0xa2 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::volcanicLand) drawPoint(x, y, { 0x4d,0x42,0x42 });
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::volcano) drawPoint(x, y, { 0xc3,0x2e,0x2e });
 
 
 						//Uint8 bright = (Uint8)((currentWorld->filledHeightMap[x][y]- currentWorld->heightMap[x][y] + 1.0f) * 0.5f * 255);

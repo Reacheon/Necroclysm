@@ -20,6 +20,8 @@ export enum class chunkType : std::uint8_t
     desert,
     snow,
     city,//일단 디버그용
+    volcanicLand,
+    volcano,
 };
 
 export enum class cityType : std::uint8_t
@@ -31,6 +33,7 @@ export enum class cityType : std::uint8_t
     sky,
     underground,
     seastead,
+    volcano,
 };
 
 export class WorldData
@@ -416,27 +419,6 @@ public:
         }
 
 
-        /////////////////////////////////////////////////사막 만들기/////////////////////////////////////////////////
-
-        for (int y = 0; y < WORLD_DATA_SIZE; y++)
-        {
-            for (int x = 0; x < WORLD_DATA_SIZE; x++)
-            {
-                float latitudeParam = (static_cast<float>(y) / static_cast<float>(WORLD_DATA_SIZE));
-                float desertVal = (desertNoise[x][y] + 0.1 * noiseMap10[x][y]) / 1.1 + 0.6 * std::cos(3 * std::numbers::pi * latitudeParam) + 0.1 * heightMap[x][y]; //cos(3πx) 0.666 2/3 지점에서 최대가 됨
-
-                if (desertVal > 0.6f)
-                {
-                    if (getProphecy(x, y, 0) == chunkType::dirt)
-                    {
-                        writeProphecy(x, y, 0, chunkType::desert);
-                    }
-                }
-            }
-        }
-
-
-
         /////////////////////////////////////////////////도시 배치/////////////////////////////////////////////////
 
         std::vector<Point2> cityCoreVec;
@@ -445,50 +427,356 @@ public:
         int loopCount = 0;
 
 
-
-
         //사막 도시 배치
-        std::unordered_set<Point2, Point2::Hash> desertPoints;
-        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        Point2 desertCityPos;
+        while (1)
         {
-            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            loopCount++;
+            errorBox(loopCount > 50000, L"사막 도시 다트 찍기가 잘 안 된다... 루프 카운트가 5만을 초과했다.");
+
+            int randX = randomRange(0, WORLD_DATA_SIZE - 1);
+            int randY = randomRange((WORLD_DATA_SIZE - 1) / 2, 84*(WORLD_DATA_SIZE - 1)/100);
+            //위도 15도 ~ 45도 정도로
+
+            if (randX < 10 || randX >= WORLD_DATA_SIZE - 10) continue;
+            if (randY < 10 || randY >= WORLD_DATA_SIZE - 10) continue;
+
+
+            if (getProphecy(randX, randY, 0) == chunkType::dirt)
             {
-                if (getProphecy(x, y, 0) == chunkType::desert) desertPoints.insert({ x,y });
+                bool cleanDistrict = true;
+                constexpr int CLEAN_RANGE = 50;
+                for (int dx = -CLEAN_RANGE / 2; dx <= CLEAN_RANGE / 2; dx++)
+                {
+                    for (int dy = -CLEAN_RANGE / 2; dy <= CLEAN_RANGE / 2; dy++)
+                    {
+                        if (isCircle(CLEAN_RANGE / 2 + 1, dx, dy)
+                            && (getProphecy(randX + dx, randY + dy, 0) != chunkType::dirt))
+                            cleanDistrict = false;
+                    }
+                }
+
+                bool noNearbyCity = true;
+                constexpr int NO_CITY_DIAMETER = 100;
+                for (int dx = -NO_CITY_DIAMETER / 2; dx <= NO_CITY_DIAMETER / 2; dx++)
+                {
+                    for (int dy = -NO_CITY_DIAMETER / 2; dy <= NO_CITY_DIAMETER / 2; dy++)
+                    {
+                        if (isCircle(NO_CITY_DIAMETER / 2 + 1, dx, dy) && getProphecy(randX + dx, randY + dy, 0) == chunkType::city) noNearbyCity = false;
+                    }
+                }
+
+                if (cleanDistrict == false || noNearbyCity == false) continue;
+                writeProphecy(randX, randY, 0, chunkType::city);
+                cityTypeMap[{randX, randY, 0}] = cityType::desert;
+                cityCoreVec.push_back({ randX, randY });
+                desertCityPos = { randX, randY };
+                cityNumber++;
+                break;
             }
         }
 
-        bool desertCityGenerated = false;
-        for (auto elem : desertPoints)
+        //사막 도시 주변을 사막으로 만들기
         {
-            bool cleanDistrict = true;
-            constexpr int CLEAN_RANGE = 50;
-            for (int dx = -CLEAN_RANGE / 2; dx <= CLEAN_RANGE / 2; dx++)
-            {
-                for (int dy = -CLEAN_RANGE / 2; dy <= CLEAN_RANGE / 2; dy++)
+            int cursorX = desertCityPos.x;
+            int cursorY = desertCityPos.y;
+            int desertMaxSize = randomRange(1000, 5000);
+            int desertCurrentSize = 1;
+
+            std::vector<Point2> desertPoints;
+
+            std::priority_queue<std::pair<float, Point2>, std::vector<std::pair<float, Point2>>, std::greater<>> frontier;
+            float randomKey = randomRangeFloat(0.0, 1.0);
+
+
+            auto desertChunkCond = [&](int x, int y) -> bool
                 {
-                    if (isCircle(CLEAN_RANGE / 2 + 1, dx, dy) && getProphecy(elem.x + dx, elem.y + dy, 0) != chunkType::desert)
-                        cleanDistrict = false;
+                    return getProphecy(x, y, 0) == chunkType::dirt;
+                };
+
+            if (desertChunkCond(desertCityPos.x + 1, desertCityPos.y)) frontier.push({ randomKey,{ desertCityPos.x + 1,desertCityPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (desertChunkCond(desertCityPos.x - 1, desertCityPos.y)) frontier.push({ randomKey,{ desertCityPos.x - 1,desertCityPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (desertChunkCond(desertCityPos.x, desertCityPos.y + 1)) frontier.push({ randomKey,{ desertCityPos.x ,desertCityPos.y + 1 } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (desertChunkCond(desertCityPos.x, desertCityPos.y - 1)) frontier.push({ randomKey,{ desertCityPos.x ,desertCityPos.y - 1} });
+
+            while (frontier.empty() == false && desertCurrentSize < desertMaxSize)
+            {
+                int targetX = frontier.top().second.x;
+                int targetY = frontier.top().second.y;
+                frontier.pop();
+                if (desertChunkCond(targetX, targetY) == false) continue;
+
+                writeProphecy(targetX, targetY, 0, chunkType::desert);
+                desertPoints.push_back({ targetX,targetY });
+
+                float randomKey = randomRangeFloat(0.0, 1.0);
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (desertChunkCond(targetX + 1, targetY)) frontier.push({ randomKey,{ targetX + 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (desertChunkCond(targetX - 1, targetY)) frontier.push({ randomKey,{ targetX - 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (desertChunkCond(targetX, targetY + 1)) frontier.push({ randomKey,{ targetX ,targetY + 1 } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (desertChunkCond(targetX, targetY - 1)) frontier.push({ randomKey,{ targetX ,targetY - 1} });
+
+                desertCurrentSize++;
+            }
+
+            for (auto elem : desertPoints)
+            {
+                for (int ddx = -4; ddx <= 4; ddx++)
+                {
+                    for (int ddy = -4; ddy <= 4; ddy++)
+                    {
+                        if (desertChunkCond(elem.x + ddx, elem.y + ddy))
+                        {
+                            writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::desert);
+                        }
+                    }
                 }
             }
 
-            bool noNearbyCity = true;
-            constexpr int NO_CITY_DIAMETER = 100;
-            for (int dx = -NO_CITY_DIAMETER / 2; dx <= NO_CITY_DIAMETER / 2; dx++)
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //화산 도시 배치
+
+        //화산 폭발
+        Point2 volcanoPos;
+        while (1)
+        {
+            loopCount++;
+            errorBox(loopCount > 50000, L"화산섬 다트 찍기가 잘 안 된다... 루프 카운트가 5만을 초과했다.");
+
+            int randX = randomRange(200, WORLD_DATA_SIZE - 1-200);
+            int randY = randomRange(4*(WORLD_DATA_SIZE - 1) / 10, WORLD_DATA_SIZE - 1 - 200);
+
+            if (randX < 10 || randX >= WORLD_DATA_SIZE - 10) continue;
+            if (randY < 10 || randY >= WORLD_DATA_SIZE - 10) continue;
+
+            if (getProphecy(randX, randY, 0) == chunkType::deepSea || getProphecy(randX, randY, 0) == chunkType::shallowSea)
             {
-                for (int dy = -NO_CITY_DIAMETER / 2; dy <= NO_CITY_DIAMETER / 2; dy++)
+                bool cleanDistrict = true;
+                constexpr int CLEAN_RANGE = 100;
+                for (int dx = -CLEAN_RANGE / 2; dx <= CLEAN_RANGE / 2; dx++)
                 {
-                    if (isCircle(NO_CITY_DIAMETER / 2 + 1, dx, dy) && getProphecy(elem.x + dx, elem.y + dy, 0) == chunkType::city) noNearbyCity = false;
+                    for (int dy = -CLEAN_RANGE / 2; dy <= CLEAN_RANGE / 2; dy++)
+                    {
+                        if (isCircle(CLEAN_RANGE / 2 + 1, dx, dy)
+                            && getProphecy(randX + dx, randY + dy, 0) != chunkType::deepSea
+                            && getProphecy(randX + dx, randY + dy, 0) != chunkType::shallowSea)
+                            cleanDistrict = false;
+                    }
+                }
+
+                bool noNearbyCity = true;
+                constexpr int NO_CITY_DIAMETER = 100;
+                for (int dx = -NO_CITY_DIAMETER / 2; dx <= NO_CITY_DIAMETER / 2; dx++)
+                {
+                    for (int dy = -NO_CITY_DIAMETER / 2; dy <= NO_CITY_DIAMETER / 2; dy++)
+                    {
+                        if (isCircle(NO_CITY_DIAMETER / 2 + 1, dx, dy) && getProphecy(randX + dx, randY + dy, 0) == chunkType::city) noNearbyCity = false;
+                    }
+                }
+
+                if (cleanDistrict == false || noNearbyCity == false) continue;
+                writeProphecy(randX, randY, 0, chunkType::volcanicLand);
+                volcanoPos = { randX, randY };
+                break;
+            }
+        }
+
+        //화산섬 확장
+        {
+            int cursorX = volcanoPos.x;
+            int cursorY = volcanoPos.y;
+            int volcanoMaxSize = randomRange(1000, 5000);
+            int volcanoCurrentSize = 1;
+
+            std::vector<Point2> volcanoPoints;
+
+            std::priority_queue<std::pair<float, Point2>, std::vector<std::pair<float, Point2>>, std::greater<>> frontier;
+            float randomKey = randomRangeFloat(0.0, 1.0);
+
+
+            auto volcanoChunkCond = [&](int x, int y) -> bool
+                {
+                    return getProphecy(x, y, 0) == chunkType::deepSea
+                        || getProphecy(x, y, 0) == chunkType::shallowSea;
+                };
+
+            if (volcanoChunkCond(volcanoPos.x + 1, volcanoPos.y)) frontier.push({ randomKey,{ volcanoPos.x + 1,volcanoPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x - 1, volcanoPos.y)) frontier.push({ randomKey,{ volcanoPos.x - 1,volcanoPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x, volcanoPos.y + 1)) frontier.push({ randomKey,{ volcanoPos.x ,volcanoPos.y + 1 } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x, volcanoPos.y - 1)) frontier.push({ randomKey,{ volcanoPos.x ,volcanoPos.y - 1} });
+
+            while (frontier.empty() == false && volcanoCurrentSize < volcanoMaxSize)
+            {
+                int targetX = frontier.top().second.x;
+                int targetY = frontier.top().second.y;
+                frontier.pop();
+                if (volcanoChunkCond(targetX, targetY) == false) continue;
+
+                writeProphecy(targetX, targetY, 0, chunkType::volcanicLand);
+                volcanoPoints.push_back({ targetX,targetY });
+
+                float randomKey = randomRangeFloat(0.0, 1.0);
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX + 1, targetY)) frontier.push({ randomKey,{ targetX + 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX - 1, targetY)) frontier.push({ randomKey,{ targetX - 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX, targetY + 1)) frontier.push({ randomKey,{ targetX ,targetY + 1 } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX, targetY - 1)) frontier.push({ randomKey,{ targetX ,targetY - 1} });
+
+                volcanoCurrentSize++;
+            }
+
+            for (auto elem : volcanoPoints)
+            {
+                for (int ddx = -3; ddx <= 3; ddx++)
+                {
+                    for (int ddy = -3; ddy <= 3; ddy++)
+                    {
+                        if (std::abs(ddx) <= 3 && std::abs(ddy) <= 3)
+                        {
+                            if (volcanoChunkCond(elem.x + ddx, elem.y + ddy))
+                            {
+                                writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::volcanicLand);
+                            }
+                        }
+
+                    }
                 }
             }
 
-            if (cleanDistrict == false || noNearbyCity == false) continue;
-            writeProphecy(elem.x, elem.y, 0, chunkType::city);
-            cityTypeMap[{elem.x, elem.y, 0}] = cityType::desert;
-            cityCoreVec.push_back({ elem.x, elem.y });
-            break;
+        }
+
+        //화산 만들기
+        {
+            int cursorX = volcanoPos.x;
+            int cursorY = volcanoPos.y;
+            int volcanoMaxSize = randomRange(200, 500);
+            int volcanoCurrentSize = 1;
+
+            std::vector<Point2> volcanoPoints;
+
+            std::priority_queue<std::pair<float, Point2>, std::vector<std::pair<float, Point2>>, std::greater<>> frontier;
+            float randomKey = randomRangeFloat(0.0, 1.0);
+
+            auto volcanoChunkCond = [&](int x, int y) -> bool
+                {
+                    return getProphecy(x, y, 0) == chunkType::volcanicLand;
+                };
+
+            if (volcanoChunkCond(volcanoPos.x + 1, volcanoPos.y)) frontier.push({ randomKey,{ volcanoPos.x + 1,volcanoPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x - 1, volcanoPos.y)) frontier.push({ randomKey,{ volcanoPos.x - 1,volcanoPos.y } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x, volcanoPos.y + 1)) frontier.push({ randomKey,{ volcanoPos.x ,volcanoPos.y + 1 } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (volcanoChunkCond(volcanoPos.x, volcanoPos.y - 1)) frontier.push({ randomKey,{ volcanoPos.x ,volcanoPos.y - 1} });
+
+            while (frontier.empty() == false && volcanoCurrentSize < volcanoMaxSize)
+            {
+                int targetX = frontier.top().second.x;
+                int targetY = frontier.top().second.y;
+                frontier.pop();
+                if (volcanoChunkCond(targetX, targetY) == false) continue;
+
+                writeProphecy(targetX, targetY, 0, chunkType::volcano);
+                volcanoPoints.push_back({ targetX,targetY });
+
+                float randomKey = randomRangeFloat(0.0, 1.0);
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX + 1, targetY)) frontier.push({ randomKey,{ targetX + 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX - 1, targetY)) frontier.push({ randomKey,{ targetX - 1,targetY } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX, targetY + 1)) frontier.push({ randomKey,{ targetX ,targetY + 1 } });
+                randomKey = randomRangeFloat(0.0, 1.0);
+                if (volcanoChunkCond(targetX, targetY - 1)) frontier.push({ randomKey,{ targetX ,targetY - 1} });
+
+                volcanoCurrentSize++;
+            }
+
+            for (auto elem : volcanoPoints)
+            {
+                for (int ddx = -8; ddx <= 8; ddx++)
+                {
+                    for (int ddy = -8; ddy <= 8; ddy++)
+                    {
+                        if (std::abs(ddx) <= 3 && std::abs(ddy) <= 3)
+                        {
+                            if (volcanoChunkCond(elem.x + ddx, elem.y + ddy) && isCircle(4, ddx, ddy))
+                            {
+                                writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::volcano);
+                            }
+                        }
+                        else if (getProphecy(elem.x + ddx, elem.y + ddy, 0) == chunkType::deepSea || getProphecy(elem.x + ddx, elem.y + ddy, 0) == chunkType::shallowSea)
+                        {
+                            writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::volcanicLand);
+                        }
+                    }
+                }
+            }
+        }
+
+        //화산섬 주변을 얕은 물로 변경
+        {
+            for (int y = 0; y < WORLD_DATA_SIZE; y++)
+            {
+                for (int x = 0; x < WORLD_DATA_SIZE; x++)
+                {
+                    if (getProphecy(x, y, 0) == chunkType::volcanicLand)
+                    {
+                        bool waterSide = false;
+                        std::vector<Point2> dirSet = { { 1, 0 }, {1,-1}, { 0,-1 },{-1,-1}, { -1,0 },{-1,1}, { 0,1 },{1,1} };
+                        for (Point2 del : dirSet)
+                        {
+                            if (getProphecy(x + del.x, y + del.y, 0) == chunkType::shallowSea || getProphecy(x + del.x, y + del.y, 0) == chunkType::deepSea)
+                            {
+                                waterSide = true;
+                                break;
+                            }
+                        }
+
+                        if (waterSide)
+                        {
+                            for (int ddx = -6; ddx <= 6; ddx++)
+                            {
+                                for (int ddy = -6; ddy <= 6; ddy++)
+                                {
+                                    if (getProphecy(x + ddx, y + ddy, 0) == chunkType::deepSea && isCircle(4+randomRange(0,3), ddx, ddy))
+                                    {
+                                        writeProphecy(x + ddx, y + ddy, 0, chunkType::shallowSea);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
         }
 
 
+        //TODO 화산땅 및 화산 사이에 있는 빈 픽셀들 메우기 작업 시작
+        //TODO 적당한 스팟에 온천 설치 작업(후순위)
+        //TODO 화산육지와 일반땅으로 둘러쌓인 얕은바다와 깊은바다를 일반땅으로 전환하는 로직 넣기
+        //TODO 화산도시 설치 작업
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //TODO 정글도시 배치할 것
+        //TODO 현재 도시가 강에 의해 이등분되어서 도시가 2조각으로 나눠지는 사태가 발생하니 해결할 것
 
 
         //일반 도시 배치
@@ -540,7 +828,6 @@ public:
 
 
         //설원 도시 배치
-
         std::unordered_set<Point2, Point2::Hash> snowPoints;
         for (int y = 0; y < WORLD_DATA_SIZE; y++)
         {
@@ -587,7 +874,7 @@ public:
 
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //도시 생성 알고리즘
+        //도시 확장 알고리즘
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         for (auto core : cityCoreVec)
@@ -650,6 +937,8 @@ public:
 
             for (auto elem : cityPoints)
             {
+                //사막 도시의 경우 주변 엣지를 사막으로 만드는 기능 추가할 것
+
                 for (int ddx = -2; ddx <= 2; ddx++)
                 {
                     for (int ddy = -2; ddy <= 2; ddy++)
@@ -658,6 +947,21 @@ public:
                         {
                             writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                             cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+
+                            if (tgtCityType == cityType::desert)
+                            {
+                                if (std::abs(ddx) == 2 || std::abs(ddy) == 2)
+                                {
+                                    std::vector<Point2> nearbyDel = { {1,0},{0,-1},{-1,0},{0,1},{1,-1},{-1,1},{-1,-1},{1,1},{2,0},{0,-2},{-2,0},{0,2} };
+                                    for (auto targetDel : nearbyDel)
+                                    {
+                                        if (getProphecy(elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0) == chunkType::dirt)
+                                        {
+                                            writeProphecy(elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0, chunkType::desert);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
