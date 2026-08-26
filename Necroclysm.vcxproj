@@ -377,6 +377,7 @@
     <ClCompile Include="code\world\Chunk.ixx" />
     <ClCompile Include="code\world\TileData.ixx" />
     <ClCompile Include="code\world\World.ixx" />
+    <ClCompile Include="code\world\WorldData_generateWorld.cpp" />
     <ClCompile Include="code\world\World_tile.cpp" />
     <ClCompile Include="code\world\World_createChunk.cpp" />
   </ItemGroup>
