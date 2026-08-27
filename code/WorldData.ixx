@@ -23,6 +23,32 @@ export enum class chunkType : std::uint8_t
     volcanicLand,
     volcano,
     jungle,
+
+    //////////////////////////////////////////////////////////////////////////////////////
+    //1*1 도시 청크
+    apartment, bank, house, warehouse, cafe, cinema, junkShop, animalHospital,
+    pharmacy, restaurant, stationeryStore, hardwareStore, bookstore,
+    patrolStation, convenienceStore, bicycleShop, temple, church, cathedral,
+    skyscraper, gasStation, shoppingArcade,
+    postOffice, autoShop, clothingStore, jewelryStore, laundromat, gardenShop,
+
+    //2*1 도시 청크
+    policeStation, fireStation, hotel, hospital, library,
+
+    //3*3 도시 청크
+    park, hypermarket, school, parkingLot,
+
+    //1*1 랜덤 인카운터
+    mine, lookoutTower, energyBank, warpGate, shop,
+
+    //2*2 랜덤 인카운터
+    nuclearPlant, solarPlant, researchLab,
+
+    //3*3 랜덤 인카운터
+    airport, prison, militaryBase,
+
+    //1*1 항구
+    harborR, harborU, harborL, harborD,
 };
 
 export enum class cityType : std::uint8_t

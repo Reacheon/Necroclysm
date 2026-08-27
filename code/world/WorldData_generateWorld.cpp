@@ -1446,6 +1446,246 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //      5,5단계 : 항구도시
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    std::unordered_set<Point2,Point2::Hash> seaSide;
+    for (int y = 1; y < WORLD_DATA_SIZE-1; y++)
+    {
+        for (int x = 1; x < WORLD_DATA_SIZE-1; x++)
+        {
+            if (getProphecy(x, y, 0) == chunkType::dirt)
+            {
+                bool hasSea = false;
+                
+                if (getProphecy(x - 1, y, 0) == chunkType::shallowSea) hasSea=true;
+                if (getProphecy(x + 1, y, 0) == chunkType::shallowSea) hasSea = true;
+                if (getProphecy(x, y - 1, 0) == chunkType::shallowSea) hasSea = true;
+                if (getProphecy(x, y + 1, 0) == chunkType::shallowSea) hasSea = true;
+
+                if (hasSea) seaSide.insert({ x,y });
+            }
+        }
+    }
+
+    Point2 portCityPos = { 0,0 };
+    std::unordered_set<Point2, Point2::Hash> portCityPoints;
+    for (auto portCandidate : seaSide)
+    {
+
+        int randX = portCandidate.x;
+        int randY = portCandidate.y;
+
+        if (randX < 10 || randX >= WORLD_DATA_SIZE - 10) continue;
+        if (randY < 10 || randY >= WORLD_DATA_SIZE - 10) continue;
+
+
+        if (getProphecy(randX, randY, 0) == chunkType::dirt)
+        {
+            bool cleanDistrict = true;
+            constexpr int CLEAN_RANGE = 50;
+            for (int dx = -CLEAN_RANGE / 2; dx <= CLEAN_RANGE / 2; dx++)
+            {
+                for (int dy = -CLEAN_RANGE / 2; dy <= CLEAN_RANGE / 2; dy++)
+                {
+                    if (isCircle(CLEAN_RANGE / 2 + 1, dx, dy)
+                        && (getProphecy(randX + dx, randY + dy, 0) != chunkType::dirt)
+                        && (getProphecy(randX + dx, randY + dy, 0) != chunkType::shallowSea)
+                        && (getProphecy(randX + dx, randY + dy, 0) != chunkType::deepSea))
+                        cleanDistrict = false;
+                }
+            }
+
+            bool noNearbyCity = true;
+            constexpr int NO_CITY_DIAMETER = 100;
+            for (int dx = -NO_CITY_DIAMETER / 2; dx <= NO_CITY_DIAMETER / 2; dx++)
+            {
+                for (int dy = -NO_CITY_DIAMETER / 2; dy <= NO_CITY_DIAMETER / 2; dy++)
+                {
+                    if (isCircle(NO_CITY_DIAMETER / 2 + 1, dx, dy) && getProphecy(randX + dx, randY + dy, 0) == chunkType::city) noNearbyCity = false;
+                }
+            }
+
+
+            int dirtNumber = 0;
+            constexpr int DIRT_FIND_RANGE = 26;
+            for (int dx = -DIRT_FIND_RANGE / 2; dx <= DIRT_FIND_RANGE / 2; dx++)
+            {
+                for (int dy = -DIRT_FIND_RANGE / 2; dy <= DIRT_FIND_RANGE / 2; dy++)
+                {
+                    if (isCircle(DIRT_FIND_RANGE / 2 + 1, dx, dy)
+                        && (getProphecy(randX + dx, randY + dy, 0) == chunkType::dirt))
+                        dirtNumber++;
+                }
+            }
+
+
+            if (cleanDistrict == false || noNearbyCity == false || dirtNumber < 100) continue;
+            writeProphecy(randX, randY, 0, chunkType::city);
+            cityTypeMap[{randX, randY, 0}] = cityType::port;
+            portCityPos = { randX,randY };
+            portCityPoints.insert({ randX,randY });
+            cityCoreVec.push_back({ randX, randY });
+            break;
+        }
+    }
+
+
+    if (portCityPos != Point2{ 0,0 })
+    {
+        int cursorX = portCityPos.x;
+        int cursorY = portCityPos.y;
+        int cityMaxSize = randomRange(150, 300);
+        int cityCurrentSize = 1;
+
+
+        std::priority_queue<std::pair<float, Point2>, std::vector<std::pair<float, Point2>>, std::greater<>> frontier;
+        float randomKey = randomRangeFloat(0.0, 1.0);
+
+        cityType tgtCityType = cityTypeMap[{portCityPos.x, portCityPos.y, 0}];
+
+        auto cityChunkCond = [&](int x, int y, cityType inputTgtCityType) -> bool
+            {
+                if (isCircle(21, x - portCityPos.x, y - portCityPos.y) == false) return false;
+                return getProphecy(x, y, 0) == chunkType::dirt
+                    || getProphecy(x, y, 0) == chunkType::snow
+                    || getProphecy(x, y, 0) == chunkType::desert
+                    || getProphecy(x, y, 0) == chunkType::forest;
+                errorBox(L"이상한 시티 타입이 cityChunkCond에 입력되었다.");
+            };
+
+        if (cityChunkCond(portCityPos.x + 1, portCityPos.y, tgtCityType)) frontier.push({ randomKey,{ portCityPos.x + 1,portCityPos.y } });
+        randomKey = randomRangeFloat(0.0, 1.0);
+        if (cityChunkCond(portCityPos.x - 1, portCityPos.y, tgtCityType)) frontier.push({ randomKey,{ portCityPos.x - 1,portCityPos.y } });
+        randomKey = randomRangeFloat(0.0, 1.0);
+        if (cityChunkCond(portCityPos.x, portCityPos.y + 1, tgtCityType)) frontier.push({ randomKey,{ portCityPos.x ,portCityPos.y + 1 } });
+        randomKey = randomRangeFloat(0.0, 1.0);
+        if (cityChunkCond(portCityPos.x, portCityPos.y - 1, tgtCityType)) frontier.push({ randomKey,{ portCityPos.x ,portCityPos.y - 1} });
+
+        while (frontier.empty() == false && cityCurrentSize < cityMaxSize)
+        {
+            int targetX = frontier.top().second.x;
+            int targetY = frontier.top().second.y;
+            frontier.pop();
+            if (cityChunkCond(targetX, targetY, tgtCityType) == false) continue;
+
+            writeProphecy(targetX, targetY, 0, chunkType::city);
+            cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+            portCityPoints.insert({ targetX,targetY });
+
+            float randomKey = randomRangeFloat(0.0, 1.0);
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (cityChunkCond(targetX + 1, targetY, tgtCityType)) frontier.push({ randomKey,{ targetX + 1,targetY } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (cityChunkCond(targetX - 1, targetY, tgtCityType)) frontier.push({ randomKey,{ targetX - 1,targetY } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (cityChunkCond(targetX, targetY + 1, tgtCityType)) frontier.push({ randomKey,{ targetX ,targetY + 1 } });
+            randomKey = randomRangeFloat(0.0, 1.0);
+            if (cityChunkCond(targetX, targetY - 1, tgtCityType)) frontier.push({ randomKey,{ targetX ,targetY - 1} });
+
+            cityCurrentSize++;
+        }
+
+        auto tempPortCityPoints = portCityPoints;
+        for (auto elem : tempPortCityPoints)
+        {
+            for (int ddx = -2; ddx <= 2; ddx++)
+            {
+                for (int ddy = -2; ddy <= 2; ddy++)
+                {
+                    if (cityChunkCond(elem.x + ddx, elem.y + ddy, tgtCityType))
+                    {
+                        writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
+                        cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                        portCityPoints.insert({ elem.x + ddx, elem.y + ddy });
+                    }
+                }
+            }
+        }
+
+        
+        //항구도시에서 바다와 접한 부분을 사각형에 가깝게 만들기
+        int minX = 9999;
+        int maxX = -1;
+        int minY = 9999;
+        int maxY = -1;
+        for (auto elem : portCityPoints)
+        {
+            if (elem.x < minX) minX = elem.x;
+            if (elem.x > maxX) maxX = elem.x;
+            if (elem.y < minY) minY = elem.y;
+            if (elem.y > maxY) maxY = elem.y;
+        }
+
+        auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        auto& cond = *condPtr;
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                if (x >= minX && x <= maxX)
+                {
+                    if (y >= minY && y <= maxY)
+                    {
+                        if (getProphecy(x, y, 0) == chunkType::city
+                            || getProphecy(x, y, 0) == chunkType::shallowSea
+                            || getProphecy(x, y, 0) == chunkType::deepSea)
+                            cond[x][y] = true;
+                    }
+                }
+            }
+        }
+
+
+        std::unordered_set<Point2, Point2::Hash> output;
+        floodFill(cond, portCityPos, output);
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                if (output.find({ x,y }) != output.end())
+                {
+                    if (getProphecy(x, y, 0) == chunkType::shallowSea || getProphecy(x, y, 0) == chunkType::deepSea)
+                    {
+                        writeProphecy(x, y, 0, chunkType::city);
+                        cityTypeMap[{x, y, 0}] = tgtCityType;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    //항구도시 확장 후 내부 고립셀 제거
+    {
+        auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        auto& cond = *condPtr;
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                if (getProphecy(x, y, 0) != chunkType::city) cond[x][y] = true;
+                else cond[x][y] = false;
+            }
+        }
+        auto internalCityPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        auto& internalCity = *internalCityPtr;
+        floodFillFindOrphan(cond, { 0,0 }, internalCity);
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                if (internalCity[x][y] == true)
+                {
+                    writeProphecy(x, y, 0, chunkType::city);
+                    cityTypeMap[{x, y, 0}] = cityType::port;
+                }
+            }
+        }
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //      6단계 : 일반도시 배치 및 확장
@@ -1620,7 +1860,50 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
         }
     }
 
-    //TODO 해변 추가할 것 filledHeightMap이랑 일반 heightMap 모두 고려
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //      7단계 : 해변 추가
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    {
+        auto condPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+        auto& cond = *condPtr;
+        for (int y = 0; y < WORLD_DATA_SIZE; y++)
+        {
+            for (int x = 0; x < WORLD_DATA_SIZE; x++)
+            {
+                if (getProphecy(x, y, 0) == chunkType::deepSea || getProphecy(x, y, 0) == chunkType::shallowSea)
+                {
+                    cond[x][y] = true;
+                }
+                else if (getProphecy(x, y, 0) == chunkType::dirt && -0.13f > heightMap[x][y] && heightMap[x][y] > -0.15f && noiseMapBeach[x][y]>0)
+                {
+                    cond[x][y] = true;
+                }
+                else cond[x][y] = false;
+            }
+        }
+
+        std::unordered_set<Point2, Point2::Hash> output;
+
+        floodFill(cond, { 0,0 }, output);
+
+        for (auto elem : output)
+        {
+            if (getProphecy(elem.x, elem.y, 0) == chunkType::dirt)
+            {
+                writeProphecy(elem.x, elem.y, 0, chunkType::beach);
+            }
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //      8단계 : 도시 내부 청크 및 도로망 배치
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
     //도로망 배치 알고리즘(N개의 도시를 잇는 완벽한 도로망 만들기)
     {
