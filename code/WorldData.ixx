@@ -25,6 +25,8 @@ export enum class chunkType : std::uint8_t
     jungle,
 
     //////////////////////////////////////////////////////////////////////////////////////
+    cityRoad,
+    
     //1*1 도시 청크
     apartment, bank, house, warehouse, cafe, cinema, junkShop, animalHospital,
     pharmacy, restaurant, stationeryStore, hardwareStore, bookstore,
@@ -35,7 +37,7 @@ export enum class chunkType : std::uint8_t
     //2*1 도시 청크
     policeStation, fireStation, hotel, hospital, library,
 
-    //3*3 도시 청크
+    //2*2 도시 청크
     park, hypermarket, school, parkingLot,
 
     //1*1 랜덤 인카운터
@@ -64,6 +66,7 @@ export enum class cityType : std::uint8_t
     jungle,
 };
 
+
 export class WorldData
 {
 private:
@@ -71,6 +74,7 @@ private:
     std::unordered_map<Point3, cityType, Point3::Hash> cityTypeMap;
 public:
 
+    std::unordered_map<Point3, int, Point3::Hash> buildingID;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap30;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> noiseMap10;

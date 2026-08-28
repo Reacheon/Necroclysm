@@ -72,7 +72,20 @@ public:
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::volcanicLand) drawPoint(x, y, { 0x4d,0x42,0x42 });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::volcano) drawPoint(x, y, { 0xc3,0x2e,0x2e });
 						else if (currentWorld->getProphecy(x, y, 0) == chunkType::jungle) drawPoint(x, y, { 0x18,0x4d,0x1d });
-
+						else if (currentWorld->getProphecy(x, y, 0) == chunkType::cityRoad) drawPoint(x, y, { 0x0,0x0,0x0 });
+						else
+						{
+							if (currentWorld->buildingID.contains({ x, y, 0 }))
+							{
+								int h = (currentWorld->buildingID.at({ x, y, 0 }) * 137) % 360;
+								int s = 70;
+								int v = 95;
+								int r = 0, g = 0, b = 0;
+								HSV2RGB(h, s, v, r, g, b);
+								drawPoint(x, y, { (Uint8)r, (Uint8)g, (Uint8)b });
+							}
+							else drawPoint(x, y, { 0xff,0x00,0xff });
+						}
 
 						//Uint8 bright = (Uint8)((currentWorld->filledHeightMap[x][y]- currentWorld->heightMap[x][y] + 1.0f) * 0.5f * 255);
 						//drawPoint(x, y, SDL_Color{ bright, bright, bright });

@@ -1,3 +1,5 @@
+#include<SDL3/SDL.h>
+
 import WorldData;
 import std;
 import util;
@@ -1903,7 +1905,188 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     //      8단계 : 도시 내부 청크 및 도로망 배치
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    auto cityCondPtr = std::make_unique< std::array<std::array<bool, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+    auto& cityCond = *cityCondPtr;
+    for (int y = 0; y < WORLD_DATA_SIZE; y++)
+    {
+        for (int x = 0; x < WORLD_DATA_SIZE; x++)
+        {
+            if (getProphecy(x, y, 0) == chunkType::city) cityCond[x][y] = true;
+        }
+    }
+    
 
+    int currentBuildingID = 0;
+    for (auto core : cityCoreVec)
+    {
+        std::unordered_set<Point2, Point2::Hash> cityPoints;
+        floodFill(cityCond, { core.x,core.y }, cityPoints);
+
+        int minX = 9999;
+        int maxX = -9999;
+        int minY = 9999;
+        int maxY = -9999;
+        for (auto elem : cityPoints)
+        {
+            if (elem.x < minX) minX = elem.x;
+            if (elem.x > maxX) maxX = elem.x;
+            if (elem.y < minY) minY = elem.y;
+            if (elem.y > maxY) maxY = elem.y;
+        }
+        minX -= 1;
+        maxX += 1;
+        minY -= 1;
+        maxY += 1;
+
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                if (cityPoints.find({ x,y }) != cityPoints.end())
+                {
+                    bool findWater = false;
+                    if (getProphecy(x + 1, y, 0) == chunkType::shallowSea
+                        || getProphecy(x + 1, y, 0) == chunkType::deepSea
+                        || getProphecy(x + 1, y, 0) == chunkType::river
+                        || getProphecy(x + 1, y, 0) == chunkType::lake) findWater = true;
+                    if (getProphecy(x - 1, y, 0) == chunkType::shallowSea
+                        || getProphecy(x - 1, y, 0) == chunkType::deepSea
+                        || getProphecy(x - 1, y, 0) == chunkType::river
+                        || getProphecy(x - 1, y, 0) == chunkType::lake) findWater = true;
+                    if (getProphecy(x, y + 1, 0) == chunkType::shallowSea
+                        || getProphecy(x, y + 1, 0) == chunkType::deepSea
+                        || getProphecy(x, y + 1, 0) == chunkType::river
+                        || getProphecy(x, y + 1, 0) == chunkType::lake) findWater = true;
+                    if (getProphecy(x, y - 1, 0) == chunkType::shallowSea
+                        || getProphecy(x, y - 1, 0) == chunkType::deepSea
+                        || getProphecy(x, y - 1, 0) == chunkType::river
+                        || getProphecy(x, y - 1, 0) == chunkType::lake) findWater = true;
+
+                    if (findWater) writeProphecy(x, y, 0, chunkType::cityRoad);
+                }
+            }
+        }
+
+        int failStreak = 0;
+        while (1)
+        {
+            //도시 다트찍기
+            int randX = randomRange(minX, maxX);
+            int randY = randomRange(minY, maxY);
+            if (cityPoints.find({ randX,randY }) != cityPoints.end())
+            {
+                bool lot2by2 = false;
+                bool lot2by1 = false;
+                bool lot1by2 = false;
+                bool lot1by1 = false;
+                int prob = randomRange(1, 100);
+                
+                SDL_Rect testRect = { randX,randY,0,0 };
+                std::vector<chunkType> buildingSet;
+                if (prob <= 10)
+                {
+                    lot2by2 = true;
+                    testRect.w = 2;
+                    testRect.h = 2;
+                    buildingSet = { chunkType::park, chunkType::hypermarket, chunkType::school, chunkType::parkingLot };
+                }
+                else if (prob <= 15)
+                {
+                    lot2by1 = true;
+                    testRect.w = 2;
+                    testRect.h = 1;
+                    buildingSet = { chunkType::policeStation, chunkType::fireStation, chunkType::hotel, chunkType::hospital, chunkType::library };
+                }
+                else if (prob <= 20)
+                {
+                    lot1by2 = true;
+                    testRect.w = 1;
+                    testRect.h = 2;
+                    buildingSet = { chunkType::policeStation, chunkType::fireStation, chunkType::hotel, chunkType::hospital, chunkType::library };
+                }
+                else
+                {
+                    lot1by1 = true;
+                    testRect.w = 1;
+                    testRect.h = 1;
+                    buildingSet = { chunkType::apartment, chunkType::bank, chunkType::house, chunkType::warehouse,
+                                    chunkType::cafe, chunkType::cinema, chunkType::junkShop, chunkType::animalHospital,
+                                    chunkType::pharmacy, chunkType::restaurant, chunkType::stationeryStore,
+                                    chunkType::hardwareStore, chunkType::bookstore, chunkType::patrolStation,
+                                    chunkType::convenienceStore, chunkType::bicycleShop, chunkType::temple,
+                                    chunkType::church, chunkType::cathedral, chunkType::skyscraper,
+                                    chunkType::gasStation, chunkType::shoppingArcade, chunkType::postOffice,
+                                    chunkType::autoShop, chunkType::clothingStore, chunkType::jewelryStore,
+                                    chunkType::laundromat, chunkType::gardenShop };
+                }
+
+                if (getProphecy(randX, randY, 0) == chunkType::city)
+                {
+                    for (int y = randY; y < randY + testRect.h; y++)
+                    {
+                        for (int x = randX; x < randX + testRect.w; x++)
+                        {
+                            if (getProphecy(x, y, 0) != chunkType::city)
+                            {
+                                failStreak++;
+                                if (failStreak > 50) goto BUILD_LOOP_END;
+                                goto SKIP_DART;
+                            }
+                        }
+                    }
+
+                    std::unordered_set<Point2, Point2::Hash> cond;
+                    Point2 startCoor = { 0,0 };
+                    for (int y = minY; y <= maxY; y++)
+                    {
+                        for (int x = minX; x <= maxX; x++)
+                        {
+                            if (getProphecy(x, y, 0) == chunkType::cityRoad || getProphecy(x, y, 0) == chunkType::city)
+                            {
+                                if ((x >= testRect.x  && x < testRect.x + testRect.w
+                                    && y >= testRect.y && y < testRect.y + testRect.h) == false)
+                                {
+                                    cond.insert({ x,y });
+                                    startCoor = { x,y };
+                                }
+
+                            }
+                        }
+                    }
+
+                    std::unordered_set<Point2, Point2::Hash> output;
+                    floodFillFindOrphan(cond, startCoor, output);
+                    if (output.size() > 0)
+                    {
+                        failStreak++;
+                        if (failStreak > 50) goto BUILD_LOOP_END;
+                        goto SKIP_DART;
+                    }
+
+                    failStreak = 0;
+                    currentBuildingID++;
+                    chunkType targetChunk = buildingSet[randomRange(0, buildingSet.size() - 1)];
+                    for (int y = randY; y < randY + testRect.h; y++)
+                    {
+                        for (int x = randX; x < randX + testRect.w; x++)
+                        {
+                            writeProphecy(x, y, 0, targetChunk);
+                            buildingID[{x, y, 0}] = currentBuildingID;
+                        }
+                    }
+                }
+                else
+                {
+                    failStreak++;
+                    if (failStreak > 50) goto BUILD_LOOP_END;
+                }
+            }
+            SKIP_DART:
+            
+        }
+        BUILD_LOOP_END:
+
+    }
 
     //도로망 배치 알고리즘(N개의 도시를 잇는 완벽한 도로망 만들기)
     {
