@@ -53,6 +53,7 @@ export namespace debug
 };
 
 export std::vector<std::wstring> sysStr;
+export std::unordered_map<std::wstring, float> tuneParam;
 
 export namespace timer
 {

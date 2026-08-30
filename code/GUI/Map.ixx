@@ -77,9 +77,8 @@ public:
 						{
 							if (currentWorld->buildingID.contains({ x, y, 0 }))
 							{
-								int h = (currentWorld->buildingID.at({ x, y, 0 }) * 137) % 360;
-								int s = 70;
-								int v = 95;
+								int h = (currentWorld->buildingID.at({ x, y, 0 }) * 137) % 360; //황금각
+								int s = 70, v = 95;
 								int r = 0, g = 0, b = 0;
 								HSV2RGB(h, s, v, r, g, b);
 								drawPoint(x, y, { (Uint8)r, (Uint8)g, (Uint8)b });

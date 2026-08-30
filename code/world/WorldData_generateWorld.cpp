@@ -3,6 +3,7 @@
 import WorldData;
 import std;
 import util;
+import globalVar;
 
 void WorldData::generateWorld(std::uint64_t inputSeed)
 {
@@ -1967,10 +1968,16 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
             }
         }
 
+
+        //도시 건물 랜덤배치
         int failStreak = 0;
+        std::vector<chunkType> buildingSet;
+        const float BLDG_PROB_2X2 = tuneParam.at(L"BLDG_PROB_2X2");
+        const float BLDG_PROB_2X1 = tuneParam.at(L"BLDG_PROB_2X1");
+        const float BLDG_PROB_1X2 = tuneParam.at(L"BLDG_PROB_1X2");
+        const float BLDG_FAIL_STREAK = tuneParam.at(L"BLDG_FAIL_STREAK");
         while (1)
         {
-            //도시 다트찍기
             int randX = randomRange(minX, maxX);
             int randY = randomRange(minY, maxY);
             if (cityPoints.find({ randX,randY }) != cityPoints.end())
@@ -1982,22 +1989,21 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 int prob = randomRange(1, 100);
                 
                 SDL_Rect testRect = { randX,randY,0,0 };
-                std::vector<chunkType> buildingSet;
-                if (prob <= 10)
+                if (prob <= BLDG_PROB_2X2)
                 {
                     lot2by2 = true;
                     testRect.w = 2;
                     testRect.h = 2;
                     buildingSet = { chunkType::park, chunkType::hypermarket, chunkType::school, chunkType::parkingLot };
                 }
-                else if (prob <= 15)
+                else if (prob <= BLDG_PROB_2X2 + BLDG_PROB_2X1)
                 {
                     lot2by1 = true;
                     testRect.w = 2;
                     testRect.h = 1;
                     buildingSet = { chunkType::policeStation, chunkType::fireStation, chunkType::hotel, chunkType::hospital, chunkType::library };
                 }
-                else if (prob <= 20)
+                else if (prob <= BLDG_PROB_2X2 + BLDG_PROB_2X1 + BLDG_PROB_1X2)
                 {
                     lot1by2 = true;
                     testRect.w = 1;
@@ -2029,7 +2035,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                             if (getProphecy(x, y, 0) != chunkType::city)
                             {
                                 failStreak++;
-                                if (failStreak > 50) goto BUILD_LOOP_END;
+                                if (failStreak > BLDG_FAIL_STREAK) goto BUILD_LOOP_END;
                                 goto SKIP_DART;
                             }
                         }
@@ -2059,7 +2065,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                     if (output.size() > 0)
                     {
                         failStreak++;
-                        if (failStreak > 50) goto BUILD_LOOP_END;
+                        if (failStreak > BLDG_FAIL_STREAK) goto BUILD_LOOP_END;
                         goto SKIP_DART;
                     }
 
@@ -2078,14 +2084,224 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 else
                 {
                     failStreak++;
-                    if (failStreak > 50) goto BUILD_LOOP_END;
+                    if (failStreak > BLDG_FAIL_STREAK) goto BUILD_LOOP_END;
                 }
             }
             SKIP_DART:
-            
         }
-        BUILD_LOOP_END:
+    BUILD_LOOP_END:
 
+        //건물이 찍힌 곳을 제외한 곳을 전부 일반 도로로 변경
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                if (getProphecy(x,y,0) == chunkType::city)
+                {
+                    writeProphecy(x, y, 0, chunkType::cityRoad);
+                }
+            }
+        }
+
+        //2*2 도로 붕괴시키기
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                if (getProphecy(x, y, 0) == chunkType::cityRoad
+                    && getProphecy(x+1, y, 0) == chunkType::cityRoad
+                    && getProphecy(x, y+1, 0) == chunkType::cityRoad
+                    && getProphecy(x+1, y+1, 0) == chunkType::cityRoad)
+                {
+
+                    buildingSet = { chunkType::apartment, chunkType::bank, chunkType::house, chunkType::warehouse,
+                                    chunkType::cafe, chunkType::cinema, chunkType::junkShop, chunkType::animalHospital,
+                                    chunkType::pharmacy, chunkType::restaurant, chunkType::stationeryStore,
+                                    chunkType::hardwareStore, chunkType::bookstore, chunkType::patrolStation,
+                                    chunkType::convenienceStore, chunkType::bicycleShop, chunkType::temple,
+                                    chunkType::church, chunkType::cathedral, chunkType::skyscraper,
+                                    chunkType::gasStation, chunkType::shoppingArcade, chunkType::postOffice,
+                                    chunkType::autoShop, chunkType::clothingStore, chunkType::jewelryStore,
+                                    chunkType::laundromat, chunkType::gardenShop };
+                    currentBuildingID++;
+                    chunkType targetChunk = buildingSet[randomRange(0, buildingSet.size() - 1)];
+
+                    int randomVal = randomRange(0, 3);
+                    for (int repeat = 0; repeat < 4; repeat++)
+                    {
+                        int tgtX, tgtY;
+                        switch ((randomVal + repeat) % 4)
+                        {
+                        case 0:
+                            tgtX = x, tgtY = y;
+                            break;
+                        case 1:
+                            tgtX = x + 1, tgtY = y;
+                            break;
+                        case 2:
+                            tgtX = x, tgtY = y + 1;
+                            break;
+                        case 3:
+                            tgtX = x + 1, tgtY = y + 1;
+                            break;
+                        }
+
+                        std::unordered_set<Point2, Point2::Hash> cond;
+                        Point2 startCoor = { 0,0 };
+                        for (int condY = minY; condY <= maxY; condY++)
+                        {
+                            for (int condX = minX; condX <= maxX; condX++)
+                            {
+                                if (getProphecy(condX, condY, 0) == chunkType::cityRoad)
+                                {
+                                    if (condX != tgtX || condY != tgtY)
+                                    {
+                                        cond.insert({ condX,condY });
+                                        startCoor = { condX,condY };
+                                    }
+                                }
+                            }
+                        }
+
+                        std::unordered_set<Point2, Point2::Hash> output;
+                        floodFillFindOrphan(cond, startCoor, output);
+                        if (output.size() == 0)
+                        {
+                            writeProphecy(tgtX, tgtY, 0, targetChunk);
+                            buildingID[{tgtX, tgtY, 0}] = currentBuildingID;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        //고립된 건물을 도로로 변경하기
+        int isolLoopCount = 0;
+        const float ISOL_LOOP_COUNT = tuneParam.at(L"ISOL_LOOP_COUNT");
+        for (int y = minY; y <= maxY; y++)
+        {
+            for (int x = minX; x <= maxX; x++)
+            {
+                isolLoopCount++;
+                if (buildingID.contains({ x,y,0 }) && buildingID[{x, y, 0}] != 0)
+                {
+                    if ((buildingID.contains({ x-1,y,0 }) && buildingID[{x-1, y, 0}] == buildingID[{x, y, 0}]) == false
+                        && (buildingID.contains({ x,y-1,0 }) && buildingID[{x, y - 1, 0}] == buildingID[{x, y, 0}]) == false)
+                    {
+
+                        //현재 이 건물이 몇칸짜리 건물인지 분석
+                        int  buildingWidth = 0, buildingHeight = 0;
+
+                        for (int dx = 0; dx <= 3; dx++)
+                        {
+                            if (buildingID.contains({ x + dx,y,0 }) && buildingID[{x + dx, y, 0}] == buildingID[{x, y, 0}])
+                            {
+                                buildingWidth++;
+                            }
+                        }
+
+                        for (int dy = 0; dy <= 3; dy++)
+                        {
+                            if (buildingID.contains({ x,y + dy,0 }) && buildingID[{x, y + dy, 0}] == buildingID[{x, y, 0}])
+                            {
+                                buildingHeight++;
+                            }
+                        }
+
+                        std::vector<Point2> nearbyPoints;
+                        for (int ny = y - 1; ny <= y + buildingHeight; ny++)
+                        {
+                            for (int nx = x - 1; nx <= x + buildingWidth; nx++)
+                            {
+                                //건물 내부 제거
+                                if (nx >= x && nx <= x + buildingWidth - 1 && ny >= y && ny <= y + buildingHeight - 1) continue;
+                                //네 모서리 제거 아래 4줄
+                                else if (nx == x + buildingWidth  && ny == y + buildingHeight) continue;
+                                else if (nx == x + buildingWidth && ny == y - 1) continue;
+                                else if (nx == x - 1 && ny == y + buildingHeight) continue;
+                                else if (nx == x - 1 && ny == y - 1) continue;
+                                else nearbyPoints.push_back({ nx,ny });
+                            }
+                        }
+
+                        bool iAmIsolated = true;
+                        
+                        for (auto nPoint : nearbyPoints)
+                        {
+                            if (getProphecy(nPoint.x, nPoint.y, 0) == chunkType::cityRoad)
+                            {
+                                iAmIsolated = false;
+                            }
+                        }
+                        
+                        if (iAmIsolated)
+                        {
+                            for (auto nPoint : nearbyPoints)
+                            {
+                                if (buildingID.contains({ nPoint.x,nPoint.y,0 }))
+                                {
+                                    //1*1 건물인지 체크
+                                    if ((buildingID.contains({ nPoint.x + 1,nPoint.y,0 }) && buildingID[{nPoint.x + 1, nPoint.y, 0}] == buildingID[{nPoint.x, nPoint.y, 0}]) == false
+                                        && (buildingID.contains({ nPoint.x - 1,nPoint.y,0 }) && buildingID[{nPoint.x - 1, nPoint.y, 0}] == buildingID[{nPoint.x, nPoint.y, 0}]) == false
+                                        && (buildingID.contains({ nPoint.x ,nPoint.y - 1,0 }) && buildingID[{nPoint.x, nPoint.y - 1, 0}] == buildingID[{nPoint.x, nPoint.y, 0}]) == false
+                                        && (buildingID.contains({ nPoint.x ,nPoint.y + 1,0 }) && buildingID[{nPoint.x, nPoint.y + 1, 0}] == buildingID[{nPoint.x, nPoint.y, 0}]) == false)
+                                    {
+                                        //주변에 도로가 한 타일이라도 있는지 체크
+                                        if (getProphecy(nPoint.x - 1, nPoint.y, 0) == chunkType::cityRoad
+                                            || getProphecy(nPoint.x + 1, nPoint.y, 0) == chunkType::cityRoad
+                                            || getProphecy(nPoint.x, nPoint.y - 1, 0) == chunkType::cityRoad
+                                            || getProphecy(nPoint.x, nPoint.y + 1, 0) == chunkType::cityRoad)
+                                        {
+                                            //만약 도로로 바꿀 경우 2*2 도로가 발생하는지 체크
+                                            if (getProphecy(nPoint.x - 1, nPoint.y - 1, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x - 1, nPoint.y, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x, nPoint.y - 1, 0) == chunkType::cityRoad)
+                                            {
+                                                continue;
+                                            }
+                                            else if (getProphecy(nPoint.x, nPoint.y - 1, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x + 1, nPoint.y - 1, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x + 1, nPoint.y, 0) == chunkType::cityRoad)
+                                            {
+                                                continue;
+                                            }
+                                            else if (getProphecy(nPoint.x - 1, nPoint.y, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x - 1, nPoint.y + 1, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x, nPoint.y + 1, 0) == chunkType::cityRoad)
+                                            {
+                                                continue;
+                                            }
+                                            else if (getProphecy(nPoint.x + 1, nPoint.y, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x + 1, nPoint.y + 1, 0) == chunkType::cityRoad
+                                                && getProphecy(nPoint.x, nPoint.y + 1, 0) == chunkType::cityRoad)
+                                            {
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                buildingID.erase({ nPoint.x,nPoint.y,0 });
+                                                writeProphecy(nPoint.x, nPoint.y, 0, chunkType::cityRoad);
+                                                x = minX, y = minY;
+                                                break;
+                                            }
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (isolLoopCount > ISOL_LOOP_COUNT)
+                {
+                    std::wprintf(L"[경고] isolLoopCount가 상한치를 넘었다.\n");
+                    x = 99999;
+                    y = 99999;
+                }
+            }
+        }
     }
 
     //도로망 배치 알고리즘(N개의 도시를 잇는 완벽한 도로망 만들기)
