@@ -5,6 +5,7 @@ Necroclysm is an open-source roguelike inspired by *Dungeon Crawl: Stone Soup* a
 ## License
 
 - **Source code**: Licensed under the [MIT License](LICENSE.txt).
-- **Fonts**: Each font retains its original license. See `font/gulim/OFL.txt` and `font/mulmaru/LICENSE.txt`.
-- **Art and music**: © 2026 Doyoung Hong (Ignyter). All Rights Reserved.
-- **No Vibe Coding. No AI Assets.**
+- **Fonts**: See font folder.
+- **Art, music, and data**: © 2026 Ignyter. All Rights Reserved.
+
+**No Vibe Coding. No AI Assets.**
