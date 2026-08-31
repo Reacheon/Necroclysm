@@ -25,7 +25,7 @@ export enum class chunkType : std::uint8_t
     jungle,
 
     //////////////////////////////////////////////////////////////////////////////////////
-    cityRoad,
+    cityRoad, road,
     
     //1*1 도시 청크
     apartment, bank, house, warehouse, cafe, cinema, junkShop, animalHospital,

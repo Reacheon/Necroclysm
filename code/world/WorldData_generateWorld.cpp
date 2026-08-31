@@ -2304,10 +2304,85 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
         }
     }
 
-    //도로망 배치 알고리즘(N개의 도시를 잇는 완벽한 도로망 만들기)
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //      9단계 : 다익스트라 알고리즘을 이용한 도시 간 도로망 생성 시작
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     {
+       std::unordered_map<chunkType, int> cost;
+       cost[chunkType::dirt] = tuneParam.at(L"COST_DIRT");
+       cost[chunkType::deepSea] = tuneParam.at(L"COST_DEEP_SEA");
+       cost[chunkType::shallowSea] = tuneParam.at(L"COST_SHALLOW_SEA");
+       cost[chunkType::beach] = tuneParam.at(L"COST_BEACH");
+       cost[chunkType::mountain] = tuneParam.at(L"COST_MOUNTAIN");
+       cost[chunkType::river] = tuneParam.at(L"COST_RIVER");
+       cost[chunkType::lake] = tuneParam.at(L"COST_LAKE");
+       cost[chunkType::forest] = tuneParam.at(L"COST_FOREST");
+       cost[chunkType::desert] = tuneParam.at(L"COST_DESERT");
+       cost[chunkType::snow] = tuneParam.at(L"COST_SNOW");
+       cost[chunkType::volcanicLand] = tuneParam.at(L"COST_VOLCANIC_LAND");
+       cost[chunkType::volcano] = tuneParam.at(L"COST_VOLCANO");
+       cost[chunkType::jungle] = tuneParam.at(L"COST_JUNGLE");
+       cost[chunkType::cityRoad] = tuneParam.at(L"COST_CITY_ROAD");
+       cost[chunkType::road] = tuneParam.at(L"COST_ROAD");
+
+       // n! / (r!(n-r)!) = nCr 대략 66개 정도인가?
+       for (Point2 cityCore : cityCoreVec)
+       {
+           std::priority_queue<std::pair<int, Point2>, std::vector<std::pair<int, Point2>>, std::greater<>> openNodes;
+           
+           //중심에 가까운 도로 찾기
+           const int CORE_NEARBY_ROAD = tuneParam.at(L"CORE_NEARBY_ROAD");
+           float hiScoreDist = std::numeric_limits<float>::max();
+           Point2 hiScorePoint = { 0,0 };
+           for (int y = cityCore.y - CORE_NEARBY_ROAD; y <= cityCore.y + CORE_NEARBY_ROAD; y++)
+           {
+               for (int x = cityCore.x - CORE_NEARBY_ROAD; x <= cityCore.x + CORE_NEARBY_ROAD; x++)
+               {
+                   if (x >= 0 && x < WORLD_DATA_SIZE && y >= 0 && y < WORLD_DATA_SIZE)
+                   {
+                       if (getProphecy(x, y, 0) == chunkType::cityRoad)
+                       {
+                           if (std::pow(x - cityCore.x, 2) + std::pow(y - cityCore.y, 2) < hiScoreDist)
+                           {
+                               hiScoreDist = std::pow(x - cityCore.x, 2) + std::pow(y - cityCore.y, 2);
+                               hiScorePoint = { x,y };
+                           }
+                       }
+                   }
+               }
+           }
+
+           errorBox(hiScorePoint == Point2{0, 0}, L"중심에 가까운 오픈노드 시작점 도로 찾기가 실패했다.");
+           openNodes.push({ 0,hiScorePoint });
+           auto distPtr = std::make_unique< std::array<std::array<int, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
+           auto& dist = *distPtr;
+           for (int y = 0; y < WORLD_DATA_SIZE; y++)
+           {
+               for (int x = 0; x < WORLD_DATA_SIZE; x++)
+               {
+                   dist[x][y] = std::numeric_limits<int>::max();
+               }
+           }
+           dist[hiScorePoint.x][hiScorePoint.y] = 0;
+
+           while (openNodes.empty() == false)
+           {
+               //다익스트라 알고리즘 하나씩 꺼내서 시작
+               //주변을 조사하면서 비용 갱신을 시작함. 자기를 거쳐서 그 방향으로 갔을 때 새 비용이 기존 써진 비용보다 낮으면 그걸로 갱신
+               //단 건물은 이 갱신 대상에서 완전히 제외
+               //도시 내부, 정확히는 cityRoad일 때는 꺾음의 코스트가 없음(도시 내부는 불규칙적인 도로망이니까)
+               //노드를 꺼낼 때는 비용이 작은 것부터 꺼내짐. 이건 우선순위 큐가 알아서 처리할거야
+               //노드가 없어질 때까지 반복한다. 그러면 이 도시 중심으로부터 각 도시에 진입하는데 걸리는 비용을 알 수 있다.
+               //근데 또 각 도시에 진입한 순간을 알아야하는데... 도시별로 추상화 레이어를 하나 더 만들어야하나? 배열 하나면 가능하기는 하지만...
+               //private에 배열 하나 만들어두고 위 생성 알고리즘에서 조금씩 수정해야겠군
+
+           }
+           
+           
+       }
+
     }
 
 
-    /////////////////////////////////////////////////도시 배치/////////////////////////////////////////////////
 }
