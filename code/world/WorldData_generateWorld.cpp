@@ -79,7 +79,6 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     createNoiseMap.operator() < 10 > (noiseMap10);
     createNoiseMap.operator() < 120 > (noiseMapBeach);
     createNoiseMap.operator() < 24 > (noiseMapForest);
-    createNoiseMap.operator() < 100 > (desertNoise);
 
 
 
@@ -402,6 +401,8 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     //      5,1단계 : 사막 및 사막도시 배치
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    int currentCityID = 1;
     std::vector<Point2> cityCoreVec;
     bool cityGenerated = false;
     int cityNumber = 0;
@@ -450,6 +451,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
             if (cleanDistrict == false || noNearbyCity == false) continue;
             writeProphecy(randX, randY, 0, chunkType::city);
             cityTypeMap[{randX, randY, 0}] = cityType::desert;
+            cityID[{randX, randY, 0}] = currentCityID;
             cityCoreVec.push_back({ randX, randY });
             desertCityPos = { randX, randY };
             cityNumber++;
@@ -565,6 +567,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
             writeProphecy(targetX, targetY, 0, chunkType::city);
             cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+            cityID[{targetX, targetY, 0}] = currentCityID;
             cityPoints.push_back({ targetX,targetY });
 
             float randomKey = randomRangeFloat(0.0, 1.0);
@@ -592,6 +595,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                     {
                         writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                         cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                        cityID[{elem.x + ddx, elem.y + ddy, 0}] = currentCityID;
 
                         if (std::abs(ddx) == 2 || std::abs(ddy) == 2)
                         {
@@ -601,6 +605,8 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                                 if (getProphecy(elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0) == chunkType::dirt)
                                 {
                                     writeProphecy(elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0, chunkType::desert);
+                                    cityTypeMap[{elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0}] = tgtCityType;
+                                    cityID[{elem.x + ddx + targetDel.x, elem.y + ddy + targetDel.y, 0}] = currentCityID;
                                 }
                             }
                         }
@@ -633,6 +639,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y,0}] = cityType::desert;
+                    cityID[{x, y, 0}] = currentCityID;
                 }
             }
         }
@@ -644,6 +651,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     //      5,2단계 : 화산 및 화산도시 배치
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    currentCityID++;
     Point2 volcanoPos;
     while (1)
     {
@@ -936,6 +944,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
             if (cleanDistrict == false || noNearbyCity == false) continue;
             writeProphecy(elem.x, elem.y, 0, chunkType::city);
             cityTypeMap[{elem.x, elem.y, 0}] = cityType::volcano;
+            cityID[{elem.x, elem.y, 0}] = currentCityID;
             cityCoreVec.push_back({ elem.x, elem.y });
             volcanoCityPos = { elem.x, elem.y };
             cityNumber++;
@@ -984,6 +993,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
                 writeProphecy(targetX, targetY, 0, chunkType::city);
                 cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+                cityID[{targetX, targetY, 0}] = currentCityID;
                 cityPoints.push_back({ targetX,targetY });
 
                 float randomKey = randomRangeFloat(0.0, 1.0);
@@ -1011,6 +1021,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                             {
                                 writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                                 cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                                cityID[{elem.x + ddx, elem.y + ddy, 0}] = currentCityID;
                             }
                         }
                         else if (getProphecy(elem.x + ddx, elem.y + ddy, 0) == chunkType::deepSea || getProphecy(elem.x + ddx, elem.y + ddy, 0) == chunkType::shallowSea)
@@ -1049,6 +1060,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y,0}] = cityType::volcano;
+                    cityID[{x, y,0}] = currentCityID;
                 }
             }
         }
@@ -1058,6 +1070,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //      5,3단계 : 정글 및 정글도시 배치
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    currentCityID++;
     Point2 jungleCityPos = { 0,0 };
     {
         //정글 도시 배치
@@ -1104,6 +1117,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 if (cleanDistrict == false || noNearbyCity == false) continue;
                 writeProphecy(randX, randY, 0, chunkType::city);
                 cityTypeMap[{randX, randY, 0}] = cityType::jungle;
+                cityID[{randX, randY, 0}] = currentCityID;
                 cityCoreVec.push_back({ randX, randY });
                 jungleCityPos = { randX, randY };
                 cityNumber++;
@@ -1217,6 +1231,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
                 writeProphecy(targetX, targetY, 0, chunkType::city);
                 cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+                cityID[{targetX, targetY, 0}] = currentCityID;
                 cityPoints.push_back({ targetX,targetY });
 
                 float randomKey = randomRangeFloat(0.0, 1.0);
@@ -1244,6 +1259,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                             {
                                 writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                                 cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                                cityID[{elem.x + ddx, elem.y + ddy, 0}] = currentCityID;
                             }
                         }
                         else
@@ -1284,6 +1300,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y,0}] = cityType::jungle;
+                    cityID[{x, y,0}] = currentCityID;
                 }
             }
         }
@@ -1293,6 +1310,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //      5.4단계 : 설원도시 배치
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    currentCityID++;
     std::unordered_set<Point2, Point2::Hash> snowPoints;
     for (int y = 0; y < WORLD_DATA_SIZE; y++)
     {
@@ -1329,6 +1347,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
         if (cleanDistrict == false || noNearbyCity == false) continue;
         writeProphecy(elem.x, elem.y, 0, chunkType::city);
         cityTypeMap[{elem.x, elem.y, 0}] = cityType::snow;
+        cityID[{elem.x, elem.y, 0}] = currentCityID;
         cityCoreVec.push_back({ elem.x, elem.y });
         snowCityPos = { elem.x, elem.y };
         break;
@@ -1375,6 +1394,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
             writeProphecy(targetX, targetY, 0, chunkType::city);
             cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+            cityID[{targetX, targetY, 0}] = currentCityID;
             cityPoints.push_back({ targetX,targetY });
 
             float randomKey = randomRangeFloat(0.0, 1.0);
@@ -1402,6 +1422,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                         {
                             writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                             cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                            cityID[{elem.x + ddx, elem.y + ddy, 0}] = currentCityID;
                         }
                     }
                     else
@@ -1444,6 +1465,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y,0}] = cityType::snow;
+                    cityID[{x, y,0}] = currentCityID;
                 }
             }
         }
@@ -1452,6 +1474,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //      5,5단계 : 항구도시
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    currentCityID++;
 
     std::unordered_set<Point2,Point2::Hash> seaSide;
     for (int y = 1; y < WORLD_DATA_SIZE-1; y++)
@@ -1527,6 +1550,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
             if (cleanDistrict == false || noNearbyCity == false || dirtNumber < 100) continue;
             writeProphecy(randX, randY, 0, chunkType::city);
             cityTypeMap[{randX, randY, 0}] = cityType::port;
+            cityID[{randX, randY, 0}] = currentCityID;
             portCityPos = { randX,randY };
             portCityPoints.insert({ randX,randY });
             cityCoreVec.push_back({ randX, randY });
@@ -1575,6 +1599,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
             writeProphecy(targetX, targetY, 0, chunkType::city);
             cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+            cityID[{targetX, targetY, 0}] = currentCityID;
             portCityPoints.insert({ targetX,targetY });
 
             float randomKey = randomRangeFloat(0.0, 1.0);
@@ -1601,6 +1626,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                     {
                         writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                         cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                        cityID[{elem.x + ddx, elem.y + ddy, 0}] = currentCityID;
                         portCityPoints.insert({ elem.x + ddx, elem.y + ddy });
                     }
                 }
@@ -1653,6 +1679,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                     {
                         writeProphecy(x, y, 0, chunkType::city);
                         cityTypeMap[{x, y, 0}] = tgtCityType;
+                        cityID[{x, y, 0}] = currentCityID;
                     }
                 }
             }
@@ -1684,6 +1711,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y, 0}] = cityType::port;
+                    cityID[{x, y, 0}] = currentCityID;
                 }
             }
         }
@@ -1733,6 +1761,8 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
             if (cleanDistrict == false || noNearbyCity == false) continue;
             writeProphecy(randX, randY, 0, chunkType::city);
             cityTypeMap[{randX, randY, 0}] = cityType::normal;
+            currentCityID++;
+            cityID[{randX, randY, 0}] = currentCityID;
             cityCoreVec.push_back({ randX, randY });
             normalCityNumber++;
         }
@@ -1755,6 +1785,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
         
         if (cityTypeMap[{core.x, core.y, 0}] != cityType::normal) continue;
         cityType tgtCityType = cityTypeMap[{core.x, core.y, 0}];
+        int thisCityID = cityID[{core.x, core.y, 0}];
 
         auto cityChunkCond = [&](int x, int y, cityType inputTgtCityType) -> bool
             {
@@ -1786,6 +1817,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
 
             writeProphecy(targetX, targetY, 0, chunkType::city);
             cityTypeMap[{targetX, targetY, 0}] = tgtCityType;
+            cityID[{targetX, targetY, 0}] = thisCityID;
             cityPoints.push_back({ targetX,targetY });
 
             float randomKey = randomRangeFloat(0.0, 1.0);
@@ -1813,6 +1845,7 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                     {
                         writeProphecy(elem.x + ddx, elem.y + ddy, 0, chunkType::city);
                         cityTypeMap[{elem.x + ddx, elem.y + ddy, 0}] = tgtCityType;
+                        cityID[{elem.x + ddx, elem.y + ddy, 0}] = thisCityID;
 
                         if (tgtCityType == cityType::desert)
                         {
@@ -1858,6 +1891,17 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                 {
                     writeProphecy(x, y, 0, chunkType::city);
                     cityTypeMap[{x, y,0}] = cityType::normal;
+
+                    for (auto dir : { dir16::right,dir16::up,dir16::left,dir16::down })
+                    {
+                        Point3 del = dir2Coord(dir);
+                        if (getProphecy(x + del.x, y + del.y, 0) == chunkType::city)
+                        {
+                            cityID[{x, y, 0}] = cityID[{x + del.x, y + del.y, 0}];
+                            break;
+                        }
+                        errorBox(dir == dir16::down, L"주변에 도시타일이 없는 고립된 도시가 생성되었다.");
+                    }
                 }
             }
         }
@@ -2326,10 +2370,11 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
        cost[chunkType::cityRoad] = tuneParam.at(L"COST_CITY_ROAD");
        cost[chunkType::road] = tuneParam.at(L"COST_ROAD");
 
+       std::vector<Point2> cityCoreRoadVec;
        // n! / (r!(n-r)!) = nCr 대략 66개 정도인가?
        for (Point2 cityCore : cityCoreVec)
        {
-           std::priority_queue<std::pair<int, Point2>, std::vector<std::pair<int, Point2>>, std::greater<>> openNodes;
+           std::priority_queue<std::tuple<int, Point2, dir16>, std::vector<std::tuple<int, Point2, dir16>>, std::greater<>> openNodes;
            
            //중심에 가까운 도로 찾기
            const int CORE_NEARBY_ROAD = tuneParam.at(L"CORE_NEARBY_ROAD");
@@ -2354,18 +2399,32 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
            }
 
            errorBox(hiScorePoint == Point2{0, 0}, L"중심에 가까운 오픈노드 시작점 도로 찾기가 실패했다.");
-           openNodes.push({ 0,hiScorePoint });
-           auto distPtr = std::make_unique< std::array<std::array<int, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>>();
-           auto& dist = *distPtr;
-           for (int y = 0; y < WORLD_DATA_SIZE; y++)
-           {
-               for (int x = 0; x < WORLD_DATA_SIZE; x++)
-               {
-                   dist[x][y] = std::numeric_limits<int>::max();
-               }
-           }
-           dist[hiScorePoint.x][hiScorePoint.y] = 0;
+           openNodes.push({ 0,hiScorePoint,dir16::right });
+           openNodes.push({ 0,hiScorePoint,dir16::up });
+           openNodes.push({ 0,hiScorePoint,dir16::left });
+           openNodes.push({ 0,hiScorePoint,dir16::down });
 
+           cityCoreRoadVec.push_back(hiScorePoint);
+
+           //std::unordered_map<dir16, std::array<std::array<int, WORLD_DATA_SIZE>, WORLD_DATA_SIZE>> costMap;
+           std::vector<int> costMapVec(WORLD_DATA_SIZE* WORLD_DATA_SIZE * 4, std::numeric_limits<int>::max());
+           auto costMap = [&](int x, int y, dir16 d) -> int&
+               {
+                   switch (d)
+                   {
+                   case dir16::right: return costMapVec[WORLD_DATA_SIZE * WORLD_DATA_SIZE * 0 + WORLD_DATA_SIZE * y + x];
+                   case dir16::up: return costMapVec[WORLD_DATA_SIZE * WORLD_DATA_SIZE * 1 + WORLD_DATA_SIZE * y + x];
+                   case dir16::left: return costMapVec[WORLD_DATA_SIZE * WORLD_DATA_SIZE * 2 + WORLD_DATA_SIZE * y + x];
+                   case dir16::down: return costMapVec[WORLD_DATA_SIZE * WORLD_DATA_SIZE * 3 + WORLD_DATA_SIZE * y + x];
+                   }
+               };
+
+           costMap(hiScorePoint.x, hiScorePoint.y, dir16::right) = 0;
+           costMap(hiScorePoint.x, hiScorePoint.y, dir16::up) = 0;
+           costMap(hiScorePoint.x, hiScorePoint.y, dir16::left) = 0;
+           costMap(hiScorePoint.x, hiScorePoint.y, dir16::down) = 0;
+
+           const int ROAD_TURN_COST = tuneParam.at(L"ROAD_TURN_COST");
            while (openNodes.empty() == false)
            {
                //다익스트라 알고리즘 하나씩 꺼내서 시작
@@ -2377,9 +2436,50 @@ void WorldData::generateWorld(std::uint64_t inputSeed)
                //근데 또 각 도시에 진입한 순간을 알아야하는데... 도시별로 추상화 레이어를 하나 더 만들어야하나? 배열 하나면 가능하기는 하지만...
                //private에 배열 하나 만들어두고 위 생성 알고리즘에서 조금씩 수정해야겠군
 
+               int cCost = std::get<0>(openNodes.top());
+               Point2 cPoint = std::get<1>(openNodes.top());
+               dir16 cDir = std::get<2>(openNodes.top());
+               openNodes.pop();
+               
+               if (cCost > costMap(cPoint.x, cPoint.y, cDir)) continue; //큐에 있는 것 중에서 이미 만료된 것들을 스킵(앞의 얘가 이미 갱신)
+               // 같은 경우일 경우 자기 자신이고 이 경우에만 계속 진행해야됨을 유의할 것
+
+               for (dir16 tgtDir : {dir16::right, dir16::up, dir16::left, dir16::down })
+               {
+                   Point3 del = dir2Coord(tgtDir);
+                   Point2 nPoint = cPoint + Point2{ del.x, del.y };
+
+                   int turnCost = 0;
+                   if (tgtDir == reverse(cDir)) continue;
+                   if (tgtDir != cDir) turnCost = ROAD_TURN_COST;
+
+                   if (nPoint.x >= 0 && nPoint.x < WORLD_DATA_SIZE && nPoint.y >= 0 && nPoint.y < WORLD_DATA_SIZE)
+                   {
+                       chunkType nChunk = getProphecy(nPoint.x, nPoint.y, 0);
+                       if (nChunk == chunkType::cityRoad) turnCost = 0;
+                       if (cost.contains(nChunk)) //코스트가 정의된 것들만(건물 등은 여기서 필터링됨)
+                       {
+                           //새로 써진 비용이 원래 비용보다 적으면
+                           if (cCost + cost[nChunk] + turnCost < costMap(nPoint.x, nPoint.y, tgtDir))
+                           {
+
+                               costMap(nPoint.x, nPoint.y, tgtDir) = cCost + cost[nChunk] + turnCost; //갱신됨
+                               openNodes.push({ costMap(nPoint.x, nPoint.y, tgtDir),{nPoint.x,nPoint.y}, tgtDir });
+                           }
+                       }
+                   }
+               }
            }
            
            
+       }
+
+       //조합루프 도시간 거리쌍 계산
+       for (int i=0; i<cityCoreRoadVec.size(); i++)
+       {
+           for (int j=i + 1; j<cityCoreRoadVec.size(); j++)
+           {
+           }
        }
 
     }

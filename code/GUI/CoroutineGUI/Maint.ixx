@@ -248,19 +248,9 @@ public:
 
 				if (selectedIndex >= 0 && selectedIndex < items.size())
 				{
-					// 선택된 아이템으로 실제 작업 수행
-					if (maintMode == maintFlag::repair)
-					{
-						// 수리 로직 수행
-						// 예: items[selectedIndex]를 수리
-						dbgPrt(L"수리 실행: %ls\n", items[selectedIndex].name.c_str());
-					}
-					else if (maintMode == maintFlag::detach)
-					{
-						// 탈착 로직 수행
-						// 예: items[selectedIndex]를 분리
-						dbgPrt(L"탈착 실행: %ls\n", items[selectedIndex].name.c_str());
-					}
+					//아직 기능 미구현
+					if (maintMode == maintFlag::repair) dbgPrt(L"수리 실행: %ls\n", items[selectedIndex].name.c_str());
+					else if (maintMode == maintFlag::detach) dbgPrt(L"탈착 실행: %ls\n", items[selectedIndex].name.c_str());
 
 					close(aniFlag::null);
 					return;

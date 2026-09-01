@@ -84,7 +84,7 @@ public:
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> filledHeightMap;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> tempMap;
     std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> desertMap;
-    std::array<std::array<float, WORLD_DATA_SIZE>, WORLD_DATA_SIZE> desertNoise;
+    std::unordered_map<Point3, int, Point3::Hash> cityID;
 
     WorldData(std::uint64_t inputSeed) //생성자이며 최초에 지형 생성을 시작함
     {

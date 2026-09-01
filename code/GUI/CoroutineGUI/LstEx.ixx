@@ -18,31 +18,33 @@ import drawWindow;
 import World;
 import Sprite;
 
-//LstEx 옵션 구조체 : 스프라이트 인덱스, 이름, 출처(노란색 우측상단 표시)
-export struct LstExOption {
+export struct LstExOption 
+{
 	int sprIndex = 0;
 	std::wstring name;
-	std::wstring source; //출처 표시 (우측상단 노란색 작은 글씨)
+	std::wstring source;
 };
 
-//확장형 리스트 GUI
-//기존 Lst에 아이템 스프라이트 표시 + 출처(source) 표시 기능을 추가한 코루틴 GUI
-//coAnswer 반환형 : 선택한 목록의 인덱스 정수형 (Lst와 동일), 예로 0번째 선택지를 고르면 L"0" 반환
+//LstEx
+//coAnswer 반환형 : 현재 선택한 목록의 인덱스 숫자 정수형, 예로 0번째 선택지를 고르면 L"0" 반환
+//기존 Lst GUI와 다르게 선택지 옵션박스의 우측 상단에 아이템의 출처가 표시됨
+//예를 들어 리볼버 탄환을 장전할 때, 바닥타일과 옆의 상자에 있는 리볼버 탄환은 다른 아이템이니까 
+//선택지에 동시에 나올 경우 이를 구분하기 위함
 export class LstEx : public GUI
 {
 private:
 	const int MAX_BTN = 9;
-	int displayCount = MAX_BTN; //실제 표시되는 버튼 수 (옵션 수에 따라 동적)
-	int extraLines = 0; //안내 문자열이 1줄 초과 시 추가 줄 수
+	int displayCount = MAX_BTN;
+	int extraLines = 0;
 	inline static LstEx* ptr = nullptr;
 	int lstScroll = 0;
 	std::wstring lstTitleText;
 	std::wstring lstText;
 	std::vector<LstExOption> lstOptionVec;
 
-	Sprite* sprSet = nullptr; //왼쪽에 표시할 스프라이트셋 (nullptr이면 스프라이트 미표시)
-	float sprZoom = 2.0f;     //스프라이트 줌 배율 (16px 실질 콘텐츠 기준, 2.0 = 32px 표시)
-	bool showSource = true;   //출처 표시 여부
+	Sprite* sprSet = nullptr;
+	float sprZoom = 2.0f;
+	bool showSource = true;
 
 	SDL_Rect lstBase;
 	SDL_Rect lstWindow;
@@ -63,11 +65,9 @@ public:
 		sprSet = inputSprSet;
 		showSource = inputShowSource;
 
-		//옵션 수에 따라 표시 버튼 수 결정
 		displayCount = myMin(MAX_BTN, (int)lstOptionVec.size());
 		if (displayCount < 1) displayCount = 1;
 
-		//안내 문자열 줄 수 계산 (1줄 초과분만큼 높이 확장)
 		setFontSize(20);
 		int lineCount = queryLineCount(lstText, 500 - 15);
 		extraLines = myMax(0, lineCount - 1);
@@ -94,7 +94,7 @@ public:
 
 	void changeXY(int inputX, int inputY, bool center)
 	{
-		int lineH = extraLines * 24; //추가 줄에 의한 높이 확장
+		int lineH = extraLines * 24;
 		int dynamicH = 150 + displayCount * 50 + lineH;
 		lstBase = { 0, 0, 500, dynamicH };
 		lstWindow = { 0, 54, 500, dynamicH - 54 };
@@ -151,7 +151,6 @@ public:
 			setFont(fontType::mainFont);
 			drawTextCenterWidth(lstText, lstWindow.x + lstWindow.w / 2, lstBase.y + 45 + 22, lstBase.w - 15, -1);
 
-			//선택지 버튼 그리기
 			int hoverCursor = -1;
 
 			for (int i = 0; i < displayCount; i++)
@@ -159,26 +158,19 @@ public:
 				int currentItemIndex = lstScroll + i;
 				if (currentItemIndex < 0 || currentItemIndex >= lstOptionVec.size()) continue;
 
-				//마우스 호버/클릭 상태 감지
 				bool isHover = checkCursor(&lstBtn[i]);
 				bool isClick = isHover && click;
 				if (isHover) hoverCursor = currentItemIndex;
 
-				//버튼 배경
 				if (isClick)      drawFillRect(lstBtn[i], SDL_Color{ 25, 40, 120 }, 255);
 				else if (isHover) drawFillRect(lstBtn[i], SDL_Color{ 35, 55, 150 }, 255);
 				else              drawFillRect(lstBtn[i], SDL_Color{ 0, 0, 0 }, 180);
 
-				//버튼 배경 (보류 옵션임 투명 회색)
-				//if (isClick)      drawFillRect(lstBtn[i], SDL_Color{ 25, 40, 120 }, 230);
-				//else if (isHover) drawFillRect(lstBtn[i], SDL_Color{ 35, 55, 150 }, 200);
-				//else              drawFillRect(lstBtn[i], SDL_Color{ 30, 30, 35 }, 180);
 
 				drawRect(lstBtn[i], col::gray);
 
 				const LstExOption& opt = lstOptionVec[currentItemIndex];
 
-				//스프라이트 표시
 				int textStartX = lstBtn[i].x + 14;
 				if (sprSet != nullptr)
 				{
@@ -188,12 +180,10 @@ public:
 					textStartX = lstBtn[i].x + 48;
 				}
 
-				//아이템 이름 표시
 				setFontSize(21);
 				setFont(fontType::mainFont);
 				drawText(opt.name, textStartX, lstBtn[i].y + 10);
 
-				//출처 표시 (우측상단, 노란색, 작은 폰트)
 				if (showSource && !opt.source.empty())
 				{
 					setFontSize(13);
@@ -202,13 +192,11 @@ public:
 				}
 			}
 
-			//하단 호버 인덱스 표시
 			setFontSize(15);
 			std::wstring hoverText = L"-";
 			if (hoverCursor != -1) hoverText = std::to_wstring(hoverCursor + 1);
 			drawTextCenter(hoverText + L"/" + std::to_wstring(lstOptionVec.size()), lstWindow.x + lstWindow.w - 45, lstBase.y + lstBase.h - 26 + 12);
 
-			//스크롤바 (스크롤 필요할 때만 표시)
 			if (lstOptionVec.size() > displayCount)
 			{
 				drawFillRect(lstScrollBox, { 120, 120, 120 });
@@ -228,7 +216,6 @@ public:
 		}
 		else
 		{
-			//펼치기/접기 애니메이션
 			SDL_Rect vRect = lstBase;
 			vRect.x = vRect.x + vRect.w * (1 - getFoldRatio()) / 2;
 			vRect.w = vRect.w * getFoldRatio();
